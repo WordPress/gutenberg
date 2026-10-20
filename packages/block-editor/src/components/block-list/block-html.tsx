@@ -9,12 +9,15 @@ import {
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useNativeUndo } from '../../utils/native-undo';
+import type { TreeBlock } from '../../store/types';
 
-function BlockHTML( { clientId } ) {
+function BlockHTML( { clientId }: { clientId: string } ) {
 	const [ html, setHtml ] = useState( '' );
 	const nativeUndoRef = useNativeUndo();
 	const block = useSelect(
-		( select ) => select( blockEditorStore ).getBlock( clientId ),
+		// The HTML editor only renders for an existing block.
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ) as TreeBlock,
 		[ clientId ]
 	);
 	const { updateBlock } = useDispatch( blockEditorStore );

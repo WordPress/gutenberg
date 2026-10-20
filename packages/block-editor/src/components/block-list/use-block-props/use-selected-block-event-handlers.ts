@@ -9,7 +9,7 @@ import { unlock } from '../../../lock-unlock';
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
 
-function isColorTransparent( color ) {
+function isColorTransparent( color: string ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
 }
 
@@ -22,9 +22,20 @@ function isColorTransparent( color ) {
  * For a block that is part of a multi selection, only the drag handling is
  * added, so that dragging any of the selected blocks moves them all.
  *
- * @param {string} clientId Block client ID.
+ * @param options                 Options.
+ * @param options.clientId        Block client ID.
+ * @param options.isSelected      Whether the block is selected.
+ * @param options.isMultiSelected Whether the block is part of a multi selection.
  */
-export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
+export function useEventHandlers( {
+	clientId,
+	isSelected,
+	isMultiSelected,
+}: {
+	clientId: string;
+	isSelected?: boolean;
+	isMultiSelected?: boolean;
+} ) {
 	const {
 		getBlockRootClientId,
 		getSelectedBlockClientIds,
@@ -44,7 +55,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isSelected && ! isMultiSelected ) {
 				return;
@@ -57,9 +68,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			 * allow for easy deletion and continuous writing flow to add additional
 			 * content.
 			 *
-			 * @param {KeyboardEvent} event Keydown event.
+			 * @param event Keydown event.
 			 */
-			function onKeyDown( event ) {
+			function onKeyDown( event: KeyboardEvent ) {
 				const { keyCode, target } = event;
 
 				if (
@@ -70,7 +81,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					return;
 				}
 
-				if ( target !== node || isTextField( target ) ) {
+				// Key events target elements.
+				if ( target !== node || isTextField( target as Element ) ) {
 					return;
 				}
 
@@ -93,9 +105,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			 * dragging the draggable block, so the host and the pressed
 			 * field are taken out of editing for the length of the press.
 			 *
-			 * @param {MouseEvent} event Mouse down event.
+			 * @param event Mouse down event.
 			 */
-			function onMouseDown( event ) {
+			function onMouseDown( event: MouseEvent ) {
 				if (
 					event.button !== 0 ||
 					event.shiftKey ||
@@ -116,9 +128,16 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				const hadDraggable = node.getAttribute( 'draggable' );
 				node.setAttribute( 'draggable', 'true' );
 				const editables = [
-					node.parentElement.closest( '[contenteditable="true"]' ),
-					event.target.closest( '[contenteditable="true"]' ),
-				].filter( Boolean );
+					// A rendered block has a parent.
+					node.parentElement!.closest< HTMLElement >(
+						'[contenteditable="true"]'
+					),
+					// Mouse events target elements.
+					( event.target as Element ).closest< HTMLElement >(
+						'[contenteditable="true"]'
+					),
+					// `Boolean` drops the missing editing hosts.
+				].filter( Boolean ) as HTMLElement[];
 
 				for ( const element of editables ) {
 					element.contentEditable = 'false';
@@ -146,20 +165,31 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			// right of the pointer, so the pointer stays over the drop
 			// targets, the next selected block peeks out from underneath it,
 			// and a count of the dragged blocks sits on its top right corner.
-			function startPile( event, clientIds, rect, inverted ) {
+			function startPile(
+				event: DragEvent,
+				clientIds: string[],
+				rect: DOMRect,
+				inverted: number
+			) {
 				const { ownerDocument } = node;
 				const index = clientIds.indexOf( clientId );
-				const backNode = ownerDocument.querySelector(
+				const backNode = ownerDocument.querySelector< HTMLElement >(
 					`[data-block="${
 						clientIds[ index + 1 ] ?? clientIds[ index - 1 ]
 					}"]`
 				);
 				// Scales a block down to a fixed diagonal.
-				const cardScale = ( { width, height } ) =>
+				const cardScale = ( { width, height }: DOMRect ) =>
 					Math.min( 1, 420 / Math.hypot( width, height ) );
 				// Moves a block's top left corner to x, y, compensating for
 				// scaling around the center.
-				const toTransform = ( from, x, y, scale, turn = 0 ) =>
+				const toTransform = (
+					from: DOMRect,
+					x: number,
+					y: number,
+					scale: number,
+					turn = 0
+				) =>
 					`translate(${
 						( x - from.left - ( from.width * ( 1 - scale ) ) / 2 ) *
 						inverted
@@ -181,14 +211,16 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				node.style.transform = toTransform( rect, left, top, scale );
 				node.style.opacity = '';
 
-				let restoreBackNode;
+				let restoreBackNode: ( () => void ) | undefined;
 				if ( backNode ) {
 					const backRect = backNode.getBoundingClientRect();
 					const backScale = cardScale( backRect );
 					const backStyle = backNode.getAttribute( 'style' );
 					const backId = backNode.id;
-					const backClone = backNode.cloneNode();
+					// A shallow clone of an element is an element.
+					const backClone = backNode.cloneNode() as HTMLElement;
 					backClone.style.display = 'none';
+					// @ts-expect-error Bug: assigning `null` sets the id to the string `null`.
 					backNode.id = null;
 					backNode.after( backClone );
 					backNode.dataset.dragPile = 'true';
@@ -202,7 +234,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					const { style } = backNode;
 					if (
 						isColorTransparent(
-							ownerDocument.defaultView.getComputedStyle(
+							// A rendered block's document has a window.
+							ownerDocument.defaultView!.getComputedStyle(
 								backNode
 							).backgroundColor
 						)
@@ -226,7 +259,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				countBadge.textContent = String( clientIds.length );
 				ownerDocument.body.appendChild( countBadge );
 
-				function positionCountBadge( clientX, clientY ) {
+				function positionCountBadge(
+					clientX: number,
+					clientY: number
+				) {
 					countBadge.style.left = `${
 						( clientX + PILE_OFFSET + width ) * inverted - 12
 					}px`;
@@ -237,7 +273,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				positionCountBadge( event.clientX, event.clientY );
 
 				return {
-					move( clientX, clientY ) {
+					move( clientX: number, clientY: number ) {
 						if ( backNode ) {
 							backNode.style.pointerEvents = 'none';
 							backNode.style.top = node.style.top;
@@ -261,10 +297,11 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			 * To do: we must handle partial selections in the future and
 			 * clean up the drag target.
 			 *
-			 * @param {DragEvent} event Drag event.
+			 * @param event Drag event.
 			 */
-			function onDragStart( event ) {
-				const { target } = event;
+			function onDragStart( event: DragEvent ) {
+				// Checked to be an element below, before it is used as one.
+				const target = event.target as Element;
 				const { activeElement } = node.ownerDocument;
 				// The drag may start on an image, which is draggable by
 				// default: it is the block's drag as long as no nested
@@ -289,7 +326,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
 					// Rich text carries a drag of the text selected in a field.
-					if ( ! event.dataTransfer.types.includes( 'rich-text' ) ) {
+					// Drag events from the browser carry a data transfer.
+					if ( ! event.dataTransfer!.types.includes( 'rich-text' ) ) {
 						event.preventDefault();
 					}
 					return;
@@ -302,12 +340,15 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					srcClientIds: clientIds,
 					srcRootClientId: getBlockRootClientId( clientIds[ 0 ] ),
 				} );
-				event.dataTransfer.effectAllowed = 'move'; // remove "+" cursor
-				event.dataTransfer.clearData();
-				event.dataTransfer.setData( 'wp-blocks', data );
+				// Drag events from the browser carry a data transfer.
+				const dataTransfer = event.dataTransfer!;
+				dataTransfer.effectAllowed = 'move'; // remove "+" cursor
+				dataTransfer.clearData();
+				dataTransfer.setData( 'wp-blocks', data );
 				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-				const selection = defaultView.getSelection();
+				// A rendered block's document has a window with a selection.
+				const defaultView = ownerDocument.defaultView!;
+				const selection = defaultView.getSelection()!;
 				selection.removeAllRanges();
 
 				// Setting the drag chip as the drag image actually works, but
@@ -323,22 +364,24 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				dragElement.style.position = 'fixed';
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
-				event.dataTransfer.setDragImage( dragElement, 0, 0 );
+				dataTransfer.setDragImage( dragElement, 0, 0 );
 
 				const rect = node.getBoundingClientRect();
 
 				// Remove the id and leave it on a shallow clone so that drop
 				// target calculations are correct.
 				const id = node.id;
-				const clone = node.cloneNode();
+				// A clone of an element is an element.
+				const clone = node.cloneNode() as HTMLElement;
 				clone.style.display = 'none';
+				// @ts-expect-error Bug: this sets the ID to `"null"`, not removes it.
 				node.id = null;
 				node.after( clone );
 
 				let _scale = 1;
 
 				{
-					let parentElement = node;
+					let parentElement: HTMLElement | null = node;
 					while ( ( parentElement = parentElement.parentElement ) ) {
 						const { scale } =
 							defaultView.getComputedStyle( parentElement );
@@ -351,7 +394,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 
 				const inverted = 1 / _scale;
 
-				const originalNodeProperties = {};
+				const originalNodeProperties: Record< string, string > = {};
 				for ( const property of [
 					'transform',
 					'transformOrigin',
@@ -363,7 +406,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					'pointerEvents',
 					'opacity',
 					'backgroundColor',
-				] ) {
+					// The names are style properties.
+				] as const ) {
 					originalNodeProperties[ property ] = node.style[ property ];
 				}
 
@@ -406,7 +450,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					)
 				) {
 					let bgColor = 'transparent';
-					let parentElement = node;
+					let parentElement: HTMLElement | null = node;
 					while ( ( parentElement = parentElement.parentElement ) ) {
 						const { backgroundColor } =
 							defaultView.getComputedStyle( parentElement );
@@ -427,7 +471,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				let lastClientX = originClientX;
 				let lastClientY = originClientY;
 
-				function dragOver( e ) {
+				function dragOver( e: DragEvent ) {
 					// Only trigger `over` if the mouse has moved.
 					if (
 						e.clientX === lastClientX &&
@@ -466,7 +510,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
 					) ) {
-						node.style[ property ] = value;
+						// These are the style properties saved above.
+						( node.style as unknown as Record< string, string > )[
+							property
+						] = value;
 					}
 					clone.remove();
 					node.id = id;
@@ -511,9 +558,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
 			 *
-			 * @param {MouseEvent} event Double-click event.
+			 * @param event Double-click event.
 			 */
-			function onDoubleClick( event ) {
+			function onDoubleClick( event: MouseEvent ) {
 				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
 				const isSyncedPattern = isReusableBlock( block );

@@ -4,7 +4,7 @@ import { IntersectionObserver } from '../';
 
 export function useIntersectionObserver() {
 	const observer = useContext( IntersectionObserver );
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( observer ) {
 				observer.observe( node );
@@ -12,6 +12,7 @@ export function useIntersectionObserver() {
 					observer.unobserve( node );
 				};
 			}
+			return undefined;
 		},
 		[ observer ]
 	);

@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import type { ComponentProps, ComponentType } from 'react';
+import type { DataRegistry } from '@wordpress/data';
 import {
 	AsyncModeProvider,
 	useSelect,
@@ -14,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
-import BlockListAppender from '../block-list-appender';
+import UntypedBlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
@@ -26,16 +28,27 @@ import {
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
+import type { BlockListItemsProps, BlockListProps } from './types';
 
-export const IntersectionObserver = createContext();
+// The appender is still JavaScript, so its inferred props are all required.
+const BlockListAppender = UntypedBlockListAppender as ComponentType<
+	Partial< ComponentProps< typeof UntypedBlockListAppender > >
+>;
+
+export const IntersectionObserver = createContext<
+	globalThis.IntersectionObserver | undefined
+>( undefined );
 IntersectionObserver.displayName = 'IntersectionObserverContext';
 
-const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
+const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap<
+	DataRegistry,
+	Array< [ string, boolean ] >
+>();
 const delayedBlockVisibilityDebounceOptions = {
 	trailing: true,
 };
 
-function Root( { className, ...settings } ) {
+function Root( { className, ...settings }: BlockListProps ) {
 	const {
 		isOutlineMode,
 		isFocusMode,
@@ -71,9 +84,10 @@ function Root( { className, ...settings } ) {
 
 	const delayedBlockVisibilityUpdates = useDebounce(
 		useCallback( () => {
-			const updates = {};
+			const updates: Record< string, boolean > = {};
 			pendingBlockVisibilityUpdatesPerRegistry
-				.get( registry )
+				// The observer queues the updates before scheduling this.
+				.get( registry )!
 				.forEach( ( [ id, isIntersecting ] ) => {
 					updates[ id ] = isIntersecting;
 				} );
@@ -94,9 +108,13 @@ function Root( { className, ...settings } ) {
 				pendingBlockVisibilityUpdatesPerRegistry.set( registry, [] );
 			}
 			for ( const entry of entries ) {
-				const clientId = entry.target.getAttribute( 'data-block' );
+				// Only block elements are observed.
+				const clientId = entry.target.getAttribute(
+					'data-block'
+				) as string;
 				pendingBlockVisibilityUpdatesPerRegistry
-					.get( registry )
+					// The queue is created above.
+					.get( registry )!
 					.push( [ clientId, entry.isIntersecting ] );
 			}
 			delayedBlockVisibilityUpdates();
@@ -128,7 +146,11 @@ function Root( { className, ...settings } ) {
 	);
 }
 
-function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+function StopEditingContentOnlySectionOnOutsideSelect( {
+	clientId,
+}: {
+	clientId: string;
+} ) {
 	const { stopEditingContentOnlySection } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -157,7 +179,7 @@ function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
 	return null;
 }
 
-export default function BlockList( settings ) {
+export default function BlockList( settings: BlockListProps ) {
 	return (
 		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
 			<Root { ...settings } />
@@ -165,8 +187,8 @@ export default function BlockList( settings ) {
 	);
 }
 
-const EMPTY_ARRAY = [];
-const EMPTY_SET = new Set();
+const EMPTY_ARRAY: string[] = [];
+const EMPTY_SET = new Set< string >();
 
 function Items( {
 	placeholder,
@@ -174,7 +196,7 @@ function Items( {
 	renderAppender: CustomAppender,
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
-} ) {
+}: BlockListItemsProps ) {
 	// Avoid passing CustomAppender to useSelect because it could be a new
 	// function on every render.
 	const hasAppender = CustomAppender !== false;
@@ -297,7 +319,7 @@ function Items( {
 
 	return (
 		<LayoutProvider value={ layout }>
-			{ items.map( ( clientId ) => (
+			{ items.map( ( clientId: string ) => (
 				<AsyncModeProvider
 					key={ clientId }
 					value={
@@ -345,7 +367,7 @@ function Items( {
 	);
 }
 
-export function BlockListItems( props ) {
+export function BlockListItems( props: BlockListItemsProps ) {
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
