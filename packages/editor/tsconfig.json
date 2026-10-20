@@ -25,7 +25,7 @@
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../dom" },
+		{ "path": "../dom/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../global-styles-ui" },

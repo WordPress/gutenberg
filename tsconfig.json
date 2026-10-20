@@ -24,6 +24,7 @@
 		{ "path": "packages/date" },
 		{ "path": "packages/deprecated" },
 		{ "path": "packages/design-system-mcp" },
+		{ "path": "packages/dom" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/editor" },
 		{ "path": "packages/element" },
