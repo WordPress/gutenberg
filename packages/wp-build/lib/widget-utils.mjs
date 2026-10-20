@@ -110,7 +110,7 @@ export function getWidgetMetadata( rootDir, widgetName ) {
 
 /**
  * Supported source extensions for widget entry files, in priority order.
- * Must stay aligned with SOURCE_EXTENSIONS in build.mjs.
+ * Must stay aligned with SOURCE_EXTENSIONS in source-files.mjs.
  */
 const WIDGET_EXTENSIONS = [
 	'tsx',

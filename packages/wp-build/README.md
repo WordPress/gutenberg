@@ -596,11 +596,11 @@ Widgets provide a file-based discovery system for building self-contained UI com
 ```text
 widgets/
   hello-world/
-    widget.json     # Static discovery metadata (required)
-    widget.ts       # Runtime values entry point (optional)
-    render.tsx      # UI component entry point (optional)
-    render.scss     # Optional styles (bundled inline when imported from render.tsx)
-    package.json    # Optional npm dependencies manifest
+    widget.json       # Static discovery metadata (required)
+    widget.ts         # Runtime values entry point (optional)
+    render.tsx        # UI component entry point (optional)
+    style.module.css  # Optional styles, imported from render.tsx and injected at runtime
+    package.json      # Optional npm dependencies manifest
 ```
 
 ### Why two entries?
@@ -609,9 +609,10 @@ Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata
 
 | Concern                                                            | Lives in          | Reason                                                                                                                           |
 | ------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Identity (`name`)                                                  | both (must match) | server needs it to register; client uses it to resolve the runtime entry                                                         |
+| Identity (`name`)                                                  | `widget.json`     | server needs it to register; the record carries it to the client                                                                 |
 | Translatable metadata (`title`, `description`, `help`, `keywords`) | `widget.json`     | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime                             |
 | Framing (`category`, `presentation`)                               | `widget.json`     | plain JSON the host reads without a JS runtime                                                                                   |
+| Icon and actions (`icon`, `actions`)                               | `widget.json`     | plain JSON; the icon is a registered name resolved client-side, action labels are translated server-side via `textdomain`        |
 | Attribute schema (types, options, labels, `relevance`)             | `widget.json`     | plain JSON; labels translated server-side via `textdomain`; a `widget.ts` entry with the same `id` adds what JSON cannot express |
 | `example` attributes                                               | `widget.json`     | plain JSON; a `widget.ts` `example` wins when its values need code                                                               |
 | Attribute props that need code                                     | `widget.ts`       | runtime values                                                                                                                   |
@@ -642,12 +643,14 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 - **`title`** (optional): Human-readable title. Translated server-side using `textdomain`.
 - **`description`** (optional): Short description. Translated server-side using `textdomain`.
 - **`help`** (optional): Contextual help note for compact surfaces. An object with `content` (may carry `<em>`/`<strong>`) and optional `links` (`label`, `href`). Translated server-side using `textdomain`.
+- **`icon`** (optional): Registered icon name (`collection/icon-name`), resolved client-side through the site's icon registry. A name that does not match the shape is dropped at registration.
+- **`actions`** (optional): Declarative actions, each with `id`, `label` and `href`, plus optional `icon`, `relevance` (`high`, `medium`, `low`), `download` and `openInNewTab`. Labels are translated server-side using `textdomain`. A relative `href` naming a file in the widget directory resolves to its URL at registration; `data:` and `javascript:` hrefs are rejected.
 - **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
 - **`attributes`** (optional): Attribute schema, one entry per attribute with the JSON-expressible subset of a DataViews `Field` (`id`, `type`, `label`, `elements`, `isValid` without `custom`, ...) plus an optional `relevance` (`high`, `medium`, `low`). `type` may name a registered field type. `label`, `header`, `description`, `placeholder`, and option labels and descriptions are translated server-side using `textdomain`.
 - **`example`** (optional): Structured example, `{ "attributes": { … } }`: the attributes hosts preview the widget with, and apply to a new instance created without any. JSON values only; an `example` in `widget.ts` wins over it.
 - **`category`** (optional): Grouping category for filtering
 - **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
-- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, `keywords`, and attribute labels
+- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, `keywords`, action labels and attribute labels
 
 ### `widget.ts` — runtime values
 
@@ -663,7 +666,6 @@ type HelloWorldAttributes = {
 };
 
 const widget = {
-	name: 'my-plugin/hello-world',
 	attributes: [ { id: 'greeting', Edit: GreetingControl } ] satisfies Partial<
 		WidgetAttributeField< HelloWorldAttributes >
 	>[],
@@ -676,7 +678,7 @@ Entries merge by `id` with the `widget.json` schema: the JSON value wins a share
 
 ### `render.tsx` — UI component
 
-The render entry receives `attributes` matching the schema declared in `widget.json`. It is bundled with CSS support (import `.scss` / `.css` directly).
+The render entry receives `attributes` matching the schema declared in `widget.json` and, when the host allows edits, `setAttributes`. Styles are imported from the entry, as a CSS Module (`style.module.css`) or a plain `.css` / `.scss` file, and injected at runtime.
 
 ```tsx
 interface HelloWorldRenderProps {
@@ -698,15 +700,15 @@ export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
 }
 ```
 
-All non-JSON entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`, `.mjs`.
+All non-JSON entries are optional. Either entry may use any of `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts` or `.cts`; ship one file per entry.
 
 ### Widgets Build Output
 
 The build system generates:
 
-- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM)
+- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM), when the widget ships a `render.*` entry
 - `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
-- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
+- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM), when the widget ships a `widget.*` entry
 - `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
 - `build/widgets/registry.php` — Widget registry data
 - `build/widgets.php` — Script module registration logic
