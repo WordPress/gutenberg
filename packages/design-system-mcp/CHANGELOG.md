@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add a `get_guidance` tool that exposes usage guidelines, best practices, and migration guides from the Storybook docs, and point to it from the other tool descriptions and the server instructions.
+-   Add a `get_guidance` tool that exposes usage guidelines, best practices, and migration guides from the Storybook docs, and point to it from the other tool descriptions and the server instructions ([#85203](https://github.com/WordPress/gutenberg/pull/85203)).
 
 ## 0.15.0 (2026-10-20)
 
