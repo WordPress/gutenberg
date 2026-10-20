@@ -447,7 +447,7 @@ test.describe( 'Block Notes', () => {
 		// and its reading keys are free to read the note text.
 		const list = sidebar.getByRole( 'list' );
 		await expect( list ).toBeVisible();
-		await expect( list ).toHaveAccessibleName( 'Unresolved notes' );
+		await expect( list ).toHaveAccessibleName( 'All notes' );
 		await expect( sidebar.getByRole( 'tree' ) ).toHaveCount( 0 );
 		await expect( sidebar.getByRole( 'treeitem' ) ).toHaveCount( 0 );
 
@@ -1477,9 +1477,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Selection persistence',
 			} );
 
-			const thread = page.getByRole( 'listitem', {
-				name: /Note: Selection persistence/,
-			} );
+			const thread = blockNoteUtils.getThread( 'Selection persistence' );
 			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
@@ -1584,18 +1582,11 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
 			await expect(
-				settings
-					.getByRole( 'listitem' )
-					.filter( { hasText: 'First note on block' } )
+				blockNoteUtils.getThread( 'First note on block' )
 			).toBeVisible();
 			await expect(
-				settings
-					.getByRole( 'listitem' )
-					.filter( { hasText: 'Second note on block' } )
+				blockNoteUtils.getThread( 'Second note on block' )
 			).toBeVisible();
 
 			// noteId is stored as an array; the array shape (vs. a child

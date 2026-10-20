@@ -49,9 +49,18 @@ test.describe( 'Block Notes: floating notes', () => {
 	}
 
 	function getThread( page, content ) {
-		return getFloatingNotes( page )
-			.getByRole( 'listitem' )
-			.filter( { hasText: content } );
+		return (
+			getFloatingNotes( page )
+				.getByRole( 'listitem' )
+				.filter( { hasText: content } )
+				// Skip the new note form while it still holds the typed text.
+				.filter( {
+					hasNot: page.getByRole( 'textbox', {
+						name: 'New note',
+						exact: true,
+					} ),
+				} )
+		);
 	}
 
 	// Space reserved for the notes inside the canvas.
