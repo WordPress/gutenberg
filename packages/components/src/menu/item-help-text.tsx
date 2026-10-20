@@ -1,12 +1,14 @@
+import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
-import * as Styled from './styles';
+import { Truncate } from '../truncate';
+import styles from './style.module.scss';
 
 export const ItemHelpText = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function UnforwardedItemHelpText( props, ref ) {
+>( function UnforwardedItemHelpText( { className, ...props }, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
@@ -15,5 +17,12 @@ export const ItemHelpText = forwardRef<
 		);
 	}
 
-	return <Styled.ItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />;
+	return (
+		<Truncate
+			numberOfLines={ 2 }
+			ref={ ref }
+			{ ...props }
+			className={ clsx( styles[ 'item-help-text' ], className ) }
+		/>
+	);
 } );
