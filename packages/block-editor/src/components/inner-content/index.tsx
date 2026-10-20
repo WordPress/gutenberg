@@ -31,11 +31,11 @@ const LAYOUT = { type: 'default', alignments: [] };
  * elements. Inner blocks are locked: they can be edited in place but not
  * moved, removed, or added to.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Client ID of the block whose inner content
- *                                should be rendered.
+ * @param props          Component props.
+ * @param props.clientId Client ID of the block whose inner content should
+ *                       be rendered.
  */
-export default function InnerContent( { clientId } ) {
+export default function InnerContent( { clientId }: { clientId: string } ) {
 	const { innerContent, order, selectedClientIds } = useSelect(
 		( select ) => {
 			const { getBlock, getBlockOrder, getSelectedBlockClientIds } =
@@ -59,11 +59,12 @@ export default function InnerContent( { clientId } ) {
 			.join( '' );
 	}, [ innerContent ] );
 
-	const containerRef = useRef();
-	const [ slots, setSlots ] = useState( [] );
+	const containerRef = useRef< HTMLDivElement >( null );
+	const [ slots, setSlots ] = useState< HTMLElement[] >( [] );
 
 	useLayoutEffect( () => {
-		const container = containerRef.current;
+		// The container renders before the layout effect runs.
+		const container = containerRef.current!;
 
 		// Sanitize before injecting into the canvas: `safeHTML` removes
 		// `<script>` elements and inline event handlers, matching how block
@@ -71,7 +72,9 @@ export default function InnerContent( { clientId } ) {
 		container.innerHTML = safeHTML( html );
 
 		setSlots(
-			Array.from( container.querySelectorAll( SLOT_TAG_NAME ) ).sort(
+			Array.from(
+				container.querySelectorAll< HTMLElement >( SLOT_TAG_NAME )
+			).sort(
 				( a, b ) =>
 					Number( a.dataset.slotIndex ) -
 					Number( b.dataset.slotIndex )

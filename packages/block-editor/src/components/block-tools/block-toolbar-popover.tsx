@@ -7,18 +7,21 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { store as blockEditorStore } from '../../store';
 import { PrivateBlockToolbar } from '../block-toolbar';
+import type { BlockToolbarPopoverProps } from './types';
 
 export default function BlockToolbarPopover( {
 	clientId,
 	isTyping,
 	__unstableContentRef,
-} ) {
+}: BlockToolbarPopoverProps ) {
 	const { capturingClientId, isInsertionPointVisible, lastClientId } =
 		useSelectedBlockToolProps( clientId );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
-	const initialToolbarItemIndexRef = useRef();
+	const initialToolbarItemIndexRef = useRef< number | undefined >(
+		undefined
+	);
 
 	useEffect( () => {
 		// Resets the index whenever the active block changes so this is not
@@ -31,6 +34,7 @@ export default function BlockToolbarPopover( {
 
 	useShortcut( 'core/block-editor/focus-toolbar', () => {
 		isToolbarForcedRef.current = true;
+		// @ts-expect-error `stopTyping` ignores the argument.
 		stopTyping( true );
 	} );
 

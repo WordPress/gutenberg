@@ -2,8 +2,11 @@ import clsx from 'clsx';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
+import type { ZoomOutModeInserterButtonProps } from './types';
 
-function ZoomOutModeInserterButton( { onClick } ) {
+function ZoomOutModeInserterButton( {
+	onClick,
+}: ZoomOutModeInserterButtonProps ) {
 	return (
 		<Button
 			variant="primary"

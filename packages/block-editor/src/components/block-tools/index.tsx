@@ -1,3 +1,5 @@
+import type { KeyboardEvent } from 'react';
+import type { SelectFunction } from '@wordpress/data';
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
@@ -7,6 +9,7 @@ import { useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
+import type { TreeBlock } from '../../store/types';
 import EmptyBlockInserter from './empty-block-inserter';
 import {
 	InsertionPointOpenRef,
@@ -23,8 +26,9 @@ import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
 import MultiBlockFormatEdit from '../rich-text/multi-block-format-edit';
+import type { BlockToolsProps } from './types';
 
-function selector( select ) {
+function selector( select: SelectFunction ) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
@@ -64,7 +68,7 @@ export default function BlockTools( {
 	children,
 	__unstableContentRef,
 	...props
-} ) {
+}: BlockToolsProps ) {
 	const {
 		clientId,
 		hasFixedToolbar,
@@ -110,7 +114,7 @@ export default function BlockTools( {
 		hideViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
-	function onKeyDown( event ) {
+	function onKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -177,7 +181,8 @@ export default function BlockTools( {
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			if ( event.target.closest( '[role=toolbar]' ) ) {
+			// Key events target elements.
+			if ( ( event.target as Element ).closest( '[role=toolbar]' ) ) {
 				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
 				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
 				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
@@ -199,9 +204,13 @@ export default function BlockTools( {
 			// skip collapsing the list view, and allow the keyboard shortcut to be handled by the text field.
 			// This condition checks for both the active element and the active element within an iframed editor.
 			if (
-				isTextField( event.target ) ||
+				// Key events target elements.
+				isTextField( event.target as Element ) ||
 				isTextField(
-					event.target?.contentWindow?.document?.activeElement
+					// An iframe target has a window with a document, whose active
+					// element `isTextField` reads.
+					( event.target as HTMLIFrameElement )?.contentWindow
+						?.document?.activeElement as Element
 				)
 			) {
 				return;
@@ -214,7 +223,11 @@ export default function BlockTools( {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( clientIds );
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = groupBlocks( blocks, groupingBlockName );
+				const newBlocks = groupBlocks(
+					blocks,
+					// `isGroupable` requires a grouping block.
+					groupingBlockName!
+				);
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 			}
@@ -242,8 +255,9 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( clientIds );
-				const supportsBlockVisibility = blocks.every( ( block ) =>
-					hasBlockSupport( block.name, 'visibility', true )
+				const supportsBlockVisibility = blocks.every(
+					( block: TreeBlock ) =>
+						hasBlockSupport( block.name, 'visibility', true )
 				);
 
 				if ( ! supportsBlockVisibility ) {
@@ -255,7 +269,7 @@ export default function BlockTools( {
 				// (e.g. Revisions UI with isPreviewMode).
 				if (
 					clientIds.some(
-						( id ) =>
+						( id: string ) =>
 							getBlockEditingMode( id ) !== 'default' ||
 							! canEditBlock( id )
 					)
@@ -329,6 +343,7 @@ export default function BlockTools( {
 				/>
 				{ isZoomOutMode && ! isDragging && (
 					<ZoomOutModeInserters
+						// @ts-expect-error The inserters ignore `__unstableContentRef`.
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }

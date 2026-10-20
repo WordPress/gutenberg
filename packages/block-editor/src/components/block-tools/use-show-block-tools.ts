@@ -6,7 +6,7 @@ import { unlock } from '../../lock-unlock';
 /**
  * Source of truth for which block tools are showing in the block editor.
  *
- * @return {Object} Object of which block tools will be shown.
+ * @return Object of which block tools will be shown.
  */
 export function useShowBlockTools() {
 	return useSelect( ( select ) => {

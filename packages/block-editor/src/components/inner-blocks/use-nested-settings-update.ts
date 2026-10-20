@@ -2,18 +2,23 @@ import { useLayoutEffect, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
+import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
+import type { BlockListSettings, SettingsByClientId } from '../../store/types';
+import type { Layout } from '../../layouts/types';
+import type { DirectInsert, DirectInsertBlock } from './types';
 
-/** @typedef {import('../../selectors').WPDirectInsertBlock } WPDirectInsertBlock */
-
-const pendingSettingsUpdates = new WeakMap();
+const pendingSettingsUpdates = new WeakMap<
+	DataRegistry,
+	SettingsByClientId
+>();
 
 // Creates a memoizing caching function that remembers the last value and keeps returning it
 // as long as the new values are shallowly equal. Helps keep dependencies stable.
-function createShallowMemo() {
-	let value;
-	return ( newValue ) => {
+function createShallowMemo< T >() {
+	let value: T | undefined;
+	return ( newValue: T ) => {
 		if ( value === undefined || ! isShallowEqual( value, newValue ) ) {
 			value = newValue;
 		}
@@ -21,8 +26,8 @@ function createShallowMemo() {
 	};
 }
 
-function useShallowMemo( value ) {
-	const [ memo ] = useState( createShallowMemo );
+function useShallowMemo< T >( value: T ) {
+	const [ memo ] = useState( createShallowMemo< T > );
 	return memo( value );
 }
 
@@ -33,40 +38,40 @@ function useShallowMemo( value ) {
  * the block-editor store, then the store is updated with the new settings which
  * came from props.
  *
- * @param {string}               clientId                   The client ID of the block to update.
- * @param {string}               parentLock
- * @param {string[]}             allowedBlocks              An array of block names which are permitted
- *                                                          in inner blocks.
- * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
- * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?boolean}             directInsert               If a default block should be inserted directly by the appender.
+ * @param clientId                   The client ID of the block to update.
+ * @param parentLock
+ * @param allowedBlocks              An array of block names which are permitted
+ *                                   in inner blocks.
+ * @param prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
+ * @param defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
+ * @param directInsert               If a default block should be inserted directly by the appender.
  *
- * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
+ * @param __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
  *
- * @param {?boolean}             __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ * @param __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
  *
- * @param {string}               [templateLock]             The template lock specified for the inner
- *                                                          blocks component. (e.g. "all")
- * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
- *                                                          in the inner blocks component rather than on
- *                                                          the child block.
- * @param {string}               orientation                The direction in which the block
- *                                                          should face.
- * @param {Object}               layout                     The layout object for the block container.
+ * @param templateLock               The template lock specified for the inner
+ *                                   blocks component. (e.g. "all")
+ * @param captureToolbars            Whether or children toolbars should be shown
+ *                                   in the inner blocks component rather than on
+ *                                   the child block.
+ * @param orientation                The direction in which the block
+ *                                   should face.
+ * @param layout                     The layout object for the block container.
  */
 export default function useNestedSettingsUpdate(
-	clientId,
-	parentLock,
-	allowedBlocks,
-	prioritizedInserterBlocks,
-	defaultBlock,
-	directInsert,
-	__experimentalDefaultBlock,
-	__experimentalDirectInsert,
-	templateLock,
-	captureToolbars,
-	orientation,
-	layout
+	clientId: string,
+	parentLock: string | false | undefined,
+	allowedBlocks: boolean | string[] | undefined,
+	prioritizedInserterBlocks: string[] | undefined,
+	defaultBlock: DirectInsertBlock | undefined,
+	directInsert: DirectInsert | undefined,
+	__experimentalDefaultBlock: DirectInsertBlock | undefined,
+	__experimentalDirectInsert: DirectInsert | undefined,
+	templateLock: string | false | undefined,
+	captureToolbars: boolean | undefined,
+	orientation: 'horizontal' | 'vertical' | undefined,
+	layout: Layout | null | undefined
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -89,7 +94,7 @@ export default function useNestedSettingsUpdate(
 			: templateLock;
 
 	useLayoutEffect( () => {
-		const newSettings = {
+		const newSettings: BlockListSettings = {
 			allowedBlocks: _allowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
 			templateLock: _templateLock,
@@ -107,7 +112,13 @@ export default function useNestedSettingsUpdate(
 			newSettings.orientation = orientation;
 		} else {
 			const layoutType = getLayoutType( layout?.type );
-			newSettings.orientation = layoutType.getOrientation( layout );
+			// Layout types return `horizontal` or `vertical` for a valid layout.
+			newSettings.orientation =
+				// @ts-expect-error Bug: an unknown layout type has no `getOrientation`, so this throws.
+				layoutType.getOrientation(
+					// Without a layout, the default layout type ignores it.
+					layout as Layout
+				) as BlockListSettings[ 'orientation' ];
 		}
 
 		if ( __experimentalDefaultBlock !== undefined ) {
@@ -155,9 +166,11 @@ export default function useNestedSettingsUpdate(
 		if ( ! pendingSettingsUpdates.get( registry ) ) {
 			pendingSettingsUpdates.set( registry, {} );
 		}
-		pendingSettingsUpdates.get( registry )[ clientId ] = newSettings;
+		// The map entry is created above.
+		pendingSettingsUpdates.get( registry )![ clientId ] = newSettings;
 		window.queueMicrotask( () => {
-			const settings = pendingSettingsUpdates.get( registry );
+			// The map entry is created above.
+			const settings = pendingSettingsUpdates.get( registry )!;
 			if ( Object.keys( settings ).length ) {
 				const { updateBlockListSettings } =
 					registry.dispatch( blockEditorStore );
