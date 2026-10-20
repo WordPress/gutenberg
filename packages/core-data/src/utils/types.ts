@@ -39,15 +39,14 @@ export interface TemplateType {
 export interface TemplateArea {
 	area: string;
 	icon?: string;
-	[ key: string ]: unknown;
 }
 
 /**
  * The template parameters of `getTemplateInfo`.
  */
 export interface TemplateInfoParams {
-	templateTypes: Array< TemplateType >;
-	templateAreas?: Array< TemplateArea >;
+	templateTypes: ReadonlyArray< TemplateType >;
+	templateAreas?: ReadonlyArray< TemplateArea >;
 	template: {
 		slug?: string;
 		area?: string;
