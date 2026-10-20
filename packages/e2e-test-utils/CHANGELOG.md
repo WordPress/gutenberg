@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- `transformBlockTo` waits for the block switcher and the requested transform option to be visible before clicking, and for the transformed block to appear, so conversions no longer fail intermittently (backport of #23232, #23279 and #23311).
+
 ## 4.0.0 (2019-12-19)
 
 ### Breaking Changes
