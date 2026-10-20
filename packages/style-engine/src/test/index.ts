@@ -6,7 +6,7 @@ describe( 'generate', () => {
 		expect(
 			compileCSS(
 				{},
-				// @ts-expect-error Preserve the existing selector-string input; options should be an object.
+				// @ts-expect-error Empty styles return no output even with invalid string options.
 				'.some-selector'
 			)
 		).toEqual( '' );
@@ -183,7 +183,7 @@ describe( 'getCSSRules', () => {
 		expect(
 			getCSSRules(
 				{},
-				// @ts-expect-error Preserve the existing selector-string input; options should be an object.
+				// @ts-expect-error Empty styles return no output even with invalid string options.
 				'.some-selector'
 			)
 		).toEqual( [] );
