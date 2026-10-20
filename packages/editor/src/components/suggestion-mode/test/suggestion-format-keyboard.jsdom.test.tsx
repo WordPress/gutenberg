@@ -13,7 +13,6 @@ import { useEffect } from '@wordpress/element';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { createBlock, registerBlockType } from '@wordpress/blocks';

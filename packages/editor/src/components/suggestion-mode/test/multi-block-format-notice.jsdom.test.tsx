@@ -6,7 +6,6 @@ import {
 	createRegistry,
 } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { createBlock, registerBlockType } from '@wordpress/blocks';

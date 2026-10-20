@@ -17,7 +17,6 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { RichTextData } from '@wordpress/rich-text';

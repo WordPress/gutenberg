@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useShortcutEventMatch`: Accept React keyboard events ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes

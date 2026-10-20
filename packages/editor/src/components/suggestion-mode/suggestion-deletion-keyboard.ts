@@ -1,6 +1,5 @@
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { RichTextData, create, slice } from '@wordpress/rich-text';
@@ -541,7 +540,7 @@ export default function SuggestionDeletionKeyboard() {
 		async ( clientId: string, attributeKey: string ) => {
 			const record = await createSuggestion( {
 				clientId,
-				blockName: getBlockName( clientId ),
+				blockName: getBlockName( clientId ) ?? '',
 				operations: [
 					{
 						type: INLINE_OP_TYPE,

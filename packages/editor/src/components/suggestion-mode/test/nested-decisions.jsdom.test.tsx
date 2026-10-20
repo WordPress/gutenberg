@@ -11,7 +11,6 @@ import {
 	createReduxStore,
 	RegistryProvider,
 } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -31,6 +30,11 @@ import {
 	unregisterSuggestionFormats,
 } from '../../inline-suggestions';
 import { useSuggestionsProvider } from '../provider';
+
+// Attribute values are `unknown` in the store types; the tests read them
+// as the blocks define them.
+const attributesOf = ( registry: any, clientId: string ): any =>
+	registry.select( blockEditorStore ).getBlockAttributes( clientId );
 
 vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
@@ -161,9 +165,7 @@ function setup( html: string ) {
 			<Capture />
 		</RegistryProvider>
 	);
-	const content = () =>
-		registry.select( blockEditorStore ).getBlockAttributes( block.clientId )
-			?.content;
+	const content = () => attributesOf( registry, block.clientId )?.content;
 	return { registry, block, saved, content, provider: () => provider };
 }
 
