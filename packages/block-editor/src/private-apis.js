@@ -40,7 +40,7 @@ import {
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
-	reusableBlocksSelectKey,
+	userPatternsSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	globalStylesDataKey,
@@ -126,7 +126,7 @@ lock( privateApis, {
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateInserterLibrary,
-	reusableBlocksSelectKey,
+	userPatternsSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	PrivateBlockPopover,

@@ -115,7 +115,7 @@ Private exports:
 - `selectBlockPatternsKey`
 - `requiresWrapperOnCopy`
 - `PrivateInserterLibrary`: has an extra prop `onPatternCategorySelection` added in #62130 (May 2024).
-- `reusableBlocksSelectKey`
+- `userPatternsSelectKey`
 - `PrivateBlockPopover`: has two extra props, `__unstableContentRef` and `__unstablePopoverSlot`.
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
@@ -173,11 +173,11 @@ Private selectors:
 - `getRegisteredInserterMediaCategories`
 - `getRemovalPromptData`
 - `getRequestedInspectorTab`
-- `getReusableBlocks`
 - `getSectionRootClientId`
 - `getStyleOverrides`
 - `getTemporarilyEditingAsBlocks`
 - `getTemporarilyEditingFocusModeToRevert`
+- `getUserPatterns`
 - `getZoomLevel`
 - `hasAllowedPatterns`
 - `isBlockInterfaceHidden`
