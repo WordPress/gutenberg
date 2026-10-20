@@ -28,7 +28,7 @@ export default function usePostTitle() {
 				getCurrentPostId,
 				isRevisionsMode,
 				isShowingRevisionDiff,
-				getPreviousRevision,
+				getComparedVersion,
 				getEditorIntent,
 				getPostFieldProposals,
 			} = unlock( select( editorStore ) );
@@ -42,7 +42,7 @@ export default function usePostTitle() {
 				// The oldest revision has nothing to compare against, so its whole
 				// title reads as added.
 				previousTitle: isDiffing
-					? ( getPreviousRevision()?.title?.raw ?? '' )
+					? ( getComparedVersion()?.title?.raw ?? '' )
 					: undefined,
 			};
 		}, [] );

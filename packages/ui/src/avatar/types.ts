@@ -1,7 +1,19 @@
 import type { Avatar as _Avatar } from '@base-ui/react/avatar';
 import type { ComponentProps } from '../utils/types';
 
-export type RootProps = ComponentProps< typeof _Avatar.Root > & {
+export type RootProps = Omit<
+	ComponentProps< typeof _Avatar.Root >,
+	'color'
+> & {
+	/**
+	 * Colors the image's inner ring or opaque fallback background, automatically
+	 * choosing a contrasting foreground tint for fallbacks.
+	 *
+	 * Accepts CSS colors and variables that resolve to a color. Do not use
+	 * `currentColor`, including through variables, or CSS-wide keywords such as
+	 * `inherit`. Browsers without support for colored fallbacks use neutral colors.
+	 */
+	color?: React.CSSProperties[ 'color' ];
 	/**
 	 * The size of the avatar: `xs` (16px), `sm` (24px), `md` (32px),
 	 * `lg` (40px), or `xl` (64px) with the default design tokens.
@@ -38,7 +50,19 @@ export type ImageProps = Omit<
 
 export type FallbackProps = ComponentProps< typeof _Avatar.Fallback > & {
 	/**
-	 * The initials, icon, or other content to show until the image loads.
+	 * Custom fallback content. Omit to display the standard person icon.
 	 */
 	children?: React.ReactNode;
+};
+
+export type InitialsProps = Omit< FallbackProps, 'children' > & {
+	/**
+	 * The person's display name. Blank names use the standard person fallback.
+	 */
+	name?: string;
+	/**
+	 * Locale used for character segmentation and uppercase conversion.
+	 * Defaults to the runtime's locale.
+	 */
+	locale?: string;
 };

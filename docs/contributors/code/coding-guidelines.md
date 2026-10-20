@@ -78,7 +78,7 @@ There are some exceptions where writing plain JavaScript (`.js`) is permitted:
 
 -   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
 -   If authoring new code in an existing `.js` or `.jsx` file. Migrating existing files to the equivalent `.ts` or `.tsx` is encouraged if it is trivial to do so.
--   If authoring new files in a package which is largely untyped, such that the new file would not have reasonable access to existing package typings.
+-   If authoring new files in a package that has no `tsconfig.json` yet, such that the new file would not have reasonable access to existing package typings. Packages with a `tsconfig.json` reject new JavaScript files (`.js`, `.jsx`, `.mjs`, `.cjs`) under `src` and `test` through the `gutenberg/use-typescript` ESLint rule, as do `routes/` and `tools/`, with the files that predate the rule listed in `tools/eslint/suppressions.json`.
 
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
@@ -408,7 +408,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.ts](/packages/block-editor/src/store/private-actions.ts):
 
 ```js
 const privateSettings = [

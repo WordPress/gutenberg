@@ -254,6 +254,61 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'aria-label="Table of Contents"', $rendered );
 	}
 
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_render
+	 */
+	public function test_render_outside_the_content_lists_the_viewed_post_headings() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status'  => 'publish',
+				'post_content' => $this->heading_block( 'Viewed post section', 'viewed-post-section' ),
+			)
+		);
+
+		$this->go_to( get_permalink( $post_id ) );
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$nav = $this->get_table_of_contents_html( do_blocks( $this->table_of_contents_block() ) );
+
+		$this->assertStringContainsString( 'Viewed post section', $nav );
+		$this->assertStringContainsString( '#viewed-post-section', $nav );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_render
+	 */
+	public function test_render_outside_the_content_returns_empty_markup_on_archives() {
+		self::factory()->post->create(
+			array(
+				'post_status'  => 'publish',
+				'post_content' => $this->heading_block( 'Archived post section', 'archived-post-section' ),
+			)
+		);
+
+		$this->go_to( home_url( '/' ) );
+		$GLOBALS['post'] = $GLOBALS['wp_query']->post;
+
+		$this->assertSame( '', do_blocks( $this->table_of_contents_block() ) );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_table_of_contents_render
+	 */
+	public function test_render_returns_empty_markup_for_password_protected_posts() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status'   => 'publish',
+				'post_password' => 'secret',
+				'post_content'  => $this->heading_block( 'Protected section', 'protected-section' ),
+			)
+		);
+
+		$this->go_to( get_permalink( $post_id ) );
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$this->assertSame( '', do_blocks( $this->table_of_contents_block() ) );
+	}
+
 	private function render_post_content( $post_id, $page_number = 1 ) {
 		global $page;
 

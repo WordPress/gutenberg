@@ -75,6 +75,10 @@ function InlineUI( {
 			setError( null );
 		}
 
+		if ( value.start === undefined ) {
+			return;
+		}
+
 		const newReplacements = value.replacements.slice();
 		newReplacements[ value.start ] = {
 			type: name,

@@ -1,4 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 test.describe( 'Post visibility', () => {
 	[ 'large', 'small' ].forEach( ( viewport ) => {
@@ -12,10 +13,10 @@ test.describe( 'Post visibility', () => {
 
 			await admin.createNewPost();
 
-			await editor.openDocumentSettingsSidebar();
+			const summary = await openPostSummary( { editor, page } );
 
-			await page
-				.getByRole( 'button', { name: 'Change status:' } )
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
 				.click();
 			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
@@ -38,28 +39,20 @@ test.describe( 'Post visibility', () => {
 
 		// Enter a title for this post.
 		await editor.canvas
-			.locator( 'role=textbox[name="Add title"i]' )
-			.type( 'Title' );
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title' );
 
-		await editor.openDocumentSettingsSidebar();
+		const summary = await openPostSummary( { editor, page } );
 
-		// Set a publish date for the next month.
+		// Set a publish date for the next year.
+		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
+		const nextYear = new Date().getFullYear() + 1;
 		await page
-			.getByRole( 'button', { name: 'Change date: Immediately' } )
-			.click();
+			.getByLabel( 'Date time' )
+			.fill( `${ nextYear }-03-15T10:00` );
+		await page.keyboard.press( 'Escape' );
 
-		await page.getByRole( 'button', { name: 'View next month' } ).click();
-		await page
-			.getByRole( 'application', { name: 'Calendar', exact: true } )
-			.getByText( '15' )
-			.click();
-		await page
-			.locator( '.block-editor-publish-date-time-picker' )
-			.getByRole( 'button', {
-				name: 'Close',
-			} )
-			.click();
-		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await summary.getByRole( 'button', { name: 'Edit Status' } ).click();
 		await page.getByRole( 'radio', { name: 'Private' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
