@@ -43,7 +43,20 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": false
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
 	},
-	"editorStyle": "wp-block-query-pagination-numbers-editor"
+	"editorStyle": "wp-block-query-pagination-numbers-editor",
+	"style": "wp-block-query-pagination-numbers"
 }
