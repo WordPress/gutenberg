@@ -7,7 +7,10 @@ export type {
 	DashboardWidget,
 	WidgetGridSettings,
 } from './types';
-export { WIDGET_DASHBOARD_COLUMN_COUNT } from './types';
+export {
+	WIDGET_DASHBOARD_COLUMN_COUNT,
+	WIDGET_DASHBOARD_COLUMN_STEPS,
+} from './types';
 export { DEFAULT_GRID } from './utils/default-grid';
 export { normalizeGridSettings } from './utils/normalize-grid-settings';
 export {
