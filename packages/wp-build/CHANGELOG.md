@@ -14,6 +14,7 @@
 
 ### Enhancements
 
+-   Let a file that only imports a script's exports by name read them through an object inheriting from the script's global. esbuild no longer copies every export of the script into a getter for each file importing it, which was costly while the page loads. Files using the script's namespace object as a whole, with `import * as`, `export *`, a default import, `require` or a dynamic import, are bundled as before.
 -   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 
 ### Bug Fixes
