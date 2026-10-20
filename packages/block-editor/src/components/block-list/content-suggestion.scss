@@ -111,9 +111,10 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 // preview state unambiguous. The tab text comes from the
 // `data-suggestion-move-label` attribute (set by the editor-package HOC) so
 // it is translatable rather than a hardcoded English string baked into CSS.
+// No opacity: it would dim the block's own text and the tab's label below
+// 4.5:1 (2.71:1 for the amber palette entry's tab on white).
 .block-editor-block-list__block.is-suggestion-pending-move {
 	position: relative;
-	opacity: 0.7;
 	outline: var(--wpds-border-width-sm) dotted $suggestion-color;
 	outline-offset: var(--wpds-border-width-sm);
 	border-radius: var(--wpds-border-radius-sm);

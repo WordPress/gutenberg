@@ -1561,6 +1561,37 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( captureOf( getOverlay, added.clientId ) ).toBeUndefined();
 	} );
 
+	it( 'adopts an empty child of a pending insertion instead of deferring it', async () => {
+		setDefaultBlockName( TEST_BLOCK_NAME );
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a ] } );
+		const { group } = await insertPendingGroup( registry, 1 );
+
+		const empty = createBlock( TEST_BLOCK_NAME );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( empty, 1, group.clientId );
+		} );
+		await flushSubscribers();
+		expect( getOverlay().isDeferredInsertion( empty.clientId ) ).toBe(
+			false
+		);
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( empty.clientId, { content: 'Typed' } );
+		} );
+		await flushSubscribers();
+
+		const attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( empty.clientId );
+		expect( attributes?.content ).toBe( 'Typed' );
+		expect( attributes?.metadata?.suggestion ).toBeUndefined();
+	} );
+
 	it( 'moves an existing block back out of a pending insertion', async () => {
 		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
 		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
