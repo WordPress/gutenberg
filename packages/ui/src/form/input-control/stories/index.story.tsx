@@ -174,7 +174,7 @@ export const Monospace: Story = {
 		...Default.args,
 		label: 'API key',
 		description: undefined,
-		placeholder: undefined,
+		placeholder: 'Enter your API key',
 		monospace: true,
 		defaultValue: 'sk_1iIl0O-Il1O0i',
 	},
