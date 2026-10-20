@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
+
 ### New Features
 
+-   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 -   `Notice.List`: Add announcements for added and changed notices, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
 
 ### Enhancements
