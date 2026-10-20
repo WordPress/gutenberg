@@ -12,7 +12,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as WCText,
 	FlexBlock,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import usePatternsState from '../hooks/use-patterns-state';
@@ -25,7 +25,7 @@ import { unlock } from '../../../lock-unlock';
 import {
 	isPatternFiltered,
 	allPatternsCategory,
-	myPatternsCategory,
+	sitePatternsCategory,
 	starterPatternsCategory,
 	otherCategoriesCategory,
 	isInOtherCategories,
@@ -55,6 +55,16 @@ export function PatternCategoryPreviews( {
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
+	const [ patternAuthorFilter, setPatternAuthorFilter ] = useState( 'all' );
+
+	// The author filter only applies while only user patterns are listed, so
+	// it doesn't linger unseen in categories where it isn't shown.
+	const isUserSource =
+		category.name === sitePatternsCategory.name ||
+		patternSourceFilter === INSERTER_PATTERN_TYPES.user;
+	const currentPatternAuthorFilter = isUserSource
+		? patternAuthorFilter
+		: 'all';
 
 	const availableCategories = usePatternCategories(
 		rootClientId,
@@ -68,7 +78,8 @@ export function PatternCategoryPreviews( {
 					isPatternFiltered(
 						pattern,
 						patternSourceFilter,
-						patternSyncFilter
+						patternSyncFilter,
+						currentPatternAuthorFilter
 					)
 				) {
 					return false;
@@ -79,7 +90,7 @@ export function PatternCategoryPreviews( {
 				}
 
 				if (
-					category.name === myPatternsCategory.name &&
+					category.name === sitePatternsCategory.name &&
 					pattern.type === INSERTER_PATTERN_TYPES.user
 				) {
 					return true;
@@ -122,6 +133,7 @@ export function PatternCategoryPreviews( {
 			category.name,
 			patternSourceFilter,
 			patternSyncFilter,
+			currentPatternAuthorFilter,
 		]
 	);
 
@@ -149,6 +161,13 @@ export function PatternCategoryPreviews( {
 		},
 		[ setPatternSourceFilter, changePage ]
 	);
+	const onSetPatternAuthorFilter = useCallback(
+		( value ) => {
+			setPatternAuthorFilter( value );
+			changePage( 1 );
+		},
+		[ setPatternAuthorFilter, changePage ]
+	);
 
 	return (
 		<>
@@ -170,13 +189,17 @@ export function PatternCategoryPreviews( {
 					<PatternsFilter
 						patternSyncFilter={ patternSyncFilter }
 						patternSourceFilter={ patternSourceFilter }
+						patternAuthorFilter={ currentPatternAuthorFilter }
 						setPatternSyncFilter={ onSetPatternSyncFilter }
 						setPatternSourceFilter={ onSetPatternSourceFilter }
+						setPatternAuthorFilter={ onSetPatternAuthorFilter }
 						scrollContainerRef={ scrollContainerRef }
 						category={ category }
 					/>
 				</HStack>
-				{ ! currentCategoryPatterns.length && isLoading && <Spinner /> }
+				{ ! currentCategoryPatterns.length && isLoading && (
+					<WCSpinner />
+				) }
 				{ ! currentCategoryPatterns.length && ! isLoading && (
 					<WCText
 						variant="muted"

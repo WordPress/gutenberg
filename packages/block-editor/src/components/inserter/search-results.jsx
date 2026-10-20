@@ -4,7 +4,7 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import BlockTypesList from '../block-types-list';
 import BlockPatternsList from '../block-patterns-list';
 import __unstableInserterMenuExtension from '../inserter-menu-extension';
@@ -200,7 +200,7 @@ function InserterSearchResults( {
 					/>
 				</div>
 			) }
-			{ isLoadingPatterns && <Spinner /> }
+			{ isLoadingPatterns && <WCSpinner /> }
 		</InserterPanel>
 	);
 

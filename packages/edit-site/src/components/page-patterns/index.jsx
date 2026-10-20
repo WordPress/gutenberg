@@ -147,15 +147,16 @@ export default function DataviewsPatterns() {
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
-		// However, the author filter in template parts and the theme filter
-		// in patterns are done client-side.
+		// However, the author filter and the theme filter in patterns are done
+		// client-side.
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search;
 		if ( postType !== TEMPLATE_PART_POST_TYPE ) {
-			viewWithoutFilters.filters =
-				view.filters?.filter(
-					( { field } ) => installedThemeField && field === 'theme'
-				) ?? [];
+			viewWithoutFilters.filters = view.filters?.filter(
+				( { field } ) =>
+					field === 'author' ||
+					( installedThemeField && field === 'theme' )
+			);
 		}
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, postType, installedThemeField ] );

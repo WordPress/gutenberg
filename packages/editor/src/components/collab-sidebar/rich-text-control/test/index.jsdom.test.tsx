@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import type { MutableRefObject } from 'react';
 import {
 	afterAll,
 	beforeAll,
@@ -17,11 +16,12 @@ import {
 	registerFormatType,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
+import type { EventCallbacksSet } from '@wordpress/rich-text';
 import RichTextControl from '../';
 import { unlock } from '../../../../lock-unlock';
 
 /*
- * `registerFormatType` types its settings as the full `WPFormat` shape; the
+ * `registerFormatType` types its settings as the full `FormatType` shape; the
  * minimal stubs in this file only need the members the control exercises.
  */
 function registerTestFormatType(
@@ -372,12 +372,11 @@ describe( 'RichTextControl', () => {
 		function TestShortcut( { onUse }: { onUse: () => void } ) {
 			const { KeyboardShortcutContext } = unlock( richTextPrivateApis );
 			// The context is created without a type argument on the private
-			// API side, so type the ref it carries here.
+			// API side, so type the Set it carries here.
 			const keyboardShortcuts = useContext(
 				KeyboardShortcutContext
-			) as MutableRefObject< Set< ( event: KeyboardEvent ) => void > >;
+			) as EventCallbacksSet< KeyboardEvent >;
 			useEffect( () => {
-				const shortcuts = keyboardShortcuts.current;
 				const handler = ( event: KeyboardEvent ) => {
 					if (
 						event.key === 'b' &&
@@ -387,9 +386,9 @@ describe( 'RichTextControl', () => {
 						onUse();
 					}
 				};
-				shortcuts.add( handler );
+				keyboardShortcuts.add( handler );
 				return () => {
-					shortcuts.delete( handler );
+					keyboardShortcuts.delete( handler );
 				};
 			}, [ onUse, keyboardShortcuts ] );
 			return null;

@@ -4,7 +4,7 @@ import {
 	Modal,
 	CheckboxControl as WCCheckboxControl,
 	SearchControl,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { Stack, Tabs, Text } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
@@ -299,7 +299,9 @@ function StartPageOptionsModalContent( { onClose } ) {
 								/>
 							) }
 							{ ! filteredStartPatterns.length &&
-								isLoadingInstalledThemePatterns && <Spinner /> }
+								isLoadingInstalledThemePatterns && (
+									<WCSpinner />
+								) }
 							{ ! filteredStartPatterns.length &&
 								! isLoadingInstalledThemePatterns && (
 									<Text

@@ -12,14 +12,18 @@ export const INSERTER_SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
+export const INSERTER_AUTHOR_TYPES = {
+	currentUser: 'currentUser',
+};
+
 export const allPatternsCategory = {
 	name: 'allPatterns',
 	label: _x( 'All', 'patterns' ),
 };
 
-export const myPatternsCategory = {
-	name: 'myPatterns',
-	label: __( 'My patterns' ),
+export const sitePatternsCategory = {
+	name: 'sitePatterns',
+	label: __( 'Site patterns' ),
 };
 
 export const starterPatternsCategory = {
@@ -119,7 +123,12 @@ export function getPopulatedCategories( patterns, allCategories ) {
 	return categories;
 }
 
-export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
+export function isPatternFiltered(
+	pattern,
+	sourceFilter,
+	syncFilter,
+	authorFilter
+) {
 	// Patterns from other installed themes only match their own source.
 	const isInstalledThemePattern =
 		pattern.type === INSERTER_PATTERN_TYPES.installedTheme;
@@ -157,6 +166,14 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	if (
 		sourceFilter === INSERTER_PATTERN_TYPES.user &&
 		pattern.type !== INSERTER_PATTERN_TYPES.user
+	) {
+		return true;
+	}
+
+	// If the current user's patterns are selected, filter out everyone else's.
+	if (
+		authorFilter === INSERTER_AUTHOR_TYPES.currentUser &&
+		! pattern.isCurrentUserPattern
 	) {
 		return true;
 	}

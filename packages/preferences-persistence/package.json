@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences-persistence",
-	"version": "2.57.0",
+	"version": "3.0.0",
 	"description": "Persistence utilities for `wordpress/preferences`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,6 +39,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch"
