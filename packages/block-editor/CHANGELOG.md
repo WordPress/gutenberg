@@ -6,6 +6,10 @@
 
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
+### Internal
+
+-   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
