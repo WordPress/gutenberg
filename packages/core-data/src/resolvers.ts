@@ -40,7 +40,7 @@ export const getAuthors =
 			'/wp/v2/users/?who=authors&per_page=100',
 			query
 		);
-		const users = await apiFetch< Array< ET.User< 'edit' > > >( { path } );
+		const users = await apiFetch< Array< ET.User< 'view' > > >( { path } );
 		dispatch.receiveUserQuery( path, users );
 	};
 

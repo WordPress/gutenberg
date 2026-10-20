@@ -799,7 +799,7 @@ _Parameters_
 
 _Returns_
 
-- Action object.
+- `ActionOf< 'ADD_ENTITIES' >`: Action object.
 
 ### clearEntityRecordEdits
 
@@ -858,7 +858,7 @@ _Parameters_
 
 _Returns_
 
-- Action object.
+- `ActionOf< 'RECEIVE_DEFAULT_TEMPLATE' >`: Action object.
 
 ### receiveEntityRecords
 
@@ -888,7 +888,7 @@ _Parameters_
 
 _Returns_
 
-- Action object.
+- `ActionOf< 'RECEIVE_NAVIGATION_FALLBACK_ID' >`: Action object.
 
 ### receiveRevisions
 
@@ -912,7 +912,7 @@ Returns an action object used in signalling that the index has been received.
 
 _Returns_
 
-- Action object.
+- `{ type: 'DO_NOTHING'; }`: Action object.
 
 ### receiveUploadPermissions
 
@@ -926,7 +926,7 @@ _Parameters_
 
 _Returns_
 
-- Action object.
+- `ActionOf< 'RECEIVE_USER_PERMISSION' >`: Action object.
 
 ### redo
 
