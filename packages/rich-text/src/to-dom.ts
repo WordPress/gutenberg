@@ -183,23 +183,54 @@ export function toDom( {
 	 */
 	const createEmpty = () => createElement( doc, '' );
 
+	// `toTree` appends text one character at a time, and appending to a DOM
+	// text node is costly, so the characters are collected and written to
+	// the node at once, before anything reads the tree.
+	let pendingNode: Text | null = null;
+	let pendingText = '';
+
+	function flushText() {
+		if ( pendingNode ) {
+			appendText( pendingNode, pendingText );
+			pendingNode = null;
+			pendingText = '';
+		}
+	}
+
 	const tree = toTree< Node >( {
 		value,
 		createEmpty,
 		// `toTree` only appends to elements, and appends text to text nodes.
-		append: append as ToTreeOptions< Node >[ 'append' ],
+		append: ( ( element: Element, child: string | TreeElement ) => {
+			flushText();
+			return append( element, child );
+		} ) as ToTreeOptions< Node >[ 'append' ],
 		getLastChild,
 		getParent,
 		isText,
-		getText,
-		remove,
-		appendText: appendText as ToTreeOptions< Node >[ 'appendText' ],
+		getText( node ) {
+			flushText();
+			return getText( node );
+		},
+		remove( node ) {
+			flushText();
+			return remove( node );
+		},
+		appendText( node, text ) {
+			if ( pendingNode !== node ) {
+				flushText();
+				pendingNode = node as Text;
+			}
+			pendingText += text;
+		},
 		onStartIndex( body, pointer ) {
+			flushText();
 			startPath = createPathToNode( pointer, body, [
 				pointer.nodeValue!.length,
 			] );
 		},
 		onEndIndex( body, pointer ) {
+			flushText();
 			endPath = createPathToNode( pointer, body, [
 				pointer.nodeValue!.length,
 			] );
@@ -207,6 +238,8 @@ export function toDom( {
 		isEditableTree,
 		placeholder,
 	} );
+
+	flushText();
 
 	return {
 		body: tree,
