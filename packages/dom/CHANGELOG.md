@@ -14,10 +14,12 @@
 
 ### Bug Fixes
 
+-   Make the `inline` argument to `removeInvalidHTML` optional in its types, matching existing behavior ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
 -   `getOffsetParent`: Fix an infinite loop when the parent of the node is not an element ([#84374](https://github.com/WordPress/gutenberg/pull/84374)).
 
 ### Internal
 
+-   Convert the remaining tests to TypeScript ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
 -   Refactor to TypeScript ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
 
 ## 4.57.0 (2026-10-07)
