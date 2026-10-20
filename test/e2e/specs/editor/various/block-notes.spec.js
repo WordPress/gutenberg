@@ -398,7 +398,8 @@ test.describe( 'Block Notes', () => {
 
 		await search.fill( '' );
 		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
-		const status = sidebar.getByRole( 'combobox', { name: 'Status' } );
+		// The filter options open in a popover outside the sidebar.
+		const status = page.getByRole( 'combobox', { name: 'Status' } );
 		await status.selectOption( 'Resolved' );
 		await expect( headingThread ).toBeVisible();
 		await expect( imageThread ).toBeHidden();
