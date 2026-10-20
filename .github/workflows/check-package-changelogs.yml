@@ -151,7 +151,7 @@ jobs:
                   ignored+="|(tsconfig\.(stories|test|bin)\.json|\.(stylelintrc|eslintrc|prettierrc)[^/]*|\.gitignore)$"
                   ignored+=")"
 
-                  relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- packages/ \
+                  relevant_changes=$(git diff --name-only --no-renames "$BASE_SHA"...HEAD -- packages/ \
                       | grep -Ev "$ignored" || true)
 
                   # RUNNER_DEBUG is 1 when the run has debug logging enabled.
