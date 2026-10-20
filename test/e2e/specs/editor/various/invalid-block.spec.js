@@ -86,6 +86,7 @@ test.describe( 'Invalid blocks', () => {
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toBeVisible();
+		await expect( editor.canvas.locator( '[onerror]' ) ).toHaveCount( 0 );
 
 		expect( hasAlert ).toBe( false );
 	} );

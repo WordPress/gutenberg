@@ -17,6 +17,7 @@ import {
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
 	isEquivalentHTMLStructure,
+	areAttributesPreserved,
 	getContentTokens,
 	isContentPreserved,
 	validateBlock,
@@ -765,6 +766,68 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'areAttributesPreserved()', () => {
+		it( 'returns true when attributes are added or values change', () => {
+			expect(
+				areAttributesPreserved(
+					[ [ 'href', 'https://a.example' ] ],
+					[
+						[ 'href', 'https://b.example' ],
+						[ 'target', '_blank' ],
+					]
+				)
+			).toBe( true );
+			expect( areAttributesPreserved( [], [ [ 'class', 'x' ] ] ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'ignores the case of attribute names', () => {
+			expect(
+				areAttributesPreserved(
+					[ [ 'DATA-Foo', 'a' ] ],
+					[ [ 'data-foo', 'b' ] ]
+				)
+			).toBe( true );
+		} );
+
+		it( 'returns false when an attribute is dropped', () => {
+			expect(
+				areAttributesPreserved( [ [ 'data-track', 'hero' ] ], [] )
+			).toBe( false );
+			expect(
+				areAttributesPreserved(
+					[ [ 'hidden', '' ] ],
+					[ [ 'class', 'x' ] ]
+				)
+			).toBe( false );
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'returns false when a class name or style property is dropped', () => {
+			expect(
+				areAttributesPreserved(
+					[ [ 'class', 'has-blue-color custom' ] ],
+					[ [ 'class', 'has-red-color custom' ] ]
+				)
+			).toBe( false );
+			expect(
+				areAttributesPreserved(
+					[ [ 'style', 'color:red;border-radius:2px' ] ],
+					[ [ 'style', 'border-radius:4px' ] ]
+				)
+			).toBe( false );
+			// Property names are compared as own properties only.
+			expect(
+				areAttributesPreserved(
+					[ [ 'style', 'constructor:1' ] ],
+					[ [ 'style', 'color:red' ] ]
+				)
+			).toBe( false );
+			expect( console ).toHaveWarned();
+		} );
+	} );
+
 	describe( 'isEquivalentHTMLStructure()', () => {
 		it( 'returns true for identical markup', () => {
 			expect(
@@ -1026,6 +1089,14 @@ describe( 'validation', () => {
 				isContentPreserved( '<p>one</p><p>one</p>', '<p>one</p>' )
 			).toBe( false );
 		} );
+
+		it( 'does not consider the order of words', () => {
+			// Tokens are compared as a multiset: reordered text counts as
+			// preserved, which keeps the check simple and predictable.
+			expect(
+				isContentPreserved( '<p>World Hello</p>', '<p>Hello World</p>' )
+			).toBe( true );
+		} );
 	} );
 
 	describe( 'Validation Levels - Level 0: ValidBlock', () => {
@@ -1200,6 +1271,63 @@ describe( 'validation', () => {
 				VALIDATION_LEVEL.MIGRATED_BLOCK
 			);
 			expect( parsedBlock.attributes.content ).toBe( 'Hello!' );
+		} );
+
+		it( 'should not migrate through a deprecation which only matches structurally', () => {
+			registerBlockType( 'core/paragraph', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'p' },
+					migrated: { type: 'boolean', default: false },
+				},
+				save: ( { attributes } ) =>
+					createElement(
+						'p',
+						{ className: 'wp-block-paragraph' },
+						attributes.content
+					),
+				deprecated: [
+					{
+						attributes: {
+							content: {
+								type: 'string',
+								source: 'html',
+								selector: 'p',
+							},
+						},
+						save: ( { attributes } ) =>
+							createElement(
+								'p',
+								{ className: 'legacy' },
+								attributes.content
+							),
+						migrate: ( attributes ) => ( {
+							...attributes,
+							migrated: true,
+						} ),
+					},
+				],
+			} );
+
+			// The stored markup differs from the deprecated `save` only by a
+			// class name, which is not enough for a deprecation: the block is
+			// reconstructed from the current `save` instead.
+			const parsedBlock = parseRawBlock(
+				{
+					blockName: 'core/paragraph',
+					attrs: {},
+					innerHTML: '<p>Content</p>',
+					innerBlocks: [],
+					innerContent: [ '<p>Content</p>' ],
+				},
+				{ __unstableSkipMigrationLogs: true }
+			);
+
+			expect( parsedBlock.isValid ).toBe( true );
+			expect( parsedBlock.validationLevel ).toBe(
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
+			);
+			expect( parsedBlock.attributes.migrated ).toBe( false );
 		} );
 	} );
 

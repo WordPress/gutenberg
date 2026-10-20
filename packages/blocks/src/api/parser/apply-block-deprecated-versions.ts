@@ -62,13 +62,18 @@ export function applyBlockDeprecatedVersions(
 
 		// Block type properties which could impact either serialization or
 		// parsing are not considered in the deprecated block type by default,
-		// and must be explicitly provided.
+		// and must be explicitly provided. Deprecations require a perfect
+		// match: unlike parsing, where automated reconstruction is acceptable,
+		// they are explicit author instructions that should only apply when
+		// the old `save` output matches the stored content exactly, so
+		// reconstruction is disabled (which also skips its comparisons).
 		const deprecatedBlockType = Object.assign(
 			omit(
 				blockType as unknown as Record< string, unknown >,
 				DEPRECATED_ENTRY_KEYS
 			),
-			deprecatedDefinitions[ i ]
+			deprecatedDefinitions[ i ],
+			{ allowsReconstruction: false }
 		) as unknown as BlockType;
 
 		let migratedBlock = {
@@ -80,10 +85,6 @@ export function applyBlockDeprecatedVersions(
 			),
 		};
 
-		// Deprecations require a perfect match. Unlike parsing, where automated
-		// reconstruction is acceptable, deprecations are explicit author
-		// instructions that should only apply when the old `save` output
-		// matches the stored content exactly.
 		let [ , , metadata ] = validateBlock(
 			migratedBlock,
 			deprecatedBlockType

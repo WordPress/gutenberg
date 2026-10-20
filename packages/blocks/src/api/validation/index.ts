@@ -713,7 +713,7 @@ export function areAttributesPreserved(
 		} else if ( nameLower === 'style' ) {
 			const expectedProperties = getStyleProperties( expectedValue );
 			dropped = Object.keys( getStyleProperties( actualValue ) ).filter(
-				( property ) => ! ( property in expectedProperties )
+				( property ) => ! Object.hasOwn( expectedProperties, property )
 			);
 		}
 
@@ -892,8 +892,9 @@ export function isEquivalentHTML(
  * `actual` has.
  *
  * Unlike `isEquivalentHTML`, which stops at the first mismatch of any kind, a
- * positive result here guarantees that regenerating `actual` as `expected`
- * only adds to the markup, so nothing the stored markup carried is lost.
+ * positive result here guarantees that no element, text, attribute, class
+ * name or style property of `actual` is absent from `expected`; attribute
+ * values may still differ.
  *
  * @param actual   Actual HTML string.
  * @param expected Expected HTML string.
