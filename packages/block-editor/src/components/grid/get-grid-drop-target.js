@@ -1,4 +1,9 @@
 import { GridRect, getClosestTrack } from './utils';
+import {
+	clampPixelRect,
+	getGridPlacementFromPixelRect,
+	snapPixelRectPosition,
+} from './free-placement';
 
 function clamp( value, min, max ) {
 	return Math.min( Math.max( value, min ), max );
@@ -52,6 +57,72 @@ export function getGridDropTarget( {
 		columnSpan: fittedColumnSpan,
 		rowSpan: fittedRowSpan,
 	} );
+}
+
+/**
+ * Works out where a block being dragged over a grid with cells of a fixed
+ * size would land when it is placed freely: exactly where it is let go, kept
+ * inside the grid by its outline with its rotation. With `snap`, its top-left
+ * corner snaps to the closest grid lines and it keeps its size.
+ *
+ * @param {Object}                              options
+ * @param {number}                              options.x            Pointer position in pixels, relative to the start of the first column track.
+ * @param {number}                              options.y            Pointer position in pixels, relative to the start of the first row track.
+ * @param {Array<{start: number, end: number}>} options.columnTracks Column tracks, as returned by `getGridTracks`.
+ * @param {Array<{start: number, end: number}>} options.rowTracks    Row tracks, as returned by `getGridTracks`.
+ * @param {number}                              options.columnSpan   Number of columns the block spans, for its default width.
+ * @param {number}                              options.rowSpan      Number of rows the block spans, for its default height.
+ * @param {number}                              options.width        Width of the block in pixels, without its rotation. Defaults to the width of the columns it spans.
+ * @param {number}                              options.height       Height of the block in pixels, without its rotation. Defaults to the height of the rows it spans.
+ * @param {number}                              options.grabX        Where the block was grabbed, in pixels from its left edge. Defaults to its center.
+ * @param {number}                              options.grabY        Where the block was grabbed, in pixels from its top edge. Defaults to its center.
+ * @param {number}                              options.angle        The block's rotation in degrees.
+ * @param {boolean}                             options.snap         Whether to snap the block's corner to the grid lines.
+ *
+ * @return {{placement: import('./free-placement').GridPlacement, pixelRect: {left: number, top: number, right: number, bottom: number}}} Where the block would land, as a place in the grid and in pixels.
+ */
+export function getFreeGridDropTarget( {
+	x,
+	y,
+	columnTracks,
+	rowTracks,
+	columnSpan = 1,
+	rowSpan = 1,
+	width = getSpanSize( columnTracks, columnSpan ),
+	height = getSpanSize( rowTracks, rowSpan ),
+	grabX = width / 2,
+	grabY = height / 2,
+	angle = 0,
+	snap = false,
+} ) {
+	const bounds = {
+		left: 0,
+		top: 0,
+		right: columnTracks[ columnTracks.length - 1 ].end,
+		bottom: rowTracks[ rowTracks.length - 1 ].end,
+	};
+	const left = x - grabX;
+	const top = y - grabY;
+	let pixelRect = clampPixelRect(
+		{ left, top, right: left + width, bottom: top + height },
+		bounds,
+		angle
+	);
+	if ( snap ) {
+		pixelRect = clampPixelRect(
+			snapPixelRectPosition( pixelRect, columnTracks, rowTracks ),
+			bounds,
+			angle
+		);
+	}
+	return {
+		placement: getGridPlacementFromPixelRect(
+			pixelRect,
+			columnTracks,
+			rowTracks
+		),
+		pixelRect,
+	};
 }
 
 /**

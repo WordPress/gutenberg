@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
 	useState,
 	useEffect,
@@ -24,13 +25,16 @@ import {
 	getGridItemRotation,
 	getGridRectFromPixelRect,
 	getBoundingGridRect,
+	isGridElementWithFixedCells,
 } from './utils';
 import { getRotatedBoundingRect } from './rotation';
 import {
+	getFreeGridDropTarget,
 	getGrabPoint,
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
+import { getGridPlacementFromPixelRect } from './free-placement';
 import {
 	isGridItemHandleDrag,
 	subscribeToGridItemPointerDrag,
@@ -563,7 +567,7 @@ function GridVisualizerDropLayer( {
 		// its rotation, so a rotated block lands by the cells it takes up.
 		// Blocks dragged in from elsewhere are the size of the cells they
 		// span, up to the size of the grid.
-		const landing = getGridDropTarget( {
+		const dropTargetOptions = {
 			x,
 			y,
 			...grabRef.current.grab,
@@ -577,7 +581,21 @@ function GridVisualizerDropLayer( {
 			height: srcPixelRect
 				? srcPixelRect.bottom - srcPixelRect.top
 				: undefined,
-		} );
+		};
+		// Where the grid's cells have a fixed size, a block lands exactly
+		// where it is let go, and Shift snaps its corner to the grid lines.
+		// Touch drags have no Shift, so they are always free.
+		const freeTarget = isGridElementWithFixedCells( gridElement )
+			? getFreeGridDropTarget( {
+					...dropTargetOptions,
+					angle: srcAngle,
+					snap: !! event.shiftKey,
+				} )
+			: null;
+		const placement = freeTarget?.placement ?? null;
+		const landing = placement
+			? new GridRect( placement )
+			: getGridDropTarget( dropTargetOptions );
 
 		const lastTarget = lastTargetRef.current;
 		if (
@@ -585,7 +603,8 @@ function GridVisualizerDropLayer( {
 			lastTarget.landing.columnStart === landing.columnStart &&
 			lastTarget.landing.rowStart === landing.rowStart &&
 			lastTarget.landing.columnSpan === landing.columnSpan &&
-			lastTarget.landing.rowSpan === landing.rowSpan
+			lastTarget.landing.rowSpan === landing.rowSpan &&
+			fastDeepEqual( lastTarget.placement, placement )
 		) {
 			return;
 		}
@@ -601,17 +620,35 @@ function GridVisualizerDropLayer( {
 		}
 
 		// The block lands by its cells, but the cells shown are the ones it
-		// reaches with its rotation, around the same center.
-		const footprint = srcAngle
-			? getGridRectFromPixelRect(
-					getRotatedBoundingRect( landingCellsPixelRect, srcAngle ),
+		// reaches with its rotation, around the same center. A block placed
+		// freely shows exactly where it lands, with its rotation, and its
+		// footprint is the cells that contain that.
+		let footprint = landing;
+		let landingPixelRect = landingCellsPixelRect;
+		if ( freeTarget ) {
+			landingPixelRect = getRotatedBoundingRect(
+				freeTarget.pixelRect,
+				srcAngle
+			);
+			footprint = new GridRect(
+				getGridPlacementFromPixelRect(
+					landingPixelRect,
 					columnTracks,
 					rowTracks
 				)
-			: landing;
-		const landingPixelRect = srcAngle
-			? getPixelRectFromGridRect( footprint, columnTracks, rowTracks )
-			: landingCellsPixelRect;
+			);
+		} else if ( srcAngle ) {
+			footprint = getGridRectFromPixelRect(
+				getRotatedBoundingRect( landingCellsPixelRect, srcAngle ),
+				columnTracks,
+				rowTracks
+			);
+			landingPixelRect = getPixelRectFromGridRect(
+				footprint,
+				columnTracks,
+				rowTracks
+			);
+		}
 
 		const overlaps = siblings
 			.filter( ( sibling ) => sibling.rect.intersectsRect( footprint ) )
@@ -656,6 +693,7 @@ function GridVisualizerDropLayer( {
 			srcClientId,
 			span: { columnSpan, rowSpan },
 			landing,
+			placement,
 			landingPixelRect,
 			overlaps,
 			guides,
@@ -671,20 +709,23 @@ function GridVisualizerDropLayer( {
 		if ( ! target || target.srcClientId !== srcClientId ) {
 			return;
 		}
-		const { landing, span } = target;
+		const { landing, span, placement } = target;
 		const { columnStart, rowStart } = landing;
-		// A block bigger than the grid is shrunk to fit, as shown by the
-		// landing cells.
-		const layout = {
-			columnStart,
-			rowStart,
-			...( landing.columnSpan < span.columnSpan && {
-				columnSpan: landing.columnSpan,
-			} ),
-			...( landing.rowSpan < span.rowSpan && {
-				rowSpan: landing.rowSpan,
-			} ),
-		};
+		// A block placed freely gets its whole place, and loses any box it
+		// had when it fills its cells. Otherwise a block bigger than the grid
+		// is shrunk to fit, as shown by the landing cells.
+		const layout = placement
+			? { ...placement, box: placement.box }
+			: {
+					columnStart,
+					rowStart,
+					...( landing.columnSpan < span.columnSpan && {
+						columnSpan: landing.columnSpan,
+					} ),
+					...( landing.rowSpan < span.rowSpan && {
+						rowSpan: landing.rowSpan,
+					} ),
+				};
 		// The grid is given to the updater because a block dropped in
 		// from elsewhere isn't in it yet.
 		updateGridChildLayout( srcClientId, layout, gridClientId );

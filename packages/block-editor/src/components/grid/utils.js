@@ -84,6 +84,22 @@ export function getComputedCSS( element, property ) {
 }
 
 /**
+ * Checks whether a grid's cells have a fixed size, as it tells its children
+ * with `--wp--style--grid-cells`. Blocks are only placed freely inside cells
+ * of a fixed size.
+ *
+ * @param {HTMLElement} gridElement The grid element.
+ *
+ * @return {boolean} Whether the grid's cells have a fixed size.
+ */
+export function isGridElementWithFixedCells( gridElement ) {
+	return (
+		getComputedCSS( gridElement, '--wp--style--grid-cells' ).trim() ===
+		'fixed'
+	);
+}
+
+/**
  * Given a grid-template-columns or grid-template-rows CSS property value, gets the start and end
  * position in pixels of each grid track.
  *

@@ -1306,6 +1306,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/grid/get-grid-drop-target.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/grid/grid-item-movers.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1341,6 +1346,11 @@
 		}
 	},
 	"packages/block-editor/src/components/grid/start-grid-item-drag.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/grid/test/get-grid-drop-target.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
