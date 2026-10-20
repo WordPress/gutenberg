@@ -174,8 +174,10 @@ export interface TypographySettings {
  * Layout constraint settings
  */
 export interface LayoutSettings {
-	wideSize?: string;
-	contentSize?: string;
+	/** `false` when the block does not support the control. */
+	wideSize?: string | false;
+	/** `false` when the block does not support the control. */
+	contentSize?: string | false;
 }
 
 /**
