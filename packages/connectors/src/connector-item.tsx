@@ -41,7 +41,7 @@ export function ConnectorItem( {
 					{ logo }
 					<Stack
 						direction="column"
-						style={ { flex: '1 1 0%', minWidth: 0 } }
+						className="connector-item__content"
 					>
 						<Text
 							variant="heading-lg"
@@ -51,9 +51,7 @@ export function ConnectorItem( {
 						</Text>
 						<Text
 							variant="body-sm"
-							style={ {
-								color: 'var(--wpds-color-foreground-content-neutral-weak)',
-							} }
+							className="connector-item__description"
 						>
 							{ description }
 						</Text>
@@ -279,6 +277,7 @@ export function DefaultConnectorSettings( {
 	return (
 		<ConnectorSettingsFrame>
 			<InputControl
+				className="connector-settings__input"
 				label={ __( 'API Key' ) }
 				value={ apiKey }
 				onValueChange={ ( value ) => {
@@ -390,6 +389,7 @@ export function ApplicationPasswordConnectorSettings( {
 	return (
 		<ConnectorSettingsFrame>
 			<InputControl
+				className="connector-settings__input"
 				label={ __( 'Username' ) }
 				value={ username }
 				onValueChange={ ( value ) => {
@@ -403,6 +403,7 @@ export function ApplicationPasswordConnectorSettings( {
 				autoComplete="username"
 			/>
 			<InputControl
+				className="connector-settings__input"
 				label={ __( 'Application password' ) }
 				value={ readOnly ? '••••••••••••••••' : applicationPassword }
 				onValueChange={ ( value ) => {
