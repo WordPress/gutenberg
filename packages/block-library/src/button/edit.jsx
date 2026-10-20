@@ -137,52 +137,52 @@ function useEnter( clientId ) {
  * The content controls shown in the block inspector's Content tab and in the
  * List View popover, mirroring the Navigation Link block's panel.
  *
- * @param {Object}                         props
- * @param {Object}                         props.attributes     Block attributes.
- * @param {( attributes: Object ) => void} props.setAttributes  Updates block attributes.
- * @param {boolean}                        props.isLinkEditable Whether the link fields are shown.
+ * The canvas, the link popover, and this panel all write through the same
+ * `setText`, `setLink`, and `unlink` so the three surfaces can't drift.
+ *
+ * @param {Object}                   props
+ * @param {string}                   props.text           The button text.
+ * @param {string}                   props.url            The button link.
+ * @param {boolean}                  props.opensInNewTab  Whether the link opens in a new tab.
+ * @param {boolean}                  props.isTextEditable Whether the text field is enabled.
+ * @param {boolean}                  props.isLinkEditable Whether the link fields are shown.
+ * @param {( text: string ) => void} props.setText        Updates the button text.
+ * @param {( link: Object ) => void} props.setLink        Updates the link, new tab, and nofollow attributes.
+ * @param {() => void}               props.unlink         Removes the link and its attributes.
  */
-function ContentControls( { attributes, setAttributes, isLinkEditable } ) {
-	const { text, url, rel, linkTarget } = attributes;
-	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
-	const nofollow = !! rel?.includes( NOFOLLOW_REL );
+function ContentControls( {
+	text,
+	url,
+	opensInNewTab,
+	isTextEditable,
+	isLinkEditable,
+	setText,
+	setLink,
+	unlink,
+} ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const preview = useLinkPreview( { url } );
-
-	const setLink = ( changes ) =>
-		setAttributes(
-			getUpdatedLinkAttributes( {
-				rel,
-				url,
-				opensInNewTab,
-				nofollow,
-				...changes,
-			} )
-		);
 
 	return (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
-			resetAll={ () =>
-				setAttributes( {
-					text: '',
-					url: undefined,
-					linkTarget: undefined,
-					rel: undefined,
-				} )
-			}
+			resetAll={ () => {
+				setText( '' );
+				unlink();
+			} }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<ToolsPanelItem
 				hasValue={ () => !! text?.length }
 				label={ __( 'Text' ) }
-				onDeselect={ () => setAttributes( { text: '' } ) }
+				onDeselect={ () => setText( '' ) }
 				isShownByDefault
 			>
 				<TextControl
 					label={ __( 'Text' ) }
 					value={ text ? stripHTML( text.toString() ) : '' }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
+					onChange={ setText }
+					disabled={ ! isTextEditable }
 					autoComplete="off"
 				/>
 			</ToolsPanelItem>
@@ -191,13 +191,7 @@ function ContentControls( { attributes, setAttributes, isLinkEditable } ) {
 					<ToolsPanelItem
 						hasValue={ () => !! url }
 						label={ __( 'Link to' ) }
-						onDeselect={ () =>
-							setAttributes( {
-								url: undefined,
-								linkTarget: undefined,
-								rel: undefined,
-							} )
-						}
+						onDeselect={ unlink }
 						isShownByDefault
 					>
 						<LinkPicker
@@ -308,6 +302,7 @@ function ButtonEdit( props ) {
 		createPageEntity,
 		userCanCreatePages,
 		lockUrlControls = false,
+		lockTextControls = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSelected ) {
@@ -316,23 +311,31 @@ function ButtonEdit( props ) {
 
 			const _settings = select( blockEditorStore ).getSettings();
 
-			const blockBindingsSource = getBlockBindingsSource(
-				metadata?.bindings?.url?.source
-			);
+			// A bound attribute is locked unless its source lets the user
+			// edit the value, which is also what makes the canvas read-only.
+			const isLocked = ( binding ) =>
+				!! binding &&
+				! getBlockBindingsSource( binding.source )?.canUserEditValue?.(
+					{
+						select,
+						context,
+						args: binding.args,
+					}
+				);
 
 			return {
 				createPageEntity: _settings.__experimentalCreatePageEntity,
 				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
-				lockUrlControls:
-					!! metadata?.bindings?.url &&
-					! blockBindingsSource?.canUserEditValue?.( {
-						select,
-						context,
-						args: metadata?.bindings?.url?.args,
-					} ),
+				lockUrlControls: isLocked( metadata?.bindings?.url ),
+				lockTextControls: isLocked( metadata?.bindings?.text ),
 			};
 		},
-		[ context, isSelected, metadata?.bindings?.url ]
+		[
+			context,
+			isSelected,
+			metadata?.bindings?.url,
+			metadata?.bindings?.text,
+		]
 	);
 
 	async function handleCreate( pageTitle ) {
@@ -364,6 +367,25 @@ function ButtonEdit( props ) {
 	function startEditing( event ) {
 		event.preventDefault();
 		setIsEditingURL( true );
+	}
+
+	// The canvas, the link popover, and the content panel write through
+	// these so the three can't drift.
+	function setText( value ) {
+		// A link inside the button's own link is invalid HTML.
+		setAttributes( { text: removeAnchorTag( value ) } );
+	}
+
+	function setLink( changes ) {
+		setAttributes(
+			getUpdatedLinkAttributes( {
+				rel,
+				url,
+				opensInNewTab,
+				nofollow,
+				...changes,
+			} )
+		);
 	}
 
 	function unlink() {
@@ -461,11 +483,7 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) =>
-						setAttributes( {
-							text: removeAnchorTag( value ),
-						} )
-					}
+					onChange={ setText }
 					withoutInteractiveFormatting
 					className={ clsx(
 						className,
@@ -525,20 +543,7 @@ function ButtonEdit( props ) {
 				>
 					<LinkControl
 						value={ linkValue }
-						onChange={ ( {
-							url: newURL,
-							opensInNewTab: newOpensInNewTab,
-							nofollow: newNofollow,
-						} ) =>
-							setAttributes(
-								getUpdatedLinkAttributes( {
-									rel,
-									url: newURL,
-									opensInNewTab: newOpensInNewTab,
-									nofollow: newNofollow,
-								} )
-							)
-						}
+						onChange={ setLink }
 						onRemove={ () => {
 							unlink();
 							richTextRef.current?.focus();
@@ -554,9 +559,14 @@ function ButtonEdit( props ) {
 			{ hasContentControls && (
 				<InspectorControls group="content">
 					<ContentControls
-						attributes={ attributes }
-						setAttributes={ setAttributes }
+						text={ text }
+						url={ url }
+						opensInNewTab={ opensInNewTab }
+						isTextEditable={ ! lockTextControls }
 						isLinkEditable={ isLinkTag && ! lockUrlControls }
+						setText={ setText }
+						setLink={ setLink }
+						unlink={ unlink }
 					/>
 				</InspectorControls>
 			) }
