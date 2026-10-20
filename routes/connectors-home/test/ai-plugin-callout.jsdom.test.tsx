@@ -40,13 +40,6 @@ vi.mock( import( '@wordpress/components' ), async () => {
 							children
 						)
 		),
-		ExternalLink: ( {
-			href,
-			children,
-		}: {
-			href: string;
-			children: ReactNode;
-		} ) => createElement( 'a', { href }, children ),
 	} as unknown as typeof import( '@wordpress/components' );
 } );
 

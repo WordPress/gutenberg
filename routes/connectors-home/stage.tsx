@@ -1,10 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
-import {
-	Button,
-	__experimentalHeading as Heading,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import {
 	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
@@ -13,7 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { Notice } from '@wordpress/ui';
+import { Notice, Stack, Text } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
@@ -118,21 +113,22 @@ function ConnectorsPage() {
 						</Notice.Root>
 					) }
 				{ isEmpty ? (
-					<VStack
-						alignment="center"
-						spacing={ 3 }
+					<Stack
+						direction="column"
+						align="center"
+						gap="md"
 						style={ { maxWidth: 480 } }
 					>
-						<VStack alignment="center" spacing={ 2 }>
-							<Heading level={ 2 } size={ 15 }>
+						<Stack direction="column" align="center" gap="sm">
+							<Text variant="heading-lg" render={ <h2 /> }>
 								{ __( 'No connectors yet' ) }
-							</Heading>
-							<WCText size={ 12 }>
+							</Text>
+							<Text variant="body-sm">
 								{ __(
 									'Connectors appear here when you install plugins that use external services. Each plugin registers the API keys it needs, and you manage them all in one place.'
 								) }
-							</WCText>
-						</VStack>
+							</Text>
+						</Stack>
 						<Button
 							variant="secondary"
 							href="plugin-install.php"
@@ -140,11 +136,11 @@ function ConnectorsPage() {
 						>
 							{ __( 'Learn more' ) }
 						</Button>
-					</VStack>
+					</Stack>
 				) : (
-					<VStack spacing={ 3 }>
+					<Stack direction="column" gap="md">
 						<AiPluginCallout />
-						<VStack spacing={ 3 } role="list">
+						<Stack direction="column" gap="md" role="list">
 							{ connectors.map(
 								( connector: ConnectorConfig ) => {
 									if ( connector.render ) {
@@ -168,8 +164,8 @@ function ConnectorsPage() {
 									return null;
 								}
 							) }
-						</VStack>
-					</VStack>
+						</Stack>
+					</Stack>
 				) }
 				{ canInstallPlugins && ! isFileModDisabled && (
 					<p className="connectors-page__help-text">
