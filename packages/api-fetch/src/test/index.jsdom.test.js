@@ -131,6 +131,47 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'bad_request',
 			message: 'Bad Request',
+			data: { status: 400 },
+		} );
+	} );
+
+	it( 'should add the status to the data of an error response', async () => {
+		globalThis.fetch.mockResolvedValue( {
+			ok: false,
+			status: 500,
+			async json() {
+				return {
+					code: 'db_update_error',
+					message: 'Could not update post in the database.',
+					data: { reason: 'test' },
+				};
+			},
+		} );
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'db_update_error',
+			message: 'Could not update post in the database.',
+			data: { reason: 'test', status: 500 },
+		} );
+	} );
+
+	it( 'should keep the data of an error response', async () => {
+		globalThis.fetch.mockResolvedValue( {
+			ok: false,
+			status: 403,
+			async json() {
+				return {
+					code: 'rest_forbidden',
+					message: 'Forbidden',
+					data: { status: 401 },
+				};
+			},
+		} );
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'rest_forbidden',
+			message: 'Forbidden',
+			data: { status: 401 },
 		} );
 	} );
 
@@ -146,6 +187,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 200 },
 		} );
 	} );
 
@@ -161,6 +203,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 200 },
 		} );
 	} );
 
@@ -234,6 +277,22 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 200 },
+		} );
+	} );
+
+	it( 'should return the redirect address with an invalid JSON error', async () => {
+		const response = new Response( '<html></html>', { status: 200 } );
+		Object.defineProperties( response, {
+			redirected: { value: true },
+			url: { value: 'http://example.com/wp-login.php' },
+		} );
+		globalThis.fetch.mockResolvedValue( response );
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+			data: { status: 200, url: 'http://example.com/wp-login.php' },
 		} );
 	} );
 
@@ -245,6 +304,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 500 },
 		} );
 	} );
 
@@ -357,6 +417,7 @@ describe( 'apiFetch', () => {
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'rest_cookie_invalid_nonce',
+			data: { status: 403 },
 		} );
 	} );
 

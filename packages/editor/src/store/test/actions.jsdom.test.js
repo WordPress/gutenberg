@@ -427,7 +427,7 @@ describe( 'Post actions', () => {
 						},
 					},
 				},
-				'There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+				'There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown\n\nError 500',
 			],
 			[
 				'ignores a PHP error message that is not a string',
@@ -436,7 +436,25 @@ describe( 'Post actions', () => {
 					message: 'Server error.',
 					data: { status: 500, error: { message: [ 'unexpected' ] } },
 				},
-				'Server error.',
+				'Server error.\n\nError 500',
+			],
+			[
+				'shows the status of a response that is not JSON',
+				{
+					code: 'invalid_json',
+					message: 'The response is not a valid JSON response.',
+					data: { status: 502 },
+				},
+				'Error 502',
+			],
+			[
+				'shows no details for a successful response that is not JSON',
+				{
+					code: 'invalid_json',
+					message: 'The response is not a valid JSON response.',
+					data: { status: 200 },
+				},
+				undefined,
 			],
 		] )( '%s', async ( _description, serverError, expectedDetails ) => {
 			const post = {

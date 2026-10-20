@@ -32,8 +32,38 @@ async function parseJsonAndNormalizeError(
 		throw {
 			code: 'invalid_json',
 			message: __( 'The response is not a valid JSON response.' ),
+			...getResponseData( response ),
 		};
 	}
+}
+
+/**
+ * Returns the response's status, and the address it was redirected to, in the
+ * shape of a REST error's `data`.
+ *
+ * @param response
+ * @return Object with a `data` property, or an empty object.
+ */
+function getResponseData( response: Response ) {
+	if ( typeof response.status !== 'number' ) {
+		return {};
+	}
+	return {
+		data: {
+			status: response.status,
+			...( response.redirected && { url: response.url } ),
+		},
+	};
+}
+
+/**
+ * Returns whether a value is an object other than an array.
+ *
+ * @param value
+ * @return Whether the value is a plain object.
+ */
+function isPlainObject( value: unknown ): value is Record< string, any > {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
 }
 
 /**
@@ -75,5 +105,16 @@ export async function parseAndThrowError(
 	}
 
 	// Parse the response JSON and throw it as an error.
-	throw await parseJsonAndNormalizeError( response );
+	const error = await parseJsonAndNormalizeError( response );
+
+	// Like WordPress's own REST errors, an error carries the status in `data`.
+	if (
+		isPlainObject( error ) &&
+		( error.data === undefined || isPlainObject( error.data ) ) &&
+		error.data?.status === undefined &&
+		typeof response.status === 'number'
+	) {
+		throw { ...error, data: { ...error.data, status: response.status } };
+	}
+	throw error;
 }

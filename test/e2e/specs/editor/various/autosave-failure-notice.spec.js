@@ -5,6 +5,9 @@ const {
 
 const AUTOSAVE_FAILED = 'Auto-save failed. You can also save manually.';
 
+const AUTOSAVE_FAILED_LOGGED_OUT =
+	'Auto-save failed because you may have been logged out.';
+
 const AUTOSAVE_FAILED_NO_RESPONSE =
 	'Auto-save failed because there was no response from the server. You can also save manually.';
 
@@ -92,12 +95,16 @@ test.describe( 'Autosave failure notice', () => {
 		[
 			'database connection lost',
 			'database-connection-lost',
-			withDetails( 'Error establishing a database connection' ),
+			withDetails(
+				'Error establishing a database connection\n\nError 500'
+			),
 		],
 		[
 			'error message containing a link',
 			'link-in-message',
-			withDetails( 'Blocked. Learn more (https://example.com).' ),
+			withDetails(
+				'Blocked. Learn more (https://example.com).\n\nError 403'
+			),
 		],
 		// TODO: Retry right away.
 		[
@@ -105,46 +112,42 @@ test.describe( 'Autosave failure notice', () => {
 			'dropped-connection',
 			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
-		// TODO: Show the status code.
-		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
+		[ 'error without a message', 'no-message', withDetails( 'Error 500' ) ],
 		[
 			'error with a plain text message',
 			'plain-message',
-			withDetails( 'Something went wrong on the server.' ),
+			withDetails( 'Something went wrong on the server.\n\nError 500' ),
 		],
 		[
 			'permission denied',
 			'permission',
-			withDetails( 'Sorry, you are not allowed to edit this post.' ),
+			withDetails(
+				'Sorry, you are not allowed to edit this post.\n\nError 403'
+			),
 		],
+		// The error's `data` is the database error, so there is no status in it.
 		[
 			'database write failed',
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
-		// TODO: Show the status code (502) instead.
-		[
-			'HTML error page',
-			'bad-gateway',
-			withDetails( 'The response is not a valid JSON response.' ),
-		],
-		// TODO: Show the status code (429) instead.
+		[ 'HTML error page', 'bad-gateway', withDetails( 'Error 502' ) ],
 		[
 			'too many requests',
 			'too-many-requests',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails( 'Error 429' ),
 		],
+		// The error is printed before the headers, so the status stays 200.
 		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		],
-		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED_LOGGED_OUT,
 		],
 		[
 			'redirected to another site',
@@ -155,7 +158,7 @@ test.describe( 'Autosave failure notice', () => {
 			'maintenance mode',
 			'maintenance',
 			withDetails(
-				'Briefly unavailable for scheduled maintenance. Check back in a minute.'
+				'Briefly unavailable for scheduled maintenance. Check back in a minute.\n\nError 503'
 			),
 		],
 		// TODO: Report the failure; the autosave fails without a notice.
@@ -210,7 +213,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.autosave();
 		// TODO: Say the session expired and offer to log in again.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'Cookie check failed' ),
+			withDetails( 'Cookie check failed\n\nError 403' ),
 		] );
 	} );
 
@@ -223,7 +226,7 @@ test.describe( 'Autosave failure notice', () => {
 		const title = await autosaveFailure.autosave();
 		// TODO: Don't report a failure; the autosave was stored.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		] );
 
 		const postId = await page.evaluate( () =>
