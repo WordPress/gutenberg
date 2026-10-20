@@ -14,6 +14,7 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
+import type { DistributiveOmit } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import type { ForwardedRef, ReactElement, RefAttributes } from 'react';
@@ -725,7 +726,9 @@ const RichTextWithDeprecations = withDeprecations( ForwardedRichTextWrapper );
 type RichTextComponent = ( <
 	V extends RichTextFieldValue = RichTextFieldValue,
 >(
-	props: Omit< RichTextProps< V >, 'ref' > & RefAttributes< HTMLElement >
+	// Distributive, to keep the plain text variant of `onChange` apart.
+	props: DistributiveOmit< RichTextProps< V >, 'ref' > &
+		RefAttributes< HTMLElement >
 ) => ReactElement | null ) & {
 	Content: typeof Content;
 	isEmpty: typeof isEmpty;

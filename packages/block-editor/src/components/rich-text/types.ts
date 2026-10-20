@@ -175,7 +175,8 @@ type InputEvents = Set< ( event: InputEvent ) => void >;
 type RichTextValueProps< V extends RichTextFieldValue > =
 	| {
 			value?: V;
-			onChange?: ( value: V ) => void;
+			// Only `value` picks the value type.
+			onChange?: ( value: NoInfer< V > ) => void;
 			__unstableDisableFormats?: false;
 	  }
 	| {
