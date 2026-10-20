@@ -2,15 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DashboardGrid` and `DashboardLanes` accept `columns` as a `ColumnSteps` map from container width to count, so a surface can step its count by container width, composed with `minColumnWidth` as before; an `'auto'` step lifts the cap from its width up and leaves the count to the floor ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
-### Enhancements
-
--   `DashboardGrid` and `DashboardLanes` accept `columns` as a `ColumnSteps` map from container width to count, so a surface can step its count by container width, composed with `minColumnWidth` as before; an `'auto'` step lifts the cap from its width up and leaves the count to the floor ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
 
 ### Internal
 
