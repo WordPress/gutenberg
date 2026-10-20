@@ -931,6 +931,42 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			] );
 	} );
 
+	test( 'should highlight a single block the selection box touches', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->` );
+
+		const paragraph1 = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		const paragraph1Box = await paragraph1.boundingBox();
+		await page.mouse.move( paragraph1Box.x - 20, paragraph1Box.y + 1 );
+		await page.mouse.down();
+		await paragraph1.hover( { position: { x: 1, y: 1 } } );
+		await page.mouse.up();
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1 ] );
+		await expect( paragraph1 ).toHaveClass( /\bis-fully-selected\b/ );
+		// The block is selected as a whole, not its text.
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
+			)
+			.toBe( '' );
+	} );
+
 	test( 'should select the inner blocks the selection box touches within a container', async ( {
 		page,
 		editor,

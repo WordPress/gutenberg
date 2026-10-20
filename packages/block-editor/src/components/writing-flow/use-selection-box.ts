@@ -172,7 +172,8 @@ export default function useSelectionBox() {
 				selectedRange = range;
 
 				if ( range ) {
-					multiSelect( range[ 0 ], range[ 1 ] );
+					// No caret: a single block stays selected as a whole.
+					multiSelect( range[ 0 ], range[ 1 ], null );
 				} else {
 					clearSelectedBlock();
 				}
