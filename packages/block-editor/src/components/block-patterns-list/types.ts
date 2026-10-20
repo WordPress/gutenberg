@@ -8,8 +8,10 @@ import type { PaginationProps } from '../block-patterns-paging/types';
  */
 export interface BlockPatternsListPattern extends Pick<
 	BlockPattern,
-	'title' | 'description' | 'type' | 'syncStatus' | 'id'
+	'title' | 'description' | 'type' | 'syncStatus'
 > {
+	/** Template patterns carry the template's string ID. */
+	id?: number | string;
 	name: string;
 	blocks: Block[];
 	viewportWidth?: number;
