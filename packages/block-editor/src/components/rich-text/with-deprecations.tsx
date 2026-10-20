@@ -4,12 +4,14 @@ import { __unstableCreateElement } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import type { ComponentType } from 'react';
 import RichTextMultiline from './multiline';
-import type { RichTextProps } from './types';
+import type { RichTextFieldValue, RichTextProps } from './types';
 
 export function withDeprecations( Component: ComponentType< RichTextProps > ) {
 	return forwardRef< HTMLElement, RichTextProps >( ( props, ref ) => {
 		let value = props.value;
-		let onChange = props.onChange;
+		// A field with formats disabled passes the string it was given.
+		let onChange = props.onChange as
+			( ( value: RichTextFieldValue ) => void ) | undefined;
 
 		// Handle deprecated format.
 		if ( Array.isArray( value ) ) {
@@ -23,7 +25,7 @@ export function withDeprecations( Component: ComponentType< RichTextProps > ) {
 			value = childrenSource.toHTML( value );
 			onChange = ( newValue ) =>
 				// A field always gets `onChange` with a value.
-				props.onChange!(
+				( props.onChange as ( value: RichTextFieldValue ) => void )(
 					childrenSource.fromDOM(
 						// The value was converted to an HTML string above.
 						__unstableCreateElement( document, newValue as string )

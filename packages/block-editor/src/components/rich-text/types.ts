@@ -17,6 +17,7 @@ import type {
 } from '@wordpress/rich-text';
 import type { usesContextKey } from './format-edit';
 import type { Completer } from '../autocomplete/types';
+import type { InitialPosition } from '../../store/types';
 
 // `@wordpress/rich-text` does not export the format type.
 type FormatType = NonNullable< ReturnType< typeof registerFormatType > >;
@@ -168,20 +169,33 @@ type Shortcuts = Set< ( event: KeyboardEvent ) => void >;
 type InputEvents = Set< ( event: InputEvent ) => void >;
 
 /**
+ * The value props. `onChange` receives the same kind of value the field was
+ * given, or the plain text when formats are disabled.
+ */
+type RichTextValueProps< V extends RichTextFieldValue > =
+	| {
+			value?: V;
+			onChange?: ( value: V ) => void;
+			__unstableDisableFormats?: false;
+	  }
+	| {
+			value?: V;
+			onChange?: ( value: string ) => void;
+			__unstableDisableFormats: true;
+	  };
+
+/**
  * Props of the `RichText` component. Other props go to the editable element.
- * `onChange` receives the same kind of value the field was given.
  */
 export type RichTextOwnProps<
 	V extends RichTextFieldValue = RichTextFieldValue,
-> = {
+> = RichTextValueProps< V > & {
 	children?: ( props: {
 		value: RichTextValue;
 		onChange: ( value: RichTextValue ) => void;
 		onFocus: () => void;
 	} ) => ReactNode;
 	tagName?: ElementType;
-	value?: V;
-	onChange?: ( value: V ) => void;
 	isSelected?: boolean;
 	multiline?: boolean | string;
 	inlineToolbar?: boolean;
@@ -190,7 +204,7 @@ export type RichTextOwnProps<
 	onReplace?: (
 		blocks: Block | Block[],
 		indexToSelect?: number,
-		initialPosition?: number
+		initialPosition?: InitialPosition
 	) => void;
 	placeholder?: string;
 	allowedFormats?: readonly string[];
@@ -204,7 +218,6 @@ export type RichTextOwnProps<
 	preserveWhiteSpace?: boolean;
 	__unstablePastePlainText?: boolean;
 	__unstableEmbedURLOnPaste?: boolean;
-	__unstableDisableFormats?: boolean;
 	disableLineBreaks?: boolean;
 	__unstableAllowPrefixTransformations?: boolean;
 	readOnly?: boolean;
