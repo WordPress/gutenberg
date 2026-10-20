@@ -1,8 +1,19 @@
+export interface ManifestDoc {
+	id: string;
+	name: string;
+	title?: string;
+	path?: string;
+	content?: string;
+	summary?: string;
+	error?: { name: string; message: string };
+}
+
 export interface ManifestComponent {
 	id: string;
 	name: string;
 	path: string;
 	description?: string;
+	docs?: Record< string, ManifestDoc >;
 	stories?: Array< {
 		name: string;
 		snippet?: string;
@@ -49,4 +60,16 @@ export interface ComponentDetail {
 		snippet?: string;
 		description?: string;
 	} >;
+}
+
+export interface GuidanceSummary {
+	id: string;
+	title: string;
+	summary: string;
+	/** Canonical names of the components the page is attached to. */
+	components: string[];
+}
+
+export interface GuidanceDoc extends GuidanceSummary {
+	content: string;
 }
