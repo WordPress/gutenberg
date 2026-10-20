@@ -4,15 +4,28 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
+import type { Block } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import type { BlockEditorThunkArgs, InserterItem } from '../../../store/types';
+import type { InserterConfig, InsertBlocks } from '../types';
+
+interface Destination {
+	destinationRootClientId: string | null | undefined;
+	/** The insertion point index, which an unset insertion point lacks. */
+	destinationIndex: number | undefined;
+}
 
 function getIndex( {
 	destinationRootClientId,
 	destinationIndex,
 	rootClientId,
 	registry,
-} ) {
+}: Destination & {
+	rootClientId: string | null | undefined;
+	registry: DataRegistry;
+} ): number | undefined {
 	if ( rootClientId === destinationRootClientId ) {
 		return destinationIndex;
 	}
@@ -20,7 +33,8 @@ function getIndex( {
 		'',
 		...registry
 			.select( blockEditorStore )
-			.getBlockParents( destinationRootClientId ),
+			// A missing root has no parents.
+			.getBlockParents( destinationRootClientId as string ),
 		destinationRootClientId,
 	];
 	const parentIndex = parents.indexOf( rootClientId );
@@ -28,7 +42,8 @@ function getIndex( {
 		return (
 			registry
 				.select( blockEditorStore )
-				.getBlockIndex( parents[ parentIndex + 1 ] ) + 1
+				// The root is below a parent, so a block follows it in the list.
+				.getBlockIndex( parents[ parentIndex + 1 ] as string ) + 1
 		);
 	}
 	return registry.select( blockEditorStore ).getBlockOrder( rootClientId )
@@ -38,18 +53,26 @@ function getIndex( {
 /**
  * Resolves where an insertion from this inserter lands.
  *
- * @param {Object}   selectors             Unlocked `core/block-editor` selectors.
- * @param {Object}   config                Inserter config.
- * @param {string}   config.rootClientId   Root the inserter belongs to.
- * @param {number=}  config.insertionIndex Explicit index to insert at.
- * @param {string=}  config.clientId       Block to insert after.
- * @param {boolean=} config.isAppender     Whether the inserter is an appender.
- * @return {{ destinationRootClientId: string, destinationIndex: number }} Destination.
+ * @param selectors             Unlocked `core/block-editor` selectors.
+ * @param config                Inserter config.
+ * @param config.rootClientId   Root the inserter belongs to.
+ * @param config.insertionIndex Explicit index to insert at.
+ * @param config.clientId       Block to insert after.
+ * @param config.isAppender     Whether the inserter is an appender.
+ * @return Destination.
  */
 function getDestination(
-	selectors,
-	{ rootClientId, insertionIndex, clientId, isAppender }
-) {
+	selectors: BlockEditorThunkArgs[ 'select' ],
+	{
+		rootClientId,
+		insertionIndex,
+		clientId,
+		isAppender,
+	}: Pick<
+		InserterConfig,
+		'rootClientId' | 'insertionIndex' | 'clientId' | 'isAppender'
+	>
+): Destination {
 	const {
 		getSelectedBlockClientId,
 		getBlockRootClientId,
@@ -85,24 +108,17 @@ function getDestination(
 }
 
 /**
- * @typedef WPInserterConfig
- *
- * @property {string=}   rootClientId   If set, insertion will be into the
- *                                      block with this ID.
- * @property {number=}   insertionIndex If set, insertion will be into this
- *                                      explicit position.
- * @property {string=}   clientId       If set, insertion will be after the
- *                                      block with this ID.
- * @property {boolean=}  isAppender     Whether the inserter is an appender
- *                                      or not.
- * @property {Function=} onSelect       Called after insertion.
- */
-
-/**
  * Returns the insertion point state given the inserter config.
  *
- * @param {WPInserterConfig} config Inserter Config.
- * @return {Array} Insertion Point State (rootClientID, onInsertBlocks and onToggle).
+ * @param config                     Inserter Config.
+ * @param config.rootClientId        If set, insertion will be into the block with this ID.
+ * @param config.insertionIndex      If set, insertion will be into this explicit position.
+ * @param config.clientId            If set, insertion will be after the block with this ID.
+ * @param config.isAppender          Whether the inserter is an appender or not.
+ * @param config.onSelect            Called after insertion.
+ * @param config.shouldFocusBlock    Whether to focus the inserted block.
+ * @param config.selectBlockOnInsert Whether to select the inserted block.
+ * @return Insertion Point State (rootClientID, onInsertBlocks and onToggle).
  */
 function useInsertionPoint( {
 	rootClientId = '',
@@ -112,7 +128,11 @@ function useInsertionPoint( {
 	onSelect,
 	shouldFocusBlock = true,
 	selectBlockOnInsert = true,
-} ) {
+}: InserterConfig ): [
+	string | null | undefined,
+	InsertBlocks,
+	( item: InserterItem | null ) => void,
+] {
 	const registry = useRegistry();
 	const {
 		getSelectedBlock,
@@ -139,7 +159,7 @@ function useInsertionPoint( {
 	} = unlock( useDispatch( blockEditorStore ) );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const onInsertBlocks = useCallback(
+	const onInsertBlocks: InsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false, _rootClientId ) => {
 			// When we are trying to move focus or select a new block on insert, we also
 			// need to clear the last focus to avoid the focus being set to the wrong block
@@ -165,7 +185,7 @@ function useInsertionPoint( {
 			if ( _rootClientId === undefined ) {
 				const names = (
 					Array.isArray( blocks ) ? blocks : [ blocks ]
-				).map( ( block ) => block.name );
+				).map( ( block: Block ) => block.name );
 				_rootClientId = getClosestAllowedInsertionPoint(
 					names,
 					destination.destinationRootClientId
@@ -246,7 +266,7 @@ function useInsertionPoint( {
 	);
 
 	const onToggleInsertionPoint = useCallback(
-		( item ) => {
+		( item: InserterItem | null ) => {
 			if ( item ) {
 				const destination = getDestination(
 					unlock( registry.select( blockEditorStore ) ),

@@ -15,6 +15,8 @@ import {
 	sitePatternsCategory,
 	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
+import type { BlockPattern } from '../../../store/types';
+import type { PatternListProps } from '../types';
 
 function PatternList( {
 	searchValue,
@@ -22,14 +24,15 @@ function PatternList( {
 	patternCategories,
 	rootClientId,
 	onModalClose,
-} ) {
-	const container = useRef();
+}: PatternListProps ) {
+	const container = useRef< HTMLDivElement >( null );
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		rootClientId,
 		shouldFocusBlock: true,
 	} );
 	const [ patterns, , onClickPattern ] = usePatternsState(
+		// @ts-expect-error Bug: the pattern name is passed unwrapped, as the meta object, which the store ignores.
 		onInsertBlocks,
 		destinationRootClientId,
 		selectedCategory
@@ -44,7 +47,7 @@ function PatternList( {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
-		const filteredPatterns = patterns.filter( ( pattern ) => {
+		const filteredPatterns = patterns.filter( ( pattern: BlockPattern ) => {
 			if ( selectedCategory === allPatternsCategory.name ) {
 				return true;
 			}
@@ -63,7 +66,12 @@ function PatternList( {
 			if ( selectedCategory === 'uncategorized' ) {
 				const hasKnownCategory =
 					pattern.categories?.some( ( category ) =>
-						registeredPatternCategories.includes( category )
+						// A category can also be a numeric user category.
+						(
+							registeredPatternCategories as Array<
+								string | number
+							>
+						 ).includes( category )
 					) ?? false;
 
 				return ! pattern.categories?.length || ! hasKnownCategory;

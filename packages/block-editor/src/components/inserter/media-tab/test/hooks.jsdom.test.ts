@@ -12,16 +12,33 @@ const { storeStub } = vi.hoisted( () => ( {
 		canInsertBlockType: vi.fn( () => true ),
 	},
 } ) );
-vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	useSelect: ( mapSelect ) => mapSelect( () => storeStub ),
-} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		...actual,
+		// The hooks only pass a map function, which reads from the stub.
+		useSelect: ( ( mapSelect: ( select: () => unknown ) => unknown ) =>
+			mapSelect(
+				() => storeStub
+			) ) as unknown as typeof actual.useSelect,
+	};
+} );
 // The hook reaches the category list through `unlock`, so the stub has to be
 // locked rather than mocked: the store itself unlocks at import time.
 lock( storeStub, storeStub );
 
+// The stub categories return only the fields the hook passes through.
+const useStubMediaResults = useMediaResults as (
+	category: {
+		name: string;
+		fetch?: ( ...args: never[] ) => Promise< unknown >;
+	},
+	query?: Record< string, unknown >,
+	refreshKey?: unknown
+) => ReturnType< typeof useMediaResults >;
+
 describe( 'useMediaResults', () => {
-	const createCategory = ( name, items ) => ( {
+	const createCategory = ( name: string, items: unknown ) => ( {
 		name,
 		fetch: vi.fn( async () => items ),
 	} );
@@ -29,7 +46,7 @@ describe( 'useMediaResults', () => {
 	it( 'fetches and returns media for the query', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		const { result } = renderHook( () =>
-			useMediaResults( category, { search: '' }, 0 )
+			useStubMediaResults( category, { search: '' }, 0 )
 		);
 		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
 		expect( category.fetch ).toHaveBeenCalledWith( { search: '' } );
@@ -39,7 +56,7 @@ describe( 'useMediaResults', () => {
 	it( 'omits the default first page from the fetch query', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		renderHook( () =>
-			useMediaResults(
+			useStubMediaResults(
 				category,
 				{ per_page: 20, page: 1, search: '' },
 				0
@@ -56,7 +73,7 @@ describe( 'useMediaResults', () => {
 	it( 'passes `page` to the fetch query when paging past the first page', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		renderHook( () =>
-			useMediaResults(
+			useStubMediaResults(
 				category,
 				{ per_page: 20, page: 2, search: '' },
 				0
@@ -74,7 +91,7 @@ describe( 'useMediaResults', () => {
 	it( 'leaves paging totals undefined for an array-returning source', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		const { result } = renderHook( () =>
-			useMediaResults( category, { search: '' }, 0 )
+			useStubMediaResults( category, { search: '' }, 0 )
 		);
 		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
 		expect( result.current.totalItems ).toBeUndefined();
@@ -91,7 +108,7 @@ describe( 'useMediaResults', () => {
 			} ) ),
 		};
 		const { result } = renderHook( () =>
-			useMediaResults( category, { search: '' }, 0 )
+			useStubMediaResults( category, { search: '' }, 0 )
 		);
 		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
 		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
@@ -102,7 +119,7 @@ describe( 'useMediaResults', () => {
 	it( 'clears the previous results when the query changes', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		const { result, rerender } = renderHook(
-			( { query } ) => useMediaResults( category, query, 0 ),
+			( { query } ) => useStubMediaResults( category, query, 0 ),
 			{ initialProps: { query: { search: 'a' } } }
 		);
 		await waitFor( () =>
@@ -110,7 +127,8 @@ describe( 'useMediaResults', () => {
 		);
 
 		// Hold the next request open so the intermediate (cleared) state is observable.
-		let resolveFetch;
+		// Set by the pending fetch below.
+		let resolveFetch!: ( value: unknown ) => void;
 		category.fetch.mockImplementationOnce(
 			() =>
 				new Promise( ( resolve ) => {
@@ -131,7 +149,7 @@ describe( 'useMediaResults', () => {
 		const category = createCategory( 'attached-images', [ { id: 1 } ] );
 		const { result, rerender } = renderHook(
 			( { refreshKey } ) =>
-				useMediaResults( category, { search: '' }, refreshKey ),
+				useStubMediaResults( category, { search: '' }, refreshKey ),
 			{ initialProps: { refreshKey: 0 } }
 		);
 		await waitFor( () =>
@@ -139,7 +157,8 @@ describe( 'useMediaResults', () => {
 		);
 
 		// Hold the refetch open so we can assert the grid is not blanked.
-		let resolveFetch;
+		// Set by the pending fetch below.
+		let resolveFetch!: ( value: unknown ) => void;
 		category.fetch.mockImplementationOnce(
 			() =>
 				new Promise( ( resolve ) => {
@@ -162,14 +181,16 @@ describe( 'useMediaResults', () => {
 			{ id: 1 },
 		] );
 		const { result, rerender } = renderHook(
-			( { category } ) => useMediaResults( category, { search: '' }, 0 ),
+			( { category } ) =>
+				useStubMediaResults( category, { search: '' }, 0 ),
 			{ initialProps: { category: firstCategory } }
 		);
 		await waitFor( () =>
 			expect( result.current.mediaList ).toEqual( [ { id: 1 } ] )
 		);
 
-		let resolveFetch;
+		// Set by the pending fetch below.
+		let resolveFetch!: ( value: unknown ) => void;
 		const secondCategory = {
 			name: 'attached-images',
 			fetch: vi.fn(
@@ -201,13 +222,21 @@ describe( 'useMediaResults', () => {
 		// itself: by the time effects have run the list has been cleared
 		// either way, and it's the render in between that would put the
 		// previous source's items on screen.
-		const renders = [];
+		const renders: Array< {
+			source: string;
+			mediaList: unknown[];
+		} > = [];
 		const { result, rerender } = renderHook(
 			( { category } ) => {
-				const results = useMediaResults( category, { search: '' }, 0 );
+				const results = useStubMediaResults(
+					category,
+					{ search: '' },
+					0
+				);
 				renders.push( {
 					source: category.name,
-					mediaList: results.mediaList,
+					// The list is set from the first render, as the source switches.
+					mediaList: results.mediaList as unknown[],
 				} );
 				return results;
 			},
@@ -218,7 +247,8 @@ describe( 'useMediaResults', () => {
 		);
 		expect( result.current.isSwitchingSource ).toBe( false );
 
-		let resolveFetch;
+		// Set by the pending fetch below.
+		let resolveFetch!: ( value: unknown ) => void;
 		const videos = {
 			name: 'videos',
 			fetch: vi.fn(
@@ -254,7 +284,8 @@ describe( 'useMediaResults', () => {
 	it( 'does not refetch when only the category wrapper changes', async () => {
 		const fetch = vi.fn( async () => [ { id: 1 } ] );
 		const { result, rerender } = renderHook(
-			( { category } ) => useMediaResults( category, { search: '' }, 0 ),
+			( { category } ) =>
+				useStubMediaResults( category, { search: '' }, 0 ),
 			{
 				initialProps: {
 					category: {

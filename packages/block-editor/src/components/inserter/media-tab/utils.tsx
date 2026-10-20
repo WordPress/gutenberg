@@ -1,18 +1,21 @@
 import { createBlock } from '@wordpress/blocks';
 import { inertValue } from '@wordpress/react-inert-value';
+import type { Block } from '@wordpress/blocks';
+import type { ReactElement, SyntheticEvent } from 'react';
 import FilePreview from './file-preview';
+import type { MediaItem, MediaType } from './types';
 
-const mediaTypeTag = { image: 'img', video: 'video' };
-
-/** @typedef {import('./hooks').InserterMediaItem} InserterMediaItem */
+const mediaTypeTag: Partial< Record< MediaType, 'img' | 'video' > > = {
+	image: 'img',
+	video: 'video',
+};
 
 /**
  * A media item minus `title`, which the interface types as a required
  * string while core sources spread in the REST record's `{ raw, rendered }`
  * object and others may omit it. Neither helper here reads it.
- *
- * @typedef {Omit<InserterMediaItem, 'title'>} MediaItemFields
  */
+type MediaItemFields = Omit< MediaItem, 'title' >;
 
 /**
  * A media item's id, used for item identity in the grid.
@@ -23,23 +26,26 @@ const mediaTypeTag = { image: 'img', video: 'video' };
  * it serves as the fallback rather than stringifying `undefined` and giving
  * every such item the same id.
  *
- * @param {MediaItemFields} media The media object.
- * @return {string} The id, as a string.
+ * @param media The media object.
+ * @return The id, as a string.
  */
-export function getItemId( media ) {
+export function getItemId( media: MediaItemFields ): string {
 	return String( media.id ?? media.sourceId ?? media.url );
 }
 
 /**
  * Creates a block and a preview element from a media object.
  *
- * @param {MediaItemFields}           media     The media object to create the block from.
- * @param {('image'|'audio'|'video')} mediaType The media type to create the block for.
- * @return {[WPBlock, React.JSX.Element]} An array containing the block and the preview element.
+ * @param media     The media object to create the block from.
+ * @param mediaType The media type to create the block for.
+ * @return An array containing the block and the preview element.
  */
-export function getBlockAndPreviewFromMedia( media, mediaType ) {
+export function getBlockAndPreviewFromMedia(
+	media: MediaItemFields,
+	mediaType: MediaType
+): [ Block, ReactElement ] {
 	// Add the common attributes between the different media types.
-	const attributes = {
+	const attributes: Record< string, unknown > = {
 		id: media.id || undefined,
 		caption: media.caption || undefined,
 	};
@@ -57,7 +63,9 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 			src={ media.previewUrl || mediaSrc }
 			alt={ alt }
 			inert={ inertValue( true ) }
-			onError={ ( { currentTarget } ) => {
+			onError={ ( {
+				currentTarget,
+			}: SyntheticEvent< HTMLImageElement | HTMLVideoElement > ) => {
 				// Fall back to the media source if the preview cannot be loaded.
 				if ( currentTarget.src === media.previewUrl ) {
 					currentTarget.src = mediaSrc;

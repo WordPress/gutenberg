@@ -12,6 +12,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Bug Fixes
+
+-   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
+
 ### Internal
 
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).

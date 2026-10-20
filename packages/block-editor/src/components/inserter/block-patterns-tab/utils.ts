@@ -1,36 +1,43 @@
 import { __, _x } from '@wordpress/i18n';
+import type { BlockPattern } from '../../../store/types';
+import type { PatternCategory } from '../types';
 
+// The literal types name the pattern types.
 export const INSERTER_PATTERN_TYPES = {
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
-};
+} as const;
 
+// The literal types name the sync types.
 export const INSERTER_SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
-};
+} as const;
 
 export const INSERTER_AUTHOR_TYPES = {
 	currentUser: 'currentUser',
 };
 
-export const allPatternsCategory = {
+export const allPatternsCategory: PatternCategory = {
 	name: 'allPatterns',
 	label: _x( 'All', 'patterns' ),
 };
 
-export const sitePatternsCategory = {
+export const sitePatternsCategory: PatternCategory = {
 	name: 'sitePatterns',
 	label: __( 'Site patterns' ),
 };
 
-export const starterPatternsCategory = {
+export const starterPatternsCategory: PatternCategory = {
 	name: 'core/starter-content',
 	label: __( 'Starter content' ),
 };
 
-function hasRegisteredCategory( pattern, allCategories ) {
+function hasRegisteredCategory(
+	pattern: BlockPattern,
+	allCategories: PatternCategory[]
+) {
 	if ( ! pattern.categories || ! pattern.categories.length ) {
 		return false;
 	}
@@ -45,12 +52,15 @@ function hasRegisteredCategory( pattern, allCategories ) {
  * sorted by label. An "Uncategorized" category is appended when some pattern
  * belongs to no registered category.
  *
- * @param {Array} patterns      The patterns to derive the categories from.
- * @param {Array} allCategories The registered pattern categories.
+ * @param patterns      The patterns to derive the categories from.
+ * @param allCategories The registered pattern categories.
  *
- * @return {Array} The populated categories.
+ * @return The populated categories.
  */
-export function getPopulatedCategories( patterns, allCategories ) {
+export function getPopulatedCategories(
+	patterns: BlockPattern[],
+	allCategories: PatternCategory[]
+): PatternCategory[] {
 	const categories = allCategories
 		.filter( ( category ) =>
 			patterns.some( ( pattern ) =>
@@ -75,11 +85,11 @@ export function getPopulatedCategories( patterns, allCategories ) {
 }
 
 export function isPatternFiltered(
-	pattern,
-	sourceFilter,
-	syncFilter,
-	authorFilter
-) {
+	pattern: BlockPattern,
+	sourceFilter: string,
+	syncFilter?: string,
+	authorFilter?: string
+): boolean {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
 		pattern.source === 'core' ||

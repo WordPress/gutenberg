@@ -236,8 +236,17 @@ export interface BlockPattern {
 	syncStatus?: string;
 	blockTypes?: string[];
 	inserter?: boolean;
+	/** Where the pattern comes from, e.g. `core` or `theme`. */
+	source?: string;
+	/** Whether the current user authored this user pattern. */
+	isCurrentUserPattern?: boolean;
 	[ key: string ]: unknown;
 }
+
+/**
+ * A pattern with its parsed blocks, as the allowed patterns come.
+ */
+export type ParsedBlockPattern = BlockPattern & { blocks: Array< Block > };
 
 /**
  * A user pattern as returned by the REST API.

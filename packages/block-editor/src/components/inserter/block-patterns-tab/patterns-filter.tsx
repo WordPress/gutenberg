@@ -15,10 +15,11 @@ import {
 	INSERTER_PATTERN_TYPES,
 	INSERTER_AUTHOR_TYPES,
 } from './utils';
+import type { PatternCategory, PatternsFilterProps } from '../types';
 
-const getShouldDisableSyncFilter = ( sourceFilter ) =>
+const getShouldDisableSyncFilter = ( sourceFilter: string ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
-const getShouldHideSourcesFilter = ( category ) => {
+const getShouldHideSourcesFilter = ( category: PatternCategory ) => {
 	return category.name === sitePatternsCategory.name;
 };
 
@@ -61,7 +62,7 @@ export function PatternsFilter( {
 	patternAuthorFilter,
 	scrollContainerRef,
 	category,
-} ) {
+}: PatternsFilterProps ) {
 	// If the category is `sitePatterns` then we need to set the source filter to `user`, but
 	// we do this by deriving from props rather than calling setPatternSourceFilter otherwise
 	// the user may be confused when switching to another category if the haven't explicitly set
@@ -106,7 +107,7 @@ export function PatternsFilter( {
 		[ shouldDisableSyncFilter ]
 	);
 
-	function handleSetSourceFilterChange( newSourceFilter ) {
+	function handleSetSourceFilterChange( newSourceFilter: string ) {
 		setPatternSourceFilter( newSourceFilter );
 		if ( getShouldDisableSyncFilter( newSourceFilter ) ) {
 			setPatternSyncFilter( 'all' );
@@ -192,6 +193,7 @@ export function PatternsFilter( {
 								),
 								{
 									Link: (
+										// @ts-expect-error `createInterpolateElement` fills in the children.
 										<ExternalLink
 											href={ __(
 												'https://wordpress.org/patterns/'
