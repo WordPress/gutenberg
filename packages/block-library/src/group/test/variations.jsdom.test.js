@@ -42,8 +42,8 @@ describe( 'Group variations', () => {
 			align: 'full',
 			layout: {
 				type: 'grid',
-				columnCount: 12,
-				rowCount: 12,
+				columnCount: 32,
+				rowCount: 32,
 				isManualPlacement: true,
 			},
 		} );

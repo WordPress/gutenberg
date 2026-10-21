@@ -82,7 +82,7 @@ const variations = [
 		icon: grid,
 		example,
 	},
-	// A full width grid of 12 by 12 cells in manual placement mode, where
+	// A full width grid of 32 by 32 cells in manual placement mode, where
 	// blocks are placed, sized and rotated on the canvas. Manual grids can
 	// only be edited that way with the grid interactivity experiment, so
 	// the variation is only offered with it. It sets no padding, so that it
@@ -99,8 +99,8 @@ const variations = [
 						align: 'full',
 						layout: {
 							type: 'grid',
-							columnCount: 12,
-							rowCount: 12,
+							columnCount: 32,
+							rowCount: 32,
 							isManualPlacement: true,
 						},
 					},
