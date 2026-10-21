@@ -8,6 +8,8 @@
 
 ### New Features
 
+-   `Badge`: Add an optional `infotip` popup with a trailing info icon.
+
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 
 ### Enhancements
