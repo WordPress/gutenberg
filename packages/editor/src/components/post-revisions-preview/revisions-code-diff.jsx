@@ -206,8 +206,28 @@ export function RevisionsCodeDiff( {
 		);
 	}
 
-	const label = showDiff ? __( 'Code changes' ) : __( 'Revision code' );
+	return (
+		<CodeDiffTable
+			rows={ rows }
+			showDiff={ showDiff }
+			label={ showDiff ? __( 'Code changes' ) : __( 'Revision code' ) }
+			emptyMessage={ __( 'This revision is empty.' ) }
+		/>
+	);
+}
 
+/**
+ * Renders code-diff rows as a scrollable, read-only table. Shared by post
+ * revisions and global styles revisions.
+ *
+ * @param {Object}        props              Component props.
+ * @param {Array<Object>} props.rows         Rows from `getCodeDiffRows`.
+ * @param {boolean}       props.showDiff     Whether rows carry change markers.
+ * @param {string}        props.label        Accessible name of the region.
+ * @param {string}        props.emptyMessage Message shown when there are no rows.
+ * @return {React.JSX.Element} The code-diff table.
+ */
+export function CodeDiffTable( { rows, showDiff, label, emptyMessage } ) {
 	return (
 		<div
 			className="editor-revisions-code-diff"
@@ -273,7 +293,7 @@ export function RevisionsCodeDiff( {
 				</table>
 			) : (
 				<p className="editor-revisions-code-diff__empty">
-					{ __( 'This revision is empty.' ) }
+					{ emptyMessage }
 				</p>
 			) }
 		</div>
