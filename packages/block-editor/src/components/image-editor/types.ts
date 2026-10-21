@@ -1,5 +1,15 @@
 import type { CSSProperties, ReactNode } from 'react';
-import type { Area } from '@wordpress/image-cropper';
+
+/**
+ * A crop area in pixels. It matches the cropper's `Area`, declared here so
+ * the public declarations do not load the cropper's types.
+ */
+export interface CropArea {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
 
 /**
  * Border classes and styles of the edited image.
@@ -93,7 +103,7 @@ export type ImageEditorCropperProps = Pick<
 export interface TransformImage {
 	editedUrl: string | undefined;
 	setEditedUrl: ( url: string | undefined ) => void;
-	crop: Area | undefined;
+	crop: CropArea | undefined;
 	zoom: number;
 	setZoom: ( zoom: number ) => void;
 	rotation: number;

@@ -2263,6 +2263,26 @@
 				":visited"
 			]
 		},
+		"stylesSelectPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesSelectPseudoSelectorsPropertyNames": {
+			"enum": [ ":active", ":focus", ":focus-visible", ":hover" ]
+		},
 		"stylesTextInputPseudoSelectorsProperties": {
 			"type": "object",
 			"properties": {
@@ -2508,11 +2528,17 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesSelectPseudoSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesSelectPseudoSelectorsPropertyNames"
 									}
 								]
 							}
