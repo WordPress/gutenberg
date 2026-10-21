@@ -52,6 +52,30 @@ describe( 'resolveColumnCap', () => {
 			)
 		).toBeUndefined();
 	} );
+
+	it( 'rounds a count down and never below one', () => {
+		expect( resolveColumnCap( { columns: 2.5 }, 1000 ) ).toBe( 2 );
+		expect( resolveColumnCap( { columns: 0.2 }, 1000 ) ).toBe( 1 );
+		expect( resolveColumnCap( { columns: { 0: 2.5 } }, 1000 ) ).toBe( 2 );
+	} );
+
+	it( 'ignores a count that is not a finite number', () => {
+		expect( resolveColumnCap( { columns: NaN }, 1000 ) ).toBeUndefined();
+		expect(
+			resolveColumnCap( { columns: Infinity }, 1000 )
+		).toBeUndefined();
+	} );
+
+	it( 'skips a step that is neither a count nor auto', () => {
+		const steps = { 0: 2, 600: '3', 960: NaN } as unknown as ColumnSteps;
+		expect( resolveColumnCap( { columns: steps }, 1000 ) ).toBe( 2 );
+		expect(
+			resolveColumnCap(
+				{ columns: { 0: '3' } as unknown as ColumnSteps },
+				1000
+			)
+		).toBeUndefined();
+	} );
 } );
 
 describe( 'resolveColumnCount', () => {
@@ -150,6 +174,32 @@ describe( 'resolveColumnCount', () => {
 	it( 'renders the default on a lone auto step with no floor', () => {
 		expect(
 			resolveColumnCount( { columns: { 0: 'auto' } }, 1000, GAP, 6 )
+		).toBe( 6 );
+	} );
+
+	it( 'treats a count that is not a finite number as unset', () => {
+		expect( resolveColumnCount( { columns: NaN }, 1000, GAP, 6 ) ).toBe(
+			6
+		);
+		expect(
+			resolveColumnCount(
+				{ columns: NaN, minColumnWidth: 240 },
+				1000,
+				GAP,
+				6
+			)
+		).toBe( 3 );
+	} );
+
+	it( 'ignores a floor that is not a finite positive number', () => {
+		expect(
+			resolveColumnCount( { minColumnWidth: Infinity }, 1000, GAP, 6 )
+		).toBe( 6 );
+		expect(
+			resolveColumnCount( { minColumnWidth: NaN }, 1000, GAP, 6 )
+		).toBe( 6 );
+		expect(
+			resolveColumnCount( { minColumnWidth: -1 }, 1000, GAP, 6 )
 		).toBe( 6 );
 	} );
 

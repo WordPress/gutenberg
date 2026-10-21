@@ -224,6 +224,8 @@ A step can be `'auto'`: from that width up there is no cap, and the floor alone 
 </DashboardGrid>
 ```
 
+A count is rounded down and never below one. A count that is not a finite number, or a step that is neither a count nor `'auto'`, is ignored.
+
 Layout items can provide an `order` to control display order
 independently of array position.
 

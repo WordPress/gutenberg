@@ -16,14 +16,25 @@ export interface ColumnPolicy {
 	minColumnWidth?: number;
 }
 
+function normalizeCount( count: unknown ): number | undefined {
+	return typeof count === 'number' && Number.isFinite( count )
+		? Math.max( 1, Math.floor( count ) )
+		: undefined;
+}
+
 function resolveFloor( { minColumnWidth }: ColumnPolicy ): number | undefined {
-	return minColumnWidth !== undefined && minColumnWidth > 0
+	return typeof minColumnWidth === 'number' &&
+		Number.isFinite( minColumnWidth ) &&
+		minColumnWidth > 0
 		? minColumnWidth
 		: undefined;
 }
 
 /**
  * The count the policy asks for at a container width, before the floor.
+ * Counts are rounded down and never below one; a count that is not a
+ * finite number, or a step that is neither a count nor `'auto'`, is
+ * ignored.
  *
  * @param policy         Column policy.
  * @param containerWidth Measured inline size of the surface in pixels.
@@ -35,21 +46,26 @@ export function resolveColumnCap(
 	containerWidth: number
 ): number | undefined {
 	const { columns } = policy;
-	if ( columns === undefined || typeof columns === 'number' ) {
-		return columns;
+	if ( typeof columns !== 'object' || columns === null ) {
+		return normalizeCount( columns );
 	}
 	const hasFloor = resolveFloor( policy ) !== undefined;
 	const widths = Object.keys( columns )
 		.map( Number )
 		.filter( Number.isFinite )
-		.filter( ( width ) => hasFloor || columns[ width ] !== 'auto' )
+		.filter( ( width ) => {
+			const step = columns[ width ];
+			return step === 'auto'
+				? hasFloor
+				: normalizeCount( step ) !== undefined;
+		} )
 		.sort( ( a, b ) => b - a );
 	if ( widths.length === 0 ) {
 		return undefined;
 	}
 	const reached = widths.find( ( width ) => containerWidth >= width );
 	const step = columns[ reached ?? widths[ widths.length - 1 ] ];
-	return typeof step === 'number' ? step : undefined;
+	return step === 'auto' ? undefined : normalizeCount( step );
 }
 
 /**
