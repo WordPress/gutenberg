@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { getMinimumInsertionRect } from '../get-minimum-insertion-rect';
 import { GridRect, getGridTracks } from '../utils';
 
-// Six 40px columns and six 40px rows, with 10px gaps: three tracks and their
-// two gaps measure 140px, and four measure 190px.
-const columnTracks = getGridTracks( '40px 40px 40px 40px 40px 40px', 10 );
-const rowTracks = getGridTracks( '40px 40px 40px 40px 40px 40px', 10 );
+// Eight 40px columns and eight 40px rows, with 10px gaps: three tracks and
+// their two gaps measure 140px, and four measure 190px.
+const tracks = getGridTracks( '40px 40px 40px 40px 40px 40px 40px 40px', 10 );
+const columnTracks = tracks;
+const rowTracks = tracks;
 
 function toPlain( rect ) {
 	return {
@@ -39,9 +40,9 @@ describe( 'getMinimumInsertionRect()', () => {
 	} );
 
 	it( 'grows to the left and up at the edges of the grid', () => {
-		expect( getRect( { columnStart: 6, rowStart: 5 } ) ).toEqual( {
-			columnStart: 3,
-			rowStart: 3,
+		expect( getRect( { columnStart: 8, rowStart: 7 } ) ).toEqual( {
+			columnStart: 5,
+			rowStart: 5,
 			columnSpan: 4,
 			rowSpan: 4,
 		} );
@@ -79,22 +80,41 @@ describe( 'getMinimumInsertionRect()', () => {
 		} );
 	} );
 
-	it( 'stays smaller than the minimum in a grid that is too small', () => {
+	it( 'never grows past half of the grid', () => {
 		expect(
 			toPlain(
 				getMinimumInsertionRect( {
 					rect: new GridRect( { columnStart: 2, rowStart: 1 } ),
-					columnTracks: getGridTracks( '40px 40px', 10 ),
-					rowTracks: getGridTracks( '40px 40px 40px', 10 ),
+					columnTracks: getGridTracks( '40px 40px 40px 40px', 10 ),
+					rowTracks: getGridTracks( '40px 40px 40px 40px 40px', 10 ),
 					minimumWidth: 160,
 					minimumHeight: 160,
 				} )
 			)
 		).toEqual( {
-			columnStart: 1,
+			columnStart: 2,
 			rowStart: 1,
 			columnSpan: 2,
-			rowSpan: 3,
+			rowSpan: 2,
+		} );
+	} );
+
+	it( 'stays one cell in a two by two grid', () => {
+		expect(
+			toPlain(
+				getMinimumInsertionRect( {
+					rect: new GridRect( { columnStart: 2, rowStart: 1 } ),
+					columnTracks: getGridTracks( '40px 40px', 10 ),
+					rowTracks: getGridTracks( '40px 40px', 10 ),
+					minimumWidth: 160,
+					minimumHeight: 160,
+				} )
+			)
+		).toEqual( {
+			columnStart: 2,
+			rowStart: 1,
+			columnSpan: 1,
+			rowSpan: 1,
 		} );
 	} );
 
@@ -106,14 +126,14 @@ describe( 'getMinimumInsertionRect()', () => {
 					columnTracks,
 					rowTracks,
 					minimumWidth: 90,
-					minimumHeight: 200,
+					minimumHeight: 190,
 				} )
 			)
 		).toEqual( {
 			columnStart: 1,
 			rowStart: 1,
 			columnSpan: 2,
-			rowSpan: 5,
+			rowSpan: 4,
 		} );
 	} );
 
@@ -123,10 +143,13 @@ describe( 'getMinimumInsertionRect()', () => {
 				getMinimumInsertionRect( {
 					rect: new GridRect( { columnStart: 1, rowStart: 1 } ),
 					columnTracks: getGridTracks(
-						'41.66px 41.66px 41.66px',
+						'41.66px 41.66px 41.66px 41.66px 41.66px 41.66px',
 						10
 					),
-					rowTracks: getGridTracks( '41.66px 41.66px 41.66px', 10 ),
+					rowTracks: getGridTracks(
+						'41.66px 41.66px 41.66px 41.66px 41.66px 41.66px',
+						10
+					),
 					minimumWidth: 145,
 					minimumHeight: 145,
 				} )
@@ -140,8 +163,8 @@ describe( 'getMinimumInsertionRect()', () => {
 	} );
 
 	it( "doesn't change cells outside the grid's tracks", () => {
-		expect( getRect( { columnStart: 7, rowStart: 1 } ) ).toEqual( {
-			columnStart: 7,
+		expect( getRect( { columnStart: 9, rowStart: 1 } ) ).toEqual( {
+			columnStart: 9,
 			rowStart: 1,
 			columnSpan: 1,
 			rowSpan: 1,
