@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `invalidateResolution`: Make `args` optional in the types, since a selector without arguments is invalidated without them (#TBD).
+-   `invalidateResolution`: Make `args` optional in the types, since a selector without arguments is invalidated without them ([#85254](https://github.com/WordPress/gutenberg/pull/85254)).
 
 ### Internal
 

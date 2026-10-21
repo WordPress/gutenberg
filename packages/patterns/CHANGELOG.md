@@ -5,6 +5,7 @@
 ### Internal
 
 -   Convert the store, `isOverridableBlock`, the constants and `lock-unlock` to TypeScript ([#85253](https://github.com/WordPress/gutenberg/pull/85253)).
+-   Convert the pattern modals, the category selector and `useAddPatternCategory` to TypeScript ([#85254](https://github.com/WordPress/gutenberg/pull/85254)).
 
 ## 3.0.0 (2026-10-20)
 
