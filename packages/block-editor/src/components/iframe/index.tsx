@@ -60,8 +60,14 @@ function bubbleEvent(
 }
 
 /**
- * Bubbles some event types (keydown, keypress, and dragover) to parent document
- * document to ensure that the keyboard shortcuts and drag and drop work.
+ * Bubbles selected native events from the iframe document onto the outer
+ * `<iframe>` element so parent-document listeners can observe them.
+ *
+ * `dragover` and `mousemove` keep drag-and-drop and pointer tracking working
+ * across the frame boundary. `pointerdown`, `mousedown`, and `click` let
+ * parent-document popups (menus, selects, etc.) treat a canvas press as an
+ * outside press. Keyboard shortcuts are bubbled separately from the React
+ * `onKeyDown` handler on the iframe element.
  *
  * Ideally, we should remove event bubbling in the future. Keyboard shortcuts
  * should be context dependent, e.g. actions on blocks like Cmd+A should not
@@ -79,7 +85,13 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 		}
 		const { frameElement } = defaultView;
 		const html = iframeDocument!.documentElement;
-		const eventTypes = [ 'dragover', 'mousemove' ];
+		const eventTypes = [
+			'dragover',
+			'mousemove',
+			'pointerdown',
+			'mousedown',
+			'click',
+		];
 		const handlers: Record< string, ( event: Event ) => void > = {};
 		for ( const name of eventTypes ) {
 			handlers[ name ] = ( event ) => {
