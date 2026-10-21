@@ -104,9 +104,13 @@ export function getGridChildUpdates( {
 		updatedGridAttributes?.layout?.isManualPlacement &&
 		window.__experimentalEnableGridInteractivity
 	) {
+		// The row helpers type the same attributes a little differently.
+		type GrowthOptions = Parameters< typeof getGridGrowthUpdate >[ 0 ];
 		const gridUpdate = getGridGrowthUpdate( {
-			gridAttributes: updatedGridAttributes,
-			childStyle: updates[ clientId ].style,
+			gridAttributes:
+				updatedGridAttributes as GrowthOptions[ 'gridAttributes' ],
+			childStyle: updates[ clientId ]
+				.style as GrowthOptions[ 'childStyle' ],
 			selectedState,
 		} ) as GridBlockAttributes | undefined;
 		if ( gridUpdate ) {
