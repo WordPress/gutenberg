@@ -43,6 +43,7 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
+	// Calendar applies only text and background colors, not gradients.
 	$color_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor' ) ) );
 	foreach ( array( 'text', 'background' ) as $feature ) {
 		if ( isset( $attributes['style']['color'][ $feature ] ) ) {
