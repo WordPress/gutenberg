@@ -15,7 +15,7 @@
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../dom" },
+		{ "path": "../dom/tsconfig.build.json" },
 		{ "path": "../editor/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../fields/tsconfig.build.json" },

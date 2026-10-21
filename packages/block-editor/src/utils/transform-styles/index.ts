@@ -6,7 +6,10 @@ import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
 import type { EditorStyle, TransformOptions } from './types';
 
-const cacheByWrapperSelector = new Map();
+const cacheByWrapperSelector = new Map<
+	string,
+	WeakMap< EditorStyle, ReturnType< typeof transformStyle > >
+>();
 
 const ROOT_SELECTOR_TOKENS = [
 	{ type: 'type', content: 'body' },

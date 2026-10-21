@@ -19,7 +19,7 @@ permissions: {}
 jobs:
     remove-label:
         name: Remove the props-bot label
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             pull-requests: write
         timeout-minutes: 5
