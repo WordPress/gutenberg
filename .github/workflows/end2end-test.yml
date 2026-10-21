@@ -19,6 +19,9 @@ concurrency:
 
 env:
     BROWSERSLIST_IGNORE_OLD_DATA: true
+    # Runs WordPress on PHP 8.2, the highest version WordPress 6.2 supports, instead of
+    # whatever version the floating `wordpress` image uses.
+    WP_ENV_PHP_VERSION: '8.2'
 
 jobs:
     e2e-puppeteer:
