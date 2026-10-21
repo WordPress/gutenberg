@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import type { BlockType } from '@wordpress/blocks';
 import rotate, {
 	getRotateCSS,
 	getRotateForState,
@@ -12,53 +13,85 @@ const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
 const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
 const TABLET_STATE = { viewport: '@tablet', pseudo: 'default' };
 
+const testWindow = window as Window & {
+	__experimentalEnableBlockRotation?: boolean;
+};
+
+/**
+ * Returns a block type with only the settings a test needs. Rotation support
+ * only reads `supports` and `attributes`.
+ *
+ * @param settings Block type settings.
+ *
+ * @return The block type.
+ */
+function createBlockType( settings: Partial< BlockType > ): BlockType {
+	return settings as BlockType;
+}
+
 describe( 'rotate block support', () => {
 	afterEach( () => {
-		delete window.__experimentalEnableBlockRotation;
+		delete testWindow.__experimentalEnableBlockRotation;
 	} );
 
 	describe( 'hasRotateSupport()', () => {
 		it( 'is on for blocks that do not opt out', () => {
-			expect( hasRotateSupport( { supports: {} } ) ).toBe( true );
-			expect( hasRotateSupport( { supports: { rotate: true } } ) ).toBe(
-				true
-			);
+			expect(
+				hasRotateSupport( createBlockType( { supports: {} } ) )
+			).toBe( true );
+			expect(
+				hasRotateSupport(
+					createBlockType( { supports: { rotate: true } } )
+				)
+			).toBe( true );
 		} );
 
 		it( 'is off for blocks that opt out', () => {
-			expect( hasRotateSupport( { supports: { rotate: false } } ) ).toBe(
-				false
-			);
+			expect(
+				hasRotateSupport(
+					createBlockType( { supports: { rotate: false } } )
+				)
+			).toBe( false );
 		} );
 
 		it( 'is off for blocks whose own style attribute is not an object', () => {
 			expect(
-				hasRotateSupport( {
-					supports: {},
-					attributes: { style: { type: 'string' } },
-				} )
+				hasRotateSupport(
+					createBlockType( {
+						supports: {},
+						attributes: { style: { type: 'string' } },
+					} )
+				)
 			).toBe( false );
 			expect(
-				hasRotateSupport( {
-					supports: {},
-					attributes: { style: { type: 'object' } },
-				} )
+				hasRotateSupport(
+					createBlockType( {
+						supports: {},
+						attributes: { style: { type: 'object' } },
+					} )
+				)
 			).toBe( true );
 		} );
 	} );
 
 	describe( 'isRotateEnabled()', () => {
 		it( 'needs the block rotation experiment', () => {
-			expect( isRotateEnabled( { supports: {} } ) ).toBe( false );
-			window.__experimentalEnableBlockRotation = true;
-			expect( isRotateEnabled( { supports: {} } ) ).toBe( true );
+			expect(
+				isRotateEnabled( createBlockType( { supports: {} } ) )
+			).toBe( false );
+			testWindow.__experimentalEnableBlockRotation = true;
+			expect(
+				isRotateEnabled( createBlockType( { supports: {} } ) )
+			).toBe( true );
 		} );
 
 		it( 'needs the block to support rotation', () => {
-			window.__experimentalEnableBlockRotation = true;
-			expect( isRotateEnabled( { supports: { rotate: false } } ) ).toBe(
-				false
-			);
+			testWindow.__experimentalEnableBlockRotation = true;
+			expect(
+				isRotateEnabled(
+					createBlockType( { supports: { rotate: false } } )
+				)
+			).toBe( false );
 		} );
 	} );
 
@@ -282,20 +315,24 @@ describe( 'rotate block support', () => {
 
 	describe( 'style attributes that are not objects', () => {
 		it( 'are read as no rotation', () => {
+			// @ts-expect-error The style attribute is deliberately not an object.
 			expect( getRotateForState( 'rotate: 15deg', DEFAULT_STATE ) ).toBe(
 				0
 			);
+			// @ts-expect-error The style attribute is deliberately not an object.
 			expect( getRotateCSS( 'rotate: 15deg', '.wp-rotate-1' ) ).toBe(
 				''
 			);
 			expect(
 				getRotateCSS( { '@mobile': 'rotate' }, '.wp-rotate-1' )
 			).toBe( '' );
+			// @ts-expect-error The style attribute is deliberately not an object.
 			expect( rotate.isMatch( { style: 'rotate' } ) ).toBe( false );
 		} );
 
 		it( 'are replaced when a rotation is set', () => {
 			expect(
+				// @ts-expect-error The style attribute is deliberately not an object.
 				getUpdatedRotateStyle( 'rotate: 15deg', 15, DEFAULT_STATE )
 			).toEqual( { rotate: 15 } );
 			expect(
