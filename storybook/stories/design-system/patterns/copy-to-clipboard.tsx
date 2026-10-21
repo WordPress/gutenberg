@@ -1,10 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { check, copy, error } from '@wordpress/icons';
-import { Button } from '../button';
-import { IconButton } from '../icon-button';
-import { Stack } from '../stack';
-import { Text } from '../text';
+import { Button, IconButton, Stack, Text } from '@wordpress/ui';
 
 const SAMPLE_VALUE = 'Sample text';
 const FEEDBACK_TIMEOUT = 2000;
