@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
