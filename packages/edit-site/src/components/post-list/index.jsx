@@ -21,10 +21,7 @@ import {
 } from '../../utils/constants';
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import {
-	useEditPostAction,
-	useQuickEditPostAction,
-} from '../dataviews-actions';
+import { useQuickEditPostAction } from '../dataviews-actions';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -222,20 +219,42 @@ export default function PostList( { postType } ) {
 		[ postType ]
 	);
 
+	// The "Edit" action of `@wordpress/core-actions` does not navigate by
+	// itself: it signals it was performed, and the list opens the editor.
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
+			}
+		},
+		[ history ]
+	);
 	const postTypeActions = usePostActions( {
 		postType,
 		context: 'list',
+		onActionPerformed,
 	} );
-	const editAction = useEditPostAction();
 	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo( () => {
+		const editAction = postTypeActions.find(
+			( action ) => action.id === 'edit-post'
+		);
+		const otherActions = postTypeActions.filter(
+			( action ) => action.id !== 'edit-post'
+		);
 		if ( view.type === LAYOUT_LIST ) {
-			const editActionPrimary = { ...editAction, isPrimary: true };
-			return [ editActionPrimary, ...postTypeActions ];
+			return editAction
+				? [ { ...editAction, isPrimary: true }, ...otherActions ]
+				: otherActions;
 		}
 
-		return [ editAction, quickEditAction, ...postTypeActions ];
-	}, [ view.type, editAction, quickEditAction, postTypeActions ] );
+		return [
+			...( editAction ? [ editAction ] : [] ),
+			quickEditAction,
+			...otherActions,
+		];
+	}, [ view.type, quickEditAction, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
