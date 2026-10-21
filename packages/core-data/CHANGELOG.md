@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Performance
+
+-   Keep the local objects of blocks a collaborator's change left untouched when applying it, so a remote keystroke only gives the edited block new objects.
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes

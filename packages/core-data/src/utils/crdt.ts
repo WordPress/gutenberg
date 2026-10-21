@@ -500,10 +500,12 @@ export function getPostChangesFromCRDTDoc(
 
 	// Blocks extracted from the CRDT document have rich-text attributes as
 	// plain strings (from Y.Text.toJSON()). Convert them back to RichTextData
-	// so block edit components receive the same types as locally-created blocks.
+	// so block edit components receive the same types as locally-created
+	// blocks, and keep the local objects of blocks the change left alone.
 	if ( changes.blocks ) {
 		changes.blocks = deserializeBlockAttributes(
-			changes.blocks as Block[]
+			changes.blocks as Block[],
+			( editedRecord as PostChanges ).blocks
 		);
 	}
 
