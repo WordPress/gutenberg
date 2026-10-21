@@ -76,6 +76,31 @@ describe( 'downloadZipSource', () => {
 		expect( read( 'wp-content/uploads/2026/image.jpg' ) ).toBe( 'image' );
 	} );
 
+	it( 'restores preserved paths on the next download when the swap fails', async () => {
+		const options = {
+			onProgress: () => {},
+			preserve: [ 'wp-config.php', 'wp-content/uploads' ],
+		};
+		const rename = fs.promises.rename;
+		const spy = vi
+			.spyOn( fs.promises, 'rename' )
+			.mockImplementation( ( from, to ) =>
+				to === source.path
+					? Promise.reject( new Error( 'Swap failed.' ) )
+					: rename( from, to )
+			);
+
+		await expect( downloadZipSource( source, options ) ).rejects.toThrow(
+			'Swap failed.'
+		);
+		spy.mockRestore();
+		await downloadZipSource( source, options );
+
+		expect( read( 'index.php' ) ).toBe( 'new index' );
+		expect( read( 'wp-config.php' ) ).toBe( 'config' );
+		expect( read( 'wp-content/uploads/2026/image.jpg' ) ).toBe( 'image' );
+	} );
+
 	it( 'skips a preserved file the previous download does not have', async () => {
 		fs.rmSync( path.join( source.path, 'wp-config.php' ) );
 
