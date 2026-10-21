@@ -17,6 +17,8 @@
  * Registers the actions of WordPress core on each post type exposed in the
  * REST API, from what it supports and what the current user can do:
  *
+ * - `edit-post`, for pages, when the user can edit them. It opens the page
+ *   the way the screen showing it does, so it is only shown in the lists.
  * - `view-post`, for the viewable post types.
  * - `view-post-revisions`, for the post types supporting `revisions`.
  * - `duplicate-post`, for the post types the user can create, except
@@ -70,6 +72,7 @@ function register_core_entity_actions() {
 		// The actions of the post type, keyed by the folder of their script
 		// module and their id, in the order they are shown.
 		$applies = array(
+			'page/edit-post'                           => 'page' === $name && current_user_can( $post_type->cap->edit_posts ),
 			'post_type_supports/view-post'             => is_post_type_viewable( $post_type ),
 			'post_type_supports/view-post-revisions'   => post_type_supports( $name, 'revisions' ),
 			'post_type_supports/duplicate-post'        => $is_gutenberg && $can_create && ! in_array( $name, $design_types, true ),

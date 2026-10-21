@@ -41,6 +41,12 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	const PAGE_ACTIONS = array( 'set-as-homepage', 'set-as-posts-page' );
 
 	/**
+	 * The action of the `page` module opening a page, for the users who can
+	 * edit pages, shown before the others.
+	 */
+	const EDIT_PAGE_ACTION = 'edit-post';
+
+	/**
 	 * Administrator user id.
 	 *
 	 * @var int
@@ -154,19 +160,20 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * Pages are viewable and support revisions, titles, and page attributes,
-	 * and the user can create them and manage the site options: they have
-	 * every action of the `post_type_supports` module, then the actions of
-	 * the `page` module, in the order the actions are shown.
+	 * and the user can edit and create them and manage the site options: they
+	 * have the edit action of the `page` module, every action of the
+	 * `post_type_supports` module, then the other actions of the `page`
+	 * module, in the order the actions are shown.
 	 */
 	public function test_the_actions_of_pages() {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array_merge( array( 'view-post', 'view-post-revisions', 'duplicate-post', 'rename-post', 'order-pages' ), self::EVERY_POST_TYPE );
-		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
+		$this->assertSame( array_merge( array( self::EDIT_PAGE_ACTION ), $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
 		$this->assertSame(
 			array(
+				self::PAGE               => array_merge( array( self::EDIT_PAGE_ACTION ), self::PAGE_ACTIONS ),
 				self::POST_TYPE_SUPPORTS => $ids,
-				self::PAGE               => self::PAGE_ACTIONS,
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
@@ -306,6 +313,22 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The edit action of pages is only registered for the users who can edit
+	 * pages, and for pages only.
+	 */
+	public function test_the_edit_action_depends_on_the_current_user() {
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame( self::EDIT_PAGE_ACTION, $this->get_action_ids( 'page' )[0] );
+		$this->assertNotContains( self::EDIT_PAGE_ACTION, $this->get_action_ids( 'post' ), 'Only pages have the action.' );
+
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame( self::EDIT_PAGE_ACTION, $this->get_action_ids( 'page' )[0], 'Editors can edit pages.' );
+
+		wp_set_current_user( self::$contributor_id );
+		$this->assertNotContains( self::EDIT_PAGE_ACTION, $this->get_action_ids( 'page' ), 'Contributors cannot edit pages.' );
+	}
+
+	/**
 	 * Setting the homepage or the posts page changes the site settings, so
 	 * the actions of the `page` module are only registered for the users who
 	 * can manage the site options.
@@ -371,6 +394,15 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 			),
 			$actions['view-post-revisions']
 		);
+		$this->assertSame(
+			array(
+				'id'      => 'edit-post',
+				'label'   => 'Edit',
+				'context' => 'list',
+				'origin'  => array( 'registeredBy' => 'core' ),
+			),
+			$actions['edit-post']
+		);
 	}
 
 	/**
@@ -383,7 +415,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$schema = ( new Gutenberg_REST_Entity_Actions_Controller_7_2() )->get_item_schema();
 
 		$modules = array(
-			'page'             => array( self::POST_TYPE_SUPPORTS, self::PAGE ),
+			'page'             => array( self::PAGE, self::POST_TYPE_SUPPORTS ),
 			'wp_block'         => array( self::POST_TYPE_SUPPORTS, self::WP_BLOCK ),
 			'wp_template_part' => array( self::POST_TYPE_SUPPORTS, self::WP_TEMPLATE_PART ),
 		);
@@ -426,11 +458,11 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array( 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete' );
-		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
+		$this->assertSame( array_merge( array( self::EDIT_PAGE_ACTION ), $ids, self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
 		$this->assertSame(
 			array(
+				self::PAGE               => array_merge( array( self::EDIT_PAGE_ACTION ), self::PAGE_ACTIONS ),
 				self::POST_TYPE_SUPPORTS => array_merge( $ids, array( 'move-to-trash' ) ),
-				self::PAGE               => self::PAGE_ACTIONS,
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
