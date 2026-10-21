@@ -628,20 +628,19 @@ test.describe( 'Navigation block', () => {
 			await textInput.fill( 'Shop later' );
 			await expect( linkLabel ).toHaveText( 'Shop later' );
 			await expect( linkLabel.locator( 'strong' ) ).toHaveText( 'Shop' );
-			const clientId = await editor.canvas
-				.locator( '[data-type="core/navigation-link"]' )
+			// The menu's blocks are controlled inner blocks, so read them from
+			// the navigation block rather than the top of the tree.
+			const navClientId = await editor.canvas
+				.locator( '[data-type="core/navigation"]', { has: linkLabel } )
 				.getAttribute( 'data-block' );
 			await expect
-				.poll( () =>
-					page.evaluate(
-						( id ) =>
-							window.wp.data
-								.select( 'core/block-editor' )
-								.getBlockAttributes( id ).label,
-						clientId
-					)
-				)
-				.toBe( '<strong>Shop</strong> later' );
+				.poll( () => editor.getBlocks( { clientId: navClientId } ) )
+				.toMatchObject( [
+					{
+						name: 'core/navigation-link',
+						attributes: { label: '<strong>Shop</strong> later' },
+					},
+				] );
 		} );
 
 		test( 'should preserve focus in sidebar text input when typing (@firefox)', async ( {
