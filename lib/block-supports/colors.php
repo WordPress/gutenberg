@@ -161,7 +161,8 @@ function gutenberg_get_color_classes_and_styles( $block_attributes ) {
 	);
 
 	foreach ( $preset_attributes as $feature => list( $preset_attribute, $preset_type ) ) {
-		$preset_value                   = array_key_exists( $preset_attribute, $block_attributes ) ? "var:preset|{$preset_type}|{$block_attributes[ $preset_attribute ]}" : null;
+		$preset_slug                    = $block_attributes[ $preset_attribute ] ?? null;
+		$preset_value                   = is_string( $preset_slug ) && '' !== $preset_slug ? "var:preset|{$preset_type}|{$preset_slug}" : null;
 		$custom_value                   = $block_attributes['style']['color'][ $feature ] ?? null;
 		$color_block_styles[ $feature ] = $preset_value ?? $custom_value;
 	}
