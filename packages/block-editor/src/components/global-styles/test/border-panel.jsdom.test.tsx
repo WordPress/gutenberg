@@ -3,7 +3,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
 import BaseBorderPanel from '../border-panel';
-import type { BorderPanelProps, PresetsPerOrigin, ShadowPreset } from '../types';
+import type {
+	BorderPanelProps,
+	PresetsPerOrigin,
+	ShadowPreset,
+} from '../types';
 
 // The per-control indicators default to off now; these tests cover them.
 const BorderPanel = ( props: BorderPanelProps ) => (

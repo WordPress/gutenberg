@@ -293,11 +293,18 @@ export function useResolvedStyle(
  * the element or variation behind a source descriptor, which only carries its
  * layer.
  *
- * @param {?string} blockName Block name (e.g. `core/heading`).
- * @param {?string} className Block `className` used to detect an applied variation.
- * @return {{ globalStyles: ?Object, elements: string[], variationName: ?string }} Global Styles config, element layers (low to high precedence) and variation slug.
+ * @param blockName Block name (e.g. `core/heading`).
+ * @param className Block `className` used to detect an applied variation.
+ * @return Global Styles config, element layers (low to high precedence) and variation slug.
  */
-export function useResolvedStyleContext( blockName, className ) {
+export function useResolvedStyleContext(
+	blockName: string | null | undefined,
+	className?: string | null
+): {
+	globalStyles: GlobalStylesConfig | null;
+	elements: string[];
+	variationName: string | null | undefined;
+} {
 	const { variationName, headingLevel } = useVariationAndElements(
 		blockName,
 		className

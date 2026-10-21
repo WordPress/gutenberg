@@ -8,11 +8,7 @@ import BaseBackgroundPanel, {
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
 } from '../background-panel';
-import type {
-	BackgroundPanelProps,
-	PanelStyle,
-	StyleSettings,
-} from '../types';
+import type { BackgroundPanelProps, PanelStyle, StyleSettings } from '../types';
 
 // The per-control indicators default to off now; these tests cover them.
 const BackgroundPanel = ( props: BackgroundPanelProps ) => (
