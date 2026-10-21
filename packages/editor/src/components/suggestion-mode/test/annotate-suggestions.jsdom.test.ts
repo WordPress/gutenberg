@@ -1,10 +1,28 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { createElement } from '@wordpress/element';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { store as annotationsStore } from '@wordpress/annotations';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	createBlock,
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-import { suggestionAnnotations } from '../annotate-suggestions';
+import {
+	suggestionAnnotations,
+	useAnnotateSuggestionThreads,
+} from '../annotate-suggestions';
 import {
 	unregisterSuggestionFormats,
 	registerSuggestionFormat,
 } from '../../inline-suggestions';
+import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -161,5 +179,98 @@ describe( 'suggestionAnnotations', () => {
 		expect( ids() ).toEqual( [ '1', '3' ] );
 		expect( ids( 3 ) ).toEqual( [ '1', '3' ] );
 		expect( ids( 1 ) ).toEqual( [ '3', '1' ] );
+	} );
+} );
+
+describe( 'useAnnotateSuggestionThreads', () => {
+	const BLOCK = 'core/test-annotate-paragraph';
+	const marker = ( id: number, text: string ) =>
+		`<mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
+
+	beforeAll( () => {
+		registerSuggestionFormat();
+		registerBlockType( BLOCK, {
+			apiVersion: 3,
+			title: 'Annotate paragraph',
+			category: 'text',
+			attributes: { content: { type: 'rich-text' } },
+			save: () => null,
+		} as any );
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+		getBlockTypes().forEach( ( type ) => unregisterBlockType( type.name ) );
+	} );
+
+	function setup() {
+		const registry = createRegistry();
+		registry.register( coreStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		registry.register( annotationsStore );
+		const block = createBlock( BLOCK, {
+			content: RichTextData.fromHTMLString(
+				`a${ marker( 6, 'bc' ) }d${ marker( 5, 'ef' ) }g`
+			),
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		const threads = [ 5, 6 ].map( ( id ) => ( {
+			id,
+			status: 'hold',
+			blockClientId: block.clientId,
+			meta: { _wp_suggestion: delPayload() },
+		} ) );
+		renderHook( () => useAnnotateSuggestionThreads( threads ), {
+			wrapper: ( { children } ) =>
+				createElement(
+					RegistryProvider,
+					{ value: registry },
+					children
+				),
+		} );
+		const annotatedIds = () =>
+			(
+				registry
+					.select( annotationsStore )
+					.__experimentalGetAllAnnotationsForBlock(
+						block.clientId
+					) as any[]
+			 ).map( ( annotation ) => annotation.id );
+		return { registry, block, annotatedIds };
+	}
+
+	it( 'decorates only the selected suggestion', async () => {
+		const { registry, annotatedIds } = setup();
+		expect( annotatedIds() ).toEqual( [] );
+
+		await act( async () => {
+			unlock( registry.dispatch( editorStore ) ).selectNote( 6 );
+		} );
+		expect( annotatedIds() ).toEqual( [ '6' ] );
+	} );
+
+	it( 'leaves the annotations alone while an unselected marker grows', async () => {
+		const { registry, block, annotatedIds } = setup();
+		await act( async () => {
+			unlock( registry.dispatch( editorStore ) ).selectNote( 6 );
+		} );
+		const changes = vi.fn();
+		registry.subscribe( changes, annotationsStore );
+
+		// A collaborator typing into suggestion 5 grows its marker.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, {
+					content: RichTextData.fromHTMLString(
+						`a${ marker( 6, 'bc' ) }d${ marker( 5, 'efx' ) }g`
+					),
+				} );
+		} );
+
+		expect( changes ).not.toHaveBeenCalled();
+		expect( annotatedIds() ).toEqual( [ '6' ] );
 	} );
 } );

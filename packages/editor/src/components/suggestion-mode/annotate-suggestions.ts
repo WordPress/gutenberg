@@ -97,15 +97,46 @@ export function suggestionAnnotations(
 }
 
 /**
- * Resolve and decorate inline-suggestion ranges for the given threads.
+ * The threads to decorate: only the selected one. A marker's own class draws
+ * every suggestion, and the decoration inside it is painted transparent, so
+ * decorating the rest shows nothing. It still costs: each keystroke into a
+ * marker moves its range, an annotations store change that re-runs the
+ * annotation props of every block and rich text, on every collaborating peer.
  *
- * @param threads Note threads (suggestion comments).
+ * @param threads    Note threads (suggestion comments).
+ * @param selectedId Id of the selected note.
+ * @return The selected thread, or none.
  */
-export function useAnnotateSuggestionThreads( threads: any[] ) {
+function threadsToAnnotate(
+	threads: any[] | undefined,
+	selectedId?: number | string | null
+): any[] {
+	if (
+		! threads?.length ||
+		selectedId === undefined ||
+		selectedId === null
+	) {
+		return [];
+	}
+	return threads.filter(
+		( thread ) => String( thread.id ) === String( selectedId )
+	);
+}
+
+/**
+ * Resolve and decorate the selected inline suggestion's range.
+ *
+ * @param allThreads Note threads (suggestion comments).
+ */
+export function useAnnotateSuggestionThreads( allThreads: any[] ) {
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const selectedId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
+	);
+	const threads = useMemo(
+		() => threadsToAnnotate( allThreads, selectedId ),
+		[ allThreads, selectedId ]
 	);
 
 	// Reactive signature of the resolved ranges. Computed inside `useSelect`
@@ -145,7 +176,7 @@ export function useAnnotateSuggestionThreads( threads: any[] ) {
 }
 
 /**
- * Invisible component that decorates the post's pending inline suggestions.
+ * Invisible component that decorates the selected pending inline suggestion.
  * Mounted once inside the suggestion overlay provider so suggestion markers are
  * visible to everyone viewing the post (author, reviewers, the suggester after
  * a reload), in any editor intent — not just while editing in Suggest mode.
