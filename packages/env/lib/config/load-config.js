@@ -1,13 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
-const fs = require( 'fs' ).promises;
-
-/**
- * Internal dependencies
- */
+const { existsSync, promises: fsPromises } = require( 'fs' );
 const getCacheDirectory = require( './get-cache-directory' );
 const md5 = require( '../md5' );
 const { parseConfig, getConfigFilePath } = require( './parse-config' );
@@ -60,7 +53,7 @@ module.exports = async function loadConfig(
 	// If a custom config path was provided, verify the file exists.
 	if ( customConfigPath ) {
 		try {
-			await fs.stat( configFilePath );
+			await fsPromises.stat( configFilePath );
 		} catch {
 			throw new ValidationError(
 				`Config file not found: ${ configFilePath }`
@@ -68,10 +61,22 @@ module.exports = async function loadConfig(
 		}
 	}
 
-	const cacheDirectoryPath = path.resolve(
-		await getCacheDirectory(),
+	const cacheDirectory = await getCacheDirectory();
+
+	// If a cache already exists at the "legacy" path (which consists of a
+	// simple but opaque md5 hash), honor it.
+	let cacheDirectoryPath = path.resolve(
+		cacheDirectory,
 		md5( configFilePath )
 	);
+
+	// Otherwise, prefer a more descriptive path.
+	if ( ! existsSync( cacheDirectoryPath ) ) {
+		cacheDirectoryPath = path.resolve(
+			cacheDirectory,
+			buildDescriptiveCacheDirectoryName( configFilePath )
+		);
+	}
 
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.
@@ -125,6 +130,53 @@ module.exports = async function loadConfig(
 };
 
 /**
+ * Derives the descriptive cache directory name for a given config file path.
+ *
+ * Format: `wp-env-<project-dir>[-<variant>]-<short-hash>`.
+ *
+ * @param {string} configFilePath Absolute path to the resolved config file.
+ *
+ * @return {string} The directory name to use as the cache directory.
+ */
+function buildDescriptiveCacheDirectoryName( configFilePath ) {
+	const projectDirectory = path.basename( path.dirname( configFilePath ) );
+	const variant = getConfigVariant( configFilePath );
+	const shortHash = md5( configFilePath ).slice( 0, 8 );
+
+	const segments = [ 'wp-env', projectDirectory ];
+	if ( variant ) {
+		segments.push( variant );
+	}
+	segments.push( shortHash );
+
+	return segments.join( '-' );
+}
+
+/**
+ * Extracts a variant label from a config file name.
+ *
+ * Example: `.wp-env.test.json`   -> 'test'
+ *
+ * @param {string} configFilePath Absolute path to the resolved config file.
+ *
+ * @return {string} The sanitized variant, or '' if none could be derived.
+ */
+function getConfigVariant( configFilePath ) {
+	const basename = path.basename( configFilePath, '.json' );
+
+	let variant;
+	if ( basename === '.wp-env' ) {
+		variant = '';
+	} else if ( basename.startsWith( '.wp-env.' ) ) {
+		variant = basename.slice( '.wp-env.'.length );
+	} else {
+		variant = basename;
+	}
+
+	return variant.replace( /[^a-zA-Z0-9._]+/g, '-' ).replace( /^-+|-+$/g, '' );
+}
+
+/**
  * Checks to see whether or not there is any configuration present in the directory.
  *
  * @param {string[]} configFilePaths The config files we want to check for existence.
@@ -134,7 +186,7 @@ module.exports = async function loadConfig(
 async function hasLocalConfig( configFilePaths ) {
 	for ( const filePath of configFilePaths ) {
 		try {
-			await fs.stat( filePath );
+			await fsPromises.stat( filePath );
 			return true;
 		} catch {}
 	}

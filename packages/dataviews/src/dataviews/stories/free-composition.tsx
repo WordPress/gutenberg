@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useMemo,
@@ -8,23 +5,17 @@ import {
 } from '@wordpress/element';
 import {
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
-// TODO: enable in the ESlint rule once we complete
-// https://github.com/WordPress/gutenberg/issues/76135.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
 import { LAYOUT_TABLE } from '../../constants';
+import styles from './style.module.css';
 
 /**
  * Custom composition example
@@ -34,10 +25,10 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 
 	return (
 		<>
-			<Heading className="free-composition-heading" level={ 2 }>
+			<Heading className={ styles.heading } level={ 2 }>
 				{ __( 'Solar System numbers' ) }
 			</Heading>
-			<div className="free-composition-header">
+			<div className={ styles.header }>
 				<Stack direction="column" gap="lg">
 					<Stack direction="row" justify="start" gap="sm">
 						<DataViews.Search label={ __( 'Search content' ) } />
@@ -56,7 +47,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					<Card.Root>
 						<Card.Content>
 							<Stack direction="column" gap="sm">
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<PlanetsNumber /> planet',
@@ -71,9 +62,9 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<SatellitesNumber /> moon',
@@ -86,7 +77,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 							</Stack>
 						</Card.Content>
 					</Card.Root>
@@ -98,14 +89,13 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 								align="center"
 								gap="sm"
 							>
-								<DataViews.BulkActionToolbar />
-								<DataViews.Pagination />
+								<DataViews.Footer />
 							</Stack>
 						</Card.Content>
 					</Card.Root>
 				</Stack>
 			</div>
-			<DataViews.Layout className="free-composition-dataviews-layout" />
+			<DataViews.Layout className={ styles.layout } />
 		</>
 	);
 }
@@ -122,7 +112,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
  *   - `<DataViews.Pagination />` - Page navigation
  *   - `<DataViews.ViewConfig />` - View settings (columns, density, etc.)
  *   - `<DataViews.LayoutSwitcher />` - Switch between table/grid/list views
- *   - `<DataViews.BulkActionToolbar />` - Actions for selected items
+ *   - `<DataViews.Footer />` - Item count and pagination
  *   - `<DataViews.Layout />` - The data display (table, grid, etc.)
  *
  * This pattern is useful when you need full control over the UI layout
@@ -171,13 +161,15 @@ export const FreeCompositionComponent = () => {
 					gap="sm"
 					justify="space-around"
 					align="center"
-					className="free-composition-dataviews-empty"
+					className={ styles.empty }
 				>
-					<Text size={ 18 } as="p">
+					<WCText size={ 18 } as="p">
 						No planets
-					</Text>
-					<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-					<Button variant="secondary">Create new planet</Button>
+					</WCText>
+					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
+					<Button variant="secondary" __next40pxDefaultSize>
+						Create new planet
+					</Button>
 				</Stack>
 			}
 		>

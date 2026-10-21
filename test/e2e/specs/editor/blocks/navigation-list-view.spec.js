@@ -1,9 +1,9 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - List view editing', () => {
+	// WordPress always has this category, so nothing needs creating or removing.
+	const DEFAULT_CATEGORY_NAME = 'Uncategorized';
+
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
 		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
@@ -24,6 +24,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 		await requestUtils.createPage( {
 			title: 'Test Page 3',
+			status: 'publish',
+		} );
+		await requestUtils.createPost( {
+			title: 'Test Post 1',
 			status: 'publish',
 		} );
 	} );
@@ -133,6 +137,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 	test( `can add new menu items`, async ( {
 		page,
+		pageUtils,
 		editor,
 		requestUtils,
 		linkControl,
@@ -183,43 +188,141 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkUIInput ).toBeFocused();
 		await expect( linkUIInput ).toBeEmpty();
 
-		// Provides test coverage for feature whereby Custom Link type
-		// should default to `Pages` when displaying the "initial suggestions"
-		// in the Link UI.
-		// See https://github.com/WordPress/gutenberg/pull/54622.
-		const firstResult = await linkControl.getNthSearchResult( 0 );
-		const secondResult = await linkControl.getNthSearchResult( 1 );
-		const thirdResult = await linkControl.getNthSearchResult( 2 );
+		await test.step( 'default initial suggestions are all page type', async () => {
+			// Provides test coverage for feature whereby Custom Link type
+			// should default to `Pages` when displaying the "initial
+			// suggestions" in the Link UI.
+			// See https://github.com/WordPress/gutenberg/pull/54622.
+			const firstResult = await linkControl.getNthSearchResult( 0 );
+			const secondResult = await linkControl.getNthSearchResult( 1 );
+			const thirdResult = await linkControl.getNthSearchResult( 2 );
 
-		const firstResultType =
-			await linkControl.getSearchResultText( firstResult );
+			const firstResultType =
+				await linkControl.getSearchResultType( firstResult );
 
-		const secondResultType =
-			await linkControl.getSearchResultText( secondResult );
+			const secondResultType =
+				await linkControl.getSearchResultType( secondResult );
 
-		const thirdResultType =
-			await linkControl.getSearchResultText( thirdResult );
+			const thirdResultType =
+				await linkControl.getSearchResultType( thirdResult );
 
-		expect( firstResultType ).toContain( 'Page' );
-		expect( secondResultType ).toContain( 'Page' );
-		expect( thirdResultType ).toContain( 'Page' );
+			expect( firstResultType ).toBe( 'Page' );
+			expect( secondResultType ).toBe( 'Page' );
+			expect( thirdResultType ).toBe( 'Page' );
+		} );
 
-		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
+		await test.step( 'search from default link returns best page type matches first', async () => {
+			// Search for a string that is the start of a page title
+			await page.keyboard.type( 'Test', { delay: 50 } );
 
-		// Create the link.
-		await firstResult.click();
+			const searchedResults = await linkControl.getSearchResults();
 
-		// Check the new menu item was inserted at the end of the existing menu.
+			// The initial suggestions are pages, so wait for a result that can only
+			// come from the typed search before asserting on the order.
+			await expect(
+				searchedResults.filter( { hasText: 'Test Post 1' } )
+			).toBeVisible();
+
+			// The appended item is a Page Link, so first results should be pages
+			const types = await Promise.all(
+				[ 0, 1, 2 ].map( async ( index ) =>
+					linkControl.getSearchResultType(
+						await linkControl.getNthSearchResult( index )
+					)
+				)
+			);
+			expect( types ).toEqual( [ 'Page', 'Page', 'Page' ] );
+		} );
+
+		await test.step( 'can find taxonomy results via default link search', async () => {
+			// Replace the search text with a category name.
+			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
+
+			const searchedResults = await linkControl.getSearchResults();
+			const categoryResult = searchedResults.filter( {
+				hasText: DEFAULT_CATEGORY_NAME,
+			} );
+
+			await expect( categoryResult ).toBeVisible();
+
+			// Nothing else on the site holds the word, so the term leads.
+			expect(
+				await linkControl.getSearchResultType( searchedResults.first() )
+			).toBe( 'Category' );
+		} );
+
+		await test.step( 'can create a taxonomy result via default link search', async () => {
+			// select it with the keyboard
+			await pageUtils.pressKeys( 'ArrowDown' );
+
+			const categoryResult = (
+				await linkControl.getSearchResults()
+			).filter( { hasText: DEFAULT_CATEGORY_NAME } );
+
+			// URLInput is a combobox: focus stays on the input and the
+			// highlighted option carries `aria-selected`.
+			await expect( categoryResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+
+			// Submit the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Check the new menu item was inserted at the end of the existing menu.
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: DEFAULT_CATEGORY_NAME,
+					} )
+					.filter( {
+						hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
+					} )
+			).toBeVisible();
+		} );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/76803.
+	test( `can add a block from the link search results`, async ( {
+		page,
+		editor,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menuId,
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+
+		await expect( linkControl.getSearchInput() ).toBeFocused();
+		await page.keyboard.type( 'Home', { delay: 50 } );
+
+		await page
+			.getByRole( 'listbox', { name: /Search results/ } )
+			.getByRole( 'option', { name: /Home Link/ } )
+			.click();
+
+		// The block takes the new link's place at the end of the menu. Being
+		// the third of three shows the new link was not left behind.
 		await expect(
 			listView
-				.getByRole( 'gridcell', {
-					name: firstResultText,
-				} )
-				.filter( {
-					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
-				} )
+				.getByRole( 'gridcell', { name: 'Home Link' } )
+				.filter( { hasText: 'Block 3 of 3, Level 1.' } )
 		).toBeVisible();
 	} );
 
@@ -600,7 +703,241 @@ test.describe( 'Navigation block - List view editing', () => {
 			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
 		).toBeVisible();
 	} );
+
+	test( 'nests and un-nests menu items by dragging across the indentation', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->
+<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->
+<!-- wp:navigation-link {"label":"Item 3","type":"custom","url":"https://wordpress.org/3","kind":"custom"} /-->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+		const item = ( name ) =>
+			listView.getByRole( 'gridcell', { name, exact: true } );
+
+		await expect( item( 'Item 3' ) ).toBeVisible();
+
+		await test.step( 'dragging an item down and to the right nests it in the item above', async () => {
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 2' ),
+				indentation: 2,
+			} );
+
+			// Item 2 becomes a submenu holding Item 1.
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect(
+				item( 'Item 2' ).filter( { hasText: 'Block 1 of 2, Level 1.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'dragging an item down and to the left moves it out of the submenu', async () => {
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 3' ),
+				indentation: 1,
+			} );
+
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 3 of 3, Level 1.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'dragging an item up and to the right nests it in the item above', async () => {
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 3' ),
+				to: item( 'Item 2' ),
+				indentation: 2,
+			} );
+
+			await expect(
+				item( 'Item 3' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'dragging a nested item to the left of its level un-nests it', async () => {
+			// Put a second item in the submenu so there is a row to drop below.
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 3' ),
+				indentation: 2,
+			} );
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 2 of 2, Level 2.' } )
+			).toBeVisible();
+
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 3' ),
+				indentation: 1,
+			} );
+
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 2 of 2, Level 1.' } )
+			).toBeVisible();
+			await expect(
+				item( 'Item 3' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+	} );
+
+	test( 'nests the last menu item in the item above it after the drag passes over that item', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->
+<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+		const item = ( name ) =>
+			listView.getByRole( 'gridcell', { name, exact: true } );
+
+		await expect( item( 'Item 2' ) ).toBeVisible();
+
+		// The dragged item is the last row, so no row follows it to bound the
+		// gap the drop indicator opens: the cursor settles over the dragged
+		// item's own slot.
+		await dragListViewBlockTo( editor, {
+			from: item( 'Item 2' ),
+			to: item( 'Item 1' ),
+			indentation: 2,
+			overshoot: true,
+		} );
+
+		await expect(
+			item( 'Item 2' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+		).toBeVisible();
+	} );
+
+	test( 'adds a navigation link from the List View appender in a contentOnly locked section', async ( {
+		editor,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		await editor.setContent(
+			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+				`<div class="wp-block-group">` +
+				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
+				`</div>` +
+				`<!-- /wp:group -->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Top Level Item 1' } )
+		).toBeVisible();
+		// Items can be added here, as the canvas appender shows, so the List
+		// View offers its appender too.
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await expect( appender ).toBeVisible();
+		await appender.click();
+
+		await linkControl.searchFor( 'Test Page 1' );
+		await ( await linkControl.getNthSearchResult( 0 ) ).click();
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 1' } )
+		).toBeVisible();
+	} );
 } );
+
+/**
+ * Drags a List View row onto the bottom half of another row, with the cursor
+ * over the given indentation level, and drops it there.
+ *
+ * @param {Object}  editor              Editor utils.
+ * @param {Object}  options
+ * @param {Object}  options.from        Locator of the dragged row's cell.
+ * @param {Object}  options.to          Locator of the target row's cell.
+ * @param {number}  options.indentation Nesting level to hold the cursor over. `1` is the
+ *                                      target's own level, `2` nests inside it.
+ * @param {boolean} [options.overshoot] Pass over the top half of the target first, then come
+ *                                      back down to the drop position, the way a hand-driven
+ *                                      drag settles after passing its target.
+ */
+async function dragListViewBlockTo(
+	editor,
+	{ from, to, indentation, overshoot = false }
+) {
+	const { page } = editor;
+	// The drop zone measures the cursor against positions 24px apart from the
+	// row's left edge, one per nesting level, and rounds to the nearest one.
+	// Stay a few pixels right of the requested level's position so the
+	// rounding resolves to that level.
+	const NESTING_LEVEL_INDENTATION = 24;
+	const fromRow = from.locator( 'xpath=ancestor::*[@role="row"][1]' );
+	const toRow = to.locator( 'xpath=ancestor::*[@role="row"][1]' );
+	const fromRect = await fromRow.boundingBox();
+	const toRect = await toRow.boundingBox();
+	const x =
+		toRect.x +
+		NESTING_LEVEL_INDENTATION * indentation +
+		NESTING_LEVEL_INDENTATION / 4;
+	let y = toRect.y + toRect.height * 0.75;
+
+	await from.hover();
+	await page.mouse.down();
+	await page.mouse.move( x, fromRect.y + fromRect.height / 2, { steps: 5 } );
+	if ( overshoot ) {
+		await page.mouse.move( x, toRect.y + 6, { steps: 20 } );
+		// Disable reason: Let the rows displace before coming back down.
+		/* eslint-disable playwright/no-wait-for-timeout */
+		await editor.page.waitForTimeout( 300 );
+		/* eslint-enable playwright/no-wait-for-timeout */
+		// The target row has shifted down a row to make room for the drop
+		// indicator above it; its bottom half is now a row lower.
+		y += toRect.height;
+	}
+	await page.mouse.move( x, y, { steps: 20 } );
+	// Dispatch a final dragover at the drop position; see
+	// https://playwright.dev/docs/input#dragging-manually
+	await page.mouse.move( x + 1, y, { steps: 2 } );
+
+	// Disable reason: Need to wait until the throttle timeout of 250ms has passed.
+	/* eslint-disable playwright/no-wait-for-timeout */
+	await editor.page.waitForTimeout( 300 );
+	/* eslint-enable playwright/no-wait-for-timeout */
+
+	await page.mouse.up();
+}
 
 class LinkControl {
 	constructor( { page } ) {
@@ -649,5 +986,13 @@ class LinkControl {
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
 			.last()
 			.innerText();
+	}
+
+	async getSearchResultType( result ) {
+		await expect( result ).toBeVisible();
+
+		// The entity type renders as a sibling of the label, so it is not part
+		// of the text returned by getSearchResultText.
+		return result.locator( '.components-menu-item__shortcut' ).innerText();
 	}
 }

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { observableMap } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import SlotFillContext from './context';
 import type {
 	SlotRecord,

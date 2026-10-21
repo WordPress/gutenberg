@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import type { Attachment, Updatable } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import mediaDimensionsField from '../index';
 
 describe( 'mediaDimensionsField', () => {

@@ -2,7 +2,7 @@
 /**
  * Tests server side rendering of core/navigation-submenu
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage block-library
  */
 

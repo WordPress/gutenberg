@@ -1,6 +1,4 @@
-const DS_TOKEN_PREFIX = 'wpds-';
-
-const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
+const { wpdsTokensRegex } = require( '../utils/ds-token-utils' );
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {

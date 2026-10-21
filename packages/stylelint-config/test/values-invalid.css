@@ -4,6 +4,7 @@
 
 .another-selector { /* Avoid adding a unit on a zero value */
 	margin: 0px 0px 20px 0px;
+	font-weight: bolder; /* Avoid relative font weights */
 }
 
 .one-more-selector {

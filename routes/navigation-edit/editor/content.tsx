@@ -1,33 +1,17 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockList,
-	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
-import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
-
-type Block = {
-	clientId: string;
-	name: string;
-	attributes: Record< string, unknown >;
-};
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
+// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
 	'postType',
@@ -48,7 +32,18 @@ export default function NavigationMenuContent( {
 }: {
 	rootClientId: string;
 } ) {
-	const { listViewRootClientId, isLoading } = useSelect(
+	// Read from the global rather than imported: `@wordpress/block-library`
+	// is not a script module and only loads with the lazily loaded editor
+	// assets, so a static import here would compile to a read of a global
+	// that does not exist yet when this bundle initializes, capturing
+	// `undefined` (and crashing the screen). This component only renders once
+	// `useEditorAssets` reports the assets ready, which is exactly when the
+	// global is defined — do not "clean this up" into an import.
+	const { NavigationLinkUI } = unlock(
+		( window as any ).wp.blockLibrary.privateApis
+	);
+
+	const { listViewRootClientId, isLoading, hasChildren } = useSelect(
 		( select ) => {
 			const {
 				areInnerBlocksControlled,
@@ -76,6 +71,7 @@ export default function NavigationMenuContent( {
 				listViewRootClientId: pageListHasBlocks
 					? blockClientIds[ 0 ]
 					: rootClientId,
+				hasChildren: blockClientIds.length > 0,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
 				isLoading:
@@ -85,35 +81,27 @@ export default function NavigationMenuContent( {
 		},
 		[ rootClientId ]
 	);
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	const offCanvasOnselect = useCallback(
-		( block: Block ) => {
-			if (
-				block.name === 'core/navigation-link' &&
-				! block.attributes.url
-			) {
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlock(
-					block.clientId,
-					createBlock( 'core/navigation-link', block.attributes )
-				);
-			}
-		},
-		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+	const { openListViewContentPanel } = unlock(
+		useDispatch( blockEditorStore )
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
+			{ ! isLoading && ! hasChildren && (
+				<p className="navigation-edit-editor__empty-message">
+					{ __( 'This Navigation Menu is empty.' ) }
+				</p>
+			) }
 			{ ! isLoading && (
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
+					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
+					showAppender
+					additionalBlockContent={ NavigationLinkUI }
+					showContentPopover
 					isExpanded
 				/>
 			) }

@@ -22,10 +22,56 @@ add_action(
 	}
 );
 
+register_activation_hook(
+	__FILE__,
+	static function () {
+		delete_option( 'gutenberg_test_cap_restriction' );
+	}
+);
+
 register_deactivation_hook(
 	__FILE__,
 	static function () {
 		delete_option( 'gutenberg_test_cap_restriction' );
+	}
+);
+
+add_action(
+	'wp_connectors_init',
+	static function ( WP_Connector_Registry $registry ) {
+		$registry->register(
+			'test_install_required_connector',
+			array(
+				'name'           => 'Test Install Required Connector',
+				'description'    => 'A connector backed by a plugin that is not installed.',
+				'type'           => 'ai_provider',
+				'plugin'         => array(
+					'file'      => 'gutenberg-test-connectors-never-installed/plugin.php',
+					'is_active' => '__return_false',
+				),
+				'authentication' => array(
+					'method'       => 'api_key',
+					'setting_name' => 'gutenberg_test_install_required_connector_api_key',
+				),
+			)
+		);
+
+		$registry->register(
+			'test_activate_required_connector',
+			array(
+				'name'           => 'Test Activate Required Connector',
+				'description'    => 'A connector backed by an installed inactive plugin.',
+				'type'           => 'ai_provider',
+				'plugin'         => array(
+					'file'      => 'hello/hello.php',
+					'is_active' => '__return_false',
+				),
+				'authentication' => array(
+					'method'       => 'api_key',
+					'setting_name' => 'gutenberg_test_activate_required_connector_api_key',
+				),
+			)
+		);
 	}
 );
 

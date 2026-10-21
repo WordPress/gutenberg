@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -15,10 +12,15 @@ test.describe( 'Post Content focus mode', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
+	test.beforeEach( async ( { requestUtils } ) => {
+		// "Show template" persists the rendering mode in user preferences.
+		// Reset before each test so it starts in post-only mode regardless
+		// of state leaked from previous tests or test files in the shard.
+		await requestUtils.resetPreferences();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
-		// Reset preferences so the persisted "Show template" rendering mode
-		// does not leak into subsequent test files.
 		await requestUtils.resetPreferences();
 	} );
 
@@ -115,12 +117,6 @@ test.describe( 'Post Content focus mode', () => {
 			} );
 		} );
 
-		test.afterEach( async ( { requestUtils } ) => {
-			// "Show template" persists the rendering mode in user preferences.
-			// Reset between tests so each test starts in post-only mode.
-			await requestUtils.resetPreferences();
-		} );
-
 		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllTemplates( 'wp_template' );
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -147,10 +143,7 @@ test.describe( 'Post Content focus mode', () => {
 					name: 'Block: Title',
 				} );
 				await expect( postTitle ).toBeVisible();
-				await expect( postTitle ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( postTitle ).not.toHaveAttribute( 'inert' );
 				// Use selectBlocks to avoid toolbar interception issues.
 				await editor.selectBlocks( postTitle );
 				await page.keyboard.type( 'Test Post Title' );
@@ -225,7 +218,7 @@ test.describe( 'Post Content focus mode', () => {
 			const siteTitle = headerTemplatePart.getByRole( 'document', {
 				name: 'Block: Site Title',
 			} );
-			await expect( siteTitle ).toHaveAttribute( 'inert', 'true' );
+			await expect( siteTitle ).toHaveAttribute( 'inert' );
 		} );
 
 		test( 'inserts blocks into Post Content from different selection states', async ( {
@@ -433,20 +426,14 @@ class PostContentFocusMode {
 	}
 
 	/**
-	 * Enables the "Show template" toggle in the post editor settings sidebar.
+	 * Enables the "Show template" toggle in the top bar View menu.
 	 * If already enabled, this is a no-op.
 	 */
 	async enableShowTemplate() {
-		// Clear selection so the sidebar shows the Post tab.
-		await this.page.evaluate( () => {
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
-		} );
-		await this.editor.openDocumentSettingsSidebar();
-
-		const templateOptionsButton = this.page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } );
-		await templateOptionsButton.click();
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
 
 		const showTemplateButton = this.page.getByRole( 'menuitemcheckbox', {
 			name: 'Show template',

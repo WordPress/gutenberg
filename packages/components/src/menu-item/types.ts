@@ -1,14 +1,10 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ButtonAsButtonProps } from '../button/types';
 
-export type MenuItemProps = Pick< ButtonAsButtonProps, 'isDestructive' > & {
+export type MenuItemProps = Pick<
+	ButtonAsButtonProps,
+	'accessibleWhenDisabled' | 'isDestructive' | 'isPressed'
+> & {
 	/**
 	 * A CSS `class` to give to the container element.
 	 */

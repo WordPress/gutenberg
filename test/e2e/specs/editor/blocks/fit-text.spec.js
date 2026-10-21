@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Fit Text', () => {
@@ -30,7 +27,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text, show' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
@@ -102,7 +99,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text, show' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
@@ -238,10 +235,11 @@ test.describe( 'Fit Text', () => {
 			await editor.openDocumentSettingsSidebar();
 
 			// Set a custom font size
-			await page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
-			);
-			await page.click( 'role=spinbutton[name="Font size"i]' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Set custom size' } )
+				.click();
+			await page.getByRole( 'spinbutton', { name: 'Font size' } ).click();
 			await page.keyboard.type( '24' );
 
 			// fitText should be cleared
@@ -283,7 +281,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text, show' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {

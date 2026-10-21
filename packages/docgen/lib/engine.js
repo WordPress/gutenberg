@@ -1,15 +1,17 @@
-/**
- * External dependencies
- */
-const babel = require( '@babel/core' );
-
-/**
- * Internal dependencies
- */
+const { parse } = require( '@babel/parser' );
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
 const getAST = ( source, filename ) => {
-	return babel.parse( source, { filename } ).program;
+	const isTypeScript = /\.[cm]?tsx?$/.test( filename );
+	const supportsJSX = ! isTypeScript || filename.endsWith( '.tsx' );
+	return parse( source, {
+		sourceType: 'module',
+		sourceFilename: filename,
+		plugins: [
+			...( isTypeScript ? [ 'typescript' ] : [] ),
+			...( supportsJSX ? [ 'jsx' ] : [] ),
+		],
+	} ).program;
 };
 
 const getExportTokens = ( ast ) =>
