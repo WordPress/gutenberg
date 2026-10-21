@@ -4,9 +4,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import '../store';
 import ifViewportMatches from '../if-viewport-matches';
 
-vi.mock( import( '../../../compose/src/hooks/use-viewport-match' ), () => ( {
-	default: vi.fn(),
-} ) );
+vi.mock( import( '../../../compose/src/hooks/use-viewport-match' ) );
 
 const mockedUseViewportMatch = vi.mocked( useViewportMatch );
 
