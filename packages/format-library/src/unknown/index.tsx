@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { removeFormat, slice, isCollapsed } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { help } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';

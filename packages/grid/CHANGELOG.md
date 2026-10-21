@@ -4,7 +4,11 @@
 
 ### Enhancements
 
--   `DashboardGrid` and `DashboardLanes` accept `columns` as a `ColumnSteps` map from container width to count, so a surface can step its count by container width, composed with `minColumnWidth` as before; an `'auto'` step lifts the cap from its width up and leaves the count to the floor; counts are rounded down and never below one ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+-   - `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+
+### Bug Fixes
+
+-   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#84869](https://github.com/WordPress/gutenberg/pull/84869)).
 
 ## 0.10.0 (2026-10-20)
 
