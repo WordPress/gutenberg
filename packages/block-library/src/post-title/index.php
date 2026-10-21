@@ -9,6 +9,7 @@
  * Renders the `core/post-title` block on the server.
  *
  * @since 6.3.0 Omitting the $post argument from the `get_the_title`.
+ * @since 7.2.0 Uses the `postId` context when it refers to a post other than the global one.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -21,11 +22,20 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 		return '';
 	}
 
-	/**
-	 * The `$post` argument is intentionally omitted so that changes are reflected when previewing a post.
-	 * See: https://github.com/WordPress/gutenberg/pull/37622#issuecomment-1000932816.
-	 */
-	$title = get_the_title();
+	if ( (int) get_the_ID() === (int) $block->context['postId'] ) {
+		/*
+		 * The `$post` argument is intentionally omitted so that changes are reflected when previewing a post:
+		 * the autosaved title only exists on the global `$post` object, not in the post cache.
+		 * See: https://github.com/WordPress/gutenberg/pull/37622#issuecomment-1000932816.
+		 */
+		$title = get_the_title();
+	} else {
+		/*
+		 * The block is rendered outside the loop for a post provided through context
+		 * (e.g. by a parent block's `providesContext`), so the global post is not the one to show.
+		 */
+		$title = get_the_title( $block->context['postId'] );
+	}
 
 	if ( ! $title ) {
 		return '';

@@ -17,6 +17,13 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	protected static $post;
 
 	/**
+	 * A second post, used to provide a `postId` context that differs from the global post.
+	 *
+	 * @var WP_Post
+	 */
+	protected static $other_post;
+
+	/**
 	 * Array of attributes.
 	 *
 	 * @var array
@@ -36,7 +43,8 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$post = $factory->post->create_and_get( array( 'post_title' => 'Post title block Unit Test' ) );
+		self::$post       = $factory->post->create_and_get( array( 'post_title' => 'Post title block Unit Test' ) );
+		self::$other_post = $factory->post->create_and_get( array( 'post_title' => 'Other post provided through context' ) );
 
 		self::$attributes = array(
 			'textAlign'  => '',
@@ -67,6 +75,7 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	 */
 	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$post->ID, true );
+		wp_delete_post( self::$other_post->ID, true );
 	}
 
 	/**
@@ -180,6 +189,66 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 			'no-relative',
 			$rendered,
 			'Failed to assert that $rendered contain the link relation attribute.'
+		);
+	}
+
+	/**
+	 * Test that, inside the loop, the title is read from the global post object so that
+	 * unsaved changes applied to it (as `_set_preview()` does when previewing) are rendered.
+	 */
+	public function test_should_render_unsaved_title_of_global_post_when_context_matches() {
+		$preview_post             = clone self::$post;
+		$preview_post->post_title = 'Unsaved preview title';
+
+		$GLOBALS['post']      = $preview_post;
+		self::$block->context = array( 'postId' => self::$post->ID );
+
+		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
+		$this->assertStringContainsString(
+			'Unsaved preview title',
+			$rendered,
+			'Failed to assert that $rendered contains the title of the global post object.'
+		);
+		$this->assertStringNotContainsString(
+			'Post title block Unit Test',
+			$rendered,
+			'Failed to assert that $rendered does not contain the stored title of the post.'
+		);
+	}
+
+	/**
+	 * Test that, outside the loop, a `postId` context that differs from the global post
+	 * renders the title and permalink of the post provided through context.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/68369
+	 */
+	public function test_should_render_title_of_post_provided_through_context_outside_loop() {
+		$GLOBALS['post']      = self::$post;
+		self::$block->context = array( 'postId' => self::$other_post->ID );
+
+		$attributes = array_merge(
+			self::$attributes,
+			array(
+				'isLink'     => true,
+				'linkTarget' => '_self',
+			)
+		);
+
+		$rendered = gutenberg_render_block_core_post_title( $attributes, '', self::$block );
+		$this->assertStringContainsString(
+			'Other post provided through context',
+			$rendered,
+			'Failed to assert that $rendered contains the title of the post provided through context.'
+		);
+		$this->assertStringNotContainsString(
+			'Post title block Unit Test',
+			$rendered,
+			'Failed to assert that $rendered does not contain the title of the global post.'
+		);
+		$this->assertStringContainsString(
+			get_permalink( self::$other_post->ID ),
+			$rendered,
+			'Failed to assert that $rendered contains the permalink of the post provided through context.'
 		);
 	}
 }
