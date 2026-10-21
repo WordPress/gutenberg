@@ -1,16 +1,23 @@
+import type { CSSProperties } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
 import { getRotatedOverlayStyle } from './rotation';
+
+/** The size of an element's border box, in pixels. */
+interface ElementSize {
+	width: number;
+	height: number;
+}
 
 /**
  * Gets the size of an element without its rotation. Offsets leave out CSS
  * transforms and the `rotate` property.
  *
- * @param {HTMLElement} element The element.
+ * @param element The element.
  *
- * @return {{width: number, height: number}} The element's border box size.
+ * @return The element's border box size.
  */
-function getUnrotatedSize( element ) {
+function getUnrotatedSize( element: HTMLElement ): ElementSize {
 	return { width: element.offsetWidth, height: element.offsetHeight };
 }
 
@@ -22,15 +29,19 @@ function getUnrotatedSize( element ) {
  * date when it changes, for example when an image in it loads or the grid
  * gets wider.
  *
- * @param {HTMLElement|null} blockElement The grid item element.
- * @param {number}           angle        Rotation in degrees.
- * @param {Object}           [baseStyle]  Other style properties for the overlay.
+ * @param blockElement The grid item element.
+ * @param angle        Rotation in degrees.
+ * @param baseStyle    Other style properties for the overlay.
  *
- * @return {Object|undefined} Style properties for the overlay.
+ * @return Style properties for the overlay.
  */
-export function useRotatedOverlayStyle( blockElement, angle, baseStyle ) {
-	const [ size, setSize ] = useState( null );
-	const updateSize = ( element ) =>
+export function useRotatedOverlayStyle(
+	blockElement: HTMLElement | null,
+	angle: number,
+	baseStyle?: CSSProperties
+): CSSProperties | undefined {
+	const [ size, setSize ] = useState< ElementSize | null >( null );
+	const updateSize = ( element: HTMLElement ) =>
 		setSize( ( previousSize ) => {
 			const nextSize = getUnrotatedSize( element );
 			return previousSize?.width === nextSize.width &&
@@ -39,7 +50,7 @@ export function useRotatedOverlayStyle( blockElement, angle, baseStyle ) {
 				: nextSize;
 		} );
 	const setObservedElement = useResizeObserver(
-		( [ entry ] ) => updateSize( entry.target ),
+		( [ entry ] ) => updateSize( entry.target as HTMLElement ),
 		{ box: 'border-box' }
 	);
 	const observedElement = angle ? blockElement : null;

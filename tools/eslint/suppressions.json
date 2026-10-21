@@ -1306,11 +1306,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/grid/get-grid-drop-target.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/grid/grid-item-movers.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1336,36 +1331,6 @@
 		}
 	},
 	"packages/block-editor/src/components/grid/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/mobile-stacking.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/start-grid-item-drag.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/test/get-grid-drop-target.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/test/mobile-stacking.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/test/use-is-in-fixed-grid-cell.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/test/use-update-grid-child-layout.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

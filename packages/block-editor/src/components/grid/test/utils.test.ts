@@ -86,7 +86,7 @@ describe( 'getBoundingGridRect()', () => {
 const columnTracks = getGridTracks( '100px 100px 100px', 10 );
 const rowTracks = getGridTracks( '50px 50px 50px', 10 );
 
-function toPlain( rect ) {
+function toPlain( rect: GridRect ) {
 	return {
 		columnStart: rect.columnStart,
 		rowStart: rect.rowStart,

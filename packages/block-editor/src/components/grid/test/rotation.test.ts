@@ -7,6 +7,7 @@ import {
 	getRotationFromPointer,
 	snapAngle,
 } from '../rotation';
+import type { PixelRect } from '../rotation';
 import { getGridRectFromPixelRect, getGridTracks } from '../utils';
 
 describe( 'snapAngle()', () => {
@@ -129,7 +130,7 @@ describe( 'getRotatedBoundingRect()', () => {
 	// Six 100px columns and rows, without gaps.
 	const tracks = getGridTracks( '100px 100px 100px 100px 100px 100px', 0 );
 
-	function toCells( rect ) {
+	function toCells( rect: PixelRect ) {
 		const cells = getGridRectFromPixelRect( rect, tracks, tracks );
 		return {
 			columnStart: cells.columnStart,
@@ -216,16 +217,22 @@ describe( 'getLowestCorner()', () => {
 
 describe( 'getCornerToolbarStyle()', () => {
 	// Resolves a `calc()` of a percentage and pixels for a length.
-	function resolve( value, length ) {
-		const [ , percent, px ] = value.match(
+	function resolve( value: unknown, length: number ) {
+		const [ , percent, px ] = ( value as string ).match(
 			/^calc\((-?[\d.]+)% \+ (-?[\d.]+)px\)$/
-		);
+		)!;
 		return ( Number( percent ) * length ) / 100 + Number( px );
 	}
 
 	// Where a point in the overlay, from its top-left corner, is on screen
 	// relative to the overlay's center, once the overlay is turned.
-	function toScreen( x, y, width, height, angle ) {
+	function toScreen(
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		angle: number
+	) {
 		const radians = ( angle * Math.PI ) / 180;
 		const localX = x - width / 2;
 		const localY = y - height / 2;

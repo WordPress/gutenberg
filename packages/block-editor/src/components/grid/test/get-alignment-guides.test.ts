@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { getAlignmentGuides } from '../get-alignment-guides';
+import type { AlignmentGuide, Rect } from '../get-alignment-guides';
 
-const container = { left: 0, top: 0, right: 300, bottom: 300 };
+const container: Rect = { left: 0, top: 0, right: 300, bottom: 300 };
 
-function rect( left, top, width, height ) {
+function rect(
+	left: number,
+	top: number,
+	width: number,
+	height: number
+): Rect {
 	return { left, top, right: left + width, bottom: top + height };
 }
 
-function byKind( guides, kind ) {
+function byKind(
+	guides: AlignmentGuide[],
+	kind: AlignmentGuide[ 'kind' ]
+): AlignmentGuide[] {
 	return guides.filter( ( guide ) => guide.kind === kind );
 }
 

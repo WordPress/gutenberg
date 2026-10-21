@@ -4,12 +4,7 @@ import {
 	MINIMUM_INSERTION_HEIGHT,
 	MINIMUM_INSERTION_WIDTH,
 } from './get-minimum-insertion-rect';
-
-/** A grid track, in pixels from the start of the first track. */
-interface GridTrack {
-	start: number;
-	end: number;
-}
+import type { GridTrack } from './get-minimum-insertion-rect';
 
 /** The number of cells a block takes up. */
 export interface InsertionSize {

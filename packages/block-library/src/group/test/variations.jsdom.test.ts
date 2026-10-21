@@ -4,15 +4,27 @@ import {
 	unregisterBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import type { BlockVariation } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+
+declare global {
+	interface Window {
+		__experimentalEnableGridInteractivity?: boolean;
+	}
+}
 
 const TEST_BLOCK = 'test/group';
 
-async function getVariations( { isGridInteractivityEnabled } ) {
+async function getVariations( {
+	isGridInteractivityEnabled,
+}: {
+	isGridInteractivityEnabled: boolean;
+} ): Promise< BlockVariation[] > {
 	vi.resetModules();
 	window.__experimentalEnableGridInteractivity = isGridInteractivityEnabled;
 	const { default: variations } = await import( '../variations' );
-	return variations;
+	// The JavaScript module infers `scope` as `string[]`, wider than `BlockVariationScope[]`.
+	return variations as BlockVariation[];
 }
 
 describe( 'Group variations', () => {
@@ -37,8 +49,8 @@ describe( 'Group variations', () => {
 		const canvas = withExperiment.find(
 			( { name } ) => name === 'group-canvas'
 		);
-		expect( canvas.title ).toBe( 'Canvas' );
-		expect( canvas.attributes ).toEqual( {
+		expect( canvas?.title ).toBe( 'Canvas' );
+		expect( canvas?.attributes ).toEqual( {
 			align: 'full',
 			layout: {
 				type: 'grid',
