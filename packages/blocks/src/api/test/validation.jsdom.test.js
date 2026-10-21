@@ -2067,6 +2067,91 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'Validation Levels - delimiter attributes', () => {
+		const rawParagraph = ( attrs ) => ( {
+			blockName: 'core/test-block',
+			attrs,
+			innerHTML: '<p>Text</p>',
+			innerBlocks: [],
+			innerContent: [ '<p>Text</p>' ],
+		} );
+
+		it( 'should not change the level when the delimiter carries attributes the block type does not declare', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'p' },
+					flag: { type: 'boolean' },
+				},
+				save: ( { attributes } ) =>
+					createElement( 'p', null, attributes.content ),
+			} );
+
+			// The parser reads the delimiter through the block type's schema
+			// before validation runs: undeclared attributes are not part of
+			// the block, so a perfect match stays a perfect match and the
+			// attributes are dropped when the block is serialized again.
+			const parsedBlock = parseRawBlock(
+				rawParagraph( { flag: true, pluginKey: 'x' } )
+			);
+
+			expect( parsedBlock.isValid ).toBe( true );
+			expect( parsedBlock.validationLevel ).toBe(
+				VALIDATION_LEVEL.VALID_BLOCK
+			);
+			expect( parsedBlock.attributes ).toEqual( {
+				content: 'Text',
+				flag: true,
+			} );
+		} );
+
+		it( 'should let a deprecation consume attributes the current schema does not declare', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'p' },
+					style: { type: 'object' },
+				},
+				save: ( { attributes } ) =>
+					createElement( 'p', null, attributes.content ),
+				deprecated: [
+					{
+						attributes: {
+							content: {
+								type: 'string',
+								source: 'html',
+								selector: 'p',
+							},
+							customColor: { type: 'string' },
+						},
+						save: ( { attributes } ) =>
+							createElement( 'p', null, attributes.content ),
+						migrate: ( { customColor, ...attributes } ) => ( {
+							...attributes,
+							style: { color: { text: customColor } },
+						} ),
+						isEligible: ( { customColor } ) => !! customColor,
+					},
+				],
+			} );
+
+			// Deprecations receive the raw delimiter attributes, so a key
+			// the current schema no longer declares can still be migrated
+			// rather than dropped.
+			const parsedBlock = parseRawBlock(
+				rawParagraph( { customColor: '#f00' } ),
+				{ __unstableSkipMigrationLogs: true }
+			);
+
+			expect( parsedBlock.validationLevel ).toBe(
+				VALIDATION_LEVEL.MIGRATED_BLOCK
+			);
+			expect( parsedBlock.attributes.style ).toEqual( {
+				color: { text: '#f00' },
+			} );
+		} );
+	} );
+
 	describe( 'Backward Compatibility', () => {
 		it( 'should return a tuple with metadata as third element', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );

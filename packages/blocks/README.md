@@ -319,7 +319,7 @@ _Parameters_
 
 - _blockTypeOrName_ `string | BlockType`: Block type or name.
 - _attributes_ `Record< string, unknown >`: Block attributes.
-- _innerBlocks_ `Block[]`: Nested blocks.
+- _innerBlocks_ `Block[] | ReactElement`: Nested blocks, or an element to render in their place.
 
 _Returns_
 
@@ -377,7 +377,7 @@ Determines whether or not the given block is a reusable block. This is a special
 
 _Parameters_
 
-- _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.
+- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
@@ -389,7 +389,7 @@ Determines whether or not the given block is a template part. This is a special 
 
 _Parameters_
 
-- _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.
+- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
@@ -1031,6 +1031,8 @@ _Returns_
 ### VALIDATION_LEVEL
 
 Validation level constants ordered by decreasing certainty over content integrity. Lower numbers indicate higher confidence in content preservation.
+
+The levels describe what serializing the parsed block again does to its serialization footprint, delimiter attributes and markup alike, as read through the block type: the parser builds the attributes from the block type's schema before any evaluation, so delimiter attributes the block type does not declare are not part of the block and are dropped at every level.
 
 ### withBlockContentContext
 

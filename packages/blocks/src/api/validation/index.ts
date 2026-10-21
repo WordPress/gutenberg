@@ -28,12 +28,20 @@ interface HTMLToken {
 /**
  * Validation level constants ordered by decreasing certainty over content
  * integrity. Lower numbers indicate higher confidence in content preservation.
+ *
+ * The levels describe what serializing the parsed block again does to its
+ * serialization footprint, delimiter attributes and markup alike, as read
+ * through the block type: the parser builds the attributes from the block
+ * type's schema before any evaluation, so delimiter attributes the block type
+ * does not declare are not part of the block and are dropped at every level.
  */
 export const VALIDATION_LEVEL = {
 	/**
-	 * The `save` output for the parsed attributes is equivalent to the stored
-	 * content. Nothing needs to change. Freeform content and unregistered
-	 * blocks are also classified here, as their raw content is kept as-is.
+	 * Serializing the block again reproduces it: the `save` output for the
+	 * parsed attributes is equivalent to the stored markup, and the declared
+	 * delimiter attributes are retained. Nothing needs to change. Freeform
+	 * content and unregistered blocks are also classified here, as their raw
+	 * content is kept as-is.
 	 */
 	VALID_BLOCK: 0,
 
