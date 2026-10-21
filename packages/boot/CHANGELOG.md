@@ -2,13 +2,15 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
 ### Bug Fixes
 
 -   Announce the route title to screen readers only when the route path and its title change. Do not announce on first load, when only the search params change, or with the previous route's title while the next route loads ([#84586](https://github.com/WordPress/gutenberg/pull/84586)).
+
+## 0.25.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ## 0.24.0 (2026-10-07)
 

@@ -1,4 +1,4 @@
-import { info, warning } from './core.ts';
+import { info, infoVerbatim, warning } from './core.ts';
 import { resolveBody, run } from './run.ts';
 
 /*
@@ -14,7 +14,7 @@ run().catch( ( error ) => {
 	);
 
 	try {
-		info( resolveBody() );
+		infoVerbatim( resolveBody() );
 	} catch {
 		info( 'The section body could not be read either.' );
 	}
