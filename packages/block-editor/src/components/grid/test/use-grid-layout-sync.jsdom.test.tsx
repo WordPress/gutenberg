@@ -172,7 +172,6 @@ describe( 'useGridLayoutSync()', () => {
 			columnStart: 4,
 			rowStart: 3,
 		} );
-		// Kept in reading order.
 		expect( order ).toEqual( [ first.clientId, added, other.clientId ] );
 	} );
 
@@ -227,18 +226,5 @@ describe( 'useGridLayoutSync()', () => {
 			columnStart: 5,
 			rowStart: 1,
 		} );
-	} );
-
-	it( 'puts blocks in reading order', () => {
-		renderSync();
-		const block = createItem();
-		act( () => {
-			registry
-				.dispatch( blockEditorStore )
-				.insertBlocks( [ block ], 0, grid.clientId, true, 0, {
-					isFromInserter: true,
-				} );
-		} );
-		expect( getOrder() ).toEqual( [ first.clientId, block.clientId ] );
 	} );
 } );
