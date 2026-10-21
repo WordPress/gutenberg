@@ -8,7 +8,8 @@
 			"caption": "",
 			"width": "164px",
 			"height": "164px",
-			"sizeSlug": "large"
+			"sizeSlug": "large",
+			"isDecorative": false
 		},
 		"innerBlocks": []
 	}
