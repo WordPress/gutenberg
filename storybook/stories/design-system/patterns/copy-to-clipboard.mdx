@@ -14,9 +14,9 @@ Put the confirmation on the button so it stays with the control that produced th
 
 <Canvas of={ CopyToClipboardStories.CopyExample } />
 
-The accessible name stays "Copy" while the visible label changes to "Copied". A changed name on the focused button is an unreliable announcement. Mount a `role="status"` region before the click, then fill it with "Copied to clipboard" or an error. The region announces the outcome politely and leaves focus on the button.
+The visible label and the accessible name stay "Copy". A check icon shows the result, so the control is not renamed while it has focus. Call `speak()` with "Copied to clipboard", or an error, to announce the outcome politely. Focus stays on the button.
 
-For an icon-only control, use `IconButton` and keep `label="Copy"`. That label is the accessible name and the tooltip. Swap the icon, and announce the result from the same status region. The success and error messages belong in that region rather than only in the tooltip.
+For an icon-only control, use `IconButton` and keep `label="Copy"`. That label is the accessible name and the tooltip. Swap the icon, and announce the result with `speak()`. The success and error messages belong in that announcement rather than only in the tooltip.
 
 Copying is a one-time action. `aria-pressed` describes a toggle that stays on or off, so this button does not use it.
 
@@ -37,7 +37,7 @@ This example uses `SnackbarList` for that message. The list animates the snackba
 <Markdown>{ `
 | Context | Recommended feedback | Rationale |
 | --- | --- | --- |
-| Standalone copy button | Temporary inline "Copied" state | The control remains visible, allowing feedback to appear directly at the point of interaction. |
+| Standalone copy button | Temporary check icon; the label stays "Copy" | The control remains visible. The name stays the action, and the icon shows the result. |
 | Copy action in a menu | Temporary snackbar | The menu closes after activation, so inline feedback would disappear before it could be perceived. |
 ` }</Markdown>
 
