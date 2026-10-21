@@ -9,8 +9,8 @@
 
 return array(
 	'type'          => 'media',
-	'label'         => __( 'Featured Image', 'gutenberg' ),
-	'placeholder'   => __( 'Set featured image', 'gutenberg' ),
+	'label'         => __( 'Featured Image' ),
+	'placeholder'   => __( 'Set featured image' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 );
