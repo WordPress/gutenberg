@@ -21,6 +21,11 @@ concurrency:
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
+# Runs WordPress on PHP 8.5, the highest version WordPress 7.1 supports, instead of
+# whatever version the floating `wordpress` image uses.
+env:
+    WP_ENV_PHP_VERSION: '8.5'
+
 jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
