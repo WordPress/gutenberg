@@ -11,7 +11,7 @@ export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
-// Keep the menu vertical, expose Escape bubbling only on SubmenuRoot, and omit
+// Expose Escape bubbling only on SubmenuRoot, and omit
 // Base UI's detached-trigger handle and payload-rendering API.
 export interface RootProps extends Pick<
 	_Menu.Root.Props,
@@ -26,6 +26,15 @@ export interface RootProps extends Pick<
 	| 'triggerId'
 	| 'defaultTriggerId'
 > {
+	/**
+	 * The menu's orientation. Horizontal menus use a compact, single-row
+	 * layout for icon or emoji actions instead of the vertical alignment grid.
+	 * Provide accessible names and tooltips for items without visible text.
+	 *
+	 * @default 'vertical'
+	 */
+	orientation?: _Menu.Root.Props[ 'orientation' ];
+
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */

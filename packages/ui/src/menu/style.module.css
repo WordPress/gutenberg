@@ -47,6 +47,61 @@
 			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
 		}
 
+		/*
+		 * A horizontal menu is a single row of compact actions. Keep the surface
+		 * and interaction states, but opt out of the vertical alignment tracks.
+		 * Base UI supplies aria-orientation from Menu.Root's orientation prop.
+		 */
+		.popup[aria-orientation="horizontal"] {
+			--wp-ui-menu-min-width: 0px;
+
+			> .list,
+			> .list > .group,
+			> .list > .radio-group {
+				display: flex;
+				gap: var(--wpds-dimension-gap-xs);
+			}
+
+			> .list > .item,
+			> .list > :is(.group, .radio-group) > .item {
+				position: relative;
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
+				min-width: var(--wpds-dimension-size-lg);
+				min-height: var(--wpds-dimension-size-lg);
+				padding: var(--wpds-dimension-padding-xs);
+
+				&:hover:not([data-disabled]) {
+					background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				}
+
+				> .item-content {
+					display: flex;
+					align-self: auto;
+				}
+
+				/* Preserve a visible checked state without reserving a column. */
+				> .item-selection-indicator {
+					position: absolute;
+					inset-inline-end: 0;
+					bottom: 0;
+					width: var(--wpds-dimension-size-2xs);
+					height: var(--wpds-dimension-size-2xs);
+					margin: 0;
+					border-radius: 50%;
+					background-color: var(--wpds-color-background-surface-neutral-strong);
+					color: var(--wpds-color-foreground-interactive-neutral);
+
+					@media ( forced-colors: active ) {
+						background-color: Canvas;
+						color: CanvasText;
+					}
+				}
+			}
+		}
+
 		.is-submenu {
 			composes: dropdown-motion--fade-only from "../utils/css/dropdown-motion.module.css";
 		}

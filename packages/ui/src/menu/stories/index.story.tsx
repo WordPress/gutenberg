@@ -17,6 +17,7 @@ import {
 	shortcutAriaLabel,
 } from '@wordpress/keycodes';
 import * as Menu from '../';
+import { EmojiMenuExample } from './emoji-menu';
 
 const meta: Meta< typeof Menu.Root > = {
 	title: 'Components/@wordpress-ui/Menu',
@@ -200,6 +201,17 @@ export const Default: Story = {
 			</Menu.Root>
 		);
 	},
+};
+
+export const HorizontalEmojiMenu: Story = {
+	parameters: {
+		docs: {
+			description: {
+				story: 'A compact horizontal reaction menu. Emoji names appear in tooltips and remain available to assistive technology. Reactions toggle independently and retain a visible check indicator.',
+			},
+		},
+	},
+	render: () => <EmojiMenuExample />,
 };
 
 export const LinkItem: Story = {
