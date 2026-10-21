@@ -4,6 +4,22 @@ import {
 	hasViewportBlockStyleState,
 	setStyleForState,
 } from '../../hooks/block-style-state';
+import type { BlockStyle, BlockStyleState } from '../../hooks/types';
+
+/** A range of grid cells, such as a `GridRect`. */
+interface Placement {
+	columnStart: number;
+	rowStart: number;
+	columnSpan: number;
+	rowSpan: number;
+}
+
+/** The parts of a grid's `layout` attribute that set its size. */
+interface GridLayout {
+	type?: string;
+	columnCount?: number;
+	rowCount?: number;
+}
 
 const PLACEMENT_KEYS = [ 'columnStart', 'rowStart', 'columnSpan', 'rowSpan' ];
 
@@ -11,11 +27,11 @@ const PLACEMENT_KEYS = [ 'columnStart', 'rowStart', 'columnSpan', 'rowSpan' ];
  * Gets the layout values that place a block in a range of cells. Spans of one
  * cell are left out, so that they remove any span the block had.
  *
- * @param {Object} rect The cells, as a `GridRect`.
+ * @param rect The cells, as a `GridRect`.
  *
- * @return {Object} The `columnStart`, `rowStart`, `columnSpan` and `rowSpan` layout values.
+ * @return The `columnStart`, `rowStart`, `columnSpan` and `rowSpan` layout values.
  */
-function getPlacement( rect ) {
+function getPlacement( rect: Placement ): Partial< Placement > {
 	return {
 		columnStart: rect.columnStart,
 		rowStart: rect.rowStart,
@@ -28,13 +44,17 @@ function getPlacement( rect ) {
  * Shrinks and moves a range of cells along one axis of a grid so that it
  * fits in the grid's number of tracks, if the grid has one.
  *
- * @param {number}  start Index of the first track, starting at 1.
- * @param {number}  span  Number of tracks.
- * @param {?number} count Number of tracks in the grid.
+ * @param start Index of the first track, starting at 1.
+ * @param span  Number of tracks.
+ * @param count Number of tracks in the grid.
  *
- * @return {[number, number]} The start and span that fit.
+ * @return The start and span that fit.
  */
-function clampToTracks( start, span, count ) {
+function clampToTracks(
+	start: number,
+	span: number,
+	count?: number
+): [ number, number ] {
 	if ( ! count ) {
 		return [ start, span ];
 	}
@@ -53,19 +73,19 @@ function clampToTracks( start, span, count ) {
  * viewports is removed, so that the block is where it was drawn everywhere.
  * The rest of the block's style is kept.
  *
- * @param {Object|undefined} style         The inserted block's style attribute.
- * @param {Object}           rect          The cells to cover, as a `GridRect`.
- * @param {Object}           selectedState Selected block style state.
- * @param {Object}           gridLayout    The grid's `layout` attribute.
+ * @param style         The inserted block's style attribute.
+ * @param rect          The cells to cover, as a `GridRect`.
+ * @param selectedState Selected block style state.
+ * @param gridLayout    The grid's `layout` attribute.
  *
- * @return {Object|undefined} The updated style attribute.
+ * @return The updated style attribute.
  */
 export function getInsertedChildLayoutStyle(
-	style,
-	rect,
-	selectedState,
-	gridLayout
-) {
+	style: BlockStyle | undefined,
+	rect: Placement,
+	selectedState: BlockStyleState,
+	gridLayout: GridLayout | undefined
+): BlockStyle | undefined {
 	const [ columnStart, columnSpan ] = clampToTracks(
 		rect.columnStart,
 		rect.columnSpan,
@@ -76,18 +96,20 @@ export function getInsertedChildLayoutStyle(
 		rect.rowSpan,
 		gridLayout?.rowCount
 	);
-	const newStyle = {
+	const newStyle: BlockStyle = {
 		...style,
 		layout: {
-			...style?.layout,
+			// Style attributes are not validated against a schema.
+			...( style?.layout as BlockStyle | undefined ),
 			...getPlacement( { columnStart, rowStart, columnSpan, rowSpan } ),
 		},
 	};
 
 	// Viewport style states are the keys that start with `@`.
-	for ( const [ key, value ] of Object.entries( newStyle ) ) {
+	for ( const [ key, entry ] of Object.entries( newStyle ) ) {
+		const value = entry as BlockStyle | null | undefined;
 		if ( key.startsWith( '@' ) && value?.layout ) {
-			const layout = { ...value.layout };
+			const layout: BlockStyle = { ...( value.layout as BlockStyle ) };
 			for ( const placementKey of PLACEMENT_KEYS ) {
 				delete layout[ placementKey ];
 			}
@@ -109,7 +131,7 @@ export function getInsertedChildLayoutStyle(
 		updatedStyle = setStyleForState( updatedStyle, layoutState, {
 			...stateStyle,
 			layout: {
-				...stateStyle?.layout,
+				...( stateStyle?.layout as BlockStyle | undefined ),
 				...getPlacement( rect ),
 			},
 		} );

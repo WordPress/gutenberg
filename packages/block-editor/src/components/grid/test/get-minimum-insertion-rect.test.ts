@@ -8,7 +8,15 @@ const tracks = getGridTracks( '40px 40px 40px 40px 40px 40px 40px 40px', 10 );
 const columnTracks = tracks;
 const rowTracks = tracks;
 
-function toPlain( rect ) {
+/** The cells to start from, as passed to `GridRect`. */
+interface RectInput {
+	columnStart: number;
+	rowStart: number;
+	columnSpan?: number;
+	rowSpan?: number;
+}
+
+function toPlain( rect: GridRect ) {
 	return {
 		columnStart: rect.columnStart,
 		rowStart: rect.rowStart,
@@ -17,7 +25,7 @@ function toPlain( rect ) {
 	};
 }
 
-function getRect( rect ) {
+function getRect( rect: RectInput ) {
 	return toPlain(
 		getMinimumInsertionRect( {
 			rect: new GridRect( rect ),
