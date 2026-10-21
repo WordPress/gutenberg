@@ -35,13 +35,15 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			'body:not(:focus) :focus, body:focus .is-selected'
 		);
 
-		// Arrow up into nested context focuses last text input.
+		// Arrow up into nested context focuses the text input under the
+		// caret, which is at the end of "Second paragraph", within the first
+		// column.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 		await expect( activeElementLocator ).toHaveCount( 1 );
-		await expect( activeElementLocator ).toHaveText( '2nd col' );
+		await expect( activeElementLocator ).toHaveText( '1st col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
@@ -464,6 +466,39 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect(
 			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/38261.
+	test( 'should navigate side by side fields in the same order up and down', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/search' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		const label = editor.canvas.getByRole( 'textbox', {
+			name: 'Label text',
+		} );
+		const input = editor.canvas.getByRole( 'searchbox', {
+			name: 'Optional placeholder text',
+		} );
+		// Empty, the paragraph is labelled as such rather than as a block.
+		const paragraph = editor.canvas.locator(
+			'[data-type="core/paragraph"]'
+		);
+
+		// The caret is at the start of the paragraph: above it is the input,
+		// not the button next to it.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( input ).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( label ).toBeFocused();
+
+		// The same fields on the way down.
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( input ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( paragraph ).toHaveClass( /is-selected/ );
 	} );
 
 	test( 'should not delete surrounding space when deleting a word with Backspace', async ( {
