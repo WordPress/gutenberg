@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Sass imports with a webpack-style `~` prefix, such as `@use "~package/path"`, no longer resolve. Import `package/path` instead ([#85257](https://github.com/WordPress/gutenberg/pull/85257)).
+
+### Enhancements
+
+-   Compile Sass through one Dart Sass process for the whole build, instead of starting two for every esbuild build that handles styles ([#85257](https://github.com/WordPress/gutenberg/pull/85257)).
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes
