@@ -12282,32 +12282,6 @@
 			"count": 1
 		}
 	},
-	"packages/viewport/src/store/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/store/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/test/if-viewport-matches.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/test/with-viewport-match.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/views/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
