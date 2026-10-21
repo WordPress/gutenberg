@@ -840,8 +840,8 @@ _Parameters_
 - _recordId_ `number | string | undefined`: Pass `undefined` for keyless entities.
 - _edits_ `object`: The edits.
 - _options_ `EditEntityRecordOptions`: Options for the edit.
-- _options.undoIgnore_ `EditEntityRecordOptions`: Whether to ignore the edit in undo history or not.
-- _options.isCached_ `EditEntityRecordOptions`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
+- _options.undoIgnore_ `EditEntityRecordOptions[ 'undoIgnore' ]`: Whether to ignore the edit in undo history or not.
+- _options.isCached_ `EditEntityRecordOptions[ 'isCached' ]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
@@ -953,9 +953,9 @@ _Parameters_
 - _name_ `string`: Name of the received entity.
 - _record_ `object`: Record to be saved.
 - _options_ `SaveEntityRecordOptions`: Saving options.
-- _options.isAutosave_ `SaveEntityRecordOptions`: Whether this is an autosave.
-- _options.\_\_unstableFetch_ `SaveEntityRecordOptions`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
-- _options.throwOnError_ `SaveEntityRecordOptions`: If false, this action suppresses all the exceptions. Defaults to false.
+- _options.isAutosave_ `SaveEntityRecordOptions[ 'isAutosave' ]`: Whether this is an autosave.
+- _options.\_\_unstableFetch_ `SaveEntityRecordOptions[ '__unstableFetch' ]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+- _options.throwOnError_ `SaveEntityRecordOptions[ 'throwOnError' ]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### undo
 

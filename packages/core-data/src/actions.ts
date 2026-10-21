@@ -407,7 +407,7 @@ export const editEntityRecord =
 		name: string,
 		recordId: number | string | undefined,
 		edits: object,
-		options: EditEntityRecordOptions = {}
+		{ undoIgnore, isCached }: EditEntityRecordOptions = {}
 	) =>
 	( { select, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
@@ -463,15 +463,15 @@ export const editEntityRecord =
 			recordId,
 			editsWithMerges,
 			{
-				isCached: Boolean( options.isCached ),
-				undoIgnore: Boolean( options.undoIgnore ),
+				isCached: Boolean( isCached ),
+				undoIgnore: Boolean( undoIgnore ),
 			}
 		);
 		// A record the sync manager has loaded has its undo history tracked
 		// by the manager, which reports each level it opens (see
 		// `recordSyncUndoLevel`). Every other record is recorded here.
 		if (
-			! options.undoIgnore &&
+			! undoIgnore &&
 			! syncManager?.isLoaded?.(
 				kind,
 				name,
@@ -496,7 +496,7 @@ export const editEntityRecord =
 						}, {} ),
 					},
 				],
-				options.isCached
+				isCached
 			);
 		}
 		dispatch( {
@@ -625,15 +625,13 @@ export const saveEntityRecord =
 		kind: string,
 		name: string,
 		record: object,
-		options: SaveEntityRecordOptions = {}
-	) =>
-	async ( { select, resolveSelect, dispatch }: CoreDataThunkArgs ) => {
-		const {
+		{
 			isAutosave = false,
 			__unstableFetch = apiFetch,
 			throwOnError = false,
-		} = options;
-
+		}: SaveEntityRecordOptions = {}
+	) =>
+	async ( { select, resolveSelect, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs: Array< EntityConfig > =
 			await resolveSelect.getEntitiesConfig( kind );
