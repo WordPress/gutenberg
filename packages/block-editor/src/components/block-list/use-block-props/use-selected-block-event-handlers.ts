@@ -497,12 +497,6 @@ export function useEventHandlers( {
 					if ( ! hasStarted ) {
 						hasStarted = true;
 						node.style.pointerEvents = 'none';
-						// Mouse events are suppressed for the length of a
-						// drag, so the next one means the drag is over: it
-						// ends the drag when neither `drop` nor `dragend`
-						// reached the document, the same way `useDropZone`
-						// covers a missed `dragend`.
-						ownerDocument.addEventListener( 'mousemove', end );
 					}
 					const pointerYDelta = lastClientY - originClientY;
 					const pointerXDelta = lastClientX - originClientX;
@@ -517,12 +511,28 @@ export function useEventHandlers( {
 					pile?.move( lastClientX, lastClientY );
 				}
 
+				// Mouse events are suppressed for the length of a drag, so
+				// one means the drag is over: it ends the drag when neither
+				// `drop` nor `dragend` reached the document, the same way
+				// `useDropZone` covers a missed `dragend`. Unlike there,
+				// ending is not reversible (the node is restored and the
+				// store told), so a move with a button still held, which
+				// only a drag still in progress could produce, is left alone.
+				function endOnMouseMove( e: MouseEvent ) {
+					if ( ! e.buttons ) {
+						end();
+					}
+				}
+
 				function end() {
 					endDrag = undefined;
 					ownerDocument.removeEventListener( 'dragover', dragOver );
 					ownerDocument.removeEventListener( 'dragend', end );
 					ownerDocument.removeEventListener( 'drop', end );
-					ownerDocument.removeEventListener( 'mousemove', end );
+					ownerDocument.removeEventListener(
+						'mousemove',
+						endOnMouseMove
+					);
 					ownerDocument.removeEventListener( 'scroll', over );
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
@@ -548,6 +558,9 @@ export function useEventHandlers( {
 				ownerDocument.addEventListener( 'dragover', dragOver );
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
+				// The mouse moves that start a drag are dispatched before
+				// `dragstart`, so none reaches this listener mid-drag.
+				ownerDocument.addEventListener( 'mousemove', endOnMouseMove );
 				ownerDocument.addEventListener( 'scroll', over );
 				endDrag = end;
 

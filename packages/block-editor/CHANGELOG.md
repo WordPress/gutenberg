@@ -11,7 +11,7 @@
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
--   Put a block dragged from the canvas back when `drop` or `dragend` does not reach the document, or the block is re-rendered during the drag, instead of leaving it scaled down and without pointer events ([#83399](https://github.com/WordPress/gutenberg/issues/83399)).
+-   Block drag: restore the dragged block (styles, pointer events, dragging state) when the drag ends without `drop` or `dragend` reaching the canvas document ([#83399](https://github.com/WordPress/gutenberg/issues/83399)).
 
 ### Internal
 

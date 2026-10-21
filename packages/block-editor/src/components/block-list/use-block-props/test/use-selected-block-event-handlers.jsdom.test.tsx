@@ -64,11 +64,11 @@ describe( 'useEventHandlers', () => {
 		],
 		[
 			// Mouse events are suppressed while a drag is in progress, so
-			// one means the drag is over.
+			// one with the button up means the drag is over.
 			'the next mouse move when drop and drag end are missed',
 			() =>
 				document.dispatchEvent(
-					new MouseEvent( 'mousemove', { bubbles: true } )
+					new MouseEvent( 'mousemove', { bubbles: true, buttons: 0 } )
 				),
 		],
 		[ 'unmount during the drag', ( { unmount }: Drag ) => unmount() ],
@@ -79,6 +79,10 @@ describe( 'useEventHandlers', () => {
 		node.dispatchEvent( dragEvent( 'dragstart' ) );
 		// The block stops receiving pointer events once the pointer moves.
 		document.dispatchEvent( dragEvent( 'dragover', 10, 10 ) );
+		// A move with the button held belongs to the drag in progress.
+		document.dispatchEvent(
+			new MouseEvent( 'mousemove', { bubbles: true, buttons: 1 } )
+		);
 
 		/* eslint-disable jest-dom/prefer-to-have-style -- The drag sets inline styles, and toHaveStyle() is disallowed in jsdom tests. */
 		expect( node ).toHaveAttribute(
