@@ -8,7 +8,7 @@ $panelPadding: $grid-unit-20;
 
 .format-library__inline-color-popover {
 
-	[role="tabpanel"] {
+	.components-popover__content {
 		padding: $panelPadding;
 		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
 	}
