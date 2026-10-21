@@ -181,8 +181,7 @@ while edit mode is on:
 
 ### Columns
 
-`columns` and `minColumnWidth` compose. Both surfaces measure their
-own width with a `ResizeObserver` and resolve the count from it.
+`columns` and `minColumnWidth` compose. Both surfaces measure their own width with a `ResizeObserver` and resolve the count from it.
 
 A number renders that many columns at every width:
 
@@ -192,8 +191,7 @@ A number renders that many columns at every width:
 </DashboardGrid>
 ```
 
-A `ColumnSteps` map renders a count from each container width up:
-one column from 0px, two from 600px, four from 960px.
+A `ColumnSteps` map renders a count from each container width up: one column from 0px, two from 600px, four from 960px.
 
 ```jsx
 <DashboardGrid layout={ layout } columns={ { 0: 1, 600: 2, 960: 4 } }>
@@ -203,10 +201,7 @@ one column from 0px, two from 600px, four from 960px.
 
 Below the smallest key, that step's count applies, so a map that starts at `0` states every width.
 
-`minColumnWidth` is a per-column floor in pixels. Alone, the surface
-fits as many columns of at least that width as the container allows.
-With `columns`, the count is capped by the number or the step, and
-lowered whenever a column would end up narrower than the floor.
+`minColumnWidth` is a per-column floor in pixels. Alone, the surface fits as many columns of at least that width as the container allows. With `columns`, the count is capped by the number or the step, and lowered whenever a column would end up narrower than the floor.
 
 ```jsx
 <DashboardGrid layout={ layout } columns={ 4 } minColumnWidth={ 240 }>
@@ -228,8 +223,7 @@ A step can be `'auto'`: from that width up there is no cap, and the floor alone 
 
 A count is rounded down and never below one. A count that is not a finite number, or a step that is neither a count nor `'auto'`, is ignored.
 
-Layout items can provide an `order` to control display order
-independently of array position.
+Layout items can provide an `order` to control display order independently of array position.
 
 #### Edit mode
 
