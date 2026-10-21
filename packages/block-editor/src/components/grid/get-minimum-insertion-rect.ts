@@ -1,5 +1,11 @@
 import { GridRect } from './utils';
 
+/** A grid track, in pixels from the start of the first track. */
+export interface GridTrack {
+	start: number;
+	end: number;
+}
+
 /**
  * The smallest width and height, in pixels, of a block inserted into a manual
  * grid, so that blocks that start out as a placeholder, such as Image, can
@@ -15,13 +21,17 @@ export const MINIMUM_INSERTION_HEIGHT = 300;
  * Gets the size in pixels of a range of tracks, including the gaps between
  * them, rounded so that a fraction of a pixel doesn't cost a track.
  *
- * @param {Array<{start: number, end: number}>} tracks The grid tracks.
- * @param {number}                              start  Index of the first track, starting at 1.
- * @param {number}                              end    Index of the last track, starting at 1.
+ * @param tracks The grid tracks.
+ * @param start  Index of the first track, starting at 1.
+ * @param end    Index of the last track, starting at 1.
  *
- * @return {number} The size of the tracks.
+ * @return The size of the tracks.
  */
-function getTracksSize( tracks, start, end ) {
+function getTracksSize(
+	tracks: GridTrack[],
+	start: number,
+	end: number
+): number {
 	return Math.round( tracks[ end - 1 ].end - tracks[ start - 1 ].start );
 }
 
@@ -30,11 +40,11 @@ function getTracksSize( tracks, start, end ) {
  * axis: half of them, so that a minimum size never fills a small grid, and at
  * least one.
  *
- * @param {number} count The number of tracks in the grid.
+ * @param count The number of tracks in the grid.
  *
- * @return {number} The most tracks to take up.
+ * @return The most tracks to take up.
  */
-export function getMaximumInsertionSpan( count ) {
+export function getMaximumInsertionSpan( count: number ): number {
 	return Math.max( 1, Math.floor( count / 2 ) );
 }
 
@@ -43,15 +53,21 @@ export function getMaximumInsertionSpan( count ) {
  * adds tracks after it, then, at the end of the grid, before it. It stops
  * growing at a maximum number of tracks.
  *
- * @param {Array<{start: number, end: number}>} tracks  The grid tracks.
- * @param {number}                              start   Index of the first track, starting at 1.
- * @param {number}                              end     Index of the last track, starting at 1.
- * @param {number}                              minimum The smallest size, in pixels.
- * @param {number}                              maximum The most tracks.
+ * @param tracks  The grid tracks.
+ * @param start   Index of the first track, starting at 1.
+ * @param end     Index of the last track, starting at 1.
+ * @param minimum The smallest size, in pixels.
+ * @param maximum The most tracks.
  *
- * @return {[number, number]} The first and last track of the grown range.
+ * @return The first and last track of the grown range.
  */
-function growTracks( tracks, start, end, minimum, maximum ) {
+function growTracks(
+	tracks: GridTrack[],
+	start: number,
+	end: number,
+	minimum: number,
+	maximum: number
+): [ number, number ] {
 	while (
 		getTracksSize( tracks, start, end ) < minimum &&
 		end - start + 1 < maximum
@@ -75,14 +91,14 @@ function growTracks( tracks, start, end, minimum, maximum ) {
  * small grid it may stay smaller than the minimum. A range that is already big
  * enough is left as it is.
  *
- * @param {Object}                              options
- * @param {GridRect}                            options.rect          The cells the block was inserted into.
- * @param {Array<{start: number, end: number}>} options.columnTracks  The grid's column tracks.
- * @param {Array<{start: number, end: number}>} options.rowTracks     The grid's row tracks.
- * @param {number}                              options.minimumWidth  The smallest width, in pixels.
- * @param {number}                              options.minimumHeight The smallest height, in pixels.
+ * @param options
+ * @param options.rect          The cells the block was inserted into.
+ * @param options.columnTracks  The grid's column tracks.
+ * @param options.rowTracks     The grid's row tracks.
+ * @param options.minimumWidth  The smallest width, in pixels.
+ * @param options.minimumHeight The smallest height, in pixels.
  *
- * @return {GridRect} The cells the block should cover.
+ * @return The cells the block should cover.
  */
 export function getMinimumInsertionRect( {
 	rect,
@@ -90,7 +106,13 @@ export function getMinimumInsertionRect( {
 	rowTracks,
 	minimumWidth = MINIMUM_INSERTION_WIDTH,
 	minimumHeight = MINIMUM_INSERTION_HEIGHT,
-} ) {
+}: {
+	rect: GridRect;
+	columnTracks: GridTrack[];
+	rowTracks: GridTrack[];
+	minimumWidth?: number;
+	minimumHeight?: number;
+} ): GridRect {
 	if (
 		rect.columnEnd > columnTracks.length ||
 		rect.rowEnd > rowTracks.length
