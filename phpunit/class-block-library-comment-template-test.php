@@ -15,8 +15,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	private static $comment_ids;
 	private static $per_page = 5;
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		update_option( 'page_comments', true );
 		update_option( 'comments_per_page', self::$per_page );
