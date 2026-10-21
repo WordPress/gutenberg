@@ -21,10 +21,7 @@ import {
 } from '../../utils/constants';
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import {
-	useEditPostAction,
-	useQuickEditPostAction,
-} from '../dataviews-actions';
+import { useQuickEditPostAction } from '../dataviews-actions';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -226,16 +223,29 @@ export default function PostList( { postType } ) {
 		postType,
 		context: 'list',
 	} );
-	const editAction = useEditPostAction();
 	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo( () => {
+		// The "Edit" action comes from the server, and opens the page with
+		// the entity navigator the app sets, see `useSetEntityNavigator`.
+		const editAction = postTypeActions.find(
+			( action ) => action.id === 'edit-post'
+		);
+		const otherActions = postTypeActions.filter(
+			( action ) => action !== editAction
+		);
 		if ( view.type === LAYOUT_LIST ) {
-			const editActionPrimary = { ...editAction, isPrimary: true };
-			return [ editActionPrimary, ...postTypeActions ];
+			return [
+				...( editAction ? [ { ...editAction, isPrimary: true } ] : [] ),
+				...otherActions,
+			];
 		}
 
-		return [ editAction, quickEditAction, ...postTypeActions ];
-	}, [ view.type, editAction, quickEditAction, postTypeActions ] );
+		return [
+			...( editAction ? [ editAction ] : [] ),
+			quickEditAction,
+			...otherActions,
+		];
+	}, [ view.type, quickEditAction, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
