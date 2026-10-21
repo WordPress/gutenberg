@@ -125,12 +125,14 @@ function render_block_core_term_template( $attributes, $content, $block ) {
  * Registers the `core/term-template` block on the server.
  *
  * @since 6.9.0
+ * @since 7.2.0 Skips rendering the inner blocks outside of the render callback.
  */
 function register_block_core_term_template() {
 	register_block_type_from_metadata(
 		__DIR__ . '/term-template',
 		array(
-			'render_callback' => 'render_block_core_term_template',
+			'render_callback'   => 'render_block_core_term_template',
+			'skip_inner_blocks' => true,
 		)
 	);
 }
