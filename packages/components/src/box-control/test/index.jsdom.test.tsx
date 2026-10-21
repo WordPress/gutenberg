@@ -553,6 +553,64 @@ describe( 'BoxControl', () => {
 				left: '5px',
 			} );
 		} );
+
+		it( 'should keep a unit when using the slider on an empty axis', () => {
+			const onChangeSpy = vi.fn();
+
+			render(
+				<UncontrolledBoxControl
+					onChange={ onChangeSpy }
+					splitOnAxis
+					values={ { left: '2em', right: '2em' } }
+				/>
+			);
+
+			fireEvent.change(
+				screen.getByRole( 'slider', { name: 'Top and bottom sides' } ),
+				{ target: { value: 4 } }
+			);
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '4px',
+				right: '2em',
+				bottom: '4px',
+				left: '2em',
+			} );
+		} );
+
+		it( 'should keep a unit when using the slider after switching from a preset', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = vi.fn();
+
+			render(
+				<UncontrolledBoxControl
+					onChange={ onChangeSpy }
+					presetKey="spacing"
+					presets={ [ { name: 'Small', slug: 's', value: '8px' } ] }
+					values={ {
+						top: 'var:preset|spacing|s',
+						right: 'var:preset|spacing|s',
+						bottom: 'var:preset|spacing|s',
+						left: 'var:preset|spacing|s',
+					} }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Set custom size' } )
+			);
+
+			fireEvent.change( screen.getByRole( 'slider' ), {
+				target: { value: 7 },
+			} );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '7px',
+				right: '7px',
+				bottom: '7px',
+				left: '7px',
+			} );
+		} );
 	} );
 
 	describe( 'onChange updates', () => {

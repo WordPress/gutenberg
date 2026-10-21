@@ -147,8 +147,8 @@ export default function BoxInputControl( {
 		parseQuantityAndUnitFromRawValue( mergedValue );
 	const resolvedUnit =
 		parsedUnit ?? selectedUnits[ defaultValuesToModify[ 0 ] ];
-	// Fall back to the first allowed unit so slider changes never emit
-	// unitless values, including after a reset clears the selected units.
+	// Fall back to the first allowed unit when neither the value nor the
+	// selected unit provides one, so slider changes never emit unitless values.
 	const computedUnit = resolvedUnit ?? units?.[ 0 ]?.value ?? 'px';
 	const generatedId = useInstanceId( BoxInputControl, 'box-control-input' );
 	const inputId = [ generatedId, side ].join( '-' );
@@ -158,8 +158,7 @@ export default function BoxInputControl( {
 		defaultValuesToModify.some(
 			( s ) => selectedUnits[ s ] !== resolvedUnit
 		);
-	const usedValue =
-		mergedValue === undefined && computedUnit ? computedUnit : mergedValue;
+	const usedValue = mergedValue ?? computedUnit;
 	const mixedPlaceholder = isMixed || isMixedUnit ? __( 'Mixed' ) : undefined;
 	const hasPresets = presets && presets.length > 0 && presetKey;
 	const hasPresetValue =
