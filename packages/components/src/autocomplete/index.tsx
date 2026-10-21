@@ -16,6 +16,7 @@ import {
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 import { isAppleOS, withIgnoreIMEEvents } from '@wordpress/keycodes';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import type {
@@ -38,9 +39,9 @@ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 // Used for generating the instance ID
 const AUTOCOMPLETE_HOOK_REFERENCE = {};
 
-function getCompletionObject(
-	completion: OptionCompletion
-): InsertOption | ReplaceOption {
+function getCompletionObject< TReplacement >(
+	completion: OptionCompletion< TReplacement >
+): InsertOption | ReplaceOption< TReplacement > {
 	if (
 		completion !== null &&
 		typeof completion === 'object' &&
@@ -57,17 +58,17 @@ function getCompletionObject(
 	};
 }
 
-const initialState: AutocompleteState = {
+const initialState: AutocompleteState< never > = {
 	selectedIndex: 0,
 	filteredOptions: EMPTY_FILTERED_OPTIONS,
 	filterValue: '',
 	autocompleter: null,
 };
 
-function autocompleteReducer(
-	state: AutocompleteState,
-	action: AutocompleteAction
-): AutocompleteState {
+function autocompleteReducer< TReplacement >(
+	state: AutocompleteState< TReplacement >,
+	action: AutocompleteAction< TReplacement >
+): AutocompleteState< TReplacement > {
 	switch ( action.type ) {
 		case 'RESET':
 			return initialState;
@@ -91,15 +92,18 @@ function autocompleteReducer(
 	}
 }
 
-export function useAutocomplete( {
+export function useAutocomplete< TReplacement = RichTextValue >( {
 	record,
 	onChange,
 	onReplace,
 	completers,
 	contentRef,
-}: UseAutocompleteProps ) {
+}: UseAutocompleteProps< TReplacement > ) {
 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
-	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
+	const [ state, dispatch ] = useReducer(
+		autocompleteReducer< TReplacement >,
+		initialState
+	);
 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
 		state;
 
@@ -373,8 +377,8 @@ export function useLastDifferentValue(
 
 // The popover is anchored to the element this hook's own `ref` lands on, so it
 // owns `contentRef` and callers don't provide one.
-export function useAutocompleteProps(
-	options: Omit< UseAutocompleteProps, 'contentRef' >
+export function useAutocompleteProps< TReplacement = RichTextValue >(
+	options: Omit< UseAutocompleteProps< TReplacement >, 'contentRef' >
 ) {
 	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef =
@@ -435,11 +439,11 @@ export function useAutocompleteProps(
 	};
 }
 
-export default function Autocomplete( {
+export default function Autocomplete< TReplacement = RichTextValue >( {
 	children,
 	isSelected,
 	...options
-}: AutocompleteProps ) {
+}: AutocompleteProps< TReplacement > ) {
 	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>

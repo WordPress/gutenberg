@@ -90,9 +90,7 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const isUnseen = useContext( UnseenNotesContext ).has( note.id );
 	const pickNote = usePickNote( { drafts, onDiscard } );
@@ -198,7 +196,7 @@ export function NoteThread( {
 
 	function onDeselectNote() {
 		selectNote( undefined );
-		toggleBlockSpotlight( note.blockClientId, false );
+		toggleBlockHighlight( note.blockClientId, false );
 	}
 
 	function handleResolve() {
@@ -212,6 +210,10 @@ export function NoteThread( {
 	}
 
 	const allReplies = note?.reply || [];
+	// Resolving is a thread-level state: it lives on the root note, and a
+	// resolved thread is an archived conversation. Replies carry their own
+	// status, so reaction controls have to read the root's.
+	const isThreadResolved = 'approved' === note.status;
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
@@ -320,6 +322,7 @@ export function NoteThread( {
 				onEditNote={ onEditNote }
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
+				isThreadResolved={ isThreadResolved }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -330,6 +333,7 @@ export function NoteThread( {
 						isSelected={ isSelected }
 						onEditNote={ onEditNote }
 						onDeleteNote={ onDeleteNote }
+						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -367,6 +371,7 @@ export function NoteThread( {
 					isSelected={ false }
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
+					isThreadResolved={ isThreadResolved }
 				/>
 			) }
 			{ isSelected && (

@@ -12,37 +12,37 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Status', 'gutenberg' ),
+	'label'         => __( 'Status' ),
 	'Edit'          => 'radio',
 	'elements'      => array(
 		array(
 			'value'       => 'draft',
-			'label'       => __( 'Draft', 'gutenberg' ),
-			'description' => __( 'Not ready to publish.', 'gutenberg' ),
+			'label'       => __( 'Draft' ),
+			'description' => __( 'Not ready to publish.' ),
 		),
 		array(
 			'value'       => 'future',
-			'label'       => __( 'Scheduled', 'gutenberg' ),
-			'description' => __( 'Publish automatically on a chosen date.', 'gutenberg' ),
+			'label'       => __( 'Scheduled' ),
+			'description' => __( 'Publish automatically on a chosen date.' ),
 		),
 		array(
 			'value'       => 'pending',
-			'label'       => __( 'Pending Review', 'gutenberg' ),
-			'description' => __( 'Waiting for review before publishing.', 'gutenberg' ),
+			'label'       => __( 'Pending Review' ),
+			'description' => __( 'Waiting for review before publishing.' ),
 		),
 		array(
 			'value'       => 'private',
-			'label'       => __( 'Private', 'gutenberg' ),
-			'description' => __( 'Only visible to site admins and editors.', 'gutenberg' ),
+			'label'       => __( 'Private' ),
+			'description' => __( 'Only visible to site admins and editors.' ),
 		),
 		array(
 			'value'       => 'publish',
-			'label'       => __( 'Published', 'gutenberg' ),
-			'description' => __( 'Visible to everyone.', 'gutenberg' ),
+			'label'       => __( 'Published' ),
+			'description' => __( 'Visible to everyone.' ),
 		),
 		array(
 			'value' => 'trash',
-			'label' => __( 'Trash', 'gutenberg' ),
+			'label' => __( 'Trash' ),
 		),
 	),
 	'enableSorting' => false,

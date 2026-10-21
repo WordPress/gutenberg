@@ -25,9 +25,6 @@
 	},
 	"devDependencies": {
 		"@babel/types": "^7.29.7",
-		"@emotion/is-prop-valid": "^1.4.0",
-		"@emotion/react": "^11.14.0",
-		"@emotion/styled": "^11.14.1",
 		"@storybook/addon-a11y": "^10.6.1",
 		"@storybook/addon-docs": "^10.6.1",
 		"@storybook/addon-vitest": "^10.6.1",
