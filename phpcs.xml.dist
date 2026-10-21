@@ -77,6 +77,11 @@
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 
+	<!-- Ignore empty files in packages/e2e-tests/themes -->
+	<rule ref="Internal.NoCodeFound">
+		<exclude-pattern>./packages/e2e-tests/themes/*</exclude-pattern>
+	</rule>
+
 	<!-- Ignore snake case error in parser -->
 	<rule ref="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
