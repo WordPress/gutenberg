@@ -87,6 +87,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertBlocks( blocks, 0 );
 	}
 
+	// Inserts text at the caret, which stays after it. The text is escaped on
+	// the way into the title, so it is never rendered as HTML.
+	function insertText( text ) {
+		onChange( insert( value, create( { text } ) ) );
+	}
+
 	function onSelect() {
 		setIsSelected( true );
 		clearSelectedBlock();
@@ -147,10 +153,9 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			const [ firstLine, remainder ] = splitFirstLine( plainText );
 
 			if ( ! remainder ) {
-				// A single line is inserted at the caret, which stays after it.
-				onChange( insert( value, create( { text: firstLine } ) ) );
+				insertText( firstLine );
 			} else if ( ! title ) {
-				onUpdate( firstLine );
+				insertText( firstLine );
 				onInsertBlockAfter(
 					pasteHandler( { plainText: remainder, mode: 'BLOCKS' } )
 				);

@@ -322,6 +322,36 @@ test.describe( 'Post title', () => {
 			] );
 		} );
 
+		test( 'should output HTML-looking plain text in plaintext when the paste is split into title and blocks', async ( {
+			editor,
+			admin,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( pageTitleField ).toBeFocused();
+
+			pageUtils.setClipboardData( {
+				plainText: 'I am <em>emphasis</em> & more\n\nSecond paragraph.',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( pageTitleField ).toHaveText(
+				'I am <em>emphasis</em> & more'
+			);
+			await expect( pageTitleField.locator( 'css=em' ) ).toBeHidden();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Second paragraph.' },
+				},
+			] );
+		} );
+
 		test( 'should output HTML tags in plaintext when added into Post Title field in visual editor mode', async ( {
 			editor,
 			page,
