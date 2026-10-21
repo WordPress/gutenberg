@@ -2614,6 +2614,11 @@ test.describe( 'Navigation block', () => {
 				name: /^Link to/,
 			} );
 			await expect( linkPicker ).toHaveText( /Add link/ );
+			// Without a link there is nothing to open in a new tab.
+			const newTabCheckbox = settings.getByRole( 'checkbox', {
+				name: 'Open in new tab',
+			} );
+			await expect( newTabCheckbox ).toBeHidden();
 			await linkPicker.click();
 
 			// Like a navigation link, the picker suggests pages before
@@ -2649,6 +2654,7 @@ test.describe( 'Navigation block', () => {
 					)
 				)
 				.toMatch( /test-page-1/ );
+			await expect( newTabCheckbox ).toBeVisible();
 		} );
 
 		test( 'strips an anchor tag typed into the Text field', async ( {

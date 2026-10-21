@@ -204,20 +204,25 @@ function ContentControls( {
 							label={ __( 'Link to' ) }
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => opensInNewTab }
-						label={ __( 'Open in new tab' ) }
-						onDeselect={ () => setLink( { opensInNewTab: false } ) }
-						isShownByDefault
-					>
-						<CheckboxControl
+					{ /* Like the toolbar link popover, only offer the new tab setting once there is a link to open. */ }
+					{ url && (
+						<ToolsPanelItem
+							hasValue={ () => opensInNewTab }
 							label={ __( 'Open in new tab' ) }
-							checked={ opensInNewTab }
-							onCheckedChange={ ( value ) =>
-								setLink( { opensInNewTab: value } )
+							onDeselect={ () =>
+								setLink( { opensInNewTab: false } )
 							}
-						/>
-					</ToolsPanelItem>
+							isShownByDefault
+						>
+							<CheckboxControl
+								label={ __( 'Open in new tab' ) }
+								checked={ opensInNewTab }
+								onCheckedChange={ ( value ) =>
+									setLink( { opensInNewTab: value } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ViewLinkButton url={ url } />
 				</>
 			) }
