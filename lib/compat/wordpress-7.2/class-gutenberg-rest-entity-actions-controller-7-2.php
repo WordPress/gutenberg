@@ -310,7 +310,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 				'context'           => array(
 					'description' => __( 'The context the action is limited to, such as `list` for the lists of items. Without it, the action shows everywhere.', 'gutenberg' ),
 					'type'        => 'string',
-					'enum'        => array( 'list', 'single' ),
+					'enum'        => array( 'list' ),
 				),
 				'modalHeader'       => array(
 					'description' => __( 'The header of the modal of the action.', 'gutenberg' ),

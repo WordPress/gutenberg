@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `withDispatch`: Accept action creators with typed arguments in the `mapDispatchToProps` types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+
 ## 11.0.0 (2026-10-20)
 
 ### Breaking Changes

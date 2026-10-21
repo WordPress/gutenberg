@@ -423,7 +423,7 @@ heights are content-driven.
 Drag-to-reorder is operable from the keyboard via `@dnd-kit`'s
 keyboard sensor:
 
-- `Tab` to focus a tile.
+- In edit mode, `Tab` to focus a draggable tile.
 - `Space` to pick it up.
 - Arrow keys to move it between positions.
 - `Space` to drop, or `Escape` to cancel.

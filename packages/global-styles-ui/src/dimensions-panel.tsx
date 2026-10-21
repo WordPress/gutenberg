@@ -1,4 +1,3 @@
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { useStyle, useSetting } from './hooks';
