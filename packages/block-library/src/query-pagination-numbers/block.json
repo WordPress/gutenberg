@@ -47,14 +47,20 @@
 		"spacing": {
 			"padding": true,
 			"__experimentalDefaultControls": {
-				"padding": false
+				"padding": true
 			}
 		},
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,
 			"width": true,
-			"style": true
+			"style": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-query-pagination-numbers-editor",
