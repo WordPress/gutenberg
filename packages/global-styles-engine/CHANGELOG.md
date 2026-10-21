@@ -6,6 +6,10 @@
 
 -   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
 
+### Enhancements
+
+-   Output a custom duotone, a list of colors in a block's `filter.duotone`, as `filter: url(#id)` with a matching SVG filter, including in block style variations ([#84670](https://github.com/WordPress/gutenberg/pull/84670)).
+
 ### Internal
 
 -   Type the `spacing.spacingSizes` and `border.radiusSizes` settings ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).

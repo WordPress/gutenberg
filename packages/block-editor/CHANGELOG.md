@@ -5,12 +5,14 @@
 ### Enhancements
 
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
+-   Filters panel: Offer custom duotone colors in the block inspector and in Global Styles, when `color.customDuotone` and `color.custom` or a color palette allow it ([#84670](https://github.com/WordPress/gutenberg/pull/84670)).
 
 ### Bug Fixes
 
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
+-   Filters panel: Show a theme's duotone presets when `color.customDuotone` and `color.defaultDuotone` are both off ([#84670](https://github.com/WordPress/gutenberg/pull/84670)).
 
 ### Internal
 

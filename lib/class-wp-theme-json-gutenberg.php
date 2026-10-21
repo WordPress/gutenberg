@@ -3239,6 +3239,12 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			// A custom duotone is a list of colors, rendered as an SVG filter by WP_Duotone_Gutenberg.
+			if ( 'filter' === $css_property && is_array( $value ) ) {
+				$filter_id = WP_Duotone_Gutenberg::get_custom_filter_id( $value );
+				$value     = $filter_id ? "url(#$filter_id)" : null;
+			}
+
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
@@ -5379,6 +5385,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Ensure indirect properties not handled by `compute_style_properties` are allowed.
 		static::remove_indirect_properties( $input, $output );
+
+		// The loop above skips arrays, so keep a custom duotone only when every color is valid.
+		$duotone = $input['filter']['duotone'] ?? null;
+		if ( is_array( $duotone ) && null !== WP_Duotone_Gutenberg::get_custom_filter_id( $duotone ) ) {
+			_wp_array_set( $output, array( 'filter', 'duotone' ), $duotone );
+		}
 
 		return $output;
 	}

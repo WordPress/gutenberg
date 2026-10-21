@@ -330,7 +330,7 @@ export interface GlobalStylesStyles {
 		};
 	};
 	filter?: {
-		duotone?: UnresolvedValue;
+		duotone?: UnresolvedValue | string[];
 		opacity?: UnresolvedValue;
 	};
 	dimensions?: {

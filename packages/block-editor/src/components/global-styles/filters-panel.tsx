@@ -71,12 +71,14 @@ export function useHasFiltersPanel( settings: StyleSettings ) {
 }
 
 function useHasDuotoneControl( settings: StyleSettings ) {
-	// The filters panel gets resolved color settings. An object of presets
-	// has no length, so it reads as none.
+	// Presets are keyed by origin. Default ones only count when `defaultDuotone` is on.
+	const hasPresets = ( [ 'theme', 'custom' ] as const ).some(
+		( origin ) => ( settings?.color?.duotone?.[ origin ]?.length ?? 0 ) > 0
+	);
 	return (
-		settings.color!.customDuotone ||
-		settings.color!.defaultDuotone ||
-		( settings.color!.duotone as unknown[] ).length > 0
+		settings?.color?.customDuotone ||
+		settings?.color?.defaultDuotone ||
+		hasPresets
 	);
 }
 
@@ -241,6 +243,11 @@ export default function FiltersPanel( {
 		presetSetting: 'palette',
 		defaultSetting: 'defaultPalette',
 	} );
+	// Mirrors the block toolbar's duotone control in hooks/duotone.jsx.
+	const disableCustomColors = ! settings?.color?.custom;
+	const disableCustomDuotone =
+		! settings?.color?.customDuotone ||
+		( colorPalette.length === 0 && disableCustomColors );
 	const localDuotone = decodeValue( value?.filter?.duotone );
 	const inheritedDuotone = decodeValue( inheritedValue?.filter?.duotone );
 	const duotone = localDuotone ?? inheritedDuotone;
@@ -351,9 +358,12 @@ export default function FiltersPanel( {
 									<DuotonePicker
 										colorPalette={ colorPalette }
 										duotonePalette={ duotonePalette }
-										// TODO: Re-enable both when custom colors are supported for block-level styles.
-										disableCustomColors
-										disableCustomDuotone
+										disableCustomColors={
+											disableCustomColors
+										}
+										disableCustomDuotone={
+											disableCustomDuotone
+										}
 										value={ duotone }
 										selectedSlug={ duotoneSlug }
 										onChange={
