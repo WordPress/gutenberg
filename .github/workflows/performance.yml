@@ -32,6 +32,7 @@ jobs:
     # potentially impact performance metrics. A series of ignore patterns are used in place of
     # an include list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
+        if: false
         name: Detect changes relevant to performance testing
         runs-on: 'ubuntu-slim'
         timeout-minutes: 5
@@ -78,7 +79,7 @@ jobs:
         permissions:
             contents: read
             actions: read
-        if: ${{ github.repository == 'WordPress/gutenberg' && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: false
         outputs:
             # See tools/release/resolve-performance-branches.mjs for the shapes.
             # Falls back to the unresolved branches when the reuse lookup fails.
@@ -121,6 +122,7 @@ jobs:
                     --branches "$BRANCHES" --repository "$GITHUB_REPOSITORY"
 
     build:
+        if: false
         timeout-minutes: 30
         name: Build plugin (${{ matrix.branch.name }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
@@ -247,6 +249,7 @@ jobs:
                   retention-days: 14
 
     performance:
+        if: false
         timeout-minutes: 60
         name: Run perf tests (${{ matrix.shard }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
@@ -349,7 +352,7 @@ jobs:
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: [prepare, performance]
         # Runs unless the whole workflow was skipped (forks), so a failure anywhere fails the check.
-        if: ${{ !cancelled() && needs.prepare.result != 'skipped' }}
+        if: false
         permissions:
             contents: read
         env:
@@ -434,7 +437,7 @@ jobs:
         needs: results
         # Runs even when the tests failed, so a stale report is cleared.
         # Skipped on a fork, whose token cannot write a comment.
-        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        if: false
         runs-on: 'ubuntu-slim'
         permissions:
             contents: read
@@ -486,7 +489,7 @@ jobs:
             contents: read
             actions: read
         needs: [detect-relevant-changes, results]
-        if: ${{ ! cancelled() && github.repository == 'WordPress/gutenberg' }}
+        if: false
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

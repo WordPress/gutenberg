@@ -238,6 +238,7 @@ jobs:
               )
             )
         strategy:
+            fail-fast: false
             matrix:
                 IS_GUTENBERG_PLUGIN: [true, false]
 
@@ -266,7 +267,12 @@ jobs:
               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
 
             - name: Build Gutenberg plugin ZIP file
-              run: npm run build:plugin-zip
+              run: |
+                  free -m
+                  ( while sleep 5; do echo "mem-sample $( date -u +%T ) $( awk '/^(MemAvailable|SwapFree):/ { printf "%s%dMB ", $1, $2 / 1024 }' /proc/meminfo )$( ps -eo rss=,comm= --sort=-rss | head -3 | awk '{ printf "%s:%dMB ", $2, $1 / 1024 }' )"; done ) &
+                  sampler=$!
+                  trap 'kill "$sampler"' EXIT
+                  npm run build:plugin-zip
               env:
                   NO_CHECKS: 'true'
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
