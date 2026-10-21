@@ -148,7 +148,6 @@ export const WithInfotip: Story = {
 						'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
 				} }
 			>
-				<Popover.Arrow />
 				<VisuallyHidden render={ <Popover.Title /> }>
 					Special requirements
 				</VisuallyHidden>
@@ -176,7 +175,6 @@ export const InfotipWithLink: Story = {
 						'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
 				} }
 			>
-				<Popover.Arrow />
 				<VisuallyHidden render={ <Popover.Title /> }>
 					HSTS required
 				</VisuallyHidden>
@@ -206,11 +204,10 @@ export const InfotipWithButton: Story = {
 						'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
 				} }
 			>
-				<Popover.Arrow />
 				<VisuallyHidden render={ <Popover.Title /> }>
 					Payout failed
 				</VisuallyHidden>
-				<Stack direction="column" gap="sm">
+				<Stack direction="column" gap="sm" align="start">
 					<Popover.Description>
 						The account number is too long. The money is back in
 						your balance and will be included in your next payout.
