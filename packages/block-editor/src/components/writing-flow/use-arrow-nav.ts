@@ -16,6 +16,7 @@ import {
 	getBlockClientId,
 	getSelectionEditableElement,
 	isInSameBlock,
+	isInsideRootBlock,
 } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
@@ -89,9 +90,10 @@ export function isNavigationCandidate(
  *                         that are visually above or under the
  *                         target.
  * @param x                Horizontal position of the caret, to pick
- *                         the candidate under it when several sit side
- *                         by side in the row reached. Only used with
- *                         `onlyVertical`; DOM order decides without it.
+ *                         the field under it when a block has several
+ *                         side by side in the row reached. Only used
+ *                         with `onlyVertical`; DOM order decides
+ *                         without it.
  *
  * @return Optimal tab target, if one exists.
  */
@@ -197,32 +199,52 @@ export function getClosestTabbable(
 	}
 
 	const first = focusableNodes[ firstIndex ];
+	const firstBlockClientId = getBlockClientId( first );
 
-	if ( ! onlyVertical || x === undefined ) {
+	if ( ! onlyVertical || x === undefined || ! firstBlockClientId ) {
 		return first;
 	}
 
-	// Candidates side by side in the row reached (e.g. the input and the
-	// button of the Search block, or the columns of a Columns block) all
-	// overlap a target wider than them. DOM order would then land on the
-	// first of them going down and on the last going up, so the field
-	// reached would depend on the direction. Prefer the candidate under the
-	// caret instead, as the caret keeps its horizontal position when moving
-	// vertically; DOM order only breaks ties.
+	// Fields side by side within a block (e.g. the input and the button of
+	// the Search block) all overlap a target wider than them. DOM order would
+	// then land on the first of them going down and on the last going up, so
+	// the field reached would depend on the direction. Prefer the field under
+	// the caret instead, as the caret keeps its horizontal position when
+	// moving vertically; DOM order only breaks ties.
+	//
+	// Only the content of the block the first candidate belongs to is
+	// considered, not its inner blocks or appenders: rows of blocks
+	// (columns, buttons) keep entering at the DOM-first block.
+	// A rendered block has an element.
+	const firstBlock = first.ownerDocument.getElementById(
+		'block-' + firstBlockClientId
+	)!;
 	const firstRect = first.getBoundingClientRect();
 	let closest = first;
 	let closestDistance = getHorizontalDistance( firstRect, x );
 
 	for ( const node of focusableNodes.slice( firstIndex + 1 ) ) {
-		const nodeRect = node.getBoundingClientRect();
+		// A block's descendants are contiguous in DOM order: past the block,
+		// nothing qualifies.
+		if ( ! firstBlock.contains( node ) ) {
+			break;
+		}
 
-		// Only elements in the same row, and not nested within one another
-		// (a block wrapper is not next to its own content), qualify.
+		// A block wrapper is not next to its own content.
 		if (
-			nodeRect.bottom <= firstRect.top ||
-			nodeRect.top >= firstRect.bottom ||
+			! isInsideRootBlock( firstBlock, node ) ||
 			node.contains( first ) ||
 			first.contains( node )
+		) {
+			continue;
+		}
+
+		const nodeRect = node.getBoundingClientRect();
+
+		// Only elements in the same row qualify.
+		if (
+			nodeRect.bottom <= firstRect.top ||
+			nodeRect.top >= firstRect.bottom
 		) {
 			continue;
 		}

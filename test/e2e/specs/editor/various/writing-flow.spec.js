@@ -35,15 +35,13 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			'body:not(:focus) :focus, body:focus .is-selected'
 		);
 
-		// Arrow up into nested context focuses the text input under the
-		// caret, which is at the end of "Second paragraph", within the first
-		// column.
+		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 		await expect( activeElementLocator ).toHaveCount( 1 );
-		await expect( activeElementLocator ).toHaveText( '1st col' );
+		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
@@ -497,6 +495,26 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// The same fields on the way down.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( input ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( paragraph ).toHaveClass( /is-selected/ );
+
+		// With the caret under the button, the button is the field above.
+		await page.keyboard.type( 'a '.repeat( 150 ) );
+		const button = editor.canvas.getByRole( 'textbox', {
+			name: 'Button text',
+		} );
+		const buttonBox = await button.boundingBox();
+		const paragraphBox = await paragraph.boundingBox();
+		await page.mouse.click(
+			buttonBox.x + buttonBox.width / 2,
+			paragraphBox.y + 8
+		);
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( button ).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( label ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( button ).toBeFocused();
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( paragraph ).toHaveClass( /is-selected/ );
 	} );
