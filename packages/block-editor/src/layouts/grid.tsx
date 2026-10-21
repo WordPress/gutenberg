@@ -141,8 +141,8 @@ export default {
 				const isViewportLayoutState =
 					isViewportState &&
 					! hasPseudoBlockStyleState( selectedState );
-				const blockStyle: GridStyle | undefined =
-					getBlockAttributes( clientId )?.style;
+				const blockStyle = getBlockAttributes( clientId )?.style as
+					GridStyle | undefined;
 				return {
 					isOtherViewportLayoutState:
 						isViewportLayoutState &&
