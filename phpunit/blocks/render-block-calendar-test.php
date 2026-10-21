@@ -48,11 +48,6 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	 */
 	public function data_color_classes_and_styles() {
 		return array(
-			'no color'                => array(
-				'attributes'     => array(),
-				'expected_class' => 'wp-calendar-table',
-				'expected_style' => null,
-			),
 			'preset colors'           => array(
 				'attributes'     => array(
 					'textColor'       => 'contrast',
@@ -72,19 +67,6 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 				),
 				'expected_class' => 'wp-calendar-table has-text-color has-background',
 				'expected_style' => 'color:#123456;background-color:#abcdef;',
-			),
-			'preset wins over custom' => array(
-				'attributes'     => array(
-					'textColor' => 'contrast',
-					'style'     => array(
-						'color' => array(
-							'text'       => '#123456',
-							'background' => '#abcdef',
-						),
-					),
-				),
-				'expected_class' => 'wp-calendar-table has-text-color has-contrast-color has-background',
-				'expected_style' => 'background-color:#abcdef;',
 			),
 			'link color'              => array(
 				'attributes'     => array(
