@@ -12,9 +12,17 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Bug Fixes
+
+-   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
+
 ### Internal
 
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
+-   `ColorIndicator`: Make `colorValue` optional, and `MenuItem`: Accept `isPressed` in the props types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   `MenuItem`: Accept `accessibleWhenDisabled` in the props types ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
+-   `Autocomplete`: Let completers type the payload they replace the field with ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
+-   `Autocomplete`: Make the `keywords` of the options from `useItems` optional, as the default filter already does ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 
 ## 43.0.0 (2026-10-20)
 
