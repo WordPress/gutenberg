@@ -32,6 +32,9 @@ const UnforwardedInserterToggle = (
 		as: Wrapper = Button,
 		label: labelProp,
 		onClick,
+		// Shows the label as the button's text, next to the icon, instead of
+		// as a tooltip.
+		showLabel = false,
 		...rest
 	} = toggleProps;
 
@@ -73,7 +76,9 @@ const UnforwardedInserterToggle = (
 			isPressed={ ! hasSingleBlockType && isOpen }
 			disabled={ disabled }
 			{ ...rest }
-		/>
+		>
+			{ showLabel ? label : undefined }
+		</Wrapper>
 	);
 };
 

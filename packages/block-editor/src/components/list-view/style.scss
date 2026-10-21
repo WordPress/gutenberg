@@ -608,7 +608,8 @@ svg {
 	color: $white;
 	margin: $grid-unit-10 0 0 $grid-unit-30;
 	height: $button-size-small;
-	padding: 0;
+	// The label follows the icon as text.
+	padding: 0 $grid-unit-10 0 0;
 
 	// TODO: Consider passing size="small" to the Inserter toggle instead.
 	// Special dimensions for this button.
@@ -625,4 +626,14 @@ svg {
 
 .list-view-appender__description {
 	display: none;
+}
+
+// An appender is inset with the items it adds to: the toggle sits where a
+// new item's icon will be, one indent level further right per level.
+@for $i from 0 to $block-navigation-max-indent {
+	.block-editor-list-view-appender-row[aria-level="#{ $i + 1 }"]
+	.list-view-appender
+	.block-editor-inserter__toggle {
+		margin-left: ($grid-unit-30 * ( $i + 1 ));
+	}
 }

@@ -168,9 +168,12 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		const appender = listView.getByRole( 'button', {
-			name: 'Add page',
-		} );
+		// Every list keeps an appender row, and the top-level one comes last.
+		const appender = listView
+			.getByRole( 'button', {
+				name: 'Add page',
+			} )
+			.last();
 
 		await expect( appender ).toBeVisible();
 
@@ -307,7 +310,11 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		// The top-level appender comes after any submenu's appender row.
+		await listView
+			.getByRole( 'button', { name: 'Add page' } )
+			.last()
+			.click();
 
 		await expect( linkControl.getSearchInput() ).toBeFocused();
 		await page.keyboard.type( 'Home', { delay: 50 } );
@@ -577,10 +584,12 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
+		// The top-level appender comes after any submenu's appender row.
 		await listView
 			.getByRole( 'button', {
 				name: 'Add page',
 			} )
+			.last()
 			.click();
 
 		// Expect the Link UI to be focused.
@@ -866,7 +875,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 		// Items can be added here, as the canvas appender shows, so the List
 		// View offers its appender too.
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		// The top-level appender comes after any submenu's appender row.
+		const appender = listView
+			.getByRole( 'button', { name: 'Add page' } )
+			.last();
 		await expect( appender ).toBeVisible();
 		await appender.click();
 

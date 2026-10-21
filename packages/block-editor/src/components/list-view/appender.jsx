@@ -88,7 +88,12 @@ export const Appender = forwardRef(
 					shouldDirectInsert={ directInsert }
 					__experimentalIsQuick
 					{ ...props }
-					toggleProps={ { 'aria-describedby': descriptionId } }
+					toggleProps={ {
+						// The label is the button's text, so the row says
+						// what it adds without a tooltip or hover.
+						showLabel: true,
+						'aria-describedby': descriptionId,
+					} }
 					onSelectOrClose={ ( maybeInsertedBlock ) => {
 						if ( maybeInsertedBlock?.clientId ) {
 							setInsertedBlockClientId(

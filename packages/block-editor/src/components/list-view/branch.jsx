@@ -57,21 +57,6 @@ function countBlocks(
 
 const noop = () => {};
 
-/**
- * Whether any of the blocks, or any block nested inside them, is selected.
- *
- * @param {Array} blocks            Block tree.
- * @param {Array} selectedClientIds Selected block client IDs.
- * @return {boolean} Whether the selection is within the blocks.
- */
-function hasSelectedBlock( blocks, selectedClientIds ) {
-	return blocks.some(
-		( block ) =>
-			isClientIdSelected( block.clientId, selectedClientIds ) ||
-			hasSelectedBlock( block.innerBlocks ?? [], selectedClientIds )
-	);
-}
-
 function ListViewBranch( props ) {
 	const {
 		blocks,
@@ -122,14 +107,9 @@ function ListViewBranch( props ) {
 	}
 
 	const filteredBlocks = blocks.filter( Boolean );
-	// The first level always shows the appender. A nested level shows it while
-	// its parent, or any block inside the parent, is selected, so the
-	// appender sits at the end of the list the user is working in.
-	const showAppender =
-		showAppenderProp &&
-		( level === 1 ||
-			isClientIdSelected( parentId, selectedClientIds ) ||
-			hasSelectedBlock( filteredBlocks, selectedClientIds ) );
+	// Every rendered list ends with an appender. A collapsed list renders no
+	// branch, so expanding a block is what shows the appender for its items.
+	const showAppender = showAppenderProp;
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -290,6 +270,7 @@ function ListViewBranch( props ) {
 			{ rows }
 			{ showAppender && (
 				<TreeGridRow
+					className="block-editor-list-view-appender-row"
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   List View: Show an appender at the end of every expanded nested list, so items can be added to a submenu or a Buttons block from the List View. Appenders in the List View show their label as text ([#84866](https://github.com/WordPress/gutenberg/pull/84866)).
+
 ### Bug Fixes
 
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
@@ -22,7 +26,6 @@
 
 ### Enhancements
 
--   List View: Show an appender at the end of a nested list while its parent, or a block inside it, is selected ([#84866](https://github.com/WordPress/gutenberg/pull/84866)).
 -   Migrate `FontFamilyControl` to `@wordpress/ui` ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
