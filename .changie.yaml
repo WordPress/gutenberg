@@ -30,13 +30,11 @@ custom:
 
 # Kinds match Gutenberg's canonical changelog subsections and ordering.
 # 'auto' specifies the semver increment level.
-# Go templates are used for 'Stable Release' and 'Breaking Changes':
-# - Pre-1.0 packages (signaled via GUTENBERG_PRE_1="true"): breaking changes bump minor,
-#   while a 'Stable Release' entry bumps major to promote to 1.0.0.
-# - Stable packages (>=1.0): breaking changes bump major as usual.
+# Pre-1.0 packages (signaled via GUTENBERG_PRE_1="true"): breaking changes bump minor,
+# while stable packages (>=1.0) bump major as usual.
+# Note: 'Stable Release' (for promoting 0.x packages to 1.0.0) is handled via
+# `npm run changelog:promote-stable` so it does not clutter everyday PR choices.
 kinds:
-    - label: Stable Release
-      auto: '{{if eq .Env.PRE_1 "true"}}major{{else}}patch{{end}}'
     - label: Breaking Changes
       auto: '{{if eq .Env.PRE_1 "true"}}minor{{else}}major{{end}}'
     - label: New Features

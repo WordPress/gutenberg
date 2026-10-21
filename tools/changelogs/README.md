@@ -8,6 +8,7 @@ Tools for managing package changelogs and fragments using [Changie](https://chan
 -   `lib/config.js`: loads configuration and detects whether a package is configured for Changie.
 -   `lib/migrate.js`: bi-directional migration between traditional `CHANGELOG.md` files and Changie version/fragment files.
 -   `lib/preview.js`: preview unreleased notes across packages.
+-   `lib/promote-stable.js`: generate `Stable Release` fragments promoting 0.x packages to 1.0.0.
 -   `lib/release.js`: version bump calculation and batch/merge operations used during automated package publishing.
 
 ## Migrating a package to Changie
@@ -68,6 +69,18 @@ npm exec --workspace @wordpress/changelog-tools --no -- changie merge --dry-run
 # Run repository changelog linter
 npm run lint:changelogs
 ```
+
+## Promoting a pre-1.0 package to stable 1.0.0
+
+For packages published as `0.x.y` pre-releases, promote the package to stable `1.0.0` using:
+
+```bash
+npm run changelog:promote-stable -- <package-name> --pr <PR#>
+```
+
+This creates a `Stable Release` fragment under `.changes/unreleased/`. During the next automated package release, the presence of the `Stable Release` fragment directs the release bumper to issue a major bump to `1.0.0`.
+
+The command validates that the target package version is strictly `< 1.0.0` before creating the fragment.
 
 ### Aborting a migration during development
 
