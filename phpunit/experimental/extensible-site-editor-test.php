@@ -62,35 +62,43 @@ class Tests_Extensible_Site_Editor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Returns the ids of the actions registered for pages, from a registry
-	 * built anew, as each request builds it.
+	 * Returns the ids of the actions registered for a post type, from a
+	 * registry built anew, as each request builds it.
 	 *
+	 * @param string $post_type The post type.
 	 * @return string[] The ids of the actions, in registration order.
 	 */
-	private function get_page_action_ids() {
+	private function get_action_ids( $post_type ) {
 		self::reset_registry();
-		return array_column( wp_get_registered_entity_actions( 'postType', 'page' ), 'id' );
+		return array_column( wp_get_registered_entity_actions( 'postType', $post_type ), 'id' );
 	}
 
 	/**
-	 * The lists of the extensible site editor open a page on click, and do
+	 * The lists of the extensible site editor open an item on click, and do
 	 * not handle the "Edit" action, so the experiment unregisters it and
-	 * keeps the other actions of pages.
+	 * keeps the other actions.
 	 */
-	public function test_the_edit_action_of_pages_is_unregistered() {
+	public function test_the_edit_action_is_unregistered() {
+		$post_types = array( 'page', 'wp_template', 'wp_template_part', 'wp_block' );
 		// The test case restores the hooks after the test.
 		remove_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_edit_post_action' );
 		wp_set_current_user( self::$admin_id );
-		$ids = $this->get_page_action_ids();
-		$this->assertContains( 'edit-post', $ids, 'Core registers the action.' );
+		switch_theme( 'block-theme' );
+		$ids = array();
+		foreach ( $post_types as $post_type ) {
+			$ids[ $post_type ] = $this->get_action_ids( $post_type );
+			$this->assertContains( 'edit-post', $ids[ $post_type ], "Core registers the action for $post_type." );
+		}
 
 		add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_edit_post_action' );
 
-		$this->assertSame( array_values( array_diff( $ids, array( 'edit-post' ) ) ), $this->get_page_action_ids() );
-		$this->assertNotContains(
-			'edit-post',
-			array_merge( ...array_values( wp_get_registered_entity_action_modules( 'postType', 'page' ) ) ),
-			'No script module applies to it.'
-		);
+		foreach ( $post_types as $post_type ) {
+			$this->assertSame( array_values( array_diff( $ids[ $post_type ], array( 'edit-post' ) ) ), $this->get_action_ids( $post_type ), "The other actions of $post_type are kept." );
+			$this->assertNotContains(
+				'edit-post',
+				array_merge( ...array_values( wp_get_registered_entity_action_modules( 'postType', $post_type ) ) ),
+				'No script module applies to it.'
+			);
+		}
 	}
 }
