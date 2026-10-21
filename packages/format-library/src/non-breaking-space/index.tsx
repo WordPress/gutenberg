@@ -4,7 +4,6 @@ import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
 	RichTextToolbarButton,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { Popover, SVG, Path } from '@wordpress/components';
 import type { FormatEditProps } from '../types';

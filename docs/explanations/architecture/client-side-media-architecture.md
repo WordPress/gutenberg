@@ -177,7 +177,7 @@ The WASM worker bundle is loaded lazily — only when the first image needs proc
 
 3.  **Single instance**: `getVips()` caches a promise so concurrent first-time calls share one initialization. The worker stays alive across uploads and is terminated by `terminateVipsWorker()` when the upload queue empties or when it is recycled (see Memory management below).
 
-4.  **Memory management**: WASM linear memory can only grow, never shrink, so the pipeline actively limits how much it accumulates:
+4.  **Memory management**: WASM linear memory can only grow, never shrink (and with wasm-vips 0.0.19 it grows up to 2 GiB, although growth can fail on memory-constrained devices), so the pipeline actively limits how much it accumulates:
     -   The libvips operation cache is disabled at startup (`Cache.max(0)`). libvips otherwise caches the results of previous operations, which grows WASM memory unbounded across a batch of uploads and can trigger out-of-memory crashes.
     -   The worker is recycled (terminated and recreated on next use) after every 50 completed vips operations, counting both successes and failures so a burst of failures can't bypass the budget. Recycling is deferred while any operation is still in flight so an active worker is never killed mid-operation.
     -   Emscripten's `setAutoDeleteLater(true)` handles automatic cleanup, and each operation also runs a manual cleanup after completion. Operations are tracked in an `inProgressOperations` set so they can be cancelled mid-flight via a progress-callback kill switch.
