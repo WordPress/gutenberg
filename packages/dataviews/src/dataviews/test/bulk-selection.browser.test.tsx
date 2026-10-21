@@ -126,7 +126,7 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.not.toHaveAttribute( 'aria-sort' );
 } );
 
-it( 'keeps loading bulk actions unfocusable over an opaque backing', async () => {
+it( 'blocks focus on bulk actions and covers column headings while loading', async () => {
 	const { rerender } = await render( <SelectableTable /> );
 	const user = userEvent.setup();
 	await user.click(
