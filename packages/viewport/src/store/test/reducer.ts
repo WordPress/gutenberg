@@ -6,7 +6,7 @@ describe( 'reducer', () => {
 	it( 'defaults to an empty object', () => {
 		const state = reducer(
 			undefined,
-			// @ts-expect-error An empty action exercises the reducer's default state.
+			// @ts-expect-error {} is not a ViewportAction; an unknown action returns the default state.
 			{}
 		);
 
@@ -17,7 +17,7 @@ describe( 'reducer', () => {
 		const original = deepFreeze(
 			reducer(
 				undefined,
-				// @ts-expect-error An empty action exercises the reducer's default state.
+				// @ts-expect-error {} is not a ViewportAction; an unknown action returns the default state.
 				{}
 			)
 		);
