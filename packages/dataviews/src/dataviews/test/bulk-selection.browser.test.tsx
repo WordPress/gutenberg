@@ -186,7 +186,7 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 						fields: [ 'author' ],
 						layout: {
 							density,
-							styles: { author: { minWidth: '1400px' } },
+							styles: { author: { minWidth: '1400.625px' } },
 						},
 					} }
 					onChangeView={ () => {} }
@@ -229,9 +229,13 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			await expect
 				.poll( () => toolbar.getBoundingClientRect().top )
 				.toBe( scroller.getBoundingClientRect().top );
-			expect( toolbar.getBoundingClientRect().left ).toBe(
-				scroller.getBoundingClientRect().left
-			);
+			// Scroll extents round to whole pixels, unlike fractional sticky bounds.
+			expect(
+				Math.abs(
+					toolbar.getBoundingClientRect().left -
+						scroller.getBoundingClientRect().left
+				)
+			).toBeLessThanOrEqual( 0.5 );
 			expect( toolbar.getBoundingClientRect().width ).toBe(
 				scroller.clientWidth
 			);
