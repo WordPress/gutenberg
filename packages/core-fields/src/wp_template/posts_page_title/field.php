@@ -8,8 +8,8 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Blog title', 'gutenberg' ),
-	'description'   => __( 'Set the Posts Page title. Appears in search results, and when the page is shared on social media.', 'gutenberg' ),
+	'label'         => __( 'Blog title' ),
+	'description'   => __( 'Set the Posts Page title. Appears in search results, and when the page is shared on social media.' ),
 	'enableSorting' => false,
 	'enableHiding'  => false,
 	'filterBy'      => false,

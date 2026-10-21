@@ -8,7 +8,7 @@
 	},
 	"jsdomBrowserApis": {
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
-		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
+		"packages/block-editor/src/utils/test/dom.jsdom.test.tsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
 		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver entries and requestAnimationFrame scheduling to test deterministic lane-placement state without browser layout.",
 		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Injects ResizeObserver notifications to verify the observer is rebuilt after resubscribing, independently of browser layout.",
 		"packages/editor/src/components/collab-sidebar/test/utils.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout.",

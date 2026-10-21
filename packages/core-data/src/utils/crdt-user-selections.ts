@@ -1,6 +1,5 @@
 import { select } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
