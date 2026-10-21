@@ -719,7 +719,7 @@ export default dedupePlugins( [
 			],
 		],
 		[
-			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.tsx',
 			[ 'expectPlaceholderState' ],
 		],
 		[

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, useMemo } from '@wordpress/element';
+import { useId, useState, useMemo } from '@wordpress/element';
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
 import type { GridOverlayRenderProps } from '../../shared/types';
@@ -182,6 +182,56 @@ export const Default: Story = {
 	},
 };
 
+function TileControls( { title }: { title: string } ) {
+	const metricId = useId();
+	return (
+		<span
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'flex-start',
+				gap: 8,
+			} }
+		>
+			<strong>{ title }</strong>
+			<a href="#details">Details</a>
+			<button type="button">Refresh</button>
+			<label htmlFor={ metricId }>
+				Metric{ ' ' }
+				<select id={ metricId }>
+					<option>Views</option>
+					<option>Clicks</option>
+				</select>
+			</label>
+		</span>
+	);
+}
+
+/**
+ * Tiles with their own links, buttons and form controls. The a11y addon checks that the lanes do not wrap them in drag semantics. In edit mode, the first tile is pinned (`draggable: false`) and its controls keep their semantics.
+ */
+export const InteractiveContent: Story = {
+	args: {
+		columns: 3,
+		layout: [
+			{ key: 'pinned', draggable: false },
+			{ key: 'a' },
+			{ key: 'b' },
+		],
+		children: [
+			<Tile key="pinned" tone="neutral" height={ 180 }>
+				<TileControls title="Pinned" />
+			</Tile>,
+			<Tile key="a" tone="info" height={ 180 }>
+				<TileControls title="Tile" />
+			</Tile>,
+			<Tile key="b" tone="success" height={ 180 }>
+				<TileControls title="Tile" />
+			</Tile>,
+		],
+	},
+};
+
 /**
  * Responsive lane count: derived from container width using
  * `minColumnWidth` as the per-lane lower bound. Resize the preview
@@ -318,7 +368,13 @@ export const EditMode: Story = {
 			height: number;
 			label: string;
 		} )[] = [
-			{ key: 'a', tone: 'brand', height: 120, label: '120px' },
+			{
+				key: 'a',
+				draggable: false,
+				tone: 'brand',
+				height: 120,
+				label: 'pinned',
+			},
 			{ key: 'b', tone: 'info', height: 200, label: '200px' },
 			{
 				key: 'wide',
