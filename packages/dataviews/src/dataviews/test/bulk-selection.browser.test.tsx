@@ -126,7 +126,7 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.not.toHaveAttribute( 'aria-sort' );
 } );
 
-it( 'prevents table bulk actions from receiving focus while loading', async () => {
+it( 'keeps loading bulk actions unfocusable over an opaque backing', async () => {
 	const { rerender } = await render( <SelectableTable /> );
 	const user = userEvent.setup();
 	await user.click(
@@ -135,9 +135,33 @@ it( 'prevents table bulk actions from receiving focus while loading', async () =
 	const cancel = page
 		.getByRole( 'button', { name: 'Cancel', exact: true } )
 		.element();
+	const table = page.getByRole( 'table' ).element();
+	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
+	const overlay = toolbar.parentElement!;
 	await rerender( <SelectableTable isLoading /> );
 	cancel.focus();
 	expect( cancel ).not.toHaveFocus();
+	await expect
+		.poll( () => {
+			const style = getComputedStyle( table );
+			return (
+				style.animationName !== 'none' || Number( style.opacity ) < 1
+			);
+		} )
+		.toBe( true );
+	expect( getComputedStyle( overlay ).opacity ).toBe( '1' );
+	expect( getComputedStyle( overlay ).animationName ).toBe( 'none' );
+	const toolbarStyle = getComputedStyle( toolbar );
+	expect(
+		toolbarStyle.animationName !== 'none' ||
+			Number( toolbarStyle.opacity ) < 1
+	).toBe( true );
+	const backing = getComputedStyle( overlay, '::before' );
+	expect( backing.content ).toBe( '""' );
+	expect( backing.backgroundColor ).toBe(
+		getComputedStyle( toolbar ).backgroundColor
+	);
+	expect( backing.backgroundColor ).not.toBe( 'rgba(0, 0, 0, 0)' );
 	await rerender( <SelectableTable /> );
 	cancel.focus();
 	expect( cancel ).toHaveFocus();
