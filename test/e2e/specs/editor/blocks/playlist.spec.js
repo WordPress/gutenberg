@@ -273,11 +273,15 @@ test.describe( 'Playlist block', () => {
 			.getByRole( 'button', { name: /Existing Track/ } )
 			.click();
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Replace track' } ).click();
+		// The track control is named after the current file.
+		await page
+			.getByRole( 'button', { name: 'playlist-e2e-test.wav' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Open Media Library' } )
+			.click();
 
-		const mediaLibrary = page.getByRole( 'dialog', {
-			name: 'Select track',
-		} );
+		const mediaLibrary = page.locator( '.media-modal' );
 		await mediaLibrary
 			.getByRole( 'tab', { name: 'Media Library' } )
 			.click();

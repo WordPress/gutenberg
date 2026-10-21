@@ -19,7 +19,7 @@ import {
 	BaseControl,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
-import { Link, Stack, Text } from '@wordpress/ui';
+import { Link } from '@wordpress/ui';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -29,6 +29,7 @@ import { getFilename } from '@wordpress/url';
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -183,40 +184,20 @@ const PlaylistTrackEdit = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ /* Only show if this is a single selection (not multiselect) */ }
 					{ isSelected && (
-						<MediaUploadCheck>
-							<BaseControl>
-								<BaseControl.VisualLabel>
-									{ __( 'Track' ) }
-								</BaseControl.VisualLabel>
-								<Stack
-									direction="row"
-									gap="sm"
-									align="center"
-									justify="flex-start"
-								>
-									{ !! src && (
-										<Text>
-											{ getFilename( src ) || src }
-										</Text>
-									) }
-									<MediaUpload
-										title={ __( 'Select track' ) }
-										onSelect={ onSelectTrack }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<Button
-												__next40pxDefaultSize
-												variant="primary"
-												onClick={ open }
-											>
-												{ __( 'Replace track' ) }
-											</Button>
-										) }
-									/>
-								</Stack>
-							</BaseControl>
-						</MediaUploadCheck>
+						<BaseControl>
+							<BaseControl.VisualLabel>
+								{ __( 'Track' ) }
+							</BaseControl.VisualLabel>
+							<MediaControl
+								mediaId={ id }
+								mediaUrl={ src }
+								filename={ getFilename( src ) }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								onSelect={ onSelectTrack }
+								onError={ onUploadError }
+								emptyLabel={ __( 'Add track' ) }
+							/>
+						</BaseControl>
 					) }
 					{ isSelected && (
 						<TextControl
