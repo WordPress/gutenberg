@@ -2,25 +2,39 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { store as blockEditorStore } from '../../../store';
 import useNestedSettingsUpdate from '../use-nested-settings-update';
+
+type TestWindow = Window & {
+	__experimentalEnableGridInteractivity?: boolean;
+};
 
 /**
  * Gets the block list settings a container ends up with.
  *
- * @param {Object}  options
- * @param {boolean} options.captureToolbars Whether the block captures toolbars.
- * @param {Object}  options.layout          The container's layout.
+ * @param options                 Options.
+ * @param options.captureToolbars Whether the block captures toolbars.
+ * @param options.layout          The container's layout.
  *
- * @return {Promise<Object>} The block list settings.
+ * @return The block list settings.
  */
-async function getSettings( { captureToolbars, layout } ) {
+async function getSettings( {
+	captureToolbars,
+	layout,
+}: {
+	captureToolbars: boolean;
+	layout: Record< string, unknown >;
+} ) {
 	const registry = createRegistry();
 	registry.register( blockEditorStore );
 	renderHook(
 		() =>
 			useNestedSettingsUpdate(
 				'container',
+				// The hook's JSDoc marks every argument as required, but it
+				// takes `undefined` for those a block doesn't set.
+				// @ts-expect-error The arguments are optional in practice.
 				undefined,
 				undefined,
 				undefined,
@@ -34,7 +48,7 @@ async function getSettings( { captureToolbars, layout } ) {
 				layout
 			),
 		{
-			wrapper: ( { children } ) =>
+			wrapper: ( { children }: { children: ReactNode } ) =>
 				createElement(
 					RegistryProvider,
 					{ value: registry },
@@ -50,19 +64,22 @@ async function getSettings( { captureToolbars, layout } ) {
 				.getBlockListSettings( 'container' )
 		).toBeDefined()
 	);
+	// The wait above makes sure the settings are there.
 	return registry
 		.select( blockEditorStore )
-		.getBlockListSettings( 'container' );
+		.getBlockListSettings( 'container' )!;
 }
 
 describe( 'useNestedSettingsUpdate', () => {
-	let originalExperiment;
+	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
-		originalExperiment = window.__experimentalEnableGridInteractivity;
-		window.__experimentalEnableGridInteractivity = true;
+		originalExperiment = ( window as TestWindow )
+			.__experimentalEnableGridInteractivity;
+		( window as TestWindow ).__experimentalEnableGridInteractivity = true;
 	} );
 	afterEach( () => {
-		window.__experimentalEnableGridInteractivity = originalExperiment;
+		( window as TestWindow ).__experimentalEnableGridInteractivity =
+			originalExperiment;
 	} );
 
 	it( 'captures toolbars when the layout does', async () => {

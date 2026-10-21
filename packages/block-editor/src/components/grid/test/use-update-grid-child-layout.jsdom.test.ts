@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getGridChildUpdates } from '../use-update-grid-child-layout';
 import { getUpdatedRotateStyle } from '../../../hooks/rotate';
+import type { GridChildStyleChange } from '../use-update-grid-child-layout';
+import type { GridBlockStyle } from '../mobile-stacking';
 
 const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
 const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
 const TABLET_STATE = { viewport: '@tablet', pseudo: 'default' };
 
 describe( 'getGridChildUpdates()', () => {
-	let originalExperiment;
+	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
 		originalExperiment = window.__experimentalEnableGridInteractivity;
 		window.__experimentalEnableGridInteractivity = true;
@@ -38,7 +40,14 @@ describe( 'getGridChildUpdates()', () => {
 		},
 	];
 
-	function getUpdates( options ) {
+	type GridChildUpdatesOptions = Parameters<
+		typeof getGridChildUpdates
+	>[ 0 ];
+
+	function getUpdates(
+		options: Pick< GridChildUpdatesOptions, 'change' | 'selectedState' > &
+			Partial< GridChildUpdatesOptions >
+	) {
 		return getGridChildUpdates( {
 			clientId: 'b',
 			style: children[ 1 ].attributes.style,
@@ -93,19 +102,19 @@ describe( 'getGridChildUpdates()', () => {
 			change: { columnSpan: 2 },
 			selectedState: MOBILE_STATE,
 		} );
-		expect( updates.a.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.a.style?.[ '@mobile' ]?.layout ).toEqual( {
 			columnStart: 1,
 			columnSpan: 3,
 			rowStart: 1,
 			rowSpan: 2,
 		} );
-		expect( updates.b.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.b.style?.[ '@mobile' ]?.layout ).toEqual( {
 			columnStart: 1,
 			columnSpan: 2,
 			rowStart: 3,
 			rowSpan: 1,
 		} );
-		expect( updates.grid.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.grid.style?.[ '@mobile' ]?.layout ).toEqual( {
 			stackOnMobile: false,
 			columnCount: 3,
 			rowCount: 3,
@@ -117,7 +126,7 @@ describe( 'getGridChildUpdates()', () => {
 			change: { rowSpan: 2 },
 			selectedState: MOBILE_STATE,
 		} );
-		expect( updates.grid.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.grid.style?.[ '@mobile' ]?.layout ).toEqual( {
 			stackOnMobile: false,
 			columnCount: 3,
 			rowCount: 4,
@@ -125,12 +134,15 @@ describe( 'getGridChildUpdates()', () => {
 	} );
 
 	it( 'applies a style function with the grid as it is after unstacking', () => {
-		const change = vi.fn( ( style ) => ( { ...style, marker: true } ) );
+		const change = vi.fn< GridChildStyleChange >( ( style ) => ( {
+			...style,
+			marker: true,
+		} ) );
 		const updates = getUpdates( { change, selectedState: MOBILE_STATE } );
 
 		const [ childStyle, selectedState, gridAttributes ] =
 			change.mock.calls[ 0 ];
-		expect( childStyle[ '@mobile' ].layout ).toEqual( {
+		expect( childStyle?.[ '@mobile' ]?.layout ).toEqual( {
 			columnStart: 1,
 			columnSpan: 3,
 			rowStart: 3,
@@ -138,8 +150,7 @@ describe( 'getGridChildUpdates()', () => {
 		} );
 		expect( selectedState ).toBe( MOBILE_STATE );
 		expect( gridAttributes.layout ).toBe( manualGrid.layout );
-		const { '@mobile': gridMobileStyle } = gridAttributes.style;
-		expect( gridMobileStyle.layout ).toEqual( {
+		expect( gridAttributes.style?.[ '@mobile' ]?.layout ).toEqual( {
 			stackOnMobile: false,
 			columnCount: 3,
 			rowCount: 3,
@@ -150,15 +161,17 @@ describe( 'getGridChildUpdates()', () => {
 	} );
 
 	describe( 'rotation, as the rotate handle changes it', () => {
-		const rotateTo = ( angle ) => ( style, state ) =>
-			getUpdatedRotateStyle( style, angle, state );
+		const rotateTo =
+			( angle: number ): GridChildStyleChange =>
+			( style, state ) =>
+				getUpdatedRotateStyle( style, angle, state ) as GridBlockStyle;
 
 		it( 'stores the rotation in the selected state', () => {
 			expect(
 				getUpdates( {
 					change: rotateTo( 30 ),
 					selectedState: DEFAULT_STATE,
-				} ).b.style
+				} ).b?.style
 			).toEqual( {
 				layout: { columnStart: 2, rowStart: 1 },
 				rotate: 30,
@@ -167,7 +180,7 @@ describe( 'getGridChildUpdates()', () => {
 				getUpdates( {
 					change: rotateTo( -15 ),
 					selectedState: TABLET_STATE,
-				} ).b.style[ '@tablet' ]
+				} ).b?.style?.[ '@tablet' ]
 			).toEqual( { rotate: -15 } );
 		} );
 
@@ -184,12 +197,12 @@ describe( 'getGridChildUpdates()', () => {
 					{ clientId: 'b', attributes: { style: { rotate: 10 } } },
 				],
 			} );
-			expect( updates.a.style ).toMatchObject( {
+			expect( updates.a?.style ).toMatchObject( {
 				rotate: 30,
 				'@mobile': { rotate: 0 },
 			} );
-			expect( updates.b.style ).toMatchObject( { rotate: 10 } );
-			expect( updates.b.style[ '@mobile' ] ).toEqual( {
+			expect( updates.b?.style ).toMatchObject( { rotate: 10 } );
+			expect( updates.b?.style?.[ '@mobile' ] ).toEqual( {
 				layout: {
 					columnStart: 1,
 					columnSpan: 3,
@@ -198,9 +211,9 @@ describe( 'getGridChildUpdates()', () => {
 				},
 				rotate: 45,
 			} );
-			expect( updates.grid.style[ '@mobile' ].layout.stackOnMobile ).toBe(
-				false
-			);
+			expect(
+				updates.grid?.style?.[ '@mobile' ]?.layout?.stackOnMobile
+			).toBe( false );
 		} );
 	} );
 

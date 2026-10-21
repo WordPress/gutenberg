@@ -6,14 +6,43 @@
 const HANDLE_DRAG_TYPE = 'wp-grid-item-handle';
 
 /**
+ * Where a touch drag from a grid item's drag handle is, and whether it is
+ * moving, dropped, or cancelled.
+ */
+export interface GridItemPointerDragEvent {
+	type: 'move' | 'drop' | 'cancel';
+	clientX: number;
+	clientY: number;
+}
+
+/**
+ * Called as a touch drag from a grid item's drag handle moves, when it is
+ * dropped, and when it is cancelled.
+ */
+export type GridItemPointerDragListener = (
+	event: GridItemPointerDragEvent
+) => void;
+
+interface GridItemDragOptions {
+	/** Client ID of the dragged block. */
+	clientId: string;
+	/** The block's element in the canvas. */
+	blockElement: HTMLElement;
+	/** Marks blocks as being dragged. */
+	startDraggingBlocks: ( clientIds: string[] ) => void;
+	/** Marks the drag as over. */
+	stopDraggingBlocks: () => void;
+}
+
+/**
  * Whether a drag event belongs to a drag started from a grid item's drag
  * handle, rather than from the block's body or anywhere else.
  *
- * @param {DragEvent} event A drag event.
+ * @param event A drag event.
  *
- * @return {boolean} Whether the drag started from a drag handle.
+ * @return Whether the drag started from a drag handle.
  */
-export function isGridItemHandleDrag( event ) {
+export function isGridItemHandleDrag( event: DragEvent ) {
 	return !! event.dataTransfer?.types?.includes( HANDLE_DRAG_TYPE );
 }
 
@@ -23,27 +52,35 @@ export function isGridItemHandleDrag( event ) {
  * block stays in place, dimmed, instead of following the pointer, and the
  * browser's drag image is a hidden pixel.
  *
- * @param {DragEvent}                     event                       The `dragstart` event.
- * @param {Object}                        options
- * @param {string}                        options.clientId            Client ID of the dragged block.
- * @param {string}                        options.rootClientId        Client ID of the grid.
- * @param {HTMLElement}                   options.blockElement        The block's element in the canvas.
- * @param {(clientIds: string[]) => void} options.startDraggingBlocks Marks blocks as being dragged.
- * @param {() => void}                    options.stopDraggingBlocks  Marks the drag as over.
+ * @param event                       The `dragstart` event.
+ * @param options                     Options.
+ * @param options.clientId            Client ID of the dragged block.
+ * @param options.rootClientId        Client ID of the grid.
+ * @param options.blockElement        The block's element in the canvas.
+ * @param options.startDraggingBlocks Marks blocks as being dragged.
+ * @param options.stopDraggingBlocks  Marks the drag as over.
  */
 export function startGridItemDrag(
-	event,
+	event: DragEvent,
 	{
 		clientId,
 		rootClientId,
 		blockElement,
 		startDraggingBlocks,
 		stopDraggingBlocks,
+	}: GridItemDragOptions & {
+		/** Client ID of the grid. */
+		rootClientId: string;
 	}
 ) {
-	event.dataTransfer.effectAllowed = 'move'; // remove "+" cursor
-	event.dataTransfer.clearData();
-	event.dataTransfer.setData(
+	// A `dragstart` event always has drag data, and starts on the block or
+	// on its handle.
+	const dataTransfer = event.dataTransfer!;
+	const target = event.target as Element;
+
+	dataTransfer.effectAllowed = 'move'; // remove "+" cursor
+	dataTransfer.clearData();
+	dataTransfer.setData(
 		'wp-blocks',
 		JSON.stringify( {
 			type: 'block',
@@ -51,15 +88,15 @@ export function startGridItemDrag(
 			srcRootClientId: rootClientId,
 		} )
 	);
-	if ( event.target !== blockElement ) {
-		event.dataTransfer.setData( HANDLE_DRAG_TYPE, '1' );
+	if ( target !== blockElement ) {
+		dataTransfer.setData( HANDLE_DRAG_TYPE, '1' );
 	}
 
 	// The canvas, and the editor around it when the drag starts on a handle
 	// there.
 	const { ownerDocument } = blockElement;
-	const sourceDocument = event.target.ownerDocument;
-	ownerDocument.defaultView.getSelection().removeAllRanges();
+	const sourceDocument = target.ownerDocument;
+	ownerDocument.defaultView!.getSelection()!.removeAllRanges();
 
 	// Chrome shows a globe icon if the drag image has no dimensions.
 	const dragElement = sourceDocument.createElement( 'div' );
@@ -68,7 +105,7 @@ export function startGridItemDrag(
 	dragElement.style.position = 'fixed';
 	dragElement.style.visibility = 'hidden';
 	sourceDocument.body.appendChild( dragElement );
-	event.dataTransfer.setDragImage( dragElement, 0, 0 );
+	dataTransfer.setDragImage( dragElement, 0, 0 );
 
 	const originalOpacity = blockElement.style.opacity;
 	blockElement.style.opacity = '0.5';
@@ -77,7 +114,11 @@ export function startGridItemDrag(
 	// and a drop there can re-render the block, after which its `dragend` no
 	// longer reaches the canvas. The drag ends on whichever comes first.
 	const documents = new Set( [ ownerDocument, document ] );
-	const endTargets = new Set( [ ...documents, blockElement, event.target ] );
+	const endTargets = new Set< EventTarget >( [
+		...documents,
+		blockElement,
+		target,
+	] );
 
 	// The grid's drop layer covers the block once dragging starts. Chrome
 	// cancels a drag when that happens during `dragstart`, so it waits for
@@ -119,19 +160,19 @@ export function startGridItemDrag(
  * The drop layers of the grids on screen, told where a touch drag from a drag
  * handle goes, since touch screens don't start the browser's drag and drop
  * from a handle.
- *
- * @type {Set<(event: {type: 'move'|'drop'|'cancel', clientX: number, clientY: number}) => void>}
  */
-const pointerDragListeners = new Set();
+const pointerDragListeners = new Set< GridItemPointerDragListener >();
 
 /**
  * Listens to touch drags started from grid item drag handles.
  *
- * @param {(event: {type: 'move'|'drop'|'cancel', clientX: number, clientY: number}) => void} listener Called as the drag moves, when it is dropped, and when it is cancelled.
+ * @param listener Called as the drag moves, when it is dropped, and when it is cancelled.
  *
- * @return {() => void} Stops listening.
+ * @return Stops listening.
  */
-export function subscribeToGridItemPointerDrag( listener ) {
+export function subscribeToGridItemPointerDrag(
+	listener: GridItemPointerDragListener
+) {
 	pointerDragListeners.add( listener );
 	return () => pointerDragListeners.delete( listener );
 }
@@ -142,17 +183,26 @@ export function subscribeToGridItemPointerDrag( listener ) {
  * layers, which work out the landing cells as they do for a drag with a mouse.
  * The block stays in place, dimmed.
  *
- * @param {PointerEvent}                  event                       The `pointerdown` event on the handle.
- * @param {Object}                        options
- * @param {string}                        options.clientId            Client ID of the dragged block.
- * @param {HTMLElement}                   options.blockElement        The block's element in the canvas.
- * @param {HTMLElement}                   options.handle              The drag handle.
- * @param {(clientIds: string[]) => void} options.startDraggingBlocks Marks blocks as being dragged.
- * @param {() => void}                    options.stopDraggingBlocks  Marks the drag as over.
+ * @param event                       The `pointerdown` event on the handle.
+ * @param options                     Options.
+ * @param options.clientId            Client ID of the dragged block.
+ * @param options.blockElement        The block's element in the canvas.
+ * @param options.handle              The drag handle.
+ * @param options.startDraggingBlocks Marks blocks as being dragged.
+ * @param options.stopDraggingBlocks  Marks the drag as over.
  */
 export function startGridItemPointerDrag(
-	event,
-	{ clientId, blockElement, handle, startDraggingBlocks, stopDraggingBlocks }
+	event: PointerEvent,
+	{
+		clientId,
+		blockElement,
+		handle,
+		startDraggingBlocks,
+		stopDraggingBlocks,
+	}: GridItemDragOptions & {
+		/** The drag handle. */
+		handle: HTMLElement;
+	}
 ) {
 	const { pointerId } = event;
 	// Keeps the drag going while the touch is over the canvas iframe, and
@@ -166,13 +216,16 @@ export function startGridItemPointerDrag(
 	const originalOpacity = blockElement.style.opacity;
 	let isStarted = false;
 
-	function notify( type, { clientX, clientY } ) {
+	function notify(
+		type: GridItemPointerDragEvent[ 'type' ],
+		{ clientX, clientY }: Pick< PointerEvent, 'clientX' | 'clientY' >
+	) {
 		for ( const listener of pointerDragListeners ) {
 			listener( { type, clientX, clientY } );
 		}
 	}
 
-	function onPointerMove( moveEvent ) {
+	function onPointerMove( moveEvent: PointerEvent ) {
 		if ( moveEvent.pointerId !== pointerId ) {
 			return;
 		}
@@ -185,7 +238,7 @@ export function startGridItemPointerDrag(
 		notify( 'move', moveEvent );
 	}
 
-	function end( endEvent ) {
+	function end( endEvent: PointerEvent ) {
 		if ( endEvent.pointerId !== pointerId ) {
 			return;
 		}

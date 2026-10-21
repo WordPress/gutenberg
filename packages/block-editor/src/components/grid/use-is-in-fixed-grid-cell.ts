@@ -1,24 +1,41 @@
 import { useSelect } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getStyleForState } from '../../hooks/block-style-state';
+import type { BlockStyle } from '../../hooks/types';
 import { hasFixedGridCells } from '../../layouts/grid';
 import { isGridStackedOnMobile } from './mobile-stacking';
+import type { Layout } from '../../layouts/types';
+
+/**
+ * The attributes of a parent block that decide whether its grid cells have a
+ * fixed size.
+ */
+interface GridParentAttributes {
+	layout?: Layout;
+	style?: BlockStyle;
+}
 
 /**
  * Checks whether a block sits directly in a grid cell with a fixed size, in
  * the viewport whose styles are being edited.
  *
- * @param {(store: Object) => Object} select   The data registry's `select`.
- * @param {string}                    clientId The block's client ID.
- * @return {boolean} Whether the block is in a grid cell with a fixed size.
+ * @param select   The data registry's `select`.
+ * @param clientId The block's client ID.
+ * @return Whether the block is in a grid cell with a fixed size.
  */
-export function isInFixedGridCell( select, clientId ) {
+export function isInFixedGridCell(
+	select: DataRegistry[ 'select' ],
+	clientId: string
+): boolean {
 	const { getBlockRootClientId, getBlockAttributes, getStyleStateViewport } =
 		unlock( select( blockEditorStore ) );
 	const parentId = getBlockRootClientId( clientId );
-	const { layout, style } =
-		( parentId && getBlockAttributes( parentId ) ) || {};
+	// Block attributes are not validated against a schema.
+	const { layout, style } = ( ( parentId &&
+		getBlockAttributes( parentId ) ) ||
+		{} ) as GridParentAttributes;
 	if ( layout?.type !== 'grid' ) {
 		return false;
 	}
@@ -30,8 +47,8 @@ export function isInFixedGridCell( select, clientId ) {
 	const viewportLayout =
 		viewport === 'default'
 			? undefined
-			: getStyleForState( style, { viewport, pseudo: 'default' } )
-					?.layout;
+			: ( getStyleForState( style, { viewport, pseudo: 'default' } )
+					?.layout as Layout | undefined );
 	return hasFixedGridCells( { ...layout, ...viewportLayout } );
 }
 
@@ -41,10 +58,10 @@ export function isInFixedGridCell( select, clientId ) {
  * cell decides their size, and blocks can hide the size controls that would
  * have no effect there.
  *
- * @param {string} clientId The block's client ID.
- * @return {boolean} Whether the block is in a grid cell with a fixed size.
+ * @param clientId The block's client ID.
+ * @return Whether the block is in a grid cell with a fixed size.
  */
-export function useIsInFixedGridCell( clientId ) {
+export function useIsInFixedGridCell( clientId: string ): boolean {
 	return useSelect(
 		( select ) => isInFixedGridCell( select, clientId ),
 		[ clientId ]
