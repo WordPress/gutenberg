@@ -24,6 +24,8 @@
 
 		.infotip-icon {
 			flex-shrink: 0;
+			/* Offset the icon's internal whitespace for optical balance. */
+			margin-inline-end: -3px;
 		}
 
 		.is-high-intent {
