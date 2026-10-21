@@ -8,7 +8,7 @@ on:
 
 jobs:
     notify:
-        if: ${{ github.event.label.name == 'Needs Testing' }}
+        if: false
         runs-on: 'ubuntu-slim'
         permissions: {}
         env:

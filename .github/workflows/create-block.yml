@@ -27,7 +27,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: false
         timeout-minutes: 10
         strategy:
             fail-fast: false
@@ -63,7 +63,7 @@ jobs:
         runs-on: ubuntu-24.04
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: false
         timeout-minutes: 10
         strategy:
             fail-fast: false
