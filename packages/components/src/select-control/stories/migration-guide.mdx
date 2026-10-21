@@ -7,7 +7,7 @@ import * as SelectControlStories from './index.story';
 
 Migrate from [`SelectControl`](?path=/docs/components-selectcontrol--docs) in `@wordpress/components` to [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui` for a standard labeled, single-selection field. For the legacy `minimal` variant, use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive.
 
-The legacy control wraps a native `<select>`. The new control uses a button with combobox semantics and a portaled listbox. Migrating requires adapting values, callbacks, and any code that depends on the native element. The new control does not support `multiple`. Choose a suitable multi-selection component, such as [`SearchableChipSelectControl`](?path=/docs/design-system-components-form-searchablechipselectcontrol--docs), or retain the legacy control for that use case.
+The legacy control wraps a native `<select>`. The new control uses a button with combobox semantics and a portaled listbox. The new control does not support `multiple`. Choose a suitable multi-selection component, such as [`SearchableChipSelectControl`](?path=/docs/design-system-components-form-searchablechipselectcontrol--docs), or retain the legacy control for that use case.
 
 For package installation, styles, and integration outside standard WordPress editor screens, follow the [`@wordpress/ui` setup instructions](https://github.com/WordPress/gutenberg/blob/trunk/packages/ui/README.md#setup). The package is distributed through npm and is not available as `wp.ui` on the WordPress global.
 
@@ -140,7 +140,7 @@ const itemToStoredValue = { default: '', sticky: 'sticky' };
 
 This mapping is appropriate for a fixed domain. When choices come from plugins or other dynamic sources, use a collision-free encoding or a separate lookup rather than assuming that `'default'` is available.
 
-Both approaches change the serialized form value. `itemToStringValue` determines the hidden input's value when `name` is provided. It does not only affect rendering. A submitted Default choice in the first example is `option:`, not `''`, and a non-empty serialization can also change required-field validation. If the consumer submits `FormData`, adapt and verify the submission and validation contract separately. Retain the native control when its native form behavior is required and has no suitable replacement.
+Both approaches change the serialized form value. `itemToStringValue` determines the hidden input's value when `name` is provided. A submitted Default choice in the first example is `option:`, not `''`, and a non-empty serialization can also change required-field validation. If the consumer submits `FormData`, adapt and verify the submission and validation contract separately. Retain the native control when its native form behavior is required and has no suitable replacement.
 
 ### Provide an option that clears the selection
 
@@ -164,7 +164,7 @@ This example stores `null` for no widget. If the application's existing empty st
 
 If there is no clearable item, pass `placeholder` for the unselected prompt instead of retaining a disabled empty-string option. A placeholder is not a selectable item.
 
-The development warning catches empty-string values in `items` when default serialization is used. It skips custom serializers and cannot inspect arbitrary custom children. Absence of a warning does not verify the migration.
+The development warning catches empty-string values in `items` when default serialization is used. It skips custom serializers and cannot inspect arbitrary custom children.
 
 ## Initial selection and unavailable values
 
@@ -182,7 +182,7 @@ For uncontrolled usage, make the initial selection explicit:
 
 For controlled usage, initialize application state deliberately and resolve it to an item. Do not replace a missing initial value with a fixed `value={ items[ 0 ] }`, which prevents subsequent changes. `defaultValue` only initializes the selection. When items arrive asynchronously, manage the selection after loading or mount the control once the initial items are ready.
 
-Preserve the consumer's policy for unavailable saved values. A missing template may need to display the default template rather than a blank trigger. A custom aspect ratio or inherited font may need a display-only item or custom trigger content instead of the first item. Do not automatically apply the same fallback to every consumer.
+Preserve the consumer's policy for unavailable saved values. A missing template may need to display the default template rather than a blank trigger. A custom aspect ratio or inherited font may need a display-only item or custom trigger content instead of the first item.
 
 The legacy control renders nothing when both its options and children are empty. The new control still renders a field with an empty popup. Keep an explicit rendering guard when the old omission was intentional. Guard failed lookups before reading properties such as `selectedItem.label`, including when an explicit empty options array overrides another source of choices.
 
@@ -248,7 +248,7 @@ The primitive accepts values beyond the control's item-object shape. With string
 
 The legacy `onChange` receives the selected string and an optional `{ event }` envelope containing a select change event. The new `onValueChange` receives the selected item and event details. That event comes from the popup interaction and is not a native select change event. Read the value from the callback's first argument, not `event.target.value`.
 
-When migrating a component that exposes its own callback to plugins, preserve its documented value and argument shape where possible. If forwarding an event is required, adapt the envelope explicitly and document the change in event semantics. Passing through event details does not recreate an `HTMLSelectElement` change event.
+When migrating a component that exposes its own callback to plugins, preserve its documented value and argument shape where possible. If forwarding an event is required, adapt the envelope explicitly and document the change in event semantics.
 
 Refs now target `HTMLButtonElement` instead of `HTMLSelectElement`. Update ref types and replace reads of `.value`, `.options`, or `.selectedOptions` with application state. Audit code that finds the native select through CSS selectors or DOM traversal.
 
