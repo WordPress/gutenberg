@@ -22,7 +22,7 @@ export interface BlockPopoverProps extends PopoverProps {
 	/**
 	 * The client ID of the block representing the bottom position of the popover.
 	 */
-	bottomClientId?: string;
+	bottomClientId?: string | null;
 	/**
 	 * Whether the block popover always shifts into the viewport or remains at
 	 * its original position.

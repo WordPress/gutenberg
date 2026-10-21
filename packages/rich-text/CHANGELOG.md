@@ -11,6 +11,7 @@
 
 ### Enhancements
 
+-   Render a value to the DOM or to an HTML string faster by appending each run of identically formatted text at once, instead of one character at a time ([#85177](https://github.com/WordPress/gutenberg/pull/85177)).
 -   Type `start` and `end` of `RichTextValue` as optional, since a value has no selection until one is set, and document the return types of the public functions ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
 
 ### Bug Fixes
