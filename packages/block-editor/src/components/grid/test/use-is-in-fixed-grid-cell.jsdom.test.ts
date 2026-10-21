@@ -2,16 +2,21 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import type { BlockStyle } from '../../../hooks/types';
+import type { Layout } from '../../../layouts/types';
 import { isInFixedGridCell } from '../use-is-in-fixed-grid-cell';
 
-const MANUAL_GRID = {
+const MANUAL_GRID: Layout = {
 	type: 'grid',
 	columnCount: 3,
 	rowCount: 2,
 	isManualPlacement: true,
 };
 
-function setUp( { layout = MANUAL_GRID, style } = {} ) {
+function setUp( {
+	layout = MANUAL_GRID,
+	style,
+}: { layout?: Layout; style?: BlockStyle } = {} ) {
 	const registry = createRegistry();
 	registry.register( blockEditorStore );
 	registry.dispatch( blockEditorStore ).resetBlocks( [
@@ -35,7 +40,7 @@ function setUp( { layout = MANUAL_GRID, style } = {} ) {
 }
 
 describe( 'isInFixedGridCell', () => {
-	let originalExperiment;
+	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
 		originalExperiment = window.__experimentalEnableGridInteractivity;
 		window.__experimentalEnableGridInteractivity = true;

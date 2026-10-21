@@ -110,12 +110,12 @@ describe( 'getGridRowResizeUpdates()', () => {
 			rowDelta: 1,
 			selectedState: DEFAULT_STATE,
 		} );
-		expect( updates.grid.layout.rowCount ).toBe( 4 );
-		expect( updates.a.style.layout ).toEqual( {
+		expect( updates?.grid.layout?.rowCount ).toBe( 4 );
+		expect( updates?.a.style?.layout ).toEqual( {
 			rowStart: 2,
 			columnStart: 1,
 		} );
-		expect( updates.b.style ).toEqual( {
+		expect( updates?.b.style ).toEqual( {
 			layout: { rowStart: 3, columnStart: 2 },
 			'@tablet': { layout: { rowStart: 3 } },
 		} );

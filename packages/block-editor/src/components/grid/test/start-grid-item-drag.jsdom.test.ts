@@ -13,13 +13,16 @@ function setUp( { fromBody = false } = {} ) {
 		setData: vi.fn(),
 		setDragImage: vi.fn(),
 	};
-	const event = new window.Event( 'dragstart', { bubbles: true } );
+	const event = new window.Event( 'dragstart', {
+		bubbles: true,
+	} ) as Event & { dataTransfer: typeof dataTransfer };
 	event.dataTransfer = dataTransfer;
 	Object.defineProperty( event, 'target', {
 		value: fromBody ? blockElement : handle,
 	} );
 	const startDraggingBlocks = vi.fn();
 	const stopDraggingBlocks = vi.fn();
+	// @ts-expect-error The test passes a plain event with a partial data transfer.
 	startGridItemDrag( event, {
 		clientId: 'block',
 		rootClientId: 'grid',
@@ -90,12 +93,15 @@ describe( 'isGridItemHandleDrag', () => {
 	it( 'reads the mark from the drag data types', () => {
 		expect(
 			isGridItemHandleDrag( {
+				// @ts-expect-error The test passes a partial drag event.
 				dataTransfer: { types: [ 'wp-blocks', 'wp-grid-item-handle' ] },
 			} )
 		).toBe( true );
 		expect(
+			// @ts-expect-error The test passes a partial drag event.
 			isGridItemHandleDrag( { dataTransfer: { types: [ 'wp-blocks' ] } } )
 		).toBe( false );
+		// @ts-expect-error The test passes an event without drag data.
 		expect( isGridItemHandleDrag( {} ) ).toBe( false );
 	} );
 } );

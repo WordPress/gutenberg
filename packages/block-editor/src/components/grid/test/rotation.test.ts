@@ -7,6 +7,7 @@ import {
 	getRotationFromPointer,
 	snapAngle,
 } from '../rotation';
+import type { PixelRect } from '../rotation';
 import { getGridRectFromPixelRect, getGridTracks } from '../utils';
 
 describe( 'snapAngle()', () => {
@@ -129,7 +130,7 @@ describe( 'getRotatedBoundingRect()', () => {
 	// Six 100px columns and rows, without gaps.
 	const tracks = getGridTracks( '100px 100px 100px 100px 100px 100px', 0 );
 
-	function toCells( rect ) {
+	function toCells( rect: PixelRect ) {
 		const cells = getGridRectFromPixelRect( rect, tracks, tracks );
 		return {
 			columnStart: cells.columnStart,
