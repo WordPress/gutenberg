@@ -260,11 +260,6 @@ export interface AlignEditProps {
 export type BlockWithClassName = Block< { className?: string } >;
 
 /**
- * A block with the style attribute that holds its child layout.
- */
-export type BlockWithStyle = Block< { style?: Record< string, unknown > } >;
-
-/**
  * A block attribute that PHP marks for an auto-generated inspector control.
  */
 export interface AutoGenerateAttribute extends BlockAttribute {

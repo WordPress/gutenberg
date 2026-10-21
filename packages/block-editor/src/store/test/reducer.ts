@@ -51,7 +51,11 @@ import {
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	isFromInserterKey,
+} from '.././private-keys';
 import type {
 	Action,
 	BlocksState,
@@ -3954,7 +3958,7 @@ describe( 'state', () => {
 					} ),
 				],
 				meta: {
-					isFromInserter: true,
+					[ isFromInserterKey ]: true,
 				},
 				type: 'INSERT_BLOCKS',
 			};

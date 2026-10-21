@@ -25,6 +25,7 @@ import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
 	deviceTypeKey,
+	isFromInserterKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -624,7 +625,10 @@ export interface State {
 	automaticChangeStatus?: 'pending' | 'final';
 }
 
-type BlocksMeta = { source?: string } & Record< string, unknown >;
+type BlocksMeta = {
+	source?: string;
+	[ isFromInserterKey ]?: boolean;
+} & Record< string, unknown >;
 
 export type Action =
 	| { type: 'CLEAR_BLOCK_REMOVAL_PROMPT' }
