@@ -1040,3 +1040,20 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Sets the entity navigator of the screen: how the current screen opens an
+ * entity for editing. The actions opening an entity, such as the "Edit"
+ * action of pages, call it to open the entity the way the screen does, so
+ * the screen sets it once, when it mounts, and clears it when it unmounts.
+ * While no navigator is set, those actions do nothing.
+ *
+ * @param {((entity: {postType: string, postId: number|string}) => void)|undefined} navigator The function opening an entity, called with its post type and id, or `undefined` to clear it.
+ * @return {Object} Action object.
+ */
+export function setEntityNavigator( navigator ) {
+	return {
+		type: 'SET_ENTITY_NAVIGATOR',
+		navigator,
+	};
+}

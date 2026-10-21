@@ -526,6 +526,26 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * @typedef {(entity: {postType: string, postId: number|string}) => void} EntityNavigator
+ */
+
+/**
+ * Reducer returning the entity navigator of the screen: the function opening
+ * an entity for editing the way the current screen does.
+ *
+ * @param {EntityNavigator|undefined} state  Current state.
+ * @param {Object}                    action Dispatched action.
+ * @return {EntityNavigator|undefined} Updated state.
+ */
+export function entityNavigator( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_ENTITY_NAVIGATOR':
+			return action.navigator;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -554,5 +574,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	entityNavigator,
 	dataviews: dataviewsReducer,
 } );

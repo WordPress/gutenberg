@@ -11,6 +11,7 @@ import {
 	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
+	entityNavigator,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -332,6 +333,32 @@ describe( 'state', () => {
 					isOpen: false,
 				} )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'entityNavigator()', () => {
+		it( 'should apply default state', () => {
+			expect( entityNavigator( undefined, {} ) ).toBeUndefined();
+		} );
+
+		it( 'should default to returning the same state', () => {
+			const navigator = () => {};
+			expect( entityNavigator( navigator, {} ) ).toBe( navigator );
+		} );
+
+		it( 'should set and clear the navigator', () => {
+			const navigator = () => {};
+			const state = entityNavigator( undefined, {
+				type: 'SET_ENTITY_NAVIGATOR',
+				navigator,
+			} );
+			expect( state ).toBe( navigator );
+			expect(
+				entityNavigator( state, {
+					type: 'SET_ENTITY_NAVIGATOR',
+					navigator: undefined,
+				} )
+			).toBeUndefined();
 		} );
 	} );
 } );

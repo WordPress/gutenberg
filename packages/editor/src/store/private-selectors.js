@@ -695,3 +695,14 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns the entity navigator of the screen, set with `setEntityNavigator`:
+ * how the current screen opens an entity for editing.
+ *
+ * @param {Object} state Global application state.
+ * @return {((entity: {postType: string, postId: number|string}) => void)|undefined} The function opening an entity, called with its post type and id, or `undefined` when the screen has not set one.
+ */
+export function getEntityNavigator( state ) {
+	return state.entityNavigator;
+}
