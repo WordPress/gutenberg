@@ -35,6 +35,10 @@ module.exports = {
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
+	transformIgnorePatterns: [
+		'/node_modules/(?!(docker-compose|yaml)/)',
+		'\\.pnp\\.[^\\/]+$',
+	],
 	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
