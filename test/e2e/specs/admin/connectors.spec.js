@@ -398,6 +398,31 @@ test.describe( 'Connectors', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should display the AI agent access panel with the toggle off', async ( {
+		page,
+		admin,
+	} ) => {
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
+
+		const panel = page.locator( '.mcp-access-panel' );
+		await expect( panel ).toBeVisible();
+		await expect( panel.getByText( 'AI agent access' ) ).toBeVisible();
+
+		const toggle = panel.getByLabel( 'Allow AI agents to connect' );
+		await expect( toggle ).toBeVisible();
+		await expect( toggle ).not.toBeChecked();
+
+		await expect(
+			panel.getByText( /Turning this on installs and activates the/ )
+		).toBeVisible();
+		await expect(
+			panel.getByRole( 'link', { name: /MCP Adapter plugin/ } )
+		).toHaveAttribute(
+			'href',
+			'https://wordpress.org/plugins/mcp-adapter/'
+		);
+	} );
+
 	test.describe( 'Empty state', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-empty-state';
 
