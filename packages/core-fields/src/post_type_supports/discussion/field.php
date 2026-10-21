@@ -9,6 +9,6 @@
 
 return array(
 	'type'     => 'text',
-	'label'    => __( 'Discussion', 'gutenberg' ),
+	'label'    => __( 'Discussion' ),
 	'filterBy' => false,
 );

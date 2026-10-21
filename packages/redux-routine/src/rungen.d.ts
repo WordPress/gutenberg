@@ -3,7 +3,7 @@ declare module 'rungen' {
 		value: any,
 		next: any,
 		iterate: any,
-		yieldNext: ( result: boolean ) => void,
+		yieldNext: ( result: unknown ) => void,
 		yieldError: ( err: Error ) => void
 	) => Promise< boolean > | boolean;
 

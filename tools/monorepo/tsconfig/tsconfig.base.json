@@ -3,9 +3,6 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"paths": {
-			"@wordpress/block-editor": [
-				"../typings/untyped-packages/any-module.d.ts"
-			],
 			"@wordpress/block-library": [
 				"../typings/untyped-packages/any-module.d.ts"
 			],

@@ -17,8 +17,8 @@ interface Placement {
 /** The parts of a grid's `layout` attribute that set its size. */
 interface GridLayout {
 	type?: string;
-	columnCount?: number;
-	rowCount?: number;
+	columnCount?: number | null;
+	rowCount?: number | null;
 }
 
 const PLACEMENT_KEYS = [ 'columnStart', 'rowStart', 'columnSpan', 'rowSpan' ];
@@ -53,7 +53,7 @@ function getPlacement( rect: Placement ): Partial< Placement > {
 function clampToTracks(
 	start: number,
 	span: number,
-	count?: number
+	count?: number | null
 ): [ number, number ] {
 	if ( ! count ) {
 		return [ start, span ];

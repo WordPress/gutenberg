@@ -204,6 +204,11 @@
 	overflow: auto;
 }
 
+.dataviews-filters__selection-indicator {
+	display: flex;
+	pointer-events: none;
+}
+
 .dataviews-filters__search-widget-listitem {
 	display: flex;
 	align-items: center;
@@ -226,26 +231,6 @@
 		background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		color: var(--wpds-color-foreground-interactive-neutral-active);
 
-		.dataviews-filters__search-widget-listitem-single-selection {
-			border-color: var(--wpds-color-stroke-interactive-brand-active);
-			background: var(--wpds-color-background-surface-neutral-strong);
-			&.is-selected {
-				border-color: var(--wpds-color-stroke-interactive-brand-active);
-				background: var(--wpds-color-background-interactive-brand-strong-active);
-			}
-		}
-
-		.dataviews-filters__search-widget-listitem-multi-selection {
-			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
-			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
-			border-color: var(--wpds-color-stroke-interactive-brand-active);
-
-			&.is-selected {
-				border-color: var(--wpds-color-stroke-interactive-brand-active);
-				background: var(--wpds-color-background-interactive-brand-strong-active);
-			}
-		}
-
 		.dataviews-filters__search-widget-listitem-description {
 			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
@@ -265,79 +250,6 @@
 		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 16px;
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
-	}
-
-	.dataviews-filters__search-widget-listitem-single-selection {
-		@include radio-control;
-		margin: 0;
-		padding: 0;
-
-		&.is-selected {
-			background: var(--wpds-color-background-interactive-brand-strong);
-			border-color: var(--wpds-color-stroke-interactive-brand);
-
-			&::before {
-				content: "";
-				border-radius: 50%;
-				box-sizing: inherit;
-				width: vars.$radio-input-size * 0.5;
-				height: vars.$radio-input-size * 0.5;
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				margin: 0;
-				background-color: var(--wpds-color-foreground-interactive-brand-strong);
-
-				// This border serves as a background color in Windows High Contrast mode.
-				border: 4px solid var(--wpds-color-foreground-interactive-brand-strong);
-
-			}
-		}
-	}
-
-	.dataviews-filters__search-widget-listitem-multi-selection {
-		--checkbox-size: 24px; // Width & height for small viewports.
-		flex-shrink: 0;
-
-		@include checkbox-control;
-		position: relative;
-		/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
-		background: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
-		color: var(--wpds-color-foreground-content-neutral);
-		margin: 0;
-		padding: 0;
-		width: var(--checkbox-size);
-		height: var(--checkbox-size);
-
-		@include break-small() {
-			--checkbox-size: 16px;
-		}
-
-		@media not (prefers-reduced-motion) {
-			transition: 0.1s border-color ease-in-out;
-		}
-
-		&.is-selected {
-			background: var(--wpds-color-background-interactive-brand-strong);
-			border-color: var(--wpds-color-stroke-interactive-brand);
-
-			svg {
-				--checkmark-size: var(--checkbox-size);
-
-				color: var(--wpds-color-foreground-interactive-neutral-strong);
-				position: absolute;
-				left: 50%;
-				top: 50%;
-				transform: translate(-50%, -50%);
-				width: var(--checkmark-size);
-				height: var(--checkmark-size);
-
-				@include break-small() {
-					--checkmark-size: calc(var(--checkbox-size) + 4px);
-				}
-			}
-		}
 	}
 }
 

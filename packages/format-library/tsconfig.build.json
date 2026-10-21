@@ -14,8 +14,7 @@
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../latex-to-mathml" },
-		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../latex-to-mathml/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url/tsconfig.build.json" }
