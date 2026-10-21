@@ -25,8 +25,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
@@ -241,26 +239,8 @@ function PostListView( {
 			) {
 				cleanupDeletedPostIdsFromUrl( items );
 			}
-		},
-	} );
-
-	const quickEditAction = useMemo(
-		() => ( {
-			id: 'quick-edit',
-			label: ( items: Post[] ) =>
-				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
-			icon: drawerRight,
-			isPrimary: true,
-			supportsBulk: true,
-			isEligible( post: Post ) {
-				// PostStatus only includes assignable statuses. 'trash' is managed
-				// internally by WordPress, but the REST API can still return it.
-				if ( ( post.status as string ) === 'trash' ) {
-					return false;
-				}
-				return post.type === 'page';
-			},
-			callback( items: Post[] ) {
+			// The "Quick edit" action does not open the form by itself.
+			if ( actionId === 'quick-edit' ) {
 				navigate( {
 					search: {
 						...searchParams,
@@ -268,18 +248,21 @@ function PostListView( {
 						postIds: items.map( ( item ) => item.id.toString() ),
 					},
 				} );
-			},
-		} ),
-		[ navigate, searchParams ]
-	);
+			}
+		},
+	} );
 
-	const actions = useMemo( () => {
-		const _actions = [ ...postTypeActions ];
-		if ( view.type !== LAYOUT_LIST ) {
-			_actions.unshift( quickEditAction );
-		}
-		return _actions;
-	}, [ quickEditAction, postTypeActions, view.type ] );
+	// The list layout shows the page next to the list, without the quick
+	// edit form.
+	const actions = useMemo(
+		() =>
+			view.type === LAYOUT_LIST
+				? postTypeActions.filter(
+						( action ) => action.id !== 'quick-edit'
+					)
+				: postTypeActions,
+		[ postTypeActions, view.type ]
+	);
 
 	const handleTabChange = useCallback(
 		( status: string ) => {
