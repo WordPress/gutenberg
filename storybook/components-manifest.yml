@@ -872,12 +872,14 @@
       - label
 - name: MenuItem
   props:
+      - accessibleWhenDisabled
       - children
       - className
       - icon
       - iconPosition
       - info
       - isDestructive
+      - isPressed
       - isSelected
       - label
       - role
@@ -1202,6 +1204,7 @@
       - separatorType
       - shiftStep
       - showTooltip
+      - size
       - step
       - trackColor
       - type
@@ -1522,7 +1525,7 @@
       - required
       - searchPlaceholder
       - statusContent
-      - triggerContent
+      - trigger
       - value
       - virtualized
   subcomponents:
@@ -1570,6 +1573,16 @@
         props:
             - className
             - render
+            - style
+      - name: SearchableSelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: SearchControl
   props:

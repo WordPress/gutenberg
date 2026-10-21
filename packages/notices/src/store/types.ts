@@ -43,6 +43,14 @@ export type Notice = {
 	spokenMessage: string | null;
 
 	/**
+	 * Longer plain text that supplements the message, such as the reason a
+	 * server gave for a failure. It is shown behind a "Show details"
+	 * disclosure, and a copy button copies it together with the message. Only
+	 * applies when type is `default`.
+	 */
+	details?: string;
+
+	/**
 	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,
 	 * and SHOULD NOT be used for notices. It is subject to removal without notice.
 	 */
@@ -132,8 +140,18 @@ export type NoticeOptions = {
 	onDismiss?: VoidFunction;
 
 	/**
+	 * Longer plain text that supplements the message, such as the reason a
+	 * server gave for a failure. It is shown behind a "Show details"
+	 * disclosure, and a copy button copies it together with the message. Only
+	 * applies when type is set to `default`.
+	 */
+	details?: string;
+
+	/**
 	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,
 	 * and SHOULD NOT be used for notices. It is subject to removal without notice.
+	 *
+	 * @deprecated Pass the message as plain text, and any longer account of what happened as `details`.
 	 */
 	__unstableHTML?: boolean;
 };

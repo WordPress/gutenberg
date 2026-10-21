@@ -8,6 +8,6 @@
 		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
-		{ "path": "../redux-routine" }
+		{ "path": "../redux-routine/tsconfig.build.json" }
 	]
 }
