@@ -239,7 +239,12 @@ function Iframe( {
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
-			contentDocument.dir = ownerDocument.dir;
+			if ( ownerDocument.dir ) {
+				contentDocument.dir = ownerDocument.dir;
+			}
+			if ( ownerDocument.documentElement.lang ) {
+				documentElement.lang = ownerDocument.documentElement.lang;
+			}
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
 				// Compatibility styles are elements with an ID.

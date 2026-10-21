@@ -33,4 +33,17 @@ test.describe( 'Should iframe', () => {
 		// The editor should remain iframed because Gutenberg is active.
 		await expect( iframe ).toBeVisible();
 	} );
+
+	test( 'should use the admin language in the iframe', async ( { page } ) => {
+		const adminLang = await page.evaluate(
+			() => document.documentElement.lang
+		);
+		expect( adminLang ).not.toBe( '' );
+
+		await expect(
+			page
+				.frameLocator( 'iframe[name="editor-canvas"]' )
+				.locator( 'html' )
+		).toHaveAttribute( 'lang', adminLang );
+	} );
 } );
