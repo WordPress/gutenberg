@@ -617,6 +617,58 @@ test.describe( 'Style Revisions', () => {
 		await expect( changes.getByRole( 'table' ) ).toBeHidden();
 	} );
 
+	test( 'should show the selected revision next to the current version', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(255, 0, 0)' );
+	} );
+
+	test( 'should show a single preview when the current version is selected', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'green' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// The newest revision is the styles the editor shows.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions-current"]' )
+		).toBeHidden();
+	} );
+
 	test( 'should paginate', async ( { page, userGlobalStylesRevisions } ) => {
 		// Create > 10 revisions to display pagination navigation component.
 		for ( let i = 9; i < 21; i++ ) {

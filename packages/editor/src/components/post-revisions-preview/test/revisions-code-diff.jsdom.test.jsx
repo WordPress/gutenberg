@@ -4,6 +4,7 @@ import {
 	RevisionsCodeDiff,
 	getCodeDiffDisplayState,
 	getCodeDiffRows,
+	getSplitCodeDiffRows,
 } from '../revisions-code-diff';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -129,6 +130,70 @@ describe( 'getCodeDiffRows', () => {
 			previousLineNumber: null,
 			currentLineNumber: 501,
 		} );
+	} );
+} );
+
+describe( 'getSplitCodeDiffRows', () => {
+	it( 'shows unchanged lines on both sides', () => {
+		expect( getSplitCodeDiffRows( 'Same\n', 'Same\n' ) ).toEqual( [
+			{
+				previous: { value: 'Same', status: 'unchanged', lineNumber: 1 },
+				current: { value: 'Same', status: 'unchanged', lineNumber: 1 },
+			},
+		] );
+	} );
+
+	it( 'pairs removed and added lines in order', () => {
+		expect(
+			getSplitCodeDiffRows(
+				'First\nBefore\nLast\n',
+				'First\nAfter\nLast\n'
+			)
+		).toEqual( [
+			{
+				previous: {
+					value: 'First',
+					status: 'unchanged',
+					lineNumber: 1,
+				},
+				current: { value: 'First', status: 'unchanged', lineNumber: 1 },
+			},
+			{
+				previous: { value: 'Before', status: 'removed', lineNumber: 2 },
+				current: { value: 'After', status: 'added', lineNumber: 2 },
+			},
+			{
+				previous: { value: 'Last', status: 'unchanged', lineNumber: 3 },
+				current: { value: 'Last', status: 'unchanged', lineNumber: 3 },
+			},
+		] );
+	} );
+
+	it( 'leaves a side empty where the other has more changed lines', () => {
+		expect(
+			getSplitCodeDiffRows( 'First\nLast\n', 'First\nOne\nTwo\nLast\n' )
+		).toEqual( [
+			{
+				previous: {
+					value: 'First',
+					status: 'unchanged',
+					lineNumber: 1,
+				},
+				current: { value: 'First', status: 'unchanged', lineNumber: 1 },
+			},
+			{
+				previous: null,
+				current: { value: 'One', status: 'added', lineNumber: 2 },
+			},
+			{
+				previous: null,
+				current: { value: 'Two', status: 'added', lineNumber: 3 },
+			},
+			{
+				previous: { value: 'Last', status: 'unchanged', lineNumber: 2 },
+				current: { value: 'Last', status: 'unchanged', lineNumber: 4 },
+			},
+		] );
 	} );
 } );
 

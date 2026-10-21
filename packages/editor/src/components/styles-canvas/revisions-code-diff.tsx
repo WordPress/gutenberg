@@ -2,8 +2,8 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
-	CodeDiffTable,
-	getCodeDiffRows,
+	SplitCodeDiffTable,
+	getSplitCodeDiffRows,
 } from '../post-revisions-preview/revisions-code-diff';
 
 type StylesConfig = Pick< GlobalStylesConfig, 'settings' | 'styles' >;
@@ -88,7 +88,8 @@ interface StylesRevisionsCodeDiffProps {
 
 /**
  * Shows how the current global styles differ from a revision, as a read-only
- * diff of their styles and settings.
+ * side-by-side diff of their styles and settings: the revision on the start
+ * side and the current styles on the end side, as in the canvas header.
  *
  * @param props               Component props.
  * @param props.revision      The revision to compare.
@@ -110,14 +111,15 @@ export default function StylesRevisionsCodeDiff( {
 		if ( revisionCode === currentCode ) {
 			return [];
 		}
-		return getCodeDiffRows( revisionCode, currentCode, true );
+		return getSplitCodeDiffRows( revisionCode, currentCode );
 	}, [ revision, currentConfig ] );
 
 	return (
-		<CodeDiffTable
+		<SplitCodeDiffTable
 			rows={ rows }
-			showDiff
 			label={ __( 'Changes since this revision' ) }
+			previousLabel={ __( 'Selected revision' ) }
+			currentLabel={ __( 'Current version' ) }
 			emptyMessage={
 				revision
 					? __( 'This revision matches the current styles.' )

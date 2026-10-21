@@ -28,6 +28,30 @@ function splitLines( value ) {
 }
 
 /**
+ * Diffs two contents line by line.
+ *
+ * @param {string} previousContent Previous content.
+ * @param {string} currentContent  Current content.
+ * @return {Array<Object>} Diff parts, each marked as added, removed or neither.
+ */
+function getDiffParts( previousContent, currentContent ) {
+	const parts = diffLines( previousContent, currentContent, {
+		maxEditLength: MAX_DIFF_EDIT_LENGTH,
+		timeout: DIFF_TIMEOUT,
+	} );
+
+	// Line diffing can be quadratic for unrelated revisions. If it exceeds
+	// either limit, mark every old and new line instead.
+	if ( ! parts ) {
+		return [
+			{ value: previousContent, removed: true },
+			{ value: currentContent, added: true },
+		];
+	}
+	return parts;
+}
+
+/**
  * Creates the rows shown in the code diff and adds line numbers for both
  * revisions.
  *
@@ -37,22 +61,9 @@ function splitLines( value ) {
  * @return {Array<Object>} Code-diff rows.
  */
 export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
-	let parts = [ { value: currentContent } ];
-	if ( showDiff ) {
-		parts = diffLines( previousContent, currentContent, {
-			maxEditLength: MAX_DIFF_EDIT_LENGTH,
-			timeout: DIFF_TIMEOUT,
-		} );
-
-		// Line diffing can be quadratic for unrelated revisions. If it exceeds
-		// either limit, mark every old and new line instead.
-		if ( ! parts ) {
-			parts = [
-				{ value: previousContent, removed: true },
-				{ value: currentContent, added: true },
-			];
-		}
-	}
+	const parts = showDiff
+		? getDiffParts( previousContent, currentContent )
+		: [ { value: currentContent } ];
 	let previousLineNumber = 1;
 	let currentLineNumber = 1;
 
@@ -82,6 +93,78 @@ export function getCodeDiffRows( previousContent, currentContent, showDiff ) {
 			return row;
 		} );
 	} );
+}
+
+/**
+ * Creates the rows of a side-by-side code diff. Each row holds a line of the
+ * previous content and a line of the current content. Unchanged lines show on
+ * both sides; a run of changes pairs its removed and added lines up in order,
+ * leaving a side empty where the other has more lines.
+ *
+ * @param {string} previousContent Previous content.
+ * @param {string} currentContent  Current content.
+ * @return {Array<{previous: Object|null, current: Object|null}>} Rows.
+ */
+export function getSplitCodeDiffRows( previousContent, currentContent ) {
+	const parts = getDiffParts( previousContent, currentContent );
+	const rows = [];
+	let previousLineNumber = 1;
+	let currentLineNumber = 1;
+	let removedLines = [];
+	let addedLines = [];
+
+	const flushChanges = () => {
+		const length = Math.max( removedLines.length, addedLines.length );
+		for ( let index = 0; index < length; index++ ) {
+			rows.push( {
+				previous:
+					index < removedLines.length
+						? {
+								value: removedLines[ index ],
+								status: 'removed',
+								lineNumber: previousLineNumber++,
+							}
+						: null,
+				current:
+					index < addedLines.length
+						? {
+								value: addedLines[ index ],
+								status: 'added',
+								lineNumber: currentLineNumber++,
+							}
+						: null,
+			} );
+		}
+		removedLines = [];
+		addedLines = [];
+	};
+
+	for ( const part of parts ) {
+		if ( part.removed ) {
+			removedLines.push( ...splitLines( part.value ) );
+		} else if ( part.added ) {
+			addedLines.push( ...splitLines( part.value ) );
+		} else {
+			flushChanges();
+			for ( const value of splitLines( part.value ) ) {
+				rows.push( {
+					previous: {
+						value,
+						status: 'unchanged',
+						lineNumber: previousLineNumber++,
+					},
+					current: {
+						value,
+						status: 'unchanged',
+						lineNumber: currentLineNumber++,
+					},
+				} );
+			}
+		}
+	}
+	flushChanges();
+
+	return rows;
 }
 
 /**
@@ -217,8 +300,8 @@ export function RevisionsCodeDiff( {
 }
 
 /**
- * Renders code-diff rows as a scrollable, read-only table. Shared by post
- * revisions and global styles revisions.
+ * Renders code-diff rows as a scrollable, read-only table, with both line
+ * numbers in one column of code. `SplitCodeDiffTable` shows them side by side.
  *
  * @param {Object}        props              Component props.
  * @param {Array<Object>} props.rows         Rows from `getCodeDiffRows`.
@@ -289,6 +372,127 @@ export function CodeDiffTable( { rows, showDiff, label, emptyMessage } ) {
 								</tr>
 							);
 						} ) }
+					</tbody>
+				</table>
+			) : (
+				<p className="editor-revisions-code-diff__empty">
+					{ emptyMessage }
+				</p>
+			) }
+		</div>
+	);
+}
+
+/**
+ * Renders one side of a side-by-side code-diff row: its line number, change
+ * marker and code, or empty cells when the side has no line.
+ *
+ * @param {Object}      props      Component props.
+ * @param {Object|null} props.line The side's line, from `getSplitCodeDiffRows`.
+ * @return {React.JSX.Element} The side's cells.
+ */
+function SplitCodeDiffSide( { line } ) {
+	if ( ! line ) {
+		return (
+			<>
+				<td className="editor-revisions-code-diff__line-number is-empty" />
+				<td className="editor-revisions-code-diff__marker is-empty" />
+				<td className="editor-revisions-code-diff__code is-empty" />
+			</>
+		);
+	}
+
+	let marker = '';
+	let statusLabel = __( 'Unchanged' );
+	if ( line.status === 'added' ) {
+		marker = '+';
+		statusLabel = __( 'Added' );
+	} else if ( line.status === 'removed' ) {
+		marker = '−';
+		statusLabel = __( 'Removed' );
+	}
+
+	return (
+		<>
+			<td
+				className={ `editor-revisions-code-diff__line-number is-${ line.status }` }
+			>
+				{ line.lineNumber }
+			</td>
+			<td
+				className={ `editor-revisions-code-diff__marker is-${ line.status }` }
+			>
+				<VisuallyHidden>{ statusLabel }</VisuallyHidden>
+				<span aria-hidden="true">{ marker }</span>
+			</td>
+			<td
+				className={ `editor-revisions-code-diff__code is-${ line.status }` }
+			>
+				<code>{ line.value }</code>
+			</td>
+		</>
+	);
+}
+
+/**
+ * Renders side-by-side code-diff rows as a read-only table, the previous
+ * content on the start side and the current content on the end side.
+ *
+ * @param {Object}        props               Component props.
+ * @param {Array<Object>} props.rows          Rows from `getSplitCodeDiffRows`.
+ * @param {string}        props.label         Accessible name of the region.
+ * @param {string}        props.previousLabel Name of the previous content.
+ * @param {string}        props.currentLabel  Name of the current content.
+ * @param {string}        props.emptyMessage  Message shown when there are no rows.
+ * @return {React.JSX.Element} The side-by-side code diff.
+ */
+export function SplitCodeDiffTable( {
+	rows,
+	label,
+	previousLabel,
+	currentLabel,
+	emptyMessage,
+} ) {
+	return (
+		<div
+			className="editor-revisions-code-diff is-split"
+			role="region"
+			aria-label={ label }
+			tabIndex={ 0 }
+		>
+			{ rows.length ? (
+				<table className="editor-revisions-code-diff__table">
+					<VisuallyHidden render={ <caption /> }>
+						{ label }
+					</VisuallyHidden>
+					<colgroup>
+						<col className="editor-revisions-code-diff__line-number-column" />
+						<col className="editor-revisions-code-diff__marker-column" />
+						<col />
+						<col className="editor-revisions-code-diff__line-number-column" />
+						<col className="editor-revisions-code-diff__marker-column" />
+						<col />
+					</colgroup>
+					<VisuallyHidden render={ <thead /> }>
+						<tr>
+							<th>{ __( 'Line' ) }</th>
+							<th>{ _x( 'Change', 'noun' ) }</th>
+							<th>{ previousLabel }</th>
+							<th>{ __( 'Line' ) }</th>
+							<th>{ _x( 'Change', 'noun' ) }</th>
+							<th>{ currentLabel }</th>
+						</tr>
+					</VisuallyHidden>
+					<tbody>
+						{ rows.map( ( row, index ) => (
+							<tr
+								key={ index }
+								className="editor-revisions-code-diff__line"
+							>
+								<SplitCodeDiffSide line={ row.previous } />
+								<SplitCodeDiffSide line={ row.current } />
+							</tr>
+						) ) }
 					</tbody>
 				</table>
 			) : (
