@@ -2,8 +2,8 @@
  * Column count per container width. Each key is the inline size in pixels
  * from which its count applies: `{ 0: 1, 600: 2, 960: 4 }` is one column
  * from 0px, two from 600px, four from 960px. An `'auto'` step lifts the
- * cap from its width up: the count is what `minColumnWidth` fits, or the
- * default count when no floor is set.
+ * cap from its width up and leaves the count to `minColumnWidth`; with no
+ * floor set, the step is skipped and the count below it holds.
  */
 export type ColumnSteps = Record< number, number | 'auto' >;
 
@@ -16,23 +16,33 @@ export interface ColumnPolicy {
 	minColumnWidth?: number;
 }
 
+function resolveFloor( { minColumnWidth }: ColumnPolicy ): number | undefined {
+	return minColumnWidth !== undefined && minColumnWidth > 0
+		? minColumnWidth
+		: undefined;
+}
+
 /**
  * The count the policy asks for at a container width, before the floor.
  *
- * @param columns        A count, or a count per container width.
+ * @param policy         Column policy.
  * @param containerWidth Measured inline size of the surface in pixels.
- * @return The count, or `undefined` when none was set or the step is `'auto'`.
+ * @return The count, or `undefined` when none applies: no count was set, or
+ *         an `'auto'` step lifts the cap over a floor.
  */
 export function resolveColumnCap(
-	columns: number | ColumnSteps | undefined,
+	policy: ColumnPolicy,
 	containerWidth: number
 ): number | undefined {
+	const { columns } = policy;
 	if ( columns === undefined || typeof columns === 'number' ) {
 		return columns;
 	}
+	const hasFloor = resolveFloor( policy ) !== undefined;
 	const widths = Object.keys( columns )
 		.map( Number )
 		.filter( Number.isFinite )
+		.filter( ( width ) => hasFloor || columns[ width ] !== 'auto' )
 		.sort( ( a, b ) => b - a );
 	if ( widths.length === 0 ) {
 		return undefined;
@@ -60,14 +70,14 @@ export function resolveColumnCount(
 	gapPx: number,
 	defaultColumns: number
 ): number {
-	const cap = resolveColumnCap( policy.columns, containerWidth );
-	const { minColumnWidth } = policy;
-	if ( ! minColumnWidth || minColumnWidth <= 0 ) {
+	const cap = resolveColumnCap( policy, containerWidth );
+	const floor = resolveFloor( policy );
+	if ( floor === undefined ) {
 		return Math.max( 1, cap ?? defaultColumns );
 	}
 	const maxFit = Math.max(
 		1,
-		Math.floor( ( containerWidth + gapPx ) / ( minColumnWidth + gapPx ) )
+		Math.floor( ( containerWidth + gapPx ) / ( floor + gapPx ) )
 	);
 	return cap === undefined ? maxFit : Math.max( 1, Math.min( cap, maxFit ) );
 }

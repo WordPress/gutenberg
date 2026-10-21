@@ -8,33 +8,46 @@ const GAP = 24;
 
 describe( 'resolveColumnCap', () => {
 	it( 'passes a count and an absent policy through', () => {
-		expect( resolveColumnCap( 3, 1000 ) ).toBe( 3 );
-		expect( resolveColumnCap( undefined, 1000 ) ).toBeUndefined();
+		expect( resolveColumnCap( { columns: 3 }, 1000 ) ).toBe( 3 );
+		expect( resolveColumnCap( {}, 1000 ) ).toBeUndefined();
 	} );
 
 	it( 'picks the widest step the container has reached', () => {
-		expect( resolveColumnCap( STEPS, 0 ) ).toBe( 1 );
-		expect( resolveColumnCap( STEPS, 599 ) ).toBe( 1 );
-		expect( resolveColumnCap( STEPS, 600 ) ).toBe( 2 );
-		expect( resolveColumnCap( STEPS, 959 ) ).toBe( 2 );
-		expect( resolveColumnCap( STEPS, 960 ) ).toBe( 4 );
-		expect( resolveColumnCap( STEPS, 5000 ) ).toBe( 4 );
+		expect( resolveColumnCap( { columns: STEPS }, 0 ) ).toBe( 1 );
+		expect( resolveColumnCap( { columns: STEPS }, 599 ) ).toBe( 1 );
+		expect( resolveColumnCap( { columns: STEPS }, 600 ) ).toBe( 2 );
+		expect( resolveColumnCap( { columns: STEPS }, 959 ) ).toBe( 2 );
+		expect( resolveColumnCap( { columns: STEPS }, 960 ) ).toBe( 4 );
+		expect( resolveColumnCap( { columns: STEPS }, 5000 ) ).toBe( 4 );
 	} );
 
 	it( 'uses the narrowest step below its own threshold', () => {
-		expect( resolveColumnCap( { 600: 2, 960: 4 }, 100 ) ).toBe( 2 );
+		expect( resolveColumnCap( { columns: { 600: 2, 960: 4 } }, 100 ) ).toBe(
+			2
+		);
 	} );
 
-	it( 'lifts the cap on an auto step', () => {
-		expect( resolveColumnCap( AUTO_STEPS, 800 ) ).toBe( 2 );
-		expect( resolveColumnCap( AUTO_STEPS, 960 ) ).toBeUndefined();
+	it( 'lifts the cap on an auto step over a floor', () => {
+		const policy = { columns: AUTO_STEPS, minColumnWidth: 240 };
+		expect( resolveColumnCap( policy, 800 ) ).toBe( 2 );
+		expect( resolveColumnCap( policy, 960 ) ).toBeUndefined();
+	} );
+
+	it( 'skips an auto step with no floor', () => {
+		expect( resolveColumnCap( { columns: AUTO_STEPS }, 960 ) ).toBe( 2 );
+		expect(
+			resolveColumnCap( { columns: { 0: 8, 960: 'auto' } }, 1000 )
+		).toBe( 8 );
+		expect(
+			resolveColumnCap( { columns: { 0: 'auto' } }, 1000 )
+		).toBeUndefined();
 	} );
 
 	it( 'treats a map with no numeric keys as unset', () => {
-		expect( resolveColumnCap( {}, 1000 ) ).toBeUndefined();
+		expect( resolveColumnCap( { columns: {} }, 1000 ) ).toBeUndefined();
 		expect(
 			resolveColumnCap(
-				{ wide: 4 } as unknown as Record< number, number >,
+				{ columns: { wide: 4 } as unknown as ColumnSteps },
 				1000
 			)
 		).toBeUndefined();
@@ -120,7 +133,21 @@ describe( 'resolveColumnCount', () => {
 		).toBe( 2 );
 	} );
 
-	it( 'renders the default on an auto step with no floor', () => {
+	it( 'keeps the count below an auto step with no floor', () => {
+		expect(
+			resolveColumnCount(
+				{ columns: { 0: 8, 960: 'auto' } },
+				1000,
+				GAP,
+				6
+			)
+		).toBe( 8 );
+		expect(
+			resolveColumnCount( { columns: AUTO_STEPS }, 1000, GAP, 6 )
+		).toBe( 2 );
+	} );
+
+	it( 'renders the default on a lone auto step with no floor', () => {
 		expect(
 			resolveColumnCount( { columns: { 0: 'auto' } }, 1000, GAP, 6 )
 		).toBe( 6 );

@@ -212,8 +212,7 @@ lowered whenever a column would end up narrower than the floor.
 </DashboardGrid>
 ```
 
-A step can be `'auto'`: from that width up there is no cap, and the
-floor alone decides the count. Below it the steps still fix the count.
+A step can be `'auto'`: from that width up there is no cap, and the floor alone decides the count. Below it the steps still fix the count. Without a floor, an `'auto'` step is skipped and the count below it holds.
 
 ```jsx
 <DashboardGrid
