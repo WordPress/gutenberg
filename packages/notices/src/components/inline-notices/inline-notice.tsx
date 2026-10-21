@@ -1,10 +1,12 @@
 import { speak } from '@wordpress/a11y';
+import { Slot } from '@wordpress/components';
 import { RawHTML, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
 import CopyButton from './copy-button';
 import DetailsText from './details-text';
+import { NOTICE_SLOT } from '../../store/constants';
 import type {
 	Notice as NoticeType,
 	NoticeAction as NoticeActionType,
@@ -101,6 +103,8 @@ export default function InlineNotice( {
 		onDismiss,
 	} = notice;
 	const actions = notice.actions as NoticeAction[];
+	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
+		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	useAnnouncement( notice );
@@ -117,7 +121,15 @@ export default function InlineNotice( {
 					<RawHTML>{ content }</RawHTML>
 				</Notice.Description>
 			) : (
-				<Notice.Description>{ content }</Notice.Description>
+				<Notice.Description>
+					{ content }
+					{ slot && (
+						<>
+							{ ' ' }
+							<Slot name={ slot } />
+						</>
+					) }
+				</Notice.Description>
 			) }
 			{ hasActions && (
 				<Notice.Actions>

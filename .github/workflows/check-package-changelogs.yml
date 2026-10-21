@@ -64,56 +64,14 @@ on:
 permissions: {}
 
 jobs:
-    # Presence: The allowlisted packages listed in the matrix have stricter
-    # expectations around changes having an accompanying changelog note.
-    presence:
-        name: Check CHANGELOG presence (${{ matrix.package }})
-        runs-on: 'ubuntu-24.04'
+    # Lists the allowlisted packages with relevant changes.
+    changed-packages:
+        name: Find packages that need a CHANGELOG entry
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
-        strategy:
-            fail-fast: false
-            matrix:
-                package:
-                    # Bundled packages
-                    # Keep in sync with dependency-extraction-webpack-plugin
-                    - admin-ui
-                    - dataviews
-                    - fields
-                    - grid
-                    - icons
-                    - interface
-                    - style-runtime
-                    - ui
-                    - undo-manager
-                    - views
-                    # Other packages
-                    - theme
-                    - components
-                    - private-apis
-                    - widget-dashboard
-                    - widget-primitives
-                    - wp-build
-                    # Tooling and config packages published to npm
-                    - babel-plugin-import-jsx-pragma
-                    - babel-plugin-makepot
-                    - babel-preset-default
-                    - browserslist-config
-                    - create-block
-                    - create-block-interactive-template
-                    - create-block-tutorial-template
-                    - dependency-extraction-webpack-plugin
-                    - docgen
-                    - e2e-test-utils-playwright
-                    - env
-                    - eslint-plugin
-                    - npm-package-json-lint-config
-                    - postcss-plugins-preset
-                    - postcss-themes
-                    - prettier-config
-                    - readable-js-assets-webpack-plugin
-                    - scripts
-                    - stylelint-config
+        outputs:
+            packages: ${{ steps.filter.outputs.packages }}
         steps:
             - name: 'Get PR commit count'
               env:
@@ -129,17 +87,57 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
-            - name: Determine if package has relevant changes
+            - name: List packages with relevant changes
               id: filter
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  PACKAGE_PATH: packages/${{ matrix.package }}
               run: |
-                  # The workflow's `paths:` filter triggers on the union of all
-                  # tracked packages, so this matrix entry may run on a PR that
-                  # doesn't touch its package. Short-circuit if that's the case.
+                  # These packages have stricter expectations around changes
+                  # having an accompanying changelog note.
+                  packages=(
+                      # Bundled packages
+                      # Keep in sync with dependency-extraction-webpack-plugin
+                      admin-ui
+                      dataviews
+                      fields
+                      grid
+                      icons
+                      interface
+                      style-runtime
+                      ui
+                      undo-manager
+                      views
+                      # Other packages
+                      theme
+                      components
+                      private-apis
+                      widget-dashboard
+                      widget-primitives
+                      wp-build
+                      # Tooling and config packages published to npm
+                      babel-plugin-import-jsx-pragma
+                      babel-plugin-makepot
+                      babel-preset-default
+                      browserslist-config
+                      create-block
+                      create-block-interactive-template
+                      create-block-tutorial-template
+                      dependency-extraction-webpack-plugin
+                      docgen
+                      e2e-test-utils-playwright
+                      env
+                      eslint-plugin
+                      npm-package-json-lint-config
+                      postcss-plugins-preset
+                      postcss-themes
+                      prettier-config
+                      readable-js-assets-webpack-plugin
+                      scripts
+                      stylelint-config
+                  )
+
                   # Files that don't warrant a CHANGELOG entry:
-                  ignored="^${PACKAGE_PATH}/("
+                  ignored="^packages/[^/]+/("
                   # Tests and stories.
                   ignored+="(.+/)?(stories|test|__tests__)/"
                   # Markdown: docs, READMEs and the CHANGELOG itself.
@@ -153,30 +151,56 @@ jobs:
                   ignored+="|(tsconfig\.(stories|test|bin)\.json|\.(stylelintrc|eslintrc|prettierrc)[^/]*|\.gitignore)$"
                   ignored+=")"
 
-                  relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
+                  relevant_changes=$(git diff --name-only --no-renames "$BASE_SHA"...HEAD -- packages/ \
                       | grep -Ev "$ignored" || true)
 
-                  if [ -z "$relevant_changes" ]; then
-                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG presence check."
-                      echo "has_changes=false" >> "$GITHUB_OUTPUT"
-                  else
-                      echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                  # RUNNER_DEBUG is 1 when the run has debug logging enabled.
+                  if [[ "${RUNNER_DEBUG:-}" == 1 ]]; then
+                      echo "Changed files under packages/ that count toward a CHANGELOG entry:"
+                      echo "${relevant_changes:-none}"
                   fi
-            # This intentionally doesn't use `.github/setup-node`, because we
-            # don't currently need to `npm ci` install any dependencies.
-            - name: Use desired version of Node.js
-              if: steps.filter.outputs.has_changes == 'true'
-              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+
+                  changed=()
+                  for package in "${packages[@]}"; do
+                      if grep -q "^packages/${package}/" <<< "$relevant_changes"; then
+                          changed+=( "$package" )
+                      fi
+                  done
+
+                  echo "packages=$(jq --compact-output --null-input '$ARGS.positional' --args "${changed[@]}")" >> "$GITHUB_OUTPUT"
+
+    # Presence: Each package with relevant changes needs a changelog note
+    # citing this pull request.
+    presence:
+        # GitHub appends the package to each matrix job's name. A skipped job
+        # shows the name as written, so it must not use the `matrix` context.
+        name: Check CHANGELOG presence
+        needs: changed-packages
+        # A matrix with no values fails the run, so skip the job instead.
+        if: ${{ needs.changed-packages.outputs.packages != '[]' }}
+        runs-on: 'ubuntu-slim'
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                package: ${{ fromJSON( needs.changed-packages.outputs.packages ) }}
+        steps:
+            - name: 'Get PR commit count'
+              env:
+                  PR_COUNT: ${{ github.event.pull_request.commits }}
+              run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  node-version-file: '.nvmrc'
-                  package-manager-cache: false
-            - name: Set up npm
-              if: steps.filter.outputs.has_changes == 'true'
-              uses: ./.github/setup-npm
-              with:
-                  cache: false
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+            - name: 'Fetch relevant history from base repository'
+              run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
             - name: Check CHANGELOG cites this PR
-              if: steps.filter.outputs.has_changes == 'true'
               env:
                   PR_NUMBER: ${{ github.event.number }}
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -194,13 +218,13 @@ jobs:
                   fi
 
                   # Confirm that the CHANGELOG has a valid entry for the current PR
-                  npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
+                  node tools/validation/validate-changelogs.ts --require-pr="${PR_NUMBER}" "${changelog_path}"
 
     # Structure: For any revisions to CHANGELOGs (regardless of package),
     # validate that the contents follow the expected format.
     structure:
         name: Validate CHANGELOG structure
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
         steps:
@@ -218,17 +242,6 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
-            # This intentionally doesn't use `.github/setup-node`, because we
-            # don't currently need to `npm ci` install any dependencies.
-            - name: Use desired version of Node.js
-              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-              with:
-                  node-version-file: '.nvmrc'
-                  package-manager-cache: false
-            - name: Set up npm
-              uses: ./.github/setup-npm
-              with:
-                  cache: false
             - name: Validate touched CHANGELOG files
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -243,4 +256,4 @@ jobs:
 
                   echo "Validating:"
                   echo "$changelogs"
-                  echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"
+                  echo "$changelogs" | xargs node tools/validation/validate-changelogs.ts --pr="${PR_NUMBER}"

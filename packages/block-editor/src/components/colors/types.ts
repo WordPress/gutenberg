@@ -3,10 +3,17 @@ import type { Color } from '@wordpress/global-styles-engine';
 import type { IncompatibleInjectedProps } from '../font-sizes/types';
 
 /**
+ * A custom color, which is in no palette.
+ */
+export type CustomColorObject = {
+	color: string | null | undefined;
+	slug?: undefined;
+};
+
+/**
  * A color, either a palette entry or just a custom color.
  */
-export type ColorObject =
-	Color | { color: string | null | undefined; slug?: undefined };
+export type ColorObject = Color | CustomColorObject;
 
 /**
  * A color type `withColors` handles: an attribute name, or an object mapping
