@@ -1,9 +1,10 @@
 /**
  * Column count per container width. Each key is the inline size in pixels
  * from which its count applies: `{ 0: 1, 600: 2, 960: 4 }` is one column
- * from 0px, two from 600px, four from 960px. An `'auto'` step lifts the
- * cap from its width up and leaves the count to `minColumnWidth`; with no
- * floor set, the step is skipped and the count below it holds.
+ * from 0px, two from 600px, four from 960px, and below the smallest key
+ * that step's count applies. An `'auto'` step lifts the cap from its
+ * width up and leaves the count to `minColumnWidth`; with no floor set,
+ * the step is skipped and the count below it holds.
  */
 export type ColumnSteps = Record< number, number | 'auto' >;
 

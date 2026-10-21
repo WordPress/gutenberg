@@ -201,6 +201,8 @@ one column from 0px, two from 600px, four from 960px.
 </DashboardGrid>
 ```
 
+Below the smallest key, that step's count applies, so a map that starts at `0` states every width.
+
 `minColumnWidth` is a per-column floor in pixels. Alone, the surface
 fits as many columns of at least that width as the container allows.
 With `columns`, the count is capped by the number or the step, and
