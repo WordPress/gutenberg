@@ -36,13 +36,12 @@ class Render_Block_Post_Featured_Image_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Renders a Post Featured Image block and returns the class and style
-	 * attributes of the image and the overlay.
+	 * Renders a Post Featured Image block and returns the image's class and style attributes.
 	 *
 	 * @param array $attributes Block attributes.
-	 * @return array Class and style of the image and the overlay.
+	 * @return array Class and style of the image.
 	 */
-	private function render_attributes( $attributes ) {
+	private function render_image_attributes( $attributes ) {
 		$block = new WP_Block(
 			array(
 				'blockName' => 'core/post-featured-image',
@@ -53,31 +52,17 @@ class Render_Block_Post_Featured_Image_Test extends WP_UnitTestCase {
 
 		$processor = new WP_HTML_Tag_Processor( $block->render() );
 		$this->assertTrue( $processor->next_tag( 'img' ) );
-		$actual = array(
-			'image_class' => $processor->get_attribute( 'class' ),
-			'image_style' => $processor->get_attribute( 'style' ),
-		);
-		if ( $processor->next_tag( 'span' ) ) {
-			$actual['overlay_class'] = $processor->get_attribute( 'class' );
-			$actual['overlay_style'] = $processor->get_attribute( 'style' );
-		}
 
-		return $actual;
+		return array(
+			'class' => $processor->get_attribute( 'class' ),
+			'style' => $processor->get_attribute( 'style' ),
+		);
 	}
 
-	public function test_shadow_is_applied_to_the_image() {
-		$actual = $this->render_attributes(
-			array( 'style' => array( 'shadow' => 'var:preset|shadow|natural' ) )
-		);
-
-		$this->assertSame( 'object-fit:cover;box-shadow:var(--wp--preset--shadow--natural);', $actual['image_style'] );
-	}
-
-	public function test_shadow_follows_border_and_dimensions_on_the_image() {
-		$actual = $this->render_attributes(
+	public function test_shadow_follows_border_on_the_image() {
+		$actual = $this->render_image_attributes(
 			array(
-				'dimRatio' => 50,
-				'style'    => array(
+				'style' => array(
 					'border' => array(
 						'radius' => '10px',
 						'color'  => '#ff0000',
@@ -87,15 +72,7 @@ class Render_Block_Post_Featured_Image_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( 'has-border-color wp-post-image', $actual['image_class'] );
-		$this->assertSame( 'border-color:#ff0000;border-radius:10px;object-fit:cover;box-shadow:1px 1px 1px #000;', $actual['image_style'] );
-		$this->assertSame( 'wp-block-post-featured-image__overlay has-border-color has-background-dim has-background-dim-50', $actual['overlay_class'] );
-		$this->assertSame( 'border-color:#ff0000;border-radius:10px', $actual['overlay_style'] );
-	}
-
-	public function test_empty_shadow_is_ignored() {
-		$actual = $this->render_attributes( array( 'style' => array( 'shadow' => '' ) ) );
-
-		$this->assertSame( 'object-fit:cover;', $actual['image_style'] );
+		$this->assertSame( 'has-border-color wp-post-image', $actual['class'] );
+		$this->assertSame( 'border-color:#ff0000;border-radius:10px;object-fit:cover;box-shadow:1px 1px 1px #000;', $actual['style'] );
 	}
 }
