@@ -170,6 +170,8 @@ $revision-code-diff-marker-width: 3ch;
 	}
 
 	.editor-revisions-code-diff__code {
+		// The two code columns share the remaining width equally.
+		width: auto;
 		vertical-align: top;
 		white-space: pre-wrap;
 		overflow-wrap: anywhere;

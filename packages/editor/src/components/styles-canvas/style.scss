@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -110,9 +109,9 @@
 	}
 }
 
-// Only the visual panes stack: the code view stays side by side, so its
-// header does too.
-@container (max-width: #{ $break-medium }) {
+// Below this width each pane would be too narrow to read, so only the visual
+// panes stack: the code view stays side by side, and so does its header.
+@container (width < 782px) {
 	.is-comparing.is-visual .editor-styles-canvas-revisions__header,
 	.editor-styles-canvas-revisions__content.is-split {
 		grid-template-columns: minmax(0, 1fr);
@@ -173,11 +172,6 @@
 		height: $grid-unit-20;
 		border-radius: 50%;
 	}
-}
-
-.editor-styles-canvas-revisions__content {
-	flex: 1 1 auto;
-	min-height: 0;
 }
 
 .editor-styles-canvas__close-button {
