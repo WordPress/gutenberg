@@ -90,9 +90,11 @@ describe( 'useGridLayoutSync()', () => {
 	}
 
 	function getLayout( clientId: string ) {
-		return registry
+		const style = registry
 			.select( blockEditorStore )
-			.getBlockAttributes( clientId )?.style?.layout;
+			.getBlockAttributes( clientId )?.style as
+			{ layout?: Record< string, number > } | undefined;
+		return style?.layout;
 	}
 
 	function getOrder() {
