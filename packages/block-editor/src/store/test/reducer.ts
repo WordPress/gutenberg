@@ -40,6 +40,7 @@ import {
 	settings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	draggedInserterBlocks,
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
@@ -2930,6 +2931,35 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'draggedInserterBlocks', () => {
+		const inserterBlocks = [ partial< Block >( { clientId: 'block-1' } ) ];
+
+		it( 'should store the blocks dragged from an inserter', () => {
+			expect(
+				draggedInserterBlocks( [], {
+					type: 'START_DRAGGING',
+					blocks: inserterBlocks,
+				} )
+			).toBe( inserterBlocks );
+		} );
+
+		it( 'should keep them when a drop zone starts a drag', () => {
+			expect(
+				draggedInserterBlocks( inserterBlocks, {
+					type: 'START_DRAGGING',
+				} )
+			).toBe( inserterBlocks );
+		} );
+
+		it( 'should clear them when the drag stops', () => {
+			expect(
+				draggedInserterBlocks( inserterBlocks, {
+					type: 'STOP_DRAGGING',
+				} )
+			).toEqual( [] );
+		} );
+	} );
+
 	describe( 'draggedBlocks', () => {
 		it( 'should store the dragged client ids when a user starts dragging blocks', () => {
 			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
@@ -3914,6 +3944,30 @@ describe( 'state', () => {
 			const state = lastBlockInserted( {}, action );
 
 			expect( state.source ).toBe( expectedSource );
+		} );
+
+		it( 'should keep whether the blocks were inserted from an inserter', () => {
+			const action: Action = {
+				blocks: [
+					partial< Block >( {
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					} ),
+				],
+				meta: {
+					isFromInserter: true,
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			expect( lastBlockInserted( {}, action ).isFromInserter ).toBe(
+				true
+			);
+			expect(
+				lastBlockInserted(
+					{ clientIds: [ 'a' ], isFromInserter: true },
+					{ ...action, meta: undefined }
+				).isFromInserter
+			).toBeUndefined();
 		} );
 
 		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
