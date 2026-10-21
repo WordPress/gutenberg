@@ -2393,6 +2393,242 @@ describe( 'state', () => {
 				} );
 			} );
 
+			describe( 'RESET_BLOCKS references', () => {
+				// Fresh objects on every call, like a tree rebuilt from a
+				// collaborator's document.
+				const getPostBlocks = ( childContent = 'child' ) => [
+					partial< Block >( {
+						clientId: 'first',
+						name: 'core/test-block',
+						isValid: true,
+						attributes: { content: 'first' },
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'group',
+						name: 'core/test-block',
+						isValid: true,
+						attributes: { layout: 'flex' },
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'child',
+								name: 'core/test-block',
+								isValid: true,
+								attributes: { content: childContent },
+								innerBlocks: [],
+							} ),
+						],
+					} ),
+				];
+
+				it( 'should keep every reference when resetting to an equal tree', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: getPostBlocks(),
+					} );
+					const state = blocks( original, {
+						type: 'RESET_BLOCKS',
+						blocks: getPostBlocks(),
+					} );
+
+					for ( const clientId of [ 'first', 'group', 'child' ] ) {
+						expect( state.byClientId.get( clientId ) ).toBe(
+							original.byClientId.get( clientId )
+						);
+						expect( state.attributes.get( clientId ) ).toBe(
+							original.attributes.get( clientId )
+						);
+						expect( state.tree.get( clientId ) ).toBe(
+							original.tree.get( clientId )
+						);
+					}
+					for ( const clientId of [ '', 'group' ] ) {
+						expect( state.order.get( clientId ) ).toBe(
+							original.order.get( clientId )
+						);
+					}
+					expect( state.tree.get( '' ) ).toBe(
+						original.tree.get( '' )
+					);
+				} );
+
+				it( 'should only replace the changed block and the tree entries of its ancestors', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: getPostBlocks(),
+					} );
+					const state = blocks( original, {
+						type: 'RESET_BLOCKS',
+						blocks: getPostBlocks( 'changed' ),
+					} );
+
+					expect( state.attributes.get( 'child' ) ).toEqual( {
+						content: 'changed',
+					} );
+					expect( state.tree.get( 'child' ) ).not.toBe(
+						original.tree.get( 'child' )
+					);
+					expect( state.tree.get( 'group' ) ).not.toBe(
+						original.tree.get( 'group' )
+					);
+					expect( state.tree.get( '' ) ).not.toBe(
+						original.tree.get( '' )
+					);
+
+					expect( state.byClientId.get( 'child' ) ).toBe(
+						original.byClientId.get( 'child' )
+					);
+					expect( state.attributes.get( 'group' ) ).toBe(
+						original.attributes.get( 'group' )
+					);
+					expect( state.tree.get( 'first' ) ).toBe(
+						original.tree.get( 'first' )
+					);
+					expect( state.order.get( '' ) ).toBe(
+						original.order.get( '' )
+					);
+
+					// Kept and new entries still link up.
+					expect( state.tree.get( '' )!.innerBlocks ).toEqual( [
+						state.tree.get( 'first' ),
+						state.tree.get( 'group' ),
+					] );
+					expect( state.tree.get( '' )!.innerBlocks[ 0 ] ).toBe(
+						state.tree.get( 'first' )
+					);
+					expect( state.tree.get( 'group' )!.innerBlocks[ 0 ] ).toBe(
+						state.tree.get( 'child' )
+					);
+					expect(
+						( state.tree.get( 'child' ) as Block ).attributes
+					).toBe( state.attributes.get( 'child' ) );
+				} );
+
+				describe( 'with controlled inner blocks', () => {
+					const getBlocksWithPattern = ( content = 'para' ) => [
+						partial< Block >( {
+							clientId: 'pattern',
+							name: 'core/block',
+							isValid: true,
+							attributes: { ref: 1 },
+							innerBlocks: [],
+						} ),
+						partial< Block >( {
+							clientId: 'para',
+							name: 'core/test-block',
+							isValid: true,
+							attributes: { content },
+							innerBlocks: [],
+						} ),
+					];
+
+					// Mirrors the order of `useBlockSync`: the root reset, then
+					// the inner controller replacing the pattern's blocks.
+					const getStateWithPattern = () => {
+						let state = blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: getBlocksWithPattern(),
+						} );
+						state = blocks( state, {
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'pattern',
+							hasControlledInnerBlocks: true,
+						} );
+						return blocks( state, {
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'pattern',
+							blocks: [
+								partial< Block >( {
+									clientId: 'pattern-child',
+									name: 'core/test-block',
+									attributes: { content: 'synced' },
+									innerBlocks: [],
+								} ),
+							],
+						} );
+					};
+
+					it( 'should keep the controlled block when its inner blocks are unchanged', () => {
+						const original = blocks( getStateWithPattern(), {
+							type: 'RESET_BLOCKS',
+							blocks: getBlocksWithPattern(),
+						} );
+						const state = blocks( original, {
+							type: 'RESET_BLOCKS',
+							blocks: getBlocksWithPattern( 'changed' ),
+						} );
+
+						expect(
+							state.controlledInnerBlocks.has( 'pattern' )
+						).toBe( true );
+						expect( state.tree.get( 'pattern' ) ).toBe(
+							original.tree.get( 'pattern' )
+						);
+						expect( state.tree.get( 'controlled||pattern' ) ).toBe(
+							original.tree.get( 'controlled||pattern' )
+						);
+						expect( state.tree.get( 'pattern-child' ) ).toBe(
+							original.tree.get( 'pattern-child' )
+						);
+						expect( state.tree.get( 'para' ) ).not.toBe(
+							original.tree.get( 'para' )
+						);
+						expect( state.tree.get( '' )!.innerBlocks[ 0 ] ).toBe(
+							state.tree.get( 'pattern' )
+						);
+						expect(
+							getBlocks(
+								partial< State >( { blocks: state } ),
+								'pattern'
+							)
+						).toBe(
+							getBlocks(
+								partial< State >( { blocks: original } ),
+								'pattern'
+							)
+						);
+					} );
+
+					it( 'should refresh the controlled block when its inner blocks changed since the last reset', () => {
+						const original = blocks( getStateWithPattern(), {
+							type: 'RESET_BLOCKS',
+							blocks: getBlocksWithPattern(),
+						} );
+						// An edit inside the pattern only updates the
+						// `controlled||` entry, not the pattern's own entry.
+						const edited = blocks( original, {
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'pattern-child' ],
+							attributes: { content: 'edited' },
+						} );
+						const state = blocks( edited, {
+							type: 'RESET_BLOCKS',
+							blocks: getBlocksWithPattern(),
+						} );
+
+						expect( state.tree.get( 'pattern-child' ) ).toBe(
+							edited.tree.get( 'pattern-child' )
+						);
+						expect( state.tree.get( 'pattern' ) ).not.toBe(
+							edited.tree.get( 'pattern' )
+						);
+						expect(
+							state.tree.get( 'pattern' )!.innerBlocks[ 0 ]
+						).toBe( edited.tree.get( 'pattern-child' ) );
+						expect( state.tree.get( 'para' ) ).toBe(
+							edited.tree.get( 'para' )
+						);
+						expect( state.tree.get( '' )!.innerBlocks ).toEqual( [
+							state.tree.get( 'pattern' ),
+							state.tree.get( 'para' ),
+						] );
+						expect( state.tree.get( '' )!.innerBlocks[ 0 ] ).toBe(
+							state.tree.get( 'pattern' )
+						);
+					} );
+				} );
+			} );
+
 			describe( 'controlledInnerBlocks', () => {
 				it( 'should remove the content of the block if it switches from controlled to uncontrolled or opposite', () => {
 					const original = blocks( undefined, {
