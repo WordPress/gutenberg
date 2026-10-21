@@ -9,7 +9,7 @@ export type {
 	DashboardLanesLayoutItem,
 	DashboardLanesProps,
 } from './dashboard-lanes/types';
-export type { ColumnPolicy, ColumnSteps } from './shared/column-policy';
+export type { ColumnSteps } from './shared/column-policy';
 export type {
 	DragPreviewRenderProps,
 	GridItemLimits,
