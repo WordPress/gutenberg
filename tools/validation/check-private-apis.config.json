@@ -54,7 +54,7 @@
 		{
 			"comment": "Depends on @wordpress/block-editor, which unlocks private APIs throughout its store and components. Remove when the block-editor dependency is dropped or that stops.",
 			"package": "global-styles-ui",
-			"via": "packages/block-editor/src/index.js"
+			"via": "packages/block-editor/src/index.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/global-styles-engine, which has its own private API surface. Remove when that surface goes public.",

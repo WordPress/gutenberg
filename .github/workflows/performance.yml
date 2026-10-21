@@ -33,7 +33,7 @@ jobs:
     # an include list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
         name: Detect changes relevant to performance testing
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             pull-requests: read
@@ -435,7 +435,7 @@ jobs:
         # Runs even when the tests failed, so a stale report is cleared.
         # Skipped on a fork, whose token cannot write a comment.
         if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
@@ -480,7 +480,7 @@ jobs:
     # housekeeping that runs alongside it.
     performance-status-check:
         name: Performance Tests - Status Check
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             contents: read
