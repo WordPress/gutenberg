@@ -19,6 +19,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { isURL, prependHTTPS } from '@wordpress/url';
+import { Text } from '@wordpress/ui';
 import { useNativeUndo } from '../../utils/native-undo';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
@@ -650,7 +651,9 @@ function LinkControl( {
 							}
 						/>
 						{ isEntity && helpTextId && (
-							<p
+							<Text
+								variant="body-sm"
+								render={ <p /> }
 								id={ helpTextId }
 								className="block-editor-link-control__help"
 							>
@@ -659,7 +662,7 @@ function LinkControl( {
 									__( 'Synced with the selected %s.' ),
 									internalControlValue?.type || 'item'
 								) }
-							</p>
+							</Text>
 						) }
 					</div>
 					{ errorMessage && (
