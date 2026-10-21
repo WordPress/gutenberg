@@ -17,7 +17,7 @@
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
 -   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
--   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses.
+-   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 
 ### Internal
 

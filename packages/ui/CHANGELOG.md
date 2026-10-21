@@ -5,7 +5,7 @@
 ### Breaking Changes
 
 -   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
--   `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround. Parent documents that need canvas presses to dismiss popups should forward those events from the iframe document onto the `<iframe>` element, as the block editor canvas does.
+-   `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround. Parent documents that need canvas presses to dismiss popups should forward those events from the iframe document onto the `<iframe>` element, as the block editor canvas does ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 
 ### New Features
 
