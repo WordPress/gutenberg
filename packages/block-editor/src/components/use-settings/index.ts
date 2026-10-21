@@ -48,8 +48,7 @@ export function useSetting( path: string ) {
 	deprecated( 'wp.blockEditor.useSetting', {
 		since: '6.5',
 		alternative: 'wp.blockEditor.useSettings',
-		// @ts-expect-error `deprecated` has no `note` option, so this is ignored.
-		note: 'The new useSettings function can retrieve multiple settings at once, with better performance.',
+		hint: 'The new useSettings function can retrieve multiple settings at once, with better performance.',
 	} );
 
 	const [ value ] = useSettings( path );

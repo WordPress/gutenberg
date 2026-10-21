@@ -54,6 +54,10 @@ function __experimentalUserPatternCategoriesSelect( select ) {
 	return select( coreStore ).getUserPatternCategories();
 }
 
+function currentUserIdSelect( select ) {
+	return select( coreStore ).getCurrentUser()?.id;
+}
+
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockBindingsSupportedAttributes',
 	'__experimentalBlockDirectory',
@@ -114,6 +118,7 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
@@ -424,6 +429,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
