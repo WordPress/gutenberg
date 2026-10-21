@@ -301,6 +301,19 @@ export function migratePackageToChangie(
 		} );
 	}
 
+	// 3. Assemble clean CHANGELOG.md without Unreleased section
+	let cleanChangelog =
+		'<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->\n\n';
+	for ( const v of parsed.versions ) {
+		cleanChangelog += `${ v.content }\n\n`;
+	}
+
+	operations.push( {
+		type: 'update-changelog',
+		path: changelogPath,
+		content: cleanChangelog.trim() + '\n',
+	} );
+
 	if ( ! dryRun ) {
 		fs.mkdirSync( projectChangesDir, { recursive: true } );
 		fs.mkdirSync( unreleasedDir, { recursive: true } );

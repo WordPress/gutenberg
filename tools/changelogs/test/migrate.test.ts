@@ -153,6 +153,16 @@ describe( 'migratePackageToChangie with cleanFirst / update', () => {
 			.filter( ( f ) => f.endsWith( '.md' ) );
 		expect( versionFiles.length ).toBe( 3 );
 
+		// Check CHANGELOG.md was updated to exclude the Unreleased section
+		const finalChangelog = fs.readFileSync(
+			path.join( pkgDir, 'CHANGELOG.md' ),
+			'utf8'
+		);
+		expect( finalChangelog ).not.toContain( '## Unreleased' );
+		expect( finalChangelog ).not.toContain( 'Fixed brand new bug C' );
+		expect( finalChangelog ).toContain( '## 2.2.0 (2026-10-15)' );
+		expect( finalChangelog ).toContain( '## 2.1.0 (2026-10-01)' );
+
 		// Cleanup
 		fs.rmSync( tmpDir, { recursive: true, force: true } );
 	} );
