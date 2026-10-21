@@ -44,7 +44,6 @@ export function useEventHandlers( {
 		hasMultiSelection,
 		__unstableIsFullySelected,
 		isSectionBlock,
-		editedContentOnlySection,
 		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
@@ -561,18 +560,14 @@ export function useEventHandlers( {
 			 * @param event Double-click event.
 			 */
 			function onDoubleClick( event: MouseEvent ) {
+				// A section whose contents are being edited, and any section
+				// nested in it, is not a section for the time being.
 				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
 				const isSyncedPattern = isReusableBlock( block );
 				const isTemplatePartBlock = isTemplatePart( block );
-				const isAlreadyEditing = editedContentOnlySection === clientId;
 
-				if (
-					! isSection ||
-					isAlreadyEditing ||
-					isSyncedPattern ||
-					isTemplatePartBlock
-				) {
+				if ( ! isSection || isSyncedPattern || isTemplatePartBlock ) {
 					return;
 				}
 
@@ -606,7 +601,6 @@ export function useEventHandlers( {
 			startDraggingBlocks,
 			stopDraggingBlocks,
 			isSectionBlock,
-			editedContentOnlySection,
 			editContentOnlySection,
 		]
 	);
