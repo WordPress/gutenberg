@@ -7,6 +7,7 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Stack, Text } from '@wordpress/ui';
 import { DOWN } from '@wordpress/keycodes';
 import { Icon, filter } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -65,22 +66,24 @@ function DuotoneControl( {
 			} }
 			renderContent={ () => (
 				<MenuGroup label={ __( 'Duotone' ) }>
-					<p>
-						{ __(
-							'Create a two-tone color effect without losing your original image.'
-						) }
-					</p>
-					<DuotonePicker
-						aria-label={ actionLabel }
-						aria-describedby={ descriptionId }
-						colorPalette={ colorPalette }
-						duotonePalette={ duotonePalette }
-						disableCustomColors={ disableCustomColors }
-						disableCustomDuotone={ disableCustomDuotone }
-						value={ value }
-						selectedSlug={ selectedSlug }
-						onChange={ onChange }
-					/>
+					<Stack direction="column" gap="md">
+						<Text id={ descriptionId } render={ <p /> }>
+							{ __(
+								'Create a two-tone color effect without losing your original image.'
+							) }
+						</Text>
+						<DuotonePicker
+							aria-label={ actionLabel }
+							aria-describedby={ descriptionId }
+							colorPalette={ colorPalette }
+							duotonePalette={ duotonePalette }
+							disableCustomColors={ disableCustomColors }
+							disableCustomDuotone={ disableCustomDuotone }
+							value={ value }
+							selectedSlug={ selectedSlug }
+							onChange={ onChange }
+						/>
+					</Stack>
 				</MenuGroup>
 			) }
 		/>
