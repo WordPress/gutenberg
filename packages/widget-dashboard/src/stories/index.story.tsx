@@ -1257,7 +1257,7 @@ export const GridSettings: StoryObj< GridSettingsStoryProps > = {
 		docs: {
 			description: {
 				story: `
-The \`gridSettings\` prop carries the host's layout decisions, and the column policy travels to the surface untouched. \`columns\` is a count at every width. \`steps\` is the same field as a map from container width to count, the form a host uses to step the count as the surface narrows, and a step can be \`'auto'\` to leave that band to the floor. \`WIDGET_DASHBOARD_COLUMN_STEPS\` (one, two and four columns) is the default when the host sets nothing; the package applies no steps of its own. Set \`steps\` and resize the canvas to watch the count change at each width.
+The \`gridSettings\` prop carries the host's layout decisions, and the column policy travels to the surface untouched. \`columns\` is a count at every width. \`steps\` is the same field as a map from container width to count, the form a host uses to step the count as the surface narrows, and a step can be \`'auto'\` to leave that band to the floor, or to the count below it when no floor is set. \`WIDGET_DASHBOARD_COLUMN_STEPS\` (one, two and four columns) is the default when the host sets nothing; the package applies no steps of its own. Set \`steps\` and resize the canvas to watch the count change at each width.
 
 \`minColumnWidth\` is a per-column floor that composes with either form: the surface fits as many columns as the container allows at that width, capped by the count, down to one. Raise it and narrow the canvas to watch the count fall one column at a time.
 

@@ -145,10 +145,11 @@ interface BaseWidgetGridSettings {
 	 * Column count. A number applies at every width; a map applies a count
 	 * from each container width up (`{ 0: 1, 600: 2, 960: 4 }` is one
 	 * column from 0px, two from 600px, four from 960px). A step can be
-	 * `'auto'`, which lifts the cap from that width up. Counts are floored
-	 * at one with no ceiling. Absent, the policy is
-	 * {@link WIDGET_DASHBOARD_COLUMN_STEPS}, or whatever `minColumnWidth`
-	 * fits when that is set.
+	 * `'auto'`, which lifts the cap from that width up and leaves the count
+	 * to `minColumnWidth`; with no floor set, the step is skipped and the
+	 * count below it holds. Counts are floored at one with no ceiling.
+	 * Absent, the policy is {@link WIDGET_DASHBOARD_COLUMN_STEPS}, or
+	 * whatever `minColumnWidth` fits when that is set.
 	 */
 	columns?: number | ColumnSteps;
 
