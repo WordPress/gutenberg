@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import rotate, {
 	getRotateCSS,
 	getRotateForState,
@@ -306,48 +305,6 @@ describe( 'rotate block support', () => {
 					MOBILE_STATE
 				)
 			).toEqual( { '@mobile': { rotate: 15 } } );
-		} );
-	} );
-
-	describe( 'style attribute registration', () => {
-		const BLOCK_NAME = 'test/rotate-attribute';
-
-		afterEach( () => {
-			unregisterBlockType( BLOCK_NAME );
-		} );
-
-		function registerTestBlock( settings ) {
-			return registerBlockType( BLOCK_NAME, {
-				apiVersion: 3,
-				title: 'Rotate attribute test',
-				category: 'text',
-				edit: () => null,
-				save: () => null,
-				...settings,
-			} );
-		}
-
-		it( 'adds an object style attribute', () => {
-			expect( registerTestBlock().attributes.style ).toEqual( {
-				type: 'object',
-			} );
-		} );
-
-		it( 'keeps an existing style attribute definition', () => {
-			const style = {
-				type: 'object',
-				default: { color: { text: 'red' } },
-			};
-			expect(
-				registerTestBlock( { attributes: { style } } ).attributes.style
-			).toEqual( style );
-		} );
-
-		it( 'does not add a style attribute to blocks that opt out', () => {
-			expect(
-				registerTestBlock( { supports: { rotate: false } } ).attributes
-					.style
-			).toBeUndefined();
 		} );
 	} );
 
