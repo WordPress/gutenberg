@@ -203,11 +203,12 @@ export const Default: Story = {
 	},
 };
 
-export const HorizontalEmojiMenu: Story = {
+export const CompactHorizontalActionMenu: Story = {
+	name: 'Compact horizontal action menu',
 	parameters: {
 		docs: {
 			description: {
-				story: 'A compact horizontal reaction menu. Emoji names appear in tooltips and remain available to assistive technology. Reactions toggle independently and use a pressed appearance when checked.',
+				story: 'A compact horizontal action menu using emoji reactions. Emoji names appear in tooltips and remain available to assistive technology. Reactions toggle independently and use a pressed appearance when checked.',
 			},
 		},
 	},
