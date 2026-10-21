@@ -12,6 +12,7 @@ const options = parseArgs( {
 	options: {
 		package: { type: 'string', short: 'p' },
 		rollback: { type: 'boolean', default: false },
+		update: { type: 'boolean', default: false },
 		'dry-run': { type: 'boolean', default: false },
 	},
 	allowPositionals: true,
@@ -20,13 +21,19 @@ const options = parseArgs( {
 const packageName = options.values.package || options.positionals[ 0 ];
 if ( ! packageName ) {
 	console.error(
-		'Usage: node tools/changelogs/bin/migrate.mjs <package-name> [--rollback] [--dry-run]'
+		'Usage: node tools/changelogs/bin/migrate.mjs <package-name> [--update] [--rollback] [--dry-run]'
 	);
 	process.exit( 1 );
 }
 
 const dryRun = options.values[ 'dry-run' ] || false;
 const isRollback = options.values.rollback || false;
+const isUpdate = options.values.update || false;
+
+if ( isRollback && isUpdate ) {
+	console.error( 'Error: --rollback and --update cannot be used together.' );
+	process.exit( 1 );
+}
 
 try {
 	if ( isRollback ) {
@@ -39,9 +46,15 @@ try {
 			`Rollback complete for ${ res.packageName }: restored ${ res.versionsRestored } versions and ${ res.fragmentsRestored } unreleased entries.`
 		);
 	} else {
-		const res = migratePackageToChangie( packageName, REPO_ROOT, dryRun );
+		const res = migratePackageToChangie(
+			packageName,
+			REPO_ROOT,
+			dryRun,
+			isUpdate
+		);
+		const actionWord = isUpdate ? 'Update' : 'Migration';
 		console.log(
-			`Migration complete for ${ res.packageName }: created ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
+			`${ actionWord } complete for ${ res.packageName }: created ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
 		);
 	}
 } catch ( err: any ) {
