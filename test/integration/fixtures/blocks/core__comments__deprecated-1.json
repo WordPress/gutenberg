@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
+			"legacy": false,
 			"textColor": "luminous-vivid-orange",
 			"className": "wp-block-comments-query-loop comments-post-extra"
 		},
