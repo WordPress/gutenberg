@@ -1,0 +1,6 @@
+project: ui
+kind: Bug Fixes
+body: Keep the `Link` new-tab indicator with the preceding text when wrapping
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84806'

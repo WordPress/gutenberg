@@ -1,0 +1,33 @@
+project: components
+kind: Breaking Changes
+body: >-
+    Components no longer use Emotion for styling, class-name composition, or
+    cross-document style injection. Consumers that compose source-order-dependent
+    Emotion fragments must combine them in a single `css()` call before passing
+    the resulting `className`. Consumers using `@emotion/react` or
+    `@emotion/styled` that relied on StyleProvider's cross-document cache must
+    provide their own cache targeting that document's `<head>` and wrap the
+    subtree in `CacheProvider`; `StyleProvider` continues to register CSS Module
+    styles. Components no longer supply Framer Motion's optional Emotion DOM prop
+    validator; without a validator, `__unstableMotion` forwards non-animation
+    props to the rendered element. This includes:
+        -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
+        -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
+        -   Removal of the remaining Emotion dependencies and obsolete snapshot helpers ([#85022](https://github.com/WordPress/gutenberg/pull/85022)).
+        -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
+        -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
+        -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
+        -   `InputControl`, `InputControlPrefixWrapper`, and `InputControlSuffixWrapper` ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
+        -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
+        -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
+        -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
+        -   `RangeControl` ([#84562](https://github.com/WordPress/gutenberg/pull/84562))
+        -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
+        -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
+        -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
+        -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
+        -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
+        -   `ColorPicker`
+time: '2026-10-20T03:22:02.069Z'
+custom:
+    PR: '84925'

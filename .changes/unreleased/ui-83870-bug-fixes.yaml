@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Menu`, `Popover`: Keep popups open when the user interacts with an iframe
+    inside the popup.
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '83870'

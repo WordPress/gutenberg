@@ -1,0 +1,8 @@
+project: ui
+kind: Enhancements
+body: >-
+    `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress
+    environment
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84305'

@@ -1,0 +1,8 @@
+project: ui
+kind: New Features
+body: >-
+    `Avatar`: Add `Avatar.Initials` using the first and last words with complete
+    Unicode characters, and a borderless person icon as the default fallback
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84653'

@@ -1,0 +1,6 @@
+project: ui
+kind: Documentation
+body: Document accessible naming for Combobox popups
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84551'

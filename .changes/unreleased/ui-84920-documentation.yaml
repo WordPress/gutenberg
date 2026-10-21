@@ -1,0 +1,6 @@
+project: ui
+kind: Documentation
+body: Clarify that badges should not be interactive in the usage guidelines
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84920'
