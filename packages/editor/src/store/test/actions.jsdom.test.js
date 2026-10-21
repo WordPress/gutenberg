@@ -92,6 +92,26 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( 'setQuickEditOpener', () => {
+		it( 'sets and clears the opener getQuickEditOpener returns', () => {
+			const registry = createRegistryWithStores();
+			const getQuickEditOpener = () =>
+				unlock( registry.select( editorStore ) ).getQuickEditOpener();
+			const { setQuickEditOpener } = unlock(
+				registry.dispatch( editorStore )
+			);
+
+			expect( getQuickEditOpener() ).toBeUndefined();
+
+			const opener = vi.fn();
+			setQuickEditOpener( opener );
+			expect( getQuickEditOpener() ).toBe( opener );
+
+			setQuickEditOpener( undefined );
+			expect( getQuickEditOpener() ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'setCanvasWidth', () => {
 		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
 			const registry = createRegistryWithStores();

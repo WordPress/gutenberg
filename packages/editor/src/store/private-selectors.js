@@ -706,3 +706,14 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 export function getEntityNavigator( state ) {
 	return state.entityNavigator;
 }
+
+/**
+ * Returns the quick edit opener of the screen, set with `setQuickEditOpener`:
+ * how the current screen opens the quick edit form of entities.
+ *
+ * @param {Object} state Global application state.
+ * @return {((entities: {postType: string, postIds: Array<number|string>}) => void)|undefined} The function opening the form, called with the post type and the ids of the entities, or `undefined` when the screen has not set one.
+ */
+export function getQuickEditOpener( state ) {
+	return state.quickEditOpener;
+}

@@ -1057,3 +1057,20 @@ export function setEntityNavigator( navigator ) {
 		navigator,
 	};
 }
+
+/**
+ * Sets the quick edit opener of the screen: how the current screen opens the
+ * quick edit form of entities. The "Quick edit" action of pages calls it to
+ * open the form the way the screen does, so the screen listing the entities
+ * sets it when it mounts, and clears it when it unmounts. While no opener is
+ * set, the action does nothing.
+ *
+ * @param {((entities: {postType: string, postIds: Array<number|string>}) => void)|undefined} opener The function opening the form, called with the post type and the ids of the entities, or `undefined` to clear it.
+ * @return {Object} Action object.
+ */
+export function setQuickEditOpener( opener ) {
+	return {
+		type: 'SET_QUICK_EDIT_OPENER',
+		opener,
+	};
+}
