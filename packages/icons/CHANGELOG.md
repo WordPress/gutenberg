@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add a `normalize-export` script that rewrites a design-tool SVG export into the shape this package expects ([#85272](https://github.com/WordPress/gutenberg/pull/85272)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
