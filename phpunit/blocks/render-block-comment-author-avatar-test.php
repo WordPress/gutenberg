@@ -66,29 +66,22 @@ class Tests_Blocks_Render_Comment_Author_Avatar extends WP_UnitTestCase {
 	 */
 	public function data_spacing_styles() {
 		return array(
-			'custom value'        => array(
-				'spacing'        => array( 'padding' => array( 'top' => '10px' ) ),
-				'expected_style' => 'padding-top:10px;',
-			),
-			'preset'              => array(
+			'preset'             => array(
 				'spacing'        => array( 'padding' => array( 'top' => 'var:preset|spacing|40' ) ),
 				'expected_style' => 'padding-top:var(--wp--preset--spacing--40);',
 			),
-			'padding and margin'  => array(
+			'padding and margin' => array(
 				'spacing'        => array(
 					'margin'  => array( 'top' => '5px' ),
 					'padding' => array( 'left' => '10px' ),
 				),
 				'expected_style' => 'padding-left:10px;margin-top:5px;',
 			),
-			'empty spacing array' => array(
-				'spacing'        => array(),
-				'expected_style' => '',
-			),
 		);
 	}
 
 	public function test_wrapper_has_no_style_without_spacing() {
 		$this->assertNull( $this->get_wrapper_style( array() ) );
+		$this->assertNull( $this->get_wrapper_style( array( 'style' => array( 'spacing' => array() ) ) ) );
 	}
 }
