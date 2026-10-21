@@ -78,6 +78,39 @@ git restore packages/<package-name>/CHANGELOG.md .changie.yaml
 git clean -fd .changes/
 ```
 
+## Updating a migration branch when falling behind trunk
+
+If a PR branch migrating a package falls behind `trunk`, new changes may have been merged into `packages/<package-name>/CHANGELOG.md` using the old changelog method.
+
+When rebasing on or merging `trunk`, Git will report a conflict on `packages/<package-name>/CHANGELOG.md`. To update:
+
+1.  Keep trunk's version of the changelog:
+
+    **1a. If performing a `git rebase`**:
+
+    ```bash
+    git checkout --theirs packages/<package-name>/CHANGELOG.md
+    ```
+
+    **1b. If performing a `git merge`**:
+
+    ```bash
+    git checkout --ours packages/<package-name>/CHANGELOG.md
+    ```
+
+2.  Run the update command to clean up previous fragments and re-migrate:
+
+    ```bash
+    npm run changelog:migrate -- <package-name> --update
+    ```
+
+3.  Stage the resolved changelog and newly updated fragments, then continue:
+
+    ```bash
+    git add packages/<package-name>/CHANGELOG.md .changes/
+    git rebase --continue # or git commit if merging
+    ```
+
 ## Reverting a migrated package (Post-merge rollback)
 
 If a package has already been migrated, merged into `trunk`, and maintainers decide to reverse the migration back to traditional manual `CHANGELOG.md` maintenance, follow these steps:

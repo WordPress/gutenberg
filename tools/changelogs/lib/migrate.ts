@@ -155,17 +155,76 @@ export function parseChangelogContent( content: string ): ParsedChangelog {
 }
 
 /**
+ * Cleans up existing version files and unreleased fragments for a package.
+ *
+ * @param packageName Normalized package directory name (e.g. 'components').
+ * @param repoRoot    Path to Gutenberg repository root.
+ * @param dryRun      If true, does not perform file deletion.
+ */
+function cleanPackageChangieFiles(
+	packageName: string,
+	repoRoot: string = process.cwd(),
+	dryRun: boolean = false
+) {
+	const changieConfig = loadChangieConfig( repoRoot );
+	const changesDir = path.resolve(
+		repoRoot,
+		changieConfig.changesDir || '.changes'
+	);
+	const projectChangesDir = path.resolve( changesDir, packageName );
+	const unreleasedDir = path.resolve(
+		changesDir,
+		changieConfig.unreleasedDir || 'unreleased'
+	);
+
+	if ( fs.existsSync( projectChangesDir ) ) {
+		const versionFiles = fs
+			.readdirSync( projectChangesDir )
+			.filter( ( f ) => f.endsWith( '.md' ) );
+		if ( ! dryRun ) {
+			for ( const f of versionFiles ) {
+				fs.unlinkSync( path.join( projectChangesDir, f ) );
+			}
+			fs.rmdirSync( projectChangesDir );
+		}
+	}
+
+	if ( fs.existsSync( unreleasedDir ) ) {
+		const fragmentFiles = fs
+			.readdirSync( unreleasedDir )
+			.filter( ( f ) => f.endsWith( '.yaml' ) );
+		for ( const f of fragmentFiles ) {
+			const filePath = path.join( unreleasedDir, f );
+			try {
+				const parsed = yaml.safeLoad(
+					fs.readFileSync( filePath, 'utf8' )
+				) as any;
+				if ( parsed && parsed.project === packageName ) {
+					if ( ! dryRun ) {
+						fs.unlinkSync( filePath );
+					}
+				}
+			} catch {
+				// Ignore malformed files during cleanup
+			}
+		}
+	}
+}
+
+/**
  * Migrates a package's CHANGELOG.md to Changie version files and fragments.
  *
  * @param packageName Package directory name (e.g. 'components' or 'ui').
  * @param repoRoot    Path to Gutenberg repository root.
  * @param dryRun      If true, does not write changes to disk.
+ * @param cleanFirst  If true, deletes existing Changie artifacts for this package before migrating.
  * @return Summary of migration actions.
  */
 export function migratePackageToChangie(
 	packageName: string,
 	repoRoot: string = process.cwd(),
-	dryRun: boolean = false
+	dryRun: boolean = false,
+	cleanFirst: boolean = false
 ) {
 	const normalized = packageName
 		.replace( /^@wordpress\//, '' )
@@ -178,6 +237,10 @@ export function migratePackageToChangie(
 	);
 	if ( ! fs.existsSync( changelogPath ) ) {
 		throw new Error( `CHANGELOG.md not found at ${ changelogPath }` );
+	}
+
+	if ( cleanFirst ) {
+		cleanPackageChangieFiles( normalized, repoRoot, dryRun );
 	}
 
 	const content = fs.readFileSync( changelogPath, 'utf8' );
@@ -366,27 +429,7 @@ export function rollbackPackageFromChangie(
 
 	if ( ! dryRun ) {
 		fs.writeFileSync( changelogPath, output.trim() + '\n', 'utf8' );
-		// Clean up project version files
-		for ( const f of versionFiles ) {
-			fs.unlinkSync( path.join( projectChangesDir, f ) );
-		}
-		fs.rmdirSync( projectChangesDir );
-
-		// Clean up unreleased fragments for this project
-		if ( fs.existsSync( unreleasedDir ) ) {
-			const fragmentFiles = fs
-				.readdirSync( unreleasedDir )
-				.filter( ( f ) => f.endsWith( '.yaml' ) );
-			for ( const f of fragmentFiles ) {
-				const filePath = path.join( unreleasedDir, f );
-				const parsed = yaml.safeLoad(
-					fs.readFileSync( filePath, 'utf8' )
-				) as any;
-				if ( parsed && parsed.project === normalized ) {
-					fs.unlinkSync( filePath );
-				}
-			}
-		}
+		cleanPackageChangieFiles( normalized, repoRoot, false );
 	}
 
 	return {
