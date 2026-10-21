@@ -1,6 +1,0 @@
-project: ui
-kind: Bug Fixes
-body: '`Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type'
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84295'

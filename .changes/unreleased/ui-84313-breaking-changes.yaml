@@ -1,8 +1,0 @@
-project: ui
-kind: Breaking Changes
-body: >-
-    Raise the minimum required Node.js version to `>=22.13.0`, for stable
-    `require(esm)` support
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84313'

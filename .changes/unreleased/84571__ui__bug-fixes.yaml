@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Notice`: Tint controls and their focus rings with the notice intent color and
+    preserve title colors when composed with `Text`
+time: '2026-10-21T05:06:33.766Z'
+custom:
+    PR: '84571'

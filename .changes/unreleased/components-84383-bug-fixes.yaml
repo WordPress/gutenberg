@@ -1,9 +1,0 @@
-project: components
-kind: Bug Fixes
-body: >-
-    `CustomGradientPicker`: Keep the color interpolation method of a gradient,
-    such as `in oklch`, when editing it, instead of replacing the gradient with
-    the default one
-time: '2026-10-20T03:22:02.071Z'
-custom:
-    PR: '84383'

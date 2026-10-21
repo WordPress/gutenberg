@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Tabs`, `TabPanel`: Expand vertical tab interaction backgrounds and focus
+    rings across the row
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '84821'

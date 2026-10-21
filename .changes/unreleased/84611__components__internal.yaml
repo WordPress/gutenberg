@@ -1,0 +1,6 @@
+project: components
+kind: Internal
+body: Refactor to TypeScript
+time: '2026-10-21T05:06:33.689Z'
+custom:
+    PR: '84611'

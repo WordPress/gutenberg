@@ -1,6 +1,0 @@
-project: ui
-kind: Internal
-body: Update Base UI to 1.9.0
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84542'

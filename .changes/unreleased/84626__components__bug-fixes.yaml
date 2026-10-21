@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Tabs`: Restore the `fit-content` width of horizontal tab lists, which
+    stretched to full width after the SCSS Modules migration
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '84626'

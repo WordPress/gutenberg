@@ -1,0 +1,8 @@
+project: components
+kind: Deprecations
+body: >-
+    `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the
+    legacy component for existing consumers
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '84197'

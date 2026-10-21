@@ -1,8 +1,0 @@
-project: components
-kind: Enhancements
-body: >-
-    `Tabs`: Show the tab panel's focus ring with the design system's outline
-    instead of a legacy box-shadow
-time: '2026-10-20T03:22:02.071Z'
-custom:
-    PR: '84914'
