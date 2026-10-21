@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the design system outline for keyboard focus on downloadable block cards.
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
