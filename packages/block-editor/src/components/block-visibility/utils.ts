@@ -215,7 +215,7 @@ export function getBlockVisibilityReason(
 
 /**
  * Appends a hiding reason to an accessible block label as a new sentence,
- * for example "Block: Column (1 of 2). Hidden on mobile".
+ * for example "Block: Paragraph. Hidden on mobile".
  *
  * @param label  The block's accessible label.
  * @param reason The reason from getBlockVisibilityReason.

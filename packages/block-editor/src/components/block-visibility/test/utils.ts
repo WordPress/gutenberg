@@ -353,11 +353,8 @@ describe( 'block-visibility utils', () => {
 
 		it( 'appends the reason as a new sentence', () => {
 			expect(
-				appendVisibilityReason(
-					'Block: Column (1 of 2)',
-					'Hidden on mobile'
-				)
-			).toBe( 'Block: Column (1 of 2). Hidden on mobile' );
+				appendVisibilityReason( 'Block: Paragraph', 'Hidden on mobile' )
+			).toBe( 'Block: Paragraph. Hidden on mobile' );
 			expect(
 				appendVisibilityReason(
 					'Empty block; start writing or type forward slash to choose a block',

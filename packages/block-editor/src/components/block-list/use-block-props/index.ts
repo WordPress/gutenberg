@@ -283,7 +283,7 @@ export function useBlockProps<
 		role: 'document',
 		// A ghosted block announces why it is hidden after whatever name it
 		// would otherwise have, so blocks that supply their own label (like
-		// Paragraph or Column) keep it and still announce the reason.
+		// Paragraph) keep it and still announce the reason.
 		'aria-label': appendVisibilityReason( baseLabel, visibilityReason ),
 		'data-block': clientId,
 		'data-type': name,
