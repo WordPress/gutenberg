@@ -484,6 +484,136 @@ describe( 'DataViews component', () => {
 			expect( onChangeView ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'page select', () => {
+		// A server-backed dataset: the totals come from the consumer and only
+		// the current page is in `data`.
+		const manyPages = { totalItems: 1453038, totalPages: 72652 };
+
+		it( 'lists every page in a select up to 100 pages', () => {
+			render(
+				<DataViewWrapper
+					paginationInfo={ { totalItems: 1000, totalPages: 100 } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Current page' } )
+			).toHaveTextContent( '1' );
+			expect(
+				screen.queryByRole( 'spinbutton', { name: 'Current page' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'offers a page number input instead of a select above 100 pages', () => {
+			render( <DataViewWrapper paginationInfo={ manyPages } /> );
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Current page' } )
+			).toHaveValue( 1 );
+			expect( screen.getByText( 'of 72652' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Current page' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'goes to the typed page on Enter', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			await user.type( input, '42{Enter}' );
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { page: 42 } )
+			);
+		} );
+
+		it( 'goes to the typed page when the input loses focus', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			await user.type( input, '7' );
+			await user.tab();
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { page: 7 } )
+			);
+		} );
+
+		it( 'clamps the typed page to the available pages', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			await user.type( input, '99999{Enter}' );
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { page: 72652 } )
+			);
+
+			// Below the first page clamps to it, which is where the view
+			// already is: nothing to change.
+			await user.clear( input );
+			await user.type( input, '0{Enter}' );
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( input ).toHaveValue( 1 );
+		} );
+
+		it( 'ignores an empty value and shows the current page again', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			expect( input ).toHaveValue( null );
+			await user.keyboard( '{Enter}' );
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 1 );
+		} );
+	} );
+
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );

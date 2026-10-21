@@ -11,3 +11,10 @@
 		font-weight: inherit;
 	}
 }
+
+.dataviews-pagination__page-input {
+	// Room for the last page number, plus the input's own padding.
+	width:
+		calc((var(--dataviews-pagination-page-input-digits, 3) + 1) * 1ch + 2 *
+		var(--wpds-dimension-padding-sm));
+}
