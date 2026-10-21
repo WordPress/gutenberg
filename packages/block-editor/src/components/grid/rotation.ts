@@ -1,4 +1,25 @@
+import type { CSSProperties } from 'react';
 import { normalizeAngle } from '../../utils/rotation';
+
+/** A rectangle, in pixels. */
+export interface PixelRect {
+	left: number;
+	top: number;
+	right: number;
+	bottom: number;
+}
+
+/** The positions of a block's center and of the pointer, in pixels. */
+interface PointerPosition {
+	/** Horizontal position of the block's center. */
+	centerX: number;
+	/** Vertical position of the block's center. */
+	centerY: number;
+	/** Horizontal position of the pointer. */
+	pointerX: number;
+	/** Vertical position of the pointer. */
+	pointerY: number;
+}
 
 // Rotation snaps to multiples of this many degrees...
 const SNAP_STEP = 15;
@@ -11,13 +32,16 @@ const DEAD_ZONE = 2;
  * Snaps an angle the way the rotate handle does: whole degrees, a pull towards
  * multiples of 15°, and a dead zone around 0.
  *
- * @param {number}  angle        Angle in degrees.
- * @param {Object}  options
- * @param {boolean} options.snap Whether to pull towards multiples of 15°.
+ * @param angle        Angle in degrees.
+ * @param options
+ * @param options.snap Whether to pull towards multiples of 15°.
  *
- * @return {number} The snapped angle in (-180, 180].
+ * @return The snapped angle in (-180, 180].
  */
-export function snapAngle( angle, { snap = true } = {} ) {
+export function snapAngle(
+	angle: number,
+	{ snap = true }: { snap?: boolean } = {}
+): number {
 	let snapped = angle;
 	if ( snap ) {
 		const nearestStep = Math.round( angle / SNAP_STEP ) * SNAP_STEP;
@@ -36,15 +60,20 @@ export function snapAngle( angle, { snap = true } = {} ) {
  * Gets the direction of the pointer from the center of a block, in degrees.
  * Straight below the center is 0°, and the angle grows clockwise.
  *
- * @param {Object} options
- * @param {number} options.centerX  Horizontal position of the block's center.
- * @param {number} options.centerY  Vertical position of the block's center.
- * @param {number} options.pointerX Horizontal position of the pointer.
- * @param {number} options.pointerY Vertical position of the pointer.
+ * @param options
+ * @param options.centerX  Horizontal position of the block's center.
+ * @param options.centerY  Vertical position of the block's center.
+ * @param options.pointerX Horizontal position of the pointer.
+ * @param options.pointerY Vertical position of the pointer.
  *
- * @return {number} The direction in degrees, in [-180, 180].
+ * @return The direction in degrees, in [-180, 180].
  */
-export function getPointerAngle( { centerX, centerY, pointerX, pointerY } ) {
+export function getPointerAngle( {
+	centerX,
+	centerY,
+	pointerX,
+	pointerY,
+}: PointerPosition ): number {
 	return (
 		( -Math.atan2( pointerX - centerX, pointerY - centerY ) * 180 ) /
 		Math.PI
@@ -61,15 +90,15 @@ export function getPointerAngle( { centerX, centerY, pointerX, pointerY } ) {
  * much as the pointer does, wherever the handle is, rather than jumping to
  * the pointer's direction.
  *
- * @param {Object}  options
- * @param {number}  options.centerX  Horizontal position of the block's center.
- * @param {number}  options.centerY  Vertical position of the block's center.
- * @param {number}  options.pointerX Horizontal position of the pointer.
- * @param {number}  options.pointerY Vertical position of the pointer.
- * @param {number}  options.offset   Degrees added to the pointer's direction.
- * @param {boolean} options.snap     Whether to pull towards multiples of 15°.
+ * @param options
+ * @param options.centerX  Horizontal position of the block's center.
+ * @param options.centerY  Vertical position of the block's center.
+ * @param options.pointerX Horizontal position of the pointer.
+ * @param options.pointerY Vertical position of the pointer.
+ * @param options.offset   Degrees added to the pointer's direction.
+ * @param options.snap     Whether to pull towards multiples of 15°.
  *
- * @return {number} The rotation in degrees, in (-180, 180].
+ * @return The rotation in degrees, in (-180, 180].
  */
 export function getRotationFromPointer( {
 	centerX,
@@ -78,7 +107,10 @@ export function getRotationFromPointer( {
 	pointerY,
 	offset = 0,
 	snap = true,
-} ) {
+}: PointerPosition & {
+	offset?: number;
+	snap?: boolean;
+} ): number {
 	const angle =
 		getPointerAngle( { centerX, centerY, pointerX, pointerY } ) + offset;
 	return snapAngle( angle, { snap } );
@@ -92,14 +124,22 @@ export function getRotationFromPointer( {
  * element's unrotated size, so it is moved to the center of the bounding box
  * and rotated by the same angle.
  *
- * @param {Object} options
- * @param {number} options.width  Unrotated width of the element.
- * @param {number} options.height Unrotated height of the element.
- * @param {number} options.angle  Rotation in degrees.
+ * @param options
+ * @param options.width  Unrotated width of the element.
+ * @param options.height Unrotated height of the element.
+ * @param options.angle  Rotation in degrees.
  *
- * @return {Object|undefined} Style properties for the overlay, or undefined when not rotated.
+ * @return Style properties for the overlay, or undefined when not rotated.
  */
-export function getRotatedOverlayStyle( { width, height, angle } ) {
+export function getRotatedOverlayStyle( {
+	width,
+	height,
+	angle,
+}: {
+	width: number;
+	height: number;
+	angle: number;
+} ): CSSProperties | undefined {
 	if ( ! angle ) {
 		return undefined;
 	}
@@ -119,12 +159,15 @@ export function getRotatedOverlayStyle( { width, height, angle } ) {
 /**
  * Gets the bounding box of a rectangle rotated around its center.
  *
- * @param {{left: number, top: number, right: number, bottom: number}} rect  The unrotated rectangle.
- * @param {number}                                                     angle Rotation in degrees.
+ * @param rect  The unrotated rectangle.
+ * @param angle Rotation in degrees.
  *
- * @return {{left: number, top: number, right: number, bottom: number}} The bounding box, around the same center.
+ * @return The bounding box, around the same center.
  */
-export function getRotatedBoundingRect( rect, angle ) {
+export function getRotatedBoundingRect(
+	rect: PixelRect,
+	angle: number | undefined
+): PixelRect {
 	if ( ! angle ) {
 		return rect;
 	}

@@ -7,7 +7,7 @@ import {
 } from '../mobile-stacking';
 
 describe( 'isGridStackedOnMobile()', () => {
-	let originalExperiment;
+	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
 		originalExperiment = window.__experimentalEnableGridInteractivity;
 		window.__experimentalEnableGridInteractivity = true;
