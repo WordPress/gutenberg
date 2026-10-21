@@ -719,7 +719,7 @@ export default dedupePlugins( [
 			],
 		],
 		[
-			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.tsx',
 			[ 'expectPlaceholderState' ],
 		],
 		[
@@ -895,7 +895,6 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/utils/colors-values.ts' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
@@ -904,14 +903,14 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
+						'--wp-admin-theme-* variables do not support component theming. Use semantic WPDS design tokens directly. Keep required admin color-scheme fallbacks in SCSS.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
+						'--wp-components-color-* variables are internal. Use semantic WPDS design tokens directly.',
 				},
 			],
 		},

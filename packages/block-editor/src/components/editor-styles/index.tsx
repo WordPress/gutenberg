@@ -13,7 +13,10 @@ import type { EditorStylesProps, EditorStylesStyle } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( styles: string[], scope?: string ) {
+function useDarkThemeBodyClassName(
+	styles: ( string | null )[],
+	scope?: string
+) {
 	return useCallback(
 		( node: HTMLStyleElement | null ) => {
 			if ( ! node ) {
