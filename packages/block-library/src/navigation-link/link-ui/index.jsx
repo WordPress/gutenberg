@@ -211,6 +211,7 @@ function UnforwardedLinkUI( props, ref ) {
 		useBlockSuggestions( {
 			clientId,
 			isEnabled: canAddBlock && ! link?.url?.length,
+			allowedBlockNames: props.allowedBlockNames,
 			onBlockInsert: props.onBlockInsert,
 			onClose: props.onClose,
 		} );

@@ -68,6 +68,13 @@ export interface LayoutBlockSupport {
 	allowVerticalAlignment?: boolean;
 	allowWrap?: boolean;
 	allowSizingOnChildren?: boolean;
+	allowSwitching?: boolean;
+	allowEditing?: boolean;
+	allowInheriting?: boolean;
+	/**
+	 * The layout a block uses when its attribute sets none.
+	 */
+	default?: Layout;
 	[ key: string ]: unknown;
 }
 
@@ -81,6 +88,11 @@ export type LayoutOnChange = ( layout: Layout | undefined ) => void;
  */
 export interface LayoutInspectorControlsProps {
 	layout: Layout;
+	/**
+	 * The layout attribute of the block, before state and default values.
+	 */
+	value?: Layout;
+	name?: string;
 	onChange: LayoutOnChange;
 	layoutBlockSupport?: LayoutBlockSupport;
 	/**
@@ -95,6 +107,8 @@ export interface LayoutInspectorControlsProps {
  */
 export interface LayoutToolbarControlsProps {
 	layout?: Layout;
+	name?: string;
+	clientId?: string;
 	onChange: LayoutOnChange;
 	layoutBlockSupport: LayoutBlockSupport;
 	controlsGroup?: string;
