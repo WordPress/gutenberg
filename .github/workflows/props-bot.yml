@@ -58,7 +58,7 @@ env:
 jobs:
     pull-request:
         name: Resolve the pull request target
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             pull-requests: read
             # Reading the target's copy of this workflow.
@@ -117,7 +117,7 @@ jobs:
         name: Generate a list of props
         needs: pull-request
         if: ${{ needs.pull-request.outputs.routing-current == 'true' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             # Read is enough: the action posts nothing, see `post-comment`.
             pull-requests: read
@@ -141,7 +141,7 @@ jobs:
         name: Update the standalone props comment
         needs: pull-request
         if: ${{ needs.pull-request.outputs.routing-current == 'false' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             pull-requests: write
             contents: read
@@ -158,7 +158,7 @@ jobs:
         # Only when the list was gathered: an empty body from a failed run would
         # clear a props list nothing had disproved.
         if: ${{ needs.props-bot.result == 'success' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
