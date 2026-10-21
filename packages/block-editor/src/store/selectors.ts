@@ -53,6 +53,7 @@ import type {
 	State,
 	BlockListSettings,
 	BlockPattern,
+	ParsedBlockPattern,
 	TreeBlock,
 	UserPattern,
 } from './types';
@@ -3032,8 +3033,13 @@ const getAllowedPatternsDependants =
 			: null,
 	];
 
-const patternsWithParsedBlocks = new WeakMap< BlockPattern, BlockPattern >();
-function enhancePatternWithParsedBlocks( pattern: BlockPattern ) {
+const patternsWithParsedBlocks = new WeakMap<
+	BlockPattern,
+	ParsedBlockPattern
+>();
+function enhancePatternWithParsedBlocks(
+	pattern: BlockPattern
+): ParsedBlockPattern {
 	let enhancedPattern = patternsWithParsedBlocks.get( pattern );
 	if ( ! enhancedPattern ) {
 		enhancedPattern = {
@@ -3062,7 +3068,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 				state: State,
 				rootClientId: string | null = null,
 				options: InserterOptions = DEFAULT_INSERTER_OPTIONS
-			): BlockPattern[] => {
+			): Array< ParsedBlockPattern > => {
 				const { getAllPatterns, getInstalledThemePatterns } = unlock(
 					select( STORE_NAME )
 				);

@@ -45,11 +45,11 @@ const INSTALLED_THEME_PATTERNS_OPTIONS = {
 };
 
 /**
- * Returns the patterns that can be used to start a new page.
+ * Returns the patterns that can start the current post.
  *
  * @param {boolean} includeInstalledThemes Whether to include the patterns from
  *                                         other installed themes.
- * @return {Array} The start patterns.
+ * @return {Object[]} The start patterns.
  */
 export function useStartPatterns( includeInstalledThemes = false ) {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
