@@ -36,6 +36,14 @@ or via npm script:
 }
 ```
 
+### Minified-only Build
+
+```bash
+wp-build --minified-only
+```
+
+Skips the non-minified bundles (`.js`) and the source maps of the minified bundles (`.min.js.map`). WordPress loads the non-minified bundles only when `SCRIPT_DEBUG` is true, so this output works only where `SCRIPT_DEBUG` is false, such as end-to-end tests in CI.
+
 ### Development Mode (Watch)
 
 ```bash
