@@ -38,7 +38,7 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 
 -   `attributes` (Object): The [attributes definition](/docs/reference-guides/block-api/block-attributes.md) of the deprecated form of the block.
 -   `supports` (Object): The [supports definition](/docs/reference-guides/block-api/block-registration.md) of the deprecated form of the block.
--   `save` (Function): The [save implementation](/docs/reference-guides/block-api/block-edit-save.md) of the deprecated form of the block.
+-   `save` (Function, Optional): The [save implementation](/docs/reference-guides/block-api/block-edit-save.md) of the deprecated form of the block. A deprecation without a `save` function is an [attribute-only deprecation](#attribute-only-deprecations).
 -   `migrate`: (Function, Optional). A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of attributes and inner blocks compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
 	- _Parameters_
 		- `attributes`: The block's old attributes.
@@ -99,6 +99,30 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 ```
 
 In the example above we updated the markup of the block to use a `div` instead of `p`.
+
+## Attribute-only deprecations
+
+When the markup of an old version of the block differs from the current `save` output only in ways the block parser can regenerate from the block's attributes (added classes or attributes, a different wrapper element, as long as all of the text, media and links are preserved — see `allowsReconstruction` in [Block Registration](/docs/reference-guides/block-api/block-registration.md)), a deprecation only needs to describe the attributes that changed. Such a deprecation omits `save` and must define `isEligible`:
+
+```js
+const v1 = {
+	attributes: {
+		...metadata.attributes,
+		// The old version stored the width as a number of pixels.
+		width: { type: 'number' },
+	},
+	supports: metadata.supports,
+	isEligible: ( attributes ) => typeof attributes.width === 'number',
+	migrate: ( { width, ...attributes } ) => ( {
+		...attributes,
+		width: `${ width }px`,
+	} ),
+};
+```
+
+An attribute-only deprecation never matches markup. It is applied when `isEligible` returns `true` and the markup the current `save` function generates from the migrated attributes preserves the stored content (any validation level but invalid — see `allowsReconstruction` in [Block Registration](/docs/reference-guides/block-api/block-registration.md)). Without a `save` function nothing ties the stored markup to the deprecated attributes, so the check happens on the result: this is what lets such a deprecation rescue a block the current block type parses as invalid, when its `attributes` still source from the markup something the current ones read from the delimiter, and what rejects an `isEligible` that opted in wrongly. When it applies, the block is parsed again through the deprecation's `attributes`, `migrate` runs, and the markup is produced by the current `save` function from the migrated attributes. Old versions whose markup cannot be regenerated, for example because content moved into inner blocks, still need a `save` function.
+
+`isEligible` receives the raw delimiter attributes, so it can detect an old attribute shape directly; when the old version can only be recognized from its markup, `data.block.originalContent` holds the stored markup. As with any deprecation, declare `supports` (typically the block's current ones) so that the attributes provided by block supports, such as `style` or `anchor`, are kept when the block is parsed again.
 
 ## Changing the attributes set
 
