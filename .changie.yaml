@@ -20,12 +20,20 @@ newlines:
     afterChange: 1
     endOfVersion: 1
 
+# Custom choices prompted during fragment creation.
+# We prompt for the Gutenberg Pull Request number to link PRs in changelog output.
 custom:
     - key: PR
       label: Gutenberg Pull Request Number
       type: int
       minInt: 1
 
+# Kinds match Gutenberg's canonical changelog subsections and ordering.
+# 'auto' specifies the semver increment level.
+# Go templates are used for 'Stable Release' and 'Breaking Changes':
+# - Pre-1.0 packages (signaled via GUTENBERG_PRE_1="true"): breaking changes bump minor,
+#   while a 'Stable Release' entry bumps major to promote to 1.0.0.
+# - Stable packages (>=1.0): breaking changes bump major as usual.
 kinds:
     - label: Stable Release
       auto: '{{if eq .Env.PRE_1 "true"}}major{{else}}patch{{end}}'
