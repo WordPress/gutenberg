@@ -1,6 +1,5 @@
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import * as globalStyles from './components/global-styles';
-import { getBlockTypesForElement } from './components/global-styles/inherited-value-context';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock, unlock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
@@ -91,7 +90,6 @@ const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
-	getBlockTypesForElement,
 	PrivateBlockInspectorEditOriginal,
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,

@@ -10981,6 +10981,11 @@
 			"count": 1
 		}
 	},
+	"packages/global-styles-ui/src/element-block-overrides.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/global-styles-ui/src/font-families.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -11209,6 +11214,14 @@
 	},
 	"packages/global-styles-ui/src/subtitle.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/test/element-block-overrides.jsdom.test.jsx": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
