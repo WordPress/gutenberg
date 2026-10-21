@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Enhancements
 
 -   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2 ([#46510](https://github.com/WordPress/gutenberg/pull/46510)).

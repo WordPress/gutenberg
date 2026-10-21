@@ -83,10 +83,48 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	if (
+		config.mariadbVersion !== undefined &&
+		config.mariadbVersion !== null
+	) {
+		checkMariaDBVersion(
+			'.wp-env.json',
+			`${ envPrefix }mariadbVersion`,
+			config.mariadbVersion
+		);
+	}
+
 	return config;
+}
+
+/**
+ * Validates a MariaDB version and throws if it isn't valid. Accepts the
+ * "lts" and "latest" image tags or a numeric version such as "10.11".
+ *
+ * @param {string} source    Where the value came from, for the error message.
+ * @param {string} configKey The configuration key we're validating.
+ * @param {string} version   The version that we're checking.
+ */
+function checkMariaDBVersion( source, configKey, version ) {
+	if ( typeof version !== 'string' ) {
+		throw new ValidationError(
+			`Invalid ${ source }: "${ configKey }" must be a string.`
+		);
+	}
+
+	if ( version === 'lts' || version === 'latest' ) {
+		return;
+	}
+
+	if ( ! /^[0-9]+(?:\.[0-9]+)*$/.test( version ) ) {
+		throw new ValidationError(
+			`Invalid ${ source }: "${ configKey }" must be "lts", "latest", or a version such as "10.11" or "11.4.2".`
+		);
+	}
 }
 
 module.exports = {
 	validateConfig,
+	checkMariaDBVersion,
 	ValidationError,
 };
