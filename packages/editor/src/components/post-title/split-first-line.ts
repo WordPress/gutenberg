@@ -1,8 +1,8 @@
 /**
  * Splits pasted plain text into the line that fits in the title and the lines
  * after it, which become blocks. Blank lines before the text and line breaks
- * after it are not content, so a paste of a single line followed by its line
- * break has no remainder.
+ * after it are not content (the Markdown converter drops them too), so a
+ * paste of a single line followed by its line break has no remainder.
  *
  * @param text The pasted plain text.
  *

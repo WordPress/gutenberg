@@ -134,6 +134,9 @@ function isPlainClipboardContent( HTML: string, plainText: string ): boolean {
  * text field keep such a paste verbatim: the Markdown conversion consumes
  * characters like `#` or `**` that the field has no formatting to carry.
  *
+ * Answers `false` for any serialised blocks, while the handler still falls
+ * back to the plain text path when they parse to a single freeform block.
+ *
  * @param options
  * @param options.HTML      The HTML as read from the clipboard.
  * @param options.plainText The plain text as read from the clipboard.
