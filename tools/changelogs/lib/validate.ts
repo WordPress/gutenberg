@@ -27,7 +27,10 @@ export function validateFragment(
 	}
 
 	const config = loadChangieConfig( repoRoot );
-	const allowedKinds = ( config.kinds || [] ).map( ( k ) => k.label );
+	const allowedKinds = [
+		'Stable Release',
+		...( config.kinds || [] ).map( ( k ) => k.label ),
+	];
 	const allowedProjects = ( config.projects || [] ).map( ( p ) => p.key );
 
 	if ( ! parsed.project ) {
