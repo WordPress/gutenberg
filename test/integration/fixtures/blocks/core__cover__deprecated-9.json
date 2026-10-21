@@ -9,6 +9,7 @@
 			"isRepeated": false,
 			"dimRatio": 100,
 			"overlayColor": "primary",
+			"isUserOverlayColor": true,
 			"backgroundType": "image",
 			"minHeightUnit": "%",
 			"isDark": true,

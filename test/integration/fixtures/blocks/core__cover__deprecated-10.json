@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"url": "https://w.wiki/59Sd",
+			"useFeaturedImage": false,
 			"id": 609,
 			"alt": "",
 			"hasParallax": false,
@@ -11,8 +12,15 @@
 			"dimRatio": 50,
 			"backgroundType": "image",
 			"isDark": true,
-			"useFeaturedImage": false,
-			"tagName": "div"
+			"tagName": "div",
+			"allowedVideoProviders": [
+				"youtube",
+				"vimeo",
+				"videopress",
+				"animoto",
+				"tiktok",
+				"wordpress-tv"
+			]
 		},
 		"innerBlocks": [
 			{
