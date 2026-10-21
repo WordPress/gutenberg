@@ -503,6 +503,11 @@
 		"collections": [ "core-admin" ]
 	},
 	{
+		"slug": "database",
+		"label": "Database",
+		"filePath": "library/database.svg"
+	},
+	{
 		"slug": "desktop",
 		"label": "Desktop",
 		"filePath": "library/desktop.svg",

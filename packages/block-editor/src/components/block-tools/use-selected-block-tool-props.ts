@@ -1,0 +1,60 @@
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '../../store';
+
+/**
+ * Returns props for the selected block tools and empty block inserter.
+ *
+ * @param clientId Selected block client ID.
+ */
+export default function useSelectedBlockToolProps( clientId: string ) {
+	const selectedBlockProps = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockParents,
+				__experimentalGetBlockListSettingsForBlocks,
+				isBlockInsertionPointVisible,
+				getBlockInsertionPoint,
+				getBlockOrder,
+				hasMultiSelection,
+				getLastMultiSelectedBlockClientId,
+			} = select( blockEditorStore );
+
+			const blockParentsClientIds = getBlockParents( clientId );
+
+			// Get Block List Settings for all ancestors of the current Block clientId.
+			const parentBlockListSettings =
+				__experimentalGetBlockListSettingsForBlocks(
+					blockParentsClientIds
+				);
+
+			// Get the clientId of the topmost parent with the capture toolbars setting.
+			const capturingClientId = blockParentsClientIds.find(
+				( parentClientId ) =>
+					parentBlockListSettings[ parentClientId ]
+						?.__experimentalCaptureToolbars
+			);
+
+			let isInsertionPointVisible = false;
+			if ( isBlockInsertionPointVisible() ) {
+				const insertionPoint = getBlockInsertionPoint();
+				const order = getBlockOrder( insertionPoint.rootClientId );
+				isInsertionPointVisible =
+					// A visible insertion point has an index.
+					order[ insertionPoint.index as number ] === clientId;
+			}
+
+			return {
+				capturingClientId,
+				isInsertionPointVisible,
+				lastClientId: hasMultiSelection()
+					? getLastMultiSelectedBlockClientId()
+					: null,
+				rootClientId: getBlockRootClientId( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	return selectedBlockProps;
+}

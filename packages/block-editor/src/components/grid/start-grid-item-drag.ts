@@ -172,9 +172,11 @@ const pointerDragListeners = new Set< GridItemPointerDragListener >();
  */
 export function subscribeToGridItemPointerDrag(
 	listener: GridItemPointerDragListener
-) {
+): () => void {
 	pointerDragListeners.add( listener );
-	return () => pointerDragListeners.delete( listener );
+	return () => {
+		pointerDragListeners.delete( listener );
+	};
 }
 
 /**
