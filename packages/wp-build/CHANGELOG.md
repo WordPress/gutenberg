@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Run at most half as many esbuild builds at once as there are available CPU cores, which lowers peak build memory.
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes
