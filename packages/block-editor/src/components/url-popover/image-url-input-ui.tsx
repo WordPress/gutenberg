@@ -25,6 +25,7 @@ import {
 	linkOff,
 } from '@wordpress/icons';
 import { prependHTTPS } from '@wordpress/url';
+import { Text } from '@wordpress/ui';
 import type { FormEvent, ReactNode, RefObject, SyntheticEvent } from 'react';
 import URLPopover from './index';
 import type { ImageLinkDestination, ImageURLInputUIProps } from './types';
@@ -274,10 +275,16 @@ const ImageURLInputUI = ( {
 				<div className="block-editor-url-popover__expand-on-click">
 					<Icon icon={ fullscreen } />
 					<div className="text">
-						<p>{ __( 'Enlarge on click' ) }</p>
-						<p className="description">
+						<Text render={ <p /> }>
+							{ __( 'Enlarge on click' ) }
+						</Text>
+						<Text
+							variant="body-sm"
+							render={ <p /> }
+							className="description"
+						>
 							{ __( 'Scales the image with a lightbox effect' ) }
-						</p>
+						</Text>
 					</div>
 					<Button
 						icon={ linkOff }
