@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Style revisions: Add a header to the revisions canvas that names the selected revision and the current version, with a Visual / Code toggle. The Code view shows what changed in the styles and settings since the selected revision, as a line diff ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
