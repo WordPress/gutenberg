@@ -3,6 +3,7 @@ import { getRotateForState, getUpdatedRotateStyle } from '../../hooks/rotate';
 import type { BlockStyleState } from '../../hooks/types';
 import type { Layout } from '../../layouts/types';
 import type { BlockVisibility } from '../block-visibility/use-block-visibility';
+import type { GridItemBox } from './free-placement';
 
 const MOBILE_VIEWPORT = '@mobile';
 const MOBILE_STATE: BlockStyleState = { viewport: MOBILE_VIEWPORT };
@@ -17,6 +18,8 @@ export interface GridStyleLayout {
 	columnSpan?: number;
 	rowStart?: number;
 	rowSpan?: number;
+	/** Where a block placed freely in a manual grid is inside its cells. */
+	box?: GridItemBox;
 	columnCount?: number | null;
 	rowCount?: number | null;
 	isManualPlacement?: boolean | null;

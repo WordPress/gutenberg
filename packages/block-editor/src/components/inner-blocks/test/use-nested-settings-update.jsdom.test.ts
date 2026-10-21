@@ -32,9 +32,6 @@ async function getSettings( {
 		() =>
 			useNestedSettingsUpdate(
 				'container',
-				// The hook's JSDoc marks every argument as required, but it
-				// takes `undefined` for those a block doesn't set.
-				// @ts-expect-error The arguments are optional in practice.
 				undefined,
 				undefined,
 				undefined,
