@@ -1,0 +1,6 @@
+project: ui
+kind: Enhancements
+body: '`Button`, `IconButton`: Use the shared `Spinner` for loading indicators'
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84321'

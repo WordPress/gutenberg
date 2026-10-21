@@ -1,92 +1,5 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-## Unreleased
-
-### Breaking Changes
-
--   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
-
-### New Features
-
--   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
--   `Notice.List`: Add announcements for added and changed notices, excluding hidden content, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
-
-### Enhancements
-
--   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. Spinners at the default size are now thinner, and large spinners are thicker ([#85378](https://github.com/WordPress/gutenberg/pull/85378)).
--   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items and their supporting content ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
--   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
-
-### Bug Fixes
-
--   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
--   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
-
-### Documentation
-
--   `Notice`: Add a Storybook example with native details and a text button to copy the error message and details ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).
-
-## 0.25.0 (2026-10-20)
-
-### Breaking Changes
-
--   `SearchableSelect` and `SearchableSelectControl`: Remove `triggerContent`. Pass custom content as children of a `.Trigger` element through the `trigger` prop instead ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
--   `Link`: Styled links with a new-tab indicator now wrap their content in a span. Update flex/grid compositions and direct-child selectors that rely on the content being a direct child of the anchor, and review anchor-level underline overrides ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
--   `SelectControl`: Remove the `triggerContent` prop. Pass custom content as children of a `SelectControl.Trigger` element through the `trigger` prop instead ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
--   `Select`, `Autocomplete`, `Combobox`, and the select controls: `actionsRef` no longer keeps closed popups mounted. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then `actionsRef.current?.unmount()` when the animation ends. Close through `actionsRef.current?.close()` to run that handler. Automatic CSS exit animations need no migration. See [Base UI's migration guide](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
--   The `actionsRef` types for these components now require `close()`. Add it to manually constructed action objects and ref stubs. See [Base UI #5734](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
--   `Autocomplete`, `Combobox`, and the searchable selects and controls: `onItemHighlighted` now receives native events. Accept `MouseEvent | PointerEvent` for pointer highlights, handle `none` when typing or clearing and `pointer` when hovering after keyboard navigation, and avoid canceling or stopping the event unless intended. See [Base UI #5838](https://github.com/mui/base-ui/pull/5838) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
--   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
-### New Features
-
--   `Avatar`: Add `Avatar.Initials` using the first and last words with complete Unicode characters, and a borderless person icon as the default fallback ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
--   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
--   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
-
-### Enhancements
-
--   `SearchableSelect` and `SearchableSelectControl`: Add a `trigger` slot and `.Trigger` subcomponents for customizing trigger props ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
--   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
--   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
--   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
--   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
--   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
--   `Dialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84379](https://github.com/WordPress/gutenberg/pull/84379)).
--   `Drawer`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84380](https://github.com/WordPress/gutenberg/pull/84380)).
--   `Dialog`: Add an opt-in `auto` popup size that fits content within the responsive minimum and viewport inset ([#84559](https://github.com/WordPress/gutenberg/pull/84559)).
--   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
--   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
--   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
-
-### Bug Fixes
-
--   `Avatar`: Use the strong neutral stroke color for the person fallback to provide sufficient non-text contrast ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
--   `Tabs`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
--   Keep the `Link` new-tab indicator with the preceding text when wrapping ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
--   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
--   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
--   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, preserve custom fallback rendering, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
--   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
--   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
--   `Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
--   `Notice`: Tint controls and their focus rings with the notice intent color and preserve title colors when composed with `Text` ([#84571](https://github.com/WordPress/gutenberg/pull/84571)).
--   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
--   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
--   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
-
-### Internal
-
--   Update `@testing-library/user-event` to 14.6.8 for UI tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
--   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
-
-### Documentation
-
--   Clarify that badges should not be interactive in the usage guidelines ([#84920](https://github.com/WordPress/gutenberg/pull/84920)).
--   `Tabs`: Preserve intrinsic icon styles in the tab icons and tooltips story ([#84618](https://github.com/WordPress/gutenberg/pull/84618)).
--   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
--   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
--   `Menu`: Clarify icon and description usage, document mixed icon alignment and current layout defaults, and favor short, clear labels ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).
 
 ## 0.24.0 (2026-10-07)
 
@@ -150,6 +63,7 @@
 -   `Progress`: Document migration from `ProgressBar`, layout width, and custom value content ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Menu`: Explain when to disable triggers and items ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
+
 ## 0.23.0 (2026-09-23)
 
 ### Breaking Changes
@@ -193,6 +107,7 @@
 -   Update `@base-ui/react` from 1.7.0 to 1.8.0 ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Run UI interaction tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 -   `VisuallyHidden`: Replace deprecated `word-wrap` with `overflow-wrap` and remove related Stylelint suppression ([#82970](https://github.com/WordPress/gutenberg/pull/82970)).
+
 
 ## 0.22.0 (2026-09-10)
 
@@ -252,6 +167,7 @@
 -   `AlertDialog`: Move confirmation lifecycle state to a private external store so event handlers and React renders read the same synchronous snapshot. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
 -   Use stable event callbacks and remove the remaining `react-hooks/refs` ESLint suppressions. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
 -   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
+
 
 ## 0.21.0 (2026-08-26)
 
@@ -313,6 +229,7 @@
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   Remove unused `outset-ring--focus-within-visible` CSS module class. ([#82077](https://github.com/WordPress/gutenberg/pull/82077))
 
+
 ## 0.20.0 (2026-08-12)
 
 ### Breaking Changes
@@ -337,6 +254,7 @@
 -   Refactor shared focus utilities to use the `outset-ring__focus()` mixin from `@wordpress/base-styles` ([#80635](https://github.com/WordPress/gutenberg/pull/80635)).
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
 
+
 ## 0.19.0 (2026-07-29)
 
 ### Enhancements
@@ -360,6 +278,7 @@
 
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   Use keyed children arrays instead of Fragments in Storybook stories so Show code examples omit `Fragment` wrappers ([#80352](https://github.com/WordPress/gutenberg/pull/80352)).
+
 
 ## 0.18.0 (2026-07-14)
 
@@ -393,13 +312,16 @@
 -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
 -   Update `--wp-ui-button-padding-block` CSS property to avoid using unitless values, which are incompatible when used in `calc` math functions ([#79786](https://github.com/WordPress/gutenberg/pull/79786)).
 
+
 ## 0.17.0 (2026-07-01)
+
 
 ## 0.16.1 (2026-06-30)
 
 ### Internal
 
 -   Add a temporary `@wordpress/theme` `ThemeProvider` compatibility fallback for older WordPress runtimes ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+
 
 ## 0.16.0 (2026-06-24)
 
@@ -431,7 +353,9 @@
 
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 
+
 ## 0.15.1 (2026-06-16)
+
 
 ## 0.15.0 (2026-06-10)
 
@@ -459,6 +383,7 @@
 ### Internal
 
 -   Update `@base-ui/react` from `1.4.1` to [`1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
+
 
 ## 0.14.0 (2026-05-27)
 
@@ -488,6 +413,7 @@
 -   `Autocomplete`: Disable the clear button when the autocomplete is disabled, and hide it from assistive technologies ([#78520](https://github.com/WordPress/gutenberg/pull/78520)).
 -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
 -   Stretch the compat overlay slot to viewport size so portaled popups stop collapsing to their min-content width — most visible on long-text tooltips, which wrapped to one word per line ([#78441](https://github.com/WordPress/gutenberg/pull/78441)).
+
 
 ## 0.13.0 (2026-05-14)
 
@@ -535,6 +461,7 @@
 -   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
 -   Add internal `getWpCompatOverlaySlot()` helper and a co-located unlayered CSS module that lazily provide a body-level `[data-wp-compat-overlay-slot]` container at z-index `1000000003`, gated by `useEnableWpCompatOverlaySlot()` and by auto-detection of `window.wp.components` ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
 
+
 ## 0.12.0 (2026-04-29)
 
 ### Breaking Changes
@@ -580,6 +507,7 @@
 -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
 
+
 ## 0.11.0 (2026-04-15)
 
 ### Breaking Changes
@@ -619,6 +547,7 @@
 -   `Notice.ActionLink`: Use `Text` component for typography ([#77332](https://github.com/WordPress/gutenberg/pull/77332)).
 -   Update `@base-ui/react` from `1.3.0` to `1.4.0` ([#77308](https://github.com/WordPress/gutenberg/pull/77308)).
 
+
 ## 0.10.0 (2026-04-01)
 
 ### New Features
@@ -646,6 +575,7 @@
 ### TypeScript
 
 -   Remove `NoticeIntent` type from package exports ([#76791](https://github.com/WordPress/gutenberg/pull/76791)).
+
 
 ## 0.9.0 (2026-03-18)
 
@@ -677,6 +607,7 @@
 
 -   Update `@base-ui/react` from 1.2.0 to [1.3.0](https://github.com/mui/base-ui/blob/master/CHANGELOG.md#v130) ([#76603](https://github.com/WordPress/gutenberg/pull/76603)).
 
+
 ## 0.8.0 (2026-03-04)
 
 ### Breaking Changes
@@ -701,6 +632,7 @@
 
 -   Update `@base-ui/react` from 1.0.0 to 1.2.0 ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
 -   `Input`: Align ref type with upstream widening to `HTMLElement` ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
+
 
 ## 0.7.0 (2026-02-18)
 
@@ -730,11 +662,13 @@
 -   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
 -   `Button`: Fix overriding of internal CSS variables ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
 
+
 ## 0.6.0 (2026-01-29)
 
 ### New Features
 
 -   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
+
 
 ## 0.5.0 (2026-01-16)
 
@@ -752,3 +686,4 @@
 -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
 -   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
 -   Add `Input` primitive ([#74615](https://github.com/WordPress/gutenberg/pull/74615)).
+

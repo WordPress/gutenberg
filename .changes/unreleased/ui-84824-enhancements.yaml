@@ -1,0 +1,6 @@
+project: ui
+kind: Enhancements
+body: '`Avatar`: Use `color` for fallback backgrounds with contrasting text and icons'
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84824'

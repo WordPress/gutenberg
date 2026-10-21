@@ -44,4 +44,10 @@ kinds:
     - label: Documentation
       auto: patch
 
-projects: []
+projects:
+    - label: Components
+      key: components
+      changelog: packages/components/CHANGELOG.md
+    - label: UI
+      key: ui
+      changelog: packages/ui/CHANGELOG.md

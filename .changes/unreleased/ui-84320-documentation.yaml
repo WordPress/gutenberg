@@ -1,0 +1,8 @@
+project: ui
+kind: Documentation
+body: >-
+    Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect,
+    and SearchableChipSelect
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84320'

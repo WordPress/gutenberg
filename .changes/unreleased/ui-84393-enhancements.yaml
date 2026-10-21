@@ -1,0 +1,9 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup
+    item spacing, use 16px selection indicators, and align group labels and
+    separators with item content
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84393'

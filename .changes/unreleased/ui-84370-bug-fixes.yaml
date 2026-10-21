@@ -1,0 +1,9 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`:
+    Preserve an explicit null portal container so popup content waits until its
+    target is available
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84370'
