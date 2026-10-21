@@ -95,14 +95,22 @@ test.describe( 'Convert to canvas', () => {
 			[ 'core/image', [] ],
 		] );
 		const [ text, image ] = canvas.innerBlocks;
-		const { columnCount } = canvas.attributes.layout;
+		// Block attributes come back from the editor untyped.
+		type GridItemLayout = { columnStart: number; columnSpan: number };
+		const { columnCount } = canvas.attributes.layout as {
+			columnCount: number;
+		};
 		expect( text.attributes.layout ).toMatchObject( {
 			type: 'flex',
 			orientation: 'vertical',
 			verticalAlignment: 'center',
 		} );
-		const textLayout = text.attributes.style.layout;
-		const imageLayout = image.attributes.style.layout;
+		const textLayout = (
+			text.attributes.style as { layout: GridItemLayout }
+		 ).layout;
+		const imageLayout = (
+			image.attributes.style as { layout: GridItemLayout }
+		 ).layout;
 		// Side by side, and as far from the edges as the wide Columns were.
 		expect( textLayout.columnStart + textLayout.columnSpan ).toBe(
 			imageLayout.columnStart
