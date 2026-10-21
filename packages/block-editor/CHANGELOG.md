@@ -128,6 +128,7 @@
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
 -   Block Switcher: Show the pattern previews' focus and hover rings with the design system's outline instead of a legacy box-shadow ([#83933](https://github.com/WordPress/gutenberg/pull/83933)).
+-   Block visibility: While the "Show hidden blocks" preference is on, blocks that visibility rules hide render dimmed in the canvas with the `is-block-ghosted` class instead of being removed and stay editable. The block toolbar's visibility button, List View and the accessible name of a ghosted block state why it is hidden ("Omitted from published content", "Hidden on mobile") ([#80439](https://github.com/WordPress/gutenberg/pull/80439)).
 
 ### Bug Fixes
 
