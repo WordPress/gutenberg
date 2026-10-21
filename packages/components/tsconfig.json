@@ -9,7 +9,7 @@
 			"style-imports"
 		]
 	},
-	"files": [ "global.d.ts", "src/popover/stories/utils.tsx" ],
+	"files": [ "global.d.ts" ],
 	"include": [
 		"src/**/test/**/*.ts",
 		"src/**/test/**/*.tsx",
