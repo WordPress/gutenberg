@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getGridChildUpdates } from '../use-update-grid-child-layout';
+import type { GridChildStyleChange } from '../use-update-grid-child-layout';
 
 const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
 const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
 const TABLET_STATE = { viewport: '@tablet', pseudo: 'default' };
 
 describe( 'getGridChildUpdates()', () => {
-	let originalExperiment;
+	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
 		originalExperiment = window.__experimentalEnableGridInteractivity;
 		window.__experimentalEnableGridInteractivity = true;
@@ -37,7 +38,14 @@ describe( 'getGridChildUpdates()', () => {
 		},
 	];
 
-	function getUpdates( options ) {
+	type GridChildUpdatesOptions = Parameters<
+		typeof getGridChildUpdates
+	>[ 0 ];
+
+	function getUpdates(
+		options: Pick< GridChildUpdatesOptions, 'change' | 'selectedState' > &
+			Partial< GridChildUpdatesOptions >
+	) {
 		return getGridChildUpdates( {
 			clientId: 'b',
 			style: children[ 1 ].attributes.style,
@@ -92,19 +100,19 @@ describe( 'getGridChildUpdates()', () => {
 			change: { columnSpan: 2 },
 			selectedState: MOBILE_STATE,
 		} );
-		expect( updates.a.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.a.style?.[ '@mobile' ]?.layout ).toEqual( {
 			columnStart: 1,
 			columnSpan: 3,
 			rowStart: 1,
 			rowSpan: 2,
 		} );
-		expect( updates.b.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.b.style?.[ '@mobile' ]?.layout ).toEqual( {
 			columnStart: 1,
 			columnSpan: 2,
 			rowStart: 3,
 			rowSpan: 1,
 		} );
-		expect( updates.grid.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.grid.style?.[ '@mobile' ]?.layout ).toEqual( {
 			stackOnMobile: false,
 			columnCount: 3,
 			rowCount: 3,
@@ -116,7 +124,7 @@ describe( 'getGridChildUpdates()', () => {
 			change: { rowSpan: 2 },
 			selectedState: MOBILE_STATE,
 		} );
-		expect( updates.grid.style[ '@mobile' ].layout ).toEqual( {
+		expect( updates.grid.style?.[ '@mobile' ]?.layout ).toEqual( {
 			stackOnMobile: false,
 			columnCount: 3,
 			rowCount: 4,
@@ -124,12 +132,15 @@ describe( 'getGridChildUpdates()', () => {
 	} );
 
 	it( 'applies a style function with the grid as it is after unstacking', () => {
-		const change = vi.fn( ( style ) => ( { ...style, marker: true } ) );
+		const change = vi.fn< GridChildStyleChange >( ( style ) => ( {
+			...style,
+			marker: true,
+		} ) );
 		const updates = getUpdates( { change, selectedState: MOBILE_STATE } );
 
 		const [ childStyle, selectedState, gridAttributes ] =
 			change.mock.calls[ 0 ];
-		expect( childStyle[ '@mobile' ].layout ).toEqual( {
+		expect( childStyle?.[ '@mobile' ]?.layout ).toEqual( {
 			columnStart: 1,
 			columnSpan: 3,
 			rowStart: 3,
@@ -137,8 +148,7 @@ describe( 'getGridChildUpdates()', () => {
 		} );
 		expect( selectedState ).toBe( MOBILE_STATE );
 		expect( gridAttributes.layout ).toBe( manualGrid.layout );
-		const { '@mobile': gridMobileStyle } = gridAttributes.style;
-		expect( gridMobileStyle.layout ).toEqual( {
+		expect( gridAttributes.style?.[ '@mobile' ]?.layout ).toEqual( {
 			stackOnMobile: false,
 			columnCount: 3,
 			rowCount: 3,
