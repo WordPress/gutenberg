@@ -9,16 +9,16 @@ fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind}}__{{.Time.Format "20
 envPrefix: 'GUTENBERG_'
 
 newlines:
-    afterChangelogHeader: 1
+    afterChangelogHeader: 0
     beforeChangelogVersion: 1
-    afterChangelogVersion: 1
-    beforeVersion: 1
-    afterVersion: 1
+    afterChangelogVersion: 0
+    beforeVersion: 0
+    afterVersion: 0
     beforeKind: 1
     afterKind: 1
     beforeChange: 0
     afterChange: 0
-    endOfVersion: 1
+    endOfVersion: 0
 
 # Custom choices prompted during fragment creation.
 # We prompt for the Gutenberg Pull Request number to link PRs in changelog output.
