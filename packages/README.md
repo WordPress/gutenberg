@@ -276,11 +276,15 @@ To check which authoring workflow a package uses, inspect `projects` in `.changi
 -   If the package is listed under `projects` (for example, `@wordpress/components` or `@wordpress/ui`), follow [Automated authoring (via Changie)](#automated-authoring-via-changie).
 -   Otherwise, follow [Manual authoring](#manual-authoring).
 
+<<<<<<< HEAD
 ### Writing concise entries
 
 -   Prefer one short sentence naming the affected API or component and what changed for consumers.
 -   Omit descriptions of behavior that remains unchanged and internal implementation details. Avoid repeating the same change across subsections.
 -   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
+=======
+Package maintainers who want to onboard another package to Changie can refer to the migration guide in [`tools/changelogs/README.md`](../tools/changelogs/README.md).
+>>>>>>> ba7013822 (Docs(Changelog Tools): add guide for migrating and rolling back packages)
 
 ### Automated authoring (via Changie)
 
