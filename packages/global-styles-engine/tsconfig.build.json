@@ -9,6 +9,6 @@
 		{ "path": "../data" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../style-engine" }
+		{ "path": "../style-engine/tsconfig.build.json" }
 	]
 }

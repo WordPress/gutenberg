@@ -35,7 +35,7 @@
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../rich-text" },
-		{ "path": "../style-engine" },
+		{ "path": "../style-engine/tsconfig.build.json" },
 		{ "path": "../token-list/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url/tsconfig.build.json" },

@@ -3,7 +3,13 @@ import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {
 	it( 'should generate empty style', () => {
-		expect( compileCSS( {}, '.some-selector' ) ).toEqual( '' );
+		expect(
+			compileCSS(
+				{},
+				// @ts-expect-error Empty styles return no output even with invalid string options.
+				'.some-selector'
+			)
+		).toEqual( '' );
 	} );
 
 	it( 'should generate empty style with empty keys', () => {
@@ -174,7 +180,13 @@ describe( 'generate', () => {
 
 describe( 'getCSSRules', () => {
 	it( 'should return an empty rules array', () => {
-		expect( getCSSRules( {}, '.some-selector' ) ).toEqual( [] );
+		expect(
+			getCSSRules(
+				{},
+				// @ts-expect-error Empty styles return no output even with invalid string options.
+				'.some-selector'
+			)
+		).toEqual( [] );
 	} );
 
 	it( 'should ignore unsupported styles', () => {
@@ -182,6 +194,7 @@ describe( 'getCSSRules', () => {
 			getCSSRules(
 				{
 					typography: {
+						// @ts-expect-error Test that unsupported typography properties are ignored.
 						fontVariantLigatures: 'no-common-ligatures',
 					},
 					spacing: { padding: '10px' },
