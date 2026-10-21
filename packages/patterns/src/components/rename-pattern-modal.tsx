@@ -6,6 +6,9 @@ import { useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import type { FormEvent } from 'react';
+import type { RestError } from '../types';
+import type { RenamePatternModalProps } from './types';
 
 export default function RenamePatternModal( {
 	onClose,
@@ -13,7 +16,7 @@ export default function RenamePatternModal( {
 	onSuccess,
 	pattern,
 	...props
-} ) {
+}: RenamePatternModalProps ) {
 	const originalName = decodeEntities( pattern.title );
 	const [ name, setName ] = useState( originalName );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -26,7 +29,7 @@ export default function RenamePatternModal( {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const onRename = async ( event ) => {
+	const onRename = async ( event: FormEvent ) => {
 		event.preventDefault();
 
 		if ( ! name || name === pattern.title || isSaving ) {
@@ -59,9 +62,11 @@ export default function RenamePatternModal( {
 		} catch ( error ) {
 			onError?.();
 
+			// A REST API error is a plain object, not an `Error`.
+			const restError = error as RestError;
 			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
+				restError.message && restError.code !== 'unknown_error'
+					? restError.message
 					: __( 'An error occurred while renaming the pattern.' );
 
 			createErrorNotice( errorMessage, {

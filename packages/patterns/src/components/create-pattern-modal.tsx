@@ -19,12 +19,16 @@ import { store as patternsStore } from '../store';
 import CategorySelector from './category-selector';
 import { useAddPatternCategory } from '../private-hooks';
 import { unlock } from '../lock-unlock';
+import type {
+	CreatePatternModalContentsProps,
+	CreatePatternModalProps,
+} from './types';
 
 export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
 	modalTitle,
 	...restProps
-} ) {
+}: CreatePatternModalProps ) {
 	const defaultModalTitle = useSelect(
 		( select ) =>
 			select( coreStore ).getPostType( PATTERN_TYPES.user )?.labels
@@ -53,9 +57,10 @@ export function CreatePatternModalContents( {
 	onSuccess,
 	defaultSyncType = PATTERN_SYNC_TYPES.full,
 	defaultTitle = '',
-} ) {
+}: CreatePatternModalContentsProps ) {
 	const [ syncType, setSyncType ] = useState( defaultSyncType );
-	const [ categoryTerms, setCategoryTerms ] = useState( defaultCategories );
+	const [ categoryTerms, setCategoryTerms ] =
+		useState< Array< string > >( defaultCategories );
 	const [ title, setTitle ] = useState( defaultTitle );
 
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -64,7 +69,7 @@ export function CreatePatternModalContents( {
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 
-	async function onCreate( patternTitle, sync ) {
+	async function onCreate( patternTitle: string, sync: string ) {
 		if ( ! title || isSaving ) {
 			return;
 		}
@@ -88,7 +93,8 @@ export function CreatePatternModalContents( {
 				categoryId: PATTERN_DEFAULT_CATEGORY,
 			} );
 		} catch ( error ) {
-			createErrorNotice( error.message, {
+			// Save failures reject with an object that carries a `message`.
+			createErrorNotice( ( error as Error ).message, {
 				type: 'snackbar',
 				id: 'pattern-create',
 			} );

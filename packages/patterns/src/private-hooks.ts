@@ -2,6 +2,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { CATEGORY_SLUG } from './components/category-selector';
+import type {
+	PatternCategoryEntry,
+	PatternCategoryMap,
+	TermExistsError,
+} from './types';
 
 /**
  * Helper hook that creates a Map with the core and user patterns categories
@@ -9,9 +14,12 @@ import { CATEGORY_SLUG } from './components/category-selector';
  * categories when creating or importing patterns.
  * This hook also provides a function to find or create a pattern category.
  *
- * @return {Object} The merged categories map and the callback function to find or create a category.
+ * @return The merged categories map and the callback function to find or create a category.
  */
-export function useAddPatternCategory() {
+export function useAddPatternCategory(): {
+	categoryMap: PatternCategoryMap;
+	findOrCreateTerm: ( term: string ) => Promise< number >;
+} {
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { corePatternCategories, userPatternCategories } = useSelect(
 		( select ) => {
@@ -27,7 +35,7 @@ export function useAddPatternCategory() {
 	);
 	const categoryMap = useMemo( () => {
 		// Merge the user and core pattern categories and remove any duplicates.
-		const uniqueCategories = new Map();
+		const uniqueCategories = new Map< string, PatternCategoryEntry >();
 		userPatternCategories.forEach( ( category ) => {
 			uniqueCategories.set( category.label.toLowerCase(), {
 				label: category.label,
@@ -52,7 +60,7 @@ export function useAddPatternCategory() {
 		return uniqueCategories;
 	}, [ userPatternCategories, corePatternCategories ] );
 
-	async function findOrCreateTerm( term ) {
+	async function findOrCreateTerm( term: string ): Promise< number > {
 		try {
 			const existingTerm = categoryMap.get( term.toLowerCase() );
 			if ( existingTerm?.id ) {
@@ -73,10 +81,12 @@ export function useAddPatternCategory() {
 			invalidateResolution( 'getUserPatternCategories' );
 			return newTerm.id;
 		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
+			// A REST API error is a plain object, not an `Error`.
+			if ( ( error as TermExistsError ).code !== 'term_exists' ) {
 				throw error;
 			}
-			return error.data.term_id;
+			// Checked above to be the error for an existing term.
+			return ( error as TermExistsError ).data.term_id;
 		}
 	}
 

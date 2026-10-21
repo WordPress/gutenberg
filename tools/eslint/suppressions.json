@@ -11279,34 +11279,14 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/allow-overrides-modal.jsx": {
+	"packages/patterns/src/components/allow-overrides-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/patterns/src/components/category-selector.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/create-pattern-modal.jsx": {
+	"packages/patterns/src/components/create-pattern-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/patterns/src/components/create-template-part-modal/index.tsx": {
@@ -11316,14 +11296,6 @@
 	},
 	"packages/patterns/src/components/create-template-part-modal/test/utils.jsdom.test.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/duplicate-pattern-modal.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -11370,25 +11342,13 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/rename-pattern-category-modal.jsx": {
+	"packages/patterns/src/components/rename-pattern-category-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
-	"packages/patterns/src/components/rename-pattern-modal.jsx": {
+	"packages/patterns/src/components/rename-pattern-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -11406,11 +11366,6 @@
 		}
 	},
 	"packages/patterns/src/private-apis.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/private-hooks.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

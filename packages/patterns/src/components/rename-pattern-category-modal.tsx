@@ -7,7 +7,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
+import type { FormEvent, RefObject } from 'react';
 import { CATEGORY_SLUG } from './category-selector';
+import type { RenamePatternCategoryModalProps } from './types';
 
 export default function RenamePatternCategoryModal( {
 	category,
@@ -16,12 +18,14 @@ export default function RenamePatternCategoryModal( {
 	onError,
 	onSuccess,
 	...props
-} ) {
+}: RenamePatternCategoryModalProps ) {
 	const id = useId();
-	const textControlRef = useRef();
+	const textControlRef = useRef< HTMLInputElement >( undefined );
 	const [ name, setName ] = useState( decodeEntities( category.name ) );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const [ validationMessage, setValidationMessage ] = useState( false );
+	const [ validationMessage, setValidationMessage ] = useState<
+		string | false | undefined
+	>( false );
 	const validationMessageId = validationMessage
 		? `patterns-rename-pattern-category-modal__validation-message-${ id }`
 		: undefined;
@@ -30,14 +34,14 @@ export default function RenamePatternCategoryModal( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const onChange = ( newName ) => {
+	const onChange = ( newName: string ) => {
 		if ( validationMessage ) {
 			setValidationMessage( undefined );
 		}
 		setName( newName );
 	};
 
-	const onSave = async ( event ) => {
+	const onSave = async ( event: FormEvent ) => {
 		event.preventDefault();
 
 		if ( isSaving ) {
@@ -99,7 +103,8 @@ export default function RenamePatternCategoryModal( {
 			} );
 		} catch ( error ) {
 			onError?.();
-			createErrorNotice( error.message, {
+			// Save failures reject with an object that carries a `message`.
+			createErrorNotice( ( error as Error ).message, {
 				type: 'snackbar',
 				id: 'pattern-category-update',
 			} );
@@ -124,7 +129,10 @@ export default function RenamePatternCategoryModal( {
 				<Stack direction="column" gap="lg">
 					<Stack direction="column" gap="sm">
 						<TextControl
-							ref={ textControlRef }
+							// React only assigns the input or `null` to the ref.
+							ref={
+								textControlRef as RefObject< HTMLInputElement | null >
+							}
 							label={ __( 'Name' ) }
 							value={ name }
 							onChange={ onChange }
