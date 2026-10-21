@@ -156,11 +156,20 @@ export function getRotatedOverlayStyle( {
 	};
 }
 
+/**
+ * A corner of a block in its own frame: `x` is -1 for its left edge and 1 for
+ * its right edge, and `y` is -1 for its top edge and 1 for its bottom edge.
+ */
+export interface Corner {
+	x: number;
+	y: number;
+}
+
 // Sines and cosines this close to 0 count as 0, so that the corners of a
 // level edge count as level.
 const EPSILON = 1e-9;
 
-function getSign( value ) {
+function getSign( value: number ): number {
 	if ( Math.abs( value ) < EPSILON ) {
 		return 0;
 	}
@@ -173,14 +182,13 @@ function getSign( value ) {
  * the right. The lowest corner only depends on the angle, not on the block's
  * size.
  *
- * @param {number} angle Rotation in degrees.
+ * @param angle Rotation in degrees.
  *
- * @return {{x: number, y: number}} The corner in the block's own frame: `x` is
- *                                  -1 for its left edge and 1 for its right
- *                                  edge, and `y` is -1 for its top edge and 1
- *                                  for its bottom edge.
+ * @return The corner in the block's own frame: `x` is -1 for its left edge and
+ *         1 for its right edge, and `y` is -1 for its top edge and 1 for its
+ *         bottom edge.
  */
-export function getLowestCorner( angle ) {
+export function getLowestCorner( angle: number ): Corner {
 	const radians = ( angle * Math.PI ) / 180;
 	const sin = getSign( Math.sin( radians ) );
 	const cos = getSign( Math.cos( radians ) );
@@ -207,15 +215,19 @@ export function getLowestCorner( angle ) {
  * and moves left by its own width, so that it is upright with its top-right
  * corner there.
  *
- * @param {number}                 angle  Rotation of the overlay in degrees.
- * @param {{x: number, y: number}} corner The corner, as returned by `getLowestCorner`.
- * @param {number}                 gap    Space between the corner and the element, in pixels.
+ * @param angle  Rotation of the overlay in degrees.
+ * @param corner The corner, as returned by `getLowestCorner`.
+ * @param gap    Space between the corner and the element, in pixels.
  *
- * @return {Object} Style properties for the element.
+ * @return Style properties for the element.
  */
-export function getCornerToolbarStyle( angle, corner, gap ) {
+export function getCornerToolbarStyle(
+	angle: number,
+	corner: Corner,
+	gap: number
+): CSSProperties {
 	const radians = ( angle * Math.PI ) / 180;
-	const round = ( value ) => Math.round( value * 10000 ) / 10000;
+	const round = ( value: number ) => Math.round( value * 10000 ) / 10000;
 	// The gap points down the screen, which is turned back by the block's
 	// angle in the overlay.
 	const gapX = round( Math.sin( radians ) * gap );
