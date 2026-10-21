@@ -362,11 +362,14 @@ export function setLastFocus( lastFocus: LastFocus | null | false = null ) {
 /**
  * Returns an action object used in signalling that the user has begun to drag.
  *
+ * @param blocks The blocks dragged from an inserter, which are inserted where
+ *               they are dropped. Omitted when the drag already started.
  * @return Action object.
  */
-export function startDragging() {
+export function startDragging( blocks?: Block[] ) {
 	return {
 		type: 'START_DRAGGING',
+		...( blocks && { blocks } ),
 	};
 }
 

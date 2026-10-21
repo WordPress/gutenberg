@@ -26,18 +26,36 @@ function getTracksSize( tracks, start, end ) {
 }
 
 /**
+ * Gets the most tracks a block inserted into a grid should take up along one
+ * axis: half of them, so that a minimum size never fills a small grid, and at
+ * least one.
+ *
+ * @param {number} count The number of tracks in the grid.
+ *
+ * @return {number} The most tracks to take up.
+ */
+export function getMaximumInsertionSpan( count ) {
+	return Math.max( 1, Math.floor( count / 2 ) );
+}
+
+/**
  * Grows a range of tracks until it is at least a minimum size in pixels: it
- * adds tracks after it, then, at the end of the grid, before it.
+ * adds tracks after it, then, at the end of the grid, before it. It stops
+ * growing at a maximum number of tracks.
  *
  * @param {Array<{start: number, end: number}>} tracks  The grid tracks.
  * @param {number}                              start   Index of the first track, starting at 1.
  * @param {number}                              end     Index of the last track, starting at 1.
  * @param {number}                              minimum The smallest size, in pixels.
+ * @param {number}                              maximum The most tracks.
  *
  * @return {[number, number]} The first and last track of the grown range.
  */
-function growTracks( tracks, start, end, minimum ) {
-	while ( getTracksSize( tracks, start, end ) < minimum ) {
+function growTracks( tracks, start, end, minimum, maximum ) {
+	while (
+		getTracksSize( tracks, start, end ) < minimum &&
+		end - start + 1 < maximum
+	) {
 		if ( end < tracks.length ) {
 			end++;
 		} else if ( start > 1 ) {
@@ -53,8 +71,8 @@ function growTracks( tracks, start, end, minimum ) {
  * Grows a range of cells, where a block is about to be inserted, until it is
  * at least a minimum width and height in pixels. It grows to the right and
  * down, then, at the edges of the grid, to the left and up. It covers other
- * blocks if it has to, but never grows past the grid's tracks, so in a small
- * grid it may stay smaller than the minimum. A range that is already big
+ * blocks if it has to, but never grows past half of the grid's tracks, so in a
+ * small grid it may stay smaller than the minimum. A range that is already big
  * enough is left as it is.
  *
  * @param {Object}                              options
@@ -83,13 +101,15 @@ export function getMinimumInsertionRect( {
 		columnTracks,
 		rect.columnStart,
 		rect.columnEnd,
-		minimumWidth
+		minimumWidth,
+		getMaximumInsertionSpan( columnTracks.length )
 	);
 	const [ rowStart, rowEnd ] = growTracks(
 		rowTracks,
 		rect.rowStart,
 		rect.rowEnd,
-		minimumHeight
+		minimumHeight,
+		getMaximumInsertionSpan( rowTracks.length )
 	);
 	return new GridRect( { columnStart, columnEnd, rowStart, rowEnd } );
 }
