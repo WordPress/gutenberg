@@ -1,0 +1,14 @@
+.snackbars:global(.components-snackbar-list) {
+	inset-block-start: auto;
+	inset-inline-end: 0;
+	inset-block-end: var(--wpds-dimension-padding-lg);
+	inset-inline-start: 0;
+	width: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.snackbars :global(.components-snackbar) {
+	margin-inline: auto;
+}
