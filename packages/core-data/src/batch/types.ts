@@ -5,7 +5,7 @@ export interface BatchRequest {
 	path: string;
 	data?: unknown;
 	method?: string;
-	headers?: Record< string, string >;
+	headers?: Record< string, string | Array< string > >;
 }
 
 /**
@@ -30,6 +30,14 @@ export type BatchProcessor< Input > = (
 export type BatchThunk< Input > = (
 	add: ( input: Input ) => Promise< unknown >
 ) => unknown;
+
+/**
+ * A batch, which combines the inputs added to it into one processor call.
+ */
+export interface Batch< Input > {
+	add: ( inputOrThunk: Input | BatchThunk< Input > ) => Promise< unknown >;
+	run: () => Promise< boolean >;
+}
 
 /**
  * The response to the preflight OPTIONS request to /batch/v1.

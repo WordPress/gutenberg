@@ -1,5 +1,6 @@
 import defaultProcessor from './default-processor';
 import type {
+	Batch,
 	BatchProcessor,
 	BatchRequest,
 	BatchResult,
@@ -31,6 +32,13 @@ import type {
  *   );
  * }
  * ```
+ * @param processor
+ */
+export default function createBatch(
+	processor?: undefined
+): Batch< BatchRequest >;
+/**
+ * Creates a batch whose inputs a custom processor handles.
  *
  * @param processor Processor function. Can be used to replace the
  *                  default functionality which is to send an API
@@ -39,10 +47,13 @@ import type {
  *                  resolves to an array of objects containing
  *                  either `output` or `error`.
  */
-export default function createBatch< Input = BatchRequest >(
-	// The default processor sends the default inputs, API requests.
+export default function createBatch< Input >(
+	processor: BatchProcessor< Input >
+): Batch< Input >;
+export default function createBatch< Input >(
+	// Only the overload without a processor leaves the inputs API requests.
 	processor = defaultProcessor as unknown as BatchProcessor< Input >
-) {
+): Batch< Input > {
 	let lastId = 0;
 	let queue: Array< {
 		input: Input;
