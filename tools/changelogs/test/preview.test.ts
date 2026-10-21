@@ -15,8 +15,9 @@ describe( 'previewUnreleasedFragments', () => {
 
 	it( 'renders unreleased fragments for configured package using Changie batch dry-run', () => {
 		const preview = previewUnreleasedFragments( 'ui', REPO_ROOT );
-		expect( preview ).toContain( '## Unreleased (@wordpress/ui)' );
+		expect( preview ).toContain( '## Unreleased' );
 		expect( preview ).toContain( '### Breaking Changes' );
 		expect( preview ).not.toContain( '0-unreleased' );
+		expect( preview ).not.toContain( '## Unreleased (@wordpress/ui)' );
 	} );
 } );

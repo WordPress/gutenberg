@@ -2,7 +2,7 @@ changesDir: .changes
 unreleasedDir: unreleased
 headerPath: header.tpl.md
 versionExt: md
-versionFormat: '## {{.Version}} ({{.Time.Format "2006-01-02"}})'
+versionFormat: '{{if eq .Version "0-unreleased"}}## Unreleased{{else}}## {{.Version}} ({{.Time.Format "2006-01-02"}}){{end}}'
 kindFormat: '### {{.Kind}}'
 changeFormat: '-   {{.Body}} ([#{{.Custom.PR}}](https://github.com/WordPress/gutenberg/pull/{{.Custom.PR}})).'
 fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind}}__{{.Time.Format "20060102150405"}}'
