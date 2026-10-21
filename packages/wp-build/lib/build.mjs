@@ -576,7 +576,7 @@ async function bundlePackage( packageName, options = {} ) {
 			entryPoints: [ entryPoint ],
 			bundle: true,
 			loader: LOADER_CONFIG,
-			sourcemap: true,
+			sourcemap: ! minifiedOnly,
 			format: 'iife',
 			target,
 			platform: 'browser',
@@ -700,7 +700,7 @@ async function bundlePackage( packageName, options = {} ) {
 					// worker) stays compact; ASCII output would escape high
 					// bytes as \uXXXX and defeat the compression.
 					charset: 'utf8',
-					sourcemap: ! isWasmWorker,
+					sourcemap: ! isWasmWorker && ! minifiedOnly,
 					format: 'esm',
 					target,
 					platform: 'browser',
