@@ -11294,11 +11294,6 @@
 			"count": 4
 		}
 	},
-	"packages/patterns/src/components/create-template-part-modal/test/utils.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/patterns/src/components/pattern-overrides-controls.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -11311,16 +11306,6 @@
 	},
 	"packages/patterns/src/components/rename-pattern-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/private-apis.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
