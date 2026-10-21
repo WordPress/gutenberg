@@ -184,6 +184,117 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		] );
 	} );
 
+	test( 'a page created from the navigation appender is not added twice', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Main menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
+			meta: { [ META_KEY ]: true },
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await expect( navigationBlock ).toContainText( 'Home' );
+
+		// Create the page from the appender's link UI, published (the default).
+		await navigationBlock.getByLabel( 'Add page' ).first().click();
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'Created page' );
+		await page.getByRole( 'button', { name: 'Create page' } ).click();
+		await expect(
+			page.getByRole( 'textbox', { name: 'Title' } )
+		).toHaveValue( 'Created page' );
+		await expect(
+			page.getByRole( 'checkbox', { name: 'Publish' } )
+		).toBeChecked();
+		await page.getByRole( 'button', { name: 'Create page' } ).click();
+		await expect(
+			page.getByRole( 'link', {
+				name: 'Created page (opens in a new tab)',
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+
+		const [ createdPage ] = await requestUtils.rest( {
+			path: '/wp/v2/pages',
+			params: { search: 'Created page', status: 'publish' },
+		} );
+		expect( createdPage ).toBeDefined();
+
+		// The menu on the server did not link to the page yet when it was
+		// published, so the server appended its own link.
+		const appendedMenu = await requestUtils.rest( {
+			path: `/wp/v2/navigation/${ menu.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( appendedMenu.content.raw ).toContain(
+			`"id":${ createdPage.id }`
+		);
+
+		// Meanwhile the link UI inserted its own link, so the block holds a
+		// pending edit; the refetched menu must not add a second link.
+		const pageLinks = navigationBlock.getByRole( 'document', {
+			name: 'Block: Page Link',
+		} );
+		await expect( pageLinks ).toHaveCount( 1 );
+		await expect( pageLinks ).toContainText( 'Created page' );
+		// Once the refetched menu, with the server-appended link, has reached
+		// the store, the block still shows one link.
+		await expect
+			.poll( () =>
+				page.evaluate(
+					( id ) =>
+						window.wp.data
+							.select( 'core' )
+							.getEntityRecord( 'postType', 'wp_navigation', id )
+							?.content?.raw ?? '',
+					menu.id
+				)
+			)
+			.toContain( `"id":${ createdPage.id }` );
+		await expect( pageLinks ).toHaveCount( 1 );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		await topBar
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+
+		// The Save button goes away once nothing is left to save.
+		await expect(
+			topBar.getByRole( 'button', { name: 'Save', exact: true } )
+		).toBeHidden();
+
+		// The saved menu links to the page once: the editor's link, not the
+		// editor's link plus the server's.
+		const savedMenu = await requestUtils.rest( {
+			path: `/wp/v2/navigation/${ menu.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( savedMenu.content.raw ).toContain( '"label":"Created page"' );
+		expect(
+			savedMenu.content.raw.match(
+				new RegExp( `"id":${ createdPage.id }\\b`, 'g' )
+			)
+		).toHaveLength( 1 );
+	} );
+
 	test( 'turning the setting off is saved with the post', async ( {
 		admin,
 		editor,
