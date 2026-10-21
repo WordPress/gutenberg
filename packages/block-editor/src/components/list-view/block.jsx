@@ -26,6 +26,7 @@ import {
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
+import { Appender } from './appender';
 import { useListViewContext } from './context';
 import {
 	getBlockPositionDescription,
@@ -40,6 +41,75 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
+
+/**
+ * The cell holding a row's appender button, which adds a block at the end of
+ * the row's inner blocks. The button shows while the row is hovered, focused,
+ * or selected, and stays while the user is on one of the blocks inside the
+ * row, hovering, focusing, or selecting it. Rows highlight the block they are
+ * on, so the highlight stands in for hover and focus.
+ *
+ * @param {Object}                     props
+ * @param {string}                     props.clientId        The row's block.
+ * @param {number}                     props.level           The row's nesting level.
+ * @param {number}                     props.innerBlockCount The number of blocks inside the row's block.
+ * @param {boolean}                    props.isSelected      Whether the row's block is selected.
+ * @param {boolean}                    props.isVisible       Whether the row itself shows its controls.
+ * @param {( update: Object ) => void} props.updateExpansion Expands or collapses rows.
+ */
+function ListViewRowAppenderCell( {
+	clientId,
+	level,
+	innerBlockCount,
+	isSelected,
+	isVisible,
+	updateExpansion,
+} ) {
+	const hasActiveDescendant = useSelect(
+		( select ) => {
+			const {
+				getClientIdsOfDescendants,
+				getSelectedBlockClientIds,
+				isBlockHighlighted,
+			} = select( blockEditorStore );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			return getClientIdsOfDescendants( clientId ).some(
+				( descendantClientId ) =>
+					isBlockHighlighted( descendantClientId ) ||
+					selectedBlockClientIds.includes( descendantClientId )
+			);
+		},
+		[ clientId ]
+	);
+
+	return (
+		<TreeGridCell
+			className={ clsx( 'block-editor-list-view-block__appender-cell', {
+				'is-visible': isVisible || hasActiveDescendant,
+			} ) }
+			aria-selected={ !! isSelected }
+		>
+			{ ( { ref, tabIndex, onFocus } ) => (
+				<Appender
+					ref={ ref }
+					clientId={ clientId }
+					nestingLevel={ level + 1 }
+					blockCount={ innerBlockCount }
+					toggleProps={ { tabIndex, onFocus } }
+					onSelectOrClose={ ( maybeInsertedBlock ) => {
+						// Show the new item, if the row is collapsed.
+						if ( maybeInsertedBlock?.clientId ) {
+							updateExpansion( {
+								type: 'expand',
+								clientIds: [ clientId ],
+							} );
+						}
+					} }
+				/>
+			) }
+		</TreeGridCell>
+	);
+}
 
 function ListViewBlock( {
 	clientId,
@@ -59,6 +129,8 @@ function ListViewBlock( {
 	isExpanded,
 	selectedClientIds,
 	isSyncedBranch,
+	showAppender,
+	innerBlockCount = 0,
 } ) {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
@@ -570,6 +642,12 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
+	// A List View with appenders gives every row an appender cell, so the
+	// columns line up. Only a row with items inside it holds a button, which
+	// adds an item at the end of them.
+	const hasRowAppender = showAppender && innerBlockCount > 0 && ! isDisabled;
+	const isAppenderCellVisible = isHovered || isFirstSelectedBlock;
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -706,6 +784,25 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ showAppender && ! hasRowAppender && (
+				<TreeGridCell
+					className={ clsx(
+						'block-editor-list-view-block__appender-cell',
+						{ 'is-visible': isAppenderCellVisible }
+					) }
+					withoutGridItem
+				/>
+			) }
+			{ hasRowAppender && (
+				<ListViewRowAppenderCell
+					clientId={ clientId }
+					level={ level }
+					innerBlockCount={ innerBlockCount }
+					isSelected={ isSelected }
+					isVisible={ isAppenderCellVisible }
+					updateExpansion={ updateExpansion }
+				/>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }

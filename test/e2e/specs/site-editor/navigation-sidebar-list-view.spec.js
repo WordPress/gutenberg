@@ -372,6 +372,262 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeHidden();
 	} );
+
+	test.describe( 'row appender', () => {
+		const nestedMenuFixture = {
+			title: 'Nested Menu',
+			content: `<!-- wp:navigation-submenu {"label":"Top Level Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} -->
+<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->
+<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"custom","url":"https://wordpress.org/nested","kind":"custom"} -->
+<!-- wp:navigation-link {"label":"Nested Item","type":"custom","url":"https://wordpress.org/nested-item","kind":"custom"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation-submenu -->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+		};
+
+		const openSidebarListView = async (
+			{ admin, page, requestUtils },
+			fixture
+		) => {
+			const menu = await requestUtils.createNavigationMenu( fixture );
+			await admin.visitSiteEditor( {
+				postId: menu?.id,
+				postType: 'wp_navigation',
+			} );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			await expect(
+				listView.getByRole( 'gridcell', {
+					name: 'Top Level Item 2',
+					exact: true,
+				} )
+			).toBeVisible();
+			return listView;
+		};
+
+		// The row of the item with the given label.
+		const rowOf = ( listView, name ) =>
+			listView.getByRole( 'row' ).filter( {
+				has: listView.page().getByRole( 'link', { name, exact: true } ),
+			} );
+
+		test( 'adds an item to a submenu from the button on its row', async ( {
+			admin,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const submenuRow = rowOf( listView, 'Top Level Item 1' );
+			const addToSubmenu = submenuRow.getByRole( 'button', {
+				name: 'Add page',
+			} );
+
+			await test.step( 'only a row with items has the button', async () => {
+				await expect( addToSubmenu ).toHaveCount( 1 );
+				await expect(
+					rowOf( listView, 'Top Level Item 2' ).getByRole( 'button', {
+						name: 'Add page',
+					} )
+				).toHaveCount( 0 );
+				// No appender row is added inside the submenu; the only
+				// appender row is the top-level one at the end.
+				await expect(
+					listView
+						.getByRole( 'row' )
+						.filter( { hasNot: page.getByRole( 'link' ) } )
+				).toHaveCount( 1 );
+			} );
+
+			await test.step( 'the button is visible at rest and filled while the row is hovered', async () => {
+				// The button is always there to find. It is a plain "+" at
+				// rest and takes the filled appender style while the row is
+				// active.
+				await expect( addToSubmenu ).toBeVisible();
+				await expect( addToSubmenu ).toHaveCSS(
+					'background-color',
+					'rgba(0, 0, 0, 0)'
+				);
+				await submenuRow
+					.getByRole( 'gridcell', { name: 'Top Level Item 1' } )
+					.hover();
+				await expect( addToSubmenu ).not.toHaveCSS(
+					'background-color',
+					'rgba(0, 0, 0, 0)'
+				);
+			} );
+
+			await test.step( 'and while an item inside the submenu is hovered', async () => {
+				const addToNested = rowOf(
+					listView,
+					'Nested Submenu'
+				).getByRole( 'button', { name: 'Add page' } );
+				const cell = ( name ) =>
+					listView.getByRole( 'gridcell', { name, exact: true } );
+				const plain = 'rgba(0, 0, 0, 0)';
+
+				await cell( 'Submenu Item' ).hover();
+				await expect( addToSubmenu ).not.toHaveCSS(
+					'background-color',
+					plain
+				);
+				await expect( addToNested ).toHaveCSS(
+					'background-color',
+					plain
+				);
+
+				// An item two levels down fills the button of each ancestor.
+				await cell( 'Nested Item' ).hover();
+				await expect( addToSubmenu ).not.toHaveCSS(
+					'background-color',
+					plain
+				);
+				await expect( addToNested ).not.toHaveCSS(
+					'background-color',
+					plain
+				);
+
+				await cell( 'Top Level Item 2' ).hover();
+				await expect( addToSubmenu ).toHaveCSS(
+					'background-color',
+					plain
+				);
+				await expect( addToNested ).toHaveCSS(
+					'background-color',
+					plain
+				);
+			} );
+
+			await test.step( 'clicking it adds a link at the end of the submenu', async () => {
+				await addToSubmenu.click();
+
+				// The Link UI opens for the new item, as it does at the top level.
+				await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+				await expect(
+					listView
+						.getByRole( 'gridcell', {
+							name: 'Test Page 1',
+							exact: true,
+						} )
+						.filter( { hasText: 'Block 3 of 3, Level 2.' } )
+				).toBeVisible();
+			} );
+		} );
+
+		test( 'reaches the button by keyboard', async ( {
+			admin,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const nestedRow = rowOf( listView, 'Nested Submenu' );
+			const addToNested = nestedRow.getByRole( 'button', {
+				name: 'Add page',
+			} );
+
+			// Focus the row without clicking it, since a click opens the
+			// Settings popover, which takes focus from the row.
+			await nestedRow.getByRole( 'link' ).focus();
+			// Focus inside the submenu fills the button of its row too.
+			await expect(
+				rowOf( listView, 'Top Level Item 1' ).getByRole( 'button', {
+					name: 'Add page',
+				} )
+			).not.toHaveCSS( 'background-color', 'rgba(0, 0, 0, 0)' );
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( addToNested ).toBeFocused();
+			// The focused button takes the active fill.
+			await expect( addToNested ).not.toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)'
+			);
+
+			await page.keyboard.press( 'Enter' );
+			await linkControl.useLinkControlSearch( 'Test Page 2' );
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: 'Test Page 2',
+						exact: true,
+					} )
+					.filter( { hasText: 'Block 2 of 2, Level 3.' } )
+			).toBeVisible();
+		} );
+
+		test( 'expands a collapsed submenu when adding to it', async ( {
+			admin,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const item = ( name ) =>
+				listView.getByRole( 'gridcell', { name, exact: true } );
+			const nestedRow = rowOf( listView, 'Nested Submenu' );
+
+			await nestedRow.getByRole( 'link' ).focus();
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( item( 'Nested Item' ) ).toBeHidden();
+
+			await nestedRow
+				.getByRole( 'gridcell', { name: 'Nested Submenu' } )
+				.hover();
+			await nestedRow.getByRole( 'button', { name: 'Add page' } ).click();
+			await linkControl.useLinkControlSearch( 'Test Page 2' );
+
+			await expect( item( 'Nested Item' ) ).toBeVisible();
+			await expect(
+				item( 'Test Page 2' ).filter( {
+					hasText: 'Block 2 of 2, Level 3.',
+				} )
+			).toBeVisible();
+		} );
+
+		test( 'adds a button from the row of a Buttons block in the menu', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Buttons Menu',
+					content: `<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">First</a></div><!-- /wp:button --></div><!-- /wp:buttons -->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+				}
+			);
+
+			const buttonsRow = listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'gridcell', { name: /^Buttons/ } ),
+			} );
+			await buttonsRow.getByRole( 'gridcell' ).first().hover();
+			await buttonsRow
+				.getByRole( 'button', { name: 'Add Button' } )
+				.click();
+
+			// The new Button follows the first one inside the Buttons block.
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Button', exact: true } )
+					.filter( {
+						hasText: 'Block 2 of 2, Level 2.',
+					} )
+			).toBeVisible();
+		} );
+	} );
 } );
 
 class LinkControl {

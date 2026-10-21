@@ -49,6 +49,30 @@
 			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 	}
+
+	// A row's appender button is a plain "+" at rest, like the row's other
+	// controls, and takes the appender colors while the row is active.
+	.block-editor-list-view-leaf .block-editor-list-view-block__appender-cell {
+		.list-view-appender .block-editor-inserter__toggle {
+			background: transparent;
+			color: var(--wpds-color-foreground-interactive-neutral-weak);
+		}
+
+		&:hover,
+		&:focus-within,
+		&.is-visible {
+			.list-view-appender .block-editor-inserter__toggle {
+				background: var(--wpds-color-background-interactive-brand-strong);
+				color: var(--wpds-color-foreground-interactive-brand-strong);
+
+				&:hover,
+				&:focus {
+					background: var(--wpds-color-background-interactive-brand-strong-active);
+					color: var(--wpds-color-foreground-interactive-brand-strong-active);
+				}
+			}
+		}
+	}
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__empty-message {

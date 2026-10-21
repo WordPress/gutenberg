@@ -11,7 +11,17 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
-	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+	(
+		{
+			nestingLevel,
+			blockCount,
+			clientId,
+			toggleProps,
+			onSelectOrClose,
+			...props
+		},
+		ref
+	) => {
 		const { setInsertedBlockClientId } = useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
@@ -88,13 +98,17 @@ export const Appender = forwardRef(
 					shouldDirectInsert={ directInsert }
 					__experimentalIsQuick
 					{ ...props }
-					toggleProps={ { 'aria-describedby': descriptionId } }
+					toggleProps={ {
+						...toggleProps,
+						'aria-describedby': descriptionId,
+					} }
 					onSelectOrClose={ ( maybeInsertedBlock ) => {
 						if ( maybeInsertedBlock?.clientId ) {
 							setInsertedBlockClientId(
 								maybeInsertedBlock.clientId
 							);
 						}
+						onSelectOrClose?.( maybeInsertedBlock );
 					} }
 				/>
 				<AriaReferencedText id={ descriptionId }>

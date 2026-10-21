@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   List View: Add an appender button to the row of a block with inner blocks, so items can be added to a submenu or a Buttons block from the List View. The button is visible at rest and takes the appender style while the row, or a block inside it, is hovered, focused, or selected ([#85154](https://github.com/WordPress/gutenberg/issues/85154)).
+
 ### Bug Fixes
 
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

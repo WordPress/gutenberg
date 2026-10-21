@@ -239,6 +239,8 @@ function ListViewBranch( props ) {
 						displacement={ displacement }
 						isAfterDraggedBlocks={ isAfterDraggedBlocks }
 						isNesting={ isNesting }
+						showAppender={ showAppenderProp }
+						innerBlockCount={ innerBlocks?.length ?? 0 }
 					/>
 				) }
 				{ showNestedBlocks && (
