@@ -97,7 +97,7 @@ export function sortImageBlocks( blocks, media, { orderby, order } ) {
 		] )
 	);
 
-	return [ ...blocks ].sort( ( a, b ) => {
+	return blocks.toSorted( ( a, b ) => {
 		const keyA = keys.get( a );
 		const keyB = keys.get( b );
 		if ( keyA === undefined || keyB === undefined ) {

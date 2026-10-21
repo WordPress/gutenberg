@@ -264,8 +264,7 @@ export const parameters = {
 					if ( aIndex !== bIndex ) {
 						return aIndex - bIndex;
 					}
-					// Same index (both not in order list), preserve export order
-					return 0;
+					return aSegment.localeCompare( bSegment );
 				}
 
 				// Same segment, descend into nested order

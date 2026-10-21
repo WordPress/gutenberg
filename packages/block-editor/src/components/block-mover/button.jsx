@@ -57,6 +57,7 @@ const BlockMoverButton = forwardRef(
 			[ clientIds ]
 		);
 		const blocksCount = normalizedClientIds.length;
+		const hasBlocks = !! normalizedClientIds[ 0 ];
 		const isMobileViewport = useViewportMatch( 'small', '<' );
 
 		const {
@@ -91,7 +92,9 @@ const BlockMoverButton = forwardRef(
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
+					isDisabled:
+						! firstClientId ||
+						( direction === 'up' ? isFirstBlock : isLastBlock ),
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
@@ -138,29 +141,31 @@ const BlockMoverButton = forwardRef(
 							? 'bottom'
 							: 'top'
 					}
-					aria-describedby={ descriptionId }
+					aria-describedby={ hasBlocks ? descriptionId : undefined }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
 					accessibleWhenDisabled
 					shortcut={ displayShortcut.secondary( keyCharacter ) }
 				/>
-				<VisuallyHidden id={ descriptionId }>
-					{ sprintf(
-						// translators: 1: Description of the block movement. 2: Keyboard shortcut.
-						__( '%1$s (%2$s)' ),
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							direction === 'up' ? -1 : 1,
-							orientation
-						),
-						shortcutAriaLabel.secondary( keyCharacter )
-					) }
-				</VisuallyHidden>
+				{ hasBlocks && (
+					<VisuallyHidden id={ descriptionId }>
+						{ sprintf(
+							// translators: 1: Description of the block movement. 2: Keyboard shortcut.
+							__( '%1$s (%2$s)' ),
+							getBlockMoverDescription(
+								blocksCount,
+								blockType && blockType.title,
+								firstIndex,
+								isFirst,
+								isLast,
+								direction === 'up' ? -1 : 1,
+								orientation
+							),
+							shortcutAriaLabel.secondary( keyCharacter )
+						) }
+					</VisuallyHidden>
+				) }
 			</>
 		);
 	}

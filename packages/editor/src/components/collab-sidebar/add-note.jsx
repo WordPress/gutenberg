@@ -9,16 +9,22 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread } from './utils';
+import { focusNoteThread, hasFocusWithin } from './utils';
 import { useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
+export function AddNote( {
+	clientId,
+	onSubmit,
+	onDiscard,
+	sidebarRef,
+	floating,
+} ) {
 	const blockElement = useBlockElement( clientId );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const isSubmittingRef = useRef( false );
@@ -43,6 +49,10 @@ export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
 		if ( isSubmittingRef.current ) {
 			return;
 		}
+		// In the block, the caret events decide; dismissing here too would race them.
+		if ( hasFocusWithin( blockElement ) ) {
+			return;
+		}
 
 		/*
 		 * Selection may have moved on before this deferred callback runs; only
@@ -50,16 +60,18 @@ export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
 		 * newly selected note.
 		 */
 		if ( getSelectedNote() === 'new' && ! hasDraft() ) {
-			toggleBlockSpotlight( clientId, false );
+			onDiscard( clientId );
+			toggleBlockHighlight( clientId, false );
 			selectNote( undefined );
 		}
 	} );
 
 	const unselectNote = () => {
 		setDraft( '' );
+		onDiscard( clientId );
 		selectNote( undefined );
 		blockElement?.focus();
-		toggleBlockSpotlight( clientId, false );
+		toggleBlockHighlight( clientId, false );
 	};
 
 	return (

@@ -50,6 +50,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `termId`
 - `taxonomy`
+- `termData`
 
 ## Block Markup
 

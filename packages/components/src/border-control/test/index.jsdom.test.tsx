@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
 import type { Border, BorderControlProps } from '../types';
-import { COLORS } from '../../utils';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -193,13 +192,14 @@ describe( 'BorderControl', () => {
 			};
 
 			/* eslint-disable jest-dom/prefer-to-have-style -- These jsdom tests check normalized inline style values without browser layout. */
-			it( 'should fall back to gray-300 when a style is set without a color', () => {
+			it( 'should fall back to a neutral surface stroke when a style is set without a color', () => {
 				const indicatorWrapper = getIndicatorWrapper( {
 					style: 'solid',
 					color: '',
 				} );
 				const expectedStyle = document.createElement( 'div' ).style;
-				expectedStyle.borderColor = COLORS.gray[ 300 ];
+				expectedStyle.borderColor =
+					'var(--wpds-color-stroke-surface-neutral)';
 
 				expect(
 					( indicatorWrapper as HTMLElement ).style.borderStyle
