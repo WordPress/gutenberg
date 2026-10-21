@@ -2,16 +2,13 @@
  * Token data from the installed `@wordpress/theme`.
  *
  * The plugins do nothing when `@wordpress/theme` cannot be loaded.
- * Versions of `@wordpress/theme` without the `tokens` export only provide the
- * token names, so the fallback plugins do nothing with them either.
  */
 
 import { createRequire } from 'node:module';
 
 /**
  * @typedef {Object} DesignTokensModule
- * @property {Record<string, { fallback: string }>} [tokens] Token metadata, keyed by CSS custom property name.
- * @property {string[]}                             default  Token names.
+ * @property {Record<string, { fallback: string }>} tokens Token metadata, keyed by CSS custom property name.
  */
 
 /**
@@ -46,11 +43,11 @@ const designTokens = loadDesignTokens();
 
 /**
  * Map of design token names to their generated fallback values, or
- * `undefined` when `@wordpress/theme` does not provide them.
+ * `undefined` when `@wordpress/theme` is unavailable.
  *
  * @type {Record<string, string> | undefined}
  */
-export const tokenFallbacks = designTokens?.tokens
+export const tokenFallbacks = designTokens
 	? Object.fromEntries(
 			Object.entries( designTokens.tokens ).map( ( [ name, token ] ) => [
 				name,
@@ -65,6 +62,6 @@ export const tokenFallbacks = designTokens?.tokens
  *
  * @type {string[] | undefined}
  */
-export const tokenList = designTokens?.tokens
+export const tokenList = designTokens
 	? Object.keys( designTokens.tokens )
-	: designTokens?.default;
+	: undefined;
