@@ -750,7 +750,7 @@ describe( 'DataViews Picker', () => {
 				screen.getByRole( 'button', { name: 'Confirm' } )
 			).toBeInTheDocument();
 			expect(
-				screen.queryByText( '2 of 3 Items' )
+				screen.queryByText( '2 of 3 items' )
 			).not.toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', { name: 'Next page' } )

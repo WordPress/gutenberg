@@ -18,6 +18,7 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
+import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
 import type { WritingFlowClipboardEvent } from './types';
 
 /**
@@ -67,13 +68,51 @@ export default function useClipboardHandler() {
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 		__unstableSplitSelection,
+		selectionChange,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect< HTMLElement >( ( node ) => {
+		// Text dropped is inserted the way it would be pasted at the drop
+		// point.
+		function moveSelectionToDropPoint( event: DragEvent ) {
+			const point = getTextDropPoint( event );
+			if (
+				! point ||
+				point.isOnDraggedText ||
+				! node.contains( point.element )
+			) {
+				return false;
+			}
+			const { element, offset, range } = point;
+			const host =
+				element.parentElement?.closest< HTMLElement >(
+					'[contenteditable]'
+				);
+			( host?.isContentEditable ? host : element ).focus();
+			const selection =
+				element.ownerDocument.defaultView!.getSelection()!;
+			selection.removeAllRanges();
+			selection.addRange( range );
+			selectionChange(
+				getBlockClientId( element )!,
+				element.dataset.wpBlockAttributeKey,
+				offset,
+				offset
+			);
+			return true;
+		}
+
 		function handler( event: WritingFlowClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
+				return;
+			}
+
+			if (
+				event.type === 'drop' &&
+				! moveSelectionToDropPoint( event as DragEvent )
+			) {
 				return;
 			}
 
@@ -159,8 +198,13 @@ export default function useClipboardHandler() {
 						blocks = [ head, ...inBetweenBlocks, tail ];
 					}
 
-					// The selected blocks exist.
-					setClipboardBlocks( event, blocks as Block[], registry );
+					// The selected blocks exist, and copy and cut events are
+					// clipboard events.
+					setClipboardBlocks(
+						event as ClipboardEvent,
+						blocks as Block[],
+						registry
+					);
 				}
 			}
 
@@ -178,22 +222,26 @@ export default function useClipboardHandler() {
 					);
 					__unstableDeleteSelection();
 				}
-			} else if ( event.type === 'paste' ) {
+			} else if ( event.type === 'paste' || event.type === 'drop' ) {
 				const {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 					mediaUpload,
 				} = getSettings();
+				// Paste and drop events carry readable data.
+				const clipboardData = (
+					'dataTransfer' in event
+						? event.dataTransfer
+						: event.clipboardData
+				)!;
 				const isInternal =
-					// Paste events carry clipboard data.
-					event.clipboardData!.getData( 'rich-text' ) === 'true';
+					clipboardData.getData( 'rich-text' ) === 'true';
 				if ( isInternal ) {
 					return;
 				}
-				// Paste events carry readable clipboard data.
-				const { plainText, html, files } = getPasteEventData(
-					event as { clipboardData: DataTransfer }
-				)!;
+				const { plainText, html, files } = getPasteEventData( {
+					clipboardData,
+				} )!;
 				const isFullySelected = __unstableIsFullySelected();
 				let blocks: Block[] | string = [];
 
@@ -330,11 +378,13 @@ export default function useClipboardHandler() {
 		node.ownerDocument.addEventListener( 'copy', handler );
 		node.ownerDocument.addEventListener( 'cut', handler );
 		node.ownerDocument.addEventListener( 'paste', handler );
+		node.ownerDocument.addEventListener( 'drop', handler, true );
 
 		return () => {
 			node.ownerDocument.removeEventListener( 'copy', handler );
 			node.ownerDocument.removeEventListener( 'cut', handler );
 			node.ownerDocument.removeEventListener( 'paste', handler );
+			node.ownerDocument.removeEventListener( 'drop', handler, true );
 		};
 	}, [] );
 }
