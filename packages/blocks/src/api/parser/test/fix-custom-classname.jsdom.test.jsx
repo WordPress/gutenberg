@@ -101,6 +101,27 @@ describe( 'Fix custom className', () => {
 
 		expect( attributes.className ).toBe( 'custom1' );
 	} );
+
+	it( 'should not treat a class rendered on a nested element as custom', () => {
+		const nestedBlockSettings = {
+			...blockSettings,
+			save: () => (
+				<div className="default">
+					<span className="default__link has-large-font-size">
+						Link
+					</span>
+				</div>
+			),
+		};
+		// An older version rendered the link classes on the root element.
+		const attributes = fixCustomClassname(
+			{},
+			nestedBlockSettings,
+			'<div class="default default__link has-large-font-size custom"><span class="default__link">Link</span></div>'
+		);
+
+		expect( attributes.className ).toBe( 'custom' );
+	} );
 } );
 
 describe( 'getHTMLRootElementClasses', () => {
