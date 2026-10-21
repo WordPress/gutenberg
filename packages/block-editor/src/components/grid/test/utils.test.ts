@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { getGridRectFromPixelRect, getGridTracks } from '../utils';
+import type { GridRect } from '../utils';
 
 // Three 100px columns and three 50px rows, with 10px gaps.
 const columnTracks = getGridTracks( '100px 100px 100px', 10 );
 const rowTracks = getGridTracks( '50px 50px 50px', 10 );
 
-function toPlain( rect ) {
+function toPlain( rect: GridRect ) {
 	return {
 		columnStart: rect.columnStart,
 		rowStart: rect.rowStart,
