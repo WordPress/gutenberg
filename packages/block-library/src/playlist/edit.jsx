@@ -27,6 +27,7 @@ import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { isFile } from '../utils/is-file';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
@@ -45,13 +46,6 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
 ];
-
-function isFile( value ) {
-	return (
-		Object.prototype.toString.call( value ) === '[object File]' ||
-		( typeof File !== 'undefined' && value instanceof File )
-	);
-}
 
 function isAudioFile( file ) {
 	return file.type

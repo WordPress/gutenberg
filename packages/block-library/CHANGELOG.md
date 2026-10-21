@@ -6,6 +6,7 @@
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
+-   Image: Show the "Only one file can be used here." notice when several files are dropped on the placeholder where no Gallery can be inserted, instead of doing nothing; files dropped on the placeholder are accepted whichever window created them.
 
 ## 12.0.0 (2026-10-20)
 

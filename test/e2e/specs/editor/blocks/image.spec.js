@@ -209,6 +209,59 @@ test.describe( 'Image', () => {
 		} );
 	} );
 
+	test( 'should turn several files dropped into the media placeholder into a gallery, even files from another realm', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		// `dragFiles` creates the File objects in the top window rather than
+		// in the canvas iframe (a browser-dispatched drop creates them in the
+		// iframe): the block must not depend on the files being from its own
+		// realm.
+		const dragging = await pageUtils.dragFiles( [
+			'./assets/10x10_e2e_test_image_z9T8jK.png',
+			'./assets/10x10_e2e_test_image_green.png',
+		] );
+		await dragging.dragOver( imageBlock );
+		await dragging.drop();
+
+		const images = editor.canvas
+			.getByRole( 'document', { name: 'Block: Gallery' } )
+			.getByRole( 'img', {
+				name: 'This image has an empty alt attribute',
+			} );
+		await expect( images ).toHaveCount( 2 );
+
+		// Wait for both uploads to complete (includes client-side media processing time).
+		for ( const image of await images.all() ) {
+			await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+				timeout: 30_000,
+			} );
+		}
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: { id: expect.any( Number ) },
+					},
+					{
+						name: 'core/image',
+						attributes: { id: expect.any( Number ) },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'allows rotating an image using the media editor modal', async ( {
 		editor,
 		page,

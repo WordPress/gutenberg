@@ -20,6 +20,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { isFile } from '../utils/is-file';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -165,43 +166,66 @@ export function ImageEdit( {
 		}
 	}
 
-	function onSelectImagesList( images ) {
-		const win = containerRef.current?.ownerDocument.defaultView;
+	/**
+	 * Turns several files dropped on the placeholder into a gallery (or into
+	 * sibling images when the block already sits in a gallery).
+	 *
+	 * @param {File[]} files The dropped files.
+	 */
+	function onSelectImagesList( files ) {
+		const rootClientId = getBlockRootClientId( clientId );
+		const isInGallery = getBlockName( rootClientId ) === 'core/gallery';
 
-		if ( images.every( ( file ) => file instanceof win.File ) ) {
-			/** @type {File[]} */
-			const files = images;
-			const rootClientId = getBlockRootClientId( clientId );
+		// Defensive: only a list of files can become a gallery. `isFile`
+		// rather than `instanceof File` because the files may have been
+		// created in another window than the one rendering this block (a
+		// synthetic drop from the top window into the canvas iframe, say).
+		if ( ! files.every( isFile ) ) {
+			return;
+		}
 
-			if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
-				// Copied from the same notice in the gallery block.
-				createErrorNotice(
-					__(
-						'If uploading to a gallery all files need to be image formats'
-					),
-					{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
-				);
-			}
+		// Without a gallery to put them in there is nothing this block can do
+		// with more than one file, so tell the user rather than leave the
+		// placeholder untouched.
+		if (
+			! isInGallery &&
+			! canInsertBlockType( 'core/gallery', rootClientId )
+		) {
+			createErrorNotice( __( 'Only one file can be used here.' ), {
+				type: 'snackbar',
+			} );
+			return;
+		}
 
-			const imageBlocks = files
-				.filter( ( file ) => isValidFileType( file ) )
-				.map( ( file ) =>
-					createBlock( 'core/image', {
-						blob: createBlobURL( file ),
-					} )
-				);
+		if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
+			// Copied from the same notice in the gallery block.
+			createErrorNotice(
+				__(
+					'If uploading to a gallery all files need to be image formats'
+				),
+				{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
+			);
+		}
 
-			if ( getBlockName( rootClientId ) === 'core/gallery' ) {
-				replaceBlock( clientId, imageBlocks );
-			} else if ( canInsertBlockType( 'core/gallery', rootClientId ) ) {
-				const galleryBlock = createBlock(
-					'core/gallery',
-					{},
-					imageBlocks
-				);
+		const imageBlocks = files
+			.filter( ( file ) => isValidFileType( file ) )
+			.map( ( file ) =>
+				createBlock( 'core/image', {
+					blob: createBlobURL( file ),
+				} )
+			);
 
-				replaceBlock( clientId, galleryBlock );
-			}
+		if ( ! imageBlocks.length ) {
+			return;
+		}
+
+		if ( isInGallery ) {
+			replaceBlock( clientId, imageBlocks );
+		} else {
+			replaceBlock(
+				clientId,
+				createBlock( 'core/gallery', {}, imageBlocks )
+			);
 		}
 	}
 
