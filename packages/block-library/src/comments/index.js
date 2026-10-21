@@ -1,7 +1,6 @@
 import { postComments as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import deprecated from './deprecated';
 import edit from './edit';
 import save from './save';
 import TEMPLATE from './edit/template';
@@ -15,7 +14,6 @@ export const settings = {
 	template: TEMPLATE,
 	edit,
 	save,
-	deprecated,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

@@ -9,6 +9,7 @@
 			"id": 246,
 			"sizeSlug": "large",
 			"linkDestination": "none",
+			"isDecorative": false,
 			"style": {
 				"border": {
 					"radius": "50px"

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the deprecations of the Accordion Heading, Comments, Embed, File and Video blocks, and the individual deprecations `v8`/`v9` of Cover, `v1`/`v5` of Image, `v7` of Gallery and `v1` of Math. Their old markup differs from the current `save` output only in classes and wrapper elements, which the block parser now regenerates from the block's attributes ([#85286](https://github.com/WordPress/gutenberg/pull/85286)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
