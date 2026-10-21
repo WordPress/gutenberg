@@ -39,7 +39,7 @@ describe( 'RawHTML', () => {
 
 	it( 'renders an empty container if there are no children', () => {
 		const { container } = render(
-			// @ts-expect-error Missing children test the empty container.
+			// @ts-expect-error RawHTML requires string children; missing children render an empty container.
 			<RawHTML></RawHTML>
 		);
 
@@ -49,11 +49,15 @@ describe( 'RawHTML', () => {
 
 	it( 'ignores non-string based children', () => {
 		const html = '<p>So scary!</p>';
+		const nonStringChild = <p>Ignore this!</p>;
 		const { container } = render(
-			<RawHTML>
-				{ html /* @ts-expect-error Test non-string children. */ }
-				<p>Ignore this!</p>
-			</RawHTML>
+			<RawHTML
+				children={ [
+					html,
+					// @ts-expect-error RawHTML accepts only string children; this element is ignored.
+					nonStringChild,
+				] }
+			/>
 		);
 
 		const expected = '<div><p>So scary!</p></div>';
