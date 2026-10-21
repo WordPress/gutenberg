@@ -8,7 +8,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { useSettings } from '../components/use-settings';
@@ -300,29 +299,6 @@ export function getRotateCSS(
 }
 
 /**
- * Filters registered block settings, extending attributes to include the
- * `style` attribute that rotation is stored in.
- *
- * @param settings Original block settings.
- *
- * @return Filtered block settings.
- */
-function addAttribute( settings: BlockType ): BlockType {
-	if ( ! hasRotateSupport( settings ) || settings.attributes?.style ) {
-		return settings;
-	}
-
-	settings.attributes = {
-		...settings.attributes,
-		style: {
-			type: 'object',
-		},
-	};
-
-	return settings;
-}
-
-/**
  * Removes the rotation from a block's attributes. The inspector controls
  * scope it to the selected style state.
  *
@@ -431,9 +407,3 @@ export default {
 	hasSupport: hasRotateSupport,
 	isMatch: ( { style }: { style?: BlockStyle } ) => hasRotateValue( style ),
 };
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/rotate/addAttribute',
-	addAttribute
-);
