@@ -20,35 +20,56 @@ export function useGridLayoutSync( {
 }: {
 	clientId: string;
 } ) {
-	const { gridLayout, blockOrder, selectedClientId, selectedBlockStyle } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockAttributes,
-					getBlockOrder,
-					getSelectedBlockClientId,
-				} = select( blockEditorStore );
-				const _selectedClientId = getSelectedBlockClientId();
-				return {
-					// The grid block exists, with its layout attribute.
-					gridLayout: ( (
-						getBlockAttributes( gridClientId ) as {
-							layout?: Layout;
-						}
-					 ).layout ?? {} ) as Layout,
-					blockOrder: getBlockOrder( gridClientId ),
-					selectedClientId: _selectedClientId,
-					// A selected grid item positions itself through its style.
-					selectedBlockStyle: _selectedClientId
-						? (
-								getBlockAttributes( _selectedClientId ) as
-									GridItemAttributes | undefined
-							 )?.style
-						: undefined,
-				};
-			},
-			[ gridClientId ]
-		);
+	// The experiment sets this global. Without it, blocks without a place go
+	// in the first free cell after the selected block.
+	const isGridInteractivityEnabled =
+		!! window.__experimentalEnableGridInteractivity;
+	const {
+		gridLayout,
+		blockOrder,
+		selectedClientId,
+		selectedBlockStyle,
+		selectedBlockLayout,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getBlockOrder,
+				getBlockRootClientId,
+				getSelectedBlockClientId,
+			} = select( blockEditorStore );
+			const _selectedClientId = getSelectedBlockClientId();
+			// A selected grid item positions itself through its style.
+			const selectedStyle = _selectedClientId
+				? (
+						getBlockAttributes( _selectedClientId ) as
+							GridItemAttributes | undefined
+					 )?.style
+				: undefined;
+			// With grid interactivity, blocks are placed next to the
+			// selected item of this grid, or where it was if they replace
+			// it, so only the style of this grid's items is needed.
+			const isSelectedItem =
+				isGridInteractivityEnabled &&
+				!! _selectedClientId &&
+				getBlockRootClientId( _selectedClientId ) === gridClientId;
+			return {
+				// The grid block exists, with its layout attribute.
+				gridLayout: ( (
+					getBlockAttributes( gridClientId ) as {
+						layout?: Layout;
+					}
+				 ).layout ?? {} ) as Layout,
+				blockOrder: getBlockOrder( gridClientId ),
+				selectedClientId: isSelectedItem ? _selectedClientId : null,
+				selectedBlockStyle: isSelectedItem ? selectedStyle : undefined,
+				selectedBlockLayout: isGridInteractivityEnabled
+					? undefined
+					: selectedStyle?.layout,
+			};
+		},
+		[ gridClientId, isGridInteractivityEnabled ]
+	);
 
 	const { getBlockAttributes, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -64,6 +85,12 @@ export function useGridLayoutSync( {
 		[ selectedClientId, selectedBlockStyle ]
 	);
 	const previousSelection = usePrevious( selection );
+	const selectedBlockRect = useMemo(
+		() =>
+			selectedBlockLayout ? new GridRect( selectedBlockLayout ) : null,
+		[ selectedBlockLayout ]
+	);
+	const previouslySelectedBlockRect = usePrevious( selectedBlockRect );
 	const previousIsManualPlacement = usePrevious(
 		gridLayout.isManualPlacement
 	);
@@ -104,7 +131,43 @@ export function useGridLayoutSync( {
 						.style?.layout ?? {};
 				return ! columnStart || ! rowStart;
 			} );
-			if ( unplacedClientIds.length ) {
+			if ( ! isGridInteractivityEnabled ) {
+				for ( const clientId of unplacedClientIds ) {
+					// The grid items exist.
+					const attributes = getBlockAttributes(
+						clientId
+					) as GridItemAttributes;
+					const { columnSpan = 1, rowSpan = 1 } =
+						attributes.style?.layout ?? {};
+					const [ newColumnStart, newRowStart ] = placeBlock(
+						occupiedRects,
+						// A manual grid has a column count.
+						gridLayout.columnCount!,
+						columnSpan,
+						rowSpan,
+						previouslySelectedBlockRect?.columnEnd,
+						previouslySelectedBlockRect?.rowEnd
+					);
+					occupiedRects.push(
+						new GridRect( {
+							columnStart: newColumnStart,
+							rowStart: newRowStart,
+							columnSpan,
+							rowSpan,
+						} )
+					);
+					updates[ clientId ] = {
+						style: {
+							...attributes.style,
+							layout: {
+								...attributes.style?.layout,
+								columnStart: newColumnStart,
+								rowStart: newRowStart,
+							},
+						},
+					};
+				}
+			} else if ( unplacedClientIds.length ) {
 				const {
 					columnTracks,
 					rowTracks,
@@ -370,10 +433,12 @@ export function useGridLayoutSync( {
 	}, [
 		// Actual deps to sync:
 		gridClientId,
+		isGridInteractivityEnabled,
 		gridLayout,
 		previousBlockOrder,
 		blockOrder,
 		previousSelection,
+		previouslySelectedBlockRect,
 		previousIsManualPlacement,
 		gridElement,
 		// These won't change, but the linter thinks they might:
@@ -383,4 +448,47 @@ export function useGridLayoutSync( {
 		wasBlockJustInsertedFromInserter,
 		updateBlockAttributes,
 	] );
+}
+
+/**
+ * Finds the first free cells, from a starting cell onwards, for a block of a
+ * given size.
+ *
+ * @param occupiedRects   The cells taken by other blocks.
+ * @param gridColumnCount The number of columns of the grid.
+ * @param blockColumnSpan The number of columns the block spans.
+ * @param blockRowSpan    The number of rows the block spans.
+ * @param startColumn     The column to start looking from.
+ * @param startRow        The row to start looking from.
+ * @return The column and row the block starts at.
+ */
+function placeBlock(
+	occupiedRects: GridRect[],
+	gridColumnCount: number,
+	blockColumnSpan: number,
+	blockRowSpan: number,
+	startColumn: number = 1,
+	startRow: number = 1
+): [ number, number ] {
+	for ( let row = startRow; ; row++ ) {
+		for (
+			let column = row === startRow ? startColumn : 1;
+			column <= gridColumnCount;
+			column++
+		) {
+			const candidateRect = new GridRect( {
+				columnStart: column,
+				rowStart: row,
+				columnSpan: blockColumnSpan,
+				rowSpan: blockRowSpan,
+			} );
+			if (
+				! occupiedRects.some( ( r ) =>
+					r.intersectsRect( candidateRect )
+				)
+			) {
+				return [ column, row ];
+			}
+		}
+	}
 }

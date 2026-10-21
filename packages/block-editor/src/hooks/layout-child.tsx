@@ -1,7 +1,6 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -21,7 +20,6 @@ import type {
 	GridBlockStyle,
 	GridChild,
 } from '../components/grid/mobile-stacking';
-import { copyChildLayout } from '../components/grid/child-layout';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
@@ -41,7 +39,6 @@ import {
 import type {
 	BlockStyleState,
 	BlockListBlockFeatureProps,
-	BlockWithStyle,
 	ChildLayoutBlockStyle,
 	ChildLayoutControlsPureProps,
 	ChildLayoutRule,
@@ -750,66 +747,6 @@ function GridTools( {
 		</>
 	);
 }
-
-/**
- * Keeps the child layout (such as a grid item's position and span) of a block
- * when it is switched to another block type. The child layout describes the
- * block's place in its parent, not the block itself, but transforms usually
- * build new attributes and drop it.
- *
- * @param result  The transformed block.
- * @param source  Original blocks transformed.
- * @param index   Index of the transformed block.
- * @param results All blocks that resulted from the transformation.
- * @return Modified transformed block.
- */
-export function addTransforms(
-	result: BlockWithStyle,
-	source: BlockWithStyle | BlockWithStyle[],
-	index: number,
-	results: BlockWithStyle[]
-): BlockWithStyle {
-	// `switchToBlockType` passes on a single original block as it got it.
-	const sourceBlocks = Array.isArray( source ) ? source : [ source ];
-
-	// A wrapping transform (e.g. a paragraph into a group) keeps the
-	// original blocks, child layout included, inside the result.
-	if (
-		results.length === 1 &&
-		result.innerBlocks.length === sourceBlocks.length
-	) {
-		return result;
-	}
-
-	// Only a block that takes the place of exactly one original block can
-	// take its child layout.
-	if ( results.length !== sourceBlocks.length ) {
-		return result;
-	}
-
-	const style = copyChildLayout(
-		result.attributes?.style,
-		sourceBlocks[ index ]?.attributes?.style
-	);
-
-	if ( style === result.attributes?.style ) {
-		return result;
-	}
-
-	return {
-		...result,
-		attributes: {
-			...result.attributes,
-			style,
-		},
-	};
-}
-
-addFilter(
-	'blocks.switchToBlockType.transformedBlock',
-	'core/layout-child/addTransforms',
-	addTransforms
-);
 
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,

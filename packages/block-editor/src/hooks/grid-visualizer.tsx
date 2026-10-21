@@ -49,10 +49,12 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 				getSettings,
 				getSelectedBlockStyleState,
 			} = unlock( select( blockEditorStore ) );
-			// Blocks dragged from the canvas or from an inserter can be
-			// dropped in any grid.
+			// Blocks dragged from the canvas can be dropped in any grid, and
+			// with grid interactivity, so can blocks dragged from an inserter.
 			const isDragging =
-				isDraggingBlocks() || getDraggedInserterBlocks().length > 0;
+				isDraggingBlocks() ||
+				( !! window.__experimentalEnableGridInteractivity &&
+					getDraggedInserterBlocks().length > 0 );
 
 			// These calls are purposely ordered from least expensive to most expensive.
 			// Hides the visualizer in cases where the user is not or cannot interact with it.
