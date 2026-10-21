@@ -184,6 +184,8 @@ function useInsertionPoint( {
 			}
 
 			const selectedBlock = getSelectedBlock();
+			// The inserter picks the block, not where it goes in its parent.
+			const insertMeta = { ...meta, isFromInserter: true };
 
 			if (
 				! isAppender &&
@@ -195,7 +197,7 @@ function useInsertionPoint( {
 					blocks,
 					null,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
-					meta
+					insertMeta
 				);
 			} else {
 				insertBlocks(
@@ -212,7 +214,7 @@ function useInsertionPoint( {
 						: _rootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
-					meta
+					insertMeta
 				);
 			}
 			const blockLength = Array.isArray( blocks ) ? blocks.length : 1;
