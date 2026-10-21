@@ -64,6 +64,9 @@ describe( 'resolveColumnCap', () => {
 		expect(
 			resolveColumnCap( { columns: Infinity }, 1000 )
 		).toBeUndefined();
+		expect(
+			resolveColumnCap( { columns: null as unknown as number }, 1000 )
+		).toBeUndefined();
 	} );
 
 	it( 'skips a step that is neither a count nor auto', () => {
