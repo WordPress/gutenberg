@@ -20,6 +20,9 @@
  * - `edit-post`, for pages, templates, template parts, and patterns, when the
  *   user can edit them. It opens the entity the way the screen showing it
  *   does, so it is only shown in the lists.
+ * - `quick-edit`, for pages, when the user can edit them. It opens the quick
+ *   edit form of the pages the way the screen showing it does, so it is only
+ *   shown in the lists.
  * - `view-post`, for the viewable post types.
  * - `view-post-revisions`, for the post types supporting `revisions`.
  * - `duplicate-post`, for the post types the user can create, except
@@ -75,6 +78,7 @@ function register_core_entity_actions() {
 		// module and their id, in the order they are shown.
 		$applies = array(
 			'post_type_supports/edit-post'             => in_array( $name, $editable_types, true ) && current_user_can( $post_type->cap->edit_posts ),
+			'page/quick-edit'                          => 'page' === $name && current_user_can( $post_type->cap->edit_posts ),
 			'post_type_supports/view-post'             => is_post_type_viewable( $post_type ),
 			'post_type_supports/view-post-revisions'   => post_type_supports( $name, 'revisions' ),
 			'post_type_supports/duplicate-post'        => $is_gutenberg && $can_create && ! in_array( $name, $design_types, true ),

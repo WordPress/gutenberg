@@ -9,7 +9,7 @@ WordPress registers them on the server through the entity actions API, like a pl
 The actions of this package live in folders of `src`, one per collection:
 
 -   `post_type_supports`: the default actions of every post type (`delete-post`, `duplicate-post`, `edit-post`, `move-to-trash`, `order-pages`, `permanently-delete`, `rename-post`, `reset-post`, `restore`, `view-post`, and `view-post-revisions`).
--   `page`: the actions pages have on top of the defaults (`set-as-homepage` and `set-as-posts-page`).
+-   `page`: the actions pages have on top of the defaults (`quick-edit`, `set-as-homepage`, and `set-as-posts-page`).
 -   `wp_block`: the actions patterns have on top of the defaults (`duplicate-pattern` and `export-pattern`).
 -   `wp_template_part`: the actions template parts have on top of the defaults (`duplicate-template-part`).
 
@@ -18,6 +18,7 @@ Each action has a folder named after its id, with the data of the action in `act
 `src/index.php` registers the actions of each post type exposed in the REST API, on the `wp_entity_actions_api_init` action at priority 0, so a plugin hooking it at the default priority can remove or replace them:
 
 -   `edit-post`, for pages, templates, template parts, and patterns, when the user can edit them. It is only shown in the lists (its `context` is `list`), and it opens the entity the way the screen showing it does: the screen sets the function opening an entity with the `setEntityNavigator` private action of the editor store, and the action does nothing on a screen that sets none.
+-   `quick-edit`, for pages, when the user can edit them. It is only shown in the lists, and it opens the quick edit form of the pages the way the screen listing them does: the screen sets the function opening the form with the `setQuickEditOpener` private action of the editor store, and the action does nothing on a screen that sets none.
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.
 -   `duplicate-post`, for the post types the user can create, except templates, template parts, and patterns. Only in the Gutenberg plugin.
