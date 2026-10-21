@@ -42,9 +42,15 @@ try {
 			REPO_ROOT,
 			dryRun
 		);
-		console.log(
-			`Rollback complete for ${ res.packageName }: restored ${ res.versionsRestored } versions and ${ res.fragmentsRestored } unreleased entries.`
-		);
+		if ( dryRun ) {
+			console.log(
+				`Dry-run rollback complete for ${ res.packageName }: would restore ${ res.versionsRestored } versions and ${ res.fragmentsRestored } unreleased entries.`
+			);
+		} else {
+			console.log(
+				`Rollback complete for ${ res.packageName }: restored ${ res.versionsRestored } versions and ${ res.fragmentsRestored } unreleased entries.`
+			);
+		}
 	} else {
 		const res = migratePackageToChangie(
 			packageName,
@@ -53,9 +59,15 @@ try {
 			isUpdate
 		);
 		const actionWord = isUpdate ? 'Update' : 'Migration';
-		console.log(
-			`${ actionWord } complete for ${ res.packageName }: created ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
-		);
+		if ( dryRun ) {
+			console.log(
+				`Dry-run ${ actionWord.toLowerCase() } complete for ${ res.packageName }: would create ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
+			);
+		} else {
+			console.log(
+				`${ actionWord } complete for ${ res.packageName }: created ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
+			);
+		}
 	}
 } catch ( err: any ) {
 	console.error( `Error: ${ err.message }` );
