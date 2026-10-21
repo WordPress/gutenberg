@@ -35,8 +35,8 @@ function _gutenberg_get_post_type_fields_preload_paths( $post_types ) {
 }
 
 /**
- * Returns the post types whose fields the screen of the site editor being
- * loaded lists, from its `p` query arg.
+ * Returns the post types whose items the screen of the site editor being
+ * loaded lists or edits, from its `p` query arg.
  *
  * The screens are the routes in
  * packages/edit-site/src/components/site-editor-routes: the lists and the
@@ -96,6 +96,55 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 	);
 }
 add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
+
+/**
+ * Preloads the actions of the post types the site editor lists.
+ *
+ * The site editor reads them from the `wp/v2/entity-actions` route as it
+ * loads, see `useEntityActions()` in
+ * packages/editor/src/dataviews/entity-actions-loader.ts: those of the edited
+ * post, if any, and of the post types of the screen it opens on, whose lists
+ * show the actions of their items. A path must match the request of the
+ * `getEntityActionsConfig` core data resolver, see
+ * packages/core-data/src/resolvers.js.
+ *
+ * The post editor is left to `_wp_preload_entity_actions()`, and the paths it
+ * already preloads are skipped.
+ *
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Block editor context.
+ * @return array Filtered preload paths.
+ */
+function _gutenberg_preload_site_editor_entity_actions( $paths, $context ) {
+	if ( 'core/edit-site' !== $context->name ) {
+		return $paths;
+	}
+
+	$post_types = array();
+	if ( isset( $context->post ) ) {
+		$post_types[] = $context->post->post_type;
+	}
+	$post_types = array_merge( $post_types, _gutenberg_get_site_editor_screen_post_types() );
+
+	foreach ( array_unique( $post_types ) as $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			continue;
+		}
+		$path = add_query_arg(
+			array(
+				'kind' => 'postType',
+				'name' => $post_type,
+			),
+			'/wp/v2/entity-actions'
+		);
+		if ( ! in_array( $path, $paths, true ) ) {
+			$paths[] = $path;
+		}
+	}
+
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_site_editor_entity_actions', 10, 2 );
 
 /**
  * Filters the block editor preload paths.
