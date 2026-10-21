@@ -9,10 +9,12 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { Link } from '@wordpress/ui';
 import type { PluginStatus } from './use-connector-plugin';
 
 const MCP_PLUGIN_SLUG = 'mcp-adapter';
 const MCP_PLUGIN_ID = 'mcp-adapter/mcp-adapter';
+const MCP_PLUGIN_URL = 'https://wordpress.org/plugins/mcp-adapter/';
 const MCP_DEFAULT_ROUTE = 'mcp/mcp-adapter-default-server';
 
 type Busy = false | 'installing' | 'activating' | 'deactivating';
@@ -107,30 +109,32 @@ export function McpAccessPanel() {
 
 	const getHelp = () => {
 		if ( busy === 'installing' ) {
-			return __( 'Installing the MCP Adapter plugin…' );
+			return __( 'Installing the <a>MCP Adapter plugin</a>…' );
 		}
 		if ( busy === 'activating' ) {
-			return __( 'Activating the MCP Adapter plugin…' );
+			return __( 'Activating the <a>MCP Adapter plugin</a>…' );
 		}
 		if ( busy === 'deactivating' ) {
-			return __( 'Deactivating the MCP Adapter plugin…' );
+			return __( 'Deactivating the <a>MCP Adapter plugin</a>…' );
 		}
 		if ( pluginStatus === 'not-installed' && ! canInstallPlugins ) {
 			return __(
-				'Needs the MCP Adapter plugin. Ask a site administrator to install it.'
+				'Needs the <a>MCP Adapter plugin</a>. Ask a site administrator to install it.'
 			);
 		}
 		if ( pluginStatus === 'not-installed' ) {
 			return __(
-				'Turning this on installs and activates the MCP Adapter plugin.'
+				'Turning this on installs and activates the <a>MCP Adapter plugin</a>.'
 			);
 		}
 		if ( pluginStatus === 'inactive' ) {
-			return __( 'Turning this on activates the MCP Adapter plugin.' );
+			return __(
+				'Turning this on activates the <a>MCP Adapter plugin</a>.'
+			);
 		}
 		if ( isOn ) {
 			return __(
-				'The MCP Adapter plugin is active. Turning this off deactivates it.'
+				'The <a>MCP Adapter plugin</a> is active. Turning this off deactivates it.'
 			);
 		}
 		return '';
@@ -139,7 +143,12 @@ export function McpAccessPanel() {
 	const endpoint = siteUrl
 		? `${ siteUrl }/wp-json/${ MCP_DEFAULT_ROUTE }`
 		: '';
-	const help = getHelp();
+	const helpText = getHelp();
+	const help = helpText
+		? createInterpolateElement( helpText, {
+				a: <Link href={ MCP_PLUGIN_URL } openInNewTab />,
+			} )
+		: '';
 	const isLocked =
 		!! busy ||
 		pluginStatus === 'checking' ||
