@@ -1,5 +1,6 @@
 import { lock } from '../lock-unlock';
 import { isContentBlock } from './utils';
+import { isBlockAllowedInParent } from './is-block-allowed-in-parent';
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
 // and `save`. The transforms specification allows converting one blocktype to
@@ -178,6 +179,7 @@ import { parseRawBlock as _parseRawBlock } from './parser';
 export const privateApis = {};
 lock( privateApis, {
 	isContentBlock,
+	isBlockAllowedInParent,
 	editableRootKey,
 	parseRawBlock: _parseRawBlock,
 } );

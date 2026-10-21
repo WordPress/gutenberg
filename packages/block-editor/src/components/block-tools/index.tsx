@@ -228,6 +228,9 @@ export default function BlockTools( {
 					// `isGroupable` requires a grouping block.
 					groupingBlockName!
 				);
+				if ( ! newBlocks ) {
+					return;
+				}
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 			}
