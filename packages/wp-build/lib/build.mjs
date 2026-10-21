@@ -128,36 +128,11 @@ const boolConfigVal = ( value ) => {
 	return [ 'true', '1' ].includes( value.toLowerCase() );
 };
 
-const { values: CLI_OPTIONS } = parseArgs( {
-	options: {
-		watch: {
-			type: 'boolean',
-			short: 'w',
-			default: false,
-		},
-		'base-url': {
-			type: 'string',
-			default:
-				( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-				boolConfigVal(
-					process.env.npm_package_config_IS_WORDPRESS_CORE
-				) )
-					? "includes_url( 'build/' )"
-					: 'plugin_dir_url( __FILE__ )',
-		},
-		'minified-only': {
-			type: 'boolean',
-			default: false,
-		},
-	},
-	strict: false,
-} );
-
 /*
- * `--minified-only` skips the bundles that WordPress loads only when
- * `SCRIPT_DEBUG` is true, and the source maps of the minified bundles.
+ * Set from `--minified-only`, which skips the bundles that WordPress loads only
+ * when `SCRIPT_DEBUG` is true, and the source maps of the minified bundles.
  */
-const MINIFIED_ONLY = CLI_OPTIONS[ 'minified-only' ];
+let minifiedOnly = false;
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -188,7 +163,7 @@ const getDefine = ( scriptDebug ) => ( {
  * @return {Promise<import('esbuild').BuildResult>|undefined} The build, or undefined when skipped.
  */
 function buildNonMinified( options ) {
-	return MINIFIED_ONLY ? undefined : esbuild.build( options );
+	return minifiedOnly ? undefined : esbuild.build( options );
 }
 
 /**
@@ -601,7 +576,7 @@ async function bundlePackage( packageName, options = {} ) {
 			entryPoints: [ entryPoint ],
 			bundle: true,
 			loader: LOADER_CONFIG,
-			sourcemap: ! MINIFIED_ONLY,
+			sourcemap: ! minifiedOnly,
 			format: 'iife',
 			target,
 			platform: 'browser',
@@ -725,7 +700,7 @@ async function bundlePackage( packageName, options = {} ) {
 					// worker) stays compact; ASCII output would escape high
 					// bytes as \uXXXX and defeat the compression.
 					charset: 'utf8',
-					sourcemap: ! isWasmWorker && ! MINIFIED_ONLY,
+					sourcemap: ! isWasmWorker && ! minifiedOnly,
 					format: 'esm',
 					target,
 					platform: 'browser',
@@ -2365,7 +2340,7 @@ async function generateWidgetsPhp( widgets, replacements ) {
  */
 async function buildAll( baseUrlExpression ) {
 	console.log(
-		MINIFIED_ONLY
+		minifiedOnly
 			? '🔨 Building packages (minified only)...\n'
 			: '🔨 Building packages...\n'
 	);
@@ -2889,11 +2864,37 @@ async function watchMode() {
  * Main entry point.
  */
 async function main() {
-	const baseUrlExpression = CLI_OPTIONS[ 'base-url' ];
+	const { values } = parseArgs( {
+		options: {
+			watch: {
+				type: 'boolean',
+				short: 'w',
+				default: false,
+			},
+			'base-url': {
+				type: 'string',
+				default:
+					( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+					boolConfigVal(
+						process.env.npm_package_config_IS_WORDPRESS_CORE
+					) )
+						? "includes_url( 'build/' )"
+						: 'plugin_dir_url( __FILE__ )',
+			},
+			'minified-only': {
+				type: 'boolean',
+				default: false,
+			},
+		},
+		strict: false,
+	} );
+
+	minifiedOnly = values[ 'minified-only' ];
+	const baseUrlExpression = values[ 'base-url' ];
 
 	await buildAll( baseUrlExpression );
 
-	if ( CLI_OPTIONS.watch ) {
+	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
 		await watchMode();
 	}
