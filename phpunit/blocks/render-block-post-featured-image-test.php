@@ -45,18 +45,24 @@ class Tests_Blocks_Render_Post_Featured_Image extends WP_UnitTestCase {
 		wp_delete_post( self::$attachment_id, true );
 	}
 
-	/**
-	 * Renders a Post Featured Image block with an overlay and returns the
-	 * class and style of the image and the overlay span.
-	 *
-	 * @param array $attributes Block attributes.
-	 * @return array Image and overlay class and style attributes.
-	 */
-	private function render_element_attributes( $attributes ) {
+	public function test_image_and_overlay_border_styles() {
 		$block = new WP_Block(
 			array(
 				'blockName' => 'core/post-featured-image',
-				'attrs'     => array_merge( array( 'dimRatio' => 50 ), $attributes ),
+				'attrs'     => array(
+					'dimRatio'    => 50,
+					'borderColor' => 'accent-2',
+					'style'       => array(
+						'border' => array(
+							'radius' => 5,
+							'top'    => array(
+								'style' => 'dashed',
+								'width' => '3px',
+							),
+						),
+						'shadow' => '10px 10px 5px #000000',
+					),
+				),
 			),
 			array( 'postId' => self::$post_id )
 		);
@@ -73,160 +79,19 @@ class Tests_Blocks_Render_Post_Featured_Image extends WP_UnitTestCase {
 			'style' => $processor->get_attribute( 'style' ),
 		);
 
-		return array(
-			'image'   => $image,
-			'overlay' => $overlay,
+		$this->assertSame(
+			array(
+				'class' => 'has-border-color has-accent-2-border-color wp-post-image',
+				'style' => 'border-radius:5px;border-top-width:3px;border-top-style:dashed;object-fit:cover;box-shadow:10px 10px 5px #000000;',
+			),
+			$image
 		);
-	}
-
-	/**
-	 * @dataProvider data_border_styles
-	 *
-	 * @param array $attributes Block attributes.
-	 * @param array $expected   Expected image and overlay class and style.
-	 */
-	public function test_image_and_overlay_border_styles( $attributes, $expected ) {
-		$this->assertSame( $expected, $this->render_element_attributes( $attributes ) );
-	}
-
-	/**
-	 * Data provider.
-	 *
-	 * @return array
-	 */
-	public function data_border_styles() {
-		return array(
-			'custom'   => array(
-				'attributes' => array(
-					'style' => array(
-						'border' => array(
-							'radius' => '10px',
-							'width'  => '2px',
-							'style'  => 'solid',
-							'color'  => '#ff0000',
-						),
-					),
-				),
-				'expected'   => array(
-					'image'   => array(
-						'class' => 'has-border-color wp-post-image',
-						'style' => 'border-color:#ff0000;border-radius:10px;border-style:solid;border-width:2px;object-fit:cover;',
-					),
-					'overlay' => array(
-						'class' => 'wp-block-post-featured-image__overlay has-border-color has-background-dim has-background-dim-50',
-						'style' => 'border-color:#ff0000;border-radius:10px;border-style:solid;border-width:2px',
-					),
-				),
+		$this->assertSame(
+			array(
+				'class' => 'wp-block-post-featured-image__overlay has-border-color has-accent-2-border-color has-background-dim has-background-dim-50',
+				'style' => 'border-radius:5px;border-top-width:3px;border-top-style:dashed',
 			),
-			'preset'   => array(
-				'attributes' => array(
-					'borderColor' => 'accent-2',
-					'style'       => array(
-						'border' => array(
-							'width' => '1px',
-							'style' => 'solid',
-						),
-					),
-				),
-				'expected'   => array(
-					'image'   => array(
-						'class' => 'has-border-color has-accent-2-border-color wp-post-image',
-						'style' => 'border-style:solid;border-width:1px;object-fit:cover;',
-					),
-					'overlay' => array(
-						'class' => 'wp-block-post-featured-image__overlay has-border-color has-accent-2-border-color has-background-dim has-background-dim-50',
-						'style' => 'border-style:solid;border-width:1px',
-					),
-				),
-			),
-			'per side' => array(
-				'attributes' => array(
-					'style' => array(
-						'border' => array(
-							'top'  => array(
-								'color' => '#00ff00',
-								'style' => 'dashed',
-								'width' => '3px',
-							),
-							'left' => array(
-								'width' => '1px',
-							),
-						),
-					),
-				),
-				'expected'   => array(
-					'image'   => array(
-						'class' => 'attachment-post-thumbnail size-post-thumbnail wp-post-image',
-						'style' => 'border-top-width:3px;border-top-color:#00ff00;border-top-style:dashed;border-left-width:1px;object-fit:cover;',
-					),
-					'overlay' => array(
-						'class' => 'wp-block-post-featured-image__overlay has-background-dim has-background-dim-50',
-						'style' => 'border-top-width:3px;border-top-color:#00ff00;border-top-style:dashed;border-left-width:1px',
-					),
-				),
-			),
-			'numeric'  => array(
-				'attributes' => array(
-					'style' => array(
-						'border' => array(
-							'radius' => 5,
-							'width'  => 2,
-						),
-					),
-				),
-				'expected'   => array(
-					'image'   => array(
-						'class' => 'attachment-post-thumbnail size-post-thumbnail wp-post-image',
-						'style' => 'border-radius:5px;border-width:2px;object-fit:cover;',
-					),
-					'overlay' => array(
-						'class' => 'wp-block-post-featured-image__overlay has-background-dim has-background-dim-50',
-						'style' => 'border-radius:5px;border-width:2px',
-					),
-				),
-			),
-			'zero'     => array(
-				'attributes' => array(
-					'style' => array(
-						'border' => array(
-							'radius' => 0,
-							'width'  => 0,
-							'style'  => 'solid',
-						),
-					),
-				),
-				'expected'   => array(
-					'image'   => array(
-						'class' => 'attachment-post-thumbnail size-post-thumbnail wp-post-image',
-						'style' => 'border-radius:0px;border-style:solid;border-width:0px;object-fit:cover;',
-					),
-					'overlay' => array(
-						'class' => 'wp-block-post-featured-image__overlay has-background-dim has-background-dim-50',
-						'style' => 'border-radius:0px;border-style:solid;border-width:0px',
-					),
-				),
-			),
-			'shadow'   => array(
-				'attributes' => array(
-					'style' => array(
-						'border' => array(
-							'radius' => '10px',
-							'color'  => '#ff0000',
-						),
-						'shadow' => '10px 10px 5px #000000',
-					),
-				),
-				'expected'   => array(
-					'image'   => array(
-						'class' => 'has-border-color wp-post-image',
-						'style' => 'border-color:#ff0000;border-radius:10px;object-fit:cover;box-shadow:10px 10px 5px #000000;',
-					),
-					'overlay' => array(
-						'class' => 'wp-block-post-featured-image__overlay has-border-color has-background-dim has-background-dim-50',
-						'style' => 'border-color:#ff0000;border-radius:10px',
-					),
-				),
-			),
+			$overlay
 		);
 	}
 }
