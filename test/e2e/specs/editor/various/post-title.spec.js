@@ -249,6 +249,79 @@ test.describe( 'Post title', () => {
 			] );
 		} );
 
+		// Plain text goes through the Markdown converter when pasted as blocks;
+		// the title is plain text and keeps the characters as pasted.
+		// See https://github.com/WordPress/gutenberg/issues/78956.
+		test( 'should keep Markdown syntax when pasting plain text into the post title', async ( {
+			editor,
+			admin,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( pageTitleField ).toBeFocused();
+
+			pageUtils.setClipboardData( {
+				plainText: '# 3 reasons why **this** matters',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( pageTitleField ).toHaveText(
+				'# 3 reasons why **this** matters'
+			);
+			await expect.poll( editor.getBlocks ).toEqual( [] );
+
+			// Pasting into a title with text inserts the text at the caret
+			// rather than adding a block.
+			pageUtils.setClipboardData( {
+				plainText: ' # twice',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( pageTitleField ).toHaveText(
+				'# 3 reasons why **this** matters # twice'
+			);
+			await expect.poll( editor.getBlocks ).toEqual( [] );
+		} );
+
+		test( 'should keep the first line of pasted plain text as the title and insert the rest as blocks', async ( {
+			editor,
+			admin,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( pageTitleField ).toBeFocused();
+
+			pageUtils.setClipboardData( {
+				plainText:
+					'# First line becomes the title\r\n\r\nSecond paragraph here.\r\n\r\n## Heading two',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( pageTitleField ).toHaveText(
+				'# First line becomes the title'
+			);
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Second paragraph here.' },
+				},
+				{
+					name: 'core/heading',
+					attributes: { content: 'Heading two', level: 2 },
+				},
+			] );
+		} );
+
 		test( 'should output HTML tags in plaintext when added into Post Title field in visual editor mode', async ( {
 			editor,
 			page,

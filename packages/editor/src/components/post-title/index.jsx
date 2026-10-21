@@ -4,7 +4,10 @@ import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { pasteHandler } from '@wordpress/blocks';
+import {
+	pasteHandler,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import {
 	privateApis as richTextPrivateApis,
 	create,
@@ -15,10 +18,12 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
+import splitFirstLine from './split-first-line';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
+const { isPlainTextPaste } = unlock( blocksPrivateApis );
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
@@ -132,12 +137,35 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			return;
 		}
 
+		event.preventDefault();
+
+		// The title is plain text, so plain text is pasted verbatim: the paste
+		// handler would parse it as Markdown and consume characters like `#`
+		// or `**` that the title has no formatting to carry. Only the lines
+		// that do not fit in the title go through the handler, as blocks.
+		if ( isPlainTextPaste( { HTML: html, plainText } ) ) {
+			const [ firstLine, remainder ] = splitFirstLine( plainText );
+
+			if ( ! remainder ) {
+				// A single line is inserted at the caret, which stays after it.
+				onChange( insert( value, create( { text: firstLine } ) ) );
+			} else if ( ! title ) {
+				onUpdate( firstLine );
+				onInsertBlockAfter(
+					pasteHandler( { plainText: remainder, mode: 'BLOCKS' } )
+				);
+			} else {
+				onInsertBlockAfter(
+					pasteHandler( { plainText, mode: 'BLOCKS' } )
+				);
+			}
+			return;
+		}
+
 		const content = pasteHandler( {
 			HTML: html,
 			plainText,
 		} );
-
-		event.preventDefault();
 
 		if ( ! content.length ) {
 			return;
