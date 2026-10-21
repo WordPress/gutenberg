@@ -6,6 +6,9 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
+// Props of every `MediaUpload` the inspector renders, keyed by its modal
+// title: the sidebar has one picker for the track and one for its image.
+let mockMediaUploadProps;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
@@ -21,8 +24,10 @@ vi.mock( import( '@wordpress/block-editor' ), async () => {
 			const { name, onSelect } = props;
 			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
 		},
-		MediaUpload: ( { render: renderMediaUpload } ) =>
-			renderMediaUpload( { open: vi.fn() } ),
+		MediaUpload: ( props ) => {
+			mockMediaUploadProps[ props.title ] = props;
+			return props.render( { open: vi.fn() } );
+		},
 		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
 		PlainText,
 		useBlockProps: vi.fn( () => ( {} ) ),
@@ -103,6 +108,7 @@ function renderEdit( props = {} ) {
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
+		mockMediaUploadProps = {};
 		useDispatch.mockReturnValue( {
 			createErrorNotice: vi.fn(),
 		} );
@@ -292,6 +298,51 @@ describe( 'PlaylistTrackEdit', () => {
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
 		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
 			'src'
+		);
+	} );
+
+	it( 'shows the track file and a replace control in the settings panel for a single selected track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( screen.getByText( 'song.mp3' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Replace track' } )
+		).toBeInTheDocument();
+		expect( mockMediaUploadProps[ 'Select track' ] ).toEqual(
+			expect.objectContaining( {
+				allowedTypes: [ 'audio' ],
+				value: 1,
+			} )
+		);
+	} );
+
+	it( 'does not show the settings panel replace control when multiple tracks are selected', () => {
+		// Replacing the source of every selected track with one file makes no
+		// sense, so the control follows the toolbar replace control.
+		renderEdit( { isSelected: false } );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Replace track' } )
+		).not.toBeInTheDocument();
+		expect( mockMediaUploadProps[ 'Select track' ] ).toBeUndefined();
+	} );
+
+	it( 'replaces the track from the settings panel media picker', () => {
+		const { setAttributes } = renderEdit( { isSelected: true } );
+
+		mockMediaUploadProps[ 'Select track' ].onSelect( {
+			id: 2,
+			url: 'https://example.com/replacement.mp3',
+			title: 'Replacement Track',
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				blob: undefined,
+				id: 2,
+				src: 'https://example.com/replacement.mp3',
+				title: 'Replacement Track',
+			} )
 		);
 	} );
 
