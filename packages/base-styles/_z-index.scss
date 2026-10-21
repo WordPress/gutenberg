@@ -18,6 +18,14 @@ $z-layers: (
 	".has-child .wp-block-navigation__submenu-container": 28,
 	".has-child:hover .wp-block-navigation__submenu-container": 29,
 
+	// Veil drawn over a hidden block while hidden blocks are shown. The ghost
+	// isolates its stacking context, so this value only has to beat the
+	// block's own descendants: in-block UI (2), floated images (9), selected
+	// negative-margin blocks (20), Navigation dropdowns (28, 29) and flex
+	// items such as Navigation links, which stack at their own z-index (1)
+	// without being positioned.
+	".block-editor-block-list__block.is-block-ghosted::before": 30,
+
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
