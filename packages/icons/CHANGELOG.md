@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing.
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
