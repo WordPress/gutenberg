@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import StylesRevisionsCodeDiff, {
 	getStylesRevisionCode,
 } from '../revisions-code-diff';
@@ -82,7 +82,7 @@ describe( 'getStylesRevisionCode', () => {
 } );
 
 describe( 'StylesRevisionsCodeDiff', () => {
-	it( 'marks the revision value as removed and the current value as added', () => {
+	it( 'shows the revision value removed next to the current value added', () => {
 		render(
 			<StylesRevisionsCodeDiff
 				revision={ { styles: { color: { background: 'blue' } } } }
@@ -95,13 +95,17 @@ describe( 'StylesRevisionsCodeDiff', () => {
 				name: 'Changes since this revision',
 			} )
 		).toBeVisible();
+
+		// The changed line pairs up in one row: the revision on the start
+		// side, the current styles on the end side.
+		const row = screen.getByRole( 'row', {
+			name: /Removed.*"background": "blue".*Added.*"background": "red"/,
+		} );
 		expect(
-			screen.getByRole( 'row', {
-				name: /Removed.*"background": "blue"/,
-			} )
+			within( row ).getByRole( 'cell', { name: /"background": "blue"/ } )
 		).toHaveClass( 'is-removed' );
 		expect(
-			screen.getByRole( 'row', { name: /Added.*"background": "red"/ } )
+			within( row ).getByRole( 'cell', { name: /"background": "red"/ } )
 		).toHaveClass( 'is-added' );
 	} );
 

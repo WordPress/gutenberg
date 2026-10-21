@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -40,25 +41,102 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	// Stack the panes when the canvas, not the window, is narrow.
+	container-type: inline-size;
 }
 
 .editor-styles-canvas-revisions__header {
 	flex: none;
 	display: grid;
-	// The selected revision on the start side, the current version in the
-	// middle and the view toggle on the end side.
-	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-	align-items: center;
-	gap: $grid-unit-20;
-	// Leave room for the close button, which sits over the top right corner.
-	padding: $grid-unit-10 ($grid-unit-10 + $button-size-compact + $grid-unit-10) $grid-unit-10 $grid-unit-20;
+	grid-template-columns: minmax(0, 1fr);
 	border-bottom: $border-width solid $gray-200;
 	background: $white;
+
+	// One column per pane, so each header sits over its preview.
+	.is-comparing & {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.editor-styles-canvas-revisions__pane-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-10 $grid-unit-20;
+	min-height: $button-size-compact + $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-20;
+
+	// The details take the room they need, and the toggle moves to its own
+	// line when both don't fit, rather than squeezing the details.
+	> .editor-styles-canvas-revision-details {
+		flex: 1 1 14rem;
+	}
+
+	& + & {
+		border-left: $border-width solid $gray-200;
+	}
+
+	// The last header holds the toggle. Leave room for the close button,
+	// which sits over the top right corner.
+	&:last-child {
+		padding-right: $grid-unit-10 + $button-size-compact + $grid-unit-10;
+	}
 }
 
 .editor-styles-canvas-revisions__view-toggle {
 	display: flex;
 	justify-content: flex-end;
+	margin-left: auto;
+}
+
+.editor-styles-canvas-revisions__content {
+	flex: 1 1 auto;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: minmax(0, 1fr);
+
+	&.is-split {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.editor-styles-canvas-revisions__pane {
+	min-width: 0;
+	min-height: 0;
+
+	& + & {
+		border-left: $border-width solid $gray-200;
+	}
+}
+
+// Only the visual panes stack: the code view stays side by side, so its
+// header does too.
+@container (max-width: #{ $break-medium }) {
+	.is-comparing.is-visual .editor-styles-canvas-revisions__header,
+	.editor-styles-canvas-revisions__content.is-split {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.editor-styles-canvas-revisions__content.is-split {
+		grid-template-rows: repeat(2, minmax(0, 1fr));
+	}
+
+	.is-visual .editor-styles-canvas-revisions__pane-header + .editor-styles-canvas-revisions__pane-header,
+	.editor-styles-canvas-revisions__pane + .editor-styles-canvas-revisions__pane {
+		border-left: 0;
+		border-top: $border-width solid $gray-200;
+	}
+
+	// Stacked, the first header is the one under the close button, so only it
+	// leaves room for it. A lone header is both first and last, and keeps it.
+	.is-visual .editor-styles-canvas-revisions__pane-header:last-child {
+		padding-right: $grid-unit-20;
+	}
+
+	.is-visual .editor-styles-canvas-revisions__pane-header:first-child {
+		padding-right: $grid-unit-10 + $button-size-compact + $grid-unit-10;
+	}
 }
 
 .editor-styles-canvas-revision-details {
