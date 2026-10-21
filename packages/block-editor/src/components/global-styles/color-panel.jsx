@@ -111,7 +111,6 @@ export function ColorToolsPanel( {
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
-			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
