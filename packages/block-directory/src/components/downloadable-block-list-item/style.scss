@@ -20,6 +20,9 @@
 	border: 0;
 	text-align: left;
 
+	// Keep the focus ring visible when keyboard navigation scrolls an item into view.
+	scroll-margin: $grid-unit-05;
+
 	@media not (prefers-reduced-motion) {
 		transition: box-shadow 0.1s linear;
 	}
@@ -40,7 +43,8 @@
 	}
 
 	&[data-focus-visible] {
-		@include button-style__focus();
+		@include outset-ring__focus();
+		box-shadow: none;
 	}
 
 	&.is-installing {
