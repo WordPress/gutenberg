@@ -190,16 +190,6 @@ $revision-code-diff-marker-width: 3ch;
 		background: rgba($revision-diff-added-color, 0.12);
 	}
 
-	.editor-revisions-code-diff__line-number.is-removed,
-	.editor-revisions-code-diff__marker.is-removed {
-		background: color-mix(in srgb, $revision-diff-removed-color 12%, $white);
-	}
-
-	.editor-revisions-code-diff__line-number.is-added,
-	.editor-revisions-code-diff__marker.is-added {
-		background: color-mix(in srgb, $revision-diff-added-color 12%, $white);
-	}
-
 	td.is-empty {
 		background: $gray-100;
 	}

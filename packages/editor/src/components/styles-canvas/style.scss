@@ -62,8 +62,10 @@
 	flex-wrap: wrap;
 	align-items: center;
 	gap: $grid-unit-10 $grid-unit-20;
+	// A 40px row under 4px of padding puts the toggle and the details on the
+	// same centre line as the 32px close button at 8px from the top.
 	min-height: $button-size-compact + $grid-unit-10;
-	padding: $grid-unit-10 $grid-unit-20;
+	padding: $grid-unit-05 $grid-unit-20;
 
 	// The details take the room they need, and the toggle moves to its own
 	// line when both don't fit, rather than squeezing the details.
@@ -136,6 +138,11 @@
 	.is-visual .editor-styles-canvas-revisions__pane-header:first-child {
 		padding-right: $grid-unit-10 + $button-size-compact + $grid-unit-10;
 	}
+}
+
+// In preview mode there is no close button to leave room for.
+.editor-styles-canvas.is-preview-mode .editor-styles-canvas-revisions__pane-header {
+	padding-right: $grid-unit-20;
 }
 
 .editor-styles-canvas-revision-details {

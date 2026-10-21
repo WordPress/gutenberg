@@ -53,6 +53,23 @@ describe( 'RevisionDetails', () => {
 		expect( screen.queryByText( 'joen' ) ).not.toBeInTheDocument();
 	} );
 
+	it( 'falls back to a generic name when the author is unknown', () => {
+		render(
+			<RevisionDetails
+				revision={ { id: 12, modified: '2026-01-22T17:12:00' } }
+			/>
+		);
+
+		expect( screen.getByText( 'User' ) ).toBeVisible();
+	} );
+
+	it( 'shows no date for a revision without one', () => {
+		render( <RevisionDetails revision={ { id: 12, author } } /> );
+
+		expect( screen.queryByText( /20\d\d/ ) ).not.toBeInTheDocument();
+		expect( screen.getByText( 'joen' ) ).toBeVisible();
+	} );
+
 	it( 'keeps the avatar out of the accessibility tree', () => {
 		render(
 			<RevisionDetails

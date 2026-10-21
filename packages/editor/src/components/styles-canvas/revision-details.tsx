@@ -39,14 +39,14 @@ function getRevisionDateLabel( revision: RevisionDetailsRevision ): string {
 	if ( 'unsaved' === revision.id ) {
 		return __( 'Unsaved changes' );
 	}
+	if ( ! revision.modified ) {
+		return '';
+	}
 	const modified =
 		revision.modified instanceof Date
 			? revision.modified.toISOString()
 			: revision.modified;
-	return dateI18n(
-		getSettings().formats.datetime,
-		getDate( modified ?? null )
-	);
+	return dateI18n( getSettings().formats.datetime, getDate( modified ) );
 }
 
 /**
@@ -61,9 +61,11 @@ export default function RevisionDetails( {
 	revision,
 	isCurrent = false,
 }: RevisionDetailsProps ) {
-	// The theme defaults have no author.
-	const author = 'parent' === revision.id ? undefined : revision.author;
-	const avatarUrl = author?.avatar_urls?.[ '48' ];
+	// The theme defaults have no author. Any other entry names one, falling
+	// back as the revisions list does when the author isn't known.
+	const hasAuthor = 'parent' !== revision.id;
+	const avatarUrl = revision.author?.avatar_urls?.[ '48' ];
+	const dateLabel = getRevisionDateLabel( revision );
 
 	return (
 		<p className="editor-styles-canvas-revision-details">
@@ -72,14 +74,14 @@ export default function RevisionDetails( {
 					{ __( 'Current version' ) }
 				</span>
 			) }
-			<span>{ getRevisionDateLabel( revision ) }</span>
-			{ author && (
+			{ dateLabel && <span>{ dateLabel }</span> }
+			{ hasAuthor && (
 				<span className="editor-styles-canvas-revision-details__author">
 					{ avatarUrl && (
 						// The name follows, so the avatar is decorative.
 						<img alt="" src={ avatarUrl } />
 					) }
-					{ author.name || __( 'User' ) }
+					{ revision.author?.name || __( 'User' ) }
 				</span>
 			) }
 		</p>

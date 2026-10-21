@@ -168,12 +168,16 @@ function StylesCanvasRevisions( { path }, ref ) {
 	const isComparingRevision =
 		!! selectedRevision && selectedRevision.id !== currentRevision?.id;
 
-	// With no revision in the path, the selected entry is the active one,
-	// which is what the editor shows. A revision the path names but the list
-	// doesn't hold has nothing to compare, rather than the current styles.
+	// The code view compares the selected revision with the current styles.
+	// The current version itself is compared as the editor holds it, as the
+	// sidebar does: the two endpoints need not serialize the same styles
+	// identically. A revision the path names but the list doesn't hold has
+	// nothing to compare.
 	let codeRevision = userConfig;
-	if ( revisionId ) {
-		codeRevision = selectedRevision ?? null;
+	if ( isComparingRevision ) {
+		codeRevision = selectedRevision;
+	} else if ( revisionId && ! selectedRevision ) {
+		codeRevision = null;
 	}
 
 	const previewProps = {
