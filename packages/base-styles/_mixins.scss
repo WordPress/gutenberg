@@ -314,6 +314,8 @@
 }
 
 @mixin checkbox-control {
+	@warn "The `checkbox-control` mixin is deprecated. Use the `CheckboxControl` component from `@wordpress/ui` instead.";
+
 	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
 	margin-right: variables.$grid-unit-15;
 	transition: none;
@@ -389,6 +391,8 @@
 }
 
 @mixin radio-control {
+	@warn "The `radio-control` mixin is deprecated. Use the `RadioGroupControl` component from `@wordpress/ui` instead.";
+
 	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
 	background: wpds.var("--wpds-color-background-interactive-neutral-weak");
 	margin-right: variables.$grid-unit-15;
