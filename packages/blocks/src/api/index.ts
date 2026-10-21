@@ -174,10 +174,12 @@ export {
 // become a public support once the feature has settled.
 const editableRootKey = Symbol( 'editableRoot' );
 import { parseRawBlock as _parseRawBlock } from './parser';
+import { isPlainTextPaste } from './raw-handling/paste-handler';
 
 export const privateApis = {};
 lock( privateApis, {
 	isContentBlock,
 	editableRootKey,
 	parseRawBlock: _parseRawBlock,
+	isPlainTextPaste,
 } );
