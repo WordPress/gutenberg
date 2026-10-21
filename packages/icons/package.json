@@ -71,6 +71,7 @@
 	"scripts": {
 		"prelint:js": "npm run build",
 		"prepare": "npm run build",
-		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs"
+		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs",
+		"normalize-export": "node lib/normalize-export.cjs"
 	}
 }
