@@ -1,4 +1,5 @@
 import { diffLines } from 'diff';
+import clsx from 'clsx';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -300,6 +301,43 @@ export function RevisionsCodeDiff( {
 }
 
 /**
+ * The scrollable, focusable region both code-diff tables render in, with the
+ * message shown instead of a table when there is nothing to list.
+ *
+ * @param {Object}          props              Component props.
+ * @param {string}          [props.className]  Extra class for the region.
+ * @param {string}          props.label        Accessible name of the region.
+ * @param {boolean}         props.isEmpty      Whether to show the message instead of the table.
+ * @param {string}          props.emptyMessage Message shown when there is nothing to list.
+ * @param {React.ReactNode} props.children     The table.
+ * @return {React.JSX.Element} The code-diff region.
+ */
+function CodeDiffRegion( {
+	className,
+	label,
+	isEmpty,
+	emptyMessage,
+	children,
+} ) {
+	return (
+		<div
+			className={ clsx( 'editor-revisions-code-diff', className ) }
+			role="region"
+			aria-label={ label }
+			tabIndex={ 0 }
+		>
+			{ isEmpty ? (
+				<p className="editor-revisions-code-diff__empty">
+					{ emptyMessage }
+				</p>
+			) : (
+				children
+			) }
+		</div>
+	);
+}
+
+/**
  * Renders code-diff rows as a scrollable, read-only table, with both line
  * numbers in one column of code. `SplitCodeDiffTable` shows them side by side.
  *
@@ -312,74 +350,67 @@ export function RevisionsCodeDiff( {
  */
 export function CodeDiffTable( { rows, showDiff, label, emptyMessage } ) {
 	return (
-		<div
-			className="editor-revisions-code-diff"
-			role="region"
-			aria-label={ label }
-			tabIndex={ 0 }
+		<CodeDiffRegion
+			label={ label }
+			isEmpty={ ! rows.length }
+			emptyMessage={ emptyMessage }
 		>
-			{ rows.length ? (
-				<table className="editor-revisions-code-diff__table">
-					<VisuallyHidden render={ <caption /> }>
-						{ label }
-					</VisuallyHidden>
-					<VisuallyHidden render={ <thead /> }>
-						<tr>
-							{ showDiff && <th>{ __( 'Previous line' ) }</th> }
-							<th>{ __( 'Current line' ) }</th>
-							{ showDiff && <th>{ _x( 'Change', 'noun' ) }</th> }
-							<th>{ __( 'Code' ) }</th>
-						</tr>
-					</VisuallyHidden>
-					<tbody>
-						{ rows.map( ( row, index ) => {
-							let marker = '';
-							let statusLabel = __( 'Unchanged' );
-							if ( row.status === 'added' ) {
-								marker = '+';
-								statusLabel = __( 'Added' );
-							} else if ( row.status === 'removed' ) {
-								marker = '−';
-								statusLabel = __( 'Removed' );
-							}
+			<table className="editor-revisions-code-diff__table">
+				<VisuallyHidden render={ <caption /> }>
+					{ label }
+				</VisuallyHidden>
+				<VisuallyHidden render={ <thead /> }>
+					<tr>
+						{ showDiff && <th>{ __( 'Previous line' ) }</th> }
+						<th>{ __( 'Current line' ) }</th>
+						{ showDiff && <th>{ _x( 'Change', 'noun' ) }</th> }
+						<th>{ __( 'Code' ) }</th>
+					</tr>
+				</VisuallyHidden>
+				<tbody>
+					{ rows.map( ( row, index ) => {
+						let marker = '';
+						let statusLabel = __( 'Unchanged' );
+						if ( row.status === 'added' ) {
+							marker = '+';
+							statusLabel = __( 'Added' );
+						} else if ( row.status === 'removed' ) {
+							marker = '−';
+							statusLabel = __( 'Removed' );
+						}
 
-							return (
-								<tr
-									key={ index }
-									className={ `editor-revisions-code-diff__line is-${ row.status }` }
-								>
-									{ showDiff && (
-										<td className="editor-revisions-code-diff__line-number is-previous">
-											{ row.previousLineNumber }
-										</td>
-									) }
-									<td className="editor-revisions-code-diff__line-number is-current">
-										{ row.currentLineNumber }
+						return (
+							<tr
+								key={ index }
+								className={ `editor-revisions-code-diff__line is-${ row.status }` }
+							>
+								{ showDiff && (
+									<td className="editor-revisions-code-diff__line-number is-previous">
+										{ row.previousLineNumber }
 									</td>
-									{ showDiff && (
-										<td className="editor-revisions-code-diff__marker">
-											<VisuallyHidden>
-												{ statusLabel }
-											</VisuallyHidden>
-											<span aria-hidden="true">
-												{ marker }
-											</span>
-										</td>
-									) }
-									<td className="editor-revisions-code-diff__code">
-										<code>{ row.value }</code>
+								) }
+								<td className="editor-revisions-code-diff__line-number is-current">
+									{ row.currentLineNumber }
+								</td>
+								{ showDiff && (
+									<td className="editor-revisions-code-diff__marker">
+										<VisuallyHidden>
+											{ statusLabel }
+										</VisuallyHidden>
+										<span aria-hidden="true">
+											{ marker }
+										</span>
 									</td>
-								</tr>
-							);
-						} ) }
-					</tbody>
-				</table>
-			) : (
-				<p className="editor-revisions-code-diff__empty">
-					{ emptyMessage }
-				</p>
-			) }
-		</div>
+								) }
+								<td className="editor-revisions-code-diff__code">
+									<code>{ row.value }</code>
+								</td>
+							</tr>
+						);
+					} ) }
+				</tbody>
+			</table>
+		</CodeDiffRegion>
 	);
 }
 
@@ -454,52 +485,46 @@ export function SplitCodeDiffTable( {
 	emptyMessage,
 } ) {
 	return (
-		<div
-			className="editor-revisions-code-diff is-split"
-			role="region"
-			aria-label={ label }
-			tabIndex={ 0 }
+		<CodeDiffRegion
+			className="is-split"
+			label={ label }
+			isEmpty={ ! rows.length }
+			emptyMessage={ emptyMessage }
 		>
-			{ rows.length ? (
-				<table className="editor-revisions-code-diff__table">
-					<VisuallyHidden render={ <caption /> }>
-						{ label }
-					</VisuallyHidden>
-					<colgroup>
-						<col className="editor-revisions-code-diff__line-number-column" />
-						<col className="editor-revisions-code-diff__marker-column" />
-						<col />
-						<col className="editor-revisions-code-diff__line-number-column" />
-						<col className="editor-revisions-code-diff__marker-column" />
-						<col />
-					</colgroup>
-					<VisuallyHidden render={ <thead /> }>
-						<tr>
-							<th>{ __( 'Line' ) }</th>
-							<th>{ _x( 'Change', 'noun' ) }</th>
-							<th>{ previousLabel }</th>
-							<th>{ __( 'Line' ) }</th>
-							<th>{ _x( 'Change', 'noun' ) }</th>
-							<th>{ currentLabel }</th>
+			<table className="editor-revisions-code-diff__table">
+				<VisuallyHidden render={ <caption /> }>
+					{ label }
+				</VisuallyHidden>
+				<colgroup>
+					<col className="editor-revisions-code-diff__line-number-column" />
+					<col className="editor-revisions-code-diff__marker-column" />
+					<col />
+					<col className="editor-revisions-code-diff__line-number-column" />
+					<col className="editor-revisions-code-diff__marker-column" />
+					<col />
+				</colgroup>
+				<VisuallyHidden render={ <thead /> }>
+					<tr>
+						<th>{ __( 'Line' ) }</th>
+						<th>{ _x( 'Change', 'noun' ) }</th>
+						<th>{ previousLabel }</th>
+						<th>{ __( 'Line' ) }</th>
+						<th>{ _x( 'Change', 'noun' ) }</th>
+						<th>{ currentLabel }</th>
+					</tr>
+				</VisuallyHidden>
+				<tbody>
+					{ rows.map( ( row, index ) => (
+						<tr
+							key={ index }
+							className="editor-revisions-code-diff__line"
+						>
+							<SplitCodeDiffSide line={ row.previous } />
+							<SplitCodeDiffSide line={ row.current } />
 						</tr>
-					</VisuallyHidden>
-					<tbody>
-						{ rows.map( ( row, index ) => (
-							<tr
-								key={ index }
-								className="editor-revisions-code-diff__line"
-							>
-								<SplitCodeDiffSide line={ row.previous } />
-								<SplitCodeDiffSide line={ row.current } />
-							</tr>
-						) ) }
-					</tbody>
-				</table>
-			) : (
-				<p className="editor-revisions-code-diff__empty">
-					{ emptyMessage }
-				</p>
-			) }
-		</div>
+					) ) }
+				</tbody>
+			</table>
+		</CodeDiffRegion>
 	);
 }

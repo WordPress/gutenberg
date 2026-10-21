@@ -64,21 +64,6 @@ describe( 'getStylesRevisionCode', () => {
 			styles: {},
 		} );
 	} );
-
-	it( 'treats empty sections encoded as arrays like empty objects', () => {
-		// PHP encodes an empty associative array as `[]`.
-		expect(
-			getStylesRevisionCode( {
-				settings: [],
-				styles: { color: { text: 'red' } },
-			} as unknown as Parameters< typeof getStylesRevisionCode >[ 0 ] )
-		).toBe(
-			getStylesRevisionCode( {
-				settings: {},
-				styles: { color: { text: 'red' } },
-			} )
-		);
-	} );
 } );
 
 describe( 'StylesRevisionsCodeDiff', () => {

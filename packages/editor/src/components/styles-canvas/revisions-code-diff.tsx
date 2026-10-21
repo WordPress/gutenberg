@@ -1,6 +1,9 @@
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import {
+	areGlobalStylesEqual,
+	type GlobalStylesConfig,
+} from '@wordpress/global-styles-engine';
 import {
 	SplitCodeDiffTable,
 	getSplitCodeDiffRows,
@@ -36,25 +39,6 @@ function sortObjectKeys( value: unknown ): unknown {
 }
 
 /**
- * Returns a config section, or an empty object for a missing one. PHP encodes
- * an empty associative array as `[]`, so the REST API can return that for an
- * empty section, which must not read as a change from `{}`.
- *
- * @param section The `styles` or `settings` section of a config.
- * @return The section, or an empty object.
- */
-function normalizeSection( section: unknown ): unknown {
-	if (
-		section === undefined ||
-		section === null ||
-		( Array.isArray( section ) && section.length === 0 )
-	) {
-		return {};
-	}
-	return section;
-}
-
-/**
  * Serializes the styles and settings of a global styles config for a code diff.
  * Revision metadata such as the id, author and date is left out, and keys are
  * sorted, as the REST endpoints and the editor need not order them the same.
@@ -67,8 +51,8 @@ export function getStylesRevisionCode(
 ): string {
 	return JSON.stringify(
 		sortObjectKeys( {
-			settings: normalizeSection( config?.settings ),
-			styles: normalizeSection( config?.styles ),
+			settings: config?.settings ?? {},
+			styles: config?.styles ?? {},
 		} ),
 		null,
 		2
@@ -104,14 +88,21 @@ export default function StylesRevisionsCodeDiff( {
 		if ( ! revision ) {
 			return [];
 		}
-		const revisionCode = getStylesRevisionCode( revision );
-		const currentCode = getStylesRevisionCode( currentConfig );
 		// Matching styles leave nothing to compare, so show the empty message
-		// rather than the whole config marked as unchanged.
-		if ( revisionCode === currentCode ) {
+		// rather than the whole config marked as unchanged. The sidebar's
+		// Apply button decides "matching" the same way.
+		if (
+			areGlobalStylesEqual(
+				revision as GlobalStylesConfig,
+				( currentConfig ?? {} ) as GlobalStylesConfig
+			)
+		) {
 			return [];
 		}
-		return getSplitCodeDiffRows( revisionCode, currentCode );
+		return getSplitCodeDiffRows(
+			getStylesRevisionCode( revision ),
+			getStylesRevisionCode( currentConfig )
+		);
 	}, [ revision, currentConfig ] );
 
 	return (
