@@ -44,6 +44,8 @@
 
 	&[data-focus-visible] {
 		@include outset-ring__focus();
+
+		// Suppress the hover box-shadow when a focused item is also hovered.
 		box-shadow: none;
 	}
 
