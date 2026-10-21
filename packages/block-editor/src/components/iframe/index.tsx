@@ -1,6 +1,13 @@
 import clsx from 'clsx';
 import { version as reactVersion } from 'react';
-import type { CSSProperties, ForwardedRef, Ref, SyntheticEvent } from 'react';
+import type {
+	CSSProperties,
+	EventHandler,
+	ForwardedRef,
+	IframeHTMLAttributes,
+	Ref,
+	SyntheticEvent,
+} from 'react';
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
@@ -12,6 +19,30 @@ import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
 import type { ResolvedAssets } from '../../store/types';
 import type { EventConstructor, IframeProps } from './types';
+
+/**
+ * Events redispatched onto the outer `<iframe>` element.
+ *
+ * Native listeners attach inside the iframe document (`useBubbleEvents`).
+ * Matching React portal bubbles are stopped so parents do not also see the
+ * portal delivery.
+ */
+const BRIDGED_EVENTS = [
+	{ native: 'dragover', react: 'onDragOver', ctor: DragEvent },
+	{ native: 'mousemove', react: 'onMouseMove', ctor: MouseEvent },
+	{ native: 'pointerdown', react: 'onPointerDown', ctor: PointerEvent },
+	{ native: 'mousedown', react: 'onMouseDown', ctor: MouseEvent },
+	{ native: 'click', react: 'onClick', ctor: MouseEvent },
+	{ native: 'keydown', react: 'onKeyDown', ctor: KeyboardEvent },
+] as const satisfies ReadonlyArray< {
+	native: string;
+	react: keyof IframeHTMLAttributes< HTMLIFrameElement >;
+	ctor: EventConstructor;
+} >;
+
+type BridgedReactEvent = ( typeof BRIDGED_EVENTS )[ number ][ 'react' ];
+type BridgedEventHandler =
+	EventHandler< SyntheticEvent< HTMLIFrameElement > > | undefined;
 
 function bubbleEvent(
 	event: Event | SyntheticEvent,
@@ -60,18 +91,63 @@ function bubbleEvent(
 }
 
 /**
+ * Stops a React synthetic event that bubbled across the portal boundary from
+ * the iframe document into the parent React tree.
+ *
+ * @param event React synthetic event that may have crossed documents.
+ */
+function stopReactPortalPropagation( event: SyntheticEvent ) {
+	if (
+		event.currentTarget.ownerDocument ===
+		( event.target as Element ).ownerDocument
+	) {
+		return;
+	}
+
+	const { stopPropagation } = event.nativeEvent;
+	event.nativeEvent.stopPropagation = () => {};
+	event.stopPropagation();
+	event.nativeEvent.stopPropagation = stopPropagation;
+}
+
+/**
+ * React props that stop portal bubbles for redispatched events at the outer
+ * `<iframe>`. Forwards any matching consumer handler first.
+ *
+ * @param props Iframe props that may include event handlers.
+ */
+function getPortalBoundaryEventProps( props: IframeProps ) {
+	const boundaryProps = {} as Pick<
+		IframeHTMLAttributes< HTMLIFrameElement >,
+		BridgedReactEvent
+	>;
+
+	for ( const { react: propName } of BRIDGED_EVENTS ) {
+		boundaryProps[ propName ] = ( event ) => {
+			( props[ propName ] as BridgedEventHandler )?.( event );
+			stopReactPortalPropagation( event );
+		};
+	}
+
+	return boundaryProps;
+}
+
+/**
  * Bubbles selected native events from the iframe document onto the outer
  * `<iframe>` element so parent-document listeners can observe them.
  *
- * `dragover` and `mousemove` keep drag-and-drop and pointer tracking working
- * across the frame boundary. `pointerdown`, `mousedown`, and `click` let
- * parent-document popups (menus, selects, etc.) treat a canvas press as an
- * outside press. Keyboard shortcuts are bubbled separately from the React
- * `onKeyDown` handler on the iframe element.
+ * - `dragover` and `mousemove` keep drag-and-drop and pointer tracking working
+ *   across the frame boundary.
+ * - `pointerdown`, `mousedown`, and `click` let parent-document popups treat
+ *   a canvas press as an outside press.
+ * - `keydown` lets parent shortcuts see canvas keystrokes.
  *
- * Ideally, we should remove event bubbling in the future. Keyboard shortcuts
- * should be context dependent, e.g. actions on blocks like Cmd+A should not
- * work globally outside the block editor.
+ * Pair with `getPortalBoundaryEventProps` so React ancestors do not also
+ * receive the portal-bubbled synthetic event for those same interactions.
+ *
+ * Ideally, we should remove the `keydown` event bubbling in the future.
+ * Keyboard shortcuts should be context dependent, e.g. actions on blocks
+ * like Cmd+A should not work globally outside the block editor.
  *
  * @param iframeDocument Document to attach listeners to.
  */
@@ -85,35 +161,17 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 		}
 		const { frameElement } = defaultView;
 		const html = iframeDocument!.documentElement;
-		const eventTypes = [
-			'dragover',
-			'mousemove',
-			'pointerdown',
-			'mousedown',
-			'click',
-		];
 		const handlers: Record< string, ( event: Event ) => void > = {};
-		for ( const name of eventTypes ) {
-			handlers[ name ] = ( event ) => {
-				const prototype = Object.getPrototypeOf( event );
-				const constructorName = prototype.constructor.name;
-				// The window has the constructors of the events it dispatches.
-				const Constructor = (
-					window as unknown as Record< string, EventConstructor >
-				 )[ constructorName ];
-				// The iframe window's frame is the iframe.
-				bubbleEvent(
-					event,
-					Constructor,
-					frameElement as HTMLIFrameElement
-				);
+		for ( const { native, ctor } of BRIDGED_EVENTS ) {
+			handlers[ native ] = ( event ) => {
+				bubbleEvent( event, ctor, frameElement as HTMLIFrameElement );
 			};
-			html.addEventListener( name, handlers[ name ] );
+			html.addEventListener( native, handlers[ native ] );
 		}
 
 		return () => {
-			for ( const name of eventTypes ) {
-				html.removeEventListener( name, handlers[ name ] );
+			for ( const { native } of BRIDGED_EVENTS ) {
+				html.removeEventListener( native, handlers[ native ] );
 			}
 		};
 	} );
@@ -355,9 +413,9 @@ function Iframe( {
 	const iframe = (
 		<>
 			{ shouldRenderFocusCaptureElements && before }
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
+				{ ...getPortalBoundaryEventProps( props ) }
 				style={ {
 					...props.style,
 					height: props.style?.height,
@@ -371,36 +429,6 @@ function Iframe( {
 				tabIndex={ tabIndex }
 				src={ src }
 				title={ title }
-				onKeyDown={ ( event ) => {
-					if ( props.onKeyDown ) {
-						props.onKeyDown( event );
-					}
-					// If the event originates from inside the iframe, it means
-					// it bubbled through the portal, but only with React
-					// events. We need to bubble native events as well,
-					// though by doing so we also trigger another React event,
-					// so we need to stop the propagation of this event to avoid
-					// duplication.
-					if (
-						event.currentTarget.ownerDocument !==
-						( event.target as Element ).ownerDocument
-					) {
-						// We should only stop propagation of the React event,
-						// the native event should further bubble inside the
-						// iframe to the document and window.
-						// Alternatively, we could consider redispatching the
-						// native event in the iframe.
-						const { stopPropagation } = event.nativeEvent;
-						event.nativeEvent.stopPropagation = () => {};
-						event.stopPropagation();
-						event.nativeEvent.stopPropagation = stopPropagation;
-						bubbleEvent(
-							event,
-							window.KeyboardEvent,
-							event.currentTarget
-						);
-					}
-				} }
 			>
 				{ iframeDocument &&
 					createPortal(
