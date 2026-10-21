@@ -1,9 +1,62 @@
 /**
+ * A rectangle in pixels.
+ */
+export interface Rect {
+	left: number;
+	top: number;
+	right: number;
+	bottom: number;
+}
+
+type Orientation = 'vertical' | 'horizontal';
+
+type AlignmentGuideKind = 'sibling' | 'container-edge' | 'container-center';
+
+/**
+ * A guide segment to draw.
+ */
+export interface AlignmentGuide {
+	/**
+	 * Which way the line runs.
+	 */
+	orientation: Orientation;
+	/**
+	 * Where the line sits on the other axis.
+	 */
+	position: number;
+	/**
+	 * Where the line starts along its own axis.
+	 */
+	start: number;
+	/**
+	 * Where the line ends along its own axis.
+	 */
+	end: number;
+	/**
+	 * What the landing area lines up with.
+	 */
+	kind: AlignmentGuideKind;
+}
+
+interface Axis {
+	getLines: ( rect: Rect ) => [ number, number, number ];
+	getStart: ( rect: Rect ) => number;
+	getEnd: ( rect: Rect ) => number;
+}
+
+interface GetAlignmentGuidesOptions {
+	target: Rect;
+	siblings?: Rect[];
+	container?: Rect;
+	tolerance?: number;
+}
+
+/**
  * The three lines of a rectangle that are compared on each axis. Vertical
  * guides compare left, horizontal center and right; horizontal guides
  * compare top, vertical center and bottom.
  */
-const AXES = {
+const AXES: Record< Orientation, Axis > = {
 	vertical: {
 		getLines: ( rect ) => [
 			rect.left,
@@ -26,7 +79,7 @@ const AXES = {
 
 const CENTER_LINE_INDEX = 1;
 
-function getGapAlongAxis( axis, a, b ) {
+function getGapAlongAxis( axis: Orientation, a: Rect, b: Rect ): number {
 	const { getStart, getEnd } = AXES[ axis ];
 	return Math.max(
 		0,
@@ -35,7 +88,7 @@ function getGapAlongAxis( axis, a, b ) {
 	);
 }
 
-function isOverlapping( a, b, tolerance ) {
+function isOverlapping( a: Rect, b: Rect, tolerance: number ): boolean {
 	return Object.values( AXES ).every(
 		( { getStart, getEnd } ) =>
 			Math.min( getEnd( a ), getEnd( b ) ) -
@@ -58,32 +111,34 @@ function isOverlapping( a, b, tolerance ) {
  * All rectangles are `{ left, top, right, bottom }` in pixels, in the same
  * coordinate space.
  *
- * @param {Object}   options
- * @param {Object}   options.target    The area the dragged block would land in.
- * @param {Object[]} options.siblings  The other blocks in the grid.
- * @param {Object}   options.container The grid's content area.
- * @param {number}   options.tolerance How close two lines must be to match, in pixels.
+ * @param options           The options.
+ * @param options.target    The area the dragged block would land in.
+ * @param options.siblings  The other blocks in the grid.
+ * @param options.container The grid's content area.
+ * @param options.tolerance How close two lines must be to match, in pixels.
  *
- * @return {Array<{orientation: string, position: number, start: number, end: number, kind: string}>}
- * Guide segments. `orientation` is `vertical` or `horizontal`, `position` is
- * where the line sits on the other axis, `start` and `end` are its extent, and
- * `kind` is `sibling`, `container-edge` or `container-center`.
+ * @return Guide segments. `orientation` is `vertical` or `horizontal`,
+ * `position` is where the line sits on the other axis, `start` and `end` are
+ * its extent, and `kind` is `sibling`, `container-edge` or `container-center`.
  */
 export function getAlignmentGuides( {
 	target,
 	siblings = [],
 	container,
 	tolerance = 1,
-} ) {
-	const guides = [];
-	const isMatch = ( a, b ) => Math.abs( a - b ) <= tolerance;
+}: GetAlignmentGuidesOptions ): AlignmentGuide[] {
+	const guides: AlignmentGuide[] = [];
+	const isMatch = ( a: number, b: number ) => Math.abs( a - b ) <= tolerance;
 	const candidates = siblings.filter(
 		( sibling ) => ! isOverlapping( target, sibling, tolerance )
 	);
 
-	for ( const [ orientation, axis ] of Object.entries( AXES ) ) {
+	for ( const [ orientation, axis ] of Object.entries( AXES ) as [
+		Orientation,
+		Axis,
+	][] ) {
 		const targetLines = axis.getLines( target );
-		const containerLines = [];
+		const containerLines: number[] = [];
 
 		if ( container ) {
 			axis.getLines( container ).forEach( ( containerLine, index ) => {
@@ -108,7 +163,8 @@ export function getAlignmentGuides( {
 		}
 
 		for ( const targetLine of targetLines ) {
-			let nearest = null;
+			let nearest: { sibling: Rect; line: number; gap: number } | null =
+				null;
 			for ( const sibling of candidates ) {
 				const siblingLine = axis
 					.getLines( sibling )
