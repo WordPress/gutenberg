@@ -2100,9 +2100,39 @@ export function lastBlockInserted(
 
 			const source = action.meta?.source;
 
+			// Blocks picked in an inserter have no place of their own in
+			// their container, which a container that places its blocks,
+			// such as a manual grid, picks for them.
+			if ( action.meta?.isFromInserter ) {
+				return { clientIds, source, isFromInserter: true };
+			}
+
 			return { clientIds, source };
 		case 'RESET_BLOCKS':
 			return {};
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the blocks dragged from an inserter, which have not been
+ * inserted yet.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function draggedInserterBlocks(
+	state: State[ 'draggedInserterBlocks' ] = [],
+	action: Action
+) {
+	switch ( action.type ) {
+		case 'START_DRAGGING':
+			// A drop zone also starts the drag when it is entered.
+			return action.blocks ?? state;
+		case 'STOP_DRAGGING':
+			return state.length ? [] : state;
 	}
 	return state;
 }
@@ -2558,6 +2588,7 @@ const combinedReducers = combineReducers( {
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
+	draggedInserterBlocks,
 	editedContentOnlySection,
 	blockVisibility,
 	viewportModalClientIds,
