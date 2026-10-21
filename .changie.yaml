@@ -17,7 +17,7 @@ newlines:
     beforeKind: 1
     afterKind: 1
     beforeChange: 0
-    afterChange: 1
+    afterChange: 0
     endOfVersion: 1
 
 # Custom choices prompted during fragment creation.
