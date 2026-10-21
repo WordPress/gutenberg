@@ -3139,4 +3139,53 @@ describe( 'getCachedRichTextData', () => {
 		getCachedValue( 'eviction-test-overflow' );
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	describe( 'serialization', () => {
+		const htmlInputs = [
+			'',
+			'plain text',
+			'<strong>bold</strong>',
+			'<em><strong>nested</strong> formats</em>',
+			'<strong>over<em>lap</strong>ping</em>',
+			'<a href="https://example.com" title="t">link</a>',
+			'<a title="t" href="https://example.com">link</a>',
+			'line<br>break',
+			'line<br/>break',
+			'&amp; &lt; &gt; &quot; &#39; &nbsp; " \' <',
+			'&eacute;&#233;é 😀',
+			'  leading and trailing  ',
+			'<span class="b a" data-x="1">span</span>',
+			'<!-- comment -->text',
+			'<img src="https://example.com/a.png" alt="">',
+			'<strong></strong>',
+			'<code>&lt;code&gt;</code>',
+		];
+
+		it.each( htmlInputs )(
+			'keeps the serialization of %j on the cached value',
+			( html ) => {
+				const getCachedValue = createRichTextDataCache( 50 );
+				const value = getCachedValue( html );
+
+				expect( value.originalHTML ).toBe(
+					RichTextData.fromHTMLString( html ).toHTMLString()
+				);
+			}
+		);
+
+		it.each( htmlInputs )(
+			'serializes %j the same as a freshly parsed value',
+			( html ) => {
+				const getCachedValue = createRichTextDataCache( 50 );
+				const fresh = RichTextData.fromHTMLString( html );
+
+				expect( getCachedValue( html ).toHTMLString() ).toBe(
+					fresh.toHTMLString()
+				);
+				expect( String( getCachedValue( html ) ) ).toBe(
+					String( fresh )
+				);
+			}
+		);
+	} );
 } );

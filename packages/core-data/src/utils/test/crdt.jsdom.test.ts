@@ -876,6 +876,36 @@ describe( 'crdt', () => {
 			);
 		} );
 
+		it( 'keeps the serialization of rich-text values read from the doc', () => {
+			addBlockToDoc( map, 'block-1', 'Hello <em>synced</em> world' );
+
+			const blocks = map.get( 'blocks' ) as YBlocks;
+			const tableBlock = createYMap< YBlockRecord >();
+			tableBlock.set( 'name', 'core/table' );
+			tableBlock.set( 'clientId', 'table-1' );
+			const attrs = new Y.Map();
+			attrs.set( 'body', [
+				{ cells: [ { content: '<strong>Cell</strong>', tag: 'td' } ] },
+			] );
+			tableBlock.set( 'attributes', attrs );
+			tableBlock.set( 'innerBlocks', new Y.Array() );
+			blocks.push( [ tableBlock ] );
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				{ blocks: [] } as unknown as Post,
+				defaultSyncedProperties
+			);
+
+			const [ paragraph, table ] = changes.blocks as any[];
+			expect( paragraph.attributes.content.originalHTML ).toBe(
+				'Hello <em>synced</em> world'
+			);
+			expect(
+				table.attributes.body[ 0 ].cells[ 0 ].content.originalHTML
+			).toBe( '<strong>Cell</strong>' );
+		} );
+
 		it( 'includes undefined blocks in changes', () => {
 			map.set( 'blocks', undefined );
 
