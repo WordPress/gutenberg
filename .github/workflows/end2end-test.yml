@@ -27,7 +27,7 @@ jobs:
     # list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
         name: Detect changes relevant to E2E tests
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             pull-requests: read
@@ -421,7 +421,7 @@ jobs:
         # means the run was clean rather than that rendering it failed.
         # Skipped on a fork, whose token cannot write a comment.
         if: ${{ needs.merge-artifacts.result == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
@@ -466,7 +466,7 @@ jobs:
     # housekeeping that runs alongside it.
     e2e-status-check:
         name: End-to-End Tests - Status Check
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             contents: read

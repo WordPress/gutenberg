@@ -18,6 +18,7 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
+					itemPopupStyles[ 'fixed-width-presets' ],
 					getItemPopupWidthClassName( width ),
 					className
 				) }
