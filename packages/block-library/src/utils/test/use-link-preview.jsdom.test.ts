@@ -11,10 +11,8 @@ import type { unlock } from '../../lock-unlock';
 // Mock useRemoteUrlData from block-editor
 const mockUseRemoteUrlData = vi.fn();
 
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	privateApis: {},
-	store: {},
 } ) );
 
 // Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath

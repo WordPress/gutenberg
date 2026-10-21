@@ -1,6 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore, type Attachment } from '@wordpress/core-data';
