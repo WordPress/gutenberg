@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
+-   Iframe: Set the canvas document's `lang` attribute from the admin page ([#85265](https://github.com/WordPress/gutenberg/pull/85265)).
 
 ### Bug Fixes
 
