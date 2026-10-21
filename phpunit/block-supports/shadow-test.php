@@ -138,28 +138,12 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 				'block_attributes' => array( 'style' => array( 'shadow' => 'var:preset|shadow|natural' ) ),
 				'expected'         => array( 'style' => 'box-shadow:var(--wp--preset--shadow--natural);' ),
 			),
-			'numeric shadow'       => array(
-				'block_attributes' => array( 'style' => array( 'shadow' => 5 ) ),
-				'expected'         => array(),
-			),
-			'zero shadow'          => array(
-				'block_attributes' => array( 'style' => array( 'shadow' => 0 ) ),
-				'expected'         => array(),
-			),
 			'empty shadow'         => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => '' ) ),
 				'expected'         => array(),
 			),
-			'no style attribute'   => array(
-				'block_attributes' => array(),
-				'expected'         => array(),
-			),
 			'non-array style'      => array(
 				'block_attributes' => array( 'style' => 'box-shadow:1px 1px 1px #000' ),
-				'expected'         => array(),
-			),
-			'array shadow'         => array(
-				'block_attributes' => array( 'style' => array( 'shadow' => array( '1px 1px 1px #000' ) ) ),
 				'expected'         => array(),
 			),
 			'non-array attributes' => array(

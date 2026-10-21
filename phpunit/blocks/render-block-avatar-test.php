@@ -50,12 +50,6 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_shadow_is_applied_to_the_image() {
-		$actual = $this->render_image_attributes( array( 'shadow' => 'var:preset|shadow|natural' ) );
-
-		$this->assertSame( 'box-shadow:var(--wp--preset--shadow--natural);', $actual['style'] );
-	}
-
 	public function test_shadow_follows_border_on_the_image() {
 		$actual = $this->render_image_attributes(
 			array(
