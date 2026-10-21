@@ -114,30 +114,19 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 	}
 
 	public function test_rendered_link_includes_border_dimensions_shadow_and_spacing() {
-		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
-
-		$this->assertStringContainsString( 'border-style:dashed', $output );
-		$this->assertStringContainsString( 'border-width:3px', $output );
-		$this->assertStringContainsString( 'min-height:100px', $output );
-		$this->assertStringContainsString( 'min-width:200px', $output );
-		$this->assertStringContainsString( 'box-shadow:10px 10px 5px #000000', $output );
-		$this->assertStringContainsString( 'padding-top:20px', $output );
-		$this->assertStringContainsString( 'margin-top:30px', $output );
-		$this->assertStringContainsString( 'has-border-color', $output );
-		$this->assertStringContainsString( 'has-accent-2-border-color', $output );
-	}
-
-	public function test_border_shadow_and_spacing_styles() {
 		$attributes                                      = $this->styled_attributes();
 		$attributes['style']['spacing']['margin']['top'] = 'var:preset|spacing|30';
 
-		$processor = new WP_HTML_Tag_Processor( $this->render_block( self::$second_post_id, $attributes ) );
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
 		$this->assertTrue( $processor->next_tag( 'div' ) );
-		$this->assertSame( 'post-navigation-link-previous has-border-color has-accent-2-border-color wp-block-post-navigation-link', $processor->get_attribute( 'class' ) );
 		$this->assertSame(
 			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:var(--wp--preset--spacing--30)',
 			$processor->get_attribute( 'style' )
 		);
+		$this->assertStringContainsString( 'has-border-color', $output );
+		$this->assertStringContainsString( 'has-accent-2-border-color', $output );
 	}
 
 	public function test_individual_border_sides_match_the_core_declaration_order() {

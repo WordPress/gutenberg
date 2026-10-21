@@ -48,9 +48,9 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 	);
 
 	// Spacing skips serialization, so it goes on the outer div, not the image.
-	if ( isset( $attributes['style']['spacing'] ) ) {
-		$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
-		return sprintf( '<div style="%1$s">%2$s</div>', esc_attr( $spacing_styles['style'] ?? '' ), $avatar_block );
+	$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
+	if ( ! empty( $spacing_styles['style'] ) ) {
+		return sprintf( '<div style="%1$s">%2$s</div>', esc_attr( $spacing_styles['style'] ), $avatar_block );
 	}
 	return sprintf( '<div>%s</div>', $avatar_block );
 }
