@@ -518,6 +518,41 @@ describe( 'BoxControl', () => {
 				left: '50px',
 			} );
 		} );
+
+		it( 'should keep only the unit when resetting to mixed values', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = vi.fn();
+
+			render(
+				<UncontrolledBoxControl
+					onChange={ onChangeSpy }
+					resetValues={ {
+						top: '10px',
+						right: '20px',
+						bottom: '10px',
+						left: '20px',
+					} }
+				/>
+			);
+
+			await user.type(
+				screen.getByRole( 'textbox', { name: 'All sides' } ),
+				'30'
+			);
+			await user.keyboard( '{Enter}' );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			fireEvent.change( screen.getByRole( 'slider' ), {
+				target: { value: 5 },
+			} );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '5px',
+				right: '5px',
+				bottom: '5px',
+				left: '5px',
+			} );
+		} );
 	} );
 
 	describe( 'onChange updates', () => {
