@@ -68,14 +68,6 @@ function TabbedSidebar(
 				selectedTabId={ selectedTab }
 			>
 				<div className="block-editor-tabbed-sidebar__tablist-and-close-button">
-					<Button
-						className="block-editor-tabbed-sidebar__close-button"
-						icon={ closeSmall }
-						label={ closeButtonLabel }
-						onClick={ () => onClose() }
-						size="compact"
-					/>
-
 					<Tabs.TabList
 						className="block-editor-tabbed-sidebar__tablist"
 						ref={ ref }
@@ -90,6 +82,14 @@ function TabbedSidebar(
 							</Tabs.Tab>
 						) ) }
 					</Tabs.TabList>
+
+					<Button
+						className="block-editor-tabbed-sidebar__close-button"
+						icon={ closeSmall }
+						label={ closeButtonLabel }
+						onClick={ () => onClose() }
+						size="compact"
+					/>
 				</div>
 				{ tabs.map( ( tab ) => (
 					<Tabs.TabPanel
