@@ -4,7 +4,7 @@
 
 ### Performance
 
--   Keep the local objects of blocks a collaborator's change left untouched when applying it, so a remote keystroke only gives the edited block new objects.
+-   Keep the local objects of blocks a collaborator's change left untouched when applying it, so a remote keystroke only gives the edited block new objects. ([#85327](https://github.com/WordPress/gutenberg/pull/85327))
 
 ## 9.0.0 (2026-10-20)
 
