@@ -15,6 +15,18 @@ The Abilities package ships with WordPress 7.0 by default. You can also install 
 
 ```bash
 npm install @wordpress/abilities --save
+```
+
+### As a WordPress Script Module
+
+To use the Abilities API in the WordPress admin, enqueue the `@wordpress/core-abilities` script module in your plugin:
+
+```php
+add_action( 'admin_enqueue_scripts', 'myplugin_enqueue_admin_script_modules' );
+function myplugin_enqueue_admin_script_modules() {
+	wp_enqueue_script_module( '@wordpress/core-abilities' );
+}
+```
 ## Usage
 
 ```javascript
