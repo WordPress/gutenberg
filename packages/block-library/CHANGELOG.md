@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Respect direct-parent restrictions when wrapping blocks in Group, Columns, Details, and Quote ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
 
