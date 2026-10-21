@@ -917,11 +917,17 @@ test.describe( 'Client-side media processing', () => {
 			name: 'Block: Image',
 			exact: true,
 		} );
-		const deletion = page.waitForResponse(
-			( response ) =>
-				response.request().method() === 'DELETE' &&
+		const deletion = page.waitForResponse( ( response ) => {
+			const request = response.request();
+			// apiFetch sends DELETE as POST with a method override header.
+			const method =
+				request.headers()[ 'x-http-method-override' ] ??
+				request.method();
+			return (
+				method === 'DELETE' &&
 				/\/wp\/v2\/media\/\d+(\?|$)/.test( response.url() )
-		);
+			);
+		} );
 		await mediaProcessingUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' ),
 			'1024x768_e2e_test_image_size.jpeg'
