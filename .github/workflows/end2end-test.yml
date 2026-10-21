@@ -21,6 +21,11 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Runs WordPress on PHP 8.0, the highest version WordPress 5.7 supports, instead of
+# whatever version the floating `wordpress` image uses.
+env:
+  WP_ENV_PHP_VERSION: '8.0'
+
 jobs:
   admin:
     name: Admin - ${{ matrix.part }}
