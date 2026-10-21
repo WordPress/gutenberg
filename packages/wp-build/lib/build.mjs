@@ -2339,11 +2339,7 @@ async function generateWidgetsPhp( widgets, replacements ) {
  * @param {string?} baseUrlExpression
  */
 async function buildAll( baseUrlExpression ) {
-	console.log(
-		minifiedOnly
-			? '🔨 Building packages (minified only)...\n'
-			: '🔨 Building packages...\n'
-	);
+	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
 
