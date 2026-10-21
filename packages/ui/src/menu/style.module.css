@@ -62,6 +62,10 @@
 				gap: var(--wpds-dimension-gap-xs);
 			}
 
+			> .list > :is(.group, .radio-group) {
+				flex-shrink: 0;
+			}
+
 			> .list > .item,
 			> .list > :is(.group, .radio-group) > .item {
 				position: relative;
@@ -80,6 +84,12 @@
 				> .item-content {
 					display: flex;
 					align-self: auto;
+				}
+
+				> .item-prefix {
+					/* stylelint-disable-next-line property-disallowed-list -- Prefixes are non-interactive and aria-hidden; keep the label-first DOM for typeahead. */
+					order: -1;
+					margin-inline-end: var(--wp-ui-menu-group-prefix-gap);
 				}
 
 				/* Preserve a visible checked state without reserving a column. */
