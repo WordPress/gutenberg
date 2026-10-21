@@ -149,7 +149,7 @@ const config: StorybookConfig = {
 						find: /^@wordpress\/block-editor$/,
 						replacement: path.resolve(
 							import.meta.dirname,
-							'../packages/block-editor/src/index.js'
+							'../packages/block-editor/src/index.ts'
 						),
 					},
 				],

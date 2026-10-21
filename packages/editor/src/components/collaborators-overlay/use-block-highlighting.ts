@@ -4,7 +4,6 @@ import {
 	type PostEditorAwarenessState as ActiveCollaborator,
 	type SelectionEndpoint,
 } from '@wordpress/core-data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 // prettier-ignore
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -347,7 +346,11 @@ export function useBlockHighlighting(
 
 		// Highlight blocks and compute positions for avatar labels.
 		const results: BlockHighlightData[] = [];
-		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
+		// Measuring forces a layout, so skip it when there is nothing to place.
+		const overlayRect =
+			( blocksToHighlight.length &&
+				overlayElement?.getBoundingClientRect() ) ||
+			null;
 
 		// Track which users already have an avatar placed. Fallback collaborators
 		// use their Yjs client ID, so anonymous sessions remain distinct while
