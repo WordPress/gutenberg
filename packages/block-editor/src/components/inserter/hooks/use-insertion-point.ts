@@ -8,6 +8,7 @@ import type { Block } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { isFromInserterKey } from '../../../store/private-keys';
 import type { BlockEditorThunkArgs, InserterItem } from '../../../store/types';
 import type { InserterConfig, InsertBlocks } from '../types';
 
@@ -205,7 +206,7 @@ function useInsertionPoint( {
 
 			const selectedBlock = getSelectedBlock();
 			// The inserter picks the block, not where it goes in its parent.
-			const insertMeta = { ...meta, isFromInserter: true };
+			const insertMeta = { ...meta, [ isFromInserterKey ]: true };
 
 			if (
 				! isAppender &&

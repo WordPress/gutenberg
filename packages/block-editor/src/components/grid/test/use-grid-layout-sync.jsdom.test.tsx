@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
 import { act, render } from '@testing-library/react';
 import {
 	createBlock,
@@ -11,6 +19,7 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import type { Block } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
+import { isFromInserterKey } from '../../../store/private-keys';
 import { useGridLayoutSync } from '../use-grid-layout-sync';
 
 function GridLayoutSync( { clientId }: { clientId: string } ) {
@@ -26,6 +35,7 @@ describe( 'useGridLayoutSync()', () => {
 	let registry: DataRegistry;
 	let grid: Block;
 	let first: Block;
+	let originalExperiment: boolean | undefined;
 
 	beforeAll( () => {
 		// @ts-expect-error The test blocks need no category.
@@ -53,6 +63,8 @@ describe( 'useGridLayoutSync()', () => {
 	} );
 
 	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
 		registry = createRegistry();
 		registry.register( blockEditorStore );
 		first = createItem( {
@@ -79,6 +91,10 @@ describe( 'useGridLayoutSync()', () => {
 			.dispatch( blockEditorStore )
 			.updateBlockListSettings( grid.clientId, {} );
 		registry.dispatch( blockEditorStore ).selectBlock( first.clientId );
+	} );
+
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
 	} );
 
 	function renderSync() {
@@ -110,7 +126,7 @@ describe( 'useGridLayoutSync()', () => {
 			registry
 				.dispatch( blockEditorStore )
 				.insertBlocks( [ block ], 1, grid.clientId, true, 0, {
-					isFromInserter: true,
+					[ isFromInserterKey ]: true,
 				} );
 		} );
 		// One cell, since the grid hasn't been measured.
@@ -128,7 +144,7 @@ describe( 'useGridLayoutSync()', () => {
 				registry
 					.dispatch( blockEditorStore )
 					.insertBlocks( [ block ], 1, grid.clientId, true, 0, {
-						isFromInserter: true,
+						[ isFromInserterKey ]: true,
 					} );
 			} );
 		}
@@ -184,7 +200,7 @@ describe( 'useGridLayoutSync()', () => {
 			registry
 				.dispatch( blockEditorStore )
 				.replaceBlocks( first.clientId, [ replacement ], 0, 0, {
-					isFromInserter: true,
+					[ isFromInserterKey ]: true,
 				} );
 		} );
 		expect( getLayout( replacement.clientId ) ).toEqual( {
@@ -227,6 +243,42 @@ describe( 'useGridLayoutSync()', () => {
 		expect( getLayout( blocks[ 1 ].clientId ) ).toEqual( {
 			columnStart: 5,
 			rowStart: 1,
+		} );
+	} );
+
+	describe( 'without grid interactivity', () => {
+		beforeEach( () => {
+			window.__experimentalEnableGridInteractivity = false;
+		} );
+
+		it( 'puts an inserted block in the first free cell after the selected block', () => {
+			renderSync();
+			const block = createItem();
+			act( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.insertBlocks( [ block ], 1, grid.clientId, true, 0, {
+						[ isFromInserterKey ]: true,
+					} );
+			} );
+			expect( getLayout( block.clientId ) ).toEqual( {
+				columnStart: 3,
+				rowStart: 2,
+			} );
+		} );
+
+		it( "doesn't give a block that replaces the selected block its place", () => {
+			renderSync();
+			const replacement = createItem();
+			act( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.replaceBlocks( first.clientId, [ replacement ] );
+			} );
+			expect( getLayout( replacement.clientId ) ).toEqual( {
+				columnStart: 2,
+				rowStart: 2,
+			} );
 		} );
 	} );
 } );

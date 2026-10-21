@@ -18,3 +18,6 @@ export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
 export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
 export const mediaSideloadFromUrlKey = Symbol( 'mediaSideloadFromUrl' );
 export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );
+// Marks inserted blocks that were picked in an inserter, in the meta of the
+// insert action.
+export const isFromInserterKey = Symbol( 'isFromInserter' );

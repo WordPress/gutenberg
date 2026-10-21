@@ -135,7 +135,10 @@ const GridVisualizerGrid = forwardRef(
 						),
 					};
 				}
-				if ( selectors.getDraggedInserterBlocks().length ) {
+				if (
+					isManualGrid &&
+					selectors.getDraggedInserterBlocks().length
+				) {
 					return {
 						isDragging: true,
 						isDroppingAllowed: !! getInserterBlocksToPlaceInGrid(
@@ -146,7 +149,7 @@ const GridVisualizerGrid = forwardRef(
 				}
 				return { isDragging: false, isDroppingAllowed: false };
 			},
-			[ gridClientId ]
+			[ gridClientId, isManualGrid ]
 		);
 
 		// When a drag ends, Safari moves the hover to where the pointer was
