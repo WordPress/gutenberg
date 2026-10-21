@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Deprecations
+### Breaking Changes
 
--   Deprecate the `checkbox-control` and `radio-control` Sass mixins. Use `CheckboxControl` and `RadioGroupControl` from `@wordpress/ui` instead ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).
+-   Remove the `checkbox-control` and `radio-control` Sass mixins. Use the `Checkbox` and `Radio` primitives from `@wordpress/ui` instead, with `Radio` inside a `RadioGroup` ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).
 
 ## 14.0.0 (2026-10-20)
 
