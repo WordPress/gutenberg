@@ -53,7 +53,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	$skip_style                = wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' );
 	$skip_width                = wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' );
 
-	// The helper reads only `style.border`, so a non-array value counts as no border styles.
+	// The unset() calls below fail on a non-array style or border.
 	if ( ! isset( $block_attributes['style']['border'] ) || ! is_array( $block_attributes['style']['border'] ) ) {
 		unset( $block_attributes['style'] );
 	}
@@ -74,7 +74,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		unset( $block_attributes['style']['border']['color'], $block_attributes['borderColor'] );
 	}
 
-	// Sides are filtered by skipped serialization only, not by feature support.
+	// Side values follow skipped serialization only, as on trunk.
 	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
 		$has_side = isset( $block_attributes['style']['border'][ $side ] ) && is_array( $block_attributes['style']['border'][ $side ] );
 
@@ -132,8 +132,17 @@ function gutenberg_get_border_classes_and_styles( $block_attributes ) {
 		$border_styles['width'] = is_numeric( $border['width'] ) ? "{$border['width']}px" : $border['width'];
 	}
 
-	$preset_border_color    = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
-	$border_styles['color'] = $preset_border_color ? $preset_border_color : ( $border['color'] ?? null );
+	$preset_slug = $block_attributes['borderColor'] ?? null;
+	if ( true === $preset_slug ) {
+		$preset_slug = 'true';
+	}
+
+	// Mirrors JS truthiness, so '0' is a slug. Arrays cannot form a class name.
+	$has_preset = is_string( $preset_slug )
+		? '' !== $preset_slug
+		: ( is_int( $preset_slug ) || is_float( $preset_slug ) ) && 0.0 !== (float) $preset_slug;
+
+	$border_styles['color'] = $has_preset ? "var:preset|color|{$preset_slug}" : ( $border['color'] ?? null );
 
 	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
 		if ( ! isset( $border[ $side ] ) || ! is_array( $border[ $side ] ) ) {

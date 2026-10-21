@@ -135,13 +135,14 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 			'color' => '#ff0000',
 			'style' => 'solid',
 		);
+		$attributes['style']['background']       = array( 'backgroundImage' => array( 'url' => 'https://example.com/image.jpg' ) );
 
 		$processor = new WP_HTML_Tag_Processor( $this->render_block( self::$second_post_id, $attributes ) );
 		$this->assertTrue( $processor->next_tag( 'div' ) );
 		$this->assertSame(
 			array(
-				'class' => 'post-navigation-link-previous has-border-color has-accent-2-border-color wp-block-post-navigation-link',
-				'style' => 'border-radius:5px;border-style:dashed;border-width:3px;border-top-width:4px;border-top-color:#ff0000;border-top-style:solid;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:30px',
+				'class' => 'post-navigation-link-previous has-border-color has-accent-2-border-color has-background wp-block-post-navigation-link',
+				'style' => 'background-image:url(\'https://example.com/image.jpg\');background-size:cover;border-radius:5px;border-style:dashed;border-width:3px;border-top-width:4px;border-top-color:#ff0000;border-top-style:solid;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:30px',
 			),
 			array(
 				'class' => $processor->get_attribute( 'class' ),
