@@ -2,13 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import create from '..';
 
-type Fetch = (
-	...args: Parameters< typeof apiFetch >
-) => ReturnType< typeof apiFetch >;
-
-vi.mock< { default: Fetch } >( import( '@wordpress/api-fetch' ), () => ( {
-	default: vi.fn< Fetch >(),
-} ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 const mockedApiFetch = vi.mocked(
 	apiFetch< { meta: { persisted_preferences: unknown } } | void >
@@ -187,7 +181,7 @@ describe( 'create', () => {
 			} );
 
 			const { get } = create( {
-				// @ts-expect-error An array tests rejection of invalid preloaded preferences.
+				// @ts-expect-error [] is not a PreferencesData object; invalid preloaded data triggers a fetch.
 				preloadedData: [],
 			} );
 			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
