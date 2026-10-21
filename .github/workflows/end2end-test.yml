@@ -24,6 +24,9 @@ concurrency:
 # Pins the MariaDB version used by `wp-env`, through Docker Compose variable substitution.
 env:
   WP_ENV_MARIADB_VERSION: '10.5'
+  # Runs WordPress on PHP 8.0, the highest version WordPress 5.6 supports, instead of
+  # whatever version the floating `wordpress` image uses.
+  WP_ENV_PHP_VERSION: '8.0'
 
 jobs:
   admin-1:
