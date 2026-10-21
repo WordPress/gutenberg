@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import '../store';
 import { toDom, applyValue } from '../to-dom';
+import { create } from '../create';
 import { createElement } from '../create-element';
+import { registerFormatType } from '../register-format-type';
+import { unregisterFormatType } from '../unregister-format-type';
+import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { spec } from './helpers';
 
 describe( 'recordToDom', () => {
@@ -12,6 +16,111 @@ describe( 'recordToDom', () => {
 			} );
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );
+		} );
+	} );
+
+	describe( 'non editable format', () => {
+		const formatName = 'my-plugin/non-editable';
+		const replacement = {
+			type: formatName,
+			attributes: { 'data-fn': 'x' },
+			innerHTML: '<a href="#x">1</a>',
+		};
+		const wrapper =
+			'<span contenteditable="false" data-rich-text-bogus="true"><sup data-fn="x" class="non-editable"><a href="#x">1</a></sup></span>';
+
+		function createValue( text, start ) {
+			const value = {
+				text,
+				formats: Array( text.length ),
+				replacements: Array( text.length ),
+				start,
+				end: start,
+			};
+			value.replacements[ text.indexOf( OBJECT_REPLACEMENT_CHARACTER ) ] =
+				replacement;
+			return value;
+		}
+
+		function getNode( body, path ) {
+			return path
+				.slice( 0, -1 )
+				.reduce( ( node, index ) => node.childNodes[ index ], body );
+		}
+
+		beforeAll( () => {
+			registerFormatType( formatName, {
+				title: 'Non Editable',
+				tagName: 'sup',
+				className: 'non-editable',
+				contentEditable: false,
+				edit() {},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterFormatType( formatName );
+		} );
+
+		it( 'should place the caret after the wrapper, before the padding, at the end of the field', () => {
+			const value = createValue(
+				`ab${ OBJECT_REPLACEMENT_CHARACTER }`,
+				3
+			);
+			const { body, selection } = toDom( { value } );
+
+			expect( body.innerHTML ).toBe( `ab${ wrapper }${ ZWNBSP }` );
+			// The caret is in the text node after the wrapper, before the
+			// padding, where the browser can act on the object.
+			expect( selection ).toEqual( {
+				startPath: [ 2, 0 ],
+				endPath: [ 2, 0 ],
+			} );
+			const caretNode = getNode( body, selection.startPath );
+			expect( caretNode.parentNode ).toBe( body );
+			expect( caretNode.previousSibling.nodeName ).toBe( 'SPAN' );
+
+			// The position reads back as the same offset.
+			const range = document.createRange();
+			range.setStart( caretNode, 0 );
+			range.setEnd( caretNode, 0 );
+			const record = create( {
+				element: body,
+				range,
+				__unstableIsEditableTree: true,
+			} );
+			expect( record.text ).toBe( value.text );
+			expect( record.start ).toBe( 3 );
+			expect( record.end ).toBe( 3 );
+		} );
+
+		it( 'should place the caret after the wrapper in the middle of the field', () => {
+			const value = createValue(
+				`ab${ OBJECT_REPLACEMENT_CHARACTER } tail`,
+				3
+			);
+			const { body, selection } = toDom( { value } );
+
+			expect( body.innerHTML ).toBe( `ab${ wrapper } tail` );
+			expect( selection ).toEqual( {
+				startPath: [ 2, 0 ],
+				endPath: [ 2, 0 ],
+			} );
+			expect( getNode( body, selection.startPath ).nodeValue ).toBe(
+				' tail'
+			);
+		} );
+
+		it( 'should not wrap or pad in the non editable tree', () => {
+			const value = createValue(
+				`ab${ OBJECT_REPLACEMENT_CHARACTER }`,
+				3
+			);
+			const { body } = toDom( { value, isEditableTree: false } );
+
+			expect( body.innerHTML ).toBe(
+				'ab<sup data-fn="x" class="non-editable"><a href="#x">1</a></sup>'
+			);
 		} );
 	} );
 } );
