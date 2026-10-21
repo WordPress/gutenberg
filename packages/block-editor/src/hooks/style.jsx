@@ -54,6 +54,7 @@ import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
+import { hasRotateSupport } from './rotate';
 import { unlock } from '../lock-unlock';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -668,6 +669,8 @@ export function getCanvasStateStyleValue( style, selectedState ) {
 
 /**
  * Filters registered block settings, extending attributes to include `style` attribute.
+ * Rotation is stored in it too, so it is added here rather than in the rotate
+ * hook, which keeps the attribute in the same place among the others.
  *
  * @param {Object} settings Original block settings.
  *
@@ -676,7 +679,8 @@ export function getCanvasStateStyleValue( style, selectedState ) {
 function addAttribute( settings ) {
 	if (
 		! hasStyleSupport( settings ) &&
-		! hasBlockSupport( settings, 'customCSS', true )
+		! hasBlockSupport( settings, 'customCSS', true ) &&
+		! hasRotateSupport( settings )
 	) {
 		return settings;
 	}
