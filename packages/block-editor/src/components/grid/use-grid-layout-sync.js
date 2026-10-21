@@ -1,37 +1,57 @@
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
-import { GridRect } from './utils';
+import { unlock } from '../../lock-unlock';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { GridRect, getGridTrackPositions } from './utils';
+import {
+	getInsertedBlockRect,
+	getInsertionSize,
+} from './get-inserted-block-rect';
+import { copyChildLayout } from './child-layout';
 import { setImmutably } from '../../utils/object';
 
 export function useGridLayoutSync( { clientId: gridClientId } ) {
-	const { gridLayout, blockOrder, selectedBlockLayout } = useSelect(
-		( select ) => {
-			const { getBlockAttributes, getBlockOrder } =
-				select( blockEditorStore );
-			const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-			return {
-				gridLayout: getBlockAttributes( gridClientId ).layout ?? {},
-				blockOrder: getBlockOrder( gridClientId ),
-				selectedBlockLayout: selectedBlock?.attributes.style?.layout,
-			};
-		},
-		[ gridClientId ]
+	const { gridLayout, blockOrder, selectedClientId, selectedBlockStyle } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockAttributes,
+					getBlockOrder,
+					getSelectedBlockClientId,
+				} = select( blockEditorStore );
+				const _selectedClientId = getSelectedBlockClientId();
+				return {
+					gridLayout: getBlockAttributes( gridClientId ).layout ?? {},
+					blockOrder: getBlockOrder( gridClientId ),
+					selectedClientId: _selectedClientId,
+					selectedBlockStyle: _selectedClientId
+						? getBlockAttributes( _selectedClientId )?.style
+						: undefined,
+				};
+			},
+			[ gridClientId ]
+		);
+
+	const {
+		getBlockAttributes,
+		getBlockRootClientId,
+		wasBlockJustInsertedFromInserter,
+	} = unlock( useSelect( blockEditorStore ) );
+	const {
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+	const registry = useRegistry();
+	const gridElement = useBlockElement( gridClientId );
+
+	const selection = useMemo(
+		() => ( { clientId: selectedClientId, style: selectedBlockStyle } ),
+		[ selectedClientId, selectedBlockStyle ]
 	);
-
-	const { getBlockAttributes, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	const selectedBlockRect = useMemo(
-		() =>
-			selectedBlockLayout ? new GridRect( selectedBlockLayout ) : null,
-		[ selectedBlockLayout ]
-	);
-
-	const previouslySelectedBlockRect = usePrevious( selectedBlockRect );
+	const previousSelection = usePrevious( selection );
 	const previousIsManualPlacement = usePrevious(
 		gridLayout.isManualPlacement
 	);
@@ -39,6 +59,9 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 
 	useEffect( () => {
 		const updates = {};
+
+		// The cells of the blocks placed here, to put them in reading order.
+		const placedRects = new Map();
 
 		if ( gridLayout.isManualPlacement ) {
 			const occupiedRects = [];
@@ -65,43 +88,153 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
-			for ( const clientId of blockOrder ) {
-				const attributes = getBlockAttributes( clientId );
-				const {
-					columnStart,
-					rowStart,
-					columnSpan = 1,
-					rowSpan = 1,
-				} = attributes.style?.layout ?? {};
-				if ( columnStart && rowStart ) {
-					continue;
-				}
-				const [ newColumnStart, newRowStart ] = placeBlock(
-					occupiedRects,
-					gridLayout.columnCount,
-					columnSpan,
-					rowSpan,
-					previouslySelectedBlockRect?.columnEnd,
-					previouslySelectedBlockRect?.rowEnd
-				);
-				occupiedRects.push(
-					new GridRect( {
-						columnStart: newColumnStart,
-						rowStart: newRowStart,
-						columnSpan,
-						rowSpan,
-					} )
-				);
-				updates[ clientId ] = {
-					style: {
-						...attributes.style,
-						layout: {
-							...attributes.style?.layout,
-							columnStart: newColumnStart,
-							rowStart: newRowStart,
+			const unplacedClientIds = blockOrder.filter( ( clientId ) => {
+				const { columnStart, rowStart } =
+					getBlockAttributes( clientId ).style?.layout ?? {};
+				return ! columnStart || ! rowStart;
+			} );
+			if ( unplacedClientIds.length ) {
+				const { columnTracks, rowTracks } = gridElement
+					? getGridTrackPositions( gridElement )
+					: {};
+				const columnCount =
+					gridLayout.columnCount || columnTracks?.length || 1;
+				const rowCount = gridLayout.rowCount || rowTracks?.length || 1;
+				const size = getInsertionSize( { columnTracks, rowTracks } );
+
+				// The block that was selected, if it is in the grid, is where
+				// a block added next to it, such as by pressing Enter, goes.
+				const previousIndex =
+					previousBlockOrder?.indexOf(
+						previousSelection?.clientId
+					) ?? -1;
+				const previousLayout = previousSelection?.style?.layout;
+				let reference =
+					blockOrder.includes( previousSelection?.clientId ) &&
+					previousLayout?.columnStart &&
+					previousLayout?.rowStart
+						? new GridRect( {
+								columnStart: previousLayout.columnStart,
+								rowStart: previousLayout.rowStart,
+								columnSpan: previousLayout.columnSpan ?? 1,
+								rowSpan: previousLayout.rowSpan ?? 1,
+							} )
+						: null;
+				// A block that replaced the selected block, such as one picked
+				// in an inserter to replace an empty paragraph, takes its place.
+				const replacedStyle =
+					previousIndex !== -1 &&
+					! blockOrder.includes( previousSelection.clientId ) &&
+					getBlockRootClientId( previousSelection.clientId ) === null
+						? previousSelection.style
+						: undefined;
+
+				for ( const clientId of unplacedClientIds ) {
+					const attributes = getBlockAttributes( clientId );
+					const index = blockOrder.indexOf( clientId );
+
+					if (
+						replacedStyle?.layout?.columnStart &&
+						replacedStyle?.layout?.rowStart &&
+						index === previousIndex
+					) {
+						let style = copyChildLayout(
+							attributes.style,
+							replacedStyle
+						);
+						// A layout of its own without a place gets the place.
+						if (
+							! style.layout.columnStart ||
+							! style.layout.rowStart
+						) {
+							style = {
+								...style,
+								layout: {
+									...replacedStyle.layout,
+									...style.layout,
+									columnStart:
+										replacedStyle.layout.columnStart,
+									rowStart: replacedStyle.layout.rowStart,
+								},
+							};
+						}
+						const { columnStart, rowStart, columnSpan, rowSpan } =
+							style.layout;
+						const rect = new GridRect( {
+							columnStart,
+							rowStart,
+							columnSpan: columnSpan ?? 1,
+							rowSpan: rowSpan ?? 1,
+						} );
+						occupiedRects.push( rect );
+						placedRects.set( clientId, rect );
+						updates[ clientId ] = { style };
+						reference = rect;
+						continue;
+					}
+
+					const layout = attributes.style?.layout ?? {};
+					// Blocks already in the grid, such as when it switches to
+					// manual placement, are placed in order, at their size.
+					// Blocks new to it are big enough for a placeholder.
+					const isNew =
+						!! previousBlockOrder &&
+						! previousBlockOrder.includes( clientId );
+					let placement = 'first-free';
+					if (
+						isNew &&
+						wasBlockJustInsertedFromInserter( clientId )
+					) {
+						placement = 'center';
+					} else if ( isNew && reference ) {
+						const referenceIndex = blockOrder.indexOf(
+							previousSelection.clientId
+						);
+						placement =
+							referenceIndex !== -1 && index < referenceIndex
+								? 'before'
+								: 'after';
+					}
+					const defaultSize = isNew
+						? size
+						: { columnSpan: 1, rowSpan: 1 };
+					const rect = getInsertedBlockRect( {
+						placement,
+						size: {
+							columnSpan: Math.min(
+								layout.columnSpan ?? defaultSize.columnSpan,
+								columnCount
+							),
+							rowSpan: layout.rowSpan ?? defaultSize.rowSpan,
 						},
-					},
-				};
+						columnCount,
+						rowCount,
+						occupiedRects,
+						reference,
+					} );
+					occupiedRects.push( rect );
+					placedRects.set( clientId, rect );
+					// The blocks inserted together go one after the other.
+					if ( isNew && placement !== 'center' ) {
+						reference = rect;
+					}
+					updates[ clientId ] = {
+						style: {
+							...attributes.style,
+							layout: {
+								...layout,
+								columnStart: rect.columnStart,
+								rowStart: rect.rowStart,
+								columnSpan:
+									rect.columnSpan > 1
+										? rect.columnSpan
+										: undefined,
+								rowSpan:
+									rect.rowSpan > 1 ? rect.rowSpan : undefined,
+							},
+						},
+					};
+				}
 			}
 
 			// Ensure there's enough rows to fit all blocks.
@@ -193,12 +326,41 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		}
 
 		if ( Object.keys( updates ).length ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes(
-				Object.keys( updates ),
-				updates,
-				/* uniqueByBlock: */ true
-			);
+			registry.batch( () => {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes(
+					Object.keys( updates ),
+					updates,
+					/* uniqueByBlock: */ true
+				);
+				// Blocks are kept in reading order, which is also the order
+				// in which they stack on small screens.
+				for ( const [ clientId, rect ] of placedRects ) {
+					const index = getReadingOrderIndex(
+						clientId,
+						rect,
+						blockOrder,
+						( otherClientId ) =>
+							placedRects.get( otherClientId ) ??
+							getBlockAttributes( otherClientId ).style?.layout
+					);
+					if (
+						index !==
+						registry
+							.select( blockEditorStore )
+							.getBlockOrder( gridClientId )
+							.indexOf( clientId )
+					) {
+						__unstableMarkNextChangeAsNotPersistent();
+						moveBlocksToPosition(
+							[ clientId ],
+							gridClientId,
+							gridClientId,
+							index
+						);
+					}
+				}
+			} );
 		}
 	}, [
 		// Actual deps to sync:
@@ -206,51 +368,44 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		gridLayout,
 		previousBlockOrder,
 		blockOrder,
-		previouslySelectedBlockRect,
+		previousSelection,
 		previousIsManualPlacement,
+		gridElement,
 		// These won't change, but the linter thinks they might:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
 		getBlockRootClientId,
+		wasBlockJustInsertedFromInserter,
 		updateBlockAttributes,
+		moveBlocksToPosition,
+		registry,
 	] );
 }
 
 /**
- * @param {GridRect[]} occupiedRects
- * @param {number}     gridColumnCount
- * @param {number}     blockColumnSpan
- * @param {number}     blockRowSpan
- * @param {number?}    startColumn
- * @param {number?}    startRow
+ * Gets the index a block placed in a manual grid has in reading order: the
+ * number of other blocks that start before it, row by row, from the left.
+ *
+ * @param {string}                        clientId   The block's client ID.
+ * @param {GridRect}                      rect       The block's cells.
+ * @param {string[]}                      blockOrder The grid's blocks.
+ * @param {(clientId: string) => ?Object} getCells   Gets another block's cells, or layout.
+ *
+ * @return {number} The index.
  */
-function placeBlock(
-	occupiedRects,
-	gridColumnCount,
-	blockColumnSpan,
-	blockRowSpan,
-	startColumn = 1,
-	startRow = 1
-) {
-	for ( let row = startRow; ; row++ ) {
-		for (
-			let column = row === startRow ? startColumn : 1;
-			column <= gridColumnCount;
-			column++
+function getReadingOrderIndex( clientId, rect, blockOrder, getCells ) {
+	let count = 0;
+	for ( const otherClientId of blockOrder ) {
+		if ( otherClientId === clientId ) {
+			continue;
+		}
+		const { columnStart, rowStart } = getCells( otherClientId ) ?? {};
+		if (
+			rowStart < rect.rowStart ||
+			( rowStart === rect.rowStart && columnStart < rect.columnStart )
 		) {
-			const candidateRect = new GridRect( {
-				columnStart: column,
-				rowStart: row,
-				columnSpan: blockColumnSpan,
-				rowSpan: blockRowSpan,
-			} );
-			if (
-				! occupiedRects.some( ( r ) =>
-					r.intersectsRect( candidateRect )
-				)
-			) {
-				return [ column, row ];
-			}
+			count++;
 		}
 	}
+	return count;
 }

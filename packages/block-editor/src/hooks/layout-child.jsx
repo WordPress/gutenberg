@@ -5,11 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import {
-	getValueFromObjectPath,
-	isPlainObject,
-	setImmutably,
-} from '../utils/object';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
 import {
@@ -22,6 +17,7 @@ import {
 	isGridStackedOnMobile,
 	getStackedLayouts,
 } from '../components/grid';
+import { copyChildLayout } from '../components/grid/child-layout';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
@@ -692,35 +688,6 @@ function GridTools( {
 }
 
 /**
- * Returns the child layout of a block style: the default layout and the
- * layout of each viewport state, keyed by their path in the style object.
- *
- * @param {Object|undefined} style Block style attributes.
- * @return {Array} Pairs of style object path and child layout.
- */
-function getChildLayoutEntries( style ) {
-	if ( ! isPlainObject( style ) ) {
-		return [];
-	}
-
-	const entries = [];
-	if ( isPlainObject( style.layout ) ) {
-		entries.push( [ [ 'layout' ], style.layout ] );
-	}
-	Object.entries( style ).forEach( ( [ key, stateStyle ] ) => {
-		// Viewport states (`@mobile`, `@tablet`) hold their own child layout.
-		if (
-			key.startsWith( '@' ) &&
-			isPlainObject( stateStyle ) &&
-			isPlainObject( stateStyle.layout )
-		) {
-			entries.push( [ [ key, 'layout' ], stateStyle.layout ] );
-		}
-	} );
-	return entries;
-}
-
-/**
  * Keeps the child layout (such as a grid item's position and span) of a block
  * when it is switched to another block type. The child layout describes the
  * block's place in its parent, not the block itself, but transforms usually
@@ -751,15 +718,9 @@ export function addTransforms( result, source, index, results ) {
 		return result;
 	}
 
-	let style = result.attributes?.style;
-	getChildLayoutEntries( sourceBlocks[ index ]?.attributes?.style ).forEach(
-		( [ path, layout ] ) => {
-			// A transform that sets a child layout itself knows best.
-			if ( getValueFromObjectPath( style, path ) === undefined ) {
-				// Setting a path on the style object keeps it an object.
-				style = setImmutably( style, path, layout );
-			}
-		}
+	const style = copyChildLayout(
+		result.attributes?.style,
+		sourceBlocks[ index ]?.attributes?.style
 	);
 
 	if ( style === result.attributes?.style ) {
