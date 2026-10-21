@@ -255,6 +255,11 @@ require __DIR__ . '/block-supports/custom-css.php';
 require __DIR__ . '/block-supports/rotate.php';
 require __DIR__ . '/block-supports/states.php';
 
+// Stored rotations are kept but only applied while block rotation is enabled.
+if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-rotation' ) ) {
+	remove_filter( 'render_block', 'gutenberg_render_rotate_support' );
+}
+
 // Client-side media processing.
 require_once __DIR__ . '/media/load.php';
 
