@@ -1,12 +1,14 @@
 import { store as editorStore } from '@wordpress/editor';
 import { pencil } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
-import type { BasePost, ActionScriptParts } from '../../shared/types';
+import type { Post, ActionScriptParts } from '../../shared/types';
 
-const editPost: ActionScriptParts< BasePost > = {
+const editPost: ActionScriptParts< Post > = {
 	icon: pencil,
 	isEligible( post ) {
-		return post.status !== 'trash';
+		// The lists of patterns also show the patterns of the theme, which
+		// are not entity records: they have no id, and cannot be edited.
+		return post.status !== 'trash' && post.id !== undefined;
 	},
 	callback( posts, { registry } ) {
 		const post = posts[ 0 ];
@@ -21,8 +23,8 @@ const editPost: ActionScriptParts< BasePost > = {
 };
 
 /**
- * The JavaScript parts of the edit post action for BasePost; its data is in
- * `action.php`. It opens the page with the entity navigator of the screen, so
- * a screen showing the action must set one with `setEntityNavigator`.
+ * The JavaScript parts of the edit post action; its data is in `action.php`.
+ * It opens the entity with the entity navigator of the screen, so a screen
+ * showing the action must set one with `setEntityNavigator`.
  */
 export default editPost;

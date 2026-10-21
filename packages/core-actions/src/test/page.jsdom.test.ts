@@ -1,16 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
-import { createRegistry } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import { describe, expect, it } from 'vitest';
 import page from '../page';
-import { unlock } from '../lock-unlock';
-
-// The editor store loads the viewport store, which reads the media queries.
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'page', () => {
 	it( 'maps the id of each page action to its JavaScript parts', () => {
 		expect( Object.keys( page ) ).toEqual( [
-			'edit-post',
 			'set-as-homepage',
 			'set-as-posts-page',
 		] );
@@ -18,58 +11,8 @@ describe( 'page', () => {
 			// The data of the action, such as its id and label, is
 			// registered on the server.
 			expect( parts ).not.toHaveProperty( 'id' );
-			expect( 'callback' in parts || 'RenderModal' in parts ).toBe(
-				true
-			);
+			expect( 'RenderModal' in parts ).toBe( true );
 		}
-	} );
-
-	describe( 'edit-post', () => {
-		const post = {
-			id: 1,
-			type: 'page',
-			status: 'draft' as const,
-			title: 'About',
-			content: '',
-		};
-		const action = page[ 'edit-post' ];
-		const { isEligible } = action;
-		const callback = 'callback' in action ? action.callback : undefined;
-
-		function createRegistryWithEditor() {
-			const registry = createRegistry();
-			registry.register( editorStore );
-			return registry;
-		}
-
-		it( 'offers to edit the pages that are not in the trash', () => {
-			expect( isEligible?.( post ) ).toBe( true );
-			expect( isEligible?.( { ...post, status: 'trash' } ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'opens the page with the entity navigator of the screen', () => {
-			const registry = createRegistryWithEditor();
-			const navigator = vi.fn();
-			unlock( registry.dispatch( editorStore ) ).setEntityNavigator(
-				navigator
-			);
-
-			callback?.( [ post ], { registry } );
-
-			expect( navigator ).toHaveBeenCalledTimes( 1 );
-			expect( navigator ).toHaveBeenCalledWith( {
-				postType: 'page',
-				postId: 1,
-			} );
-		} );
-
-		it( 'does nothing when the screen sets no entity navigator', () => {
-			const registry = createRegistryWithEditor();
-
-			expect( () => callback?.( [ post ], { registry } ) ).not.toThrow();
-		} );
 	} );
 
 	it.each( [
