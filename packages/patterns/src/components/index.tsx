@@ -1,8 +1,11 @@
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import PatternConvertButton from './pattern-convert-button';
 import PatternsManageButton from './patterns-manage-button';
+import type { PatternsMenuItemsProps } from './types';
 
-export default function PatternsMenuItems( { rootClientId } ) {
+export default function PatternsMenuItems( {
+	rootClientId,
+}: PatternsMenuItemsProps ) {
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds, onClose } ) => (
@@ -10,7 +13,8 @@ export default function PatternsMenuItems( { rootClientId } ) {
 					<PatternConvertButton
 						clientIds={ selectedClientIds }
 						rootClientId={ rootClientId }
-						closeBlockSettingsMenu={ onClose }
+						// The block settings menu passes `onClose` to its fills.
+						closeBlockSettingsMenu={ onClose! }
 					/>
 					{ selectedClientIds.length === 1 && (
 						<PatternsManageButton
