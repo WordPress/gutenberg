@@ -1,6 +1,4 @@
-import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
@@ -28,25 +26,21 @@ export const useEditPostHandler = () => {
 	);
 };
 
-export const useQuickEditPostAction = () => {
+/**
+ * Returns the `onActionPerformed` handler of the pages list of the site editor,
+ * which opens the quick edit form when the "Quick edit" action of
+ * `@wordpress/core-actions` is performed: the action does not open it by
+ * itself.
+ *
+ * @return {(actionId: string, items: Object[]) => void} The handler to pass to
+ *                                                      `usePostActions`.
+ */
+export const useQuickEditPostHandler = () => {
 	const history = useHistory();
 	const { path, query } = useLocation();
-	return useMemo(
-		() => ( {
-			id: 'quick-edit',
-			label: ( items ) =>
-				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
-			icon: drawerRight,
-			isPrimary: true,
-			supportsBulk: true,
-			isEligible( post ) {
-				if ( post.status === 'trash' ) {
-					return false;
-				}
-
-				return post.type === 'page';
-			},
-			callback( items ) {
+	return useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'quick-edit' ) {
 				history.navigate(
 					addQueryArgs( path, {
 						...query,
@@ -54,8 +48,8 @@ export const useQuickEditPostAction = () => {
 						postId: items.map( ( item ) => item.id ).join( ',' ),
 					} )
 				);
-			},
-		} ),
+			}
+		},
 		[ history, path, query ]
 	);
 };

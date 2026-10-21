@@ -23,7 +23,7 @@ import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import {
 	useEditPostHandler,
-	useQuickEditPostAction,
+	useQuickEditPostHandler,
 } from '../dataviews-actions';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
@@ -222,32 +222,34 @@ export default function PostList( { postType } ) {
 		[ postType ]
 	);
 
-	const onActionPerformed = useEditPostHandler();
+	const onEditPost = useEditPostHandler();
+	const onQuickEditPost = useQuickEditPostHandler();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			onEditPost( actionId, items );
+			onQuickEditPost( actionId, items );
+		},
+		[ onEditPost, onQuickEditPost ]
+	);
 	const postTypeActions = usePostActions( {
 		postType,
 		context: 'list',
 		onActionPerformed,
 	} );
-	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo( () => {
-		const editAction = postTypeActions.find(
-			( action ) => action.id === 'edit-post'
-		);
-		const otherActions = postTypeActions.filter(
-			( action ) => action.id !== 'edit-post'
-		);
-		if ( view.type === LAYOUT_LIST ) {
-			return editAction
-				? [ { ...editAction, isPrimary: true }, ...otherActions ]
-				: otherActions;
+		if ( view.type !== LAYOUT_LIST ) {
+			return postTypeActions;
 		}
-
-		return [
-			...( editAction ? [ editAction ] : [] ),
-			quickEditAction,
-			...otherActions,
-		];
-	}, [ view.type, quickEditAction, postTypeActions ] );
+		// The list layout shows the edited page next to the list, so it has
+		// no quick edit form, and editing is its primary action.
+		return postTypeActions
+			.filter( ( action ) => action.id !== 'quick-edit' )
+			.map( ( action ) =>
+				action.id === 'edit-post'
+					? { ...action, isPrimary: true }
+					: action
+			);
+	}, [ view.type, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
