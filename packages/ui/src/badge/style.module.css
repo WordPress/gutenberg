@@ -8,6 +8,24 @@
 			border-radius: var(--wpds-border-radius-lg);
 		}
 
+		.infotip-trigger {
+			--_gcd-button-font-family: var(--wpds-typography-font-family-body);
+			--_gcd-button-font-size: var(--wpds-typography-font-size-sm);
+			--_gcd-button-font-weight: var(--wpds-typography-font-weight-default);
+
+			display: inline-flex;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-xs);
+			border: 0;
+			cursor: var(--wpds-cursor-control);
+			vertical-align: middle;
+			text-align: start;
+		}
+
+		.infotip-icon {
+			flex-shrink: 0;
+		}
+
 		.is-high-intent {
 			background-color: var(--wpds-color-background-surface-error);
 			color: var(--wpds-color-foreground-content-error);
