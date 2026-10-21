@@ -9,17 +9,27 @@ import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
 import type { TreeBlock } from '../../store/types';
 import type { BlockVisibilityClientIdsProps } from './types';
+import { getBlockVisibilityReason } from './utils';
 
 export default function BlockVisibilityViewportToolbar( {
 	clientIds,
 }: BlockVisibilityClientIdsProps ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
 	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
-	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
+	const {
+		canToggleBlockVisibility,
+		areBlocksHiddenAnywhere,
+		visibilityReason,
+	} = useSelect(
 		( select ) => {
+			const { getSettings, getBlockAttributes } =
+				select( blockEditorStore );
 			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
 				unlock( select( blockEditorStore ) );
 			const _blocks = getBlocksByClientId( clientIds );
+			const _areBlocksHiddenAnywhere = clientIds?.every( ( clientId ) =>
+				isBlockHiddenAnywhere( clientId )
+			);
 			return {
 				canToggleBlockVisibility: _blocks.every(
 					( { clientId }: TreeBlock ) =>
@@ -29,12 +39,19 @@ export default function BlockVisibilityViewportToolbar( {
 							true
 						)
 				),
-				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
-					isBlockHiddenAnywhere( clientId )
-				),
+				areBlocksHiddenAnywhere: _areBlocksHiddenAnywhere,
+				// With a single hidden block selected, the button states
+				// why it's hidden instead of a generic "Hidden".
+				visibilityReason:
+					clientIds?.length === 1 && _areBlocksHiddenAnywhere
+						? getBlockVisibilityReason(
+								getBlockAttributes( clientIds[ 0 ] )?.metadata
+									?.blockVisibility,
+								getSettings().__experimentalFeatures?.viewport
+							)
+						: null,
 			};
 		},
-
 		[ clientIds ]
 	);
 	const blockEditorDispatch = useDispatch( blockEditorStore );
@@ -71,7 +88,10 @@ export default function BlockVisibilityViewportToolbar( {
 				disabled={ ! canToggleBlockVisibility }
 				icon={ areBlocksHiddenAnywhere ? unseen : seen }
 				label={
-					areBlocksHiddenAnywhere ? __( 'Hidden' ) : __( 'Visible' )
+					visibilityReason ??
+					( areBlocksHiddenAnywhere
+						? __( 'Hidden' )
+						: __( 'Visible' ) )
 				}
 				onClick={ () => showViewportModal( clientIds ) }
 				aria-haspopup="dialog"

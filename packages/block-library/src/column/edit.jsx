@@ -108,35 +108,31 @@ function ColumnEdit( {
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	// State, not a ref, so that the element is there on the next render.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	const columnsCount = columnsIds.length;
+	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
 	const blockProps = useBlockProps( {
 		ref: setDropZoneElement,
 		className: classes,
 		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		// Passed in rather than composed from the returned label so anything
+		// the wrapper appends (such as a hiding reason) follows the position.
+		'aria-label': sprintf(
+			/* translators: 1: Position of the column, 2: Total number of columns. */
+			__( 'Block: Column (%1$d of %2$d)' ),
+			currentColumnPosition,
+			columnsCount
+		),
 	} );
 
-	const columnsCount = columnsIds.length;
-	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
-
-	const label = sprintf(
-		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */
-		__( '%1$s (%2$d of %3$d)' ),
-		blockProps[ 'aria-label' ],
-		currentColumnPosition,
-		columnsCount
-	);
-
-	const innerBlocksProps = useInnerBlocksProps(
-		{ ...blockProps, 'aria-label': label },
-		{
-			// Allows dropping before or after the column, not only inside it.
-			dropZoneElement,
-			templateLock,
-			allowedBlocks,
-			renderAppender: hasChildBlocks
-				? false
-				: InnerBlocks.ButtonBlockAppender,
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		// Allows dropping before or after the column, not only inside it.
+		dropZoneElement,
+		templateLock,
+		allowedBlocks,
+		renderAppender: hasChildBlocks
+			? false
+			: InnerBlocks.ButtonBlockAppender,
+	} );
 
 	return (
 		<>
