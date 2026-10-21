@@ -93,6 +93,37 @@ test.describe( 'Post Content focus mode', () => {
 		} );
 	} );
 
+	test( 'hides the template again after showing it', async ( {
+		admin,
+		editor,
+		page,
+		postContentFocusMode,
+	} ) => {
+		await admin.createNewPost();
+		await postContentFocusMode.enableShowTemplate();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
+		const showTemplateButton = page.getByRole( 'menuitemcheckbox', {
+			name: 'Show template',
+		} );
+		await showTemplateButton.click();
+		await expect( showTemplateButton ).toHaveAttribute(
+			'aria-checked',
+			'false'
+		);
+		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: header' } )
+		).toBeHidden();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeVisible();
+	} );
+
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
 	test.describe( 'post content inside a template part', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
