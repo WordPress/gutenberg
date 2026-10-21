@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Use the design system outline for keyboard focus on downloadable block cards.
+-   Use the design system outline for keyboard focus on downloadable block cards ([#85307](https://github.com/WordPress/gutenberg/pull/85307)).
 
 ## 6.0.0 (2026-10-20)
 
