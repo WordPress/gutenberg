@@ -186,6 +186,8 @@ function StylesCanvasRevisions( { path }, ref ) {
 		settings,
 	};
 
+	// Each header is placed over its pane by grid area, so that the panes can
+	// stack with their headers when the canvas is narrow.
 	return (
 		<div
 			ref={ ref }
@@ -194,13 +196,14 @@ function StylesCanvasRevisions( { path }, ref ) {
 				'is-visual': view === 'visual',
 			} ) }
 		>
-			<div className="editor-styles-canvas-revisions__header">
+			{ /* The container query needs an ancestor container, so the grid is a child of it. */ }
+			<div className="editor-styles-canvas-revisions__layout">
 				{ isComparingRevision && (
-					<div className="editor-styles-canvas-revisions__pane-header">
+					<div className="editor-styles-canvas-revisions__pane-header is-selected">
 						<RevisionDetails revision={ selectedRevision } />
 					</div>
 				) }
-				<div className="editor-styles-canvas-revisions__pane-header">
+				<div className="editor-styles-canvas-revisions__pane-header is-current">
 					{ currentRevision && (
 						<RevisionDetails
 							revision={ currentRevision }
@@ -225,46 +228,44 @@ function StylesCanvasRevisions( { path }, ref ) {
 						</ToggleGroupControl>
 					</div>
 				</div>
-			</div>
-			<div
-				className={ clsx( 'editor-styles-canvas-revisions__content', {
-					'is-split': view === 'visual' && isComparingRevision,
-				} ) }
-			>
 				{ view === 'code' && (
-					<StylesRevisionsCodeDiff
-						revision={ codeRevision }
-						currentConfig={ userConfig }
-					/>
+					<div className="editor-styles-canvas-revisions__code">
+						<StylesRevisionsCodeDiff
+							revision={ codeRevision }
+							currentConfig={ userConfig }
+						/>
+					</div>
 				) }
 				{ view === 'visual' && isComparingRevision && (
-					<>
-						<div className="editor-styles-canvas-revisions__pane">
-							{ /* The `revisions` name is what tests and tooling look up, so it stays on the pane showing the selected revision. */ }
-							<RevisionPreview
-								{ ...previewProps }
-								config={ selectedRevision }
-								name="revisions"
-								title={ __( 'Selected revision' ) }
-							/>
-						</div>
-						<div className="editor-styles-canvas-revisions__pane">
-							<RevisionPreview
-								{ ...previewProps }
-								config={ userConfig }
-								name="revisions-current"
-								title={ __( 'Current version' ) }
-							/>
-						</div>
-					</>
-				) }
-				{ view === 'visual' && ! isComparingRevision && (
-					<div className="editor-styles-canvas-revisions__pane">
+					<div className="editor-styles-canvas-revisions__pane is-selected">
+						{ /* The `revisions` name is what tests and tooling look up, so it stays on the pane showing the selected revision. */ }
 						<RevisionPreview
 							{ ...previewProps }
-							config={ selectedRevision || userConfig }
+							config={ selectedRevision }
 							name="revisions"
-							title={ __( 'Revision preview' ) }
+							title={ __( 'Selected revision' ) }
+						/>
+					</div>
+				) }
+				{ view === 'visual' && (
+					<div className="editor-styles-canvas-revisions__pane is-current">
+						<RevisionPreview
+							{ ...previewProps }
+							config={
+								isComparingRevision
+									? userConfig
+									: selectedRevision || userConfig
+							}
+							name={
+								isComparingRevision
+									? 'revisions-current'
+									: 'revisions'
+							}
+							title={
+								isComparingRevision
+									? __( 'Current version' )
+									: __( 'Revision preview' )
+							}
 						/>
 					</div>
 				) }

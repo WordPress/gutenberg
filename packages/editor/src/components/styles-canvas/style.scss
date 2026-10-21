@@ -37,23 +37,40 @@
 }
 
 .editor-styles-canvas-revisions {
-	display: flex;
-	flex-direction: column;
 	height: 100%;
-	// Stack the panes when the canvas, not the window, is narrow.
+	// Stack the panes when the canvas, not the window, is narrow. The grid
+	// is a child, as an element can't be its own query container.
 	container-type: inline-size;
 }
 
-.editor-styles-canvas-revisions__header {
-	flex: none;
+.editor-styles-canvas-revisions__layout {
+	height: 100%;
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	border-bottom: $border-width solid $gray-200;
-	background: $white;
+	grid-template-rows: auto minmax(0, 1fr);
+	grid-template-areas:
+		"current-header"
+		"current";
 
-	// One column per pane, so each header sits over its preview.
-	.is-comparing & {
+	// The code view takes the whole width under the headers.
+	.editor-styles-canvas-revisions:not(.is-visual) > & {
+		grid-template-areas:
+			"current-header"
+			"code";
+	}
+
+	// Comparing, each pane sits under its own header.
+	.is-comparing > & {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-areas:
+			"selected-header current-header"
+			"selected current";
+	}
+
+	.is-comparing:not(.is-visual) > & {
+		grid-template-areas:
+			"selected-header current-header"
+			"code code";
 	}
 }
 
@@ -66,6 +83,8 @@
 	// same centre line as the 32px close button at 8px from the top.
 	min-height: $button-size-compact + $grid-unit-10;
 	padding: $grid-unit-05 $grid-unit-20;
+	border-bottom: $border-width solid $gray-200;
+	background: $white;
 
 	// The details take the room they need, and the toggle moves to its own
 	// line when both don't fit, rather than squeezing the details.
@@ -73,14 +92,19 @@
 		flex: 1 1 14rem;
 	}
 
-	& + & {
-		border-left: $border-width solid $gray-200;
+	&.is-selected {
+		grid-area: selected-header;
 	}
 
-	// The last header holds the toggle. Leave room for the close button,
-	// which sits over the top right corner.
-	&:last-child {
+	&.is-current {
+		grid-area: current-header;
+		// This header holds the toggle, in the top right corner, so it leaves
+		// room for the close button that sits over it.
 		padding-right: $grid-unit-10 + $button-size-compact + $grid-unit-10;
+	}
+
+	.is-comparing &.is-current {
+		border-left: $border-width solid $gray-200;
 	}
 }
 
@@ -90,53 +114,50 @@
 	margin-left: auto;
 }
 
-.editor-styles-canvas-revisions__content {
-	flex: 1 1 auto;
+.editor-styles-canvas-revisions__code {
+	grid-area: code;
 	min-height: 0;
-	display: grid;
-	grid-template-columns: minmax(0, 1fr);
-	grid-template-rows: minmax(0, 1fr);
-
-	&.is-split {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
 }
 
 .editor-styles-canvas-revisions__pane {
 	min-width: 0;
 	min-height: 0;
 
-	& + & {
+	&.is-selected {
+		grid-area: selected;
+	}
+
+	&.is-current {
+		grid-area: current;
+	}
+
+	.is-comparing &.is-current {
 		border-left: $border-width solid $gray-200;
 	}
 }
 
-// Below this width each pane would be too narrow to read, so only the visual
-// panes stack: the code view stays side by side, and so does its header.
+// Below this width each pane would be too narrow to read, so the visual
+// panes stack, each under its header. The current version goes first, as in
+// the revisions list, which keeps the view toggle in the top row. The code
+// view stays side by side.
 @container (width < 782px) {
-	.is-comparing.is-visual .editor-styles-canvas-revisions__header,
-	.editor-styles-canvas-revisions__content.is-split {
+	.is-comparing.is-visual > .editor-styles-canvas-revisions__layout {
 		grid-template-columns: minmax(0, 1fr);
-	}
+		grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr);
+		grid-template-areas:
+			"current-header"
+			"current"
+			"selected-header"
+			"selected";
 
-	.editor-styles-canvas-revisions__content.is-split {
-		grid-template-rows: repeat(2, minmax(0, 1fr));
-	}
+		.editor-styles-canvas-revisions__pane-header.is-current,
+		.editor-styles-canvas-revisions__pane.is-current {
+			border-left: 0;
+		}
 
-	.is-visual .editor-styles-canvas-revisions__pane-header + .editor-styles-canvas-revisions__pane-header,
-	.editor-styles-canvas-revisions__pane + .editor-styles-canvas-revisions__pane {
-		border-left: 0;
-		border-top: $border-width solid $gray-200;
-	}
-
-	// Stacked, the first header is the one under the close button, so only it
-	// leaves room for it. A lone header is both first and last, and keeps it.
-	.is-visual .editor-styles-canvas-revisions__pane-header:last-child {
-		padding-right: $grid-unit-20;
-	}
-
-	.is-visual .editor-styles-canvas-revisions__pane-header:first-child {
-		padding-right: $grid-unit-10 + $button-size-compact + $grid-unit-10;
+		.editor-styles-canvas-revisions__pane-header.is-selected {
+			border-top: $border-width solid $gray-200;
+		}
 	}
 }
 
