@@ -32,7 +32,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-block-rotation',
 					'label'       => __( 'Block rotation', 'gutenberg' ),
-					'description' => __( 'Adds a Rotation control to the Dimensions panel of blocks. Blocks that are already rotated stay rotated when this is off.', 'gutenberg' ),
+					'description' => __( 'Adds a Rotation control to the Dimensions panel of blocks. When this is off, blocks that were rotated keep their rotation but are shown unrotated.', 'gutenberg' ),
 				),
 			),
 		),

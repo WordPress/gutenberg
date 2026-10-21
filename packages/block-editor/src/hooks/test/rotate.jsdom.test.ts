@@ -345,6 +345,15 @@ describe( 'rotate block support', () => {
 		} );
 	} );
 
+	describe( 'hasSupport()', () => {
+		it( 'needs the block rotation experiment, so a stored rotation is only applied with it', () => {
+			const blockType = createBlockType( { supports: {} } );
+			expect( rotate.hasSupport( blockType ) ).toBe( false );
+			testWindow.__experimentalEnableBlockRotation = true;
+			expect( rotate.hasSupport( blockType ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isMatch()', () => {
 		it( 'matches styles with a default or a viewport rotation', () => {
 			expect( rotate.isMatch( { style: { rotate: 15 } } ) ).toBe( true );

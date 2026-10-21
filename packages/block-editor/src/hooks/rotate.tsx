@@ -94,14 +94,15 @@ function getStyleObject( style: unknown ): BlockStyle | undefined {
 }
 
 /**
- * Returns whether rotation can be edited for a block: the block rotation
+ * Returns whether rotation is edited and shown for a block: the block rotation
  * experiment is on and the block supports rotation.
  *
- * Rotation that is already stored is shown whether or not this is true.
+ * When this is false, a rotation that is already stored is kept but not shown,
+ * as on the front end.
  *
  * @param nameOrType Block name or block type object.
  *
- * @return Whether rotation can be edited.
+ * @return Whether rotation is edited and shown.
  */
 export function isRotateEnabled( nameOrType: string | BlockType ): boolean {
 	const { __experimentalEnableBlockRotation: isExperimentEnabled } =
@@ -371,13 +372,6 @@ function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
 	);
 }
 
-function RotateEdit( props: RotateEditProps ) {
-	if ( ! isRotateEnabled( props.name ) ) {
-		return null;
-	}
-	return <RotateControl { ...props } />;
-}
-
 function useBlockProps( {
 	clientId,
 	style,
@@ -401,9 +395,11 @@ function useBlockProps( {
 }
 
 export default {
-	edit: RotateEdit,
+	edit: RotateControl,
 	useBlockProps,
 	attributeKeys: [ 'style' ],
-	hasSupport: hasRotateSupport,
+	// Blocks without the experiment keep their stored rotation, which the
+	// style attribute registered for them holds, but it isn't applied.
+	hasSupport: isRotateEnabled,
 	isMatch: ( { style }: { style?: BlockStyle } ) => hasRotateValue( style ),
 };

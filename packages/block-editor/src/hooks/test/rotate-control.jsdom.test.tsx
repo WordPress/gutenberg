@@ -18,8 +18,6 @@ import rotate from '../rotate';
 
 const BLOCK_NAME = 'test/rotate-control';
 
-type TestWindow = Window & { __experimentalEnableBlockRotation?: boolean };
-
 type BlockStyle = Record< string, unknown >;
 
 type BlockAttributes = { style?: BlockStyle } | null;
@@ -94,7 +92,6 @@ describe( 'Rotation control', () => {
 
 	afterEach( () => {
 		unregisterBlockType( BLOCK_NAME );
-		delete ( window as TestWindow ).__experimentalEnableBlockRotation;
 		act( () => {
 			unlock( dispatch( blockEditorStore ) ).setStyleStateViewport(
 				'default'
@@ -102,16 +99,7 @@ describe( 'Rotation control', () => {
 		} );
 	} );
 
-	it( 'is not shown without the block rotation experiment', () => {
-		showRotateControl( { rotate: 15 } );
-
-		expect(
-			screen.queryByRole( 'spinbutton', { name: 'Rotation' } )
-		).not.toBeInTheDocument();
-	} );
-
 	it( 'shows and edits the default rotation', () => {
-		( window as TestWindow ).__experimentalEnableBlockRotation = true;
 		const clientId = showRotateControl( { rotate: 15 } );
 
 		const input = screen.getByRole( 'spinbutton', { name: 'Rotation' } );
@@ -125,7 +113,6 @@ describe( 'Rotation control', () => {
 	} );
 
 	it( 'edits the rotation of the selected viewport', () => {
-		( window as TestWindow ).__experimentalEnableBlockRotation = true;
 		act( () => {
 			unlock( dispatch( blockEditorStore ) ).setStyleStateViewport(
 				'@mobile'
@@ -147,7 +134,6 @@ describe( 'Rotation control', () => {
 	} );
 
 	it( 'resets only the rotation of the selected viewport', () => {
-		( window as TestWindow ).__experimentalEnableBlockRotation = true;
 		act( () => {
 			unlock( dispatch( blockEditorStore ) ).setStyleStateViewport(
 				'@mobile'
