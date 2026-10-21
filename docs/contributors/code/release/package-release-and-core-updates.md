@@ -28,14 +28,18 @@ Behind the scenes, all steps are automated via `npm exec --no release-cli -- npm
 4. Remove all files from the current branch: `git rm -r .`.
 5. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 6. Commit all changes to the `wp/latest` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
-7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/latest` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version bumps gets applied. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
+7. Update package changelogs and versions:
+    - For packages configured with Changie (listed in `.changie.yaml`), batch the unreleased fragments for each package: `npm exec --workspace @wordpress/changelog-tools --no -- changie batch <version> --project <package-name>`, then merge the compiled changelogs: `npm exec --workspace @wordpress/changelog-tools --no -- changie merge`.
+    - For traditional packages not yet using Changie, update `CHANGELOG.md` directly by replacing `## Unreleased` with `## Unreleased\n\n## <version> (<date>)`.
+    - When calculating versions, assume the package versions are written using this format `major.minor.patch` and make sure at least the `minor` version bump is applied. For example, if the changelog of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as the `minor` version bump. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
+    - Commit the updated changelogs, fragment removals, and version files to the `wp/latest` branch.
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/latest` branch, install npm dependencies with `npm ci`.
 10. Run the script `npm exec --no -- lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
-11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish") and the changelog/version updates (including `CHANGELOG.md`, `package.json`, and `.changes/` files) into the `trunk` branch of Gutenberg.
 
 ### Recovering from a partial npm publish
 
@@ -177,14 +181,14 @@ To publish packages to npm with bugfixes, select `bugfix` from the "Release type
 Behind the scenes, the rest of the process is automated with `npm exec --no release-cli -- npm-bugfix` command. For the record, the manual process would look very close to the following steps:
 
 1. Check out the `wp/latest` branch.
-2. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/latest` branch.
+2. Update the changelogs of the packages with the new publish version calculated and commit to the `wp/latest` branch. For Changie packages, batch using `npm exec --workspace @wordpress/changelog-tools --no -- changie batch <version> --project <package-name>` and `npm exec --workspace @wordpress/changelog-tools --no -- changie merge`; for other packages, edit `CHANGELOG.md` directly.
 3. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 4. From the `wp/latest` branch, install npm dependencies with `npm ci`.
 5. Run the script `npm exec --no -- lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
-6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish") and the changelog/version updates into the `trunk` branch of Gutenberg.
 
 ## Development releases
 
