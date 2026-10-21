@@ -236,6 +236,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 				{ view === 'visual' && isComparingRevision && (
 					<>
 						<div className="editor-styles-canvas-revisions__pane">
+							{ /* The `revisions` name is what tests and tooling look up, so it stays on the pane showing the selected revision. */ }
 							<RevisionPreview
 								{ ...previewProps }
 								config={ selectedRevision }
@@ -259,6 +260,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 							{ ...previewProps }
 							config={ selectedRevision || userConfig }
 							name="revisions"
+							title={ __( 'Revision preview' ) }
 						/>
 					</div>
 				) }
