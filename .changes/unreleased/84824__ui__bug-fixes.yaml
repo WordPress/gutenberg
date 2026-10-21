@@ -1,8 +1,0 @@
-project: ui
-kind: Bug Fixes
-body: >-
-    `Avatar`: Use the strong neutral stroke color for the person fallback to
-    provide sufficient non-text contrast
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84824'

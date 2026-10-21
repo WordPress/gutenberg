@@ -1,8 +1,0 @@
-project: ui
-kind: Bug Fixes
-body: >-
-    `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of
-    its wrapper, while retaining navigation landmark labels for page breadcrumbs
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84295'

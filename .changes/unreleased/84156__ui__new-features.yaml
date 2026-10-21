@@ -1,8 +1,0 @@
-project: ui
-kind: New Features
-body: >-
-    `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only
-    trails, and customizable `CurrentItem` `aria-current`
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84156'

@@ -1,8 +1,0 @@
-project: components
-kind: Bug Fixes
-body: >-
-    `Tabs`: Use semantic interaction colors for unselected tabs, preserve keyboard
-    focus rings, and replace vertical chevrons with content-height selection lines
-time: '2026-10-21T05:06:33.688Z'
-custom:
-    PR: '84572'

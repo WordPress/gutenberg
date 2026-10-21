@@ -1,0 +1,10 @@
+project: ui
+kind: Breaking Changes
+body: >-
+    `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now
+    set a maximum width and size to content, retaining the anchor-width minimum.
+    For fixed widths, compose `Select` with a popup `className` or `style`.
+    Combobox, Autocomplete, and searchable-select presets remain fixed
+time: '2026-10-21T11:19:07.630Z'
+custom:
+    PR: '84086'

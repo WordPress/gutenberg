@@ -1,6 +1,0 @@
-project: ui
-kind: Documentation
-body: '`Tabs`: Preserve intrinsic icon styles in the tab icons and tooltips story'
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84618'

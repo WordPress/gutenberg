@@ -1,8 +1,0 @@
-project: ui
-kind: Bug Fixes
-body: >-
-    `Select`: Keep long popup lists scrollable when item alignment falls back to
-    anchored positioning or the popup opens through touch
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84682'
