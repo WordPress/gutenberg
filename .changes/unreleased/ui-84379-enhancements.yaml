@@ -1,9 +1,0 @@
-project: ui
-kind: Enhancements
-body: >-
-    `Dialog`: Use the WordPress compatibility overlay slot as the default portal
-    container when available, preserving explicit container overrides, including
-    null to delay rendering
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84379'

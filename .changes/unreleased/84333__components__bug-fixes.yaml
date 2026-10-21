@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal
+    controls while preserving live edits
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '84333'

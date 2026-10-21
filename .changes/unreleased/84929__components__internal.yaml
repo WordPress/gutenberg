@@ -1,0 +1,6 @@
+project: components
+kind: Internal
+body: Remove unused Emotion-based `boxSizingReset` and `rtl` utilities
+time: '2026-10-21T05:06:33.689Z'
+custom:
+    PR: '84929'

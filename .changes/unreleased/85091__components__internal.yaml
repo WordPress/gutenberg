@@ -1,0 +1,8 @@
+project: components
+kind: Internal
+body: >-
+    Remove unused internal BoxControl and UnitControl helpers and gradient
+    constants
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '85091'

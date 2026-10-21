@@ -1,0 +1,8 @@
+project: components
+kind: Documentation
+body: >-
+    Update styling guidance and the `ToolsPanel` example after the Emotion
+    migration
+time: '2026-10-21T05:06:33.689Z'
+custom:
+    PR: '85020'

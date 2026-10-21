@@ -1,0 +1,9 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Avatar`: Add an optional `color` prop for an internal ring, preserving the
+    avatar's layout size and neutral fallbacks while leaving room for an external
+    focus ring
+time: '2026-10-21T05:06:33.766Z'
+custom:
+    PR: '84822'

@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Notice`: Tint dismiss controls and their focus rings with the notice status
+    color
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '84571'

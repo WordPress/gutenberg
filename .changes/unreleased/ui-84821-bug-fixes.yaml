@@ -1,8 +1,0 @@
-project: ui
-kind: Bug Fixes
-body: >-
-    `Tabs`: Expand vertical tab interaction backgrounds and focus rings across the
-    row
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84821'

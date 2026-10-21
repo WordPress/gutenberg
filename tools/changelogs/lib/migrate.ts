@@ -22,8 +22,6 @@ export interface ParsedChangelog {
 
 const VERSION_HEADING_REGEX =
 	/^##\s+(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)(?:\s+\((.*?)\))?/;
-const GUTENBERG_PR_REGEX =
-	/\[#(\d+)\]\(https:\/\/github\.com\/WordPress\/gutenberg\/pull\/\d+\)/;
 
 /**
  * Parses an existing CHANGELOG.md file into preamble, unreleased entries, and version blocks.
@@ -98,8 +96,17 @@ export function parseChangelogContent( content: string ): ParsedChangelog {
 					i++;
 				}
 				const fullBullet = bulletLines.join( '\n' );
-				const prMatch = fullBullet.match( GUTENBERG_PR_REGEX );
-				const pr = prMatch ? parseInt( prMatch[ 1 ], 10 ) : 0;
+				// Match the last PR link in the bullet
+				const allPrMatches = [
+					...fullBullet.matchAll(
+						/\[#(\d+)\]\(https:\/\/github\.com\/WordPress\/gutenberg\/pull\/\d+\)/g
+					),
+				];
+				const lastPrMatch =
+					allPrMatches.length > 0
+						? allPrMatches[ allPrMatches.length - 1 ]
+						: null;
+				const pr = lastPrMatch ? parseInt( lastPrMatch[ 1 ], 10 ) : 0;
 				const cleanBody = fullBullet
 					.replace(
 						/\s*\(\[#\d+\]\(https:\/\/github\.com\/WordPress\/gutenberg\/pull\/\d+\)\)\.?\s*$/,
@@ -202,11 +209,19 @@ export function migratePackageToChangie(
 		} );
 	}
 
-	// 2. Create unreleased YAML fragments
+	// 2. Create unreleased YAML fragments with unique filenames: PR__PACKAGE__KIND(__INDEX).yaml
+	const usedFilenames = new Map< string, number >();
+
 	for ( const entry of parsed.unreleasedEntries ) {
 		const pr = entry.pr || 0;
 		const safeKind = entry.kind.toLowerCase().replace( /\s+/g, '-' );
-		const filename = `${ normalized }-${ pr }-${ safeKind }.yaml`;
+		const baseKey = `${ pr }__${ normalized }__${ safeKind }`;
+
+		const count = ( usedFilenames.get( baseKey ) || 0 ) + 1;
+		usedFilenames.set( baseKey, count );
+
+		const filename =
+			count === 1 ? `${ baseKey }.yaml` : `${ baseKey }__${ count }.yaml`;
 		const fragmentData = {
 			project: normalized,
 			kind: entry.kind,

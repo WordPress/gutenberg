@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `SelectControl`: Preserve the minimal variant's inline layout in iframe
+    documents
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '84732'

@@ -5,7 +5,7 @@ versionExt: md
 versionFormat: '## {{.Version}} ({{.Time.Format "2006-01-02"}})'
 kindFormat: '### {{.Kind}}'
 changeFormat: '-   {{.Body}} ([#{{.Custom.PR}}](https://github.com/WordPress/gutenberg/pull/{{.Custom.PR}})).'
-fragmentFileFormat: '{{.Project}}-{{.Custom.PR}}-{{.Kind}}-{{.Time.Format "20060102150405"}}'
+fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind}}__{{.Time.Format "20060102150405"}}'
 envPrefix: 'GUTENBERG_'
 
 newlines:
