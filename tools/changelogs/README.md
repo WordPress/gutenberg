@@ -99,16 +99,8 @@ When rebasing on or merging `trunk`, Git will report a conflict on `packages/<pa
 
 1.  Keep trunk's version of the changelog:
 
-    **1a. If performing a `git rebase`**:
-
     ```bash
-    git checkout --theirs packages/<package-name>/CHANGELOG.md
-    ```
-
-    **1b. If performing a `git merge`**:
-
-    ```bash
-    git checkout --ours packages/<package-name>/CHANGELOG.md
+    git checkout origin/trunk -- packages/<package-name>/CHANGELOG.md
     ```
 
 2.  Run the update command to clean up previous fragments and re-migrate:
