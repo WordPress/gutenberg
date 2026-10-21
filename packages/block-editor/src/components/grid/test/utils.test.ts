@@ -6,7 +6,6 @@ import {
 	getGridTracks,
 	getRowEndForResize,
 } from '../utils';
-import type { GridRect } from '../utils';
 
 describe( 'getBoundingGridRect()', () => {
 	it( 'spans from one cell to another', () => {
