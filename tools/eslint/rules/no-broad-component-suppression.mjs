@@ -14,7 +14,7 @@ export default {
 		schema: [],
 		messages: {
 			narrowSuppression:
-				'Place eslint-disable-next-line {{ rule }} immediately above one import specifier on its own line.',
+				'Place eslint-disable-next-line {{ rule }} immediately above one import specifier or destructured property on its own line.',
 		},
 	},
 	create( context ) {
@@ -43,16 +43,21 @@ export default {
 					const node =
 						token &&
 						sourceCode.getNodeByRangeIndex( token.range[ 0 ] );
-					const specifier =
-						node?.type === 'ImportSpecifier' ? node : node?.parent;
+					const component =
+						node?.type === 'ImportSpecifier' ||
+						node?.type === 'Property'
+							? node
+							: node?.parent;
 					if (
 						directive.label === 'eslint-disable-next-line' &&
-						specifier?.type === 'ImportSpecifier' &&
-						specifier.loc.start.line === targetLine &&
-						specifier.loc.end.line === targetLine
+						( component?.type === 'ImportSpecifier' ||
+							( component?.type === 'Property' &&
+								component.parent.type === 'ObjectPattern' ) ) &&
+						component.loc.start.line === targetLine &&
+						component.loc.end.line === targetLine
 					) {
-						const before = sourceCode.getTokenBefore( specifier );
-						let after = sourceCode.getTokenAfter( specifier );
+						const before = sourceCode.getTokenBefore( component );
+						let after = sourceCode.getTokenAfter( component );
 						if ( after?.value === ',' ) {
 							after = sourceCode.getTokenAfter( after );
 						}

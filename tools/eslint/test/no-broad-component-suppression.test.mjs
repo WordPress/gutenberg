@@ -56,6 +56,65 @@ describe( 'no-broad-component-suppression', () => {
 		] );
 	} );
 
+	it( 'accepts an exception above one unlocked property', () => {
+		const messages = new Linter().verify(
+			`import { privateApis } from '@wordpress/components';
+import { unlock } from '../../lock-unlock';
+const {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Tabs,
+} = unlock( privateApis );`,
+			config
+		);
+
+		expect( messages ).toEqual( [] );
+	} );
+
+	it( 'still reports another unrecommended unlocked property on a separate line', () => {
+		const messages = new Linter().verify(
+			`import { privateApis } from '@wordpress/components';
+import { unlock } from '../../lock-unlock';
+const {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Tabs,
+	Flex,
+} = unlock( privateApis );`,
+			config
+		);
+
+		expect( messages ).toEqual( [
+			expect.objectContaining( {
+				ruleId: RECOMMENDATION_RULE,
+				line: 6,
+				message: expect.stringContaining( '`Stack`' ),
+			} ),
+		] );
+	} );
+
+	it( 'rejects an exception covering multiple unlocked properties', () => {
+		const linter = new Linter();
+		const messages = linter.verify(
+			`import { privateApis } from '@wordpress/components';
+import { unlock } from '../../lock-unlock';
+const {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Tabs, Flex,
+} = unlock( privateApis );`,
+			config
+		);
+
+		expect( messages ).toEqual( [
+			expect.objectContaining( {
+				ruleId: RULE_ID,
+				messageId: 'narrowSuppression',
+				line: 4,
+			} ),
+		] );
+		expect(
+			linter.getSuppressedMessages().map( ( message ) => message.ruleId )
+		).toEqual( [ RECOMMENDATION_RULE, RECOMMENDATION_RULE ] );
+	} );
+
 	it.each( [
 		'// eslint-disable-next-line "@wordpress/use-recommended-components"',
 		"// eslint-disable-next-line '@wordpress/use-recommended-components'",
