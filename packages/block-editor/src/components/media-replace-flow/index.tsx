@@ -21,6 +21,7 @@ import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
+import { Text } from '@wordpress/ui';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
@@ -265,9 +266,9 @@ const MediaReplaceFlow = ( {
 					</NavigableMenu>
 					{ onSelectURL && (
 						<form className="block-editor-media-flow__url-input">
-							<span className="block-editor-media-replace-flow__image-url-label">
+							<Text className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
-							</span>
+							</Text>
 
 							<LinkControl
 								value={ { url: mediaURL } }
