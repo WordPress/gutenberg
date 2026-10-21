@@ -25,6 +25,7 @@
 -   `MenuItem`: Accept `accessibleWhenDisabled` in the props types ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
 -   `Autocomplete`: Let completers type the payload they replace the field with ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 -   `Autocomplete`: Make the `keywords` of the options from `useItems` optional, as the default filter already does ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
+-   Convert the remaining Popover test helper to TypeScript ([#85150](https://github.com/WordPress/gutenberg/pull/85150)).
 
 ## 43.0.0 (2026-10-20)
 
@@ -94,7 +95,6 @@
 
 ### Internal
 
--   Convert the remaining Popover test helper to TypeScript ([#85150](https://github.com/WordPress/gutenberg/pull/85150)).
 -   `RangeControl`, `Tabs`, `BorderBoxControl`: Remove unused styles and simplify SCSS nesting while preserving specificity and rendered styles ([#85086](https://github.com/WordPress/gutenberg/pull/85086)).
 -   Remove obsolete JavaScript style configuration and unused style helpers ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
