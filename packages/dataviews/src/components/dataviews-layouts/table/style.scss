@@ -363,6 +363,17 @@
 	}
 
 	&.is-refreshing {
-		@include dataviews-refreshing();
+		// Keep covered headers behind an opaque surface while the toolbar fades.
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			height: var(--wp-dataviews-table-header-height);
+			background: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+		}
+
+		> .dataviews-bulk-actions {
+			@include dataviews-refreshing();
+		}
 	}
 }
