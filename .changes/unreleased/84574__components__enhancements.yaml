@@ -1,9 +1,0 @@
-project: components
-kind: Enhancements
-body: >-
-    `Popover`: Use the design-system stroke color, border width, radius, and
-    background on the default surface. `Dropdown` and `DropdownMenu` pick this up
-    through `Popover`
-time: '2026-10-21T05:06:33.688Z'
-custom:
-    PR: '84574'

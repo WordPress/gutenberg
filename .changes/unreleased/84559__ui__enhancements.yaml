@@ -1,8 +1,0 @@
-project: ui
-kind: Enhancements
-body: >-
-    `Dialog`: Add an opt-in `auto` popup size that fits content within the
-    responsive minimum and viewport inset
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84559'

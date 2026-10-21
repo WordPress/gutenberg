@@ -1,9 +1,0 @@
-project: ui
-kind: Enhancements
-body: >-
-    `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard
-    focus rings, and replace vertical chevrons with content-height selection lines
-    without widening minimal tab lists
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84572'
