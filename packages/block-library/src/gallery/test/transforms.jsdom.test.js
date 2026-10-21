@@ -39,6 +39,12 @@ describe( 'transforms', () => {
 				sizeSlug: {
 					type: 'string',
 				},
+				href: {
+					type: 'string',
+				},
+				linkDestination: {
+					type: 'string',
+				},
 			},
 			save: () => {},
 			category: 'media',
@@ -160,6 +166,66 @@ describe( 'transforms', () => {
 		expect( transformedBlocks[ 0 ] ).toMatchObject( {
 			name: 'core/group',
 			attributes: { layout: { type: 'grid' } },
+		} );
+	} );
+
+	describe( 'from Image blocks', () => {
+		const createImages = ( linkDestinations ) =>
+			linkDestinations.map( ( linkDestination, index ) =>
+				createBlock( 'core/image', {
+					url: `https://example.com/${ index }.jpg`,
+					id: index + 1,
+					linkDestination,
+					href:
+						linkDestination && linkDestination !== 'none'
+							? `https://example.com/link/${ index }`
+							: undefined,
+				} )
+			);
+
+		// Attributes without a value are dropped from the created block, so
+		// compare them one by one rather than with `toMatchObject`.
+		const expectImageLinksKept = ( gallery, images ) =>
+			gallery.innerBlocks.forEach( ( innerBlock, index ) => {
+				expect( innerBlock.attributes.linkDestination ).toBe(
+					images[ index ].attributes.linkDestination
+				);
+				expect( innerBlock.attributes.href ).toBe(
+					images[ index ].attributes.href
+				);
+			} );
+
+		it.each( [ 'media', 'attachment', 'none' ] )(
+			'sets the Gallery linkTo to %s when every image links there',
+			( linkDestination ) => {
+				const images = createImages( [
+					linkDestination,
+					linkDestination,
+				] );
+
+				const [ gallery ] = switchToBlockType( images, 'core/gallery' );
+
+				expect( gallery.attributes.linkTo ).toBe( linkDestination );
+				expect( gallery.innerBlocks ).toHaveLength( 2 );
+				expectImageLinksKept( gallery, images );
+			}
+		);
+
+		it( 'leaves the Gallery linkTo unset and keeps each image link when the images disagree', () => {
+			const images = createImages( [ 'media', 'none', 'custom' ] );
+
+			const [ gallery ] = switchToBlockType( images, 'core/gallery' );
+
+			expect( gallery.attributes.linkTo ).toBeUndefined();
+			expectImageLinksKept( gallery, images );
+		} );
+
+		it( 'leaves the Gallery linkTo unset when the images have no link destination', () => {
+			const images = createImages( [ undefined, undefined ] );
+
+			const [ gallery ] = switchToBlockType( images, 'core/gallery' );
+
+			expect( gallery.attributes.linkTo ).toBeUndefined();
 		} );
 	} );
 

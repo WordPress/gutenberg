@@ -6,7 +6,22 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import {
+	LINK_DESTINATION_ATTACHMENT as IMAGE_LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA as IMAGE_LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE as IMAGE_LINK_DESTINATION_NONE,
+} from '../image/constants';
 import { defaultColumnsNumber } from './shared';
+
+/**
+ * The Gallery `linkTo` value for each Image `linkDestination` the Gallery can
+ * express. A custom image link has no Gallery equivalent.
+ */
+const GALLERY_LINK_TO_BY_IMAGE_LINK_DESTINATION = {
+	[ IMAGE_LINK_DESTINATION_MEDIA ]: LINK_DESTINATION_MEDIA,
+	[ IMAGE_LINK_DESTINATION_ATTACHMENT ]: LINK_DESTINATION_ATTACHMENT,
+	[ IMAGE_LINK_DESTINATION_NONE ]: LINK_DESTINATION_NONE,
+};
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -122,9 +137,9 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/image' ],
 			transform: ( attributes ) => {
-				// Init the align and size from the first item which may be either the placeholder or an image.
-				let { align, sizeSlug } = attributes[ 0 ];
-				// Loop through all the images and check if they have the same align and size.
+				// Init the align, size and link from the first item which may be either the placeholder or an image.
+				let { align, sizeSlug, linkDestination } = attributes[ 0 ];
+				// Loop through all the images and check if they have the same align, size and link.
 				align = attributes.every(
 					( attribute ) => attribute.align === align
 				)
@@ -134,6 +149,17 @@ const transforms = {
 					( attribute ) => attribute.sizeSlug === sizeSlug
 				)
 					? sizeSlug
+					: undefined;
+				// The images keep their own links either way; the gallery's
+				// link setting only follows them when they all agree, so the
+				// Link control shows what the images actually link to.
+				const linkTo = attributes.every(
+					( attribute ) =>
+						attribute.linkDestination === linkDestination
+				)
+					? GALLERY_LINK_TO_BY_IMAGE_LINK_DESTINATION[
+							linkDestination
+						]
 					: undefined;
 
 				const validImages = attributes.filter( ( { url } ) => url );
@@ -150,6 +176,7 @@ const transforms = {
 					{
 						align,
 						sizeSlug,
+						linkTo,
 					},
 					innerBlocks
 				);

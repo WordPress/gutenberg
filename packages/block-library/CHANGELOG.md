@@ -6,6 +6,7 @@
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
+-   Gallery: Keep the link setting when Image blocks that all link to the same destination are transformed into a Gallery, so the Link control shows where the images link instead of "None" while the images still link.
 
 ## 12.0.0 (2026-10-20)
 
