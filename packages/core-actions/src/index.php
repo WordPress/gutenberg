@@ -17,8 +17,9 @@
  * Registers the actions of WordPress core on each post type exposed in the
  * REST API, from what it supports and what the current user can do:
  *
- * - `edit-post`, for pages, when the user can edit them. It only signals it
- *   was performed: the list showing it opens the editor.
+ * - `edit-post`, for pages, templates, template parts, and patterns, when
+ *   the user can edit them. It only signals it was performed: the list
+ *   showing it opens the editor.
  * - `view-post`, for the viewable post types.
  * - `view-post-revisions`, for the post types supporting `revisions`.
  * - `duplicate-post`, for the post types the user can create, except
@@ -51,6 +52,7 @@ function register_core_entity_actions() {
 	$is_gutenberg   = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
 	$is_block_theme = wp_is_block_theme();
 	$design_types   = array( 'wp_block', 'wp_template', 'wp_template_part' );
+	$listed_types   = array_merge( array( 'page' ), $design_types );
 	$definitions    = array();
 
 	// Each file is required in its own variable scope.
@@ -72,7 +74,7 @@ function register_core_entity_actions() {
 		// The actions of the post type, keyed by the folder of their script
 		// module and their id, in the order they are shown.
 		$applies = array(
-			'page/edit-post'                           => 'page' === $name && current_user_can( $post_type->cap->edit_posts ),
+			'post_type_supports/edit-post'             => in_array( $name, $listed_types, true ) && current_user_can( $post_type->cap->edit_posts ),
 			'post_type_supports/view-post'             => is_post_type_viewable( $post_type ),
 			'post_type_supports/view-post-revisions'   => post_type_supports( $name, 'revisions' ),
 			'post_type_supports/duplicate-post'        => $is_gutenberg && $can_create && ! in_array( $name, $design_types, true ),
