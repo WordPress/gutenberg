@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import { loadChangieConfig } from './config.ts';
+import { execChangie } from './release.ts';
 
 export interface Fragment {
 	filePath: string;
@@ -60,7 +61,8 @@ export function loadUnreleasedFragments(
 }
 
 /**
- * Generates Markdown preview for pending unreleased fragments of a package.
+ * Generates Markdown preview for pending unreleased fragments of a package
+ * using Changie's native batch dry-run.
  *
  * @param packageName Package directory name (e.g. 'components' or 'ui').
  * @param repoRoot    Path to Gutenberg repository root.
@@ -79,29 +81,27 @@ export function previewUnreleasedFragments(
 	);
 
 	if ( projectFragments.length === 0 ) {
-		return `## Unreleased\n\n_No unreleased fragments found for @wordpress/${ normalized }._\n`;
+		return `## Unreleased (@wordpress/${ normalized })\n\n_No unreleased fragments found for @wordpress/${ normalized }._\n`;
 	}
 
-	const groupedByKind = new Map< string, Fragment[] >();
-	for ( const frag of projectFragments ) {
-		const kind = frag.kind || 'Enhancements';
-		if ( ! groupedByKind.has( kind ) ) {
-			groupedByKind.set( kind, [] );
-		}
-		groupedByKind.get( kind )!.push( frag );
+	const res = execChangie(
+		[ 'batch', '0-unreleased', '--dry-run', '--project', normalized ],
+		repoRoot
+	);
+
+	if ( res.status !== 0 ) {
+		throw new Error(
+			`Failed to preview unreleased fragments for ${ normalized }: ${
+				res.stderr || res.stdout
+			}`
+		);
 	}
 
-	let output = `## Unreleased (@wordpress/${ normalized })\n`;
-	for ( const [ kind, items ] of groupedByKind.entries() ) {
-		output += `\n### ${ kind }\n\n`;
-		for ( const item of items ) {
-			const pr = item.custom?.PR;
-			const prLink = pr
-				? ` ([#${ pr }](https://github.com/WordPress/gutenberg/pull/${ pr })).`
-				: '.';
-			output += `-   ${ item.body }${ prLink }\n`;
-		}
-	}
+	// Replace the placeholder version header with the unreleased preview header
+	const output = res.stdout.replace(
+		/^##\s+0-unreleased[^\r\n]*/m,
+		`## Unreleased (@wordpress/${ normalized })`
+	);
 
-	return output;
+	return output.trim() + '\n';
 }
