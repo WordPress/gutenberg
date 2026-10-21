@@ -28,15 +28,25 @@ describe( 'downloadZipSource', () => {
 
 		const zip = new AdmZip();
 		zip.addFile( 'wordpress/index.php', Buffer.from( 'new index' ) );
+		zip.addFile(
+			'wordpress/wp-content/index.php',
+			Buffer.from( 'silence' )
+		);
 		vi.spyOn( got, 'stream' ).mockImplementation( () =>
 			Readable.from( [ zip.toBuffer() ] )
 		);
 
-		// A previous download that WordPress has since been configured in.
-		fs.mkdirSync( source.path );
+		// A previous download that WordPress has since been configured and used in.
+		fs.mkdirSync( path.join( source.path, 'wp-content/uploads/2026' ), {
+			recursive: true,
+		} );
 		fs.writeFileSync( path.join( source.path, 'index.php' ), 'old index' );
 		fs.writeFileSync( path.join( source.path, 'stale.php' ), 'stale' );
 		fs.writeFileSync( path.join( source.path, 'wp-config.php' ), 'config' );
+		fs.writeFileSync(
+			path.join( source.path, 'wp-content/uploads/2026/image.jpg' ),
+			'image'
+		);
 	} );
 
 	afterEach( () => {
@@ -50,17 +60,20 @@ describe( 'downloadZipSource', () => {
 		expect( read( 'index.php' ) ).toBe( 'new index' );
 		expect( exists( 'stale.php' ) ).toBe( false );
 		expect( exists( 'wp-config.php' ) ).toBe( false );
+		expect( exists( 'wp-content/uploads' ) ).toBe( false );
 	} );
 
-	it( 'carries the files it is asked to preserve into the new download', async () => {
+	it( 'carries the paths it is asked to preserve into the new download', async () => {
 		await downloadZipSource( source, {
 			onProgress: () => {},
-			preserve: [ 'wp-config.php' ],
+			preserve: [ 'wp-config.php', 'wp-content/uploads' ],
 		} );
 
 		expect( read( 'index.php' ) ).toBe( 'new index' );
+		expect( read( 'wp-content/index.php' ) ).toBe( 'silence' );
 		expect( exists( 'stale.php' ) ).toBe( false );
 		expect( read( 'wp-config.php' ) ).toBe( 'config' );
+		expect( read( 'wp-content/uploads/2026/image.jpg' ) ).toBe( 'image' );
 	} );
 
 	it( 'skips a preserved file the previous download does not have', async () => {

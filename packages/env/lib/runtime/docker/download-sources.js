@@ -58,9 +58,9 @@ module.exports = function downloadSources( config, spinner ) {
 			downloadSource( source, {
 				onProgress: getProgressSetter( source.basename ),
 				spinner,
-				// A zip download replaces the directory, so the site's configuration has to be carried over.
+				// A zip download replaces the directory, so the site's configuration and media have to be carried over.
 				preserve: coreSourceUrls.has( source.url )
-					? [ 'wp-config.php' ]
+					? [ 'wp-config.php', 'wp-content/uploads' ]
 					: [],
 			} )
 		)
