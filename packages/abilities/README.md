@@ -11,12 +11,10 @@ Client library for the WordPress Abilities API, providing a standardized way to 
 
 ## Installation
 
-The client is currently available as a part of the Composer package.
+The Abilities package ships with WordPress 7.0 by default. You can also install the package via npm:
 
-### As a WordPress Script
-
-When the Abilities API is installed, the client is automatically registered and enqueue in the admin.
-
+```bash
+npm install @wordpress/abilities --save
 ## Usage
 
 ```javascript
