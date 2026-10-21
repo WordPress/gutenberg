@@ -1,8 +1,0 @@
-project: ui
-kind: Enhancements
-body: >-
-    `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent
-    for customizing trigger props
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84828'

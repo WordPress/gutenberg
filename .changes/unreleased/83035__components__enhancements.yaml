@@ -1,0 +1,6 @@
+project: components
+kind: Enhancements
+body: '`ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector'
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '83035'

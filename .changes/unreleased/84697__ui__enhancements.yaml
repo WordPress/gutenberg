@@ -1,0 +1,8 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Link`: Use a small border radius for consistent focus rings in the default
+    variant
+time: '2026-10-21T05:06:33.766Z'
+custom:
+    PR: '84697'

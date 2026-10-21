@@ -217,7 +217,7 @@ jobs:
 
                   if [ "$is_changie" = "true" ]; then
                       # Check if any .changes/unreleased fragment was added/modified for this PR and package
-                      changed_fragments=$(git diff --name-only "$BASE_SHA"...HEAD -- ".changes/unreleased/*.yaml" || true)
+                      changed_fragments=$(git diff --name-only "$BASE_SHA"...HEAD -- ".changes/unreleased/*__${PACKAGE_NAME}__*.yaml" || true)
                       if [ -z "$changed_fragments" ]; then
                           echo "Please add a changelog fragment via 'npm run changelog:add -- -j ${PACKAGE_NAME}'"
                           echo

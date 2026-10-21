@@ -1,9 +1,0 @@
-project: components
-kind: Enhancements
-body: >-
-    `BorderBoxControl`, `BorderControl`, `Heading`, `InputControl`, `Menu`,
-    `RangeControl`, `Text`, `ToolsPanel`: Use semantic WPDS tokens for typography,
-    spacing, border previews, and range rails
-time: '2026-10-20T03:22:02.070Z'
-custom:
-    PR: '85038'

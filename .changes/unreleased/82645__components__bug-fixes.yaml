@@ -1,0 +1,10 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Modal`: Keep an accessible name on the dialog when `title` is combined with
+    `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is
+    not rendered in that case, so the title is now applied as the dialog's
+    `aria-label` instead
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '82645'

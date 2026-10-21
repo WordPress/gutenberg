@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `BaseControl`: Remove the unsupported `as` prop from the component types and
+    documentation
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '70064'

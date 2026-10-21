@@ -1,9 +1,0 @@
-project: ui
-kind: Bug Fixes
-body: >-
-    `AlertDialog`: Use the WordPress compatibility overlay slot as the default
-    portal container when available, preserving an explicit null container to
-    delay rendering
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '83878'

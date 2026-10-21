@@ -1,8 +1,0 @@
-project: ui
-kind: Documentation
-body: >-
-    `Menu`: Clarify icon and description usage, document mixed icon alignment and
-    current layout defaults, and favor short, clear labels
-time: '2026-10-20T03:22:02.144Z'
-custom:
-    PR: '84020'

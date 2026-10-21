@@ -1,8 +1,0 @@
-project: components
-kind: Bug Fixes
-body: >-
-    `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner
-    instead of the bottom left one
-time: '2026-10-20T03:22:02.071Z'
-custom:
-    PR: '82641'

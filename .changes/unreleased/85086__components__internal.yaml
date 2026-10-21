@@ -1,0 +1,8 @@
+project: components
+kind: Internal
+body: >-
+    `RangeControl`, `Tabs`, `BorderBoxControl`: Remove unused styles and simplify
+    SCSS nesting while preserving specificity and rendered styles
+time: '2026-10-21T05:06:33.688Z'
+custom:
+    PR: '85086'
