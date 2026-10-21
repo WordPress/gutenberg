@@ -6,7 +6,11 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	getDate,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
@@ -139,7 +143,12 @@ export function RevisionsSlider( {
 		if ( ! revision ) {
 			return index;
 		}
-		return dateI18n( dateSettings.formats.datetime, revision.date );
+		// The REST API gives the date in site time without an offset;
+		// getDate() reads it in the site timezone rather than the browser's.
+		return dateI18n(
+			dateSettings.formats.datetime,
+			getDate( revision.date )
+		);
 	};
 
 	const showPagination = totalPages > 1;

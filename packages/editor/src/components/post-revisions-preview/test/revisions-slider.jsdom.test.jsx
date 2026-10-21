@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getSettings, setSettings } from '@wordpress/date';
 import { RevisionsSlider } from '../revisions-slider';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -27,6 +28,32 @@ function getRevisionsSlider( revisions ) {
 }
 
 describe( 'RevisionsSlider', () => {
+	it( 'labels the selected revision with its date in the site timezone', () => {
+		const settings = getSettings();
+		// The REST API gives revision dates as site-local time without an
+		// offset. Use a site timezone that differs from the test runner's
+		// (UTC) to tell site time from browser time.
+		setSettings( {
+			...settings,
+			timezone: {
+				...settings.timezone,
+				offset: 9,
+				string: 'Asia/Tokyo',
+				abbr: 'JST',
+			},
+		} );
+
+		try {
+			render( getRevisionsSlider( loadedRevisions ) );
+
+			expect(
+				screen.getByRole( 'slider', { name: 'Revision' } )
+			).toHaveAttribute( 'aria-valuetext', 'July 14, 2026 12:00 pm' );
+		} finally {
+			setSettings( settings );
+		}
+	} );
+
 	it( 'focuses the slider when revisions load without user interaction', () => {
 		const { rerender } = render( getRevisionsSlider() );
 

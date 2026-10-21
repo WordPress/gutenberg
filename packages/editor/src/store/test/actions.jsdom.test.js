@@ -4,6 +4,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
+import {
+	getSettings as getDateSettings,
+	setSettings as setDateSettings,
+} from '@wordpress/date';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -1289,6 +1293,51 @@ describe( 'Post actions', () => {
 			expect( savedData ).toHaveLength( 1 );
 			expect( savedData[ 0 ] ).toMatchObject( {
 				content: 'autosaved content',
+			} );
+		} );
+
+		it( 'shows the date of the restored revision in the site timezone', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'publish',
+			};
+			const { registry } = setUpRestore( post );
+
+			const dateSettings = getDateSettings();
+			// The REST API gives revision dates as site-local time without
+			// an offset. Use a site timezone that differs from the test
+			// runner's (UTC) to tell site time from browser time.
+			setDateSettings( {
+				...dateSettings,
+				timezone: {
+					...dateSettings.timezone,
+					offset: 9,
+					string: 'Asia/Tokyo',
+					abbr: 'JST',
+				},
+			} );
+
+			try {
+				await unlock(
+					registry.dispatch( editorStore )
+				).restoreRevision( revisionId );
+			} finally {
+				setDateSettings( dateSettings );
+			}
+
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.find(
+						( notice ) => notice.id === 'editor-revision-restored'
+					)
+			).toMatchObject( {
+				content: 'Restored to revision from October 13, 2026 10:00 am.',
 			} );
 		} );
 
