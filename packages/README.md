@@ -296,7 +296,7 @@ Packages configured in `.changie.yaml` use independent changelog fragment files 
 
 #### Additional commands
 
--   **Preview unreleased notes**: preview the compiled unreleased notes for a package: `npm run changelog:preview -- -p <package-name>`, or omit `-p` to preview all configured packages.
+-   **Preview unreleased notes**: preview the compiled unreleased notes for a package: `npm run changelog:preview -- <package-name>`.
 -   **Write using your text editor**: use `-e` to write the description in your `$EDITOR`: `npm run changelog:add -- -e`.
 -   **Direct non-interactive creation**: pass flags directly to skip interactive prompts: `npm run changelog:add -- -j <package-name> -k "<Kind>" -m "PR=<number>" -b "<Description>"`.
 
