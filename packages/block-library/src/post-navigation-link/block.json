@@ -30,6 +30,10 @@
 		"taxonomy": {
 			"type": "string",
 			"default": ""
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"usesContext": [ "postType" ],

@@ -27,7 +27,8 @@ export default function PostNavigationLinkEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const { type, label, showTitle, linkLabel, arrow, taxonomy } = attributes;
+	const { type, label, showTitle, linkLabel, arrow, taxonomy, linkTarget } =
+		attributes;
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
@@ -110,6 +111,7 @@ export default function PostNavigationLinkEdit( {
 							showTitle: false,
 							linkLabel: false,
 							arrow: 'none',
+							linkTarget: '_self',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -198,6 +200,24 @@ export default function PostNavigationLinkEdit( {
 								) }
 							/>
 						</ToggleGroupControl>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Open in new tab' ) }
+						isShownByDefault
+						hasValue={ () => linkTarget === '_blank' }
+						onDeselect={ () =>
+							setAttributes( { linkTarget: '_self' } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							checked={ linkTarget === '_blank' }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
