@@ -41,6 +41,10 @@ function gutenberg_register_background_support( $block_type ) {
  * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_background_classes_and_styles( $block_attributes ) {
+	if ( ! is_array( $block_attributes ) ) {
+		return array();
+	}
+
 	$background = $block_attributes['style']['background'] ?? null;
 
 	if ( ! is_array( $background ) ) {
@@ -116,7 +120,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// The helper ignores a non-array background, so only an array needs filtering.
+	// unset() fatals on a string, and the helper ignores one anyway.
 	if ( is_array( $block_attributes['style']['background'] ) ) {
 		if ( $skip_background_image ) {
 			unset(
