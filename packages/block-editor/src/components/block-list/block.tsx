@@ -35,7 +35,7 @@ import {
 } from '../../utils/multi-selection-attributes';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
-import { deviceTypeKey } from '../../store/private-keys';
+import { deviceTypeKey, showHiddenBlocksKey } from '../../store/private-keys';
 import type { InitialPosition, TreeBlock } from '../../store/types';
 import type {
 	BlockListBlockProps,
@@ -903,6 +903,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					'splitting',
 					false
 				),
+				showHiddenBlocks: !! settings?.[ showHiddenBlocksKey ],
 			};
 		},
 		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
@@ -989,6 +990,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		deviceType,
 		viewportSettings,
 		supportsSplitting,
+		showHiddenBlocks = false,
 	} = selectedProps;
 
 	const privateContext = {
@@ -1032,10 +1034,15 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		deviceType,
 		viewportSettings,
 		supportsSplitting,
+		showHiddenBlocks,
 	};
 
+	// Unless hidden blocks are shown, they stay out of the canvas so editing
+	// matches the front end. When shown, they render ghosted instead (see
+	// useBlockProps) so authors can find and edit them.
 	if (
 		isBlockCurrentlyHidden &&
+		! showHiddenBlocks &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected

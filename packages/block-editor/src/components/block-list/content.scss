@@ -125,6 +125,56 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		margin-right: 0 !important;
 	}
 
+	// Ghosted blocks.
+	// While hidden blocks are shown, blocks the previewed context would hide
+	// stay in the canvas dimmed but fully editable. The dimming is a veil
+	// drawn over the block instead of opacity on the block itself, so the
+	// outline stays fully visible and nested ghosts do not compound. The
+	// two-tone dashed outline (a dash with a contrasting halo on both sides)
+	// reads on light and dark backgrounds alike. Everything is drawn inside
+	// the block's box, so layout is unaffected. Selecting a ghosted block (or
+	// one of its children) removes the veil.
+	.block-editor-block-list__block.is-block-ghosted:not(.is-selected):not(.is-multi-selected):not(.has-child-selected) {
+		&::after {
+			content: "";
+			position: absolute;
+			top: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			z-index: 1;
+			pointer-events: none;
+			border: $border-width dashed $gray-900;
+			box-shadow: inset 0 0 0 $border-width $white, 0 0 0 $border-width $white;
+			background-color: rgba($white, 0.6);
+
+			@media not ( prefers-reduced-motion ) {
+				transition: background-color 0.1s ease-out;
+			}
+
+			.is-dark-theme & {
+				border-color: $white;
+				box-shadow: inset 0 0 0 $border-width $gray-900, 0 0 0 $border-width $gray-900;
+				background-color: rgba($gray-900, 0.6);
+			}
+		}
+
+		// Hovering lifts the veil partway so the contents are easier to read.
+		&:hover::after {
+			background-color: rgba($white, 0.3);
+
+			.is-dark-theme & {
+				background-color: rgba($gray-900, 0.3);
+			}
+		}
+
+		// Only the outermost ghost is dimmed. A hidden block inside a ghost
+		// keeps its outline but gets no veil of its own.
+		.block-editor-block-list__block.is-block-ghosted::after {
+			background-color: transparent;
+		}
+	}
+
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;

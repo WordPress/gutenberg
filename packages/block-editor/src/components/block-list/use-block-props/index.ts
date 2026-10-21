@@ -25,7 +25,11 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
-import { useBlockVisibility } from '../../block-visibility/';
+import {
+	useBlockVisibility,
+	getBlockVisibilityReason,
+	appendVisibilityReason,
+} from '../../block-visibility/';
 import type {
 	UseBlockPropsOptions,
 	UseBlockPropsProps,
@@ -164,6 +168,7 @@ export function useBlockProps<
 		ariaLabel,
 		ghostBlock,
 		rootClientId,
+		showHiddenBlocks,
 		// A block list block provides the context, with its client ID.
 	} = useContext( PrivateBlockContext ) as PrivateBlockContextValue & {
 		clientId: string;
@@ -229,6 +234,20 @@ export function useBlockProps<
 		view: defaultViewRef.current,
 	} );
 
+	// Hidden blocks are only ghosted while the "Show hidden blocks" preference
+	// is on; otherwise they are visually hidden like on the front end.
+	const isGhosted = !! showHiddenBlocks && isBlockCurrentlyHidden;
+	const visibilityReason = isGhosted
+		? getBlockVisibilityReason( blockVisibility, viewportSettings )
+		: null;
+	const baseLabel =
+		ariaLabel ??
+		( clientId === ghostBlock?.clientId
+			? __( 'Add default block' )
+			: undefined ) ??
+		props[ 'aria-label' ] ??
+		blockLabel;
+
 	// Ensures it warns only inside the `edit` implementation for the block.
 	// A missing version compares false.
 	if (
@@ -262,13 +281,10 @@ export function useBlockProps<
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label':
-			ariaLabel ??
-			( clientId === ghostBlock?.clientId
-				? __( 'Add default block' )
-				: undefined ) ??
-			props[ 'aria-label' ] ??
-			blockLabel,
+		// A ghosted block announces why it is hidden after whatever name it
+		// would otherwise have, so blocks that supply their own label (like
+		// Paragraph or Column) keep it and still announce the reason.
+		'aria-label': appendVisibilityReason( baseLabel, visibilityReason ),
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
@@ -291,7 +307,8 @@ export function useBlockProps<
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockCurrentlyHidden,
+				'is-block-hidden': isBlockCurrentlyHidden && ! showHiddenBlocks,
+				'is-block-ghosted': isGhosted,
 			},
 			className,
 			props.className,

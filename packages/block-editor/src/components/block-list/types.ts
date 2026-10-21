@@ -71,6 +71,8 @@ export interface PrivateBlockContextValue {
 	deviceType?: BlockVisibilityViewport;
 	viewportSettings?: ViewportBreakpoints;
 	supportsSplitting?: boolean;
+	// Whether hidden blocks render ghosted instead of leaving the canvas.
+	showHiddenBlocks?: boolean;
 	wrapperProps?: BlockListWrapperProps;
 	isAligned?: boolean;
 }

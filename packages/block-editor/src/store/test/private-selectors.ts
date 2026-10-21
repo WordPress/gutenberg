@@ -29,6 +29,7 @@ import {
 	isRemoveLockedBlock,
 	isLockedBlock,
 	isBlockHiddenAnywhere,
+	hasHiddenBlocks,
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
 	isSectionBlock,
@@ -2285,6 +2286,67 @@ describe( 'private selectors', () => {
 			);
 			const result = isBlockHiddenAnywhere( state, 'test-block' );
 			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasHiddenBlocks', () => {
+		const createState = (
+			attributesByClientId: Record< string, BlockAttributes >
+		) => {
+			const clientIds = Object.keys( attributesByClientId );
+			return partial< State >( {
+				settings: {},
+				blocks: {
+					order: new Map( [ [ '', clientIds ] ] ),
+					byClientId: new Map(
+						clientIds.map( ( clientId ) => [
+							clientId,
+							{ name: 'core/paragraph' },
+						] )
+					),
+					attributes: new Map(
+						Object.entries( attributesByClientId )
+					),
+				},
+			} );
+		};
+
+		it( 'returns false when no block has a hiding rule', () => {
+			expect(
+				hasHiddenBlocks(
+					createState( {
+						a: {},
+						b: { metadata: { blockVisibility: true } },
+					} )
+				)
+			).toBe( false );
+		} );
+
+		it( 'returns true when a block is hidden everywhere', () => {
+			expect(
+				hasHiddenBlocks(
+					createState( {
+						a: {},
+						b: { metadata: { blockVisibility: false } },
+					} )
+				)
+			).toBe( true );
+		} );
+
+		it( 'returns true when a block is hidden at a viewport', () => {
+			expect(
+				hasHiddenBlocks(
+					createState( {
+						a: {
+							metadata: {
+								blockVisibility: {
+									viewport: { mobile: false },
+								},
+							},
+						},
+					} )
+				)
+			).toBe( true );
 		} );
 	} );
 
