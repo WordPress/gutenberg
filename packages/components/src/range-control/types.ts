@@ -199,6 +199,12 @@ export type RangeControlProps = Pick<
 		 */
 		showTooltip?: boolean;
 		/**
+		 * Adjusts the size of the control.
+		 *
+		 * @default 'default'
+		 */
+		size?: 'default' | 'compact';
+		/**
 		 * CSS color string to customize the track element's background.
 		 */
 		trackColor?: CSSProperties[ 'color' ];
