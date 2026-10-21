@@ -91,37 +91,29 @@ test.describe( 'Post Content focus mode', () => {
 				'core/heading',
 			] );
 		} );
-	} );
 
-	test( 'hides the template again after showing it', async ( {
-		admin,
-		editor,
-		page,
-		postContentFocusMode,
-	} ) => {
-		await admin.createNewPost();
-		await postContentFocusMode.enableShowTemplate();
+		await test.step( 'Hiding the template removes it from the canvas', async () => {
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			const showTemplateButton = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show template',
+			} );
+			await showTemplateButton.click();
+			await expect( showTemplateButton ).toHaveAttribute(
+				'aria-checked',
+				'false'
+			);
+			await page.keyboard.press( 'Escape' );
 
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'View', exact: true } )
-			.click();
-		const showTemplateButton = page.getByRole( 'menuitemcheckbox', {
-			name: 'Show template',
+			await expect(
+				editor.canvas.getByRole( 'document', { name: 'Block: header' } )
+			).toBeHidden();
+			await expect(
+				editor.canvas.getByText( 'Initial paragraph' )
+			).toBeVisible();
 		} );
-		await showTemplateButton.click();
-		await expect( showTemplateButton ).toHaveAttribute(
-			'aria-checked',
-			'false'
-		);
-		await page.keyboard.press( 'Escape' );
-
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: header' } )
-		).toBeHidden();
-		await expect(
-			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
-		).toBeVisible();
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
