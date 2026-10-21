@@ -3,6 +3,7 @@
  * `snapshot.html` files.
  */
 export const SLOT_PATTERN = /__wpuislot_([a-z0-9_]+)__/;
+export const TEXT_PATTERN = /__wpuitext_([0-9]+)__/;
 
 /**
  * Removes attributes that only Base UI's JavaScript reads, such as
@@ -25,12 +26,20 @@ export function stripRuntimeAttributes( html, css ) {
  *
  *   - `[ 'slot', prop, 'text' ]`             A slot prop in text, escaped as HTML.
  *   - `[ 'slot', prop, 'attribute', name ]`  A slot prop in an attribute, escaped for it.
+ *   - `[ 'text', text, domain, 'text' ]`     A string React translates, translated
+ *                                           by PHP and escaped as HTML, or with
+ *                                           `'attribute'` for an attribute.
  *
- * @param {string} html Rendered HTML.
+ * @param {string} html  Rendered HTML.
+ * @param {Array}  texts Strings React translated, as `{ text, domain }`, by
+ *                       placeholder index.
  * @return {Array} Snapshot parts.
  */
-export function toSnapshot( html ) {
-	const pattern = new RegExp( SLOT_PATTERN.source, 'g' );
+export function toSnapshot( html, texts = [] ) {
+	const pattern = new RegExp(
+		[ SLOT_PATTERN.source, TEXT_PATTERN.source ].join( '|' ),
+		'g'
+	);
 	const parts = [];
 	let offset = 0;
 
@@ -43,15 +52,25 @@ export function toSnapshot( html ) {
 		const before = html.slice( 0, match.index );
 		const inTag = before.lastIndexOf( '<' ) > before.lastIndexOf( '>' );
 
-		// In an attribute, record which one, so PHP can escape URLs as URLs.
-		const attribute = inTag
-			? before.match( /([^\s=<]+)="[^"]*$/ )?.[ 1 ]
-			: null;
-		parts.push(
-			attribute
-				? [ 'slot', match[ 1 ], 'attribute', attribute ]
-				: [ 'slot', match[ 1 ], 'text' ]
-		);
+		if ( match[ 1 ] ) {
+			// In an attribute, record which one, so PHP can escape URLs as URLs.
+			const attribute = inTag
+				? before.match( /([^\s=<]+)="[^"]*$/ )?.[ 1 ]
+				: null;
+			parts.push(
+				attribute
+					? [ 'slot', match[ 1 ], 'attribute', attribute ]
+					: [ 'slot', match[ 1 ], 'text' ]
+			);
+		} else {
+			const { text, domain } = texts[ Number( match[ 2 ] ) ];
+			parts.push( [
+				'text',
+				text,
+				domain,
+				inTag ? 'attribute' : 'text',
+			] );
+		}
 	}
 	if ( offset < html.length ) {
 		parts.push( html.slice( offset ) );

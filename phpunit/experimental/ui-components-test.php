@@ -86,6 +86,68 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_deprecated_props_and_values_map_to_their_replacements() {
+		$dir = get_temp_dir() . 'wp-ui-components-test/';
+		wp_mkdir_p( $dir );
+		file_put_contents(
+			$dir . 'manifest.php',
+			'<?php return ' . var_export(
+				array(
+					'version'    => '1.0.0',
+					'components' => array(
+						'badge' => array(
+							'props'        => array(
+								'label'  => array(
+									'type'     => 'string',
+									'required' => true,
+								),
+								'intent' => array(
+									'type'    => 'string',
+									'enum'    => array( 'neutral', 'warning' ),
+									'default' => 'neutral',
+								),
+							),
+							'variants'     => array( 'intent' ),
+							'snapshots'    => array(
+								'intent=neutral' => array( '<span>', array( 'slot', 'label', 'text' ), '</span>' ),
+								'intent=warning' => array( '<span class="warning">', array( 'slot', 'label', 'text' ), '</span>' ),
+							),
+							'deprecations' => array(
+								array(
+									'prop'        => 'text',
+									'replacement' => 'label',
+									'since'       => '1.0.0',
+								),
+								array(
+									'prop'        => 'intent',
+									'value'       => 'caution',
+									'replacement' => 'warning',
+									'since'       => '1.0.0',
+								),
+							),
+						),
+					),
+				),
+				true
+			) . ';'
+		);
+		$components = new Gutenberg_UI_Components( $dir, 'https://example.org/' );
+
+		$this->setExpectedDeprecated( 'Gutenberg_UI_Components::render' );
+		$this->assertSame(
+			'<span class="warning">Saved</span>',
+			$components->render(
+				'badge',
+				array(
+					'text'   => 'Saved',
+					'intent' => 'caution',
+				)
+			)
+		);
+
+		unlink( $dir . 'manifest.php' );
+	}
+
 	public function test_a_bundled_copy_uses_its_own_asset_handles() {
 		$bundled = new Gutenberg_UI_Components(
 			dirname( __DIR__, 2 ) . '/packages/ui/build-php',
