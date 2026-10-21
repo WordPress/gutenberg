@@ -1,0 +1,9 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Avatar`: Show missing and failed image fallbacks immediately despite a delay,
+    preserve custom fallback rendering, scale fallback SVGs with the avatar, and
+    preserve decorative avatar layout and typography inside wp-admin trees
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84653'

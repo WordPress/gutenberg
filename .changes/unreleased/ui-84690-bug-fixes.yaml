@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient
+    the search icon toward the top left in LTR and the top right in RTL
+time: '2026-10-20T03:22:02.144Z'
+custom:
+    PR: '84690'

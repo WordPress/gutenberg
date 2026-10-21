@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `ColorPicker`: Make the HSL and RGB input labels translatable, and name the
+    Hue and Alpha inputs after their color format
+time: '2026-10-20T03:22:02.071Z'
+custom:
+    PR: '70214'

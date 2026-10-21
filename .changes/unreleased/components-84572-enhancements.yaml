@@ -1,0 +1,8 @@
+project: components
+kind: Enhancements
+body: >-
+    `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard
+    focus rings, and size neutral vertical selection lines to the content
+time: '2026-10-20T03:22:02.071Z'
+custom:
+    PR: '84572'

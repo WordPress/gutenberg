@@ -267,7 +267,14 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries are optional for trivial changes or work with no consumer impact, such as tests and behavior-preserving refactors. Put new entries under `## Unreleased` at the top of the file, creating the heading if needed.
+Each package tracks consumer-impacting changes so the release process can calculate version increments and publish release notes.
+
+The repository currently supports two authoring workflows:
+
+1. **Changie fragments (piloted in `@wordpress/components` and `@wordpress/ui`)**: each PR adds an independent YAML fragment file under `.changes/unreleased/` to avoid git merge conflicts during rebases. Run `npm run changelog:add -- -j <package-name>` to create an entry interactively, or `npm run changelog:preview -- -p <package-name>` to see pending notes.
+2. **Traditional CHANGELOG.md (other packages)**: add entries under `## Unreleased` at the top of the package's `CHANGELOG.md`.
+
+Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or internal changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
 
 ### Writing concise entries
 
@@ -277,7 +284,9 @@ Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries a
 
 ### Changelog Entry Format
 
-Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period. Do not leave blank lines between bullets in a subsection, including before nested bullets.
+For packages using traditional `CHANGELOG.md` files: under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period. Do not leave blank lines between bullets in a subsection, including before nested bullets.
+
+For packages using Changie fragments: run `npm run changelog:add -- -j <project>` and provide the category, pull request number, and change description.
 
 Example:
 
