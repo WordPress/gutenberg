@@ -48,6 +48,12 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	const EDIT_POST = 'edit-post';
 
 	/**
+	 * The action of the `page` module opening the quick edit form of pages,
+	 * for the users who can edit them, shown after the edit action.
+	 */
+	const QUICK_EDIT = 'quick-edit';
+
+	/**
 	 * Administrator user id.
 	 *
 	 * @var int
@@ -162,18 +168,19 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	/**
 	 * Pages are viewable and support revisions, titles, and page attributes,
 	 * and the user can edit and create them and manage the site options: they
-	 * have every action of the `post_type_supports` module, edit first, then
-	 * the actions of the `page` module, in the order the actions are shown.
+	 * have every action of the `post_type_supports` module, edit and quick
+	 * edit first, then the other actions of the `page` module, in the order
+	 * the actions are shown.
 	 */
 	public function test_the_actions_of_pages() {
 		wp_set_current_user( self::$admin_id );
 
-		$ids = array_merge( array( self::EDIT_POST, 'view-post', 'view-post-revisions', 'duplicate-post', 'rename-post', 'order-pages' ), self::EVERY_POST_TYPE );
-		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
+		$ids = array_merge( array( 'view-post', 'view-post-revisions', 'duplicate-post', 'rename-post', 'order-pages' ), self::EVERY_POST_TYPE );
+		$this->assertSame( array_merge( array( self::EDIT_POST, self::QUICK_EDIT ), $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
 		$this->assertSame(
 			array(
-				self::POST_TYPE_SUPPORTS => $ids,
-				self::PAGE               => self::PAGE_ACTIONS,
+				self::POST_TYPE_SUPPORTS => array_merge( array( self::EDIT_POST ), $ids ),
+				self::PAGE               => array_merge( array( self::QUICK_EDIT ), self::PAGE_ACTIONS ),
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
@@ -331,6 +338,19 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The quick edit action is only registered for pages, and for the users
+	 * who can edit them.
+	 */
+	public function test_the_quick_edit_action_depends_on_the_current_user() {
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame( self::QUICK_EDIT, $this->get_action_ids( 'page' )[1], 'Editors can edit pages.' );
+		$this->assertNotContains( self::QUICK_EDIT, $this->get_action_ids( 'post' ), 'The lists of the site editor only quick edit pages.' );
+
+		wp_set_current_user( self::$contributor_id );
+		$this->assertNotContains( self::QUICK_EDIT, $this->get_action_ids( 'page' ), 'Contributors cannot edit pages.' );
+	}
+
+	/**
 	 * Setting the homepage or the posts page changes the site settings, so
 	 * the actions of the `page` module are only registered for the users who
 	 * can manage the site options.
@@ -405,6 +425,17 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 			),
 			$actions['edit-post']
 		);
+		$this->assertSame(
+			array(
+				'id'           => 'quick-edit',
+				'label'        => 'Quick edit',
+				'context'      => 'list',
+				'isPrimary'    => true,
+				'supportsBulk' => true,
+				'origin'       => array( 'registeredBy' => 'core' ),
+			),
+			$actions['quick-edit']
+		);
 	}
 
 	/**
@@ -460,11 +491,11 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array( self::EDIT_POST, 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete' );
-		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
+		$this->assertSame( array_merge( array( self::EDIT_POST, self::QUICK_EDIT ), array_slice( $ids, 1 ), self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
 		$this->assertSame(
 			array(
 				self::POST_TYPE_SUPPORTS => array_merge( $ids, array( 'move-to-trash' ) ),
-				self::PAGE               => self::PAGE_ACTIONS,
+				self::PAGE               => array_merge( array( self::QUICK_EDIT ), self::PAGE_ACTIONS ),
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
