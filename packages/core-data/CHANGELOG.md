@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: keep the HTML serialization of rich-text values read from the shared document, so syncing a local edit no longer serializes every rich-text value in the post again ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes
