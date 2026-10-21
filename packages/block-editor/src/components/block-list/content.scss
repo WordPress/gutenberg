@@ -134,8 +134,12 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	// reads on light and dark backgrounds alike. Everything is drawn inside
 	// the block's box, so layout is unaffected. Selecting a ghosted block (or
 	// one of its children) removes the veil.
+	// The veil is drawn on ::before because the selection, highlight and hover
+	// rings above draw on ::after, and a later pseudo-element paints above an
+	// earlier one, so those rings stay on top of the veil and keep their own
+	// offsets and shadow.
 	.block-editor-block-list__block.is-block-ghosted:not(.is-selected):not(.is-multi-selected):not(.has-child-selected) {
-		&::after {
+		&::before {
 			content: "";
 			position: absolute;
 			top: $border-width;
@@ -160,7 +164,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 
 		// Hovering lifts the veil partway so the contents are easier to read.
-		&:hover::after {
+		&:hover::before {
 			background-color: rgba($white, 0.3);
 
 			.is-dark-theme & {
@@ -170,7 +174,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 
 		// Only the outermost ghost is dimmed. A hidden block inside a ghost
 		// keeps its outline but gets no veil of its own.
-		.block-editor-block-list__block.is-block-ghosted::after {
+		.block-editor-block-list__block.is-block-ghosted::before {
 			background-color: transparent;
 		}
 	}
