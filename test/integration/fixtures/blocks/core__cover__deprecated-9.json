@@ -3,6 +3,7 @@
 		"name": "core/cover",
 		"isValid": true,
 		"attributes": {
+			"useFeaturedImage": false,
 			"alt": "",
 			"hasParallax": false,
 			"isRepeated": false,
@@ -11,7 +12,15 @@
 			"backgroundType": "image",
 			"minHeightUnit": "%",
 			"isDark": true,
-			"tagName": "div"
+			"tagName": "div",
+			"allowedVideoProviders": [
+				"youtube",
+				"vimeo",
+				"videopress",
+				"animoto",
+				"tiktok",
+				"wordpress-tv"
+			]
 		},
 		"innerBlocks": [
 			{
