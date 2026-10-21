@@ -79,6 +79,18 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Set up method.
+	 *
+	 * The block object is shared between tests; reset its context so no test depends
+	 * on the context another test left behind.
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		unset( self::$block->context );
+	}
+
+	/**
 	 * Test if the function returns an empty string when the post title is empty.
 	 *
 	 * @param mixed  $context         Block context.
@@ -203,7 +215,15 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		$GLOBALS['post']      = $preview_post;
 		self::$block->context = array( 'postId' => self::$post->ID );
 
-		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
+		$attributes = array(
+			'textAlign'  => '',
+			'level'      => 2,
+			'isLink'     => false,
+			'linkTarget' => '',
+			'rel'        => '',
+		);
+
+		$rendered = gutenberg_render_block_core_post_title( $attributes, '', self::$block );
 		$this->assertStringContainsString(
 			'Unsaved preview title',
 			$rendered,
@@ -226,12 +246,12 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		$GLOBALS['post']      = self::$post;
 		self::$block->context = array( 'postId' => self::$other_post->ID );
 
-		$attributes = array_merge(
-			self::$attributes,
-			array(
-				'isLink'     => true,
-				'linkTarget' => '_self',
-			)
+		$attributes = array(
+			'textAlign'  => '',
+			'level'      => 2,
+			'isLink'     => true,
+			'linkTarget' => '_self',
+			'rel'        => '',
 		);
 
 		$rendered = gutenberg_render_block_core_post_title( $attributes, '', self::$block );
