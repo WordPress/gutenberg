@@ -49,19 +49,19 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
  * @param string|null $pre_render The pre-rendered content. Default null.
  * @param array       $block      The block being rendered.
  *
- * @return null
+ * @return string|null Filtered pre-rendered content.
  */
 function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	// Return early if the block has not support for descendent block styles.
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	if ( ! block_has_support( $block_type, array( '__experimentalSettings' ), false ) ) {
-		return null;
+		return $pre_render;
 	}
 
 	// return early if no settings are found on the block attributes.
 	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
-		return null;
+		return $pre_render;
 	}
 
 	$class_name = '.' . _wp_get_presets_class_name( $block );
@@ -125,7 +125,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 		wp_enqueue_block_support_styles( $styles );
 	}
 
-	return null;
+	return $pre_render;
 }
 // Remove WordPress core filter to avoid rendering duplicate settings style blocks.
 remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10 );
