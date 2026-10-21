@@ -6,6 +6,10 @@
 
 -   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
 
+### Enhancements
+
+-   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
+
 ## 21.0.0 (2026-10-20)
 
 ### Breaking Changes

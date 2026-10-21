@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Spinner as WCSpinner, Popover } from '@wordpress/components';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import {
 	useContext,
 	useEffect,
@@ -316,6 +317,14 @@ function ViewTable< Item >( {
 	const tableSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const [ tableHeaderHeight, setTableHeaderHeight ] = useState( 52 );
+	const resizeHeaderRef = useResizeObserver< HTMLTableSectionElement >(
+		( [ entry ] ) => {
+			setTableHeaderHeight( entry.borderBoxSize[ 0 ].blockSize );
+		},
+		{ box: 'border-box' }
+	);
+	const tableHeaderRefs = useMergeRefs( [ tableHeaderRef, resizeHeaderRef ] );
 	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const showBulkActions =
@@ -453,6 +462,31 @@ function ViewTable< Item >( {
 
 	return (
 		<>
+			{ ( hasBulkActions || isActionInProgress ) && (
+				<div
+					className={ clsx(
+						'dataviews-view-table__bulk-actions-overlay',
+						{
+							'is-refreshing':
+								! isInfiniteScroll && isDelayedLoading,
+						}
+					) }
+					ref={ bulkActionsRef }
+					hidden={ ! showBulkActions }
+					inert={ inertValue( !! isLoading ) }
+					aria-busy={ isLoading }
+					style={
+						{
+							'--wp-dataviews-table-header-height': `${ tableHeaderHeight }px`,
+						} as CSSProperties
+					}
+				>
+					<BulkActionToolbar
+						onActionInProgressChange={ setIsActionInProgress }
+						selectionCheckboxRef={ bulkSelectionRef }
+					/>
+				</div>
+			) }
 			<table
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
@@ -504,7 +538,7 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
-					ref={ tableHeaderRef }
+					ref={ tableHeaderRefs }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -640,29 +674,6 @@ function ViewTable< Item >( {
 							</th>
 						) }
 					</tr>
-					{ ( hasBulkActions || isActionInProgress ) && (
-						<tr
-							className="dataviews-view-table__bulk-actions-row"
-							hidden={ ! showBulkActions }
-						>
-							<td colSpan={ columnCount }>
-								<div
-									className="dataviews-view-table__bulk-actions-overlay"
-									ref={ bulkActionsRef }
-									inert={ inertValue( !! isLoading ) }
-								>
-									<BulkActionToolbar
-										onActionInProgressChange={
-											setIsActionInProgress
-										}
-										selectionCheckboxRef={
-											bulkSelectionRef
-										}
-									/>
-								</div>
-							</td>
-						</tr>
-					) }
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
