@@ -352,6 +352,54 @@ test.describe( 'Post title', () => {
 			] );
 		} );
 
+		test( 'should keep structured plain text whole below an empty post title', async ( {
+			editor,
+			admin,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const titleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( titleField ).toBeFocused();
+
+			// A list: the first line is an item, not the title.
+			pageUtils.setClipboardData( {
+				plainText: '- item 1\n- item 2\n- item 3',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( titleField ).toHaveText( '' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{ attributes: { content: 'item 1' } },
+						{ attributes: { content: 'item 2' } },
+						{ attributes: { content: 'item 3' } },
+					],
+				},
+			] );
+
+			// A fenced code block: the first line is the fence.
+			await titleField.focus();
+			pageUtils.setClipboardData( {
+				plainText: '```\nconst a = 1;\n```',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( titleField ).toHaveText( '' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/code',
+					attributes: { content: 'const a = 1;' },
+				},
+				{ name: 'core/list' },
+			] );
+		} );
+
 		test( 'should output HTML tags in plaintext when added into Post Title field in visual editor mode', async ( {
 			editor,
 			page,

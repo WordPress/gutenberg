@@ -25,6 +25,17 @@ import { unlock } from '../../lock-unlock';
 const { useRichText } = unlock( richTextPrivateApis );
 const { isPlainTextPaste } = unlock( blocksPrivateApis );
 
+/**
+ * Whether a pasted block holds text that can be the title.
+ *
+ * @param {Object} block The block.
+ *
+ * @return {boolean} Whether its content can be the title.
+ */
+function isTextBlock( block ) {
+	return block?.name === 'core/heading' || block?.name === 'core/paragraph';
+}
+
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
 		( select ) => {
@@ -154,15 +165,20 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 			if ( ! remainder ) {
 				insertText( firstLine );
-			} else if ( ! title ) {
+				return;
+			}
+
+			const blocks = pasteHandler( { plainText, mode: 'BLOCKS' } );
+
+			// As with HTML, the first line is only the title when it is text;
+			// a list or a code block pasted into an empty title stays whole.
+			if ( ! title && isTextBlock( blocks[ 0 ] ) ) {
 				insertText( firstLine );
 				onInsertBlockAfter(
 					pasteHandler( { plainText: remainder, mode: 'BLOCKS' } )
 				);
 			} else {
-				onInsertBlockAfter(
-					pasteHandler( { plainText, mode: 'BLOCKS' } )
-				);
+				onInsertBlockAfter( blocks );
 			}
 			return;
 		}
@@ -179,11 +195,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		if ( typeof content !== 'string' ) {
 			const [ firstBlock ] = content;
 
-			if (
-				! title &&
-				( firstBlock.name === 'core/heading' ||
-					firstBlock.name === 'core/paragraph' )
-			) {
+			if ( ! title && isTextBlock( firstBlock ) ) {
 				// Strip HTML to avoid unwanted HTML being added to the title.
 				// In the majority of cases it is assumed that HTML in the title
 				// is undesirable.
