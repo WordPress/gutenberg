@@ -12,7 +12,7 @@ describe( 'element', () => {
 	describe( 'renderToString', () => {
 		it( 'should return an empty string for booleans/null/undefined values', () => {
 			expect(
-				// @ts-expect-error Omitting the element tests serialization of missing input.
+				// @ts-expect-error renderToString requires an element argument; missing input serializes to an empty string.
 				renderToString()
 			).toBe( '' );
 			expect( renderToString( false ) ).toBe( '' );
@@ -87,7 +87,7 @@ describe( 'element', () => {
 			expect(
 				concatChildren(
 					[ 'a' ],
-					// @ts-expect-error A scalar child tests the legacy non-array input.
+					// @ts-expect-error concatChildren expects an array; a scalar string is accepted at runtime.
 					'b'
 				)
 			).toEqual( [ 'a', 'b' ] );
@@ -96,7 +96,7 @@ describe( 'element', () => {
 		it( 'should concat the object arrays and rewrite keys', () => {
 			const concat = concatChildren(
 				[ createElement( 'strong', {}, 'Courgette' ) ],
-				// @ts-expect-error A single element tests the legacy non-array input.
+				// @ts-expect-error concatChildren expects an array; a single element is accepted at runtime.
 				createElement( 'strong', {}, 'Concombre' )
 			) as ReactElement[];
 			expect( concat ).toHaveLength( 2 );
@@ -108,7 +108,7 @@ describe( 'element', () => {
 	describe( 'switchChildrenNodeName', () => {
 		it( 'should return undefined for undefined children', () => {
 			expect(
-				// @ts-expect-error Missing arguments test the empty-input path.
+				// @ts-expect-error switchChildrenNodeName requires children and nodeName arguments; missing input returns undefined.
 				switchChildrenNodeName()
 			).toBeUndefined();
 		} );

@@ -126,7 +126,7 @@ describe( 'serialize()', () => {
 		it( 'should not render an undefined attribute value', () => {
 			const result = serialize(
 				<video
-					// @ts-expect-error A null source tests omission of null attributes.
+					// @ts-expect-error src expects a string, not null; null attributes are omitted.
 					src={ null }
 				/>
 			);
@@ -153,7 +153,7 @@ describe( 'serialize()', () => {
 				const result = serialize(
 					<video
 						src="/"
-						// @ts-expect-error A null value tests omission of false-like boolean attributes.
+						// @ts-expect-error controls expects a boolean or undefined, not null; false-like values are omitted.
 						controls={ controls }
 					/>
 				);
@@ -167,7 +167,7 @@ describe( 'serialize()', () => {
 				const result = serialize(
 					<video
 						src="/"
-						// @ts-expect-error String values test legacy boolean attribute serialization.
+						// @ts-expect-error controls expects a boolean, not a string; legacy string values render the attribute.
 						controls={ controls }
 					/>
 				);
@@ -179,7 +179,7 @@ describe( 'serialize()', () => {
 		it( 'should not render non-boolean-attribute with boolean value', () => {
 			const result = serialize(
 				<video
-					// @ts-expect-error A boolean source tests omission of an invalid attribute value.
+					// @ts-expect-error src expects a string, not a boolean; invalid boolean values are omitted.
 					src
 					controls
 				/>
@@ -232,7 +232,7 @@ describe( 'renderElement()', () => {
 					x="0"
 					y="0"
 					strokeWidth="5"
-					// @ts-expect-error Deliberately wrong casing tests SVG attribute normalization.
+					// @ts-expect-error STROKELinejoin is not a valid SVG prop; its casing is normalized at runtime.
 					// eslint-disable-next-line react/no-unknown-property
 					STROKELinejoin="miter"
 				></rect>
@@ -247,7 +247,7 @@ describe( 'renderElement()', () => {
 	it( 'Case sensitive attributes should have the right casing - even with wrong casing', () => {
 		const result = renderElement(
 			<svg
-				// @ts-expect-error Deliberately wrong casing tests SVG attribute normalization.
+				// @ts-expect-error ViEWBOx is not a valid SVG prop; its casing is normalized at runtime.
 				// eslint-disable-next-line react/no-unknown-property
 				ViEWBOx="0 0 1 1"
 				// eslint-disable-next-line react/no-unknown-property
@@ -264,7 +264,7 @@ describe( 'renderElement()', () => {
 		const result = renderElement(
 			<svg
 				viewBox="0 0 1 1"
-				// @ts-expect-error Deliberately wrong casing tests SVG attribute normalization.
+				// @ts-expect-error XLINKROLE is not a valid SVG prop; its casing is normalized at runtime.
 				// eslint-disable-next-line react/no-unknown-property
 				XLINKROLE="some-role"
 				xlinkShow="hello"
@@ -318,7 +318,7 @@ describe( 'renderElement()', () => {
 
 	it( 'renders empty string for indeterminite types', () => {
 		const result = renderElement(
-			// @ts-expect-error An object without an element type tests unsupported input.
+			// @ts-expect-error {} is not a ReactNode; unsupported input renders an empty string.
 			{}
 		);
 
@@ -429,7 +429,7 @@ describe( 'renderElement()', () => {
 
 	it( 'renders RawHTML with empty children as empty string', () => {
 		const result = renderElement(
-			// @ts-expect-error Missing children test empty raw HTML.
+			// @ts-expect-error RawHTML requires string children; missing children render an empty string.
 			<RawHTML />
 		);
 
@@ -438,7 +438,7 @@ describe( 'renderElement()', () => {
 
 	it( 'renders RawHTML with wrapper and empty children', () => {
 		const result = renderElement(
-			// @ts-expect-error Missing children test a raw HTML wrapper without content.
+			// @ts-expect-error RawHTML requires string children; missing children leave the wrapper empty.
 			<RawHTML className="foo" />
 		);
 
@@ -478,7 +478,7 @@ describe( 'renderNativeComponent()', () => {
 		it( 'should not render invalid dangerouslySetInnerHTML', () => {
 			const result = renderNativeComponent( 'div', {
 				dangerouslySetInnerHTML: {
-					// @ts-expect-error Undefined HTML tests an invalid dangerouslySetInnerHTML value.
+					// @ts-expect-error __html requires a string, not undefined; invalid HTML is ignored.
 					__html: undefined,
 				},
 			} );
