@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `invalidateResolution`: Make `args` optional in the types, since a selector without arguments is invalidated without them (#TBD).
+
 ### Internal
 
 -   `withDispatch`: Accept action creators with typed arguments in the `mapDispatchToProps` types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
