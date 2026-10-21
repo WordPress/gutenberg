@@ -1,4 +1,4 @@
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
@@ -39,12 +39,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		getBlockRootClientId,
 		wasBlockJustInsertedFromInserter,
 	} = unlock( useSelect( blockEditorStore ) );
-	const {
-		updateBlockAttributes,
-		moveBlocksToPosition,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
-	const registry = useRegistry();
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const gridElement = useBlockElement( gridClientId );
 
 	const selection = useMemo(
@@ -59,9 +55,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 
 	useEffect( () => {
 		const updates = {};
-
-		// The cells of the blocks placed here, to put them in reading order.
-		const placedRects = new Map();
 
 		if ( gridLayout.isManualPlacement ) {
 			const occupiedRects = [];
@@ -167,7 +160,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 							rowSpan: rowSpan ?? 1,
 						} );
 						occupiedRects.push( rect );
-						placedRects.set( clientId, rect );
 						updates[ clientId ] = { style };
 						reference = rect;
 						continue;
@@ -213,7 +205,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						reference,
 					} );
 					occupiedRects.push( rect );
-					placedRects.set( clientId, rect );
 					// The blocks inserted together go one after the other.
 					if ( isNew && placement !== 'center' ) {
 						reference = rect;
@@ -326,41 +317,12 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		}
 
 		if ( Object.keys( updates ).length ) {
-			registry.batch( () => {
-				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes(
-					Object.keys( updates ),
-					updates,
-					/* uniqueByBlock: */ true
-				);
-				// Blocks are kept in reading order, which is also the order
-				// in which they stack on small screens.
-				for ( const [ clientId, rect ] of placedRects ) {
-					const index = getReadingOrderIndex(
-						clientId,
-						rect,
-						blockOrder,
-						( otherClientId ) =>
-							placedRects.get( otherClientId ) ??
-							getBlockAttributes( otherClientId ).style?.layout
-					);
-					if (
-						index !==
-						registry
-							.select( blockEditorStore )
-							.getBlockOrder( gridClientId )
-							.indexOf( clientId )
-					) {
-						__unstableMarkNextChangeAsNotPersistent();
-						moveBlocksToPosition(
-							[ clientId ],
-							gridClientId,
-							gridClientId,
-							index
-						);
-					}
-				}
-			} );
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes(
+				Object.keys( updates ),
+				updates,
+				/* uniqueByBlock: */ true
+			);
 		}
 	}, [
 		// Actual deps to sync:
@@ -377,35 +339,5 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		getBlockRootClientId,
 		wasBlockJustInsertedFromInserter,
 		updateBlockAttributes,
-		moveBlocksToPosition,
-		registry,
 	] );
-}
-
-/**
- * Gets the index a block placed in a manual grid has in reading order: the
- * number of other blocks that start before it, row by row, from the left.
- *
- * @param {string}                        clientId   The block's client ID.
- * @param {GridRect}                      rect       The block's cells.
- * @param {string[]}                      blockOrder The grid's blocks.
- * @param {(clientId: string) => ?Object} getCells   Gets another block's cells, or layout.
- *
- * @return {number} The index.
- */
-function getReadingOrderIndex( clientId, rect, blockOrder, getCells ) {
-	let count = 0;
-	for ( const otherClientId of blockOrder ) {
-		if ( otherClientId === clientId ) {
-			continue;
-		}
-		const { columnStart, rowStart } = getCells( otherClientId ) ?? {};
-		if (
-			rowStart < rect.rowStart ||
-			( rowStart === rect.rowStart && columnStart < rect.columnStart )
-		) {
-			count++;
-		}
-	}
-	return count;
 }
