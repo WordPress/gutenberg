@@ -11279,11 +11279,6 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/api/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/patterns/src/components/allow-overrides-modal.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -11405,17 +11400,7 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/patterns/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/lock-unlock.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -11426,31 +11411,6 @@
 		}
 	},
 	"packages/patterns/src/private-hooks.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/selectors.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
