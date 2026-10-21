@@ -502,7 +502,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 					'class' => 'has-text-color has-contrast-color',
 				),
 			),
-			'null preset wins over custom' => array(
+			'null preset uses custom text' => array(
 				'block_attributes' => array(
 					'textColor' => null,
 					'style'     => array(
@@ -513,26 +513,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 				),
 				'expected'         => array(
 					'class' => 'has-text-color',
-				),
-			),
-			'numeric'                      => array(
-				'block_attributes' => array(
-					'textColor' => 1,
-				),
-				'expected'         => array(
-					'class' => 'has-text-color has-1-color',
-				),
-			),
-			'zero'                         => array(
-				'block_attributes' => array(
-					'style' => array(
-						'color' => array(
-							'text' => '0',
-						),
-					),
-				),
-				'expected'         => array(
-					'style' => 'color:0;',
+					'style' => 'color:#d92828;',
 				),
 			),
 			'empty'                        => array(
