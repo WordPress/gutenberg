@@ -81,7 +81,7 @@ export function previewUnreleasedFragments(
 	);
 
 	if ( projectFragments.length === 0 ) {
-		return `## Unreleased (@wordpress/${ normalized })\n\n_No unreleased fragments found for @wordpress/${ normalized }._\n`;
+		return `## Unreleased\n\n_No unreleased fragments found for @wordpress/${ normalized }._\n`;
 	}
 
 	const res = execChangie(
@@ -97,11 +97,5 @@ export function previewUnreleasedFragments(
 		);
 	}
 
-	// Replace the placeholder version header with the unreleased preview header
-	const output = res.stdout.replace(
-		/^##\s+0-unreleased[^\r\n]*/m,
-		`## Unreleased (@wordpress/${ normalized })`
-	);
-
-	return output.trim() + '\n';
+	return res.stdout.trim() + '\n';
 }

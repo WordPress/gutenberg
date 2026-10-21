@@ -60,7 +60,7 @@ Confirm the package builds, passes changelog linting, and renders expected outpu
 
 ```bash
 # Preview the extracted unreleased notes
-npm run changelog:preview -- -p <package-name>
+npm run changelog:preview -- <package-name>
 
 # Test full changelog merge without modifying disk
 npm exec --workspace @wordpress/changelog-tools --no -- changie merge --dry-run
