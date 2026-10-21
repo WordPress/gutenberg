@@ -9,6 +9,7 @@
  * Function that recursively renders a list of nested comments.
  *
  * @since 6.3.0 Changed render_block_context priority to `1`.
+ * @since 7.2.0 Passes the block's context on to the inner blocks.
  *
  * @global int $comment_depth
  *
@@ -46,8 +47,13 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 		/*
 		 * We construct a new WP_Block instance from the parsed block so that
 		 * it'll receive any changes made by the `render_block_data` filter.
+		 *
+		 * The Comment Template block's own context is passed on as the
+		 * available context of the inner blocks, so that values provided by
+		 * its ancestors (e.g. by the Comments block or through filters) reach
+		 * them. The `commentId` still takes precedence through the filter above.
 		 */
-		$block_content = ( new WP_Block( $block->parsed_block ) )->render( array( 'dynamic' => false ) );
+		$block_content = ( new WP_Block( $block->parsed_block, $block->context ) )->render( array( 'dynamic' => false ) );
 
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 

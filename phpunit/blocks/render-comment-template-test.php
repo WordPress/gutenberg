@@ -172,4 +172,65 @@ END;
 			"Inner block inserted by render_block_data isn't named as expected."
 		);
 	}
+
+	/**
+	 * Tests that the context available to the `core/comment-template` block is passed on to its inner blocks,
+	 * at any depth, while the `commentId` of the comment being iterated takes precedence over a value
+	 * the block received from its ancestors.
+	 */
+	public function test_rendering_comment_template_passes_context_to_inner_blocks() {
+		$logged_contexts = array();
+		register_block_type(
+			'test/context-logger',
+			array(
+				'uses_context'    => array( 'commentId', 'postId', 'test/custom' ),
+				'render_callback' => static function ( $attributes, $content, $block ) use ( &$logged_contexts ) {
+					$logged_contexts[] = $block->context;
+					return '';
+				},
+			)
+		);
+
+		// Add a custom context value to the Comment Template block, as an extender would,
+		// along with a stale `commentId` that must not reach the inner blocks.
+		$add_custom_context = static function ( $context, $parsed_block ) {
+			if ( 'core/comment-template' === $parsed_block['blockName'] ) {
+				$context['test/custom'] = 'custom value';
+				$context['commentId']   = 'stale';
+			}
+			return $context;
+		};
+		add_filter( 'render_block_context', $add_custom_context, 10, 2 );
+
+		// One logger as a direct child of the Comment Template block, one nested inside a Group block.
+		$content  = '<!-- wp:comments -->';
+		$content .= '<!-- wp:comment-template -->';
+		$content .= '<!-- wp:test/context-logger /-->';
+		$content .= '<!-- wp:group --><div class="wp-block-group"><!-- wp:test/context-logger /--></div><!-- /wp:group -->';
+		$content .= '<!-- /wp:comment-template -->';
+		$content .= '<!-- /wp:comments -->';
+
+		$parsed_blocks = parse_blocks( $content );
+		$block         = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+		$block->render();
+
+		remove_filter( 'render_block_context', $add_custom_context, 10 );
+		unregister_block_type( 'test/context-logger' );
+
+		$expected_context = array(
+			'commentId'   => self::$comment_ids[0],
+			'postId'      => self::$custom_post->ID,
+			'test/custom' => 'custom value',
+		);
+
+		$this->assertCount( 2, $logged_contexts, 'Unexpected number of rendered inner blocks' );
+		foreach ( $logged_contexts as $index => $logged_context ) {
+			$this->assertEqualSetsWithIndex( $expected_context, $logged_context, "Unexpected context for inner block at index $index" );
+		}
+	}
 }

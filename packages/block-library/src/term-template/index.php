@@ -9,6 +9,7 @@
  * Renders the `core/term-template` block on the server.
  *
  * @since 6.9.0
+ * @since 7.2.0 Passes the block's context on to the inner blocks.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -94,9 +95,15 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		// Use an early priority to so that other 'render_block_context' filters have access to the values.
 		add_filter( 'render_block_context', $filter_block_context, 1 );
 
-		// Render the inner blocks of the Term Template block with `dynamic` set to `false` to prevent calling
-		// `render_callback` and ensure that no wrapper markup is included.
-		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
+		/*
+		 * Render the inner blocks of the Term Template block with `dynamic` set to `false` to prevent calling
+		 * `render_callback` and ensure that no wrapper markup is included.
+		 *
+		 * The Term Template block's own context is passed on as the available context of the inner blocks,
+		 * so that values provided by its ancestors (e.g. by the Terms Query block or through filters) reach them.
+		 * The term context set by the filter above still takes precedence.
+		 */
+		$block_content = ( new WP_Block( $block_instance, $block->context ) )->render( array( 'dynamic' => false ) );
 
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
