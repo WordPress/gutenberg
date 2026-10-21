@@ -11699,14 +11699,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/test/element-block-overrides.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/test/screen-block-list.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

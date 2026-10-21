@@ -2,17 +2,21 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Navigator } from '@wordpress/components';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import ElementBlockOverrides, {
 	getOverridingBlockTypes,
 } from '../element-block-overrides';
 import { GlobalStylesContext } from '../context';
 
-const BLOCKS = {
+const BLOCKS: Record< string, string > = {
 	'core/heading': 'Heading',
 	'core/post-title': 'Title',
 };
 
-function getConfig( blocks ) {
+type BlockStyles = Record< string, object >;
+
+function getConfig( blocks: BlockStyles ) {
+	// The engine types lack the lineHeight setting and state styles.
 	return {
 		settings: { typography: { lineHeight: true } },
 		styles: {
@@ -26,7 +30,7 @@ function getConfig( blocks ) {
 			},
 			blocks,
 		},
-	};
+	} as GlobalStylesConfig;
 }
 
 describe( 'getOverridingBlockTypes', () => {
@@ -60,6 +64,7 @@ describe( 'ElementBlockOverrides', () => {
 			registerBlockType( name, {
 				apiVersion: 3,
 				title,
+				attributes: {},
 				category: 'text',
 				supports: { typography: { lineHeight: true } },
 				save: () => null,
@@ -71,7 +76,7 @@ describe( 'ElementBlockOverrides', () => {
 		Object.keys( BLOCKS ).forEach( unregisterBlockType );
 	} );
 
-	function renderOverrides( blocks ) {
+	function renderOverrides( blocks: BlockStyles ) {
 		const config = getConfig( blocks );
 		return render(
 			<GlobalStylesContext.Provider
