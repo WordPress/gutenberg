@@ -7,7 +7,7 @@
 	"references": [
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../private-apis" },
-		{ "path": "../url" }
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }

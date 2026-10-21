@@ -13,15 +13,15 @@
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../dataviews/tsconfig.build.json" },
-		{ "path": "../date" },
+		{ "path": "../date/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../kebab-case" },
+		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" }
 	],
 	"exclude": [
