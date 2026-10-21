@@ -1,4 +1,4 @@
-import { getUpdatedChildLayoutStyle as getUntypedChildLayoutStyle } from '../../hooks/layout-child';
+import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
@@ -31,17 +31,10 @@ interface GridAttributes {
 /**
  * Attributes to update on a grid or on one of its blocks.
  */
-interface GridAttributesUpdate {
+export interface GridAttributesUpdate {
 	layout?: Layout;
 	style?: BlockStyle;
 }
-
-// The JS module types the style it returns as `Object`.
-const getUpdatedChildLayoutStyle = getUntypedChildLayoutStyle as (
-	style: BlockStyle | undefined,
-	layout: GridLayout,
-	selectedState: BlockStyleState
-) => BlockStyle | undefined;
 
 /**
  * Gets the layout a block has in a style state: its default layout with the
