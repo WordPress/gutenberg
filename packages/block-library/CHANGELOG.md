@@ -6,6 +6,7 @@
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
+-   Page List: Show an informational "No pages found" notice when the site has no pages, and say when the selected parent page could not be found, instead of reporting "Cannot retrieve Pages" for both ([#44486](https://github.com/WordPress/gutenberg/issues/44486)).
 
 ## 12.0.0 (2026-10-20)
 

@@ -7,7 +7,6 @@ import {
 	useInnerBlocksProps,
 	getColorClassName,
 	store as blockEditorStore,
-	Warning,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -31,6 +30,12 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
 
+function getPageTitle( page ) {
+	const title = page.title?.rendered;
+	// translators: displayed when a page has an empty title.
+	return title?.trim() ? title : __( '(no title)' );
+}
+
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
 function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
@@ -52,7 +57,7 @@ function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
 	);
 }
 
-function BlockContent( {
+export function BlockContent( {
 	blockProps,
 	innerBlocksProps,
 	hasResolvedPages,
@@ -70,6 +75,7 @@ function BlockContent( {
 		);
 	}
 
+	// `null` means the request failed; an empty array is a successful answer.
 	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
@@ -80,31 +86,24 @@ function BlockContent( {
 		);
 	}
 
-	if ( pages.length === 0 ) {
-		return (
-			<div { ...blockProps }>
-				<Notice status="info" isDismissible={ false }>
-					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
-			</div>
-		);
+	if ( blockList.length > 0 ) {
+		return <ul { ...innerBlocksProps }></ul>;
 	}
 
-	if ( blockList.length === 0 ) {
-		const parentPageDetails = pages.find(
-			( page ) => page.id === parentPageID
-		);
+	// There are pages, but none under the selected parent.
+	if ( pages.length > 0 && parentPageID ) {
+		const parentPage = pages.find( ( page ) => page.id === parentPageID );
 
-		if ( parentPageDetails?.title?.rendered ) {
+		if ( parentPage ) {
 			return (
 				<div { ...blockProps }>
-					<Warning>
+					<Notice status="warning" isDismissible={ false }>
 						{ sprintf(
 							// translators: %s: Page title.
 							__( 'Page List: "%s" page has no children.' ),
-							parentPageDetails.title.rendered
+							getPageTitle( parentPage )
 						) }
-					</Warning>
+					</Notice>
 				</div>
 			);
 		}
@@ -112,15 +111,23 @@ function BlockContent( {
 		return (
 			<div { ...blockProps }>
 				<Notice status="warning" isDismissible={ false }>
-					{ __( 'Page List: Cannot retrieve Pages.' ) }
+					{ __(
+						'Page List: The selected parent page could not be found.'
+					) }
 				</Notice>
 			</div>
 		);
 	}
 
-	if ( pages.length > 0 ) {
-		return <ul { ...innerBlocksProps }></ul>;
-	}
+	// Nothing to list and no parent filter: a successful answer with no
+	// pages in it, not a failed request.
+	return (
+		<div { ...blockProps }>
+			<Notice status="info" isDismissible={ false }>
+				{ __( 'Page List: No pages found.' ) }
+			</Notice>
+		</div>
+	);
 }
 
 export default function PageListEdit( {
@@ -204,10 +211,11 @@ export default function PageListEdit( {
 
 			return childPages.reduce( ( tree, page ) => {
 				const hasChildren = pagesByParentId.has( page.id );
+				const title = getPageTitle( page );
 				const item = {
 					value: page.id,
-					label: '— '.repeat( level ) + page.title.rendered,
-					rawName: page.title.rendered,
+					label: '— '.repeat( level ) + title,
+					rawName: title,
 				};
 				tree.push( item );
 				if ( hasChildren ) {
@@ -229,18 +237,11 @@ export default function PageListEdit( {
 
 			return childPages.reduce( ( template, page ) => {
 				const hasChildren = pagesByParentId.has( page.id );
+				const title = getPageTitle( page );
 				const pageProps = {
 					id: page.id,
-					label:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
-					title:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
+					label: title,
+					title,
 					link: page.url,
 					hasChildren,
 				};
