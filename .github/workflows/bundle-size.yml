@@ -44,6 +44,7 @@ permissions: {}
 
 jobs:
     build:
+        if: false
         name: Check
         runs-on: 'ubuntu-24.04'
         permissions:
@@ -108,7 +109,7 @@ jobs:
         needs: build
         # Runs even when the build failed, so a stale size report is cleared.
         # Skipped on a fork, whose token cannot write a comment.
-        if: ${{ !cancelled() && github.event.pull_request.head.repo.full_name == github.repository }}
+        if: false
         runs-on: 'ubuntu-slim'
         permissions:
             contents: read

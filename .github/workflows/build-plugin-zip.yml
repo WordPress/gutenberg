@@ -34,7 +34,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: false
         outputs:
             current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
             next_stable_branch: ${{ steps.get_branches.outputs.next_stable_branch }}
@@ -62,7 +62,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
         permissions: {}
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: false
 
         steps:
             # Request the same elevated permissions as create-release so invalid
@@ -82,19 +82,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
         needs: [compute-stable-branches, preflight-release-token]
-        if: |
-            github.event_name == 'workflow_dispatch' && (
-              (
-                github.ref == 'refs/heads/trunk' ||
-                endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
-              ) && (
-                github.event.inputs.version == 'rc' ||
-                github.event.inputs.version == 'stable'
-              ) || (
-                startsWith( github.ref, 'refs/heads/release/' ) &&
-                github.event.inputs.version == 'stable'
-              )
-            )
+        if: false
         outputs:
             old_version: ${{ steps.get_version.outputs.old_version }}
             new_version: ${{ steps.get_version.outputs.new_version }}
@@ -225,18 +213,7 @@ jobs:
         permissions:
             contents: read
         needs: bump-version
-        if: |
-            always() && (
-              github.event_name == 'pull_request' ||
-              (
-                github.event_name == 'workflow_dispatch' &&
-                needs.bump-version.result == 'success'
-              ) ||
-              (
-                github.event_name != 'workflow_dispatch' &&
-                github.repository == 'WordPress/gutenberg'
-              )
-            )
+        if: false
         strategy:
             matrix:
                 IS_GUTENBERG_PLUGIN: [true, false]
@@ -323,18 +300,7 @@ jobs:
         permissions:
             contents: read
             packages: write
-        if: |
-            always() &&
-            needs.build.result == 'success' &&
-            github.repository == 'WordPress/gutenberg' &&
-            (
-              github.event_name == 'push' ||
-              github.event_name == 'workflow_dispatch' ||
-              (
-                github.event_name == 'pull_request' &&
-                github.event.pull_request.head.repo.full_name == github.repository
-              )
-            )
+        if: false
 
         steps:
             - name: Download build artifact
@@ -410,10 +376,7 @@ jobs:
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
-        if: |
-            always() &&
-            needs.build.result == 'failure' &&
-            needs.bump-version.outputs.release_branch_commit
+        if: false
 
         steps:
             - name: Generate application token
@@ -476,7 +439,7 @@ jobs:
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
-        if: ${{ needs.bump-version.outputs.new_version }}
+        if: false
 
         steps:
             - name: Generate application token
@@ -560,7 +523,7 @@ jobs:
             contents: read
         environment: WordPress packages
         needs: [bump-version, build]
-        if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
+        if: false
         steps:
             - name: Checkout (for CLI)
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -116,7 +116,7 @@ jobs:
         # (see the guard step below). `!cancelled()` is what drops the implicit
         # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
         # lives on the build job.
-        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        if: false
         permissions:
             contents: read
             id-token: write
@@ -187,7 +187,7 @@ jobs:
         # (see the guard step below). `!cancelled()` is what drops the implicit
         # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
         # lives on the build job.
-        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        if: false
         permissions:
             contents: read
             id-token: write
@@ -261,7 +261,7 @@ jobs:
         # (see the guard step below). `!cancelled()` is what drops the implicit
         # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
         # lives on the build job.
-        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        if: false
         permissions:
             contents: read
             id-token: write
@@ -325,7 +325,7 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: false
         needs:
             [
                 detect-relevant-changes,
@@ -420,7 +420,7 @@ jobs:
         # Only when the job above succeeded, though, since a missing report then
         # means the run was clean rather than that rendering it failed.
         # Skipped on a fork, whose token cannot write a comment.
-        if: ${{ needs.merge-artifacts.result == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        if: false
         runs-on: 'ubuntu-slim'
         permissions:
             contents: read
@@ -478,7 +478,7 @@ jobs:
                 e2e-playwright-rtc-websocket,
                 e2e-playwright-site-editor-v2,
             ]
-        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        if: false
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

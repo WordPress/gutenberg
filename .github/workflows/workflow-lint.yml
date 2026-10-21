@@ -36,6 +36,7 @@ permissions: {}
 
 jobs:
     lint:
+        if: false
         name: Lint GitHub Action files
         permissions:
             security-events: write

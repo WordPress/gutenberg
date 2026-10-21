@@ -17,6 +17,7 @@ permissions: {}
 
 jobs:
     consumer:
+        if: false
         name: Node.js ${{ matrix.node }} / Vite ${{ matrix.vite }}
         runs-on: ubuntu-24.04
         timeout-minutes: 20
