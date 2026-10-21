@@ -46,12 +46,15 @@ function gutenberg_unregister_view_post_revisions_entity_action() {
 add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_view_post_revisions_entity_action' );
 
 /**
- * Unregisters the "Edit" action of pages, which WordPress core registers at
- * priority 0. The action opens a page with the entity navigator its screen
- * sets in the editor store, and the extensible site editor sets none: its
- * lists open a page when it is clicked.
+ * Unregisters the "Edit" action of pages, templates, template parts, and
+ * patterns, which WordPress core registers at priority 0. The action opens an
+ * entity with the entity navigator its screen sets in the editor store, and
+ * the extensible site editor sets none: its lists open an entity when it is
+ * clicked.
  */
 function gutenberg_unregister_extensible_site_editor_entity_actions() {
-	wp_unregister_entity_actions( 'postType', 'page', array( 'edit-post' ) );
+	foreach ( array( 'page', 'wp_template', 'wp_template_part', 'wp_block' ) as $post_type ) {
+		wp_unregister_entity_actions( 'postType', $post_type, array( 'edit-post' ) );
+	}
 }
 add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_entity_actions' );

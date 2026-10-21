@@ -63,33 +63,54 @@ class Tests_Extensible_Site_Editor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Returns the ids of the actions registered for pages, from a registry
-	 * built anew.
+	 * Returns the ids of the actions registered for a post type, from a
+	 * registry built anew.
 	 *
+	 * @param string $post_type The post type.
 	 * @return string[] The ids of the actions.
 	 */
-	private function get_page_action_ids() {
+	private function get_action_ids( $post_type ) {
 		self::reset_registry();
-		return array_column( wp_get_registered_entity_actions( 'postType', 'page' ), 'id' );
+		return array_column( wp_get_registered_entity_actions( 'postType', $post_type ), 'id' );
 	}
 
 	/**
 	 * The extensible site editor sets no entity navigator, so it removes the
-	 * "Edit" action of pages, after core registers it at priority 0.
+	 * "Edit" action of pages, templates, template parts, and patterns, after
+	 * core registers it at priority 0.
+	 *
+	 * @dataProvider data_post_types_with_the_edit_action
+	 *
+	 * @param string $post_type The post type.
 	 */
-	public function test_the_edit_action_of_pages_is_unregistered() {
+	public function test_the_edit_action_is_unregistered( $post_type ) {
 		$this->assertSame( 10, self::$priority, 'The actions are unregistered at the default priority.' );
 
 		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
 		remove_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_entity_actions', self::$priority );
-		$without_experiment = $this->get_page_action_ids();
+		$without_experiment = $this->get_action_ids( $post_type );
 		$this->assertContains( 'edit-post', $without_experiment, 'Core registers the action.' );
 
 		add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_entity_actions', self::$priority );
 		$this->assertSame(
 			array_values( array_diff( $without_experiment, array( 'edit-post' ) ) ),
-			$this->get_page_action_ids(),
+			$this->get_action_ids( $post_type ),
 			'The experiment only removes the edit action.'
+		);
+	}
+
+	/**
+	 * The post types core registers the edit action for.
+	 *
+	 * @return array[] The post type of each test.
+	 */
+	public function data_post_types_with_the_edit_action() {
+		return array(
+			'pages'          => array( 'page' ),
+			'templates'      => array( 'wp_template' ),
+			'template parts' => array( 'wp_template_part' ),
+			'patterns'       => array( 'wp_block' ),
 		);
 	}
 }
