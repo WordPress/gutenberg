@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   InnerBlocks: Keep the block list mounted and preserve block identities when adopting a controlled data source ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
 
@@ -56,7 +57,6 @@
 
 ### Bug Fixes
 
--   InnerBlocks: Keep the block list mounted and preserve block identities when adopting a controlled data source ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
 -   Block Editor: Include migration hint in useSetting deprecation warning ([#85100](https://github.com/WordPress/gutenberg/pull/85100)).
 -   List View: Fix the drag-and-drop nesting gesture over an item without children ([#84856](https://github.com/WordPress/gutenberg/pull/84856)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
