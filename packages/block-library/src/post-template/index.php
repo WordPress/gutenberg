@@ -37,6 +37,7 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  * Renders the `core/post-template` block on the server.
  *
  * @since 6.3.0 Changed render_block_context priority to `1`.
+ * @since 7.2.0 Passes the block's context on to the inner blocks.
  *
  * @global WP_Query $wp_query WordPress Query object.
  *
@@ -121,9 +122,15 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		// Use an early priority to so that other 'render_block_context' filters have access to the values.
 		add_filter( 'render_block_context', $filter_block_context, 1 );
-		// Render the inner blocks of the Post Template block with `dynamic` set to `false` to prevent calling
-		// `render_callback` and ensure that no wrapper markup is included.
-		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
+		/*
+		 * Render the inner blocks of the Post Template block with `dynamic` set to `false` to prevent calling
+		 * `render_callback` and ensure that no wrapper markup is included.
+		 *
+		 * The Post Template block's own context is passed on as the available context of the inner blocks,
+		 * so that values provided by its ancestors (e.g. by the Query block or through filters) reach them.
+		 * The `postId` and `postType` of the current post still take precedence through the filter above.
+		 */
+		$block_content = ( new WP_Block( $block_instance, $block->context ) )->render( array( 'dynamic' => false ) );
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
 		// Wrap the render inner blocks in a `li` element with the appropriate post classes.

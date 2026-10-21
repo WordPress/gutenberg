@@ -216,4 +216,72 @@ END;
 
 		$this->assertSame( $expected, $output, 'Unexpected parsed post content' );
 	}
+
+	/**
+	 * Tests that the context available to the `core/post-template` block is passed on to its inner blocks,
+	 * at any depth, while the `postId` and `postType` of the post being iterated take precedence over
+	 * the values the block received from its ancestors.
+	 */
+	public function test_rendering_post_template_passes_context_to_inner_blocks() {
+		$logged_contexts = array();
+		register_block_type(
+			'test/context-logger',
+			array(
+				'uses_context'    => array( 'postId', 'postType', 'test/custom' ),
+				'render_callback' => static function ( $attributes, $content, $block ) use ( &$logged_contexts ) {
+					$logged_contexts[] = $block->context;
+					return '';
+				},
+			)
+		);
+
+		// Add a custom context value to the Post Template block, as an extender would.
+		$add_custom_context = static function ( $context, $parsed_block ) {
+			if ( 'core/post-template' === $parsed_block['blockName'] ) {
+				$context['test/custom'] = 'custom value';
+			}
+			return $context;
+		};
+		add_filter( 'render_block_context', $add_custom_context, 10, 2 );
+
+		// One logger as a direct child of the Post Template block, one nested inside a Group block.
+		$content  = '<!-- wp:query {"query":{"inherit":false}} -->';
+		$content .= '<!-- wp:post-template -->';
+		$content .= '<!-- wp:test/context-logger /-->';
+		$content .= '<!-- wp:group --><div class="wp-block-group"><!-- wp:test/context-logger /--></div><!-- /wp:group -->';
+		$content .= '<!-- /wp:post-template -->';
+		$content .= '<!-- /wp:query -->';
+
+		$parsed_blocks = parse_blocks( $content );
+
+		// Emulate a Query block placed on a singular template, where the ancestry provides
+		// the `postId` and `postType` of the post being viewed.
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'   => self::$other_post->ID,
+				'postType' => 'page',
+			)
+		);
+		$block->render();
+
+		remove_filter( 'render_block_context', $add_custom_context, 10 );
+		unregister_block_type( 'test/context-logger' );
+
+		$expected = array();
+		foreach ( array( self::$other_post->ID, self::$post->ID ) as $post_id ) {
+			$post_context = array(
+				'postId'      => $post_id,
+				'postType'    => 'post',
+				'test/custom' => 'custom value',
+			);
+			$expected[]   = $post_context;
+			$expected[]   = $post_context;
+		}
+
+		$this->assertCount( 4, $logged_contexts, 'Unexpected number of rendered inner blocks' );
+		foreach ( $expected as $index => $expected_context ) {
+			$this->assertSameSetsWithIndex( $expected_context, $logged_contexts[ $index ], "Unexpected context for inner block at index $index" );
+		}
+	}
 }

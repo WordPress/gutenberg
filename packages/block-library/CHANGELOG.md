@@ -6,6 +6,7 @@
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
+-   Post Template: Pass the block's context on to its inner blocks when rendering on the server, so context provided by the Query block or through filters reaches them ([#68608](https://github.com/WordPress/gutenberg/issues/68608)).
 
 ## 12.0.0 (2026-10-20)
 
