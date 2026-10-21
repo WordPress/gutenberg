@@ -1,9 +1,0 @@
-project: ui
-kind: Breaking Changes
-body: >-
-    The `actionsRef` types for these components now require `close()`. Add it to
-    manually constructed action objects and ref stubs. See [Base UI
-    #5734](https://github.com/mui/base-ui/pull/5734)
-time: '2026-10-21T05:06:33.765Z'
-custom:
-    PR: '84542'

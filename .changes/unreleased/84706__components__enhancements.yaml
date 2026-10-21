@@ -1,6 +1,0 @@
-project: components
-kind: Enhancements
-body: '`Menu`: Use WPDS motion tokens for popup transition durations and slide easing'
-time: '2026-10-21T05:06:33.688Z'
-custom:
-    PR: '84706'

@@ -1,6 +1,0 @@
-project: ui
-kind: Documentation
-body: Clarify that badges should not be interactive in the usage guidelines
-time: '2026-10-21T05:06:33.766Z'
-custom:
-    PR: '84920'

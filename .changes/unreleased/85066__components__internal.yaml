@@ -1,6 +1,0 @@
-project: components
-kind: Internal
-body: Update Ariakit to 0.4.42
-time: '2026-10-21T05:06:33.688Z'
-custom:
-    PR: '85066'

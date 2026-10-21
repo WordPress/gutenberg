@@ -1,0 +1,6 @@
+project: components
+kind: Internal
+body: Restore `change-case` for connected component class-name generation
+time: '2026-10-21T11:19:15.957Z'
+custom:
+    PR: '85192'

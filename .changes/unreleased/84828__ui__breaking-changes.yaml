@@ -1,9 +1,0 @@
-project: ui
-kind: Breaking Changes
-body: >-
-    `SelectControl`: Remove the `triggerContent` prop. Pass custom content as
-    children of a `SelectControl.Trigger` element through the `trigger` prop
-    instead
-time: '2026-10-21T05:06:33.765Z'
-custom:
-    PR: '84828'

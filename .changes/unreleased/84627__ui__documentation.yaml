@@ -1,0 +1,8 @@
+project: ui
+kind: Documentation
+body: >-
+    `Notice`: Add a Storybook example with native details and a text button to
+    copy the error message and details
+time: '2026-10-21T11:19:07.631Z'
+custom:
+    PR: '84627'

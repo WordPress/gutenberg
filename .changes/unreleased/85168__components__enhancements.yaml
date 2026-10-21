@@ -1,0 +1,6 @@
+project: components
+kind: Enhancements
+body: '`Snackbar`: Use design system focus ring'
+time: '2026-10-21T11:19:15.956Z'
+custom:
+    PR: '85168'

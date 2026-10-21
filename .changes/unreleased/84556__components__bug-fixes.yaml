@@ -1,6 +1,0 @@
-project: components
-kind: Bug Fixes
-body: '`DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled'
-time: '2026-10-21T05:06:33.688Z'
-custom:
-    PR: '84556'

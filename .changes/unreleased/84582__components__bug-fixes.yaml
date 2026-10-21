@@ -1,9 +1,0 @@
-project: components
-kind: Bug Fixes
-body: >-
-    `CustomGradientPicker`: Use the bundled `gradient-parser` types, preserve
-    gradient angles when editing, and keep unsupported gradient syntax on the
-    existing fallback path
-time: '2026-10-21T05:06:33.688Z'
-custom:
-    PR: '84582'
