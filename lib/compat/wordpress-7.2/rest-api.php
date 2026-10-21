@@ -7,75 +7,171 @@
  */
 
 /**
- * Recursively casts empty arrays to objects where the schema types them as
- * objects.
+ * Prepares a value for JSON encoding according to its schema.
  *
- * PHP cannot distinguish an empty associative array from an empty list, so
- * `json_encode()` always serializes `array()` as a JSON array (`[]`). A REST
- * schema, however, may type a value as an object, which must encode as `{}`.
- * This walks the value against its schema and casts any empty, object-typed
- * array to an object. Non-empty associative arrays already encode as objects,
- * so they are left as arrays and only recursed into to fix any nested empty
- * objects.
+ * Preserves the distinction between JSON objects and arrays by converting
+ * empty PHP arrays to objects where the schema identifies them as objects.
+ * Nested properties and items are prepared according to their schemas.
+ * Empty arrays remain arrays when a matching schema allows them.
  *
- * Union schemas (`oneOf`/`anyOf`) are handled only for the empty-array case:
- * an empty value is cast to an object when any branch allows an object. Such
- * values are not recursed into.
+ * Prepares the representation of existing values without inserting defaults
+ * or performing full JSON Schema validation.
  *
- * @param mixed $value  The value to normalize.
- * @param array $schema The schema node describing the value.
- * @return mixed The normalized value, with empty object-typed arrays cast to objects.
+ * Copy of `wp_prepare_json_value_for_client()` from WordPress 7.2.
+ *
+ * @param mixed                $value  The value to prepare.
+ * @param array<string, mixed> $schema The schema describing the value.
+ * @return mixed The value prepared for JSON encoding.
  */
-function gutenberg_rest_cast_empty_objects_from_schema( $value, $schema ) {
-	if ( ! is_array( $value ) || ! is_array( $schema ) ) {
+function gutenberg_prepare_json_value_for_client( $value, array $schema ) {
+	if ( $value instanceof JsonSerializable ) {
+		$value = $value->jsonSerialize();
+	}
+
+	if ( ! is_array( $value ) && ! $value instanceof stdClass ) {
 		return $value;
 	}
 
-	if ( isset( $schema['oneOf'] ) || isset( $schema['anyOf'] ) ) {
-		$branches = isset( $schema['oneOf'] ) ? $schema['oneOf'] : $schema['anyOf'];
-		if ( array() === $value ) {
-			foreach ( $branches as $branch ) {
-				if ( is_array( $branch ) && in_array( 'object', (array) ( isset( $branch['type'] ) ? $branch['type'] : array() ), true ) ) {
-					return (object) array();
+	foreach ( array( 'anyOf', 'oneOf' ) as $keyword ) {
+		if ( ! isset( $schema[ $keyword ] ) ) {
+			continue;
+		}
+
+		$matching_schema = null;
+
+		/*
+		 * Prefer an array schema for PHP lists. An empty PHP array also matches an
+		 * object schema, but should remain [] when an array schema accepts it.
+		 */
+		if ( is_array( $value ) && array_is_list( $value ) ) {
+			foreach ( $schema[ $keyword ] as $candidate_schema ) {
+				if ( ! isset( $candidate_schema['type'] ) && isset( $schema['type'] ) ) {
+					$candidate_schema['type'] = $schema['type'];
+				}
+
+				if ( _gutenberg_json_schema_matches_type( $value, $candidate_schema, 'array' ) ) {
+					$matching_schema = $candidate_schema;
+					break;
 				}
 			}
 		}
-		return $value;
+
+		// Like rest_filter_response_by_context(), use the first matching oneOf branch.
+		if ( null === $matching_schema ) {
+			$matching_schema = 'anyOf' === $keyword
+				? rest_find_any_matching_schema( $value, $schema, '' )
+				: rest_find_one_matching_schema( $value, $schema, '', true );
+		}
+
+		if ( is_wp_error( $matching_schema ) ) {
+			continue;
+		}
+
+		if ( ! isset( $schema['type'] ) && isset( $matching_schema['type'] ) ) {
+			$schema['type'] = $matching_schema['type'];
+		}
+
+		$value = gutenberg_prepare_json_value_for_client( $value, $matching_schema );
 	}
 
-	$types = (array) ( isset( $schema['type'] ) ? $schema['type'] : array() );
+	$is_array_value = is_array( $value );
+	$types          = isset( $schema['type'] ) ? (array) $schema['type'] : array();
+	$allows_object  = in_array( 'object', $types, true );
+	$allows_array   = in_array( 'array', $types, true );
 
-	if ( in_array( 'array', $types, true ) && isset( $schema['items'] ) ) {
+	if ( $is_array_value && empty( $value ) && $allows_object && ! $allows_array ) {
+		return (object) $value;
+	}
+
+	$is_object_value = $value instanceof stdClass || ( $is_array_value && $allows_object && ( ! $allows_array || ! array_is_list( $value ) ) );
+	if ( $allows_object && $is_object_value ) {
+		if ( $value instanceof stdClass ) {
+			$value = clone $value;
+		}
+
+		foreach ( $value as $property => $property_value ) {
+			$property_schema = null;
+			if ( isset( $schema['properties'][ $property ] ) && is_array( $schema['properties'][ $property ] ) ) {
+				$property_schema = $schema['properties'][ $property ];
+			} else {
+				$property_schema = rest_find_matching_pattern_property_schema( $property, $schema );
+				if ( null === $property_schema && isset( $schema['additionalProperties'] ) && is_array( $schema['additionalProperties'] ) ) {
+					$property_schema = $schema['additionalProperties'];
+				}
+			}
+
+			if ( null === $property_schema ) {
+				continue;
+			}
+
+			$property_value = gutenberg_prepare_json_value_for_client( $property_value, $property_schema );
+			if ( is_array( $value ) ) {
+				$value[ $property ] = $property_value;
+			} else {
+				$value->$property = $property_value;
+			}
+		}
+	} elseif ( $allows_array && $is_array_value && isset( $schema['items'] ) && is_array( $schema['items'] ) ) {
 		foreach ( $value as $index => $item ) {
-			$value[ $index ] = gutenberg_rest_cast_empty_objects_from_schema( $item, $schema['items'] );
-		}
-		return $value;
-	}
-
-	if ( in_array( 'object', $types, true ) ) {
-		if ( isset( $schema['properties'] ) ) {
-			foreach ( $schema['properties'] as $property => $property_schema ) {
-				if ( array_key_exists( $property, $value ) ) {
-					$value[ $property ] = gutenberg_rest_cast_empty_objects_from_schema( $value[ $property ], $property_schema );
-				}
-			}
-		}
-		if ( isset( $schema['additionalProperties'] ) && is_array( $schema['additionalProperties'] ) ) {
-			foreach ( $value as $key => $item ) {
-				if ( isset( $schema['properties'][ $key ] ) ) {
-					continue;
-				}
-				$value[ $key ] = gutenberg_rest_cast_empty_objects_from_schema( $item, $schema['additionalProperties'] );
-			}
-		}
-
-		// Empty object-typed arrays must serialize as {} to match the schema.
-		if ( array() === $value ) {
-			return (object) array();
+			$value[ $index ] = gutenberg_prepare_json_value_for_client( $item, $schema['items'] );
 		}
 	}
 
 	return $value;
+}
+
+/**
+ * Determines whether a value matches a JSON Schema through a given type.
+ *
+ * Combining schemas must have a matching branch that allows the requested type.
+ * Finding the type in one branch and validating the value against another branch
+ * is not sufficient.
+ *
+ * Copy of `_wp_json_schema_matches_type()` from WordPress 7.2.
+ *
+ * @access private
+ *
+ * @param mixed                $value  The value to validate.
+ * @param array<string, mixed> $schema The schema to inspect.
+ * @param string               $type   The type to match.
+ * @return bool Whether the value matches the schema through the requested type.
+ */
+function _gutenberg_json_schema_matches_type( $value, array $schema, string $type ): bool {
+	if ( isset( $schema['type'] ) && ! in_array( $type, (array) $schema['type'], true ) ) {
+		return false;
+	}
+
+	foreach ( array( 'anyOf', 'oneOf' ) as $keyword ) {
+		if ( ! isset( $schema[ $keyword ] ) ) {
+			continue;
+		}
+
+		foreach ( $schema[ $keyword ] as $sub_schema ) {
+			if ( ! is_array( $sub_schema ) ) {
+				continue;
+			}
+
+			// Match rest_find_any_matching_schema(), which applies the parent type to untyped branches.
+			if ( ! isset( $sub_schema['type'] ) && isset( $schema['type'] ) ) {
+				$sub_schema['type'] = $schema['type'];
+			}
+
+			if ( _gutenberg_json_schema_matches_type( $value, $sub_schema, $type ) ) {
+				continue 2;
+			}
+		}
+
+		return false;
+	}
+
+	if ( ! isset( $schema['type'] ) && ! isset( $schema['anyOf'] ) && ! isset( $schema['oneOf'] ) ) {
+		return false;
+	}
+
+	// Explicit and inferred types must both validate through the requested type only.
+	$schema['type'] = $type;
+
+	return ! is_wp_error( rest_validate_value_from_schema( $value, $schema ) );
 }
 
 /**

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, useMemo } from '@wordpress/element';
+import { useId, useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { Icon, IconButton, Stack } from '@wordpress/ui';
@@ -281,6 +281,50 @@ export const Default: Story = {
 	},
 };
 
+function TileControls( { title }: { title: string } ) {
+	const metricId = useId();
+	return (
+		<Stack direction="column" gap="sm" align="flex-start">
+			<strong>{ title }</strong>
+			<a href="#details">Details</a>
+			<button type="button">Refresh</button>
+			<label htmlFor={ metricId }>
+				Metric{ ' ' }
+				<select id={ metricId }>
+					<option>Views</option>
+					<option>Clicks</option>
+				</select>
+			</label>
+		</Stack>
+	);
+}
+
+/**
+ * Tiles with their own links, buttons and form controls. The a11y addon checks that the grid does not wrap them in drag semantics. In edit mode, the first tile is pinned (`draggable: false`) and its controls keep their semantics.
+ */
+export const InteractiveContent: Story = {
+	args: {
+		layout: [
+			{ key: 'pinned', width: 2, draggable: false },
+			{ key: 'a', width: 2 },
+			{ key: 'b', width: 2 },
+		],
+		columns: 6,
+		rowHeight: 160,
+		children: [
+			<Tile key="pinned" tone="neutral">
+				<TileControls title="Pinned" />
+			</Tile>,
+			<Tile key="a" tone="info">
+				<TileControls title="Tile" />
+			</Tile>,
+			<Tile key="b" tone="success">
+				<TileControls title="Tile" />
+			</Tile>,
+		],
+	},
+};
+
 /**
  * Responsive grid: the column count is derived from the container
  * width using `minColumnWidth` as the lower bound per column. A
@@ -504,6 +548,7 @@ export const EditMode: Story = {
 				width: 1,
 				height: 1,
 				order: 1,
+				draggable: false,
 				tone: 'success',
 			},
 			{
