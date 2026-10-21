@@ -1,32 +1,29 @@
 import { __ } from '@wordpress/i18n';
-import { pencil, drawerRight } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { drawerRight } from '@wordpress/icons';
+import { useCallback, useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
-import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
-export const useEditPostAction = () => {
+/**
+ * Returns the `onActionPerformed` handler of the lists of the site editor,
+ * which opens the editor when the "Edit" action of `@wordpress/core-actions`
+ * is performed: the action does not navigate by itself.
+ *
+ * @return {(actionId: string, items: Object[]) => void} The handler to pass to
+ *                                                      `usePostActions`.
+ */
+export const useEditPostHandler = () => {
 	const history = useHistory();
-	return useMemo(
-		() => ( {
-			id: 'edit-post',
-			label: __( 'Edit' ),
-			icon: pencil,
-			isEligible( post ) {
-				if ( post.status === 'trash' ) {
-					return false;
-				}
-				// It's eligible for all post types except theme patterns.
-				return post.type !== PATTERN_TYPES.theme;
-			},
-			callback( items ) {
+	return useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
 				const post = items[ 0 ];
 				history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
-			},
-		} ),
+			}
+		},
 		[ history ]
 	);
 };

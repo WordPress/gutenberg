@@ -21,7 +21,10 @@ import {
 } from '../../utils/constants';
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import { useQuickEditPostAction } from '../dataviews-actions';
+import {
+	useEditPostHandler,
+	useQuickEditPostAction,
+} from '../dataviews-actions';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -219,17 +222,7 @@ export default function PostList( { postType } ) {
 		[ postType ]
 	);
 
-	// The "Edit" action of `@wordpress/core-actions` does not navigate by
-	// itself: it signals it was performed, and the list opens the editor.
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
-			}
-		},
-		[ history ]
-	);
+	const onActionPerformed = useEditPostHandler();
 	const postTypeActions = usePostActions( {
 		postType,
 		context: 'list',

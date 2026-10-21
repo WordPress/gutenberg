@@ -18,7 +18,7 @@ import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
-import { useEditPostAction } from '../dataviews-actions';
+import { useEditPostHandler } from '../dataviews-actions';
 import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
@@ -116,22 +116,21 @@ export default function DataviewsPatterns() {
 
 	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
 
+	const onActionPerformed = useEditPostHandler();
 	const templatePartActions = usePostActions( {
 		postType: TEMPLATE_PART_POST_TYPE,
 		context: 'list',
+		onActionPerformed,
 	} );
 	const patternActions = usePostActions( {
 		postType: PATTERN_TYPES.user,
 		context: 'list',
+		onActionPerformed,
 	} );
-	const editAction = useEditPostAction();
-
-	const actions = useMemo( () => {
-		if ( postType === TEMPLATE_PART_POST_TYPE ) {
-			return [ editAction, ...templatePartActions ].filter( Boolean );
-		}
-		return [ editAction, ...patternActions ].filter( Boolean );
-	}, [ editAction, postType, templatePartActions, patternActions ] );
+	const actions =
+		postType === TEMPLATE_PART_POST_TYPE
+			? templatePartActions
+			: patternActions;
 	const settings = usePatternSettings();
 	const { title, description } = usePagePatternsHeader(
 		postType,
