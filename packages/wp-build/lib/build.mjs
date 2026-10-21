@@ -7,7 +7,6 @@ import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
@@ -48,6 +47,7 @@ import {
 	compileInlineStyle,
 	dsTokenFallbacks,
 } from './compile-inline-style.mjs';
+import { disposeSassCompiler, sassPlugin } from './sass-plugin.mjs';
 
 /**
  * Resolve the ESBuild target from the project's Browserslist config.
@@ -210,11 +210,6 @@ function getSassOptions( workingDir ) {
 	};
 }
 
-function inlineStyle( contents ) {
-	// The `contents` is already a JS code created by `compileInlineStyle`.
-	return contents;
-}
-
 /**
  * Create style bundling plugins with the given working directory.
  *
@@ -227,21 +222,17 @@ function createStyleBundlingPlugins( workingDir ) {
 		styleRuntimeAliasPlugin(),
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
-			embedded: true,
-			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
 			transform: compileInlineStyle( { cssModules: true } ),
-			type: inlineStyle,
+			loader: 'js',
 			...sassOptions,
 		} ),
 		// Handle regular CSS/SCSS files
 		// Note: .module.css and .module.scss already handled by plugin above
 		sassPlugin( {
-			embedded: true,
-			sourceMap: false,
 			filter: /\.(css|scss)$/,
 			transform: compileInlineStyle(),
-			type: inlineStyle,
+			loader: 'js',
 			...sassOptions,
 		} ),
 	];
@@ -1576,7 +1567,8 @@ async function compileStyles( packageName ) {
 				},
 				plugins: [
 					sassPlugin( {
-						embedded: true,
+						filter: /\.(s[ac]ss|css)$/,
+						loader: 'css',
 						...getSassOptions( packageDir ),
 						async transform( source ) {
 							const ltrResult = await postcss(
@@ -2871,6 +2863,8 @@ async function main() {
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
 		await watchMode();
+	} else {
+		await disposeSassCompiler();
 	}
 }
 

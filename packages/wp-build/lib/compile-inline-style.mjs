@@ -20,7 +20,7 @@ export { dsTokenFallbacks };
  * @param {Object}  options
  * @param {boolean} [options.cssModules=false] Whether to emit CSS Module exports.
  * @param {boolean} [options.minify=true]      Whether to minify the CSS.
- * @return {Function} esbuild-sass-plugin transform callback.
+ * @return {Function} `sassPlugin()` transform callback.
  */
 export function compileInlineStyle( {
 	cssModules = false,
