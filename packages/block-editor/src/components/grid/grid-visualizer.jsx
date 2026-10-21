@@ -7,6 +7,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { cloneBlock } from '@wordpress/blocks';
 import {
 	__experimentalUseDropZone as useDropZone,
 	useMergeRefs,
@@ -42,6 +43,10 @@ import {
 } from './mobile-stacking';
 import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
 import { getMinimumInsertionRect } from './get-minimum-insertion-rect';
+import {
+	getInsertedBlockRect,
+	getInsertionSize,
+} from './get-inserted-block-rect';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
@@ -87,16 +92,26 @@ const GridVisualizerGrid = forwardRef(
 		);
 		const { isDragging, isDroppingAllowed } = useSelect(
 			( select ) => {
-				if ( ! select( blockEditorStore ).isDraggingBlocks() ) {
-					return { isDragging: false, isDroppingAllowed: false };
+				const selectors = unlock( select( blockEditorStore ) );
+				if ( selectors.isDraggingBlocks() ) {
+					return {
+						isDragging: true,
+						isDroppingAllowed: !! getBlockToPlaceInGrid(
+							selectors,
+							gridClientId
+						),
+					};
 				}
-				return {
-					isDragging: true,
-					isDroppingAllowed: !! getBlockToPlaceInGrid(
-						select( blockEditorStore ),
-						gridClientId
-					),
-				};
+				if ( selectors.getDraggedInserterBlocks().length ) {
+					return {
+						isDragging: true,
+						isDroppingAllowed: !! getInserterBlocksToPlaceInGrid(
+							selectors,
+							gridClientId
+						),
+					};
+				}
+				return { isDragging: false, isDroppingAllowed: false };
 			},
 			[ gridClientId ]
 		);
@@ -437,6 +452,28 @@ function getBlockToPlaceInGrid( selectors, gridClientId ) {
 }
 
 /**
+ * Gets the blocks being dragged from an inserter, if they can all be inserted
+ * into the grid.
+ *
+ * @param {Object} selectors    Block editor store selectors.
+ * @param {string} gridClientId Client ID of the grid block.
+ *
+ * @return {?Object[]} The blocks, or null.
+ */
+function getInserterBlocksToPlaceInGrid( selectors, gridClientId ) {
+	const blocks = selectors.getDraggedInserterBlocks();
+	if (
+		! blocks.length ||
+		! blocks.every( ( block ) =>
+			selectors.canInsertBlockType( block.name, gridClientId )
+		)
+	) {
+		return null;
+	}
+	return blocks;
+}
+
+/**
  * A drop zone covering the whole grid. While a block is dragged over it, it
  * works out which cells the block would land in, which other blocks those
  * cells overlap, and which alignment guides to show.
@@ -467,9 +504,13 @@ function GridVisualizerDropLayer( {
 		}
 	}, [ isDragging ] );
 	const blockEditorSelectors = unlock( useSelect( blockEditorStore ) );
-	const { getBlockAttributes, getBlockRootClientId } = blockEditorSelectors;
-	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const { getBlockAttributes, getBlockOrder, getBlockRootClientId } =
+		blockEditorSelectors;
+	const {
+		moveBlocksToPosition,
+		insertBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const updateGridChildLayout = useUpdateGridChildLayout();
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
@@ -485,13 +526,22 @@ function GridVisualizerDropLayer( {
 		return getBlockToPlaceInGrid( blockEditorSelectors, gridClientId );
 	}
 
+	function getInserterBlocks() {
+		return getInserterBlocksToPlaceInGrid(
+			blockEditorSelectors,
+			gridClientId
+		);
+	}
+
 	function updateDropTarget(
 		event,
 		isHandleDrag = isGridItemHandleDrag( event )
 	) {
 		const srcClientId = getDraggedBlock();
+		// Blocks dragged from an inserter haven't been inserted yet.
+		const inserterBlocks = srcClientId ? null : getInserterBlocks();
 		const layer = layerRef.current;
-		if ( ! srcClientId || ! layer ) {
+		if ( ( ! srcClientId && ! inserterBlocks ) || ! layer ) {
 			clearDropTarget();
 			return;
 		}
@@ -537,7 +587,11 @@ function GridVisualizerDropLayer( {
 				),
 			} );
 		}
-		const srcLayout = getBlockAttributes( srcClientId )?.style?.layout;
+		// Blocks from an inserter get the size of a block inserted into
+		// the grid, as do blocks inserted any other way.
+		const srcLayout = srcClientId
+			? getBlockAttributes( srcClientId )?.style?.layout
+			: getInsertionSize( { columnTracks, rowTracks } );
 		const columnSpan = srcSpan?.columnSpan ?? srcLayout?.columnSpan ?? 1;
 		const rowSpan = srcSpan?.rowSpan ?? srcLayout?.rowSpan ?? 1;
 
@@ -582,6 +636,7 @@ function GridVisualizerDropLayer( {
 		const lastTarget = lastTargetRef.current;
 		if (
 			lastTarget?.srcClientId === srcClientId &&
+			lastTarget.inserterBlocks === inserterBlocks &&
 			lastTarget.landing.columnStart === landing.columnStart &&
 			lastTarget.landing.rowStart === landing.rowStart &&
 			lastTarget.landing.columnSpan === landing.columnSpan &&
@@ -654,6 +709,7 @@ function GridVisualizerDropLayer( {
 
 		const target = {
 			srcClientId,
+			inserterBlocks,
 			span: { columnSpan, rowSpan },
 			landing,
 			landingPixelRect,
@@ -667,6 +723,12 @@ function GridVisualizerDropLayer( {
 	function dropOnTarget() {
 		const target = lastTargetRef.current;
 		clearDropTarget();
+		if ( target?.inserterBlocks ) {
+			if ( target.inserterBlocks === getInserterBlocks() ) {
+				insertInserterBlocks( target.inserterBlocks, target.landing );
+			}
+			return;
+		}
 		const srcClientId = getDraggedBlock();
 		if ( ! target || target.srcClientId !== srcClientId ) {
 			return;
@@ -695,6 +757,81 @@ function GridVisualizerDropLayer( {
 			gridClientId,
 			getNumberOfBlocksBeforeCell( columnStart, rowStart )
 		);
+	}
+
+	/**
+	 * Inserts blocks dragged from an inserter where they were dropped. The
+	 * first block takes the landing cells, and any others, such as the rest
+	 * of a pattern, go one after the other next to it.
+	 *
+	 * @param {Object[]} blocks  The dragged blocks.
+	 * @param {GridRect} landing The cells the first block lands in.
+	 */
+	function insertInserterBlocks( blocks, landing ) {
+		const occupiedRects = getBlockOrder( gridClientId ).flatMap(
+			( clientId ) => {
+				const {
+					columnStart,
+					rowStart,
+					columnSpan = 1,
+					rowSpan = 1,
+				} = getBlockAttributes( clientId )?.style?.layout ?? {};
+				return columnStart && rowStart
+					? [
+							new GridRect( {
+								columnStart,
+								rowStart,
+								columnSpan,
+								rowSpan,
+							} ),
+						]
+					: [];
+			}
+		);
+		let reference = null;
+		const rects = blocks.map( () => {
+			const rect = reference
+				? getInsertedBlockRect( {
+						placement: 'after',
+						reference,
+						size: {
+							columnSpan: landing.columnSpan,
+							rowSpan: landing.rowSpan,
+						},
+						columnCount: gridInfo.numColumns,
+						rowCount: gridInfo.numRows,
+						occupiedRects,
+					} )
+				: landing;
+			occupiedRects.push( rect );
+			reference = rect;
+			return rect;
+		} );
+		const blocksToInsert = blocks.map( ( block ) => cloneBlock( block ) );
+		insertBlocks(
+			blocksToInsert,
+			getNumberOfBlocksBeforeCell(
+				landing.columnStart,
+				landing.rowStart
+			),
+			gridClientId
+		);
+		blocksToInsert.forEach( ( block, index ) => {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateGridChildLayout(
+				block.clientId,
+				( style, selectedState, gridAttributes ) =>
+					getInsertedChildLayoutStyle(
+						style,
+						rects[ index ],
+						selectedState,
+						// Rows are added for blocks below the grid, instead
+						// of moving them into it.
+						{ ...gridAttributes?.layout, rowCount: undefined }
+					),
+				gridClientId
+			);
+		} );
 	}
 
 	const dropZoneRef = useDropZone( {
