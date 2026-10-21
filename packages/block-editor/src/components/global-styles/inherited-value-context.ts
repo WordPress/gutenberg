@@ -181,8 +181,8 @@ function getElementLayers(
 }
 
 /**
- * Element layers for a block rendered outside its own edit context, from the
- * block's attributes and the block context its edit component receives.
+ * Element layers for a block, from its attributes and block context. The
+ * non-hook form of what `useResolvedStyle` derives.
  *
  * @param blockName    Block name.
  * @param attributes   Block attributes.

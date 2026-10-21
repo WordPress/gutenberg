@@ -3,7 +3,10 @@ import type { Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import type { ReactElement, ReactNode } from 'react';
-import { useResolvedStyle } from '../inherited-value-context';
+import {
+	getBlockElementLayers,
+	useResolvedStyle,
+} from '../inherited-value-context';
 import type { BlockStyleState } from '../../../hooks/types';
 import { BlockContextProvider } from '../../block-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
@@ -215,6 +218,16 @@ describe( 'useResolvedStyle hook', () => {
 		);
 		const parsed = resolveInAccordion( 'core/heading' );
 		expect( parsed.value.typography.fontSize ).toBe( '24px' );
+	} );
+
+	test( 'getBlockElementLayers takes the Accordion Heading level from block context', () => {
+		expect(
+			getBlockElementLayers(
+				'core/accordion-heading',
+				{},
+				{ 'core/accordion-heading-level': 2 }
+			)
+		).toEqual( [ 'heading', 'h2' ] );
 	} );
 
 	// A title block at level 0 renders a paragraph, so no heading element styles

@@ -63,10 +63,8 @@ export function useReviewRows( rows, merged, name, elements ) {
 		const resolve = ( value ) =>
 			getValueFromVariable( merged, name, value );
 
-		// Walks root, element and block layers, so a value the block type
-		// inherits (e.g. a Button's font size from the button element) shows
-		// too. Leaves preset values encoded (e.g. `var:preset|color|vivid-red`)
-		// so they show by name, matching the new value.
+		// Includes values the block type inherits from root and element styles.
+		// Presets stay encoded so they show by name, like the new value.
 		const { value: resolvedStyle } = resolveStyle( merged, {
 			blockName: name,
 			elements,

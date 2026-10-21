@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
-import {
-	getBlockElementLayers,
-	useResolvedStyle,
-} from '../inherited-value-context';
+import { useResolvedStyle } from '../inherited-value-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
 // Coverage for `useResolvedStyle` with the inheritance indicator experiment
@@ -87,23 +84,5 @@ describe( 'useResolvedStyle with the indicator experiment off', () => {
 			elements: { h2: { color: { text: '#111111' } } },
 		} );
 		expect( result.current.sources ).toBeDefined();
-	} );
-} );
-
-describe( 'getBlockElementLayers', () => {
-	it( 'takes the Accordion Heading level from block context', () => {
-		expect(
-			getBlockElementLayers(
-				'core/accordion-heading',
-				{},
-				{ 'core/accordion-heading-level': 2 }
-			)
-		).toEqual( [ 'heading', 'h2' ] );
-	} );
-
-	it( 'gives a Site Title at level 0 no heading layer', () => {
-		expect(
-			getBlockElementLayers( 'core/site-title', { level: 0 }, {} )
-		).toEqual( [] );
 	} );
 } );
