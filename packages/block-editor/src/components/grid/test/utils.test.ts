@@ -6,6 +6,7 @@ import {
 	getGridTracks,
 	getRowEndForResize,
 } from '../utils';
+import type { GridRect } from '../utils';
 
 describe( 'getBoundingGridRect()', () => {
 	it( 'spans from one cell to another', () => {
@@ -85,7 +86,7 @@ describe( 'getBoundingGridRect()', () => {
 const columnTracks = getGridTracks( '100px 100px 100px', 10 );
 const rowTracks = getGridTracks( '50px 50px 50px', 10 );
 
-function toPlain( rect ) {
+function toPlain( rect: GridRect ) {
 	return {
 		columnStart: rect.columnStart,
 		rowStart: rect.rowStart,

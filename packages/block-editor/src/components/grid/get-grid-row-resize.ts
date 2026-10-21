@@ -1,4 +1,39 @@
 /**
+ * The edge of a grid that is dragged to add or remove rows.
+ */
+export type GridEdge = 'top' | 'bottom';
+
+/**
+ * Where a block is placed in a grid's rows.
+ */
+export interface GridRowPlacement {
+	rowStart?: number;
+	rowSpan?: number;
+}
+
+/**
+ * The result of dragging a grid's top or bottom edge.
+ */
+export interface GridRowResize {
+	/**
+	 * The new row count.
+	 */
+	rowCount: number;
+	/**
+	 * The number of rows to move each block by.
+	 */
+	rowShift: number;
+}
+
+/**
+ * The start and end position in pixels of a grid track.
+ */
+interface GridTrack {
+	start: number;
+	end: number;
+}
+
+/**
  * Works out the new row count of a grid whose top or bottom edge is dragged,
  * and how far its blocks move.
  *
@@ -9,15 +44,25 @@
  * grows or shrinks above them. Rows can only be removed from the top while
  * they are empty.
  *
- * @param {Object}                                       options
- * @param {number}                                       options.rowCount The grid's current number of rows.
- * @param {Array<{rowStart?: number, rowSpan?: number}>} options.children Placement of the grid's blocks.
- * @param {'top'|'bottom'}                               options.edge     The edge being dragged.
- * @param {number}                                       options.rowDelta Rows to add, or remove when negative.
+ * @param options
+ * @param options.rowCount The grid's current number of rows.
+ * @param options.children Placement of the grid's blocks.
+ * @param options.edge     The edge being dragged.
+ * @param options.rowDelta Rows to add, or remove when negative.
  *
- * @return {{rowCount: number, rowShift: number}} The new row count, and the number of rows to move each block by.
+ * @return The new row count, and the number of rows to move each block by.
  */
-export function getGridRowResize( { rowCount, children, edge, rowDelta } ) {
+export function getGridRowResize( {
+	rowCount,
+	children,
+	edge,
+	rowDelta,
+}: {
+	rowCount: number | null | undefined;
+	children: GridRowPlacement[];
+	edge: GridEdge;
+	rowDelta: number;
+} ): GridRowResize {
 	let topRow = Infinity;
 	let bottomRow = 1;
 	for ( const { rowStart, rowSpan = 1 } of children ) {
@@ -51,13 +96,17 @@ export function getGridRowResize( { rowCount, children, edge, rowDelta } ) {
 /**
  * Converts the distance an edge of a grid was dragged into a number of rows.
  *
- * @param {Array<{start: number, end: number}>} rowTracks Row tracks, as returned by `getGridTracks`.
- * @param {number}                              distance  Distance in pixels, positive when the grid grows.
- * @param {number}                              gap       The gap between rows in pixels.
+ * @param rowTracks Row tracks, as returned by `getGridTracks`.
+ * @param distance  Distance in pixels, positive when the grid grows.
+ * @param gap       The gap between rows in pixels.
  *
- * @return {number} Rows to add, or remove when negative.
+ * @return Rows to add, or remove when negative.
  */
-export function getRowDeltaFromDistance( rowTracks, distance, gap = 0 ) {
+export function getRowDeltaFromDistance(
+	rowTracks: GridTrack[],
+	distance: number,
+	gap = 0
+): number {
 	if ( ! rowTracks.length ) {
 		return 0;
 	}
