@@ -763,7 +763,11 @@ function GridVisualizerDropLayer( {
 		clearDropTarget();
 		if ( target?.inserterBlocks ) {
 			if ( target.inserterBlocks === getInserterBlocks() ) {
-				insertInserterBlocks( target.inserterBlocks, target.landing );
+				insertInserterBlocks(
+					target.inserterBlocks,
+					target.landing,
+					target.placement
+				);
 			}
 			return;
 		}
@@ -802,13 +806,15 @@ function GridVisualizerDropLayer( {
 
 	/**
 	 * Inserts blocks dragged from an inserter where they were dropped. The
-	 * first block takes the landing cells, and any others, such as the rest
-	 * of a pattern, go one after the other next to it.
+	 * first block takes the landing cells, or its exact place when it was
+	 * placed freely, and any others, such as the rest of a pattern, go one
+	 * after the other next to it.
 	 *
-	 * @param {Object[]} blocks  The dragged blocks.
-	 * @param {GridRect} landing The cells the first block lands in.
+	 * @param {Object[]} blocks    The dragged blocks.
+	 * @param {GridRect} landing   The cells the first block lands in.
+	 * @param {?Object}  placement The first block's place, when placed freely.
 	 */
-	function insertInserterBlocks( blocks, landing ) {
+	function insertInserterBlocks( blocks, landing, placement ) {
 		const occupiedRects = getBlockOrder( gridClientId ).flatMap(
 			( clientId ) => {
 				const {
@@ -859,6 +865,14 @@ function GridVisualizerDropLayer( {
 		);
 		blocksToInsert.forEach( ( block, index ) => {
 			__unstableMarkNextChangeAsNotPersistent();
+			if ( index === 0 && placement ) {
+				updateGridChildLayout(
+					block.clientId,
+					{ ...placement, box: placement.box },
+					gridClientId
+				);
+				return;
+			}
 			updateGridChildLayout(
 				block.clientId,
 				( style, selectedState, gridAttributes ) =>
