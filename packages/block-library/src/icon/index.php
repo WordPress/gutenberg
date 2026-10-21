@@ -73,24 +73,24 @@ function render_block_core_icon( $attributes ) {
 		}
 	}
 
-	// Separate calls, concatenated in the style engine's group order.
-	$color_result      = wp_style_engine_get_styles(
+	// Border sits between color and shadow in the style engine's order.
+	$styles_before_border = wp_style_engine_get_styles(
 		array(
 			'background' => $background_styles,
 			'color'      => $color_styles,
 		)
 	);
-	$border_result     = wp_get_border_classes_and_styles( $attributes );
-	$dimensions_result = wp_style_engine_get_styles(
+	$border               = wp_get_border_classes_and_styles( $attributes );
+	$styles_after_border  = wp_style_engine_get_styles(
 		array(
 			'shadow'     => $shadow_styles,
 			'dimensions' => $dimensions_styles,
 			'spacing'    => $spacing_styles,
 		)
 	);
-	$styles            = array(
-		'classnames' => implode( ' ', array_filter( array( $color_result['classnames'] ?? '', $border_result['class'] ?? '', $dimensions_result['classnames'] ?? '' ) ) ),
-		'css'        => ( $color_result['css'] ?? '' ) . ( $border_result['style'] ?? '' ) . ( $dimensions_result['css'] ?? '' ),
+	$styles               = array(
+		'classnames' => implode( ' ', array_filter( array( $styles_before_border['classnames'] ?? '', $border['class'] ?? '', $styles_after_border['classnames'] ?? '' ) ) ),
+		'css'        => ( $styles_before_border['css'] ?? '' ) . ( $border['style'] ?? '' ) . ( $styles_after_border['css'] ?? '' ),
 	);
 
 	$svg = wp_get_icon(
