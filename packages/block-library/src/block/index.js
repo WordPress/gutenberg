@@ -20,25 +20,15 @@ export const settings = {
 			return;
 		}
 
-		const {
-			getEditedEntityRecord,
-			getEntityRecord,
-			hasFinishedResolution,
-		} = select( coreStore );
-		let title = getEditedEntityRecord( 'postType', 'wp_block', ref )?.title;
-		// A user who can't edit the pattern only has its `view` record.
-		if (
-			! title &&
-			hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] )
-		) {
-			title = getEntityRecord( 'postType', 'wp_block', ref, {
-				context: 'view',
-			} )?.title?.raw;
-		}
+		const { hasEntityRecord, getEditedEntityRecord, getEntityRecord } =
+			select( coreStore );
+		// Match the block's edit component: use the `edit` record only once
+		// it's loaded, so reading the label doesn't request it.
+		const title = hasEntityRecord( 'postType', 'wp_block', ref )
+			? getEditedEntityRecord( 'postType', 'wp_block', ref )?.title
+			: getEntityRecord( 'postType', 'wp_block', ref, {
+					context: 'view',
+				} )?.title?.raw;
 		if ( ! title ) {
 			return;
 		}
