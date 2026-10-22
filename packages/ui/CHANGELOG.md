@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. The default 16px spinner now has a 1px stroke instead of 2px, and `Button` loading spinners are thinner
+-   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. The default 16px spinner now has a 1px stroke instead of 2px, and `Button` loading spinners are thinner ([#85378](https://github.com/WordPress/gutenberg/pull/85378)).
 
 ## 0.25.0 (2026-10-20)
 
