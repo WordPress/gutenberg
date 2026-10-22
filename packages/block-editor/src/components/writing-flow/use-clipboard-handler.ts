@@ -25,19 +25,13 @@ import type { WritingFlowClipboardEvent } from './types';
  * Whether the DOM selection entirely spans the content of the given block,
  * and the block's editable element is the block element itself, like a
  * heading or a paragraph, not a field within a larger block, like a caption.
- * A bound field's text belongs to its source, not to the block.
  *
  * @param ownerDocument The block's document.
  * @param clientId      The block's client ID.
- * @param bindings      The block's bindings.
  *
  * @return Whether the block is entirely selected.
  */
-function isBlockEntirelySelected(
-	ownerDocument: Document,
-	clientId: string,
-	bindings?: Record< string, unknown >
-) {
+function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
 	// The editor's document has a window with a selection.
 	const selection = ownerDocument.defaultView!.getSelection()!;
 
@@ -47,17 +41,9 @@ function isBlockEntirelySelected(
 
 	const blockElement = ownerDocument.getElementById( `block-${ clientId }` );
 
-	if ( ! blockElement?.isContentEditable ) {
-		return false;
-	}
-
-	const key = blockElement.dataset.wpBlockAttributeKey;
-
-	if ( bindings && ( ( key && bindings[ key ] ) || bindings.__default ) ) {
-		return false;
-	}
-
-	return isEntirelySelected( blockElement );
+	return (
+		!! blockElement?.isContentEditable && isEntirelySelected( blockElement )
+	);
 }
 
 export default function useClipboardHandler() {
@@ -118,6 +104,11 @@ export default function useClipboardHandler() {
 			return true;
 		}
 
+		// A bound block's text belongs to its source, not to the block.
+		function isBlockBound( clientId: string ) {
+			return !! getBlockAttributes( clientId )?.metadata?.bindings;
+		}
+
 		function handler( event: WritingFlowClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
@@ -147,11 +138,10 @@ export default function useClipboardHandler() {
 			const isWholeSingleBlockCopy =
 				event.type === 'copy' &&
 				! hasMultiSelection() &&
+				! isBlockBound( selectedBlockClientIds[ 0 ] ) &&
 				isBlockEntirelySelected(
 					( event.target as Element ).ownerDocument,
-					selectedBlockClientIds[ 0 ],
-					getBlockAttributes( selectedBlockClientIds[ 0 ] )?.metadata
-						?.bindings
+					selectedBlockClientIds[ 0 ]
 				);
 
 			// Let native copy/paste behaviour take over in input fields.
@@ -337,11 +327,10 @@ export default function useClipboardHandler() {
 				// equivalent of pasting into an empty block.
 				if (
 					! hasMultiSelection() &&
+					! isBlockBound( selectedBlockClientIds[ 0 ] ) &&
 					isBlockEntirelySelected(
 						( event.target as Element ).ownerDocument,
-						selectedBlockClientIds[ 0 ],
-						getBlockAttributes( selectedBlockClientIds[ 0 ] )
-							?.metadata?.bindings
+						selectedBlockClientIds[ 0 ]
 					)
 				) {
 					replaceBlocks(
