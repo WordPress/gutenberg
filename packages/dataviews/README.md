@@ -1086,6 +1086,8 @@ The unique identifier of the action.
 
 The user facing description of the action.
 
+Add a trailing ellipsis (`…`) for menu items that require further input before completing the action. DataViews omits trailing ellipses when displaying the action as a button.
+
 -   Type: `string | function`
 -   Required
 -   Example:

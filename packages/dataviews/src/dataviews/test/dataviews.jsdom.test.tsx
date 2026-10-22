@@ -87,7 +87,8 @@ const fields = [
 const actions: Action< Data >[] = [
 	{
 		id: 'delete',
-		label: 'Delete',
+		label: 'Delete…',
+		modalHeader: 'Delete',
 		supportsBulk: true,
 		RenderModal: () => <div>Modal Content</div>,
 	},
@@ -1510,7 +1511,7 @@ describe( 'DataViews component', () => {
 			expect( callback ).not.toHaveBeenCalled();
 
 			await user.click(
-				screen.getByRole( 'menuitem', { name: 'Delete' } )
+				screen.getByRole( 'menuitem', { name: 'Delete…' } )
 			);
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 			expect(

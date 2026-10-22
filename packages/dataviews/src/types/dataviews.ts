@@ -645,6 +645,7 @@ interface ActionBase< Item > {
 	 * The label of the action.
 	 * In case we want to adjust the label based on the selected items,
 	 * a function can be provided.
+	 * Trailing ellipses are omitted when the action is displayed as a button.
 	 */
 	label: string | ( ( items: Item[] ) => string );
 
