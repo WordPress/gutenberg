@@ -28,25 +28,37 @@ import type { EventConstructor, IframeProps } from './types';
  * portal delivery.
  */
 const BRIDGED_EVENTS = [
-	{ native: 'dragover', react: 'onDragOver', ctor: DragEvent },
-	{ native: 'mousemove', react: 'onMouseMove', ctor: MouseEvent },
-	{ native: 'pointerdown', react: 'onPointerDown', ctor: PointerEvent },
-	{ native: 'mousedown', react: 'onMouseDown', ctor: MouseEvent },
-	{ native: 'click', react: 'onClick', ctor: MouseEvent },
-	{ native: 'keydown', react: 'onKeyDown', ctor: KeyboardEvent },
+	{ native: 'dragover', react: 'onDragOver' },
+	{ native: 'mousemove', react: 'onMouseMove' },
+	{ native: 'pointerdown', react: 'onPointerDown' },
+	{ native: 'mousedown', react: 'onMouseDown' },
+	{ native: 'click', react: 'onClick' },
+	{ native: 'keydown', react: 'onKeyDown' },
 ] as const satisfies ReadonlyArray< {
 	native: string;
 	react: keyof IframeHTMLAttributes< HTMLIFrameElement >;
-	ctor: EventConstructor;
 } >;
 
 type BridgedReactEvent = ( typeof BRIDGED_EVENTS )[ number ][ 'react' ];
 type BridgedEventHandler =
 	EventHandler< SyntheticEvent< HTMLIFrameElement > > | undefined;
 
+/**
+ * Resolves the parent-window event constructor that matches `event`.
+ * Looks up by the event prototype's constructor name so the redispatched
+ * event is created in this realm (not the iframe's).
+ *
+ * @param event Native or React synthetic event from the iframe document.
+ */
+function getEventConstructor( event: Event | SyntheticEvent ) {
+	const constructorName = Object.getPrototypeOf( event ).constructor.name;
+	return ( window as unknown as Record< string, EventConstructor > )[
+		constructorName
+	];
+}
+
 function bubbleEvent(
 	event: Event | SyntheticEvent,
-	Constructor: EventConstructor,
 	frame: HTMLIFrameElement
 ) {
 	const init: {
@@ -79,7 +91,7 @@ function bubbleEvent(
 		init.clientY! += rect.top;
 	}
 
-	const newEvent = new Constructor( event.type, init );
+	const newEvent = new ( getEventConstructor( event ) )( event.type, init );
 	if ( init.defaultPrevented ) {
 		newEvent.preventDefault();
 	}
@@ -162,9 +174,9 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 		const { frameElement } = defaultView;
 		const html = iframeDocument!.documentElement;
 		const handlers: Record< string, ( event: Event ) => void > = {};
-		for ( const { native, ctor } of BRIDGED_EVENTS ) {
+		for ( const { native } of BRIDGED_EVENTS ) {
 			handlers[ native ] = ( event ) => {
-				bubbleEvent( event, ctor, frameElement as HTMLIFrameElement );
+				bubbleEvent( event, frameElement as HTMLIFrameElement );
 			};
 			html.addEventListener( native, handlers[ native ] );
 		}
