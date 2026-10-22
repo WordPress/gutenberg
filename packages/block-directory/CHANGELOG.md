@@ -11,6 +11,7 @@
 ### Enhancements
 
 -   Replace the no-results tip with an info notice and a documentation action link ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Use the design system outline for keyboard focus on downloadable block cards and update hover to use a subtle background tint ([#85307](https://github.com/WordPress/gutenberg/pull/85307)).
 
 ## 5.57.0 (2026-10-07)
 
