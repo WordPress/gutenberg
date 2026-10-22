@@ -25,14 +25,25 @@ import { getEntitySyncManager } from '../entity-sync';
 import type { EntitySyncManager } from '../entity-sync';
 import type { State } from '../selectors';
 
+type DeepPartial< T > = { [ K in keyof T ]?: DeepPartial< T[ K ] > };
+
+/**
+ * A state fixture holding only the fields the selector under test reads. The
+ * entity configs and records are left unchecked: the store keys queried items
+ * by the `default` context and holds whole configs, which `State` does not
+ * describe.
+ */
+type StateFixture = DeepPartial< Omit< State, 'entities' > > & {
+	entities?: { config?: Array< object >; records?: object };
+};
+
 /**
  * Types a state fixture that holds only the fields the selector under test
- * reads. Queried data fixtures key items by the `default` context and hold
- * whole entity configs, which `State` does not describe.
+ * reads.
  *
  * @param value The state fixture.
  */
-function partialState( value: object ): State {
+function partialState( value: StateFixture ): State {
 	return value as State;
 }
 
@@ -41,7 +52,7 @@ function partialState( value: object ): State {
  *
  * @param value The state fixture.
  */
-function frozenState( value: object ): State {
+function frozenState( value: StateFixture ): State {
 	return deepFreeze( value ) as State;
 }
 
@@ -1082,7 +1093,10 @@ describe( 'getEmbedPreview()', () => {
 
 		state = frozenState( {
 			embedPreviews: {
-				'http://example.com/': { records: 42 },
+				// Any preview is returned as is, whatever its shape.
+				'http://example.com/': { records: 42 } as unknown as {
+					html: string;
+				},
 			},
 		} );
 		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( {
