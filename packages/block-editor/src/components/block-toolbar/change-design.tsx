@@ -10,11 +10,14 @@ import { cloneBlock } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import { withInstalledThemePatterns } from '../../store/utils';
 import BlockPatternsList from '../block-patterns-list';
 import type { ParsedBlockPattern } from '../../store/types';
 import type { PatternMetadata } from './types';
 
 const EMPTY_ARRAY: [] = [];
+// Other installed themes can offer designs for the same category.
+const ALLOWED_PATTERNS_OPTIONS = { [ withInstalledThemePatterns ]: true };
 const MAX_PATTERNS_TO_SHOW = 6;
 const POPOVER_PROPS: ComponentProps< typeof Dropdown >[ 'popoverProps' ] = {
 	placement: 'bottom-start',
@@ -40,7 +43,10 @@ export default function ChangeDesign( { clientId }: { clientId: string } ) {
 			// See: https://github.com/WordPress/gutenberg/pull/64736.
 			const _patterns: Array< ParsedBlockPattern > =
 				_categories.length > 0
-					? __experimentalGetAllowedPatterns( rootBlock )
+					? __experimentalGetAllowedPatterns(
+							rootBlock,
+							ALLOWED_PATTERNS_OPTIONS
+						)
 					: EMPTY_ARRAY;
 			return {
 				categories: _categories,
@@ -62,9 +68,6 @@ export default function ChangeDesign( { clientId }: { clientId: string } ) {
 					( pattern.source?.startsWith( 'pattern-directory' ) &&
 						pattern.source !== 'pattern-directory/theme' );
 				return (
-					// Check if the pattern has only one top level block,
-					// otherwise we may switch to a pattern that doesn't have replacement suggestions.
-					pattern.blocks.length === 1 &&
 					// We exclude the core patterns and pattern directory patterns that are not theme patterns.
 					! isCorePattern &&
 					// Exclude current pattern.
@@ -73,7 +76,11 @@ export default function ChangeDesign( { clientId }: { clientId: string } ) {
 						return categories.includes( category );
 					} ) &&
 					// Check if the pattern is not a synced pattern.
-					( pattern.syncStatus === 'unsynced' || ! pattern.id )
+					( pattern.syncStatus === 'unsynced' || ! pattern.id ) &&
+					// Check if the pattern has only one top level block,
+					// otherwise we may switch to a pattern that doesn't have replacement suggestions.
+					// This parses the pattern, so it's checked last.
+					pattern.blocks.length === 1
 				);
 			} )
 			.slice( 0, MAX_PATTERNS_TO_SHOW );

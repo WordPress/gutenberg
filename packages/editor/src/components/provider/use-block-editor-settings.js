@@ -117,6 +117,7 @@ const {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
+	selectInstalledThemePatternsKey,
 	reusableBlocksSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
@@ -319,6 +320,20 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
+	// Patterns from installed themes other than the active one. The server
+	// only offers them to users who can switch themes.
+	const { hasInstalledThemePatterns } = settings;
+	const selectInstalledThemePatterns = useMemo(
+		() =>
+			hasInstalledThemePatterns
+				? ( select ) =>
+						unlock(
+							select( coreStore )
+						).getInstalledThemePatterns()
+				: undefined,
+		[ hasInstalledThemePatterns ]
+	);
+
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -428,6 +443,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? patterns
 					: undefined;
 			},
+			[ selectInstalledThemePatternsKey ]: selectInstalledThemePatterns,
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
@@ -491,6 +507,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		keepCaretInsideBlock,
 		settings,
 		hasUploadPermissions,
+		selectInstalledThemePatterns,
 		blockPatterns,
 		blockPatternCategories,
 		inserterMediaCategories,

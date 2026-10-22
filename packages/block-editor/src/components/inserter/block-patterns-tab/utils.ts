@@ -7,6 +7,7 @@ export const INSERTER_PATTERN_TYPES = {
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
+	installedTheme: 'installed-theme',
 } as const;
 
 // The literal types name the sync types.
@@ -34,6 +35,11 @@ export const starterPatternsCategory: PatternCategory = {
 	label: __( 'Starter content' ),
 };
 
+export const otherCategoriesCategory: PatternCategory = {
+	name: 'otherCategories',
+	label: __( 'Other categories' ),
+};
+
 function hasRegisteredCategory(
 	pattern: BlockPattern,
 	allCategories: PatternCategory[]
@@ -48,9 +54,50 @@ function hasRegisteredCategory(
 }
 
 /**
+ * Returns whether a pattern belongs to "Other categories": it comes from an
+ * installed theme other than the active one, and only uses categories that
+ * theme registers. Those categories are only registered while the theme is
+ * active.
+ *
+ * @param pattern       The pattern.
+ * @param allCategories The registered pattern categories.
+ *
+ * @return Whether the pattern belongs to "Other categories".
+ */
+export function isInOtherCategories(
+	pattern: BlockPattern,
+	allCategories: PatternCategory[]
+): boolean {
+	return (
+		pattern.type === INSERTER_PATTERN_TYPES.installedTheme &&
+		!! pattern.categories?.length &&
+		! hasRegisteredCategory( pattern, allCategories )
+	);
+}
+
+/**
+ * Returns whether a pattern belongs to no category, so it shows in
+ * "Uncategorized".
+ *
+ * @param pattern       The pattern.
+ * @param allCategories The registered pattern categories.
+ *
+ * @return Whether the pattern is uncategorized.
+ */
+export function isUncategorized(
+	pattern: BlockPattern,
+	allCategories: PatternCategory[]
+): boolean {
+	return (
+		! hasRegisteredCategory( pattern, allCategories ) &&
+		! isInOtherCategories( pattern, allCategories )
+	);
+}
+
+/**
  * Returns the categories that contain at least one of the given patterns,
- * sorted by label. An "Uncategorized" category is appended when some pattern
- * belongs to no registered category.
+ * sorted by label. "Uncategorized" and "Other categories" are appended when
+ * some pattern belongs to them.
  *
  * @param patterns      The patterns to derive the categories from.
  * @param allCategories The registered pattern categories.
@@ -70,8 +117,8 @@ export function getPopulatedCategories(
 		.sort( ( a, b ) => a.label.localeCompare( b.label ) );
 
 	if (
-		patterns.some(
-			( pattern ) => ! hasRegisteredCategory( pattern, allCategories )
+		patterns.some( ( pattern ) =>
+			isUncategorized( pattern, allCategories )
 		) &&
 		! categories.find( ( category ) => category.name === 'uncategorized' )
 	) {
@@ -79,6 +126,14 @@ export function getPopulatedCategories(
 			name: 'uncategorized',
 			label: __( 'Uncategorized' ),
 		} );
+	}
+
+	if (
+		patterns.some( ( pattern ) =>
+			isInOtherCategories( pattern, allCategories )
+		)
+	) {
+		categories.push( otherCategoriesCategory );
 	}
 
 	return categories;
@@ -90,6 +145,16 @@ export function isPatternFiltered(
 	syncFilter?: string,
 	authorFilter?: string
 ): boolean {
+	// Patterns from other installed themes only match their own source.
+	const isInstalledThemePattern =
+		pattern.type === INSERTER_PATTERN_TYPES.installedTheme;
+	if ( sourceFilter === INSERTER_PATTERN_TYPES.installedTheme ) {
+		return ! isInstalledThemePattern;
+	}
+	if ( sourceFilter !== 'all' && isInstalledThemePattern ) {
+		return true;
+	}
+
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
 		pattern.source === 'core' ||

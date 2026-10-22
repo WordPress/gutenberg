@@ -28,6 +28,10 @@ import type {
 type GrammarBlock = ReturnType< typeof grammarParse >[ number ];
 
 export const isFiltered = Symbol( 'isFiltered' );
+// Opts in to the patterns from installed themes other than the active one.
+export const withInstalledThemePatterns = Symbol(
+	'withInstalledThemePatterns'
+);
 const parsedPatternCache = new WeakMap< BlockPattern, ParsedBlockPattern >();
 const grammarMapCache = new WeakMap< BlockPattern, GrammarBlock[] >();
 

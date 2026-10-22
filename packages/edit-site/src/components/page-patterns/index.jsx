@@ -16,7 +16,10 @@ import {
 } from '../../utils/constants';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
+import usePatterns, {
+	selectInstalledThemePatterns,
+	useAugmentPatternsWithPermissions,
+} from './use-patterns';
 import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
@@ -28,6 +31,44 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
+
+/**
+ * Returns a field to filter patterns by the installed theme, other than the
+ * active one, they come from. There's no field until patterns from other
+ * themes have loaded.
+ *
+ * @return {Object|undefined} The field.
+ */
+function useInstalledThemeField() {
+	const installedThemePatterns = useSelect(
+		( select ) => selectInstalledThemePatterns( select ).patterns,
+		[]
+	);
+	return useMemo( () => {
+		const themes = new Map(
+			installedThemePatterns.map( ( { theme, themeName } ) => [
+				theme,
+				themeName,
+			] )
+		);
+		if ( ! themes.size ) {
+			return undefined;
+		}
+		return {
+			id: 'theme',
+			type: 'text',
+			label: __( 'Theme' ),
+			readOnly: true,
+			enableSorting: false,
+			getValue: ( { item } ) => item.theme,
+			elements: Array.from( themes, ( [ value, label ] ) => ( {
+				value,
+				label,
+			} ) ).sort( ( a, b ) => a.label.localeCompare( b.label ) ),
+			filterBy: { operators: [ 'isAny' ] },
+		};
+	}, [ installedThemePatterns ] );
+}
 
 function usePagePatternsHeader( type, categoryId ) {
 	const { patternCategories } = usePatternCategories();
@@ -97,22 +138,32 @@ export default function DataviewsPatterns() {
 	} );
 
 	const postTypeFields = usePostFields( { postType } );
+	const installedThemeField = useInstalledThemeField();
 	const fields = useMemo( () => {
-		return [ previewField, ...( postTypeFields || [] ) ];
-	}, [ postTypeFields ] );
+		return [
+			previewField,
+			...( postTypeFields || [] ),
+			...( installedThemeField && postType === PATTERN_TYPES.user
+				? [ installedThemeField ]
+				: [] ),
+		];
+	}, [ postTypeFields, installedThemeField, postType ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
-		// However, the author filter is done client-side.
+		// However, the author filter and the theme filter in patterns are done
+		// client-side.
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search;
 		if ( postType !== TEMPLATE_PART_POST_TYPE ) {
 			viewWithoutFilters.filters = view.filters?.filter(
-				( { field } ) => field === 'author'
+				( { field } ) =>
+					field === 'author' ||
+					( installedThemeField && field === 'theme' )
 			);
 		}
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
-	}, [ patterns, view, fields, postType ] );
+	}, [ patterns, view, fields, postType, installedThemeField ] );
 
 	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
 

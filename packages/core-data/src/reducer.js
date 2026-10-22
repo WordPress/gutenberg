@@ -552,6 +552,23 @@ export function blockPatterns( state = [], action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the patterns of installed themes other than the active one.
+ *
+ * @param {Array|null} state  Current state.
+ * @param {Object}     action Dispatched action.
+ *
+ * @return {Array|null} Updated state.
+ */
+export function installedThemePatterns( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_INSTALLED_THEME_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
 export function blockPatternCategories( state = [], action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
@@ -812,6 +829,7 @@ export default combineReducers( {
 	userPermissions,
 	autosaves,
 	blockPatterns,
+	installedThemePatterns,
 	blockPatternCategories,
 	userPatternCategories,
 	navigationFallbackId,

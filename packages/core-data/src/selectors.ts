@@ -28,6 +28,7 @@ import logEntityDeprecation from './utils/log-entity-deprecation';
 export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
+	installedThemePatterns: Array< unknown > | null;
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: number | undefined;
 	currentTheme: string;

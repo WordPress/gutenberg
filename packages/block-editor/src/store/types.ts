@@ -29,6 +29,7 @@ import type {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
+	selectInstalledThemePatternsKey,
 	userPatternCategoriesSelectKey,
 } from './private-keys';
 
@@ -459,6 +460,10 @@ export type Settings = Record< string | symbol, unknown > & {
 	) => UserPattern[] | null;
 	[ sectionRootClientIdKey ]?: string;
 	[ selectBlockPatternsKey ]?: (
+		select: typeof globalSelect
+	) => BlockPattern[] | undefined;
+	// Returns undefined while the patterns load.
+	[ selectInstalledThemePatternsKey ]?: (
 		select: typeof globalSelect
 	) => BlockPattern[] | undefined;
 	[ userPatternCategoriesSelectKey ]?: (

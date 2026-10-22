@@ -12,6 +12,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
 	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_OTHER_CATEGORIES,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PART_ALL_AREAS_CATEGORY,
@@ -54,20 +55,28 @@ function CategoriesGroup( {
 				/>
 			) ) }
 			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
-			{ patternViews?.map( ( view ) => (
-				<CategoryItem
-					key={ view.slug }
-					count={ patternCounts[ view.slug ] }
-					label={ view.title }
-					icon={ file }
-					id={ view.slug }
-					type={ PATTERN_TYPES.user }
-					isActive={
-						currentCategory === `${ view.slug }` &&
-						currentType === PATTERN_TYPES.user
-					}
-				/>
-			) ) }
+			{ patternViews
+				// "Other categories" only has patterns when other installed
+				// themes do, which only shows once they've loaded.
+				?.filter(
+					( view ) =>
+						view.slug !== PATTERN_OTHER_CATEGORIES ||
+						patternCounts[ view.slug ]
+				)
+				.map( ( view ) => (
+					<CategoryItem
+						key={ view.slug }
+						count={ patternCounts[ view.slug ] }
+						label={ view.title }
+						icon={ file }
+						id={ view.slug }
+						type={ PATTERN_TYPES.user }
+						isActive={
+							currentCategory === `${ view.slug }` &&
+							currentType === PATTERN_TYPES.user
+						}
+					/>
+				) ) }
 		</ItemGroup>
 	);
 }

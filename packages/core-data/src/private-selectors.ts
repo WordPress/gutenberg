@@ -49,6 +49,21 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 );
 
 /**
+ * Returns the patterns that installed themes, other than the active one, would
+ * add if they were activated. Patterns the editor already offers are left out,
+ * and each pattern has the stylesheet of its theme in `theme`.
+ *
+ * @param state Data state.
+ *
+ * @return The patterns, or undefined while they load.
+ */
+export function getInstalledThemePatterns(
+	state: State
+): Array< any > | undefined {
+	return state.installedThemePatterns ?? undefined;
+}
+
+/**
  * Returns the entity records permissions for the given entity record ids.
  */
 export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>

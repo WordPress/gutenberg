@@ -31,6 +31,7 @@ import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
+	selectInstalledThemePatternsKey,
 	reusableBlocksSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
@@ -38,6 +39,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -695,6 +697,46 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 );
 
 const EMPTY_ARRAY: never[] = [];
+
+/**
+ * Returns the patterns from installed themes other than the active one, when
+ * the editor provides them. They're only offered where a caller asks for them
+ * with the `withInstalledThemePatterns` option.
+ *
+ * @return The patterns.
+ */
+export const getInstalledThemePatterns = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state: State ): BlockPattern[] =>
+			(
+				state.settings[ selectInstalledThemePatternsKey ]?.( select ) ??
+				EMPTY_ARRAY
+			).map( ( pattern ) => ( {
+				...pattern,
+				type: INSERTER_PATTERN_TYPES.installedTheme,
+			} ) ),
+		( state: State ) => [
+			state.settings[ selectInstalledThemePatternsKey ]?.( select ),
+		]
+	)
+);
+
+/**
+ * Returns whether the patterns from installed themes other than the active one
+ * are still loading. Asking starts loading them.
+ *
+ * @return Whether the patterns are loading.
+ */
+export const isLoadingInstalledThemePatterns = createRegistrySelector(
+	( select ) => ( state: State ) => {
+		const selectInstalledThemePatterns =
+			state.settings[ selectInstalledThemePatternsKey ];
+		return (
+			!! selectInstalledThemePatterns &&
+			selectInstalledThemePatterns( select ) === undefined
+		);
+	}
+);
 
 export const getReusableBlocks = createRegistrySelector(
 	( select ) => ( state: State ) => {

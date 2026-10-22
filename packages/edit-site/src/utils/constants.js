@@ -27,6 +27,9 @@ export const {
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_SYNC_TYPES,
 } = unlock( patternPrivateApis );
+// Patterns from other installed themes whose categories are only registered
+// while their theme is active.
+export const PATTERN_OTHER_CATEGORIES = 'other-categories';
 
 // Entities that are editable in focus mode.
 export const FOCUSABLE_ENTITIES = [

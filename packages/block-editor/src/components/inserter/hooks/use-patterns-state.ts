@@ -11,13 +11,19 @@ import {
 	userPatternCategoriesSelectKey,
 } from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
-import { isFiltered } from '../../../store/utils';
+import { isFiltered, withInstalledThemePatterns } from '../../../store/utils';
 import type { BlockPattern } from '../../../store/types';
 import type { InsertPattern, PatternCategory, PatternsState } from '../types';
 
 // Shared so the selector cache survives the inserter closing and reopening.
 const FILTERED_OPTIONS = { [ isFiltered ]: true };
-const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
+// Patterns from other installed themes start loading once the inserter shows
+// patterns. The quick inserter leaves them out, so opening it doesn't load
+// every installed theme.
+const UNFILTERED_OPTIONS = {
+	[ isFiltered ]: false,
+	[ withInstalledThemePatterns ]: true,
+};
 
 /**
  * Retrieves the block patterns inserter state.

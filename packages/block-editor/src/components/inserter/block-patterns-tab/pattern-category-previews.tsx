@@ -12,17 +12,23 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as WCText,
 	FlexBlock,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
 import { usePatternCategories } from './use-pattern-categories';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import {
 	isPatternFiltered,
 	allPatternsCategory,
 	sitePatternsCategory,
 	starterPatternsCategory,
+	otherCategoriesCategory,
+	isInOtherCategories,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 import type { BlockPattern } from '../../../store/types';
@@ -37,10 +43,17 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 }: PatternCategoryPreviewsProps ) {
-	const [ allPatterns, , onClickPattern ] = usePatternsState(
+	const [ allPatterns, allCategories, onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
 		category?.name
+	);
+	const isLoading = useSelect(
+		( select ) =>
+			unlock(
+				select( blockEditorStore )
+			).isLoadingInstalledThemePatterns(),
+		[]
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
@@ -92,15 +105,24 @@ export function PatternCategoryPreviews( {
 					return true;
 				}
 
+				if ( category.name === otherCategoriesCategory.name ) {
+					return isInOtherCategories( pattern, allCategories );
+				}
+
 				if ( category.name === 'uncategorized' ) {
 					// The uncategorized category should show all the patterns without any category...
 					if ( ! pattern.categories ) {
 						return true;
 					}
 
-					// ...or with no available category.
-					return ! pattern.categories.some( ( catName ) =>
-						availableCategories.some( ( c ) => c.name === catName )
+					// ...or with no available category, unless they're in
+					// "Other categories".
+					return (
+						! pattern.categories.some( ( catName ) =>
+							availableCategories.some(
+								( c ) => c.name === catName
+							)
+						) && ! isInOtherCategories( pattern, allCategories )
 					);
 				}
 
@@ -108,6 +130,7 @@ export function PatternCategoryPreviews( {
 			} ),
 		[
 			allPatterns,
+			allCategories,
 			availableCategories,
 			category.name,
 			patternSourceFilter,
@@ -176,7 +199,10 @@ export function PatternCategoryPreviews( {
 						category={ category }
 					/>
 				</HStack>
-				{ ! currentCategoryPatterns.length && (
+				{ ! currentCategoryPatterns.length && isLoading && (
+					<WCSpinner />
+				) }
+				{ ! currentCategoryPatterns.length && ! isLoading && (
 					<WCText
 						variant="muted"
 						className="block-editor-inserter__patterns-category-no-results"

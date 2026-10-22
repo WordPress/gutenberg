@@ -4,10 +4,10 @@ import apiFetch from '@wordpress/api-fetch';
 export { default as __experimentalFetchLinkSuggestions } from './__experimental-fetch-link-suggestions';
 export { default as __experimentalFetchUrlData } from './__experimental-fetch-url-data';
 
-export async function fetchBlockPatterns() {
-	const restPatterns = await apiFetch( {
-		path: '/wp/v2/block-patterns/patterns',
-	} );
+export async function fetchBlockPatterns(
+	path = '/wp/v2/block-patterns/patterns'
+) {
+	const restPatterns = await apiFetch( { path } );
 	if ( ! restPatterns ) {
 		return [];
 	}

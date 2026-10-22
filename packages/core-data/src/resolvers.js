@@ -794,6 +794,24 @@ export const getBlockPatterns =
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
+/**
+ * Requests the patterns that installed themes, other than the active one,
+ * would add if they were activated.
+ */
+export const getInstalledThemePatterns =
+	() =>
+	async ( { dispatch } ) => {
+		let patterns = [];
+		try {
+			patterns = await fetchBlockPatterns(
+				'/wp/v2/block-patterns/installed-theme-patterns'
+			);
+		} catch {
+			// Without them, the editor still offers every other pattern.
+		}
+		dispatch.receiveInstalledThemePatterns( patterns );
+	};
+
 export const getBlockPatternCategories =
 	() =>
 	async ( { dispatch } ) => {

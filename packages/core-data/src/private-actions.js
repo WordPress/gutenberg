@@ -196,6 +196,21 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
+ * Returns an action object used to receive the patterns of installed themes
+ * other than the active one.
+ *
+ * @param {Array} patterns The patterns.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveInstalledThemePatterns( patterns ) {
+	return {
+		type: 'RECEIVE_INSTALLED_THEME_PATTERNS',
+		patterns,
+	};
+}
+
+/**
  * Returns an action object used to receive the fields config of an entity.
  *
  * @param {string} kind   Entity kind.

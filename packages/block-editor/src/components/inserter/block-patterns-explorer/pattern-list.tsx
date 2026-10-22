@@ -14,6 +14,8 @@ import {
 	allPatternsCategory,
 	sitePatternsCategory,
 	starterPatternsCategory,
+	otherCategoriesCategory,
+	isInOtherCategories,
 } from '../block-patterns-tab/utils';
 import type { BlockPattern } from '../../../store/types';
 import type { PatternListProps } from '../types';
@@ -31,7 +33,7 @@ function PatternList( {
 		rootClientId,
 		shouldFocusBlock: true,
 	} );
-	const [ patterns, , onClickPattern ] = usePatternsState(
+	const [ patterns, allCategories, onClickPattern ] = usePatternsState(
 		// @ts-expect-error Bug: the pattern name is passed unwrapped, as the meta object, which the store ignores.
 		onInsertBlocks,
 		destinationRootClientId,
@@ -63,6 +65,9 @@ function PatternList( {
 			) {
 				return true;
 			}
+			if ( selectedCategory === otherCategoriesCategory.name ) {
+				return isInOtherCategories( pattern, allCategories );
+			}
 			if ( selectedCategory === 'uncategorized' ) {
 				const hasKnownCategory =
 					pattern.categories?.some( ( category ) =>
@@ -74,7 +79,11 @@ function PatternList( {
 						 ).includes( category )
 					) ?? false;
 
-				return ! pattern.categories?.length || ! hasKnownCategory;
+				return (
+					! pattern.categories?.length ||
+					( ! hasKnownCategory &&
+						! isInOtherCategories( pattern, allCategories ) )
+				);
 			}
 
 			return pattern.categories?.includes( selectedCategory );
@@ -90,6 +99,7 @@ function PatternList( {
 		patterns,
 		selectedCategory,
 		registeredPatternCategories,
+		allCategories,
 	] );
 
 	// Announce search results on change.
