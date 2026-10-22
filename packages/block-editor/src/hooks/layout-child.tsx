@@ -670,6 +670,9 @@ function GridTools( {
 	// Like the Rotation control in the block settings, the handle is only
 	// offered for blocks that can be fully edited, and not in a state such as
 	// `:hover`, since rotation is stored per viewport.
+	// The resizer sizes the block from pointer movement along the screen's
+	// axes, not the block's, so it is hidden while the block is rotated.
+	const isRotated = !! ( previewRotate ?? rotate );
 	const showRotator =
 		isManualGrid &&
 		! isBlockItselfCurrentlyHidden &&
@@ -717,7 +720,7 @@ function GridTools( {
 				parentLayout={ parentLayout }
 				childGridClientId={ childGridClientId }
 			/>
-			{ showResizer && (
+			{ showResizer && ! isRotated && (
 				<GridItemResizer
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.
