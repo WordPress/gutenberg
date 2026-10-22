@@ -45,7 +45,7 @@ jobs:
         needs: pull-request-automation
         # Only a pull request opened by a first-time contributor gets a welcome.
         if: ${{ !cancelled() && needs.pull-request-automation.outputs.welcome-prompt }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
@@ -74,7 +74,7 @@ jobs:
     playground:
         name: Link a Playground preview
         if: ${{ github.event_name == 'pull_request_target' && github.repository == 'WordPress/gutenberg' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
@@ -107,7 +107,7 @@ jobs:
         needs: pull-request-automation
         # Only a push that merged a first pull request produces a prompt.
         if: ${{ !cancelled() && needs.pull-request-automation.outputs.account-link-pr-number }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write

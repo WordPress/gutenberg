@@ -1,5 +1,4 @@
 import { speak } from '@wordpress/a11y';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -8,8 +7,10 @@ import { useLayoutEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 import MoreMenuSubmenu from '../more-menu/more-menu-submenu';
 import { ALL_NOTES_SIDEBAR } from './constants';

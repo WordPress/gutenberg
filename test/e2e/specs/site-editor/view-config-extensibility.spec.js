@@ -186,7 +186,7 @@ test.describe( 'View config extensibility', () => {
 			name: new RegExp( MATCHING_PAGE_TITLE ),
 		} );
 		await matchingPageRow
-			.getByRole( 'button', { name: 'Quick Edit' } )
+			.getByRole( 'button', { name: 'Quick edit' } )
 			.click();
 
 		const quickEditModal = page.locator(

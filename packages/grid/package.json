@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/grid",
-	"version": "0.9.0",
+	"version": "0.10.0",
 	"description": "Grid layout components for arranging tiles in dashboard-style surfaces, with drag-to-reorder and tile resizing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,7 +60,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
-		"storybook": "^10.6.1",
+		"storybook": "^10.6.2",
 		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
 	},

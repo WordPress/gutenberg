@@ -8,8 +8,10 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as WCText,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -25,7 +27,6 @@ import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
-	// @ts-expect-error: Not typed yet.
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
+## 19.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
