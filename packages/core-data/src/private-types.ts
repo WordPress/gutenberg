@@ -13,7 +13,7 @@ import type {
 	ReceiveItemsAction,
 	RemoveItemsAction,
 } from './queried-data/types';
-import type { EntityConfig, EntityProviderProps } from './types';
+import type { EntityConfig, EntityProviderProps, RestRecord } from './types';
 
 /**
  * The IDs of the provided entities, by kind and name, and their revisions
@@ -286,6 +286,14 @@ export interface MediaEdits {
 	 */
 	modifiers?: Array< MediaEditModifier >;
 }
+
+/**
+ * The attachment the REST API responds with when editing a media item.
+ */
+export type EditedMediaRecord = RestRecord & {
+	id: number;
+	source_url: string;
+};
 
 /**
  * A dirty record to save, or an edited property of the site entity.

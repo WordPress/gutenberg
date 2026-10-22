@@ -11,14 +11,11 @@ import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import type {
 	ActionOf,
 	CoreDataThunkArgs,
+	EditedMediaRecord,
 	MediaEdits,
 	SaveDirtyEntitiesOptions,
 } from './private-types';
-import type {
-	DeleteEntityRecordOptions,
-	EntityConfig,
-	RestRecord,
-} from './types';
+import type { DeleteEntityRecordOptions, EntityConfig } from './types';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -84,7 +81,7 @@ export const editMediaEntity =
 			{ exclusive: true }
 		);
 
-		let updatedRecord: RestRecord | undefined;
+		let updatedRecord: EditedMediaRecord | undefined;
 		let error: unknown;
 		let hasError = false;
 
@@ -98,14 +95,14 @@ export const editMediaEntity =
 
 			try {
 				const path = `${ entityConfig.baseURL }/${ recordId }/edit`;
-				// The REST API responds with the duplicated record.
+				// The REST API responds with the duplicated attachment.
 				const newRecord = ( await __unstableFetch( {
 					path,
 					method: 'POST',
 					data: {
 						...edits,
 					},
-				} ) ) as RestRecord | undefined;
+				} ) ) as EditedMediaRecord | undefined;
 
 				if ( newRecord ) {
 					dispatch.receiveEntityRecords(
