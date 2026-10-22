@@ -15,7 +15,7 @@ const queuedBuilds = [];
 
 /**
  * Get the default number of concurrent esbuild builds: half of the available
- * parallelism, and at least one.
+ * parallelism, rounded up.
  *
  * @param {number} availableParallelism Available parallelism to use.
  * @return {number} Default build concurrency.
@@ -23,7 +23,7 @@ const queuedBuilds = [];
 export function getDefaultBuildConcurrency(
 	availableParallelism = os.availableParallelism()
 ) {
-	return Math.max( 1, Math.floor( availableParallelism / 2 ) );
+	return Math.max( 1, Math.ceil( availableParallelism / 2 ) );
 }
 
 /**

@@ -17,11 +17,12 @@ const flushPromises = () =>
 	} );
 
 describe( 'getDefaultBuildConcurrency()', () => {
-	it( 'uses half of the available parallelism, and at least one', () => {
+	it( 'uses half of the available parallelism, rounded up', () => {
 		expect( getDefaultBuildConcurrency( 1 ) ).toBe( 1 );
 		expect( getDefaultBuildConcurrency( 2 ) ).toBe( 1 );
-		expect( getDefaultBuildConcurrency( 3 ) ).toBe( 1 );
+		expect( getDefaultBuildConcurrency( 3 ) ).toBe( 2 );
 		expect( getDefaultBuildConcurrency( 4 ) ).toBe( 2 );
+		expect( getDefaultBuildConcurrency( 5 ) ).toBe( 3 );
 		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 6 );
 		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 32 );
 	} );

@@ -54,7 +54,7 @@ or via npm script:
 
 ### Build Concurrency
 
-By default, `wp-build` limits concurrent `esbuild` build jobs to half of the available CPU parallelism (at least one job). This prevents large projects from starting every package, route, and widget bundle at once.
+By default, `wp-build` limits concurrent `esbuild` build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
 
 ### Testing Generated Styles
 
