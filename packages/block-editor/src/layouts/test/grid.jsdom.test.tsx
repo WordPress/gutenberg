@@ -538,12 +538,11 @@ describe( 'GridLayoutInspectorControls', () => {
 				const onChange = vi.fn();
 				renderInspectorControls( { layout, onChange } );
 
-				fireEvent.change(
-					await screen.findByRole( 'spinbutton', {
-						name: 'Columns',
-					} ),
-					{ target: { value: '5' } }
-				);
+				const columnsInput = await screen.findByRole( 'spinbutton', {
+					name: 'Columns',
+				} );
+				fireEvent.change( columnsInput, { target: { value: '5' } } );
+				fireEvent.blur( columnsInput );
 
 				expect( onChange ).toHaveBeenCalledWith( {
 					...layout,
@@ -572,12 +571,11 @@ describe( 'GridLayoutInspectorControls', () => {
 				const onChange = vi.fn();
 				renderInspectorControls( { layout, onChange } );
 
-				fireEvent.change(
-					await screen.findByRole( 'spinbutton', {
-						name: 'Columns',
-					} ),
-					{ target: { value: '5' } }
-				);
+				const columnsInput = await screen.findByRole( 'spinbutton', {
+					name: 'Columns',
+				} );
+				fireEvent.change( columnsInput, { target: { value: '5' } } );
+				fireEvent.blur( columnsInput );
 
 				expect( onChange ).toHaveBeenCalledWith( {
 					...layout,
@@ -593,6 +591,27 @@ describe( 'GridLayoutInspectorControls', () => {
 					rowStart: 1,
 					rowSpan: 1,
 				} );
+			} );
+
+			it( 'only changes the count once a typed count is committed', async () => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				renderInspectorControls( { layout, onChange } );
+
+				const columnsInput = await screen.findByRole( 'spinbutton', {
+					name: 'Columns',
+				} );
+				await user.clear( columnsInput );
+				await user.type( columnsInput, '12' );
+
+				expect( onChange ).not.toHaveBeenCalled();
+
+				await user.keyboard( '{Enter}' );
+
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange ).toHaveBeenCalledWith(
+					expect.objectContaining( { columnCount: 12 } )
+				);
 			} );
 		} );
 
