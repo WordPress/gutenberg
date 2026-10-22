@@ -5,8 +5,14 @@ import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Comment } from '@wordpress/core-data';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
-import { Button, IconButton, Stack, Tooltip } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
+	Button,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
+	IconButton,
+	Stack,
+	Tooltip,
+} from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
