@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add a preference, View menu item, and command to show block boundaries in the editor canvas ([#69388](https://github.com/WordPress/gutenberg/pull/69388)).
+-   Add an accessibility preference and command to show block boundaries in the editor canvas ([#69388](https://github.com/WordPress/gutenberg/pull/69388)).
 
 ### Bug Fixes
 

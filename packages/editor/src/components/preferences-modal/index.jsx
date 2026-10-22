@@ -270,14 +270,6 @@ function PreferencesModalContents( { extraSections = {} } ) {
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="showBlockBoundaries"
-								help={ __(
-									'Shows block outlines to help identify content boundaries.'
-								) }
-								label={ __( 'Show block boundaries' ) }
-							/>
 							{ extraSections?.appearance }
 						</PreferencesModalSection>
 					),
@@ -314,6 +306,14 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									help={ __(
 										'Show text instead of icons on buttons across the interface.'
 									) }
+								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showBlockBoundaries"
+									help={ __(
+										'Shows block outlines to help identify content boundaries.'
+									) }
+									label={ __( 'Show block boundaries' ) }
 								/>
 							</PreferencesModalSection>
 						</>
