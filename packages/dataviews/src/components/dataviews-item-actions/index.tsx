@@ -12,6 +12,7 @@ import {
 } from '@wordpress/ui';
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
+import getActionButtonLabel from '../../utils/get-action-button-label';
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -60,8 +61,7 @@ function ButtonTrigger< Item >( {
 	items,
 	variant,
 }: ActionTriggerProps< Item > ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionButtonLabel( action, items );
 	return (
 		<Button
 			disabled={ !! action.disabled }
