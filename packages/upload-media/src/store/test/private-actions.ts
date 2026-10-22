@@ -42,9 +42,6 @@ vi.mock( import( '../utils' ), () => ( {
 	vipsRotateImage: vi.fn(),
 	terminateVipsWorker: vi.fn(),
 	maybeRecycleVipsWorker: vi.fn(),
-	withVipsWorkerHeld: vi.fn( ( callback: () => Promise< unknown > ) =>
-		callback()
-	),
 } ) );
 
 // Mock the HEIC conversion so prepareItem's failure branch can be driven.

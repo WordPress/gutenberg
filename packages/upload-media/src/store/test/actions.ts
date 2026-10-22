@@ -51,7 +51,7 @@ vi.mock(
 			vipsEnsureJxlSupport: vi.fn( () => Promise.resolve() ),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
-			withVipsWorkerHeld: vi.fn( ( callback: () => Promise< unknown > ) =>
+			withVipsWorkerHeld: vi.fn( < T >( callback: () => Promise< T > ) =>
 				callback()
 			),
 		} ) as unknown as typeof import( '../utils' )
