@@ -2684,6 +2684,54 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	/**
+	 * This test checks that feature selectors for core/navigation-submenu
+	 * defined in block.json are correctly output in the stylesheet targeting
+	 * the submenu container instead of the parent list item.
+	 */
+	public function test_get_stylesheet_with_navigation_submenu_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation-submenu' => array(
+							'border'   => array(
+								'color' => '#0000ff',
+								'style' => 'solid',
+								'width' => '4px',
+							),
+							'color'    => array(
+								'background' => '#ff0000',
+								'text'       => '#ffffff',
+							),
+							'spacing'  => array(
+								'padding' => array(
+									'left' => '32px',
+								),
+							),
+							'elements' => array(
+								'link' => array(
+									'color'  => array(
+										'text' => '#00ff00',
+									),
+									':hover' => array(
+										'color' => array(
+											'text' => '#ff00ff',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-navigation-submenu > .wp-block-navigation__submenu-container){border-color: #0000ff;border-width: 4px;border-style: solid;background-color: #ff0000;color: #ffffff;padding-left: 32px;}:root :where(.wp-block-navigation-submenu a:where(:not(.wp-element-button))){color: #00ff00;}:root :where(.wp-block-navigation-submenu a:where(:not(.wp-element-button)):hover){color: #ff00ff;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	public function test_get_stylesheet_generates_layout_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
