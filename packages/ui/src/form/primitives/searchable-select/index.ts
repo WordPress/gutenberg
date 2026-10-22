@@ -1,4 +1,5 @@
 import { Item } from './item';
+import { Trigger } from './trigger';
 import { ItemDescription } from '../combobox/item-description';
 import { ItemLabel } from '../combobox/item-label';
 import { Group } from '../combobox/group';
@@ -8,6 +9,7 @@ import { Collection } from '../combobox/collection';
 import { useFilteredItems } from '../combobox/use-filtered-items';
 import { SearchableSelect as _SearchableSelect } from './searchable-select';
 
+Trigger.displayName = 'SearchableSelect.Trigger';
 Item.displayName = 'SearchableSelect.Item';
 ItemLabel.displayName = 'SearchableSelect.ItemLabel';
 ItemDescription.displayName = 'SearchableSelect.ItemDescription';
@@ -21,6 +23,11 @@ GroupLabel.displayName = 'SearchableSelect.GroupLabel';
  * Prefer `SearchableSelectControl` when using with a standard label and description.
  */
 export const SearchableSelect = Object.assign( _SearchableSelect, {
+	/**
+	 * The trigger button, passed through the `trigger` prop to customize its props
+	 * or selected content.
+	 */
+	Trigger,
 	Item,
 	ItemLabel,
 	ItemDescription,

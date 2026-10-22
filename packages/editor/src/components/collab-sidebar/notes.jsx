@@ -29,10 +29,9 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		onDelete,
 	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
-	useNoteFocus( { sidebarRef } );
 
 	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -110,7 +109,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 			focusNoteThread( adjacentThread.id, sidebarRef.current );
 		} else {
 			selectNote( undefined );
-			toggleBlockSpotlight( note.blockClientId, false );
+			toggleBlockHighlight( note.blockClientId, false );
 			// Move focus to the related block.
 			relatedBlockElement?.focus();
 		}
@@ -123,6 +122,10 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 			isFloating,
 			sidebarRef,
 		} );
+	useNoteFocus( {
+		sidebarRef,
+		isPlaced: ! isFloating || notePositions[ selectedNote ] !== undefined,
+	} );
 
 	const navigate = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -148,7 +151,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 			// Collapse thread.
 			selectNote( undefined );
 			if ( thread.blockClientId ) {
-				toggleBlockSpotlight( thread.blockClientId, false );
+				toggleBlockHighlight( thread.blockClientId, false );
 			}
 			focusNoteThread( thread.id, sidebarRef.current );
 		} else if ( isSelfTarget ) {

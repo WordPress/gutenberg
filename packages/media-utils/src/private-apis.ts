@@ -4,7 +4,7 @@ import MediaEdit, { MediaEditControl } from './components/media-edit';
 import { lock } from './lock-unlock';
 
 /**
- * Private @wordpress/media-utils APIs.
+ * Private `@wordpress/media-utils` APIs.
  */
 export const privateApis = {};
 

@@ -12,7 +12,6 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
@@ -26,7 +25,7 @@ import { textColor as settings, transparentValue } from './index';
 export interface ColorObject {
 	slug: string;
 	color: string;
-	name?: string;
+	name: string;
 }
 
 interface InlineColorUIProps {
@@ -92,7 +91,8 @@ export function parseClassName(
 					colorSettings,
 					colorSlug
 				);
-				accumulator.color = colorObject.color;
+				// Without a custom color, an unknown slug gives no color.
+				accumulator.color = colorObject.color as string | undefined;
 			}
 			return accumulator;
 		}, {} );
