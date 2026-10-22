@@ -3,6 +3,6 @@ kind: Breaking Changes
 body: >-
     `RadioControl`: Remove the `components-base-control__help` class from group
     help text
-time: '2026-10-22T04:10:27.322Z'
+time: '2026-10-22T04:39:12.242Z'
 custom:
     PR: '85126'
