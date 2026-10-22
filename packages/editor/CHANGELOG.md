@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Sidebar: Describe the post title in the Block tab, instead of reporting that no block is selected. The panel names the template its appearance comes from and offers to edit it ([#82673](https://github.com/WordPress/gutenberg/pull/82673)).
+
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
