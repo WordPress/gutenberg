@@ -1,165 +1,176 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import apiFetch from '@wordpress/api-fetch';
+import type { APIFetchOptions } from '@wordpress/api-fetch';
 import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
 } from '../__experimental-fetch-link-suggestions';
 
-// @ts-expect-error The mock provides only the default export the tests need.
-vi.mock( import( '@wordpress/api-fetch' ), () => ( {
-	default: vi.fn( ( { path }: { path: string } ) => {
-		switch ( path ) {
-			case '/wp/v2/search?search=&per_page=20&type=post':
-			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 37,
-						title: 'Contact Page',
-						url: 'http://wordpress.local/contact-page/',
-						type: 'post',
-						subtype: 'page',
+vi.mock( import( '@wordpress/api-fetch' ) );
+
+/**
+ * Answers the search requests the tests make.
+ *
+ * @param options      The request options.
+ * @param options.path The search path.
+ */
+function search( { path }: APIFetchOptions ) {
+	switch ( path ) {
+		case '/wp/v2/search?search=&per_page=20&type=post':
+		case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
+			return Promise.resolve( [
+				{
+					id: 37,
+					title: 'Contact Page',
+					url: 'http://wordpress.local/contact-page/',
+					type: 'post',
+					subtype: 'page',
+				},
+			] );
+		case '/wp/v2/search?search=&per_page=20&type=term':
+		case '/wp/v2/search?search=cat&per_page=20&type=term&subtype=category':
+			return Promise.resolve( [
+				{
+					id: 9,
+					title: 'Cats',
+					url: 'http://wordpress.local/category/cats/',
+					type: 'category',
+				},
+				{
+					id: 1,
+					title: 'Uncategorized',
+					url: 'http://wordpress.local/category/uncategorized/',
+					type: 'category',
+				},
+			] );
+		case '/wp/v2/search?search=&per_page=20&type=post-format':
+			return Promise.resolve( [
+				{
+					id: 'gallery',
+					title: 'Gallery',
+					url: 'http://wordpress.local/type/gallery/',
+					type: 'post-format',
+					kind: 'taxonomy',
+				},
+				{
+					id: 'quote',
+					title: 'Quote',
+					url: 'http://wordpress.local/type/quote/',
+					type: 'post-format',
+					kind: 'taxonomy',
+				},
+			] );
+		case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
+			return Promise.resolve( [
+				{
+					id: 11,
+					title: 'Limit Case',
+					url: 'http://wordpress.local/limit-case/',
+					type: 'post',
+					subtype: 'page',
+				},
+			] );
+		case '/wp/v2/search?search=&page=11&per_page=20&type=post&subtype=page':
+			return Promise.resolve( [
+				{
+					id: 22,
+					title: 'Page Case',
+					url: 'http://wordpress.local/page-case/',
+					type: 'post',
+					subtype: 'page',
+				},
+			] );
+		case '/wp/v2/search?search=few%20notes&per_page=20&type=post':
+			return Promise.resolve( [
+				...Array.from( { length: 5 }, ( _, index ) => ( {
+					id: 600 + index,
+					title: `Few Notes ${ index }`,
+					url: `http://wordpress.local/few-notes-${ index }/`,
+					type: 'post',
+					subtype: 'page',
+				} ) ),
+				// Holds neither word; WordPress matched a body.
+				...Array.from( { length: 30 }, ( _, index ) => ( {
+					id: 800 + index,
+					title: `Unrelated ${ index }`,
+					url: `http://wordpress.local/unrelated-${ index }/`,
+					type: 'post',
+					subtype: 'page',
+				} ) ),
+			] );
+		case '/wp/v2/search?search=few%20notes&per_page=20&type=term':
+			return Promise.resolve(
+				Array.from( { length: 5 }, ( _, index ) => ( {
+					// Holds "notes" but not "few".
+					id: 700 + index,
+					title: `Notes ${ index }`,
+					url: `http://wordpress.local/notes-${ index }/`,
+					type: 'category',
+				} ) )
+			);
+		case '/wp/v2/search?search=few%20notes&per_page=20&type=post-format':
+		case '/wp/v2/media?search=few%20notes&per_page=20':
+			return Promise.resolve( [] );
+		case '/wp/v2/search?search=&per_page=3&type=post':
+			return Promise.resolve(
+				Array.from( { length: 3 }, ( _, index ) => ( {
+					id: 500 + index,
+					title: `Initial Page ${ index }`,
+					url: `http://wordpress.local/initial-page-${ index }/`,
+					type: 'post',
+					subtype: 'page',
+				} ) )
+			);
+		case '/wp/v2/search?search=&per_page=3&type=term':
+			return Promise.resolve(
+				Array.from( { length: 3 }, ( _, index ) => ( {
+					id: 510 + index,
+					title: `Initial Category ${ index }`,
+					url: `http://wordpress.local/initial-category-${ index }/`,
+					type: 'category',
+				} ) )
+			);
+		case '/wp/v2/search?search=&per_page=3&type=post-format':
+			return Promise.resolve(
+				Array.from( { length: 3 }, ( _, index ) => ( {
+					id: 520 + index,
+					title: `Initial Format ${ index }`,
+					url: `http://wordpress.local/initial-format-${ index }/`,
+					type: 'post-format',
+				} ) )
+			);
+		case '/wp/v2/media?search=&per_page=3':
+			return Promise.resolve( [] );
+		case '/wp/v2/media?search=&per_page=20':
+			return Promise.resolve( [
+				{
+					id: 54,
+					title: {
+						rendered: 'Some Test Media Title',
 					},
-				] );
-			case '/wp/v2/search?search=&per_page=20&type=term':
-			case '/wp/v2/search?search=cat&per_page=20&type=term&subtype=category':
-				return Promise.resolve( [
-					{
-						id: 9,
-						title: 'Cats',
-						url: 'http://wordpress.local/category/cats/',
-						type: 'category',
-					},
-					{
-						id: 1,
-						title: 'Uncategorized',
-						url: 'http://wordpress.local/category/uncategorized/',
-						type: 'category',
-					},
-				] );
-			case '/wp/v2/search?search=&per_page=20&type=post-format':
-				return Promise.resolve( [
-					{
-						id: 'gallery',
-						title: 'Gallery',
-						url: 'http://wordpress.local/type/gallery/',
-						type: 'post-format',
-						kind: 'taxonomy',
-					},
-					{
-						id: 'quote',
-						title: 'Quote',
-						url: 'http://wordpress.local/type/quote/',
-						type: 'post-format',
-						kind: 'taxonomy',
-					},
-				] );
-			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 11,
-						title: 'Limit Case',
-						url: 'http://wordpress.local/limit-case/',
-						type: 'post',
-						subtype: 'page',
-					},
-				] );
-			case '/wp/v2/search?search=&page=11&per_page=20&type=post&subtype=page':
-				return Promise.resolve( [
-					{
-						id: 22,
-						title: 'Page Case',
-						url: 'http://wordpress.local/page-case/',
-						type: 'post',
-						subtype: 'page',
-					},
-				] );
-			case '/wp/v2/search?search=few%20notes&per_page=20&type=post':
-				return Promise.resolve( [
-					...Array.from( { length: 5 }, ( _, index ) => ( {
-						id: 600 + index,
-						title: `Few Notes ${ index }`,
-						url: `http://wordpress.local/few-notes-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) ),
-					// Holds neither word; WordPress matched a body.
-					...Array.from( { length: 30 }, ( _, index ) => ( {
-						id: 800 + index,
-						title: `Unrelated ${ index }`,
-						url: `http://wordpress.local/unrelated-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) ),
-				] );
-			case '/wp/v2/search?search=few%20notes&per_page=20&type=term':
-				return Promise.resolve(
-					Array.from( { length: 5 }, ( _, index ) => ( {
-						// Holds "notes" but not "few".
-						id: 700 + index,
-						title: `Notes ${ index }`,
-						url: `http://wordpress.local/notes-${ index }/`,
-						type: 'category',
-					} ) )
-				);
-			case '/wp/v2/search?search=few%20notes&per_page=20&type=post-format':
-			case '/wp/v2/media?search=few%20notes&per_page=20':
-				return Promise.resolve( [] );
-			case '/wp/v2/search?search=&per_page=3&type=post':
-				return Promise.resolve(
-					Array.from( { length: 3 }, ( _, index ) => ( {
-						id: 500 + index,
-						title: `Initial Page ${ index }`,
-						url: `http://wordpress.local/initial-page-${ index }/`,
-						type: 'post',
-						subtype: 'page',
-					} ) )
-				);
-			case '/wp/v2/search?search=&per_page=3&type=term':
-				return Promise.resolve(
-					Array.from( { length: 3 }, ( _, index ) => ( {
-						id: 510 + index,
-						title: `Initial Category ${ index }`,
-						url: `http://wordpress.local/initial-category-${ index }/`,
-						type: 'category',
-					} ) )
-				);
-			case '/wp/v2/search?search=&per_page=3&type=post-format':
-				return Promise.resolve(
-					Array.from( { length: 3 }, ( _, index ) => ( {
-						id: 520 + index,
-						title: `Initial Format ${ index }`,
-						url: `http://wordpress.local/initial-format-${ index }/`,
-						type: 'post-format',
-					} ) )
-				);
-			case '/wp/v2/media?search=&per_page=3':
-				return Promise.resolve( [] );
-			case '/wp/v2/media?search=&per_page=20':
-				return Promise.resolve( [
-					{
-						id: 54,
-						title: {
-							rendered: 'Some Test Media Title',
-						},
-						type: 'attachment',
-						source_url:
-							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
-					},
-				] );
-			default:
-				return Promise.resolve( [
-					{
-						id: -1,
-						title: 'missing case or failed',
-						url: path,
-						type: 'missing case or failed',
-					},
-				] );
-		}
-	} ),
-} ) );
+					type: 'attachment',
+					source_url:
+						'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+				},
+			] );
+		default:
+			return Promise.resolve( [
+				{
+					id: -1,
+					title: 'missing case or failed',
+					url: path,
+					type: 'missing case or failed',
+				},
+			] );
+	}
+}
 
 describe( 'fetchLinkSuggestions', () => {
+	beforeEach( () => {
+		vi.mocked( apiFetch ).mockImplementation( search );
+	} );
+
 	it( 'filters suggestions by post-type', () => {
 		return fetchLinkSuggestions( 'Contact', {
 			type: 'post',
