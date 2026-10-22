@@ -107,6 +107,12 @@ export type IframeProps = IframeHTMLAttributes< HTMLIFrameElement > & {
 	 * Whether the content is read only.
 	 */
 	readonly?: boolean;
+	/**
+	 * Let the closest scrollable ancestor scroll the document, through a
+	 * spacer as tall as the document. The iframe itself stays one window
+	 * tall, so `vh` means the same as on the front end.
+	 */
+	fitContent?: boolean;
 	forwardedRef?: ForwardedRef< HTMLIFrameElement >;
 };
 

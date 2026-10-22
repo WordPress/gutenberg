@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { getScrollContainer } from '@wordpress/dom';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -165,6 +166,7 @@ function Iframe( {
 	scale = 1,
 	frameSize = 0,
 	readonly,
+	fitContent = false,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
 	...props
@@ -309,6 +311,102 @@ function Iframe( {
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 
+	// `vh` is the iframe's layout viewport, so an iframe that grows to its
+	// content makes a 100vh Cover block grow the iframe forever. Instead the
+	// iframe stays one window tall (`height: 100vh`, see style.scss) and is
+	// sticky inside the container, which is a spacer as tall as the document.
+	// As the ancestor scrolls through the spacer, the iframe stays put and the
+	// document inside it scrolls by the same amount. Once the spacer ends the
+	// iframe scrolls away with it, and whatever follows (the meta boxes) comes
+	// into view.
+	const fitContentRef = useRefEffect< HTMLElement >(
+		( body ) => {
+			if ( ! fitContent ) {
+				return;
+			}
+			const { ownerDocument } = body;
+			// The body lives in the iframe document, which has a window and a frame.
+			const defaultView = ownerDocument.defaultView!;
+			const iframe = defaultView.frameElement!;
+			const container = iframe.closest(
+				'.block-editor-iframe__container'
+			) as HTMLElement;
+			// Standards mode, so the document element is the scrolling element,
+			// and it has a style. `scrollingElement` is only typed as `Element`.
+			const scrollingElement = ownerDocument.documentElement;
+			// The ancestor's scrollbar is the only one. The document still
+			// scrolls when `scrollTop` is set.
+			const { overflow } = scrollingElement.style;
+			scrollingElement.style.overflow = 'hidden';
+
+			// How far the ancestor has scrolled into the spacer: the distance
+			// the sticky iframe has moved from the top of the spacer.
+			const scrolledIntoSpacer = () =>
+				iframe.getBoundingClientRect().top -
+				container.getBoundingClientRect().top;
+
+			const resize = () => {
+				container.style.height = `${ scrollingElement.scrollHeight }px`;
+			};
+
+			// The ancestor scrolled, so the document scrolls by the same amount.
+			let synced = 0;
+			const followAncestor = () => {
+				scrollingElement.scrollTop = scrolledIntoSpacer();
+				synced = scrollingElement.scrollTop;
+			};
+
+			// The document scrolled on its own (a block scrolled into view, or
+			// it scrolled before it was fit), so the ancestor scrolls until the
+			// spacer is scrolled into by that amount instead.
+			const followDocument = () => {
+				const { scrollTop } = scrollingElement;
+				if ( scrollTop === synced ) {
+					return;
+				}
+				const scroller = getScrollContainer( container );
+				if ( scroller ) {
+					scroller.scrollBy(
+						0,
+						container.getBoundingClientRect().top -
+							scroller.getBoundingClientRect().top +
+							scrollTop
+					);
+				}
+			};
+
+			resize();
+			followDocument();
+			followAncestor();
+
+			const observer = new defaultView.ResizeObserver( () => {
+				resize();
+				followAncestor();
+			} );
+			observer.observe( body );
+			// Capture catches whichever ancestor scrolls.
+			iframe.ownerDocument.addEventListener(
+				'scroll',
+				followAncestor,
+				true
+			);
+			// The document's own scroll events target the document.
+			ownerDocument.addEventListener( 'scroll', followDocument );
+			return () => {
+				observer.disconnect();
+				iframe.ownerDocument.removeEventListener(
+					'scroll',
+					followAncestor,
+					true
+				);
+				ownerDocument.removeEventListener( 'scroll', followDocument );
+				scrollingElement.style.overflow = overflow;
+				container.style.height = '';
+			};
+		},
+		[ fitContent ]
+	);
+
 	const unguardedBodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		// `useMergeRefs` skips unset refs.
@@ -316,6 +414,7 @@ function Iframe( {
 		writingFlowRef,
 		disabledRef,
 		scaleContentRef,
+		fitContentRef,
 	] );
 
 	// Attach the body ref only when the iframe document and window are available.
@@ -412,7 +511,13 @@ function Iframe( {
 	);
 
 	return (
-		<div className="block-editor-iframe__container" ref={ containerRef }>
+		<div
+			className={ clsx(
+				'block-editor-iframe__container',
+				fitContent && 'is-fit-content'
+			) }
+			ref={ containerRef }
+		>
 			<div
 				className={ clsx(
 					'block-editor-iframe__scale-container',
