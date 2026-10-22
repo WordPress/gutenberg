@@ -2,7 +2,7 @@ import { useCallback } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { getGridItemBox } from './free-placement';
+import { GRID_PLACEMENT_KEYS, getGridItemBox } from './free-placement';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getUpdatedChildLayoutStyle,
@@ -12,8 +12,6 @@ import { isGridStackedOnMobile } from './mobile-stacking';
 import { getComputedCSS, isGridElementWithFixedCells } from './utils';
 import { getColumnCountChangeUpdates } from './remap-grid-placements';
 import type { GridPlacement } from './free-placement';
-
-const PLACEMENT_KEYS = [ 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' ];
 
 type GridLayout = Record< string, any >;
 
@@ -139,7 +137,7 @@ export function useChangeGridColumnCount( clientId?: string ) {
 					const viewportLayout = hasViewportBlockStyleState( state )
 						? child.style?.[ state.viewport ]?.layout
 						: undefined;
-					const ownsPlacement = PLACEMENT_KEYS.some( ( key ) =>
+					const ownsPlacement = GRID_PLACEMENT_KEYS.some( ( key ) =>
 						Object.hasOwn( viewportLayout ?? {}, key )
 					);
 					// Viewports that use the default place follow it.
