@@ -488,7 +488,13 @@ if ( ! class_exists( 'WP_Entity_Fields_Registry' ) ) {
 			$this->initialize();
 			return array_map(
 				static function ( $entities ) {
-					return array_map( 'array_keys', $entities );
+					return array_map(
+						static function ( $modules ) {
+							// A numeric module id is an integer as an array key.
+							return array_map( 'strval', array_keys( $modules ) );
+						},
+						$entities
+					);
 				},
 				$this->field_modules
 			);

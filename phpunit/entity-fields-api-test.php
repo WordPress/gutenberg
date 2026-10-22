@@ -1564,6 +1564,18 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A numeric script module id is read back as a string, like any other,
+	 * not as the integer its array key becomes.
+	 */
+	public function test_a_numeric_module_id_is_read_as_a_string() {
+		$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) ), '42' );
+
+		$modules = wp_get_all_registered_entity_field_modules()['postType']['page'];
+		$this->assertContains( '42', $modules );
+		$this->assertContainsOnly( 'string', $modules );
+	}
+
+	/**
 	 * A field whose `type` DataViews does not provide renders without a
 	 * control, so it is reported, and registered anyway. A field without a
 	 * `type` is not reported.
