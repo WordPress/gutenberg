@@ -13,7 +13,8 @@
 
 @mixin menu-item {
 	&:is(:hover, :focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"], [aria-expanded="true"]) {
-		@include highlight;
+		// Popup colors take precedence over the underlying Button variant.
+		@include highlight(!important);
 
 		.components-menu-item__info {
 			color: inherit;
@@ -21,8 +22,8 @@
 	}
 
 	&[aria-expanded="true"]:not(:disabled, [aria-disabled="true"]) {
-		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active) !important;
+		color: var(--wpds-color-foreground-interactive-neutral-active) !important;
 		outline: none;
 		box-shadow: none;
 
