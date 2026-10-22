@@ -1,0 +1,49 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-block-html-modal {
+	z-index: z-index(".block-editor-block-html-modal");
+
+	// The modal caps its own height, so this makes it as tall as it allows,
+	// giving long markup room even when the block's HTML is short.
+	.components-modal__frame {
+		@include break-small() {
+			height: 9999rem;
+		}
+	}
+
+	.components-modal__children-container {
+		height: 100%;
+	}
+}
+
+.block-editor-block-html-modal__content {
+	height: 100%;
+}
+
+.block-editor-block-html-modal__textarea {
+	display: block;
+	margin: 0;
+	padding: $grid-unit-15;
+	width: 100%;
+	flex: 1;
+	min-height: $grid-unit-80 * 2;
+	border: none;
+	border-radius: $radius-small;
+	box-sizing: border-box;
+	box-shadow: inset 0 0 0 $border-width $gray-600;
+	resize: none;
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	line-height: 1.5;
+	// HTML input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
+
+	&:focus {
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+}

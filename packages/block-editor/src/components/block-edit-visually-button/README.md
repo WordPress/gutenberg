@@ -1,12 +1,14 @@
 # Block Edit Visually Button
 
-`BlockEditVisuallyButton` renders the toolbar button that takes a block out of the HTML editor and back to the visual editor. It is the toolbar counterpart of the "Edit as HTML" / "Edit visually" item that [`BlockSettingsMenu`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu/README.md) renders, and it exists so that a block being edited as HTML always offers a visible way back without opening the settings menu.
+`BlockEditVisuallyButton` renders the toolbar buttons for a block being edited as HTML: one takes the block out of the HTML editor and back to the visual editor, and one opens the block's HTML in a larger editor. It is the toolbar counterpart of the "Edit as HTML" / "Edit visually" item that [`BlockSettingsMenu`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu/README.md) renders, and it exists so that a block being edited as HTML always offers a visible way back without opening the settings menu.
 
 _Note:_ This component is internal to the block editor and is not exported from `@wordpress/block-editor`. It is rendered by [`BlockToolbar`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md); it is documented here for contributors working on the block toolbar rather than as public API.
 
 ## Development guidelines
 
 The button renders only when a single block is selected and that block's mode is `html`, so it is safe to render unconditionally alongside the rest of the toolbar: with a multi-block selection, or with a block in visual mode, it returns `null`. Clicking it dispatches `toggleBlockMode` for the selected block, which flips the mode back to `visual`.
+
+Next to it, an "Expand HTML editor" button opens the block's HTML in a modal. The inline HTML editor is as wide as the block, which leaves little room for markup in narrow blocks such as a column, so the modal gives the same HTML the full dialog width. Its edits stay local to the modal until "Update" commits them through the same parsing and validation as the inline editor; "Cancel" discards them.
 
 Note that the two entry points are not gated the same way. The settings menu item is only rendered for a valid block that supports `html` editing while the `codeEditingEnabled` setting is on, whereas this button checks the block's mode alone. Whatever put the block into HTML mode, the toolbar button is there to bring it back.
 

@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	getBlockAttributes,
-	getBlockContent,
-	getBlockType,
-	getSaveContent,
-	validateBlock,
-} from '@wordpress/blocks';
+import { getBlockContent } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useNativeUndo } from '../../utils/native-undo';
+import getBlockHTMLUpdate from './get-block-html-update';
 import type { TreeBlock } from '../../store/types';
 
 function BlockHTML( { clientId }: { clientId: string } ) {
@@ -32,37 +27,17 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 	);
 
 	const onChange = () => {
-		const blockType = getBlockType( block.name );
+		const update = getBlockHTMLUpdate( block, html );
 
-		if ( ! blockType ) {
+		if ( ! update ) {
 			return;
 		}
 
-		const attributes = getBlockAttributes(
-			blockType,
-			html,
-			block.attributes
-		);
-
-		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
-		const content = html ? html : getSaveContent( blockType, attributes );
-		const [ isValid ] = html
-			? validateBlock( {
-					...block,
-					attributes,
-					originalContent: content,
-				} )
-			: [ true ];
-
-		updateBlock( clientId, {
-			attributes,
-			originalContent: content,
-			isValid,
-		} );
+		updateBlock( clientId, update );
 
 		// Ensure the state is updated if we reset so it displays the default content.
 		if ( ! html ) {
-			setHtml( content );
+			setHtml( update.originalContent );
 		}
 	};
 
