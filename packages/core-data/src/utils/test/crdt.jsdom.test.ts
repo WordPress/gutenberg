@@ -40,6 +40,13 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 				attributes: { content: { type: 'rich-text' } },
 			},
 			{
+				name: 'core/image',
+				attributes: {
+					url: { type: 'string' },
+					blob: { type: 'string', role: 'local' },
+				},
+			},
+			{
 				name: 'core/table',
 				attributes: {
 					hasFixedLayout: { type: 'boolean' },
@@ -1271,6 +1278,176 @@ describe( 'crdt', () => {
 
 			expect( changes.blocks ).toBeUndefined();
 			expect( changes.content ).toBeUndefined();
+		} );
+
+		describe( 'local block objects', () => {
+			const createLocalBlock = (
+				clientId: string,
+				content: string,
+				innerBlocks: Block[] = []
+			): Block => ( {
+				clientId,
+				name: 'core/paragraph',
+				attributes: {
+					content: RichTextData.fromHTMLString( content ),
+				},
+				innerBlocks,
+			} );
+
+			const getChanges = ( localBlocks: Block[] ) =>
+				getPostChangesFromCRDTDoc(
+					doc,
+					{ blocks: localBlocks } as unknown as Post,
+					defaultSyncedProperties
+				).blocks as Block[];
+
+			it( 'keeps the local objects of unchanged blocks and replaces changed ones', () => {
+				addBlockToDoc( map, 'block-1', 'Hello <strong>world</strong>' );
+				addBlockToDoc( map, 'block-2', 'Changed remotely' );
+				const localBlocks = [
+					createLocalBlock(
+						'block-1',
+						'Hello <strong>world</strong>'
+					),
+					createLocalBlock( 'block-2', 'Original' ),
+				];
+
+				const blocks = getChanges( localBlocks );
+
+				expect( blocks[ 0 ] ).toBe( localBlocks[ 0 ] );
+				expect( blocks[ 1 ] ).not.toBe( localBlocks[ 1 ] );
+				expect(
+					( blocks[ 1 ].attributes.content as RichTextData ).text
+				).toBe( 'Changed remotely' );
+			} );
+
+			it( 'compares rich-text values by their HTML, not their text', () => {
+				addBlockToDoc( map, 'block-1', '<em>Hello</em>' );
+				const localBlocks = [ createLocalBlock( 'block-1', 'Hello' ) ];
+
+				const blocks = getChanges( localBlocks );
+
+				expect( blocks[ 0 ] ).not.toBe( localBlocks[ 0 ] );
+				expect(
+					(
+						blocks[ 0 ].attributes.content as RichTextData
+					 ).toHTMLString()
+				).toBe( '<em>Hello</em>' );
+			} );
+
+			it( 'returns the local blocks when the document has the same blocks', () => {
+				addBlockToDoc( map, 'block-1', 'One' );
+				addBlockToDoc( map, 'block-2', 'Two' );
+				const localBlocks = [
+					createLocalBlock( 'block-1', 'One' ),
+					createLocalBlock( 'block-2', 'Two' ),
+				];
+
+				expect( getChanges( localBlocks ) ).toBe( localBlocks );
+			} );
+
+			it( 'does not reuse a local block with the same client ID but another name', () => {
+				addBlockToDoc( map, 'block-1', 'One', 'core/heading' );
+				const localBlocks = [ createLocalBlock( 'block-1', 'One' ) ];
+
+				const blocks = getChanges( localBlocks );
+
+				expect( blocks[ 0 ] ).not.toBe( localBlocks[ 0 ] );
+				expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+			} );
+
+			it( 'gives the ancestors of a changed inner block new objects but keeps their attributes', () => {
+				const createParagraph = (
+					clientId: string,
+					content: string
+				) => {
+					const block = createYMap< YBlockRecord >();
+					block.set( 'name', 'core/paragraph' );
+					block.set( 'clientId', clientId );
+					const attributes = new Y.Map();
+					attributes.set( 'content', new Y.Text( content ) );
+					block.set( 'attributes', attributes );
+					block.set( 'innerBlocks', new Y.Array() );
+					return block;
+				};
+				const group = createYMap< YBlockRecord >();
+				group.set( 'name', 'core/group' );
+				group.set( 'clientId', 'group' );
+				const groupAttributes = new Y.Map();
+				groupAttributes.set( 'tagName', 'section' );
+				group.set( 'attributes', groupAttributes );
+				const innerBlocks = new Y.Array< YBlock >();
+				innerBlocks.push( [
+					createParagraph( 'inner-1', 'Same' ),
+					createParagraph( 'inner-2', 'Changed' ),
+				] );
+				group.set( 'innerBlocks', innerBlocks );
+				const blocks = new Y.Array< YBlock >();
+				blocks.push( [ group ] );
+				map.set( 'blocks', blocks );
+
+				const localInner = [
+					createLocalBlock( 'inner-1', 'Same' ),
+					createLocalBlock( 'inner-2', 'Before' ),
+				];
+				const localGroup: Block = {
+					clientId: 'group',
+					name: 'core/group',
+					attributes: { tagName: 'section' },
+					innerBlocks: localInner,
+				};
+
+				const [ syncedGroup ] = getChanges( [ localGroup ] );
+
+				expect( syncedGroup ).not.toBe( localGroup );
+				expect( syncedGroup.attributes ).toBe( localGroup.attributes );
+				expect( syncedGroup.innerBlocks[ 0 ] ).toBe( localInner[ 0 ] );
+				expect( syncedGroup.innerBlocks[ 1 ] ).not.toBe(
+					localInner[ 1 ]
+				);
+			} );
+
+			it( 'ignores local attributes, which are never synced', () => {
+				const image = createYMap< YBlockRecord >();
+				image.set( 'name', 'core/image' );
+				image.set( 'clientId', 'image' );
+				const attributes = new Y.Map();
+				attributes.set( 'url', 'https://example.com/a.jpg' );
+				image.set( 'attributes', attributes );
+				image.set( 'innerBlocks', new Y.Array() );
+				const blocks = new Y.Array< YBlock >();
+				blocks.push( [ image ] );
+				map.set( 'blocks', blocks );
+				const localBlocks: Block[] = [
+					{
+						clientId: 'image',
+						name: 'core/image',
+						attributes: {
+							url: 'https://example.com/a.jpg',
+							blob: 'blob:https://example.com/1',
+						},
+						innerBlocks: [],
+					},
+				];
+
+				expect( getChanges( localBlocks ) ).toBe( localBlocks );
+			} );
+
+			it( 'serializes each local rich-text value at most once', () => {
+				addBlockToDoc( map, 'block-1', 'One' );
+				const localBlocks = [ createLocalBlock( 'block-1', 'One' ) ];
+				const toHTMLString = vi.spyOn(
+					localBlocks[ 0 ].attributes.content as RichTextData,
+					'toHTMLString'
+				);
+
+				getChanges( localBlocks );
+				getChanges( localBlocks );
+
+				expect( toHTMLString.mock.calls.length ).toBeLessThanOrEqual(
+					1
+				);
+			} );
 		} );
 	} );
 } );

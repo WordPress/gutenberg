@@ -3,6 +3,10 @@ import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
+	isShallowEqualArrays,
+	isShallowEqualObjects,
+} from '@wordpress/is-shallow-equal';
+import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
@@ -569,6 +573,96 @@ const withInnerBlocksRemoveCascade =
 	};
 
 /**
+ * Puts back the previous state's objects for blocks that a reset left
+ * unchanged, so that resetting to a tree that differs in one block (such as a
+ * remote edit in real-time collaboration) only gives that block and its
+ * ancestors new references, and the rest of the block list does not
+ * re-render.
+ *
+ * Runs after the controlled inner blocks are re-attached: their sub-trees
+ * already hold the previous entries, and a controlled block keeps its own
+ * entry only while its inner blocks still match.
+ *
+ * @param state    Previous state.
+ * @param newState State rebuilt from the reset blocks. Mutated in place.
+ */
+function keepUnchangedBlockReferences(
+	state: BlocksState,
+	newState: BlocksState
+) {
+	for ( const [ clientId, block ] of newState.byClientId ) {
+		const previous = state.byClientId.get( clientId );
+		if ( previous && isShallowEqualObjects( previous, block ) ) {
+			newState.byClientId.set( clientId, previous );
+		}
+	}
+	for ( const [ clientId, attributes ] of newState.attributes ) {
+		const previous = state.attributes.get( clientId );
+		if (
+			previous &&
+			attributes &&
+			isShallowEqualObjects( previous, attributes )
+		) {
+			newState.attributes.set( clientId, previous );
+		}
+	}
+	for ( const [ clientId, order ] of newState.order ) {
+		const previous = state.order.get( clientId );
+		if ( previous && isShallowEqualArrays( previous, order ) ) {
+			newState.order.set( clientId, previous );
+		}
+	}
+
+	// Bottom up: an entry is kept when its block and attributes were kept
+	// and its inner blocks resolve to the same entries as before. A changed
+	// entry is new to this reset, so it can be pointed at the kept entries.
+	const resolveTreeEntry = ( clientId: string ) => {
+		const next = newState.tree.get( clientId );
+		const previous = state.tree.get( clientId );
+		if ( ! next || next === previous ) {
+			return next;
+		}
+		const innerBlocks = ( newState.order.get( clientId ) ?? [] ).map(
+			( childId ) => resolveTreeEntry( childId ) as TreeBlock
+		);
+		const attributes = newState.attributes.get( clientId );
+		const isBlockUnchanged =
+			clientId === '' ||
+			( newState.byClientId.get( clientId ) ===
+				state.byClientId.get( clientId ) &&
+				( previous as TreeBlock | undefined )?.attributes ===
+					attributes );
+		if (
+			previous &&
+			isBlockUnchanged &&
+			isShallowEqualArrays( previous.innerBlocks, innerBlocks )
+		) {
+			newState.tree.set( clientId, previous );
+			return previous;
+		}
+		next.innerBlocks = innerBlocks;
+		if ( clientId !== '' ) {
+			( next as TreeBlock ).attributes = attributes!;
+		}
+		return next;
+	};
+	resolveTreeEntry( '' );
+
+	for ( const clientId of newState.controlledInnerBlocks ) {
+		const key = 'controlled||' + clientId;
+		const next = newState.tree.get( key );
+		const previous = state.tree.get( key );
+		if (
+			next &&
+			previous &&
+			isShallowEqualArrays( previous.innerBlocks, next.innerBlocks )
+		) {
+			newState.tree.set( key, previous );
+		}
+	}
+}
+
+/**
  * Higher-order reducer which targets the combined blocks reducer and handles
  * the `RESET_BLOCKS` action. When dispatched, this action will replace all
  * blocks that exist in the post, leaving blocks that exist only in state (e.g.
@@ -680,6 +774,10 @@ const withBlockReset =
 					continue;
 				}
 				newState.blockEditingModes.set( clientId, mode );
+			}
+
+			if ( state?.tree ) {
+				keepUnchangedBlockReferences( state, newState );
 			}
 
 			return newState;

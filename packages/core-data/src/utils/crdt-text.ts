@@ -2,6 +2,27 @@ import { RichTextData } from '@wordpress/rich-text';
 
 const RICH_TEXT_CACHE_MAX_SIZE = 500;
 
+// Rich-text values are immutable, so their HTML can be kept for their lifetime.
+const richTextHTML = new WeakMap< RichTextData, string >();
+
+/**
+ * Returns the HTML of a rich-text value, serializing each value at most once.
+ * Values from `getCachedRichTextData` return the string they were built from.
+ *
+ * @param value Rich-text value.
+ * @return The HTML string.
+ */
+export function getRichTextHTML( value: RichTextData ): string {
+	let html = richTextHTML.get( value );
+
+	if ( html === undefined ) {
+		html = value.toHTMLString();
+		richTextHTML.set( value, html );
+	}
+
+	return html;
+}
+
 /**
  * Returns a function that converts HTML strings to RichTextData instances,
  * using a FIFO cache bounded by `maxSize` to avoid re-parsing identical
@@ -24,6 +45,7 @@ export function createRichTextDataCache(
 		}
 
 		const result = RichTextData.fromHTMLString( value );
+		richTextHTML.set( result, value );
 
 		if ( cache.size >= maxSize ) {
 			// Evict the oldest entry (Map preserves insertion order).

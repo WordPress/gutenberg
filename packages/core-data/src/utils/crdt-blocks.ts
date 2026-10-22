@@ -11,7 +11,7 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
-import { getCachedRichTextData } from './crdt-text';
+import { getCachedRichTextData, getRichTextHTML } from './crdt-text';
 import { Delta } from '../sync';
 import { type WPBlockSelection } from '../types';
 
@@ -195,18 +195,137 @@ function deserializeAttributeValue(
 }
 
 /**
- * Convert blocks from their CRDT-serialized form back to the runtime form
- * expected by the block editor. Rich-text attributes are stored as Y.Text in
- * the CRDT document, which serializes to plain strings via toJSON(). This
- * function restores them to RichTextData instances so that block edit
- * components that rely on RichTextData methods (e.g. `.text`) work correctly.
+ * Returns whether an attribute value read from the CRDT document matches a
+ * local attribute value, comparing rich-text values by their HTML.
  *
- * @param blocks Blocks as extracted from the CRDT document via toJSON().
- * @return Blocks with rich-text attributes restored to RichTextData.
+ * @param syncedValue Value from the CRDT document (toJSON).
+ * @param localValue  Value from the local block.
+ * @return Whether the values match.
  */
-export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
+function isSyncedValueEqual( syncedValue: unknown, localValue: unknown ) {
+	if ( localValue instanceof RichTextData ) {
+		return (
+			typeof syncedValue === 'string' &&
+			syncedValue === getRichTextHTML( localValue )
+		);
+	}
+
+	if ( syncedValue === localValue ) {
+		return true;
+	}
+
+	if ( Array.isArray( syncedValue ) ) {
+		return (
+			Array.isArray( localValue ) &&
+			syncedValue.length === localValue.length &&
+			syncedValue.every( ( item, index ) =>
+				isSyncedValueEqual( item, localValue[ index ] )
+			)
+		);
+	}
+
+	if (
+		syncedValue &&
+		localValue &&
+		typeof syncedValue === 'object' &&
+		typeof localValue === 'object' &&
+		! Array.isArray( localValue )
+	) {
+		const syncedObject = syncedValue as Record< string, unknown >;
+		const localObject = localValue as Record< string, unknown >;
+		const keys = Object.keys( syncedObject );
+		return (
+			keys.length === Object.keys( localObject ).length &&
+			keys.every( ( key ) =>
+				isSyncedValueEqual( syncedObject[ key ], localObject[ key ] )
+			)
+		);
+	}
+
+	return false;
+}
+
+/**
+ * Returns whether a block from the CRDT document has the same attributes as
+ * the local block. Local attributes are never synced, so they are ignored.
+ *
+ * @param name             Block name.
+ * @param syncedAttributes Attributes from the CRDT document (toJSON).
+ * @param localAttributes  Attributes of the local block.
+ * @return Whether the attributes match.
+ */
+function areSyncedAttributesEqual(
+	name: string,
+	syncedAttributes: BlockAttributes,
+	localAttributes: BlockAttributes
+) {
+	for ( const [ key, value ] of Object.entries( syncedAttributes ) ) {
+		if ( ! isSyncedValueEqual( value, localAttributes[ key ] ) ) {
+			return false;
+		}
+	}
+
+	for ( const [ key, value ] of Object.entries( localAttributes ) ) {
+		if (
+			! ( key in syncedAttributes ) &&
+			value !== undefined &&
+			! isLocalAttribute( name, key )
+		) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function deserializeBlocks(
+	blocks: Block[],
+	localBlocksByClientId: Map< string, Block >
+): Block[] {
 	return blocks.map( ( block: Block ) => {
 		const { name, innerBlocks, attributes, ...rest } = block;
+		const newInnerBlocks = deserializeBlocks(
+			innerBlocks ?? [],
+			localBlocksByClientId
+		);
+		const localBlock = block.clientId
+			? localBlocksByClientId.get( block.clientId )
+			: undefined;
+
+		if ( localBlock?.name === name ) {
+			const isSameAttributes = areSyncedAttributesEqual(
+				name,
+				attributes,
+				localBlock.attributes ?? {}
+			);
+			const localInnerBlocks = localBlock.innerBlocks ?? [];
+			const isSameBlock =
+				isSameAttributes &&
+				newInnerBlocks.length === localInnerBlocks.length &&
+				newInnerBlocks.every(
+					( innerBlock, index ) =>
+						innerBlock === localInnerBlocks[ index ]
+				) &&
+				Object.entries( rest ).every( ( [ key, value ] ) =>
+					fastDeepEqual(
+						value,
+						localBlock[ key as keyof typeof rest ]
+					)
+				);
+
+			if ( isSameBlock ) {
+				return localBlock;
+			}
+
+			if ( isSameAttributes ) {
+				return {
+					...rest,
+					name,
+					attributes: localBlock.attributes,
+					innerBlocks: newInnerBlocks,
+				};
+			}
+		}
 
 		const newAttributes = { ...attributes };
 
@@ -225,9 +344,46 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 			...rest,
 			name,
 			attributes: newAttributes,
-			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
+			innerBlocks: newInnerBlocks,
 		};
 	} );
+}
+
+/**
+ * Convert blocks from their CRDT-serialized form back to the runtime form
+ * expected by the block editor. Rich-text attributes are stored as Y.Text in
+ * the CRDT document, which serializes to plain strings via toJSON(). This
+ * function restores them to RichTextData instances so that block edit
+ * components that rely on RichTextData methods (e.g. `.text`) work correctly.
+ *
+ * Blocks that match a local block with the same client ID are returned as the
+ * local block, so a remote change only gives the blocks it touched new
+ * objects, and the block editor does not re-render the others.
+ *
+ * @param blocks      Blocks as extracted from the CRDT document via toJSON().
+ * @param localBlocks Blocks of the local record, reused where unchanged.
+ * @return Blocks with rich-text attributes restored to RichTextData.
+ */
+export function deserializeBlockAttributes(
+	blocks: Block[],
+	localBlocks: Block[] = []
+): Block[] {
+	const localBlocksByClientId = new Map< string, Block >();
+	const stack = [ ...localBlocks ];
+	while ( stack.length ) {
+		const block = stack.pop()!;
+		if ( block.clientId ) {
+			localBlocksByClientId.set( block.clientId, block );
+		}
+		stack.push( ...( block.innerBlocks ?? [] ) );
+	}
+
+	const result = deserializeBlocks( blocks, localBlocksByClientId );
+
+	return result.length === localBlocks.length &&
+		result.every( ( block, index ) => block === localBlocks[ index ] )
+		? localBlocks
+		: result;
 }
 
 /**
