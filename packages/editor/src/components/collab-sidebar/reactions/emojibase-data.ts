@@ -84,7 +84,7 @@ export interface EmojibaseDataResult extends EmojibaseDataState {
 
 /*
  * Locales Emojibase ships translated labels for. Must stay in sync with
- * `LOCALES` in `tools/build-scripts/copy-emojibase-data.mjs`.
+ * `LOCALES` in `tools/build-scripts/copy-emojibase-data.mts`.
  */
 export const EMOJIBASE_LOCALES = new Set( [
 	'bn',

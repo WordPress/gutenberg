@@ -1,7 +1,10 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Tooltip } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Tooltip,
+} from '@wordpress/ui';
 import type { EmojibaseEntry, EmojibaseSkin } from './emojibase-data';
 
 /**

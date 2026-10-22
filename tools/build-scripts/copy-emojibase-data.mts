@@ -27,7 +27,7 @@ const ROOT_DIR = path.resolve( __dirname, '../..' );
  */
 const SRC_DIR = resolveEmojibaseDir();
 
-function resolveEmojibaseDir() {
+function resolveEmojibaseDir(): string | null {
 	try {
 		return path.dirname( require.resolve( 'emojibase-data/package.json' ) );
 	} catch {
