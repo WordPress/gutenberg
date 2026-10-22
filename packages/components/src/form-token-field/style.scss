@@ -175,8 +175,6 @@
 
 // Suggestion list
 .components-form-token-field__suggestions-list {
-	background-color: var(--wpds-color-background-surface-neutral-strong);
-	box-sizing: border-box;
 	flex: 1 0 100%;
 	min-width: 100%;
 	max-height: $grid-unit-80 * 2;
@@ -189,14 +187,12 @@
 	list-style: none;
 	box-shadow: inset 0 $border-width 0 0 $gray-600; // Matches the border color of the input.
 	margin: 0;
-	padding: var(--wpds-dimension-padding-xs);
-	scroll-padding: var(--wpds-dimension-padding-xs);
+	padding: 0;
 }
 
 .components-form-token-field__suggestion {
 	border-radius: var(--wpds-border-radius-sm);
-	scroll-margin: var(--wpds-dimension-padding-xs);
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	display: block;
 	font-size: $default-font-size;
 	padding: $grid-unit-10 $grid-unit-15;
@@ -204,20 +200,19 @@
 	margin: 0;
 	box-sizing: border-box;
 
-	&:is(:hover, .is-selected):not([aria-disabled="true"]) {
+	&:is(:hover, .is-selected):not([aria-disabled="true"], .is-empty) {
 		@include composite-item.highlight;
-	}
-
-	[data-keyboard-navigation] &.is-selected {
-		@include composite-item.focus;
 	}
 
 	&[aria-disabled="true"] {
 		pointer-events: none;
-		color: $gray-600;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 		&.is-selected {
 			background: var(--wpds-color-background-interactive-neutral-weak-disabled);
+			@include outset-ring__focus;
+			// Keep the outline inside the scrollable suggestion list.
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 	}
 
