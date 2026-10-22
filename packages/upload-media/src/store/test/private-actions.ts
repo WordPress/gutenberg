@@ -1236,10 +1236,13 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'generateThumbnails (source-format original sideload)', () => {
-		function runGenerate( item ) {
-			const dispatchFn = vi.fn();
-			dispatchFn.finishOperation = vi.fn();
-			dispatchFn.addSideloadItem = vi.fn();
+		function runGenerate(
+			item: { id: string } & Record< string, unknown >
+		) {
+			const dispatchFn = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				addSideloadItem: vi.fn(),
+			} );
 			const select = {
 				getItem: () => item,
 				getSettings: () => ( {} ),
@@ -1247,7 +1250,7 @@ describe( 'private actions', () => {
 			return generateThumbnails( item.id )( {
 				select,
 				dispatch: dispatchFn,
-			} ).then( () => dispatchFn );
+			} as unknown as ThunkArgs ).then( () => dispatchFn );
 		}
 
 		/*
