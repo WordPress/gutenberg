@@ -6,6 +6,7 @@ import type { Block } from '@wordpress/blocks';
 import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
+	BoundInnerBlocks,
 	InsertionPoint,
 	LastFocus,
 	RemovalPromptMessage,
@@ -639,4 +640,56 @@ export function setResponsiveEditing( enabled: boolean ) {
 		type: 'SET_RESPONSIVE_EDITING',
 		enabled,
 	};
+}
+
+/**
+ * Switches whether a block's inner blocks are controlled, for a block whose
+ * inner blocks are bound to a source. While bound, the block's own inner blocks
+ * remain the ones its parents see, as the binding's fallback.
+ *
+ * @param clientId         The block's client ID.
+ * @param boundInnerBlocks The binding, or `false` to release the block.
+ *
+ * @return Action object.
+ */
+export function setHasBoundInnerBlocks(
+	clientId: string,
+	boundInnerBlocks: BoundInnerBlocks | false
+) {
+	return {
+		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+		clientId,
+		hasControlledInnerBlocks: !! boundInnerBlocks,
+		boundInnerBlocks: boundInnerBlocks || undefined,
+	};
+}
+
+/**
+ * Updates the binding of a block whose inner blocks are bound to a source.
+ *
+ * @param clientId         The block's client ID.
+ * @param boundInnerBlocks The binding.
+ *
+ * @return Action object.
+ */
+export function updateBoundInnerBlocks(
+	clientId: string,
+	boundInnerBlocks: BoundInnerBlocks
+) {
+	return {
+		type: 'UPDATE_BOUND_INNER_BLOCKS',
+		clientId,
+		boundInnerBlocks,
+	};
+}
+
+/**
+ * Marks the next change as derived from the previous one, e.g. writing bound
+ * inner blocks back to their source: it takes the previous change's
+ * persistence, and doesn't interrupt its coalescing.
+ *
+ * @return Action object.
+ */
+export function markNextChangeAsDerived() {
+	return { type: 'MARK_NEXT_CHANGE_AS_DERIVED' };
 }

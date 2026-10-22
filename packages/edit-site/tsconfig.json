@@ -27,7 +27,7 @@
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
-		{ "path": "../patterns" },
+		{ "path": "../patterns/tsconfig.build.json" },
 		{ "path": "../plugins" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },

@@ -7,6 +7,58 @@ const PATTERN_OVERRIDES_SOURCE = 'core/pattern-overrides';
 const EMPTY_CONTEXT: Record< string, unknown > = {};
 
 /**
+ * The reserved binding key that binds a block's inner blocks, rather than an
+ * attribute, to a source. Its value is serialized block markup: a string
+ * replaces the block's inner blocks, `''` empties them, and anything else
+ * falls back to the block's own inner blocks.
+ */
+export const INNER_BLOCKS_BINDING_KEY = 'innerBlocks';
+
+/**
+ * Sources whose values are attribute values, which can't bind inner blocks.
+ */
+const SOURCES_WITHOUT_INNER_BLOCKS = [
+	'core/post-meta',
+	'core/post-data',
+	'core/term-data',
+];
+
+/**
+ * Returns a block's inner blocks binding, if a source can bind them.
+ *
+ * @param bindings A block's bindings from the metadata attribute.
+ *
+ * @return The inner blocks binding.
+ */
+export function getInnerBlocksBinding(
+	bindings: Bindings | undefined | null
+): Binding | undefined {
+	const binding = bindings?.[ INNER_BLOCKS_BINDING_KEY ];
+	if (
+		typeof binding?.source !== 'string' ||
+		SOURCES_WITHOUT_INNER_BLOCKS.includes( binding.source )
+	) {
+		return undefined;
+	}
+	return binding;
+}
+
+/**
+ * Returns whether a source value for inner blocks is one: either `''`, or
+ * serialized block markup.
+ *
+ * @param value The source value.
+ *
+ * @return Whether the value replaces the block's own inner blocks.
+ */
+export function isInnerBlocksBindingValue( value: unknown ): value is string {
+	return (
+		typeof value === 'string' &&
+		( value === '' || /^[ \t\n\f\r]*<!-- wp:/.test( value ) )
+	);
+}
+
+/**
  * Assembles the context made available to a block's bindings sources: the
  * entries of the surrounding block context declared by the block type's
  * `usesContext`, plus the entries declared by the given sources' `usesContext`.
@@ -89,7 +141,11 @@ export function replacePatternOverridesDefaultBinding(
 	}
 
 	const bindingsWithDefaults: Bindings = {};
-	for ( const attributeName of supportedAttributes ) {
+	for ( const attributeName of supportedAttributes ?? [] ) {
+		// Inner blocks are only bound explicitly.
+		if ( attributeName === INNER_BLOCKS_BINDING_KEY ) {
+			continue;
+		}
 		// If the block has mixed binding sources, retain any non pattern override bindings.
 		const bindingSource = bindings[ attributeName ]
 			? bindings[ attributeName ]

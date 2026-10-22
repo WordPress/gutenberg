@@ -1,7 +1,11 @@
 import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { PATTERN_SYNC_TYPES } from '../constants';
+import { parseInnerBlocksOverride } from '../api';
+import {
+	PATTERN_OVERRIDES_BINDING_SOURCE,
+	PATTERN_SYNC_TYPES,
+} from '../constants';
 
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
@@ -90,7 +94,9 @@ export const convertSyncedPatternToStatic =
 		function cloneBlocksAndRemoveBindings( blocks ) {
 			return blocks.map( ( block ) => {
 				let metadata = block.attributes.metadata;
+				let overriddenInnerBlocks;
 				if ( metadata ) {
+					const { bindings } = metadata;
 					metadata = { ...metadata };
 					delete metadata.id;
 					delete metadata.bindings;
@@ -100,8 +106,9 @@ export const convertSyncedPatternToStatic =
 						for ( const [ attributeName, value ] of Object.entries(
 							existingOverrides[ metadata.name ]
 						) ) {
-							// Skip if the attribute does not exist in the block type.
+							// Skip the inner blocks, and attributes that don't exist in the block type.
 							if (
+								attributeName === 'innerBlocks' ||
 								! getBlockType( block.name )?.attributes[
 									attributeName
 								]
@@ -110,6 +117,14 @@ export const convertSyncedPatternToStatic =
 							}
 							// Update the block attribute with the override value.
 							block.attributes[ attributeName ] = value;
+						}
+						if (
+							bindings?.innerBlocks?.source ===
+							PATTERN_OVERRIDES_BINDING_SOURCE
+						) {
+							overriddenInnerBlocks = parseInnerBlocksOverride(
+								existingOverrides[ metadata.name ].innerBlocks
+							);
 						}
 					}
 				}
@@ -121,7 +136,10 @@ export const convertSyncedPatternToStatic =
 								? metadata
 								: undefined,
 					},
-					cloneBlocksAndRemoveBindings( block.innerBlocks )
+					// The overridden inner blocks hold their own values, so the
+					// other overrides of the instance don't apply to them.
+					overriddenInnerBlocks ??
+						cloneBlocksAndRemoveBindings( block.innerBlocks )
 				);
 			} );
 		}

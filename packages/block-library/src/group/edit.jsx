@@ -57,6 +57,11 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+	// Inner blocks bound to a source are an area of content, not an empty
+	// group to set up.
+	const hasBoundInnerBlocks =
+		!! window.__experimentalInnerBlocksBindings &&
+		!! attributes.metadata?.bindings?.innerBlocks;
 
 	const {
 		tagName: TagName = 'div',
@@ -77,7 +82,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const [ showPlaceholder, setShowPlaceholder ] = useShouldShowPlaceHolder( {
 		attributes,
 		usedLayoutType: type,
-		hasInnerBlocks,
+		hasInnerBlocks: hasInnerBlocks || hasBoundInnerBlocks,
 	} );
 
 	// Default to the regular appender being rendered.
@@ -88,7 +93,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		// state so that blocks can dragged onto the placeholder area
 		// from both the list view and in the editor canvas.
 		renderAppender = false;
-	} else if ( ! hasInnerBlocks ) {
+	} else if ( ! hasInnerBlocks && ! hasBoundInnerBlocks ) {
 		// When there is no placeholder, but the block is also empty,
 		// use the larger button appender.
 		renderAppender = InnerBlocks.ButtonBlockAppender;
