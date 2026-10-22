@@ -31,7 +31,9 @@ export const createPattern =
 
 		const updatedRecord = await registry
 			.dispatch( coreStore )
-			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
+			.saveEntityRecord( 'postType', 'wp_block', reusableBlock, {
+				throwOnError: true,
+			} );
 
 		return updatedRecord;
 	};
