@@ -61,7 +61,7 @@ const singleSelectCallback = vi.fn();
 const singleSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
-		label: 'Confirm...',
+		label: 'Confirm…',
 		supportsBulk: false,
 		isPrimary: true,
 		callback: singleSelectCallback,
