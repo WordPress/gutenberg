@@ -177,6 +177,27 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 			}
 		}
 
+		// With "Enlarge on click" the caption is laid over an image that opens
+		// a lightbox, and the lightbox opens from a click on the image itself.
+		// A caption long enough to cover the image took every one of those
+		// clicks, leaving no way to open it. Let the whole caption click
+		// through to the image, as the scrim above already does, so the tile
+		// is one surface that carries the zoom cursor throughout: choosing the
+		// lightbox is choosing to make the image interactive, and the caption
+		// is read in the lightbox, where it is legible and selectable, rather
+		// than in a thumbnail-sized scrolling box. This takes in any link the
+		// caption holds, which is not clickable here for the same reason.
+		//
+		// The rounded and bordered styles below put the caption underneath the
+		// image rather than over it, where it covers nothing and there is
+		// nothing to click through to, so they are left alone.
+		// `wp-lightbox-container` is added when the block is rendered, so
+		// captions in the editor, and in galleries without the lightbox, keep
+		// their own pointer events too.
+		&.wp-lightbox-container:not(.is-style-rounded):not(.has-custom-border) figcaption {
+			pointer-events: none;
+		}
+
 		&.has-custom-border img {
 			box-sizing: border-box;
 		}
