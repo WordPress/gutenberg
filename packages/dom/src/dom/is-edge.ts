@@ -118,22 +118,6 @@ export default function isEdge(
 	// viewport when the selection is.
 	const y = isReverse ? rangeRect.top + 1 : rangeRect.bottom - 1;
 
-	// The test point can only be hit-tested when it is within the viewport
-	// (`caretRangeFromPoint` returns nothing for a point outside it, upon
-	// which `scrollIfNoRange` scrolls the container's edge into view to
-	// measure, e.g. on every arrow press within a container wider than the
-	// viewport). When the edge is outside the viewport and the selection is
-	// within it, they are at least a viewport boundary apart, so the
-	// selection cannot be at the edge.
-	const isFarFromHorizontalEdge =
-		( x < 0 || x > defaultView.innerWidth ) &&
-		rangeRect.left >= 0 &&
-		rangeRect.right <= defaultView.innerWidth;
-
-	if ( ! onlyVertical && isFarFromHorizontalEdge ) {
-		return false;
-	}
-
 	const testRange = scrollIfNoRange( container, isReverse, () =>
 		hiddenCaretRangeFromPoint( ownerDocument, x, y, container )
 	);
