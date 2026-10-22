@@ -5,7 +5,7 @@ import { Radio } from '../';
 import * as Field from '../../field';
 import * as Fieldset from '../../fieldset';
 import { RadioGroup } from '../../radio-group';
-import styles from './radio-card.module.css';
+import styles from './radio-card.module.scss';
 
 const meta: Meta< typeof Radio > = {
 	tags: [ 'manifest' ],
@@ -85,9 +85,10 @@ export const DisabledChecked: Story = {
  *   the label, and sets `data-disabled` on the card.
  * - Style the checked card with `:has()` on the radio's `data-checked`
  *   attribute.
+ * - Move the focus ring from the radio to the card with `:has(:focus-visible)`.
  * - Do not put interactive elements inside the card.
  *
- * See `radio-card.module.css` in this story's folder for the styles.
+ * See `radio-card.module.scss` in this story's folder for the styles.
  */
 export const WithCard: Story = {
 	render: () => (
@@ -131,7 +132,10 @@ export const WithCard: Story = {
 								>
 									{ item.label }
 								</Field.Label>
-								<Radio value={ item.value } />
+								<Radio
+									value={ item.value }
+									className={ styles.radio }
+								/>
 							</Stack>
 							<Field.Description>
 								{ item.description }
