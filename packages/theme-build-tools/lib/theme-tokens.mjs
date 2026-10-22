@@ -12,8 +12,8 @@ import { createRequire } from 'node:module';
  */
 
 /**
- * Load `@wordpress/theme/design-tokens.js`, or return `undefined` when
- * `@wordpress/theme` is not installed.
+ * Load `@wordpress/theme/design-tokens.js`, or return `undefined` when it
+ * cannot be loaded.
  *
  * This loads the module synchronously, without a top-level `await`, so that
  * CommonJS consumers can still `require()` the plugins.
@@ -25,17 +25,8 @@ function loadDesignTokens() {
 		return createRequire( import.meta.url )(
 			'@wordpress/theme/design-tokens.js'
 		);
-	} catch ( error ) {
-		const { code, message } =
-			/** @type {{ code?: string, message?: string }} */ ( error );
-		const isThemeMissing =
-			( code === 'MODULE_NOT_FOUND' ||
-				code === 'ERR_MODULE_NOT_FOUND' ) &&
-			message?.includes( '@wordpress/theme' );
-		if ( isThemeMissing || code === 'ERR_PACKAGE_PATH_NOT_EXPORTED' ) {
-			return undefined;
-		}
-		throw error;
+	} catch {
+		return undefined;
 	}
 }
 
