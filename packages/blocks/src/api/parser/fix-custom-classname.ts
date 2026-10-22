@@ -28,10 +28,30 @@ export function getHTMLRootElementClasses( innerHTML: string ): string[] {
 }
 
 /**
+ * Given an HTML string, returns an array of every class name assigned to any
+ * element in the markup.
+ *
+ * @param html Markup string from which to extract classes.
+ *
+ * @return Array of class names, in order of appearance.
+ */
+function getAllElementClasses( html: string ): string[] {
+	const classes: string[] = [];
+	for ( const [ , value ] of html.matchAll( /\bclass="([^"]*)"/g ) ) {
+		classes.push( ...value.trim().split( /\s+/ ).filter( Boolean ) );
+	}
+	return classes;
+}
+
+/**
  * Given a parsed set of block attributes, if the block supports custom class
  * names and an unknown class (per the block's serialization behavior) is
  * found, the unknown classes are treated as custom classes. This prevents the
  * block from being considered as invalid.
+ *
+ * A class the block renders on a nested element is not unknown: an older
+ * version of the block may have rendered it on the root element instead, and
+ * treating it as a custom class would duplicate it there.
  *
  * @param blockAttributes Original block attributes.
  * @param blockType       Block type settings.
@@ -57,10 +77,13 @@ export function fixCustomClassname(
 		modifiedBlockAttributes;
 	const serialized = getSaveContent( blockType, attributesSansClassName );
 	const defaultClasses = getHTMLRootElementClasses( serialized );
+	const nestedClasses = getAllElementClasses( serialized );
 	const actualClasses = getHTMLRootElementClasses( innerHTML );
 
 	const customClasses = actualClasses.filter(
-		( className ) => ! defaultClasses.includes( className )
+		( className ) =>
+			! defaultClasses.includes( className ) &&
+			! nestedClasses.includes( className )
 	);
 
 	if ( customClasses.length ) {

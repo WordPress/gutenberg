@@ -5,10 +5,11 @@
 		"attributes": {
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
-			"caption": [],
-			"align": "left",
-			"width": 100,
-			"height": 100
+			"caption": "",
+			"width": "100px",
+			"height": "100px",
+			"isDecorative": false,
+			"align": "left"
 		},
 		"innerBlocks": []
 	}

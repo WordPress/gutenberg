@@ -15,6 +15,8 @@
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
+					"tagName": "a",
+					"type": "button",
 					"text": "My button 1"
 				},
 				"innerBlocks": []
@@ -23,6 +25,8 @@
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
+					"tagName": "a",
+					"type": "button",
 					"text": "My button 2"
 				},
 				"innerBlocks": []

@@ -751,16 +751,26 @@ export interface BlockType<
 export interface BlockDeprecation<
 	NewAttributes extends Record< string, unknown > = Record< string, unknown >,
 	OldAttributes extends Record< string, unknown > = Record< string, unknown >,
-> extends Pick<
-	BlockType< OldAttributes >,
-	'attributes' | 'save' | 'supports'
-> {
+> extends Pick< BlockType< OldAttributes >, 'attributes' | 'supports' > {
+	/**
+	 * The `save` function of the deprecated form of the block. A deprecation
+	 * without one is attribute-only: it never matches markup, and applies
+	 * when `isEligible` opts in and the markup generated from the migrated
+	 * attributes preserves the stored content.
+	 */
+	save?: BlockType< OldAttributes >[ 'save' ];
 	/**
 	 * A function which, given the attributes and inner blocks of the
 	 * parsed block, returns true if the deprecation can handle the
-	 * block migration.
+	 * block migration. The attributes are the raw block delimiter
+	 * attributes; the context carries the raw block node and the block as
+	 * parsed by the current block type (including `originalContent`).
 	 */
-	isEligible?: ( attributes: OldAttributes, innerBlocks: Block[] ) => boolean;
+	isEligible?: (
+		attributes: OldAttributes,
+		innerBlocks: Block[],
+		context: { blockNode: RawBlock; block: Block }
+	) => boolean;
 	/**
 	 * A function which, given the old attributes and inner blocks,
 	 * returns either the new attributes or a tuple of

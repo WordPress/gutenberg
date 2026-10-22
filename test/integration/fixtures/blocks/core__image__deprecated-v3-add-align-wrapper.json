@@ -3,12 +3,13 @@
 		"name": "core/image",
 		"isValid": true,
 		"attributes": {
-			"align": "left",
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
 			"caption": "",
 			"width": "100px",
-			"height": "100px"
+			"height": "100px",
+			"isDecorative": false,
+			"align": "left"
 		},
 		"innerBlocks": []
 	}

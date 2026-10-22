@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import '../../../store';
 import { applyBlockDeprecatedVersions } from '../apply-block-deprecated-versions';
+import { parseRawBlock } from '../index';
+import serialize from '../../serializer';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -286,5 +288,263 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		);
 
 		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
+	} );
+
+	describe( 'attribute-only deprecations (no `save`)', () => {
+		const rawBlock = {
+			attrs: { fruit: 'Bananas', size: 10 },
+			name: 'core/test-block',
+		};
+		// Old content stored `size` as a number; the current block type
+		// stores it as a string with a unit.
+		const attributeOnlyDeprecation = {
+			attributes: {
+				...defaultBlockSettings.attributes,
+				size: { type: 'number' },
+			},
+			isEligible: ( attributes ) => typeof attributes.size === 'number',
+			migrate: ( { size, ...attributes } ) => ( {
+				...attributes,
+				size: `${ size }px`,
+			} ),
+		};
+		const registerWithAttributeOnly = ( extra = {} ) =>
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					...defaultBlockSettings.attributes,
+					size: { type: 'string' },
+				},
+				deprecated: [ attributeOnlyDeprecation ],
+				...extra,
+			} );
+		const blockAtLevel = ( validationLevel, isValid ) =>
+			deepFreeze( {
+				name: 'core/test-block',
+				// The current schema dropped the numeric `size`.
+				attributes: { fruit: 'Bananas' },
+				originalContent: 'Bananas',
+				isValid,
+				validationLevel,
+			} );
+
+		it.each( [
+			[ 'valid', 0, true ],
+			[ 'reconstructed', 2, false ],
+			[ 'regenerated', 3, false ],
+		] )(
+			'should apply to a %s block when eligible',
+			( _label, validationLevel, isValid ) => {
+				const blockType = registerWithAttributeOnly();
+
+				const migratedBlock = applyBlockDeprecatedVersions(
+					blockAtLevel( validationLevel, isValid ),
+					rawBlock,
+					blockType
+				);
+
+				expect( migratedBlock.isValid ).toBe( true );
+				expect( migratedBlock.validationLevel ).toBe( 1 );
+				expect( migratedBlock.attributes ).toEqual( {
+					fruit: 'Bananas',
+					size: '10px',
+				} );
+			}
+		);
+
+		it( 'should apply to an invalid block when the migrated attributes preserve its content', () => {
+			// `text` moved from the markup to the delimiter: parsed through the
+			// current block type, old content loses its text and is invalid.
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: { text: { type: 'string' } },
+				save: ( { attributes } ) => <p>{ attributes.text }</p>,
+				deprecated: [
+					{
+						attributes: {
+							text: {
+								type: 'string',
+								source: 'html',
+								selector: 'p',
+							},
+						},
+						isEligible: ( attributes ) =>
+							attributes.text === undefined,
+					},
+				],
+			} );
+
+			const parsedBlock = parseRawBlock(
+				{
+					blockName: 'core/test-block',
+					attrs: {},
+					innerHTML: '<p>Hello</p>',
+					innerBlocks: [],
+					innerContent: [ '<p>Hello</p>' ],
+				},
+				{ __unstableSkipMigrationLogs: true }
+			);
+
+			expect( parsedBlock.isValid ).toBe( true );
+			expect( parsedBlock.validationLevel ).toBe( 1 );
+			expect( parsedBlock.attributes ).toEqual( { text: 'Hello' } );
+		} );
+
+		it( 'should not apply when the migrated attributes do not preserve the content', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: { text: { type: 'string' } },
+				save: ( { attributes } ) => <p>{ attributes.text }</p>,
+				deprecated: [
+					{
+						// Opts in, but sources nothing the current block type
+						// does not: the result would still lose the text.
+						attributes: { text: { type: 'string' } },
+						isEligible: () => true,
+						migrate: ( attributes ) => ( {
+							...attributes,
+							text: 'Replaced',
+						} ),
+					},
+				],
+			} );
+
+			const parsedBlock = parseRawBlock(
+				{
+					blockName: 'core/test-block',
+					attrs: {},
+					innerHTML: '<p>Hello</p>',
+					innerBlocks: [],
+					innerContent: [ '<p>Hello</p>' ],
+				},
+				{ __unstableSkipMigrationLogs: true }
+			);
+
+			expect( parsedBlock.isValid ).toBe( false );
+			expect( parsedBlock.validationLevel ).toBe( 4 );
+			expect( parsedBlock.attributes ).toEqual( {} );
+			// The block stays invalid, which the parser reports as usual.
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'should not apply when `isEligible` declines or is missing', () => {
+			const declining = registerWithAttributeOnly( {
+				deprecated: [
+					{ ...attributeOnlyDeprecation, isEligible: () => false },
+				],
+			} );
+			expect(
+				applyBlockDeprecatedVersions(
+					blockAtLevel( 2, false ),
+					rawBlock,
+					declining
+				).attributes
+			).toEqual( { fruit: 'Bananas' } );
+			unregisterBlockType( 'core/test-block' );
+
+			const { isEligible, ...withoutIsEligible } =
+				attributeOnlyDeprecation;
+			const missing = registerWithAttributeOnly( {
+				deprecated: [ withoutIsEligible ],
+			} );
+			expect(
+				applyBlockDeprecatedVersions(
+					blockAtLevel( 0, true ),
+					rawBlock,
+					missing
+				).attributes
+			).toEqual( { fruit: 'Bananas' } );
+		} );
+
+		it( 'should chain after a deprecation matched by markup', () => {
+			const blockType = registerWithAttributeOnly( {
+				deprecated: [
+					{
+						attributes: {
+							...defaultBlockSettings.attributes,
+							size: { type: 'number' },
+						},
+						save: ( { attributes } ) => (
+							<div>{ attributes.fruit }</div>
+						),
+					},
+					attributeOnlyDeprecation,
+				],
+			} );
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: { fruit: 'Bananas' },
+				originalContent: '<div>Bananas</div>',
+				isValid: false,
+				validationLevel: 4,
+			} );
+
+			const migratedBlock = applyBlockDeprecatedVersions(
+				block,
+				rawBlock,
+				blockType
+			);
+
+			expect( migratedBlock.validationLevel ).toBe( 1 );
+			expect( migratedBlock.attributes ).toEqual( {
+				fruit: 'Bananas',
+				size: '10px',
+			} );
+		} );
+
+		it( 'should migrate a regenerated block when parsing', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'p' },
+					size: { type: 'string' },
+				},
+				save: ( { attributes } ) => (
+					<p className="wp-block-test">{ attributes.content }</p>
+				),
+				deprecated: [
+					{
+						attributes: {
+							content: {
+								type: 'string',
+								source: 'html',
+								selector: 'p',
+							},
+							size: { type: 'number' },
+						},
+						isEligible: ( attributes ) =>
+							typeof attributes.size === 'number',
+						migrate: ( { size, ...attributes } ) => ( {
+							...attributes,
+							size: `${ size }px`,
+						} ),
+					},
+				],
+			} );
+
+			// The markup lacks the generated class (Level 2) and the
+			// delimiter carries the old numeric size.
+			const parsedBlock = parseRawBlock(
+				{
+					blockName: 'core/test-block',
+					attrs: { size: 10 },
+					innerHTML: '<p>Text</p>',
+					innerBlocks: [],
+					innerContent: [ '<p>Text</p>' ],
+				},
+				{ __unstableSkipMigrationLogs: true }
+			);
+
+			expect( parsedBlock.isValid ).toBe( true );
+			expect( parsedBlock.validationLevel ).toBe( 1 );
+			expect( parsedBlock.attributes ).toEqual( {
+				content: 'Text',
+				size: '10px',
+			} );
+			expect( serialize( [ parsedBlock ] ) ).toBe(
+				'<!-- wp:test-block {"size":"10px"} -->\n<p class="wp-block-test">Text</p>\n<!-- /wp:test-block -->'
+			);
+		} );
 	} );
 } );

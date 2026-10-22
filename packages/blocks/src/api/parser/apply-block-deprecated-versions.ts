@@ -19,7 +19,16 @@ function stubFalse(): boolean {
  * deprecated migrations applied, or the original block if it was both valid
  * and no eligible migrations exist.
  *
- * @param block     Parsed and invalid block object.
+ * A deprecation with a `save` function applies when its output matches the
+ * stored markup exactly, or, for a valid block, when its `isEligible` function
+ * opts in. A deprecation without a `save` function (an attribute-only
+ * deprecation) never matches markup: it applies when its `isEligible` function
+ * opts in and the markup the current block type generates from the migrated
+ * attributes preserves the stored content. Without a `save` signature nothing
+ * ties the stored markup to the deprecated schema, so the check happens on the
+ * result instead.
+ *
+ * @param block     Parsed block object, validated against the current block type.
  * @param rawBlock  Raw block object.
  * @param blockType Block type. This is normalize not necessary and
  *                  can be inferred from the block name,
@@ -46,12 +55,16 @@ export function applyBlockDeprecatedVersions(
 	// machine-specific code. An invalid block is thus a block that could not be
 	// matched successfully with any of the registered deprecation definitions.
 	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
-		// A block can opt into a migration even if the block is valid by
-		// defining `isEligible` on its deprecation. If the block is valid
-		// (Level 0 perfect match) and does not opt to migrate, skip.
-		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
+		const { isEligible = stubFalse, save } = deprecatedDefinitions[ i ];
+		const isAttributeOnly = ! save;
+
+		// A deprecation with a `save` function is tried by markup match on an
+		// invalid block, and on a valid block only when its `isEligible`
+		// function opts in. An attribute-only deprecation never matches
+		// markup: it applies only by opting in, and only if the block it
+		// produces preserves the stored content (checked below).
 		if (
-			block.isValid &&
+			( block.isValid || isAttributeOnly ) &&
 			! ( isEligible as Function )( parsedAttributes, block.innerBlocks, {
 				blockNode: rawBlock,
 				block,
@@ -85,32 +98,34 @@ export function applyBlockDeprecatedVersions(
 			),
 		};
 
-		let [ , , metadata ] = validateBlock(
-			migratedBlock,
-			deprecatedBlockType
-		);
-		let isValidDeprecation =
-			metadata.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
-
-		// If the migrated block is not valid initially, try the built-in fixes.
-		if ( ! isValidDeprecation ) {
-			migratedBlock = applyBuiltInValidationFixes(
+		if ( ! isAttributeOnly ) {
+			let [ , , metadata ] = validateBlock(
 				migratedBlock,
 				deprecatedBlockType
 			);
-			[ , , metadata ] = validateBlock(
-				migratedBlock,
-				deprecatedBlockType
-			);
-			isValidDeprecation =
+			let isValidDeprecation =
 				metadata.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
-		}
 
-		// An invalid block does not imply incorrect HTML but the fact block
-		// source information could be lost on re-serialization. We continue to
-		// the next deprecation to see if the block becomes valid.
-		if ( ! isValidDeprecation ) {
-			continue;
+			// If the migrated block is not valid initially, try the built-in fixes.
+			if ( ! isValidDeprecation ) {
+				migratedBlock = applyBuiltInValidationFixes(
+					migratedBlock,
+					deprecatedBlockType
+				);
+				[ , , metadata ] = validateBlock(
+					migratedBlock,
+					deprecatedBlockType
+				);
+				isValidDeprecation =
+					metadata.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
+			}
+
+			// An invalid block does not imply incorrect HTML but the fact block
+			// source information could be lost on re-serialization. We continue to
+			// the next deprecation to see if the block becomes valid.
+			if ( ! isValidDeprecation ) {
+				continue;
+			}
 		}
 
 		let migratedInnerBlocks = migratedBlock.innerBlocks;
@@ -132,6 +147,27 @@ export function applyBlockDeprecatedVersions(
 				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = block.innerBlocks,
 			] = migrated;
+		}
+
+		// An attribute-only deprecation has no `save` function to tie the
+		// stored markup to its attributes, so the check happens on its
+		// result: the markup the current block type generates from the
+		// migrated attributes must preserve the stored content (any level
+		// but invalid). This is what lets such a deprecation rescue an
+		// invalid block when its attributes source what the current ones no
+		// longer do, and what rejects an `isEligible` that opted in wrongly.
+		if ( isAttributeOnly ) {
+			const [ , , { validationLevel } ] = validateBlock(
+				{
+					...block,
+					attributes: migratedAttributes,
+					innerBlocks: migratedInnerBlocks,
+				},
+				blockType
+			);
+			if ( validationLevel === VALIDATION_LEVEL.INVALID_BLOCK ) {
+				continue;
+			}
 		}
 
 		block = {
