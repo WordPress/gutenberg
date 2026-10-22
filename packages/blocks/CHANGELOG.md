@@ -8,11 +8,11 @@
 -   `validateBlock`: Return a third tuple element with validation metadata (`validationLevel`, `originalContent`, `generatedContent`) ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
 -   Export the `VALIDATION_LEVEL` constants and the `ValidationLevel` and `ValidationMetadata` types ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
 -   `registerBlockType`: Add the `allowsReconstruction` setting, allowing a block type to opt out of automatic reconstruction so that only an exact match or a matching deprecation is accepted ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
--   Block deprecations may omit `save`. Such an attribute-only deprecation never matches markup: it applies when its `isEligible` function returns `true` and the markup generated from the migrated attributes preserves the stored content, re-parsing the block through the deprecation's `attributes` and running `migrate` ([#TODO](https://github.com/WordPress/gutenberg/pull/TODO)).
+-   Block deprecations may omit `save`. Such an attribute-only deprecation never matches markup: it applies when its `isEligible` function returns `true` and the markup generated from the migrated attributes preserves the stored content, re-parsing the block through the deprecation's `attributes` and running `migrate` ([#85387](https://github.com/WordPress/gutenberg/pull/85387)).
 
 ### Bug Fixes
 
--   When a block is regenerated, a class that the current `save` renders on a nested element is no longer treated as a custom class if an older version rendered it on the root element ([#TODO](https://github.com/WordPress/gutenberg/pull/TODO)).
+-   When a block is regenerated, a class that the current `save` renders on a nested element is no longer treated as a custom class if an older version rendered it on the root element ([#85387](https://github.com/WordPress/gutenberg/pull/85387)).
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 -   `isReusableBlock`, `isTemplatePart`: Accept any object with a name ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
 
