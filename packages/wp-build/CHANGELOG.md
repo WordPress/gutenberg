@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Run at most half as many esbuild builds at once as there are available CPU cores, which lowers peak build memory.
+-   Run at most half as many esbuild builds at once as there are available CPU cores, which lowers peak build memory ([#85371](https://github.com/WordPress/gutenberg/pull/85371)).
 
 ## 0.26.0 (2026-10-20)
 
