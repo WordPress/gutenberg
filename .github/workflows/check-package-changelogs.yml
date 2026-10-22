@@ -202,6 +202,8 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
             - name: Check CHANGELOG cites this PR
               env:
                   PR_NUMBER: ${{ github.event.number }}
@@ -260,6 +262,8 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
             - name: Validate touched CHANGELOG files
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}

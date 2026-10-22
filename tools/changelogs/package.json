@@ -5,6 +5,12 @@
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"changelog",
+		"changie"
+	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/changelogs",
 	"repository": {
 		"type": "git",
