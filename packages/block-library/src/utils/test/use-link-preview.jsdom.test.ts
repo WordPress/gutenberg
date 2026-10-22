@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { beforeEach, describe, expect, it, test, vi, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import {
@@ -6,33 +6,30 @@ import {
 	computeBadges,
 	isHomepage,
 	useLinkPreview,
-} from '../use-link-preview';
+} from '../link-picker';
+import type { unlock } from '../../lock-unlock';
 // Mock useRemoteUrlData from block-editor
 const mockUseRemoteUrlData = vi.fn();
 
 vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	privateApis: {},
-	store: {},
 } ) );
 
 // Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath
-vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: vi.fn( () => ( {
-		useRemoteUrlData: ( ...args ) => mockUseRemoteUrlData( ...args ),
-		isHashLink: ( url ) => url?.startsWith( '#' ),
-		isRelativePath: ( url ) =>
+vi.mock( import( '../../lock-unlock' ), () => ( {
+	unlock: ( () => ( {
+		useRemoteUrlData: ( ...args: unknown[] ) =>
+			mockUseRemoteUrlData( ...args ),
+		isHashLink: ( url?: string ) => url?.startsWith( '#' ),
+		isRelativePath: ( url?: string ) =>
 			url?.startsWith( '/' ) && ! url?.startsWith( '//' ),
-	} ) ),
+	} ) ) as typeof unlock,
 } ) );
 
 // Mock @wordpress/data
-vi.mock( import( '@wordpress/data' ), () => ( {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	useSelect: vi.fn(),
-} ) );
-
-// Mock @wordpress/core-data
-vi.mock( import( '@wordpress/core-data' ), () => ( {
-	store: {},
 } ) );
 
 describe( 'computeDisplayUrl', () => {
@@ -66,12 +63,12 @@ describe( 'computeDisplayUrl', () => {
 
 	describe( 'internal links', () => {
 		it( 'should mark relative paths as internal', () => {
-			const result = computeDisplayUrl( '/page' );
+			const result = computeDisplayUrl( { linkUrl: '/page' } );
 			expect( result.isExternal ).toBe( false );
 		} );
 
 		it( 'should mark anchor links as internal', () => {
-			const result = computeDisplayUrl( '#section' );
+			const result = computeDisplayUrl( { linkUrl: '#section' } );
 			expect( result.isExternal ).toBe( false );
 		} );
 
@@ -117,7 +114,7 @@ describe( 'computeDisplayUrl', () => {
 			}
 		);
 
-		test.each( [
+		test.each< [ string | null, string ] >( [
 			[ '', 'empty URL' ],
 			[ null, 'null URL' ],
 		] )( 'should handle %s', ( url ) => {
@@ -453,7 +450,7 @@ describe( 'useLinkPreview', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
 		mockUseRemoteUrlData.mockReturnValue( { richData: null } );
-		useSelect.mockReturnValue( null );
+		( useSelect as Mock ).mockReturnValue( null );
 	} );
 
 	describe( 'title computation', () => {
@@ -592,7 +589,7 @@ describe( 'useLinkPreview', () => {
 				},
 			};
 
-			useSelect.mockImplementation( ( callback ) =>
+			( useSelect as Mock ).mockImplementation( ( callback ) =>
 				callback( () => ( {
 					getEntityRecord: () => mockMedia,
 				} ) )
@@ -614,7 +611,7 @@ describe( 'useLinkPreview', () => {
 		} );
 
 		it( 'should return null when no featured_media', () => {
-			useSelect.mockReturnValue( null );
+			( useSelect as Mock ).mockReturnValue( null );
 
 			const { result } = renderHook( () =>
 				useLinkPreview( {

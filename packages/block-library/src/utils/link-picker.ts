@@ -2,20 +2,91 @@ import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
-import { unlock } from '../../lock-unlock';
+import { store as coreDataStore, type Attachment } from '@wordpress/core-data';
+import { unlock } from '../lock-unlock';
+
+/**
+ * Helpers for a block that edits a link with the block editor's `LinkPicker`:
+ * the preview it shows for the current link, and the search options for its
+ * suggestions.
+ */
 
 const { useRemoteUrlData, isHashLink, isRelativePath } = unlock(
 	blockEditorPrivateApis
 );
 
+interface SearchOptions {
+	type: string;
+	subtype?: string;
+}
+
+export interface SuggestionsQuery {
+	preferTypes: ( SearchOptions | string )[];
+	initialSuggestionsSearchOptions: SearchOptions & { perPage: number };
+}
+
+/**
+ * Given the Link block's type attribute, return the query params for that one
+ * entity type.
+ *
+ * @param type Link block's type attribute.
+ * @param kind Link block's entity of kind (post-type|taxonomy)
+ * @return Search query params.
+ */
+function getOwnTypeSearchOptions(
+	type?: string,
+	kind?: string
+): SearchOptions {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type };
+		case 'category':
+			return { type: 'term', subtype: 'category' };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
+		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
+			// for custom link which has no type
+			// always show pages as initial suggestions
+			return { type: 'post', subtype: 'page' };
+	}
+}
+
+/**
+ * Given the Link block's type attribute, return the query params to give to
+ * /wp/v2/search.
+ *
+ * @param type Link block's type attribute.
+ * @param kind Link block's entity of kind (post-type|taxonomy)
+ * @return Search query params.
+ */
+export function getSuggestionsQuery(
+	type?: string,
+	kind?: string
+): SuggestionsQuery {
+	const ownType = getOwnTypeSearchOptions( type, kind );
+
+	return {
+		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
+		initialSuggestionsSearchOptions: { ...ownType, perPage: 20 },
+	};
+}
+
 /**
  * Capitalize the first letter of a string.
  *
- * @param {string} str - The string to capitalize
- * @return {string} Capitalized string
+ * @param str The string to capitalize
+ * @return Capitalized string
  */
-function capitalize( str ) {
+function capitalize( str: string ) {
 	return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 }
 
@@ -24,11 +95,11 @@ function capitalize( str ) {
  * Handles protocol (http/https) and trailing slash variations.
  * Does not match subdomains unless they are the site URL.
  *
- * @param {string} url     - The URL to check
- * @param {string} homeUrl - The WordPress site URL
- * @return {boolean} True if url is the homepage
+ * @param url     The URL to check
+ * @param homeUrl The WordPress site URL
+ * @return True if url is the homepage
  */
-export function isHomepage( url, homeUrl ) {
+export function isHomepage( url?: string | null, homeUrl?: string ) {
 	if ( url === '/' ) {
 		return true;
 	}
@@ -57,12 +128,15 @@ export function isHomepage( url, homeUrl ) {
 /**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
- * @param {Object} options         - Parameters object
- * @param {string} options.linkUrl - The URL to process
- * @param {string} options.homeUrl - The WordPress site URL (required for internal/external detection)
- * @return {Object} Object with displayUrl and isExternal flag
+ * @param options         Parameters object
+ * @param options.linkUrl The URL to process
+ * @param options.homeUrl The WordPress site URL (required for internal/external detection)
+ * @return Object with displayUrl and isExternal flag
  */
-export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
+export function computeDisplayUrl( {
+	linkUrl,
+	homeUrl,
+}: { linkUrl?: string | null; homeUrl?: string } = {} ) {
 	if ( ! linkUrl ) {
 		return { displayUrl: '', isExternal: false };
 	}
@@ -80,7 +154,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 	try {
 		const parsedUrl = new URL( linkUrl );
 		// Compare by host (not origin) so http/https to same site both count as internal
-		const siteHost = new URL( homeUrl ).host;
+		const siteHost = new URL( homeUrl as string ).host;
 
 		if ( parsedUrl.host === siteHost ) {
 			// Show only the pathname (and search/hash if present)
@@ -102,19 +176,24 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 	return { displayUrl, isExternal };
 }
 
+export interface Badge {
+	label: string;
+	/** A `@wordpress/ui` `Badge` intent. */
+	intent: 'none' | 'high' | 'low' | 'stable' | 'informational';
+}
+
 /**
  * Compute badges for the link preview.
  *
- * @param {Object}  options                   - Options object
- * @param {string}  options.url               - Link URL
- * @param {string}  options.homeUrl           - WordPress site URL (for homepage detection)
- * @param {string}  options.type              - Entity type (page, post, etc.)
- * @param {boolean} options.isExternal        - Whether link is external
- * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
- * @param {boolean} options.hasBinding        - Whether link has entity binding
- * @param {boolean} options.isEntityAvailable - Whether bound entity exists
- * @return {Array} Array of badge objects with label and `@wordpress/ui`
- *                 `Badge` intent
+ * @param options                   Options object
+ * @param options.url               Link URL
+ * @param options.homeUrl           WordPress site URL (for homepage detection)
+ * @param options.type              Entity type (page, post, etc.)
+ * @param options.isExternal        Whether link is external
+ * @param options.entityStatus      Entity status (publish, draft, etc.)
+ * @param options.hasBinding        Whether link has entity binding
+ * @param options.isEntityAvailable Whether bound entity exists
+ * @return Array of badge objects with label and `@wordpress/ui` `Badge` intent
  */
 export function computeBadges( {
 	url,
@@ -124,8 +203,16 @@ export function computeBadges( {
 	entityStatus,
 	hasBinding,
 	isEntityAvailable,
-} ) {
-	const badges = [];
+}: {
+	url?: string | null;
+	homeUrl?: string;
+	type?: string | null;
+	isExternal?: boolean;
+	entityStatus?: string;
+	hasBinding?: boolean;
+	isEntityAvailable?: boolean;
+} ): Badge[] {
+	const badges: Badge[] = [];
 	// Kind badge
 	if ( url ) {
 		if ( isExternal ) {
@@ -164,14 +251,14 @@ export function computeBadges( {
 			label: sprintf(
 				/* translators: %s is the entity type (e.g., "page", "post", "category") */
 				__( 'Missing %s' ),
-				type
+				type as string
 			),
 			intent: 'high',
 		} );
 	} else if ( ! url ) {
 		badges.push( { label: __( 'No link selected' ), intent: 'high' } );
 	} else if ( entityStatus ) {
-		const statusMap = {
+		const statusMap: Record< string, Badge > = {
 			publish: { label: __( 'Published' ), intent: 'stable' },
 			future: { label: __( 'Scheduled' ), intent: 'informational' },
 			draft: { label: __( 'Draft' ), intent: 'low' },
@@ -189,13 +276,24 @@ export function computeBadges( {
 }
 
 /**
+ * The parts of an entity record the link preview reads. Posts and pages
+ * expose `title` as a `{ raw, rendered }` object; terms use a plain `name`.
+ */
+export interface LinkPreviewEntityRecord {
+	title?: string | { raw?: string; rendered?: string };
+	name?: string;
+	status?: string;
+	featured_media?: number;
+}
+
+/**
  * Returns an entity record's display title: the rendered title, "(no title)"
  * for an untitled entity, or the record's name.
  *
- * @param {Object} entityRecord The entity record.
- * @return {string|undefined} The display title.
+ * @param entityRecord The entity record.
+ * @return The display title.
  */
-function getEntityTitle( entityRecord ) {
+function getEntityTitle( entityRecord?: LinkPreviewEntityRecord | null ) {
 	const title = entityRecord?.title;
 
 	// Some entity types use a plain string for the title.
@@ -217,13 +315,13 @@ function getEntityTitle( entityRecord ) {
  * This hook takes raw link data and entity information and computes
  * presentation-ready preview data including formatted title, URL, and badges.
  *
- * @param {Object}  options                   - Options object
- * @param {string}  options.url               - Link URL
- * @param {string}  options.type              - Entity type (page, post, etc.)
- * @param {Object}  options.entityRecord      - Entity record
- * @param {boolean} options.hasBinding        - Whether link has entity binding
- * @param {boolean} options.isEntityAvailable - Whether bound entity exists
- * @return {Object} Preview data object with title, url, image, and badges
+ * @param options                   Options object
+ * @param options.url               Link URL
+ * @param options.type              Entity type (page, post, etc.)
+ * @param options.entityRecord      Entity record
+ * @param options.hasBinding        Whether link has entity binding
+ * @param options.isEntityAvailable Whether bound entity exists
+ * @return Preview data object with title, url, image, and badges
  */
 export function useLinkPreview( {
 	url,
@@ -231,10 +329,16 @@ export function useLinkPreview( {
 	type,
 	hasBinding,
 	isEntityAvailable,
+}: {
+	url?: string | null;
+	entityRecord?: LinkPreviewEntityRecord | null;
+	type?: string | null;
+	hasBinding?: boolean;
+	isEntityAvailable?: boolean;
 } ) {
 	// Get the WordPress homepage URL from settings
 	const homeUrl = useSelect( ( select ) => {
-		return select( coreDataStore ).getEntityRecord(
+		return select( coreDataStore ).getEntityRecord< { home?: string } >(
 			'root',
 			'__unstableBase'
 		)?.home;
@@ -261,7 +365,7 @@ export function useLinkPreview( {
 			const { getEntityRecord } = select( coreDataStore );
 
 			// Get the media entity to fetch the image URL
-			const media = getEntityRecord(
+			const media = getEntityRecord< Attachment >(
 				'postType',
 				'attachment',
 				entityRecord.featured_media

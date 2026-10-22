@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getSuggestionsQuery } from '..';
+import { getSuggestionsQuery } from '../link-picker';
 
 const PER_PAGE = 20;
 
-const LINK_TYPES = [
+const LINK_TYPES: [ string, string, { type: string; subtype?: string } ][] = [
 	[ 'page', 'post-type', { type: 'post', subtype: 'page' } ],
 	[ 'post', 'post-type', { type: 'post', subtype: 'post' } ],
 	[ 'category', 'taxonomy', { type: 'term', subtype: 'category' } ],
@@ -21,8 +21,8 @@ describe( 'getSuggestionsQuery', () => {
 		( type, kind ) => {
 			const query = getSuggestionsQuery( type, kind );
 
-			expect( query.type ).toBeUndefined();
-			expect( query.subtype ).toBeUndefined();
+			expect( query ).not.toHaveProperty( 'type' );
+			expect( query ).not.toHaveProperty( 'subtype' );
 		}
 	);
 
@@ -52,7 +52,7 @@ describe( 'getSuggestionsQuery', () => {
 	// A custom link points at a URL, and a link just inserted has no type at
 	// all, so neither has a kind of its own to preview. Pages are the most
 	// likely thing to link to.
-	it.each( [
+	it.each< [ string, string | undefined, string | undefined ] >( [
 		[ 'a custom link', 'custom', 'custom' ],
 		[ 'a link with no type', undefined, undefined ],
 	] )(
