@@ -10,13 +10,13 @@ Choose the feedback from where the action remains after it runs. A control that 
 
 ## Standalone button
 
-Put the confirmation on the button so it stays with the control that produced the result. Don't use a snackbar here: the button is still visible. Don't use a tooltip: touch users and many keyboard users never see it.
+Put the confirmation on the button so it stays with the control that produced the result. Use `variant="minimal"`, `tone="neutral"`, and `size="compact"`: a copy action is rarely the primary button on the page. Don't use a snackbar here: the button is still visible. Don't use a tooltip: touch users and many keyboard users never see it.
 
 <Canvas of={ CopyToClipboardStories.CopyExample } />
 
 The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure, so the control is not renamed while it has focus. Copy with `useCopyToClipboard` from `@wordpress/compose`, and use its `onError` callback when the write fails. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails, to announce the outcome politely. Focus stays on the button.
 
-For an icon-only control, use `IconButton` and keep `label="Copy"`. That label is the accessible name and the tooltip. Swap the icon for a check on success or an error icon on failure, and announce the result with `speak()`. The success and error messages belong in that announcement rather than only in the tooltip.
+For an icon-only control, use `IconButton` with the same variant, tone, and size, and keep `label="Copy"`. That label is the accessible name and the tooltip. Swap the icon for a check on success or an error icon on failure, and announce the result with `speak()`. The success and error messages belong in that announcement rather than only in the tooltip.
 
 Copying is a one-time action. `aria-pressed` describes a toggle that stays on or off, so this button does not use it.
 

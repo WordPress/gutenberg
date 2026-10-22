@@ -56,7 +56,7 @@ export function CopyToClipboardExample() {
 	return (
 		<Stack direction="row" gap="sm" align="center">
 			<Text>{ SAMPLE_VALUE }</Text>
-			<Button ref={ ref }>
+			<Button ref={ ref } variant="minimal" tone="neutral" size="compact">
 				<Button.Icon icon={ RESULT_ICON[ result ] } />
 				Copy
 			</Button>
@@ -81,6 +81,9 @@ export function CopyToClipboardIconButtonExample() {
 				ref={ ref }
 				label="Copy"
 				icon={ RESULT_ICON[ result ] }
+				variant="minimal"
+				tone="neutral"
+				size="compact"
 			/>
 		</Stack>
 	);
