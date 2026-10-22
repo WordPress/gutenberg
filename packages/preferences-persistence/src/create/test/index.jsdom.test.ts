@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import create from '..';
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( {
-	default: vi.fn(),
-} ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
-const mockedApiFetch = vi.mocked( apiFetch );
+const mockedApiFetch = vi.mocked(
+	apiFetch< { meta: { persisted_preferences: unknown } } | void >
+);
 
 describe( 'create', () => {
 	afterEach( () => {
@@ -180,7 +180,10 @@ describe( 'create', () => {
 				},
 			} );
 
-			const { get } = create( { preloadedData: [] } );
+			const { get } = create( {
+				// @ts-expect-error [] is not a PreferencesData object; invalid preloaded data triggers a fetch.
+				preloadedData: [],
+			} );
 			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
 			expect( mockedApiFetch ).toHaveBeenCalled();
 		} );

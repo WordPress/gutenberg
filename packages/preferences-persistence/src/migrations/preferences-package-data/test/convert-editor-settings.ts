@@ -37,7 +37,9 @@ describe( 'convertEditorSettings', () => {
 		( scope ) => {
 			expect(
 				convertEditorSettings( {
+					// @ts-expect-error String, array, and null are not valid ScopePreferences objects; invalid scopes are removed.
 					'core/edit-post': scope,
+					// @ts-expect-error String, array, and null are not valid ScopePreferences objects; invalid scopes are removed.
 					'core/edit-site': scope,
 				} )
 			).toEqual( {} );
@@ -47,6 +49,7 @@ describe( 'convertEditorSettings', () => {
 	it( 'replaces a `core` scope that is not an object', () => {
 		expect(
 			convertEditorSettings( {
+				// @ts-expect-error 'abc' is not a ScopePreferences object; an invalid core scope is replaced.
 				core: 'abc',
 				'core/edit-post': { fixedToolbar: true },
 			} )
