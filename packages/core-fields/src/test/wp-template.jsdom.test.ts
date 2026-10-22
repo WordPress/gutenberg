@@ -10,8 +10,16 @@ describe( 'wp_template', () => {
 			'posts_page_title',
 			'posts_per_page',
 			'default_comment_status',
+			'template',
 			'title',
 		] );
+	} );
+
+	it( 'provides the JavaScript parts of the template field', () => {
+		expect( wpTemplate.template ).toEqual( {
+			Edit: expect.any( Function ),
+			render: expect.any( Function ),
+		} );
 	} );
 
 	it( 'provides the JavaScript parts of the template author field', () => {

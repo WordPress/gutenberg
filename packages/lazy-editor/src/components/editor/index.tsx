@@ -73,7 +73,19 @@ export function Editor( {
 				return undefined;
 			}
 			if ( resolvedPostType === 'wp_template' ) {
-				return resolvedPostId;
+				// A template can name the template it is rendered inside, so
+				// that is what the canvas shows around it. `null` means it is
+				// rendered on its own and stands for itself, `undefined` that
+				// the template has not resolved yet.
+				const parentTemplateId = unlock(
+					select( coreDataStore )
+				).getTemplateId( resolvedPostType, resolvedPostId );
+
+				if ( parentTemplateId === undefined ) {
+					return undefined;
+				}
+
+				return parentTemplateId ?? resolvedPostId;
 			}
 			// Use private API to get template ID for this post
 			return unlock( select( coreDataStore ) ).getTemplateId(

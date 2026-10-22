@@ -3,6 +3,7 @@ import { useMemo } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 export function useEditedPostContext() {
 	return useSelect( ( select ) => {
@@ -144,9 +145,23 @@ export function usePostTemplatePanelMode() {
 			select( editorStore );
 		const { getPostType, canUser } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
-		const postType = getPostType( postTypeSlug );
 		const settings = getEditorSettings();
 		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+		/*
+		 * A template can name the template it is rendered inside, so that the
+		 * header, the footer and whatever else surrounds it live in one place
+		 * instead of being repeated in every template. It is not a viewable
+		 * post type, so it is answered before the checks below.
+		 */
+		if ( postTypeSlug === TEMPLATE_POST_TYPE ) {
+			const canEditTemplates =
+				canUser( 'create', {
+					kind: 'postType',
+					name: TEMPLATE_POST_TYPE,
+				} ) ?? false;
+			return isBlockTheme && canEditTemplates ? 'template-parent' : null;
+		}
+		const postType = getPostType( postTypeSlug );
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;

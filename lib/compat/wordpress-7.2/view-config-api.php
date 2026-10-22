@@ -7,17 +7,18 @@
  */
 
 /**
- * Adds the `reading_settings` field to the `wp_template` form configuration.
+ * Adds the `template` and `reading_settings` fields to the `wp_template` form
+ * configuration.
  *
  * The `fields` list is pinned rather than merged because a merged member is
- * appended to the end of the list, and the link belongs above the last edited
+ * appended to the end of the list, and both belong above the last edited
  * date. Keep it in sync with the list built in
  * _gutenberg_get_entity_view_config_posttype_wp_template().
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
+function _gutenberg_add_form_fields_to_wp_template_view_config( $data ) {
 	return $data->replace(
 		array(
 			'form' => array(
@@ -36,6 +37,7 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 							'labelPosition' => 'none',
 						),
 					),
+					'template',
 					array(
 						'id'     => 'reading_settings',
 						'layout' => array(
@@ -314,7 +316,7 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	);
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
-		'_gutenberg_add_reading_settings_to_wp_template_view_config',
+		'_gutenberg_add_form_fields_to_wp_template_view_config',
 		6,
 		1
 	);
