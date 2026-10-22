@@ -58,7 +58,11 @@ export function getQueryParts( query: Query ): QueryParts {
 				// fields from the response even if we explicitly asked for it.
 				// Example: Asking for titles in posts without title support.
 				if ( key === '_fields' ) {
-					parts.fields = getNormalizedCommaSeparable( value ) ?? [];
+					parts.fields =
+						getNormalizedCommaSeparable(
+							// The REST API takes `_fields` as a string or an array of names.
+							value as string | Array< string >
+						) ?? [];
 					// Make sure to normalize value for `stableKey`
 					value = parts.fields.join();
 				}
