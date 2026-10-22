@@ -369,6 +369,14 @@
 		overflow-y: auto;
 		// Keeps the scroll from chaining to the page once the caption ends.
 		overscroll-behavior: contain;
+		// This layer spans the whole overlay, so only the caption panel itself
+		// may take pointer events: everything else has to fall through to what
+		// it covers, or the layer would swallow the clicks that close the
+		// lightbox (handled by `.scrim`) and the swipe gestures that navigate a
+		// gallery (handled on the overlay). Scrolling the panel still scrolls
+		// this container, because a scroll travels up the scroll ancestry of
+		// the element under the finger rather than being hit-tested here.
+		pointer-events: none;
 
 		&[hidden] {
 			display: none;
@@ -384,7 +392,6 @@
 	// anchored responsively.
 	.wp-lightbox-caption-spacer {
 		height: calc(50vh + var(--wp--lightbox-container-height, 0px) / 2);
-		cursor: zoom-out;
 	}
 
 	// Opaque panel painted with the overlay background, so a caption long enough
@@ -401,6 +408,9 @@
 		// `setOverlayStyles()` publishes the variable.
 		padding-inline: max(16px, calc((100% - var(--wp--lightbox-container-width, 100%)) / 2));
 		cursor: default;
+		// Re-enables pointer events disabled on the scroll layer above, so the
+		// caption can be scrolled, selected, and its links followed.
+		pointer-events: auto;
 	}
 
 	.wp-lightbox-caption {
