@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show icons for elements in the Blocks & Elements list, and rename Input, Select and Button (element) to Form input, Form select and Form button.
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes
