@@ -170,7 +170,7 @@ interface BlockMenuItemProps {
 	block: any;
 }
 
-function BlockMenuItem( { block }: BlockMenuItemProps ) {
+export function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
