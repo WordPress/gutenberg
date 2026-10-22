@@ -253,7 +253,7 @@
 .block-editor-grid-item-resizer {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
-		z-index: z-index(".block-editor-grid-item-resizer");
+		z-index: z-index(".block-editor-grid-visualizer");
 
 		.components-popover__content * {
 			pointer-events: none;
@@ -275,7 +275,7 @@
 .block-editor-grid-row-resizer {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-row-resizer.block-editor-grid-row-resizer {
-		z-index: z-index(".block-editor-grid-row-resizer");
+		z-index: z-index(".block-editor-grid-visualizer");
 
 		.components-popover__content * {
 			pointer-events: none;
