@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Prioritize the Category Link and Tag Link variations in the block appender's quick inserter, so they're reachable without opening "Browse all" ([#83108](https://github.com/WordPress/gutenberg/pull/83108)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
