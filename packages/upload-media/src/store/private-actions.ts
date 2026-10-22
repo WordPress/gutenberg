@@ -31,6 +31,7 @@ import {
 	vipsEnsureJxlSupport,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
+	withVipsWorkerHeld,
 	maybeRecycleVipsWorker,
 } from './utils';
 import {
@@ -984,16 +985,20 @@ export function prepareItem( id: QueueItemId ) {
 			// a companion file (sideloaded in generateThumbnails), mirroring how
 			// HEIC keeps its original.
 			try {
-				await vipsEnsureJxlSupport();
-				jxlJpeg = await vipsConvertImageFormat(
-					item.id,
-					file,
-					'image/jpeg',
-					{
-						quality:
-							settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
-					}
-				);
+				// Held so a recycle cannot replace the worker after it got the
+				// JXL library and before, or while, it decodes.
+				jxlJpeg = await withVipsWorkerHeld( async () => {
+					await vipsEnsureJxlSupport();
+					return vipsConvertImageFormat(
+						item.id,
+						file,
+						'image/jpeg',
+						{
+							quality:
+								settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+						}
+					);
+				} );
 			} catch ( error ) {
 				dispatch.cancelItem(
 					id,
