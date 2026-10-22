@@ -109,7 +109,7 @@
 		"lightningcss": "^1.33.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"source-map": "^0.6.1",
-		"storybook": "^10.6.1",
+		"storybook": "^10.6.2",
 		"stylelint": "^17.14.1",
 		"vite": "^8.3.4",
 		"vitest": "^5.0.3",
