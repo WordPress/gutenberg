@@ -1693,6 +1693,93 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).not.toContain( 'metadata' );
 	} );
 
+	test( 'style — bolding a whole paragraph over your own pending suggestions is refused', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Reported on #73411: Ctrl+B over a whole paragraph that already holds
+		// the suggester's add, delete and replace suggestions. Formatting
+		// across those markers is declined like a text edit over them.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First line.<br>Second line.<br>Third line.',
+			},
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+
+		// Select through the store, which RichText mirrors onto the DOM:
+		// arrow keys step over the markers' screen-reader decoration.
+		const select = ( start: number, end = start ) =>
+			page.evaluate(
+				( [ s, e ]: number[] ) => {
+					const { select: read, dispatch } = window.wp.data;
+					const [ block ] = read( 'core/block-editor' ).getBlocks();
+					dispatch( 'core/block-editor' ).selectionChange(
+						block.clientId,
+						'content',
+						s,
+						e
+					);
+				},
+				[ start, end ]
+			);
+
+		// "First line." gains " now", "Second line." is deleted and "Third"
+		// is typed over.
+		let saved = suggestionSavedPromise( page );
+		await select( 'First line'.length );
+		await page.keyboard.type( ' now' );
+		await saved;
+		saved = suggestionSavedPromise( page );
+		await select( 16, 16 + 'Second line.'.length );
+		await page.keyboard.press( 'Backspace' );
+		await saved;
+		saved = suggestionSavedPromise( page );
+		await select( 29, 29 + 'Third'.length );
+		await page.keyboard.type( 'Last' );
+		await saved;
+
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 3 );
+		const before = await editor.getEditedPostContent();
+
+		const notesWritten: string[] = [];
+		page.on( 'request', ( request: any ) => {
+			if (
+				/\/wp\/v2\/comments/.test( request.url() ) &&
+				request.method() !== 'GET'
+			) {
+				notesWritten.push( request.url() );
+			}
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-format' )
+		).toHaveCount( 0 );
+		expect( await editor.getEditedPostContent() ).toBe( before );
+		await expect( summaries ).toHaveCount( 3 );
+		expect( notesWritten ).toEqual( [] );
+	} );
+
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
 		editor,
 		page,
