@@ -114,4 +114,87 @@ class Tests_Blocks_Render_Pattern extends WP_UnitTestCase {
 			'A URL in a nested block\'s rendered output should be left as-is.'
 		);
 	}
+
+	/**
+	 * Tests that a user pattern referenced as `core/block/{id}` is rendered.
+	 *
+	 * @covers ::render_block_core_pattern
+	 */
+	public function test_renders_user_pattern() {
+		$user_pattern_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_block',
+				'post_status'  => 'publish',
+				'post_content' => "<!-- wp:paragraph -->\n<p>User pattern content</p>\n<!-- /wp:paragraph -->",
+			)
+		);
+
+		$output = do_blocks( '<!-- wp:pattern {"slug":"core/block/' . $user_pattern_id . '"} /-->' );
+
+		$this->assertStringContainsString( 'User pattern content', $output );
+	}
+
+	/**
+	 * Tests that a `core/block/{id}` reference renders nothing when the post
+	 * is not a user pattern visitors are allowed to see.
+	 *
+	 * @covers ::render_block_core_pattern
+	 *
+	 * @dataProvider data_unavailable_user_patterns
+	 *
+	 * @param array $post_args Arguments for the referenced post.
+	 */
+	public function test_does_not_render_unavailable_user_pattern( $post_args ) {
+		$post_id = self::factory()->post->create(
+			array_merge(
+				array(
+					'post_type'    => 'wp_block',
+					'post_status'  => 'publish',
+					'post_content' => "<!-- wp:paragraph -->\n<p>Hidden content</p>\n<!-- /wp:paragraph -->",
+				),
+				$post_args
+			)
+		);
+
+		$output = do_blocks( '<!-- wp:pattern {"slug":"core/block/' . $post_id . '"} /-->' );
+
+		$this->assertSame( '', $output );
+	}
+
+	/**
+	 * Data provider for test_does_not_render_unavailable_user_pattern().
+	 *
+	 * @return array[]
+	 */
+	public function data_unavailable_user_patterns() {
+		return array(
+			'not a user pattern' => array( array( 'post_type' => 'post' ) ),
+			'draft'              => array( array( 'post_status' => 'draft' ) ),
+			'password protected' => array( array( 'post_password' => 'secret' ) ),
+		);
+	}
+
+	/**
+	 * Tests that a user pattern which references itself does not recurse.
+	 *
+	 * @covers ::render_block_core_pattern
+	 */
+	public function test_user_pattern_does_not_render_itself() {
+		$user_pattern_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wp_block',
+				'post_status' => 'publish',
+			)
+		);
+		wp_update_post(
+			array(
+				'ID'           => $user_pattern_id,
+				'post_content' => "<!-- wp:paragraph -->\n<p>Outer</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:pattern {\"slug\":\"core/block/$user_pattern_id\"} /-->",
+			)
+		);
+
+		$output = do_blocks( '<!-- wp:pattern {"slug":"core/block/' . $user_pattern_id . '"} /-->' );
+
+		$this->assertSame( 1, substr_count( $output, 'Outer' ) );
+	}
 }
