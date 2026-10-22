@@ -53,18 +53,31 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 		/**
 		 * Given an Espree VariableDeclarator node, returns true if the node
 		 * can be exempted from consideration as unused, or false otherwise. A
-		 * node can be exempt if it destructures to multiple variables, since
-		 * those other variables may be used prior to the return statement. A
-		 * future enhancement could validate that they are in-fact referenced.
+		 * node can be exempt if it destructures to multiple named variables,
+		 * since those other variables may be used prior to the return
+		 * statement. A future enhancement could validate that they are
+		 * in-fact referenced.
+		 *
+		 * For array patterns, holes (skipped elements like `const [a, , c]`)
+		 * are `null` in the AST and don't count as named bindings — only
+		 * actual variable names do:
+		 *
+		 *   const [ x ] = thing;       // 1 binding → not exempt
+		 *   const [ x, y ] = thing;    // 2 bindings → exempt
+		 *   const [ , x ] = thing;     // 1 binding → not exempt
+		 *   const [ x, , z ] = thing;  // 2 bindings → exempt
+		 *   const [ , , z ] = thing;   // 1 binding → not exempt
 		 *
 		 * @param {Object} node Node to test.
 		 *
-		 * @return {boolean} Whether declarator is emempt from consideration.
+		 * @return {boolean} Whether declarator is exempt from consideration.
 		 */
-		function isExemptObjectDestructureDeclarator( node ) {
+		function isExemptDestructureDeclarator( node ) {
 			return (
-				node.id.type === 'ObjectPattern' &&
-				node.id.properties.length > 1
+				( node.id.type === 'ObjectPattern' &&
+					node.id.properties.length > 1 ) ||
+				( node.id.type === 'ArrayPattern' &&
+					node.id.elements.filter( Boolean ).length > 1 )
 			);
 		}
 
@@ -103,7 +116,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 							// Target function calls as "expensive".
 							def.node.init.type === 'CallExpression' &&
 							// Allow unused if part of an object destructuring.
-							! isExemptObjectDestructureDeclarator( def.node ) &&
+							! isExemptDestructureDeclarator( def.node ) &&
 							// Only target assignments preceding `return`.
 							def.node.range[ 1 ] < node.range[ 1 ]
 						);
