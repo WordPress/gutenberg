@@ -6,7 +6,7 @@ vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'fetchUrlData', () => {
 	afterEach( () => {
-		apiFetch.mockReset();
+		vi.mocked( apiFetch ).mockReset();
 	} );
 
 	describe( 'return value settles as expected', () => {
@@ -18,7 +18,9 @@ describe( 'fetchUrlData', () => {
 				description:
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			};
-			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
+			vi.mocked( apiFetch ).mockReturnValueOnce(
+				Promise.resolve( data )
+			);
 
 			await expect(
 				fetchUrlData( 'https://www.wordpress.org' )
@@ -28,7 +30,9 @@ describe( 'fetchUrlData', () => {
 		} );
 
 		it( 'rejects with error upon fetch failure', async () => {
-			apiFetch.mockReturnValueOnce( Promise.reject( 'fetch failed' ) );
+			vi.mocked( apiFetch ).mockReturnValueOnce(
+				Promise.reject( 'fetch failed' )
+			);
 
 			await expect(
 				fetchUrlData( 'https://www.wordpress.org/1' )
@@ -38,7 +42,7 @@ describe( 'fetchUrlData', () => {
 
 	describe( 'interaction with underlying fetch API', () => {
 		it( 'passes options argument through to fetch API', async () => {
-			apiFetch.mockReturnValueOnce( Promise.resolve() );
+			vi.mocked( apiFetch ).mockReturnValueOnce( Promise.resolve() );
 
 			await fetchUrlData( 'https://www.wordpress.org/2', {
 				method: 'POST',
@@ -46,7 +50,8 @@ describe( 'fetchUrlData', () => {
 
 			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 
-			const argsPassedToFetchApi = apiFetch.mock.calls[ 0 ][ 0 ];
+			const argsPassedToFetchApi =
+				vi.mocked( apiFetch ).mock.calls[ 0 ][ 0 ];
 
 			expect( argsPassedToFetchApi ).toEqual(
 				expect.objectContaining( {
@@ -66,14 +71,16 @@ describe( 'fetchUrlData', () => {
 				description:
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			};
-			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
+			vi.mocked( apiFetch ).mockReturnValueOnce(
+				Promise.resolve( data )
+			);
 
 			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
 			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 
 			// Allow us to reassert on calls without it being polluted by first fetch
 			// but retains the mock implementation from earlier.
-			apiFetch.mockClear();
+			vi.mocked( apiFetch ).mockClear();
 
 			// Fetch the same URL again...should be cached.
 			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
@@ -92,7 +99,7 @@ describe( 'fetchUrlData', () => {
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			};
 
-			apiFetch
+			vi.mocked( apiFetch )
 				.mockReturnValueOnce( Promise.reject( 'fetch failed' ) )
 				.mockReturnValueOnce( Promise.resolve( data ) );
 

@@ -4,7 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'defaultProcessor', () => {
-	let defaultProcessor;
+	let defaultProcessor: ( typeof import( '../default-processor' ) )[ 'default' ];
 
 	beforeEach( async () => {
 		vi.resetModules();
@@ -67,7 +67,7 @@ describe( 'defaultProcessor', () => {
 	};
 
 	it( 'handles a successful request', async () => {
-		apiFetch.mockImplementation( async ( { method } ) =>
+		vi.mocked( apiFetch ).mockImplementation( async ( { method } ) =>
 			method === 'OPTIONS'
 				? preflightResponse
 				: {
@@ -94,7 +94,7 @@ describe( 'defaultProcessor', () => {
 	} );
 
 	it( 'handles a failed request', async () => {
-		apiFetch.mockImplementation( async ( { method } ) =>
+		vi.mocked( apiFetch ).mockImplementation( async ( { method } ) =>
 			method === 'OPTIONS'
 				? preflightResponse
 				: {

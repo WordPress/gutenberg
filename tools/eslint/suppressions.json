@@ -6669,31 +6669,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/batch/create-batch.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/default-processor.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/test/create-batch.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/test/default-processor.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -6744,26 +6719,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/__experimental-fetch-url-data.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/test/__experimental-fetch-link-suggestions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/test/__experimental-fetch-url-data.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
