@@ -1,13 +1,4 @@
-interface GridItemDragOptions {
-	/** Client ID of the dragged block. */
-	clientId: string;
-	/** The block's element in the canvas. */
-	blockElement: HTMLElement;
-	/** Marks blocks as being dragged. */
-	startDraggingBlocks: ( clientIds: string[] ) => void;
-	/** Marks the drag as over. */
-	stopDraggingBlocks: () => void;
-}
+import type { ChildDragOptions } from '../../layouts/types';
 
 /**
  * Starts dragging a block of a manual placement grid by its body. The grid
@@ -31,10 +22,7 @@ export function startGridItemDrag(
 		blockElement,
 		startDraggingBlocks,
 		stopDraggingBlocks,
-	}: GridItemDragOptions & {
-		/** Client ID of the grid. */
-		rootClientId: string;
-	}
+	}: ChildDragOptions
 ) {
 	// A `dragstart` event always has drag data.
 	const dataTransfer = event.dataTransfer!;
