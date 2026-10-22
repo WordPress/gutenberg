@@ -88,6 +88,12 @@ const textdomain = {
 	},
 };
 
+const includeTests = {
+	type: 'confirm',
+	message: 'Include automated test setup (Jest, sample test file)?',
+	default: false,
+};
+
 // Plugin header fields.
 const pluginURI = {
 	type: 'input',
@@ -151,4 +157,5 @@ module.exports = {
 	licenseURI,
 	domainPath,
 	updateURI,
+	includeTests,
 };
