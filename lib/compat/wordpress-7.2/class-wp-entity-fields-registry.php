@@ -486,6 +486,16 @@ if ( ! class_exists( 'WP_Entity_Fields_Registry' ) ) {
 		 */
 		public function get_all_registered_field_modules() {
 			$this->initialize();
+			/*
+			 * Keeps the module ids and drops the field ids they apply to, e.g.:
+			 *
+			 *     array(
+			 *         'postType' => array(
+			 *             'page' => array( 'my-plugin/fields', '123' ),
+			 *             'post' => array( 'my-plugin/fields' ),
+			 *         ),
+			 *     )
+			 */
 			return array_map(
 				static function ( $entities ) {
 					return array_map(
