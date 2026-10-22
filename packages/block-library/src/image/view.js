@@ -86,6 +86,33 @@ const COMMIT_DISTANCE_RATIO = 0.2;
 const FLICK_DISTANCE_PX = 50;
 const FLICK_MAX_DURATION_MS = 300;
 
+// Assumed line height when a wheel reports its delta in lines rather than
+// pixels. Only some mice and browsers do, and the exact value matters little:
+// it decides how far one notch of such a wheel moves the caption.
+const WHEEL_LINE_HEIGHT_PX = 16;
+
+/**
+ * The distance a wheel event asks to scroll, in pixels.
+ *
+ * `deltaY` is in pixels for trackpads and most mice, but some report lines or
+ * pages instead, while `scrollTop` is only ever pixels.
+ *
+ * @param {WheelEvent} event    The wheel event.
+ * @param {Element}    scroller The element being scrolled.
+ * @return {number} The distance in pixels.
+ */
+function getWheelDeltaPx( event, scroller ) {
+	// `WheelEvent.DOM_DELTA_LINE` and `WheelEvent.DOM_DELTA_PAGE`, spelled out
+	// because `WheelEvent` is not among this file's known globals.
+	if ( event.deltaMode === 1 ) {
+		return event.deltaY * WHEEL_LINE_HEIGHT_PX;
+	}
+	if ( event.deltaMode === 2 ) {
+		return event.deltaY * scroller.clientHeight;
+	}
+	return event.deltaY;
+}
+
 /**
  * How far a committed swipe travels before the image is swapped.
  *
@@ -504,6 +531,35 @@ const { state, actions, callbacks } = store(
 				stopDragAnimations();
 				resetTouchDrag();
 			},
+			handleCaptionWheel: withSyncEvent( ( event ) => {
+				if ( ! state.overlayEnabled || event.ctrlKey ) {
+					return;
+				}
+
+				const scroller = event.currentTarget.querySelector(
+					'.wp-lightbox-caption-scroll'
+				);
+				if ( ! scroller || scroller.hidden ) {
+					return;
+				}
+
+				// A wheel over the caption panel already scrolls the caption,
+				// so it is left to do that natively, smoothing and all. The
+				// panel only begins below the enlarged image, though, and the
+				// image fills most of the overlay, so the pointer is usually
+				// somewhere the caption layer takes no pointer events. There
+				// the wheel would scroll the page behind instead, which
+				// `handleScroll()` immediately yanks back, leaving the caption
+				// unreachable. Carry those deltas over to the caption by hand.
+				if ( event.target.closest( '.wp-lightbox-caption-scroll' ) ) {
+					return;
+				}
+
+				scroller.scrollTop += getWheelDeltaPx( event, scroller );
+				// Without this the page behind still scrolls underneath the
+				// overlay, even though the caption is what moved.
+				event.preventDefault();
+			} ),
 			handleTouchCancel() {
 				// The gesture was interrupted — the browser cancelled the drag, or
 				// a system gesture took over — so no `touchend` will arrive to
