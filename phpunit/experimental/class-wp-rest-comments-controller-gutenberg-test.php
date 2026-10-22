@@ -1216,6 +1216,96 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Dispatches a request to permanently delete a comment.
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @return WP_REST_Response Response object.
+	 */
+	protected function delete_comment_request( $comment_id ) {
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $comment_id );
+		$request->set_param( 'force', true );
+		return rest_get_server()->dispatch( $request );
+	}
+
+	public function test_can_delete_own_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$editor_id );
+		$response = $this->delete_comment_request( $reaction_id );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertNull( get_comment( $reaction_id ) );
+	}
+
+	/**
+	 * A reaction speaks for its author, so not even a moderator can remove it.
+	 *
+	 * @dataProvider data_moderator_roles
+	 *
+	 * @param string $role Role of the user attempting the delete.
+	 */
+	public function test_cannot_delete_another_users_reaction( $role ) {
+		wp_set_current_user( self::$author_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		$note_id     = $this->create_note( $post_id, self::$author_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$author_id );
+
+		wp_set_current_user( self::$user_ids[ $role ] );
+		$response = $this->delete_comment_request( $reaction_id );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ) );
+	}
+
+	/**
+	 * Data provider for test_cannot_delete_another_users_reaction().
+	 *
+	 * @return array[]
+	 */
+	public function data_moderator_roles() {
+		return array(
+			'administrator' => array( 'administrator' ),
+			'editor'        => array( 'editor' ),
+		);
+	}
+
+	/**
+	 * Reactions on a resolved thread are frozen, like adding new ones.
+	 *
+	 * @dataProvider data_resolved_thread_targets
+	 *
+	 * @param bool $on_reply Whether the reaction is on a reply rather than the root note.
+	 */
+	public function test_cannot_delete_reaction_on_resolved_thread( $on_reply ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		$target  = $note_id;
+		if ( $on_reply ) {
+			$target = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => $post_id,
+					'comment_parent'   => $note_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 0,
+					'user_id'          => self::$editor_id,
+				)
+			);
+		}
+		$reaction_id = $this->create_reaction( $post_id, $target, self::$editor_id );
+		wp_set_comment_status( $note_id, 'approve' );
+
+		wp_set_current_user( self::$editor_id );
+		$response = $this->delete_comment_request( $reaction_id );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ) );
+	}
+
+	/**
 	 * Notes remain editable - only reactions are locked down.
 	 */
 	public function test_can_still_update_note() {
