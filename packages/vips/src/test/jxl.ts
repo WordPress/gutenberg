@@ -40,7 +40,7 @@ vi.mock(
 /**
  * Loads a fresh copy of the module.
  *
- * `vipsPromise`, `jxlWasmBytes` and `vipsInitializedWithJxl` are module-level
+ * `vipsPromise`, `jxlWasmBytes` and `vipsPromiseHasJxl` are module-level
  * state, and every assertion here is about how one call leaves that state for
  * the next, so each test needs its own module instance.
  *
@@ -158,5 +158,66 @@ describe( 'JPEG XL support', () => {
 			[ 'vips-heif.wasm', 'vips-jxl.wasm' ],
 			[ 'vips-heif.wasm', 'vips-jxl.wasm' ],
 		] );
+	} );
+	it( 'shares a pending JXL-enabled init between concurrent operations', async () => {
+		/*
+		 * Regression test: the JXL flag used to flip only once the init
+		 * resolved, so a second JXL operation arriving mid-init took the
+		 * pending JXL instance for a stale one and shut it down under the
+		 * first operation.
+		 */
+		const vips = await loadVips();
+		vips.setJxlWasm( new ArrayBuffer( 8 ) );
+
+		await Promise.all( [ runOperation( vips ), runOperation( vips ) ] );
+
+		expect( initCalls() ).toEqual( [
+			[ 'vips-heif.wasm', 'vips-jxl.wasm' ],
+		] );
+		expect( mockShutdown ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps a retired instance alive until the operations using it finish', async () => {
+		const vips = await loadVips();
+
+		// Hold the first, JXL-less init open so an operation is still waiting
+		// on it when the JXL bytes arrive.
+		let resolveFirstInit: () => void = () => {};
+		const firstInstance = {
+			Image: { newFromBuffer: vi.fn( () => new MockImage() ) },
+			Cache: { max: vi.fn() },
+			shutdown: vi.fn(),
+		};
+		mockVipsFactory.mockImplementationOnce(
+			() =>
+				new Promise( ( resolve ) => {
+					resolveFirstInit = () => resolve( firstInstance );
+				} ) as never
+		);
+
+		const plainOperation = runOperation( vips );
+		await vi.waitFor( () => expect( initCalls() ).toHaveLength( 1 ) );
+
+		vips.setJxlWasm( new ArrayBuffer( 8 ) );
+		const jxlOperation = runOperation( vips );
+
+		resolveFirstInit();
+		await Promise.all( [ plainOperation, jxlOperation ] );
+
+		expect( initCalls() ).toEqual( [
+			[ 'vips-heif.wasm' ],
+			[ 'vips-heif.wasm', 'vips-jxl.wasm' ],
+		] );
+		expect( firstInstance.Image.newFromBuffer ).toHaveBeenCalledTimes( 1 );
+		await vi.waitFor( () =>
+			expect( firstInstance.shutdown ).toHaveBeenCalledTimes( 1 )
+		);
+		// Shut down only after the plain operation was done with it.
+		expect(
+			firstInstance.shutdown.mock.invocationCallOrder[ 0 ]
+		).toBeGreaterThan(
+			firstInstance.Image.newFromBuffer.mock.invocationCallOrder[ 0 ]
+		);
+		expect( mockShutdown ).not.toHaveBeenCalled();
 	} );
 } );

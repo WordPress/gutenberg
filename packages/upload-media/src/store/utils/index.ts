@@ -373,6 +373,34 @@ export function terminateVipsWorker(): void {
 }
 
 /**
+ * Number of vips operations in flight outside of the queue's ResizeCrop and
+ * Rotate operations, which `getActiveImageProcessingCount()` already counts.
+ */
+let heldVipsOperations = 0;
+
+/**
+ * Runs vips work that the worker must not be recycled during.
+ *
+ * Use this for vips calls made outside ResizeCrop and Rotate, such as decoding
+ * a JPEG XL upload in Prepare. Recycling mid-call would drop the in-flight
+ * request, and drop worker-side state such as JXL support that a later call
+ * in the same callback relies on.
+ *
+ * @param callback Vips work to run.
+ * @return The callback's result.
+ */
+export async function withVipsWorkerHeld< T >(
+	callback: () => Promise< T >
+): Promise< T > {
+	heldVipsOperations++;
+	try {
+		return await callback();
+	} finally {
+		heldVipsOperations--;
+	}
+}
+
+/**
  * Tracks the number of completed vips image processing operations across
  * both the success path (`finishOperation`) and the failure path
  * (`cancelItem`). Used to periodically recycle the WASM worker to reclaim
@@ -407,7 +435,8 @@ export function maybeRecycleVipsWorker(
 
 	if (
 		completedVipsOperations >= MAX_VIPS_OPS_BEFORE_RECYCLE &&
-		activeImageProcessingCount === 0
+		activeImageProcessingCount === 0 &&
+		heldVipsOperations === 0
 	) {
 		terminateVipsWorker();
 		completedVipsOperations = 0;

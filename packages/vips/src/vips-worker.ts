@@ -186,9 +186,10 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
  *
  * The JXL WASM module is dynamically imported the first time a JXL image
  * is processed, keeping it out of the worker's static bundle. Subsequent
- * calls reuse the cached promise.
+ * calls reuse the cached promise, which resolves to the module's own bytes
+ * so the main thread holds a single copy.
  */
-let jxlWasmBytesPromise: Promise< ArrayBuffer > | undefined;
+let jxlWasmBytesPromise: Promise< Uint8Array< ArrayBuffer > > | undefined;
 
 /**
  * The worker API the JXL bytes were last handed to.
@@ -219,16 +220,7 @@ export async function vipsEnsureJxlSupport(): Promise< void > {
 			// `@wordpress/vips/jxl-wasm` bundle (~3 MB) that is only
 			// fetched by the browser on this dynamic import.
 			const mod = await import( '@wordpress/vips/jxl-wasm' );
-			const bytes = mod.default as Uint8Array< ArrayBuffer >;
-			// Hand the RPC layer a bare ArrayBuffer: it only recognises those
-			// as transferable, and walks any other object key by key — which
-			// for ~3 MB of image codec means millions of main-thread
-			// allocations per call. `slice` also detaches this copy from the
-			// module's own bytes, so transferring it cannot empty the cache.
-			return bytes.buffer.slice(
-				bytes.byteOffset,
-				bytes.byteOffset + bytes.byteLength
-			);
+			return mod.default as Uint8Array< ArrayBuffer >;
 		} )().catch( ( error ) => {
 			// Do not cache the failure: a transient network error fetching the
 			// chunk would otherwise disable JXL for the rest of the session.
@@ -244,9 +236,17 @@ export async function vipsEnsureJxlSupport(): Promise< void > {
 		return;
 	}
 
-	// The buffer is transferred, so hand over a fresh copy each time and keep
-	// the cached original intact for the next worker.
-	await api.setJxlWasm( bytes.slice( 0 ) );
+	// Hand the RPC layer a bare ArrayBuffer: it only recognises those as
+	// transferable, and walks any other object key by key, which for ~3 MB
+	// of image codec means millions of main-thread allocations per call. The
+	// buffer is transferred away, so send a fresh copy each time and keep the
+	// module's own bytes intact for the next worker.
+	await api.setJxlWasm(
+		bytes.buffer.slice(
+			bytes.byteOffset,
+			bytes.byteOffset + bytes.byteLength
+		)
+	);
 	jxlWasmRecipient = api;
 }
 

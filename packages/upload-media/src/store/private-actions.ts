@@ -31,6 +31,7 @@ import {
 	vipsEnsureJxlSupport,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
+	withVipsWorkerHeld,
 	maybeRecycleVipsWorker,
 } from './utils';
 import {
@@ -852,7 +853,7 @@ export function prepareItem( id: QueueItemId ) {
 		}
 
 		let heicJpeg: File | null = null;
-		let jxlJpeg: File | null = null;
+		let jxlDerivative: File | null = null;
 
 		// `File.type` comes from the OS MIME registry, which has no `.jxl`
 		// mapping on many systems and hands back an empty string there. Fall
@@ -925,7 +926,7 @@ export function prepareItem( id: QueueItemId ) {
 		// image_editor_output_format filter during create_item.
 		// The response carries image_output_format so generateThumbnails
 		// can transcode sub-sizes to the same target format.
-		if ( isImage && isVipsSupported && ! isJxl && ! tooLargeForClient ) {
+		if ( isImage && isVipsSupported && ! tooLargeForClient ) {
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -978,22 +979,37 @@ export function prepareItem( id: QueueItemId ) {
 		} else if ( isImage && isJxl ) {
 			// JPEG XL is not yet broadly web-compatible: most browsers cannot
 			// display it and the server cannot read it (no GD/Imagick support).
-			// Decode it to JPEG client-side with vips — lazily loading the ~3 MB
-			// JXL WASM chunk on demand — and upload the JPEG so the editor and
-			// front end use a portable format. The original .jxl is preserved as
-			// a companion file (sideloaded in generateThumbnails), mirroring how
-			// HEIC keeps its original.
+			// Decode it client-side with vips — lazily loading the ~3 MB JXL
+			// WASM chunk on demand — and upload a JPEG, or a PNG when the image
+			// is transparent, so the editor and front end use a portable
+			// format. The original .jxl is preserved as a companion file
+			// (sideloaded in generateThumbnails), mirroring how HEIC keeps its
+			// original.
 			try {
-				await vipsEnsureJxlSupport();
-				jxlJpeg = await vipsConvertImageFormat(
-					item.id,
-					file,
-					'image/jpeg',
-					{
-						quality:
-							settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+				// Held so a recycle cannot replace the worker after it got the
+				// JXL library and before, or while, it decodes.
+				jxlDerivative = await withVipsWorkerHeld( async () => {
+					await vipsEnsureJxlSupport();
+
+					const blobUrl = createBlobURL( file );
+					let hasTransparency: boolean;
+					try {
+						hasTransparency = await vipsHasTransparency( blobUrl );
+					} finally {
+						revokeBlobURL( blobUrl );
 					}
-				);
+
+					return vipsConvertImageFormat(
+						item.id,
+						file,
+						hasTransparency ? 'image/png' : 'image/jpeg',
+						{
+							quality:
+								settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+							stripMeta: settings.imageStripMeta,
+						}
+					);
+				} );
 			} catch ( error ) {
 				dispatch.cancelItem(
 					id,
@@ -1029,10 +1045,11 @@ export function prepareItem( id: QueueItemId ) {
 		// to false so the server skips the image-type support check
 		// (allowing formats like AVIF that the server can't process).
 		let updates: Partial< QueueItem >;
-		if ( isJxl && jxlJpeg ) {
-			// Upload the JPEG derivative as the main file and keep the original
-			// .jxl so generateThumbnails() can sideload it as a companion
-			// (stored under $metadata['source_image'], like the HEIC original).
+		if ( isJxl && jxlDerivative ) {
+			// Upload the JPEG or PNG derivative as the main file and keep the
+			// original .jxl so generateThumbnails() can sideload it as a
+			// companion (stored under $metadata['source_image'], like the HEIC
+			// original).
 			//
 			// `generate_sub_sizes` must be turned off explicitly: it defaults
 			// to true server-side, and leaving it on makes create_item build
@@ -1042,8 +1059,8 @@ export function prepareItem( id: QueueItemId ) {
 			// processing. Decoding the JXL at all proves vips is available, so
 			// unlike HEIC there is no canvas-only case to fall back for.
 			updates = {
-				file: jxlJpeg,
-				sourceFile: jxlJpeg,
+				file: jxlDerivative,
+				sourceFile: jxlDerivative,
 				originalJxlFile: item.file,
 				additionalData: {
 					...item.additionalData,

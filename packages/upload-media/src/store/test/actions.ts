@@ -16,7 +16,9 @@ import {
 	vipsCancelOperations,
 	vipsConvertImageFormat,
 	vipsEnsureJxlSupport,
+	vipsHasTransparency,
 	vipsResizeImage,
+	withVipsWorkerHeld,
 } from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
@@ -49,6 +51,9 @@ vi.mock(
 			vipsEnsureJxlSupport: vi.fn( () => Promise.resolve() ),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
+			withVipsWorkerHeld: vi.fn( < T >( callback: () => Promise< T > ) =>
+				callback()
+			),
 		} ) as unknown as typeof import( '../utils' )
 );
 
@@ -276,8 +281,10 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			// The JXL WASM chunk is only fetched when a JXL is processed.
+			// The JXL WASM chunk is only fetched when a JXL is processed, and
+			// the worker is held so a recycle cannot drop it mid-decode.
 			expect( vipsEnsureJxlSupport ).toHaveBeenCalled();
+			expect( withVipsWorkerHeld ).toHaveBeenCalledTimes( 1 );
 			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
 				item.id,
 				jxlFile,
@@ -339,6 +346,69 @@ describe( 'actions', () => {
 			expect( updatedItem.originalJxlFile ).toBe( untypedJxlFile );
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				false
+			);
+		} );
+
+		it( 'converts a transparent JPEG XL to PNG to keep its transparency', async () => {
+			const pngDerivative = new File( [ 'png' ], 'example.png', {
+				type: 'image/png',
+			} );
+			( vipsHasTransparency as Mock ).mockResolvedValueOnce( true );
+			( vipsConvertImageFormat as Mock ).mockResolvedValue(
+				pngDerivative
+			);
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				item.id,
+				jxlFile,
+				'image/png',
+				expect.anything()
+			);
+			expect( updatedItem.file ).toBe( pngDerivative );
+			expect( updatedItem.originalJxlFile ).toBe( jxlFile );
+		} );
+
+		it( 'keeps JXL metadata when the site turns off metadata stripping', async () => {
+			( vipsConvertImageFormat as Mock ).mockResolvedValue(
+				new File( [ 'jpeg' ], 'example.jpg', { type: 'image/jpeg' } )
+			);
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				imageStripMeta: false,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				item.id,
+				jxlFile,
+				'image/jpeg',
+				expect.objectContaining( { stripMeta: false } )
 			);
 		} );
 
