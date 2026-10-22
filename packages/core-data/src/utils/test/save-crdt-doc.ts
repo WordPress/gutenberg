@@ -27,12 +27,15 @@ async function flushPromises() {
 }
 
 describe( 'saveCRDTDoc', () => {
-	let syncManager: { createPersistedCRDTDoc: Mock };
+	let syncManager: {
+		createPersistedCRDTDoc: Mock< SyncManager[ 'createPersistedCRDTDoc' ] >;
+	};
 
 	beforeEach( () => {
 		vi.mocked( apiFetch ).mockReset();
 		syncManager = {
-			createPersistedCRDTDoc: vi.fn(),
+			createPersistedCRDTDoc:
+				vi.fn< SyncManager[ 'createPersistedCRDTDoc' ] >(),
 		};
 		vi.mocked( getSyncManager ).mockReturnValue(
 			// The stub provides only what `saveCRDTDoc` needs.

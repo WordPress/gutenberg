@@ -48,12 +48,17 @@ export interface TemplateArea {
 export interface TemplateInfoParams {
 	templateTypes: ReadonlyArray< TemplateType >;
 	templateAreas?: ReadonlyArray< TemplateArea >;
-	template: {
-		slug?: string;
-		area?: string;
-		title?: string | { rendered?: string };
-		description?: string | { raw?: string };
-	};
+	template: TemplateInfoTemplate | false;
+}
+
+/**
+ * The template fields `getTemplateInfo` reads.
+ */
+export interface TemplateInfoTemplate {
+	slug?: string;
+	area?: string;
+	title?: string | { rendered?: string };
+	description?: string | { raw?: string };
 }
 
 /**

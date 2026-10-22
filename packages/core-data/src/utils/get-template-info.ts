@@ -1,6 +1,11 @@
 import { layout } from '@wordpress/icons';
 import { getTemplatePartIcon } from './get-template-part-icon';
-import type { TemplateInfo, TemplateInfoParams, TemplateType } from './types';
+import type {
+	TemplateInfo,
+	TemplateInfoParams,
+	TemplateInfoTemplate,
+	TemplateType,
+} from './types';
 
 const EMPTY_OBJECT = {};
 
@@ -21,7 +26,8 @@ export const getTemplateInfo = (
 
 	const { templateTypes, templateAreas, template } = params;
 
-	const { description, slug, title, area } = template;
+	// Destructuring a missing (`false`) record reads every field as undefined.
+	const { description, slug, title, area } = template as TemplateInfoTemplate;
 
 	const { title: defaultTitle, description: defaultDescription } =
 		Object.values( templateTypes ).find( ( type ) => type.slug === slug ) ??
