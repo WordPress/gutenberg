@@ -96,6 +96,9 @@ export type Action =
 			type: 'EDIT_ENTITY_RECORD';
 			recordId: ItemId | undefined;
 			edits: Record< string, unknown >;
+			// Set by the edits the sync manager applies.
+			meta?: { undo?: unknown };
+			options?: Record< string, unknown >;
 	  } )
 	| { type: 'RECEIVE_AUTOSAVES'; postId: ItemId; autosaves: Array< unknown > }
 	| { type: 'RECEIVE_BLOCK_PATTERNS'; patterns: Array< unknown > }
@@ -123,10 +126,12 @@ export type Action =
 			EntityActionTarget & {
 				type: 'RECEIVE_ITEM_REVISIONS';
 				recordKey?: ItemId;
-				invalidateCache?: boolean;
+				invalidateCache?: boolean | null;
 			} )
 	| ( ReceiveItemsAction &
-			Partial< EntityActionTarget > & { invalidateCache?: boolean } )
+			Partial< EntityActionTarget > & {
+				invalidateCache?: boolean | null;
+			} )
 	| { type: 'RECEIVE_NAVIGATION_FALLBACK_ID'; fallbackId: ItemId | null }
 	| {
 			type: 'RECEIVE_REGISTERED_POST_META';
@@ -228,6 +233,6 @@ export interface EntitiesState {
  * The users state: the users by ID, and the IDs each query lists.
  */
 export interface UsersState {
-	byId: Record< ItemId, ET.User< 'edit' > >;
+	byId: Record< ItemId, ET.User< 'view' > >;
 	queries: Record< string, Array< ItemId > >;
 }
