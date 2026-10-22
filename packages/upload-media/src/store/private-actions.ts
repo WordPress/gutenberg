@@ -926,7 +926,7 @@ export function prepareItem( id: QueueItemId ) {
 		// image_editor_output_format filter during create_item.
 		// The response carries image_output_format so generateThumbnails
 		// can transcode sub-sizes to the same target format.
-		if ( isImage && isVipsSupported && ! isJxl && ! tooLargeForClient ) {
+		if ( isImage && isVipsSupported && ! tooLargeForClient ) {
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
