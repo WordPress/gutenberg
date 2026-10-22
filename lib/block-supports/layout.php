@@ -919,8 +919,16 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		// Manual grids give all their cells the same size, as part of the grid interactivity experiment.
-		$has_same_size_cells = ! empty( $layout_for_styles['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		/**
+		 * Filters whether manual grids are interactive: their cells all have the same size,
+		 * and blocks can be moved and resized in them. It's the plugin's switch for the grid
+		 * interactivity experiment, and goes away when the experiment does.
+		 *
+		 * @param bool $has_grid_interactivity Whether grid interactivity is on. Default false.
+		 */
+		$has_grid_interactivity = (bool) apply_filters( 'gutenberg_layout_has_grid_interactivity', false );
+		// Manual grids give all their cells the same size, as part of grid interactivity.
+		$has_same_size_cells = ! empty( $layout_for_styles['isManualPlacement'] ) && $has_grid_interactivity;
 		// Cells take their size from the grid's width, unless a minimum column width lets the columns wrap into more rows than the grid has.
 		$has_cells_sized_by_width      = $has_same_size_cells && empty( $layout_for_styles['minimumColumnWidth'] );
 		$base_has_cells_sized_by_width = $has_same_size_cells && empty( $base_layout['minimumColumnWidth'] );

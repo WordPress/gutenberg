@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getInserterDragBlockNames,
 	GridRect,
 	getBoundingGridRect,
 	getGridRectFromPixelRect,
@@ -145,5 +146,25 @@ describe( 'getRowEndForResize()', () => {
 	it( 'adds a row for every row height dragged past the end', () => {
 		expect( getRowEndForResize( rowTracks, 230, 10 ) ).toBe( 4 );
 		expect( getRowEndForResize( rowTracks, 290, 10 ) ).toBe( 5 );
+	} );
+} );
+
+describe( 'getInserterDragBlockNames()', () => {
+	it( 'returns the block names of an inserter drag', () => {
+		expect(
+			getInserterDragBlockNames( {
+				types: [ 'wp-block:core/image', 'wp-blocks' ],
+			} )
+		).toEqual( [ 'core/image' ] );
+	} );
+
+	it( 'returns nothing for a file drag', () => {
+		expect( getInserterDragBlockNames( { types: [ 'Files' ] } ) ).toEqual(
+			[]
+		);
+	} );
+
+	it( 'returns nothing without a dataTransfer', () => {
+		expect( getInserterDragBlockNames( null ) ).toEqual( [] );
 	} );
 } );
