@@ -82,6 +82,23 @@ export default function isEdge(
 		return false;
 	}
 
+	// A line above the selection (or below, when going down) means it is not
+	// at the vertical edge. Unlike hit-testing a point, a range measures
+	// lines outside the viewport too.
+	const contentRange = ownerDocument.createRange();
+	contentRange.selectNodeContents( container );
+	const hasLineBeyond = Array.from( contentRange.getClientRects() ).some(
+		( rect ) =>
+			rect.height > 0 &&
+			( isReverse
+				? rect.bottom <= rangeRect.top + 1
+				: rect.top >= rangeRect.bottom - 1 )
+	);
+
+	if ( hasLineBeyond ) {
+		return false;
+	}
+
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
 	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
 	const containerRect = container.getBoundingClientRect();
@@ -97,30 +114,23 @@ export default function isEdge(
 	// edge, because we cannot know the padding and line height reliably in
 	// pixels. `getComputedStyle` may return a value with different units.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
-	const y = isReverse ? containerRect.top + 1 : containerRect.bottom - 1;
+	// The selection is on the edge line, so test that line: it is within the
+	// viewport when the selection is.
+	const y = isReverse ? rangeRect.top + 1 : rangeRect.bottom - 1;
 
 	// The test point can only be hit-tested when it is within the viewport
 	// (`caretRangeFromPoint` returns nothing for a point outside it, upon
 	// which `scrollIfNoRange` scrolls the container's edge into view to
-	// measure, e.g. on every arrow press within a container taller than the
+	// measure, e.g. on every arrow press within a container wider than the
 	// viewport). When the edge is outside the viewport and the selection is
-	// within it, they are at least a viewport boundary apart along that
-	// axis, so the selection cannot be at the edge. Check each axis
-	// separately: the vertical check must not be short-circuited by a
-	// horizontally overflowing container, and vice versa.
-	const isFarFromVerticalEdge =
-		( y < 0 || y > defaultView.innerHeight ) &&
-		rangeRect.top >= 0 &&
-		rangeRect.bottom <= defaultView.innerHeight;
+	// within it, they are at least a viewport boundary apart, so the
+	// selection cannot be at the edge.
 	const isFarFromHorizontalEdge =
 		( x < 0 || x > defaultView.innerWidth ) &&
 		rangeRect.left >= 0 &&
 		rangeRect.right <= defaultView.innerWidth;
 
-	if (
-		isFarFromVerticalEdge ||
-		( ! onlyVertical && isFarFromHorizontalEdge )
-	) {
+	if ( ! onlyVertical && isFarFromHorizontalEdge ) {
 		return false;
 	}
 
