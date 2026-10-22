@@ -755,6 +755,14 @@ function GridLayoutColumnsAndRowsControl( {
 								} );
 							} }
 							value={ columnCount ?? '' }
+							// A new column count rearranges a manual grid's
+							// blocks, so a typed count only applies when
+							// it's committed with Enter or by leaving the field,
+							// and not for each digit on the way to it.
+							isPressEnterToChange={
+								isManualPlacement &&
+								window.__experimentalEnableGridInteractivity
+							}
 							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={ ! isManualPlacement }
