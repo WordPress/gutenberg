@@ -43,7 +43,7 @@ async function generateContentHash(
  * @param {string|false} scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
  * @param {Object}       externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
  * @param {string}       handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
- * @param {Object}       externals          Packages to load from a custom script module in ESM builds (e.g., { '@wordpress/ui': { module: 'my-plugin/wp-ui-0-1-2' } }).
+ * @param {Object}       externals          Packages to load from a custom script or script module, (e.g., { '@wordpress/ui': { module: 'my-plugin/wp-ui-0-1-2', handle: 'my-plugin-wp-ui-0-1-2', global: 'myPlugin.wpUi' } }).
  * @return {Function} Function that creates the esbuild plugin instance.
  */
 export function createWordpressExternalsPlugin(
@@ -176,28 +176,52 @@ export function createWordpressExternalsPlugin(
 
 				for ( const [
 					packageName,
-					{ module: moduleId },
+					{ module: moduleId, handle, global: globalName },
 				] of Object.entries( externals ) ) {
 					build.onResolve(
 						{ filter: new RegExp( `^${ packageName }$` ) },
 						( args ) => {
-							if ( buildFormat !== 'esm' || ! moduleId ) {
-								// Fall back to default behavior. Can implement in the future if needed.
-								return undefined;
+							if ( buildFormat === 'esm' && moduleId ) {
+								// Write the module name, and don't bundle the import, resulting in the following:
+								//   source: import { Button } from '@wordpress/ui'
+								//   output: import { Button } from 'my-plugin/wp-ui-0-1-2'
+
+								// A static import anywhere in the bundle takes precedence, so the module is preloaded instead of lazy-loaded.
+								// See also: https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/
+								if ( args.kind !== 'dynamic-import' ) {
+									moduleDependencies.set(
+										moduleId,
+										'static'
+									);
+								} else if (
+									! moduleDependencies.has( moduleId )
+								) {
+									moduleDependencies.set(
+										moduleId,
+										'dynamic'
+									);
+								}
+
+								return { path: moduleId, external: true };
 							}
 
-							// A static import anywhere in the bundle takes precedence, so the module is preloaded instead of lazy-loaded.
-							// See also: https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/
-							if ( args.kind !== 'dynamic-import' ) {
-								moduleDependencies.set( moduleId, 'static' );
-							} else if ( ! moduleDependencies.has( moduleId ) ) {
-								moduleDependencies.set( moduleId, 'dynamic' );
+							if (
+								buildFormat !== 'esm' &&
+								handle &&
+								globalName
+							) {
+								// Adds the handle as a dependency and resolves the `@wordpress/some-package` into the
+								// `vendor-external` namespace, ultimately loading the package from window.myPlugin.someGlobal.
+								dependencies.add( handle );
+								return {
+									path: args.path,
+									namespace: 'vendor-external',
+									pluginData: { global: globalName },
+								};
 							}
 
-							// Write the module name, and don't bundle the import, resulting in the following:
-							//   source: import { Button } from '@wordpress/ui'
-							//   output: import { Button } from 'my-plugin/wp-ui-0-1-2'
-							return { path: moduleId, external: true };
+							// Fall back to default behavior.
+							return undefined;
 						}
 					);
 				}

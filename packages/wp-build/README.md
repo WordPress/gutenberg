@@ -278,21 +278,28 @@ If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` â†
 
 ### `wpPlugin.externals`
 
-Individual packages to load from a shared script module instead of bundling them or using their default handle. Each entry maps a package name to an object with the `module` ID of the script module that provides it:
+Individual packages to load from a shared script module or script instead of bundling them or using their default handle. Each entry maps a package name to the `module` ID of the script module that provides it, and the `handle` and `global` of the script that provides it:
 
 ```json
 {
 	"wpPlugin": {
 		"externals": {
 			"@wordpress/ui": {
-				"module": "my-plugin/wp-ui-0-1-2"
+				"module": "my-plugin/wp-ui-0-1-2",
+				"handle": "my-plugin-wp-ui-0-1-2",
+				"global": "myPlugin.wpUi"
 			}
 		}
 	}
 }
 ```
 
-With this configuration, `import { Button } from '@wordpress/ui'` in a script module imports `my-plugin/wp-ui-0-1-2` and adds it to `module_dependencies`. Classic scripts resolve the package as usual. The plugin must register a script module with that ID that exports the package. Only exact package names are matched.
+With this configuration, `import { Button } from '@wordpress/ui'`:
+
+- In script modules, imports `my-plugin/wp-ui-0-1-2` and adds it to `module_dependencies`.
+- In classic scripts, loads the package from `window.myPlugin.wpUi` and adds the `my-plugin-wp-ui-0-1-2` handle to `dependencies`.
+
+The plugin must register the script module or script that provides the package. Only exact package names are matched.
 
 ### `wpPlugin.pages` (Experimental)
 
