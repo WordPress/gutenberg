@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
-import { Icon, IconButton, Stack } from '@wordpress/ui';
+import {
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
+	IconButton,
+	Stack,
+} from '@wordpress/ui';
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
 import type {
@@ -25,12 +29,13 @@ const meta: Meta< typeof DashboardGrid > = {
 		children: { control: false },
 		columns: {
 			control: { type: 'number', min: 1, max: 24, step: 1 },
-			description: 'Total columns in fixed mode.',
+			description:
+				'Column count, or the cap when `minColumnWidth` is set.',
 		},
 		minColumnWidth: {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
-				'Enables responsive mode. Per-column lower bound in pixels.',
+				'Per-column floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
@@ -326,86 +331,115 @@ export const InteractiveContent: Story = {
 };
 
 /**
- * Responsive grid: the column count is derived from the container
- * width using `minColumnWidth` as the lower bound per column. A
- * `ResizeObserver` recomputes the count on container resize.
+ * `columns` and `minColumnWidth` compose. `columns` alone fixes the count.
+ * `minColumnWidth` alone fits as many columns of at least that width as
+ * the container allows. Together, `columns` caps what the floor fits:
+ * up to four columns here, none narrower than 240px, down to one. The
+ * layout mixes fixed, `fill`, `full` and two-row tiles so the repacking
+ * is visible at every count: a `fill` takes the free run of the row it
+ * lands in, and the tall tile's shadow shortens the runs below it. Open
+ * the story full screen and resize the browser to walk the counts.
  */
-export const Responsive: Story = {
+export const Columns: Story = {
 	args: {
-		layout: [
-			{ key: 'a', width: 1, order: 1 },
-			{ key: 'b', width: 2, order: 2 },
-			{ key: 'c', width: 2, order: 3 },
-			{ key: 'd', width: 1, order: 4 },
-			{ key: 'e', width: 2, order: 5 },
-			{ key: 'f', width: 2, order: 6 },
-		],
+		columns: 4,
+		minColumnWidth: 240,
 		rowHeight: 96,
-		minColumnWidth: 192,
+		layout: [
+			{ key: 'a', width: 1 },
+			{ key: 'b', width: 'fill' },
+			{ key: 'c', width: 1, height: 2 },
+			{ key: 'd', width: 1 },
+			{ key: 'e', width: 'fill' },
+			{ key: 'f', width: 'full' },
+		],
 		children: [
 			<Tile key="a" tone="brand">
-				width: 1
+				1
 			</Tile>,
 			<Tile key="b" tone="info">
-				width: 2
+				fill
 			</Tile>,
 			<Tile key="c" tone="success">
-				width: 2
+				1 · 2 rows
 			</Tile>,
 			<Tile key="d" tone="warning">
-				width: 1
+				1
 			</Tile>,
 			<Tile key="e" tone="error">
-				width: 2
+				fill
 			</Tile>,
 			<Tile key="f" tone="neutral">
-				width: 2
+				full
 			</Tile>,
 		],
 	},
 };
 
 /**
- * Layered configuration: `columns` caps the count and
- * `minColumnWidth` enforces a per-tile width floor. The grid renders
- * up to `columns` columns on wide containers and reduces the count
- * on narrow ones whenever fitting all of them would push tiles
- * below `minColumnWidth`. Resize the preview to see the cap apply
- * on wide widths and the floor reduce the count on narrow widths.
+ * `columns` as a map: one column from 0px, two from 600px, four from
+ * 960px. The count steps at those container widths regardless of how
+ * wide each column ends up; add `minColumnWidth` to lower it further.
  */
-export const Layered: Story = {
+export const ColumnSteps: Story = {
+	argTypes: {
+		columns: { control: 'object' },
+	},
 	args: {
-		layout: [
-			{ key: 'a', width: 1, order: 1 },
-			{ key: 'b', width: 2, order: 2 },
-			{ key: 'c', width: 2, order: 3 },
-			{ key: 'd', width: 1, order: 4 },
-			{ key: 'e', width: 2, order: 5 },
-			{ key: 'f', width: 2, order: 6 },
-		],
+		columns: { 0: 1, 600: 2, 960: 4 },
 		rowHeight: 96,
-		columns: 6,
-		minColumnWidth: 240,
+		layout: [
+			{ key: 'fixed-1', width: 1, height: 1 },
+			{ key: 'fixed-2', width: 2, height: 2 },
+			{ key: 'fill-1', width: 'fill' },
+			{ key: 'fixed-3', width: 1, height: 1 },
+			{ key: 'fixed-4', width: 1, height: 2 },
+			{ key: 'fixed-5', width: 2, height: 1 },
+			{ key: 'fill-2', width: 'fill' },
+			{ key: 'full-1', width: 'full' },
+		],
 		children: [
-			<Tile key="a" tone="brand">
-				width: 1
+			<Tile key="fixed-1" tone="brand">
+				width: <strong>1</strong> · height: <strong>1</strong>
 			</Tile>,
-			<Tile key="b" tone="info">
-				width: 2
+			<Tile key="fixed-2" tone="info">
+				width: <strong>2</strong> · height: <strong>2</strong>
 			</Tile>,
-			<Tile key="c" tone="success">
-				width: 2
+			<Tile key="fill-1" tone="info">
+				width: <strong>fill</strong>
 			</Tile>,
-			<Tile key="d" tone="warning">
-				width: 1
+			<Tile key="fixed-3" tone="success">
+				width: <strong>1</strong> · height: <strong>1</strong>
 			</Tile>,
-			<Tile key="e" tone="error">
-				width: 2
+			<Tile key="fixed-4" tone="warning">
+				width: <strong>1</strong> · height: <strong>2</strong>
 			</Tile>,
-			<Tile key="f" tone="neutral">
-				width: 2
+			<Tile key="fixed-5" tone="error">
+				width: <strong>2</strong> · height: <strong>1</strong>
+			</Tile>,
+			<Tile key="fill-2" tone="error">
+				width: <strong>fill</strong>
+			</Tile>,
+			<Tile key="full-1" tone="neutral">
+				width: <strong>full</strong>
 			</Tile>,
 		],
+	},
+};
+
+/**
+ * A step can be `'auto'`: from that width up there is no cap and the
+ * floor alone decides the count. Here the steps fix one and two columns
+ * below 960px, and 240px columns fill the container above it.
+ */
+export const ColumnStepsWithFloor: Story = {
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		...ColumnSteps.args,
+		columns: { 0: 1, 600: 2, 960: 'auto' },
+		minColumnWidth: 240,
 	},
 };
 
