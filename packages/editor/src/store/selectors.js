@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
@@ -11,14 +8,12 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { Platform } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	ATTACHMENT_POST_TYPE,
 	EDIT_MERGE_PROPERTIES,
@@ -27,9 +22,10 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
-import { getTemplateInfo } from '../utils/get-template-info';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
+
+const { getTemplateInfo, getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -524,8 +520,7 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state ) ||
-		Platform.OS === 'native'
+		! isEditedPostEmpty( state )
 	);
 }
 
@@ -985,6 +980,11 @@ export function getPermalink( state ) {
 	const { prefix, postName, suffix } = permalinkParts;
 
 	if ( isPermalinkEditable( state ) ) {
+		// A post without a slug or a title has no pretty permalink yet, so
+		// use its plain one (`?p=ID`).
+		if ( ! postName ) {
+			return getCurrentPostAttribute( state, 'link' ) ?? null;
+		}
 		return prefix + postName + suffix;
 	}
 
@@ -992,9 +992,14 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the slug for the post being edited, preferring a manually edited
- * value if one exists, then a sanitized version of the current post title, and
- * finally the post ID.
+ * Returns the slug for the post being edited: the edited or saved slug if one
+ * is set, otherwise the slug derived from the current title, which is what
+ * WordPress uses when the post is published. Returns an empty string for a
+ * post with neither.
+ *
+ * The server-generated slug isn't used: it comes from the saved title, so it
+ * lags behind title edits, and for a new post it comes from the `Auto Draft`
+ * placeholder.
  *
  * @param {Object} state Editor state.
  *
@@ -1003,8 +1008,7 @@ export function getPermalink( state ) {
 export function getEditedPostSlug( state ) {
 	return (
 		getEditedPostAttribute( state, 'slug' ) ||
-		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
-		getCurrentPostId( state )
+		cleanForSlug( getEditedPostAttribute( state, 'title' ) )
 	);
 }
 
@@ -1026,9 +1030,7 @@ export function getPermalinkParts( state ) {
 		return null;
 	}
 
-	const postName =
-		getEditedPostAttribute( state, 'slug' ) ||
-		getEditedPostAttribute( state, 'generated_slug' );
+	const postName = getEditedPostSlug( state );
 
 	const [ prefix, suffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX
@@ -1350,11 +1352,15 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const isZoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		const blockEditorSelect = unlock( select( blockEditorStore ) );
+		const isZoomOut = blockEditorSelect.isZoomOut();
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
-		return state.deviceType;
+		const canvasWidth = state.canvasWidth;
+		const viewportSettings =
+			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
+		return getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings );
 	}
 );
 

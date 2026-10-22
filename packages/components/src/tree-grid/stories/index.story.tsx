@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { Fragment } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TreeGrid, { TreeGridRow, TreeGridCell } from '..';
 import { Button } from '../../button';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof TreeGrid > = {
-	title: 'Components/Navigation/TreeGrid',
+	title: 'Components/@wordpress-components/Navigation/TreeGrid',
 	id: 'components-treegrid',
 	component: TreeGrid,
 	subcomponents: { TreeGridRow, TreeGridCell },
@@ -124,7 +113,6 @@ const Rows = ( {
 										label="Description"
 										hideLabelFromVision
 										placeholder="Description"
-										__next40pxDefaultSize
 										{ ...props }
 									/>
 								) }
@@ -135,7 +123,6 @@ const Rows = ( {
 										label="Notes"
 										hideLabelFromVision
 										placeholder="Notes"
-										__next40pxDefaultSize
 										{ ...props }
 									/>
 								) }

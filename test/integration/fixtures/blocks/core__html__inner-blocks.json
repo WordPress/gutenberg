@@ -1,0 +1,23 @@
+[
+	{
+		"name": "core/html",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Editable paragraph",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		],
+		"innerContent": [
+			"\n<div class=\"banner\"><h1>Static heading</h1>",
+			null,
+			"<footer>Static footer</footer></div>\n"
+		]
+	}
+]

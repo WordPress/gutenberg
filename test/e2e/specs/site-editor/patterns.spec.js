@@ -1,10 +1,12 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
 } = require( '@wordpress/e2e-test-utils-playwright' );
+
+// Whether the run targets the extensible site editor (v2). Its Patterns page
+// is a single region with view tabs instead of the classic editor's
+// navigation-and-content split with a category sidebar.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 /** @type {ReturnType<typeof base.extend<{patterns: Patterns}>>} */
 const test = base.extend( {
@@ -21,6 +23,10 @@ test.describe( 'Patterns', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllUsers();
+		// Drop persisted view state (search and filters) so one test's
+		// filtering doesn't hide another test's fixtures.
+		await requestUtils.resetPreferences();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -35,9 +41,12 @@ test.describe( 'Patterns', () => {
 	} ) => {
 		await admin.visitSiteEditor( { postType: 'wp_block' } );
 		await expect(
-			patterns.navigation.getByRole( 'heading', {
+			( isSiteEditorV2
+				? patterns.content
+				: patterns.navigation
+			).getByRole( 'heading', {
 				name: 'Patterns',
-				level: 1,
+				level: isSiteEditorV2 ? 2 : 1,
 			} )
 		).toBeVisible();
 		await expect( patterns.content ).toContainText( 'No results' );
@@ -46,15 +55,19 @@ test.describe( 'Patterns', () => {
 			.getByRole( 'button', { name: 'add pattern' } )
 			.click();
 
-		const addNewMenuItem = page
-			.getByRole( 'menu', {
-				name: 'add pattern',
-			} )
-			.getByRole( 'menuitem', {
-				name: 'add pattern',
-			} );
-		await expect( addNewMenuItem ).toBeFocused();
-		await addNewMenuItem.click();
+		// The classic editor's button opens a menu offering a pattern or a
+		// template part; the extensible editor's opens the dialog directly.
+		if ( ! isSiteEditorV2 ) {
+			const addNewMenuItem = page
+				.getByRole( 'menu', {
+					name: 'add pattern',
+				} )
+				.getByRole( 'menuitem', {
+					name: 'add pattern',
+				} );
+			await expect( addNewMenuItem ).toBeFocused();
+			await addNewMenuItem.click();
+		}
 
 		const createPatternDialog = page.getByRole( 'dialog', {
 			name: 'add pattern',
@@ -72,7 +85,7 @@ test.describe( 'Patterns', () => {
 		).toBeVisible();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'My pattern' );
 
@@ -84,30 +97,47 @@ test.describe( 'Patterns', () => {
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
 		).toContainText( 'Pattern updated' );
 
-		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
+		if ( isSiteEditorV2 ) {
+			await page
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.click();
 
-		await expect(
-			patterns.navigation.getByRole( 'button', {
-				name: 'All patterns',
-			} )
-		).toContainText( '1' );
-		await expect(
-			patterns.navigation.getByRole( 'button', {
-				name: 'My patterns',
-			} )
-		).toContainText( '1' );
-		await expect(
-			patterns.navigation.getByRole( 'button', {
-				name: 'Uncategorized',
-			} )
-		).toContainText( '1' );
+			// The extensible editor's Patterns page filters through view tabs
+			// without per-category counts.
+			await expect(
+				page.getByRole( 'tab', { name: 'All patterns' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'tab', { name: 'Site patterns' } )
+			).toBeVisible();
+		} else {
+			await page
+				.getByRole( 'button', { name: 'Open navigation' } )
+				.click();
 
-		await expect(
-			patterns.content.getByRole( 'heading', {
-				name: 'All patterns',
-				level: 2,
-			} )
-		).toBeVisible();
+			await expect(
+				patterns.navigation.getByRole( 'button', {
+					name: 'All patterns',
+				} )
+			).toContainText( '1' );
+			await expect(
+				patterns.navigation.getByRole( 'button', {
+					name: 'Site patterns',
+				} )
+			).toContainText( '1' );
+			await expect(
+				patterns.navigation.getByRole( 'button', {
+					name: 'Uncategorized',
+				} )
+			).toContainText( '1' );
+
+			await expect(
+				patterns.content.getByRole( 'heading', {
+					name: 'All patterns',
+					level: 2,
+				} )
+			).toBeVisible();
+		}
 		await expect( patterns.item ).toHaveCount( 1 );
 		await expect(
 			patterns.itemsList.getByText( 'My pattern', {
@@ -155,10 +185,10 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item
-				.getByRole( 'button' )
-				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
-				.allInnerTexts()
+			// The title element: a button in the classic editor, a link in
+			// the extensible one, so target the title field wrapper.
+			// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+			await patterns.itemTitle.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced footer', 'Synced footer' ] )
 		);
@@ -183,10 +213,10 @@ test.describe( 'Patterns', () => {
 		await page.getByRole( 'option', { name: /^Not synced/ } ).click();
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item
-				.getByRole( 'button' )
-				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
-				.allInnerTexts()
+			// The title element: a button in the classic editor, a link in
+			// the extensible one, so target the title field wrapper.
+			// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+			await patterns.itemTitle.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced header', 'Unsynced footer' ] )
 		);
@@ -194,6 +224,45 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 1 );
 		await expect( patterns.item ).toContainText( 'Unsynced footer' );
+	} );
+
+	test( 'filter patterns by author', async ( {
+		admin,
+		requestUtils,
+		patterns,
+		page,
+	} ) => {
+		const editorUser = await requestUtils.createUser( {
+			username: 'patterneditor',
+			email: 'patterneditor@example.com',
+			password: 'patterneditorpassword',
+			roles: [ 'editor' ],
+		} );
+		await Promise.all( [
+			requestUtils.createBlock( {
+				title: 'Editor pattern',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Editor pattern</p>\n<!-- /wp:paragraph -->`,
+				author: editorUser.id,
+			} ),
+			requestUtils.createBlock( {
+				title: 'Administrator pattern',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Administrator pattern</p>\n<!-- /wp:paragraph -->`,
+			} ),
+		] );
+
+		await admin.visitSiteEditor( { postType: 'wp_block' } );
+		await expect( patterns.item ).toHaveCount( 2 );
+
+		await patterns.content
+			.getByRole( 'button', { name: 'Add filter' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Author' } ).click();
+		await page.getByRole( 'option', { name: 'patterneditor' } ).click();
+
+		await expect( patterns.item ).toHaveCount( 1 );
+		await expect( patterns.item ).toContainText( 'Editor pattern' );
 	} );
 
 	test( 'sort patterns', async ( {
@@ -262,7 +331,7 @@ class Patterns {
 		this.#page = page;
 
 		this.content = this.#page.getByRole( 'region', {
-			name: 'All patterns',
+			name: isSiteEditorV2 ? 'Patterns' : 'All patterns',
 		} );
 		this.navigation = this.#page.getByRole( 'region', {
 			name: 'Navigation',

@@ -6,7 +6,7 @@ The Block Locking API allows you to restrict actions on specific blocks within t
 
 Users can lock and unlock blocks via the Editor. The locking UI has options for preventing blocks from being moved within the content canvas or removed:
 
-![Image of locking interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20interface.png?raw=true)
+![Image of locking interface](https://developer.wordpress.org/files/2026/06/Locking-interface.png)
 
 Keep in mind that you can apply locking options to blocks nested inside of a containing block by turning on the "Apply to all blocks inside" option. However, you cannot mass lock blocks otherwise.
 

@@ -1,5 +1,18 @@
 @use "@wordpress/base-styles/variables" as *;
 
+.editor-editor-interface__breadcrumbs {
+	flex: 1 1 auto;
+	height: var(--wpds-dimension-size-md);
+	padding: 0 ($grid-unit-15 + 6px);
+	min-width: 0;
+}
+
+.editor-editor-interface__footer {
+	flex: 1;
+	min-width: 0;
+	min-height: var(--wpds-dimension-size-md);
+}
+
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }
@@ -9,8 +22,15 @@
 	isolation: isolate;
 }
 
-.editor-editor-interface .editor-notices {
-	padding: var(--wpds-dimension-padding-md);
+.editor-notices.notices-inline-notices-wrapper,
+.editor-notices .notices-inline-notices__list {
+	gap: 0;
+}
+
+.editor-notices .notices-inline-notices__notice,
+.editor-notices .editor-template-validation-notice {
+	border-top-width: 0;
+	border-inline-width: 0;
 }
 
 .editor-visual-editor {

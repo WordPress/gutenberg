@@ -1,10 +1,9 @@
-.wp-block-tab-list {
-	// Allow the inner block list to be displayed in the flex layout, so the tab buttons appear as direct flex children in the editor.
-	> .block-editor-block-list__layout {
-		display: contents;
-	}
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
 
-	.block-editor-block-list__block:has(> .wp-block-tab) {
-		display: contents;
+.wp-block-tab-list__mover-button {
+	@include break-small() {
+		width: $button-size-small;
+		min-width: 0 !important;
 	}
 }

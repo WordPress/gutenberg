@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useRegisterPanel } from './context';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
 import type { TabPanelProps } from './types';
 
 /**

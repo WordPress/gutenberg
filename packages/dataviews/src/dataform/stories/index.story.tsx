@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import LayoutCardComponent from './layout-card';
 import LayoutDetailsComponent from './layout-details';
@@ -10,10 +7,13 @@ import LayoutRowComponent from './layout-row';
 import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
+import ValidationPanelComponent from './validation-panel';
 import VisibilityComponent from './visibility';
 
 const meta = {
-	title: 'DataViews/DataForm',
+	tags: [ 'manifest' ],
+	id: 'dataviews-dataform',
+	title: 'Design System/DataViews/DataForm',
 	component: DataForm,
 };
 export default meta;
@@ -67,6 +67,11 @@ export const LayoutPanel = {
 			description: 'Chooses when the edit icon is visible.',
 			options: [ 'default', 'always', 'on-hover' ],
 		},
+		showPlaceholderIfEmpty: {
+			control: { type: 'boolean' },
+			description:
+				'Whether the summary shows the field placeholder when the value is empty.',
+		},
 		applyLabel: {
 			control: { type: 'text' },
 			description:
@@ -79,13 +84,24 @@ export const LayoutPanel = {
 				'Custom text for the modal cancel button. Defaults to "Cancel".',
 			if: { arg: 'openAs', eq: 'modal' },
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
 	},
 	args: {
 		openAs: 'default',
+		showPlaceholderIfEmpty: false,
+		disabled: false,
 	},
 };
 
 export const LayoutRegular = {
+	parameters: {
+		// FIXME: Story renders unlabeled form controls (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutRegularComponent,
 	argTypes: {
 		labelPosition: {
@@ -104,6 +120,11 @@ export const LayoutRegular = {
 };
 
 export const LayoutRow = {
+	parameters: {
+		// FIXME: Story renders unlabeled form controls (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutRowComponent,
 	argTypes: {
 		alignment: {
@@ -122,6 +143,11 @@ export const LayoutMixed = {
 };
 
 export const Validation = {
+	parameters: {
+		// FIXME: Error-delegate inputs are unlabeled (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: ValidationComponent,
 	argTypes: {
 		layout: {
@@ -171,6 +197,10 @@ export const Validation = {
 		pattern: false,
 		minMax: false,
 	},
+};
+
+export const ValidationPanelErrorIndicator = {
+	render: ValidationPanelComponent,
 };
 
 export const Visibility = {

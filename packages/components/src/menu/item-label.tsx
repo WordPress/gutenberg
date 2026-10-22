@@ -1,19 +1,14 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
-import * as Styled from './styles';
+import { Truncate } from '../truncate';
+import styles from './style.module.scss';
 
 export const ItemLabel = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function ItemLabel( props, ref ) {
+>( function UnforwardedItemLabel( { className, ...props }, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
@@ -22,5 +17,12 @@ export const ItemLabel = forwardRef<
 		);
 	}
 
-	return <Styled.ItemLabel numberOfLines={ 1 } ref={ ref } { ...props } />;
+	return (
+		<Truncate
+			numberOfLines={ 1 }
+			ref={ ref }
+			{ ...props }
+			className={ clsx( styles[ 'item-label' ], className ) }
+		/>
+	);
 } );

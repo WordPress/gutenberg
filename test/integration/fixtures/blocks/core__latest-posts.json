@@ -9,8 +9,6 @@
 			"excerptLength": 55,
 			"displayAuthor": false,
 			"displayPostDate": false,
-			"postLayout": "list",
-			"columns": 3,
 			"order": "desc",
 			"orderBy": "date",
 			"displayFeaturedImage": false,

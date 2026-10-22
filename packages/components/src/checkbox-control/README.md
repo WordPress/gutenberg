@@ -45,7 +45,7 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed 
 
 ### Usage
 
-Render an is author checkbox:
+Render an author checkbox:
 
 ```jsx
 import { useState } from 'react';

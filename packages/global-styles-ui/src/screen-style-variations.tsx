@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Card, CardBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { StyleVariationsContent } from './style-variations-content';
 

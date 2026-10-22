@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/math",
+		"isValid": true,
+		"attributes": {
+			"latex": "\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}",
+			"mathML": "<semantics><mrow><mo fence=\"true\" form=\"prefix\">(</mo><mtable columnalign=\"center center\" columnspacing=\"0.5em\" rowspacing=\"0.16em\"><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo fence=\"true\" form=\"postfix\">)</mo></mrow><annotation encoding=\"application/x-tex\">\\begin{pmatrix} a &amp; b \\\\ c &amp; d \\end{pmatrix}</annotation></semantics>"
+		},
+		"innerBlocks": []
+	}
+]

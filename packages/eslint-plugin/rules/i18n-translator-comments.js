@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	TRANSLATION_FUNCTIONS,
 	REGEXP_SPRINTF_PLACEHOLDER,
@@ -214,7 +211,7 @@ module.exports = {
 										);
 
 									return isValidType && isUnused;
-							  } )
+								} )
 							: [];
 
 						if ( extra.length > 0 ) {
