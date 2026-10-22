@@ -69,6 +69,7 @@ const ALLOWLIST = {
 			'Breadcrumb',
 			'Button',
 			'ButtonLink',
+			'CardRadio',
 			'Combobox',
 			'ControlWithError',
 			'Dialog',

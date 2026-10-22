@@ -1,5 +1,6 @@
 export * from './primitives';
 
+export * from './card-radio';
 export * from './checkbox-control';
 export * from './input-control';
 export * from './radio-group-control';

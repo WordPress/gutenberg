@@ -1,0 +1,41 @@
+@use "../../utils/css/mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer compositions {
+		.root {
+			position: relative;
+
+			&:hover:not(:has(.radio[data-disabled], .radio[data-checked])) {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
+
+			&:has(.radio[data-checked]) {
+				border-color: var(--wpds-color-stroke-interactive-brand);
+			}
+
+			&:has(.radio:focus-visible) {
+				@include mixins.focus-ring();
+			}
+
+			&:has(.radio[data-disabled]) {
+				background-color: var(--wpds-color-background-surface-neutral-weak);
+			}
+		}
+
+		.radio:focus {
+			outline: none;
+		}
+
+		.label::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+		}
+
+		.root:not(:has(.radio[data-disabled])) .label {
+			cursor: var(--wpds-cursor-control);
+		}
+	}
+}

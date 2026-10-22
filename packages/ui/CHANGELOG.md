@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `CardRadio`, a radio option presented as a card for high-emphasis single selection. Clicking anywhere on the card selects it, and it accepts additional non-interactive content ([#85401](https://github.com/WordPress/gutenberg/pull/85401)).
+
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes

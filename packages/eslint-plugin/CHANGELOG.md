@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Recognize `CardRadio` from `@wordpress/ui` as use-with-caution ([#85401](https://github.com/WordPress/gutenberg/pull/85401)).
+
 ## 28.0.0 (2026-10-20)
 
 ### Breaking Changes
