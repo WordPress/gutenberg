@@ -35,6 +35,7 @@
 		"esbuild": "^0.27.2",
 		"glob": "^13.0.6",
 		"jsonc-parser": "^3.3.1",
+		"semver": "^7.5.4",
 		"simple-git": "^4.0.2",
 		"vitest": "^5.0.3"
 	},
@@ -48,6 +49,7 @@
 		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
 		"check-local-changes": "node ./check-local-changes.cjs",
 		"check-peer-dependencies": "node ./check-peer-dependencies.ts",
+		"check-peer-version-ranges": "node ./check-peer-version-ranges.ts",
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
