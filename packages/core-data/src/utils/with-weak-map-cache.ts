@@ -3,17 +3,19 @@
  * tracks in WeakMap. The result is only cached if the original function is
  * passed a valid object-like argument (requirement for WeakMap key).
  *
- * @param {Function} fn Original function.
+ * @param fn Original function.
  *
- * @return {Function} Enhanced caching function.
+ * @return Enhanced caching function.
  */
-function withWeakMapCache( fn ) {
-	const cache = new WeakMap();
+function withWeakMapCache< K, V >( fn: ( key: K ) => V ): ( key: K ) => V {
+	const cache = new WeakMap< object, V >();
 
 	return ( key ) => {
-		let value;
-		if ( cache.has( key ) ) {
-			value = cache.get( key );
+		let value: V;
+		// `has` and `get` accept any value, returning nothing for a non-object.
+		if ( cache.has( key as object ) ) {
+			// Found above.
+			value = cache.get( key as object )!;
 		} else {
 			value = fn( key );
 

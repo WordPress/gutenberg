@@ -5,10 +5,12 @@
  * resolved records, so that `finishResolutions` receives args that match the
  * keys used by callers who omit pagination params.
  *
- * @param {Object} query The raw query object.
- * @return {Object|undefined} Normalised query or undefined.
+ * @param query The raw query object.
+ * @return Normalised query or undefined.
  */
-export default function normalizeQueryForResolution( query ) {
+export default function normalizeQueryForResolution(
+	query: Record< string, unknown > | undefined
+): Record< string, unknown > | undefined {
 	if ( ! query ) {
 		return undefined;
 	}

@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import {
 	header as headerIcon,
 	footer as footerIcon,
@@ -9,11 +10,13 @@ import {
 /**
  * Helper function to retrieve the corresponding icon by area name.
  *
- * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
+ * @param areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
  *
- * @return {Object} The corresponding icon.
+ * @return The corresponding icon.
  */
-export function getTemplatePartIcon( areaOrIconName ) {
+export function getTemplatePartIcon(
+	areaOrIconName: string | undefined
+): ReactElement {
 	if ( 'header' === areaOrIconName ) {
 		return headerIcon;
 	} else if ( 'footer' === areaOrIconName ) {

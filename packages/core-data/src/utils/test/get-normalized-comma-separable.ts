@@ -8,6 +8,12 @@ describe( 'getNormalizedCommaSeparable', () => {
 		expect( result ).toEqual( [ 'a', 'b' ] );
 	} );
 
+	it( 'preserves the element type of a given array', () => {
+		const result: Array< number > = getNormalizedCommaSeparable( [ 1, 2 ] );
+
+		expect( result ).toEqual( [ 1, 2 ] );
+	} );
+
 	it( 'returns a given string as an array of comma-separated parts', () => {
 		const result = getNormalizedCommaSeparable( 'a,b' );
 

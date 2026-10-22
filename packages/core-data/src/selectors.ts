@@ -501,7 +501,7 @@ export function hasEntityRecord(
 
 	// When `query._fields` is provided, check that each requested field exists,
 	// including any nested paths, on the item; return false if any part is missing.
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;
@@ -1657,7 +1657,7 @@ export function hasRevision(
 		return false;
 	}
 
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;

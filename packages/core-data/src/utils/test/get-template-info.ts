@@ -33,7 +33,9 @@ describe( '__experimentalGetTemplateInfo', () => {
 
 	it( 'should return an empty object if no template is passed', () => {
 		expect( getTemplateInfo( undefined ) ).toEqual( {} );
+		// @ts-expect-error Tests the guard against a missing params object.
 		expect( getTemplateInfo( null ) ).toEqual( {} );
+		// @ts-expect-error Tests the guard against a missing params object.
 		expect( getTemplateInfo( false ) ).toEqual( {} );
 	} );
 

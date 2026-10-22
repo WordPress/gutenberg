@@ -6739,11 +6739,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/entity-context.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/entity-provider.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6873,11 +6868,6 @@
 		}
 	},
 	"packages/core-data/src/locks/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/name.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -7028,126 +7018,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/utils/conservative-map-item.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/forward-resolver.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-normalized-comma-separable.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-template-info.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-template-part-icon.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/if-matching-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/is-numeric-id.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/normalize-query-for-resolution.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/receive-intermediate-results.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/replace-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/save-crdt-doc.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/set-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/clear-unchanged-edits.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/conservative-map-item.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-normalized-comma-separable.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-pagination-meta.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-template-info.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/if-matching-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/is-numeric-id.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/log-entity-deprecation.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/replace-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/utils/test/rtc-rich-text-cursor-scope.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -7158,32 +7028,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/utils/test/save-crdt-doc.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/set-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/utils/test/sync-undo-levels.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/with-weak-map-cache.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/user-permissions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/with-weak-map-cache.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

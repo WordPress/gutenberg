@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes
