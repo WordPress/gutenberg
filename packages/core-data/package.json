@@ -76,6 +76,7 @@
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
+		"@types/deep-freeze": "^0.1.5",
 		"@types/node": "^24.13.3",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
