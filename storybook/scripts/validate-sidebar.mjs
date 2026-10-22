@@ -63,7 +63,7 @@ for ( const docs of entries.filter(
 	assert.equal(
 		firstEntry,
 		docs,
-		`Docs must be the first sidebar entry in "${ docs.title }".`
+		`Docs must be the first sidebar entry in "${ docs.title }". Found "${ firstEntry?.name }" in "${ firstEntry?.title }" first.`
 	);
 }
 
