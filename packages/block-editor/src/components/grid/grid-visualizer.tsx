@@ -20,9 +20,7 @@ import {
 	GridRect,
 	getGridInfo,
 	getGridItemRect,
-	getGridTrackPositions,
-	getGridItemPixelRect,
-	getGridRectFromPixelRect,
+	getGridItemMeasurements,
 } from './utils';
 import {
 	getGridDropTarget,
@@ -39,7 +37,9 @@ import type {
 	GridDragGrab,
 	GridDropIndicatorProps,
 	GridDropTarget,
+	GridInfo,
 	GridItemAttributes,
+	GridItemMeasurements,
 	GridPixelRect,
 	GridVisualizerCellProps,
 	GridVisualizerCellPosition,
@@ -388,6 +388,13 @@ function GridVisualizerDropLayer( {
 	const lastTargetRef = useRef< GridDropTarget | null >( null );
 	// Where the dragged block was grabbed, for the length of the drag.
 	const grabRef = useRef< GridDragGrab | null >( null );
+	// The grid measured when the drag started over it. Blocks don't move
+	// until the drop, so it is measured again only when the grid resizes.
+	const measurementsRef = useRef< {
+		srcClientId: string;
+		gridInfo: GridInfo;
+		measurements: GridItemMeasurements;
+	} | null >( null );
 	const isDragging = useSelect(
 		( select ) => select( blockEditorStore ).isDraggingBlocks(),
 		[]
@@ -395,6 +402,7 @@ function GridVisualizerDropLayer( {
 	useEffect( () => {
 		if ( ! isDragging ) {
 			grabRef.current = null;
+			measurementsRef.current = null;
 		}
 	}, [ isDragging ] );
 	const blockEditorSelectors = useSelect( blockEditorStore );
@@ -415,7 +423,24 @@ function GridVisualizerDropLayer( {
 
 	function clearDropTarget() {
 		lastTargetRef.current = null;
+		measurementsRef.current = null;
 		setDropTarget( null );
+	}
+
+	function getMeasurements( srcClientId: string ) {
+		const cached = measurementsRef.current;
+		if (
+			cached?.srcClientId === srcClientId &&
+			cached.gridInfo === gridInfo
+		) {
+			return cached.measurements;
+		}
+		const measurements = getGridItemMeasurements(
+			gridElement,
+			srcClientId
+		);
+		measurementsRef.current = { srcClientId, gridInfo, measurements };
+		return measurements;
 	}
 
 	function getDraggedBlock() {
@@ -430,38 +455,14 @@ function GridVisualizerDropLayer( {
 			return;
 		}
 
-		const { columnTracks, rowTracks } =
-			getGridTrackPositions( gridElement );
+		const { columnTracks, rowTracks, siblings, src } =
+			getMeasurements( srcClientId );
 		if ( ! columnTracks.length || ! rowTracks.length ) {
 			clearDropTarget();
 			return;
 		}
-
-		// Measure the blocks in the grid from the canvas, so that the result
-		// matches what is on screen in every viewport.
-		const siblingRects: GridRect[] = [];
-		let srcSpan: GridRect | null = null;
-		let srcPixelRect: GridPixelRect | null = null;
-		for ( const element of gridElement.children ) {
-			// Block elements are HTML elements.
-			const child = element as HTMLElement;
-			const childClientId = child.getAttribute( 'data-block' );
-			if ( ! childClientId || ! child.offsetParent ) {
-				continue;
-			}
-			const pixelRect = getGridItemPixelRect( child );
-			const rect = getGridRectFromPixelRect(
-				pixelRect,
-				columnTracks,
-				rowTracks
-			);
-			if ( childClientId === srcClientId ) {
-				srcSpan = rect;
-				srcPixelRect = pixelRect;
-				continue;
-			}
-			siblingRects.push( rect );
-		}
+		const srcSpan = src?.rect ?? null;
+		const srcPixelRect = src?.pixelRect ?? null;
 		// The dragged block exists.
 		const srcLayout = (
 			getBlockAttributes( srcClientId ) as GridItemAttributes | null
@@ -537,7 +538,8 @@ function GridVisualizerDropLayer( {
 			return;
 		}
 
-		const overlaps = siblingRects
+		const overlaps = siblings
+			.map( ( { rect } ) => rect )
 			.filter( ( rect ) => rect.intersectsRect( landing ) )
 			.map( ( rect ) =>
 				getPixelRectFromGridRect(
