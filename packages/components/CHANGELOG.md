@@ -8,12 +8,12 @@
 
 ### Enhancements
 
--   Popup menu and option items: Use WPDS colors for solid brand hover and keyboard highlights, neutral open submenu parents, and readable supporting content ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   `Modal`: Use the design system outline for scrollable content focus ([#85251](https://github.com/WordPress/gutenberg/pull/85251)).
 -   `FormToggle`: Use the design system outline for the focus ring ([#85285](https://github.com/WordPress/gutenberg/pull/85285)).
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
+-   Popup menu and option items: Use WPDS colors for solid brand hover and keyboard highlights, neutral open submenu parents, and readable supporting content ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 
 ### Bug Fixes
 
