@@ -124,9 +124,6 @@ export interface LayoutControlProps {
 }
 
 /**
- * A layout type, such as flow, flex, constrained or grid.
- */
-/**
  * What a layout needs to take over the drag of one of its blocks.
  */
 export interface ChildDragOptions {
@@ -142,6 +139,9 @@ export interface ChildDragOptions {
 	stopDraggingBlocks: () => void;
 }
 
+/**
+ * A layout type, such as flow, flex, constrained or grid.
+ */
 export interface LayoutType {
 	name: string;
 	label: string;

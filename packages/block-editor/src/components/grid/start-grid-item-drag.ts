@@ -1,3 +1,5 @@
+import type { ChildDragOptions } from '../../layouts/types';
+
 /**
  * The drag data type that marks a drag started from a grid item's drag handle.
  * Drag data can only be read on drop, but its types can be read while
@@ -22,17 +24,6 @@ export interface GridItemPointerDragEvent {
 export type GridItemPointerDragListener = (
 	event: GridItemPointerDragEvent
 ) => void;
-
-interface GridItemDragOptions {
-	/** Client ID of the dragged block. */
-	clientId: string;
-	/** The block's element in the canvas. */
-	blockElement: HTMLElement;
-	/** Marks blocks as being dragged. */
-	startDraggingBlocks: ( clientIds: string[] ) => void;
-	/** Marks the drag as over. */
-	stopDraggingBlocks: () => void;
-}
 
 /**
  * Whether a drag event belongs to a drag started from a grid item's drag
@@ -68,10 +59,7 @@ export function startGridItemDrag(
 		blockElement,
 		startDraggingBlocks,
 		stopDraggingBlocks,
-	}: GridItemDragOptions & {
-		/** Client ID of the grid. */
-		rootClientId: string;
-	}
+	}: ChildDragOptions
 ) {
 	// A `dragstart` event always has drag data, and starts on the block or
 	// on its handle.
@@ -201,7 +189,7 @@ export function startGridItemPointerDrag(
 		handle,
 		startDraggingBlocks,
 		stopDraggingBlocks,
-	}: GridItemDragOptions & {
+	}: Omit< ChildDragOptions, 'rootClientId' > & {
 		/** The drag handle. */
 		handle: HTMLElement;
 	}
