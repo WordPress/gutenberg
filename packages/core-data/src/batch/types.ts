@@ -27,15 +27,17 @@ export type BatchProcessor< Input > = (
 /**
  * A thunk that adds an input to a batch asynchronously.
  */
-export type BatchThunk< Input > = (
+export type BatchThunk< Input, Result = unknown > = (
 	add: ( input: Input ) => Promise< unknown >
-) => unknown;
+) => Result;
 
 /**
  * A batch, which combines the inputs added to it into one processor call.
  */
 export interface Batch< Input > {
-	add: ( inputOrThunk: Input | BatchThunk< Input > ) => Promise< unknown >;
+	add: < Result = unknown >(
+		inputOrThunk: Input | BatchThunk< Input, Result >
+	) => Promise< Awaited< Result > >;
 	run: () => Promise< boolean >;
 }
 

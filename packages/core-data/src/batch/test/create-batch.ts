@@ -54,6 +54,20 @@ describe( 'createBatch', () => {
 		expect( promise2Value ).toBe( 2 );
 	} );
 
+	test( 'resolves a thunk with what the thunk returns', async () => {
+		const processor = async ( inputs: Array< number > ) =>
+			inputs.map( ( input ) => ( {
+				output: input,
+			} ) );
+		const batch = createBatch( processor );
+		const result: Promise< string > = batch.add( async ( add ) => {
+			await add( 1 );
+			return 'done';
+		} );
+		expect( await batch.run() ).toBe( true );
+		expect( await result ).toBe( 'done' );
+	} );
+
 	test( "running doesn't time out when a thunk doesn't call add()", async () => {
 		const processor = async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => ( {

@@ -89,7 +89,9 @@ export default function createBatch< Input >(
 		 *         processed. If given a thunk, returns the return
 		 *         value of that thunk.
 		 */
-		add( inputOrThunk: Input | BatchThunk< Input > ): Promise< unknown > {
+		add< Result = unknown >(
+			inputOrThunk: Input | BatchThunk< Input, Result >
+		): Promise< Awaited< Result > > {
 			const id = ++lastId;
 			pending.add( id );
 
@@ -106,14 +108,17 @@ export default function createBatch< Input >(
 			if ( typeof inputOrThunk === 'function' ) {
 				// A function input is a thunk.
 				return Promise.resolve(
-					( inputOrThunk as BatchThunk< Input > )( add )
+					( inputOrThunk as BatchThunk< Input, Result > )( add )
 				).finally( () => {
 					pending.delete( id );
 				} );
 			}
 
-			// Not a function, so not a thunk.
-			return add( inputOrThunk as Input );
+			/*
+			 * Not a function, so not a thunk. `Result` is only inferred from
+			 * a thunk, so it stays `unknown` for an input.
+			 */
+			return add( inputOrThunk as Input ) as Promise< Awaited< Result > >;
 		},
 
 		/**
