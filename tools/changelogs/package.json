@@ -29,6 +29,7 @@
 		"./preview": "./lib/preview.js"
 	},
 	"devDependencies": {
+		"@types/js-yaml": "^3.12.10",
 		"@types/node": "^24.13.3",
 		"changie": "^1.26.0",
 		"js-yaml": "^3.15.2",
