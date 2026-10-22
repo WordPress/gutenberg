@@ -81,6 +81,50 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		);
 	} );
 
+	test( 'should edit HTML in the expanded HTML editor', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+
+		const paragraphHTML = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.getByRole( 'textbox' );
+		const expandButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Expand HTML editor' } );
+		const dialog = page.getByRole( 'dialog', { name: 'Edit HTML' } );
+		const dialogHTML = dialog.getByRole( 'textbox', { name: 'HTML' } );
+
+		// Cancelling discards the edits.
+		await expandButton.click();
+		await expect( dialogHTML ).toBeFocused();
+		await expect( dialogHTML ).toHaveValue( '<p>Hello world!</p>' );
+		await dialogHTML.fill( '<p>Discarded</p>' );
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		await expect( dialog ).toBeHidden();
+		await expect( paragraphHTML ).toHaveValue( '<p>Hello world!</p>' );
+
+		// Updating commits the edits to the block.
+		await expandButton.click();
+		await dialogHTML.fill( '<p>Hello <strong>world</strong>!</p>' );
+		await dialog.getByRole( 'button', { name: 'Update' } ).click();
+
+		await expect( dialog ).toBeHidden();
+		await expect( paragraphHTML ).toHaveValue(
+			'<p>Hello <strong>world</strong>!</p>'
+		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello <strong>world</strong>!' },
+			},
+		] );
+	} );
+
 	test( 'the code editor should unselect blocks and disable the inserter', async ( {
 		editor,
 		page,
