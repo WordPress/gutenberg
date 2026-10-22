@@ -984,7 +984,7 @@ export const __experimentalSaveSpecifiedEntityEdits =
 	(
 		kind: string,
 		name: string,
-		recordId: number | string,
+		recordId: number | string | undefined,
 		itemsToSave: Array< string | Array< string > >,
 		options?: SaveEntityRecordOptions
 	) =>
