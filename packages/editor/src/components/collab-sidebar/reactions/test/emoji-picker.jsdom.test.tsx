@@ -30,7 +30,8 @@ vi.mock( import( '../emojibase-data' ), async ( importOriginal ) => {
 } );
 
 describe( 'EmojiPicker', () => {
-	it( 'announces the number of search results', async () => {
+	// Filtering is synchronous, so a live count would announce on every keystroke.
+	it( 'does not announce a result count while searching', async () => {
 		render(
 			<EmojiPicker
 				trigger={ <button type="button" aria-label="React" /> }
@@ -47,11 +48,13 @@ describe( 'EmojiPicker', () => {
 		fireEvent.change( search, { target: { value: 'grinning' } } );
 
 		await waitFor( () =>
-			expect(
-				screen
-					.getAllByRole( 'status' )
-					.map( ( region ) => region.textContent )
-			).toContain( '2 emojis found.' )
+			expect( screen.getAllByRole( 'gridcell' ) ).toHaveLength( 2 )
 		);
+		expect(
+			screen
+				.queryAllByRole( 'status' )
+				.map( ( region ) => region.textContent )
+				.join( '' )
+		).not.toMatch( /\d/ );
 	} );
 } );
