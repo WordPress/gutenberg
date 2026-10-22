@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getCuratedLabel } from './reaction-emojis';
 
