@@ -176,6 +176,21 @@ export interface GridSibling {
 }
 
 /**
+ * A grid's tracks and blocks, measured in the canvas when a drag starts.
+ * Nothing in the grid moves until the drop.
+ */
+export interface GridItemMeasurements {
+	/** Column tracks. */
+	columnTracks: GridTrack[];
+	/** Row tracks. */
+	rowTracks: GridTrack[];
+	/** The blocks in the grid, other than the dragged one. */
+	siblings: GridSibling[];
+	/** The dragged block, or null when it isn't in the grid. */
+	src: { pixelRect: GridPixelRect; rect: GridRect } | null;
+}
+
+/**
  * The cells a block dragged over a manual grid would land in.
  */
 export interface GridDropTarget {

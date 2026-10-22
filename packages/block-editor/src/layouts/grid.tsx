@@ -18,7 +18,9 @@ import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import { startGridItemDrag } from '../components/grid/start-grid-item-drag';
 import type {
+	ChildDragOptions,
 	Layout,
 	LayoutAlignment,
 	LayoutControlProps,
@@ -432,6 +434,35 @@ export default {
 	},
 	getAlignments(): LayoutAlignment[] {
 		return [];
+	},
+	/**
+	 * A manual grid shows the cells a dragged block will land in, so the block
+	 * stays in place instead of following the pointer, as part of the grid
+	 * interactivity experiment.
+	 *
+	 * @param event                       The `dragstart` event.
+	 * @param options                     Options.
+	 * @param options.layout              The grid's layout.
+	 * @param options.clientId            Client ID of the dragged block.
+	 * @param options.rootClientId        Client ID of the grid.
+	 * @param options.blockElement        The dragged block's element in the canvas.
+	 * @param options.startDraggingBlocks Marks blocks as being dragged.
+	 * @param options.stopDraggingBlocks  Marks the drag as over.
+	 *
+	 * @return Whether the grid took over the drag.
+	 */
+	startChildDrag(
+		event: DragEvent,
+		{ layout, ...options }: ChildDragOptions & { layout?: Layout }
+	): boolean {
+		if (
+			! layout?.isManualPlacement ||
+			! window.__experimentalEnableGridInteractivity
+		) {
+			return false;
+		}
+		startGridItemDrag( event, options );
+		return true;
 	},
 };
 
