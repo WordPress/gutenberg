@@ -66,6 +66,10 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		WP_Theme_JSON_Resolver::clean_cached_data();
 
 		remove_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+		remove_filter( 'gutenberg_layout_has_grid_interactivity', '__return_true' );
+		if ( function_exists( 'gutenberg_layout_enable_grid_interactivity' ) ) {
+			add_filter( 'gutenberg_layout_has_grid_interactivity', 'gutenberg_layout_enable_grid_interactivity' );
+		}
 
 		parent::tear_down();
 	}
@@ -1658,6 +1662,57 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			':where(.wp-layout .is-layout-grid){--wp--style--grid-cells:auto;}',
 			$layout_styles
 		);
+	}
+
+	/**
+	 * Check that the layout support takes the grid interactivity flag from the
+	 * `gutenberg_layout_has_grid_interactivity` filter, and not from the experiments option,
+	 * so that the block support doesn't depend on the plugin's experiments.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_reads_grid_interactivity_from_filter() {
+		remove_filter( 'gutenberg_layout_has_grid_interactivity', 'gutenberg_layout_enable_grid_interactivity' );
+		add_filter( 'gutenberg_layout_has_grid_interactivity', '__return_true' );
+
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'rowCount'          => 2,
+				'isManualPlacement' => true,
+			)
+		);
+
+		$this->assertSame(
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;--wp--style--grid-cells:fixed;}' .
+			':where(.wp-layout .is-layout-grid){--wp--style--grid-cells:auto;}',
+			$layout_styles
+		);
+	}
+
+	/**
+	 * Check that children of manual grids take the grid interactivity flag from the
+	 * `gutenberg_layout_has_grid_interactivity` filter, not from the experiments option.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_reads_grid_interactivity_from_filter() {
+		remove_filter( 'gutenberg_layout_has_grid_interactivity', 'gutenberg_layout_enable_grid_interactivity' );
+		add_filter( 'gutenberg_layout_has_grid_interactivity', '__return_true' );
+
+		$rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnStart' => 2 ),
+			array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'isManualPlacement' => true,
+			)
+		);
+
+		$this->assertSame( '1', $rules[0]['declarations']['--wp--grid-item--row-span'] );
 	}
 
 	/**

@@ -6,6 +6,11 @@ import { dispatch, select } from '@wordpress/data';
 import grid, { hasFixedGridCells } from '../grid';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { startGridItemDrag } from '../../components/grid/start-grid-item-drag';
+
+vi.mock( '../../components/grid/start-grid-item-drag', () => ( {
+	startGridItemDrag: vi.fn(),
+} ) );
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
@@ -629,5 +634,57 @@ describe( 'capturesToolbars', () => {
 		expect(
 			grid.capturesToolbars( { type: 'grid', isManualPlacement: true } )
 		).toBe( false );
+	} );
+} );
+
+describe( 'startChildDrag', () => {
+	let originalExperiment: boolean | undefined;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+		vi.mocked( startGridItemDrag ).mockClear();
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	const event = new window.Event( 'dragstart' ) as DragEvent;
+	const options = {
+		clientId: 'block',
+		rootClientId: 'grid',
+		blockElement: document.createElement( 'div' ),
+		startDraggingBlocks: vi.fn(),
+		stopDraggingBlocks: vi.fn(),
+	};
+
+	it( 'returns false for a grid without manual placement', () => {
+		expect(
+			grid.startChildDrag?.( event, {
+				...options,
+				layout: { type: 'grid', columnCount: 3 },
+			} )
+		).toBe( false );
+		expect( startGridItemDrag ).not.toHaveBeenCalled();
+	} );
+
+	it( 'returns false with the experiment off', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect(
+			grid.startChildDrag?.( event, {
+				...options,
+				layout: { type: 'grid', isManualPlacement: true },
+			} )
+		).toBe( false );
+		expect( startGridItemDrag ).not.toHaveBeenCalled();
+	} );
+
+	it( 'starts the grid item drag in a manual grid and returns true', () => {
+		expect(
+			grid.startChildDrag?.( event, {
+				...options,
+				layout: { type: 'grid', isManualPlacement: true },
+			} )
+		).toBe( true );
+		expect( startGridItemDrag ).toHaveBeenCalledWith( event, options );
 	} );
 } );
