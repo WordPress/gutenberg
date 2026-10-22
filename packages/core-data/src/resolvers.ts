@@ -24,8 +24,8 @@ import type * as ET from './entity-types';
 import type { QueriedMeta, Query } from './queried-data/types';
 import type { PermissionResource } from './utils/types';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
-import type { Action, CoreDataThunkArgs, RestRecord } from './private-types';
-import type { EntityConfig, TransientEditConfig } from './types';
+import type { Action, CoreDataThunkArgs } from './private-types';
+import type { EntityConfig, RestRecord, TransientEditConfig } from './types';
 
 /**
  * Requests authors from the REST API.

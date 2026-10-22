@@ -23,7 +23,8 @@ import {
 import { getEntitySyncManager } from '../entity-sync';
 import type { EntitySyncManager } from '../entity-sync';
 import type * as ET from '../entity-types';
-import type { CoreDataThunkArgs, RestRecord } from '../private-types';
+import type { CoreDataThunkArgs } from '../private-types';
+import type { RestRecord } from '../types';
 
 // A mocked `dispatch`, with the action creators the tests check.
 type DispatchMock< Action extends string > = Mock & Record< Action, Mock >;

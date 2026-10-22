@@ -4,7 +4,6 @@ import type {
 	ConnectionStatusDisconnected,
 	Y,
 } from '@wordpress/sync';
-import type { RestRecord } from './private-types';
 import type {
 	SelectionType,
 	SelectionDirection,
@@ -376,3 +375,23 @@ export type BatchRequest = ( api: BatchActions ) => unknown;
 export type BatchResults< Requests extends Array< BatchRequest > > = {
 	[ Index in keyof Requests ]: Awaited< ReturnType< Requests[ Index ] > >;
 };
+
+/**
+ * A record received from the REST API.
+ */
+export type RestRecord = Record< string, unknown > & {
+	_links?: RestLinks;
+};
+
+/**
+ * The links of a REST API record that core data reads.
+ */
+export interface RestLinks {
+	self?: Array< {
+		href?: string;
+		targetHints?: { allow?: ReadonlyArray< string > };
+	} >;
+	'version-history'?: Array< { href?: string } >;
+	'wp:user-global-styles'?: Array< { href?: string } >;
+	[ relation: string ]: unknown;
+}

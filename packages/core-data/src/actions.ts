@@ -12,7 +12,7 @@ import { applyUndoLevel, recordEntityEdit } from './utils/sync-undo-levels';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 import type * as ET from './entity-types';
 import type { QueriedItem, QueriedMeta, Query } from './queried-data/types';
-import type { ActionOf, CoreDataThunkArgs, RestRecord } from './private-types';
+import type { ActionOf, CoreDataThunkArgs } from './private-types';
 import type {
 	BatchActions,
 	BatchRequest,
@@ -20,6 +20,7 @@ import type {
 	DeleteEntityRecordOptions,
 	EditEntityRecordOptions,
 	EntityConfig,
+	RestRecord,
 	SaveEntityRecordOptions,
 } from './types';
 
