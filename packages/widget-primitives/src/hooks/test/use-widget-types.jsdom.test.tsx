@@ -105,6 +105,27 @@ const actionIconRecords: WidgetModuleRecord[] = [
 	},
 ];
 
+const exampleRecords: WidgetModuleRecord[] = [
+	{
+		...moduleLessRecords[ 0 ],
+		example: { attributes: { message: 'Hello from the record' } },
+	},
+];
+
+const moduleWithoutExampleRecords: WidgetModuleRecord[] = [
+	{
+		...stringIconRecords[ 0 ],
+		example: { attributes: { message: 'Hello from the record' } },
+	},
+];
+
+const moduleExampleRecords: WidgetModuleRecord[] = [
+	{
+		...records[ 0 ],
+		example: { attributes: { location: 'Record' } },
+	},
+];
+
 describe( 'useWidgetTypes', () => {
 	afterEach( () => {
 		unregisterFieldType( 'test/location' );
@@ -229,6 +250,40 @@ describe( 'useWidgetTypes', () => {
 		expect( attributes[ 0 ].isValid ).toMatchObject( { required: true } );
 		expect( attributes[ 0 ].isValid?.custom ).toBeTypeOf( 'function' );
 		expect( attributes[ 2 ] ).toMatchObject( { label: 'Label' } );
+	} );
+
+	it( 'reads the record example without a metadata module', async () => {
+		const { result } = renderHook( () => useWidgetTypes( exampleRecords ) );
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].example ).toEqual( {
+			attributes: { message: 'Hello from the record' },
+		} );
+	} );
+
+	it( 'falls back to the record example when the module declares none', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( moduleWithoutExampleRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].example ).toEqual( {
+			attributes: { message: 'Hello from the record' },
+		} );
+	} );
+
+	it( 'keeps the module example over the record', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( moduleExampleRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].example ).toEqual( {
+			attributes: { location: 'Module', label: 'Store' },
+		} );
 	} );
 
 	it( 'drops a record with neither metadata nor render module', async () => {

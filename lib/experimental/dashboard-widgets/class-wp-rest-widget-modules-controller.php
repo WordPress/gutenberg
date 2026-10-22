@@ -223,6 +223,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['attributes'] = $widget_type->attributes;
 			}
 
+			if ( rest_is_field_included( 'example', $fields ) ) {
+				$data['example'] = $widget_type->example;
+			}
+
 			if ( rest_is_field_included( 'keywords', $fields ) ) {
 				$data['keywords'] = $widget_type->keywords;
 			}
@@ -388,6 +392,20 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 									'type' => 'string',
 									'enum' => array( 'high', 'medium', 'low' ),
 								),
+							),
+						),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'example'       => array(
+						'description' => __( 'Structured example: the attributes hosts preview the widget type with, and apply to a new instance created without any.', 'gutenberg' ),
+						'type'        => array( 'object', 'null' ),
+						'properties'  => array(
+							'attributes' => array(
+								'description'          => __( 'Attribute values by attribute name.', 'gutenberg' ),
+								'type'                 => 'object',
+								'additionalProperties' => true,
 							),
 						),
 						'context'     => array( 'view', 'edit', 'embed' ),

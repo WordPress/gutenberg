@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes
