@@ -5,7 +5,7 @@
  * @package gutenberg
  *
  * @covers ::_wp_add_entity_preload_paths
- * @covers ::_wp_preload_entity_fields
+ * @covers ::_gutenberg_preload_entity_fields
  */
 class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 
@@ -28,7 +28,7 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 			)
 		);
 
-		$paths = _wp_preload_entity_fields( array(), $context );
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
 
 		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), $paths );
 	}
@@ -40,7 +40,7 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 		$_GET['p'] = '/page';
 		$context   = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
-		$paths     = _wp_preload_entity_fields( array(), $context );
+		$paths     = _gutenberg_preload_entity_fields( array(), $context );
 
 		$preloaded = array_reduce( $paths, 'rest_preload_api_request', array() );
 
@@ -61,7 +61,7 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		$_GET['p'] = $path;
 		$context   = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
 
-		$paths = _wp_preload_entity_fields( array(), $context );
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
 		unset( $_GET['p'] );
 
 		$expected = array();
@@ -105,7 +105,7 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 			)
 		);
 
-		$paths = _wp_preload_entity_fields( array(), $context );
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
 		unset( $_GET['p'] );
 
 		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), $paths );
@@ -120,9 +120,9 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		$no_post     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-post' ) );
 		$widgets     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-widgets' ) );
 
-		$this->assertSame( array(), _wp_preload_entity_fields( array(), $site_editor ) );
-		$this->assertSame( array(), _wp_preload_entity_fields( array(), $no_post ) );
-		$this->assertSame( array(), _wp_preload_entity_fields( array(), $widgets ) );
+		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $site_editor ) );
+		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $no_post ) );
+		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $widgets ) );
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 	public function test_empty_paths_that_are_not_an_array_become_an_array( $paths ) {
 		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
 
-		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), _wp_preload_entity_fields( $paths, $context ) );
+		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), _gutenberg_preload_entity_fields( $paths, $context ) );
 	}
 
 	/**
@@ -160,9 +160,9 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
 		$object  = new stdClass();
 
-		$this->assertSame( 'not paths', _wp_preload_entity_fields( 'not paths', $context ) );
-		$this->assertSame( $object, _wp_preload_entity_fields( $object, $context ) );
-		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_fields( array( '/wp/v2/types' ) ) );
-		$this->assertSame( array(), _wp_preload_entity_fields( null ) );
+		$this->assertSame( 'not paths', _gutenberg_preload_entity_fields( 'not paths', $context ) );
+		$this->assertSame( $object, _gutenberg_preload_entity_fields( $object, $context ) );
+		$this->assertSame( array( '/wp/v2/types' ), _gutenberg_preload_entity_fields( array( '/wp/v2/types' ) ) );
+		$this->assertSame( array(), _gutenberg_preload_entity_fields( null ) );
 	}
 }

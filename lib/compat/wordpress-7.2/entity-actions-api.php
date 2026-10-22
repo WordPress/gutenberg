@@ -142,25 +142,27 @@ if ( ! function_exists( '_wp_add_entity_action_modules_to_editor_script' ) ) {
 	add_action( 'admin_footer', '_wp_add_entity_action_modules_to_editor_script', 10, 0 );
 }
 
-if ( ! function_exists( '_wp_preload_entity_actions' ) ) {
-	/**
-	 * Preloads the actions of the post types the editors list.
-	 *
-	 * The editors read them from the `wp/v2/entity-actions` route as they load,
-	 * see `useEntityActions()` in
-	 * packages/editor/src/dataviews/entity-actions-loader.ts. The post editor
-	 * reads those of the edited post in its actions menu. The site editor reads
-	 * those of the edited post, if any, and of the post types of the screen it
-	 * opens on, whose lists show the actions of their items. A path must match
-	 * the request of the `getEntityActionsConfig` core data resolver, see
-	 * packages/core-data/src/resolvers.ts.
-	 *
-	 * @param mixed $paths   REST API paths to preload.
-	 * @param mixed $context Optional. Block editor context. Default null.
-	 * @return mixed Filtered preload paths. See _wp_add_entity_preload_paths().
-	 */
-	function _wp_preload_entity_actions( $paths, $context = null ) {
-		return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-actions' );
-	}
-	add_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_actions', 10, 2 );
+/**
+ * Preloads the actions of the post types the editors list.
+ *
+ * The editors read them from the `wp/v2/entity-actions` route as they load,
+ * see `useEntityActions()` in
+ * packages/editor/src/dataviews/entity-actions-loader.ts. The post editor
+ * reads those of the edited post in its actions menu. The site editor reads
+ * those of the edited post, if any, and of the post types of the screen it
+ * opens on, whose lists show the actions of their items. A path must match
+ * the request of the `getEntityActionsConfig` core data resolver, see
+ * packages/core-data/src/resolvers.ts.
+ *
+ * It replaces `_wp_preload_entity_actions()`, which WordPress versions before
+ * core#14716 ship without the guards of _wp_add_entity_preload_paths().
+ *
+ * @param mixed $paths   REST API paths to preload.
+ * @param mixed $context Optional. Block editor context. Default null.
+ * @return mixed Filtered preload paths. See _wp_add_entity_preload_paths().
+ */
+function _gutenberg_preload_entity_actions( $paths, $context = null ) {
+	return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-actions' );
 }
+remove_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_actions' );
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_actions', 10, 2 );

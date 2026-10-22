@@ -208,23 +208,25 @@ if ( ! function_exists( 'wp_register_entity_field_collection' ) ) {
 	}
 }
 
-if ( ! function_exists( '_wp_preload_entity_fields' ) ) {
-	/**
-	 * Preloads the fields of the post types the editors list.
-	 *
-	 * The editors read them from the `wp/v2/entity-fields` route, see `useFields`
-	 * in packages/editor/src/dataviews/fields-loader/index.ts. The post editor
-	 * reads those of the edited post in the post summary of its inspector. The
-	 * site editor reads those of the edited post, if any, and of the post types of
-	 * the screen it opens on. A path must match the request of the
-	 * `getFieldsConfig` core data resolver, see packages/core-data/src/resolvers.js.
-	 *
-	 * @param mixed $paths   REST API paths to preload.
-	 * @param mixed $context Optional. Block editor context. Default null.
-	 * @return mixed Filtered preload paths. See _wp_add_entity_preload_paths().
-	 */
-	function _wp_preload_entity_fields( $paths, $context = null ) {
-		return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-fields' );
-	}
-	add_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_fields', 10, 2 );
+/**
+ * Preloads the fields of the post types the editors list.
+ *
+ * The editors read them from the `wp/v2/entity-fields` route, see `useFields`
+ * in packages/editor/src/dataviews/fields-loader/index.ts. The post editor
+ * reads those of the edited post in the post summary of its inspector. The
+ * site editor reads those of the edited post, if any, and of the post types of
+ * the screen it opens on. A path must match the request of the
+ * `getFieldsConfig` core data resolver, see packages/core-data/src/resolvers.js.
+ *
+ * It replaces `_wp_preload_entity_fields()`, which WordPress versions before
+ * core#14716 ship without the guards of _wp_add_entity_preload_paths().
+ *
+ * @param mixed $paths   REST API paths to preload.
+ * @param mixed $context Optional. Block editor context. Default null.
+ * @return mixed Filtered preload paths. See _wp_add_entity_preload_paths().
+ */
+function _gutenberg_preload_entity_fields( $paths, $context = null ) {
+	return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-fields' );
 }
+remove_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_fields' );
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );

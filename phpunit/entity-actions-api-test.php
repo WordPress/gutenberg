@@ -7,7 +7,7 @@
  * @covers ::_wp_add_entity_action_modules_to_editor_script
  * @covers ::_wp_add_entity_modules_to_editor_script
  * @covers ::_wp_add_entity_preload_paths
- * @covers ::_wp_preload_entity_actions
+ * @covers ::_gutenberg_preload_entity_actions
  * @covers ::wp_register_entity_actions
  * @covers ::wp_unregister_entity_actions
  * @covers ::gutenberg_override_wp_entity_actions_registry
@@ -396,7 +396,7 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
 
-		$paths     = _wp_preload_entity_actions( array(), $context );
+		$paths     = _gutenberg_preload_entity_actions( array(), $context );
 		$preloaded = array_reduce( $paths, 'rest_preload_api_request', array() );
 
 		$this->assertSame(
@@ -422,7 +422,7 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 		foreach ( $post_types as $post_type ) {
 			$expected[] = '/wp/v2/entity-actions?kind=postType&name=' . $post_type;
 		}
-		$this->assertSame( $expected, _wp_preload_entity_actions( array(), $context ) );
+		$this->assertSame( $expected, _gutenberg_preload_entity_actions( array(), $context ) );
 	}
 
 	/**
@@ -460,7 +460,7 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 
 		$this->assertSame(
 			array( '/wp/v2/entity-actions?kind=postType&name=page' ),
-			_wp_preload_entity_actions( array(), $context )
+			_gutenberg_preload_entity_actions( array(), $context )
 		);
 	}
 
@@ -473,9 +473,9 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 		$no_post     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-post' ) );
 		$widgets     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-widgets' ) );
 
-		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $site_editor ), 'The paths of the site editor root are unchanged.' );
-		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $no_post ), 'The paths of a post editor without a post are unchanged.' );
-		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $widgets ), 'The paths of the widgets editor are unchanged.' );
+		$this->assertSame( array( '/wp/v2/types' ), _gutenberg_preload_entity_actions( array( '/wp/v2/types' ), $site_editor ), 'The paths of the site editor root are unchanged.' );
+		$this->assertSame( array( '/wp/v2/types' ), _gutenberg_preload_entity_actions( array( '/wp/v2/types' ), $no_post ), 'The paths of a post editor without a post are unchanged.' );
+		$this->assertSame( array( '/wp/v2/types' ), _gutenberg_preload_entity_actions( array( '/wp/v2/types' ), $widgets ), 'The paths of the widgets editor are unchanged.' );
 	}
 
 	/**
