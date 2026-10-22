@@ -27,7 +27,7 @@
 		"@babel/types": "^7.29.7",
 		"@storybook/addon-a11y": "^10.6.2",
 		"@storybook/addon-docs": "^10.6.1",
-		"@storybook/addon-vitest": "^10.6.1",
+		"@storybook/addon-vitest": "^10.6.2",
 		"@storybook/icons": "^2.1.0",
 		"@storybook/react-vite": "^10.6.1",
 		"@types/js-yaml": "^3.12.10",
