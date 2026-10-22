@@ -228,7 +228,7 @@
 
 			/* Heavier than the Spinner default to match the emphasized label weight. */
 			> * {
-				stroke-width: 2.25;
+				stroke-width: 2.75;
 			}
 
 			@media ( prefers-reduced-motion ) {
