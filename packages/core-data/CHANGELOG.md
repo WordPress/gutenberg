@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Convert the entities config and the store reducer to TypeScript, and add the store `Action` type ([#85065](https://github.com/WordPress/gutenberg/pull/85065)).
 -   Convert the entity hooks, the entity providers and the parsed blocks cache to TypeScript ([#85063](https://github.com/WordPress/gutenberg/pull/85063)).
 -   Convert the batch and fetch helpers to TypeScript ([#85062](https://github.com/WordPress/gutenberg/pull/85062)).
 -   Convert the queried data to TypeScript ([#85061](https://github.com/WordPress/gutenberg/pull/85061)).
