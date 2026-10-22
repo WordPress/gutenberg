@@ -1,9 +1,12 @@
 import type {
 	GridInfo,
+	GridItemMeasurements,
 	GridPixelRect,
 	GridRectOptions,
+	GridSibling,
 	GridTrack,
 } from './types';
+import { getRotatedBoundingRect } from './rotation';
 
 export function range( start: number, length: number ) {
 	return Array.from( { length }, ( _, i ) => start + i );
@@ -264,11 +267,18 @@ export function getGridTrackPositions( gridElement: Element ): {
  * the area it takes up in the grid, without its rotation.
  *
  * @param gridItemElement The grid item element.
+ * @param padding         The grid's padding, when it is already known.
+ * @param padding.left    Left padding, in pixels.
+ * @param padding.top     Top padding, in pixels.
  *
  * @return The item's position.
  */
 export function getGridItemPixelRect(
-	gridItemElement: HTMLElement
+	gridItemElement: HTMLElement,
+	padding: { left: number; top: number } = getGridPadding(
+		// A grid item is inside its grid.
+		gridItemElement.parentElement!
+	)
 ): GridPixelRect {
 	// A grid item is inside its grid.
 	const gridElement = gridItemElement.parentElement!;
@@ -278,8 +288,8 @@ export function getGridItemPixelRect(
 		left -= gridElement.offsetLeft + gridElement.clientLeft;
 		top -= gridElement.offsetTop + gridElement.clientTop;
 	}
-	left -= parseFloat( getComputedCSS( gridElement, 'padding-left' ) ) || 0;
-	top -= parseFloat( getComputedCSS( gridElement, 'padding-top' ) ) || 0;
+	left -= padding.left;
+	top -= padding.top;
 	return {
 		left,
 		top,
@@ -353,6 +363,74 @@ export function setInlineStyle(
 }
 
 /**
+ * Gets a grid's left and top padding, in pixels.
+ *
+ * @param gridElement The grid element.
+ *
+ * @return The padding.
+ */
+function getGridPadding( gridElement: Element ) {
+	return {
+		left: parseFloat( getComputedCSS( gridElement, 'padding-left' ) ) || 0,
+		top: parseFloat( getComputedCSS( gridElement, 'padding-top' ) ) || 0,
+	};
+}
+
+/**
+ * Measures a grid's tracks and the blocks in it, once, when a drag starts.
+ * Blocks are measured in the canvas, so that the result matches what is on
+ * screen in every viewport. Hidden blocks are left out, and other blocks take
+ * up the cells they reach with their rotation.
+ *
+ * @param gridElement The grid element.
+ * @param srcClientId Client ID of the dragged block, or null when it isn't in
+ *                    the grid.
+ *
+ * @return The measurements.
+ */
+export function getGridItemMeasurements(
+	gridElement: Element,
+	srcClientId: string | null
+): GridItemMeasurements {
+	const { columnTracks, rowTracks } = getGridTrackPositions( gridElement );
+	const padding = getGridPadding( gridElement );
+	const siblings: GridSibling[] = [];
+	let src: GridItemMeasurements[ 'src' ] = null;
+	for ( const element of gridElement.children ) {
+		// Block elements are HTML elements.
+		const child = element as HTMLElement;
+		const childClientId = child.getAttribute( 'data-block' );
+		if ( ! childClientId || ! child.offsetParent ) {
+			continue;
+		}
+		const pixelRect = getGridItemPixelRect( child, padding );
+		const angle = getGridItemRotation( child );
+		if ( childClientId === srcClientId ) {
+			src = {
+				pixelRect,
+				rect: getGridRectFromPixelRect(
+					pixelRect,
+					columnTracks,
+					rowTracks
+				),
+				angle,
+			};
+			continue;
+		}
+		const rotatedPixelRect = getRotatedBoundingRect( pixelRect, angle );
+		siblings.push( {
+			pixelRect: rotatedPixelRect,
+			rect: getGridRectFromPixelRect(
+				rotatedPixelRect,
+				columnTracks,
+				rowTracks
+			),
+		} );
+	}
+	return { columnTracks, rowTracks, siblings, src };
+}
+
+/**
  * Gets the grid cells that a rectangle in pixels covers, snapping its edges to
  * the closest tracks.
  *
@@ -404,4 +482,21 @@ export function getRowEndForResize(
 		( position - lastTrack.end ) / ( averageRowHeight + gap )
 	);
 	return extraRows > 0 ? rowTracks.length + extraRows : closestRowEnd;
+}
+
+/**
+ * Gets the names of the blocks dragged from an inserter, which it adds to the
+ * drag's data types as `wp-block:<name>`, since only the types can be read
+ * while dragging. Each name is listed once.
+ *
+ * @param dataTransfer The drag's data, if any.
+ *
+ * @return The block names, or none when the drag isn't from an inserter.
+ */
+export function getInserterDragBlockNames(
+	dataTransfer: Pick< DataTransfer, 'types' > | null | undefined
+): string[] {
+	return Array.from( dataTransfer?.types ?? [] )
+		.filter( ( type ) => type.startsWith( 'wp-block:' ) )
+		.map( ( type ) => type.slice( 'wp-block:'.length ) );
 }

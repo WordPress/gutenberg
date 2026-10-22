@@ -2,7 +2,7 @@ import { useCallback } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
+import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
 import { getGridGrowthUpdate } from './get-grid-row-updates';
 import {
 	getUnstackedMobileUpdates,

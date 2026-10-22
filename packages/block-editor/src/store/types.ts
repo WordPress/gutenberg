@@ -577,7 +577,6 @@ export interface State {
 	isTyping: boolean;
 	isBlockInterfaceHidden: boolean;
 	draggedBlocks: string[];
-	draggedInserterBlocks: Block[];
 	selection: SelectionState;
 	isMultiSelecting: boolean;
 	isSelectionEnabled: boolean;
@@ -784,7 +783,7 @@ export type Action =
 	| { type: 'SHOW_BLOCK_INTERFACE' }
 	| ( { type: 'SHOW_INSERTION_POINT' } & InsertionCue )
 	| { type: 'SHOW_VIEWPORT_MODAL'; clientIds: string[] }
-	| { type: 'START_DRAGGING'; blocks?: Block[] }
+	| { type: 'START_DRAGGING' }
 	| { type: 'START_DRAGGING_BLOCKS'; clientIds: string[] }
 	| { type: 'START_MULTI_SELECT' }
 	| { type: 'START_TYPING' }

@@ -101,16 +101,6 @@ export function wasBlockJustInsertedFromInserter(
 	return !! isFromInserter && !! clientIds?.includes( clientId );
 }
 
-/**
- * Returns the blocks being dragged from an inserter, if any.
- *
- * @param state Global application state.
- * @return The blocks, which have not been inserted yet.
- */
-export function getDraggedInserterBlocks( state: State ) {
-	return state.draggedInserterBlocks;
-}
-
 export function getBlockWithoutAttributes( state: State, clientId: string ) {
 	return state.blocks.byClientId.get( clientId );
 }
