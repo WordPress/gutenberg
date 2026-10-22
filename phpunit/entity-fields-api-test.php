@@ -5,6 +5,7 @@
  * @package gutenberg
  *
  * @covers ::_wp_add_entity_field_modules_to_editor_script
+ * @covers ::_wp_add_entity_modules_to_editor_script
  * @covers ::wp_register_entity_fields
  * @covers ::wp_update_entity_fields
  * @covers ::wp_unregister_entity_fields
