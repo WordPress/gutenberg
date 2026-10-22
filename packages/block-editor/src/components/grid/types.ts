@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode, Ref } from 'react';
-import type { Block } from '@wordpress/blocks';
 import type { Layout } from '../../layouts/types';
 import type { AlignmentGuide } from './get-alignment-guides';
 import type { GridItemBox, GridPlacement } from './free-placement';
@@ -212,11 +211,10 @@ export interface GridMarqueeDrag {
 }
 
 /**
- * The selectors that find the blocks dragged from an inserter that a grid can
- * take.
+ * The selectors that tell whether a grid can take blocks dragged from an
+ * inserter.
  */
 export interface InserterBlockSelectors {
-	getDraggedInserterBlocks: () => Block[];
 	canInsertBlockType: ( blockName: string, rootClientId: string ) => boolean;
 }
 
@@ -241,13 +239,31 @@ export interface GridSibling {
 }
 
 /**
+ * A grid's tracks and blocks, measured in the canvas when a drag starts.
+ * Nothing in the grid moves until the drop.
+ */
+export interface GridItemMeasurements {
+	/** Column tracks. */
+	columnTracks: GridTrack[];
+	/** Row tracks. */
+	rowTracks: GridTrack[];
+	/** The blocks in the grid, other than the dragged one. */
+	siblings: GridSibling[];
+	/**
+	 * The dragged block, unrotated, with its rotation in degrees, or null when
+	 * it isn't in the grid.
+	 */
+	src: { pixelRect: GridPixelRect; rect: GridRect; angle: number } | null;
+}
+
+/**
  * The cells a block dragged over a manual grid would land in.
  */
 export interface GridDropTarget {
 	/** Client ID of the dragged block, or null for blocks from an inserter. */
 	srcClientId: string | null;
-	/** The blocks dragged from an inserter, or null for a block in the canvas. */
-	inserterBlocks: Block[] | null;
+	/** Whether the blocks are dragged from an inserter, not in the canvas. */
+	isInserterDrag: boolean;
 	/** Number of columns and rows the block spans. */
 	span: { columnSpan: number; rowSpan: number };
 	/** The cells the block would land in. */

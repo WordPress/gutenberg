@@ -2,12 +2,10 @@ import { useCallback } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import {
-	getGridItemBox,
-	getUpdatedChildLayoutStyle,
-} from '../../hooks/layout-child';
+import { getGridItemBox } from '../../hooks/layout-child';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
+	getUpdatedChildLayoutStyle,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import { isGridStackedOnMobile } from './mobile-stacking';

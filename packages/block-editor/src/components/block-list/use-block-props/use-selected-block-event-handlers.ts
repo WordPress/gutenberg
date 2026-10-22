@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-import { startGridItemDrag } from '../../grid/start-grid-item-drag';
+import { getLayoutType } from '../../../layouts';
 
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
@@ -335,24 +335,27 @@ export function useEventHandlers( {
 					return;
 				}
 
-				// A block in a manual placement grid stays in place while the
-				// grid shows where it will land. A multi-selection drag can't
-				// be placed in cells, so it follows the pointer.
+				// A layout can take over the drag of its blocks, such as a
+				// manual placement grid, which shows the cells the block will
+				// land in. A multi-selection drag follows the pointer in every
+				// layout.
 				const rootClientId = getBlockRootClientId( clientId );
 				const rootLayout = getBlockAttributes( rootClientId )?.layout;
 				if (
 					! isMultiSelectionDrag &&
-					rootLayout?.type === 'grid' &&
-					rootLayout.isManualPlacement &&
-					window.__experimentalEnableGridInteractivity
+					getLayoutType( rootLayout?.type )?.startChildDrag?.(
+						event,
+						{
+							layout: rootLayout,
+							clientId,
+							// A block that can be dragged is in a block list.
+							rootClientId: rootClientId!,
+							blockElement: node,
+							startDraggingBlocks,
+							stopDraggingBlocks,
+						}
+					)
 				) {
-					startGridItemDrag( event, {
-						clientId,
-						rootClientId,
-						blockElement: node,
-						startDraggingBlocks,
-						stopDraggingBlocks,
-					} );
 					return;
 				}
 
@@ -531,6 +534,7 @@ export function useEventHandlers( {
 					ownerDocument.removeEventListener( 'dragend', end );
 					ownerDocument.removeEventListener( 'drop', end );
 					ownerDocument.removeEventListener( 'scroll', over );
+					document.removeEventListener( 'drop', end );
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
 					) ) {
@@ -556,6 +560,12 @@ export function useEventHandlers( {
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
 				ownerDocument.addEventListener( 'scroll', over );
+				// A drop in the editor document, such as on a manual grid's
+				// drop layer, can move the block before its `dragend`, which
+				// then no longer reaches the canvas document.
+				if ( document !== ownerDocument ) {
+					document.addEventListener( 'drop', end );
+				}
 
 				startDraggingBlocks( clientIds );
 				// Important because it hides the block toolbar.

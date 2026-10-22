@@ -4,9 +4,9 @@ import {
 	getChildLayoutStyles,
 	getGridItemBox,
 	getResponsiveChildLayoutStyles,
-	getUpdatedChildLayoutStyle,
 	hasGridItemBoxInAnyState,
 } from '../layout-child';
+import { getUpdatedChildLayoutStyle } from '../block-style-state';
 
 describe( 'layout child', () => {
 	describe( 'getChildLayoutStyleRules()', () => {
