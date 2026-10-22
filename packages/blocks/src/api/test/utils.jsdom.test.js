@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { isValidElement } from '@wordpress/element';
 import '../../store';
 import { createBlock } from '../factory';
 import {
@@ -17,6 +18,7 @@ import {
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
 	isContentBlock,
+	convertSvgStringToIconElement,
 } from '../utils';
 
 const noop = () => {};
@@ -546,5 +548,59 @@ describe( 'isUnmodifiedBlock', () => {
 			},
 		} );
 		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
+	} );
+} );
+
+describe( 'convertSvgStringToIconElement', () => {
+	it( 'should return a non-string value unchanged', () => {
+		const icon = () => null;
+		expect( convertSvgStringToIconElement( icon ) ).toBe( icon );
+	} );
+
+	it( 'should return a dashicon slug unchanged', () => {
+		expect( convertSvgStringToIconElement( 'smile' ) ).toBe( 'smile' );
+	} );
+
+	it( 'should convert an SVG markup string to an element', () => {
+		const result = convertSvgStringToIconElement( '<svg></svg>' );
+
+		expect( isValidElement( result ) ).toBe( true );
+		expect( result.type ).toBe( 'svg' );
+	} );
+
+	it( 'should convert an SVG markup string preceded by an XML prolog', () => {
+		const result = convertSvgStringToIconElement(
+			'<?xml version="1.0" encoding="UTF-8"?><svg></svg>'
+		);
+
+		expect( isValidElement( result ) ).toBe( true );
+		expect( result.type ).toBe( 'svg' );
+	} );
+
+	it( 'should preserve the attributes of the SVG element', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg viewBox="0 0 24 24" fill="none"></svg>'
+		);
+
+		expect( result.props.viewBox ).toBe( '0 0 24 24' );
+		expect( result.props.fill ).toBe( 'none' );
+	} );
+
+	it( 'should omit the xmlns attribute', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></svg>'
+		);
+
+		expect( result.props ).not.toHaveProperty( 'xmlns' );
+		expect( result.props.viewBox ).toBe( '0 0 24 24' );
+	} );
+
+	it( 'should convert child elements of the SVG element', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg><path d="M5 5h10v10H5z"></path></svg>'
+		);
+
+		expect( result.props.children.type ).toBe( 'path' );
+		expect( result.props.children.props.d ).toBe( 'M5 5h10v10H5z' );
 	} );
 } );
