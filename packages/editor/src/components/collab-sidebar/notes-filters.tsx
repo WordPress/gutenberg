@@ -1,13 +1,9 @@
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
-	SearchControl,
-} from '@wordpress/components';
+import { Button, SearchControl } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { funnel } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import { settings } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack } from '@wordpress/ui';
 
 type NoteStatusFilter = 'all' | 'hold' | 'approved';
 
@@ -139,9 +135,6 @@ export function filterNotes< T extends Note >(
 	} );
 }
 
-// `MenuItemsChoice` types require `onHover`, though nothing here uses it.
-const noop = () => {};
-
 type NotesFiltersProps = {
 	notes: Note[];
 	filters: NotesFilterValues;
@@ -178,74 +171,81 @@ export function NotesFilters( {
 				onChange={ ( search ) => onChange( { ...filters, search } ) }
 			/>
 			<div className="editor-collab-sidebar-filters__toggle">
-				<DropdownMenu
-					icon={ funnel }
-					label={
-						panelFilterCount
-							? sprintf(
-									/* translators: %d: Number of filters applied. */
-									_n(
-										'Filter (%d applied)',
-										'Filter (%d applied)',
-										panelFilterCount
-									),
+				<Menu.Root>
+					<Menu.Trigger
+						render={
+							<Button
+								__next40pxDefaultSize
+								icon={ settings }
+								label={
 									panelFilterCount
-								)
-							: _x( 'Filter', 'verb' )
-					}
-					toggleProps={ { __next40pxDefaultSize: true } }
-					popoverProps={ { placement: 'bottom-end' } }
-				>
-					{ () => (
-						<>
-							<MenuGroup label={ __( 'Status' ) }>
-								<MenuItemsChoice
-									choices={ [
-										{ label: __( 'All' ), value: 'all' },
-										{ label: __( 'Open' ), value: 'hold' },
-										{
-											label: __( 'Resolved' ),
-											value: 'approved',
-										},
-									] }
-									value={ filters.status }
-									onHover={ noop }
-									onSelect={ ( status ) =>
-										onChange( {
-											...filters,
-											status: status as NoteStatusFilter,
-										} )
+										? sprintf(
+												/* translators: %d: Number of filters applied. */
+												_n(
+													'Filter (%d applied)',
+													'Filter (%d applied)',
+													panelFilterCount
+												),
+												panelFilterCount
+											)
+										: _x( 'Filter', 'verb' )
+								}
+							/>
+						}
+					/>
+					<Menu.Popup positioner={ <Menu.Positioner align="end" /> }>
+						<Menu.RadioGroup
+							value={ filters.status }
+							onValueChange={ ( status: NoteStatusFilter ) =>
+								onChange( { ...filters, status } )
+							}
+						>
+							<Menu.GroupLabel>
+								{ __( 'Status' ) }
+							</Menu.GroupLabel>
+							<Menu.RadioItem value="all">
+								<Menu.ItemLabel>{ __( 'All' ) }</Menu.ItemLabel>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="hold">
+								<Menu.ItemLabel>
+									{ __( 'Open' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="approved">
+								<Menu.ItemLabel>
+									{ __( 'Resolved' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+						{ ( authors.size > 1 || filters.author !== 'all' ) && (
+							<>
+								<Menu.Separator />
+								<Menu.RadioGroup
+									value={ filters.author }
+									onValueChange={ ( author: string ) =>
+										onChange( { ...filters, author } )
 									}
-								/>
-							</MenuGroup>
-							{ ( authors.size > 1 ||
-								filters.author !== 'all' ) && (
-								<MenuGroup label={ __( 'Author' ) }>
-									<MenuItemsChoice
-										choices={ [
-											{
-												label: __( 'All' ),
-												value: 'all',
-											},
-											...Array.from(
-												authors,
-												( [ value, label ] ) => ( {
-													label,
-													value,
-												} )
-											),
-										] }
-										value={ filters.author }
-										onHover={ noop }
-										onSelect={ ( author ) =>
-											onChange( { ...filters, author } )
-										}
-									/>
-								</MenuGroup>
-							) }
-						</>
-					) }
-				</DropdownMenu>
+								>
+									<Menu.GroupLabel>
+										{ __( 'Author' ) }
+									</Menu.GroupLabel>
+									<Menu.RadioItem value="all">
+										<Menu.ItemLabel>
+											{ __( 'All' ) }
+										</Menu.ItemLabel>
+									</Menu.RadioItem>
+									{ Array.from( authors, ( [ id, name ] ) => (
+										<Menu.RadioItem key={ id } value={ id }>
+											<Menu.ItemLabel>
+												{ name }
+											</Menu.ItemLabel>
+										</Menu.RadioItem>
+									) ) }
+								</Menu.RadioGroup>
+							</>
+						) }
+					</Menu.Popup>
+				</Menu.Root>
 				{ panelFilterCount > 0 && (
 					<span
 						className="editor-collab-sidebar-filters__count"

@@ -30,6 +30,7 @@ describe( 'NotesFilters', () => {
 
 		const toggle = screen.getByRole( 'button', { name: 'Filter' } );
 		await user.click( toggle );
+		await screen.findByRole( 'menu' );
 		expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
 		expect( screen.getByRole( 'group', { name: 'Status' } ) ).toBeVisible();
 		expect( screen.getByRole( 'group', { name: 'Author' } ) ).toBeVisible();
@@ -50,7 +51,7 @@ describe( 'NotesFilters', () => {
 		expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
 		await user.click( toggle );
 		expect(
-			screen.getByRole( 'menuitemradio', { name: 'Resolved' } )
+			await screen.findByRole( 'menuitemradio', { name: 'Resolved' } )
 		).toBeChecked();
 	} );
 
@@ -66,7 +67,7 @@ describe( 'NotesFilters', () => {
 		);
 		await user.click( screen.getByRole( 'button', { name: 'Filter' } ) );
 		await user.click(
-			screen.getByRole( 'menuitemradio', { name: 'Open' } )
+			await screen.findByRole( 'menuitemradio', { name: 'Open' } )
 		);
 		expect( onChange ).toHaveBeenCalledWith( {
 			...DEFAULT_NOTES_FILTERS,
@@ -84,6 +85,7 @@ describe( 'NotesFilters', () => {
 			/>
 		);
 		await user.click( screen.getByRole( 'button', { name: 'Filter' } ) );
+		await screen.findByRole( 'menu' );
 		expect( screen.getByRole( 'group', { name: 'Status' } ) ).toBeVisible();
 		expect(
 			screen.queryByRole( 'group', { name: 'Author' } )
@@ -103,6 +105,7 @@ describe( 'NotesFilters', () => {
 		await user.click(
 			screen.getByRole( 'button', { name: 'Filter (1 applied)' } )
 		);
+		await screen.findByRole( 'menu' );
 		expect(
 			within( screen.getByRole( 'group', { name: 'Author' } ) ).getByRole(
 				'menuitemradio',
