@@ -5,6 +5,7 @@
 ### New Features
 
 -   In single-page mode, wp-admin menu links that point at the current page navigate between its routes without reloading, and the current menu item follows the route.
+-   In single-page mode, the button to review and save changes is shown in the page header.
 
 ## 0.25.0 (2026-10-20)
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { SlotFillProvider } from '@wordpress/components';
 import type { NavigationLinkProps } from '../../navigation/types';
 import Page from '..';
 
@@ -11,13 +12,15 @@ describe( 'Page navigation', () => {
 
 	it( 'should render the navigation links in the page header', () => {
 		render(
-			<Page
-				title="Analytics"
-				showSidebarToggle={ false }
-				navigation={ { items, currentHref: '/overview' } }
-			>
-				<div>Content</div>
-			</Page>
+			<SlotFillProvider>
+				<Page
+					title="Analytics"
+					showSidebarToggle={ false }
+					navigation={ { items, currentHref: '/overview' } }
+				>
+					<div>Content</div>
+				</Page>
+			</SlotFillProvider>
 		);
 
 		expect(
@@ -36,13 +39,15 @@ describe( 'Page navigation', () => {
 
 	it( 'should not render a navigation landmark when there are no items', () => {
 		render(
-			<Page
-				title="Analytics"
-				showSidebarToggle={ false }
-				navigation={ { items: [] } }
-			>
-				<div>Content</div>
-			</Page>
+			<SlotFillProvider>
+				<Page
+					title="Analytics"
+					showSidebarToggle={ false }
+					navigation={ { items: [] } }
+				>
+					<div>Content</div>
+				</Page>
+			</SlotFillProvider>
 		);
 
 		expect( screen.queryByRole( 'navigation' ) ).not.toBeInTheDocument();
@@ -56,14 +61,16 @@ describe( 'Page navigation', () => {
 		);
 
 		render(
-			<Page
-				title="Analytics"
-				showSidebarToggle={ false }
-				components={ { link: CustomLink } }
-				navigation={ { items, currentHref: '/overview' } }
-			>
-				<div>Content</div>
-			</Page>
+			<SlotFillProvider>
+				<Page
+					title="Analytics"
+					showSidebarToggle={ false }
+					components={ { link: CustomLink } }
+					navigation={ { items, currentHref: '/overview' } }
+				>
+					<div>Content</div>
+				</Page>
+			</SlotFillProvider>
 		);
 
 		const link = screen.getByRole( 'link', { name: 'Overview' } );

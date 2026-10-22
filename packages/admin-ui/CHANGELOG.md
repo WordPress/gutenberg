@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Page`: Add `Page.HeaderActionsFill`, which renders its content after the page's own header actions.
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

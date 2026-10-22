@@ -3,10 +3,12 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { getAdminThemeColors } from '@wordpress/admin-ui';
+import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
+import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import SavePanel from '../save-panel';
+import SaveButton from '../save-button';
 import CanvasRenderer from '../canvas-renderer';
 import PluginArea from '../plugin-area';
 import { unlock } from '../../lock-unlock';
@@ -40,54 +42,60 @@ export default function RootSinglePage() {
 
 	return (
 		<SlotFillProvider>
-			<PluginArea />
-			<ThemeProvider
-				isRoot
-				color={ { ...themeColors, background: '#f8f8f8' } }
-			>
-				<ThemeProvider color={ themeColors }>
-					<div
-						ref={ layoutRef }
-						className={ clsx(
-							styles.layout,
-							styles[ 'layout-single-page' ],
-							{
-								[ styles[ 'has-canvas' ] ]:
-									!! canvas || canvas === null,
-								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
-							}
-						) }
-					>
-						<UnsavedChangesWarning />
-						<SavePanel />
-						<SnackbarNotices
-							className={ styles[ 'notices-snackbar' ] }
-						/>
-						<div className={ styles.surfaces }>
-							<ThemeProvider
-								color={ {
-									...themeColors,
-									// Reset to the default background color.
-									background: '#fcfcfc',
-								} }
-							>
-								<Outlet />
-								{ /* Render Canvas in Root to prevent remounting on route changes */ }
-								{ ( canvas || canvas === null ) && (
-									<div className={ styles.canvas }>
-										<CanvasRenderer
-											canvas={ canvas }
-											routeContentModule={
-												routeContentModule
-											}
-										/>
-									</div>
-								) }
-							</ThemeProvider>
+			<Tooltip.Provider>
+				<PluginArea />
+				<ThemeProvider
+					isRoot
+					color={ { ...themeColors, background: '#f8f8f8' } }
+				>
+					<ThemeProvider color={ themeColors }>
+						<div
+							ref={ layoutRef }
+							className={ clsx(
+								styles.layout,
+								styles[ 'layout-single-page' ],
+								{
+									[ styles[ 'has-canvas' ] ]:
+										!! canvas || canvas === null,
+									[ styles[ 'has-full-canvas' ] ]:
+										isFullScreen,
+								}
+							) }
+						>
+							<UnsavedChangesWarning />
+							<SavePanel />
+							<Page.HeaderActionsFill>
+								<SaveButton isFullWidth={ false } />
+							</Page.HeaderActionsFill>
+							<SnackbarNotices
+								className={ styles[ 'notices-snackbar' ] }
+							/>
+							<div className={ styles.surfaces }>
+								<ThemeProvider
+									color={ {
+										...themeColors,
+										// Reset to the default background color.
+										background: '#fcfcfc',
+									} }
+								>
+									<Outlet />
+									{ /* Render Canvas in Root to prevent remounting on route changes */ }
+									{ ( canvas || canvas === null ) && (
+										<div className={ styles.canvas }>
+											<CanvasRenderer
+												canvas={ canvas }
+												routeContentModule={
+													routeContentModule
+												}
+											/>
+										</div>
+									) }
+								</ThemeProvider>
+							</div>
 						</div>
-					</div>
+					</ThemeProvider>
 				</ThemeProvider>
-			</ThemeProvider>
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }

@@ -26,6 +26,11 @@
 	flex-shrink: 0;
 }
 
+/* The slot wrapper is not a flex item, so an empty slot adds no gap. */
+.header-actions-slot {
+	display: contents;
+}
+
 /* Let the title cluster shrink below its content width, so a long title
 truncates instead of overflowing the page horizontally. */
 .header-lockup {

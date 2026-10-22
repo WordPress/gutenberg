@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
@@ -19,7 +20,11 @@ import {
 import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 
-export default function SaveButton() {
+export default function SaveButton( {
+	isFullWidth = true,
+}: {
+	isFullWidth?: boolean;
+} ) {
 	const [ isSaveViewOpen, setIsSaveViewOpened ] = useState( false );
 	const { isSaving, dirtyEntityRecordsCount } = useSelect( ( select ) => {
 		const { isSavingEntityRecord, __experimentalGetDirtyEntityRecords } =
@@ -108,7 +113,9 @@ export default function SaveButton() {
 							disabled={ disabled }
 							accessibleWhenDisabled
 							isBusy={ isSaving }
-							className={ styles[ 'save-button' ] }
+							className={ clsx(
+								isFullWidth && styles[ 'is-full-width' ]
+							) }
 							icon={ isInSavedState ? check : undefined }
 						/>
 					}
