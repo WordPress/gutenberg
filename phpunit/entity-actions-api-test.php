@@ -5,6 +5,7 @@
  * @package gutenberg
  *
  * @covers ::_wp_add_entity_action_modules_to_editor_script
+ * @covers ::_wp_add_entity_preload_paths
  * @covers ::_wp_preload_entity_actions
  * @covers ::wp_register_entity_actions
  * @covers ::wp_unregister_entity_actions
@@ -39,6 +40,7 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 	 * the actions WordPress registers back.
 	 */
 	public function tear_down() {
+		unset( $_GET['p'] );
 		self::reset_registry();
 
 		parent::tear_down();
@@ -403,13 +405,76 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Only the post editor preloads the actions: the other editors have no
-	 * post type of their own.
+	 * The site editor preloads the actions of the post types its screen lists,
+	 * from the `p` query arg.
+	 *
+	 * @dataProvider data_site_editor_screens
+	 *
+	 * @param string   $path       The `p` query arg.
+	 * @param string[] $post_types The post types whose actions are preloaded.
+	 */
+	public function test_the_site_editor_preloads_the_actions_of_its_screen( $path, $post_types ) {
+		$_GET['p'] = $path;
+		$context   = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
+
+		$expected = array();
+		foreach ( $post_types as $post_type ) {
+			$expected[] = '/wp/v2/entity-actions?kind=postType&name=' . $post_type;
+		}
+		$this->assertSame( $expected, _wp_preload_entity_actions( array(), $context ) );
+	}
+
+	/**
+	 * Data provider for test_the_site_editor_preloads_the_actions_of_its_screen().
+	 *
+	 * @return array[]
+	 */
+	public function data_site_editor_screens() {
+		return array(
+			'pages'         => array( '/page', array( 'page' ) ),
+			'page'          => array( '/page/12', array( 'page' ) ),
+			'templates'     => array( '/template', array( 'wp_template' ) ),
+			'template'      => array( '/wp_template/emptytheme//index', array( 'wp_template' ) ),
+			'patterns'      => array( '/pattern', array( 'wp_block', 'wp_template_part' ) ),
+			'pattern'       => array( '/wp_block/12', array( 'wp_block' ) ),
+			'template part' => array( '/wp_template_part/emptytheme//header', array( 'wp_template_part' ) ),
+			'root'          => array( '/', array() ),
+			'styles'        => array( '/styles', array() ),
+			'navigation'    => array( '/navigation', array() ),
+		);
+	}
+
+	/**
+	 * The site editor preloads the actions of the edited post, once, next to
+	 * those of its screen.
+	 */
+	public function test_the_site_editor_preloads_the_actions_of_the_edited_post() {
+		$_GET['p'] = '/page';
+		$context   = new WP_Block_Editor_Context(
+			array(
+				'name' => 'core/edit-site',
+				'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ),
+			)
+		);
+
+		$this->assertSame(
+			array( '/wp/v2/entity-actions?kind=postType&name=page' ),
+			_wp_preload_entity_actions( array(), $context )
+		);
+	}
+
+	/**
+	 * Other editors, a post editor context without a post, and a site editor
+	 * screen that lists no posts are left untouched.
 	 */
 	public function test_other_editors_do_not_preload_the_actions() {
-		$context = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
+		$site_editor = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
+		$no_post     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-post' ) );
+		$widgets     = new WP_Block_Editor_Context( array( 'name' => 'core/edit-widgets' ) );
 
-		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $context ) );
+		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $site_editor ), 'The paths of the site editor root are unchanged.' );
+		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $no_post ), 'The paths of a post editor without a post are unchanged.' );
+		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_actions( array( '/wp/v2/types' ), $widgets ), 'The paths of the widgets editor are unchanged.' );
 	}
 
 	/**
