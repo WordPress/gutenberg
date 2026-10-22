@@ -1,5 +1,6 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
+const { createReadStream } = require( 'fs' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
 const { createRequire } = require( 'node:module' );
@@ -594,10 +595,23 @@ test.describe( 'Client-side media processing', () => {
 		);
 
 		try {
+			// Upload the way the client-side pipeline does, with server-side
+			// sub-sizes off, which skips the check for image types the server
+			// cannot resize and leaves the file type check to decide.
 			await expect(
-				requestUtils.uploadMedia(
-					path.join( ASSETS_DIR, '200x150_e2e_test_image_decode.jxl' )
-				)
+				requestUtils.rest( {
+					method: 'POST',
+					path: '/wp/v2/media',
+					multipart: {
+						file: createReadStream(
+							path.join(
+								ASSETS_DIR,
+								'200x150_e2e_test_image_decode.jxl'
+							)
+						),
+						generate_sub_sizes: 'false',
+					},
+				} )
 			).rejects.toMatchObject( {
 				message: expect.stringMatching(
 					/not allowed to upload this file type/
