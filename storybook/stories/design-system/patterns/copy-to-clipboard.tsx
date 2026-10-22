@@ -1,5 +1,6 @@
 import { speak } from '@wordpress/a11y';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCopyToClipboard } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
 import { check, copy, error } from '@wordpress/icons';
 import { Button, IconButton, Stack, Text } from '@wordpress/ui';
 
@@ -14,65 +15,33 @@ const RESULT_ICON = {
 	error,
 };
 
-function useCopyToClipboard() {
+function useCopyFeedback() {
 	const [ result, setResult ] = useState< CopyResult >( 'idle' );
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > | null >( null );
-	const requestRef = useRef( 0 );
 
 	useEffect( () => {
-		return () => {
-			if ( timeoutRef.current !== null ) {
-				clearTimeout( timeoutRef.current );
-			}
-		};
-	}, [] );
-
-	function showResult(
-		requestId: number,
-		next: Exclude< CopyResult, 'idle' >,
-		message: string
-	) {
-		if ( requestId !== requestRef.current ) {
+		if ( result === 'idle' ) {
 			return;
 		}
-		if ( timeoutRef.current !== null ) {
-			clearTimeout( timeoutRef.current );
-		}
-		setResult( next );
-		speak( message );
-		timeoutRef.current = setTimeout( () => {
-			timeoutRef.current = null;
-			setResult( 'idle' );
-		}, FEEDBACK_TIMEOUT );
-	}
-
-	function onCopy() {
-		const requestId = ++requestRef.current;
-		if ( timeoutRef.current !== null ) {
-			clearTimeout( timeoutRef.current );
-			timeoutRef.current = null;
-		}
-		setResult( 'idle' );
-
-		let pending: Promise< void >;
-		try {
-			pending = navigator.clipboard.writeText( SAMPLE_VALUE );
-		} catch {
-			showResult( requestId, 'error', "Couldn't copy to clipboard." );
-			return;
-		}
-
-		void pending.then(
-			() => {
-				showResult( requestId, 'copied', 'Copied to clipboard' );
-			},
-			() => {
-				showResult( requestId, 'error', "Couldn't copy to clipboard." );
-			}
+		const timeoutId = setTimeout(
+			() => setResult( 'idle' ),
+			FEEDBACK_TIMEOUT
 		);
-	}
+		return () => clearTimeout( timeoutId );
+	}, [ result ] );
 
-	return { result, onCopy };
+	const ref = useCopyToClipboard(
+		SAMPLE_VALUE,
+		() => {
+			setResult( 'copied' );
+			speak( 'Copied to clipboard' );
+		},
+		() => {
+			setResult( 'error' );
+			speak( "Couldn't copy to clipboard." );
+		}
+	);
+
+	return { result, ref };
 }
 
 /**
@@ -82,12 +51,12 @@ function useCopyToClipboard() {
  * success and an error icon shows failure. `speak()` announces the outcome.
  */
 export function CopyToClipboardExample() {
-	const { result, onCopy } = useCopyToClipboard();
+	const { result, ref } = useCopyFeedback();
 
 	return (
 		<Stack direction="row" gap="sm" align="center">
 			<Text>{ SAMPLE_VALUE }</Text>
-			<Button onClick={ onCopy }>
+			<Button ref={ ref }>
 				<Button.Icon icon={ RESULT_ICON[ result ] } />
 				Copy
 			</Button>
@@ -103,15 +72,15 @@ export function CopyToClipboardExample() {
  * announces the outcome.
  */
 export function CopyToClipboardIconButtonExample() {
-	const { result, onCopy } = useCopyToClipboard();
+	const { result, ref } = useCopyFeedback();
 
 	return (
 		<Stack direction="row" gap="sm" align="center">
 			<Text>{ SAMPLE_VALUE }</Text>
 			<IconButton
+				ref={ ref }
 				label="Copy"
 				icon={ RESULT_ICON[ result ] }
-				onClick={ onCopy }
 			/>
 		</Stack>
 	);
