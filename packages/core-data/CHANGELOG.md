@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Convert the queried data to TypeScript ([#85061](https://github.com/WordPress/gutenberg/pull/85061)).
 -   Convert the store locks to TypeScript ([#85059](https://github.com/WordPress/gutenberg/pull/85059)).
 -   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
 

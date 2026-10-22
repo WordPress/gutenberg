@@ -6837,51 +6837,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/queried-data/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/get-query-parts.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/get-query-parts.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

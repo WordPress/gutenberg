@@ -1,27 +1,33 @@
 import EquivalentKeyMap from 'equivalent-key-map';
 import getQueryParts from './get-query-parts';
 import { setNestedValue } from '../utils';
+import type { QueriedDataState, QueriedItemsOptions, Query } from './types';
 
 /**
  * Cache of state keys to EquivalentKeyMap where the inner map tracks queries
  * to their resulting items set. WeakMap allows garbage collection on expired
  * state references.
- *
- * @type {WeakMap<Object,EquivalentKeyMap>}
  */
-const queriedItemsCacheByState = new WeakMap();
+const queriedItemsCacheByState = new WeakMap<
+	QueriedDataState< unknown >,
+	EquivalentKeyMap< Query, Array< unknown > | null >
+>();
 
 /**
  * Returns items for a given query, or null if the items are not known.
  *
- * @param {Object}  state                      State object.
- * @param {?Object} query                      Optional query.
- * @param {?Object} options                    Optional pagination options.
- * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default true.
+ * @param state                      State object.
+ * @param query                      Optional query.
+ * @param options                    Optional pagination options.
+ * @param options.supportsPagination Whether the entity supports pagination. Default true.
  *
- * @return {?Array} Query items.
+ * @return Query items.
  */
-function getQueriedItemsUncached( state, query, options = {} ) {
+function getQueriedItemsUncached< Item >(
+	state: QueriedDataState< Item >,
+	query: Query,
+	options: QueriedItemsOptions = {}
+): Array< Item > | null {
 	const { supportsPagination = true } = options;
 	const {
 		stableKey,
@@ -52,15 +58,20 @@ function getQueriedItemsUncached( state, query, options = {} ) {
 	if ( isPaginated && itemIds.length < startOffset + perPage ) {
 		const totalItems =
 			state.queries[ context ][ stableKey ].meta?.totalItems;
-		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems ) {
+		// `isFinite` is false for a missing total.
+		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems! ) {
 			return null;
 		}
 	}
 
-	const items = [];
+	const items: Array< Item > = [];
 	for ( let i = startOffset; i < endOffset; i++ ) {
 		const itemId = itemIds[ i ];
-		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
+		// Item IDs listed by an `include` query are numbers.
+		if (
+			Array.isArray( include ) &&
+			! include.includes( itemId as number )
+		) {
 			continue;
 		}
 		if ( itemId === undefined ) {
@@ -73,15 +84,19 @@ function getQueriedItemsUncached( state, query, options = {} ) {
 
 		const item = state.items[ context ][ itemId ];
 
-		let filteredItem;
+		let filteredItem: Item;
 		if ( Array.isArray( fields ) ) {
-			filteredItem = {};
+			// The requested fields of the item, set below.
+			filteredItem = {} as Item;
 
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
-				let value = item;
+				let value: unknown = item;
 				field.forEach( ( fieldName ) => {
-					value = value?.[ fieldName ];
+					// Reads through whatever value the path reaches, as `?.` allows.
+					value = ( value as Record< string, unknown > )?.[
+						fieldName
+					];
 				} );
 
 				setNestedValue( filteredItem, field, value );
@@ -108,19 +123,24 @@ function getQueriedItemsUncached( state, query, options = {} ) {
  *
  * `getQueriedItems( state, {} ) === getQueriedItems( state, {} )`
  *
- * @param {Object}  state                      State object.
- * @param {?Object} query                      Optional query.
- * @param {?Object} options                    Optional pagination options.
- * @param {boolean} options.supportsPagination Whether the entity supports pagination. Default true.
+ * @param state                      State object.
+ * @param query                      Optional query.
+ * @param options                    Optional pagination options.
+ * @param options.supportsPagination Whether the entity supports pagination. Default true.
  *
- * @return {?Array} Query items.
+ * @return Query items.
  */
-export function getQueriedItems( state, query = {}, options = {} ) {
+export function getQueriedItems< Item >(
+	state: QueriedDataState< Item >,
+	query: Query = {},
+	options: QueriedItemsOptions = {}
+): Array< Item > | null {
 	let queriedItemsCache = queriedItemsCacheByState.get( state );
 	if ( queriedItemsCache ) {
 		const queriedItems = queriedItemsCache.get( query );
 		if ( queriedItems !== undefined ) {
-			return queriedItems;
+			// Cached from this state, which holds `Item`s.
+			return queriedItems as Array< Item > | null;
 		}
 	} else {
 		queriedItemsCache = new EquivalentKeyMap();
@@ -132,13 +152,19 @@ export function getQueriedItems( state, query = {}, options = {} ) {
 	return items;
 }
 
-export function getQueriedTotalItems( state, query = {} ) {
+export function getQueriedTotalItems(
+	state: QueriedDataState< unknown >,
+	query: Query = {}
+): number | null {
 	const { stableKey, context } = getQueryParts( query );
 
 	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
 }
 
-export function getQueriedTotalPages( state, query = {} ) {
+export function getQueriedTotalPages(
+	state: QueriedDataState< unknown >,
+	query: Query = {}
+): number | null {
 	const { stableKey, context } = getQueryParts( query );
 
 	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalPages ?? null;

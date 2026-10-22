@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getQueriedItems } from '../selectors';
+import type { QueriedDataState } from '../types';
 import { getMergedItemIds } from '../reducer';
 
 describe( 'getQueriedItems', () => {
@@ -42,7 +43,7 @@ describe( 'getQueriedItems', () => {
 	} );
 
 	it( 'should cache on query by state', () => {
-		const state = {
+		const state: QueriedDataState< { id: number } > = {
 			items: {
 				default: {
 					1: { id: 1 },
@@ -55,7 +56,7 @@ describe( 'getQueriedItems', () => {
 					2: true,
 				},
 			},
-			queries: { itemIds: [ 1, 2 ] },
+			queries: { default: { '': { itemIds: [ 1, 2 ] } } },
 		};
 
 		const resultA = getQueriedItems( state, {} );
