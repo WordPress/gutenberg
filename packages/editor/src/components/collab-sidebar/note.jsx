@@ -52,6 +52,7 @@ export function Note( {
 	onDeleteNote,
 	onResolve,
 	isThreadResolved = false,
+	isUnseen,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -212,6 +213,7 @@ export function Note( {
 			note={ note }
 			actions={ actions }
 			className="editor-collab-sidebar-panel__note"
+			isUnseen={ isUnseen }
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			<div className="editor-collab-sidebar-panel__note-body">

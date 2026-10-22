@@ -948,6 +948,22 @@ export function hasUnseenNoteActivity( threads, lastSeen, currentUserId ) {
 }
 
 /**
+ * Returns the ids of the threads with unseen activity, as `hasUnseenNoteActivity` defines it.
+ *
+ * @param {Array}   threads       Note threads, each optionally carrying a `reply` array.
+ * @param {?string} lastSeen      `date_gmt` the user last saw the post's notes, if ever.
+ * @param {?number} currentUserId Current user id. Without it nothing counts.
+ * @return {number[]} Ids of the threads with unseen activity.
+ */
+export function getUnseenNoteIds( threads, lastSeen, currentUserId ) {
+	return ( threads ?? [] )
+		.filter( ( thread ) =>
+			hasUnseenNoteActivity( [ thread ], lastSeen, currentUserId )
+		)
+		.map( ( thread ) => thread.id );
+}
+
+/**
  * Records a post's "notes last seen" timestamp, keeping only the `limit` most
  * recently seen posts.
  *

@@ -2,7 +2,14 @@ import clsx from 'clsx';
 import { Stack } from '@wordpress/ui';
 import { NoteByline } from './note-byline';
 
-export function NoteCard( { note, actions, className, children, ...props } ) {
+export function NoteCard( {
+	note,
+	actions,
+	className,
+	isUnseen,
+	children,
+	...props
+} ) {
 	return (
 		<Stack
 			direction="column"
@@ -16,6 +23,7 @@ export function NoteCard( { note, actions, className, children, ...props } ) {
 					name={ note?.author_name }
 					date={ note?.date }
 					userId={ note?.author }
+					isUnseen={ isUnseen }
 				/>
 				{ actions && (
 					<Stack

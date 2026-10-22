@@ -278,6 +278,20 @@
 	bottom: $grid-unit-10;
 }
 
+// Marks a thread with unseen activity, after its first note's date.
+.editor-collab-sidebar-panel__unseen-dot {
+	flex-shrink: 0;
+	width: $grid-unit-10;
+	height: $grid-unit-10;
+	border-radius: $radius-round;
+	background: var(--wp-admin-theme-color, #3858e9);
+
+	@media (forced-colors: active) {
+		forced-color-adjust: none;
+		background: Highlight;
+	}
+}
+
 // Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
 // Each marker is tinted by `<NoteHighlightStyles>` using the note author's
 // color from `AVATAR_BORDER_COLORS`; this base rule only provides shared

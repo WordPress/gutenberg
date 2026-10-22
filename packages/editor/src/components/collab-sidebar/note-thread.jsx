@@ -18,7 +18,12 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { NoteDraftsContext, useNoteDraft, usePickNote } from './hooks';
+import {
+	NoteDraftsContext,
+	UnseenNotesContext,
+	useNoteDraft,
+	usePickNote,
+} from './hooks';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
@@ -87,6 +92,7 @@ export function NoteThread( {
 	const isFloating = !! floating;
 	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
+	const isUnseen = useContext( UnseenNotesContext ).has( note.id );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
@@ -216,7 +222,7 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
+	let ariaLabel = !! note.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -227,6 +233,13 @@ export function NoteThread( {
 				__( 'Original block deleted. Note: %s' ),
 				noteExcerpt
 			);
+	if ( isUnseen ) {
+		ariaLabel = sprintf(
+			// translators: %s: note label, e.g. "Note: Fix the typo".
+			__( '%s, new activity' ),
+			ariaLabel
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -300,6 +313,7 @@ export function NoteThread( {
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
+				isUnseen={ isUnseen }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
