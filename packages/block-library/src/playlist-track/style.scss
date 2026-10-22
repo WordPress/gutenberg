@@ -1,6 +1,20 @@
 .wp-block-playlist-track {
+	position: relative;
+
 	&:has([aria-current="true"]) {
 		background-color: color-mix(in srgb, currentColor 10%, transparent);
+
+		// The tint alone is faint, is weaker than the hover tint, and is
+		// removed in forced colors mode. A solid edge marks the current track
+		// in every color mode without shifting the track's content.
+		&::before {
+			content: "";
+			position: absolute;
+			inset-block: 0;
+			inset-inline-start: 0;
+			border-inline-start: 3px solid currentColor;
+			pointer-events: none;
+		}
 	}
 
 	&:hover {
