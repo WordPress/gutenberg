@@ -8,7 +8,7 @@ export const ALLOWED_RESOURCE_ACTIONS = [
 ];
 
 export function getUserPermissionsFromAllowHeader(
-	allowedMethods: string | null | undefined
+	allowedMethods: string | ReadonlyArray< string > | null | undefined
 ): Record< string, boolean > {
 	const permissions: Record< string, boolean > = {};
 	const methods = {
@@ -30,7 +30,7 @@ export function getUserPermissionsFromAllowHeader(
 export function getUserPermissionCacheKey(
 	action: string,
 	resource: string | PermissionResource,
-	id?: string | number
+	id?: string | number | null
 ): string {
 	const key = (
 		typeof resource === 'object'
