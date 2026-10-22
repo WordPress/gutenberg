@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { NavigationConfig } from '../navigation/types';
 import Header from './header';
-import type { PageComponents } from './types';
+import type { PageBreadcrumbItem, PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
 import styles from './style.module.css';
@@ -23,7 +23,11 @@ function Page( {
 	showSidebarToggle = true,
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
-	breadcrumbs?: React.ReactNode;
+	/**
+	 * An array of items to display in the breadcrumb trail. The last item is
+	 * considered the current item.
+	 */
+	breadcrumbs?: PageBreadcrumbItem[];
 	badges?: React.ReactNode;
 	/**
 	 * Optional visual mark (icon, image, etc.) shown before the page title or breadcrumbs.
@@ -62,7 +66,7 @@ function Page( {
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
 			{ ( title ||
-				breadcrumbs ||
+				!! breadcrumbs?.length ||
 				badges ||
 				actions ||
 				visual ||
