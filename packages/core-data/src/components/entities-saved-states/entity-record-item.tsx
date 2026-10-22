@@ -9,7 +9,7 @@ import { STORE_NAME } from '../../name';
 import { getTemplateInfo } from '../../utils/get-template-info';
 import type { store as coreStore } from '../../';
 import type { EntityRecordItemProps } from './types';
-import type { TemplateInfoParams } from '../../utils/types';
+import type * as ET from '../../entity-types';
 
 export default function EntityRecordItem( {
 	record,
@@ -40,9 +40,9 @@ export default function EntityRecordItem( {
 
 			return {
 				entityRecordTitle: getTemplateInfo( {
-					// A missing record is `false`, whose fields read as `undefined`.
-					template:
-						template as unknown as TemplateInfoParams[ 'template' ],
+					// The early return leaves only templates.
+					template: template as
+						ET.Updatable< ET.WpTemplate< 'edit' > > | false,
 					templateTypes,
 				} ).title,
 			};
