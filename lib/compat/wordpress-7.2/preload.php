@@ -6,35 +6,6 @@
  */
 
 /**
- * Returns the paths that serve the fields of the given post types, skipping
- * the post types that are not registered.
- *
- * A path must match the request of the `getFieldsConfig` core data resolver,
- * see packages/core-data/src/resolvers.ts.
- *
- * @param string[] $post_types The post types.
- * @return string[] One path of the `wp/v2/entity-fields` route per post type, in the
- *                  order the post types are given, without duplicates.
- */
-function _gutenberg_get_post_type_fields_preload_paths( $post_types ) {
-	$paths = array();
-	foreach ( array_unique( $post_types ) as $post_type ) {
-		if ( ! post_type_exists( $post_type ) ) {
-			continue;
-		}
-		$paths[] = add_query_arg(
-			array(
-				'kind' => 'postType',
-				'name' => $post_type,
-			),
-			'/wp/v2/entity-fields'
-		);
-	}
-
-	return $paths;
-}
-
-/**
  * Filters the block editor preload paths.
  *
  * @since 7.2.0
