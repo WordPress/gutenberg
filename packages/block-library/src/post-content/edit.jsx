@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import {
+	BlockContextProvider,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -129,6 +130,33 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	);
 }
 
+/**
+ * Renders a child template inside its parent template's Content block, for the
+ * template inheritance experiment. The child's blocks are edited as the
+ * template they belong to, so they get the context a template is edited with,
+ * not the context of the post the parent wraps.
+ *
+ * @param {Object} props Props passed through to `EditableContent`.
+ */
+function ChildTemplateContent( props ) {
+	const { postId } = props.context;
+	const [ slug ] = useEntityProp( 'postType', 'wp_template', 'slug', postId );
+	const childContext = useMemo(
+		() => ( {
+			postId: undefined,
+			postType: undefined,
+			queryId: undefined,
+			templateSlug: slug,
+		} ),
+		[ slug ]
+	);
+	return (
+		<BlockContextProvider value={ childContext }>
+			<EditableContent { ...props } />
+		</BlockContextProvider>
+	);
+}
+
 function Content( props ) {
 	const {
 		context: { queryId, postType, postId } = {},
@@ -142,6 +170,10 @@ function Content( props ) {
 
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+
+	if ( postType === 'wp_template' ) {
+		return isEditable ? <ChildTemplateContent { ...props } /> : null;
+	}
 
 	return isEditable ? (
 		<EditableContent { ...props } />

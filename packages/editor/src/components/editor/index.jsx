@@ -11,6 +11,28 @@ import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 
+/**
+ * Returns the ID of the template a template renders inside, when the template
+ * inheritance experiment is on and the template names one.
+ *
+ * @param {Object} [record] The edited template record.
+ * @return {string|undefined} The parent template ID.
+ */
+function getParentTemplateId( record ) {
+	const isEnabled = globalThis.IS_GUTENBERG_PLUGIN
+		? !! window.__experimentalTemplateInheritance
+		: false;
+	if (
+		! isEnabled ||
+		! record?.parent_template ||
+		! record.theme ||
+		record.parent_template === record.slug
+	) {
+		return undefined;
+	}
+	return `${ record.theme }//${ record.parent_template }`;
+}
+
 function Editor( {
 	postType,
 	postId,
@@ -33,6 +55,7 @@ function Editor( {
 	const {
 		post,
 		template,
+		inheritsTemplate,
 		hasLoadedPost,
 		error,
 		isBlockTheme,
@@ -41,6 +64,7 @@ function Editor( {
 		( select ) => {
 			const {
 				getEntityRecord,
+				getEditedEntityRecord,
 				getResolutionError,
 				hasFinishedResolution,
 				getCurrentTheme,
@@ -65,15 +89,35 @@ function Editor( {
 					} )
 				: false;
 
+			// A template that names a parent template is edited inside it,
+			// the way a page is edited inside its template. Some callers pass
+			// a template as its own template, which means it has none.
+			const parentTemplateId =
+				postType === TEMPLATE_POST_TYPE &&
+				( ! templateId || templateId === postId )
+					? getParentTemplateId(
+							getEditedEntityRecord( ...postArgs )
+						)
+					: undefined;
+			const parentTemplate = parentTemplateId
+				? getEntityRecord(
+						'postType',
+						TEMPLATE_POST_TYPE,
+						parentTemplateId
+					)
+				: undefined;
+			const _templateId = parentTemplate ? parentTemplateId : templateId;
+
 			return {
 				post: getEntityRecord( ...postArgs ),
-				template: templateId
+				template: _templateId
 					? getEntityRecord(
 							'postType',
 							TEMPLATE_POST_TYPE,
-							templateId
+							_templateId
 						)
 					: undefined,
+				inheritsTemplate: !! parentTemplate,
 				hasLoadedPost: hasFinishedResolution(
 					'getEntityRecord',
 					postArgs
@@ -112,7 +156,10 @@ function Editor( {
 					settings={ settings }
 					initialEdits={ initialEdits }
 					initialViewport={ initialViewport }
-					renderingMode={ renderingMode }
+					renderingMode={
+						renderingMode ??
+						( inheritsTemplate ? 'template-locked' : undefined )
+					}
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>

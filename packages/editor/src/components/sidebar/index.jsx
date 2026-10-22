@@ -18,6 +18,7 @@ import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
+import TemplateParentPanel from '../template-parent-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
@@ -29,6 +30,9 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
 function Sidebar( { extraPanels, onActionPerformed } ) {
 	useAutoSwitchEditorSidebars();
+	const isTemplateInheritanceEnabled = globalThis.IS_GUTENBERG_PLUGIN
+		? !! window.__experimentalTemplateInheritance
+		: false;
 
 	const { tabName, keyboardShortcut, isRevisionsMode } = useSelect(
 		( select ) => {
@@ -74,6 +78,7 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 			<>
 				<DataFormPostSummary onActionPerformed={ onActionPerformed } />
 				<PluginDocumentSettingPanel.Slot />
+				{ isTemplateInheritanceEnabled && <TemplateParentPanel /> }
 				<TemplateContentPanel />
 				<TemplateActionsPanel />
 				<TemplatePartContentPanel />

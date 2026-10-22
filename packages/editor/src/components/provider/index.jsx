@@ -254,8 +254,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
-			// If it is a template, try to inherit the post type from the name.
-			if ( post.type === 'wp_template' ) {
+			// A template shown inside its parent template is the parent's
+			// content, the way a page is its template's content, so the
+			// parent's Content block renders it.
+			if ( post.type === 'wp_template' && shouldRenderTemplate ) {
+				postContext.postId = post.id;
+				postContext.postType = post.type;
+			} else if ( post.type === 'wp_template' ) {
+				// If it is a template, try to inherit the post type from the name.
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
