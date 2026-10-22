@@ -4,11 +4,24 @@ import userEvent from '@testing-library/user-event';
 import { dispatch, select } from '@wordpress/data';
 import PostPublishButton from '../';
 import { store as editorStore } from '../../../store';
+import {
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+} from '../../../store/constants';
+import { unlock } from '../../../lock-unlock';
+
+function setEditorIntent( intent ) {
+	unlock( dispatch( editorStore ) ).setEditorIntent( intent );
+}
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'PostPublishButton', () => {
 	beforeEach( () => {
+		// The intent is registry state, not a mock, so restoring the spies
+		// doesn't reset what a previous test left behind. Reset it before
+		// rendering, while nothing is mounted to react to the change.
+		setEditorIntent( EDITOR_INTENT_EDIT );
 		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			_links: {},
 		} );
@@ -116,6 +129,152 @@ describe( 'PostPublishButton', () => {
 				'aria-disabled',
 				'false'
 			);
+		} );
+
+		it( 'should be false while suggesting', () => {
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			// The click opens the reason, so the control stays operable.
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+		} );
+
+		it( 'should be false for the toggle while suggesting', () => {
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton isToggle /> );
+
+			// The click opens the reason, so the control stays operable.
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+		} );
+	} );
+
+	describe( 'suggesting', () => {
+		it( 'should not save the post when clicked', async () => {
+			const user = userEvent.setup();
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			await user.click( screen.getByRole( 'button' ) );
+
+			// `editPost` would drop the status but `savePost` would still
+			// write the post to the server as a draft.
+			expect( dispatch( editorStore ).editPost ).not.toHaveBeenCalled();
+			expect( dispatch( editorStore ).savePost ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not open the entities save panel when clicked', async () => {
+			const user = userEvent.setup();
+			const setEntitiesSavedStatesCallback = vi.fn();
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'hasNonPostEntityChanges', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render(
+				<PostPublishButton
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button' ) );
+
+			// A dirty non-post entity would otherwise send the click straight
+			// into the "Are you ready to save?" dialog.
+			expect( setEntitiesSavedStatesCallback ).not.toHaveBeenCalled();
+			expect( dispatch( editorStore ).savePost ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should keep its visible label as its accessible name', () => {
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Publish' } )
+			).toBeVisible();
+		} );
+
+		it( 'should say where to change the status when clicked', async () => {
+			const user = userEvent.setup();
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			// The reason opens on click rather than in a tooltip, so it is
+			// reachable by touch and assistive technology alike.
+			const button = screen.getByRole( 'button', { name: 'Publish' } );
+			expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
+
+			await user.click( button );
+
+			expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
+			expect(
+				screen.getByText(
+					'Switch to Editing to change the post status.'
+				)
+			).toBeVisible();
+		} );
+
+		it( 'should stay enabled when the click would only save', () => {
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isCurrentPostPublished', true );
+			mockSelector( 'getEditedPostAttribute', 'publish' );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			// Suggestions write their markers into the post content, and
+			// there is no save lock while suggesting, so a published post
+			// has to stay saveable or the suggester is trapped behind an
+			// unsaved-changes warning.
+			const button = screen.getByRole( 'button', { name: 'Save' } );
+			expect( button ).toHaveAttribute( 'aria-disabled', 'false' );
+			expect( button ).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should save a published post when clicked', async () => {
+			const user = userEvent.setup();
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isCurrentPostPublished', true );
+			mockSelector( 'getEditedPostAttribute', 'publish' );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render( <PostPublishButton /> );
+
+			await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
+
+			expect( dispatch( editorStore ).savePost ).toHaveBeenCalled();
 		} );
 	} );
 

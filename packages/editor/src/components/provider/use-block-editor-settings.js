@@ -23,6 +23,7 @@ import { default as mediaSideloadFromUrl } from '../../utils/media-sideload-from
 import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_VIEW } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
 
@@ -155,6 +156,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		focusMode,
 		hasFixedToolbar,
 		isDistractionFree,
+		isViewIntent,
 		keepCaretInsideBlock,
 		hasUploadPermissions,
 		hiddenBlockTypes,
@@ -182,9 +184,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const { getBlockTypes } = select( blocksStore );
 			const { getCurrentPostId, getCurrentPostType } =
 				select( editorStore );
-			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
-				select( editorStore )
-			);
+			const {
+				getDeviceType,
+				isRevisionsMode: _isRevisionsMode,
+				getEditorIntent,
+			} = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -245,6 +249,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
+				isViewIntent: getEditorIntent() === EDITOR_INTENT_VIEW,
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {
@@ -476,13 +481,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
-		if ( isRevisionsMode ) {
+		if ( isRevisionsMode || isViewIntent ) {
 			blockEditorSettings.isPreviewMode = true;
 		}
 
 		return blockEditorSettings;
 	}, [
 		isRevisionsMode,
+		isViewIntent,
 		allowedBlockTypes,
 		allowRightClickOverrides,
 		focusMode,
