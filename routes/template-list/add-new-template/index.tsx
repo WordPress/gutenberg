@@ -6,6 +6,7 @@ import {
 	__experimentalText as WCText,
 	Flex,
 	Icon as WCIcon,
+	Spinner,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -284,7 +285,15 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 							'Select what the new template should apply to:'
 						) }
 					</Flex>
-					{ missingTemplates.map( ( template ) => {
+					{ ! missingTemplates && (
+						<Flex
+							justify="center"
+							className="template-list-add-new-template__template-list__loading"
+						>
+							<Spinner />
+						</Flex>
+					) }
+					{ missingTemplates?.map( ( template ) => {
 						const { title, description, slug, onClick } = template;
 						return (
 							<TemplateListItem
@@ -378,7 +387,7 @@ interface MissingTemplate extends TemplateData {
 function useMissingTemplates(
 	setEntityForSuggestions: ( entity: EntityForSuggestions ) => void,
 	onClick?: () => void
-): MissingTemplate[] {
+): MissingTemplate[] | null {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
 		( template: any ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
@@ -394,10 +403,16 @@ function useMissingTemplates(
 	const enhancedMissingDefaultTemplateTypes: MissingTemplate[] = [
 		...missingDefaultTemplates,
 	];
-	const { defaultTaxonomiesMenuItems, taxonomiesMenuItems } =
-		useTaxonomiesMenuItems( onClickMenuItem );
-	const { defaultPostTypesMenuItems, postTypesMenuItems } =
-		usePostTypeMenuItems( onClickMenuItem );
+	const {
+		defaultTaxonomiesMenuItems,
+		taxonomiesMenuItems,
+		isResolving: isResolvingTaxonomies,
+	} = useTaxonomiesMenuItems( onClickMenuItem );
+	const {
+		defaultPostTypesMenuItems,
+		postTypesMenuItems,
+		isResolving: isResolvingPostTypes,
+	} = usePostTypeMenuItems( onClickMenuItem );
 
 	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
 	[
@@ -435,6 +450,14 @@ function useMissingTemplates(
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
 	];
+	// A default template type is listed on its own until the post type or
+	// taxonomy it belongs to loads and replaces it with an item that offers
+	// the choice between a template for all items and one for a specific
+	// item. Handing back the list only once both have settled keeps a quick
+	// click from creating the general template without that choice.
+	if ( isResolvingPostTypes || isResolvingTaxonomies ) {
+		return null;
+	}
 	return missingTemplates;
 }
 
