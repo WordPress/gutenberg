@@ -1202,7 +1202,7 @@ export const GridSettings: StoryObj< GridSettingsStoryProps > = {
 	render: ( args ) => <GridSettingsStory { ...args } />,
 	args: {
 		columns: 4,
-		steps: {},
+		steps: { 0: 1, 600: 2, 960: 4 },
 		minColumnWidth: 0,
 		model: 'grid',
 		rowHeight: 'medium',
@@ -1257,7 +1257,7 @@ export const GridSettings: StoryObj< GridSettingsStoryProps > = {
 		docs: {
 			description: {
 				story: `
-The \`gridSettings\` prop carries the host's layout decisions, and the column policy travels to the surface untouched. \`columns\` is a count at every width. \`steps\` is the same field as a map from container width to count, the form a host uses to step the count as the surface narrows, and a step can be \`'auto'\` to leave that band to the floor, or to the count below it when no floor is set. One, two and four columns (\`DEFAULT_GRID.columns\`) is the default when the host sets nothing; the package applies no steps of its own. Set \`steps\` and resize the canvas to watch the count change at each width.
+The \`gridSettings\` prop carries the host's layout decisions, and the column policy travels to the surface untouched. \`columns\` is a count at every width. \`steps\` is the same field as a map from container width to count, the form a host uses to step the count as the surface narrows, and a step can be \`'auto'\` to leave that band to the floor, or to the count below it when no floor is set. One, two and four columns (\`DEFAULT_GRID.columns\`) is the default when the host sets nothing; the package applies no steps of its own. Resize the canvas to watch the count change at each step; clear \`steps\` to hold \`columns\` at every width.
 
 \`minColumnWidth\` is a per-column floor that composes with either form: the surface fits as many columns as the container allows at that width, capped by the count, down to one. Raise it and narrow the canvas to watch the count fall one column at a time.
 
