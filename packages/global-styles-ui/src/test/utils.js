@@ -166,4 +166,70 @@ describe( 'withUserCustomColorPresets', () => {
 			variation
 		);
 	} );
+
+	it( 'keeps the user custom colors set on a block', () => {
+		const variation = {
+			settings: {
+				color: { palette: { theme: themeColors } },
+				blocks: {
+					'core/paragraph': { typography: { fontSize: '1rem' } },
+				},
+			},
+		};
+		const user = {
+			settings: {
+				blocks: {
+					'core/paragraph': {
+						color: { palette: { custom: customColors } },
+					},
+					'core/heading': {
+						color: { gradients: { custom: customGradients } },
+					},
+				},
+			},
+		};
+
+		expect( withUserCustomColorPresets( variation, user ) ).toEqual( {
+			settings: {
+				color: { palette: { theme: themeColors } },
+				blocks: {
+					'core/paragraph': {
+						typography: { fontSize: '1rem' },
+						color: { palette: { custom: customColors } },
+					},
+					'core/heading': {
+						color: { gradients: { custom: customGradients } },
+					},
+				},
+			},
+		} );
+	} );
+
+	it( 'keeps the block custom colors the variation defines itself', () => {
+		const variationColors = [
+			{ slug: 'variation', color: '#ff0000', name: 'Variation' },
+		];
+		const variation = {
+			settings: {
+				blocks: {
+					'core/paragraph': {
+						color: { palette: { custom: variationColors } },
+					},
+				},
+			},
+		};
+		const user = {
+			settings: {
+				blocks: {
+					'core/paragraph': {
+						color: { palette: { custom: customColors } },
+					},
+				},
+			},
+		};
+
+		expect( withUserCustomColorPresets( variation, user ) ).toBe(
+			variation
+		);
+	} );
 } );

@@ -201,24 +201,18 @@ export function isVariationWithProperties(
 const CUSTOM_COLOR_PRESETS = [ 'palette', 'gradients', 'duotone' ] as const;
 
 /**
- * Copies the user's custom color presets (colors, gradients and duotones)
- * into a variation, so they are not lost when the variation is applied.
- * Presets the variation defines itself are left as they are.
+ * Adds the user's custom color presets to a color settings object, keeping
+ * the presets it defines itself.
  *
- * @param variation The variation to apply.
- * @param user      The current user config.
- * @return The variation with the user's custom color presets.
+ * @param color     The color settings to add to.
+ * @param userColor The user's color settings.
+ * @return The color settings with the user's custom presets.
  */
-export function withUserCustomColorPresets< T extends GlobalStylesConfig >(
-	variation: T,
-	user?: GlobalStylesConfig
-): T {
-	const userColor = user?.settings?.color;
+function mergeCustomColorPresets( color: any, userColor: any ): any {
 	if ( ! userColor ) {
-		return variation;
+		return color;
 	}
 
-	let color = variation.settings?.color;
 	for ( const preset of CUSTOM_COLOR_PRESETS ) {
 		const userPresets = userColor[ preset ];
 		const variationPresets = color?.[ preset ];
@@ -238,14 +232,65 @@ export function withUserCustomColorPresets< T extends GlobalStylesConfig >(
 		};
 	}
 
-	if ( color === variation.settings?.color ) {
+	return color;
+}
+
+/**
+ * Copies the user's custom color presets (colors, gradients and duotones),
+ * both global and per block, into a variation, so they are not lost when the
+ * variation is applied. Presets the variation defines itself are left as they
+ * are.
+ *
+ * @param variation The variation to apply.
+ * @param user      The current user config.
+ * @return The variation with the user's custom color presets.
+ */
+export function withUserCustomColorPresets< T extends GlobalStylesConfig >(
+	variation: T,
+	user?: GlobalStylesConfig
+): T {
+	const userSettings = user?.settings;
+	if ( ! userSettings ) {
 		return variation;
 	}
 
-	return {
-		...variation,
-		settings: { ...variation.settings, color },
-	};
+	let settings = variation.settings;
+
+	const color = mergeCustomColorPresets(
+		settings?.color,
+		userSettings.color
+	);
+	if ( color !== settings?.color ) {
+		settings = { ...settings, color };
+	}
+
+	if ( userSettings.blocks ) {
+		for ( const [ blockName, userBlockSettings ] of Object.entries(
+			userSettings.blocks
+		) ) {
+			const blockSettings = settings?.blocks?.[ blockName ];
+			const blockColor = mergeCustomColorPresets(
+				blockSettings?.color,
+				userBlockSettings?.color
+			);
+			if ( blockColor === blockSettings?.color ) {
+				continue;
+			}
+			settings = {
+				...settings,
+				blocks: {
+					...settings?.blocks,
+					[ blockName ]: { ...blockSettings, color: blockColor },
+				},
+			};
+		}
+	}
+
+	if ( settings === variation.settings ) {
+		return variation;
+	}
+
+	return { ...variation, settings };
 }
 
 function getFontFamilyFromSetting( fontFamilies: any[], setting: string ): any {
