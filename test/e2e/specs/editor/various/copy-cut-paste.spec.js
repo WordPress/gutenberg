@@ -998,34 +998,5 @@ test.describe( 'Copy/cut/paste', () => {
 				},
 			] );
 		} );
-
-		test( 'should copy the bound text of a selected block', async ( {
-			editor,
-			page,
-			pageUtils,
-		} ) => {
-			await editor.selectBlocks(
-				editor.canvas
-					.getByRole( 'document', {
-						name: 'Block: Paragraph',
-					} )
-					.first()
-			);
-			await pageUtils.pressKeys( 'primary+c' );
-
-			await editor.canvas.getByText( 'existing' ).click();
-			await page.keyboard.press( 'ArrowDown' );
-			await pageUtils.pressKeys( 'primary+v' );
-
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{ name: 'core/paragraph' },
-				{
-					name: 'core/paragraph',
-					attributes: {
-						content: 'existing Value of the text custom field',
-					},
-				},
-			] );
-		} );
 	} );
 } );

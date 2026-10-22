@@ -13,14 +13,12 @@ import {
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
 import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
-import { BlockRefs } from '../provider/block-refs-provider';
 import type { WritingFlowClipboardEvent } from './types';
 
 /**
@@ -88,7 +86,6 @@ export default function useClipboardHandler() {
 		selectionChange,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
-	const { refsMap } = useContext( BlockRefs );
 
 	return useRefEffect< HTMLElement >( ( node ) => {
 		// Text dropped is inserted the way it would be pasted at the drop
@@ -223,8 +220,7 @@ export default function useClipboardHandler() {
 					setClipboardBlocks(
 						event as ClipboardEvent,
 						blocks as Block[],
-						registry,
-						refsMap
+						registry
 					);
 				}
 			}
