@@ -2164,6 +2164,67 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'adds a block-level note when the selected text is bound to a source', async ( {
+			editor,
+			page,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+			try {
+				await page.evaluate( () =>
+					window.wp.data.dispatch( 'core/editor' ).editPost( {
+						meta: { text_custom_field: 'Hello brave new world.' },
+					} )
+				);
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'Fallback',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraph ).toHaveText(
+					'Hello brave new world.'
+				);
+
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+				await blockNoteUtils.addNote( 'Bound text note' );
+
+				// The offsets belong to the bound value, so wrapping the stored
+				// attribute would place a marker around the wrong text.
+				await expect(
+					editor.canvas.locator( 'mark.wp-note' )
+				).toHaveCount( 0 );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Fallback',
+							metadata: { noteId: [ expect.any( Number ) ] },
+						},
+					},
+				] );
+			} finally {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-block-bindings'
+				);
+			}
+		} );
+
 		test( 'highlights the drafted text and anchors the note to it across a block switch', async ( {
 			editor,
 			page,
