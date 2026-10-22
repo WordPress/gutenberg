@@ -369,11 +369,13 @@ export function useEventHandlers( {
 
 				// In a manual placement grid, the grid shows the cells the
 				// block will land in, so the block stays in place, dimmed,
-				// instead of following the pointer.
+				// instead of following the pointer. A multi-selection drag
+				// can't be placed in cells, so it follows the pointer.
 				const rootLayout = getBlockAttributes(
 					getBlockRootClientId( clientId )
 				)?.layout;
 				if (
+					! isMultiSelectionDrag &&
 					rootLayout?.type === 'grid' &&
 					rootLayout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity
