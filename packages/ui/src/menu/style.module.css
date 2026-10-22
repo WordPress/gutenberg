@@ -175,8 +175,9 @@
 				grid-template-columns: subgrid;
 			}
 
-			&[data-popup-open]:not([data-disabled]),
-			&[data-highlighted]:not([data-disabled]) {
+			/* Link items expose aria-disabled without a data-disabled state. */
+			&[data-popup-open]:not([data-disabled], [aria-disabled="true"]),
+			&[data-highlighted]:not([data-disabled], [aria-disabled="true"]) {
 				--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-strong-active);
 
 				background-color: var(--wpds-color-background-interactive-brand-strong-active);
@@ -192,7 +193,7 @@
 				}
 			}
 
-			&[data-disabled] {
+			&:is([data-disabled], [aria-disabled="true"]) {
 				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
@@ -378,20 +379,20 @@
 			content: "\2196";
 		}
 
-		.item[data-popup-open]:not([data-disabled]) .item-description,
-		.item[data-popup-open]:not([data-disabled]) .item-suffix,
-		.item[data-popup-open]:not([data-disabled]) .item-shortcut,
-		.item[data-popup-open]:not([data-disabled]) .item-trailing,
-		.item[data-highlighted]:not([data-disabled]) .item-description,
-		.item[data-highlighted]:not([data-disabled]) .item-suffix,
-		.item[data-highlighted]:not([data-disabled]) .item-shortcut,
-		.item[data-highlighted]:not([data-disabled]) .item-trailing,
-		.item[data-highlighted]:not([data-disabled]) .item-selection-indicator,
-		.item[data-disabled] .item-description,
-		.item[data-disabled] .item-suffix,
-		.item[data-disabled] .item-shortcut,
-		.item[data-disabled] .item-trailing,
-		.item[data-disabled] .item-selection-indicator {
+		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-description,
+		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-suffix,
+		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-shortcut,
+		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-trailing,
+		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-description,
+		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-suffix,
+		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-shortcut,
+		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-trailing,
+		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-selection-indicator,
+		.item:is([data-disabled], [aria-disabled="true"]) .item-description,
+		.item:is([data-disabled], [aria-disabled="true"]) .item-suffix,
+		.item:is([data-disabled], [aria-disabled="true"]) .item-shortcut,
+		.item:is([data-disabled], [aria-disabled="true"]) .item-trailing,
+		.item:is([data-disabled], [aria-disabled="true"]) .item-selection-indicator {
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;

@@ -234,6 +234,8 @@
 		}
 
 		.item-label {
+			--_gcd-heading-color: currentColor;
+
 			min-width: 0;
 		}
 
