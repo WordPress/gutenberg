@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -11,9 +10,7 @@ import useResourcePermissions from '../use-resource-permissions';
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
-const apiFetchMock = triggerFetch as unknown as Mock<
-	( options: { path: string; method?: string; parse?: boolean } ) => unknown
->;
+const apiFetchMock = vi.mocked( triggerFetch );
 
 describe( 'useResourcePermissions', () => {
 	let registry: ReturnType< typeof createRegistry >;
@@ -21,7 +18,7 @@ describe( 'useResourcePermissions', () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
 
-		apiFetchMock.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( async () => ( {
 			headers: new Headers( {
 				allow: 'POST',
 			} ),
@@ -114,7 +111,7 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'normalizes id-less entity resources before resolving permissions', async () => {
-		apiFetchMock.mockImplementation( ( options ) => {
+		apiFetchMock.mockImplementation( async ( options ) => {
 			if ( options.path === '/wp/v2/types?context=view' ) {
 				return {
 					wp_navigation: {

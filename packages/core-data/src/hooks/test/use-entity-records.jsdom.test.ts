@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -13,9 +12,7 @@ import useEntityRecords, {
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
-const apiFetchMock = triggerFetch as unknown as Mock<
-	( options: { path: string; parse?: boolean } ) => unknown
->;
+const apiFetchMock = vi.mocked( triggerFetch );
 
 describe( 'useEntityRecords', () => {
 	let registry: ReturnType< typeof createRegistry >;
@@ -42,7 +39,7 @@ describe( 'useEntityRecords', () => {
 
 	it( 'resolves the entity records when missing from the state', async () => {
 		// Provide response
-		apiFetchMock.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( async () => TEST_RECORDS );
 
 		const { result } = renderHookWithRegistry( () =>
 			useEntityRecords( 'root', 'widget', { status: 'draft' } )
@@ -113,7 +110,7 @@ describe( 'useEntityRecordsWithPermissions', () => {
 
 	it( 'injects _links when _fields is provided', async () => {
 		// Mock the API response
-		apiFetchMock.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( async () => TEST_RECORDS );
 
 		renderHookWithRegistry( () =>
 			useEntityRecordsWithPermissions( 'postType', 'post', {
@@ -133,7 +130,7 @@ describe( 'useEntityRecordsWithPermissions', () => {
 
 	it( 'does not modify query when _fields is not provided', async () => {
 		// Mock the API response
-		apiFetchMock.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( async () => TEST_RECORDS );
 
 		renderHookWithRegistry( () =>
 			useEntityRecordsWithPermissions( 'postType', 'post', {} )
@@ -149,7 +146,7 @@ describe( 'useEntityRecordsWithPermissions', () => {
 
 	it( 'avoids duplicate _links when already present in _fields', async () => {
 		// Mock the API response
-		apiFetchMock.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( async () => TEST_RECORDS );
 
 		const fieldsWithLinks = fieldsFromMock + ',_links';
 		renderHookWithRegistry( () =>
