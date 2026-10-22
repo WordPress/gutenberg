@@ -5,7 +5,7 @@ Build plugins and Stylelint plugins for the WordPress Design System design token
 -   The [Stylelint plugins](#stylelint-plugins) validate `--wpds-*` design token usage in CSS.
 -   The [build plugins](#build-plugins) inject the generated fallback values into `var(--wpds-*)` references, for PostCSS, Lightning CSS, esbuild, and Vite.
 
-The token names and fallback values come from the `@wordpress/theme` package, which this package depends on, so they match the design tokens stylesheet it ships.
+The token names and fallback values come from the `@wordpress/theme` package, which is a peer dependency, so they match the design tokens stylesheet of the version you installed.
 
 ## Installation
 
