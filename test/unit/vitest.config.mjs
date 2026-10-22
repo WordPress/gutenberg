@@ -110,7 +110,7 @@ export default defineConfig( {
 				find: '@wordpress/vips/jxl-wasm',
 				replacement: path.join(
 					ROOT_DIR,
-					'test/unit/config/vips-jxl-wasm-stub.vitest.js'
+					'test/unit/config/vips-jxl-wasm-stub.vitest.ts'
 				),
 			},
 			{
