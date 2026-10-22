@@ -1,16 +1,18 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { groups } from '../../prebuilt/js/design-tokens.mjs';
-import fallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import { GroupTitle } from './group-title';
 import { TokenTable } from './token-table';
 import { previewStyle } from './token-preview-styles';
 
-const defaultValues = fallbacks as Record< string, string >;
+const surfaceWidth = ( name: string ) =>
+	parseFloat(
+		( tokens as Record< string, { modes: { default: { css: string } } } > )[
+			name
+		].modes.default.css
+	);
 
 const widestSurfaceWidth = Math.max(
-	...groups.dimension.groups[ 'surface-width' ].tokens.map( ( name ) =>
-		parseFloat( defaultValues[ name ] )
-	)
+	...groups.dimension.groups[ 'surface-width' ].tokens.map( surfaceWidth )
 );
 
 const boxStyle: CSSProperties = {
@@ -95,9 +97,7 @@ const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 					...boxStyle,
 					display: 'block',
 					width: `${
-						( parseFloat( defaultValues[ name ] ) /
-							widestSurfaceWidth ) *
-						100
+						( surfaceWidth( name ) / widestSurfaceWidth ) * 100
 					}%`,
 					height: 'var(--wpds-dimension-size-md)',
 				} }

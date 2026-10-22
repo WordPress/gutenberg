@@ -4,7 +4,6 @@ import { tokens } from '../../prebuilt/js/design-tokens.mjs';
 import { CopyTokenButton } from './copy-token-button';
 import { ShareTokenLink } from './share-token-link';
 import { nameRowStyle, tokenId } from './token-item';
-import fallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
 import {
 	descriptionStyle,
 	textStyle,
@@ -12,7 +11,10 @@ import {
 	valueStyle,
 } from './token-preview-styles';
 
-const defaultValues = fallbacks as Record< string, string >;
+const tokenData = tokens as Record<
+	string,
+	{ $description: string; modes: { default: { css: string } } }
+>;
 
 /**
  * Table of tokens with a sample, the token name and description, and its
@@ -71,14 +73,7 @@ export function TokenTable( {
 									/>
 								</span>
 								<span style={ descriptionStyle }>
-									{
-										(
-											tokens as Record<
-												string,
-												{ $description: string }
-											>
-										 )[ name ].$description
-									}
+									{ tokenData[ name ].$description }
 								</span>
 							</span>
 						</td>
@@ -87,7 +82,7 @@ export function TokenTable( {
 								Default value
 							</span>
 							<code style={ valueStyle }>
-								{ defaultValues[ name ] }
+								{ tokenData[ name ].modes.default.css }
 							</code>
 						</td>
 					</tr>
