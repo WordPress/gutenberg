@@ -1,0 +1,59 @@
+changesDir: .changes
+unreleasedDir: unreleased
+headerPath: header.tpl.md
+versionExt: md
+versionFormat: '{{if eq .Version "0-unreleased"}}## Unreleased{{else}}## {{.Version}} ({{.Time.Format "2006-01-02"}}){{end}}'
+kindFormat: '### {{.Kind}}'
+changeFormat: '-   {{.Body}} ([#{{.Custom.PR}}](https://github.com/WordPress/gutenberg/pull/{{.Custom.PR}})).'
+fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind}}__{{.Time.Format "20060102150405"}}'
+envPrefix: 'GUTENBERG_'
+
+newlines:
+    afterChangelogHeader: 0
+    beforeChangelogVersion: 1
+    afterChangelogVersion: 0
+    beforeVersion: 0
+    afterVersion: 0
+    beforeKind: 1
+    afterKind: 1
+    beforeChange: 0
+    afterChange: 0
+    endOfVersion: 1
+
+# Custom choices prompted during fragment creation.
+# We prompt for the Gutenberg Pull Request number to link PRs in changelog output.
+custom:
+    - key: PR
+      label: Gutenberg Pull Request Number
+      type: int
+      minInt: 1
+
+# Kinds match Gutenberg's canonical changelog subsections and ordering.
+# 'auto' specifies the semver increment level.
+# Pre-1.0 packages (signaled via GUTENBERG_PRE_1="true"): breaking changes bump minor,
+# while stable packages (>=1.0) bump major as usual.
+# Note: 'Stable Release' (for promoting 0.x packages to 1.0.0) is handled via
+# `npm run changelog:promote-stable` so it does not clutter everyday PR choices.
+kinds:
+    - label: Breaking Changes
+      auto: '{{if eq .Env.PRE_1 "true"}}minor{{else}}major{{end}}'
+    - label: New Features
+      auto: minor
+    - label: Enhancements
+      auto: minor
+    - label: Deprecations
+      auto: minor
+    - label: Bug Fixes
+      auto: patch
+    - label: Internal
+      auto: patch
+    - label: Documentation
+      auto: patch
+
+projects:
+    - label: Components
+      key: components
+      changelog: packages/components/CHANGELOG.md
+    - label: UI
+      key: ui
+      changelog: packages/ui/CHANGELOG.md

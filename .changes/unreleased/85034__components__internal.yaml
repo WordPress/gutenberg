@@ -1,0 +1,8 @@
+project: components
+kind: Internal
+body: >-
+    `Autocomplete`: Make the `keywords` of the options from `useItems` optional,
+    as the default filter already does
+time: '2026-10-22T04:39:12.244Z'
+custom:
+    PR: '85034'

@@ -1,23 +1,5 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-## Unreleased
-
-### Breaking Changes
-
--   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
-
-### New Features
-
--   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
-
-### Enhancements
-
--   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
-
-### Documentation
-
--   `Notice`: Add a Storybook example with native details and a text button to copy the error message and details ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).
-
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes
