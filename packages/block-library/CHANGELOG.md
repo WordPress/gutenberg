@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Image: Warn in the "Alternative text" field when the alt text looks like a file name, is only a generic word like "image", duplicates the caption, is unusually long, or is empty on a linked image ([#83130](https://github.com/WordPress/gutenberg/pull/83130)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

@@ -17,6 +17,7 @@ import {
 	ToolbarItem,
 	DropdownMenu,
 	Popover,
+	Notice,
 } from '@wordpress/components';
 import {
 	useMergeRefs,
@@ -68,8 +69,10 @@ import {
 	ALLOWED_MEDIA_TYPES,
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
+	LINK_DESTINATION_NONE,
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
+import { getAltTextWarning } from './get-alt-text-warning';
 
 const {
 	DimensionsTool,
@@ -298,6 +301,7 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
+		caption,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -871,6 +875,18 @@ export default function Image( {
 		! lockUrlControls &&
 		! isDecorative;
 
+	const altTextWarning = ! isDecorative
+		? getAltTextWarning( {
+				alt,
+				caption:
+					caption && typeof caption !== 'string'
+						? caption.toPlainText()
+						: caption,
+				url,
+				isLinked: !! href && linkDestination !== LINK_DESTINATION_NONE,
+			} )
+		: null;
+
 	const showCoverControls =
 		isSingleSelected && canInsertCover && ! isContentOnlyMode;
 
@@ -1033,6 +1049,15 @@ export default function Image( {
 										)
 									}
 								/>
+								{ ! lockAltControls && altTextWarning && (
+									<Notice
+										status="warning"
+										isDismissible={ false }
+										className="wp-block-image__alt-text-warning"
+									>
+										{ altTextWarning.message }
+									</Notice>
+								) }
 							</ToolsPanelItem>
 						) }
 
