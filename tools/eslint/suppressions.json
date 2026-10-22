@@ -6714,14 +6714,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/entity-provider.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/footnotes/get-footnotes-order.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6762,27 +6754,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/hooks/use-entity-block-editor.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/use-entity-id.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/use-entity-prop.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/parsed-blocks-cache.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -6831,11 +6803,6 @@
 		}
 	},
 	"packages/core-data/src/test/entity-sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/parsed-blocks-cache.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

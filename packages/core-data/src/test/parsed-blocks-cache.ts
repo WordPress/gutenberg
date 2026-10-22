@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
 
 describe( 'parsed blocks cache', () => {
 	const content = '<!-- wp:test/block /-->';
-	const blocks = [];
+	const blocks: Array< Block > = [];
 
 	it( 'returns an entry parsed from the same content with the same block types', () => {
 		setCachedBlocks( 'postType', 'page', 1, content, blocks );
@@ -31,6 +32,7 @@ describe( 'parsed blocks cache', () => {
 			apiVersion: 3,
 			title: 'Test Block',
 			category: 'text',
+			attributes: {},
 		} );
 
 		try {
