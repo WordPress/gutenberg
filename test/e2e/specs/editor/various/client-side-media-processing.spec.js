@@ -48,6 +48,58 @@ async function probeUltraHdrUrl( url ) {
 }
 
 /**
+ * Writes a JPEG XL file generated with wasm-vips to a temporary directory.
+ *
+ * Lets a test derive the JXL variant it needs from an existing fixture rather
+ * than committing another binary.
+ *
+ * @param {(vips: Object) => Object} build       Returns the image to encode.
+ * @param {Object}                   saveOptions `jxlsave` options.
+ * @return {Promise<string>} Path to the generated file.
+ */
+async function writeGeneratedJxl( build, saveOptions = {} ) {
+	const { default: Vips } = await import( wasmVipsEntry );
+	const vips = await Vips( {} );
+	const bytes = build( vips ).writeToBuffer( '.jxl', saveOptions );
+	const tmpDirectory = await fs.mkdtemp(
+		path.join( os.tmpdir(), 'gutenberg-test-jxl-' )
+	);
+	const filePath = path.join( tmpDirectory, 'generated.jxl' );
+	await fs.writeFile( filePath, bytes );
+	return filePath;
+}
+
+/**
+ * Downloads an image and reads its alpha channel and EXIF artist with wasm-vips.
+ *
+ * @param {string} url Image URL to fetch.
+ * @return {Promise<{ hasAlpha: boolean, minAlpha: number|null, artist: string|null }>} Probe result.
+ */
+async function probeImageUrl( url ) {
+	const { default: Vips } = await import( wasmVipsEntry );
+	const vips = await Vips( {} );
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( `Failed to fetch ${ url }: ${ response.status }` );
+	}
+	const image = vips.Image.newFromBuffer(
+		new Uint8Array( await response.arrayBuffer() )
+	);
+	const hasAlpha = image.hasAlpha();
+	let artist = null;
+	try {
+		artist = image.getString( 'exif-ifd0-Artist' );
+	} catch {
+		// No EXIF artist recorded.
+	}
+	return {
+		hasAlpha,
+		minAlpha: hasAlpha ? image.extractBand( image.bands - 1 ).min() : null,
+		artist,
+	};
+}
+
+/**
  * Colour type 3 in a PNG header means the image is palette (indexed) encoded.
  *
  * @type {number}
@@ -102,7 +154,7 @@ class MediaProcessingUtils {
 	 * Copies the file to a temp directory with a unique name to avoid collisions.
 	 *
 	 * @param {import('@playwright/test').Locator} inputElement File input locator.
-	 * @param {string}                             fileName     File name in the assets directory.
+	 * @param {string}                             fileName     File name in the assets directory, or an absolute path.
 	 * @return {Promise<string>} The unique file name (without extension).
 	 */
 	async upload( inputElement, fileName ) {
@@ -112,7 +164,12 @@ class MediaProcessingUtils {
 		const uniqueName = randomUUID();
 		const extension = path.extname( fileName );
 		const tmpFileName = path.join( tmpDirectory, uniqueName + extension );
-		await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
+		await fs.copyFile(
+			path.isAbsolute( fileName )
+				? fileName
+				: path.join( ASSETS_DIR, fileName ),
+			tmpFileName
+		);
 		await inputElement.setInputFiles( tmpFileName );
 		return uniqueName;
 	}
@@ -177,7 +234,7 @@ class MediaProcessingUtils {
 	 *
 	 * @param {Object} editor       The editor fixture.
 	 * @param {Object} requestUtils The requestUtils fixture.
-	 * @param {string} fileName     File name in the assets directory.
+	 * @param {string} fileName     File name in the assets directory, or an absolute path.
 	 * @return {Promise<Object>} REST media object for the uploaded attachment.
 	 */
 	async uploadImageAndGetMedia( editor, requestUtils, fileName ) {
@@ -446,6 +503,49 @@ test.describe( 'Client-side media processing', () => {
 			path.join( ASSETS_DIR, '200x150_e2e_test_image_gainmap.jxl' )
 		);
 		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
+	} );
+
+	test( 'keeps JXL metadata when the site turns off metadata stripping', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const jxlWithExif = await writeGeneratedJxl(
+			( vips ) => {
+				const image = vips.Image.newFromFile(
+					path.join( ASSETS_DIR, '200x150_e2e_test_image_opaque.png' )
+				).copy();
+				image.setString( 'exif-ifd0-Artist', 'Gutenberg E2E' );
+				return image;
+			},
+			{ keep: 'all' }
+		);
+
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-keep-metadata'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				jxlWithExif
+			);
+
+			// The `image_strip_meta` filter applies to the JPEG made from the
+			// JXL, as it does to every other client-side conversion.
+			expect( media.mime_type ).toBe( 'image/jpeg' );
+			const probe = await probeImageUrl( media.source_url );
+			expect( probe.artist ).toMatch( /^Gutenberg E2E/ );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-keep-metadata'
+			);
+		}
 	} );
 
 	test( 'rejects a JXL upload when the site does not allow JXL', async ( {

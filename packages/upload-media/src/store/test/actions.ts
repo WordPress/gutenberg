@@ -348,6 +348,34 @@ describe( 'actions', () => {
 			);
 		} );
 
+		it( 'keeps JXL metadata when the site turns off metadata stripping', async () => {
+			( vipsConvertImageFormat as Mock ).mockResolvedValue(
+				new File( [ 'jpeg' ], 'example.jpg', { type: 'image/jpeg' } )
+			);
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				imageStripMeta: false,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				item.id,
+				jxlFile,
+				'image/jpeg',
+				expect.objectContaining( { stripMeta: false } )
+			);
+		} );
+
 		it( 'cancels with a JXL-specific error code when decoding fails', async () => {
 			/*
 			 * The code used to be the bare string 'JXL_DECODE_ERROR', which is

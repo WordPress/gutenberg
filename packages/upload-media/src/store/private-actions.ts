@@ -996,6 +996,7 @@ export function prepareItem( id: QueueItemId ) {
 						{
 							quality:
 								settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+							stripMeta: settings.imageStripMeta,
 						}
 					);
 				} );
