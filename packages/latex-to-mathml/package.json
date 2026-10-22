@@ -24,7 +24,6 @@
 		"node": ">=22.13.0"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-types"
