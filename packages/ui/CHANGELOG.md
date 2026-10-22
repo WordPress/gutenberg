@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. The default 16px spinner now has a 1px stroke instead of 2px, and `Button` loading spinners are thinner
+
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes
