@@ -61,6 +61,13 @@ export interface WidgetHost {
 	 * Runtime action placement. Absent: widgets keep their own affordances.
 	 */
 	actions?: WidgetHostActions;
+
+	/**
+	 * The translated title of the widget being rendered, for the accessible
+	 * names a widget builds from it. Absent: the widget falls back to a name
+	 * of its own.
+	 */
+	title?: string;
 }
 
 const WidgetHostContext = createContext< WidgetHost >( {} );

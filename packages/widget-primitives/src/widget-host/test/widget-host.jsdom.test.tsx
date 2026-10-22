@@ -60,4 +60,21 @@ describe( 'useWidgetHost', () => {
 
 		expect( result.current.links ).toBe( otherLinks );
 	} );
+
+	it( 'keeps inherited capabilities alongside a title set per widget', () => {
+		const wrapper = ( { children }: { children: ReactNode } ) => (
+			<WidgetHostProvider value={ { links } }>
+				<WidgetHostProvider value={ { title: 'Sales by device' } }>
+					{ children }
+				</WidgetHostProvider>
+			</WidgetHostProvider>
+		);
+
+		const { result } = renderHook( () => useWidgetHost(), { wrapper } );
+
+		expect( result.current ).toEqual( {
+			links,
+			title: 'Sales by device',
+		} );
+	} );
 } );
