@@ -61,6 +61,7 @@ export default function useClipboardHandler() {
 		canInsertBlockType,
 		getBlockRootClientId,
 		getBlockAttributes,
+		getSelectionStart,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -104,9 +105,16 @@ export default function useClipboardHandler() {
 			return true;
 		}
 
-		// A bound block's text belongs to its source, not to the block.
-		function isBlockBound( clientId: string ) {
-			return !! getBlockAttributes( clientId )?.metadata?.bindings;
+		// A bound field's text belongs to its source, not to the block.
+		function isSelectedFieldBound() {
+			const { clientId, attributeKey } = getSelectionStart();
+			const bindings = clientId
+				? getBlockAttributes( clientId )?.metadata?.bindings
+				: undefined;
+			return !! (
+				( attributeKey && bindings?.[ attributeKey ] ) ||
+				bindings?.__default
+			);
 		}
 
 		function handler( event: WritingFlowClipboardEvent ) {
@@ -138,7 +146,7 @@ export default function useClipboardHandler() {
 			const isWholeSingleBlockCopy =
 				event.type === 'copy' &&
 				! hasMultiSelection() &&
-				! isBlockBound( selectedBlockClientIds[ 0 ] ) &&
+				! isSelectedFieldBound() &&
 				isBlockEntirelySelected(
 					( event.target as Element ).ownerDocument,
 					selectedBlockClientIds[ 0 ]
@@ -327,7 +335,6 @@ export default function useClipboardHandler() {
 				// equivalent of pasting into an empty block.
 				if (
 					! hasMultiSelection() &&
-					! isBlockBound( selectedBlockClientIds[ 0 ] ) &&
 					isBlockEntirelySelected(
 						( event.target as Element ).ownerDocument,
 						selectedBlockClientIds[ 0 ]
