@@ -1,12 +1,11 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { info } from '@wordpress/icons';
+import { help } from '@wordpress/icons';
 import { type BadgeProps } from './types';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import { Text } from '../text';
 import { Icon } from '../icon';
 import * as Popover from '../popover';
-import focusStyles from '../utils/css/focus.module.scss';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
@@ -24,17 +23,16 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
 				className={ clsx(
 					styles.badge,
 					styles[ `is-${ intent }-intent` ],
-					infotip && [
-						styles[ 'infotip-trigger' ],
-						defenseStyles.button,
-						focusStyles[ 'outset-ring--focus-except-active' ],
-					],
 					className
 				) }
 				{ ...props }
 				render={
 					infotip ? (
 						<Popover.Trigger
+							className={ clsx(
+								styles[ 'infotip-trigger' ],
+								defenseStyles.button
+							) }
 							openOnHover
 							delay={ 200 }
 							closeDelay={ 200 }
@@ -49,7 +47,7 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
 				{ children }
 				{ infotip && (
 					<Icon
-						icon={ info }
+						icon={ help }
 						size={ 16 }
 						aria-hidden="true"
 						className={ styles[ 'infotip-icon' ] }
