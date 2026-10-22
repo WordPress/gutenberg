@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
+import { getOverridingBlockTypes } from '../element-block-overrides';
 
 describe( 'hasUserStylesForBlock', () => {
 	it( 'returns false when there is no user config', () => {
@@ -115,5 +116,51 @@ describe( 'hasUserStylesForBlock', () => {
 			},
 		};
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
+	} );
+} );
+
+describe( 'getOverridingBlockTypes', () => {
+	function getConfig( blocks ) {
+		return {
+			settings: { typography: { lineHeight: true } },
+			styles: {
+				typography: { fontWeight: '300' },
+				elements: {
+					heading: {
+						typography: { fontWeight: '400' },
+						':hover': { typography: { fontWeight: '500' } },
+					},
+					h2: { typography: { fontSize: '2rem' } },
+				},
+				blocks,
+			},
+		};
+	}
+
+	it.each( [ 'heading', 'h5' ] )(
+		'lists a block type that sets a property a heading element sets on %s',
+		( element ) => {
+			const config = getConfig( {
+				'core/post-title': { typography: { fontSize: '3rem' } },
+			} );
+			expect( getOverridingBlockTypes( config, element ) ).toEqual( [
+				'core/post-title',
+			] );
+		}
+	);
+
+	it.each( [
+		[
+			'a property the element leaves to the root styles',
+			{ typography: { lineHeight: '2' } },
+		],
+		[ 'state styles', { ':hover': { typography: { fontWeight: '700' } } } ],
+		[
+			'block style variations',
+			{ variations: { plain: { typography: { fontWeight: '700' } } } },
+		],
+	] )( 'skips %s', ( _, style ) => {
+		const config = getConfig( { 'core/post-title': style } );
+		expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual( [] );
 	} );
 } );
