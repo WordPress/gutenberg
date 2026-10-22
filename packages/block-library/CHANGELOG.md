@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Image: Show the image caption inside the lightbox ("Enlarge on click"), for both single images and gallery images ([#81500](https://github.com/WordPress/gutenberg/pull/81500)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
