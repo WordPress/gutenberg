@@ -7,18 +7,9 @@ import {
 	hasConflictingLock,
 	deepCopyLocksTreePath,
 } from '../utils';
-import type { Lock, LockNode } from '../types';
+import type { LockNode } from '../types';
 
 type DeepPartial< T > = { [ K in keyof T ]?: DeepPartial< T[ K ] > };
-
-/**
- * Types a fixture that holds only the fields the code under test reads.
- *
- * @param value The partial fixture.
- */
-function partial< T >( value: DeepPartial< T > ): T {
-	return value as T;
-}
 
 /**
  * Freezes a partial fixture to catch mutations, keeping it writable to the
@@ -153,14 +144,10 @@ describe( 'hasConflictingLock', () => {
 	} );
 	it( 'Returns true when requesting an exclusive lock and any locks at all are present', () => {
 		expect(
-			hasConflictingLock( { exclusive: true }, [
-				partial< Lock >( { exclusive: false } ),
-			] )
+			hasConflictingLock( { exclusive: true }, [ { exclusive: false } ] )
 		).toBe( true );
 		expect(
-			hasConflictingLock( { exclusive: true }, [
-				partial< Lock >( { exclusive: true } ),
-			] )
+			hasConflictingLock( { exclusive: true }, [ { exclusive: true } ] )
 		).toBe( true );
 	} );
 
@@ -170,30 +157,26 @@ describe( 'hasConflictingLock', () => {
 
 	it( 'Returns false when requesting a shared lock and only shared locks at all are present', () => {
 		expect(
-			hasConflictingLock( { exclusive: false }, [
-				partial< Lock >( { exclusive: false } ),
-			] )
+			hasConflictingLock( { exclusive: false }, [ { exclusive: false } ] )
 		).toBe( false );
 		expect(
 			hasConflictingLock( { exclusive: false }, [
-				partial< Lock >( { exclusive: false } ),
-				partial< Lock >( { exclusive: false } ),
-				partial< Lock >( { exclusive: false } ),
+				{ exclusive: false },
+				{ exclusive: false },
+				{ exclusive: false },
 			] )
 		).toBe( false );
 	} );
 
 	it( 'Returns true when requesting a shared lock and any exclusive shared locks at all are present', () => {
 		expect(
-			hasConflictingLock( { exclusive: false }, [
-				partial< Lock >( { exclusive: true } ),
-			] )
+			hasConflictingLock( { exclusive: false }, [ { exclusive: true } ] )
 		).toBe( true );
 		expect(
 			hasConflictingLock( { exclusive: false }, [
-				partial< Lock >( { exclusive: false } ),
-				partial< Lock >( { exclusive: true } ),
-				partial< Lock >( { exclusive: false } ),
+				{ exclusive: false },
+				{ exclusive: true },
+				{ exclusive: false },
 			] )
 		).toBe( true );
 	} );

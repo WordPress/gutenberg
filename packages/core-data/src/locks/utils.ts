@@ -1,4 +1,4 @@
-import type { Lock, LockNode, LockPath } from './types';
+import type { LockNode, LockPath } from './types';
 
 export function deepCopyLocksTreePath(
 	tree: LockNode,
@@ -62,7 +62,7 @@ export function* iterateDescendants( node: LockNode ): Generator< LockNode > {
 
 export function hasConflictingLock(
 	{ exclusive }: { exclusive: boolean },
-	locks: Array< Lock >
+	locks: ReadonlyArray< { exclusive: boolean } >
 ): boolean {
 	if ( exclusive && locks.length ) {
 		return true;
