@@ -18,10 +18,7 @@ import { DirectionProvider } from '../../../utils/direction-provider';
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
 	return (
 		<DirectionProvider>
-			<_Select.Root< Value, false >
-				{ ...props }
-				highlightItemOnHover={ props.highlightItemOnHover ?? false }
-			/>
+			<_Select.Root< Value, false > { ...props } />
 		</DirectionProvider>
 	);
 }

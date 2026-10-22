@@ -176,11 +176,12 @@
 			}
 
 			&[data-popup-open]:not([data-disabled]),
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
+			&[data-highlighted]:not([data-disabled]) {
+				--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-strong-active);
 
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral-active);
+				background-color: var(--wpds-color-background-interactive-brand-strong-active);
+				color: var(--wpds-color-foreground-interactive-brand-strong-active);
+				outline: none;
 
 				@media ( forced-colors: active ) {
 					--_gcd-a-color: HighlightText;
@@ -191,41 +192,7 @@
 				}
 			}
 
-			&[data-popup-open]:not([data-disabled]) {
-				@media ( forced-colors: active ) {
-					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
-					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
-				}
-			}
-
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				outline: none;
-			}
-
-			@media ( hover: hover ) {
-				&:hover:not([aria-disabled="true"]) {
-					--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
-
-					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-					color: var(--wpds-color-foreground-interactive-neutral-active);
-
-					:is(.item-description, .item-suffix, .item-shortcut, .item-trailing, .item-selection-indicator) {
-						--_gcd-heading-color: currentColor;
-
-						color: inherit;
-					}
-
-					@media ( forced-colors: active ) {
-						--_gcd-a-color: HighlightText;
-
-						forced-color-adjust: none;
-						background-color: Highlight;
-						color: HighlightText;
-					}
-				}
-			}
-
-			&[aria-disabled="true"] {
+			&[data-disabled] {
 				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
@@ -237,21 +204,7 @@
 					color: GrayText;
 				}
 			}
-		}
 
-		.popup .item[data-highlighted]:focus-visible {
-			/* Keep the ring visible above adjacent rows and wp-admin's resets. */
-			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
-			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
-
-			position: relative;
-			z-index: 1;
-			outline-offset: 0;
-
-			@media ( forced-colors: active ) {
-				--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
-				--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
-			}
 		}
 
 		/*
@@ -429,16 +382,16 @@
 		.item[data-popup-open]:not([data-disabled]) .item-suffix,
 		.item[data-popup-open]:not([data-disabled]) .item-shortcut,
 		.item[data-popup-open]:not([data-disabled]) .item-trailing,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-shortcut,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-trailing,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
-		.item[aria-disabled="true"] .item-description,
-		.item[aria-disabled="true"] .item-suffix,
-		.item[aria-disabled="true"] .item-shortcut,
-		.item[aria-disabled="true"] .item-trailing,
-		.item[aria-disabled="true"] .item-selection-indicator {
+		.item[data-highlighted]:not([data-disabled]) .item-description,
+		.item[data-highlighted]:not([data-disabled]) .item-suffix,
+		.item[data-highlighted]:not([data-disabled]) .item-shortcut,
+		.item[data-highlighted]:not([data-disabled]) .item-trailing,
+		.item[data-highlighted]:not([data-disabled]) .item-selection-indicator,
+		.item[data-disabled] .item-description,
+		.item[data-disabled] .item-suffix,
+		.item[data-disabled] .item-shortcut,
+		.item[data-disabled] .item-trailing,
+		.item[data-disabled] .item-selection-indicator {
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;

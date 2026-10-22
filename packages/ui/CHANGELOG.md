@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items, including supporting content and open submenu parents ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ### Documentation
@@ -42,7 +43,6 @@
 -   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
--   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use neutral highlights and zero-offset rings. Keep active targets independent from pointer hover. Combobox and autocomplete options show rings while the input has focus, including options highlighted by pointer opening or typing. Keep open submenu parents highlighted with the same neutral colors ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Dialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84379](https://github.com/WordPress/gutenberg/pull/84379)).

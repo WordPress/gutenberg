@@ -187,9 +187,9 @@
 				}
 			}
 
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral-active);
+			&[data-highlighted]:not([data-disabled]) {
+				background-color: var(--wpds-color-background-interactive-brand-strong-active);
+				color: var(--wpds-color-foreground-interactive-brand-strong-active);
 				outline: none; /* Disable user agent focus ring */
 
 				@media ( forced-colors: active ) {
@@ -199,47 +199,13 @@
 				}
 			}
 
-			@media ( hover: hover ) {
-				&:hover:not([aria-disabled="true"]) {
-					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-					color: var(--wpds-color-foreground-interactive-neutral-active);
-
-					.item-description {
-						--_gcd-heading-color: currentColor;
-
-						color: inherit;
-					}
-
-					@media ( forced-colors: active ) {
-						forced-color-adjust: none;
-						background-color: Highlight;
-						color: HighlightText;
-					}
-				}
-			}
-
-			&[aria-disabled="true"] {
+			&[data-disabled] {
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
 				}
-			}
-		}
-
-		.popup .item[data-highlighted]:focus-visible,
-		.item[data-highlighted][data-input-focused] {
-			/* Keep the ring visible above adjacent rows and wp-admin's resets. */
-			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
-
-			position: relative;
-			z-index: 1;
-			outline-offset: 0;
-
-			@media ( forced-colors: active ) {
-				--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
-				--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
 			}
 		}
 
@@ -275,8 +241,8 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
-		.item[aria-disabled="true"] .item-description {
+		.item[data-highlighted]:not([data-disabled]) .item-description,
+		.item[data-disabled] .item-description {
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;

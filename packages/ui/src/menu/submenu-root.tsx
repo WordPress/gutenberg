@@ -12,10 +12,7 @@ function SubmenuRoot( props: SubmenuRootProps ) {
 	return (
 		<MenuContext.Provider value={ { isSubmenu: true, submenuTriggerRef } }>
 			<MenuGroupContext.Provider value={ null }>
-				<_Menu.SubmenuRoot
-					{ ...props }
-					highlightItemOnHover={ props.highlightItemOnHover ?? false }
-				/>
+				<_Menu.SubmenuRoot { ...props } />
 			</MenuGroupContext.Provider>
 		</MenuContext.Provider>
 	);

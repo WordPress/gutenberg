@@ -11,7 +11,6 @@ import {
 } from './item-description';
 import { ItemLabel } from './item-label';
 import type { AutocompleteItemProps } from './types';
-import { useInputFocus } from '../../../utils/item-popup/input-focus-context';
 
 const ITEM_CONTENT_COMPONENTS = {
 	Label: ItemLabel,
@@ -33,7 +32,6 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 		},
 		ref
 	) {
-		const { inputFocused } = useInputFocus();
 		const { contentChildren, itemAriaProps } = useItemContent(
 			children,
 			ITEM_CONTENT_COMPONENTS,
@@ -45,7 +43,6 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 		);
 		return (
 			<_Autocomplete.Item
-				data-input-focused={ inputFocused ? '' : undefined }
 				className={ clsx(
 					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],

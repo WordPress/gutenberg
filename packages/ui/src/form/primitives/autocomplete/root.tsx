@@ -2,10 +2,6 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import { AutocompleteGridContext } from './context';
-import {
-	InputFocusContext,
-	useInputFocusState,
-} from '../../../utils/item-popup/input-focus-context';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
@@ -19,19 +15,10 @@ import {
 export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
-	const contextValue = useInputFocusState();
-
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
 			<DirectionProvider>
-				<InputFocusContext.Provider value={ contextValue }>
-					<_Autocomplete.Root
-						{ ...props }
-						highlightItemOnHover={
-							props.highlightItemOnHover ?? false
-						}
-					/>
-				</InputFocusContext.Provider>
+				<_Autocomplete.Root { ...props } />
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);
