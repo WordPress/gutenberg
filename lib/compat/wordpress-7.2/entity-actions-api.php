@@ -87,15 +87,20 @@ if ( ! function_exists( 'wp_get_registered_entity_actions' ) ) {
 
 if ( ! function_exists( 'wp_get_registered_entity_action_modules' ) ) {
 	/**
-	 * Returns the ids of the script modules registered for the given entity.
+	 * Returns the script modules registered for the given entity.
 	 *
 	 * @param string $kind The entity kind (e.g. `postType`).
 	 * @param string $name The entity name (e.g. `page`).
-	 * @return array<string, string[]> The ids of the actions each module
-	 *                                 applies to, keyed by module id, in
-	 *                                 registration order. Empty until the
-	 *                                 `init` action has completed: a read
-	 *                                 before then is refused.
+	 * @return array[] {
+	 *     The script modules, in registration order. Empty until the `init`
+	 *     action has completed: a read before then is refused.
+	 *
+	 *     @type array ...$0 {
+	 *         @type string   $id      The id of the script module.
+	 *         @type string[] $actions The ids of the actions the module
+	 *                                 applies to, in registration order.
+	 *     }
+	 * }
 	 */
 	function wp_get_registered_entity_action_modules( $kind, $name ) {
 		return WP_Entity_Actions_Registry::get_instance()->get_registered_action_modules( $kind, $name );

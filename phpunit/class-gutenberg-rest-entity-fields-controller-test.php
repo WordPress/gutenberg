@@ -166,6 +166,81 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A numeric script module id is returned as a string, like any other.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_returns_a_numeric_module_id_as_a_string() {
+		$this->register_fields(
+			'customKind',
+			'customName',
+			array(
+				array(
+					'id'    => 'color',
+					'type'  => 'text',
+					'label' => 'Color',
+				),
+			),
+			'123'
+		);
+
+		wp_set_current_user( self::$editor_id );
+		$data = $this->dispatch_request( 'customKind', 'customName' )->get_data();
+
+		$this->assertSame(
+			array(
+				array(
+					'id'     => '123',
+					'fields' => array( 'color' ),
+				),
+			),
+			$data['script_modules']
+		);
+	}
+
+	/**
+	 * On a WordPress whose registry keys the ids of the fields by module id,
+	 * the response lists the script modules all the same.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_lists_the_script_modules_of_a_registry_keyed_by_module_id() {
+		$registry = new class() extends WP_Entity_Fields_Registry_Gutenberg {
+			public function get_registered_field_modules( $kind, $name ) {
+				if ( 'postType' !== $kind || 'page' !== $name ) {
+					return array();
+				}
+				return array(
+					'plugin/fields' => array( 'color', 'size' ),
+					123             => array( 'color' ),
+				);
+			}
+		};
+		$instance = new ReflectionProperty( WP_Entity_Fields_Registry::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance->setAccessible( true );
+		}
+		$instance->setValue( null, $registry );
+
+		wp_set_current_user( self::$editor_id );
+		$data = $this->dispatch_request()->get_data();
+
+		$this->assertSame(
+			array(
+				array(
+					'id'     => 'plugin/fields',
+					'fields' => array( 'color', 'size' ),
+				),
+				array(
+					'id'     => '123',
+					'fields' => array( 'color' ),
+				),
+			),
+			$data['script_modules']
+		);
+	}
+
+	/**
 	 * The route is registered once, and served by the 7.2 controller.
 	 *
 	 * @covers ::register_routes

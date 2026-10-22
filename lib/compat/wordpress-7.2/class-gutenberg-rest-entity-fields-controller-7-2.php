@@ -147,11 +147,16 @@ class Gutenberg_REST_Entity_Fields_Controller_7_2 extends WP_REST_Controller {
 		}
 
 		$script_modules = array();
-		foreach ( wp_get_registered_entity_field_modules( $kind, $name ) as $module => $field_ids ) {
-			$script_modules[] = array(
-				'id'     => $module,
-				'fields' => array_values( $field_ids ),
-			);
+		foreach ( wp_get_registered_entity_field_modules( $kind, $name ) as $key => $module ) {
+			// WordPress versions that ship this API before core#14716 key the
+			// ids of the fields by module id, with numeric ids as integers.
+			if ( ! isset( $module['id'] ) ) {
+				$module = array(
+					'id'     => (string) $key,
+					'fields' => array_values( $module ),
+				);
+			}
+			$script_modules[] = $module;
 		}
 
 		$response = array(

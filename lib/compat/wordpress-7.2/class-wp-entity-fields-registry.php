@@ -468,13 +468,27 @@ if ( ! class_exists( 'WP_Entity_Fields_Registry' ) ) {
 		 *
 		 * @param string $kind The entity kind (e.g. `postType`).
 		 * @param string $name The entity name (e.g. `page`).
-		 * @return array<string, string[]> The ids of the fields each module
-		 *                                 applies to, keyed by module id, in
-		 *                                 registration order.
+		 * @return array[] {
+		 *     The script modules, in registration order.
+		 *
+		 *     @type array ...$0 {
+		 *         @type string   $id     The id of the script module.
+		 *         @type string[] $fields The ids of the fields the module applies
+		 *                                to, in registration order.
+		 *     }
+		 * }
 		 */
 		public function get_registered_field_modules( $kind, $name ) {
 			$this->initialize();
-			return $this->field_modules[ $kind ][ $name ] ?? array();
+			$modules = array();
+			foreach ( $this->field_modules[ $kind ][ $name ] ?? array() as $module => $field_ids ) {
+				$modules[] = array(
+					// A numeric module id is an integer as an array key.
+					'id'     => (string) $module,
+					'fields' => $field_ids,
+				);
+			}
+			return $modules;
 		}
 
 		/**

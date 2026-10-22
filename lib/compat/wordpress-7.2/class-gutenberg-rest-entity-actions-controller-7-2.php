@@ -184,12 +184,16 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		$script_modules = array();
-		foreach ( wp_get_registered_entity_action_modules( $kind, $name ) as $module => $action_ids ) {
-			$script_modules[] = array(
-				// A numeric module id is an integer as an array key.
-				'id'      => (string) $module,
-				'actions' => array_values( $action_ids ),
-			);
+		foreach ( wp_get_registered_entity_action_modules( $kind, $name ) as $key => $module ) {
+			// WordPress versions that ship this API before core#14716 key the
+			// ids of the actions by module id, with numeric ids as integers.
+			if ( ! isset( $module['id'] ) ) {
+				$module = array(
+					'id'      => (string) $key,
+					'actions' => array_values( $module ),
+				);
+			}
+			$script_modules[] = $module;
 		}
 
 		$response = array(

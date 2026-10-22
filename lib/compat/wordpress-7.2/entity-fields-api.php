@@ -117,14 +117,20 @@ if ( ! function_exists( 'wp_get_registered_entity_fields' ) ) {
 
 if ( ! function_exists( 'wp_get_registered_entity_field_modules' ) ) {
 	/**
-	 * Returns the ids of the script modules registered for the given entity.
+	 * Returns the script modules registered for the given entity.
 	 *
 	 * @param string $kind The entity kind (e.g. `postType`).
 	 * @param string $name The entity name (e.g. `page`).
-	 * @return array<string, string[]> The ids of the fields each module applies
-	 *                                 to, keyed by module id, in registration
-	 *                                 order. Empty until the `init` action has
-	 *                                 completed: a read before then is refused.
+	 * @return array[] {
+	 *     The script modules, in registration order. Empty until the `init`
+	 *     action has completed: a read before then is refused.
+	 *
+	 *     @type array ...$0 {
+	 *         @type string   $id     The id of the script module.
+	 *         @type string[] $fields The ids of the fields the module applies
+	 *                                to, in registration order.
+	 *     }
+	 * }
 	 */
 	function wp_get_registered_entity_field_modules( $kind, $name ) {
 		return WP_Entity_Fields_Registry::get_instance()->get_registered_field_modules( $kind, $name );
