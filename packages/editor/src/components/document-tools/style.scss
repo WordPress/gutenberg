@@ -6,15 +6,9 @@
 	display: inline-flex;
 	align-items: center;
 
-	// Hide all action buttons except the inserter on mobile.
-	.editor-document-tools__left > .editor-history__redo,
-	.editor-document-tools__left > .editor-history__undo {
-		display: none;
-
-		@include break-medium() {
-			display: inline-flex;
-		}
-	}
+	// Undo and redo are not rendered below the medium breakpoint. That is done
+	// in DocumentTools rather than hidden here, so they are not left in the
+	// toolbar's roving tabindex while invisible.
 
 	.editor-document-tools__left > .editor-document-tools__inserter-toggle {
 		display: inline-flex;
