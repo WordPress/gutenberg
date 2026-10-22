@@ -29,6 +29,7 @@
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
 -   Navigation Link: Apply the "Open in new tab" setting from the link popover. Clicking Apply dropped the change, so the setting could only be changed from the block settings sidebar. The Submenu block had the same problem ([#83506](https://github.com/WordPress/gutenberg/pull/83506)).
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 
 ## 11.2.0 (2026-10-07)
 
