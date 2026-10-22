@@ -5,6 +5,6 @@ body: >-
     set a maximum width and size to content, retaining the anchor-width minimum.
     For fixed widths, compose `Select` with a popup `className` or `style`.
     Combobox, Autocomplete, and searchable-select presets remain fixed
-time: '2026-10-21T11:19:07.630Z'
+time: '2026-10-22T04:10:21.566Z'
 custom:
     PR: '84086'
