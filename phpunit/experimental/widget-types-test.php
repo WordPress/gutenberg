@@ -8,6 +8,7 @@
  * @covers ::gutenberg_get_widget_metadata_i18n_schema
  * @covers ::gutenberg_sanitize_widget_help
  * @covers ::gutenberg_sanitize_widget_icon
+ * @covers ::gutenberg_sanitize_widget_footprint
  * @covers ::gutenberg_sanitize_widget_actions
  * @covers ::gutenberg_sanitize_widget_attributes
  * @covers ::gutenberg_resolve_widget_action_href
@@ -161,6 +162,19 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/calendar-' ) );
 		$this->assertNull( gutenberg_sanitize_widget_icon( 'icon.svg' ) );
 		$this->assertNull( gutenberg_sanitize_widget_icon( '<svg viewBox="0 0 24 24"></svg>' ) );
+	}
+
+	public function test_sanitize_widget_footprint_requires_an_allowed_form() {
+		$this->assertSame( 'glance', gutenberg_sanitize_widget_footprint( 'glance' ) );
+		$this->assertSame( 'strip', gutenberg_sanitize_widget_footprint( 'strip' ) );
+		$this->assertSame( 'card', gutenberg_sanitize_widget_footprint( 'card' ) );
+		$this->assertSame( 'panel', gutenberg_sanitize_widget_footprint( 'panel' ) );
+
+		$this->assertNull( gutenberg_sanitize_widget_footprint( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_footprint( '' ) );
+		$this->assertNull( gutenberg_sanitize_widget_footprint( 'Panel' ) );
+		$this->assertNull( gutenberg_sanitize_widget_footprint( 'tiny' ) );
+		$this->assertNull( gutenberg_sanitize_widget_footprint( array( 'panel' ) ) );
 	}
 
 	/**

@@ -18,7 +18,7 @@ The host shows this almost verbatim, in pickers, headers, and help. It decides _
 
 ## Framing
 
-How the widget asks to sit in the host's frame. Today this layer holds one property, `presentation`.
+How the widget asks to sit in the host's frame. This layer holds two properties, `presentation` and `footprint`.
 
 `presentation` suggests how much chrome the widget wants around it.
 The widget speaks in its own vocabulary ("render me without a frame"); the host decides how to materialize it, including whether to show the identity at all and which parts of it.
@@ -36,6 +36,10 @@ Painting the icon and title into a header is the conventional choice, not the on
 A host that hides the header still keeps the identity available, so assistive technology can name the tile.
 
 ![In full-bleed, the widget owns the tile edge to edge while the host keeps the identity header in a VisuallyHidden node for accessibility. Shown with Welcome.](./assets/presentation-full-bleed.svg)
+
+`footprint` names the smallest form the widget's content can take, the point where its own responsive adaptation ends. It carries no units. `glance` (the default) is an at-a-glance signal, such as a number or a badge, with no floor. `strip` is a shallow band that needs breadth and almost no height. `card` is a self-contained unit, a heading plus a few rows, on both axes. `panel` is a working region, such as a chart, a table or a preview.
+
+The host translates the form into a minimum tile size in its own geometry, so a `card` is a different number of columns in a four-column dashboard and in a twelve-column one. A host that cannot grant the floor grants everything it has.
 
 Framing is the layer the host translates, and the one place where the same declaration can yield different results in different hosts. Each host makes these calls differently; another host could honor the same three values in its own way.
 
