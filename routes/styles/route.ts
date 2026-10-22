@@ -45,21 +45,7 @@ export const route = {
 	// this route has to show.
 	stage: isBlockTheme,
 
-	async canvas( context: any ) {
-		// Use the custom canvas (StyleBookPreview) when the style book is the
-		// only thing to render, or when its preview is toggled on. Otherwise,
-		// use the default editor canvas.
-		if (
-			context.search.preview === 'stylebook' ||
-			! ( await isBlockTheme() )
-		) {
-			return null;
-		}
-		return {
-			isPreview: true,
-			// Styling the site means styling the template around it, so it is
-			// shown even when the canvas resolves to a static front page.
-			renderingMode: 'template-locked' as const,
-		};
-	},
+	// The custom canvas in `canvas.tsx` shows the style book, or, for block
+	// themes, the site's front end with the edited styles applied.
+	canvas: async () => null,
 };

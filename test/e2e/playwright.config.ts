@@ -58,7 +58,8 @@ const config = defineConfig( {
 		{
 			name: 'chromium',
 			use: { ...devices[ 'Desktop Chrome' ] },
-			grepInvert: /-chromium/,
+			// Tests for the extensible site editor only run in its own config.
+			grepInvert: /-chromium|@site-editor-v2-only/,
 		},
 		{
 			name: 'webkit',

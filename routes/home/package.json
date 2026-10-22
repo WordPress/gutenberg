@@ -15,8 +15,7 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/route": "file:../../packages/route",
-		"@wordpress/ui": "file:../../packages/ui",
-		"@wordpress/url": "file:../../packages/url"
+		"@wordpress/routes-site-preview": "file:../site-preview"
 	},
 	"devDependencies": {
 		"@types/react": "^19.3.0"
