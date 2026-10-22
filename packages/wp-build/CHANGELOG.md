@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 3.x releases.
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes
