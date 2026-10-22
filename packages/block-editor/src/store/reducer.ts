@@ -2119,29 +2119,6 @@ export function lastBlockInserted(
 }
 
 /**
- * Reducer returning the blocks dragged from an inserter, which have not been
- * inserted yet.
- *
- * @param state  Current state.
- * @param action Dispatched action.
- *
- * @return Updated state.
- */
-export function draggedInserterBlocks(
-	state: State[ 'draggedInserterBlocks' ] = [],
-	action: Action
-) {
-	switch ( action.type ) {
-		case 'START_DRAGGING':
-			// A drop zone also starts the drag when it is entered.
-			return action.blocks ?? state;
-		case 'STOP_DRAGGING':
-			return state.length ? [] : state;
-	}
-	return state;
-}
-
-/**
  * Reducer returning the contentOnly block that is being edited.
  *
  * @param state  Current state.
@@ -2592,7 +2569,6 @@ const combinedReducers = combineReducers( {
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
-	draggedInserterBlocks,
 	editedContentOnlySection,
 	blockVisibility,
 	viewportModalClientIds,

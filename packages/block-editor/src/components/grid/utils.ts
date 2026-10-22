@@ -405,3 +405,20 @@ export function getRowEndForResize(
 	);
 	return extraRows > 0 ? rowTracks.length + extraRows : closestRowEnd;
 }
+
+/**
+ * Gets the names of the blocks dragged from an inserter, which it adds to the
+ * drag's data types as `wp-block:<name>`, since only the types can be read
+ * while dragging. Each name is listed once.
+ *
+ * @param dataTransfer The drag's data, if any.
+ *
+ * @return The block names, or none when the drag isn't from an inserter.
+ */
+export function getInserterDragBlockNames(
+	dataTransfer: Pick< DataTransfer, 'types' > | null | undefined
+): string[] {
+	return Array.from( dataTransfer?.types ?? [] )
+		.filter( ( type ) => type.startsWith( 'wp-block:' ) )
+		.map( ( type ) => type.slice( 'wp-block:'.length ) );
+}

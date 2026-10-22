@@ -39,7 +39,7 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isDraggingBlocks,
-				getDraggedInserterBlocks,
+				isDragging: isDraggingAnything,
 				getTemplateLock,
 				getBlockEditingMode,
 				getBlockAttributes,
@@ -48,11 +48,12 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 				getSettings,
 			} = unlock( select( blockEditorStore ) );
 			// Blocks dragged from the canvas can be dropped in any grid, and
-			// with grid interactivity, so can blocks dragged from an inserter.
+			// with grid interactivity, so can blocks dragged from an inserter,
+			// which the grid tells apart by the drag's data types.
 			const isDragging =
 				isDraggingBlocks() ||
 				( !! window.__experimentalEnableGridInteractivity &&
-					getDraggedInserterBlocks().length > 0 );
+					isDraggingAnything() );
 
 			// These calls are purposely ordered from least expensive to most expensive.
 			// Hides the visualizer in cases where the user is not or cannot interact with it.

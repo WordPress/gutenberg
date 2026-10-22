@@ -40,7 +40,6 @@ import {
 	settings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
-	draggedInserterBlocks,
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
@@ -2932,35 +2931,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
-		} );
-	} );
-
-	describe( 'draggedInserterBlocks', () => {
-		const inserterBlocks = [ partial< Block >( { clientId: 'block-1' } ) ];
-
-		it( 'should store the blocks dragged from an inserter', () => {
-			expect(
-				draggedInserterBlocks( [], {
-					type: 'START_DRAGGING',
-					blocks: inserterBlocks,
-				} )
-			).toBe( inserterBlocks );
-		} );
-
-		it( 'should keep them when a drop zone starts a drag', () => {
-			expect(
-				draggedInserterBlocks( inserterBlocks, {
-					type: 'START_DRAGGING',
-				} )
-			).toBe( inserterBlocks );
-		} );
-
-		it( 'should clear them when the drag stops', () => {
-			expect(
-				draggedInserterBlocks( inserterBlocks, {
-					type: 'STOP_DRAGGING',
-				} )
-			).toEqual( [] );
 		} );
 	} );
 

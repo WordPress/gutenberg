@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode, Ref } from 'react';
-import type { Block } from '@wordpress/blocks';
 import type { Layout } from '../../layouts/types';
 import type { AlignmentGuide } from './get-alignment-guides';
 import type { GridRect } from './utils';
@@ -206,11 +205,10 @@ export interface GridMarqueeDrag {
 }
 
 /**
- * The selectors that find the blocks dragged from an inserter that a grid can
- * take.
+ * The selectors that tell whether a grid can take blocks dragged from an
+ * inserter.
  */
 export interface InserterBlockSelectors {
-	getDraggedInserterBlocks: () => Block[];
 	canInsertBlockType: ( blockName: string, rootClientId: string ) => boolean;
 }
 
@@ -255,8 +253,8 @@ export interface GridItemMeasurements {
 export interface GridDropTarget {
 	/** Client ID of the dragged block, or null for blocks from an inserter. */
 	srcClientId: string | null;
-	/** The blocks dragged from an inserter, or null for a block in the canvas. */
-	inserterBlocks: Block[] | null;
+	/** Whether the blocks are dragged from an inserter, not in the canvas. */
+	isInserterDrag: boolean;
 	/** Number of columns and rows the block spans. */
 	span: { columnSpan: number; rowSpan: number };
 	/** The cells the block would land in. */
