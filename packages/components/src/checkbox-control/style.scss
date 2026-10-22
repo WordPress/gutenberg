@@ -20,18 +20,11 @@
 }
 
 .components-checkbox-control__input[type="checkbox"] {
-	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 	transition: none;
-	border-radius: $radius-small;
 	@include input-control;
 
 	&:hover:not(:disabled, [aria-disabled="true"]) {
 		background: var(--wpds-color-background-interactive-neutral-active);
-	}
-
-	&:checked {
-		background: $components-color-accent;
-		border-color: $components-color-accent;
 	}
 
 	&:checked::before,
