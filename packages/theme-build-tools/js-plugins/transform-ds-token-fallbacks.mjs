@@ -1,7 +1,10 @@
 import { parse } from '@babel/parser';
 import { isTSType, traverse } from '@babel/types';
 import MagicString from 'magic-string';
-import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
+import {
+	addFallbackToVar,
+	hasTokenFallbacks,
+} from '../postcss-plugins/ds-token-fallbacks.mjs';
 
 /**
  * Whether an ancestor makes a literal part of a name, module path, or type.
@@ -47,10 +50,10 @@ function isNonValue( ancestors ) {
  *
  * @param {string} source   JavaScript or TypeScript source.
  * @param {string} filename Source filename, without a query string.
- * @return {{ code: string, map: import('magic-string').SourceMap, sourceMappingURL: string | undefined } | null} Transformation, or null when unchanged or unparseable.
+ * @return {{ code: string, map: import('magic-string').SourceMap, sourceMappingURL: string | undefined } | null} Transformation, or null when unchanged, unparseable, or `@wordpress/theme` is not installed.
  */
 export function transformDsTokenFallbacks( source, filename ) {
-	if ( ! source.includes( '--wpds-' ) ) {
+	if ( ! hasTokenFallbacks || ! source.includes( '--wpds-' ) ) {
 		return null;
 	}
 

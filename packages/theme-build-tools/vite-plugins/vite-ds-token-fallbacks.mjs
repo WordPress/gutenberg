@@ -5,7 +5,7 @@ import { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fall
  *
  * Replaces bare `var(--wpds-*)` references in string literals with
  * `var(--wpds-*, <fallback>)` so components render correctly without
- * a ThemeProvider.
+ * a ThemeProvider. Does nothing when `@wordpress/theme` is not installed.
  *
  * @type {() => import('vite').Plugin}
  */

@@ -3,6 +3,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import remapping from '@jridgewell/remapping';
 import { AnyMap } from '@jridgewell/trace-mapping';
 import { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
+import { hasTokenFallbacks } from '../postcss-plugins/ds-token-fallbacks.mjs';
 
 /** @type {Record<string, import('esbuild').Loader>} */
 const LOADER_MAP = {
@@ -21,13 +22,17 @@ const LOADER_MAP = {
  *
  * Replaces bare `var(--wpds-*)` references in string literals with
  * `var(--wpds-*, <fallback>)` so components render correctly without
- * a ThemeProvider.
+ * a ThemeProvider. Does nothing when `@wordpress/theme` is not installed.
  *
  * @type {import('esbuild').Plugin}
  */
 const plugin = {
 	name: 'ds-token-fallbacks-js',
 	setup( build ) {
+		if ( ! hasTokenFallbacks ) {
+			return;
+		}
+
 		build.onLoad(
 			{ filter: /\.[mc]?[jt]sx?$/, namespace: 'file' },
 			async ( args ) => {
