@@ -1,6 +1,46 @@
 import apiFetch from '@wordpress/api-fetch';
 
 /**
+ * Returns the editor canvas iframe, when the canvas is iframed.
+ *
+ * Modern block editors render the blocks inside an iframe. When the canvas is
+ * not iframed (or the iframe is not there yet) this returns `null`.
+ *
+ * @return {HTMLIFrameElement|null} The editor canvas iframe, or null.
+ */
+const getEditorCanvasIframe = () =>
+	document.querySelector( 'iframe[name="editor-canvas"]' );
+
+/**
+ * Mirrors a newly added stylesheet into the editor canvas iframe.
+ *
+ * `loadAssets()` appends the assets of a freshly installed block to the main
+ * document. That is enough for scripts, which must run in the editor's own
+ * context, but styles have to be present inside the editor canvas document as
+ * well. Otherwise a block installed from the Block Directory renders unstyled
+ * until the editor is reloaded, because the canvas only picks up the styles
+ * that existed when it was created.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/63762
+ *
+ * @param {HTMLElement} node The stylesheet element added to the main document.
+ */
+const mirrorStyleIntoCanvasIframe = ( node ) => {
+	const canvasDocument = getEditorCanvasIframe()?.contentDocument;
+
+	if ( ! canvasDocument?.head ) {
+		return;
+	}
+
+	// Avoid injecting a stylesheet the canvas already has.
+	if ( node.id && canvasDocument.getElementById( node.id ) ) {
+		return;
+	}
+
+	canvasDocument.head.appendChild( node.cloneNode( true ) );
+};
+
+/**
  * Load an asset for a block.
  *
  * This function returns a Promise that will resolve once the asset is loaded,
@@ -33,6 +73,14 @@ export const loadAsset = ( el ) => {
 		newNode.onerror = () => reject( new Error( 'Error loading asset.' ) );
 
 		document.body.appendChild( newNode );
+
+		// Styles must also reach the editor canvas iframe.
+		if (
+			'link' === newNode.nodeName.toLowerCase() &&
+			'stylesheet' === newNode.rel
+		) {
+			mirrorStyleIntoCanvasIframe( newNode );
+		}
 
 		// Resolve Stylesheets and Inline JavaScript immediately.
 		if (
