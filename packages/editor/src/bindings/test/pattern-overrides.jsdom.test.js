@@ -258,36 +258,40 @@ describe( 'pattern-overrides bindings', () => {
 			} );
 		} );
 
-		it( 'stores the overridden values of the blocks inside the inner blocks', () => {
+		it( 'stores the inner blocks as written, with the bindings of the blocks inside them', () => {
 			const { area, pattern } = createPatternWithArea( {
 				Title: { content: 'Overridden' },
 			} );
 			const registry = createRegistryWithBlocks( [ pattern ] );
+			const innerBlocks = serialize( [
+				createBlock( 'core/paragraph', {
+					content: 'Default',
+					metadata: {
+						name: 'Title',
+						bindings: { __default: PATTERN_OVERRIDES_BINDING },
+					},
+				} ),
+			] );
 
 			setValues( registry, area.clientId, {
-				innerBlocks: {
-					newValue: serialize( [
-						createBlock( 'core/paragraph', {
-							content: 'Default',
-							metadata: {
-								name: 'Title',
-								bindings: {
-									__default: PATTERN_OVERRIDES_BINDING,
-								},
-							},
-						} ),
-					] ),
-				},
+				innerBlocks: { newValue: innerBlocks },
 			} );
 
-			expect( getContent( registry, pattern ).Area.innerBlocks ).toBe(
-				serialize( [
-					createBlock( 'core/paragraph', {
-						content: 'Overridden',
-						metadata: { name: 'Title' },
-					} ),
-				] )
-			);
+			expect( getContent( registry, pattern ) ).toEqual( {
+				Title: { content: 'Overridden' },
+				Area: { innerBlocks },
+			} );
+			// The editor reads back what it wrote.
+			expect(
+				patternOverridesBindings.getValues( {
+					select: registry.select,
+					clientId: area.clientId,
+					context: {
+						'pattern/overrides': getContent( registry, pattern ),
+					},
+					bindings: { innerBlocks: PATTERN_OVERRIDES_BINDING },
+				} )
+			).toEqual( { innerBlocks } );
 		} );
 
 		it( 'stores cleared attributes as an empty string', () => {
@@ -373,6 +377,58 @@ describe( 'pattern-overrides bindings', () => {
 					blocksBefore
 				);
 			} );
+		} );
+	} );
+
+	describe( 'canUserEditValue', () => {
+		const canUserEditValue = ( attributes, clientId ) =>
+			patternOverridesBindings.canUserEditValue( {
+				select: makeSelect( attributes ),
+				context: {},
+				clientId,
+			} );
+
+		it( 'lets the user edit attributes, which are checked without a client ID', () => {
+			expect( canUserEditValue( blockAttributes ) ).toBe( true );
+			expect(
+				canUserEditValue( {
+					content: 'original content',
+					metadata: {
+						bindings: { content: PATTERN_OVERRIDES_BINDING },
+					},
+				} )
+			).toBe( true );
+		} );
+
+		it( 'lets the user edit the inner blocks of a named block', () => {
+			expect(
+				canUserEditValue(
+					{
+						metadata: {
+							name: 'Area',
+							bindings: {
+								innerBlocks: PATTERN_OVERRIDES_BINDING,
+							},
+						},
+					},
+					'block-1'
+				)
+			).toBe( true );
+		} );
+
+		it( 'does not let the user edit the inner blocks of a block without a name', () => {
+			expect(
+				canUserEditValue(
+					{
+						metadata: {
+							bindings: {
+								innerBlocks: PATTERN_OVERRIDES_BINDING,
+							},
+						},
+					},
+					'block-1'
+				)
+			).toBe( false );
 		} );
 	} );
 } );

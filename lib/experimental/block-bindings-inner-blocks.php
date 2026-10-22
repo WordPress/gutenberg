@@ -33,11 +33,17 @@ function gutenberg_block_bindings_get_inner_blocks_hosts() {
  * Adds `innerBlocks` to the attributes that block bindings support on the Group
  * and Column blocks.
  *
- * @param string[] $supported_attributes The attributes supported by block bindings.
- * @param string   $block_type           The block type name.
- * @return string[] The supported attributes.
+ * Another filter can return something other than an array, such as null, which
+ * Core takes for no supported attributes: it is returned as it is.
+ *
+ * @param string[]|mixed $supported_attributes The attributes supported by block bindings.
+ * @param string         $block_type           The block type name.
+ * @return string[]|mixed The supported attributes.
  */
 function gutenberg_block_bindings_add_inner_blocks_support( $supported_attributes, $block_type ) {
+	if ( ! is_array( $supported_attributes ) ) {
+		return $supported_attributes;
+	}
 	if (
 		in_array( $block_type, gutenberg_block_bindings_get_inner_blocks_hosts(), true ) &&
 		! in_array( 'innerBlocks', $supported_attributes, true )
@@ -52,12 +58,15 @@ add_filter( 'block_bindings_supported_attributes', 'gutenberg_block_bindings_add
  * Removes `innerBlocks` from the attributes that block bindings support on every
  * other block type, as their markup has no known place for inner blocks.
  *
- * @param string[] $supported_attributes The attributes supported by block bindings.
- * @param string   $block_type           The block type name.
- * @return string[] The supported attributes.
+ * Like the filter above, it returns anything other than an array as it is.
+ *
+ * @param string[]|mixed $supported_attributes The attributes supported by block bindings.
+ * @param string         $block_type           The block type name.
+ * @return string[]|mixed The supported attributes.
  */
 function gutenberg_block_bindings_restrict_inner_blocks_support( $supported_attributes, $block_type ) {
 	if (
+		! is_array( $supported_attributes ) ||
 		in_array( $block_type, gutenberg_block_bindings_get_inner_blocks_hosts(), true ) ||
 		! in_array( 'innerBlocks', $supported_attributes, true )
 	) {
@@ -124,8 +133,9 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 /**
  * Returns the state the inner blocks bindings filters share in a request.
  *
- * - `frames`: the substitutions being rendered, outermost first, each with the
- *   ID of the block instance and a key made of the source and the value.
+ * - `frames`: the substitutions being rendered, outermost first, each with a
+ *   weak reference to the block instance and a key made of the source and the
+ *   value.
  * - `bytes`: the length of the values substituted since `frames` was last empty.
  * - `parsed`: the blocks of the values parsed last, keyed by the value.
  *
@@ -325,6 +335,12 @@ function gutenberg_block_bindings_get_bound_inner_content( $inner_content, $coun
  *   any, and they have rendered less than 1 MB of values so far.
  * - The markup of the block has an unambiguous place for the inner blocks.
  *
+ * A substituted block counts as an ancestor until it has rendered. When its
+ * rendering throws, or its binding is resolved outside `WP_Block::render()`, it
+ * counts until it is gone or a substituted block around it has rendered: a
+ * caller that keeps it after resolving its binding keeps it counting, which is
+ * accepted.
+ *
  * Every value is sanitized, whatever its source, as the user who supplied it
  * may not be allowed to publish unfiltered HTML.
  *
@@ -365,6 +381,10 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	}
 
 	$state = gutenberg_block_bindings_get_inner_blocks_state();
+	// Blocks that are gone without having finished rendering left their frames.
+	while ( $state->frames && null === end( $state->frames )['block']->get() ) {
+		array_pop( $state->frames );
+	}
 	if ( empty( $state->frames ) ) {
 		$state->bytes = 0;
 	}
@@ -400,8 +420,8 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->inner_content = $inner_content;
 
 	$state->frames[] = array(
-		'id'  => spl_object_id( $block_instance ),
-		'key' => $key,
+		'block' => WeakReference::create( $block_instance ),
+		'key'   => $key,
 	);
 	$state->bytes   += strlen( $value );
 
@@ -412,16 +432,25 @@ add_filter( 'block_bindings_source_value', 'gutenberg_block_bindings_replace_inn
 /**
  * Ends the substitution of the inner blocks of a block once it has rendered.
  *
+ * Any substitution that began after it ends too: it was left by an inner block
+ * whose rendering threw an exception that was caught inside the block, or whose
+ * binding was resolved outside its rendering.
+ *
  * @param string        $block_content The block content.
  * @param array         $parsed_block  The full block.
  * @param WP_Block|null $instance      The block instance.
  * @return string The block content.
  */
 function gutenberg_block_bindings_end_inner_blocks_substitution( $block_content, $parsed_block, $instance = null ) {
+	if ( ! $instance instanceof WP_Block ) {
+		return $block_content;
+	}
 	$state = gutenberg_block_bindings_get_inner_blocks_state();
-	$frame = end( $state->frames );
-	if ( $frame && $instance instanceof WP_Block && spl_object_id( $instance ) === $frame['id'] ) {
-		array_pop( $state->frames );
+	for ( $index = count( $state->frames ) - 1; $index >= 0; $index-- ) {
+		if ( $state->frames[ $index ]['block']->get() === $instance ) {
+			array_splice( $state->frames, $index );
+			break;
+		}
 	}
 	return $block_content;
 }

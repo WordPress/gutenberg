@@ -852,6 +852,20 @@ export const getParentSectionBlock = ( state: State, clientId: string ) => {
 };
 
 /**
+ * Returns what identifies the most recent block change, or the change it
+ * derives from, like the edit that writing bound inner blocks back to their
+ * source follows. A controller of blocks that reported a change reports the
+ * changes derived from it as part of it.
+ *
+ * @param state Global application state.
+ *
+ * @return The change, as an object to compare by identity.
+ */
+export function getLastBlockChangeOrigin( state: State ): object {
+	return state.blocks.derivedFrom ?? state.blocks;
+}
+
+/**
  * Returns the binding of a block whose inner blocks are bound to a source.
  *
  * @param state    Global application state.

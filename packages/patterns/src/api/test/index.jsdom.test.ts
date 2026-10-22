@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { InnerBlocks } from '@wordpress/block-editor';
 import {
 	createBlock,
 	registerBlockType,
@@ -7,21 +6,17 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
-import { createElement } from '@wordpress/element';
-import { bakeAndStripPatternOverrides } from '..';
+import { parseInnerBlocksOverride } from '..';
 
-const PATTERN_OVERRIDES_BINDING = { source: 'core/pattern-overrides' };
+const serializeTexts = ( contents: string[] ) =>
+	serialize(
+		contents.map( ( content ) => createBlock( 'test/text', { content } ) )
+	);
 
-const createText = ( attributes: Record< string, unknown > ) =>
-	createBlock( 'test/text', attributes );
-const createArea = (
-	attributes: Record< string, unknown >,
-	innerBlocks?: Block[]
-) => createBlock( 'test/area', attributes, innerBlocks );
-const getContents = ( blocks: Block[] ) =>
-	blocks.map( ( block ) => block.attributes.content );
+const getContents = ( blocks: Block[] | undefined ) =>
+	blocks?.map( ( block ) => block.attributes.content );
 
-describe( 'bakeAndStripPatternOverrides', () => {
+describe( 'parseInnerBlocksOverride', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/text', {
 			apiVersion: 3,
@@ -29,258 +24,67 @@ describe( 'bakeAndStripPatternOverrides', () => {
 			category: 'text',
 			attributes: {
 				content: { type: 'string' },
-				url: { type: 'string' },
-				metadata: { type: 'object' },
 			},
 			save: () => null,
-		} );
-		registerBlockType( 'test/area', {
-			apiVersion: 3,
-			title: 'Area',
-			category: 'design',
-			attributes: {
-				metadata: { type: 'object' },
-			},
-			save: () => createElement( InnerBlocks.Content ),
 		} );
 	} );
 
 	afterAll( () => {
 		unregisterBlockType( 'test/text' );
-		unregisterBlockType( 'test/area' );
 	} );
 
-	describe( 'attributes', () => {
-		const createTitle = ( bindings: Record< string, unknown > ) =>
-			createText( {
-				content: 'Default',
-				url: 'https://example.com',
-				metadata: { name: 'Title', bindings },
-			} );
-
-		it( 'sets the overridden values of a named block as its attributes', () => {
-			const [ block ] = bakeAndStripPatternOverrides(
-				[ createTitle( { __default: PATTERN_OVERRIDES_BINDING } ) ],
-				{ Title: { content: 'Overridden' } }
-			);
-
-			expect( block.attributes ).toMatchObject( {
-				content: 'Overridden',
-				url: 'https://example.com',
-			} );
-			expect( block.attributes.metadata ).toEqual( { name: 'Title' } );
-		} );
-
-		it( 'clears an attribute overridden with an empty string', () => {
-			const [ block ] = bakeAndStripPatternOverrides(
-				[ createTitle( { __default: PATTERN_OVERRIDES_BINDING } ) ],
-				{ Title: { url: '' } }
-			);
-
-			expect( block.attributes.url ).toBeUndefined();
-		} );
-
-		it( 'ignores the overrides of attributes the block type does not have', () => {
-			const [ block ] = bakeAndStripPatternOverrides(
-				[ createTitle( { __default: PATTERN_OVERRIDES_BINDING } ) ],
-				{ Title: { unknown: 'Value' } }
-			);
-
-			expect( block.attributes ).not.toHaveProperty( 'unknown' );
-		} );
-
-		it( 'removes the pattern overrides bindings of a block without overrides', () => {
-			const [ block ] = bakeAndStripPatternOverrides( [
-				createTitle( { content: PATTERN_OVERRIDES_BINDING } ),
-			] );
-
-			expect( block.attributes.content ).toBe( 'Default' );
-			expect( block.attributes.metadata ).toEqual( { name: 'Title' } );
-		} );
-
-		it( 'keeps the bindings to other sources', () => {
-			const postMetaBinding = {
-				source: 'core/post-meta',
-				args: { key: 'url' },
-			};
-			const [ block ] = bakeAndStripPatternOverrides(
-				[
-					createTitle( {
-						content: PATTERN_OVERRIDES_BINDING,
-						url: postMetaBinding,
-					} ),
-				],
-				{ Title: { content: 'Overridden' } }
-			);
-
-			expect( block.attributes.metadata ).toEqual( {
-				name: 'Title',
-				bindings: { url: postMetaBinding },
-			} );
-		} );
-
-		it( 'applies the overrides to nested blocks', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[
-					createArea( {}, [
-						createTitle( { __default: PATTERN_OVERRIDES_BINDING } ),
-					] ),
-				],
-				{ Title: { content: 'Overridden' } }
-			);
-
-			expect( getContents( area.innerBlocks ) ).toEqual( [
-				'Overridden',
-			] );
-		} );
+	it( 'parses block markup', () => {
+		expect(
+			getContents(
+				parseInnerBlocksOverride(
+					serializeTexts( [ 'First', 'Second' ] )
+				)
+			)
+		).toEqual( [ 'First', 'Second' ] );
 	} );
 
-	describe( 'inner blocks', () => {
-		const createBoundArea = ( bindings: Record< string, unknown > ) =>
-			createArea( { metadata: { name: 'Area', bindings } }, [
-				createText( { content: 'Default' } ),
-			] );
+	it( 'parses an empty string as no inner blocks', () => {
+		expect( parseInnerBlocksOverride( '' ) ).toEqual( [] );
+	} );
 
-		it( 'replaces the inner blocks of a block that binds them', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[
-					createBoundArea( {
-						innerBlocks: PATTERN_OVERRIDES_BINDING,
-					} ),
-				],
-				{
-					Area: {
-						innerBlocks: serialize( [
-							createText( { content: 'First' } ),
-							createText( { content: 'Second' } ),
-						] ),
-					},
-				}
-			);
+	it.each( [
+		[ 'a space', ' ' ],
+		[ 'a tab', '\t' ],
+		[ 'a newline', '\n' ],
+		[ 'a form feed', '\f' ],
+		[ 'a carriage return', '\r' ],
+	] )( 'parses block markup that starts with %s', ( _name, prefix ) => {
+		expect(
+			getContents(
+				parseInnerBlocksOverride(
+					prefix + serializeTexts( [ 'First' ] )
+				)
+			)
+		).toEqual( [ 'First' ] );
+	} );
 
-			expect( getContents( area.innerBlocks ) ).toEqual( [
-				'First',
-				'Second',
-			] );
-			expect( area.attributes.metadata ).toEqual( { name: 'Area' } );
-		} );
-
-		it( 'removes the inner blocks overridden with an empty string', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[
-					createBoundArea( {
-						innerBlocks: PATTERN_OVERRIDES_BINDING,
-					} ),
-				],
-				{ Area: { innerBlocks: '' } }
-			);
-
-			expect( area.innerBlocks ).toEqual( [] );
-		} );
-
-		it( 'keeps the inner blocks that are not overridden', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[
-					createBoundArea( {
-						innerBlocks: PATTERN_OVERRIDES_BINDING,
-					} ),
-				],
-				{ Area: {} }
-			);
-
-			expect( getContents( area.innerBlocks ) ).toEqual( [ 'Default' ] );
-			expect( area.attributes.metadata ).toEqual( { name: 'Area' } );
-		} );
-
-		it( 'keeps the inner blocks when the override is not block markup', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[
-					createBoundArea( {
-						innerBlocks: PATTERN_OVERRIDES_BINDING,
-					} ),
-				],
-				{ Area: { innerBlocks: '<p>Classic content</p>' } }
-			);
-
-			expect( getContents( area.innerBlocks ) ).toEqual( [ 'Default' ] );
-		} );
-
-		it( 'keeps the inner blocks of a block that does not bind them', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[ createBoundArea( { __default: PATTERN_OVERRIDES_BINDING } ) ],
-				{
-					Area: {
-						innerBlocks: serialize( [
-							createText( { content: 'Override' } ),
-						] ),
-					},
-				}
-			);
-
-			expect( getContents( area.innerBlocks ) ).toEqual( [ 'Default' ] );
-		} );
-
-		it( 'does not apply the overrides to the overridden inner blocks', () => {
-			const [ area ] = bakeAndStripPatternOverrides(
-				[
-					createBoundArea( {
-						innerBlocks: PATTERN_OVERRIDES_BINDING,
-					} ),
-				],
-				{
-					Area: {
-						innerBlocks: serialize( [
-							createText( {
-								content: 'Stored',
-								metadata: {
-									name: 'Title',
-									bindings: {
-										__default: PATTERN_OVERRIDES_BINDING,
-									},
-								},
-							} ),
-						] ),
-					},
-					Title: { content: 'Overridden' },
-				}
-			);
-
-			expect( area.innerBlocks[ 0 ].attributes ).toMatchObject( {
-				content: 'Stored',
-				metadata: { name: 'Title' },
-			} );
+	it.each( [
+		[ 'a no-break space', '\u00a0' ],
+		[ 'a byte order mark', '\ufeff' ],
+		[ 'a vertical tab', '\v' ],
+	] )(
+		'does not parse block markup that starts with %s',
+		( _name, prefix ) => {
 			expect(
-				area.innerBlocks[ 0 ].attributes.metadata
-			).not.toHaveProperty( 'bindings' );
-		} );
-	} );
+				parseInnerBlocksOverride(
+					prefix + serializeTexts( [ 'First' ] )
+				)
+			).toBeUndefined();
+		}
+	);
 
-	it( 'does not mutate the given blocks', () => {
-		const blocks = [
-			createArea(
-				{
-					metadata: {
-						name: 'Area',
-						bindings: { innerBlocks: PATTERN_OVERRIDES_BINDING },
-					},
-				},
-				[ createText( { content: 'Default' } ) ]
-			),
-			createText( {
-				content: 'Default',
-				metadata: {
-					name: 'Title',
-					bindings: { __default: PATTERN_OVERRIDES_BINDING },
-				},
-			} ),
-		];
-		const blocksBefore = structuredClone( blocks );
-
-		bakeAndStripPatternOverrides( blocks, {
-			Area: { innerBlocks: '' },
-			Title: { content: 'Overridden' },
-		} );
-
-		expect( blocks ).toEqual( blocksBefore );
+	it.each( [
+		[ 'HTML', '<p>Classic content</p>' ],
+		[ 'whitespace', ' ' ],
+		[ 'a missing value', undefined ],
+		[ 'null', null ],
+		[ 'an array', [] ],
+	] )( 'does not parse %s', ( _name, value ) => {
+		expect( parseInnerBlocksOverride( value ) ).toBeUndefined();
 	} );
 } );

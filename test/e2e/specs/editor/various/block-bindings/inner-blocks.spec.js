@@ -10,6 +10,51 @@ const PATTERN_CONTENT = `<!-- wp:paragraph -->
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->`;
 
+const PATTERN_WITH_OVERRIDABLE_BLOCK_CONTENT = `<!-- wp:group {"metadata":{"name":"Body","bindings":{"innerBlocks":{"source":"core/pattern-overrides"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"metadata":{"name":"Intro","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Intro</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Details</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->`;
+
+/**
+ * Moves a block with the block editor store, as dragging it in List View does,
+ * without selecting it.
+ *
+ * @param {Object} page             The page.
+ * @param {Object} options          Options.
+ * @param {string} options.from     Path of client IDs to the block.
+ * @param {string} options.to       Path of client IDs to the new parent, empty for the root.
+ * @param {number} options.index    The index in the new parent.
+ * @param {string} options.selected Path of client IDs to the block to select.
+ */
+async function moveBlock( page, { from, to, index, selected } ) {
+	await page.evaluate(
+		( args ) => {
+			const { select, dispatch } = window.wp.data;
+			const { getBlockOrder } = select( 'core/block-editor' );
+			const resolve = ( path ) =>
+				path.reduce(
+					( parent, position ) => getBlockOrder( parent )[ position ],
+					''
+				);
+			const clientId = resolve( args.from );
+			const actions = dispatch( 'core/block-editor' );
+			actions.selectBlock( resolve( args.selected ) );
+			actions.moveBlocksToPosition(
+				[ clientId ],
+				resolve( args.from.slice( 0, -1 ) ),
+				resolve( args.to ),
+				args.index
+			);
+		},
+		{ from, to, index, selected }
+	);
+}
+
 test.describe( 'Inner blocks bindings', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -132,6 +177,88 @@ test.describe( 'Inner blocks bindings', () => {
 			).not.toContain( 'typed' );
 		} );
 
+		test( 'moves a block into the area, and undoes it at once', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Moved in' },
+			} );
+
+			// From the root into the area, with the pattern selected.
+			await moveBlock( page, {
+				from: [ 1 ],
+				to: [ 0, 1 ],
+				index: 1,
+				selected: [ 0 ],
+			} );
+
+			const area = editor.canvas.getByRole( 'document', {
+				name: 'Block: Group',
+			} );
+			await expect(
+				area.getByRole( 'document', { name: 'Block: Paragraph' } )
+			).toHaveText( [ 'Default content', 'Moved in' ] );
+			let blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+			expect( blocks[ 0 ].attributes.content.Body.innerBlocks ).toContain(
+				'Moved in'
+			);
+
+			await page
+				.getByRole( 'toolbar', { name: 'Document tools' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+
+			await expect(
+				area.getByRole( 'document', { name: 'Block: Paragraph' } )
+			).toHaveText( [ 'Default content' ] );
+			blocks = await editor.getBlocks();
+			expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/block',
+				'core/paragraph',
+			] );
+			expect(
+				blocks[ 0 ].attributes.content?.Body?.innerBlocks ?? ''
+			).not.toContain( 'Moved in' );
+		} );
+
+		test( 'moves a block out of the area once, and undoes it at once', async ( {
+			editor,
+			page,
+		} ) => {
+			// From the area to the root, with the pattern selected.
+			await moveBlock( page, {
+				from: [ 0, 1, 0 ],
+				to: [],
+				index: 1,
+				selected: [ 0 ],
+			} );
+
+			const area = editor.canvas.getByRole( 'document', {
+				name: 'Block: Group',
+			} );
+			await expect(
+				area.getByRole( 'document', { name: 'Block: Paragraph' } )
+			).toHaveCount( 0 );
+			const content = await editor.getEditedPostContent();
+			expect( content.match( /Default content/g ) ).toHaveLength( 1 );
+
+			await page
+				.getByRole( 'toolbar', { name: 'Document tools' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+
+			await expect(
+				area.getByRole( 'document', { name: 'Block: Paragraph' } )
+			).toHaveText( [ 'Default content' ] );
+			const blocks = await editor.getBlocks();
+			expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/block',
+			] );
+		} );
+
 		test( 'resets the area to the content of the pattern', async ( {
 			editor,
 			page,
@@ -187,6 +314,54 @@ test.describe( 'Inner blocks bindings', () => {
 				'Default content detached'
 			);
 		} );
+	} );
+
+	test( 'keeps the overrides of the overridable blocks in an area', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Card with an overridable paragraph',
+			status: 'publish',
+			content: PATTERN_WITH_OVERRIDABLE_BLOCK_CONTENT,
+		} );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+		const [ intro, details ] = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Group' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.all();
+
+		await intro.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' overridden' );
+		await details.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' edited' );
+
+		await expect( intro ).toHaveText( 'Intro overridden' );
+		await expect( details ).toHaveText( 'Details edited' );
+		const [ instance ] = await editor.getBlocks();
+		expect( instance.attributes.content.Intro.content ).toBe(
+			'Intro overridden'
+		);
+		// The area keeps the overridable paragraph as it is.
+		expect( instance.attributes.content.Body.innerBlocks ).toContain(
+			'"name":"Intro"'
+		);
+		expect( instance.attributes.content.Body.innerBlocks ).toContain(
+			'Details edited'
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		await expect( page.getByText( 'Intro overridden' ) ).toBeVisible();
+		await expect( page.getByText( 'Details edited' ) ).toBeVisible();
 	} );
 
 	test.describe( 'bound to a custom field', () => {

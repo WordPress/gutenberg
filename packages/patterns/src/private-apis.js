@@ -12,7 +12,7 @@ import {
 	default as CreateTemplatePartModal,
 	CreateTemplatePartModalContents,
 } from './components/create-template-part-modal';
-import { bakeAndStripPatternOverrides, isOverridableBlock } from './api';
+import { isOverridableBlock } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
@@ -36,7 +36,6 @@ lock( privateApis, {
 	CreateTemplatePartModal,
 	CreateTemplatePartModalContents,
 	isOverridableBlock,
-	bakeAndStripPatternOverrides,
 	useDuplicatePatternProps,
 	RenamePatternModal,
 	PatternsMenuItems,

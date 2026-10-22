@@ -19,41 +19,72 @@ const PATTERN_OVERRIDES_BINDING = { source: 'core/pattern-overrides' };
 const getContents = ( blocks: Block[] ) =>
 	blocks.map( ( block ) => block.attributes.content );
 
+const createText = ( content: string, name?: string ) =>
+	createBlock( 'test/text', {
+		content,
+		metadata: name
+			? { name, bindings: { __default: PATTERN_OVERRIDES_BINDING } }
+			: undefined,
+	} );
+
+const createArea = ( name: string, innerBlocks: Block[] ) =>
+	createBlock(
+		'test/area',
+		{
+			metadata: {
+				name,
+				bindings: { innerBlocks: PATTERN_OVERRIDES_BINDING },
+			},
+		},
+		innerBlocks
+	);
+
 /**
- * Detaches a synced pattern holding a named block, and an area whose inner
- * blocks can be overridden, and returns the blocks that replace the pattern.
+ * Detaches a synced pattern and returns the blocks that replace it.
+ *
+ * @param content             The overrides of the pattern instance.
+ * @param innerBlocks         The blocks of the pattern.
+ * @param supportedAttributes The attributes block bindings support, by block.
+ *
+ * @return The blocks of the editor after detaching.
+ */
+function detachPattern(
+	content: Record< string, unknown >,
+	innerBlocks: Block[],
+	supportedAttributes: Record< string, string[] > = {
+		'test/area': [ 'innerBlocks' ],
+	}
+) {
+	const pattern = createBlock(
+		'core/block',
+		{ ref: 1, content },
+		innerBlocks
+	);
+	const registry = createRegistry();
+	registry.register( blockEditorStore );
+	registry.dispatch( blockEditorStore ).updateSettings( {
+		__experimentalBlockBindingsSupportedAttributes: supportedAttributes,
+	} );
+	registry.dispatch( blockEditorStore ).resetBlocks( [ pattern ] );
+
+	convertSyncedPatternToStatic( pattern.clientId )( { registry } );
+
+	return registry.select( blockEditorStore ).getBlocks();
+}
+
+/**
+ * Detaches a synced pattern holding an area whose inner blocks can be
+ * overridden, and a named block, and returns the blocks that replace it.
  *
  * @param content The overrides of the pattern instance.
  *
  * @return The blocks of the editor after detaching.
  */
 function detachPatternWithArea( content: Record< string, unknown > ) {
-	const pattern = createBlock( 'core/block', { ref: 1, content }, [
-		createBlock(
-			'test/area',
-			{
-				metadata: {
-					name: 'Area',
-					bindings: { innerBlocks: PATTERN_OVERRIDES_BINDING },
-				},
-			},
-			[ createBlock( 'test/text', { content: 'Default' } ) ]
-		),
-		createBlock( 'test/text', {
-			content: 'Default',
-			metadata: {
-				name: 'Title',
-				bindings: { __default: PATTERN_OVERRIDES_BINDING },
-			},
-		} ),
+	return detachPattern( content, [
+		createArea( 'Area', [ createText( 'Default' ) ] ),
+		createText( 'Default', 'Title' ),
 	] );
-	const registry = createRegistry();
-	registry.register( blockEditorStore );
-	registry.dispatch( blockEditorStore ).resetBlocks( [ pattern ] );
-
-	convertSyncedPatternToStatic( pattern.clientId )( { registry } );
-
-	return registry.select( blockEditorStore ).getBlocks();
 }
 
 describe( 'convertSyncedPatternToStatic', () => {
@@ -99,8 +130,8 @@ describe( 'convertSyncedPatternToStatic', () => {
 		const [ area ] = detachPatternWithArea( {
 			Area: {
 				innerBlocks: serialize( [
-					createBlock( 'test/text', { content: 'First' } ),
-					createBlock( 'test/text', { content: 'Second' } ),
+					createText( 'First' ),
+					createText( 'Second' ),
 				] ),
 			},
 		} );
@@ -132,7 +163,86 @@ describe( 'convertSyncedPatternToStatic', () => {
 		} );
 	} );
 
-	it( 'does not apply the other overrides of the instance to the overridden inner blocks', () => {
+	it( 'keeps the inner blocks of the pattern when the block can not bind them', () => {
+		const [ area ] = detachPattern(
+			{
+				Area: {
+					innerBlocks: serialize( [ createText( 'Override' ) ] ),
+				},
+			},
+			[ createArea( 'Area', [ createText( 'Default' ) ] ) ],
+			{}
+		);
+
+		expect( getContents( area.innerBlocks ) ).toEqual( [ 'Default' ] );
+	} );
+
+	it( 'keeps the inner blocks of the pattern when the override is not block markup', () => {
+		const [ area ] = detachPatternWithArea( {
+			Area: { innerBlocks: '<p>Classic content</p>' },
+		} );
+
+		expect( getContents( area.innerBlocks ) ).toEqual( [ 'Default' ] );
+	} );
+
+	it.each( [
+		[ 'a no-break space', '\u00a0' ],
+		[ 'a byte order mark', '\ufeff' ],
+		[ 'a vertical tab', '\v' ],
+	] )(
+		'keeps the inner blocks of the pattern when the override starts with %s',
+		( _name, prefix ) => {
+			const [ area ] = detachPatternWithArea( {
+				Area: {
+					innerBlocks:
+						prefix + serialize( [ createText( 'Override' ) ] ),
+				},
+			} );
+
+			expect( getContents( area.innerBlocks ) ).toEqual( [ 'Default' ] );
+		}
+	);
+
+	it.each( [
+		[ 'a space', ' ' ],
+		[ 'a tab', '\t' ],
+		[ 'a newline', '\n' ],
+	] )(
+		'keeps the overridden inner blocks when they start with %s',
+		( _name, prefix ) => {
+			const [ area ] = detachPatternWithArea( {
+				Area: {
+					innerBlocks:
+						prefix + serialize( [ createText( 'Override' ) ] ),
+				},
+			} );
+
+			expect( getContents( area.innerBlocks ) ).toEqual( [ 'Override' ] );
+		}
+	);
+
+	it( 'applies the overrides of the instance to the blocks inside the overridden inner blocks', () => {
+		const [ area, title ] = detachPatternWithArea( {
+			Area: {
+				innerBlocks: serialize( [
+					createText( 'Stored', 'Title' ),
+					createText( 'Stored', 'Subtitle' ),
+				] ),
+			},
+			Title: { content: 'Overridden' },
+		} );
+
+		expect( area.innerBlocks.map( ( block ) => block.attributes ) ).toEqual(
+			[
+				{ content: 'Overridden', metadata: { name: 'Title' } },
+				{ content: 'Stored', metadata: { name: 'Subtitle' } },
+			]
+		);
+		expect( title.attributes.content ).toBe( 'Overridden' );
+	} );
+
+	it( 'applies the overrides of the instance only to the blocks bound to them inside the overridden inner blocks, which keep their other bindings', () => {
+		const otherBinding = { source: 'test/other' };
 		const [ area ] = detachPatternWithArea( {
 			Area: {
 				innerBlocks: serialize( [
@@ -140,17 +250,137 @@ describe( 'convertSyncedPatternToStatic', () => {
 						content: 'Stored',
 						metadata: {
 							name: 'Title',
-							bindings: { __default: PATTERN_OVERRIDES_BINDING },
+							bindings: {
+								content: PATTERN_OVERRIDES_BINDING,
+								url: otherBinding,
+							},
 						},
+					} ),
+					createBlock( 'test/text', {
+						content: 'Renamed',
+						metadata: { name: 'Title' },
+					} ),
+					createBlock( 'test/text', {
+						content: 'Bound elsewhere',
+						metadata: { bindings: { content: otherBinding } },
 					} ),
 				] ),
 			},
 			Title: { content: 'Overridden' },
 		} );
 
-		expect( area.innerBlocks[ 0 ].attributes.content ).toBe( 'Stored' );
-		expect( area.innerBlocks[ 0 ].attributes.metadata ).toEqual( {
-			name: 'Title',
-		} );
+		expect( area.innerBlocks.map( ( block ) => block.attributes ) ).toEqual(
+			[
+				{
+					content: 'Overridden',
+					metadata: {
+						name: 'Title',
+						bindings: { url: otherBinding },
+					},
+				},
+				{ content: 'Renamed', metadata: { name: 'Title' } },
+				{
+					content: 'Bound elsewhere',
+					metadata: { bindings: { content: otherBinding } },
+				},
+			]
+		);
+	} );
+
+	it( 'keeps the overridden inner blocks of the blocks inside overridden inner blocks', () => {
+		const [ outer ] = detachPattern(
+			{
+				Outer: {
+					innerBlocks: serialize( [
+						createText( 'Outer' ),
+						createArea( 'Inner', [ createText( 'Default' ) ] ),
+					] ),
+				},
+				Inner: {
+					innerBlocks: serialize( [
+						createText( 'Stored', 'Title' ),
+					] ),
+				},
+				Title: { content: 'Overridden' },
+			},
+			[ createArea( 'Outer', [ createText( 'Default' ) ] ) ]
+		);
+
+		const [ text, inner ] = outer.innerBlocks;
+		expect( text.attributes.content ).toBe( 'Outer' );
+		expect( inner.attributes.metadata ).toEqual( { name: 'Inner' } );
+		expect(
+			inner.innerBlocks.map( ( block ) => block.attributes )
+		).toEqual( [ { content: 'Overridden', metadata: { name: 'Title' } } ] );
+	} );
+
+	it( 'keeps the own inner blocks of a block overridden with the inner blocks it is in', () => {
+		const [ outer ] = detachPattern(
+			{
+				Area: {
+					innerBlocks: serialize( [
+						createText( 'Bound' ),
+						createArea( 'Area', [
+							createText( 'Inner own', 'Title' ),
+						] ),
+					] ),
+				},
+				Title: { content: 'Overridden' },
+			},
+			[ createArea( 'Area', [ createText( 'Outer own' ) ] ) ]
+		);
+
+		const [ text, inner ] = outer.innerBlocks;
+		expect( text.attributes.content ).toBe( 'Bound' );
+		expect( inner.attributes.metadata ).toEqual( { name: 'Area' } );
+		// The own inner blocks are overridden too.
+		expect(
+			inner.innerBlocks.map( ( block ) => block.attributes )
+		).toEqual( [ { content: 'Overridden', metadata: { name: 'Title' } } ] );
+	} );
+
+	it( 'keeps the own inner blocks of a block overridden with the inner blocks it is in, all the way down', () => {
+		const [ outer ] = detachPattern(
+			{
+				Area: {
+					innerBlocks: serialize( [
+						createArea( 'Area', [
+							createArea( 'Area', [ createText( 'Leaf' ) ] ),
+						] ),
+					] ),
+				},
+			},
+			[ createArea( 'Area', [ createText( 'Outer own' ) ] ) ]
+		);
+
+		const [ inner ] = outer.innerBlocks;
+		const [ innermost ] = inner.innerBlocks;
+		expect( getContents( innermost.innerBlocks ) ).toEqual( [ 'Leaf' ] );
+	} );
+
+	it( 'keeps the own inner blocks of a block nested in eight overridden inner blocks', () => {
+		const content: Record< string, unknown > = {};
+		for ( let level = 1; level <= 9; level++ ) {
+			content[ `Level ${ level }` ] = {
+				innerBlocks: serialize( [
+					createText( `Level ${ level }.` ),
+					createArea( `Level ${ level + 1 }`, [
+						createText( `Own ${ level + 1 }.` ),
+					] ),
+				] ),
+			};
+		}
+
+		let [ area ] = detachPattern( content, [
+			createArea( 'Level 1', [ createText( 'Own 1.' ) ] ),
+		] );
+
+		for ( let level = 1; level <= 8; level++ ) {
+			const [ text, nextArea ] = area.innerBlocks;
+			expect( text.attributes.content ).toBe( `Level ${ level }.` );
+			area = nextArea;
+		}
+		expect( area.attributes.metadata ).toEqual( { name: 'Level 9' } );
+		expect( getContents( area.innerBlocks ) ).toEqual( [ 'Own 9.' ] );
 	} );
 } );

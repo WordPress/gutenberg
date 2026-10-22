@@ -179,6 +179,48 @@ describe( 'bound inner blocks', () => {
 		] );
 	} );
 
+	it( 'updates the blocks its parents see when a block moves out of blocks nested in bound inner blocks to the root', () => {
+		actions().resetBlocks( [ container( 'host', [ text( 'a' ) ] ) ] );
+		bind( 'host', [ container( 'group', [ text( 'x' ), text( 'y' ) ] ) ] );
+
+		actions().moveBlockToPosition( 'x', 'group', '', 1 );
+
+		expect( clientIds( selectors().getBlocks() ) ).toEqual( [
+			'host',
+			'x',
+		] );
+	} );
+
+	it( 'leaves no blocks behind when a reset puts a controlled block in the own inner blocks of a bound block', () => {
+		actions().resetBlocks( [
+			container( 'inner-host', [ text( 'inner-own' ) ] ),
+			container( 'host', [ text( 'own' ) ] ),
+		] );
+		bind( 'inner-host', [ text( 'inner-bound' ) ] );
+		bind( 'host', [ text( 'bound' ) ] );
+
+		actions().resetBlocks( [
+			container( 'host', [
+				container( 'inner-host', [ text( 'inner-own' ) ] ),
+			] ),
+		] );
+
+		expect( selectors().getBlockName( 'inner-bound' ) ).toBeNull();
+		expect( selectors().getBlockName( 'inner-host' ) ).toBeNull();
+		expect( selectors().areInnerBlocksControlled( 'inner-host' ) ).toBe(
+			false
+		);
+		expect( selectors().getBoundInnerBlocks( 'inner-host' ) ).toBe(
+			undefined
+		);
+		expect( clientIds( selectors().getBlocks( 'host' ) ) ).toEqual( [
+			'bound',
+		] );
+		expect( clientIds( selectors().getBlocks()[ 0 ].innerBlocks ) ).toEqual(
+			[ 'inner-host' ]
+		);
+	} );
+
 	it( 'still removes the own inner blocks of other controlled blocks from their parents', () => {
 		actions().resetBlocks( [
 			{
@@ -252,6 +294,59 @@ describe( 'bound inner blocks', () => {
 			expect( selectors().getBlockEditingMode( 'a' ) ).toBe( 'default' );
 		} );
 
+		it( 'keeps editable bound inner blocks out of the sections the synced pattern is in', () => {
+			actions().resetBlocks( [
+				{
+					...createBlock(
+						'core/test-container',
+						{ metadata: { patternName: 'test/section' } },
+						[
+							{
+								...createBlock( 'core/block' ),
+								clientId: 'pattern',
+							},
+						]
+					),
+					clientId: 'section',
+				},
+			] );
+			actions().setHasControlledInnerBlocks( 'pattern', true );
+			actions().replaceInnerBlocks( 'pattern', [
+				{
+					...createBlock( 'core/test-container', {
+						metadata: {
+							name: 'Area',
+							bindings: {
+								innerBlocks: {
+									source: 'core/pattern-overrides',
+								},
+							},
+						},
+					} ),
+					clientId: 'host',
+				},
+			] );
+			actions().updateBlockListSettings( 'host', {} );
+			bind( 'host', [ text( 'a' ) ] );
+
+			actions().insertBlock(
+				container( 'inserted', [ text( 'inserted-text' ) ] ),
+				1,
+				'host'
+			);
+
+			expect( selectors().getBlockEditingMode( 'a' ) ).toBe( 'default' );
+			expect( selectors().getBlockEditingMode( 'inserted' ) ).toBe(
+				'default'
+			);
+			expect( selectors().getBlockEditingMode( 'inserted-text' ) ).toBe(
+				'default'
+			);
+			expect(
+				selectors().canInsertBlockType( 'core/test-container', 'host' )
+			).toBe( true );
+		} );
+
 		it( 'treats a synced pattern within editable bound inner blocks as a top-level one', () => {
 			bind( 'host', [
 				{ ...createBlock( 'core/block' ), clientId: 'nested-pattern' },
@@ -279,6 +374,48 @@ describe( 'bound inner blocks', () => {
 		expect(
 			selectors().__unstableHasActiveBlockOverlayActive( 'host' )
 		).toBe( false );
+	} );
+
+	it( 'identifies a change derived from another one, and the changes derived from it, with that change', () => {
+		actions().resetBlocks( [ text( 'a', '' ), text( 'b', '' ) ] );
+		actions().updateBlockAttributes( 'a', { content: 'h' } );
+		const origin = selectors().getLastBlockChangeOrigin();
+
+		actions().markNextChangeAsDerived();
+		actions().updateBlockAttributes( 'b', { content: 'h' } );
+		expect( selectors().isLastBlockChangePersistent() ).toBe( true );
+		expect( selectors().getLastBlockChangeOrigin() ).toBe( origin );
+
+		actions().markNextChangeAsDerived();
+		actions().updateBlockAttributes( 'b', { content: 'hi' } );
+		expect( selectors().isLastBlockChangePersistent() ).toBe( true );
+		expect( selectors().getLastBlockChangeOrigin() ).toBe( origin );
+
+		actions().updateBlockAttributes( 'b', { content: 'hey' } );
+		expect( selectors().getLastBlockChangeOrigin() ).not.toBe( origin );
+	} );
+
+	it( 'applies a mark that a derived change follows to it, and to no later change', () => {
+		actions().resetBlocks( [ text( 'a', '' ), text( 'b', '' ) ] );
+		actions().updateBlockAttributes( 'a', { content: 'h' } );
+
+		// As a source marks its change through the actions it writes with.
+		actions().markNextChangeAsDerived();
+		actions().__unstableMarkNextChangeAsNotPersistent( {
+			history: 'ignore',
+		} );
+		actions().markNextChangeAsDerived();
+		actions().updateBlockAttributes( 'b', { content: 'h' } );
+		expect( selectors().isLastBlockChangePersistent() ).toBe( false );
+		expect( selectors().__unstableGetLastBlockChangeHistoryMode() ).toBe(
+			'ignore'
+		);
+
+		actions().updateBlockAttributes( 'b', { content: 'x' } );
+		expect( selectors().isLastBlockChangePersistent() ).toBe( true );
+		expect( selectors().__unstableGetLastBlockChangeHistoryMode() ).toBe(
+			'persistent'
+		);
 	} );
 
 	it( 'lets a change derived from the previous one take its persistence without interrupting its coalescing', () => {

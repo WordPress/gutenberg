@@ -9,6 +9,7 @@ import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 vi.mock( import( '../../../store/actions' ), async ( importOriginal ) => {
 	const actions = await importOriginal();
 	return {
@@ -360,6 +361,66 @@ describe( 'useBlockSync hook', () => {
 			expect.objectContaining( { selection: expect.any( Object ) } )
 		);
 		expect( onInput ).not.toHaveBeenCalled();
+	} );
+
+	it( 'calls onInput for a change derived from a persistent change it reported, and onChange for one derived from a change it did not report', async () => {
+		const onChange = vi.fn();
+		const onInput = vi.fn();
+
+		const value1 = [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{ clientId: 'b', innerBlocks: [], attributes: { foo: 1 } },
+			{ clientId: 'c', innerBlocks: [], attributes: { foo: 1 } },
+		];
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
+			registry = reg;
+		};
+		render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				value={ value1 }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+		const {
+			markNextChangeAsDerived,
+			replaceInnerBlocks,
+			setHasControlledInnerBlocks,
+			updateBlockAttributes,
+		} = unlock( registry.dispatch( blockEditorStore ) );
+		setHasControlledInnerBlocks( 'c', true );
+		replaceInnerBlocks( 'c', [
+			{ clientId: 'd', innerBlocks: [], attributes: { foo: 1 } },
+		] );
+		onChange.mockClear();
+		onInput.mockClear();
+
+		// A change, and a change derived from it, like writing bound inner
+		// blocks back to their source.
+		updateBlockAttributes( 'a', { foo: 2 } );
+		markNextChangeAsDerived();
+		updateBlockAttributes( 'b', { foo: 2 } );
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onInput ).toHaveBeenCalledTimes( 1 );
+		expect( onInput ).toHaveBeenCalledWith(
+			[
+				expect.objectContaining( { attributes: { foo: 2 } } ),
+				expect.objectContaining( { attributes: { foo: 2 } } ),
+				expect.objectContaining( { clientId: 'c' } ),
+			],
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+
+		// A change in a nested controller, and a change derived from it.
+		updateBlockAttributes( 'd', { foo: 2 } );
+		markNextChangeAsDerived();
+		updateBlockAttributes( 'b', { foo: 3 } );
+
+		expect( onChange ).toHaveBeenCalledTimes( 2 );
+		expect( onInput ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'avoids updating the parent if there is a pending incoming change', async () => {

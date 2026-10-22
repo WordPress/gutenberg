@@ -420,12 +420,10 @@ const withBlockTree =
 				}
 				if ( action.toRootClientId ) {
 					updatedBlockUids.push( action.toRootClientId );
-				} else if (
-					newState.boundInnerBlocks?.has( action.fromRootClientId! )
-				) {
+				} else if ( newState.boundInnerBlocks?.size ) {
 					// Updating a controlled block stops at it, so the root
-					// needs its own update when receiving a bound block's
-					// inner block.
+					// needs its own update when receiving a block from bound
+					// inner blocks, or from blocks nested in them.
 					updatedBlockUids.push( '' );
 				}
 				newState.tree = new Map( newState.tree );
@@ -476,18 +474,8 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 			isNextChangeDerived = true;
 			return nextState;
 		}
-
-		// A change derived from the previous one, like writing the inner
-		// blocks of a bound block back to their source, takes that change's
-		// persistence and doesn't interrupt its coalescing.
-		if ( isNextChangeDerived && state && state !== nextState ) {
-			isNextChangeDerived = false;
-			const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
-			return {
-				...blockChange,
-				isPersistentChange: state.isPersistentChange,
-			};
-		}
+		const isDerivedChange =
+			isNextChangeDerived && !! state && state !== nextState;
 		isNextChangeDerived = false;
 
 		const pendingHistoryMode = nextHistoryMode;
@@ -495,6 +483,30 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
 				? ( action.history ?? 'merge' )
 				: undefined;
+
+		// A change derived from another one, like writing the inner blocks of
+		// a bound block back to their source, keeps the persistence of that
+		// change, unless it's marked otherwise, and doesn't interrupt its
+		// coalescing. Controllers that reported that change report this one
+		// as part of it.
+		if ( isDerivedChange ) {
+			const derivedFrom = state!.derivedFrom ?? state!;
+			const {
+				lastBlockChangeHistoryMode,
+				derivedFrom: previousDerivedFrom,
+				...blockChange
+			} = nextState;
+			const isIgnored =
+				pendingHistoryMode === 'ignore' ||
+				derivedFrom.lastBlockChangeHistoryMode === 'ignore';
+			return {
+				...blockChange,
+				isPersistentChange:
+					! pendingHistoryMode && derivedFrom.isPersistentChange,
+				...( isIgnored && { lastBlockChangeHistoryMode: 'ignore' } ),
+				derivedFrom,
+			};
+		}
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
@@ -518,15 +530,16 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
+		const { lastBlockChangeHistoryMode, derivedFrom, ...blockChange } =
+			nextState;
+
 		if ( pendingHistoryMode === 'ignore' ) {
 			return {
-				...nextState,
+				...blockChange,
 				isPersistentChange,
 				lastBlockChangeHistoryMode: 'ignore',
 			};
 		}
-
-		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
 
 		return { ...blockChange, isPersistentChange };
 	};
@@ -652,7 +665,9 @@ const withBlockReset =
 
 			// The inner blocks that `action.blocks` gives a bound block are
 			// its own ones: they stay in its tree entry, but the store holds
-			// the bound inner blocks.
+			// the bound inner blocks. They're removed before the controlled
+			// inner blocks are preserved, so that the controlled blocks they
+			// contain aren't.
 			const incomingBoundBlocks = new Map< string, Block >();
 			if ( preservedBoundInnerBlocks.size ) {
 				const stack = [ ...action.blocks ];
@@ -662,6 +677,9 @@ const withBlockReset =
 						incomingBoundBlocks.set( block.clientId, block );
 					}
 					stack.push( ...block.innerBlocks );
+				}
+				for ( const block of incomingBoundBlocks.values() ) {
+					removeBlocksFromState( newState, block.innerBlocks );
 				}
 			}
 
@@ -687,10 +705,6 @@ const withBlockReset =
 						const incomingBlock =
 							incomingBoundBlocks.get( clientId );
 						if ( incomingBlock ) {
-							removeBlocksFromState(
-								newState,
-								incomingBlock.innerBlocks
-							);
 							// The incoming own inner blocks are usually the
 							// ones the block had: keeping them as they are
 							// keeps them unchanged for its subscribers.
@@ -2920,23 +2934,25 @@ function traverseBlockTree(
 /**
  * Checks if a block has a parent in a list of client IDs, and if so returns the client ID of the parent.
  *
- * @param state     The current state object.
- * @param clientId  The client ID of the block to search the parents of.
- * @param clientIds The client IDs of the blocks to check.
+ * @param state            The current state object.
+ * @param clientId         The client ID of the block to search the parents of.
+ * @param clientIds        The client IDs of the blocks to check.
+ * @param boundaryClientId The client ID of a parent to stop the search at, if any.
  *
  * @return The client ID of the parent block if found, undefined otherwise.
  */
 function findParentInClientIdsList(
 	state: State,
 	clientId: string,
-	clientIds: string[]
+	clientIds: string[],
+	boundaryClientId?: string
 ): string | void {
 	if ( ! clientIds.length ) {
 		return;
 	}
 
 	let parent = state.blocks.parents.get( clientId );
-	while ( parent !== undefined ) {
+	while ( parent !== undefined && parent !== boundaryClientId ) {
 		if ( clientIds.includes( parent ) ) {
 			return parent;
 		}
@@ -3207,8 +3223,8 @@ function getDerivedBlockEditingModesForTree(
 		// Blocks within bound inner blocks follow the binding when a bound
 		// block is the closest of their synced pattern and bound block
 		// ancestors: they are disabled if it can't be edited, and are free from
-		// the synced pattern it may be in otherwise.
-		let isWithinEditableBoundInnerBlocks = false;
+		// the synced pattern and the sections it may be in otherwise.
+		let editableBoundBlockClientId: string | undefined;
 		if ( state.blocks.boundInnerBlocks?.size ) {
 			const boundaryClientId = findSyncedPatternOrBoundBlockParent(
 				state,
@@ -3229,13 +3245,13 @@ function getDerivedBlockEditingModesForTree(
 					derivedBlockEditingModes.set( clientId, 'disabled' );
 					return;
 				}
-				isWithinEditableBoundInnerBlocks = true;
+				editableBoundBlockClientId = boundaryClientId;
 			}
 		}
 
 		if (
 			syncedPatternClientIds.length &&
-			! isWithinEditableBoundInnerBlocks
+			editableBoundBlockClientId === undefined
 		) {
 			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
@@ -3290,7 +3306,10 @@ function getDerivedBlockEditingModesForTree(
 			const hasContentOnlyParent = !! findParentInClientIdsList(
 				state,
 				clientId,
-				contentOnlyParents
+				contentOnlyParents,
+				// Editable bound inner blocks aren't part of the sections
+				// around them.
+				editableBoundBlockClientId
 			);
 			if ( hasContentOnlyParent ) {
 				if ( isContentBlock( blockName ) ) {

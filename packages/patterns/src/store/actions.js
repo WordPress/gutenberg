@@ -8,6 +8,11 @@ import {
 } from '../constants';
 
 /**
+ * How many overridden inner blocks can be nested, as on the server.
+ */
+const MAX_NESTED_INNER_BLOCKS_OVERRIDES = 8;
+
+/**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
  *
  * @param {string}             title        Pattern title.
@@ -90,8 +95,27 @@ export const convertSyncedPatternToStatic =
 			.select( blockEditorStore )
 			.getBlock( clientId );
 		const existingOverrides = patternBlock.attributes?.content;
+		// The blocks whose inner blocks can be bound, as in the editor.
+		const supportedAttributes = registry
+			.select( blockEditorStore )
+			.getSettings().__experimentalBlockBindingsSupportedAttributes;
 
-		function cloneBlocksAndRemoveBindings( blocks ) {
+		/**
+		 * Clones blocks with the overrides of the pattern instance applied,
+		 * and without bindings.
+		 *
+		 * The blocks of overridden inner blocks belong to the instance: as in
+		 * the editor and on the frontend, only the ones bound to pattern
+		 * overrides take its overrides, and their other bindings stay.
+		 *
+		 * @param {WPBlock[]} blocks           The blocks.
+		 * @param {string[]}  [ancestorValues] The serialized overridden inner
+		 *                                     blocks the blocks are nested in.
+		 *
+		 * @return {WPBlock[]} The cloned blocks.
+		 */
+		function cloneBlocksAndRemoveBindings( blocks, ancestorValues = [] ) {
+			const isOverriddenInnerBlocks = ancestorValues.length > 0;
 			return blocks.map( ( block ) => {
 				let metadata = block.attributes.metadata;
 				let overriddenInnerBlocks;
@@ -100,8 +124,24 @@ export const convertSyncedPatternToStatic =
 					metadata = { ...metadata };
 					delete metadata.id;
 					delete metadata.bindings;
+					const otherBindings = Object.entries(
+						bindings ?? {}
+					).filter(
+						( [ , binding ] ) =>
+							binding?.source !== PATTERN_OVERRIDES_BINDING_SOURCE
+					);
+					if ( isOverriddenInnerBlocks && otherBindings.length ) {
+						metadata.bindings = Object.fromEntries( otherBindings );
+					}
+					const isOverridable =
+						! isOverriddenInnerBlocks ||
+						otherBindings.length <
+							Object.keys( bindings ?? {} ).length;
 					// Use overridden values of the pattern block if they exist.
-					if ( existingOverrides?.[ metadata.name ] ) {
+					if (
+						isOverridable &&
+						existingOverrides?.[ metadata.name ]
+					) {
 						// Iterate over each overridden attribute.
 						for ( const [ attributeName, value ] of Object.entries(
 							existingOverrides[ metadata.name ]
@@ -118,13 +158,29 @@ export const convertSyncedPatternToStatic =
 							// Update the block attribute with the override value.
 							block.attributes[ attributeName ] = value;
 						}
-						if (
+						const innerBlocksValue =
+							existingOverrides[ metadata.name ].innerBlocks;
+						// As on the server, overridden inner blocks aren't
+						// expanded inside themselves, nor nested too deep: the
+						// block keeps its own inner blocks instead.
+						const parsedInnerBlocks =
 							bindings?.innerBlocks?.source ===
-							PATTERN_OVERRIDES_BINDING_SOURCE
-						) {
-							overriddenInnerBlocks = parseInnerBlocksOverride(
-								existingOverrides[ metadata.name ].innerBlocks
-							);
+								PATTERN_OVERRIDES_BINDING_SOURCE &&
+							supportedAttributes?.[ block.name ]?.includes(
+								'innerBlocks'
+							) &&
+							ancestorValues.length <
+								MAX_NESTED_INNER_BLOCKS_OVERRIDES &&
+							! ancestorValues.includes( innerBlocksValue )
+								? parseInnerBlocksOverride( innerBlocksValue )
+								: undefined;
+						if ( parsedInnerBlocks ) {
+							// The blocks inside them are overridden too.
+							overriddenInnerBlocks =
+								cloneBlocksAndRemoveBindings(
+									parsedInnerBlocks,
+									[ ...ancestorValues, innerBlocksValue ]
+								);
 						}
 					}
 				}
@@ -136,10 +192,11 @@ export const convertSyncedPatternToStatic =
 								? metadata
 								: undefined,
 					},
-					// The overridden inner blocks hold their own values, so the
-					// other overrides of the instance don't apply to them.
 					overriddenInnerBlocks ??
-						cloneBlocksAndRemoveBindings( block.innerBlocks )
+						cloneBlocksAndRemoveBindings(
+							block.innerBlocks,
+							ancestorValues
+						)
 				);
 			} );
 		}

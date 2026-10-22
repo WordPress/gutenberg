@@ -22,6 +22,16 @@ import {
 
 const SOURCE = 'test/inner-blocks';
 const CONTEXT_SOURCE = 'test/inner-blocks-from-context';
+const PRIVATE_SOURCE = 'test/inner-blocks-with-private-actions';
+const NAMED_SOURCE = 'test/inner-blocks-of-named-blocks';
+
+interface BoundResult {
+	value: Block[];
+	onChange: Function;
+	onInput: Function;
+	boundInnerBlocks: { editable: boolean };
+	ancestorKeys: string[];
+}
 
 const blockSettings = {
 	apiVersion: 3,
@@ -154,11 +164,53 @@ describe( 'useBoundInnerBlocks', () => {
 			},
 			canUserEditValue: () => true,
 		} );
+		// A source that writes its value back with the private actions of the
+		// block editor.
+		registerBlockBindingsSource( {
+			name: PRIVATE_SOURCE,
+			label: 'Private',
+			usesContext: [ 'test/key' ],
+			getValues: () => ( { innerBlocks: getStoredValue() } ),
+			setValues: ( {
+				dispatch: sourceDispatch,
+				bindings,
+			}: {
+				dispatch: typeof dispatch;
+				bindings: Record< string, { newValue: string } >;
+			} ) => {
+				unlock(
+					sourceDispatch( blockEditorStore )
+				).updateBlockAttributes( 'storage', {
+					content: bindings.innerBlocks.newValue,
+				} );
+			},
+			canUserEditValue: () => true,
+		} );
+		// A source whose values can only be edited for blocks with a name.
+		registerBlockBindingsSource( {
+			name: NAMED_SOURCE,
+			label: 'Named',
+			usesContext: [ 'test/key' ],
+			getValues: () => ( { innerBlocks: getStoredValue() } ),
+			setValues: () => {},
+			canUserEditValue: ( {
+				select: sourceSelect,
+				clientId,
+			}: {
+				select: typeof select;
+				clientId: string;
+			} ) =>
+				!! sourceSelect( blockEditorStore ).getBlockAttributes(
+					clientId
+				)?.metadata?.name,
+		} );
 	} );
 
 	afterAll( () => {
 		unregisterBlockBindingsSource( SOURCE );
 		unregisterBlockBindingsSource( CONTEXT_SOURCE );
+		unregisterBlockBindingsSource( PRIVATE_SOURCE );
+		unregisterBlockBindingsSource( NAMED_SOURCE );
 		unregisterBlockType( 'core/test-container' );
 		unregisterBlockType( 'core/test-text' );
 		unregisterBlockType( 'core/test-provider' );
@@ -171,6 +223,7 @@ describe( 'useBoundInnerBlocks', () => {
 			},
 		} );
 		actions().resetBlocks( [ storage(), host( [ text( 'own' ) ] ) ] );
+		actions().clearSelectedBlock();
 	} );
 
 	it( 'uses the own inner blocks while the source has no value', () => {
@@ -228,6 +281,29 @@ describe( 'useBoundInnerBlocks', () => {
 		expect( ( result.current as { value: Block[] } ).value ).toBe( edited );
 	} );
 
+	it( 'gives the own inner blocks back anew after a value that came and went before it rendered again, so that they replace its blocks', () => {
+		const { result } = renderBoundInnerBlocks();
+		const ownValue = ( result.current as BoundResult ).value;
+		act( () => {
+			actions().selectBlock( 'host' );
+		} );
+
+		act( () => {
+			( result.current as BoundResult ).onChange(
+				[ text( 'own', 'Typed' ) ],
+				{}
+			);
+			// An undo, before the block renders again.
+			actions().updateBlockAttributes( 'storage', {
+				content: undefined,
+			} );
+		} );
+
+		const { value } = result.current as BoundResult;
+		expect( value ).not.toBe( ownValue );
+		expect( value.map( ( block ) => block.clientId ) ).toEqual( [ 'own' ] );
+	} );
+
 	it( 'writes no changes back that sync the inner blocks, or that it no longer controls', () => {
 		actions().updateBlockAttributes( 'storage', { content: '' } );
 		const { result } = renderBoundInnerBlocks();
@@ -252,28 +328,73 @@ describe( 'useBoundInnerBlocks', () => {
 		expect( getStoredValue() ).toBe( '' );
 	} );
 
-	it( 'gives the source no value until the user edits the own inner blocks', () => {
+	it( 'gives the source no value for changes to the own inner blocks that the user does not make', () => {
 		const { result } = renderBoundInnerBlocks();
 
 		act( () => {
-			( result.current as { onChange: Function } ).onChange(
-				[ text( 'normalized' ) ],
+			// A block that updates its attributes as it mounts.
+			( result.current as BoundResult ).onChange(
+				[ text( 'own', 'normalized' ) ],
+				{}
+			);
+			// A block that inserts the blocks of its template as it mounts.
+			( result.current as BoundResult ).onInput(
+				[ text( 'own' ), text( 'template' ) ],
 				{}
 			);
 		} );
-		expect( getStoredValue() ).toBeUndefined();
 
+		expect( getStoredValue() ).toBeUndefined();
+	} );
+
+	it( 'gives the source the own inner blocks once the user edits them', () => {
+		const { result } = renderBoundInnerBlocks();
 		act( () => {
 			actions().replaceInnerBlocks( 'host', [ text( 'typed' ) ] );
 			actions().selectBlock( 'typed' );
 		} );
+
 		act( () => {
-			( result.current as { onChange: Function } ).onChange(
-				[ text( 'typed', 'Typed' ) ],
+			( result.current as BoundResult ).onInput(
+				[ text( 'own', 'Typed' ) ],
 				{}
 			);
 		} );
+
 		expect( getStoredValue() ).toContain( 'Typed' );
+	} );
+
+	it( 'gives the source the own inner blocks once the user moves a block into them, wherever the selection is', () => {
+		const { result } = renderBoundInnerBlocks();
+		act( () => {
+			actions().selectBlock( 'storage' );
+		} );
+
+		act( () => {
+			( result.current as BoundResult ).onChange(
+				[ text( 'own' ), text( 'dragged' ) ],
+				{}
+			);
+		} );
+
+		expect( getStoredValue() ).toBe(
+			serialize( [ text( 'own' ), text( 'dragged' ) ], {
+				isInnerBlocks: true,
+			} )
+		);
+	} );
+
+	it( 'gives the source the own inner blocks once the user moves a block out of them, wherever the selection is', () => {
+		const { result } = renderBoundInnerBlocks();
+		act( () => {
+			actions().selectBlock( 'storage' );
+		} );
+
+		act( () => {
+			( result.current as BoundResult ).onChange( [], {} );
+		} );
+
+		expect( getStoredValue() ).toBe( '' );
 	} );
 
 	it( 'gives the change it writes back the persistence of the edit', () => {
@@ -299,6 +420,85 @@ describe( 'useBoundInnerBlocks', () => {
 	it( 'is not bound without the context the source uses', () => {
 		const { result } = renderBoundInnerBlocks( { context: {} } );
 		expect( result.current ).toBe( 'unbound' );
+	} );
+
+	it( 'lets a source write back with private actions', () => {
+		actions().resetBlocks( [
+			storage(),
+			host( [ text( 'own' ) ], PRIVATE_SOURCE ),
+		] );
+		actions().updateBlockAttributes( 'storage', { content: '' } );
+		const { result } = renderBoundInnerBlocks();
+
+		act( () => {
+			( result.current as BoundResult ).onChange(
+				[ text( 'edited' ) ],
+				{}
+			);
+		} );
+
+		expect( getStoredValue() ).toBe(
+			serialize( [ text( 'edited' ) ], { isInnerBlocks: true } )
+		);
+	} );
+
+	it( 'asks the source whether the inner blocks of the block can be edited', () => {
+		actions().resetBlocks( [
+			storage(),
+			host( [ text( 'own' ) ], NAMED_SOURCE ),
+		] );
+		const { result } = renderBoundInnerBlocks();
+		expect(
+			( result.current as BoundResult ).boundInnerBlocks.editable
+		).toBe( false );
+
+		act( () => {
+			actions().updateBlockAttributes( 'host', {
+				metadata: {
+					name: 'Area',
+					bindings: { innerBlocks: { source: NAMED_SOURCE } },
+				},
+			} );
+		} );
+		expect(
+			( result.current as BoundResult ).boundInnerBlocks.editable
+		).toBe( true );
+	} );
+
+	it( 'adds values, but not the own inner blocks, to the bound inner blocks that its inner blocks are in', () => {
+		const { result } = renderBoundInnerBlocks( {
+			ancestorKeys: [ 'outer' ],
+		} );
+		expect( ( result.current as BoundResult ).ancestorKeys ).toEqual( [
+			'outer',
+		] );
+
+		act( () => {
+			actions().updateBlockAttributes( 'storage', { content: '' } );
+		} );
+		expect( ( result.current as BoundResult ).ancestorKeys ).toEqual( [
+			'outer',
+			`${ SOURCE }|`,
+		] );
+	} );
+
+	it( 'is not bound to a value within too many others, unlike to its own inner blocks', () => {
+		const { result } = renderBoundInnerBlocks( {
+			ancestorKeys: Array.from(
+				{ length: 8 },
+				( _, index ) => `${ SOURCE }|${ index }`
+			),
+		} );
+		expect(
+			( result.current as BoundResult ).value.map(
+				( block ) => block.clientId
+			)
+		).toEqual( [ 'own' ] );
+
+		act( () => {
+			actions().updateBlockAttributes( 'storage', { content: '' } );
+		} );
+		expect( result.current ).toBeUndefined();
 	} );
 
 	it( 'is not bound within itself', () => {

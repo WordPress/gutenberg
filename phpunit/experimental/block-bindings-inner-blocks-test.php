@@ -39,10 +39,17 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 				unregister_block_bindings_source( $source_name );
 			}
 		}
+		foreach ( array_keys( WP_Block_Type_Registry::get_instance()->get_all_registered() ) as $block_name ) {
+			if ( str_starts_with( $block_name, 'test/' ) ) {
+				unregister_block_type( $block_name );
+			}
+		}
 		unregister_post_meta( 'post', 'tests_inner_blocks' );
 		gutenberg_block_bindings_get_inner_blocks_state( true );
 		// Rendering layouts stores their styles.
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		// A block whose rendering throws stays the block to render.
+		WP_Block_Supports::$block_to_render = null;
 
 		parent::tear_down();
 	}
@@ -177,6 +184,45 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertSame( array( 'innerBlocks' ), $supported_attributes['core/column'] );
 		$this->assertArrayNotHasKey( 'core/quote', $supported_attributes );
 		$this->assertSame( array( 'content' ), $supported_attributes['core/paragraph'] );
+	}
+
+	public function data_priorities_of_a_filter_that_returns_null() {
+		return array(
+			'before the filter that adds inner blocks' => array( 5 ),
+			'after it'                                 => array( 20 ),
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_block_bindings_add_inner_blocks_support
+	 * @covers ::gutenberg_block_bindings_restrict_inner_blocks_support
+	 *
+	 * @dataProvider data_priorities_of_a_filter_that_returns_null
+	 *
+	 * @param int $priority The priority of the filter.
+	 */
+	public function test_blocks_render_when_a_filter_returns_null_for_the_supported_attributes( $priority ) {
+		$this->values['area'] = self::paragraph( 'Bound' );
+		$paragraph            = do_blocks( self::paragraph( 'Text' ) );
+		$bound                = self::bound_group( 'area', self::paragraph( 'Own' ) );
+
+		// A filter for a single block type that returns nothing for the others.
+		$filter_one_block_type = static function ( $supported_attributes, $block_type ) {
+			return 'test/made-up' === $block_type ? $supported_attributes : null;
+		};
+		add_filter( 'block_bindings_supported_attributes', $filter_one_block_type, $priority, 2 );
+
+		$this->assertSame( $paragraph, do_blocks( self::paragraph( 'Text' ) ) );
+		$this->assertEqualHTML(
+			do_blocks( self::group( self::paragraph( 'Own' ) ) ),
+			do_blocks( $bound ),
+			'<body>',
+			'The group should render its own inner blocks, as no attribute supports bindings.'
+		);
+
+		remove_filter( 'block_bindings_supported_attributes', $filter_one_block_type, $priority );
+
+		$this->assertEqualHTML( do_blocks( self::group( self::paragraph( 'Bound' ) ) ), do_blocks( $bound ) );
 	}
 
 	public function data_values_that_supply_no_inner_blocks() {
@@ -387,10 +433,10 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 
 	/**
 	 * Returns the markup of a Pattern block that renders a synced pattern, with
-	 * overrides for its block named "Area".
+	 * overrides for its blocks.
 	 *
 	 * @param string $pattern   The content of the synced pattern.
-	 * @param array  $overrides The overrides of the block named "Area".
+	 * @param array  $overrides The overrides, keyed by the name of the block they apply to.
 	 * @return string The block markup.
 	 */
 	private static function synced_pattern( $pattern, $overrides ) {
@@ -406,7 +452,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 			'core/block',
 			array(
 				'ref'     => $pattern_id,
-				'content' => array( 'Area' => $overrides ),
+				'content' => $overrides,
 			),
 			''
 		);
@@ -424,7 +470,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 			'<div class="wp-block-group">' . self::paragraph( 'Own' ) . '</div>'
 		);
 
-		$content = self::synced_pattern( $pattern, array( 'innerBlocks' => self::paragraph( 'Override' ) ) );
+		$content = self::synced_pattern( $pattern, array( 'Area' => array( 'innerBlocks' => self::paragraph( 'Override' ) ) ) );
 		$output  = do_blocks( $content );
 
 		$this->assertStringContainsString( 'Override', $output );
@@ -444,10 +490,45 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 			'<div class="wp-block-group">' . self::paragraph( 'Own' ) . '</div>'
 		);
 
-		$output = do_blocks( self::synced_pattern( $pattern, array( 'innerBlocks' => self::paragraph( 'Override' ) ) ) );
+		$output = do_blocks( self::synced_pattern( $pattern, array( 'Area' => array( 'innerBlocks' => self::paragraph( 'Override' ) ) ) ) );
 
 		$this->assertStringContainsString( 'Own', $output );
 		$this->assertStringNotContainsString( 'Override', $output );
+	}
+
+	public function test_pattern_overrides_apply_to_blocks_in_the_inner_blocks_they_supply() {
+		$pattern   = get_comment_delimited_block_content(
+			'core/group',
+			array(
+				'metadata' => array(
+					'name'     => 'area',
+					'bindings' => array( 'innerBlocks' => array( 'source' => 'core/pattern-overrides' ) ),
+				),
+			),
+			'<div class="wp-block-group">' . self::paragraph( 'Pattern' ) . '</div>'
+		);
+		$paragraph = get_comment_delimited_block_content(
+			'core/paragraph',
+			array(
+				'metadata' => array(
+					'name'     => 'p',
+					'bindings' => array( '__default' => array( 'source' => 'core/pattern-overrides' ) ),
+				),
+			),
+			'<p>Own</p>'
+		);
+
+		$output = do_blocks(
+			self::synced_pattern(
+				$pattern,
+				array(
+					'area' => array( 'innerBlocks' => $paragraph ),
+					'p'    => array( 'content' => 'Override' ),
+				)
+			)
+		);
+
+		$this->assertEqualHTML( do_blocks( self::group( self::paragraph( 'Override' ) ) ), $output );
 	}
 
 	public function test_post_meta_does_not_supply_inner_blocks() {
@@ -549,6 +630,97 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 			do_blocks( self::bound_group( 'third' ) ),
 			'The third group should render its value when it renders on its own.'
 		);
+	}
+
+	public function test_group_renders_the_value_after_it_is_resolved_for_a_block_that_never_renders() {
+		$this->values['area'] = self::paragraph( 'Bound' );
+		$bound                = self::bound_group( 'area', self::paragraph( 'Own' ) );
+
+		// Resolve the binding of a block that is gone right after, without rendering.
+		get_block_bindings_source( 'test/inner-blocks' )->get_value( array( 'key' => 'area' ), new WP_Block( parse_blocks( $bound )[0] ), 'innerBlocks' );
+		$output = do_blocks( $bound );
+
+		$this->assertEqualHTML( do_blocks( self::group( self::paragraph( 'Bound' ) ) ), $output );
+	}
+
+	public function test_values_resolved_for_a_block_that_never_renders_do_not_count_towards_the_megabyte() {
+		$this->values['leak']   = self::paragraph( str_repeat( 'a', 600 * KB_IN_BYTES ) );
+		$this->values['first']  = self::paragraph( str_repeat( 'b', 600 * KB_IN_BYTES ) ) . self::bound_group( 'second', self::paragraph( 'Own 2.' ) );
+		$this->values['second'] = self::paragraph( 'Bound 2.' );
+
+		// Resolve the binding of a block that is gone right after, without rendering.
+		get_block_bindings_source( 'test/inner-blocks' )->get_value( array( 'key' => 'leak' ), new WP_Block( parse_blocks( self::bound_group( 'leak' ) )[0] ), 'innerBlocks' );
+		$output = do_blocks( self::bound_group( 'first', self::paragraph( 'Own 1.' ) ) );
+
+		$this->assertStringContainsString( 'Bound 2.', $output );
+		$this->assertStringNotContainsString( 'Own 2.', $output );
+	}
+
+	/**
+	 * Registers a block whose rendering throws an exception the first time.
+	 */
+	private static function register_block_that_throws_once() {
+		$throws = true;
+		register_block_type(
+			'test/throws',
+			array(
+				'render_callback' => static function () use ( &$throws ) {
+					if ( $throws ) {
+						$throws = false;
+						throw new RuntimeException( 'Rendering failed.' );
+					}
+					return '<p>Rendered</p>';
+				},
+			)
+		);
+	}
+
+	public function test_group_renders_the_value_again_after_rendering_it_threw() {
+		self::register_block_that_throws_once();
+		$this->values['area'] = self::paragraph( 'Bound' ) . '<!-- wp:test/throws /-->';
+		$bound                = self::bound_group( 'area', self::paragraph( 'Own' ) );
+
+		$message = null;
+		try {
+			do_blocks( $bound );
+		} catch ( RuntimeException $exception ) {
+			$message = $exception->getMessage();
+		}
+		$output = do_blocks( $bound );
+
+		$this->assertSame( 'Rendering failed.', $message, 'Rendering the value should throw the first time.' );
+		$this->assertEqualHTML( do_blocks( self::group( self::paragraph( 'Bound' ) . '<!-- wp:test/throws /-->' ) ), $output );
+	}
+
+	public function test_group_renders_the_value_again_after_an_exception_was_caught_inside_it() {
+		self::register_block_that_throws_once();
+		register_block_type(
+			'test/catches',
+			array(
+				'skip_inner_blocks' => true,
+				'render_callback'   => static function ( $attributes, $content, $block ) {
+					$output = '';
+					foreach ( $block->inner_blocks as $inner_block ) {
+						try {
+							$output .= $inner_block->render();
+						} catch ( RuntimeException $exception ) {
+							$output .= '<p>Failed</p>';
+						}
+					}
+					return $output;
+				},
+			)
+		);
+		$this->values['area']  = '<!-- wp:test/catches -->' . self::bound_group( 'inner' ) . '<!-- /wp:test/catches -->';
+		$this->values['inner'] = '<!-- wp:test/throws /-->';
+		$bound                 = self::bound_group( 'area', self::paragraph( 'Own' ) );
+
+		// Inside another block, the first group is still there when the second renders.
+		$output = do_blocks( self::group( $bound . $bound ) );
+
+		$this->assertStringContainsString( 'Failed', $output, 'The first group should render the value, which throws inside it.' );
+		$this->assertStringContainsString( 'Rendered', $output, 'The second group should render the value.' );
+		$this->assertStringNotContainsString( 'Own', $output );
 	}
 
 	public function test_markup_from_the_source_is_sanitized() {

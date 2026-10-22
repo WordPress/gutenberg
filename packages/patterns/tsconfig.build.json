@@ -1,6 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"compilerOptions": {
+		"checkJs": false
+	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },
@@ -17,9 +20,5 @@
 		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url/tsconfig.build.json" }
-	],
-	// Only the TypeScript sources are checked. The JavaScript sources stay
-	// unchecked, and the package stays untyped for its consumers through the
-	// `paths` of the base configuration.
-	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+	]
 }

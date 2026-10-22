@@ -426,11 +426,15 @@ export default function useBlockSync( {
 			areInnerBlocksControlled,
 			getBlockParents,
 		} = registry.select( blockEditorStore );
+		const { getLastBlockChangeOrigin } = unlock(
+			registry.select( blockEditorStore )
+		);
 
 		let blocks = getBlocks( clientId );
 		let isPersistent = isLastBlockChangePersistent();
 		let blockHistoryMode = __unstableGetLastBlockChangeHistoryMode();
 		let previousAreBlocksDifferent = false;
+		let reportedChangeOrigin: object | undefined;
 		let prevSelectionStart = getSelectionStart();
 		let prevSelectionEnd = getSelectionEnd();
 
@@ -520,9 +524,16 @@ export default function useBlockSync( {
 							blocksForParent
 						);
 
-						const updateParent = isPersistent
-							? onChangeRef.current
-							: onInputRef.current;
+						// A change derived from one already reported, like
+						// writing bound inner blocks back to their source, is
+						// part of it.
+						const changeOrigin = getLastBlockChangeOrigin();
+						const updateParent =
+							isPersistent &&
+							changeOrigin !== reportedChangeOrigin
+								? onChangeRef.current
+								: onInputRef.current;
+						reportedChangeOrigin = changeOrigin;
 						const updateOptions: Parameters< OnBlockUpdate >[ 1 ] =
 							{
 								selection: selectionForParent,

@@ -540,6 +540,11 @@ export interface BlocksState {
 	isPersistentChange?: boolean;
 	isIgnoredChange?: boolean;
 	lastBlockChangeHistoryMode?: HistoryMode;
+	/**
+	 * For a change derived from another one, like writing bound inner blocks
+	 * back to their source, the state that change resulted in.
+	 */
+	derivedFrom?: BlocksState;
 }
 
 export interface SelectionState {
