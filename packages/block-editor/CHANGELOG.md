@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `Iframe`: Add a `fitContent` prop that sizes the iframe to its document so the closest scrollable ancestor scrolls the canvas instead ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 
 ### Bug Fixes
@@ -46,7 +47,6 @@
 
 ### Enhancements
 
--   `Iframe`: Add a `fitContent` prop that sizes the iframe to its document so the closest scrollable ancestor scrolls the canvas instead ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
 -   Migrate `FontFamilyControl` to `@wordpress/ui` ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
