@@ -1693,6 +1693,29 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that children of manual grids take the grid interactivity flag from the
+	 * `gutenberg_layout_has_grid_interactivity` filter, not from the experiments option.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_reads_grid_interactivity_from_filter() {
+		remove_filter( 'gutenberg_layout_has_grid_interactivity', 'gutenberg_layout_enable_grid_interactivity' );
+		add_filter( 'gutenberg_layout_has_grid_interactivity', '__return_true' );
+
+		$rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnStart' => 2 ),
+			array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'isManualPlacement' => true,
+			)
+		);
+
+		$this->assertSame( '1', $rules[0]['declarations']['--wp--grid-item--row-span'] );
+	}
+
+	/**
 	 * Check that manual placement grids size their rows by their content when the grid
 	 * interactivity experiment is off.
 	 *
