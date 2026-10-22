@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Style Book: Use the design system outline for focused preview cards.
+-   Style Book: Use the design system outline for focused preview cards ([#85370](https://github.com/WordPress/gutenberg/pull/85370)).
 
 ### Bug Fixes
 
