@@ -1,15 +1,6 @@
 import { AnchorMdx } from '@storybook/addon-docs/blocks';
-import { Tooltip } from '@wordpress/ui';
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 import styles from './copy-token-button.module.css';
-
-const visuallyHiddenStyle = {
-	position: 'absolute',
-	width: 1,
-	height: 1,
-	overflow: 'hidden',
-	clipPath: 'inset(50%)',
-	whiteSpace: 'nowrap',
-} as const;
 
 /**
  * Link to a token's own URL hash, shown as `#` with a "Share link" tooltip.
@@ -31,9 +22,9 @@ export function ShareTokenLink( { id, name }: { id: string; name: string } ) {
 				<AnchorMdx href={ `#${ id }` } target="_self">
 					<span aria-hidden="true">#</span>
 					{ /* `AnchorMdx` drops `aria-*` props, so name the link with text. */ }
-					<span style={ visuallyHiddenStyle }>
+					<VisuallyHidden render={ <span /> }>
 						Share link to { name }
-					</span>
+					</VisuallyHidden>
 				</AnchorMdx>
 			</Tooltip.Trigger>
 			<Tooltip.Popup>Share link</Tooltip.Popup>

@@ -1,24 +1,14 @@
+import { speak } from '@wordpress/a11y';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { check, copySmall } from '@wordpress/icons';
 import {
 	// Storybook documentation only, which does not run in a WordPress environment.
 	// eslint-disable-next-line @wordpress/use-recommended-components
-	Button,
-	Icon,
-	Tooltip,
+	IconButton,
 } from '@wordpress/ui';
 import styles from './copy-token-button.module.css';
 
 const COPIED_DURATION_MS = 2000;
-
-const visuallyHiddenStyle = {
-	position: 'absolute',
-	width: 1,
-	height: 1,
-	overflow: 'hidden',
-	clipPath: 'inset(50%)',
-	whiteSpace: 'nowrap',
-} as const;
 
 /**
  * Copies text with the Clipboard API, falling back to `execCommand` where
@@ -82,6 +72,7 @@ export function CopyTokenButton( {
 			return;
 		}
 		setCopied( true );
+		speak( 'Copied' );
 		clearTimeout( timeoutRef.current );
 		timeoutRef.current = setTimeout(
 			() => setCopied( false ),
@@ -90,35 +81,16 @@ export function CopyTokenButton( {
 	};
 
 	return (
-		<>
-			<Tooltip.Root>
-				{ /* Keep the tooltip open on click so it can show "Copied". */ }
-				<Tooltip.Trigger
-					closeOnClick={ false }
-					className={ styles.button }
-					render={
-						<Button
-							data-copied={ copied || undefined }
-							variant="minimal"
-							tone="neutral"
-							size="small"
-							aria-label={ label }
-							aria-describedby={ describedBy }
-							onClick={ onClick }
-						/>
-					}
-				>
-					<Icon
-						icon={ copied ? check : copySmall }
-						size={ 24 }
-						className={ styles.icon }
-					/>
-				</Tooltip.Trigger>
-				<Tooltip.Popup>{ label }</Tooltip.Popup>
-			</Tooltip.Root>
-			<span role="status" style={ visuallyHiddenStyle }>
-				{ copied ? 'Copied' : '' }
-			</span>
-		</>
+		<IconButton
+			className={ styles.button }
+			data-copied={ copied || undefined }
+			variant="minimal"
+			tone="neutral"
+			size="small"
+			icon={ copied ? check : copySmall }
+			label={ label }
+			aria-describedby={ describedBy }
+			onClick={ onClick }
+		/>
 	);
 }

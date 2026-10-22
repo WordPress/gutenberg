@@ -1,9 +1,4 @@
 .button {
-	/* Square icon-only button, matching `IconButton` from `@wordpress/ui`. */
-	--wp-ui-button-aspect-ratio: 1;
-	--wp-ui-button-padding-inline: 0px;
-	--wp-ui-button-min-width: unset;
-
 	opacity: 0;
 	transition: opacity 0.1s;
 	flex-shrink: 0;
@@ -27,11 +22,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		transition: none;
 	}
-}
-
-/* Compensate for the button's border so the icon fills it edge to edge. */
-.icon {
-	margin: -1px;
 }
 
 /*
