@@ -2030,6 +2030,41 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that a block placed freely in a manual grid takes the grid interactivity flag
+	 * from the `gutenberg_layout_has_grid_interactivity` filter, not the experiments option.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_reads_grid_item_box_flag_from_filter() {
+		remove_filter( 'gutenberg_layout_has_grid_interactivity', 'gutenberg_layout_enable_grid_interactivity' );
+		add_filter( 'gutenberg_layout_has_grid_interactivity', '__return_true' );
+
+		$rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'columnStart' => 1,
+				'columnSpan'  => 2,
+				'rowStart'    => 1,
+				'rowSpan'     => 1,
+				'box'         => array(
+					'left'   => 0.25,
+					'top'    => 0,
+					'width'  => 0.5,
+					'height' => 1,
+				),
+			),
+			array(
+				'isManualPlacement' => true,
+				'columnCount'       => 4,
+			),
+			null,
+			true
+		);
+
+		$this->assertSame( '25%', $rules[0]['declarations']['--wp--grid-item--box-left'] );
+	}
+
+	/**
 	 * Check that a block placed freely in a manual grid publishes its box inside its cells,
 	 * and applies it where the cells have a fixed size.
 	 *

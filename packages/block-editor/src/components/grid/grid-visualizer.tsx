@@ -25,7 +25,6 @@ import {
 	getGridInfo,
 	getGridItemRect,
 	getBoundingGridRect,
-	isGridElementWithFixedCells,
 	getGridItemMeasurements,
 	getGridTrackPositions,
 	getGridRectFromPixelRect,
@@ -658,7 +657,7 @@ function GridVisualizerDropLayer( {
 			return;
 		}
 
-		const { columnTracks, rowTracks, siblings, src } =
+		const { columnTracks, rowTracks, siblings, src, hasFixedCells } =
 			getMeasurements( srcClientId );
 		if ( ! columnTracks.length || ! rowTracks.length ) {
 			clearDropTarget();
@@ -720,7 +719,7 @@ function GridVisualizerDropLayer( {
 		// Where the grid's cells have a fixed size, a block lands exactly
 		// where it is let go, and Shift snaps its corner to the grid lines.
 		// Touch drags have no Shift, so they are always free.
-		const freeTarget = isGridElementWithFixedCells( gridElement )
+		const freeTarget = hasFixedCells
 			? getFreeGridDropTarget( {
 					...dropTargetOptions,
 					angle: srcAngle,

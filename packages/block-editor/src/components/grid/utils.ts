@@ -443,7 +443,13 @@ export function getGridItemMeasurements(
 			),
 		} );
 	}
-	return { columnTracks, rowTracks, siblings, src };
+	return {
+		columnTracks,
+		rowTracks,
+		siblings,
+		src,
+		hasFixedCells: isGridElementWithFixedCells( gridElement ),
+	};
 }
 
 /**

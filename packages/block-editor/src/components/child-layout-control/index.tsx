@@ -20,7 +20,7 @@ import {
 	isGridStackedOnMobile,
 } from '../grid/mobile-stacking';
 import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
-import { getGridItemBox } from '../../hooks/layout-child';
+import { getGridItemBox } from '../grid/free-placement';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import type { GridBlockAttributes, GridChild } from '../grid/mobile-stacking';
 import type { GridItemAttributes } from '../grid/types';

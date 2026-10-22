@@ -384,6 +384,9 @@ function gutenberg_get_grid_item_box_percent( $fraction ) {
  * @return array Child layout style rules.
  */
 function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array(), $viewport_overrides = null, $has_box = false ) {
+	/** This filter is documented in lib/block-supports/layout.php */
+	$has_grid_interactivity = (bool) apply_filters( 'gutenberg_layout_has_grid_interactivity', false );
+
 	$base_child_layout              = is_array( $child_layout ) ? $child_layout : array();
 	$viewport_overrides             = is_array( $viewport_overrides ) ? $viewport_overrides : null;
 	$child_layout                   = null === $viewport_overrides ? $base_child_layout : array_replace( $base_child_layout, $viewport_overrides );
@@ -480,8 +483,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	if (
 		null === $viewport_overrides &&
 		! empty( $parent_layout['isManualPlacement'] ) &&
-		/** This filter is documented in lib/block-supports/layout.php */
-		apply_filters( 'gutenberg_layout_has_grid_interactivity', false )
+		$has_grid_interactivity
 	) {
 		$child_layout_declarations['--wp--grid-item--row-span'] = (string) ( $row_span ? $row_span : 1 );
 	}
@@ -494,7 +496,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	 */
 	$has_grid_item_box = $has_box &&
 		! empty( $parent_layout['isManualPlacement'] ) &&
-		gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		$has_grid_interactivity;
 	if (
 		$has_grid_item_box &&
 		(

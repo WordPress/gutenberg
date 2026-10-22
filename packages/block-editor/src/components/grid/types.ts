@@ -254,6 +254,8 @@ export interface GridItemMeasurements {
 	 * it isn't in the grid.
 	 */
 	src: { pixelRect: GridPixelRect; rect: GridRect; angle: number } | null;
+	/** Whether the grid's cells have a fixed size. */
+	hasFixedCells: boolean;
 }
 
 /**

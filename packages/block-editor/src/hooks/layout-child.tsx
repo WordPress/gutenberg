@@ -47,8 +47,11 @@ import type {
 	ResponsiveChildLayoutStylesOptions,
 } from './types';
 import type { ChildLayout } from '../components/child-layout-control/types';
+import {
+	GRID_PLACEMENT_KEYS,
+	getGridItemBox,
+} from '../components/grid/free-placement';
 import type { GridItemBox } from '../components/grid/free-placement';
-import type { GridItemLayout } from '../components/grid/types';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -81,57 +84,6 @@ function serializeRule( { selector, declarations }: ChildLayoutRule ) {
 			.map( ( [ property, value ] ) => `${ property }: ${ value }` )
 			.join( '; ' ) };
 	}`;
-}
-
-const GRID_PLACEMENT_KEYS = [
-	'columnStart',
-	'columnSpan',
-	'rowStart',
-	'rowSpan',
-];
-
-/**
- * Gets the box of a manual grid item in a state: where it is inside its
- * cells when it doesn't fill them. The box belongs to the placement, so a
- * viewport override that sets any part of the placement also sets the box,
- * and has none if it doesn't include one.
- *
- * @param layout            The item's base child layout.
- * @param viewportOverrides The child layout of a viewport, if any.
- *
- * @return The box, with `left`, `top`, `width` and `height`.
- */
-export function getGridItemBox(
-	layout: GridItemLayout = {},
-	viewportOverrides?: GridItemLayout
-): GridItemBox | undefined {
-	const ownsPlacement =
-		viewportOverrides &&
-		GRID_PLACEMENT_KEYS.some( ( key ) =>
-			Object.hasOwn( viewportOverrides, key )
-		);
-	const box = ( ownsPlacement ? viewportOverrides : layout )?.box;
-	// The same check as the front end, so that the editor never shows a box
-	// the front end ignores.
-	if (
-		! box ||
-		( [ 'left', 'top', 'width', 'height' ] as const ).some(
-			( key ) =>
-				typeof box[ key ] !== 'number' ||
-				! Number.isFinite( box[ key ] )
-		) ||
-		box.left < 0 ||
-		box.left > 100 ||
-		box.top < 0 ||
-		box.top > 100 ||
-		box.width <= 0 ||
-		box.width > 1 ||
-		box.height <= 0 ||
-		box.height > 1
-	) {
-		return undefined;
-	}
-	return box;
 }
 
 /**
