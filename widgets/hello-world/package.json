@@ -4,7 +4,6 @@
 	"private": true,
 	"dependencies": {
 		"@wordpress/ui": "file:../../packages/ui",
-		"@wordpress/widget-primitives": "file:../../packages/widget-primitives",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {

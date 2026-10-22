@@ -1,0 +1,929 @@
+import { useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+import { useStyleOverride } from './utils';
+import { useLayout } from '../components/block-list/layout';
+import {
+	GridVisualizer,
+	GridItemResizer,
+	GridItemMovers,
+	GridItemRotator,
+	GridItemDragHandle,
+	GridItemDeleteHandle,
+	GridItemHandles,
+	useUpdateGridChildLayout,
+	isGridStackedOnMobile,
+	getStackedLayouts,
+} from '../components/grid';
+import type {
+	GridBlockStyle,
+	GridChild,
+} from '../components/grid/mobile-stacking';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import useBlockVisibility from '../components/block-visibility/use-block-visibility';
+import { deviceTypeKey } from '../store/private-keys';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+	setStyleForState,
+} from './block-style-state';
+import {
+	getRotateForState,
+	getUpdatedRotateStyle,
+	isRotateEnabled,
+} from './rotate';
+import type {
+	BlockStyleState,
+	BlockListBlockFeatureProps,
+	ChildLayoutBlockStyle,
+	ChildLayoutControlsPureProps,
+	ChildLayoutRule,
+	ChildLayoutStyleRulesOptions,
+	GridToolsProps,
+	ResponsiveChildLayoutStylesOptions,
+} from './types';
+import type { ChildLayout } from '../components/child-layout-control/types';
+import type { GridItemBox } from '../components/grid/free-placement';
+import type { GridItemLayout } from '../components/grid/types';
+import type { Layout, LayoutBlockSupport } from '../layouts/types';
+
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+
+// Used for generating the instance ID
+const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
+
+// These are the serialized `selfStretch` values. `max` used to be called
+// "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
+const FLEX_CHILD_LAYOUT_VALUES = {
+	fit: 'fit',
+	grow: 'fill',
+	max: 'fixed',
+	fixed: 'fixedNoShrink',
+};
+
+const FLEX_SIZE_VALUES = [
+	FLEX_CHILD_LAYOUT_VALUES.max,
+	FLEX_CHILD_LAYOUT_VALUES.fixed,
+];
+
+function isFlexSizeValue( value: string | undefined ) {
+	// `includes` finds no match for `undefined`.
+	return FLEX_SIZE_VALUES.includes( value as string );
+}
+
+function serializeRule( { selector, declarations }: ChildLayoutRule ) {
+	return `${ selector } {
+		${ Object.entries( declarations )
+			.map( ( [ property, value ] ) => `${ property }: ${ value }` )
+			.join( '; ' ) };
+	}`;
+}
+
+const GRID_PLACEMENT_KEYS = [
+	'columnStart',
+	'columnSpan',
+	'rowStart',
+	'rowSpan',
+];
+
+/**
+ * Gets the box of a manual grid item in a state: where it is inside its
+ * cells when it doesn't fill them. The box belongs to the placement, so a
+ * viewport override that sets any part of the placement also sets the box,
+ * and has none if it doesn't include one.
+ *
+ * @param layout            The item's base child layout.
+ * @param viewportOverrides The child layout of a viewport, if any.
+ *
+ * @return The box, with `left`, `top`, `width` and `height`.
+ */
+export function getGridItemBox(
+	layout: GridItemLayout = {},
+	viewportOverrides?: GridItemLayout
+): GridItemBox | undefined {
+	const ownsPlacement =
+		viewportOverrides &&
+		GRID_PLACEMENT_KEYS.some( ( key ) =>
+			Object.hasOwn( viewportOverrides, key )
+		);
+	const box = ( ownsPlacement ? viewportOverrides : layout )?.box;
+	// The same check as the front end, so that the editor never shows a box
+	// the front end ignores.
+	if (
+		! box ||
+		( [ 'left', 'top', 'width', 'height' ] as const ).some(
+			( key ) =>
+				typeof box[ key ] !== 'number' ||
+				! Number.isFinite( box[ key ] )
+		) ||
+		box.left < 0 ||
+		box.left > 100 ||
+		box.top < 0 ||
+		box.top > 100 ||
+		box.width <= 0 ||
+		box.width > 1 ||
+		box.height <= 0 ||
+		box.height > 1
+	) {
+		return undefined;
+	}
+	return box;
+}
+
+/**
+ * Checks whether a manual grid item has a box in any state.
+ *
+ * @param style The item's style attribute.
+ *
+ * @return Whether the item has a box in its base layout or a viewport's.
+ */
+export function hasGridItemBoxInAnyState( style?: ChildLayoutBlockStyle ) {
+	if ( ! style ) {
+		return false;
+	}
+	return Object.entries( style ).some(
+		( [ key, value ] ) =>
+			( key === 'layout' || key.startsWith( '@' ) ) &&
+			!! (
+				key === 'layout'
+					? ( value as ChildLayout | undefined )
+					: // A viewport's style holds the child layout it overrides.
+						( value as ChildLayoutBlockStyle | undefined )?.layout
+			)?.box
+	);
+}
+
+function toPercent( fraction: number ) {
+	return `${ Math.round( fraction * 1e5 ) / 1e3 }%`;
+}
+
+/**
+ * Gets the custom properties that place a manual grid item inside its cells,
+ * or that make it fill them when it has no box.
+ *
+ * @param box The item's box.
+ *
+ * @return The declarations.
+ */
+function getGridItemBoxDeclarations( box?: GridItemBox ) {
+	return {
+		'--wp--grid-item--box-left': toPercent( box?.left ?? 0 ),
+		'--wp--grid-item--box-top': toPercent( box?.top ?? 0 ),
+		'--wp--grid-item--box-width': toPercent( box?.width ?? 1 ),
+		'--wp--grid-item--box-height': toPercent( box?.height ?? 1 ),
+	};
+}
+
+export function getChildLayoutStyleRules( {
+	selector,
+	layout = {},
+	viewportOverrides,
+	parentLayout = {},
+	includeContainerQuery = true,
+	hasBox = false,
+}: ChildLayoutStyleRulesOptions ): ChildLayoutRule[] {
+	const hasViewportOverrides = viewportOverrides !== undefined;
+	const effectiveLayout = hasViewportOverrides
+		? {
+				...layout,
+				...viewportOverrides,
+			}
+		: layout;
+	const hasViewportOverride = ( key: string ) =>
+		Object.hasOwn( viewportOverrides || {}, key );
+	const {
+		selfStretch,
+		flexSize,
+		columnStart,
+		rowStart,
+		columnSpan,
+		rowSpan,
+	} = effectiveLayout;
+	const baseSelfStretch = layout.selfStretch;
+	const { columnCount, minimumColumnWidth, isManualPlacement } = parentLayout;
+	const rules: ChildLayoutRule[] = [];
+
+	const declarations: Record< string, string > = {};
+	if (
+		! hasViewportOverrides ||
+		hasViewportOverride( 'selfStretch' ) ||
+		hasViewportOverride( 'flexSize' )
+	) {
+		if (
+			hasViewportOverrides &&
+			( selfStretch === FLEX_CHILD_LAYOUT_VALUES.fit ||
+				selfStretch === FLEX_CHILD_LAYOUT_VALUES.grow ) &&
+			isFlexSizeValue( baseSelfStretch ) &&
+			layout.flexSize
+		) {
+			declarations[ 'flex-basis' ] = 'unset';
+			if ( baseSelfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
+		}
+		if ( isFlexSizeValue( selfStretch ) && flexSize ) {
+			declarations[ 'flex-basis' ] = flexSize;
+			if ( selfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
+				declarations[ 'flex-shrink' ] = '0';
+			} else if (
+				hasViewportOverrides &&
+				baseSelfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed
+			) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
+			declarations[ 'box-sizing' ] = 'border-box';
+		} else if ( selfStretch === FLEX_CHILD_LAYOUT_VALUES.grow ) {
+			declarations[ 'flex-grow' ] = '1';
+		}
+	}
+
+	if (
+		! hasViewportOverrides ||
+		hasViewportOverride( 'columnStart' ) ||
+		hasViewportOverride( 'columnSpan' )
+	) {
+		if ( columnStart && columnSpan ) {
+			declarations[ 'grid-column' ] =
+				`${ columnStart } / span ${ columnSpan }`;
+		} else if ( columnStart ) {
+			declarations[ 'grid-column' ] = `${ columnStart }`;
+		} else if ( columnSpan ) {
+			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		}
+	}
+
+	if (
+		! hasViewportOverrides ||
+		hasViewportOverride( 'rowStart' ) ||
+		hasViewportOverride( 'rowSpan' )
+	) {
+		if ( rowStart && rowSpan ) {
+			declarations[ 'grid-row' ] = `${ rowStart } / span ${ rowSpan }`;
+		} else if ( rowStart ) {
+			declarations[ 'grid-row' ] = `${ rowStart }`;
+		} else if ( rowSpan ) {
+			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		}
+	}
+
+	// Manual grids stack their children on mobile, as part of the grid
+	// interactivity experiment, with a rule on the grid that reads each
+	// child's row span from this custom property so that tall blocks stay
+	// tall. It is always set, so that a child doesn't inherit the row span of
+	// a grid it is nested in.
+	if (
+		! hasViewportOverrides &&
+		isManualPlacement &&
+		window.__experimentalEnableGridInteractivity
+	) {
+		declarations[ '--wp--grid-item--row-span' ] = `${ rowSpan || 1 }`;
+	}
+
+	// A block placed freely in a manual grid sits inside its cells, with
+	// margins and a size that are percentages of them. They are custom
+	// properties, so that a viewport can change them, and they only apply
+	// where the cells have a fixed size: grids whose rows are sized by their
+	// content, and stacked grids, leave blocks to fill their cells.
+	const hasGridItemBox =
+		hasBox &&
+		isManualPlacement &&
+		window.__experimentalEnableGridInteractivity;
+	if (
+		hasGridItemBox &&
+		( ! hasViewportOverrides ||
+			GRID_PLACEMENT_KEYS.some( hasViewportOverride ) )
+	) {
+		Object.assign(
+			declarations,
+			getGridItemBoxDeclarations(
+				getGridItemBox( layout, viewportOverrides )
+			)
+		);
+	}
+
+	if ( Object.keys( declarations ).length ) {
+		rules.push( { selector, declarations } );
+	}
+
+	// The box's margins are `!important` because a block's own margin is an
+	// inline style, which would otherwise move it away from its box.
+	if ( hasGridItemBox && ! hasViewportOverrides ) {
+		rules.push( {
+			rulesGroup: '@container style(--wp--style--grid-cells: fixed)',
+			selector,
+			declarations: {
+				'justify-self': 'start',
+				'align-self': 'start',
+				'box-sizing': 'border-box',
+				'margin-left': 'var(--wp--grid-item--box-left) !important',
+				'margin-top': 'var(--wp--grid-item--box-top) !important',
+				width: 'var(--wp--grid-item--box-width)',
+				height: 'var(--wp--grid-item--box-height)',
+			},
+		} );
+	}
+
+	if ( includeContainerQuery && ! hasViewportOverrides ) {
+		/**
+		 * If minimumColumnWidth is set on the parent, or if no
+		 * columnCount is set, the grid is responsive so a
+		 * container query is needed for the span to resize.
+		 */
+		if (
+			( columnSpan || columnStart ) &&
+			( minimumColumnWidth || ! columnCount )
+		) {
+			// `parseFloat` gives `NaN` for a missing width, handled below.
+			let parentColumnValue = parseFloat( minimumColumnWidth as string );
+			/**
+			 * 12rem is the default minimumColumnWidth value.
+			 * If parentColumnValue is not a number, default to 12.
+			 */
+			if ( isNaN( parentColumnValue ) ) {
+				parentColumnValue = 12;
+			}
+
+			let parentColumnUnit = minimumColumnWidth?.replace(
+				// `replace` converts the number to its string.
+				parentColumnValue as unknown as string,
+				''
+			);
+			/**
+			 * Check that parent column unit is either 'px', 'rem' or 'em'.
+			 * If not, default to 'rem'.
+			 */
+			// A missing unit matches none, so it defaults below.
+			if (
+				! [ 'px', 'rem', 'em' ].includes( parentColumnUnit as string )
+			) {
+				parentColumnUnit = 'rem';
+			}
+
+			let numColsToBreakAt = 2;
+
+			if ( columnSpan && columnStart ) {
+				numColsToBreakAt = columnSpan + columnStart - 1;
+			} else if ( columnSpan ) {
+				numColsToBreakAt = columnSpan;
+			} else {
+				// Only reached with a column start.
+				numColsToBreakAt = columnStart!;
+			}
+
+			const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
+			const containerQueryValue =
+				numColsToBreakAt * parentColumnValue +
+				( numColsToBreakAt - 1 ) * defaultGapValue;
+			// For blocks that only span one column, we want to remove any rowStart values as
+			// the container reduces in size, so that blocks are still arranged in markup order.
+			const minimumContainerQueryValue =
+				parentColumnValue * 2 + defaultGapValue - 1;
+			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
+			const gridColumnValue =
+				columnSpan && columnSpan > 1 ? '1/-1' : 'auto';
+
+			rules.push( {
+				rulesGroup: `@container (max-width: ${ Math.max(
+					containerQueryValue,
+					minimumContainerQueryValue
+				) }${ parentColumnUnit })`,
+				selector,
+				declarations: {
+					'grid-column': gridColumnValue,
+					'grid-row': 'auto',
+				},
+			} );
+		}
+	}
+
+	return rules;
+}
+
+export function getChildLayoutStyles( {
+	selector,
+	layout = {},
+	parentLayout = {},
+	includeContainerQuery = true,
+	hasBox = false,
+}: ChildLayoutStyleRulesOptions ) {
+	return getChildLayoutStyleRules( {
+		selector,
+		layout,
+		parentLayout,
+		includeContainerQuery,
+		hasBox,
+	} )
+		.map( ( rule ) => {
+			const serializedRule = serializeRule( rule );
+			return rule.rulesGroup
+				? `${ rule.rulesGroup } {
+				${ serializedRule }
+			}`
+				: serializedRule;
+		} )
+		.join( '' );
+}
+
+export function getResponsiveChildLayoutStyles( {
+	style = {},
+	selector,
+	parentLayout = {},
+	viewportSettings,
+}: ResponsiveChildLayoutStylesOptions ) {
+	const baseLayout = style?.layout ?? {};
+	const hasBox = hasGridItemBoxInAnyState( style );
+
+	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
+		.map( ( [ viewport, mediaQuery ] ) => {
+			const viewportLayout = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				// A style state holds the child layout it overrides.
+			} )?.layout as ChildLayout | undefined;
+			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
+				return '';
+			}
+
+			const viewportRules = getChildLayoutStyleRules( {
+				selector,
+				layout: baseLayout,
+				viewportOverrides: viewportLayout,
+				parentLayout,
+				includeContainerQuery: false,
+				hasBox,
+			} );
+			const css = viewportRules.map( serializeRule ).join( '' );
+
+			return css ? `${ mediaQuery }{${ css }}` : '';
+		} )
+		.filter( Boolean )
+		.join( '' );
+}
+
+/**
+ * Merges child layout changes into the active layout style state.
+ *
+ * @param style         Block style attributes.
+ * @param layout        Child layout changes.
+ * @param selectedState Selected block style state.
+ * @return Updated block style attributes.
+ */
+export function getUpdatedChildLayoutStyle(
+	style: ChildLayoutBlockStyle | undefined,
+	layout: ChildLayout,
+	selectedState: BlockStyleState | undefined
+): ChildLayoutBlockStyle | undefined {
+	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+		return {
+			...style,
+			layout: {
+				...style?.layout,
+				...layout,
+			},
+		};
+	}
+
+	const layoutState = {
+		// A viewport state is selected here.
+		viewport: selectedState!.viewport,
+		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+	};
+	// A style state holds the child layout it overrides.
+	const stateStyle = getStyleForState( style, layoutState ) as
+		ChildLayoutBlockStyle | undefined;
+
+	return setStyleForState( style, layoutState, {
+		...stateStyle,
+		layout: {
+			...stateStyle?.layout,
+			...layout,
+		},
+	} );
+}
+
+function useBlockPropsChildLayoutStyles( {
+	style,
+}: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
+	const { shouldRenderChildLayoutStyles, viewportSettings } = useSelect(
+		( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
+			return {
+				shouldRenderChildLayoutStyles: ! settings.disableLayoutStyles,
+				// The editor features hold the viewport settings.
+				viewportSettings: settings?.__experimentalFeatures?.viewport as
+					Record< string, unknown > | undefined,
+			};
+		}
+	);
+	const layout = style?.layout ?? {};
+	const { columnStart, rowStart, columnSpan, rowSpan } = layout;
+	// The layout context holds the parent block's layout.
+	const parentLayout = ( useLayout() as Layout | undefined ) || {};
+	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
+	const selector = `.wp-container-content-${ id }`;
+
+	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+	// write code that stores a string attribute instead of a number.
+	if ( process.env.NODE_ENV === 'development' ) {
+		if ( columnStart && typeof columnStart !== 'number' ) {
+			throw new Error( 'columnStart must be a number' );
+		}
+		if ( rowStart && typeof rowStart !== 'number' ) {
+			throw new Error( 'rowStart must be a number' );
+		}
+		if ( columnSpan && typeof columnSpan !== 'number' ) {
+			throw new Error( 'columnSpan must be a number' );
+		}
+		if ( rowSpan && typeof rowSpan !== 'number' ) {
+			throw new Error( 'rowSpan must be a number' );
+		}
+		if (
+			layout.box &&
+			( [ 'left', 'top', 'width', 'height' ] as const ).some(
+				( key ) => typeof layout.box?.[ key ] !== 'number'
+			)
+		) {
+			throw new Error( 'box values must be numbers' );
+		}
+	}
+
+	let css = '';
+	if ( shouldRenderChildLayoutStyles ) {
+		css = [
+			getChildLayoutStyles( {
+				selector,
+				layout,
+				parentLayout,
+				hasBox: hasGridItemBoxInAnyState( style ),
+			} ),
+			getResponsiveChildLayoutStyles( {
+				style,
+				selector,
+				parentLayout,
+				viewportSettings,
+			} ),
+		].join( '' );
+	}
+
+	// A block in a manual placement grid stays in place while it is dragged,
+	// so the browser's drag image must not show. WebKit ignores the drag
+	// image set for a block when the drag starts on an image, and shows the
+	// image instead, so images leave the drag to the block.
+	if (
+		parentLayout.type === 'grid' &&
+		parentLayout.isManualPlacement &&
+		window.__experimentalEnableGridInteractivity
+	) {
+		css += `${ selector } img { -webkit-user-drag: none; }`;
+		// A block inserted into cells of a fixed size gets enough of them for
+		// its placeholder, which then fills them rather than leaving a gap.
+		css += `@container style(--wp--style--grid-cells: fixed) { ${ selector } > .components-placeholder { min-height: 100%; } }`;
+	}
+
+	useStyleOverride( { css } );
+
+	// Only attach a container class if there is generated CSS to be attached.
+	if ( ! css ) {
+		return;
+	}
+
+	// Attach a `wp-container-content` id-based classname.
+	return { className: `wp-container-content-${ id }` };
+}
+
+function ChildLayoutControlsPure( {
+	clientId,
+	name,
+	style,
+}: ChildLayoutControlsPureProps ) {
+	// The layout context merges the parent's layout and its support.
+	const parentLayout =
+		( useLayout() as ( Layout & LayoutBlockSupport ) | undefined ) || {};
+	const {
+		type: parentLayoutType = 'default',
+		allowSizingOnChildren = false,
+		isManualPlacement,
+	} = parentLayout;
+
+	if ( parentLayoutType !== 'grid' ) {
+		return null;
+	}
+
+	return (
+		<GridTools
+			clientId={ clientId }
+			name={ name }
+			style={ style }
+			allowSizingOnChildren={ allowSizingOnChildren }
+			isManualPlacement={ isManualPlacement }
+			parentLayout={ parentLayout }
+		/>
+	);
+}
+
+function GridTools( {
+	clientId,
+	name,
+	style,
+	allowSizingOnChildren,
+	isManualPlacement,
+	parentLayout,
+}: GridToolsProps ) {
+	const {
+		rootClientId,
+		isVisible,
+		parentBlockVisibility,
+		blockBlockVisibility,
+		deviceType,
+		viewportSettings,
+		isChildBlockAGrid,
+		selectedState,
+		parentStyle,
+		blockEditingMode,
+		canMove,
+		canRemove,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockEditingMode,
+				getTemplateLock,
+				getBlockAttributes,
+				getSettings,
+				getSelectedBlockStyleState,
+				canMoveBlock,
+				canRemoveBlock,
+			} = unlock( select( blockEditorStore ) );
+			const _rootClientId = getBlockRootClientId( clientId );
+
+			if (
+				getTemplateLock( _rootClientId ) ||
+				getBlockEditingMode( _rootClientId ) !== 'default'
+			) {
+				return {
+					rootClientId: _rootClientId,
+					isVisible: false,
+				};
+			}
+
+			const parentAttributes = getBlockAttributes( _rootClientId );
+			const blockAttributes = getBlockAttributes( clientId );
+			const settings = getSettings();
+			const currentDeviceType =
+				settings?.[ deviceTypeKey ]?.toLowerCase() ||
+				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
+
+			return {
+				rootClientId: _rootClientId,
+				isVisible: true,
+				parentBlockVisibility:
+					parentAttributes?.metadata?.blockVisibility,
+				blockBlockVisibility:
+					blockAttributes?.metadata?.blockVisibility,
+				deviceType: currentDeviceType,
+				viewportSettings: settings?.__experimentalFeatures?.viewport,
+				// Check if the selected child block is itself a grid.
+				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
+				selectedState: getSelectedBlockStyleState( clientId ),
+				parentStyle: parentAttributes?.style,
+				blockEditingMode: getBlockEditingMode( clientId ),
+				canMove: canMoveBlock( clientId ),
+				canRemove: canRemoveBlock( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
+	const {
+		isBlockCurrentlyHidden: isParentBlockCurrentlyHidden,
+		currentViewport,
+	} = useBlockVisibility( {
+		blockVisibility: parentBlockVisibility,
+		deviceType,
+		view: canvasView,
+		viewportSettings,
+	} );
+
+	// Check whether any ancestor of the parent grid is hidden at the viewport
+	// actually detected from the canvas, so it stays consistent with how
+	// blocks are hidden.
+	const isAnyAncestorHidden = useSelect(
+		( select ) => {
+			if ( ! rootClientId ) {
+				return false;
+			}
+			const { isBlockParentHiddenAtViewport } = unlock(
+				select( blockEditorStore )
+			);
+			return isBlockParentHiddenAtViewport(
+				rootClientId,
+				currentViewport
+			);
+		},
+		[ rootClientId, currentViewport ]
+	);
+
+	const { isBlockCurrentlyHidden: isBlockItselfCurrentlyHidden } =
+		useBlockVisibility( {
+			blockVisibility: blockBlockVisibility,
+			deviceType,
+			view: canvasView,
+			viewportSettings,
+		} );
+
+	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
+	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
+	// The angle shown while the rotate handle is being dragged.
+	const [ previewRotate, setPreviewRotate ] = useState< number | null >(
+		null
+	);
+
+	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
+
+	const isManualGrid =
+		isManualPlacement && window.__experimentalEnableGridInteractivity;
+	// On mobile, a stacked grid shows every block full width, one after
+	// another. The tools work from that stack: the first edit gives the grid
+	// its own mobile layout matching it (see `useUpdateGridChildLayout`).
+	const isStackedOnMobile =
+		selectedState?.viewport === '@mobile' &&
+		isGridStackedOnMobile( parentLayout, parentStyle );
+	const siblings = useSelect(
+		( select ) => {
+			if ( ! isStackedOnMobile ) {
+				return undefined;
+			}
+			const { getBlockOrder, getBlocksByClientId } =
+				select( blockEditorStore );
+			// The grid's children exist.
+			return getBlocksByClientId(
+				getBlockOrder( rootClientId )
+			) as GridChild[];
+		},
+		[ isStackedOnMobile, rootClientId ]
+	);
+	const stackedLayouts = useMemo(
+		() =>
+			isStackedOnMobile && siblings
+				? getStackedLayouts(
+						{ layout: parentLayout, style: parentStyle },
+						siblings,
+						clientId
+					)
+				: null,
+		[ isStackedOnMobile, siblings, clientId, parentLayout, parentStyle ]
+	);
+	const updateGridChildLayout = useUpdateGridChildLayout();
+
+	if ( ! isVisible || isParentBlockCurrentlyHidden || isAnyAncestorHidden ) {
+		return null;
+	}
+
+	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
+	const isViewportState = hasViewportBlockStyleState( selectedState );
+	// The layout the canvas shows for this block and its grid in the
+	// selected state.
+	const viewportLayout = isViewportState
+		? // A style state holds the child layout it overrides.
+			(
+				getStyleForState( style, {
+					viewport: selectedState.viewport,
+					pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				} ) as ChildLayoutBlockStyle | undefined
+			 )?.layout
+		: undefined;
+	const effectiveLayout = stackedLayouts?.child ?? {
+		...style?.layout,
+		...viewportLayout,
+		// A viewport that sets its own place has its own box, or none.
+		box: getGridItemBox( style?.layout, viewportLayout ),
+	};
+	const effectiveParentLayout = {
+		...parentLayout,
+		...( isViewportState
+			? parentStyle?.[ selectedState.viewport ]?.layout
+			: undefined ),
+		...stackedLayouts?.grid,
+	};
+	// Stacked blocks are shown unrotated.
+	const rotate = isStackedOnMobile
+		? 0
+		: getRotateForState( style, selectedState );
+	// Like the Rotation control in the block settings, the handle is only
+	// offered for blocks that can be fully edited, and not in a state such as
+	// `:hover`, since rotation is stored per viewport.
+	const showRotator =
+		isManualGrid &&
+		! isBlockItselfCurrentlyHidden &&
+		blockEditingMode === 'default' &&
+		! hasPseudoBlockStyleState( selectedState ) &&
+		isRotateEnabled( name );
+
+	// Text blocks can't be dragged by their body, so every block that can be
+	// moved gets a handle that drags it the way a body drag does.
+	const showDragHandle =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && canMove;
+	const showDeleteHandle =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && canRemove;
+
+	function updateLayout( layout: ChildLayout ) {
+		updateGridChildLayout( clientId, layout );
+	}
+
+	function updateRotate( angle: number ) {
+		// Goes through the grid item update, so that rotating a block of a
+		// stacked grid on mobile first gives the grid its own mobile layout.
+		updateGridChildLayout(
+			clientId,
+			( childStyle, state ) =>
+				// The rotate helpers type the style loosely. An undefined
+				// style, when nothing is left in it, clears the attribute.
+				getUpdatedRotateStyle(
+					childStyle,
+					angle,
+					state
+				) as GridBlockStyle
+		);
+	}
+
+	return (
+		<>
+			<GridVisualizer
+				clientId={ rootClientId }
+				// The resizer treats the null an unmount stores as no bounds.
+				contentRef={
+					setResizerBounds as (
+						element: HTMLDivElement | null
+					) => void
+				}
+				parentLayout={ parentLayout }
+				childGridClientId={ childGridClientId }
+			/>
+			{ showResizer && (
+				<GridItemResizer
+					clientId={ clientId }
+					// Don't allow resizing beyond the grid visualizer.
+					bounds={ resizerBounds }
+					onChange={ updateLayout }
+					parentLayout={ parentLayout }
+					angle={ previewRotate ?? rotate }
+				/>
+			) }
+			{ ( showDragHandle || showRotator || showDeleteHandle ) && (
+				<GridItemHandles
+					clientId={ clientId }
+					angle={ previewRotate ?? rotate }
+					anchorAngle={ rotate }
+				>
+					{ showDragHandle && (
+						<GridItemDragHandle
+							clientId={ clientId }
+							gridClientId={ rootClientId }
+						/>
+					) }
+					{ showRotator && (
+						<GridItemRotator
+							clientId={ clientId }
+							angle={ rotate }
+							onPreview={ setPreviewRotate }
+							onChange={ updateRotate }
+						/>
+					) }
+					{ showDeleteHandle && (
+						<GridItemDeleteHandle clientId={ clientId } />
+					) }
+				</GridItemHandles>
+			) }
+			{ isManualGrid && (
+				<GridItemMovers
+					layout={ effectiveLayout }
+					parentLayout={ effectiveParentLayout }
+					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
+				/>
+			) }
+		</>
+	);
+}
+
+export default {
+	useBlockProps: useBlockPropsChildLayoutStyles,
+	edit: ChildLayoutControlsPure,
+	attributeKeys: [ 'style' ],
+	hasSupport() {
+		return true;
+	},
+};

@@ -1,0 +1,288 @@
+import { describe, expect, it } from 'vitest';
+import {
+	getCornerToolbarStyle,
+	getLowestCorner,
+	getRotatedBoundingRect,
+	getRotatedOverlayStyle,
+	getRotationFromPointer,
+	snapAngle,
+} from '../rotation';
+import type { PixelRect } from '../rotation';
+import { getGridRectFromPixelRect, getGridTracks } from '../utils';
+
+describe( 'snapAngle()', () => {
+	it( 'snaps to multiples of 15° within 5°', () => {
+		expect( snapAngle( 41 ) ).toBe( 45 );
+		expect( snapAngle( 49 ) ).toBe( 45 );
+		expect( snapAngle( -88 ) ).toBe( -90 );
+	} );
+
+	it( 'leaves angles outside the snap window as whole degrees', () => {
+		expect( snapAngle( 37.4 ) ).toBe( 37 );
+		expect( snapAngle( 52.6 ) ).toBe( 53 );
+	} );
+
+	it( 'rotates freely when snapping is off', () => {
+		expect( snapAngle( 41, { snap: false } ) ).toBe( 41 );
+	} );
+
+	it( 'treats angles near 0 as 0, even without snapping', () => {
+		expect( snapAngle( 1.4, { snap: false } ) ).toBe( 0 );
+		expect( snapAngle( -1, { snap: false } ) ).toBe( 0 );
+		expect( snapAngle( 2, { snap: false } ) ).toBe( 2 );
+	} );
+
+	it( 'wraps snapped angles at ±180', () => {
+		expect( snapAngle( -178 ) ).toBe( 180 );
+		expect( snapAngle( 182, { snap: false } ) ).toBe( -178 );
+	} );
+
+	it( 'never returns -0', () => {
+		expect( Object.is( snapAngle( -0.4 ), 0 ) ).toBe( true );
+		expect( Object.is( snapAngle( -360 ), 0 ) ).toBe( true );
+	} );
+} );
+
+describe( 'getRotationFromPointer()', () => {
+	const center = { centerX: 100, centerY: 100 };
+
+	it( 'is 0° with the pointer straight below the center', () => {
+		expect(
+			getRotationFromPointer( {
+				...center,
+				pointerX: 100,
+				pointerY: 200,
+			} )
+		).toBe( 0 );
+	} );
+
+	it( 'rotates clockwise as the pointer moves clockwise', () => {
+		// Pointer to the left of the center: a quarter turn clockwise.
+		expect(
+			getRotationFromPointer( { ...center, pointerX: 0, pointerY: 100 } )
+		).toBe( 90 );
+		// Pointer to the right of the center: a quarter turn counterclockwise.
+		expect(
+			getRotationFromPointer( {
+				...center,
+				pointerX: 200,
+				pointerY: 100,
+			} )
+		).toBe( -90 );
+		// Pointer straight above the center: half a turn.
+		expect(
+			getRotationFromPointer( { ...center, pointerX: 100, pointerY: 0 } )
+		).toBe( 180 );
+	} );
+
+	it( 'snaps unless told not to', () => {
+		// About 43.5° clockwise.
+		const pointer = { pointerX: 5, pointerY: 200 };
+		expect( getRotationFromPointer( { ...center, ...pointer } ) ).toBe(
+			45
+		);
+		expect(
+			getRotationFromPointer( { ...center, ...pointer, snap: false } )
+		).toBe( 44 );
+	} );
+
+	it( 'adds the offset and keeps the result in range', () => {
+		const left = { pointerX: 0, pointerY: 100 };
+		expect(
+			getRotationFromPointer( { ...center, ...left, offset: -60 } )
+		).toBe( 30 );
+		// 90° + 120° is 210°, which is -150°.
+		expect(
+			getRotationFromPointer( { ...center, ...left, offset: 120 } )
+		).toBe( -150 );
+	} );
+} );
+
+describe( 'getRotatedOverlayStyle()', () => {
+	it( 'returns nothing when not rotated', () => {
+		expect(
+			getRotatedOverlayStyle( { width: 100, height: 50, angle: 0 } )
+		).toBeUndefined();
+	} );
+
+	it( 'centers the overlay in the rotated bounding box', () => {
+		// A 100x50 box rotated 90° has a 50x100 bounding box, so the overlay
+		// moves 25px left and 25px down before rotating.
+		expect(
+			getRotatedOverlayStyle( { width: 100, height: 50, angle: 90 } )
+		).toEqual( {
+			transform: 'translate(-25px, 25px) rotate(90deg)',
+			transformOrigin: 'center',
+		} );
+	} );
+
+	it( 'keeps the overlay in place for a half turn', () => {
+		expect(
+			getRotatedOverlayStyle( { width: 100, height: 50, angle: 180 } )
+		).toEqual( {
+			transform: 'translate(0px, 0px) rotate(180deg)',
+			transformOrigin: 'center',
+		} );
+	} );
+} );
+
+describe( 'getRotatedBoundingRect()', () => {
+	// Six 100px columns and rows, without gaps.
+	const tracks = getGridTracks( '100px 100px 100px 100px 100px 100px', 0 );
+
+	function toCells( rect: PixelRect ) {
+		const cells = getGridRectFromPixelRect( rect, tracks, tracks );
+		return {
+			columnStart: cells.columnStart,
+			rowStart: cells.rowStart,
+			columnSpan: cells.columnSpan,
+			rowSpan: cells.rowSpan,
+		};
+	}
+
+	it( 'returns the rectangle as it is when it is not rotated', () => {
+		const rect = { left: 100, top: 200, right: 400, bottom: 300 };
+		expect( getRotatedBoundingRect( rect, 0 ) ).toEqual( rect );
+		expect( getRotatedBoundingRect( rect, undefined ) ).toEqual( rect );
+	} );
+
+	it( 'turns a rectangle around its center', () => {
+		// 1x3 in column 2, rows 1 to 3, turned a quarter.
+		const rect = getRotatedBoundingRect(
+			{ left: 100, top: 0, right: 200, bottom: 300 },
+			90
+		);
+		expect( rect.left ).toBeCloseTo( 0 );
+		expect( rect.top ).toBeCloseTo( 100 );
+		expect( rect.right ).toBeCloseTo( 300 );
+		expect( rect.bottom ).toBeCloseTo( 200 );
+		expect( toCells( rect ) ).toEqual( {
+			columnStart: 1,
+			rowStart: 2,
+			columnSpan: 3,
+			rowSpan: 1,
+		} );
+	} );
+
+	it( 'covers the cells a diagonal block reaches', () => {
+		// 3x1 in columns 2 to 4, row 3, at 45°: about 283px square.
+		const rect = getRotatedBoundingRect(
+			{ left: 100, top: 200, right: 400, bottom: 300 },
+			45
+		);
+		expect( rect.right - rect.left ).toBeCloseTo( 282.84 );
+		expect( rect.bottom - rect.top ).toBeCloseTo( 282.84 );
+		expect( toCells( rect ) ).toEqual( {
+			columnStart: 2,
+			rowStart: 2,
+			columnSpan: 3,
+			rowSpan: 3,
+		} );
+	} );
+
+	it( 'is the same for negative angles and angles past a half turn', () => {
+		const rect = { left: 100, top: 200, right: 400, bottom: 300 };
+		const rotated = getRotatedBoundingRect( rect, 30 );
+		for ( const angle of [ -30, 150, -150 ] ) {
+			const other = getRotatedBoundingRect( rect, angle );
+			expect( other.left ).toBeCloseTo( rotated.left );
+			expect( other.top ).toBeCloseTo( rotated.top );
+			expect( other.right ).toBeCloseTo( rotated.right );
+			expect( other.bottom ).toBeCloseTo( rotated.bottom );
+		}
+	} );
+} );
+
+describe( 'getLowestCorner()', () => {
+	it( 'is the bottom right corner of a level block', () => {
+		expect( getLowestCorner( 0 ) ).toEqual( { x: 1, y: 1 } );
+	} );
+
+	it( 'is the corner with the bottom right of the screen on a level edge', () => {
+		// Upside down, the block's top-left corner is at the bottom right.
+		expect( getLowestCorner( 180 ) ).toEqual( { x: -1, y: -1 } );
+		// A quarter turn clockwise puts the block's right edge at the bottom.
+		expect( getLowestCorner( 90 ) ).toEqual( { x: 1, y: -1 } );
+		expect( getLowestCorner( -90 ) ).toEqual( { x: -1, y: 1 } );
+	} );
+
+	it( 'is the lowest corner of a rotated block', () => {
+		// Turned clockwise, the bottom right corner drops.
+		expect( getLowestCorner( 30 ) ).toEqual( { x: 1, y: 1 } );
+		// Turned counterclockwise, the bottom left corner drops.
+		expect( getLowestCorner( -30 ) ).toEqual( { x: -1, y: 1 } );
+		expect( getLowestCorner( 150 ) ).toEqual( { x: 1, y: -1 } );
+	} );
+} );
+
+describe( 'getCornerToolbarStyle()', () => {
+	// Resolves a `calc()` of a percentage and pixels for a length.
+	function resolve( value: unknown, length: number ) {
+		const [ , percent, px ] = ( value as string ).match(
+			/^calc\((-?[\d.]+)% \+ (-?[\d.]+)px\)$/
+		)!;
+		return ( Number( percent ) * length ) / 100 + Number( px );
+	}
+
+	// Where a point in the overlay, from its top-left corner, is on screen
+	// relative to the overlay's center, once the overlay is turned.
+	function toScreen(
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		angle: number
+	) {
+		const radians = ( angle * Math.PI ) / 180;
+		const localX = x - width / 2;
+		const localY = y - height / 2;
+		return {
+			x: localX * Math.cos( radians ) - localY * Math.sin( radians ),
+			y: localX * Math.sin( radians ) + localY * Math.cos( radians ),
+		};
+	}
+
+	it( 'is under the bottom right corner of a level block', () => {
+		expect( getCornerToolbarStyle( 0, getLowestCorner( 0 ), 8 ) ).toEqual( {
+			left: 'calc(100% + 0px)',
+			top: 'calc(100% + 8px)',
+			transformOrigin: '0 0',
+			transform: 'rotate(0deg) translateX(-100%)',
+		} );
+	} );
+
+	it.each( [
+		[ 30, 30 ],
+		[ -30, -30 ],
+		[ 90, 90 ],
+		[ 135, 135 ],
+		[ -60, -60 ],
+		[ 180, 180 ],
+		// The corner picked at 30°, while the block turns to -30°.
+		[ 30, -30 ],
+	] )(
+		'is under the corner picked at %d° when the block is at %d°',
+		( anchorAngle, angle ) => {
+			const width = 200;
+			const height = 100;
+			const corner = getLowestCorner( anchorAngle );
+			const { left, top } = getCornerToolbarStyle( angle, corner, 8 );
+			const point = toScreen(
+				resolve( left, width ),
+				resolve( top, height ),
+				width,
+				height,
+				angle
+			);
+			const cornerOnScreen = toScreen(
+				( ( corner.x + 1 ) / 2 ) * width,
+				( ( corner.y + 1 ) / 2 ) * height,
+				width,
+				height,
+				angle
+			);
+			expect( point.x ).toBeCloseTo( cornerOnScreen.x, 2 );
+			expect( point.y ).toBeCloseTo( cornerOnScreen.y + 8, 2 );
+		}
+	);
+} );

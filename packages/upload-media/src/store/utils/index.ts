@@ -363,6 +363,9 @@ let completedVipsOperations = 0;
 /**
  * Maximum number of vips operations before recycling the worker.
  * Each operation can consume 50-100MB+ of WASM memory for large images.
+ * The threshold is unchanged now that wasm-vips memory can grow to 2 GiB: a
+ * grown heap is only handed back when the worker is recycled, so a lower
+ * ceiling on accumulation still matters.
  */
 const MAX_VIPS_OPS_BEFORE_RECYCLE = 50;
 
