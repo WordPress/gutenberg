@@ -24,12 +24,14 @@ html.interface-interface-skeleton__html-container {
 	height: auto;
 	max-height: 100%;
 
-	// Fill the available space on Mobile.
+	// Fill the available space on Mobile. The visual viewport offsets keep the
+	// skeleton above the on-screen keyboard, see `useFollowVisualViewport`.
+	// Once the admin bar is panned out of view, the skeleton takes its place.
 	position: fixed;
-	top: $admin-bar-height-big;
+	top: max(#{$admin-bar-height-big}, var(--wp-interface-skeleton--visual-viewport-top, 0px));
 	left: 0;
 	right: 0;
-	bottom: 0;
+	bottom: var(--wp-interface-skeleton--visual-viewport-bottom, 0px);
 
 	// Adjust to admin-bar going small.
 	@media (min-width: #{ ($break-medium + 1) }) {
