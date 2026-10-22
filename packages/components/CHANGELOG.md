@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
 -   `Modal`: Use the design system outline for scrollable content focus ([#85251](https://github.com/WordPress/gutenberg/pull/85251)).
 -   `FormToggle`: Use the design system outline for the focus ring ([#85285](https://github.com/WordPress/gutenberg/pull/85285)).
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
