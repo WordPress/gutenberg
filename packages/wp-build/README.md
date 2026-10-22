@@ -276,6 +276,24 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.externals`
+
+Individual packages to load from a shared script module instead of bundling them or using their default handle. Each entry maps a package name to an object with the `module` ID of the script module that provides it:
+
+```json
+{
+	"wpPlugin": {
+		"externals": {
+			"@wordpress/ui": {
+				"module": "my-plugin/wp-ui-0-1-2"
+			}
+		}
+	}
+}
+```
+
+With this configuration, `import { Button } from '@wordpress/ui'` in a script module imports `my-plugin/wp-ui-0-1-2` and adds it to `module_dependencies`. Classic scripts resolve the package as usual. The plugin must register a script module with that ID that exports the package. Only exact package names are matched.
+
 ### `wpPlugin.pages` (Experimental)
 
 Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
