@@ -21,19 +21,13 @@ import {
 	VALID_BACKGROUND_CLIP_VALUES,
 } from '@wordpress/style-engine';
 import type { Style } from '@wordpress/style-engine';
-import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
-import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
+import { BACKGROUND_SUPPORT_KEY } from './background';
+import { BORDER_SUPPORT_KEY, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY } from './color';
-import { ElementsEdit } from './elements';
-import {
-	TypographyPanel,
-	TYPOGRAPHY_SUPPORT_KEY,
-	TYPOGRAPHY_SUPPORT_KEYS,
-} from './typography';
+import { TYPOGRAPHY_SUPPORT_KEY, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
-	DimensionsPanel,
 	isExplicitAspectRatio,
 } from './dimensions';
 import {
@@ -59,6 +53,7 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
 import { unlock } from '../lock-unlock';
+import BlockStylePanels from '../components/block-inspector/block-style-panels';
 import type {
 	PanelBorderSide,
 	PanelStyle,
@@ -1138,30 +1133,14 @@ function BlockStyleControls( {
 		return null;
 	}
 
-	const panelSettings = {
-		...settings,
-		typography: {
-			...settings.typography,
-			// The text alignment UI for individual blocks is rendered in
-			// the block toolbar, so disable it here.
-			textAlign: false,
-		},
-	};
-
-	const passedProps = {
-		clientId,
-		name,
-		setAttributes,
-		settings: panelSettings,
-	};
-
 	return (
 		<BlockStyleStateProvider value={ selectedState }>
-			<ElementsEdit { ...passedProps } />
-			<BackgroundImagePanel { ...passedProps } />
-			<TypographyPanel { ...passedProps } />
-			<BorderPanel { ...passedProps } />
-			<DimensionsPanel { ...passedProps } />
+			<BlockStylePanels
+				clientId={ clientId }
+				name={ name }
+				setAttributes={ setAttributes }
+				settings={ settings }
+			/>
 		</BlockStyleStateProvider>
 	);
 }

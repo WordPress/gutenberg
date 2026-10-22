@@ -85,6 +85,7 @@ export function DimensionsPanel( {
 	name,
 	setAttributes,
 	settings,
+	asWrapper,
 }: DimensionsHookPanelProps ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
@@ -161,7 +162,7 @@ export function DimensionsPanel( {
 	return (
 		<>
 			<StylesDimensionsPanel
-				as={ DimensionsInspectorControl }
+				as={ asWrapper || DimensionsInspectorControl }
 				panelId={ clientId }
 				settings={ settings }
 				allowAxialBlockGap={ isAxialBlockGapAllowed(
