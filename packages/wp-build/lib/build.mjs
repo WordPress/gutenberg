@@ -128,6 +128,12 @@ const boolConfigVal = ( value ) => {
 	return [ 'true', '1' ].includes( value.toLowerCase() );
 };
 
+/*
+ * Set from `--minified-only`, which skips the bundles that WordPress loads only
+ * when `SCRIPT_DEBUG` is true, and the source maps of the minified bundles.
+ */
+let minifiedOnly = false;
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
 		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ??
@@ -148,6 +154,17 @@ const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
 } );
+
+/**
+ * Bundles the non-minified version of an entry point, which WordPress loads
+ * when `SCRIPT_DEBUG` is true. Does nothing with `--minified-only`.
+ *
+ * @param {import('esbuild').BuildOptions} options esbuild build options.
+ * @return {Promise<import('esbuild').BuildResult>|undefined} The build, or undefined when skipped.
+ */
+function buildNonMinified( options ) {
+	return minifiedOnly ? undefined : esbuild.build( options );
+}
 
 /**
  * Initialize WordPress externals plugin with custom namespace configuration.
@@ -559,7 +576,7 @@ async function bundlePackage( packageName, options = {} ) {
 			entryPoints: [ entryPoint ],
 			bundle: true,
 			loader: LOADER_CONFIG,
-			sourcemap: true,
+			sourcemap: ! minifiedOnly,
 			format: 'iife',
 			target,
 			platform: 'browser',
@@ -615,7 +632,7 @@ async function bundlePackage( packageName, options = {} ) {
 					),
 				],
 			} ),
-			esbuild.build( {
+			buildNonMinified( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
@@ -683,7 +700,7 @@ async function bundlePackage( packageName, options = {} ) {
 					// worker) stays compact; ASCII output would escape high
 					// bytes as \uXXXX and defeat the compression.
 					charset: 'utf8',
-					sourcemap: ! isWasmWorker,
+					sourcemap: ! isWasmWorker && ! minifiedOnly,
 					format: 'esm',
 					target,
 					platform: 'browser',
@@ -703,7 +720,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 			if ( ! isWasmWorker ) {
 				builds.push(
-					esbuild.build( {
+					buildNonMinified( {
 						loader: LOADER_CONFIG,
 						entryPoints: [ entryPoint ],
 						outfile: path.join(
@@ -1721,7 +1738,7 @@ async function buildRoute( routeName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
+				buildNonMinified( {
 					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.js' ),
@@ -1775,7 +1792,7 @@ async function buildRoute( routeName ) {
 					),
 				],
 			} ),
-			esbuild.build( {
+			buildNonMinified( {
 				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.js' ),
@@ -1888,7 +1905,7 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
+				buildNonMinified( {
 					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.js' ),
@@ -1941,7 +1958,7 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
+				buildNonMinified( {
 					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.js' ),
@@ -2860,10 +2877,15 @@ async function main() {
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},
+			'minified-only': {
+				type: 'boolean',
+				default: false,
+			},
 		},
 		strict: false,
 	} );
 
+	minifiedOnly = values[ 'minified-only' ];
 	const baseUrlExpression = values[ 'base-url' ];
 
 	await buildAll( baseUrlExpression );

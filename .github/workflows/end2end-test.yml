@@ -79,8 +79,10 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            # The tests run with `SCRIPT_DEBUG` false (see .wp-env.test.json),
+            # which loads only the minified bundles.
             - name: Npm build
-              run: npm run build
+              run: npm run build -- --minified-only
 
             # Wider than the `build*` directories, because the build also emits
             # generated files next to sources: the block parsers, the icon

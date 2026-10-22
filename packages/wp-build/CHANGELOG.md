@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `--minified-only` option that skips the non-minified bundles and the source maps of the minified bundles, for builds that only run with `SCRIPT_DEBUG` false ([#85252](https://github.com/WordPress/gutenberg/pull/85252)).
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes
