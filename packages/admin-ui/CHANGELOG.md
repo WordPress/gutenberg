@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Page`: Add `Page.HeaderActionsFill`, which renders its content after the page's own header actions.
+
 ### Internal
 
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
