@@ -50,6 +50,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `queryId`
 - `query`
 - `enhancedPagination`
+- `useAlphabeticalPagination`
 
 ## Block Markup
 
