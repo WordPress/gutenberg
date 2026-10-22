@@ -42,6 +42,7 @@ import type { BlockVisibility } from '../components/block-visibility/use-block-v
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
 	BlockPattern,
+	BlockToolbarView,
 	ClientIdsTreeNode,
 	State,
 	UserPattern,
@@ -903,6 +904,25 @@ export function isSyncedBlock( state: State, clientId: string ) {
  */
 export function getEditedContentOnlySection( state: State ) {
 	return state.editedContentOnlySection;
+}
+
+/**
+ * Returns which view of the block toolbar is shown for a block: `block` for
+ * block-level actions or `content` for the block's editing tools.
+ *
+ * @param state    Global application state.
+ * @param clientId The client id of the block.
+ *
+ * @return `block` or `content`.
+ */
+export function getBlockToolbarView(
+	state: State,
+	clientId: string | undefined
+): BlockToolbarView {
+	const { blockToolbarView } = state;
+	return blockToolbarView && blockToolbarView.clientId === clientId
+		? blockToolbarView.view
+		: 'block';
 }
 
 export function isWithinEditedContentOnlySection(

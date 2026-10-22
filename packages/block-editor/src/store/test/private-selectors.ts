@@ -38,6 +38,7 @@ import {
 	shouldRenderBlockListView,
 	getStyleOverrides,
 	canHostEditableRoot,
+	getBlockToolbarView,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -93,6 +94,23 @@ describe( 'private selectors', () => {
 			} );
 
 			expect( isBlockInterfaceHidden( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getBlockToolbarView', () => {
+		it( 'returns the block view when no view was chosen', () => {
+			const state = partial< State >( { blockToolbarView: null } );
+			expect( getBlockToolbarView( state, 'block-1' ) ).toBe( 'block' );
+			// No block selected.
+			expect( getBlockToolbarView( state, undefined ) ).toBe( 'block' );
+		} );
+
+		it( 'returns the chosen view for its block only', () => {
+			const state = partial< State >( {
+				blockToolbarView: { clientId: 'block-1', view: 'content' },
+			} );
+			expect( getBlockToolbarView( state, 'block-1' ) ).toBe( 'content' );
+			expect( getBlockToolbarView( state, 'block-2' ) ).toBe( 'block' );
 		} );
 	} );
 

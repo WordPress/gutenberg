@@ -1,6 +1,15 @@
 import type { ComponentProps, ReactElement, RefObject } from 'react';
 import type { createSlotFill, DropdownMenu } from '@wordpress/components';
 
+declare global {
+	interface Window {
+		/**
+		 * Whether the block toolbar views experiment is enabled.
+		 */
+		__experimentalBlockToolbarViews?: boolean;
+	}
+}
+
 type SlotFill = ReturnType< typeof createSlotFill >;
 
 /**

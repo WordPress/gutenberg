@@ -6,6 +6,7 @@ import type { Block } from '@wordpress/blocks';
 import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
+	BlockToolbarView,
 	InsertionPoint,
 	LastFocus,
 	RemovalPromptMessage,
@@ -425,6 +426,25 @@ export function editContentOnlySection( clientId?: string | null ) {
 export function stopEditingContentOnlySection() {
 	return {
 		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
+
+/**
+ * Shows the block-level actions (`block`) or the editing tools (`content`) in
+ * the toolbar of the given block. Only changes what the toolbar shows; the
+ * block behaves the same in the canvas either way.
+ *
+ * @param clientId The client id of the block.
+ * @param view     Either `block` or `content`.
+ */
+export function setBlockToolbarView(
+	clientId: string,
+	view: BlockToolbarView
+) {
+	return {
+		type: 'SET_BLOCK_TOOLBAR_VIEW',
+		clientId,
+		view,
 	};
 }
 
