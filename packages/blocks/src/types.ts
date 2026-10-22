@@ -305,6 +305,18 @@ export interface BlockFilesTransform extends BlockTransformBase {
 }
 
 /**
+ * A transform triggered by typing text that matches a pattern.
+ */
+export interface BlockInputTransform extends BlockTransformBase {
+	type: 'input';
+	/**
+	 * The pattern the whole text has to match for the transform to apply.
+	 */
+	regExp: RegExp;
+	transform: () => Block | Block[];
+}
+
+/**
  * A transform triggered by typing a prefix followed by a space.
  */
 export interface BlockPrefixTransform extends BlockTransformBase {
@@ -419,6 +431,7 @@ export type BlockTransform<
 	| BlockBlockTransform< Attributes >
 	| BlockEnterTransform
 	| BlockFilesTransform
+	| BlockInputTransform
 	| BlockPrefixTransform
 	| BlockRawTransform
 	| BlockShortcodeTransform;
