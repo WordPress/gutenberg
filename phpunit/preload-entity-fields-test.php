@@ -163,5 +163,6 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		$this->assertSame( 'not paths', _wp_preload_entity_fields( 'not paths', $context ) );
 		$this->assertSame( $object, _wp_preload_entity_fields( $object, $context ) );
 		$this->assertSame( array( '/wp/v2/types' ), _wp_preload_entity_fields( array( '/wp/v2/types' ) ) );
+		$this->assertSame( array(), _wp_preload_entity_fields( null ) );
 	}
 }
