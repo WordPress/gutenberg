@@ -104,18 +104,20 @@ export const InfotipWithButton: Story = {
 				<VisuallyHidden render={ <Popover.Title /> }>
 					Upload failed
 				</VisuallyHidden>
-				<Stack direction="column" gap="sm" align="start">
+				<Stack direction="column" gap="sm">
 					<Popover.Description>
 						The upload was interrupted. Check your connection and
 						try again.
 					</Popover.Description>
-					<Button
-						variant="minimal"
-						tone="brand"
-						onClick={ action( 'Retry upload' ) }
-					>
-						Retry upload
-					</Button>
+					<Stack direction="row" justify="flex-end">
+						<Button
+							variant="minimal"
+							tone="brand"
+							onClick={ action( 'Retry upload' ) }
+						>
+							Retry upload
+						</Button>
+					</Stack>
 				</Stack>
 			</Popover.Popup>
 		),
