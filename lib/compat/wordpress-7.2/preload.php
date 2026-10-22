@@ -35,25 +35,6 @@ function _gutenberg_get_post_type_fields_preload_paths( $post_types ) {
 }
 
 /**
- * Preloads the fields of the post types the editors list.
- *
- * The editors read them from the `wp/v2/entity-fields` route, see `useFields`
- * in packages/editor/src/dataviews/fields-loader/index.ts. The post editor
- * reads those of the edited post in the post summary of its inspector. The
- * site editor reads those of the edited post, if any, and of the post types of
- * the screen it opens on. A path must match the request of the
- * `getFieldsConfig` core data resolver, see packages/core-data/src/resolvers.js.
- *
- * @param array                   $paths   REST API paths to preload.
- * @param WP_Block_Editor_Context $context Block editor context.
- * @return array Filtered preload paths.
- */
-function _gutenberg_preload_entity_fields( $paths, $context = null ) {
-	return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-fields' );
-}
-add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
-
-/**
  * Filters the block editor preload paths.
  *
  * @since 7.2.0

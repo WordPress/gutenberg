@@ -201,3 +201,24 @@ if ( ! function_exists( 'wp_register_entity_field_collection' ) ) {
 		return WP_Entity_Fields_Registry::get_instance()->register_collection( $directory );
 	}
 }
+
+if ( ! function_exists( '_wp_preload_entity_fields' ) ) {
+	/**
+	 * Preloads the fields of the post types the editors list.
+	 *
+	 * The editors read them from the `wp/v2/entity-fields` route, see `useFields`
+	 * in packages/editor/src/dataviews/fields-loader/index.ts. The post editor
+	 * reads those of the edited post in the post summary of its inspector. The
+	 * site editor reads those of the edited post, if any, and of the post types of
+	 * the screen it opens on. A path must match the request of the
+	 * `getFieldsConfig` core data resolver, see packages/core-data/src/resolvers.js.
+	 *
+	 * @param array                   $paths   REST API paths to preload.
+	 * @param WP_Block_Editor_Context $context Block editor context.
+	 * @return array Filtered preload paths.
+	 */
+	function _wp_preload_entity_fields( $paths, $context = null ) {
+		return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-fields' );
+	}
+	add_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_fields', 10, 2 );
+}
