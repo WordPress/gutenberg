@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { ReactElement } from 'react';
 import {
 	concatChildren,
 	createElement,
@@ -10,7 +11,10 @@ import {
 describe( 'element', () => {
 	describe( 'renderToString', () => {
 		it( 'should return an empty string for booleans/null/undefined values', () => {
-			expect( renderToString() ).toBe( '' );
+			expect(
+				// @ts-expect-error renderToString requires an element argument; missing input serializes to an empty string.
+				renderToString()
+			).toBe( '' );
 			expect( renderToString( false ) ).toBe( '' );
 			expect( renderToString( true ) ).toBe( '' );
 			expect( renderToString( null ) ).toBe( '' );
@@ -80,14 +84,21 @@ describe( 'element', () => {
 		} );
 
 		it( 'should concat the string arrays', () => {
-			expect( concatChildren( [ 'a' ], 'b' ) ).toEqual( [ 'a', 'b' ] );
+			expect(
+				concatChildren(
+					[ 'a' ],
+					// @ts-expect-error concatChildren expects an array; a scalar string is accepted at runtime.
+					'b'
+				)
+			).toEqual( [ 'a', 'b' ] );
 		} );
 
 		it( 'should concat the object arrays and rewrite keys', () => {
 			const concat = concatChildren(
 				[ createElement( 'strong', {}, 'Courgette' ) ],
+				// @ts-expect-error concatChildren expects an array; a single element is accepted at runtime.
 				createElement( 'strong', {}, 'Concombre' )
-			);
+			) as ReactElement[];
 			expect( concat ).toHaveLength( 2 );
 			expect( concat[ 0 ].key ).toBe( '0,0' );
 			expect( concat[ 1 ].key ).toBe( '1,0' );
@@ -96,11 +107,17 @@ describe( 'element', () => {
 
 	describe( 'switchChildrenNodeName', () => {
 		it( 'should return undefined for undefined children', () => {
-			expect( switchChildrenNodeName() ).toBeUndefined();
+			expect(
+				// @ts-expect-error switchChildrenNodeName requires children and nodeName arguments; missing input returns undefined.
+				switchChildrenNodeName()
+			).toBeUndefined();
 		} );
 
 		it( 'should switch strings', () => {
-			const children = switchChildrenNodeName( [ 'a', 'b' ], 'strong' );
+			const children = switchChildrenNodeName(
+				[ 'a', 'b' ],
+				'strong'
+			) as ReactElement< { children: string } >[];
 			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'strong' );
 			expect( children[ 0 ].props.children ).toBe( 'a' );
@@ -115,7 +132,7 @@ describe( 'element', () => {
 					createElement( 'strong', {}, 'Concombre' ),
 				],
 				'em'
-			);
+			) as ReactElement< { children: string; align?: string } >[];
 			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'em' );
 			expect( children[ 0 ].props.children ).toBe( 'Courgette' );
