@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 
 ### Internal
