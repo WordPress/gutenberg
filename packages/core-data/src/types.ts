@@ -1,4 +1,9 @@
-import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
+import type { ReactNode } from 'react';
+import type {
+	SyncConfig,
+	ConnectionStatusDisconnected,
+	Y,
+} from '@wordpress/sync';
 import type {
 	SelectionType,
 	SelectionDirection,
@@ -199,4 +204,87 @@ export interface ResolvedSelection {
 	//   core/table cell.
 	// Set to `null` for WholeBlock selections.
 	attributeKey: string | null;
+}
+
+/**
+ * The props of `EntityProvider`.
+ */
+export interface EntityProviderProps {
+	/**
+	 * The entity kind.
+	 */
+	kind: string;
+	/**
+	 * The entity name.
+	 */
+	type: string;
+	/**
+	 * The entity ID.
+	 */
+	id?: number | string;
+	/**
+	 * Optional revision ID. When set, `useEntityProp` reads from the revision
+	 * record instead of the current entity. Applies only to this entity, not
+	 * to others rendered within it.
+	 */
+	revisionId?: number | string;
+	/**
+	 * The children to wrap.
+	 */
+	children?: ReactNode;
+}
+
+declare global {
+	interface Window {
+		_wpCollaborationDisabledPostTypes?: unknown;
+	}
+}
+
+/**
+ * A transient edit derived from the record, such as the parsed blocks.
+ */
+export interface TransientEditConfig {
+	read: ( record: Record< string, unknown > ) => unknown;
+	write: ( record: Record< string, unknown > ) => Record< string, unknown >;
+}
+
+/**
+ * The fields of a record that an entity's `getTitle` reads.
+ */
+export interface EntityTitleRecord {
+	id?: string | number;
+	name?: string;
+	slug?: string;
+	title?: string | { rendered?: string };
+	[ key: string ]: unknown;
+}
+
+/**
+ * The configuration of an entity.
+ */
+export interface EntityConfig {
+	name: string;
+	kind: string;
+	label?: string;
+	key?: string | false;
+	baseURL: string;
+	baseURLParams?: Record< string, unknown >;
+	plural?: string;
+	rawAttributes?: ReadonlyArray< string >;
+	transientEdits?: Record< string, boolean | TransientEditConfig >;
+	mergedEdits?: Record< string, boolean >;
+	supportsPagination?: boolean;
+	getTitle?: ( record: EntityTitleRecord ) => string | undefined;
+	getRevisionsUrl?: (
+		parentId: string | number,
+		revisionId?: string | number
+	) => string;
+	__unstablePrePersist?: (
+		persistedRecord: Record< string, unknown > | undefined,
+		edits: Record< string, unknown >
+	) => Promise< Record< string, unknown > >;
+	__unstable_rest_base?: string;
+	revisionKey?: string;
+	syncConfig?: SyncConfig;
+	meta?: Record< string, unknown >;
 }

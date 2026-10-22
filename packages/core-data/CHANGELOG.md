@@ -2,9 +2,30 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the resolvers to TypeScript and add the store thunk arguments type ([#85069](https://github.com/WordPress/gutenberg/pull/85069)).
+-   Convert the entities config and the store reducer to TypeScript, and add the store `Action` type ([#85065](https://github.com/WordPress/gutenberg/pull/85065)).
+-   Convert the entity hooks, the entity providers and the parsed blocks cache to TypeScript ([#85063](https://github.com/WordPress/gutenberg/pull/85063)).
+-   Convert the batch and fetch helpers to TypeScript ([#85062](https://github.com/WordPress/gutenberg/pull/85062)).
+-   Convert the queried data to TypeScript ([#85061](https://github.com/WordPress/gutenberg/pull/85061)).
+-   Convert the store locks to TypeScript ([#85059](https://github.com/WordPress/gutenberg/pull/85059)).
+-   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
+
+## 9.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
+
+### Internal
+
+-   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Add the private `getEntityActionsConfig( kind, name )` selector, which fetches the actions registered on the server for an entity from the `/wp/v2/entity-actions` route ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 
 ## 8.2.0 (2026-10-07)
 
