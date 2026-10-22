@@ -112,7 +112,7 @@ const positionItems = [
 />;
 ```
 
-Prefixing every non-null value avoids collisions with an arbitrary sentinel such as `__default` that might also occur in application data. Keep serialization stable and unique across the item collection.
+Prefixing every non-null value avoids collisions with a special value such as `__default` that might also occur in application data. Keep serialization stable and unique across the item collection.
 
 When submitting a form, `itemToStringValue` also determines the submitted field value. In this example, Default submits `option:`, while `onValueChange` still receives the original item with `value: ''`. Convert the serialized value back to the application's stored value in your form handler. Check required-field validation separately, because the non-empty serialization makes Default count as a selection.
 

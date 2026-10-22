@@ -81,7 +81,7 @@ export const WithCustomPlaceholder: Story = {
 /**
  * Preserve an empty string in application state by giving each choice a unique,
  * non-empty serialization. The callback still receives the original item.
- * This serializer also changes the value submitted with a form.
+ * This `itemToStringValue` serializer also changes the value submitted with a form.
  */
 export const WithEmptyStringValue: Story = {
 	args: {
