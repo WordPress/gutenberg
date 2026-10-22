@@ -256,6 +256,30 @@
 	}
 }
 
+// In single-page mode the wp-admin menu stays visible, so start the canvas
+// after it. Matches the `editor-left` mixin used by the post editor.
+.layout-single-page.has-full-canvas .canvas {
+	@media (min-width: #{ (breakpoints.$break-medium + 1) }) {
+		inset-inline-start: variables.$admin-sidebar-width;
+
+		:global(.auto-fold) & {
+			inset-inline-start: variables.$admin-sidebar-width-collapsed;
+		}
+	}
+
+	@media (min-width: #{ (breakpoints.$break-large + 1) }) {
+		:global(.auto-fold) & {
+			inset-inline-start: variables.$admin-sidebar-width;
+		}
+	}
+
+	@media (min-width: #{ (breakpoints.$break-medium + 1) }) {
+		:global(.folded) & {
+			inset-inline-start: variables.$admin-sidebar-width-collapsed;
+		}
+	}
+}
+
 @media (max-width: #{breakpoints.$break-medium}) {
 	.stage,
 	.inspector,

@@ -32,7 +32,8 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' ) ) {
 		$collaboration_enabled = ! (
 			'site-editor.php' === $pagenow ||
-			( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] )
+			( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] ) ||
+			( isset( $_GET['page'] ) && 'site-editor-v2-wp-admin' === $_GET['page'] )
 		);
 
 		wp_add_inline_script(

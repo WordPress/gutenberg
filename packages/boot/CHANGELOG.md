@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   In single-page mode, wp-admin menu links that point at the current page navigate between its routes without reloading, and the current menu item follows the route.
+
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes

@@ -12,6 +12,7 @@ import PluginArea from '../plugin-area';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
+import useAdminMenuSync from './use-admin-menu-sync';
 import styles from './style.module.scss';
 import useRouteTitle from '../app/use-route-title';
 
@@ -31,6 +32,7 @@ export default function RootSinglePage() {
 	const isFullScreen = canvas && ! canvas.isPreview;
 
 	useRouteTitle();
+	useAdminMenuSync();
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
