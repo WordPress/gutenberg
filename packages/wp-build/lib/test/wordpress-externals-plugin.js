@@ -30,8 +30,7 @@ Button();
 	} );
 
 	expect( await readFile( path.join( outdir, 'index.min.js' ), 'utf8' ) )
-		.toBe( `
-// <stdin>
+		.toBe( `// <stdin>
 import { Button } from "my-plugin/wp-ui-0-1-2";
 Button();
 ` );
