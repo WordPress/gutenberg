@@ -30,109 +30,6 @@ export const Default: Story = {
 	},
 };
 
-export const High: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'high',
-	},
-};
-
-export const Medium: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'medium',
-	},
-};
-
-export const Low: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'low',
-	},
-};
-
-export const Stable: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'stable',
-	},
-};
-
-export const Informational: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'informational',
-	},
-};
-
-export const Draft: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'draft',
-	},
-};
-
-export const None: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'none',
-	},
-};
-
-export const AllIntents: Story = {
-	...Default,
-	render: ( args ) => (
-		<div
-			style={ {
-				display: 'grid',
-				gridTemplateColumns: 'max-content min-content',
-				gap: '1rem',
-				color: 'var(--wpds-color-foreground-content-neutral)',
-			} }
-		>
-			{ (
-				[
-					'high',
-					'medium',
-					'low',
-					'stable',
-					'informational',
-					'draft',
-					'none',
-				] as const
-			 ).map( ( intent ) => (
-				<Fragment key={ intent }>
-					<div
-						style={ {
-							paddingInlineEnd: '1rem',
-							display: 'flex',
-							alignItems: 'center',
-						} }
-					>
-						{ intent }
-					</div>
-					<div
-						style={ {
-							padding: '0.5rem 1rem',
-							display: 'flex',
-							alignItems: 'center',
-						} }
-					>
-						<Badge { ...args } intent={ intent } />
-					</div>
-				</Fragment>
-			) ) }
-		</div>
-	),
-};
-
 /**
  * Use an infotip sparingly when a status needs a short explanation.
  * The whole badge opens the popup on hover or activation.
@@ -205,19 +102,19 @@ export const InfotipWithButton: Story = {
 				} }
 			>
 				<VisuallyHidden render={ <Popover.Title /> }>
-					Payout failed
+					Upload failed
 				</VisuallyHidden>
 				<Stack direction="column" gap="sm" align="start">
 					<Popover.Description>
-						The account number is too long. The money is back in
-						your balance and will be included in your next payout.
+						The upload was interrupted. Check your connection and
+						try again.
 					</Popover.Description>
 					<Button
-						variant="outline"
-						size="small"
-						onClick={ action( 'Update bank account' ) }
+						variant="minimal"
+						tone="brand"
+						onClick={ action( 'Retry upload' ) }
 					>
-						Update bank account
+						Retry upload
 					</Button>
 				</Stack>
 			</Popover.Popup>
@@ -225,8 +122,11 @@ export const InfotipWithButton: Story = {
 	},
 };
 
-export const AllIntentsWithInfotips: Story = {
-	args: WithInfotip.args,
+export const AllIntents: Story = {
+	args: {
+		...WithInfotip.args,
+		children: 'Status',
+	},
 	render: ( args ) => (
 		<div
 			style={ {
@@ -254,10 +154,12 @@ export const AllIntentsWithInfotips: Story = {
 			 ).map( ( intent ) => (
 				<Fragment key={ intent }>
 					<span>{ intent }</span>
-					<Badge intent={ intent }>Status</Badge>
-					<Badge { ...args } intent={ intent }>
-						Status
-					</Badge>
+					<Badge
+						{ ...args }
+						intent={ intent }
+						infotip={ undefined }
+					/>
+					<Badge { ...args } intent={ intent } />
 				</Fragment>
 			) ) }
 		</div>
