@@ -266,11 +266,11 @@ export interface MediaEditModifier {
 	/**
 	 * The type of modifier.
 	 */
-	type?: string;
+	type: string;
 	/**
 	 * The arguments of the modifier.
 	 */
-	args?: Record< string, unknown >;
+	args: Record< string, unknown >;
 }
 
 /**
@@ -280,7 +280,7 @@ export interface MediaEdits {
 	/**
 	 * The URL of the media item.
 	 */
-	src?: string;
+	src: string;
 	/**
 	 * The modifiers to apply to the media item.
 	 */

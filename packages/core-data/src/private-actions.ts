@@ -51,7 +51,8 @@ export function receiveRegisteredPostMeta(
 export const editMediaEntity =
 	(
 		recordId: string | number,
-		edits: MediaEdits = {},
+		// The endpoint rejects the empty default, which only a call without edits sends.
+		edits: MediaEdits | Record< string, never > = {},
 		{
 			__unstableFetch = apiFetch,
 			throwOnError = false,
