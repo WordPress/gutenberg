@@ -1,14 +1,21 @@
 /*
- * The count is metadata about the tab it trails, so it stays quieter than the
- * label. On the selected tab the whole tab reads as one active item, so the
- * count takes the label's color instead.
+ * The count takes the tab's color, so it follows every state the tab styles:
+ * selected, hovered, focused, pressed, and disabled. Only an idle tab that can
+ * be selected mutes it, as metadata quieter than the label.
  */
 .count {
 	margin-inline-start: var(--wpds-dimension-gap-xs);
-	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-variant-numeric: tabular-nums;
 }
 
-[aria-selected="true"] .count {
-	color: inherit;
+[role="tab"]:not(
+	[aria-selected="true"],
+	[aria-disabled="true"],
+	:disabled,
+	:hover,
+	:active,
+	:focus-within,
+	[data-focus-visible]
+) .count {
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
