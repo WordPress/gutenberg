@@ -1471,6 +1471,111 @@ describe( 'Post actions', () => {
 				content: 'unsaved content',
 			} );
 		} );
+
+		describe( 'restoreBrowserBackup()', () => {
+			const backup = {
+				title: 'Backup title',
+				content: 'backup content',
+				excerpt: '',
+				time: Date.parse( '2026-10-12T15:41:00' ),
+			};
+
+			it( 'saves the current content of a draft before restoring the backup', async () => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'Saved title',
+					content: 'saved content',
+					excerpt: '',
+					status: 'draft',
+				};
+				const { registry, savedData } = setUpRestore( post );
+				const editorActions = unlock(
+					registry.dispatch( editorStore )
+				);
+				editorActions.viewBrowserBackup( backup );
+
+				await editorActions.restoreBrowserBackup();
+
+				expect( savedData ).toHaveLength( 1 );
+				expect( savedData[ 0 ] ).toMatchObject( {
+					content: 'saved content',
+				} );
+				expect(
+					registry
+						.select( editorStore )
+						.getEditedPostAttribute( 'title' )
+				).toBe( 'Backup title' );
+			} );
+
+			it( 'does not save first for a published post', async () => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'Saved title',
+					content: 'saved content',
+					excerpt: '',
+					status: 'publish',
+				};
+				const { registry, savedData } = setUpRestore( post );
+				const editorActions = unlock(
+					registry.dispatch( editorStore )
+				);
+				editorActions.viewBrowserBackup( backup );
+
+				await editorActions.restoreBrowserBackup();
+
+				expect( savedData ).toHaveLength( 0 );
+				expect(
+					registry
+						.select( editorStore )
+						.getEditedPostAttribute( 'title' )
+				).toBe( 'Backup title' );
+			} );
+
+			it( 'does not restore the backup when saving the current content fails', async () => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'Saved title',
+					content: 'saved content',
+					excerpt: '',
+					status: 'draft',
+				};
+				const { registry } = setUpRestore( post, {
+					onSave: () => {
+						throw {
+							code: 'test_save_failure',
+							message: 'Details from server.',
+						};
+					},
+				} );
+				const editorActions = unlock(
+					registry.dispatch( editorStore )
+				);
+				editorActions.viewBrowserBackup( backup );
+
+				await editorActions.restoreBrowserBackup();
+
+				expect(
+					registry
+						.select( editorStore )
+						.getEditedPostAttribute( 'title' )
+				).toBe( 'Saved title' );
+				expect(
+					registry
+						.select( noticesStore )
+						.getNotices()
+						.find(
+							( notice ) =>
+								notice.id === 'editor-revision-restore-failed'
+						)
+				).toMatchObject( {
+					content:
+						'The backup was not restored because the current version of the post could not be saved first. Your content has not been changed.',
+				} );
+			} );
+		} );
 	} );
 } );
 
