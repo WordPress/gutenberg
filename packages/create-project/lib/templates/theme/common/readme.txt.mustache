@@ -1,0 +1,251 @@
+=== {{title}} ===
+
+Contributors: {{author}}
+Tags: {{#tags}}{{tags}}{{/tags}}{{^tags}}custom-menu, custom-logo, editor-style, featured-images, full-site-editing, one-column, rtl-language-support, sticky-post, threaded-comments{{/tags}}
+{{#themeURI}}Theme URI: {{themeURI}}{{/themeURI}}
+Requires at least: {{#requiresAtLeast}}{{requiresAtLeast}}{{/requiresAtLeast}}{{^requiresAtLeast}}6.0{{/requiresAtLeast}}
+Tested up to: {{#testedUpTo}}{{testedUpTo}}{{/testedUpTo}}{{^testedUpTo}}6.4{{/testedUpTo}}
+Requires PHP: {{#requiresPHP}}{{requiresPHP}}{{/requiresPHP}}{{^requiresPHP}}7.4{{/requiresPHP}}
+Stable tag: {{#version}}{{version}}{{/version}}{{^version}}1.0.0{{/version}}
+License: {{#license}}{{license}}{{/license}}{{^license}}GPL-2.0-or-later{{/license}}
+{{#licenseURI}}License URI: {{licenseURI}}{{/licenseURI}}
+
+{{#description}}{{description}}{{/description}}{{^description}}A custom WordPress theme built with modern development practices.{{/description}}
+
+== Description ==
+
+{{title}} is a {{#isFseVariant}}modern Full Site Editing (FSE) theme{{/isFseVariant}}{{#isClassicVariant}}classic WordPress theme{{/isClassicVariant}} designed for flexibility and ease of customization.
+
+{{#description}}
+{{description}}
+{{/description}}
+
+{{#isFseVariant}}
+This theme takes full advantage of the WordPress block editor and Site Editor, allowing you to customize every aspect of your site using blocks. No coding knowledge required!
+{{/isFseVariant}}
+
+{{#isClassicVariant}}
+This theme follows WordPress best practices and provides a solid foundation for building custom websites with traditional PHP templates.
+{{/isClassicVariant}}
+
+
+
+== Features ==
+
+{{#isFseVariant}}
+* Full Site Editing support
+* Global styles and theme.json configuration
+* Template parts and block patterns
+* Custom color palettes and typography
+* Responsive design
+* RTL language support
+{{/isFseVariant}}
+
+{{#isClassicVariant}}
+* Custom header and logo support
+* Primary navigation menu
+* Widget-ready sidebar
+* Post thumbnails support
+* Custom background support
+* Threaded comments
+* RTL language support
+{{/isClassicVariant}}
+
+
+
+{{#withBlocks}}
+* Custom blocks included
+* Block-based content creation
+* Pattern library
+{{/withBlocks}}
+
+== Installation ==
+
+1. Upload the theme files to the `/wp-content/themes/{{slug}}` directory, or install the theme through the WordPress themes screen directly.
+2. Activate the theme through the 'Appearance > Themes' screen in WordPress.
+{{#isFseVariant}}
+3. Visit the Site Editor (Appearance > Editor) to customize your site.
+{{/isFseVariant}}
+{{^isFseVariant}}
+3. Customize your theme through the 'Appearance > Customize' screen.
+{{/isFseVariant}}
+
+== Customization ==
+
+{{#isFseVariant}}
+### Site Editor
+Use the Site Editor to customize your site's appearance:
+- Go to Appearance > Editor
+- Edit templates, template parts, and global styles
+- Customize colors, typography, and layout
+- Create and manage block patterns
+
+### Theme.json
+This theme includes a theme.json file that defines:
+- Color palettes
+- Typography settings
+- Layout defaults
+- Block styling
+{{/isFseVariant}}
+
+{{#isClassicVariant}}
+### Customizer
+Use the WordPress Customizer to personalize your theme:
+- Site Identity: Upload a logo and set site title
+- Colors: Customize header and background colors
+- Menus: Create and assign navigation menus
+- Widgets: Add content to sidebar areas
+- Additional CSS: Add custom styling
+{{/isClassicVariant}}
+
+
+
+{{#withBlocks}}
+
+### Custom Blocks
+This theme includes custom blocks located in:
+- `/assets/src/` - Block source files
+
+To modify or add new blocks, edit the block.json files and associated scripts.
+{{/withBlocks}}
+
+== Development ==
+
+{{#wpScripts}}
+### Build Process
+This theme uses @wordpress/scripts for development:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development mode
+npm start
+
+# Build for production
+npm run build
+
+# Check code quality
+npm run lint
+
+# Format code
+npm run format
+```
+
+### File Structure
+```
+{{slug}}/
+├── assets/
+│   ├── css/          # Compiled styles
+│   ├── js/           # Compiled scripts
+{{#withBlocks}}
+│   └── src/          # Custom blocks
+{{/withBlocks}}
+├── inc/              # PHP includes
+├── template-parts/   # Reusable template parts
+{{#isFseVariant}}
+├── parts/            # Block template parts
+├── patterns/         # Block patterns
+├── styles/           # Style variations
+├── templates/        # Block templates
+└── theme.json        # Theme configuration
+{{/isFseVariant}}
+{{^isFseVariant}}
+└── style.css         # Main stylesheet
+{{/isFseVariant}}
+```
+{{/wpScripts}}
+
+{{^wpScripts}}
+### File Structure
+```
+{{slug}}/
+├── assets/
+│   ├── css/          # Stylesheets
+│   ├── js/           # JavaScript files
+{{#withBlocks}}
+│   └── src/          # Custom blocks
+{{/withBlocks}}
+├── inc/              # PHP includes
+├── template-parts/   # Reusable template parts
+{{#isFseVariant}}
+├── parts/            # Block template parts
+├── patterns/         # Block patterns
+├── styles/           # Style variations
+├── templates/        # Block templates
+└── theme.json        # Theme configuration
+{{/isFseVariant}}
+{{^isFseVariant}}
+└── style.css         # Main stylesheet
+{{/isFseVariant}}
+```
+{{/wpScripts}}
+
+== Frequently Asked Questions ==
+
+{{#isFseVariant}}
+= How do I customize the header and footer? =
+Use the Site Editor (Appearance > Editor) to edit the header and footer template parts. You can modify these using blocks without touching any code.
+
+= Can I change colors and fonts? =
+Yes! Go to Appearance > Editor > Styles to customize colors, typography, and other design elements.
+
+= How do I create custom page layouts? =
+In the Site Editor, go to Templates and either edit existing templates or create new ones using blocks.
+{{/isFseVariant}}
+
+{{#isClassicVariant}}
+= How do I add a custom logo? =
+Go to Appearance > Customize > Site Identity and upload your logo.
+
+= How do I set up navigation menus? =
+Go to Appearance > Menus to create and customize your navigation menus, then assign them in Appearance > Customize > Menus.
+
+= Can I add widgets to the sidebar? =
+Yes! Go to Appearance > Widgets to add content to the sidebar area.
+{{/isClassicVariant}}
+
+{{#withBlocks}}
+= How do I use the custom blocks? =
+The custom blocks will appear in the block editor when editing posts or pages. Look for them in the block inserter or search by name.
+
+= Can I modify the custom blocks? =
+Yes! The block files are located in the theme directory and can be customized to fit your needs.
+{{/withBlocks}}
+
+== Changelog ==
+
+= {{#version}}{{version}}{{/version}}{{^version}}1.0.0{{/version}} =
+* Initial release
+{{#isFseVariant}}
+* Full Site Editing support
+* Theme.json configuration
+* Block templates and patterns
+{{/isFseVariant}}
+{{#isClassicVariant}}
+* Classic theme structure
+* Customizer integration
+* Widget support
+{{/isClassicVariant}}
+
+{{#withBlocks}}
+* Custom blocks included
+{{/withBlocks}}
+
+== Credits ==
+
+{{#author}}* Created by {{author}}{{/author}}
+* Built with WordPress best practices
+* Uses modern web standards
+{{#wpScripts}}
+* Developed with @wordpress/scripts
+{{/wpScripts}}
+
+== Support ==
+
+For theme support and documentation, please visit:
+{{#themeURI}}
+* Theme Homepage: {{themeURI}}
+{{/themeURI}}
+* WordPress Support Forums: https://wordpress.org/support/
+* WordPress Developer Resources: https://developer.wordpress.org/
