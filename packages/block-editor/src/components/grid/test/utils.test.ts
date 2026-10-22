@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getInserterDragBlockNames,
 	GridRect,
 	getBoundingGridRect,
 	getGridRectFromPixelRect,
@@ -175,5 +176,25 @@ describe( 'getRotationFromCSS()', () => {
 	it( 'is 0 for a rotation around another axis', () => {
 		expect( getRotationFromCSS( 'x 45deg' ) ).toBe( 0 );
 		expect( getRotationFromCSS( '1 1 0 45deg' ) ).toBe( 0 );
+	} );
+} );
+
+describe( 'getInserterDragBlockNames()', () => {
+	it( 'returns the block names of an inserter drag', () => {
+		expect(
+			getInserterDragBlockNames( {
+				types: [ 'wp-block:core/image', 'wp-blocks' ],
+			} )
+		).toEqual( [ 'core/image' ] );
+	} );
+
+	it( 'returns nothing for a file drag', () => {
+		expect( getInserterDragBlockNames( { types: [ 'Files' ] } ) ).toEqual(
+			[]
+		);
+	} );
+
+	it( 'returns nothing without a dataTransfer', () => {
+		expect( getInserterDragBlockNames( null ) ).toEqual( [] );
 	} );
 } );
