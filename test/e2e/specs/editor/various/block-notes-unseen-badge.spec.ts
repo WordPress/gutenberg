@@ -185,13 +185,15 @@ test.describe( 'Notes: unseen badge', () => {
 		await expect( secondThread ).toHaveAccessibleName( /, new activity$/ );
 		await expect( ownThread ).not.toHaveAccessibleName( /new activity/ );
 
-		// The dot hides its "New" label until the thread is hovered.
-		const label = firstThread.locator(
-			'.editor-collab-sidebar-panel__unseen-badge'
+		// An 8px dot sits after the note's date and stays put on hover.
+		const dot = firstThread.locator(
+			'time + .editor-collab-sidebar-panel__unseen-dot'
 		);
-		await expect( label ).toHaveCSS( 'font-size', '0px' );
+		await expect( dot ).toHaveCSS( 'width', '8px' );
+		await expect( dot ).toHaveCSS( 'height', '8px' );
+		await expect( dot ).toHaveText( '' );
 		await firstThread.hover();
-		await expect( label ).toHaveCSS( 'font-size', '11px' );
+		await expect( dot ).toHaveCSS( 'width', '8px' );
 
 		await firstThread.click();
 		await expect( firstThread ).not.toHaveAccessibleName( /new activity/ );

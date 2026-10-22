@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getAvatarBorderColor } from './utils';
 
-export function NoteByline( { avatar, name, date, userId } ) {
+export function NoteByline( { avatar, name, date, userId, isUnseen } ) {
 	const hasAvatar = !! avatar;
 	const dateSettings = getDateSettings();
 	const {
@@ -90,19 +90,28 @@ export function NoteByline( { avatar, name, date, userId } ) {
 					{ name ?? currentUserName }
 				</span>
 				{ date && (
-					<Tooltip.Root>
-						<Tooltip.Trigger
-							render={
-								<time
-									dateTime={ commentDateTime }
-									className="editor-collab-sidebar-panel__user-time"
-								>
-									{ commentDateText }
-								</time>
-							}
-						/>
-						<Tooltip.Popup>{ tooltipText }</Tooltip.Popup>
-					</Tooltip.Root>
+					<Stack direction="row" align="center" gap="sm">
+						<Tooltip.Root>
+							<Tooltip.Trigger
+								render={
+									<time
+										dateTime={ commentDateTime }
+										className="editor-collab-sidebar-panel__user-time"
+									>
+										{ commentDateText }
+									</time>
+								}
+							/>
+							<Tooltip.Popup>{ tooltipText }</Tooltip.Popup>
+						</Tooltip.Root>
+						{ isUnseen && (
+							// Not a span: core styles `[role="treeitem"] span[aria-hidden]` as a dashicon.
+							<div
+								className="editor-collab-sidebar-panel__unseen-dot"
+								aria-hidden="true"
+							/>
+						) }
+					</Stack>
 				) }
 			</Stack>
 		</>

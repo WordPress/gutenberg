@@ -262,7 +262,6 @@ export function NoteThread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'has-focus': hasFocus,
-				'is-unseen': isUnseen,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
@@ -302,15 +301,6 @@ export function NoteThread( {
 			>
 				{ __( 'Add new reply' ) }
 			</Button>
-			{ isUnseen && (
-				// Not a span: core styles `[role="treeitem"] span[aria-hidden]` as a dashicon.
-				<div
-					className="editor-collab-sidebar-panel__unseen-badge"
-					aria-hidden="true"
-				>
-					{ __( 'New' ) }
-				</div>
-			) }
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
@@ -323,6 +313,7 @@ export function NoteThread( {
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
+				isUnseen={ isUnseen }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
