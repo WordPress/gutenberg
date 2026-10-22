@@ -79,4 +79,15 @@ class WP_Theme_JSON_Data_Gutenberg {
 	public function get_theme_json() {
 		return $this->theme_json;
 	}
+
+	/**
+	 * Return the origin of the data.
+	 *
+	 * @since N.E.X.T // need to update the version
+	 *
+	 * @return string
+	 */
+	public function get_origin() {
+		return $this->origin;
+	}
 }
