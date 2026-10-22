@@ -2,3 +2,39 @@
 	overflow-x: auto;
 	overflow-y: hidden;
 }
+
+// Tagged and numbered equations sit in a table as wide as the line, with
+// an empty column before the equation and the tag's column taking half of it
+// each, so the equation stays centered and the tag reaches the edge. The
+// converter writes that as the MathML 3 attributes `width` and `columnwidth`,
+// which MathML Core left out: Firefox renders `width`, no engine
+// `columnwidth`. These environments exist in display mode only, so the block
+// is the only place they render, and the rules can live here. They key on
+// the values the converter writes, since `attr()` cannot read a list.
+//
+// Mathematical notation is written left to right in every language, so
+// nothing here is flipped for RTL.
+/*!rtl:begin:ignore*/
+.wp-block-math {
+	// The table's width is a share of its parent, `semantics`, which is
+	// otherwise as wide as its content: Firefox then keeps the table at its
+	// natural width, and WebKit paints nothing at all.
+	math[display="block"] > semantics {
+		width: 100%;
+	}
+
+	mtable[width="100%"] {
+		width: 100%;
+	}
+
+	mtable[columnwidth="50% auto 50%"] > mtr > mtd:first-child,
+	mtable[columnwidth="50% auto 50%"] > mtr > mtd:last-child {
+		width: 50%;
+	}
+
+	mtable[columnwidth="7.5% auto 7.5%"] > mtr > mtd:first-child,
+	mtable[columnwidth="7.5% auto 7.5%"] > mtr > mtd:last-child {
+		width: 7.5%;
+	}
+}
+/*!rtl:end:ignore*/

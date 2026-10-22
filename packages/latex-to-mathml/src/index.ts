@@ -65,6 +65,7 @@ export default function latexToMathML(
 	}
 
 	for ( const table of math.querySelectorAll( 'mtable' ) ) {
+		writeLineWidth( table );
 		writeColumnSpacing( table );
 	}
 
@@ -142,6 +143,81 @@ function setDeclarations(
 }
 
 const MATHML = 'http://www.w3.org/1998/Math/MathML';
+
+/**
+ * Writes the layout of a tagged or numbered equation as table attributes.
+ *
+ * temml sets `\tag` and the numbers of `equation`, `align` and `gather` at
+ * the right edge of the line the way TeX does: the table is as wide as the
+ * line, and an empty cell before the equation and the cell of the tag take
+ * half of it each, so the equation stays centered. It writes that as
+ * `width` styles, as MathML Core has no attribute for it. MathML 3 does:
+ * `width` and `columnwidth` on the table. Firefox renders the first, no
+ * engine the second, and the Math block's stylesheet covers both. These
+ * environments exist in display mode only, so the block is the only place
+ * they render. The numbers come from a counter in temml's stylesheet, which
+ * is not used, so their empty placeholders go.
+ *
+ * @param table The `mtable`.
+ */
+function writeLineWidth( table: Element ) {
+	const declarations = getDeclarations( table );
+	if ( declarations.get( 'width' ) !== '100%' ) {
+		return;
+	}
+	const rows = Array.from( table.children ).filter(
+		( child ) => child.localName === 'mtr'
+	);
+	const widths = new Set< string >();
+	const isBlank = ( cell: Element ) =>
+		( cell.textContent ?? '' ).trim() === '';
+	for ( const row of rows ) {
+		const cells = Array.from( row.children ).filter(
+			( child ) => child.localName === 'mtd'
+		);
+		const first = cells[ 0 ];
+		const last = cells[ cells.length - 1 ];
+		if ( cells.length < 2 || ! isBlank( first ) ) {
+			return;
+		}
+		for ( const cell of [ first, last ] ) {
+			const cellDeclarations = getDeclarations( cell );
+			const width = cellDeclarations.get( 'width' );
+			if ( ! width ) {
+				return;
+			}
+			widths.add( width );
+		}
+	}
+	if ( widths.size !== 1 ) {
+		return;
+	}
+	const [ width ] = widths;
+
+	declarations.delete( 'width' );
+	setDeclarations( table, declarations );
+	table.setAttribute( 'width', '100%' );
+	table.setAttribute( 'columnwidth', `${ width } auto ${ width }` );
+
+	for ( const row of rows ) {
+		const cells = Array.from( row.children ).filter(
+			( child ) => child.localName === 'mtd'
+		);
+		for ( const cell of [ cells[ 0 ], cells[ cells.length - 1 ] ] ) {
+			const cellDeclarations = getDeclarations( cell );
+			cellDeclarations.delete( 'width' );
+			// temml gives these cells no padding at all. The sides are the
+			// table's business, and the row is as tall as the equation
+			// anyway.
+			cellDeclarations.delete( 'padding-top' );
+			cellDeclarations.delete( 'padding-bottom' );
+			setDeclarations( cell, cellDeclarations );
+			if ( isBlank( cell ) ) {
+				cell.replaceChildren();
+			}
+		}
+	}
+}
 
 /**
  * Moves the space between the columns of a table from the cells to the table.

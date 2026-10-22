@@ -47,6 +47,74 @@ describe( 'latexToMathML', () => {
 		).toEqual( [ false, false ] );
 	} );
 
+	describe( 'tags', () => {
+		/**
+		 * The converted LaTeX as a document body.
+		 *
+		 * @param {string} latex The source.
+		 * @return {HTMLElement} The body.
+		 */
+		const convert = ( latex ) => {
+			const doc = document.implementation.createHTMLDocument( '' );
+			doc.body.innerHTML = `<math>${ latexToMathML( latex ) }</math>`;
+			return doc.body;
+		};
+
+		it( 'writes the width of the table and its glue columns', () => {
+			const table =
+				convert( 'E = mc^2 \\tag{1}' ).querySelector( 'mtable' );
+			expect( table?.getAttribute( 'width' ) ).toBe( '100%' );
+			expect( table?.getAttribute( 'columnwidth' ) ).toBe(
+				'50% auto 50%'
+			);
+			expect(
+				Array.from( table?.querySelectorAll( 'mtd' ) ?? [], ( cell ) =>
+					cell.textContent?.trim()
+				)
+			).toEqual( [ '', 'E=mc2', '(1)' ] );
+		} );
+
+		it( 'narrows the glue of multline', () => {
+			expect(
+				convert( '\\begin{multline} a + b \\\\ + c \\end{multline}' )
+					.querySelector( 'mtable' )
+					?.getAttribute( 'columnwidth' )
+			).toBe( '7.5% auto 7.5%' );
+		} );
+
+		it( 'drops the placeholders of equation numbers', () => {
+			const body = convert(
+				'\\begin{gather} a \\tag{1} \\\\ b \\notag \\end{gather}'
+			);
+			expect( body.querySelector( 'span' ) ).toBeNull();
+			expect(
+				Array.from( body.querySelectorAll( 'mtr' ), ( row ) =>
+					Array.from( row.children, ( cell ) => cell.innerHTML )
+				)
+			).toEqual( [
+				[ '', '<mi>a</mi>', '<mtext>(1)</mtext>' ],
+				[ '', '<mi>b</mi>', '' ],
+			] );
+		} );
+
+		it( 'leaves no style behind', () => {
+			for ( const latex of [
+				'E = mc^2 \\tag{1}',
+				'\\begin{equation} a = b \\end{equation}',
+				'\\begin{gather} a \\tag{1} \\\\ b \\notag \\end{gather}',
+				'\\begin{align} a &= b \\tag{x} \\\\ c &= d \\end{align}',
+				'\\begin{multline} a + b \\\\ + c \\end{multline}',
+				'\\begin{aligned} a &= b \\\\ c &= d \\end{aligned} \\tag{2}',
+			] ) {
+				const styled = convert( latex ).querySelector( '[style]' );
+				expect( {
+					latex,
+					style: styled ? styled.getAttribute( 'style' ) : null,
+				} ).toEqual( { latex, style: null } );
+			}
+		} );
+	} );
+
 	describe( 'column spacing', () => {
 		/**
 		 * The table of the converted LaTeX.
