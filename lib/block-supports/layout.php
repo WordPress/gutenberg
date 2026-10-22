@@ -384,6 +384,9 @@ function gutenberg_get_grid_item_box_percent( $fraction ) {
  * @return array Child layout style rules.
  */
 function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array(), $viewport_overrides = null, $has_box = false ) {
+	/** This filter is documented in lib/block-supports/layout.php */
+	$has_grid_interactivity = (bool) apply_filters( 'gutenberg_layout_has_grid_interactivity', false );
+
 	$base_child_layout              = is_array( $child_layout ) ? $child_layout : array();
 	$viewport_overrides             = is_array( $viewport_overrides ) ? $viewport_overrides : null;
 	$child_layout                   = null === $viewport_overrides ? $base_child_layout : array_replace( $base_child_layout, $viewport_overrides );
@@ -480,7 +483,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	if (
 		null === $viewport_overrides &&
 		! empty( $parent_layout['isManualPlacement'] ) &&
-		gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
+		$has_grid_interactivity
 	) {
 		$child_layout_declarations['--wp--grid-item--row-span'] = (string) ( $row_span ? $row_span : 1 );
 	}
@@ -493,7 +496,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	 */
 	$has_grid_item_box = $has_box &&
 		! empty( $parent_layout['isManualPlacement'] ) &&
-		gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		$has_grid_interactivity;
 	if (
 		$has_grid_item_box &&
 		(
@@ -1018,8 +1021,16 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		// Manual grids give all their cells the same size, as part of the grid interactivity experiment.
-		$has_same_size_cells = ! empty( $layout_for_styles['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		/**
+		 * Filters whether manual grids are interactive: their cells all have the same size,
+		 * and blocks can be moved and resized in them. It's the plugin's switch for the grid
+		 * interactivity experiment, and goes away when the experiment does.
+		 *
+		 * @param bool $has_grid_interactivity Whether grid interactivity is on. Default false.
+		 */
+		$has_grid_interactivity = (bool) apply_filters( 'gutenberg_layout_has_grid_interactivity', false );
+		// Manual grids give all their cells the same size, as part of grid interactivity.
+		$has_same_size_cells = ! empty( $layout_for_styles['isManualPlacement'] ) && $has_grid_interactivity;
 		// Cells take their size from the grid's width, unless a minimum column width lets the columns wrap into more rows than the grid has.
 		$has_cells_sized_by_width      = $has_same_size_cells && empty( $layout_for_styles['minimumColumnWidth'] );
 		$base_has_cells_sized_by_width = $has_same_size_cells && empty( $base_layout['minimumColumnWidth'] );
@@ -1189,8 +1200,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * Children of manual grids publish their row span for mobile stacking, as part of the grid
 	 * interactivity experiment, even when they have no child layout of their own.
 	 */
-	$parent_layout         = is_array( $block['parentLayout'] ?? null ) ? $block['parentLayout'] : array();
-	$publishes_grid_layout = ! empty( $parent_layout['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+	$parent_layout = is_array( $block['parentLayout'] ?? null ) ? $block['parentLayout'] : array();
+	/** This filter is documented in lib/block-supports/layout.php */
+	$has_grid_interactivity = (bool) apply_filters( 'gutenberg_layout_has_grid_interactivity', false );
+	$publishes_grid_layout  = ! empty( $parent_layout['isManualPlacement'] ) && $has_grid_interactivity;
 
 	/*
 	 * A block with no layout support and no style attribute at all, that isn't a
@@ -1250,7 +1263,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 */
 		// Children of manual grids publish their row span for mobile stacking.
 		$parent_layout_hash_keys = array( 'minimumColumnWidth', 'columnCount' );
-		if ( gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' ) ) {
+		if ( $has_grid_interactivity ) {
 			$parent_layout_hash_keys[] = 'isManualPlacement';
 		}
 		$container_content_hash_input = array(
@@ -1573,7 +1586,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			'grid' === ( $used_layout['type'] ?? null ) &&
 			! empty( $mobile_layout['isManualPlacement'] ) &&
 			true === ( $mobile_layout['stackOnMobile'] ?? false ) &&
-			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
+			$has_grid_interactivity
 		) {
 			// Stacked blocks are sized by their content again, so their cells are no longer fixed.
 			$stacking_selector = ".$container_class.$container_class";

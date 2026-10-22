@@ -65,7 +65,7 @@ export default function InserterDraggableBlocks( {
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ { type: 'inserter', blocks: draggableBlocks } }
 			onDragStart={ ( event ) => {
-				startDragging( draggableBlocks );
+				startDragging();
 				const addedTypes = new Set< string >();
 				for ( const block of draggableBlocks ) {
 					const type = `wp-block:${ block.name }`;

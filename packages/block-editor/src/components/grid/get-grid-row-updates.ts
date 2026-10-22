@@ -1,7 +1,7 @@
-import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	getUpdatedChildLayoutStyle,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import type { BlockStyle, BlockStyleState } from '../../hooks/types';

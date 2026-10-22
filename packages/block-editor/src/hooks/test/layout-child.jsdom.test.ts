@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
 	getChildLayoutStyleRules,
 	getChildLayoutStyles,
-	getGridItemBox,
 	getResponsiveChildLayoutStyles,
-	getUpdatedChildLayoutStyle,
 	hasGridItemBoxInAnyState,
 } from '../layout-child';
+import { getUpdatedChildLayoutStyle } from '../block-style-state';
+import { getGridItemBox } from '../../components/grid/free-placement';
 
 describe( 'layout child', () => {
 	describe( 'getChildLayoutStyleRules()', () => {

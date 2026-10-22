@@ -24,15 +24,15 @@ import {
 	GridRect,
 	getGridInfo,
 	getGridItemRect,
-	getGridTrackPositions,
-	getGridItemPixelRect,
-	getGridItemRotation,
+	getGridItemMeasurements,
 	getGridRectFromPixelRect,
 	getComputedCSS,
 	getGridTracks,
-	isGridElementWithFixedCells,
+	getInserterDragBlockNames,
 } from './utils';
 import { getRotatedBoundingRect } from './rotation';
+import { useInserterDragBlockNames } from './use-inserter-drag-block-names';
+import { parseDropEvent } from '../use-on-block-drop';
 import {
 	getFreeGridDropTarget,
 	getGrabPoint,
@@ -55,7 +55,6 @@ import {
 } from './get-inserted-block-rect';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
-import { unlock } from '../../lock-unlock';
 import { useStyleOverride } from '../../hooks/utils';
 import { useUpdateGridChildLayout } from './use-update-grid-child-layout';
 import type {
@@ -64,9 +63,10 @@ import type {
 	GridDropIndicatorProps,
 	GridDropTarget,
 	GridCellTilesOptions,
+	GridInfo,
 	GridItemAttributes,
+	GridItemMeasurements,
 	GridPixelRect,
-	GridSibling,
 	GridVisualizerCellProps,
 	GridVisualizerDropLayerProps,
 	GridVisualizerGridProps,
@@ -124,33 +124,26 @@ const GridVisualizerGrid = forwardRef(
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
-		const { isDragging, isDroppingAllowed } = useSelect(
+		// Blocks dragged from an inserter can be dropped in a manual grid,
+		// with grid interactivity.
+		const inserterBlockNames = useInserterDragBlockNames(
+			isManualGrid && window.__experimentalEnableGridInteractivity
+				? gridElement
+				: null
+		);
+		const isDroppingAllowed = useSelect(
 			( select ) => {
-				const selectors = unlock( select( blockEditorStore ) );
+				const selectors = select( blockEditorStore );
 				if ( selectors.isDraggingBlocks() ) {
-					return {
-						isDragging: true,
-						isDroppingAllowed: !! getBlockToPlaceInGrid(
-							selectors,
-							gridClientId
-						),
-					};
+					return !! getBlockToPlaceInGrid( selectors, gridClientId );
 				}
-				if (
-					isManualGrid &&
-					selectors.getDraggedInserterBlocks().length
-				) {
-					return {
-						isDragging: true,
-						isDroppingAllowed: !! getInserterBlocksToPlaceInGrid(
-							selectors,
-							gridClientId
-						),
-					};
-				}
-				return { isDragging: false, isDroppingAllowed: false };
+				return canInsertBlockNamesInGrid(
+					selectors,
+					inserterBlockNames,
+					gridClientId
+				);
 			},
-			[ gridClientId, isManualGrid ]
+			[ gridClientId, inserterBlockNames ]
 		);
 
 		// Get the element for the child grid block so we can
@@ -191,18 +184,14 @@ const GridVisualizerGrid = forwardRef(
 			<BlockPopoverCover
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
+					// Popovers in the block tools slots are hidden once a drag
+					// has been over the block flow. A manual grid's stays, so
+					// that its drop layer can take blocks from the block flow
+					// and give them back.
+					'is-shown-while-dragging': isManualGrid,
 				} ) }
 				clientId={ gridClientId }
-				// Popovers in the block tools slots are hidden once a drag
-				// has been over the block flow. While blocks are dragged, a
-				// manual grid renders in the default popover slot instead, so
-				// its drop layer stays and blocks can be moved between the
-				// grid and the block flow in both directions.
-				__unstablePopoverSlot={
-					isManualGrid && isDragging
-						? 'Popover'
-						: '__unstable-block-tools-after'
-				}
+				__unstablePopoverSlot="__unstable-block-tools-after"
 			>
 				<div
 					ref={ ref }
@@ -431,28 +420,25 @@ function getBlockToPlaceInGrid(
 }
 
 /**
- * Gets the blocks being dragged from an inserter, if they can all be inserted
- * into the grid.
+ * Whether blocks dragged from an inserter can all be inserted into the grid.
  *
  * @param selectors    Block editor store selectors.
+ * @param blockNames   Names of the dragged blocks.
  * @param gridClientId Client ID of the grid block.
  *
- * @return The blocks, or null.
+ * @return Whether they can be dropped in the grid.
  */
-function getInserterBlocksToPlaceInGrid(
+function canInsertBlockNamesInGrid(
 	selectors: InserterBlockSelectors,
+	blockNames: string[],
 	gridClientId: string
-): Block[] | null {
-	const blocks = selectors.getDraggedInserterBlocks();
-	if (
-		! blocks.length ||
-		! blocks.every( ( block ) =>
-			selectors.canInsertBlockType( block.name, gridClientId )
+): boolean {
+	return (
+		blockNames.length > 0 &&
+		blockNames.every( ( name ) =>
+			selectors.canInsertBlockType( name, gridClientId )
 		)
-	) {
-		return null;
-	}
-	return blocks;
+	);
 }
 
 /**
@@ -476,6 +462,13 @@ function GridVisualizerDropLayer( {
 	const lastTargetRef = useRef< GridDropTarget | null >( null );
 	// Where the dragged block was grabbed, for the length of the drag.
 	const grabRef = useRef< GridDragGrab | null >( null );
+	// The grid measured when the drag started over it. Blocks don't move
+	// until the drop, so it is measured again only when the grid resizes.
+	const measurementsRef = useRef< {
+		key: string;
+		gridInfo: GridInfo;
+		measurements: GridItemMeasurements;
+	} | null >( null );
 	const isDragging = useSelect(
 		( select ) => select( blockEditorStore ).isDraggingBlocks(),
 		[]
@@ -483,6 +476,7 @@ function GridVisualizerDropLayer( {
 	useEffect( () => {
 		if ( ! isDragging ) {
 			grabRef.current = null;
+			measurementsRef.current = null;
 		}
 	}, [ isDragging ] );
 	const blockEditorSelectors = useSelect( blockEditorStore );
@@ -501,78 +495,71 @@ function GridVisualizerDropLayer( {
 
 	function clearDropTarget() {
 		lastTargetRef.current = null;
+		measurementsRef.current = null;
 		setDropTarget( null );
+	}
+
+	function getMeasurements( srcClientId: string | null ) {
+		// Blocks dragged from an inserter aren't in the grid.
+		const key = srcClientId ?? 'inserter';
+		const cached = measurementsRef.current;
+		if ( cached?.key === key && cached.gridInfo === gridInfo ) {
+			return cached.measurements;
+		}
+		const measurements = getGridItemMeasurements(
+			gridElement,
+			srcClientId
+		);
+		measurementsRef.current = { key, gridInfo, measurements };
+		return measurements;
 	}
 
 	function getDraggedBlock() {
 		return getBlockToPlaceInGrid( blockEditorSelectors, gridClientId );
 	}
 
-	function getInserterBlocks() {
-		return getInserterBlocksToPlaceInGrid(
-			unlock( blockEditorSelectors ),
+	/**
+	 * Whether the drag is of blocks from an inserter, which haven't been
+	 * inserted yet, that can all be inserted into the grid.
+	 *
+	 * @param event              A drag event, or a touch drag's position.
+	 * @param event.dataTransfer The drag's data, which a touch drag doesn't have.
+	 *
+	 * @return Whether they can be dropped in the grid.
+	 */
+	function isInserterDragToGrid( event: {
+		dataTransfer?: DragEvent[ 'dataTransfer' ];
+	} ) {
+		return canInsertBlockNamesInGrid(
+			blockEditorSelectors,
+			getInserterDragBlockNames( event.dataTransfer ),
 			gridClientId
 		);
 	}
 
 	function updateDropTarget(
-		// A touch drag has no modifier keys.
+		// A touch drag has no modifier keys and no drag data.
 		event: Pick< DragEvent, 'clientX' | 'clientY' > &
-			Partial< Pick< DragEvent, 'shiftKey' > >,
+			Partial< Pick< DragEvent, 'shiftKey' | 'dataTransfer' > >,
 		isHandleDrag: boolean
 	) {
 		const srcClientId = getDraggedBlock();
-		// Blocks dragged from an inserter haven't been inserted yet.
-		const inserterBlocks = srcClientId ? null : getInserterBlocks();
+		const isInserterDrag = ! srcClientId && isInserterDragToGrid( event );
 		const layer = layerRef.current;
-		if ( ( ! srcClientId && ! inserterBlocks ) || ! layer ) {
+		if ( ( ! srcClientId && ! isInserterDrag ) || ! layer ) {
 			clearDropTarget();
 			return;
 		}
 
-		const { columnTracks, rowTracks } =
-			getGridTrackPositions( gridElement );
+		const { columnTracks, rowTracks, siblings, src, hasFixedCells } =
+			getMeasurements( srcClientId );
 		if ( ! columnTracks.length || ! rowTracks.length ) {
 			clearDropTarget();
 			return;
 		}
-
-		// Measure the blocks in the grid from the canvas, so that the result
-		// matches what is on screen in every viewport. Other blocks take up
-		// the cells they reach with their rotation.
-		const siblings: GridSibling[] = [];
-		let srcSpan: GridRect | null = null;
-		let srcPixelRect: GridPixelRect | null = null;
-		let srcAngle = 0;
-		for ( const element of gridElement.children ) {
-			// Block elements are HTML elements.
-			const child = element as HTMLElement;
-			const childClientId = child.getAttribute( 'data-block' );
-			if ( ! childClientId || ! child.offsetParent ) {
-				continue;
-			}
-			const pixelRect = getGridItemPixelRect( child );
-			const angle = getGridItemRotation( child );
-			if ( childClientId === srcClientId ) {
-				srcSpan = getGridRectFromPixelRect(
-					pixelRect,
-					columnTracks,
-					rowTracks
-				);
-				srcPixelRect = pixelRect;
-				srcAngle = angle;
-				continue;
-			}
-			const rotatedPixelRect = getRotatedBoundingRect( pixelRect, angle );
-			siblings.push( {
-				pixelRect: rotatedPixelRect,
-				rect: getGridRectFromPixelRect(
-					rotatedPixelRect,
-					columnTracks,
-					rowTracks
-				),
-			} );
-		}
+		const srcSpan = src?.rect ?? null;
+		const srcPixelRect = src?.pixelRect ?? null;
+		const srcAngle = src?.angle ?? 0;
 		// Blocks from an inserter get the size of a block inserted into
 		// the grid, as do blocks inserted any other way.
 		const srcLayout = srcClientId
@@ -626,7 +613,7 @@ function GridVisualizerDropLayer( {
 		// Where the grid's cells have a fixed size, a block lands exactly
 		// where it is let go, and Shift snaps its corner to the grid lines.
 		// Touch drags have no Shift, so they are always free.
-		const freeTarget = isGridElementWithFixedCells( gridElement )
+		const freeTarget = hasFixedCells
 			? getFreeGridDropTarget( {
 					...dropTargetOptions,
 					angle: srcAngle,
@@ -641,7 +628,7 @@ function GridVisualizerDropLayer( {
 		const lastTarget = lastTargetRef.current;
 		if (
 			lastTarget?.srcClientId === srcClientId &&
-			lastTarget.inserterBlocks === inserterBlocks &&
+			lastTarget.isInserterDrag === isInserterDrag &&
 			lastTarget.landing.columnStart === landing.columnStart &&
 			lastTarget.landing.rowStart === landing.rowStart &&
 			lastTarget.landing.columnSpan === landing.columnSpan &&
@@ -736,7 +723,7 @@ function GridVisualizerDropLayer( {
 
 		const target: GridDropTarget = {
 			srcClientId,
-			inserterBlocks,
+			isInserterDrag,
 			span: { columnSpan, rowSpan },
 			landing,
 			placement,
@@ -748,13 +735,31 @@ function GridVisualizerDropLayer( {
 		setDropTarget( target );
 	}
 
-	function dropOnTarget() {
+	/**
+	 * Drops the dragged blocks on the drop target.
+	 *
+	 * @param event The `drop` event, which a touch drag from a drag handle
+	 *              doesn't have.
+	 */
+	function dropOnTarget( event?: DragEvent ) {
 		const target = lastTargetRef.current;
 		clearDropTarget();
-		if ( target?.inserterBlocks ) {
-			if ( target.inserterBlocks === getInserterBlocks() ) {
+		if ( target?.isInserterDrag ) {
+			// The blocks dragged from an inserter are in the drop's data.
+			const { type, blocks } = event
+				? parseDropEvent( event )
+				: { type: null, blocks: null };
+			if (
+				type === 'inserter' &&
+				blocks?.length &&
+				canInsertBlockNamesInGrid(
+					blockEditorSelectors,
+					blocks.map( ( block ) => block.name ),
+					gridClientId
+				)
+			) {
 				insertInserterBlocks(
-					target.inserterBlocks,
+					blocks,
 					target.landing,
 					target.placement
 				);
