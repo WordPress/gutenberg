@@ -632,9 +632,8 @@ export function MediaEditControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	allowedTypes = [ 'image' ],
-	// TEMP: force the compact multi-item group for testing.
-	// multiple,
-	// isExpanded,
+	multiple,
+	isExpanded,
 	validity,
 	isPickerFiltered,
 	featuredImageFlow,
@@ -655,8 +654,6 @@ export function MediaEditControl< Item >( {
 	 */
 	pickerTitle?: string;
 } ) {
-	const multiple = true;
-	const isExpanded = false;
 	const MediaUploadComponent = isPickerFiltered
 		? FilteredMediaUpload
 		: ConditionalMediaUpload;
