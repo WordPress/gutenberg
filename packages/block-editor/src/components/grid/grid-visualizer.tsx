@@ -210,10 +210,12 @@ const GridVisualizerGrid = forwardRef(
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
 					// Popovers in the block tools slots are hidden once a drag
-					// has been over the block flow. A manual grid's stays, so
-					// that its drop layer can take blocks from the block flow
-					// and give them back.
-					'is-shown-while-dragging': isManualGrid,
+					// has been over the block flow. A manual grid's stays while
+					// the dragged blocks can be dropped in it, so that its drop
+					// layer can take them from the block flow and give them
+					// back. Other drags, such as files, go to the block flow.
+					'is-shown-while-dragging':
+						isManualGrid && isDroppingAllowed,
 				} ) }
 				clientId={ gridClientId }
 				__unstablePopoverSlot="__unstable-block-tools-after"
