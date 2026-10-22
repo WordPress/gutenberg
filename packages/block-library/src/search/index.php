@@ -95,6 +95,22 @@ function render_block_core_search( $attributes ) {
 
 	if ( count( $query_params ) > 0 ) {
 		foreach ( $query_params as $param => $value ) {
+			// Array values, such as multiple post types, are sent as `param[]`
+			// so the query receives them as an array.
+			if ( is_array( $value ) ) {
+				foreach ( $value as $item ) {
+					if ( ! is_scalar( $item ) ) {
+						continue;
+					}
+					$query_params_markup .= sprintf(
+						'<input type="hidden" name="%s[]" value="%s" />',
+						esc_attr( $param ),
+						esc_attr( $item )
+					);
+				}
+				continue;
+			}
+
 			$query_params_markup .= sprintf(
 				'<input type="hidden" name="%s" value="%s" />',
 				esc_attr( $param ),
