@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import type { ActionCreatorWithCustomDispatchSignature } from '@wordpress/data';
 import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
@@ -871,6 +872,19 @@ export const saveEntityRecord =
 	};
 
 /**
+ * The `__experimentalBatch` action creator, whose results `dispatch` keeps.
+ */
+export interface ExperimentalBatch extends ActionCreatorWithCustomDispatchSignature {
+	< Requests extends Array< BatchRequest > | [] >(
+		requests: Requests
+	): ( thunkArgs: CoreDataThunkArgs ) => Promise< BatchResults< Requests > >;
+
+	DispatchSignature: < Requests extends Array< BatchRequest > | [] >(
+		requests: Requests
+	) => Promise< BatchResults< Requests > >;
+}
+
+/**
  * Runs multiple core-data actions at the same time using one API request.
  *
  * Example:
@@ -892,8 +906,11 @@ export const saveEntityRecord =
  * @return A promise that resolves to an array containing the return
  *         values of each function given in `requests`.
  */
-export const __experimentalBatch =
-	< Requests extends Array< BatchRequest > | [] >( requests: Requests ) =>
+export const __experimentalBatch = ( <
+		Requests extends Array< BatchRequest > | [],
+	>(
+		requests: Requests
+	) =>
 	async ( {
 		dispatch,
 	}: CoreDataThunkArgs ): Promise< BatchResults< Requests > > => {
@@ -931,7 +948,7 @@ export const __experimentalBatch =
 		] );
 		// `Promise.all` keeps the order of the requests.
 		return results as BatchResults< Requests >;
-	};
+	} ) as ExperimentalBatch;
 
 /**
  * Action triggered to save an entity record's edits.

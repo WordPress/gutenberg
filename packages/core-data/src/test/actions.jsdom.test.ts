@@ -8,6 +8,7 @@ import {
 	vi,
 } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
+import { dispatch as dispatchStore } from '@wordpress/data';
 import type { Mock } from 'vitest';
 import {
 	editEntityRecord,
@@ -21,6 +22,7 @@ import {
 	__experimentalBatch,
 } from '../actions';
 import { getEntitySyncManager } from '../entity-sync';
+import { store as coreStore } from '../index';
 import type { EntitySyncManager } from '../entity-sync';
 import type * as ET from '../entity-types';
 import type { CoreDataThunkArgs } from '../private-types';
@@ -1576,5 +1578,18 @@ describe( '__experimentalBatch', () => {
 			{ id: 123, updated: true },
 			{ id: 123, deleted: true },
 		] );
+
+		// Never called: the assertion is on the type of the public call.
+		const batchThroughStore = () =>
+			dispatchStore( coreStore ).__experimentalBatch( [
+				( { saveEntityRecord: _saveEntityRecord } ) =>
+					_saveEntityRecord( 'root', 'widget', {} ),
+				( { deleteEntityRecord: _deleteEntityRecord } ) =>
+					_deleteEntityRecord( 'root', 'widget', 123 ),
+			] );
+
+		expectTypeOf( batchThroughStore ).returns.resolves.toEqualTypeOf<
+			[ RestRecord | undefined, unknown ]
+		>();
 	} );
 } );
