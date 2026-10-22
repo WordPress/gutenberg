@@ -13,25 +13,33 @@ import {
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
 import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
+import { BlockRefs } from '../provider/block-refs-provider';
 import type { WritingFlowClipboardEvent } from './types';
 
 /**
  * Whether the DOM selection entirely spans the content of the given block,
  * and the block's editable element is the block element itself, like a
  * heading or a paragraph, not a field within a larger block, like a caption.
+ * A bound field's text belongs to its source, not to the block.
  *
  * @param ownerDocument The block's document.
  * @param clientId      The block's client ID.
+ * @param bindings      The block's bindings.
  *
  * @return Whether the block is entirely selected.
  */
-function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
+function isBlockEntirelySelected(
+	ownerDocument: Document,
+	clientId: string,
+	bindings?: Record< string, unknown >
+) {
 	// The editor's document has a window with a selection.
 	const selection = ownerDocument.defaultView!.getSelection()!;
 
@@ -41,9 +49,17 @@ function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
 
 	const blockElement = ownerDocument.getElementById( `block-${ clientId }` );
 
-	return (
-		!! blockElement?.isContentEditable && isEntirelySelected( blockElement )
-	);
+	if ( ! blockElement?.isContentEditable ) {
+		return false;
+	}
+
+	const key = blockElement.dataset.wpBlockAttributeKey;
+
+	if ( bindings && ( ( key && bindings[ key ] ) || bindings.__default ) ) {
+		return false;
+	}
+
+	return isEntirelySelected( blockElement );
 }
 
 export default function useClipboardHandler() {
@@ -60,6 +76,7 @@ export default function useClipboardHandler() {
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
 		getBlockRootClientId,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -71,6 +88,7 @@ export default function useClipboardHandler() {
 		selectionChange,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
+	const { refsMap } = useContext( BlockRefs );
 
 	return useRefEffect< HTMLElement >( ( node ) => {
 		// Text dropped is inserted the way it would be pasted at the drop
@@ -134,7 +152,9 @@ export default function useClipboardHandler() {
 				! hasMultiSelection() &&
 				isBlockEntirelySelected(
 					( event.target as Element ).ownerDocument,
-					selectedBlockClientIds[ 0 ]
+					selectedBlockClientIds[ 0 ],
+					getBlockAttributes( selectedBlockClientIds[ 0 ] )?.metadata
+						?.bindings
 				);
 
 			// Let native copy/paste behaviour take over in input fields.
@@ -203,7 +223,8 @@ export default function useClipboardHandler() {
 					setClipboardBlocks(
 						event as ClipboardEvent,
 						blocks as Block[],
-						registry
+						registry,
+						refsMap
 					);
 				}
 			}
@@ -322,7 +343,9 @@ export default function useClipboardHandler() {
 					! hasMultiSelection() &&
 					isBlockEntirelySelected(
 						( event.target as Element ).ownerDocument,
-						selectedBlockClientIds[ 0 ]
+						selectedBlockClientIds[ 0 ],
+						getBlockAttributes( selectedBlockClientIds[ 0 ] )
+							?.metadata?.bindings
 					)
 				) {
 					replaceBlocks(

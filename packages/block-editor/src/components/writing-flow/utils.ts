@@ -10,11 +10,69 @@ import {
 } from '@wordpress/blocks';
 import type { Block, BlockFilesTransform } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
+import { create, RichTextData } from '@wordpress/rich-text';
 import type { ClipboardEvent as ReactClipboardEvent } from 'react';
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
+import type { BlockRefsContextValue } from '../provider/types';
 
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
+
+/**
+ * Returns the blocks with their bound rich text fields holding the text shown
+ * in the editor: a bound attribute's value comes from its source.
+ *
+ * @param blocks  Blocks to copy.
+ * @param refsMap The block elements by client ID.
+ *
+ * @return The blocks with their bound values.
+ */
+function withBoundFieldValues(
+	blocks: Block[],
+	refsMap: BlockRefsContextValue[ 'refsMap' ]
+): Block[] {
+	return blocks.map( ( block ) => {
+		const bindings = (
+			block.attributes.metadata as
+				{ bindings?: Record< string, unknown > } | undefined
+		 )?.bindings;
+		const blockElement = refsMap.get( block.clientId );
+		let { attributes } = block;
+
+		if ( bindings && blockElement ) {
+			for ( const field of [
+				blockElement,
+				...blockElement.querySelectorAll(
+					'[data-wp-block-attribute-key]'
+				),
+			] as HTMLElement[] ) {
+				const key = field.dataset.wpBlockAttributeKey;
+
+				if (
+					key &&
+					( bindings[ key ] || bindings.__default ) &&
+					field.closest( '[data-block]' ) === blockElement
+				) {
+					attributes = {
+						...attributes,
+						[ key ]: new RichTextData(
+							create( {
+								element: field,
+								__unstableIsEditableTree: true,
+							} )
+						),
+					};
+				}
+			}
+		}
+
+		return {
+			...block,
+			attributes,
+			innerBlocks: withBoundFieldValues( block.innerBlocks, refsMap ),
+		};
+	} );
+}
 
 /**
  * Sets the clipboard data for the provided blocks, with both HTML and plain
@@ -23,13 +81,15 @@ export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
  * @param event    Clipboard event.
  * @param blocks   Blocks to set as clipboard data.
  * @param registry The registry to select from.
+ * @param refsMap  The block elements by client ID.
  */
 export function setClipboardBlocks(
 	event: ClipboardEvent | ReactClipboardEvent,
 	blocks: Block[],
-	registry: DataRegistry
+	registry: DataRegistry,
+	refsMap: BlockRefsContextValue[ 'refsMap' ]
 ) {
-	let _blocks: Block | Block[] = blocks;
+	let _blocks: Block | Block[] = withBoundFieldValues( blocks, refsMap );
 
 	const [ firstBlock ] = blocks;
 
