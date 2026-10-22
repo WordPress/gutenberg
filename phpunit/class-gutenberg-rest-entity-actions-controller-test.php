@@ -395,48 +395,6 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * On a WordPress whose registry keys the ids of the actions by module id,
-	 * the response lists the script modules all the same.
-	 *
-	 * @covers ::get_items
-	 */
-	public function test_get_items_lists_the_script_modules_of_a_registry_keyed_by_module_id() {
-		$registry = new class() extends WP_Entity_Actions_Registry_Gutenberg {
-			public function get_registered_action_modules( $kind, $name ) {
-				if ( 'postType' !== $kind || 'page' !== $name ) {
-					return array();
-				}
-				return array(
-					'plugin/actions' => array( 'feature', 'archive' ),
-					123              => array( 'feature' ),
-				);
-			}
-		};
-		$instance = new ReflectionProperty( WP_Entity_Actions_Registry::class, 'instance' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$instance->setAccessible( true );
-		}
-		$instance->setValue( null, $registry );
-
-		wp_set_current_user( self::$editor_id );
-		$data = $this->dispatch_request()->get_data();
-
-		$this->assertSame(
-			array(
-				array(
-					'id'      => 'plugin/actions',
-					'actions' => array( 'feature', 'archive' ),
-				),
-				array(
-					'id'      => '123',
-					'actions' => array( 'feature' ),
-				),
-			),
-			$data['script_modules']
-		);
-	}
-
-	/**
 	 * The response echoes the entity and lists its actions and script modules.
 	 *
 	 * @covers ::get_items

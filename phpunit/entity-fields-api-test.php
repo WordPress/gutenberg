@@ -1273,8 +1273,10 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$instance->setValue( null, null );
 		$core_registry = WP_Entity_Fields_Registry::get_instance();
 		$this->assertNotInstanceOf( WP_Entity_Fields_Registry_Gutenberg::class, $core_registry, 'Until the plugin replaces it, core creates its own registry.' );
-		$fields  = wp_get_registered_entity_fields( 'postType', 'page' );
-		$modules = wp_get_registered_entity_field_modules( 'postType', 'page' );
+		$fields = wp_get_registered_entity_fields( 'postType', 'page' );
+		// Only the module ids: WordPress versions before core#14716 list the
+		// modules of an entity in another shape.
+		$modules = wp_get_all_registered_entity_field_modules();
 		$fired   = did_action( 'wp_entity_fields_api_init' );
 		$this->assertNotEmpty( $fields, 'The defaults are registered on the core registry.' );
 
@@ -1284,7 +1286,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertInstanceOf( WP_Entity_Fields_Registry_Gutenberg::class, $registry );
 		$this->assertSame( $registry, WP_Entity_Fields_Registry_Gutenberg::get_instance(), 'Both getters share the instance.' );
 		$this->assertSame( $fields, wp_get_registered_entity_fields( 'postType', 'page' ), 'The fields of the core registry are handed over.' );
-		$this->assertSame( $modules, wp_get_registered_entity_field_modules( 'postType', 'page' ), 'So are their script modules.' );
+		$this->assertSame( $modules, wp_get_all_registered_entity_field_modules(), 'So are their script modules.' );
 		$this->assertSame( $fired, did_action( 'wp_entity_fields_api_init' ), 'The action does not fire again.' );
 	}
 

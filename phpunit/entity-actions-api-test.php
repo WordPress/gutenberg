@@ -532,7 +532,9 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 		$core_registry = WP_Entity_Actions_Registry::get_instance();
 		$this->assertNotInstanceOf( WP_Entity_Actions_Registry_Gutenberg::class, $core_registry, 'Until the plugin replaces it, core creates its own registry.' );
 		$actions = wp_get_registered_entity_actions( 'postType', 'page' );
-		$modules = wp_get_registered_entity_action_modules( 'postType', 'page' );
+		// Only the module ids: WordPress versions before core#14716 list the
+		// modules of an entity in another shape.
+		$modules = wp_get_all_registered_entity_action_modules();
 		$fired   = did_action( 'wp_entity_actions_api_init' );
 		$this->assertNotEmpty( $actions, 'The defaults are registered on the core registry.' );
 
@@ -542,7 +544,7 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 		$this->assertInstanceOf( WP_Entity_Actions_Registry_Gutenberg::class, $registry );
 		$this->assertSame( $registry, WP_Entity_Actions_Registry_Gutenberg::get_instance(), 'Both getters share the instance.' );
 		$this->assertSame( $actions, wp_get_registered_entity_actions( 'postType', 'page' ), 'The actions of the core registry are handed over.' );
-		$this->assertSame( $modules, wp_get_registered_entity_action_modules( 'postType', 'page' ), 'So are their script modules.' );
+		$this->assertSame( $modules, wp_get_all_registered_entity_action_modules(), 'So are their script modules.' );
 		$this->assertSame( $fired, did_action( 'wp_entity_actions_api_init' ), 'The action does not fire again.' );
 	}
 
