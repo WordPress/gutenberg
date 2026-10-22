@@ -99,8 +99,12 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
  * @param {Object}   options.spinner    A CLI spinner which indicates progress.
  * @param {boolean}  options.debug      True if debug mode is enabled.
+ * @param {string[]} [options.preserve] Files or directories in a previous download, relative to `source.path`, to move into the new one.
  */
-async function downloadZipSource( source, { onProgress, spinner, debug } ) {
+async function downloadZipSource(
+	source,
+	{ onProgress, spinner, debug, preserve = [] }
+) {
 	const log = debug
 		? ( message ) => {
 				spinner.info( `NodeGit: ${ message }` );
@@ -128,13 +132,7 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 		/* keepOriginalPermission */ false
 	);
 
-	const files = (
-		await Promise.all( [
-			rimraf( zipName ),
-			rimraf( source.path ),
-			fs.promises.readdir( tempDir ),
-		] )
-	)[ 2 ];
+	const files = await fs.promises.readdir( tempDir );
 
 	/**
 	 * The plugin container is the extracted directory which is the direct parent
@@ -157,6 +155,19 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 		// In this case, only one sub directory exists, so use that as the container.
 		pluginContainer = firstSubItem;
 	}
+
+	for ( const entry of preserve ) {
+		const from = path.join( source.path, entry );
+		const to = path.join( pluginContainer, entry );
+		if ( ! fs.existsSync( from ) ) {
+			continue;
+		}
+		await rimraf( to );
+		await fs.promises.mkdir( path.dirname( to ), { recursive: true } );
+		await fs.promises.rename( from, to );
+	}
+
+	await Promise.all( [ rimraf( zipName ), rimraf( source.path ) ] );
 	await fs.promises.rename( pluginContainer, source.path );
 	await rimraf( tempDir );
 

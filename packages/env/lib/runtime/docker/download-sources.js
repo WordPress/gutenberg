@@ -31,6 +31,7 @@ module.exports = function downloadSources( config, spinner ) {
 	// Will contain a unique array of sources to download.
 	const sources = [];
 	const addedSources = {};
+	const coreSourceUrls = new Set();
 	const addSource = ( source ) => {
 		if ( source && source.url && ! addedSources[ source.url ] ) {
 			sources.push( source );
@@ -47,6 +48,9 @@ module.exports = function downloadSources( config, spinner ) {
 		env.themeSources.forEach( addSource );
 		Object.values( env.mappings ).forEach( addSource );
 		addSource( env.coreSource );
+		if ( env.coreSource ) {
+			coreSourceUrls.add( env.coreSource.url );
+		}
 	}
 
 	return Promise.all(
@@ -54,6 +58,10 @@ module.exports = function downloadSources( config, spinner ) {
 			downloadSource( source, {
 				onProgress: getProgressSetter( source.basename ),
 				spinner,
+				// A zip download replaces the directory, so the site's configuration and media have to be carried over.
+				preserve: coreSourceUrls.has( source.url )
+					? [ 'wp-config.php', 'wp-content/uploads' ]
+					: [],
 			} )
 		)
 	);
