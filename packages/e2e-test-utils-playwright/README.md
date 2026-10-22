@@ -80,6 +80,87 @@ const requestUtils = await RequestUtils.setup( {
 	},
 } );
 ```
+#### RequestUtils Functions
+
+RequestUtils functions provide a convenient way to interact with the WordPress REST API during end-to-end tests. You can use them to programmatically log in users, manage posts, or handle other test data setup and teardown tasks
+
+
+#### createPost
+
+Creates a new post in WordPress.
+
+_Parameters_
+
+-   _title_ `string`: The title of the post.
+-   _content_ `string`: The content of the post.
+-   _status_ `'publish' | 'draft' | 'private'`: The status of the post.
+
+_Example_
+
+```js
+await requestUtils.createPost({
+    title: 'Test Post',
+    content: 'This is a test post content.',
+    status: 'publish',
+});
+```
+
+#### deleteAllPosts
+
+Deletes all posts in WordPress.
+
+_Parameters_
+
+This function does not require any parameters.
+
+_Example_
+
+```js
+await requestUtils.deleteAllPosts();
+```
+
+#### createPage
+
+Creates a new page in WordPress.
+
+_Parameters_
+
+-   _title_ `string` (optional): The title of the page.
+-   _content_ `string` (optional): The content of the page.
+-   _status_ `(typeof PAGE_STATUS)[number]`: The status of the page. Must be one of the predefined statuses in `PAGE_STATUS`.
+-   _date_ `string` (optional): The date of the page in local time.
+-   _date_gmt_ `string` (optional): The date of the page in GMT.
+
+_Example_
+
+```js
+await requestUtils.createPage({
+    title: 'Test Page',
+    content: 'This is a test page content.',
+    status: 'publish',
+    date: '2025-08-12T10:00:00',
+    date_gmt: '2025-08-12T14:00:00',
+});
+```
+
+#### deleteAllPages
+
+Deletes all pages in WordPress.
+
+_Description_
+
+This function removes all pages from the WordPress site. It is useful for cleaning up test data or resetting the environment during automated tests.
+
+_Parameters_
+
+This function does not require any parameters.
+
+_Example_
+
+```js
+await requestUtils.deleteAllPages();
+```
+
 
 ## Contributing to this package
 
