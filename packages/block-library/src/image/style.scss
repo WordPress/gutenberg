@@ -304,7 +304,7 @@
 		// `--wp--lightbox-drag-offset` is set on this element by `view.js` while
 		// a swipe is in progress, and the slide and fade that follow a swipe are
 		// scripted animations rather than rules here.
-		transform: translate(calc(-50% + var(--wp--lightbox-drag-offset, 0px)), -50%);
+		transform: translate(calc(var(--wp--lightbox-container-offset-x, -50%) + var(--wp--lightbox-drag-offset, 0px)), var(--wp--lightbox-container-offset-y, -50%));
 		width: var(--wp--lightbox-container-width);
 		height: var(--wp--lightbox-container-height);
 		z-index: 2000001;
@@ -461,7 +461,7 @@
 	}
 	100% {
 		clip-path: inset(0);
-		transform: translate(-50%, -50%) scale(1, 1);
+		transform: translate(var(--wp--lightbox-container-offset-x, -50%), var(--wp--lightbox-container-offset-y, -50%)) scale(1, 1);
 	}
 }
 
@@ -469,7 +469,7 @@
 	0% {
 		visibility: visible;
 		clip-path: inset(0);
-		transform: translate(-50%, -50%) scale(1, 1);
+		transform: translate(var(--wp--lightbox-container-offset-x, -50%), var(--wp--lightbox-container-offset-y, -50%)) scale(1, 1);
 	}
 	99% {
 		visibility: visible;

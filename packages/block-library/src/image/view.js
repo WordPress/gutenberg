@@ -850,11 +850,29 @@ const { state, actions, callbacks } = store(
 				// handle absolute positioning and CSS transformation. In any case,
 				// adding 1 pixel to the container width and height solves the problem,
 				// though this can be removed if the issue is fixed in the future.
+				const lightboxWidth = containerWidth + 1;
+				const lightboxHeight = containerHeight + 1;
+
+				// Centering with `translate(-50%, -50%)` lands on half pixels
+				// whenever the container size is odd or fractional. The container
+				// is composited while the lightbox is open, so the browser doesn't
+				// snap it to the pixel grid and the image looks blurry. Round the
+				// offsets to whole device pixels instead.
+				const { devicePixelRatio = 1 } = window;
+				const snapToDevicePixel = ( value ) =>
+					Math.round( value * devicePixelRatio ) / devicePixelRatio;
+
 				state.overlayStyles = `
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
-					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
-					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
+					--wp--lightbox-container-width: ${ lightboxWidth }px;
+					--wp--lightbox-container-height: ${ lightboxHeight }px;
+					--wp--lightbox-container-offset-x: ${ snapToDevicePixel(
+						-lightboxWidth / 2
+					) }px;
+					--wp--lightbox-container-offset-y: ${ snapToDevicePixel(
+						-lightboxHeight / 2
+					) }px;
 					--wp--lightbox-image-width: ${ containerWidth }px;
 					--wp--lightbox-image-height: ${ containerHeight }px;
 					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px);
