@@ -11,13 +11,23 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  * @return Minimally modified merged item.
  */
 export default function conservativeMapItem<
+	N extends Record< string, unknown >,
+>( item: undefined, nextItem: N ): N;
+export default function conservativeMapItem<
 	I extends Record< string, unknown >,
 	N extends Record< string, unknown >,
->( item: I | undefined, nextItem: N ): Omit< I, keyof N > & N {
+>( item: I, nextItem: N ): Omit< I, keyof N > & N;
+export default function conservativeMapItem<
+	I extends Record< string, unknown >,
+	N extends Record< string, unknown >,
+>( item: I | undefined, nextItem: N ): N | ( Omit< I, keyof N > & N );
+export default function conservativeMapItem<
+	I extends Record< string, unknown >,
+	N extends Record< string, unknown >,
+>( item: I | undefined, nextItem: N ): N | ( Omit< I, keyof N > & N ) {
 	// Return next item in its entirety if there is no original item.
 	if ( ! item ) {
-		// With no original item, the next item is the whole result.
-		return nextItem as Omit< I, keyof N > & N;
+		return nextItem;
 	}
 
 	let hasChanges = false;

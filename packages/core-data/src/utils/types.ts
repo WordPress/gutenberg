@@ -6,13 +6,14 @@ import type { ReactElement } from 'react';
 export type Reducer< S, A > = ( state: S | undefined, action: A ) => S;
 
 /**
- * The thunk argument a forwarded resolver uses.
+ * The thunk argument a forwarded resolver uses: only the resolver it forwards
+ * to, called with the forwarded arguments.
  */
-export interface ForwardedResolverArgs {
-	resolveSelect: Record<
-		string,
-		( ...args: Array< unknown > ) => Promise< unknown >
-	>;
+export interface ForwardedResolverArgs<
+	Name extends string,
+	Args extends Array< unknown >,
+> {
+	resolveSelect: Record< Name, ( ...args: Args ) => Promise< unknown > >;
 }
 
 /**

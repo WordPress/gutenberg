@@ -8,9 +8,11 @@ import type { ForwardedResolverArgs } from './types';
  * @return Enhanced resolver.
  */
 const forwardResolver =
-	( resolverName: string ) =>
-	( ...args: Array< unknown > ) =>
-	async ( { resolveSelect }: ForwardedResolverArgs ): Promise< void > => {
+	< Name extends string >( resolverName: Name ) =>
+	< Args extends Array< unknown > >( ...args: Args ) =>
+	async ( {
+		resolveSelect,
+	}: ForwardedResolverArgs< Name, Args > ): Promise< void > => {
 		await resolveSelect[ resolverName ]( ...args );
 	};
 

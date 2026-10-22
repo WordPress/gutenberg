@@ -10,7 +10,7 @@ import type { Reducer } from './types';
  * @return Higher-order reducer.
  */
 const ifMatchingAction =
-	< A >( isMatch: ( action: A ) => boolean ) =>
+	< A >( isMatch: ( action: A ) => unknown ) =>
 	< S >( reducer: Reducer< S, A > ): Reducer< S, A > =>
 	( state, action ) => {
 		if ( state === undefined || isMatch( action ) ) {
