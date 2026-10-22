@@ -148,7 +148,7 @@ interface BaseWidgetGridSettings {
 	 * `'auto'`, which lifts the cap from that width up and leaves the count
 	 * to `minColumnWidth`; with no floor set, the step is skipped and the
 	 * count below it holds. Counts are floored at one with no ceiling.
-	 * Absent, the policy is {@link WIDGET_DASHBOARD_COLUMN_STEPS}, or
+	 * Absent, the policy is the default steps (`DEFAULT_GRID.columns`), or
 	 * whatever `minColumnWidth` fits when that is set.
 	 */
 	columns?: number | ColumnSteps;
