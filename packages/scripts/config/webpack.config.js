@@ -303,7 +303,7 @@ const scriptConfig = {
 				devMiddleware: {
 					writeToDisk: true,
 				},
-				allowedHosts: 'all',
+				allowedHosts: 'auto',
 				host: 'localhost',
 				port: 8887,
 				proxy: [
