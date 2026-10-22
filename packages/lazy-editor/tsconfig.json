@@ -15,6 +15,6 @@
 		{ "path": "../editor/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis/tsconfig.build.json" }
 	]
 }

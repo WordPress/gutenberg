@@ -1,24 +1,8 @@
-@use "@wordpress/base-styles/mixins";
-
-@mixin popup {
-	.components-popover__content,
-	.components-popover__header {
-		background-color: var(--wpds-color-background-surface-neutral-strong);
-		color: var(--wpds-color-foreground-content-neutral);
-	}
-
-	.components-popover__arrow::before {
-		background-color: var(--wpds-color-background-surface-neutral-strong);
-	}
-
-	.components-popover__triangle-bg {
-		fill: var(--wpds-color-background-surface-neutral-strong);
-	}
-}
-
 @mixin highlight {
-	background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-	color: var(--wpds-color-foreground-interactive-neutral-active);
+	background-color: var(--wpds-color-background-interactive-brand-strong-active);
+	color: var(--wpds-color-foreground-interactive-brand-strong-active);
+	outline: none;
+	box-shadow: none;
 
 	@media ( forced-colors: active ) {
 		forced-color-adjust: none;
@@ -27,25 +11,8 @@
 	}
 }
 
-@mixin focus {
-	@include mixins.outset-ring__focus;
-	outline-offset: 0;
-	box-shadow: none;
-	position: relative;
-	z-index: 1;
-
-	@media ( forced-colors: active ) {
-		outline-color: Highlight;
-	}
-}
-
 @mixin menu-item {
-	&:focus {
-		outline: none;
-		box-shadow: none;
-	}
-
-	&:is(:hover, :focus-visible, [aria-expanded="true"]):not(:disabled, [aria-disabled="true"]) {
+	&:is(:hover, :focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"], [aria-expanded="true"]) {
 		@include highlight;
 
 		.components-menu-item__info {
@@ -53,7 +20,14 @@
 		}
 	}
 
-	&:focus-visible:not(:active) {
-		@include focus;
+	&[aria-expanded="true"]:not(:disabled, [aria-disabled="true"]) {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+		outline: none;
+		box-shadow: none;
+
+		.components-menu-item__info {
+			color: inherit;
+		}
 	}
 }

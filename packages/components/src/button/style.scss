@@ -185,7 +185,7 @@
 		--wp-components-color-accent-darker-20: #{color.adjust($alert-red, $lightness: -20%)};
 
 		// Only the default variant is styled differently from the non-destructive counterparts.
-		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+		&:not(:where(.is-primary, .is-secondary, .is-tertiary, .is-link)) {
 			color: $alert-red;
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
@@ -202,8 +202,7 @@
 			}
 		}
 
-		&.is-tertiary,
-		&.is-secondary {
+		&:where(.is-tertiary, .is-secondary) {
 			&:hover:not(:disabled, [aria-disabled="true"]) {
 				background: rgba($alert-red, 0.04);
 			}

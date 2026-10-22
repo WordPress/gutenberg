@@ -7,8 +7,6 @@
 }
 
 .components-dropdown__content {
-	@include composite-item.popup;
-
 	.components-button[role^="menuitem"] {
 		@include composite-item.menu-item;
 	}

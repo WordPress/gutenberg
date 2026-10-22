@@ -2,9 +2,25 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
+## 19.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `tag`, `termCount`, `termName` and `postTerms`: mirror the tag so it leans the same way as the other angled icons, such as `brush`, `pin` and `plugins`. The number in `termCount` stays readable ([#84675](https://github.com/WordPress/gutenberg/pull/84675)).
+-   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
 
 ## 18.0.0 (2026-10-07)
 

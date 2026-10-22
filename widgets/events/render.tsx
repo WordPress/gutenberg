@@ -1,7 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 import { Icon, Stack, EmptyState } from '@wordpress/ui';
@@ -144,7 +144,7 @@ export default function WordPressEvents( {
 					align="center"
 					justify="center"
 				>
-					<Spinner />
+					<WCSpinner />
 				</Stack>
 			) }
 			{ hasSelectedLocation && ! eventsLoading && (
