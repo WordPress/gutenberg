@@ -118,16 +118,23 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 		$origin = 'theme';
 	}
 
-	$cache_group = 'theme_json';
-	$cache_key   = 'gutenberg_get_global_settings_' . $origin;
-	$settings    = wp_cache_get( $cache_key, $cache_group );
-
-	if ( false === $settings || WP_DEBUG ) {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
-		wp_cache_set( $cache_key, $settings, $cache_group );
-	}
+	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 
 	return _wp_array_get( $settings, $path, $settings );
+}
+
+/**
+ * Returns CSS media queries for responsive viewport style states.
+ *
+ * @param mixed $viewport_settings Viewport settings from theme.json.
+ * @param array $options           Options for generating media queries.
+ * @return array Responsive media queries.
+ */
+function gutenberg_get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
+	return WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+		$viewport_settings,
+		$options
+	);
 }
 
 /**
@@ -345,12 +352,6 @@ function gutenberg_add_global_styles_for_blocks() {
 function _gutenberg_clean_theme_json_caches() {
 	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_styles_custom', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_styles_custom_resolved', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_styles_theme', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_styles_theme_resolved', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_custom_css', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_styles_base_custom_css', 'theme_json' );
 	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
@@ -397,21 +398,11 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 	&& is_array( $context['transforms'] )
 	&& in_array( 'resolve-variables', $context['transforms'], true );
 
-	$cache_group = 'theme_json';
-	$cache_key   = 'gutenberg_get_global_styles_' . $origin;
+	$merged_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
 	if ( $resolve_variables ) {
-		$cache_key .= '_resolved';
+		$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
 	}
-	$styles = wp_cache_get( $cache_key, $cache_group );
-
-	if ( false === $styles || WP_DEBUG ) {
-		$merged_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
-		if ( $resolve_variables ) {
-			$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
-		}
-		$styles = $merged_data->get_raw_data()['styles'];
-		wp_cache_set( $cache_key, $styles, $cache_group );
-	}
+	$styles = $merged_data->get_raw_data()['styles'];
 
 	return _wp_array_get( $styles, $path, $styles );
 }

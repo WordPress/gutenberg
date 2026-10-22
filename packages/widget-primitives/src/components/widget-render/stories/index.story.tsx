@@ -12,9 +12,16 @@ import {
 } from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
-/* eslint-disable @wordpress/use-recommended-components */
-import { Button, Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Card,
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	IconButton,
+	Link,
+	Stack,
+} from '@wordpress/ui';
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
@@ -150,7 +157,8 @@ const resolveDemoModule = async () => ( {
 } );
 
 const meta: Meta< typeof WidgetRender > = {
-	title: 'Widget Primitives/WidgetRender',
+	id: 'widget-primitives-widgetrender',
+	title: 'Widgets/Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -849,7 +857,7 @@ const DEMO_NAVIGATE_EVENT = 'wp-widget-primitives-demo-navigate';
 const RouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function RouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedRouteLink( { path, onClick, children, ...props }, ref ) {
 	return (
 		<a
 			ref={ ref }
@@ -1017,7 +1025,7 @@ The widget declares where to go; the application decides how to get there. \`Hos
 
 **Takeaway**
 
-Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`LinkButton\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
+Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`ButtonLink\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
 `,
 			},
 		},

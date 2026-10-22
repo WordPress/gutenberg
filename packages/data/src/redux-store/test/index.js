@@ -73,20 +73,19 @@ describe( 'controls', () => {
 			},
 		} );
 
-		return new Promise( ( resolve ) => {
+		await new Promise( ( resolve ) => {
 			registry.subscribe( () => {
 				const isFinished = registry
 					.select( 'store' )
 					.hasFinishedResolution( 'getItems' );
 				if ( isFinished ) {
-					const items = registry.select( 'store' ).getItems();
-					expect( items ).toEqual( [ 1, 2, 3 ] );
+					resolve();
 				}
-				resolve();
 			} );
 
 			registry.select( 'store' ).getItems();
 		} );
+		expect( registry.select( 'store' ).getItems() ).toEqual( [ 1, 2, 3 ] );
 	} );
 	describe( 'selectors have expected value for the `hasResolver` property', () => {
 		it( 'when custom store has resolvers defined', () => {

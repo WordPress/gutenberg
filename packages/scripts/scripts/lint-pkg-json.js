@@ -28,7 +28,7 @@ const hasLintConfig =
 	hasPackageProp( 'npmPackageJsonLintConfig' );
 
 const defaultConfigArgs = ! hasLintConfig
-	? [ '--configFile', fromConfigRoot( 'npmpackagejsonlint.json' ) ]
+	? [ '--configFile', fromConfigRoot( 'npmpackagejsonlint.js' ) ]
 	: [];
 
 // See: https://github.com/tclindner/npm-package-json-lint/#cli-commands-and-configuration.

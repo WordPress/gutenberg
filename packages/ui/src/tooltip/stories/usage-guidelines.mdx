@@ -7,24 +7,12 @@ import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 ## Usage guidelines
 
--   **Use tooltips as visual labels only.** Tooltips should act as
-    supplementary visual labels for sighted mouse and keyboard users.
-    Tooltip popups are not exposed to assistive technologies — the
-    trigger's accessible name (e.g. `aria-label`) is what provides the
-    label for screen reader users.
-    See [_Alternatives to tooltips_](#alternatives-to-tooltips) below for
-    more details.
--   **Provide an accessible name for the trigger.** Tooltips are visual-only
-    elements and are not a replacement for labeling the trigger. The
-    tooltip's trigger must have an `aria-label` that matches or is a concise
-    equivalent of the tooltip's content to ensure consistency for screen
-    reader users. If the tooltip also displays a keyboard shortcut, use
-    `aria-keyshortcuts` on the trigger.
+-   **Use tooltips as visual labels only.** Tooltips provide supplementary visual labels for sighted mouse and keyboard users. Tooltip popups are not exposed to assistive technologies, so the trigger's accessible name provides the label for screen reader users. Do not use tooltips for descriptions, instructions, disabled reasons, or dynamic status messages. See [_Alternatives to tooltips_](#alternatives-to-tooltips) below.
+-   **Match the tooltip label to the trigger's accessible name.** Use the same wording for both. For example, a button with the accessible name "Publish" should have a "Publish" tooltip. The trigger must have its own accessible name, provided by its visible text, `aria-labelledby`, or `aria-label` for an icon-only control. The tooltip does not provide that name. If the tooltip also displays a keyboard shortcut, keep it separate from the label and use `aria-keyshortcuts` on the trigger.
 
 <Canvas of={ UsageGuidelinesStories.RecommendedUsage } />
 
-`IconButton` has built-in tooltip support via the `label` prop, making it
-the easiest way to provide a tooltip for icon-only actions.
+`IconButton` uses its `label` prop for both the accessible name and the tooltip label, making it the easiest way to keep them consistent for icon-only actions.
 
 <Canvas of={ UsageGuidelinesStories.IconButtonWithTooltip } />
 
@@ -51,10 +39,7 @@ Popups that open when hovering an info icon should use
 `openOnHover` prop on the trigger instead of a tooltip. This way, touch
 users and screen reader users can access the content.
 
-To know when to reach for a popover instead of a tooltip, consider the
-**purpose** of the trigger element: if the trigger's purpose is to open the
-popup itself, it's a popover. If the trigger's purpose is unrelated to
-opening the popup, it's a tooltip.
+To know when to reach for a popover instead of a tooltip, consider the **purpose** of the trigger element and the popup content. If the trigger's purpose is to open the popup itself, use a popover. If the trigger performs another action and the popup only shows that action's label, use a tooltip. Use inline text or a popover for explanations about an action.
 
 <Canvas of={ UsageGuidelinesStories.InfotipWithPopover } />
 
@@ -64,19 +49,11 @@ Infotips opened on hover can be dismissed by pressing `Escape`.
 
 ### Description text
 
-Tooltips are designed for sighted mouse and keyboard users and are not a reliable way to deliver
-important information to touch users or assistive technologies. If the
-description is important to understanding the element, don't hide it behind a
-tooltip — use inline text or
-[Popover](?path=/docs/design-system-components-popover--docs) if space is
-limited, so the information is accessible to everyone.
+Descriptions and instructions should use inline text or [Popover](?path=/docs/design-system-components-popover--docs) if space is limited, so the information is accessible to touch users and assistive technologies. This applies even when the description is not critical. For example, keep "Publish" as the button's accessible name and tooltip label, and explain a disabled state separately. Adding an accessible description to the button does not make a tooltip suitable for that explanation.
 
 Since tooltips serve sighted mouse and keyboard users, iconography should
 clearly communicate the purpose of icon-only triggers, especially on mobile
 where the text label may not be visible.
-
-If the description is not critical, a tooltip can still be used to provide
-extra clarity for sighted mouse or keyboard users.
 
 ### Contextual feedback messages
 
@@ -88,4 +65,4 @@ content, such as a
 ## References
 
 -   [WCAG 1.4.13: Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html) — tooltips must be dismissible (Escape), hoverable, and persistent.
--   [WAI-ARIA APG: Tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/) — note that this component intentionally diverges from the traditional `role="tooltip"` + `aria-describedby` pattern. The trigger's `aria-label` is the source of truth for assistive technologies, and the tooltip popup is a visual-only supplement.
+-   [WAI-ARIA APG: Tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/) — note that this component intentionally diverges from the traditional `role="tooltip"` + `aria-describedby` pattern. The trigger's accessible name is the source of truth for assistive technologies, and the tooltip popup is a visual-only supplement.

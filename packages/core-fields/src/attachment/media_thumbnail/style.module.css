@@ -1,0 +1,66 @@
+.thumbnail {
+	display: flex;
+	align-items: center;
+	position: relative;
+	block-size: 100%;
+}
+
+@media not (prefers-reduced-motion) {
+	.is-loading img,
+	.is-loaded img {
+		transition: opacity 0.1s linear;
+	}
+}
+
+.is-loading img {
+	opacity: 0;
+}
+
+.is-loaded img {
+	opacity: 1;
+}
+
+.image {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.stack {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	box-sizing: border-box;
+	inline-size: 100%;
+	block-size: 100%;
+}
+
+.icon {
+	fill: currentColor;
+}
+
+.filename {
+	box-sizing: border-box;
+	text-align: center;
+	padding: 0 var(--wpds-dimension-padding-lg);
+	inline-size: 100%;
+	container-type: inline-size;
+}
+
+/*
+ * A top margin instead of a gap on the stack, as the file name is not always
+ * rendered: the icon stays vertically centered in all contexts.
+ */
+.filename-text {
+	display: block;
+	margin-block-start: var(--wpds-dimension-gap-xs);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Hide the file name when previews are very small, as in list views. */
+@container (max-width: 90px) {
+	.filename-text {
+		display: none;
+	}
+}

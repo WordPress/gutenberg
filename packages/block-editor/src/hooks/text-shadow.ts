@@ -93,7 +93,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'textShadow' ],
-	hasSupport( name: string ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, TEXT_SHADOW_SUPPORT_KEY );
 	},
 };

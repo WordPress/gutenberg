@@ -1,5 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
@@ -44,8 +44,11 @@ function ExperimentsPage() {
 	const settings = useMemo( () => {
 		const combined: Record< string, boolean > = {};
 
+		// The `siteSettings` field only records experiments that have been
+		// explicitly set by the user. We must fill the defaults from the schema
+		// from `fetchExperiments`.
 		for ( const exp of experiments ?? [] ) {
-			combined[ exp.id ] = false;
+			combined[ exp.id ] = exp.defaultValue;
 		}
 
 		for ( const [ key, value ] of Object.entries( gutenbergExperiments ) ) {
@@ -136,7 +139,7 @@ function ExperimentsPage() {
 	}, [ experiments ] );
 
 	if ( experiments === null || ! siteSettings ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	return (

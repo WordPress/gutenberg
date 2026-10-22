@@ -3,7 +3,8 @@ import { Fieldset, InputControl, InputLayout } from '..';
 import { Stack } from '../../stack';
 
 const meta: Meta = {
-	title: 'Design System/Components/Form/Best Practices',
+	title: 'Components/@wordpress-ui/Form/Best Practices',
+	id: 'design-system-components-form-best-practices',
 	tags: [ '!dev' ],
 	parameters: {
 		controls: { disable: true },

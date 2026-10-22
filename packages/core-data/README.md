@@ -160,6 +160,12 @@ wp.data.select( 'core' ).getStatuses();
 wp.data.select( 'core' ).getStatus( recordId );
 ```
 
+## Syncing entity records (private)
+
+The store offers a private extension point for real-time collaboration with an entity sync manager. When one is registered, the store tells it when a record is loaded, edited, saved, and deleted, and lets it take over undo. The store itself knows nothing about how the syncing works.
+
+The interface lives in `src/entity-sync.ts`. `registerEntitySyncManager( manager )` and `getEntitySyncManager()` are internal to the package for now and are not exposed. Only one manager can be registered at a time. The `EntitySyncManager` type documents the interface.
+
 ## Actions
 
 The following set of dispatching action creators are available on the object returned by `wp.data.dispatch( 'core' )`:
@@ -1042,12 +1048,12 @@ _Parameters_
 
 - _kind_ `string`: The entity kind.
 - _name_ `string`: The entity name.
-- _options_ `Object`:
-- _options.id_ `[string]`: An entity ID to use instead of the context-provided one.
+- _options_ `EntityBlockEditorOptions`:
+- _options.id_ `EntityBlockEditorOptions[ 'id' ]`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 
-- `[unknown[], Function, Function]`: The block array and setters.
+- `EntityBlockEditorResult`: The block array and setters.
 
 ### useEntityId
 
@@ -1067,11 +1073,11 @@ _Parameters_
 - _kind_ `string`: The entity kind.
 - _name_ `string`: The entity name.
 - _prop_ `string`: The property name.
-- _\_id_ `[number|string]`: An entity ID to use instead of the context-provided one.
+- _\_id_ `number | string`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 
-- `[*, Function, *]`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
+- `EntityPropResult< Value, FullValue >`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
 
 ### useEntityRecord
 

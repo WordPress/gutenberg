@@ -25,6 +25,8 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
+/.npmrc                                         @manzoorwanijk
+# Emptied out by #83033; the entry stays so anything reappearing there gets reviewed.
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
@@ -35,6 +37,7 @@
 /packages/nux                                   @peterwilsoncc
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
 /packages/theme                                 @WordPress/gutenberg-components
+/packages/theme-build-tools                     @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
 /packages/widget-dashboard                      @retrofox
 /packages/grid                                  @retrofox

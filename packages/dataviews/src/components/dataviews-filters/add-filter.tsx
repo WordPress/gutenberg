@@ -2,8 +2,10 @@ import type { Ref } from 'react';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import type { NormalizedFilter, View } from '../../types';
 
 interface AddFilterProps {
@@ -24,11 +26,11 @@ export function AddFilterMenu( {
 } ) {
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
-		// The `disabled` prop on `Menu.Root` (rather than on the trigger)
-		// keeps the menu from opening while letting the trigger button stay
-		// focusable via its own `accessibleWhenDisabled`.
-		<Menu.Root disabled={ ! inactiveFilters.length }>
-			<Menu.Trigger { ...triggerProps } />
+		<Menu.Root>
+			<Menu.Trigger
+				{ ...triggerProps }
+				disabled={ ! inactiveFilters.length || triggerProps.disabled }
+			/>
 			<Menu.Popup>
 				{ inactiveFilters.map( ( filter ) => {
 					return (
@@ -66,7 +68,6 @@ function AddFilter(
 	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
 		return null;
 	}
-	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
 		<AddFilterMenu
 			triggerProps={ {
@@ -76,7 +77,6 @@ function AddFilter(
 						size="compact"
 						className="dataviews-filters-button"
 						variant="tertiary"
-						disabled={ ! inactiveFilters.length }
 						ref={ ref }
 					/>
 				),

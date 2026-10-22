@@ -13,7 +13,11 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function ComboboxPortal( { container, ...restProps }, ref ) {
 		return (
 			<_Combobox.Portal
-				container={ container ?? getWpCompatOverlaySlot() }
+				container={
+					container === undefined
+						? getWpCompatOverlaySlot()
+						: container
+				}
 				{ ...restProps }
 				ref={ ref }
 			/>

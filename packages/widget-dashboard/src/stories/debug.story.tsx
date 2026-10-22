@@ -7,8 +7,10 @@ import {
 	useState,
 } from '@wordpress/element';
 import { lockOutline } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+} from '@wordpress/ui';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -371,7 +373,8 @@ function StagingEnforcementStory( {
 }
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground/Debug',
+	id: 'widget-dashboard-playground-debug',
+	title: 'Widgets/Dashboard/Playground/Debug',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {

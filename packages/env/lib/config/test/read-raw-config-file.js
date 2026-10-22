@@ -28,14 +28,8 @@ describe( 'readRawConfigFile', () => {
 	it( 'rejects when read file fails', async () => {
 		readFile.mockRejectedValue( { message: 'Test' } );
 
-		expect.assertions( 1 );
-
-		try {
-			await readRawConfigFile( '/.wp-env.json' );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError( 'Could not read .wp-env.json: Test' )
-			);
-		}
+		await expect( readRawConfigFile( '/.wp-env.json' ) ).rejects.toEqual(
+			new ValidationError( 'Could not read .wp-env.json: Test' )
+		);
 	} );
 } );

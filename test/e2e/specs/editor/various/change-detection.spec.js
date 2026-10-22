@@ -78,7 +78,7 @@ test.describe( 'Change detection', () => {
 
 		// Toggle post as needing review (not persisted for autosave).
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'button', { name: 'Edit Status' } ).click();
 		await page.getByRole( 'radio', { name: 'Pending' } ).click();
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -456,7 +456,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Typography options' } )
-			.getByRole( 'menuitemcheckbox', { name: 'Show drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'drop cap, show' } )
 			.click();
 
 		await page

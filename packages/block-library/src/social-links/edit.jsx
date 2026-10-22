@@ -19,7 +19,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const sizeOptions = [
@@ -56,8 +55,8 @@ export function SocialLinksEdit( props ) {
 				const {
 					getBlockCount,
 					hasSelectedInnerBlock,
-					hasSelectedStyleState: hasSelectedBlockStyleState,
-				} = unlock( select( blockEditorStore ) );
+					hasSelectedBlockStyleState,
+				} = select( blockEditorStore );
 				return {
 					hasSocialIcons: getBlockCount( clientId ) > 0,
 					hasSelectedChild: hasSelectedInnerBlock( clientId ),

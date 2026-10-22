@@ -1,11 +1,12 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useRef } from '@wordpress/element';
 import { View } from '../../view';
-import { Scrollable } from '..';
+import Scrollable from '../deprecated';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components/Scrollable',
+	title: 'Components/@wordpress-components/Deprecated/Scrollable',
+	id: 'components-scrollable',
 	argTypes: {
 		as: {
 			control: { type: 'text' },
@@ -23,7 +24,7 @@ const meta: Meta< typeof Scrollable > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. Write your own CSS instead.',
 		},
 	},
 };

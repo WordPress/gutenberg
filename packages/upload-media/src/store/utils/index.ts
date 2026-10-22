@@ -57,10 +57,14 @@ interface VipsResizeOptions {
 	 * Maximum output bit depth.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized.
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
- * Cached dynamic import promise for @wordpress/vips/worker.
+ * Cached dynamic import promise for `@wordpress/vips/worker`.
  *
  * The module contains ~10MB of inlined WASM code. By using a dynamic import,
  * the WASM is only loaded when vips functions are actually called at image
@@ -78,7 +82,7 @@ let vipsModulePromise:
 let vipsModule: typeof import( '@wordpress/vips/worker' ) | undefined;
 
 /**
- * Lazily loads and caches the @wordpress/vips/worker module.
+ * Lazily loads and caches the `@wordpress/vips/worker` module.
  *
  * @return The vips worker module.
  */
@@ -213,6 +217,7 @@ export async function vipsResizeImage(
 		quality,
 		stripMeta,
 		maxBitdepth,
+		preserveAnimation,
 	} = options;
 
 	if ( signal?.aborted ) {
@@ -226,6 +231,7 @@ export async function vipsResizeImage(
 			quality,
 			stripMeta,
 			maxBitdepth,
+			preserveAnimation,
 		} );
 
 	let fileName = file.name;
@@ -377,6 +383,9 @@ let completedVipsOperations = 0;
 /**
  * Maximum number of vips operations before recycling the worker.
  * Each operation can consume 50-100MB+ of WASM memory for large images.
+ * The threshold is unchanged now that wasm-vips memory can grow to 2 GiB: a
+ * grown heap is only handed back when the worker is recycled, so a lower
+ * ceiling on accumulation still matters.
  */
 const MAX_VIPS_OPS_BEFORE_RECYCLE = 50;
 

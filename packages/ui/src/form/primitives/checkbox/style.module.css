@@ -10,7 +10,7 @@
 			flex-shrink: 0;
 			width: var(--_checkbox-input-size);
 			aspect-ratio: 1;
-			border-radius: var(--wpds-border-radius-sm);
+			border-radius: min(var(--wpds-border-radius-sm), 2px);
 			border:
 				var(--wpds-border-width-xs) solid
 				var(--wpds-color-stroke-interactive-neutral);
