@@ -40,8 +40,9 @@ assert(
 	`${ indexPath } does not contain a valid Storybook index.`
 );
 
+const entries = Object.values( storyIndex.entries );
 const roots = new Set();
-for ( const { title } of Object.values( storyIndex.entries ) ) {
+for ( const { title } of entries ) {
 	roots.add( title.split( '/' )[ 0 ] );
 }
 
@@ -51,9 +52,24 @@ assert.deepEqual(
 	'Storybook has unexpected top-level sidebar folders.'
 );
 
+for ( const docs of entries.filter(
+	( entry ) => entry.type === 'docs' && entry.name === 'Docs'
+) ) {
+	const firstEntry = entries.find(
+		( entry ) =>
+			entry.title === docs.title ||
+			entry.title.startsWith( `${ docs.title }/` )
+	);
+	assert.equal(
+		firstEntry,
+		docs,
+		`Docs must be the first sidebar entry in "${ docs.title }".`
+	);
+}
+
 /**
  * @param {unknown} value
- * @return {value is { entries: Record< string, { title: string } > }} Whether the value is a Storybook index.
+ * @return {value is { entries: Record< string, { title: string, type: string, name: string } > }} Whether the value is a Storybook index.
  */
 function isStoryIndex( value ) {
 	if ( ! isRecord( value ) || ! isRecord( value.entries ) ) {
@@ -61,7 +77,11 @@ function isStoryIndex( value ) {
 	}
 
 	return Object.values( value.entries ).every(
-		( entry ) => isRecord( entry ) && typeof entry.title === 'string'
+		( entry ) =>
+			isRecord( entry ) &&
+			typeof entry.title === 'string' &&
+			typeof entry.type === 'string' &&
+			typeof entry.name === 'string'
 	);
 }
 
