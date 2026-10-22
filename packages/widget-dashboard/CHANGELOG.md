@@ -10,6 +10,7 @@
 ### Enhancements
 
 -   Honor `gridSettings.minColumnWidth` as a per-column floor: the surface fits as many columns as the container allows at that width, capped by `columns` when set ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+-   `WidgetHeader`: Use the help icon for infotips ([#85309](https://github.com/WordPress/gutenberg/pull/85309)).
 
 ## 0.10.0 (2026-10-20)
 
