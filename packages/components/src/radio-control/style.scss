@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
@@ -27,7 +28,75 @@
 	grid-column: 1;
 	grid-row: 1;
 
-	@include radio-control;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+	background: var(--wpds-color-background-interactive-neutral-weak);
+	transition: none;
+	border-radius: $radius-round;
+	width: $radio-input-size;
+	height: $radio-input-size;
+	min-width: $radio-input-size;
+	max-width: $radio-input-size;
+	position: relative;
+
+	@media not (prefers-reduced-motion) {
+		transition: box-shadow 0.1s linear;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: $grid-unit-30;
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
+	}
+
+	&:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+
+	&:checked::before {
+		box-sizing: inherit;
+		width: math.div($radio-input-size, 2);
+		height: math.div($radio-input-size, 2);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
+		background-color: currentColor;
+
+		// This border serves as a background color in Windows High Contrast mode.
+		border: 4px solid currentColor;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) var(--wpds-color-stroke-focus);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: transparent;
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: var(--wpds-color-background-interactive-neutral-weak-disabled);
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		cursor: default;
+		opacity: 1; // Override opacity inherited from wp-admin forms.css.
+
+		@media (forced-colors: active) {
+			color: GrayText;
+			border-color: GrayText;
+		}
+	}
 
 	display: inline-flex;
 	margin: 0;
