@@ -1,0 +1,35 @@
+@use "../../../../utils/css/mixins";
+
+.card {
+	position: relative;
+
+	&:hover:not([data-disabled], :has([data-checked])) {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+
+	&:has([data-checked]) {
+		border-color: var(--wpds-color-stroke-interactive-brand);
+	}
+
+	&:has(:focus-visible) {
+		@include mixins.focus-ring();
+	}
+
+	&[data-disabled] {
+		background-color: var(--wpds-color-background-surface-neutral-weak);
+	}
+}
+
+.radio:focus {
+	outline: none;
+}
+
+.label::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+}
+
+.card:not([data-disabled]) .label {
+	cursor: var(--wpds-cursor-control);
+}
