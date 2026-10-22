@@ -1,9 +1,6 @@
 import os from 'node:os';
 import esbuild from 'esbuild';
 
-const MIN_DEFAULT_BUILD_CONCURRENCY = 2;
-const MAX_DEFAULT_BUILD_CONCURRENCY = 16;
-
 /**
  * @typedef {Object} QueuedBuild
  * @property {() => Promise<unknown> | unknown} task    Task to run.
@@ -11,13 +8,14 @@ const MAX_DEFAULT_BUILD_CONCURRENCY = 16;
  * @property {(reason?: unknown) => void}       reject  Promise rejecter.
  */
 
-let buildConcurrency = MIN_DEFAULT_BUILD_CONCURRENCY;
+let buildConcurrency = 1;
 let activeBuilds = 0;
 /** @type {QueuedBuild[]} */
 const queuedBuilds = [];
 
 /**
- * Get the default number of concurrent esbuild builds.
+ * Get the default number of concurrent esbuild builds: half of the available
+ * parallelism, and at least one.
  *
  * @param {number} availableParallelism Available parallelism to use.
  * @return {number} Default build concurrency.
@@ -25,33 +23,7 @@ const queuedBuilds = [];
 export function getDefaultBuildConcurrency(
 	availableParallelism = os.availableParallelism()
 ) {
-	return Math.max(
-		MIN_DEFAULT_BUILD_CONCURRENCY,
-		Math.min( MAX_DEFAULT_BUILD_CONCURRENCY, availableParallelism )
-	);
-}
-
-/**
- * Parse a concurrency override.
- *
- * @param {string|undefined} value Concurrency override value.
- * @return {number|undefined} Parsed concurrency, or undefined when unset.
- */
-export function parseBuildConcurrency( value ) {
-	if ( value === undefined ) {
-		return undefined;
-	}
-
-	if ( ! /^\d+$/.test( value ) || Number( value ) === 0 ) {
-		console.warn(
-			`Invalid build concurrency value: ${ JSON.stringify(
-				value
-			) }. Expected a positive integer; falling back to the default.`
-		);
-		return undefined;
-	}
-
-	return Number( value );
+	return Math.max( 1, Math.floor( availableParallelism / 2 ) );
 }
 
 /**

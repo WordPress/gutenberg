@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Limit concurrent `esbuild` build jobs by default and add `--concurrency` / `WP_BUILD_CONCURRENCY` overrides for `wp-build` ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+-   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
 ## 0.26.0 (2026-10-20)
 

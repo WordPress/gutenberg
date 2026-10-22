@@ -50,7 +50,6 @@ import {
 import {
 	buildWithConcurrency,
 	getDefaultBuildConcurrency,
-	parseBuildConcurrency,
 	setBuildConcurrency,
 } from './build-concurrency.mjs';
 
@@ -2865,18 +2864,12 @@ async function main() {
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},
-			concurrency: {
-				type: 'string',
-				default: process.env.WP_BUILD_CONCURRENCY,
-			},
 		},
 		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
-	const buildConcurrency =
-		parseBuildConcurrency( values.concurrency ) ??
-		getDefaultBuildConcurrency();
+	const buildConcurrency = getDefaultBuildConcurrency();
 	setBuildConcurrency( buildConcurrency );
 	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 

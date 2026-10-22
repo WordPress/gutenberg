@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	enqueueBuild,
 	getDefaultBuildConcurrency,
-	parseBuildConcurrency,
 	setBuildConcurrency,
 } from '../build-concurrency.mjs';
 
@@ -18,37 +17,13 @@ const flushPromises = () =>
 	} );
 
 describe( 'getDefaultBuildConcurrency()', () => {
-	it( 'uses the available parallelism clamped to the default range', () => {
-		expect( getDefaultBuildConcurrency( 1 ) ).toBe( 2 );
-		expect( getDefaultBuildConcurrency( 2 ) ).toBe( 2 );
-		expect( getDefaultBuildConcurrency( 4 ) ).toBe( 4 );
-		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 12 );
-		expect( getDefaultBuildConcurrency( 16 ) ).toBe( 16 );
-		expect( getDefaultBuildConcurrency( 32 ) ).toBe( 16 );
-		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 16 );
-	} );
-} );
-
-describe( 'parseBuildConcurrency()', () => {
-	it( 'returns undefined when no value is configured', () => {
-		expect( parseBuildConcurrency( undefined ) ).toBe( undefined );
-	} );
-
-	it( 'accepts positive integers', () => {
-		expect( parseBuildConcurrency( '1' ) ).toBe( 1 );
-		expect( parseBuildConcurrency( '01' ) ).toBe( 1 );
-		expect( parseBuildConcurrency( '12' ) ).toBe( 12 );
-	} );
-
-	it( 'warns and returns undefined for invalid values', () => {
-		for ( const value of [ '', '0', '-1', '1.5', 'abc' ] ) {
-			expect( parseBuildConcurrency( value ) ).toBe( undefined );
-			expect( console ).toHaveWarnedWith(
-				'Invalid build concurrency value: ' +
-					JSON.stringify( value ) +
-					'. Expected a positive integer; falling back to the default.'
-			);
-		}
+	it( 'uses half of the available parallelism, and at least one', () => {
+		expect( getDefaultBuildConcurrency( 1 ) ).toBe( 1 );
+		expect( getDefaultBuildConcurrency( 2 ) ).toBe( 1 );
+		expect( getDefaultBuildConcurrency( 3 ) ).toBe( 1 );
+		expect( getDefaultBuildConcurrency( 4 ) ).toBe( 2 );
+		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 6 );
+		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 32 );
 	} );
 } );
 
