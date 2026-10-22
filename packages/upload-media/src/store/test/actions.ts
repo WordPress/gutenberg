@@ -16,6 +16,7 @@ import {
 	vipsCancelOperations,
 	vipsConvertImageFormat,
 	vipsEnsureJxlSupport,
+	vipsHasTransparency,
 	vipsResizeImage,
 	withVipsWorkerHeld,
 } from '../utils';
@@ -346,6 +347,41 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				false
 			);
+		} );
+
+		it( 'converts a transparent JPEG XL to PNG to keep its transparency', async () => {
+			const pngDerivative = new File( [ 'png' ], 'example.png', {
+				type: 'image/png',
+			} );
+			( vipsHasTransparency as Mock ).mockResolvedValueOnce( true );
+			( vipsConvertImageFormat as Mock ).mockResolvedValue(
+				pngDerivative
+			);
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				item.id,
+				jxlFile,
+				'image/png',
+				expect.anything()
+			);
+			expect( updatedItem.file ).toBe( pngDerivative );
+			expect( updatedItem.originalJxlFile ).toBe( jxlFile );
 		} );
 
 		it( 'keeps JXL metadata when the site turns off metadata stripping', async () => {

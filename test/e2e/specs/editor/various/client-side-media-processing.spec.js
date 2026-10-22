@@ -505,6 +505,42 @@ test.describe( 'Client-side media processing', () => {
 		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
 	} );
 
+	test( 'converts a transparent JXL to PNG instead of flattening it to JPEG', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const transparentJxl = await writeGeneratedJxl(
+			( vips ) =>
+				vips.Image.newFromFile(
+					path.join(
+						ASSETS_DIR,
+						'200x150_e2e_test_image_transparent.png'
+					)
+				),
+			{ lossless: true }
+		);
+
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			transparentJxl
+		);
+
+		// JPEG has no alpha channel, so a JPEG derivative would fill the
+		// transparent areas in.
+		expect( media.mime_type ).toBe( 'image/png' );
+		const probe = await probeImageUrl( media.source_url );
+		expect( probe.hasAlpha ).toBe( true );
+		expect( probe.minAlpha ).toBeLessThan( 255 );
+
+		const fullMedia = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ media.id }?context=edit`,
+		} );
+		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
+	} );
+
 	test( 'keeps JXL metadata when the site turns off metadata stripping', async ( {
 		page,
 		editor,
