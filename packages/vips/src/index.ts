@@ -117,6 +117,14 @@ function releaseVips(): void {
 }
 
 /**
+ * Encoder effort for JXL output.
+ *
+ * The default of 7 is too slow for interactive use; 3 balances speed and
+ * compression.
+ */
+const JXL_SAVE_EFFORT = 3;
+
+/**
  * Bytes of WASM memory a decoded pixel occupies.
  *
  * This is RGBA at one byte per channel, nothing more: it does not account for
@@ -425,10 +433,8 @@ export async function convertImageFormat(
 			}
 		}
 
-		// JXL default effort of 7 is too slow for interactive use.
-		// Use 3 for a good balance of speed and compression.
 		if ( 'image/jxl' === outputType ) {
-			saveOptions.effort = 3;
+			saveOptions.effort = JXL_SAVE_EFFORT;
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -755,10 +761,8 @@ function buildSaveOptions( {
 		}
 	}
 
-	// JXL default effort of 7 is too slow for interactive use.
-	// Use 3 for a good balance of speed and compression.
 	if ( 'image/jxl' === type ) {
-		saveOptions.effort = 3;
+		saveOptions.effort = JXL_SAVE_EFFORT;
 	}
 
 	return saveOptions;
