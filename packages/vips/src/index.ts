@@ -39,13 +39,27 @@ let vipsPromise: Promise< typeof Vips > | undefined;
 let jxlWasmBytes: ArrayBuffer | undefined;
 
 /**
- * Whether the current vips instance was initialized with JXL dynamic library.
+ * Whether the current `vipsPromise` was started with the JXL dynamic library.
  *
- * If JXL becomes available after vips was already initialized without it,
- * the existing instance is discarded so the next call reinitializes with
- * JXL support included.
+ * Set when the init starts, not when it resolves, so a second caller arriving
+ * mid-init waits for that JXL-enabled instance instead of retiring it. If JXL
+ * becomes available after vips was initialized without it, the instance is
+ * retired so the next call reinitializes with JXL support included.
  */
-let vipsInitializedWithJxl = false;
+let vipsPromiseHasJxl = false;
+
+/**
+ * Number of operations currently using a vips instance.
+ *
+ * Counted from before the instance is requested until the operation finishes,
+ * so a retired instance is never shut down while an operation still holds it.
+ */
+let activeVipsUsers = 0;
+
+/**
+ * Instances replaced by a JXL-enabled one, waiting for their users to finish.
+ */
+const retiredVips: Promise< typeof Vips >[] = [];
 
 /**
  * Counter identifying the current vips initialization attempt.
@@ -71,6 +85,35 @@ let vipsInitGeneration = 0;
  */
 export function setJxlWasm( bytes: ArrayBuffer ): void {
 	jxlWasmBytes = bytes;
+}
+
+/**
+ * Marks the start of an operation that uses a vips instance.
+ *
+ * Call before `getVips()` and pair with `releaseVips()` in a `finally`.
+ */
+function holdVips(): void {
+	activeVipsUsers++;
+}
+
+/**
+ * Marks the end of an operation that used a vips instance.
+ *
+ * Shuts down retired instances once nothing is using them anymore. Each holds
+ * a large WASM heap that would otherwise be stranded for the worker's lifetime.
+ */
+function releaseVips(): void {
+	activeVipsUsers--;
+	if ( activeVipsUsers > 0 ) {
+		return;
+	}
+	for ( const staleVips of retiredVips.splice( 0 ) ) {
+		staleVips.then(
+			( instance ) => instance.shutdown(),
+			// Nothing to reclaim if the stale instance never came up.
+			() => {}
+		);
+	}
 }
 
 /**
@@ -167,18 +210,13 @@ function getWasmUrl( bytes: Uint8Array< ArrayBuffer > | ArrayBuffer ): string {
  * and recreated with JXL dynamic library support.
  */
 async function getVips(): Promise< typeof Vips > {
-	// If JXL is now available but vips was initialized without it, discard the
-	// existing instance so the next init picks up the dynamic library. Shut it
-	// down first: a wasm-vips instance holds a large WASM heap that would
-	// otherwise be stranded for the lifetime of the worker.
-	if ( jxlWasmBytes && vipsPromise && ! vipsInitializedWithJxl ) {
-		const staleVips = vipsPromise;
+	// If JXL is now available but vips was initialized without it, retire the
+	// existing instance so the next init picks up the dynamic library. Other
+	// operations may still be using it, so `releaseVips()` shuts it down once
+	// they finish.
+	if ( jxlWasmBytes && vipsPromise && ! vipsPromiseHasJxl ) {
+		retiredVips.push( vipsPromise );
 		vipsPromise = undefined;
-		try {
-			( await staleVips ).shutdown();
-		} catch {
-			// Nothing to reclaim if the stale instance never came up.
-		}
 	}
 
 	if ( vipsPromise ) {
@@ -195,7 +233,7 @@ async function getVips(): Promise< typeof Vips > {
 
 	const instancePromise: Promise< typeof Vips > = ( async () => {
 		try {
-			const instance = await Vips( {
+			return await Vips( {
 				// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
 				// JXL is loaded on demand when a JXL image is processed, via
 				// setJxlWasm() which is called from the main thread after the
@@ -236,25 +274,19 @@ async function getVips(): Promise< typeof Vips > {
 					( globalThis as any ).__vipsDebug?.( text );
 				},
 			} );
-
-			// Only now is the instance known to carry JXL support. Recording
-			// it earlier would let a failed JXL init latch the flag on, and
-			// the reset above - which requires the flag to be off - could
-			// never discard the broken instance.
-			vipsInitializedWithJxl = withJxl;
-			return instance;
 		} catch ( error ) {
 			// Drop the rejected promise so the next call retries instead of
 			// replaying this failure for the rest of the worker's life.
 			if ( vipsInitGeneration === initGeneration ) {
 				vipsPromise = undefined;
-				vipsInitializedWithJxl = false;
+				vipsPromiseHasJxl = false;
 			}
 			throw error;
 		}
 	} )();
 
 	vipsPromise = instancePromise;
+	vipsPromiseHasJxl = withJxl;
 
 	const vipsInstance = await instancePromise;
 
@@ -312,6 +344,7 @@ export async function convertImageFormat(
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
+	holdVips();
 
 	try {
 		let strOptions = '';
@@ -406,6 +439,7 @@ export async function convertImageFormat(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		releaseVips();
 	}
 }
 
@@ -932,6 +966,7 @@ export async function resizeImage(
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
+	holdVips();
 
 	try {
 		const vips = await getVips();
@@ -1110,6 +1145,7 @@ export async function resizeImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		releaseVips();
 	}
 }
 
@@ -1138,6 +1174,7 @@ interface UltraHdrInfo {
 export async function getUltraHdrInfo(
 	buffer: ArrayBuffer
 ): Promise< UltraHdrInfo | null > {
+	holdVips();
 	try {
 		const vips = await getVips();
 		const image = vips.Image.uhdrloadBuffer( buffer );
@@ -1170,6 +1207,8 @@ export async function getUltraHdrInfo(
 		// Not an UltraHDR image (or libultrahdr decoder unavailable).
 		cleanup?.();
 		return null;
+	} finally {
+		releaseVips();
 	}
 }
 
@@ -1205,6 +1244,7 @@ export async function rotateImage(
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
+	holdVips();
 
 	try {
 		const vips = await getVips();
@@ -1299,6 +1339,7 @@ export async function rotateImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		releaseVips();
 	}
 }
 
@@ -1319,25 +1360,30 @@ export async function rotateImage(
 export async function hasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
-	const vips = await getVips();
-	const image = vips.Image.newFromBuffer( buffer );
+	holdVips();
+	try {
+		const vips = await getVips();
+		const image = vips.Image.newFromBuffer( buffer );
 
-	if ( ! image.hasAlpha() ) {
+		if ( ! image.hasAlpha() ) {
+			cleanup?.();
+			return false;
+		}
+
+		// `min()` on the alpha band is one read of a single channel of frame 0.
+		// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
+		// inputs here) use 65535. Anything lower means at least one pixel is
+		// transparent.
+		const alpha = image.extractBand( image.bands - 1 );
+		const minAlpha = alpha.min();
+		const opaqueValue = image.format === 'ushort' ? 65535 : 255;
+
 		cleanup?.();
-		return false;
+
+		return minAlpha < opaqueValue;
+	} finally {
+		releaseVips();
 	}
-
-	// `min()` on the alpha band is one read of a single channel of frame 0.
-	// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
-	// inputs here) use 65535. Anything lower means at least one pixel is
-	// transparent.
-	const alpha = image.extractBand( image.bands - 1 );
-	const minAlpha = alpha.min();
-	const opaqueValue = image.format === 'ushort' ? 65535 : 255;
-
-	cleanup?.();
-
-	return minAlpha < opaqueValue;
 }
 
 // Re-export with vips prefix for worker module compatibility.
