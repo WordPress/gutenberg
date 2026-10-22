@@ -1686,6 +1686,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 							'label' => 'Numeric id',
 						),
 						$this->field( 'weight' ),
+						$this->field( '0' ),
 					)
 				);
 				$updated    = wp_update_entity_fields(
@@ -1698,15 +1699,20 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 							'id'    => 'color',
 							'label' => 'Colour',
 						),
+						array(
+							'id'    => '0',
+							'label' => 'Zero',
+						),
 					)
 				);
 			}
 		);
 
-		$this->assertSame( array( 'color', 'weight' ), $registered, 'The valid definitions are registered.' );
-		$this->assertSame( array( 'color' ), $updated, 'The valid definitions are updated.' );
+		$this->assertSame( array( 'color', 'weight', '0' ), $registered, 'The valid definitions are registered, `0` included.' );
+		$this->assertSame( array( 'color', '0' ), $updated, 'The valid definitions are updated, `0` included.' );
 		$fields = array_column( wp_get_registered_entity_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertSame( 'Colour', $fields['color']['label'] );
+		$this->assertSame( 'Zero', $fields['0']['label'] );
 		$this->assertArrayHasKey( 'weight', $fields );
 		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );

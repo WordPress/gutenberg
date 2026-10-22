@@ -729,7 +729,7 @@ if ( ! class_exists( 'WP_Entity_Fields_Registry' ) ) {
 			$valid   = array();
 			$invalid = array();
 			foreach ( $fields as $position => $field ) {
-				if ( is_array( $field ) && ! empty( $field['id'] ) && is_string( $field['id'] ) ) {
+				if ( is_array( $field ) && isset( $field['id'] ) && is_string( $field['id'] ) && '' !== $field['id'] ) {
 					$valid[] = $field;
 				} else {
 					$invalid[] = '#' . ( $position + 1 );
