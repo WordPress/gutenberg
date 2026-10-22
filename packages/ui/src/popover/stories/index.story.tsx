@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
-import { close, info } from '@wordpress/icons';
+import { close, help } from '@wordpress/icons';
 import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
@@ -1227,7 +1227,7 @@ export const HoverTrigger: Story = {
 };
 
 /**
- * Popups that open when hovering an info icon should use Popover with the
+ * Popups that open when hovering a help icon should use Popover with the
  * `openOnHover` prop on the trigger instead of a
  * [tooltip](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs).
  * This way, touch users and screen reader users can access the content.
@@ -1265,7 +1265,7 @@ export const Infotip: Story = {
 							borderRadius: 'var(--wpds-border-radius-sm)',
 						} }
 					>
-						<Icon icon={ info } size={ 20 } />
+						<Icon icon={ help } size={ 20 } />
 					</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
@@ -1321,7 +1321,7 @@ export const InfotipWithLink: Story = {
 							borderRadius: 'var(--wpds-border-radius-sm)',
 						} }
 					>
-						<Icon icon={ info } size={ 20 } />
+						<Icon icon={ help } size={ 20 } />
 					</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
