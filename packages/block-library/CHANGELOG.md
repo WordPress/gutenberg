@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Broaden the block appender's search to all link types instead of scoping it to pages, matching the Custom Link variation. Categories and tags can now be found directly from the appender instead of only through Custom Link ([#83110](https://github.com/WordPress/gutenberg/pull/83110)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
