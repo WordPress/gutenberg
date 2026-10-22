@@ -367,7 +367,6 @@ function Layout( {
 	const {
 		mode,
 		isFullscreenActive,
-		hasResolvedMode,
 		hasActiveMetaboxes,
 		hasBlockSelected,
 		showIconLabels,
@@ -393,25 +392,18 @@ function Layout( {
 			const { getBlockSelectionStart, isZoomOut } = unlock(
 				select( blockEditorStore )
 			);
-			const { getEditorMode, getDefaultRenderingMode } = unlock(
-				select( editorStore )
-			);
+			const { getEditorMode } = unlock( select( editorStore ) );
 			const isNotDesignPostType =
 				! DESIGN_POST_TYPES.includes( currentPostType );
 			const isDirectlyEditingPattern =
 				currentPostType === 'wp_block' &&
 				! onNavigateToPreviousEntityRecord;
 			const _templateId = getTemplateId( currentPostType, currentPostId );
-			const defaultMode = getDefaultRenderingMode( currentPostType );
 
 			return {
 				mode: getEditorMode(),
 				isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 				hasActiveMetaboxes: hasMetaBoxes(),
-				hasResolvedMode:
-					defaultMode === 'template-locked'
-						? !! _templateId
-						: defaultMode !== undefined,
 				hasBlockSelected: !! getBlockSelectionStart(),
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
@@ -437,7 +429,11 @@ function Layout( {
 		]
 	);
 
-	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
+	// Classic meta boxes are independent of template rendering mode. Gating
+	// initialization on mode resolution left them uninitialized forever when a
+	// stale `template-locked` preference could not resolve a template, so their
+	// values never saved.
+	useMetaBoxInitialization( hasActiveMetaboxes );
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
