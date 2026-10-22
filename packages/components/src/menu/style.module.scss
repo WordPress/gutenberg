@@ -109,7 +109,7 @@
 	font-weight: 400;
 	line-height: 20px;
 
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	border-radius: $radius-small;
 
 	padding-block: $grid-unit-05;
@@ -139,8 +139,7 @@
 
 	/* Open submenu parents stay neutral while hovered or focused. */
 	&[aria-expanded="true"]:not([aria-disabled="true"]) {
-		background-color: $components-color-gray-100;
-		color: $components-color-foreground;
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 
 		@media ( forced-colors: active ) {
 			&:focus {
@@ -179,7 +178,7 @@
 	align-items: center;
 	justify-content: center;
 
-	color: $components-color-gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 
 	/* Inherit the active, open-parent, or disabled foreground. */
 	[data-active-item] > &,
@@ -222,7 +221,7 @@
 	justify-content: center;
 	gap: $grid-unit-15;
 
-	color: $components-color-gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 
 	/* Inherit the active, open-parent, or disabled foreground. */
 	[data-active-item] *:not(.menu) &,
@@ -283,7 +282,7 @@
 .item-help-text {
 	font-size: $helptext-font-size;
 	line-height: 16px;
-	color: $components-color-gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	overflow-wrap: anywhere;
 
 	[data-active-item] *:not(.menu) &,

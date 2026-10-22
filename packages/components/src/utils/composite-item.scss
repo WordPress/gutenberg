@@ -1,13 +1,13 @@
-@mixin highlight {
-	background-color: var(--wpds-color-background-interactive-brand-strong-active);
-	color: var(--wpds-color-foreground-interactive-brand-strong-active);
+@mixin highlight($priority: null) {
+	background-color: var(--wpds-color-background-interactive-brand-strong-active) $priority;
+	color: var(--wpds-color-foreground-interactive-brand-strong-active) $priority;
 	outline: none;
 	box-shadow: none;
 
 	@media ( forced-colors: active ) {
 		forced-color-adjust: none;
-		background-color: Highlight;
-		color: HighlightText;
+		background-color: Highlight $priority;
+		color: HighlightText $priority;
 	}
 }
 
@@ -25,6 +25,11 @@
 		color: var(--wpds-color-foreground-interactive-neutral-active);
 		outline: none;
 		box-shadow: none;
+
+		@media ( forced-colors: active ) {
+			outline: var(--wpds-border-width-xs) solid GrayText;
+			outline-offset: 0;
+		}
 
 		.components-menu-item__info {
 			color: inherit;

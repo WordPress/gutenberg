@@ -9,5 +9,6 @@
 
 	&:is([aria-selected="true"], :hover, :focus) .block-editor-block-icon {
 		color: inherit !important;
+		background-color: transparent !important;
 	}
 }

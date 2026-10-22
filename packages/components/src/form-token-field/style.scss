@@ -192,7 +192,7 @@
 
 .components-form-token-field__suggestion {
 	border-radius: var(--wpds-border-radius-sm);
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	display: block;
 	font-size: $default-font-size;
 	padding: $grid-unit-10 $grid-unit-15;
@@ -206,10 +206,13 @@
 
 	&[aria-disabled="true"] {
 		pointer-events: none;
-		color: $gray-600;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 		&.is-selected {
 			background: var(--wpds-color-background-interactive-neutral-weak-disabled);
+			@include outset-ring__focus;
+			// Keep the outline inside the scrollable suggestion list.
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 	}
 
