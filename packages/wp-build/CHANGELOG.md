@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 3.x releases ([#85383](https://github.com/WordPress/gutenberg/pull/85383)).
 
 ## 0.26.0 (2026-10-20)
 
