@@ -870,8 +870,8 @@ export function prepareItem( id: QueueItemId ) {
 				} )
 			: file;
 
-		// Gate very large images out of client-side processing. wasm-vips is
-		// capped at 1 GiB of memory, so high-megapixel images, especially
+		// Gate very large images out of client-side processing. wasm-vips's
+		// memory can grow to at most 2 GiB, so high-megapixel images, especially
 		// interlaced/progressive ones, which can't be decoded with
 		// shrink-on-load, can exhaust it and fail. These are routed to the
 		// server, which has no comparable per-image ceiling. If dimensions

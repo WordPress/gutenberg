@@ -40,13 +40,12 @@ const BYTES_PER_PIXEL = 4;
 /**
  * Memory budget (in bytes) for decoding every frame of an animated image.
  *
- * wasm-vips runs in a fixed 1 GiB WASM heap that cannot grow (wasm-vips 0.0.18
- * builds with `INITIAL_MEMORY` === `MAXIMUM_MEMORY` === 1 GiB), so an
- * animation loaded with `[n=-1]` — every frame stacked into one tall image —
- * costs at most frames * width * pageHeight * 4 bytes. A long animation of
- * otherwise modest dimensions can therefore exhaust the heap even though a
- * single frame is small. ~0.5 GiB leaves headroom for the resize and re-encode
- * steps.
+ * An animation loaded with `[n=-1]` (every frame stacked into one tall image)
+ * costs at most frames * width * pageHeight * 4 bytes, so a long animation of
+ * otherwise modest dimensions can exhaust the heap even though a single frame
+ * is small. wasm-vips 0.0.19 grows its heap up to 2 GiB, but growth can fail
+ * on memory-constrained devices, so ~0.75 GiB leaves headroom for that and
+ * for the resize and re-encode steps.
  *
  * The estimate is the fully materialized frame stack, which is an upper bound:
  * libvips streams the sequential load/resize/save pipeline, so real peak usage
@@ -55,7 +54,7 @@ const BYTES_PER_PIXEL = 4;
  * that would have fit against never failing an upload outright. See
  * `logAnimationFallback()` for how that decision is surfaced.
  */
-const ANIMATION_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
+const ANIMATION_MEMORY_BUDGET = 0.75 * 1024 * 1024 * 1024;
 
 /**
  * Warns that an animation was flattened even though it was asked to keep it.
@@ -84,7 +83,7 @@ function logAnimationFallback(
 			estimatedBytes
 		) } MiB, over the ${ mib(
 			ANIMATION_MEMORY_BUDGET
-		) } MiB budget for the 1 GiB WASM heap.`
+		) } MiB budget for the WASM heap.`
 	);
 }
 

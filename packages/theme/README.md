@@ -53,7 +53,7 @@ const fontFamilyTokenNames = groups.typography.groups[ 'font-family' ].tokens;
 
 `tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, containing the resolved DTCG `$value` and CSS string `css`. `group` identifies the top-level namespace, such as `border`, `color`, or `typography`.
 
-`groups` preserves the source token hierarchy, keyed by top-level namespace. Each group has a `tokens` array of CSS custom property names belonging directly to it and a `groups` object containing its child groups. These are empty when the group has no direct tokens or children, respectively.
+`groups` preserves the source token hierarchy, keyed by top-level namespace. Each group has a `tokens` array of CSS custom property names belonging directly to it and a `groups` object containing its child groups. These are empty when the group has no direct tokens or children, respectively. A group that has a `$description` in the token source also exposes it as `$description`, for example `groups.dimension.groups.gap.$description`.
 
 `modes.default` contains build-time defaults and does not reflect theme overrides. Use CSS custom properties to follow the current theme. `fallback` is the expression used by the build plugins when a token variable is unavailable and can differ from the default value, as shown above.
 

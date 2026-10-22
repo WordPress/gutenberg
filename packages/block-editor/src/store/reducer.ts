@@ -2052,48 +2052,6 @@ export function highlightedBlock(
 }
 
 /**
- * Reducer returning current spotlighted block.
- *
- * @param state  Current clientId or null.
- * @param action Dispatched action.
- *
- * @return Updated state.
- */
-export function hasBlockSpotlight(
-	state: State[ 'hasBlockSpotlight' ],
-	action: Action
-) {
-	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_SPOTLIGHT':
-			const { clientId, hasBlockSpotlight: _hasBlockSpotlight } = action;
-
-			if ( _hasBlockSpotlight ) {
-				return clientId;
-			} else if ( state === clientId ) {
-				return null;
-			}
-			return state;
-		case 'SELECT_BLOCK':
-			if ( action.clientId !== state ) {
-				return null;
-			}
-			return state;
-		case 'SELECTION_CHANGE':
-			if (
-				action.start?.clientId !== state ||
-				action.end?.clientId !== state
-			) {
-				return null;
-			}
-			return state;
-		case 'CLEAR_SELECTED_BLOCK':
-			return null;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning current expanded block in the list view.
  *
  * @param state  Current expanded block.
@@ -2608,7 +2566,6 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	registeredInserterMediaCategories,
 	zoomLevel,
-	hasBlockSpotlight,
 	openedListViewPanels,
 	listViewExpandRevision,
 	listViewContentPanelOpen,
