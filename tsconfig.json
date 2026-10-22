@@ -53,6 +53,7 @@
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
 		{ "path": "packages/preferences" },
+		{ "path": "packages/preferences-persistence" },
 		{ "path": "packages/priority-queue" },
 		{ "path": "packages/private-apis" },
 		{ "path": "packages/react-inert-value" },

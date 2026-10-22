@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
