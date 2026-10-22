@@ -237,6 +237,64 @@ test.describe( 'Block Locking', () => {
 			] );
 	} );
 
+	test( 'applies the lock to inner blocks only for blocks that hold them', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Outside' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'constrained' } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside' },
+				},
+			],
+		} );
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first(),
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
+		await modal
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await modal
+			.getByRole( 'checkbox', {
+				name: 'Apply to all blocks inside',
+				exact: true,
+			} )
+			.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { lock: { move: true, remove: true } },
+			},
+			{
+				name: 'core/group',
+				attributes: {
+					lock: { move: true, remove: true },
+					templateLock: 'all',
+				},
+			},
+		] );
+		const [ paragraph ] = await editor.getBlocks();
+		expect( paragraph.attributes.templateLock ).toBeUndefined();
+	} );
+
 	test( 'block locking supersedes template locking', async ( {
 		editor,
 		page,

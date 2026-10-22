@@ -35,6 +35,10 @@ describe( 'block-lock utils', () => {
 			expect( getSharedLockValue( [ true, true ] ) ).toBe( true );
 		} );
 
+		it( 'returns false when there are no values', () => {
+			expect( getSharedLockValue( [] ) ).toBe( false );
+		} );
+
 		it( 'returns false when no value is true', () => {
 			expect( getSharedLockValue( [ false ] ) ).toBe( false );
 			expect( getSharedLockValue( [ false, false ] ) ).toBe( false );

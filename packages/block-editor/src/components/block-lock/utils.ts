@@ -26,11 +26,11 @@ export function getTemplateLockValue( lock: BlockLock ) {
  *
  * @param values The value of each block.
  *
- * @return `true` when every value is true, `false` when none is, and `null`
- *         when the values differ.
+ * @return `true` when every value is true, `false` when none is or there are
+ *         no values, and `null` when the values differ.
  */
 export function getSharedLockValue( values: boolean[] ): SharedLockValue {
-	if ( values.every( Boolean ) ) {
+	if ( values.length > 0 && values.every( Boolean ) ) {
 		return true;
 	}
 

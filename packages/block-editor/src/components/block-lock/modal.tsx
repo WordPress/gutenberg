@@ -144,6 +144,9 @@ function useSharedLockState( clientIds: string[] ) {
 			const locks = clientIds.map( ( clientId ) =>
 				getCurrentLock( selectors, clientId )
 			);
+			const templateLockClientIds = clientIds.filter( ( clientId ) =>
+				supportsTemplateLock( selectors, clientId )
+			);
 
 			return {
 				isEditLocked: getSharedLockValue(
@@ -160,13 +163,11 @@ function useSharedLockState( clientIds: string[] ) {
 					clientIds,
 					allowsEditLock
 				),
-				hasTemplateLock: everyBlock(
-					selectors,
-					clientIds,
-					supportsTemplateLock
-				),
+				// Offered when at least one block can hold inner blocks, and
+				// applied only to those that can.
+				hasTemplateLock: templateLockClientIds.length > 0,
 				appliesTemplateLock: getSharedLockValue(
-					clientIds.map( ( clientId ) =>
+					templateLockClientIds.map( ( clientId ) =>
 						hasAppliedTemplateLock( selectors, clientId )
 					)
 				),
@@ -206,6 +207,38 @@ function useLockSelection( clientIds: string[] ) {
 }
 
 /**
+ * Returns the `templateLock` attribute matching a block's new lock. A block
+ * whose type doesn't support a template lock gets no attribute.
+ *
+ * @param selectors         The block editor selectors.
+ * @param clientId          The block client ID.
+ * @param newLock           The block's new lock.
+ * @param applyTemplateLock Whether to apply the lock to inner blocks, or
+ *                          `null` to keep the block's current choice.
+ *
+ * @return The `templateLock` attribute, if any.
+ */
+function getTemplateLockAttribute(
+	selectors: BlockLockSelectors,
+	clientId: string,
+	newLock: BlockLock,
+	applyTemplateLock: SharedLockValue
+) {
+	if ( ! supportsTemplateLock( selectors, clientId ) ) {
+		return {};
+	}
+
+	const shouldApplyTemplateLock =
+		applyTemplateLock ?? hasAppliedTemplateLock( selectors, clientId );
+
+	return {
+		templateLock: shouldApplyTemplateLock
+			? getTemplateLockValue( newLock )
+			: undefined,
+	};
+}
+
+/**
  * Returns the attributes that apply the chosen lock features to each block.
  *
  * @param selectors         The block editor selectors.
@@ -228,17 +261,17 @@ function getLockAttributesByClientId(
 				lock,
 				getCurrentLock( selectors, clientId )
 			);
-			const shouldApplyTemplateLock =
-				applyTemplateLock ??
-				hasAppliedTemplateLock( selectors, clientId );
 
 			return [
 				clientId,
 				{
 					lock: newLock,
-					templateLock: shouldApplyTemplateLock
-						? getTemplateLockValue( newLock )
-						: undefined,
+					...getTemplateLockAttribute(
+						selectors,
+						clientId,
+						newLock,
+						applyTemplateLock
+					),
 				},
 			];
 		} )
