@@ -3,16 +3,19 @@ import type { ColumnSteps } from '@wordpress/grid';
 /**
  * Resolves the column count a host asked for. A finite number is floored,
  * with a floor of one and no ceiling; a map keeps its finite positive
- * entries, keyed by container width, each count floored the same way and
- * an `'auto'` step kept as is. Anything else, or a map left empty, is
- * unset. How many columns a surface can carry is the host's decision, not
- * the package's.
+ * entries, keyed by container width, each count floored the same way, and
+ * an `'auto'` step only when a floor is set, since the surface skips it
+ * otherwise. Anything else, or a map left with no entries, is unset. How
+ * many columns a surface can carry is the host's decision, not the
+ * package's.
  *
- * @param columns Host-provided `gridSettings.columns`, if any.
+ * @param columns        Host-provided `gridSettings.columns`, if any.
+ * @param minColumnWidth Host-provided `gridSettings.minColumnWidth`, if any.
  * @return The count, the steps, or `undefined` when the host set none.
  */
 export function resolveDashboardColumns(
-	columns?: number | ColumnSteps
+	columns?: number | ColumnSteps,
+	minColumnWidth?: number
 ): number | ColumnSteps | undefined {
 	if ( typeof columns === 'number' ) {
 		return Number.isFinite( columns )
@@ -24,6 +27,8 @@ export function resolveDashboardColumns(
 		return undefined;
 	}
 
+	const hasFloor =
+		resolveDashboardMinColumnWidth( minColumnWidth ) !== undefined;
 	const steps: ColumnSteps = {};
 	for ( const [ width, count ] of Object.entries( columns ) ) {
 		const from = Number( width );
@@ -31,7 +36,9 @@ export function resolveDashboardColumns(
 			continue;
 		}
 		if ( count === 'auto' ) {
-			steps[ from ] = 'auto';
+			if ( hasFloor ) {
+				steps[ from ] = 'auto';
+			}
 			continue;
 		}
 		if ( typeof count !== 'number' || ! Number.isFinite( count ) ) {

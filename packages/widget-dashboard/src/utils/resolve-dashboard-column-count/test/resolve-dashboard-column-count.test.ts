@@ -31,11 +31,18 @@ describe( 'resolveDashboardColumns', () => {
 		expect( resolveDashboardColumns( { 600: 0 } ) ).toEqual( { 600: 1 } );
 	} );
 
-	it( 'keeps an auto step as is', () => {
+	it( 'keeps an auto step when a floor is set', () => {
+		expect( resolveDashboardColumns( { 0: 1, 960: 'auto' }, 240 ) ).toEqual(
+			{ 0: 1, 960: 'auto' }
+		);
+	} );
+
+	it( 'drops auto steps when no floor is set', () => {
 		expect( resolveDashboardColumns( { 0: 1, 960: 'auto' } ) ).toEqual( {
 			0: 1,
-			960: 'auto',
 		} );
+		expect( resolveDashboardColumns( { 0: 'auto' } ) ).toBeUndefined();
+		expect( resolveDashboardColumns( { 0: 'auto' }, 0 ) ).toBeUndefined();
 	} );
 
 	it( 'drops step entries that are not finite widths and counts', () => {

@@ -139,6 +139,17 @@ describe( 'column count', () => {
 		await waitFor( () => expect( columns() ).toBe( 1 ) );
 	} );
 
+	it( 'renders the package steps when only auto steps are set', async () => {
+		// With no floor the step cannot apply, so no count reaches the
+		// surface: the package steps fill in, not the surface's own default.
+		const columns = await renderDashboard( {
+			model: 'grid',
+			columns: { 0: 'auto' },
+			rowHeight: 200,
+		} );
+		await waitFor( () => expect( columns() ).toBe( 1 ) );
+	} );
+
 	it( 'treats a non-positive floor as unset', async () => {
 		const columns = await renderDashboard( {
 			model: 'grid',

@@ -35,18 +35,20 @@ import type {
 } from '../types';
 
 /*
- * Validates the host's column policy and hands it to the surface untouched:
- * the `@wordpress/grid` surface measures its own width and resolves the
- * count. The default steps only apply when the host set neither a policy
- * nor a floor.
+ * Validates the host's column policy and hands it to the surface: the
+ * `@wordpress/grid` surface measures its own width and resolves the count.
+ * The default steps only apply when the host set no count and no floor.
  */
 function resolveGridSettings(
 	settings: WidgetGridSettings
 ): WidgetGridSettings {
 	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
-	const columns = resolveDashboardColumns( normalized.columns );
 	const minColumnWidth = resolveDashboardMinColumnWidth(
 		normalized.minColumnWidth
+	);
+	const columns = resolveDashboardColumns(
+		normalized.columns,
+		minColumnWidth
 	);
 
 	return {
