@@ -21,6 +21,8 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "./tsconfig.prebuilt.json" },
 		{ "path": "../compose/tsconfig.build.json" },
-		{ "path": "../style-runtime/tsconfig.build.json" }
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../ui/tsconfig.build.json" }
 	]
 }
