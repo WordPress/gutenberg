@@ -49,11 +49,11 @@ vi.mock( import( '../../components/grid' ), async ( importOriginal ) => ( {
 	GridItemRotator: ( {
 		onPreview,
 	}: {
-		onPreview: ( angle: number | null ) => void;
+		onPreview?: ( angle: number | null ) => void;
 	} ) => (
 		<button
 			data-testid="grid-item-rotator"
-			onClick={ () => onPreview( 30 ) }
+			onClick={ () => onPreview?.( 30 ) }
 		/>
 	),
 } ) );
