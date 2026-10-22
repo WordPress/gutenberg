@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { getLayoutType } from '../../../layouts';
 
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
@@ -333,6 +334,31 @@ export function useEventHandlers( {
 					}
 					return;
 				}
+
+				// A layout can take over the drag of its blocks, such as a
+				// manual placement grid, which shows the cells the block will
+				// land in. A multi-selection drag follows the pointer in every
+				// layout.
+				const rootClientId = getBlockRootClientId( clientId );
+				const rootLayout = getBlockAttributes( rootClientId )?.layout;
+				if (
+					! isMultiSelectionDrag &&
+					getLayoutType( rootLayout?.type )?.startChildDrag?.(
+						event,
+						{
+							layout: rootLayout,
+							clientId,
+							// A block that can be dragged is in a block list.
+							rootClientId: rootClientId!,
+							blockElement: node,
+							startDraggingBlocks,
+							stopDraggingBlocks,
+						}
+					)
+				) {
+					return;
+				}
+
 				const clientIds = isMultiSelectionDrag
 					? getSelectedBlockClientIds()
 					: [ clientId ];
@@ -366,83 +392,6 @@ export function useEventHandlers( {
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
 				dataTransfer.setDragImage( dragElement, 0, 0 );
-
-				// In a manual placement grid, the grid shows the cells the
-				// block will land in, so the block stays in place, dimmed,
-				// instead of following the pointer. A multi-selection drag
-				// can't be placed in cells, so it follows the pointer.
-				const rootLayout = getBlockAttributes(
-					getBlockRootClientId( clientId )
-				)?.layout;
-				if (
-					! isMultiSelectionDrag &&
-					rootLayout?.type === 'grid' &&
-					rootLayout.isManualPlacement &&
-					window.__experimentalEnableGridInteractivity
-				) {
-					const originalOpacity = node.style.opacity;
-					node.style.opacity = '0.5';
-
-					// The grid's drop layer is in the editor's document,
-					// outside the canvas, and a drop there can re-render the
-					// block, after which its `dragend` no longer reaches the
-					// canvas. The drag ends on whichever comes first.
-					const endTargets = new Set( [
-						ownerDocument,
-						document,
-						node,
-					] );
-
-					// The grid's drop layer covers the block once dragging
-					// starts. Chrome cancels a drag when that happens during
-					// `dragstart`, so it waits for the first `dragover`.
-					function startGridDrag() {
-						ownerDocument.removeEventListener(
-							'dragover',
-							startGridDrag
-						);
-						startDraggingBlocks( [ clientId ] );
-						document.body.classList.add(
-							'is-dragging-components-draggable'
-						);
-						ownerDocument.documentElement.classList.add(
-							'is-dragging'
-						);
-					}
-
-					function endGridDrag() {
-						ownerDocument.removeEventListener(
-							'dragover',
-							startGridDrag
-						);
-						for ( const endTarget of endTargets ) {
-							endTarget.removeEventListener(
-								'dragend',
-								endGridDrag
-							);
-							endTarget.removeEventListener(
-								'drop',
-								endGridDrag
-							);
-						}
-						node.style.opacity = originalOpacity;
-						dragElement.remove();
-						stopDraggingBlocks();
-						document.body.classList.remove(
-							'is-dragging-components-draggable'
-						);
-						ownerDocument.documentElement.classList.remove(
-							'is-dragging'
-						);
-					}
-
-					for ( const endTarget of endTargets ) {
-						endTarget.addEventListener( 'dragend', endGridDrag );
-						endTarget.addEventListener( 'drop', endGridDrag );
-					}
-					ownerDocument.addEventListener( 'dragover', startGridDrag );
-					return;
-				}
 
 				const rect = node.getBoundingClientRect();
 
