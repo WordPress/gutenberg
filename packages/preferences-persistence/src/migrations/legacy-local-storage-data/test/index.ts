@@ -217,7 +217,12 @@ describe( 'convertLegacyData', () => {
 
 	it( 'ignores legacy preferences that are not an object', () => {
 		expect(
-			convertLegacyData( { 'core/preferences': { preferences: [] } } )
+			convertLegacyData( {
+				'core/preferences': {
+					// @ts-expect-error [] is not a preferences object; non-object legacy data is ignored.
+					preferences: [],
+				},
+			} )
 		).toBeUndefined();
 	} );
 } );

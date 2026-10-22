@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 
 ### Internal
@@ -25,6 +26,7 @@
 -   `MenuItem`: Accept `accessibleWhenDisabled` in the props types ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
 -   `Autocomplete`: Let completers type the payload they replace the field with ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 -   `Autocomplete`: Make the `keywords` of the options from `useItems` optional, as the default filter already does ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
+-   Convert the remaining Popover test helper to TypeScript ([#85150](https://github.com/WordPress/gutenberg/pull/85150)).
 
 ## 43.0.0 (2026-10-20)
 

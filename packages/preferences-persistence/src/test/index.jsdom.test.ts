@@ -1,12 +1,14 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableCreatePersistenceLayer } from '..';
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( {
-	default: vi.fn( () => Promise.resolve() ),
-} ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( '__unstableCreatePersistenceLayer', () => {
+	beforeEach( () => {
+		vi.mocked( apiFetch ).mockResolvedValue( undefined );
+	} );
+
 	afterEach( () => {
 		vi.mocked( apiFetch ).mockClear();
 		vi.restoreAllMocks();
