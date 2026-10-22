@@ -6,18 +6,26 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
+// The settings panel's track control is a second `MediaReplaceFlow`, which
+// `MediaControl` renders with a class name of its own.
+let mockSidebarMediaReplaceFlowProps;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
 		await import( '../../../../block-editor/src/components/plain-text' );
 
 	return {
+		store: {},
 		BlockControls: ( { children } ) => <div>{ children }</div>,
 		BlockIcon: () => <span />,
 		InspectorControls: ( { children } ) => <div>{ children }</div>,
 		MediaPlaceholder: () => <div />,
 		MediaReplaceFlow: ( props ) => {
-			mockMediaReplaceFlowProps = props;
+			if ( props.className ) {
+				mockSidebarMediaReplaceFlowProps = props;
+			} else {
+				mockMediaReplaceFlowProps = props;
+			}
 			const { name, onSelect } = props;
 			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
 		},
@@ -32,11 +40,20 @@ vi.mock( import( '@wordpress/block-editor' ), async () => {
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	const data = await importOriginal();
 	const mockUseDispatch = vi.fn();
+	// `MediaControl` reads the block editor settings straight from the store;
+	// everything else keeps the real `useSelect`.
+	const mockUseSelect = ( mapSelect, ...rest ) =>
+		typeof mapSelect === 'function'
+			? data.useSelect( mapSelect, ...rest )
+			: { getSettings: () => ( {} ) };
 
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useDispatch' ) {
 				return mockUseDispatch;
+			}
+			if ( property === 'useSelect' ) {
+				return mockUseSelect;
 			}
 
 			return target[ property ];
@@ -103,6 +120,7 @@ function renderEdit( props = {} ) {
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
+		mockSidebarMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: vi.fn(),
 		} );
@@ -292,6 +310,47 @@ describe( 'PlaylistTrackEdit', () => {
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
 		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
 			'src'
+		);
+	} );
+
+	it( 'shows the track file and a replace control in the settings panel for a single selected track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( screen.getByText( 'song.mp3' ) ).toBeInTheDocument();
+		expect( mockSidebarMediaReplaceFlowProps ).toEqual(
+			expect.objectContaining( {
+				allowedTypes: [ 'audio' ],
+				mediaId: 1,
+				mediaURL: 'https://example.com/song.mp3',
+			} )
+		);
+	} );
+
+	it( 'does not show the settings panel replace control when multiple tracks are selected', () => {
+		// Replacing the source of every selected track with one file makes no
+		// sense, so the control follows the toolbar replace control.
+		renderEdit( { isSelected: false } );
+
+		expect( screen.queryByText( 'song.mp3' ) ).not.toBeInTheDocument();
+		expect( mockSidebarMediaReplaceFlowProps ).toBeUndefined();
+	} );
+
+	it( 'replaces the track from the settings panel media picker', () => {
+		const { setAttributes } = renderEdit( { isSelected: true } );
+
+		mockSidebarMediaReplaceFlowProps.onSelect( {
+			id: 2,
+			url: 'https://example.com/replacement.mp3',
+			title: 'Replacement Track',
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				blob: undefined,
+				id: 2,
+				src: 'https://example.com/replacement.mp3',
+				title: 'Replacement Track',
+			} )
 		);
 	} );
 
