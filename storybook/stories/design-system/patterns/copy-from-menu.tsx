@@ -1,3 +1,4 @@
+import { useCopyToClipboard } from '@wordpress/compose';
 import { useRef, useState } from '@wordpress/element';
 import { copy } from '@wordpress/icons';
 import { SnackbarList } from '@wordpress/components';
@@ -20,11 +21,15 @@ export function CopyFromMenuExample() {
 	const [ notices, setNotices ] = useState<
 		Array< { id: string; content: string } >
 	>( [] );
-	const requestRef = useRef( 0 );
+	const noticeIdRef = useRef( 0 );
 
 	function showSnackbar( message: string ) {
+		noticeIdRef.current += 1;
 		setNotices( [
-			{ id: String( requestRef.current ), content: message },
+			{
+				id: String( noticeIdRef.current ),
+				content: message,
+			},
 		] );
 	}
 
@@ -34,32 +39,11 @@ export function CopyFromMenuExample() {
 		);
 	}
 
-	function onCopy() {
-		const requestId = ++requestRef.current;
-
-		let pending: Promise< void >;
-		try {
-			pending = navigator.clipboard.writeText( SAMPLE_LINK );
-		} catch {
-			showSnackbar( LINK_COPY_FAILED_MESSAGE );
-			return;
-		}
-
-		void pending.then(
-			() => {
-				if ( requestId !== requestRef.current ) {
-					return;
-				}
-				showSnackbar( LINK_COPIED_MESSAGE );
-			},
-			() => {
-				if ( requestId !== requestRef.current ) {
-					return;
-				}
-				showSnackbar( LINK_COPY_FAILED_MESSAGE );
-			}
-		);
-	}
+	const ref = useCopyToClipboard(
+		SAMPLE_LINK,
+		() => showSnackbar( LINK_COPIED_MESSAGE ),
+		() => showSnackbar( LINK_COPY_FAILED_MESSAGE )
+	);
 
 	return (
 		<Stack
@@ -74,7 +58,7 @@ export function CopyFromMenuExample() {
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Item
-						onClick={ onCopy }
+						ref={ ref }
 						prefix={ <Menu.PrefixIcon icon={ copy } /> }
 					>
 						<Menu.ItemLabel>Copy link</Menu.ItemLabel>

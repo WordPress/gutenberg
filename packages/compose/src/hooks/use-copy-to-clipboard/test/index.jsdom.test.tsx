@@ -6,11 +6,16 @@ import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
 interface TestComponentProps {
 	text: string | ( () => string );
 	onSuccess?: () => void;
+	onError?: () => void;
 }
 
 describe( 'useCopyToClipboard', () => {
-	const TestComponent = ( { text, onSuccess }: TestComponentProps ) => {
-		const ref = useCopyToClipboard( text, onSuccess );
+	const TestComponent = ( {
+		text,
+		onSuccess,
+		onError,
+	}: TestComponentProps ) => {
+		const ref = useCopyToClipboard( text, onSuccess, onError );
 		return <button ref={ ref }>Copy</button>;
 	};
 
@@ -60,6 +65,46 @@ describe( 'useCopyToClipboard', () => {
 		await user.click( screen.getByRole( 'button' ) );
 
 		expect( onSuccess ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should call onError when copy fails', async () => {
+		const user = userEvent.setup();
+		const onError = vi.fn();
+		render( <TestComponent text="test text" onError={ onError } /> );
+
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+			new Error()
+		);
+
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( onError ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should call onError after the node unmounts', async () => {
+		const user = userEvent.setup();
+		let rejectPromise: ( reason?: unknown ) => void;
+		const delayedPromise = new Promise< void >( ( _, reject ) => {
+			rejectPromise = reject;
+		} );
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+			delayedPromise
+		);
+
+		const onError = vi.fn();
+		const { unmount } = render(
+			<TestComponent text="test" onError={ onError } />
+		);
+
+		await user.click( screen.getByRole( 'button' ) );
+		unmount();
+
+		await act( async () => {
+			rejectPromise( new Error() );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		} );
+
+		expect( onError ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should call onSuccess after the node unmounts', async () => {

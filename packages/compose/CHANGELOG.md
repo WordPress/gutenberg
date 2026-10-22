@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useCopyToClipboard`: Add an optional `onError` callback for a failed copy ([#85269](https://github.com/WordPress/gutenberg/pull/85269)).
+
 ### Bug Fixes
 
 -   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).

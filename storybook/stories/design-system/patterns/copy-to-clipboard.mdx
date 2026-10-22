@@ -14,7 +14,7 @@ Put the confirmation on the button so it stays with the control that produced th
 
 <Canvas of={ CopyToClipboardStories.CopyExample } />
 
-The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure, so the control is not renamed while it has focus. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails, to announce the outcome politely. Focus stays on the button.
+The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure, so the control is not renamed while it has focus. Copy with `useCopyToClipboard` from `@wordpress/compose`, and use its `onError` callback when the write fails. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails, to announce the outcome politely. Focus stays on the button.
 
 For an icon-only control, use `IconButton` and keep `label="Copy"`. That label is the accessible name and the tooltip. Swap the icon for a check on success or an error icon on failure, and announce the result with `speak()`. The success and error messages belong in that announcement rather than only in the tooltip.
 
@@ -30,7 +30,7 @@ A snackbar isn't strictly necessary for accessibility. The essential requirement
 
 <Canvas of={ CopyFromMenuStories.CopyFromMenu } />
 
-This example uses `SnackbarList` for that message. The list animates the snackbar in and out, and `Snackbar` announces "Link copied to clipboard", or "Couldn't copy link to clipboard." if copying fails, through its own polite live region. That region stays on the page after the menu closes, so the example does not add a second one. The item label stays "Copy link".
+This example uses `useCopyToClipboard` for the write and `SnackbarList` for the message. The list animates the snackbar in and out, and `Snackbar` announces "Link copied to clipboard", or "Couldn't copy link to clipboard." if copying fails, through its own polite live region. That region stays on the page after the menu closes, so the example does not add a second one. The item label stays "Copy link".
 
 ## Guidance
 
