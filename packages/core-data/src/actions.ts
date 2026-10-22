@@ -15,6 +15,8 @@ import type { QueriedItem, QueriedMeta, Query } from './queried-data/types';
 import type { ActionOf, CoreDataThunkArgs, RestRecord } from './private-types';
 import type {
 	BatchActions,
+	BatchRequest,
+	BatchResults,
 	DeleteEntityRecordOptions,
 	EditEntityRecordOptions,
 	EntityConfig,
@@ -103,7 +105,7 @@ export function receiveEntityRecords(
 	records: object | Array< object >,
 	query: Query | null | undefined = undefined,
 	invalidateCache: boolean | null = false,
-	edits: Record< string, unknown > | null | undefined = undefined,
+	edits: object | null | undefined = undefined,
 	meta: QueriedMeta | null | undefined = undefined
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
@@ -119,14 +121,16 @@ export function receiveEntityRecords(
 			// Records are read by their fields' names.
 			records as QueriedItem | Array< QueriedItem >,
 			query,
-			edits,
+			// Edits are read by their fields' names.
+			edits as Record< string, unknown > | null | undefined,
 			meta
 		);
 	} else {
 		action = receiveItems(
 			// Records are read by their fields' names.
 			records as QueriedItem | Array< QueriedItem >,
-			edits,
+			// Edits are read by their fields' names.
+			edits as Record< string, unknown > | null | undefined,
 			meta
 		);
 	}
@@ -888,8 +892,10 @@ export const saveEntityRecord =
  *         values of each function given in `requests`.
  */
 export const __experimentalBatch =
-	( requests: Array< ( api: BatchActions ) => unknown > ) =>
-	async ( { dispatch }: CoreDataThunkArgs ) => {
+	< Requests extends Array< BatchRequest > | [] >( requests: Requests ) =>
+	async ( {
+		dispatch,
+	}: CoreDataThunkArgs ): Promise< BatchResults< Requests > > => {
 		const batch = createBatch();
 		const api: BatchActions = {
 			saveEntityRecord( kind, name, record, options ) {
@@ -922,7 +928,8 @@ export const __experimentalBatch =
 			batch.run(),
 			...resultPromises,
 		] );
-		return results;
+		// `Promise.all` keeps the order of the requests.
+		return results as BatchResults< Requests >;
 	};
 
 /**
@@ -1165,7 +1172,7 @@ export const receiveRevisions =
 		kind: string,
 		name: string,
 		recordKey: number | string,
-		records: RestRecord | Array< RestRecord >,
+		records: object | Array< object >,
 		query?: Query | null,
 		invalidateCache: boolean | null = false,
 		meta?: QueriedMeta | null
@@ -1182,7 +1189,8 @@ export const receiveRevisions =
 		dispatch( {
 			type: 'RECEIVE_ITEM_REVISIONS',
 			key,
-			items: records,
+			// Records are read by their fields' names.
+			items: records as QueriedItem | Array< QueriedItem >,
 			recordKey,
 			meta,
 			query,

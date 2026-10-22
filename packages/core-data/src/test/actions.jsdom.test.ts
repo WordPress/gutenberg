@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	expectTypeOf,
+	it,
+	vi,
+} from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import type { Mock } from 'vitest';
 import {
@@ -15,7 +23,7 @@ import {
 import { getEntitySyncManager } from '../entity-sync';
 import type { EntitySyncManager } from '../entity-sync';
 import type * as ET from '../entity-types';
-import type { CoreDataThunkArgs } from '../private-types';
+import type { CoreDataThunkArgs, RestRecord } from '../private-types';
 
 // A mocked `dispatch`, with the action creators the tests check.
 type DispatchMock< Action extends string > = Mock & Record< Action, Mock >;
@@ -1530,18 +1538,14 @@ describe( '__experimentalBatch', () => {
 			),
 		};
 
-		const results = await __experimentalBatch(
-			[
-				( { saveEntityRecord: _saveEntityRecord } ) =>
-					_saveEntityRecord( 'root', 'widget', {} ),
-				( { saveEditedEntityRecord: _saveEditedEntityRecord } ) =>
-					_saveEditedEntityRecord( 'root', 'widget', 123 ),
-				( { deleteEntityRecord: _deleteEntityRecord } ) =>
-					_deleteEntityRecord( 'root', 'widget', 123, {} ),
-			],
-			// @ts-expect-error The action takes no options; the mocked batch processes the requests.
-			{ __unstableProcessor: ( inputs ) => Promise.resolve( inputs ) }
-		)( thunkArgs( { dispatch } ) );
+		const results = await __experimentalBatch( [
+			( { saveEntityRecord: _saveEntityRecord } ) =>
+				_saveEntityRecord( 'root', 'widget', {} ),
+			( { saveEditedEntityRecord: _saveEditedEntityRecord } ) =>
+				_saveEditedEntityRecord( 'root', 'widget', 123 ),
+			( { deleteEntityRecord: _deleteEntityRecord } ) =>
+				_deleteEntityRecord( 'root', 'widget', 123, {} ),
+		] )( thunkArgs( { dispatch } ) );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
@@ -1563,6 +1567,9 @@ describe( '__experimentalBatch', () => {
 			{ __unstableFetch: expect.any( Function ) }
 		);
 
+		expectTypeOf( results ).toEqualTypeOf<
+			[ RestRecord | undefined, RestRecord | undefined, unknown ]
+		>();
 		expect( results ).toEqual( [
 			{ id: 123, created: true },
 			{ id: 123, updated: true },

@@ -871,7 +871,7 @@ _Parameters_
 - _records_ `object | Array< object >`: Records received.
 - _query_ `Query | null | undefined`: Query Object.
 - _invalidateCache_ `boolean | null`: Should invalidate query caches.
-- _edits_ `Record< string, unknown > | null | undefined`: Edits to reset.
+- _edits_ `object | null | undefined`: Edits to reset.
 - _meta_ `QueriedMeta | null | undefined`: Meta information about pagination.
 
 _Returns_
@@ -899,7 +899,7 @@ _Parameters_
 - _kind_ `string`: Kind of the received entity record revisions.
 - _name_ `string`: Name of the received entity record revisions.
 - _recordKey_ `number | string`: The key of the entity record whose revisions you want to fetch.
-- _records_ `RestRecord | Array< RestRecord >`: Revisions received.
+- _records_ `object | Array< object >`: Revisions received.
 - _query_ `Query | null`: Query Object.
 - _invalidateCache_ `boolean | null`: Should invalidate query caches.
 - _meta_ `QueriedMeta | null`: Meta information about pagination.

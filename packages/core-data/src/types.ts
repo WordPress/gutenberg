@@ -4,6 +4,7 @@ import type {
 	ConnectionStatusDisconnected,
 	Y,
 } from '@wordpress/sync';
+import type { RestRecord } from './private-types';
 import type {
 	SelectionType,
 	SelectionDirection,
@@ -348,13 +349,13 @@ export interface BatchActions {
 		name: string,
 		record: object,
 		options?: SaveEntityRecordOptions
-	) => Promise< unknown >;
+	) => Promise< RestRecord | undefined >;
 	saveEditedEntityRecord: (
 		kind: string,
 		name: string,
 		recordId?: string | number,
 		options?: SaveEntityRecordOptions
-	) => Promise< unknown >;
+	) => Promise< RestRecord | undefined >;
 	deleteEntityRecord: (
 		kind: string,
 		name: string,
@@ -363,3 +364,15 @@ export interface BatchActions {
 		options?: DeleteEntityRecordOptions
 	) => Promise< unknown >;
 }
+
+/**
+ * A request of a `__experimentalBatch` call.
+ */
+export type BatchRequest = ( api: BatchActions ) => unknown;
+
+/**
+ * The resolved results of the requests of a `__experimentalBatch` call.
+ */
+export type BatchResults< Requests extends Array< BatchRequest > > = {
+	[ Index in keyof Requests ]: Awaited< ReturnType< Requests[ Index ] > >;
+};
