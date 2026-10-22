@@ -79,12 +79,6 @@ export function validateFragment(
 		}
 	}
 
-	if ( options.pr && fragmentPr && fragmentPr !== options.pr ) {
-		errors.push(
-			`${ filePath }: PR #${ fragmentPr } does not match current PR #${ options.pr }`
-		);
-	}
-
 	return errors;
 }
 
@@ -111,13 +105,13 @@ export function validateAllFragments(
 	for ( const f of files ) {
 		const filePath = path.join( unreleasedDir, f );
 		const content = fs.readFileSync( filePath, 'utf8' );
-		const errors = validateFragment( filePath, content, options, repoRoot );
+		// When validating all fragments, individual fragments belong to different PRs.
+		// Only check fragment schema/syntax without requiring options.requirePr per fragment;
+		// options.requirePr is checked below across all fragments for the project.
+		const errors = validateFragment( filePath, content, {}, repoRoot );
 		allErrors.push( ...errors );
 
-		if (
-			options.requirePr &&
-			! errors.some( ( e ) => e.includes( 'does not match' ) )
-		) {
+		if ( options.requirePr ) {
 			const parsed = yaml.safeLoad( content ) as any;
 			if ( String( parsed?.custom?.PR ) === options.requirePr ) {
 				if (
