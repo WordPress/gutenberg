@@ -1,6 +1,7 @@
 import { getNode, deepCopyLocksTreePath } from './utils';
+import type { LocksAction, LocksState } from './types';
 
-const DEFAULT_STATE = {
+const DEFAULT_STATE: LocksState = {
 	requests: [],
 	tree: {
 		locks: [],
@@ -11,12 +12,15 @@ const DEFAULT_STATE = {
 /**
  * Reducer returning locks.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export default function locks( state = DEFAULT_STATE, action ) {
+export default function locks(
+	state: LocksState = DEFAULT_STATE,
+	action: LocksAction
+): LocksState {
 	switch ( action.type ) {
 		case 'ENQUEUE_LOCK_REQUEST': {
 			const { request } = action;
@@ -31,7 +35,8 @@ export default function locks( state = DEFAULT_STATE, action ) {
 			const storePath = [ store, ...path ];
 
 			const newTree = deepCopyLocksTreePath( state.tree, storePath );
-			const node = getNode( newTree, storePath );
+			// The copy above holds every node on the path.
+			const node = getNode( newTree, storePath )!;
 			node.locks = [ ...node.locks, lock ];
 
 			return {
@@ -45,7 +50,8 @@ export default function locks( state = DEFAULT_STATE, action ) {
 			const storePath = [ lock.store, ...lock.path ];
 
 			const newTree = deepCopyLocksTreePath( state.tree, storePath );
-			const node = getNode( newTree, storePath );
+			// The copy above holds every node on the path.
+			const node = getNode( newTree, storePath )!;
 			node.locks = node.locks.filter( ( l ) => l !== lock );
 
 			return {

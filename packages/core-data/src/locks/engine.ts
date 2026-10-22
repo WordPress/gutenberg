@@ -1,5 +1,6 @@
 import reducer from './reducer';
 import { isLockAvailable, getPendingLockRequests } from './selectors';
+import type { Lock, LockPath } from './types';
 
 export default function createLocks() {
 	let state = reducer( undefined, { type: '@@INIT' } );
@@ -19,7 +20,11 @@ export default function createLocks() {
 		}
 	}
 
-	function acquire( store, path, exclusive ) {
+	function acquire(
+		store: string,
+		path: LockPath,
+		exclusive: boolean
+	): Promise< Lock > {
 		return new Promise( ( resolve ) => {
 			state = reducer( state, {
 				type: 'ENQUEUE_LOCK_REQUEST',
@@ -28,7 +33,7 @@ export default function createLocks() {
 			processPendingLockRequests();
 		} );
 	}
-	function release( lock ) {
+	function release( lock: Lock ) {
 		state = reducer( state, {
 			type: 'RELEASE_LOCK',
 			lock,

@@ -7,9 +7,22 @@ import {
 	hasConflictingLock,
 	deepCopyLocksTreePath,
 } from '../utils';
+import type { LockNode } from '../types';
+
+type DeepPartial< T > = { [ K in keyof T ]?: DeepPartial< T[ K ] > };
+
+/**
+ * Freezes a partial fixture to catch mutations, keeping it writable to the
+ * type checker as the code under test expects.
+ *
+ * @param value The partial fixture.
+ */
+function frozen< T >( value: DeepPartial< T > ): T {
+	return deepFreeze( value ) as T;
+}
 
 describe( 'getNode', () => {
-	const tree = deepFreeze( {
+	const tree = frozen< LockNode >( {
 		locks: [],
 		children: {
 			target: {
@@ -38,7 +51,7 @@ describe( 'iteratePath', () => {
 	const green = buildNode();
 	const bird = buildNode( { red, blue, green } );
 	const target = buildNode( { bird } );
-	const tree = deepFreeze( buildNode( { target } ) );
+	const tree = frozen< LockNode >( buildNode( { target } ) );
 
 	it( 'Is a generator', () => {
 		const isGenerator = [
@@ -171,7 +184,7 @@ describe( 'hasConflictingLock', () => {
 
 describe( 'deepCopyLocksTreePath', () => {
 	it( 'Returns a tree with a cloned path', () => {
-		const tree = deepFreeze( {
+		const tree = frozen< LockNode >( {
 			locks: [ { exclusive: true } ],
 			children: {
 				target: {
@@ -203,7 +216,7 @@ describe( 'deepCopyLocksTreePath', () => {
 	} );
 
 	it( 'Creates missing branches', () => {
-		const tree = deepFreeze( {
+		const tree = frozen< LockNode >( {
 			locks: [ { exclusive: true } ],
 			children: {
 				target: {
@@ -216,6 +229,7 @@ describe( 'deepCopyLocksTreePath', () => {
 		const deepCopy = deepCopyLocksTreePath(
 			tree,
 			[ 'target', 'bird', 'blue' ],
+			// @ts-expect-error The function has no options: it always creates missing branches.
 			{
 				createMissing: true,
 			}

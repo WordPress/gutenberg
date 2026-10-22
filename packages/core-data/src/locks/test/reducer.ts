@@ -1,16 +1,38 @@
 import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import locks from '../reducer';
+import type { Lock, LockNode, LockRequest, LocksState } from '../types';
 
-const buildNode = ( children = {} ) => ( {
+type DeepPartial< T > = { [ K in keyof T ]?: DeepPartial< T[ K ] > };
+
+/**
+ * Types a fixture that holds only the fields the code under test reads.
+ *
+ * @param value The partial fixture.
+ */
+function partial< T >( value: DeepPartial< T > ): T {
+	return value as T;
+}
+
+/**
+ * Freezes a partial fixture to catch mutations, keeping it writable to the
+ * type checker as the code under test expects.
+ *
+ * @param value The partial fixture.
+ */
+function frozen< T >( value: DeepPartial< T > ): T {
+	return deepFreeze( value ) as T;
+}
+
+const buildNode = ( children: Record< string, LockNode > = {} ): LockNode => ( {
 	locks: [],
 	children,
 } );
 
 describe( 'locks', () => {
 	it( 'Enqueues lock requests', () => {
-		const request = {};
-		const state = deepFreeze( {
+		const request = partial< LockRequest >( {} );
+		const state = frozen< LocksState >( {
 			requests: [],
 		} );
 
@@ -31,13 +53,16 @@ describe( 'locks', () => {
 		const bird = buildNode( { red, blue, green } );
 		const tree = buildNode( { bird } );
 
-		const request = { store: 'bird', path: [ 'green' ] };
-		const state = deepFreeze( {
+		const request = partial< LockRequest >( {
+			store: 'bird',
+			path: [ 'green' ],
+		} );
+		const state = frozen< LocksState >( {
 			requests: [ request ],
 			tree,
 		} );
 
-		const lock = {};
+		const lock = partial< Lock >( {} );
 		expect(
 			locks( state, {
 				type: 'GRANT_LOCK_REQUEST',
@@ -70,11 +95,11 @@ describe( 'locks', () => {
 	it( 'Releases acquired locks', () => {
 		const red = buildNode();
 		const blue = buildNode();
-		const lock = {
+		const lock = partial< Lock >( {
 			store: 'bird',
 			path: [ 'green' ],
-		};
-		const state = deepFreeze( {
+		} );
+		const state = frozen< LocksState >( {
 			// Should remove the request...
 			requests: [],
 			tree: {
