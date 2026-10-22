@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use design system focus ring for filter chips & prevent text from touching remove button ([#85374](https://github.com/WordPress/gutenberg/pull/85374)).
+
 ### Breaking Changes
 
 -   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
