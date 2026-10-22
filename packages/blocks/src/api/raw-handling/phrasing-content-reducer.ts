@@ -59,6 +59,9 @@ export default function phrasingContentReducer(
 		if ( anchor.name && ! anchor.id ) {
 			anchor.id = anchor.name;
 		}
+		// `name` isn't allowed anyway, and leaving it makes an empty Word
+		// bookmark look non-empty, so it would survive as `<a></a>`.
+		anchor.removeAttribute( 'name' );
 
 		// Keeps id only if there is an internal link pointing to it
 		if (
