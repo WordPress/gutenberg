@@ -18,6 +18,7 @@ import {
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import { REACTION_EMOJIS, getReactionEmoji } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
 
@@ -97,7 +98,7 @@ function ReactionButton( {
 				'root',
 				'comment',
 				{
-					post: select( editorStore ).getCurrentPostId(),
+					post: unlock( select( editorStore ) ).getNotesPostId(),
 					parent: noteId,
 					type: 'reaction',
 					status: 'all',
