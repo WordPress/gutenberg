@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Playlist: Store each track's waveform peaks on the block when it is added, so the front end draws the real waveform without fetching and decoding the audio. Analysis needs to read the raw bytes, which is not possible for media served from another origin without CORS headers; a file that is still uploading is local, so uploads now produce a waveform wherever the file is stored afterwards ([#83086](https://github.com/WordPress/gutenberg/pull/83086)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

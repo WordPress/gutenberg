@@ -729,6 +729,7 @@ const PlaylistEdit = ( {
 						image={ currentTrackData?.image }
 						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }
+						waveform={ currentTrackData?.waveform }
 						color={ waveformColor }
 						gradient={ waveformGradientValue }
 						backgroundColor={ waveformBackgroundColor }

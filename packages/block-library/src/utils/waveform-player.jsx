@@ -7,6 +7,7 @@ import {
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from './waveform-utils';
+import { decodePeaks } from './waveform-peaks';
 
 /**
  * Update the metadata of a WaveformPlayer element to reflect current props.
@@ -74,6 +75,7 @@ function updatePlayerMetadata(
  * @param {string}   props.backgroundGradient    - The waveform background gradient.
  * @param {string}   props.textColor             - The player text color.
  * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {string}   [props.waveform]            - Base64-encoded peaks stored on the track, drawn instead of analysing the audio.
  * @param {Function} props.onEnded               - Callback when the track finishes playing.
  * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Element} The WaveformPlayer element.
@@ -90,6 +92,7 @@ export function WaveformPlayer( {
 	backgroundGradient,
 	textColor,
 	waveformStyle,
+	waveform,
 	onEnded,
 	showPlayButtonArtwork = false,
 } ) {
@@ -109,7 +112,14 @@ export function WaveformPlayer( {
 
 	// Combined props ref for `initWaveformPlayer`, which is called
 	// asynchronously after this component mounts.
-	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
+	const metadataRef = useRef( {
+		src,
+		title,
+		artist,
+		image,
+		imageAlt,
+		waveform,
+	} );
 	const stylesRef = useRef( {
 		color,
 		gradient,
@@ -118,8 +128,15 @@ export function WaveformPlayer( {
 		textColor,
 	} );
 	useEffect( () => {
-		metadataRef.current = { src, title, artist, image, imageAlt };
-	}, [ src, title, artist, image, imageAlt ] );
+		metadataRef.current = {
+			src,
+			title,
+			artist,
+			image,
+			imageAlt,
+			waveform,
+		};
+	}, [ src, title, artist, image, imageAlt, waveform ] );
 
 	useEffect( () => {
 		stylesRef.current = {
@@ -177,6 +194,7 @@ export function WaveformPlayer( {
 					backgroundGradient: stylesRef.current.backgroundGradient,
 					textColor: stylesRef.current.textColor,
 					waveformStyle,
+					waveform: decodePeaks( metadataRef.current.waveform ),
 					labels: {
 						seek: __( 'Seek' ),
 						/* translators: %1$s: current audio time, %2$s: total audio duration. */
@@ -241,6 +259,7 @@ export function WaveformPlayer( {
 	useEffect( () => {
 		if ( src && playerRef.current?.instance ) {
 			const wasPlaying = playerRef.current.instance.isPlaying;
+			const storedPeaks = decodePeaks( metadataRef.current.waveform );
 			const promise = playerRef.current.instance.loadTrack(
 				src,
 				metadataRef.current.title,
@@ -252,6 +271,9 @@ export function WaveformPlayer( {
 					artworkAlt: showPlayButtonArtwork
 						? ''
 						: metadataRef.current.imageAlt,
+					// Only sent when there are peaks to send: loadTrack()
+					// clears any previous waveform either way.
+					...( storedPeaks ? { waveform: storedPeaks } : {} ),
 				}
 			);
 			promise.then( () => {

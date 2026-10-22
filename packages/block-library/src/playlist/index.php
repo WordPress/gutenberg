@@ -50,6 +50,21 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$url              = is_string( $track_src ) ? $track_src : '';
 				$aria_label       = $title;
 
+				// Waveform peaks, base64-encoded by the editor. Validated
+				// rather than trusted: block attributes can be hand-edited, and
+				// anything unusable is dropped so the front end falls back to
+				// analysing the audio instead of drawing nonsense.
+				$track_waveform = $track_attributes['waveform'] ?? '';
+				$waveform       = '';
+
+				if (
+					is_string( $track_waveform )
+					&& strlen( $track_waveform ) <= 8192
+					&& 1 === preg_match( '#^[A-Za-z0-9+/]+={0,2}$#', $track_waveform )
+				) {
+					$waveform = $track_waveform;
+				}
+
 				if ( $title && $artist && $album ) {
 					$aria_label = sprintf(
 						/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
@@ -71,6 +86,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'image'     => esc_url( $image ),
 					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
+					'waveform'  => $waveform,
 				);
 			}
 		}
