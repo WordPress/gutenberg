@@ -47,6 +47,14 @@
 		transform: translate(-50%, -50%);
 	}
 
+	&:focus {
+		@include outset-ring__focus();
+		border-color: var(--wpds-color-stroke-interactive-neutral);
+
+		// Override the focus shadow from wp-admin forms.css.
+		box-shadow: none;
+	}
+
 	&:hover {
 		border-color: var(--wpds-color-stroke-interactive-neutral-active);
 	}
@@ -95,13 +103,6 @@
 		cursor: var(--wpds-cursor-control);
 	}
 
-	&:focus {
-		@include outset-ring__focus();
-
-		// Override the focus shadow from wp-admin forms.css.
-		box-shadow: none;
-	}
-
 	&:checked {
 		&::before {
 			content: "";
@@ -109,12 +110,8 @@
 		}
 	}
 
-	&:disabled {
+	&:disabled:checked::before {
 		opacity: 1; // Override style from wp-admin forms.css.
-
-		&:checked::before {
-			opacity: 1; // Override style from wp-admin forms.css.
-		}
 	}
 }
 
