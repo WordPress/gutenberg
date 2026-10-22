@@ -6,6 +6,9 @@
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 -   `isReusableBlock`, `isTemplatePart`: Accept any object with a name ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
+-   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   applyBuiltInValidationFixes` keeps an `anchor` or `ariaLabel` the markup still carries on a nested element. Only the root element was checked, so a block rendering its save props deeper lost the attribute ([#83605](https://github.com/WordPress/gutenberg/pull/83605)).
 
 ## 17.0.0 (2026-10-20)
 
@@ -20,9 +23,6 @@
 -   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
 -   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 -   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
--   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
--   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
--   applyBuiltInValidationFixes` keeps an `anchor` or `ariaLabel` the markup still carries on a nested element. Only the root element was checked, so a block rendering its save props deeper lost the attribute ([#83605](https://github.com/WordPress/gutenberg/pull/83605)).
 
 ## 16.2.0 (2026-10-07)
 
