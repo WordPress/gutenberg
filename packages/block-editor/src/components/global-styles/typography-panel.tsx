@@ -956,7 +956,7 @@ export default function TypographyPanel( {
 					background,
 				};
 			}
-			return {
+			const resetValue = {
 				...previousValue,
 				typography: {},
 				background,
@@ -965,6 +965,20 @@ export default function TypographyPanel( {
 					text: undefined,
 				},
 			};
+			// A link color matching the text color is the copy `setTextColor`
+			// keeps in sync, so it goes with the text color, as in `resetTextColor`.
+			const linkColor = previousValue?.elements?.link?.color?.text;
+			if (
+				linkColor !== undefined &&
+				linkColor === previousValue?.color?.text
+			) {
+				return setImmutably(
+					resetValue,
+					[ 'elements', 'link', 'color', 'text' ],
+					undefined
+				);
+			}
+			return resetValue;
 		},
 		[ baseClip, hasTextColorEnabled, hasTextGradientEnabled ]
 	);
