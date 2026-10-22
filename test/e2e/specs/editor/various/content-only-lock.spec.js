@@ -1,8 +1,139 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function setCustomFontSize( page, value ) {
+	const editorSettings = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	await editorSettings
+		.getByRole( 'button', { name: 'Set custom size' } )
+		.click();
+	await editorSettings
+		.getByRole( 'spinbutton', { name: 'Font size' } )
+		.fill( value );
+}
+
 test.describe( 'Content-only lock', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test( 'applies shared text styles to text descendants only', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img alt="Unchanged image"/></figure>
+<!-- /wp:image --></div>
+<!-- /wp:group -->` );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeVisible();
+
+		const imageAttributes = ( await editor.getBlocks() )[ 0 ]
+			.innerBlocks[ 2 ].attributes;
+		await setCustomFontSize( page, '31' );
+
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() )[ 0 ].innerBlocks
+					.slice( 0, 2 )
+					.map(
+						( block ) =>
+							block.attributes.style?.typography?.fontSize
+					)
+			)
+			.toEqual( [ '31px', '31px' ] );
+		expect(
+			( await editor.getBlocks() )[ 0 ].innerBlocks[ 2 ].attributes
+		).toEqual( imageAttributes );
+	} );
+
+	test( 'includes text descendants when a section is multi-selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Represented paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img alt="Unchanged image"/></figure>
+<!-- /wp:image -->` );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } ),
+			editor.canvas.getByRole( 'document', { name: 'Block: Image' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const imageAttributes = ( await editor.getBlocks() )[ 1 ].attributes;
+		await setCustomFontSize( page, '27' );
+
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes.style?.typography?.fontSize
+			)
+			.toBe( '27px' );
+		expect( ( await editor.getBlocks() )[ 1 ].attributes ).toEqual(
+			imageAttributes
+		);
+	} );
+
+	test( 'does not add shared text styles to a section without text', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:image -->
+<figure class="wp-block-image"><img alt="Image"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer --></div>
+<!-- /wp:group -->` );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Set custom size' } )
+		).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Border' } )
+		).toBeHidden();
 	} );
 
 	test( 'should be able to edit the content of blocks with content-only lock', async ( {

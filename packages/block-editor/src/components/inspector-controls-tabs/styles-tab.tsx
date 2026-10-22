@@ -13,6 +13,9 @@ import { ColorToolsPanel } from '../global-styles/color-panel';
 import { TypographyToolsPanel } from '../global-styles/typography-panel';
 import { BackgroundToolsPanel } from '../global-styles/background-panel';
 import type { SectionStyleControlsProps, StylesTabProps } from './types';
+import MixedTextStyleControls, {
+	SECTION_TEXT_STYLE_PANELS,
+} from '../block-inspector/mixed-text-style-controls';
 
 // Section blocks present a curated subset of the normal block style panels.
 // Their block-support fills are gated off by editing mode (see
@@ -26,6 +29,7 @@ export function SectionStyleControls( {
 	blockName,
 	clientId,
 	contentClientIds,
+	showTypography = true,
 }: SectionStyleControlsProps ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -66,13 +70,15 @@ export function SectionStyleControls( {
 
 	return (
 		<>
-			<TypographyPanel
-				clientId={ clientId }
-				name={ blockName }
-				settings={ typographySettings }
-				setAttributes={ setAttributes }
-				asWrapper={ TypographyToolsPanel }
-			/>
+			{ showTypography && (
+				<TypographyPanel
+					clientId={ clientId }
+					name={ blockName }
+					settings={ typographySettings }
+					setAttributes={ setAttributes }
+					asWrapper={ TypographyToolsPanel }
+				/>
+			) }
 			<BackgroundImagePanel
 				clientId={ clientId }
 				name={ blockName }
@@ -102,7 +108,10 @@ const StylesTab = ( {
 	hasBlockStyles,
 	isSectionBlock,
 	contentClientIds,
+	textStyleClientIds,
 }: StylesTabProps ) => {
+	const hasTextStyleControls = !! textStyleClientIds?.length;
+
 	return (
 		<>
 			{ hasBlockStyles && (
@@ -115,6 +124,15 @@ const StylesTab = ( {
 					blockName={ blockName as string }
 					clientId={ clientId as string }
 					contentClientIds={ contentClientIds as string[] }
+					showTypography={ ! hasTextStyleControls }
+				/>
+			) }
+			{ hasTextStyleControls && (
+				<MixedTextStyleControls
+					clientIds={ textStyleClientIds }
+					panels={
+						isSectionBlock ? SECTION_TEXT_STYLE_PANELS : undefined
+					}
 				/>
 			) }
 			{

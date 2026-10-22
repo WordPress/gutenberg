@@ -714,6 +714,7 @@ export interface DimensionsHookPanelProps {
 	name: string;
 	setAttributes: ( attributes: Record< string, unknown > ) => void;
 	settings: StyleSettings;
+	asWrapper?: ComponentType< StyleToolsPanelProps >;
 }
 
 /**
@@ -730,6 +731,7 @@ export interface BorderHookPanelProps {
 	name: string;
 	setAttributes: ( attributes: Record< string, unknown > ) => void;
 	settings: StyleSettings;
+	asWrapper?: ComponentType< StyleToolsPanelProps >;
 }
 
 /**

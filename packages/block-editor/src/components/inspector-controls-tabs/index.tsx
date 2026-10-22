@@ -25,6 +25,7 @@ export default function InspectorControlsTabs( {
 	tabs,
 	isSectionBlock,
 	contentClientIds,
+	textStyleClientIds,
 }: InspectorControlsTabsProps ) {
 	const listViewRef = useRef< HTMLDivElement >( null );
 	const showIconLabels = useSelect( ( select ) => {
@@ -204,6 +205,7 @@ export default function InspectorControlsTabs( {
 						hasBlockStyles={ hasBlockStyles }
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
+						textStyleClientIds={ textStyleClientIds }
 					/>
 				</Tabs.TabPanel>
 			</Tabs>
