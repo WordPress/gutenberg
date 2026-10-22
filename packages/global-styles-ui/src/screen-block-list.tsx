@@ -64,15 +64,15 @@ const {
 	searchItems,
 } = unlock( blockEditorPrivateApis );
 
+// `text` is the site's base text, styled under Typography rather than listed.
+type ListedElementName = Exclude< ElementName, 'text' >;
+
 /*
  * Elements are listed alongside blocks, grouped under subheadings, so that
  * anything styleable is one list away rather than behind its own drilldown.
  * Their labels are the titles of their screens, singular to match how blocks
  * are listed.
  */
-// `text` is the site's base text, styled under Typography rather than listed.
-type ListedElementName = Exclude< ElementName, 'text' >;
-
 const ELEMENT_GROUPS: { title: string; elements: ListedElementName[] }[] = [
 	{
 		title: __( 'Elements' ),
