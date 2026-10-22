@@ -1,6 +1,7 @@
 import { useContext, useMemo } from '@wordpress/element';
 import { EntityContext } from './entity-context';
-import type { EntityProviderProps, PrivateEntityProviderProps } from './types';
+import type { EntityProviderProps } from './types';
+import type { PrivateEntityProviderProps } from './private-types';
 
 /**
  * Context provider component for providing

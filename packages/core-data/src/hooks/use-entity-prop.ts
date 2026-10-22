@@ -32,12 +32,12 @@ const REVISION_QUERY = {
  *         information like `raw`, `rendered` and
  *         `protected` props.
  */
-export default function useEntityProp< Value = unknown >(
+export default function useEntityProp< Value = unknown, FullValue = unknown >(
 	kind: string,
 	name: string,
 	prop: string,
 	_id?: number | string
-): EntityPropResult< Value > {
+): EntityPropResult< Value, FullValue > {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
@@ -49,13 +49,11 @@ export default function useEntityProp< Value = unknown >(
 			: undefined;
 	const revisionRecord =
 		// A provided revision record is an object, a revision ID is not.
-		typeof providedRevision === 'object'
-			? ( providedRevision as Record< string, unknown > | null )
-			: undefined;
+		typeof providedRevision === 'object' ? providedRevision : undefined;
 	// Otherwise the provided revision is its ID.
 	const revisionId = revisionRecord
 		? undefined
-		: ( providedRevision as number | undefined );
+		: ( providedRevision as number | string | undefined );
 	const isRevision = !! ( revisionRecord || revisionId );
 
 	const { value, fullValue } = useSelect(
@@ -72,7 +70,7 @@ export default function useEntityProp< Value = unknown >(
 						// Without an entity ID, this reads the record under `undefined`.
 						id as string | number,
 						// Set, as the condition above checks.
-						revisionId as number,
+						revisionId!,
 						REVISION_QUERY
 					);
 				// Fields are read by their name.
@@ -130,6 +128,10 @@ export default function useEntityProp< Value = unknown >(
 		[ editEntityRecord, kind, name, id, prop, isRevision ]
 	);
 
-	// The caller names the type of the property.
-	return [ value as Value | undefined, setValue, fullValue ];
+	// The caller names the types of the property and of its full REST value.
+	return [
+		value as Value | undefined,
+		setValue,
+		fullValue as FullValue | undefined,
+	];
 }

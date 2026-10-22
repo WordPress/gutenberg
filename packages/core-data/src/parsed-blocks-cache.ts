@@ -1,7 +1,7 @@
 import { select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import type { Block, BlockType } from '@wordpress/blocks';
-import type { ParsedBlocksCacheEntry } from './types';
+import type { ParsedBlocksCacheEntry } from './private-types';
 
 /**
  * Shared cache of blocks parsed from an entity's `content` string. Populated

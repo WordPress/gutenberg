@@ -1077,7 +1077,7 @@ _Parameters_
 
 _Returns_
 
-- `EntityPropResult< Value >`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
+- `EntityPropResult< Value, FullValue >`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
 
 ### useEntityRecord
 

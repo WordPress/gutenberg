@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import type { Block } from '@wordpress/blocks';
 import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
 import type {
 	SelectionType,
@@ -204,17 +203,6 @@ export interface ResolvedSelection {
 }
 
 /**
- * The IDs of the provided entities, by kind and name, and their revisions
- * under `revision`.
- */
-export type EntityContextValue = Record<
-	string,
-	Record< string, unknown > | undefined
-> & {
-	revision?: Record< string, Record< string, unknown > | undefined >;
-};
-
-/**
  * The props of `EntityProvider`.
  */
 export interface EntityProviderProps {
@@ -240,22 +228,4 @@ export interface EntityProviderProps {
 	 * The children to wrap.
 	 */
 	children?: ReactNode;
-}
-
-/**
- * The props of `PrivateEntityProvider`.
- */
-export interface PrivateEntityProviderProps extends EntityProviderProps {
-	/**
-	 * Optional record to read from.
-	 */
-	revision?: Record< string, unknown >;
-}
-
-/**
- * Blocks cached for an entity, with the `content` string they were parsed from.
- */
-export interface ParsedBlocksCacheEntry {
-	content: string;
-	blocks: Array< Block >;
 }

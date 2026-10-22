@@ -49,8 +49,8 @@ export type EntityBlockEditorResult = [
  * The value of `useEntityProp`, its setter and the full value from the REST
  * API.
  */
-export type EntityPropResult< Value > = [
+export type EntityPropResult< Value, FullValue = unknown > = [
 	Value | undefined,
 	( newValue: Value ) => void,
-	unknown,
+	FullValue | undefined,
 ];
