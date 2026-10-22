@@ -624,11 +624,14 @@ function GridVisualizerDropLayer( {
 	 * Whether the drag is of blocks from an inserter, which haven't been
 	 * inserted yet, that can all be inserted into the grid.
 	 *
-	 * @param event A drag event.
+	 * @param event              A drag event, or a touch drag's position.
+	 * @param event.dataTransfer The drag's data, which a touch drag doesn't have.
 	 *
 	 * @return Whether they can be dropped in the grid.
 	 */
-	function isInserterDragToGrid( event: Pick< DragEvent, 'dataTransfer' > ) {
+	function isInserterDragToGrid( event: {
+		dataTransfer?: DragEvent[ 'dataTransfer' ];
+	} ) {
 		return canInsertBlockNamesInGrid(
 			blockEditorSelectors,
 			getInserterDragBlockNames( event.dataTransfer ),
@@ -642,9 +645,7 @@ function GridVisualizerDropLayer( {
 		isHandleDrag: boolean
 	) {
 		const srcClientId = getDraggedBlock();
-		const isInserterDrag =
-			! srcClientId &&
-			isInserterDragToGrid( { dataTransfer: null, ...event } );
+		const isInserterDrag = ! srcClientId && isInserterDragToGrid( event );
 		const layer = layerRef.current;
 		if ( ( ! srcClientId && ! isInserterDrag ) || ! layer ) {
 			clearDropTarget();
