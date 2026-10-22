@@ -67,6 +67,14 @@ async function trashTwoPages( page, requestUtils ) {
 	await failChangesToPage( page, failing.id );
 }
 
+// The bulk actions show in the table header, apart from each row's own actions.
+const getBulkAction = ( page, name ) =>
+	page
+		.getByRole( 'table' )
+		.getByRole( 'rowgroup' )
+		.first()
+		.getByRole( 'button', { name, exact: true } );
+
 async function selectAllInTrash( page ) {
 	await getTab( page, 'Trash' ).click();
 	const table = page.getByRole( 'table' );
@@ -236,10 +244,7 @@ test.describe( 'Page List status tab counts', () => {
 		await expectCounts( page, { 'All Pages': 2, Drafts: 1, Trash: 2 } );
 
 		await selectAllInTrash( page );
-		await page
-			.locator( '.dataviews-bulk-actions-footer__container' )
-			.getByRole( 'button', { name: 'Restore' } )
-			.click();
+		await getBulkAction( page, 'Restore' ).click();
 
 		// Restored pages become drafts; the failing page stays in the trash.
 		await expectCounts( page, { 'All Pages': 3, Drafts: 2, Trash: 1 } );
@@ -255,10 +260,7 @@ test.describe( 'Page List status tab counts', () => {
 		await expectCounts( page, { 'All Pages': 2, Trash: 2 } );
 
 		await selectAllInTrash( page );
-		await page
-			.locator( '.dataviews-bulk-actions-footer__container' )
-			.getByRole( 'button', { name: 'Permanently delete…' } )
-			.click();
+		await getBulkAction( page, 'Permanently delete…' ).click();
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete permanently' } )
