@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+## 0.26.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Remove the automatic Babel processing for `packages/components`, including the Emotion transform, implicit project Babel configuration support, and build-time dependencies. Projects that rely on these transforms must run Babel separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Support importing `.svg` files from JavaScript. The SVG is inlined into the bundle (and into transpiled packages) and the import resolves to a `data:` URI ([#85147](https://github.com/WordPress/gutenberg/pull/85147)).
+-   Add a `{prefix}_{page_slug}_wp_admin_preload_paths` filter to the generated wp-admin page template, so a page can preload the REST API requests its JavaScript issues on mount ([#77353](https://github.com/WordPress/gutenberg/pull/77353)).
+
+### Enhancements
+
+-   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
+
+### Bug Fixes
+
+-   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
+-   Add `generate_animated_image_subsizes` to the page template `/?_fields=` preload path, keeping it in sync with the `_fields` list in `@wordpress/core-data` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 0.25.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Add the `@babel/core` dependency, a peer of `esbuild-plugin-babel` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   Keep the build machine's absolute paths out of worker source maps when `wpWorkers` redirects a module with `resolve`, so the output is reproducible across checkouts ([#84163](https://github.com/WordPress/gutenberg/pull/84163)).
+
+### Internal
+
+-   Drop the optional `@wordpress/boot`, `@wordpress/private-apis`, and `@wordpress/route` peer dependencies, unused since they are no longer bundled ([#83601](https://github.com/WordPress/gutenberg/pull/83601)).
+
 ## 0.24.0 (2026-09-23)
 
 ### Enhancements

@@ -10,22 +10,19 @@
 			overflow: visible;
 			opacity: 1;
 			background-color: transparent;
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.track,
 		.indicator {
 			fill: transparent;
-			stroke-width: 1.5px;
-		}
-
-		.track {
-			stroke: var(--wpds-color-background-track-neutral);
-		}
-
-		.indicator {
-			stroke: var(--wpds-color-background-thumb-brand);
+			stroke: currentColor;
+			stroke-width: var(--wpds-border-width-sm);
 			stroke-linecap: round;
 			transform-origin: 50% 50%;
+
+			@media ( forced-colors: active ) {
+				stroke: CanvasText;
+			}
 
 			/* Intentionally kept even for prefers-reduced-motion.
 			See Note 4 of https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html */

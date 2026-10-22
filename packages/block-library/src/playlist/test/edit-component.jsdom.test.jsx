@@ -9,7 +9,7 @@ let mediaReplaceFlowProps;
 // test can look at what ended up in the tracklist.
 let mockTracks = [];
 
-vi.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: {},
 	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
@@ -52,7 +52,7 @@ vi.mock( '@wordpress/block-editor', () => ( {
 	} ),
 } ) );
 
-vi.mock( '@wordpress/blocks', () => ( {
+vi.mock( import( '@wordpress/blocks' ), () => ( {
 	createBlock: vi.fn( ( name, attributes ) => ( {
 		name,
 		attributes,
@@ -60,11 +60,11 @@ vi.mock( '@wordpress/blocks', () => ( {
 	} ) ),
 } ) );
 
-vi.mock( '@wordpress/blob', () => ( {
+vi.mock( import( '@wordpress/blob' ), () => ( {
 	createBlobURL: vi.fn( () => 'blob:track' ),
 } ) );
 
-vi.mock( '@wordpress/components', () => ( {
+vi.mock( import( '@wordpress/components' ), () => ( {
 	Disabled: ( { children } ) => <div>{ children }</div>,
 	SelectControl: () => <div />,
 	ToggleControl: () => <div />,
@@ -72,33 +72,33 @@ vi.mock( '@wordpress/components', () => ( {
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
 } ) );
 
-vi.mock( '@wordpress/data', () => ( {
+vi.mock( import( '@wordpress/data' ), () => ( {
 	useDispatch: vi.fn(),
 	useSelect: vi.fn(),
 } ) );
 
-vi.mock( '@wordpress/i18n', () => ( {
+vi.mock( import( '@wordpress/i18n' ), () => ( {
 	__: ( text ) => text,
 	_x: ( text ) => text,
 } ) );
 
-vi.mock( '@wordpress/icons', () => ( {
+vi.mock( import( '@wordpress/icons' ), () => ( {
 	playlist: 'playlist',
 } ) );
 
-vi.mock( '@wordpress/notices', () => ( {
+vi.mock( import( '@wordpress/notices' ), () => ( {
 	store: {},
 } ) );
 
-vi.mock( '../../utils/caption', () => ( {
+vi.mock( import( '../../utils/caption' ), () => ( {
 	Caption: () => <figcaption />,
 } ) );
 
-vi.mock( '../../utils/hooks', () => ( {
+vi.mock( import( '../../utils/hooks' ), () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
-vi.mock( '../../utils/waveform-player', () => ( {
+vi.mock( import( '../../utils/waveform-player' ), () => ( {
 	WaveformPlayer: () => <div />,
 } ) );
 

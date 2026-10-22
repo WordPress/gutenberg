@@ -4,12 +4,7 @@
 @use "../utils/theme-variables" as *;
 
 .components-checkbox-control {
-	// Careful, these CSS vars have experimental overrides in Data Views (packages/dataviews/src/style.scss).
-	--checkbox-input-size: 24px; // Width & height for small viewports.
-
-	@include break-small() {
-		--checkbox-input-size: 16px;
-	}
+	--checkbox-input-size: 16px;
 
 	--checkbox-input-margin: #{$grid-unit-10};
 }
@@ -25,7 +20,77 @@
 }
 
 .components-checkbox-control__input[type="checkbox"] {
-	@include checkbox-control;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+	transition: none;
+	border-radius: $radius-small;
+	@include input-control;
+
+	&:hover:not(:disabled, [aria-disabled="true"]) {
+		background: var(--wpds-color-background-interactive-neutral-active);
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) $components-color-accent;
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: $components-color-accent;
+		border-color: $components-color-accent;
+	}
+
+	&:checked::before,
+	&[aria-checked="mixed"]::before {
+		margin: -3px -5px;
+		color: $white;
+
+		@include break-medium() {
+			margin: -4px 0 0 -5px;
+		}
+	}
+
+	&[aria-checked="mixed"] {
+		background: $components-color-accent;
+		border-color: $components-color-accent;
+
+		&::before {
+			// Inherited from `forms.css`.
+			// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+			content: "\f460";
+			float: left;
+			display: inline-block;
+			vertical-align: middle;
+			width: 16px;
+			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
+			font: 400 30px/1 dashicons;
+			speak: none;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+
+			@include break-medium() {
+				float: none;
+				font-size: 21px;
+			}
+		}
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: var(--wpds-color-background-interactive-neutral-disabled);
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		cursor: default;
+
+		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
+		opacity: 1;
+
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
+	}
 	background: $white;
 	color: $gray-900;
 	clear: none;
@@ -36,6 +101,7 @@
 	padding: 0 !important;
 	text-align: center;
 	vertical-align: top;
+	position: relative;
 	width: var(--checkbox-input-size);
 	height: var(--checkbox-input-size);
 
@@ -60,6 +126,16 @@
 
 	&:checked::before {
 		content: none;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: max(var(--checkbox-input-size), #{$grid-unit-30});
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
 	}
 }
 
