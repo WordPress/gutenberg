@@ -25,6 +25,7 @@ import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
 	deviceTypeKey,
+	showHiddenBlocksKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -453,6 +454,7 @@ export type Settings = Record< string | symbol, unknown > & {
 	) => number | undefined;
 	/** The device the editor previews, such as `Desktop`. */
 	[ deviceTypeKey ]?: string;
+	[ showHiddenBlocksKey ]?: boolean;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect

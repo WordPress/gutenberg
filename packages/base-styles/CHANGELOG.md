@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add a `.block-editor-block-list__block.is-block-ghosted::before` z-index entry for the veil drawn over hidden blocks while they are shown in the canvas ([#80439](https://github.com/WordPress/gutenberg/pull/80439)).
+
 ## 14.0.0 (2026-10-20)
 
 ### Breaking Changes

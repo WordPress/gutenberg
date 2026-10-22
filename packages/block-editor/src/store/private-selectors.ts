@@ -1088,6 +1088,26 @@ export const isBlockHiddenAnywhere = ( state: State, clientId: string ) => {
 };
 
 /**
+ * Returns true if any block in the editor has a visibility rule that hides it
+ * somewhere: everywhere, or at a viewport the theme configures.
+ *
+ * @param state Global application state.
+ *
+ * @return Whether any block is hidden somewhere.
+ */
+export const hasHiddenBlocks = createSelector(
+	( state: State ) =>
+		getClientIdsWithDescendants( state ).some( ( clientId ) =>
+			isBlockHiddenAnywhere( state, clientId )
+		),
+	( state: State ) => [
+		state.blocks.order,
+		state.blocks.attributes,
+		state.settings,
+	]
+);
+
+/**
  * Returns true if the block is hidden everywhere (blockVisibility is false).
  *
  * A block is considered hidden everywhere when blockVisibility is explicitly

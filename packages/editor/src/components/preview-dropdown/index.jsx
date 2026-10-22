@@ -45,6 +45,8 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		templateId,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
+		showHiddenBlocks,
+		canShowHiddenBlocks,
 		hasBlockSelection,
 		activeComplementaryArea,
 	} = useSelect( ( select ) => {
@@ -57,6 +59,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		} = unlock( select( editorStore ) );
 		const {
 			isResponsiveEditing: _isResponsiveEditing,
+			hasHiddenBlocks,
 			getBlockSelectionStart,
 			getSettings,
 		} = unlock( select( blockEditorStore ) );
@@ -80,6 +83,13 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			isResponsiveEditing: _isResponsiveEditing(),
 			isResponsiveEditingEnabled:
 				getEditorSettings().responsiveEditingEnabled,
+			showHiddenBlocks: get( 'core', 'showHiddenBlocks' ),
+			// Offered unless the theme turns off block visibility editing in
+			// theme.json, and even then once the content has hidden blocks,
+			// so they can still be found.
+			canShowHiddenBlocks:
+				getSettings().__experimentalFeatures?.blockVisibility
+					?.allowEditing !== false || hasHiddenBlocks(),
 			hasBlockSelection: !! getBlockSelectionStart(),
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
@@ -90,6 +100,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	);
 	const { resetZoomLevel, setStyleStateViewport, setResponsiveEditing } =
 		unlock( useDispatch( blockEditorStore ) );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
@@ -153,6 +164,9 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 				]
 			: [] ),
 	];
+
+	const hasTemplateToggle =
+		! isTemplate && !! templateId && ! hasRenderingMode;
 
 	return (
 		<Menu.Root modal={ false } actionsRef={ menuActionsRef }>
@@ -237,25 +251,50 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						</Menu.Group>
 					</>
 				) }
-				{ ! isTemplate && !! templateId && ! hasRenderingMode && (
+				{ ( hasTemplateToggle || canShowHiddenBlocks ) && (
 					<>
 						<Menu.Separator />
 						<Menu.Group>
-							<Menu.CheckboxItem
-								checked={ ! isTemplateHidden }
-								onCheckedChange={ ( checked ) => {
-									const newRenderingMode = checked
-										? 'template-locked'
-										: 'post-only';
-									setRenderingMode( newRenderingMode );
-									setDefaultRenderingMode( newRenderingMode );
-									resetZoomLevel();
-								} }
-							>
-								<Menu.ItemLabel>
-									{ __( 'Show template' ) }
-								</Menu.ItemLabel>
-							</Menu.CheckboxItem>
+							{ hasTemplateToggle && (
+								<Menu.CheckboxItem
+									checked={ ! isTemplateHidden }
+									onCheckedChange={ ( checked ) => {
+										const newRenderingMode = checked
+											? 'template-locked'
+											: 'post-only';
+										setRenderingMode( newRenderingMode );
+										setDefaultRenderingMode(
+											newRenderingMode
+										);
+										resetZoomLevel();
+									} }
+								>
+									<Menu.ItemLabel>
+										{ __( 'Show template' ) }
+									</Menu.ItemLabel>
+								</Menu.CheckboxItem>
+							) }
+							{ canShowHiddenBlocks && (
+								<Menu.CheckboxItem
+									checked={ !! showHiddenBlocks }
+									onCheckedChange={ ( checked ) =>
+										setPreference(
+											'core',
+											'showHiddenBlocks',
+											checked
+										)
+									}
+								>
+									<Menu.ItemLabel>
+										{ __( 'Show hidden blocks' ) }
+									</Menu.ItemLabel>
+									<Menu.ItemDescription>
+										{ __(
+											'Hidden blocks appear dimmed so you can edit them.'
+										) }
+									</Menu.ItemDescription>
+								</Menu.CheckboxItem>
+							) }
 						</Menu.Group>
 					</>
 				) }
