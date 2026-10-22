@@ -25,6 +25,13 @@
 	}
 }
 
+// The visualizer of a manual grid stays through drags over the block flow. Its
+// cell inserters let drags the grid can't take, such as files, through to the
+// canvas below.
+.block-editor-block-tools--is-dragging .block-editor-grid-visualizer.block-editor-grid-visualizer:not(.is-dropping-allowed) .block-editor-inserter * {
+	pointer-events: none;
+}
+
 .block-editor-grid-visualizer__grid {
 	display: grid;
 	position: absolute;
