@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `pasteHandler`: Add a `convertMarkdown` option to preserve literal Markdown while retaining paragraph boundaries ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
