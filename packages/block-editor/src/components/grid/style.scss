@@ -13,6 +13,8 @@
 		}
 
 		&.is-dropping-allowed {
+			z-index: z-index(".block-editor-grid-visualizer.is-dropping-allowed");
+
 			.block-editor-grid-visualizer__drop-layer {
 				pointer-events: all;
 			}
