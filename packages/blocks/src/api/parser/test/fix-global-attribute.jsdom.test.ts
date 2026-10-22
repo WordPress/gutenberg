@@ -4,7 +4,9 @@ import {
 	ANCHOR_ATTR_SCHEMA,
 	ARIA_LABEL_ATTR_SCHEMA,
 } from '../apply-built-in-validation-fixes';
+import type { BlockType } from '../../../types';
 
+// The fix only reads the supports, so the block type needs no name or save.
 const blockSettings = {
 	category: 'text',
 	title: 'block title',
@@ -12,9 +14,13 @@ const blockSettings = {
 		anchor: true,
 		ariaLabel: true,
 	},
-};
+} as BlockType;
 
-function fixAnchor( attributes, innerHTML, settings = blockSettings ) {
+function fixAnchor(
+	attributes: Record< string, unknown >,
+	innerHTML: string,
+	settings: BlockType = blockSettings
+) {
 	return fixGlobalAttribute(
 		attributes,
 		settings,
@@ -25,7 +31,10 @@ function fixAnchor( attributes, innerHTML, settings = blockSettings ) {
 	);
 }
 
-function fixAriaLabel( attributes, innerHTML ) {
+function fixAriaLabel(
+	attributes: Record< string, unknown >,
+	innerHTML: string
+) {
 	return fixGlobalAttribute(
 		attributes,
 		blockSettings,
