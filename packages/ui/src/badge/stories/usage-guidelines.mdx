@@ -126,11 +126,11 @@ Use the least attention‑grabbing intent that still:
 
 ## Keep icons outside badges
 
-`Badge` is text-only by default. Intent is communicated through color and label. A badge with an `infotip` adds a fixed trailing info icon. This icon signals that more context is available; it does not represent the status. Use the same info icon for every intent, and do not add other icons.
+`Badge` is text-only by default. Intent is communicated through color and label. A badge with an `infotip` adds a fixed trailing help icon. This icon signals that more context is available; it does not represent the status. Do not add other icons.
 
 ### ❌ Don't
 
--   **Put icons inside badges.** A status icon duplicates what the intent color and label already convey.
+-   **Put status icons inside badges.** A status icon duplicates what the intent color and label already convey.
 
 <Canvas of={ UsageGuidelinesStories.IncorrectBadgeWithIcon } />
 
@@ -146,21 +146,21 @@ Use the least attention‑grabbing intent that still:
 
 ## Use infotips sparingly to explain a status
 
-Use `infotip` when a status needs a short explanation that does not fit in the label. Choose the intent as usual, then add an infotip only if the status needs explaining. The whole badge becomes a trigger with a trailing info icon.
+Use `infotip` when a status needs a short explanation that does not fit in the label. Choose the intent as usual, then add an infotip only if the status needs explaining.
 
 <Canvas of={ BadgeStories.WithInfotip } />
 
 -   Rewrite an unclear label first. Self-explanatory statuses such as "Draft", "Active", or "Scheduled" usually do not need an infotip.
--   Reserve infotips for statuses that need context. If every row needs an explanation, show it inline or in a dedicated column.
+-   Reserve infotips for statuses that need context. If every badge needs an explanation, show the information directly in the interface.
 -   Keep essential information visible. Users who do not open the infotip should still understand the status and what to do next. Use inline text or a Notice for critical messages.
--   Keep essential recovery actions available elsewhere, such as row actions or a detail view. The infotip must not be the only way to update bank details or resolve a failed payment.
--   Keep content brief, usually one to three sentences explaining why the status happened and what happens next. Prefer at most one related link or button. Use a detail view or dialog for long explanations or workflows with several actions.
+-   Keep essential recovery actions available elsewhere in the interface. The infotip must not be the only way to retry a failed upload or fix a publishing error.
+-   Keep content brief, usually one to three sentences. Prefer at most one related link or button. Use a detail view or dialog for long explanations or workflows with several actions.
 
 ### Compose the popup
 
 Pass a complete `Popover.Popup` composition to `infotip`. Include a meaningful `Popover.Title`, which can be visually hidden, and use `Popover.Description` for explanatory text. Popover's positioning, portal, and focus options remain available on the supplied popup. Constrain the popup width for readable lines and narrow layouts, as shown in these examples.
 
-A popup can contain a related link or button. Prefer one action that directly relates to the explanation.
+A popup can contain a related link or button. Prefer one action that directly relates to the explanation. For buttons, use `variant="minimal"` and `tone="brand"`.
 
 <Canvas of={ BadgeStories.InfotipWithLink } />
 
@@ -168,8 +168,8 @@ A popup can contain a related link or button. Prefer one action that directly re
 
 ### Interaction and accessibility
 
-The entire badge is one button and one tab stop. It opens on hover with the same delay as the [Popover infotip example](?path=/story/design-system-components-popover--infotip). Users can move the pointer into the popup to read its content or use its action. Clicking or tapping also opens the popup.
+Keep the badge's visible label in its accessible name.
 
-Use Tab to focus the badge, then Enter or Space to open it. Tab can reach links and buttons inside the popup. Escape dismisses the popup. Keep the badge's visible label in its accessible name; the info icon is decorative.
+Do not place a badge with an infotip inside a link, button, or another interactive trigger. If you customize the badge's `render` prop, preserve its button element when an infotip is present.
 
-Do not place a badge with an infotip inside a link, button, or another interactive trigger. If you customize the badge's `render` prop, preserve its button element when an infotip is present. Without an infotip, the badge remains static.
+If you remove the `infotip` while the badge or its popup has focus, move focus to a relevant control in the surrounding interface.
