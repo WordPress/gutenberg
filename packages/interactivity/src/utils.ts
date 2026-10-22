@@ -117,7 +117,7 @@ export const onDOMReady = ( callback: () => void ) => {
  * @param callback The callback to execute when a dependency changes.
  * @return A cleanup function to stop watching.
  */
-export const watch: typeof effect = ( callback ) =>
+export const watch: typeof effect = ( callback: () => void | ( () => void ) ) =>
 	effect( () => {
 		setScope();
 		try {
