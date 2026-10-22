@@ -1,5 +1,7 @@
-import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
 import * as SelectControlStories from './index.story';
+import * as UISelectControlStories from '../../../../ui/src/form/select-control/stories/index.story';
+import * as SelectStories from '../../../../ui/src/form/primitives/select/stories/index.story';
 
 <Meta of={ SelectControlStories } name="Migration Guide" />
 
@@ -8,8 +10,6 @@ import * as SelectControlStories from './index.story';
 Migrate from [`SelectControl`](?path=/docs/components-selectcontrol--docs) in `@wordpress/components` to [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui` for a standard labeled, single-selection field. For the legacy `minimal` variant, use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive.
 
 The legacy control wraps a native `<select>`. The new control uses a button with combobox semantics and a portaled listbox. The new control does not support `multiple`. Choose a suitable multi-selection component, such as [`SearchableChipSelectControl`](?path=/docs/design-system-components-form-searchablechipselectcontrol--docs), or retain the legacy control for that use case.
-
-For package installation, styles, and integration outside standard WordPress editor screens, follow the [`@wordpress/ui` setup instructions](https://github.com/WordPress/gutenberg/blob/trunk/packages/ui/README.md#setup). The package is distributed through npm and is not available as `wp.ui` on the WordPress global.
 
 ## Basic migration
 
@@ -66,20 +66,20 @@ Object values are compared by identity by default. Resolve the selected object f
 | --- | --- | --- |
 | \`options\` | \`items\` | Items have \`label\`, \`value\`, optional \`disabled\`, and optional \`description\`. Arbitrary native option attributes are not forwarded by the array API. |
 | String \`value\` / \`defaultValue\` | Item \`value\` / \`defaultValue\` | Resolve an object from \`items\`, or pass \`null\` for no selection. |
-| \`onChange\` | \`onValueChange\` | Receives the item or \`null\`, followed by event details. See [Callbacks and refs](#callbacks-and-refs). |
+| \`onChange\` | \`onValueChange\` | Receives the item or \`null\`, followed by event details. See [Adapt change callbacks](#adapt-change-callbacks). |
 | \`help\` | \`description\` or \`details\` | Use \`description\` for plain text and \`details\` for links or other semantic content. |
 | \`label\` | \`label\` | Required plain string. \`hideLabelFromVision\` keeps it accessible while visually hidden. |
 | \`disabled\`, \`name\`, \`required\` | Same prop names | Review form behavior, especially when changing serialization. |
 | \`onFocus\`, \`onBlur\`, \`id\`, trigger ARIA attributes | \`trigger\` element props | Put button-specific props on \`SelectControl.Trigger\`. |
 | \`className\` | \`className\` or trigger \`className\` | The control class styles the field wrapper. Trigger classes style the trigger layout wrapper. Revisit native-element selectors. |
 | \`size="default"\` / \`size="compact"\` | Same values | The control does not support \`size="small"\`. The primitive supports a small trigger and items. |
-| \`variant="minimal"\` | \`Select.Trigger variant="minimal"\` | Compose the primitive. See [Minimal controls](#minimal-controls). |
+| \`variant="minimal"\` | \`Select.Trigger variant="minimal"\` | Compose the primitive. See [Migrate minimal controls with Select](#migrate-minimal-controls-with-select). |
 | \`prefix\`, \`suffix\`, \`labelPosition\` | Custom composition | There is no direct prop mapping. Check trigger customization before using primitives. |
 | \`__next*\` opt-ins | Remove | Legacy size and margin opt-ins do not apply to the new control. |
 | Native \`option\` / \`optgroup\` children | Compound components | Use \`SelectControl.Item\`, \`Group\`, and \`GroupLabel\`. |
 ` }</Markdown>
 
-## Empty strings, clearing, and placeholders
+## Migrate empty-string options
 
 Decide what each existing empty-string option means before migrating it. An empty string may be a real application value, such as the saved value for a default template, or it may mean that nothing is selected.
 
@@ -88,6 +88,8 @@ With default serialization, an item with `value: ''` is treated as an empty sele
 ### Preserve an empty string as a real choice
 
 For application state saved through `onValueChange`, keep the domain values and supply a serializer that returns a unique, non-empty string for each ordinary choice:
+
+<Canvas of={ UISelectControlStories.WithEmptyStringValue } sourceState="none" />
 
 ```jsx
 const positionItems = [
@@ -110,63 +112,30 @@ const positionItems = [
 />;
 ```
 
-The Default choice serializes as `option:`, while the callback still receives the original item with `value: ''`. Prefixing every non-null value avoids collisions with an arbitrary sentinel such as `__default` that might also occur in application data. Keep serialization stable and unique across the item collection.
+Prefixing every non-null value avoids collisions with an arbitrary sentinel such as `__default` that might also occur in application data. Keep serialization stable and unique across the item collection.
 
-Another approach is to give each choice a non-empty UI identifier and map it back to the stored value. Keep both directions explicit and avoid reserving an identifier that unrestricted consumer data could contain:
-
-```jsx
-const positionItems = [
-	{ value: 'default', label: 'Default' },
-	{ value: 'sticky', label: 'Sticky' },
-];
-const storedToItemValue = { '': 'default', sticky: 'sticky' };
-const itemToStoredValue = { default: '', sticky: 'sticky' };
-
-<SelectControl
-	label="Position"
-	items={ positionItems }
-	value={
-		positionItems.find(
-			( item ) => item.value === storedToItemValue[ position ]
-		) ?? null
-	}
-	onValueChange={ ( item ) => {
-		if ( item && item.value !== null ) {
-			setPosition( itemToStoredValue[ item.value ] );
-		}
-	} }
-/>;
-```
-
-This mapping is appropriate for a fixed domain. When choices come from plugins or other dynamic sources, use a collision-free encoding or a separate lookup rather than assuming that `'default'` is available.
-
-Both approaches change the serialized form value. `itemToStringValue` determines the hidden input's value when `name` is provided. A submitted Default choice in the first example is `option:`, not `''`, and a non-empty serialization can also change required-field validation. If the consumer submits `FormData`, adapt and verify the submission and validation contract separately. Retain the native control when its native form behavior is required and has no suitable replacement.
+When submitting a form, `itemToStringValue` also determines the submitted field value. In this example, Default submits `option:`, while `onValueChange` still receives the original item with `value: ''`. Convert the serialized value back to the application's stored value in your form handler. Check required-field validation separately, because the non-empty serialization makes Default count as a selection.
 
 ### Provide an option that clears the selection
 
 Use an item with `value: null` when the choice means no selection. Its label overrides the placeholder, but it retains empty-selection semantics:
 
-```jsx
-const widgetItems = [
-	{ value: null, label: 'Select widget' },
-	{ value: 'calendar', label: 'Calendar' },
-];
+<Canvas of={ UISelectControlStories.WithNullValueOption } sourceState="shown" />
 
-<SelectControl
-	label="Widget"
-	items={ widgetItems }
-	value={ widgetItems.find( ( item ) => item.value === widgetType ) ?? null }
-	onValueChange={ ( item ) => setWidgetType( item?.value ?? null ) }
-/>;
-```
+If the application's existing empty state is `''`, translate it to `null` when resolving the selection and back to `''` in the callback. Do this only for an actual empty state, not a named default choice.
 
-This example stores `null` for no widget. If the application's existing empty state is `''`, translate it to `null` when resolving the selection and back to `''` in the callback. Do this only for an actual empty state, not a named default choice.
+### Show a placeholder before selection
 
 If there is no clearable item, pass `placeholder` for the unselected prompt instead of retaining a disabled empty-string option. A placeholder is not a selectable item.
 
+<Canvas
+	of={ UISelectControlStories.WithCustomPlaceholder }
+	sourceState="shown"
+/>
+
 The development warning catches empty-string values in `items` when default serialization is used. It skips custom serializers and cannot inspect arbitrary custom children.
 
-## Initial selection and unavailable values
+## Set an initial selection
 
 Without `value` or `defaultValue`, a native single select normally displays its first enabled option. This does not call `onChange` or initialize application state. The new control starts with no selection and shows its placeholder, or the label of a null-valued item.
 
@@ -182,15 +151,21 @@ For uncontrolled usage, make the initial selection explicit:
 
 For controlled usage, initialize application state deliberately and resolve it to an item. Do not replace a missing initial value with a fixed `value={ items[ 0 ] }`, which prevents subsequent changes. `defaultValue` only initializes the selection. When items arrive asynchronously, manage the selection after loading or mount the control once the initial items are ready.
 
-Preserve the consumer's policy for unavailable saved values. A missing template may need to display the default template rather than a blank trigger. A custom aspect ratio or inherited font may need a display-only item or custom trigger content instead of the first item.
+## Handle unavailable values
 
-The legacy control renders nothing when both its options and children are empty. The new control still renders a field with an empty popup. Keep an explicit rendering guard when the old omission was intentional. Guard failed lookups before reading properties such as `selectedItem.label`, including when an explicit empty options array overrides another source of choices.
+Preserve the consumer's policy for unavailable saved values. A missing template may need to display the default template rather than a blank trigger. A custom aspect ratio may need a display-only item instead of the first item.
 
-## Labels, descriptions, and trigger props
+The legacy control renders nothing when both its options and children are empty. The new control still renders a field with an empty popup. Keep an explicit rendering guard when the old omission was intentional. Guard failed lookups before reading properties such as `selectedItem.label`.
 
-Pass a descriptive string to `label`, even if `hideLabelFromVision` is set. `description` is associated with the control through `aria-describedby`. Use `details` for semantic content such as links. For a hidden description or a label containing markup, compose [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) with `Select` and, where needed, [`VisuallyHidden`](?path=/docs/design-system-components-visuallyhidden--docs). Preserve existing accessible descriptions and selected hints without duplicating their announcement.
+## Preserve labels and descriptions
 
-Use the `trigger` slot for focus handlers, hover previews, button IDs, ARIA attributes, or custom selected-value rendering. Props passed to the control generally reach `Select.Root`, not its button:
+Pass a descriptive string to `label`, even if `hideLabelFromVision` is set. Use `description` for plain-text help and `details` for links or other semantic content.
+
+For a hidden description or a label containing markup, compose [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) with `Select` and, where needed, [`VisuallyHidden`](?path=/docs/design-system-components-visuallyhidden--docs).
+
+## Move button props to the trigger
+
+Use the `trigger` slot for focus handlers, hover previews, button IDs, or ARIA attributes. Props passed to the control generally reach `Select.Root`, not its button:
 
 ```jsx
 <SelectControl
@@ -209,54 +184,37 @@ Use the `trigger` slot for focus handlers, hover previews, button IDs, ARIA attr
 />
 ```
 
-Props on the supplied trigger override the control's `size` and `placeholder`. The trigger's children can customize the selected item's content. Rich item content, descriptions, separators, and grouped choices are also supported by `SelectControl`, so these features alone do not require primitives. For grouped children, pass a flat `items` array for label resolution and use those same objects as item values. Put `ItemLabel` first, followed by any `ItemDescription` components, and provide the item's plain `label` for typeahead. See the new control's [customization stories](?path=/story/design-system-components-form-selectcontrol--with-custom-items).
+Props on the supplied trigger override the control's `size` and `placeholder`.
 
-## Minimal controls
+## Migrate grouped options
 
-Use string values directly with the generic `Select` primitive when the standard field wrapper is unnecessary. Give the trigger an accessible name:
+Replace native `<optgroup>` children with `SelectControl.Group` and `SelectControl.GroupLabel`, and native `<option>` children with `SelectControl.Item` containing `SelectControl.ItemLabel`. Pass a flat `items` array for trigger label resolution and use those same objects as item values. See the [grouped options story](?path=/story/design-system-components-form-selectcontrol--grouped).
 
-```jsx
-import { Select } from '@wordpress/ui';
+## Migrate minimal controls with Select
 
-<Select.Root
-	items={ sizeItems }
-	value={ size }
-	onValueChange={ ( nextSize ) => {
-		if ( nextSize !== null ) {
-			setSize( nextSize );
-		}
-	} }
->
-	<Select.Trigger variant="minimal" aria-label="Size" />
-	<Select.Popup width="content">
-		{ sizeItems.map( ( item ) => (
-			<Select.Item
-				key={ item.value }
-				value={ item.value }
-				label={ item.label }
-			>
-				<Select.ItemLabel>{ item.label }</Select.ItemLabel>
-			</Select.Item>
-		) ) }
-	</Select.Popup>
-</Select.Root>;
-```
+Use minimal select triggers sparingly, because users may not recognize them as interactive controls. A small minimal trigger can suit compact pagination controls. When migrating a legacy `variant="minimal"` control, compose the `Select` primitive and give its trigger an accessible name.
 
-The primitive accepts values beyond the control's item-object shape. With string item values as above, the callback receives a string or `null`. With object item values, it receives an object or `null`, and the same identity and serialization considerations apply.
+<Canvas of={ SelectStories.Minimal } sourceState="shown" />
 
-## Callbacks and refs
+The primitive accepts string values directly. With string item values as in this story, `onValueChange` receives a string or `null`.
+
+## Adapt change callbacks
 
 The legacy `onChange` receives the selected string and an optional `{ event }` envelope containing a select change event. The new `onValueChange` receives the selected item and event details. That event comes from the popup interaction and is not a native select change event. Read the value from the callback's first argument, not `event.target.value`.
 
 When migrating a component that exposes its own callback to plugins, preserve its documented value and argument shape where possible. If forwarding an event is required, adapt the envelope explicitly and document the change in event semantics.
 
+## Update refs and DOM access
+
 Refs now target `HTMLButtonElement` instead of `HTMLSelectElement`. Update ref types and replace reads of `.value`, `.options`, or `.selectedOptions` with application state. Audit code that finds the native select through CSS selectors or DOM traversal.
 
-## Layout and overlay integration
+## Check popup sizing
 
 `SelectControl` defaults to `popupWidth="content"`: the popup is at least as wide as the trigger and may grow for long or translated labels. Use `popupWidth="anchor"` only when matching the trigger width is intentional. The primitive uses `Select.Popup width="content"` for the corresponding behavior.
 
 Revisit legacy CSS hooks and native select resets. Check sizing and shrinking within the actual container, especially beside long labels. Avoid carrying over one-off popup height, positioning, or z-index workarounds without checking the shared component's current behavior.
+
+## Check popups inside existing overlays
 
 The popup is portaled outside the field's DOM subtree. Check surrounding outside-click handlers, block selection, focus containment, and form submission in the real consumer. A click on a popup option must not dismiss its parent popover, deselect its block, or submit the surrounding form unexpectedly.
 
