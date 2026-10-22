@@ -1,0 +1,6 @@
+project: components
+kind: Enhancements
+body: '`FormToggle`: Use the design system outline for the focus ring'
+time: '2026-10-22T04:10:27.323Z'
+custom:
+    PR: '85285'

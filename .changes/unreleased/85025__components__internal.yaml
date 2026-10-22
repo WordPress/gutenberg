@@ -1,6 +1,6 @@
 project: components
 kind: Internal
 body: '`Autocomplete`: Let completers type the payload they replace the field with'
-time: '2026-10-21T11:19:15.957Z'
+time: '2026-10-22T04:10:27.323Z'
 custom:
     PR: '85025'
