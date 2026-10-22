@@ -98,19 +98,13 @@ const GridVisualizerGrid = forwardRef(
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
-		const { isDragging, isDroppingAllowed } = useSelect(
-			( select ) => {
-				if ( ! select( blockEditorStore ).isDraggingBlocks() ) {
-					return { isDragging: false, isDroppingAllowed: false };
-				}
-				return {
-					isDragging: true,
-					isDroppingAllowed: !! getBlockToPlaceInGrid(
-						select( blockEditorStore ),
-						gridClientId
-					),
-				};
-			},
+		const isDroppingAllowed = useSelect(
+			( select ) =>
+				select( blockEditorStore ).isDraggingBlocks() &&
+				!! getBlockToPlaceInGrid(
+					select( blockEditorStore ),
+					gridClientId
+				),
 			[ gridClientId ]
 		);
 
@@ -152,18 +146,14 @@ const GridVisualizerGrid = forwardRef(
 			<BlockPopoverCover
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
+					// Popovers in the block tools slots are hidden once a drag
+					// has been over the block flow. A manual grid's stays, so
+					// that its drop layer can take blocks from the block flow
+					// and give them back.
+					'is-shown-while-dragging': isManualGrid,
 				} ) }
 				clientId={ gridClientId }
-				// Popovers in the block tools slots are hidden once a drag
-				// has been over the block flow. While blocks are dragged, a
-				// manual grid renders in the default popover slot instead, so
-				// its drop layer stays and blocks can be moved between the
-				// grid and the block flow in both directions.
-				__unstablePopoverSlot={
-					isManualGrid && isDragging
-						? 'Popover'
-						: '__unstable-block-tools-after'
-				}
+				__unstablePopoverSlot="__unstable-block-tools-after"
 			>
 				<div
 					ref={ ref }
