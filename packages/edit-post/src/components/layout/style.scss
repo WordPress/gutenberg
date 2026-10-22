@@ -52,8 +52,10 @@
 		&:focus-visible::after {
 			content: "";
 			position: absolute;
-			inset: var(--wp-admin-border-width-focus);
-			@include button-style__focus();
+			inset: 0;
+			@include outset-ring__focus();
+			// Keep the ring inside the panel, which clips overflowing content.
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 		> svg {
 			fill: currentColor;

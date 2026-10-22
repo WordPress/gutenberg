@@ -8,8 +8,10 @@ function flushPromises() {
 }
 
 // Promisify a timeout for use with vi.fn.
-function timeout( milliseconds ) {
-	return new Promise( ( resolve ) => setTimeout( resolve, milliseconds ) );
+function timeout( milliseconds: number ) {
+	return new Promise< void >( ( resolve ) =>
+		setTimeout( resolve, milliseconds )
+	);
 }
 
 describe( 'debounceAsync', () => {
@@ -23,7 +25,9 @@ describe( 'debounceAsync', () => {
 	it( 'calls the function on the leading edge and then once on the trailing edge when there are multiple calls', async () => {
 		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
 		try {
-			const fn = vi.fn( async () => {} );
+			const fn = vi.fn< ( value: string ) => Promise< void > >(
+				async () => {}
+			);
 			const debounced = debounceAsync( fn, 20 );
 
 			debounced( 'A' );
