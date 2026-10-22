@@ -3,6 +3,6 @@ kind: New Features
 body: >-
     `Menu.Popup`: Add width presets, with `sm` as the default to preserve the
     320px maximum width
-time: '2026-10-21T11:19:07.631Z'
+time: '2026-10-22T04:10:21.567Z'
 custom:
     PR: '84086'

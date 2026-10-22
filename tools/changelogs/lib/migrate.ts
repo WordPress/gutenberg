@@ -305,7 +305,7 @@ export function migratePackageToChangie(
 	let cleanChangelog =
 		'<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->\n\n';
 	for ( const v of parsed.versions ) {
-		cleanChangelog += `${ v.content }\n\n`;
+		cleanChangelog += `${ v.content }\n`;
 	}
 
 	operations.push( {
