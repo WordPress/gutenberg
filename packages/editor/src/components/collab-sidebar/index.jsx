@@ -25,6 +25,7 @@ import {
 	usePickNote,
 } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { useLintItems } from '../document-annotations';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
 
@@ -60,6 +61,7 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const lintItems = useLintItems();
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -77,7 +79,10 @@ function NotesSidebar( { postId, drafts } ) {
 	const areNotesHidden = notesDisplayMode === 'hidden';
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
-		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
+		notes.length > 0 ||
+		lintItems.length > 0 ||
+		! isLargeViewport ||
+		isAllNotesSidebarOpen;
 	const selectedThread = notes.find(
 		( thread ) => thread.id === selectedNoteId
 	);
@@ -86,7 +91,9 @@ function NotesSidebar( { postId, drafts } ) {
 		selectedNoteId !== undefined && selectedThread?.status !== 'approved';
 	const hasFloatingNotes =
 		isLargeViewport &&
-		( unresolvedNotes.length > 0 || canSelectedNoteFloat );
+		( unresolvedNotes.length > 0 ||
+			lintItems.length > 0 ||
+			canSelectedNoteFloat );
 	// "All notes" lists the same threads, so floating notes yield to it.
 	const showFloatingNotes =
 		hasFloatingNotes && ! areNotesHidden && ! isAllNotesSidebarOpen;
@@ -178,7 +185,11 @@ function NotesSidebar( { postId, drafts } ) {
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						<Notes
+							notes={ notes }
+							lintItems={ lintItems }
+							sidebarRef={ sidebarRef }
+						/>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }
@@ -194,6 +205,7 @@ function NotesSidebar( { postId, drafts } ) {
 						<NoteDraftsContext.Provider value={ drafts }>
 							<Notes
 								notes={ unresolvedNotes }
+								lintItems={ lintItems }
 								sidebarRef={ sidebarRef }
 								isFloating
 							/>
