@@ -121,11 +121,11 @@ export function addAttribute( settings: BlockType ): BlockType {
  *
  * @param clientId The block whose alignments are withheld.
  *
- * @return What is limiting the width, or `null` when nothing reachable is.
+ * @return What is limiting the width, or `undefined` when nothing reachable is.
  */
 function useAlignmentConstraint(
 	clientId: string
-): BlockAlignmentConstraint | null {
+): BlockAlignmentConstraint | undefined {
 	const parentClientId = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getBlockEditingMode } =
@@ -144,11 +144,11 @@ function useAlignmentConstraint(
 		[ clientId ]
 	);
 
-	const parentInfo = useBlockDisplayInformation( parentClientId );
+	const parentInfo = useBlockDisplayInformation( parentClientId ?? '' );
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	if ( ! parentClientId || ! parentInfo ) {
-		return null;
+		return undefined;
 	}
 
 	return {
