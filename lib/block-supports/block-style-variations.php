@@ -118,6 +118,34 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
+	/*
+	 * A block style variation resolves to the same data every time it is
+	 * encountered, so consecutive blocks using the same variation generate
+	 * byte-identical CSS. Reuse the previous instance's class name in that case
+	 * so the stylesheet is only generated and enqueued once.
+	 *
+	 * Reuse is deliberately limited to the immediately preceding instance.
+	 * Variation selectors are wrapped in `:where()`, so every variation rule has
+	 * the same specificity and source order alone decides which one wins. Reusing
+	 * a class emitted before some other variation's styles would move it in the
+	 * cascade, breaking the descendant-wins behaviour this filter relies on for
+	 * nested blocks.
+	 */
+	static $last_variation_key   = null;
+	static $last_variation_class = null;
+
+	$variation_key = $parsed_block['blockName'] . '|' . $variation;
+
+	if ( null !== $last_variation_class && $last_variation_key === $variation_key ) {
+		_wp_array_set(
+			$parsed_block,
+			array( 'attrs', 'className' ),
+			$parsed_block['attrs']['className'] . " $last_variation_class"
+		);
+
+		return $parsed_block;
+	}
+
 	// Recursively resolve any ref values with the appropriate value within the
 	// theme_json data.
 	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
@@ -206,6 +234,11 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 
 	wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
 	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
+
+	// Record the instance so an immediately following block using the same
+	// variation can reuse it instead of emitting a duplicate stylesheet.
+	$last_variation_key   = $variation_key;
+	$last_variation_class = $class_name;
 
 	/*
 	 * Add variation instance class name to block's className string so it can
