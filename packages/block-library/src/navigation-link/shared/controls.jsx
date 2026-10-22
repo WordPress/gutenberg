@@ -93,6 +93,11 @@ export function Controls( {
 		hasUrlBinding
 	);
 
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
 	let helpText = '';
 
 	if ( isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ) ) {
@@ -105,6 +110,15 @@ export function Controls( {
 			type: attributes.type,
 			kind: attributes.kind,
 		} );
+	} else if (
+		attributes.kind === 'custom' &&
+		isSameSiteUrl( url, homeUrl )
+	) {
+		// A custom (URL-only) link to a page on this site has no entity ID
+		// attached, so it can never be marked as the current menu item.
+		// Surface that here since it looks identical to an entity link
+		// otherwise, both while editing and on the front end.
+		helpText = getCustomUrlHelpText();
 	}
 	// Get the link change handler with built-in binding management
 	const handleLinkChange = useHandleLinkChange( {
@@ -118,11 +132,6 @@ export function Controls( {
 			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
 		[]
 	);
-
-	const homeUrl = useSelect( ( select ) => {
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
-	}, [] );
 
 	const blockEditingMode = useSelect(
 		( select ) =>
@@ -326,4 +335,47 @@ function getDraftHelpText( { type, kind } ) {
 		),
 		entityType
 	);
+}
+
+/**
+ * Returns the help text shown when a custom (URL-only) link points at a page
+ * on this site.
+ *
+ * @return {string} Custom URL help text.
+ */
+function getCustomUrlHelpText() {
+	return __(
+		"This is a custom URL, not a link to an existing page, post, category, or tag. It won't be marked as the current menu item when visitors are on this page."
+	);
+}
+
+/**
+ * Determines whether a URL points at a page on this site, so that a custom
+ * (URL-only) link to it is worth flagging as never getting current-menu-item
+ * highlighting. Returns `false` for external URLs, `mailto:`/`tel:` links,
+ * and plain hash links, since none of those are expected to be "the current
+ * page" in the first place.
+ *
+ * @param {string}      url     The URL to check.
+ * @param {string|void} homeUrl The site's home URL.
+ * @return {boolean} Whether the URL is same-site.
+ */
+function isSameSiteUrl( url, homeUrl ) {
+	if ( ! url || isHashLink( url ) ) {
+		return false;
+	}
+
+	if ( isRelativePath( url ) ) {
+		return true;
+	}
+
+	if ( ! homeUrl ) {
+		return false;
+	}
+
+	try {
+		return new URL( url, homeUrl ).origin === new URL( homeUrl ).origin;
+	} catch {
+		return false;
+	}
 }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation Link: Show a help text in the Inspector when a custom (URL-only) link points at a page on this site, since it has no entity ID and will never receive `current-menu-item` highlighting ([#83109](https://github.com/WordPress/gutenberg/pull/83109)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

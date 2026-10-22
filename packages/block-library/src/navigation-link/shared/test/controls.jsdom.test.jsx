@@ -211,6 +211,66 @@ describe( 'Controls', () => {
 			// When link is valid (not invalid, not draft, no binding issues), no help text should be shown
 			expect( screen.queryByText( /This link/ ) ).not.toBeInTheDocument();
 		} );
+
+		it( 'shows custom URL help text for a same-site custom link (relative path)', () => {
+			const propsWithSameSiteCustomLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/category/podcast/',
+					kind: 'custom',
+					type: 'custom',
+				},
+			};
+
+			render( <Controls { ...propsWithSameSiteCustomLink } /> );
+
+			expect(
+				screen.getByText(
+					/This is a custom URL, not a link to an existing page, post, category, or tag\./
+				)
+			).toBeInTheDocument();
+		} );
+
+		it( 'does not show custom URL help text for a hash-only custom link', () => {
+			const propsWithHashLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '#some-anchor',
+					kind: 'custom',
+					type: 'custom',
+				},
+			};
+
+			render( <Controls { ...propsWithHashLink } /> );
+
+			expect(
+				screen.queryByText( /This is a custom URL/ )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'does not show custom URL help text for an external custom link', () => {
+			const propsWithExternalCustomLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+					kind: 'custom',
+					type: 'custom',
+				},
+			};
+
+			render( <Controls { ...propsWithExternalCustomLink } /> );
+
+			// The test environment's core-data store has no `root` entity
+			// record loaded, so the home URL is unknown and an absolute URL
+			// can't be confirmed as same-site — this must fail closed rather
+			// than guess.
+			expect(
+				screen.queryByText( /This is a custom URL/ )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'View button', () => {
