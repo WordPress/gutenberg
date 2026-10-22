@@ -13,7 +13,8 @@ import {
 } from '../reducer';
 import type * as ET from '../entity-types';
 import type { EntityActionsConfig, FieldsConfig } from '../private-selectors';
-import type { Action, EntitiesState, EntityConfig } from '../types';
+import type { Action, EntitiesState } from '../private-types';
+import type { EntityConfig } from '../types';
 
 type DeepPartial< T > = T extends ( ...args: Array< never > ) => unknown
 	? T

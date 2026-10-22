@@ -17,11 +17,11 @@ import type { ItemId } from './queried-data/types';
 import type {
 	Action,
 	EntitiesState,
-	EntityConfig,
 	EntityRecordsState,
 	KeyedEntityAction,
 	UsersState,
-} from './types';
+} from './private-types';
+import type { EntityConfig } from './types';
 
 /**
  * Reducer managing authors state. Keyed by id.

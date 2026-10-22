@@ -12,12 +12,8 @@ import {
 	taxonomySyncConfig,
 } from './utils/crdt';
 import type { Post } from './entity-types/post';
-import type {
-	EntityConfig,
-	EntityConfigLoader,
-	RestTypeDescription,
-	TransientEditConfig,
-} from './types';
+import type { EntityConfigLoader, RestTypeDescription } from './private-types';
+import type { EntityConfig, TransientEditConfig } from './types';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
