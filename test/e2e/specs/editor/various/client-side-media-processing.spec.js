@@ -809,6 +809,67 @@ test.describe( 'Client-side media processing', () => {
 		await expect( publishButton ).toBeEnabled( { timeout: 60_000 } );
 	} );
 
+	test( 'converts several JXL images uploaded together', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// Uploading JXLs alongside a JPEG makes the worker build a JXL-enabled
+		// vips instance while other operations are using, or waiting on, the
+		// one it replaces. Neither may be shut down under them.
+		await editor.insertBlock( { name: 'core/gallery' } );
+
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-jxl-gallery-' )
+		);
+		const files = [
+			'1024x768_e2e_test_image_size.jpeg',
+			'200x150_e2e_test_image_decode.jxl',
+			'200x150_e2e_test_image_hdr.jxl',
+			'200x150_e2e_test_image_gainmap.jxl',
+		];
+		const tmpFiles = [];
+		for ( const file of files ) {
+			const tmpFile = path.join(
+				tmpDirectory,
+				randomUUID() + path.extname( file )
+			);
+			await fs.copyFile( path.join( ASSETS_DIR, file ), tmpFile );
+			tmpFiles.push( tmpFile );
+		}
+
+		await galleryBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFiles );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		await expect(
+			page.locator( '.components-snackbar' ).filter( {
+				hasText: /JPEG XL|failed/i,
+			} )
+		).toHaveCount( 0 );
+
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: '/wp/v2/media',
+			params: { per_page: 20, context: 'edit' },
+		} );
+		const convertedJxl = media.filter( ( item ) =>
+			/\.jxl$/.test( item.media_details?.source_image ?? '' )
+		);
+		expect( convertedJxl ).toHaveLength( 3 );
+		for ( const item of convertedJxl ) {
+			expect( item.mime_type ).toBe( 'image/jpeg' );
+		}
+	} );
+
 	test( 'rejects an unsupported file type', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
