@@ -448,6 +448,32 @@ test.describe( 'Client-side media processing', () => {
 		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
 	} );
 
+	test( 'rejects a JXL upload when the site does not allow JXL', async ( {
+		requestUtils,
+	} ) => {
+		// The server-side check that restores the JXL type fileinfo misreports
+		// must not override a site that removed JXL from its upload types.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disallow-jxl-uploads'
+		);
+
+		try {
+			await expect(
+				requestUtils.uploadMedia(
+					path.join( ASSETS_DIR, '200x150_e2e_test_image_decode.jxl' )
+				)
+			).rejects.toMatchObject( {
+				message: expect.stringMatching(
+					/not allowed to upload this file type/
+				),
+			} );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-disallow-jxl-uploads'
+			);
+		}
+	} );
+
 	test( 'preserves UltraHDR gain map through sub-size resize', async ( {
 		editor,
 		mediaProcessingUtils,
