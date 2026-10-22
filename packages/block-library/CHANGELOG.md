@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Image: Show the image caption inside the lightbox ("Enlarge on click"), for both single images and gallery images ([#81500](https://github.com/WordPress/gutenberg/pull/81500)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
@@ -165,10 +169,6 @@
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
 -   Post Template: Pass an explicit default layout to the inner blocks of the Post Template and Term Template blocks, so the movers, inserters, and child controls of the template's blocks no longer follow the grid used to arrange the post/term items ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
 -   Accordion Heading: Declare the spacing selector in the block's `selectors` map, so padding set in `theme.json` or Global Styles applies to the toggle button the block writes its own padding to, rather than to the heading wrapper where it could not lower the default ([#81976](https://github.com/WordPress/gutenberg/pull/81976)).
-
-### Enhancements
-
--   Image: Show the image caption inside the lightbox ("Enlarge on click"), for both single images and gallery images.
 
 ## 10.4.0 (2026-08-12)
 

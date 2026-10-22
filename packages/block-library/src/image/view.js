@@ -429,6 +429,21 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				// A gesture that starts on the caption belongs to the caption,
+				// so it is left to scroll natively: the `preventDefault()`
+				// below would otherwise stop the caption from scrolling at all
+				// on touch devices, and the swipe tracking that follows would
+				// drag the image sideways while the finger is reading. Touch
+				// events keep the target they started on for the whole gesture,
+				// so one test here covers the whole scroll. The caption layer
+				// sets `overscroll-behavior: contain`, which keeps the page
+				// behind from scrolling once the caption reaches its end.
+				if (
+					event.target?.closest?.( '.wp-lightbox-caption-scroll' )
+				) {
+					return;
+				}
+
 				// Prevents triggering the scroll event because otherwise the page
 				// jumps around when it resets the scroll position. This also means
 				// that closing the lightbox requires a simple tap. May change in
@@ -717,13 +732,6 @@ const { state, actions, callbacks } = store(
 					state.preloadTimers.delete( imageId );
 				}
 			},
-			handleCaptionClick: withSyncEvent( ( event ) => {
-				// Keeps clicks inside the caption (selecting text, following a
-				// link) from bubbling to the overlay, which would otherwise
-				// close the lightbox. Clicks on the image or surrounding area
-				// still close it.
-				event.stopPropagation();
-			} ),
 		},
 		callbacks: {
 			setOverlayStyles() {
