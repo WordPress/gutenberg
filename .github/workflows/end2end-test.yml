@@ -80,12 +80,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: |
-                  free -m
-                  ( while sleep 5; do echo "mem-sample $( date -u +%T ) $( awk '/^(MemAvailable|SwapFree):/ { printf "%s%dMB ", $1, $2 / 1024 }' /proc/meminfo )$( ps -eo rss=,comm= --sort=-rss | head -3 | awk '{ printf "%s:%dMB ", $2, $1 / 1024 }' )"; done ) &
-                  sampler=$!
-                  trap 'kill "$sampler"' EXIT
-                  npm run build
+              run: npm run build
 
             # Wider than the `build*` directories, because the build also emits
             # generated files next to sources: the block parsers, the icon
@@ -121,7 +116,7 @@ jobs:
         # (see the guard step below). `!cancelled()` is what drops the implicit
         # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
         # lives on the build job.
-        if: false
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
             id-token: write
@@ -192,7 +187,7 @@ jobs:
         # (see the guard step below). `!cancelled()` is what drops the implicit
         # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
         # lives on the build job.
-        if: false
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
             id-token: write
@@ -266,7 +261,7 @@ jobs:
         # (see the guard step below). `!cancelled()` is what drops the implicit
         # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
         # lives on the build job.
-        if: false
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
             id-token: write
@@ -330,7 +325,7 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: false
+        if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         needs:
             [
                 detect-relevant-changes,
@@ -483,7 +478,7 @@ jobs:
                 e2e-playwright-rtc-websocket,
                 e2e-playwright-site-editor-v2,
             ]
-        if: false
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -34,7 +34,6 @@ jobs:
     # potentially impact unit tests. A series of ignore patterns are used in place of an include
     # list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
-        if: false
         name: Detect changes relevant to unit tests
         runs-on: 'ubuntu-slim'
         timeout-minutes: 5
@@ -72,7 +71,7 @@ jobs:
         needs: [detect-relevant-changes]
         permissions:
             contents: read
-        if: false
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -100,7 +99,7 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        if: false
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -148,7 +147,8 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        if: false
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -209,7 +209,7 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        if: false
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -246,7 +246,7 @@ jobs:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-slim'
         needs: [detect-relevant-changes]
-        if: false
+        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -275,7 +275,7 @@ jobs:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
         needs: [detect-relevant-changes]
-        if: false
+        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions:
             contents: read
         steps:
@@ -311,7 +311,7 @@ jobs:
         permissions:
             contents: read
         timeout-minutes: 20
-        if: false
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: true
             matrix:
@@ -455,7 +455,8 @@ jobs:
         permissions:
             contents: read
         timeout-minutes: 20
-        if: false
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -531,7 +532,7 @@ jobs:
                 test-php,
                 phpcs,
             ]
-        if: false
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

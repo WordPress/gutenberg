@@ -66,7 +66,6 @@ permissions: {}
 jobs:
     # Lists the allowlisted packages with relevant changes.
     changed-packages:
-        if: false
         name: Find packages that need a CHANGELOG entry
         runs-on: 'ubuntu-slim'
         permissions:
@@ -178,7 +177,7 @@ jobs:
         name: Check CHANGELOG presence
         needs: changed-packages
         # A matrix with no values fails the run, so skip the job instead.
-        if: false
+        if: ${{ needs.changed-packages.outputs.packages != '[]' }}
         runs-on: 'ubuntu-slim'
         permissions:
             contents: read
@@ -224,7 +223,6 @@ jobs:
     # Structure: For any revisions to CHANGELOGs (regardless of package),
     # validate that the contents follow the expected format.
     structure:
-        if: false
         name: Validate CHANGELOG structure
         runs-on: 'ubuntu-slim'
         permissions:
