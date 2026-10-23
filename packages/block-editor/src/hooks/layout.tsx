@@ -316,45 +316,20 @@ export function getResponsiveLayoutStyles( {
 				// A style state holds the layout it overrides.
 				viewportStyle?.layout as Layout | undefined
 			);
-			const hasViewportLayout = Object.keys( viewportLayout ).length > 0;
-			const hasViewportBlockGap =
-				viewportStyle?.spacing &&
-				Object.hasOwn( viewportStyle.spacing, 'blockGap' );
-			const hasViewportPadding =
-				viewportStyle?.spacing &&
-				Object.hasOwn( viewportStyle.spacing, 'padding' );
+			// Layout types only output what changes in the viewport, which
+			// can be more than its overrides, such as a grid that stacks on
+			// mobile, so they are asked even when nothing is overridden.
 			const layoutType = getLayoutType( layout?.type || 'default' );
-			const stackingCSS =
-				viewport === '@mobile'
-					? layoutType?.getMobileStackingStyle?.( {
-							selector,
-							// Stacking can be turned off from the mobile state too.
-							layout: { ...layout, ...viewportLayout },
-						} )
-					: '';
-			if (
-				! hasViewportLayout &&
-				! hasViewportBlockGap &&
-				! hasViewportPadding &&
-				! stackingCSS
-			) {
-				return '';
-			}
-
-			const viewportCSS = [
-				layoutType?.getLayoutStyle?.( {
-					blockName,
-					selector,
-					layout,
-					viewportOverrides: viewportLayout,
-					style: viewportStyle,
-					hasBlockGapSupport,
-					globalBlockGapValue,
-				} ),
-				stackingCSS,
-			]
-				.filter( Boolean )
-				.join( '' );
+			const viewportCSS = layoutType?.getLayoutStyle?.( {
+				blockName,
+				selector,
+				layout,
+				viewportOverrides: viewportLayout,
+				viewport,
+				style: viewportStyle,
+				hasBlockGapSupport,
+				globalBlockGapValue,
+			} );
 
 			return viewportCSS ? `${ mediaQuery }{${ viewportCSS }}` : '';
 		} )

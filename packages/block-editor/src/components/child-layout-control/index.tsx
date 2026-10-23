@@ -10,17 +10,13 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
-import {
-	getStackedLayouts,
-	isGridStackedOnMobile,
-} from '../grid/mobile-stacking';
 import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
-import type { GridBlockAttributes, GridChild } from '../grid/mobile-stacking';
 import type {
 	ChildLayout,
 	ChildLayoutControlProps,
@@ -276,56 +272,20 @@ function GridControls( {
 	// needs its own mobile layout before an edit to one of its blocks can have
 	// an effect, so edits go through the grid updater, which creates it from
 	// the stack.
-	const { stackGridAttributes, stackItems } = useSelect(
-		( select ) => {
-			// A block without a parent isn't in a grid.
-			if (
-				! window.__experimentalEnableGridInteractivity ||
-				! rootClientId
-			) {
-				return {};
-			}
-			const {
-				getBlockAttributes,
-				getBlockOrder,
-				getBlocksByClientId,
-				getSelectedBlockStyleState,
-			} = select( blockEditorStore );
-			// The grid's layout and style attributes are objects when set.
-			const gridAttributes = getBlockAttributes(
-				rootClientId
-			) as GridBlockAttributes | null;
-			if (
-				// The viewport is the same for every block.
-				getSelectedBlockStyleState( rootClientId )?.viewport !==
-					'@mobile' ||
-				! isGridStackedOnMobile(
-					gridAttributes?.layout,
-					gridAttributes?.style
-				)
-			) {
-				return {};
-			}
-			return {
-				stackGridAttributes: gridAttributes,
-				// The grid's children exist.
-				stackItems: getBlocksByClientId(
-					getBlockOrder( rootClientId )
-				) as GridChild[],
-			};
-		},
+	const stackedLayouts = useSelect(
+		( select ) =>
+			// A block without a parent isn't in a grid, and grids only stack
+			// with the grid interactivity experiment.
+			rootClientId && window.__experimentalEnableGridInteractivity
+				? unlock( select( blockEditorStore ) ).getStackedGridLayouts(
+						rootClientId
+					)
+				: null,
 		[ rootClientId ]
 	);
-	const isStackedOnMobile = !! stackItems;
-	const stackedLayouts = useMemo(
-		() =>
-			stackItems
-				? getStackedLayouts( stackGridAttributes, stackItems, panelId )
-				: undefined,
-		[ stackGridAttributes, stackItems, panelId ]
-	);
+	const isStackedOnMobile = !! stackedLayouts;
 	const { columnStart, rowStart, columnSpan, rowSpan } =
-		stackedLayouts?.child ?? childLayout;
+		stackedLayouts?.children[ panelId ] ?? childLayout;
 	const { columnCount, rowCount } = {
 		...parentLayout,
 		...stackedLayouts?.grid,
