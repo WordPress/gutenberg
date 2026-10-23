@@ -12,7 +12,7 @@
 return array(
 	'id'            => 'notesCount',
 	'type'          => 'integer',
-	'label'         => __( 'Notes', 'gutenberg' ),
+	'label'         => __( 'Notes' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 );

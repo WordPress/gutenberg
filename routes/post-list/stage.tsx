@@ -247,7 +247,8 @@ function PostListView( {
 	const quickEditAction = useMemo(
 		() => ( {
 			id: 'quick-edit',
-			label: __( 'Quick Edit' ),
+			label: ( items: Post[] ) =>
+				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
@@ -273,17 +274,7 @@ function PostListView( {
 	);
 
 	const actions = useMemo( () => {
-		const _actions = [
-			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					// Skip revisions as the admin does not support it
-					case 'view-post-revisions':
-						return [];
-				}
-
-				return [ action ];
-			} ),
-		];
+		const _actions = [ ...postTypeActions ];
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
 		}

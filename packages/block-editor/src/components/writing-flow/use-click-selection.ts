@@ -18,16 +18,26 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
+		isBlockMultiSelected,
+		isAncestorMultiSelected,
+		__unstableIsFullySelected,
+		canMoveBlocks,
+		getSelectedBlockClientIds,
 	} = useSelect( blockEditorStore );
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			let pointerType: string | undefined;
+			// The block to collapse a multi-selection to on click, recorded
+			// on mousedown. See the comment in `onMouseDown`.
+			let clickCollapseClientId: string | undefined;
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
 			}
 
 			function onMouseDown( event: MouseEvent ) {
+				clickCollapseClientId = undefined;
+
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
@@ -118,17 +128,77 @@ export default function useClickSelection() {
 					// multiselection, as focus can be incurred by starting a
 					// multiselection (focus moved to first block's multi-
 					// controls).
-					// A click outside blocks passes no client ID, as before.
-					selectBlock( clickedClientId as string );
+					if (
+						clickedClientId &&
+						__unstableIsFullySelected() &&
+						canMoveBlocks( getSelectedBlockClientIds() ) &&
+						( isBlockMultiSelected( clickedClientId ) ||
+							isAncestorMultiSelected( clickedClientId ) )
+					) {
+						// Pressing on one of the selected blocks may start a
+						// drag of the whole selection, so wait for the click
+						// event to collapse the selection: no click fires
+						// when a drag takes place.
+						clickCollapseClientId = clickedClientId;
+					} else {
+						// A click outside blocks passes no client ID, as before.
+						selectBlock( clickedClientId as string );
+					}
 				}
+			}
+
+			function onClick( event: MouseEvent ) {
+				const clientId = clickCollapseClientId;
+				clickCollapseClientId = undefined;
+
+				if ( ! clientId || ! hasMultiSelection() ) {
+					return;
+				}
+
+				// The press did not place a caret because it could have
+				// started a drag, so place it at the click on text.
+				const { ownerDocument } = node;
+				const { clientX, clientY } = event;
+				let textNode: Node | null = null;
+				let offset = 0;
+				if ( ownerDocument.caretPositionFromPoint ) {
+					const position = ownerDocument.caretPositionFromPoint(
+						clientX,
+						clientY
+					);
+					textNode = position?.offsetNode ?? null;
+					offset = position?.offset ?? 0;
+				} else {
+					const range = ownerDocument.caretRangeFromPoint?.(
+						clientX,
+						clientY
+					);
+					textNode = range?.startContainer ?? null;
+					offset = range?.startOffset ?? 0;
+				}
+
+				if (
+					textNode?.nodeType === textNode?.TEXT_NODE &&
+					getBlockClientId( textNode ) === clientId
+				) {
+					// A mounted element's document has a window and a selection.
+					ownerDocument
+						.defaultView!.getSelection()!
+						.collapse( textNode!, offset );
+					return;
+				}
+
+				selectBlock( clientId );
 			}
 
 			node.addEventListener( 'pointerdown', onPointerDown );
 			node.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener( 'click', onClick );
 
 			return () => {
 				node.removeEventListener( 'pointerdown', onPointerDown );
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'click', onClick );
 			};
 		},
 		[
@@ -137,6 +207,11 @@ export default function useClickSelection() {
 			getBlockSelectionStart,
 			getSelectionStart,
 			hasMultiSelection,
+			isBlockMultiSelected,
+			isAncestorMultiSelected,
+			__unstableIsFullySelected,
+			canMoveBlocks,
+			getSelectedBlockClientIds,
 		]
 	);
 }

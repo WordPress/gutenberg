@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Dimensions', 'gutenberg' ),
+	'label'         => __( 'Dimensions' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 	'readOnly'      => true,

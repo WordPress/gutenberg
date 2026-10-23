@@ -3,9 +3,9 @@
  */
 export interface BlockTitleProps {
 	/**
-	 * Client ID of block.
+	 * Client ID of block. Without one, the title is `null`.
 	 */
-	clientId: string;
+	clientId?: string | null;
 	/**
 	 * The maximum length that the block title string may be before truncated.
 	 */

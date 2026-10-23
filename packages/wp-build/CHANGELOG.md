@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+
+### Internal
+
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency, so fallbacks no longer require installing `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+
+## 0.26.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Remove the automatic Babel processing for `packages/components`, including the Emotion transform, implicit project Babel configuration support, and build-time dependencies. Projects that rely on these transforms must run Babel separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
@@ -9,6 +20,7 @@
 
 ### New Features
 
+-   Support importing `.svg` files from JavaScript. The SVG is inlined into the bundle (and into transpiled packages) and the import resolves to a `data:` URI ([#85147](https://github.com/WordPress/gutenberg/pull/85147)).
 -   Add a `{prefix}_{page_slug}_wp_admin_preload_paths` filter to the generated wp-admin page template, so a page can preload the REST API requests its JavaScript issues on mount ([#77353](https://github.com/WordPress/gutenberg/pull/77353)).
 
 ### Enhancements

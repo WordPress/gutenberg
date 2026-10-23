@@ -10,7 +10,7 @@
 
 return array(
 	'type'     => 'integer',
-	'label'    => __( 'Author', 'gutenberg' ),
+	'label'    => __( 'Author' ),
 	'filterBy' => array(
 		'operators' => array( 'isAny', 'isNone' ),
 	),
