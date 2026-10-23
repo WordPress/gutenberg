@@ -57,6 +57,11 @@ done
 
 echo "::endgroup::"
 
+# Record CPU and memory use while the tests run.
+nproc > "$work/usage.log"
+vmstat -S M 30 >> "$work/usage.log" &
+vmstat_pid=$!
+
 pids=()
 for site in $( seq 1 "$sites" ); do
 	shard=$(( ( part - 1 ) * sites + site ))
@@ -78,5 +83,10 @@ for site in $( seq 1 "$sites" ); do
 	cat "$work/tests-$site.log"
 	echo "::endgroup::"
 done
+
+kill "$vmstat_pid"
+echo "::group::CPU and memory"
+cat "$work/usage.log"
+echo "::endgroup::"
 
 exit $status
