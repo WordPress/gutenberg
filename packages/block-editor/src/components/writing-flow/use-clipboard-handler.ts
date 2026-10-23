@@ -316,28 +316,6 @@ export default function useClipboardHandler() {
 					return;
 				}
 
-<<<<<<< HEAD:packages/block-editor/src/components/writing-flow/use-clipboard-handler.js
-=======
-				// Pasting over an entirely selected block replaces it, the
-				// equivalent of pasting into an empty block.
-				if (
-					! hasMultiSelection() &&
-					isBlockEntirelySelected(
-						( event.target as Element ).ownerDocument,
-						selectedBlockClientIds[ 0 ]
-					)
-				) {
-					replaceBlocks(
-						selectedBlockClientIds,
-						blocks,
-						blocks.length - 1,
-						-1
-					);
-					event.preventDefault();
-					return;
-				}
-
->>>>>>> trunk:packages/block-editor/src/components/writing-flow/use-clipboard-handler.ts
 				const [ firstSelectedClientId ] = selectedBlockClientIds;
 				const rootClientId = getBlockRootClientId(
 					firstSelectedClientId
@@ -378,7 +356,7 @@ export default function useClipboardHandler() {
 				if (
 					! hasMultiSelection() &&
 					isBlockEntirelySelected(
-						event.target.ownerDocument,
+						( event.target as Element ).ownerDocument,
 						firstSelectedClientId
 					)
 				) {
