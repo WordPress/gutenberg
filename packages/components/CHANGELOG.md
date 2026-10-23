@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `DropdownMenu`: Focus the menu on pointer opening and enter its items with arrow keys ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   `RangeControl`: Use the design system outline for the slider thumb focus ring ([#85536](https://github.com/WordPress/gutenberg/pull/85536)).
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
 -   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
