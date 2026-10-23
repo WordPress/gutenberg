@@ -127,25 +127,22 @@
 	&[aria-disabled="true"] {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
-		&:focus {
+		&:is(:focus, [data-focus]) {
 			@include outset-ring__focus;
 			outline-offset: 0;
 		}
 	}
 
-	&[data-active-item]:not([aria-disabled="true"], [aria-expanded="true"]) {
+	&:is(:focus, [data-focus]):not([aria-disabled="true"]) {
 		@include composite-item.highlight;
 	}
 
-	/* Open submenu parents stay neutral while hovered or focused. */
-	&[aria-expanded="true"]:not([aria-disabled="true"]) {
+	&[aria-expanded="true"]:not(:focus, [data-focus], [aria-disabled="true"]) {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 
 		@media ( forced-colors: active ) {
-			&:focus {
-				@include outset-ring__focus;
-				outline-offset: 0;
-			}
+			outline: var(--wpds-border-width-xs) solid GrayText;
+			outline-offset: 0;
 		}
 	}
 

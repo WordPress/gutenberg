@@ -4,13 +4,13 @@
 
 ### Enhancements
 
+-   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
 
--   Keep `LinkControl` result type labels and block icons readable on highlighted popup items ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).

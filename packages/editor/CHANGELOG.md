@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+
 ### Bug Fixes
 
--   Autocomplete: Keep user mention slugs readable on highlighted results ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 16.0.0 (2026-10-20)

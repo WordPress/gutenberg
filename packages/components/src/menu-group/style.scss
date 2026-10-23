@@ -1,10 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/composite-item";
-
-.components-menu-group > [role="group"] {
-	@include composite-item.join-highlights(".components-menu-item__button#{composite-item.$menu-item-highlighted}");
-}
 
 .components-menu-group + .components-menu-group {
 	padding-top: $grid-unit-10;
