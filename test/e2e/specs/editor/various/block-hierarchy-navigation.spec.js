@@ -219,6 +219,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'just a paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/spacer' );
+		await expect(
+			page.getByRole( 'option', { name: 'Spacer', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		// Verify group block contents.
