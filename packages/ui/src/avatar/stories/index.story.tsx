@@ -1,14 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { forwardRef } from '@wordpress/element';
-import { commentAuthorAvatar } from '@wordpress/icons';
 import * as Avatar from '../index';
-import { Icon } from '../../icon';
+import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
-// Profile illustration by Boxicons: https://unsplash.com/illustrations/simple-black-outline-of-a-person-icon-s4_txsqJZ7M
+// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
+// Used under the Unsplash License: https://unsplash.com/license
 const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1776244476031-db2aa624a2a0?w=128&h=128&fit=crop&fm=jpg';
+	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
 
 const meta: Meta< typeof Avatar.Root > = {
 	title: 'Components/@wordpress-ui/Avatar',
@@ -17,6 +16,7 @@ const meta: Meta< typeof Avatar.Root > = {
 	subcomponents: {
 		'Avatar.Image': Avatar.Image,
 		'Avatar.Fallback': Avatar.Fallback,
+		'Avatar.Initials': Avatar.Initials,
 	},
 	parameters: {
 		componentStatus: {
@@ -25,10 +25,15 @@ const meta: Meta< typeof Avatar.Root > = {
 			notes: 'API and design may change.',
 		},
 	},
+};
+export default meta;
+
+type Story = StoryObj< typeof Avatar.Root >;
+
+export const Default: Story = {
 	args: {
-		size: 'md',
-		role: 'img',
 		'aria-label': 'Alex Morgan',
+		role: 'img',
 	},
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
@@ -37,97 +42,65 @@ const meta: Meta< typeof Avatar.Root > = {
 		</Avatar.Root>
 	),
 };
-export default meta;
 
-type Story = StoryObj< typeof Avatar.Root >;
-
-export const Default: Story = {};
-
-/** Square avatars use the theme's corner radius for buttons and controls. */
-export const Square: Story = {
-	args: { shape: 'square' },
-};
-
-/** Supply initials as fallback content. */
-export const FallbackOnly: Story = {
+/** Apply the same color to image rings, initials, and person fallbacks. */
+export const WithColor: Story = {
+	...Default,
+	args: { ...Default.args, color: '#008a20' },
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback>AM</Avatar.Fallback>
-		</Avatar.Root>
-	),
-};
-
-/** Supply a profile icon from `@wordpress/icons` as fallback content. */
-export const IconFallback: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback>
-				<Icon
-					icon={ commentAuthorAvatar }
-					style={ {
-						inlineSize: '75%',
-						blockSize: '75%',
-					} }
-				/>
-			</Avatar.Fallback>
-		</Avatar.Root>
-	),
-};
-
-/** An image that fails to load leaves the fallback visible. */
-export const FailedImage: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image
-				src="data:image/png;base64,invalid"
-				alt=""
-				keepMounted
-			/>
-		</Avatar.Root>
-	),
-};
-
-export const Sizes: Story = {
-	name: 'Sizes and shapes',
-	render: ( args ) => (
-		<Stack direction="column" gap="lg">
-			{ ( [ 'circle', 'square' ] as const ).map( ( shape ) => (
-				<Stack key={ shape } direction="column" gap="md">
-					<Stack gap="md" align="center">
-						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-							( size ) => (
-								<Avatar.Root
-									{ ...args }
-									key={ size }
-									size={ size }
-									shape={ shape }
-								>
-									<Avatar.Fallback delay={ 300 }>
-										AM
-									</Avatar.Fallback>
-									<Avatar.Image src={ IMAGE_SRC } alt="" />
-								</Avatar.Root>
-							)
-						) }
-					</Stack>
-					<Stack gap="md" align="center">
-						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-							( size ) => (
-								<Avatar.Root
-									{ ...args }
-									key={ size }
-									size={ size }
-									shape={ shape }
-								>
-									<Avatar.Fallback>AM</Avatar.Fallback>
-								</Avatar.Root>
-							)
-						) }
-					</Stack>
-				</Stack>
-			) ) }
+		<Stack gap="md" align="center">
+			<Avatar.Root { ...args }>
+				<Avatar.Fallback />
+				<Avatar.Image src={ IMAGE_SRC } alt="" />
+			</Avatar.Root>
+			<Avatar.Root { ...args }>
+				<Avatar.Initials name="Alex Morgan" />
+			</Avatar.Root>
+			<Avatar.Root { ...args }>
+				<Avatar.Fallback />
+			</Avatar.Root>
 		</Stack>
+	),
+};
+
+/** Wrap a decorative avatar in a button to make it interactive. */
+export const Interactive: Story = {
+	render: ( args ) => (
+		<Button
+			variant="unstyled"
+			aria-label="Open Alex Morgan's profile"
+			style={ {
+				display: 'inline-flex',
+				borderRadius:
+					args.shape === 'square'
+						? 'var(--wpds-border-radius-sm)'
+						: '50%',
+			} }
+		>
+			<Avatar.Root { ...args } aria-hidden="true">
+				<Avatar.Initials name="Alex Morgan" />
+			</Avatar.Root>
+		</Button>
+	),
+};
+
+/** Omit fallback content to display the person icon. */
+export const IconFallback: Story = {
+	...Default,
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Fallback />
+		</Avatar.Root>
+	),
+};
+
+/** Derive initials from a display name. */
+export const Initials: Story = {
+	...Default,
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Initials name="Alex Morgan" />
+		</Avatar.Root>
 	),
 };
 
@@ -136,57 +109,9 @@ export const WithVisibleName: Story = {
 	render: ( args ) => (
 		<Stack gap="sm" align="center">
 			<Avatar.Root { ...args } aria-hidden="true">
-				<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-				<Avatar.Image src={ IMAGE_SRC } alt="" />
+				<Avatar.Initials name="Alex Morgan" />
 			</Avatar.Root>
 			<Text>Alex Morgan</Text>
 		</Stack>
-	),
-};
-
-/** Use `keepMounted` to let the browser load the image lazily. */
-export const LazyImage: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image src={ IMAGE_SRC } alt="" keepMounted loading="lazy" />
-		</Avatar.Root>
-	),
-};
-
-const ProfileImage = forwardRef<
-	HTMLImageElement,
-	React.ComponentProps< 'img' >
->( function UnforwardedProfileImage( props, ref ) {
-	return <img alt="" { ...props } ref={ ref } />;
-} );
-
-/**
- * When passing a custom image component through `render`, forward the ref and
- * image props, including `onLoad` and `onError`, to the underlying image element.
- */
-export const CustomImage: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image
-				keepMounted
-				render={ <ProfileImage src={ IMAGE_SRC } alt="" /> }
-			/>
-		</Avatar.Root>
-	),
-};
-
-/** Pass a Gravatar URL to `Avatar.Image` through its `src` prop. */
-export const Gravatar: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image
-				src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=identicon&f=y&s=96"
-				alt=""
-				keepMounted
-			/>
-		</Avatar.Root>
 	),
 };

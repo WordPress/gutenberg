@@ -561,8 +561,10 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
--   `DataViews.BulkActionToolbar`
+-   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
+
+Bulk actions are now rendered within the built-in table and grid layouts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)). `DataViews.BulkActionToolbar` remains available for compatibility but renders nothing, so you can remove it from custom compositions.
 
 #### example
 
@@ -1148,11 +1150,11 @@ Whether the action is disabled.
 
 ### `context`
 
-Where this action would be visible.
+The context the action is limited to: `list` for the lists of items. Without it, the action shows everywhere. DataViews does not filter the actions by context: the consumer does, before passing them.
 
 -   Type: `string`
 -   Optional
--   One of: `list`, `single`
+-   One of: `list`
 
 ### `callback`
 

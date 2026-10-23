@@ -212,6 +212,7 @@ export interface BlockAttribute {
 	role?: string;
 	__experimentalRole?: string;
 	query?: Record< string, BlockAttribute >;
+	items?: BlockAttribute;
 	enum?: unknown[];
 	multiline?: string;
 	__unstablePreserveWhiteSpace?: boolean;
@@ -302,6 +303,18 @@ export interface BlockFilesTransform extends BlockTransformBase {
 		files: File[],
 		onChange?: ( id: string, attributes: Record< string, unknown > ) => void
 	) => Block | Block[];
+}
+
+/**
+ * A transform triggered by typing text that matches a pattern.
+ */
+export interface BlockInputTransform extends BlockTransformBase {
+	type: 'input';
+	/**
+	 * The pattern the whole text has to match for the transform to apply.
+	 */
+	regExp: RegExp;
+	transform: () => Block | Block[];
 }
 
 /**
@@ -419,6 +432,7 @@ export type BlockTransform<
 	| BlockBlockTransform< Attributes >
 	| BlockEnterTransform
 	| BlockFilesTransform
+	| BlockInputTransform
 	| BlockPrefixTransform
 	| BlockRawTransform
 	| BlockShortcodeTransform;
@@ -654,6 +668,10 @@ export interface BlockType<
 		 * Transforms from this block type to another block type.
 		 */
 		to?: BlockTransform[];
+		/**
+		 * Returns the blocks that replace this block when it is ungrouped.
+		 */
+		ungroup?: ( attributes: Attributes, innerBlocks: Block[] ) => Block[];
 	};
 	/**
 	 * Array of the names of context values to inherit from
@@ -692,10 +710,10 @@ export interface BlockType<
 	/**
 	 * Custom block label callback function.
 	 */
-	__experimentalLabel: (
+	__experimentalLabel?: (
 		attributes: Attributes,
 		options: { context: string }
-	) => string;
+	) => string | void;
 }
 
 /**
@@ -1184,17 +1202,41 @@ export interface BlockSupports {
 	 */
 	background?: {
 		/**
+		 * Enable background clip control, including clipping to the text.
+		 *
+		 * (default) false
+		 */
+		backgroundClip?: boolean;
+		/**
 		 * Enable background image control.
 		 *
 		 * (default) false
 		 */
 		backgroundImage?: boolean;
 		/**
+		 * Enable background position control.
+		 *
+		 * (default) false
+		 */
+		backgroundPosition?: boolean;
+		/**
+		 * Enable background repeat control.
+		 *
+		 * (default) false
+		 */
+		backgroundRepeat?: boolean;
+		/**
 		 * Enable background size control.
 		 *
 		 * (default) false
 		 */
 		backgroundSize?: boolean;
+		/**
+		 * Enable background gradient control.
+		 *
+		 * (default) false
+		 */
+		gradient?: boolean;
 	};
 
 	/**

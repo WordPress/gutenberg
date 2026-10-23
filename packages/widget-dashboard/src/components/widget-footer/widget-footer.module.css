@@ -14,11 +14,17 @@
 	margin-inline-start: auto;
 }
 
-/* High action with a declared icon: the icon rides as a prefix. */
-.prefixed-action {
+.link-action {
 	display: inline-flex;
 	align-items: center;
+}
+
+/* High action with a declared icon: the icon rides as a prefix. */
+.prefixed-action {
+	display: flex;
+	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
+	text-decoration: inherit;
 }
 
 /*
