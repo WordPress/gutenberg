@@ -1,6 +1,9 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### New Features
+
+-   Add a `runtime` option to `.wp-env.json`, so the runtime (`docker` or `playground`) can be set without passing `--runtime` to `wp-env start` ([#77902](https://github.com/WordPress/gutenberg/pull/77902)).
 
 ## 12.0.0 (2026-10-20)
 

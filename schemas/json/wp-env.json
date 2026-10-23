@@ -188,6 +188,12 @@
 					"type": "boolean",
 					"default": false
 				},
+				"runtime": {
+					"description": "The runtime to use for the environment. 'docker' uses Docker containers, 'playground' uses WordPress Playground (experimental).",
+					"type": "string",
+					"enum": [ "docker", "playground" ],
+					"default": "docker"
+				},
 				"lifecycleScripts": {
 					"description": "Mapping of commands that should be executed at certain points in the lifecycle.",
 					"type": "object",
@@ -231,6 +237,7 @@
 							"testsPort",
 							"testsEnvironment",
 							"autoPort",
+							"runtime",
 							"lifecycleScripts"
 						]
 					}

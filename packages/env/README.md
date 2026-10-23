@@ -34,6 +34,16 @@ To use the Playground runtime:
 $ wp-env start --runtime=playground
 ```
 
+To use it every time without passing the flag, set `runtime` in your `.wp-env.json`:
+
+```json
+{
+	"runtime": "playground"
+}
+```
+
+The `--runtime` flag takes precedence over the `runtime` set in `.wp-env.json`.
+
 ### Playground vs Docker
 
 | Feature | Docker | Playground |
@@ -609,6 +619,7 @@ To enable editor autocomplete and validation, add a `$schema` key:
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
 | `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. |
 | `"autoPort"`         | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy. |
+| `"runtime"`          | `string`       | `"docker"`                             | The runtime to use: `"docker"` or `"playground"` (experimental). Can only be set at the root, not inside `env`. The `--runtime` flag takes precedence. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 | `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |

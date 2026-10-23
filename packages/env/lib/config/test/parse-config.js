@@ -716,4 +716,64 @@ describe( 'parseConfig', () => {
 			)
 		);
 	} );
+
+	it( 'should accept a known runtime', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					runtime: 'playground',
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.runtime ).toEqual( 'playground' );
+	} );
+
+	it( 'should leave runtime unset when it is not configured', async () => {
+		readRawConfigFile.mockImplementation( async () => null );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.runtime ).toBeUndefined();
+	} );
+
+	it( 'throws for an unknown runtime', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					runtime: 'podman',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "runtime" must be one of: docker, playground.`
+			)
+		);
+	} );
+
+	it( 'throws for runtime inside an environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					env: {
+						tests: {
+							runtime: 'playground',
+						},
+					},
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "tests.runtime" is not a configuration option.`
+			)
+		);
+	} );
 } );
