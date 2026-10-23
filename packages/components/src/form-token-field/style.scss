@@ -199,7 +199,7 @@
 	margin: 0;
 	box-sizing: border-box;
 
-	&:is(:hover, .is-selected):not([aria-disabled="true"], .is-empty) {
+	&.is-selected:not([aria-disabled="true"], .is-empty) {
 		@include composite-item.highlight;
 	}
 

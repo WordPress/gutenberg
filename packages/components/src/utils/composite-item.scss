@@ -1,3 +1,5 @@
+@use "./popup-item";
+
 @mixin highlight($priority: null) {
 	background-color: var(--wpds-color-background-interactive-brand-strong-active) $priority;
 	color: var(--wpds-color-foreground-interactive-brand-strong-active) $priority;
@@ -12,7 +14,7 @@
 }
 
 @mixin menu-item {
-	&:is(:hover, :focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) {
+	&:is(#{popup-item.$hover-selector}, :focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) {
 		// Popup colors take precedence over the underlying Button variant.
 		@include highlight(!important);
 
@@ -21,7 +23,7 @@
 		}
 	}
 
-	&[aria-expanded="true"]:not(:hover, :focus, [aria-selected="true"], :disabled, [aria-disabled="true"]) {
+	&[aria-expanded="true"]:not(#{popup-item.$hover-selector}, :focus, [aria-selected="true"], :disabled, [aria-disabled="true"]) {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active) !important;
 		color: var(--wpds-color-foreground-interactive-neutral-active) !important;
 		outline: none;

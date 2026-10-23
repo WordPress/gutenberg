@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "../utils/composite-item";
+@use "../utils/popup-item";
 
 .components-autocomplete__popover .components-popover__content {
 	padding: $grid-unit-10;
@@ -16,7 +17,7 @@
 	font-weight: var(--wpds-typography-font-weight-default);
 	position: relative;
 
-	&:is(:hover, :focus, .is-selected):not(:disabled, [aria-disabled="true"]) {
+	&:is(#{popup-item.$hover-selector}, :focus, .is-selected):not(:disabled, [aria-disabled="true"]) {
 		@include composite-item.highlight;
 	}
 
