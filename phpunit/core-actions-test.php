@@ -168,7 +168,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 				self::POST_TYPE_SUPPORTS => $ids,
 				self::PAGE               => self::PAGE_ACTIONS,
 			),
-			wp_get_registered_entity_action_modules( 'postType', 'page' )
+			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( wp_get_registered_entity_actions( 'postType', 'page' ), 'origin' ), 'registeredBy' ) ), 'Every action is registered by core.' );
 	}
@@ -202,7 +202,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 				self::POST_TYPE_SUPPORTS => array_merge( array( 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
 				self::WP_BLOCK           => array( 'duplicate-pattern', 'export-pattern' ),
 			),
-			wp_get_registered_entity_action_modules( 'postType', 'wp_block' )
+			array_column( wp_get_registered_entity_action_modules( 'postType', 'wp_block' ), 'actions', 'id' )
 		);
 	}
 
@@ -232,7 +232,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 			$this->get_action_ids( 'wp_template_part' ),
 			'A block theme can duplicate template parts.'
 		);
-		$this->assertSame( array( 'duplicate-template-part' ), wp_get_registered_entity_action_modules( 'postType', 'wp_template_part' )[ self::WP_TEMPLATE_PART ] );
+		$this->assertSame( array( 'duplicate-template-part' ), array_column( wp_get_registered_entity_action_modules( 'postType', 'wp_template_part' ), 'actions', 'id' )[ self::WP_TEMPLATE_PART ] );
 
 		switch_theme( 'default' );
 		$this->assertNotContains( 'duplicate-template-part', $this->get_action_ids( 'wp_template_part' ), 'A classic theme cannot.' );
@@ -432,7 +432,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 				self::POST_TYPE_SUPPORTS => array_merge( $ids, array( 'move-to-trash' ) ),
 				self::PAGE               => self::PAGE_ACTIONS,
 			),
-			wp_get_registered_entity_action_modules( 'postType', 'page' )
+			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
 
 		$actions = array_column( wp_get_registered_entity_actions( 'postType', 'page' ), null, 'id' );

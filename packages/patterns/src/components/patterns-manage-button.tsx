@@ -11,8 +11,12 @@ import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as patternsStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type { PatternsManageButtonProps } from './types';
 
-function PatternsManageButton( { clientId, onClose } ) {
+function PatternsManageButton( {
+	clientId,
+	onClose,
+}: PatternsManageButtonProps ) {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	const {
@@ -41,11 +45,13 @@ function PatternsManageButton( { clientId, onClose } ) {
 				!! canUser( 'read', {
 					kind: 'postType',
 					name: 'wp_block',
-					id: block.attributes.ref,
+					// A pattern block's `ref` is its `wp_block` post ID.
+					id: block.attributes.ref as number,
 				} );
 
 			return {
-				attributes: block.attributes,
+				// The menu only renders for a block that is in the editor.
+				attributes: block!.attributes,
 				canEdit: canEditBlock( clientId ),
 				// For unsynced patterns, detaching is simply removing the `patternName` attribute.
 				// For synced patterns, the `core:block` block is replaced with its inner blocks,

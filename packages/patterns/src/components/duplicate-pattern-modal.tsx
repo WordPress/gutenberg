@@ -4,8 +4,18 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import CreatePatternModal from './create-pattern-modal';
 import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../constants';
+import type {
+	DuplicatedPattern,
+	DuplicatePatternModalProps,
+	DuplicatePatternProps,
+	DuplicatePatternPropsOptions,
+	PatternCategories,
+} from './types';
 
-function getTermLabels( pattern, categories ) {
+function getTermLabels(
+	pattern: DuplicatedPattern,
+	categories: PatternCategories
+) {
 	// Theme patterns rely on core pattern categories.
 	if ( pattern.type !== PATTERN_TYPES.user ) {
 		return categories.core
@@ -22,7 +32,10 @@ function getTermLabels( pattern, categories ) {
 		.map( ( category ) => category.label );
 }
 
-export function useDuplicatePatternProps( { pattern, onSuccess } ) {
+export function useDuplicatePatternProps( {
+	pattern,
+	onSuccess,
+}: DuplicatePatternPropsOptions ): DuplicatePatternProps | null {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const categories = useSelect( ( select ) => {
 		const { getUserPatternCategories, getBlockPatternCategories } =
@@ -72,7 +85,7 @@ export default function DuplicatePatternModal( {
 	pattern,
 	onClose,
 	onSuccess,
-} ) {
+}: DuplicatePatternModalProps ) {
 	const duplicatedProps = useDuplicatePatternProps( { pattern, onSuccess } );
 	if ( ! pattern ) {
 		return null;
@@ -83,7 +96,8 @@ export default function DuplicatePatternModal( {
 			confirmLabel={ __( 'Duplicate' ) }
 			onClose={ onClose }
 			onError={ onClose }
-			{ ...duplicatedProps }
+			// Set, since `pattern` is.
+			{ ...duplicatedProps! }
 		/>
 	);
 }

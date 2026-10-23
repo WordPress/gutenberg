@@ -5,10 +5,14 @@ import {
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import type { PatternOverrides } from '../store/types';
+import type { ResetOverridesControlProps } from './types';
 
 const CONTENT = 'content';
 
-export default function ResetOverridesControl( props ) {
+export default function ResetOverridesControl(
+	props: ResetOverridesControlProps
+) {
 	const name = props.attributes.metadata?.name;
 	const registry = useRegistry();
 	const isOverridden = useSelect(
@@ -29,7 +33,10 @@ export default function ResetOverridesControl( props ) {
 				return;
 			}
 
-			const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+			// The pattern block exists, and keeps its overrides in `content`.
+			const overrides = getBlockAttributes( patternClientId )![
+				CONTENT
+			] as PatternOverrides | undefined;
 
 			if ( ! overrides ) {
 				return;
@@ -53,9 +60,13 @@ export default function ResetOverridesControl( props ) {
 			return;
 		}
 
-		const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+		// The button is only enabled once the pattern block has overrides.
+		const overrides = getBlockAttributes( patternClientId )![
+			CONTENT
+		] as PatternOverrides;
 
-		if ( ! overrides.hasOwnProperty( name ) ) {
+		// An enabled button means the block has a name, as `isOverridden` needs one.
+		if ( ! overrides.hasOwnProperty( name! ) ) {
 			return;
 		}
 
@@ -63,8 +74,9 @@ export default function ResetOverridesControl( props ) {
 			registry.dispatch( blockEditorStore );
 		__unstableMarkLastChangeAsPersistent();
 
-		let newOverrides = { ...overrides };
-		delete newOverrides[ name ];
+		let newOverrides: PatternOverrides | undefined = { ...overrides };
+		// Checked above, under the same name.
+		delete newOverrides[ name! ];
 
 		if ( ! Object.keys( newOverrides ).length ) {
 			newOverrides = undefined;
