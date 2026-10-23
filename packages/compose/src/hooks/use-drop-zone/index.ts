@@ -188,7 +188,7 @@ export default function useDropZone( {
 			// The `dragstart` event doesn't fire if the drag started outside
 			// the document.
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
-			// Chrome can send `dragover` to an iframe without a `dragenter`
+			// Browsers can send `dragover` to an iframe without a `dragenter`
 			// first, after a previous drag left the iframe over an element of
 			// the parent document. Start the drag on the first `dragover` too,
 			// so that its end is still handled. It's a capture listener, so

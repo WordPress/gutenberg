@@ -9,8 +9,8 @@ export interface UseDropZoneProps {
 	isDisabled?: boolean;
 	/**
 	 * Called when dragging has started, on the first `dragenter` or
-	 * `dragover` in the document. A drag can start on a `dragover`, as Chrome
-	 * can skip the `dragenter` in an iframe.
+	 * `dragover` in the document. A drag can start on a `dragover`, as
+	 * browsers can skip the `dragenter` in an iframe.
 	 */
 	onDragStart?: ( e: DragEvent ) => void;
 	/**
