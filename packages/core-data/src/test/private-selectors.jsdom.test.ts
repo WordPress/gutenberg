@@ -92,22 +92,34 @@ describe( 'getEntityActionsConfig', () => {
 } );
 
 describe( 'getTemplateId', () => {
-	function setUpRegistry( { editedTemplate, templates } ) {
+	type TestTemplate = { id: string; slug: string; template?: string };
+
+	function setUpRegistry( {
+		editedTemplate,
+		templates,
+	}: {
+		editedTemplate?: Partial< TestTemplate >;
+		templates?: TestTemplate[];
+	} ) {
 		getTemplateId.registry = {
 			select: () => ( {
 				getEditedEntityRecord: () => editedTemplate,
 				getEntityRecords: () => templates,
 			} ),
-		};
+		} as never;
 	}
 
-	const layout = { id: 'theme//layout', slug: 'layout' };
+	const layout: TestTemplate = { id: 'theme//layout', slug: 'layout' };
 
 	it( 'returns undefined until the edited template is received', () => {
 		setUpRegistry( { editedTemplate: undefined, templates: [ layout ] } );
 
 		expect(
-			getTemplateId( {}, 'wp_template', 'theme//page-404' )
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
 		).toBeUndefined();
 	} );
 
@@ -118,7 +130,11 @@ describe( 'getTemplateId', () => {
 		} );
 
 		expect(
-			getTemplateId( {}, 'wp_template', 'theme//page-404' )
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
 		).toBeNull();
 	} );
 
@@ -128,9 +144,13 @@ describe( 'getTemplateId', () => {
 			templates: [ layout ],
 		} );
 
-		expect( getTemplateId( {}, 'wp_template', 'theme//page-404' ) ).toBe(
-			'theme//layout'
-		);
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBe( 'theme//layout' );
 	} );
 
 	it( 'returns undefined until the templates are received', () => {
@@ -140,7 +160,11 @@ describe( 'getTemplateId', () => {
 		} );
 
 		expect(
-			getTemplateId( {}, 'wp_template', 'theme//page-404' )
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
 		).toBeUndefined();
 	} );
 
@@ -151,7 +175,11 @@ describe( 'getTemplateId', () => {
 		} );
 
 		expect(
-			getTemplateId( {}, 'wp_template', 'theme//page-404' )
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
 		).toBeNull();
 	} );
 } );
