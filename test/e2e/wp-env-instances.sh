@@ -6,11 +6,15 @@
 # per environment.
 #
 # Usage, from the repository root:
-#   test/e2e/wp-env-instances.sh <sites>
+#   test/e2e/wp-env-instances.sh [sites]
 
 set -euo pipefail
 
-sites=$1
+# One site per two cores: on four cores, two sites were as fast as three.
+sites=${1:-$(( $( nproc ) / 2 ))}
+if (( sites < 1 )); then
+	sites=1
+fi
 
 root=$( pwd )
 work=${RUNNER_TEMP:-/tmp}/e2e-envs
