@@ -6,6 +6,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState } from '@wordpress/element';
@@ -20,6 +21,7 @@ import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
@@ -46,6 +48,8 @@ type BoxValues = ComponentProps< typeof BoxControl >[ 'values' ];
 type BoxSides = ComponentProps< typeof BoxControl >[ 'sides' ];
 type SpacingValues = ComponentProps< typeof SpacingSizesControl >[ 'values' ];
 type SpacingSides = ComponentProps< typeof SpacingSizesControl >[ 'sides' ];
+
+const { unpackBoxShorthand } = unlock( componentsPrivateApis );
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -234,12 +238,7 @@ function splitStyleValue(
 	// Check for shorthand value (a string value).
 	if ( hasValue( value ) && typeof value === 'string' ) {
 		// Convert to value for individual sides for BoxControl.
-		return {
-			top: value,
-			right: value,
-			bottom: value,
-			left: value,
-		};
+		return unpackBoxShorthand( value );
 	}
 
 	return value;
