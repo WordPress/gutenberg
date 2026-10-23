@@ -6,6 +6,10 @@
 
 -   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
 -   Redraw `file` as a single document, the icon the library was missing. Import `folder` to keep the previous drawing ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Remove the `copySmall` and `pinSmall` icons. Their full-size counterparts `copy` and `pin` have been optically rebalanced, so a bespoke small drawing is no longer needed ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Remove the `cautionFilled`, `helpFilled` and `plusCircleFilled` icons in favour of `caution`, `help` and `plusCircle`, which are drawn entirely in strokes and can therefore be stroke-weight balanced for their context ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Remove the `cancelCircleFilled` icon. It has no stroke-drawn counterpart; use `close` where a cancel affordance is needed ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Remove the `bellUnread` icon. Compose an unread indicator from the `bell` icon and a separately positioned dot instead, so the dot can be separated from the bell with a ring in the surrounding surface colour ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
 
 ### Enhancements
 
