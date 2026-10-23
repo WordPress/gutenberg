@@ -1,6 +1,13 @@
-import type { ReactElement } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import {
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+	justifySpaceBetween,
+	justifySpaceAround,
+	justifySpaceEvenly,
+	justifyStretch,
 	justifyTop,
 	justifyCenterVertical,
 	justifyBottom,
@@ -16,7 +23,7 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { SelectControl } from '@wordpress/ui';
+import { Icon, SelectControl, Stack } from '@wordpress/ui';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -195,7 +202,7 @@ export default {
 					<Flex
 						align="flex-start"
 						className="block-editor-hooks__flex-layout-controls"
-						gap={ 4 }
+						gap={ 1 }
 						justify="flex-start"
 					>
 						{ allowJustification && (
@@ -546,22 +553,22 @@ function FlexLayoutJustifyContentControl( {
 	const justificationOptions: {
 		value: string;
 		label: string;
-		description: string;
+		icon: ComponentProps< typeof Icon >[ 'icon' ];
 	}[] = [
 		{
 			value: 'left',
 			label: _x( 'Left', 'Flex layout justification option' ),
-			description: __( 'Space after the items.' ),
+			icon: justifyLeft,
 		},
 		{
 			value: 'center',
 			label: _x( 'Center', 'Flex layout justification option' ),
-			description: __( 'Space on both sides.' ),
+			icon: justifyCenter,
 		},
 		{
 			value: 'right',
 			label: _x( 'Right', 'Flex layout justification option' ),
-			description: __( 'Space before the items.' ),
+			icon: justifyRight,
 		},
 	];
 	if ( orientation === 'horizontal' ) {
@@ -569,24 +576,24 @@ function FlexLayoutJustifyContentControl( {
 			{
 				value: 'space-between',
 				label: __( 'Space between' ),
-				description: __( 'No space at the edges.' ),
+				icon: justifySpaceBetween,
 			},
 			{
 				value: 'space-around',
 				label: __( 'Space around' ),
-				description: __( 'Half space at the edges.' ),
+				icon: justifySpaceAround,
 			},
 			{
 				value: 'space-evenly',
 				label: __( 'Space evenly' ),
-				description: __( 'Equal space at the edges.' ),
+				icon: justifySpaceEvenly,
 			}
 		);
 	} else {
 		justificationOptions.push( {
 			value: 'stretch',
 			label: __( 'Stretch items' ),
-			description: __( 'Fill the available space.' ),
+			icon: justifyStretch,
 		} );
 	}
 
@@ -601,13 +608,51 @@ function FlexLayoutJustifyContentControl( {
 			label={ __( 'Justification' ) }
 			items={ justificationOptions }
 			value={ selectedOption }
+			trigger={
+				<SelectControl.Trigger>
+					<Stack
+						render={ <span /> }
+						direction="row"
+						align="center"
+						gap="xs"
+					>
+						<Icon
+							icon={ selectedOption.icon }
+							style={ { flexShrink: 0 } }
+						/>
+						<span
+							style={ {
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+							} }
+						>
+							{ selectedOption.label }
+						</span>
+					</Stack>
+				</SelectControl.Trigger>
+			}
 			isItemEqualToValue={ ( item, value ) => item.value === value.value }
 			onValueChange={ ( selectedItem ) => {
 				if ( selectedItem && selectedItem.value !== null ) {
 					onJustificationChange( selectedItem.value );
 				}
 			} }
-		/>
+		>
+			{ justificationOptions.map( ( option ) => (
+				<SelectControl.Item
+					key={ option.value }
+					value={ option }
+					label={ option.label }
+				>
+					<SelectControl.ItemLabel>
+						<Stack direction="row" align="center" gap="xs">
+							<Icon icon={ option.icon } />
+							{ option.label }
+						</Stack>
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ) }
+		</SelectControl>
 	);
 }
 

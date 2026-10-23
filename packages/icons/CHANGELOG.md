@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `insertBefore` and `insertAfter` icons. These were old Dashicons that were never used; use `create` or `plus` instead ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+-   Remove the `offline` icon. It was added in error for a React Native client that is no longer used, so it has no direct replacement; `info` or `error` can stand in ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+
 ### New Features
 
 -   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).

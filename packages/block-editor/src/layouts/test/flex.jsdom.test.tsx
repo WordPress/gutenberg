@@ -88,23 +88,32 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
-	it( 'should describe each justification option', async () => {
+	it( 'should show icons and labels without descriptions', async () => {
 		const user = userEvent.setup();
 		renderInspectorControls();
 
-		await user.click(
-			await screen.findByRole( 'combobox', { name: 'Justification' } )
-		);
+		const trigger = await screen.findByRole( 'combobox', {
+			name: 'Justification',
+		} );
+		expect( trigger ).toHaveTextContent( 'Left' );
+		// eslint-disable-next-line testing-library/no-node-access -- Decorative icons have no accessible role; includes the caret.
+		expect( trigger.querySelectorAll( 'svg' ) ).toHaveLength( 2 );
 
-		for ( const description of [
-			'Space after the items.',
-			'Space on both sides.',
-			'Space before the items.',
-			'No space at the edges.',
-			'Half space at the edges.',
-			'Equal space at the edges.',
+		await user.click( trigger );
+
+		for ( const label of [
+			'Left',
+			'Center',
+			'Right',
+			'Space between',
+			'Space around',
+			'Space evenly',
 		] ) {
-			expect( await screen.findByText( description ) ).toBeVisible();
+			const option = await screen.findByRole( 'option', { name: label } );
+			expect( option ).toBeVisible();
+			expect( option ).not.toHaveAttribute( 'aria-describedby' );
+			// eslint-disable-next-line testing-library/no-node-access -- Decorative icons have no accessible role; includes the selection indicator.
+			expect( option.querySelectorAll( 'svg' ) ).toHaveLength( 2 );
 		}
 	} );
 
