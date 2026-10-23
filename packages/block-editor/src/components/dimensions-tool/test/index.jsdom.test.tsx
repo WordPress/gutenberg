@@ -639,6 +639,39 @@ describe( 'DimensionsTool', () => {
 				[ { aspectRatio: '16/9', scale: 'fill' } ],
 			] );
 		} );
+
+		it( 'shows scale without an aspect ratio or size when it is the only tool', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			render( <Example onChange={ onChange } tools={ [ 'scale' ] } /> );
+
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Aspect ratio' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'spinbutton', { name: 'Width' } )
+			).not.toBeInTheDocument();
+
+			await user.click( screen.getByRole( 'radio', { name: 'Fill' } ) );
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { scale: 'fill' } ],
+			] );
+		} );
+
+		it( 'hides scale without an aspect ratio or size when the aspect ratio tool shows', () => {
+			render(
+				<Example
+					onChange={ vi.fn() }
+					tools={ [ 'aspectRatio', 'scale' ] }
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'radio', { name: 'Fill' } )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'updating dimensions', () => {
