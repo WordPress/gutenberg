@@ -4,8 +4,11 @@ import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
 import { inertValue } from '@wordpress/react-inert-value';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, VisuallyHidden } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {
 	NormalizedField,
