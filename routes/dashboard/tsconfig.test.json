@@ -13,7 +13,7 @@
 	"exclude": [ "build", "node_modules" ],
 	"references": [
 		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
-		{ "path": "../../packages/data" },
+		{ "path": "../../packages/data/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/preferences/tsconfig.build.json" },
 		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" },
