@@ -2,6 +2,7 @@ import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 import Button from '../../button';
@@ -954,4 +955,31 @@ test( 'should render deselectable styles without enclosing borders', async () =>
 		optionStyles.button,
 		optionStyles[ 'is-deselectable' ]
 	);
+} );
+
+test( 'should keep its width when the pressed option changes', async () => {
+	await render(
+		<ControlledToggleGroupControl
+			label="Test Toggle Group Control"
+			value="narrow"
+		>
+			<ToggleGroupControlOption value="narrow" label="i" />
+			<ToggleGroupControlOption value="wide" label="MMMMMMMM" />
+		</ControlledToggleGroupControl>
+	);
+
+	const control = screen.getByRole( 'radiogroup', {
+		name: 'Test Toggle Group Control',
+	} );
+	const wideOption = screen.getByRole( 'radio', { name: 'MMMMMMMM' } );
+	const initialWidth = control.getBoundingClientRect().width;
+
+	await userEvent.click( wideOption );
+	await waitFor( () => expect( wideOption ).toBeChecked() );
+	// Wait for the font weight transition to finish.
+	await Promise.all(
+		wideOption.getAnimations().map( ( animation ) => animation.finished )
+	);
+
+	expect( control.getBoundingClientRect().width ).toBe( initialWidth );
 } );
