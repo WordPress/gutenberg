@@ -17,7 +17,7 @@
 
 ### Bug Fixes
 
--   `Menu`: Show a focus ring on disabled menu items when they receive keyboard focus ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   `Menu`: Show a focus ring on disabled menu items when they receive keyboard focus ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
 
 ### Documentation
 
