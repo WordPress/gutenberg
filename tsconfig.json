@@ -53,6 +53,7 @@
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
+		{ "path": "packages/patterns" },
 		{ "path": "packages/preferences" },
 		{ "path": "packages/preferences-persistence" },
 		{ "path": "packages/priority-queue" },
