@@ -1,6 +1,7 @@
 import { listItem as icon } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import type { RichTextData } from '@wordpress/rich-text';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
@@ -11,6 +12,11 @@ import { unlock } from '../lock-unlock';
 const { editableRootKey } = unlock( blocksPrivateApis );
 const { requiresWrapperOnCopy } = unlock( blockEditorPrivateApis );
 
+type DescriptionListItemAttributes = {
+	content?: string | RichTextData;
+	metadata?: { name?: string };
+};
+
 const { name } = metadata;
 
 export { metadata, name };
@@ -20,18 +26,24 @@ export const settings = {
 	[ editableRootKey ]: true,
 	edit,
 	save,
-	merge( attributes, attributesToMerge ) {
+	merge(
+		attributes: DescriptionListItemAttributes,
+		attributesToMerge: DescriptionListItemAttributes
+	) {
 		return {
 			...attributes,
-			content: attributes.content + attributesToMerge.content,
+			content: `${ attributes.content || '' }${ attributesToMerge.content || '' }`,
 		};
 	},
 	transforms,
 	[ requiresWrapperOnCopy ]: true,
-	__experimentalLabel( attributes, { context } ) {
+	__experimentalLabel(
+		attributes: DescriptionListItemAttributes,
+		{ context }: { context: string }
+	) {
 		const { content } = attributes;
 		const customName = attributes?.metadata?.name;
-		const hasContent = content?.trim().length > 0;
+		const hasContent = !! content?.toString().trim();
 
 		if ( context === 'list-view' && ( customName || hasContent ) ) {
 			return customName || content;
@@ -40,6 +52,8 @@ export const settings = {
 		if ( context === 'breadcrumb' && customName ) {
 			return customName;
 		}
+
+		return undefined;
 	},
 };
 

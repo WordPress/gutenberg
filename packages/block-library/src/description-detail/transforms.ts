@@ -5,7 +5,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/description-term' ],
-			transform: ( attributes ) =>
+			transform: ( attributes: Record< string, unknown > ) =>
 				createBlock( 'core/description-term', attributes ),
 		},
 	],
