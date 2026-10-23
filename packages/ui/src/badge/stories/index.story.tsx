@@ -38,22 +38,25 @@ export const WithInfotip: Story = {
 	args: {
 		children: 'Special requirements',
 		intent: 'informational',
-		infotip: (
-			<Popover.Popup
-				style={ {
-					maxWidth:
-						'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
-				} }
-			>
-				<VisuallyHidden render={ <Popover.Title /> }>
-					Special requirements
-				</VisuallyHidden>
-				<Popover.Description>
-					This domain requires a local address in the country where it
-					is registered.
-				</Popover.Description>
-			</Popover.Popup>
-		),
+		infotip: {
+			popover: Popover,
+			popup: (
+				<Popover.Popup
+					style={ {
+						maxWidth:
+							'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
+					} }
+				>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						Special requirements
+					</VisuallyHidden>
+					<Popover.Description>
+						This domain requires a local address in the country
+						where it is registered.
+					</Popover.Description>
+				</Popover.Popup>
+			),
+		},
 	},
 };
 
@@ -65,24 +68,27 @@ export const InfotipWithLink: Story = {
 	args: {
 		children: 'HSTS required',
 		intent: 'medium',
-		infotip: (
-			<Popover.Popup
-				style={ {
-					maxWidth:
-						'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
-				} }
-			>
-				<VisuallyHidden render={ <Popover.Title /> }>
-					HSTS required
-				</VisuallyHidden>
-				<Popover.Description>
-					This domain requires HTTPS for every connection.{ ' ' }
-					<Link href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security">
-						Learn about HSTS
-					</Link>
-				</Popover.Description>
-			</Popover.Popup>
-		),
+		infotip: {
+			popover: Popover,
+			popup: (
+				<Popover.Popup
+					style={ {
+						maxWidth:
+							'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
+					} }
+				>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						HSTS required
+					</VisuallyHidden>
+					<Popover.Description>
+						This domain requires HTTPS for every connection.{ ' ' }
+						<Link href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security">
+							Learn about HSTS
+						</Link>
+					</Popover.Description>
+				</Popover.Popup>
+			),
+		},
 	},
 };
 
@@ -94,33 +100,36 @@ export const InfotipWithButton: Story = {
 	args: {
 		children: 'Failed',
 		intent: 'high',
-		infotip: (
-			<Popover.Popup
-				style={ {
-					maxWidth:
-						'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
-				} }
-			>
-				<VisuallyHidden render={ <Popover.Title /> }>
-					Upload failed
-				</VisuallyHidden>
-				<Stack direction="column" gap="sm">
-					<Popover.Description>
-						The upload was interrupted. Check your connection and
-						try again.
-					</Popover.Description>
-					<Stack direction="row" justify="flex-end">
-						<Button
-							variant="minimal"
-							tone="brand"
-							onClick={ action( 'Retry upload' ) }
-						>
-							Retry upload
-						</Button>
+		infotip: {
+			popover: Popover,
+			popup: (
+				<Popover.Popup
+					style={ {
+						maxWidth:
+							'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
+					} }
+				>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						Upload failed
+					</VisuallyHidden>
+					<Stack direction="column" gap="sm">
+						<Popover.Description>
+							The upload was interrupted. Check your connection
+							and try again.
+						</Popover.Description>
+						<Stack direction="row" justify="flex-end">
+							<Button
+								variant="minimal"
+								tone="brand"
+								onClick={ action( 'Retry upload' ) }
+							>
+								Retry upload
+							</Button>
+						</Stack>
 					</Stack>
-				</Stack>
-			</Popover.Popup>
-		),
+				</Popover.Popup>
+			),
+		},
 	},
 };
 

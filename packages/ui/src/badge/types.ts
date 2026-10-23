@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { type ComponentProps } from '../utils/types';
 import type { PopupProps } from '../popover/types';
+import type * as Popover from '../popover';
 
 export interface BadgeProps extends ComponentProps< 'span' > {
 	/**
@@ -9,14 +10,23 @@ export interface BadgeProps extends ComponentProps< 'span' > {
 	children: string;
 
 	/**
-	 * An optional `Popover.Popup` composition explaining the badge's status.
-	 * Include a `Popover.Title`, which can be visually hidden.
+	 * An optional infotip explaining the badge's status.
 	 *
 	 * The whole badge becomes a button that opens the popup on hover or
 	 * activation. When customizing `render`, preserve a native button element.
 	 * Keep content brief and prefer at most one related link or action.
 	 */
-	infotip?: ReactElement< PopupProps >;
+	infotip?: {
+		/**
+		 * Pass the `Popover` export from `@wordpress/ui`.
+		 */
+		popover: Pick< typeof Popover, 'Root' | 'Trigger' >;
+		/**
+		 * A `Popover.Popup` composition. Include a `Popover.Title`, which can
+		 * be visually hidden.
+		 */
+		popup: ReactElement< PopupProps >;
+	};
 
 	/**
 	 * The semantic intent of the badge, communicating its meaning through color.

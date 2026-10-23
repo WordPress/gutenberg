@@ -42,7 +42,7 @@ describe( 'Badge', () => {
 				<Badge
 					ref={ ref }
 					render={ <button data-custom="badge" /> }
-					infotip={ infotip }
+					infotip={ { popover: Popover, popup: infotip } }
 					onClick={ onClick }
 				>
 					Special requirements
