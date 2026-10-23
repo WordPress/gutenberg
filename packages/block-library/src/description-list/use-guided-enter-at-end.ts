@@ -2,12 +2,29 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, type Block } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { RichTextData } from '@wordpress/rich-text';
 
 type DescriptionListChildBlockName =
 	'core/description-term' | 'core/description-detail';
 
 const DESCRIPTION_TERM = 'core/description-term';
 const DESCRIPTION_DETAIL = 'core/description-detail';
+const PARAGRAPH = 'core/paragraph';
+
+function isEmptyRichTextContent( content: unknown ) {
+	if ( content instanceof RichTextData ) {
+		return content.toPlainText().trim().length === 0;
+	}
+
+	if ( typeof content === 'string' ) {
+		return (
+			RichTextData.fromHTMLString( content ).toPlainText().trim()
+				.length === 0
+		);
+	}
+
+	return content === undefined || content === null;
+}
 
 export default function useGuidedEnterAtEnd( {
 	blockName,
@@ -20,20 +37,68 @@ export default function useGuidedEnterAtEnd( {
 
 	return useCallback( () => {
 		const {
+			canRemoveBlocks,
 			canInsertBlockType,
+			getBlockAttributes,
 			getBlockIndex,
+			getBlockName,
 			getBlockOrder,
 			getBlockRootClientId,
 		} = registry.select( blockEditorStore );
-		const { insertBlocks, selectionChange } =
+		const { insertBlocks, removeBlocks, selectionChange } =
 			registry.dispatch( blockEditorStore );
 		const rootClientId = getBlockRootClientId( clientId );
+		if ( ! rootClientId ) {
+			return;
+		}
 		const blockIndex = getBlockIndex( clientId );
 		const blockOrder = getBlockOrder( rootClientId );
 		const nextClientId = blockOrder[ blockIndex + 1 ];
 
 		if ( nextClientId ) {
 			selectionChange( nextClientId, 'content', 0, 0 );
+			return;
+		}
+
+		if (
+			blockName === DESCRIPTION_DETAIL &&
+			isEmptyRichTextContent( getBlockAttributes( clientId )?.content )
+		) {
+			const parentRootClientId = getBlockRootClientId( rootClientId );
+			if (
+				parentRootClientId === null ||
+				! canInsertBlockType( PARAGRAPH, parentRootClientId )
+			) {
+				return;
+			}
+
+			const paragraph = createBlock( PARAGRAPH );
+			const parentBlockIndex = getBlockIndex( rootClientId );
+			const previousClientId = blockOrder[ blockIndex - 1 ];
+			const removableClientIds = [ previousClientId, clientId ].filter(
+				( id ): id is string => !! id
+			);
+			const shouldRemoveEmptyPair =
+				blockOrder.length > 2 &&
+				!! previousClientId &&
+				getBlockName( previousClientId ) === DESCRIPTION_TERM &&
+				isEmptyRichTextContent(
+					getBlockAttributes( previousClientId )?.content
+				) &&
+				canRemoveBlocks( removableClientIds );
+
+			registry.batch( () => {
+				if ( shouldRemoveEmptyPair ) {
+					removeBlocks( removableClientIds, false );
+				}
+				insertBlocks(
+					[ paragraph ],
+					parentBlockIndex + 1,
+					parentRootClientId,
+					false
+				);
+				selectionChange( paragraph.clientId, 'content', 0, 0 );
+			} );
 			return;
 		}
 

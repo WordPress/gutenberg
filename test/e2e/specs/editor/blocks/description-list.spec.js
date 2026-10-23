@@ -990,10 +990,10 @@ test.describe( 'Description List', () => {
 		] );
 	} );
 
-	// Enter in an empty trailing detail keeps appending pairs instead of leaving the list.
-	test.fixme( 'should exit the list on Enter in an empty trailing detail', async ( {
+	test( 'should exit the list on Enter in an empty trailing detail', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/description-list' } );
 		await page.keyboard.type( 'API' );
@@ -1002,7 +1002,6 @@ test.describe( 'Description List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'After' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -1018,6 +1017,119 @@ test.describe( 'Description List', () => {
 							content: 'Application programming interface',
 						},
 					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{ name: 'core/description-term' },
+					{ name: 'core/description-detail' },
+					{
+						name: 'core/description-term',
+						attributes: { content: '' },
+					},
+					{
+						name: 'core/description-detail',
+						attributes: { content: '' },
+					},
+				],
+			},
+		] );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const blockEditor =
+						window.wp.data.select( 'core/block-editor' );
+					return blockEditor.getBlockName(
+						blockEditor.getSelectedBlockClientId()
+					);
+				} )
+			)
+			.toBe( 'core/description-detail' );
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/description-list', innerBlocks: [ {}, {} ] },
+				{ name: 'core/paragraph' },
+			] );
+		await page.keyboard.type( 'After' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/description-list', innerBlocks: [ {}, {} ] },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'After' },
+			},
+		] );
+	} );
+
+	test( 'should retain an empty detail after a populated trailing term when exiting', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'API' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: '<strong></strong>' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Detail' } )
+			.click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'After' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'API' },
+					},
+					{ name: 'core/description-detail' },
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'After' },
+			},
+		] );
+	} );
+
+	test( 'should retain the initial empty pair when exiting an empty list', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/description-list' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Detail' } )
+			.click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'After' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{ name: 'core/description-term' },
+					{ name: 'core/description-detail' },
 				],
 			},
 			{
