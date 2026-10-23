@@ -11,7 +11,6 @@ import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
-import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
 import './style.scss';
 
@@ -118,16 +117,20 @@ function NavigationListView( {
 	} );
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
-	const editAction = useEditNavigationAction();
-	const postTypeActions: Action< Post >[] = usePostActions( {
+	const onActionPerformed = useCallback(
+		( actionId: string, items: Post[] ) => {
+			// The "Edit" action does not open the editor by itself.
+			if ( actionId === 'edit-post' ) {
+				navigate( { to: `/navigation/edit/${ items[ 0 ].id }` } );
+			}
+		},
+		[ navigate ]
+	);
+	const actions: Action< Post >[] = usePostActions( {
 		postType: NAVIGATION_POST_TYPE,
 		context: 'list',
+		onActionPerformed,
 	} );
-
-	const actions: Action< Post >[] = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ editAction, postTypeActions ]
-	);
 
 	const selection =
 		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
