@@ -74,7 +74,7 @@ Yes! Pass it as the first argument:
 npm run other:cherry-pick "Another Label"
 ```
 
-### Can I preview the cherry-picks without changing anything?
+### Can I preview the cherry-picks before pushing?
 
 Yes! Pass `--dry-run` to list the PRs that would be cherry-picked without pushing, commenting, or removing labels:
 
