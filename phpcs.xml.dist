@@ -29,6 +29,7 @@
 
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
+	<arg name="cache" value=".cache/phpcs.json"/>
 
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
