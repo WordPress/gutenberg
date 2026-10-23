@@ -157,23 +157,39 @@ export const ControlWithError = forwardRef<
 		};
 	}, [ getValidityTarget ] );
 
-	// Handle validity messages.
+	// Handle validity messages. Consumers pass an inline `getValidityTarget`,
+	// so this runs after every render. It only sets changed values: React can
+	// still schedule a render for an unchanged one, and in React 19 a render
+	// per keystroke trips its nested update limit, dropping typed input.
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
+		const updateErrorMessage = ( message?: string ) => {
+			if ( message !== errorMessage ) {
+				setErrorMessage( message );
+			}
+		};
+		const updateStatusMessage = ( status?: typeof statusMessage ) => {
+			if (
+				status?.type !== statusMessage?.type ||
+				status?.message !== statusMessage?.message
+			) {
+				setStatusMessage( status );
+			}
+		};
 
 		if ( ! customValidity?.type ) {
 			validityTarget?.setCustomValidity( '' );
-			setErrorMessage( validityTarget?.validationMessage );
-			setStatusMessage( undefined );
+			updateErrorMessage( validityTarget?.validationMessage );
+			updateStatusMessage( undefined );
 			return;
 		}
 
 		switch ( customValidity.type ) {
 			case 'validating': {
 				validityTarget?.setCustomValidity( '' );
-				setErrorMessage( undefined );
+				updateErrorMessage( undefined );
 
-				setStatusMessage( {
+				updateStatusMessage( {
 					type: 'validating',
 					message: customValidity.message,
 				} );
@@ -181,9 +197,9 @@ export const ControlWithError = forwardRef<
 			}
 			case 'valid': {
 				validityTarget?.setCustomValidity( '' );
-				setErrorMessage( validityTarget?.validationMessage );
+				updateErrorMessage( validityTarget?.validationMessage );
 
-				setStatusMessage( {
+				updateStatusMessage( {
 					type: 'valid',
 					message: customValidity.message,
 				} );
@@ -193,13 +209,13 @@ export const ControlWithError = forwardRef<
 				validityTarget?.setCustomValidity(
 					customValidity.message ?? ''
 				);
-				setErrorMessage( validityTarget?.validationMessage );
+				updateErrorMessage( validityTarget?.validationMessage );
 
-				setStatusMessage( undefined );
+				updateStatusMessage( undefined );
 				break;
 			}
 		}
-	}, [ customValidity, getValidityTarget ] );
+	}, [ customValidity, getValidityTarget, errorMessage, statusMessage ] );
 
 	// Show messages if field has been touched (i.e. has blurred at least once),
 	// or validation has been triggered by the consumer/user.
