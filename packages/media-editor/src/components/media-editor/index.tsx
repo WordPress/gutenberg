@@ -21,6 +21,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -61,7 +62,7 @@ import MediaEditorPanel, {
 	useMediaEditorPanels,
 	type MediaEditorPanelFillProps,
 } from '../media-editor-panel';
-import { getMediaTypeFromMimeType } from '../../utils';
+import { getMediaTypeFromMimeType, type MediaType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
@@ -221,6 +222,7 @@ function MediaEditorSidebar( {
  */
 interface MediaEditorFrameContextValue {
 	isImage: boolean;
+	mediaType: MediaType[ 'type' ];
 	isSaving: boolean;
 	hasMedia: boolean;
 	hasChanges: boolean;
@@ -1000,6 +1002,7 @@ function MediaEditorContent( {
 	// as they always did, but the cluster component types stay stable.
 	const contextValue: MediaEditorFrameContextValue = {
 		isImage,
+		mediaType,
 		isSaving,
 		hasMedia: !! media,
 		hasChanges,
@@ -1109,5 +1112,82 @@ export function MediaEditor( props: MediaEditorProps ) {
 MediaEditor.HeaderActions = HeaderActions;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
+
+/**
+ * What a sidebar panel may read and do. The session has far more, the
+ * cropper controller with its state shape, gestures and image loading, and
+ * public means frozen: adding to this later costs nothing, removing from
+ * the session would need a deprecation cycle.
+ */
+export interface MediaEditorPanelContextValue {
+	/** `image`, `video`, `audio` or `application`. */
+	mediaType: MediaType[ 'type' ];
+	isImage: boolean;
+	/** `true` while a save runs. */
+	isSaving: boolean;
+	/** Whether there is anything to save. */
+	hasChanges: boolean;
+	/** The selected aspect-ratio preset's key. */
+	aspectRatioValue: string;
+	/** Free and Original, then the host's presets or the defaults. */
+	aspectRatioOptions: AspectRatioPreset[];
+	setAspectRatioValue: ( presetKey: string ) => void;
+	/** A quarter turn: `1` clockwise, `-1` anticlockwise. */
+	rotate: ( direction: 1 | -1 ) => void;
+	flipHorizontal: () => void;
+	flipVertical: () => void;
+}
+
+/**
+ * The editor as a sidebar panel sees it. A panel reads state and drives the
+ * session through this rather than through the session itself.
+ *
+ * Must be used within `MediaEditor`.
+ *
+ * @return What the panel may read and do.
+ */
+export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
+	const { mediaType, isImage, isSaving, hasChanges, aspectRatioPresets } =
+		useMediaEditorFrameContext();
+	const { cropper } = useMediaEditor();
+	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
+		useCropOptions( { aspectRatioPresets } );
+	const { snapRotate90, setFlip } = cropper;
+	const { flip } = cropper.state;
+	return useMemo(
+		() => ( {
+			mediaType,
+			isImage,
+			isSaving,
+			hasChanges,
+			aspectRatioValue,
+			aspectRatioOptions,
+			setAspectRatioValue,
+			rotate: snapRotate90,
+			flipHorizontal: () =>
+				setFlip( {
+					horizontal: ! flip.horizontal,
+					vertical: flip.vertical,
+				} ),
+			flipVertical: () =>
+				setFlip( {
+					horizontal: flip.horizontal,
+					vertical: ! flip.vertical,
+				} ),
+		} ),
+		[
+			mediaType,
+			isImage,
+			isSaving,
+			hasChanges,
+			aspectRatioValue,
+			aspectRatioOptions,
+			setAspectRatioValue,
+			snapRotate90,
+			setFlip,
+			flip,
+		]
+	);
+}
 
 export default MediaEditor;
