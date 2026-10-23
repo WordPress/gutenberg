@@ -47,6 +47,9 @@ export interface CropperController extends CropperSetters {
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
 	/**
+	 * Plumbing for `Cropper`, which calls it on every size change. Not part
+	 * of the consumer contract; a composite store provides it for `Cropper`.
+	 *
 	 * Report the current rendered image size to the controller. The
 	 * Cropper component calls this on visualSize changes; composite
 	 * controllers use it to compute aspect-ratio reshapes. The pure
@@ -54,6 +57,9 @@ export interface CropperController extends CropperSetters {
 	 */
 	setVisualSize: ( size: Size ) => void;
 	/**
+	 * Plumbing for `Cropper`, which calls it on viewport changes. Not part
+	 * of the consumer contract; a composite store provides it for `Cropper`.
+	 *
 	 * Adjust the cropRect in response to a viewport change (window
 	 * resize, canvas resize). Behaves like `setCropRect` but, in
 	 * composite controllers, does NOT record an undo entry — viewport
@@ -75,7 +81,8 @@ function areCropperImagesEqual(
 }
 
 /**
- * Pure reducer hook for the image cropper.
+ * Controller hook for the image cropper: the state, the named setters and
+ * the export helpers, without history.
  *
  * Wraps the framework-agnostic `cropperReducer` and exposes named
  * setters (built from the shared `buildCropperSetters` factory).
@@ -86,7 +93,7 @@ function areCropperImagesEqual(
  * @param initialState Optional partial state to merge with DEFAULT_STATE.
  * @return The cropper controller — state, setters, and helpers.
  */
-export function useCropperReducer(
+export function useCropperController(
 	initialState?: Partial< CropperState >
 ): CropperController {
 	const [ state, dispatch ] = useReducer(
