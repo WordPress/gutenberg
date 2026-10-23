@@ -611,7 +611,6 @@ function keepUnchangedBlocks( state: BlocksState, newState: BlocksState ) {
 	);
 	newState.order = keepMapIfSame( state.order, newState.order );
 	newState.parents = keepMapIfSame( state.parents, newState.parents );
-	newState.tree = keepMapIfSame( state.tree, newState.tree );
 	return newState;
 }
 
