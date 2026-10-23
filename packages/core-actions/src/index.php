@@ -17,9 +17,9 @@
  * Registers the actions of WordPress core on each post type exposed in the
  * REST API, from what it supports and what the current user can do:
  *
- * - `edit-post`, for pages, templates, template parts, and patterns, when the
- *   user can edit them. It opens the entity the way the screen showing it
- *   does, so it is only shown in the lists.
+ * - `edit-post`, for pages, templates, template parts, patterns, and
+ *   navigation menus, when the user can edit them. It opens the entity the
+ *   way the screen showing it does, so it is only shown in the lists.
  * - `quick-edit`, for pages, when the user can edit them. It opens the quick
  *   edit form of the pages the way the screen showing it does, so it is only
  *   shown in the lists.
@@ -55,7 +55,7 @@ function register_core_entity_actions() {
 	$is_gutenberg   = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
 	$is_block_theme = wp_is_block_theme();
 	$design_types   = array( 'wp_block', 'wp_template', 'wp_template_part' );
-	$editable_types = array_merge( array( 'page' ), $design_types );
+	$editable_types = array_merge( array( 'page', 'wp_navigation' ), $design_types );
 	$definitions    = array();
 
 	// Each file is required in its own variable scope.

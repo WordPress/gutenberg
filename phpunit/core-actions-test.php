@@ -42,8 +42,8 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * The action of the `post_type_supports` module opening an entity, for
-	 * pages, templates, template parts, and patterns, and the users who can
-	 * edit them, shown before the others.
+	 * pages, templates, template parts, patterns, and navigation menus, and
+	 * the users who can edit them, shown before the others.
 	 */
 	const EDIT_ACTION = 'edit-post';
 
@@ -321,13 +321,14 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * The edit action is only registered for pages, templates, template
-	 * parts, and patterns, and for the users who can edit them.
+	 * parts, patterns, and navigation menus, and for the users who can edit
+	 * them.
 	 */
 	public function test_the_edit_action_depends_on_the_current_user() {
 		switch_theme( 'block-theme' );
 
 		wp_set_current_user( self::$admin_id );
-		foreach ( array( 'page', 'wp_template', 'wp_template_part', 'wp_block' ) as $post_type ) {
+		foreach ( array( 'page', 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ) as $post_type ) {
 			$this->assertSame( self::EDIT_ACTION, $this->get_action_ids( $post_type )[0], "Administrators can edit the entities of $post_type." );
 		}
 		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'post' ), 'Posts do not have the action.' );
@@ -337,6 +338,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$this->assertSame( self::EDIT_ACTION, $this->get_action_ids( 'wp_block' )[0], 'Editors can edit patterns.' );
 		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'wp_template' ), 'Editors cannot edit templates.' );
 		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'wp_template_part' ), 'Editors cannot edit template parts.' );
+		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'wp_navigation' ), 'Editors cannot edit navigation menus.' );
 
 		wp_set_current_user( self::$contributor_id );
 		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'page' ), 'Contributors cannot edit pages.' );

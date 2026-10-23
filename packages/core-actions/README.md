@@ -17,7 +17,7 @@ Each action has a folder named after its id, with the data of the action in `act
 
 `src/index.php` registers the actions of each post type exposed in the REST API, on the `wp_entity_actions_api_init` action at priority 0, so a plugin hooking it at the default priority can remove or replace them:
 
--   `edit-post`, for pages, templates, template parts, and patterns, when the user can edit them. It is only shown in the lists (its `context` is `list`), and it opens the entity the way the screen showing it does: the screen sets the function opening an entity with the `setEntityNavigator` private action of the editor store, and the action does nothing on a screen that sets none.
+-   `edit-post`, for pages, templates, template parts, patterns, and navigation menus, when the user can edit them. It is only shown in the lists (its `context` is `list`), and it opens the entity the way the screen showing it does: the screen sets the function opening an entity with the `setEntityNavigator` private action of the editor store, and the action does nothing on a screen that sets none.
 -   `quick-edit`, for pages, when the user can edit them. It is only shown in the lists, and it opens the quick edit form of the pages the way the screen listing them does: the screen sets the function opening the form with the `setQuickEditOpener` private action of the editor store, and the action does nothing on a screen that sets none.
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.
