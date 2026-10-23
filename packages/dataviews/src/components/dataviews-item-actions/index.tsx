@@ -12,7 +12,7 @@ import {
 } from '@wordpress/ui';
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
-import getActionButtonLabel from '../../utils/get-action-button-label';
+import getActionLabel from '../../utils/get-action-label';
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -61,7 +61,7 @@ function ButtonTrigger< Item >( {
 	items,
 	variant,
 }: ActionTriggerProps< Item > ) {
-	const label = getActionButtonLabel( action, items );
+	const label = getActionLabel( action, items );
 	return (
 		<Button
 			disabled={ !! action.disabled }
@@ -80,8 +80,7 @@ function MenuItemTrigger< Item >( {
 	onClick,
 	items,
 }: ActionTriggerProps< Item > ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items, 'menu' );
 	return (
 		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
