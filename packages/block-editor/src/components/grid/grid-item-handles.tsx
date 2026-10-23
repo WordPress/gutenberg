@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useMemo } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getCornerToolbarStyle, getLowestCorner } from './rotation';
+import { getCornerToolbarStyle, getLowestCorner } from '../../utils/rotation';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 
 // Space between the block and the toolbar, in pixels.

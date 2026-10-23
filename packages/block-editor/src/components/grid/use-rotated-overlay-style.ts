@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
-import { getRotatedOverlayStyle } from './rotation';
+import { getRotatedOverlayStyle } from '../../utils/rotation';
 
 /** The size of an element's border box, in pixels. */
 interface ElementSize {
