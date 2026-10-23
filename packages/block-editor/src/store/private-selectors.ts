@@ -719,6 +719,19 @@ export function getLastFocus( state: State ) {
 }
 
 /**
+ * Returns the last explicit focus request for a block.
+ *
+ * @param state    Block editor state.
+ * @param clientId Block client ID.
+ * @return Selection request, if it targets this block.
+ */
+export function getBlockSelectionRequest( state: State, clientId: string ) {
+	return state.blockSelectionRequest?.clientId === clientId
+		? state.blockSelectionRequest
+		: undefined;
+}
+
+/**
  * Returns true if the user is dragging anything, or false otherwise. It is possible for a
  * user to be dragging data from outside of the editor, so this selector is separate from
  * the `isDraggingBlocks` selector which only returns true if the user is dragging blocks.

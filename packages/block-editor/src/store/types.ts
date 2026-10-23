@@ -580,6 +580,7 @@ export interface State {
 	isMultiSelecting: boolean;
 	isSelectionEnabled: boolean;
 	initialPosition: InitialPosition | undefined;
+	blockSelectionRequest: { clientId: string } | null;
 	blocksMode: Record< string, 'html' | 'visual' >;
 	blockListSettings: Map< string, BlockListSettings >;
 	insertionPoint: InsertionPoint | null;
