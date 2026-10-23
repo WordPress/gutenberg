@@ -1,24 +1,31 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { STORE_NAME } from '../../../name';
+import type { store as coreStore } from '../../../';
+import type {
+	EntitySavedStatesRecord,
+	IsDirtyState,
+	SetUnselectedEntities,
+} from '../types';
 
 /**
  * Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
  *
- * @return {Object} An object containing the following properties:
+ * @return An object containing the following properties:
  *   - dirtyEntityRecords: An array of dirty entity records.
  *   - isDirty: A boolean indicating if there are any dirty entity records.
  *   - setUnselectedEntities: A function to set the unselected entities.
  *   - unselectedEntities: An array of unselected entities.
  */
-export const useIsDirty = () => {
+export const useIsDirty = (): IsDirtyState => {
 	const { editedEntities, siteEdits, siteEntityConfig } = useSelect(
 		( select ) => {
 			const {
 				__experimentalGetDirtyEntityRecords,
 				getEntityRecordEdits,
 				getEntityConfig,
-			} = select( STORE_NAME );
+				// The store is selected by name, which carries no store types.
+			} = select( STORE_NAME as unknown as typeof coreStore );
 
 			return {
 				editedEntities: __experimentalGetDirtyEntityRecords(),
@@ -49,7 +56,8 @@ export const useIsDirty = () => {
 			siteLogoEdit !== undefined && 'site_logo',
 			siteIconEdit !== undefined && 'site_icon',
 			...Object.keys( otherSiteEdits ),
-		].filter( Boolean );
+			// `Boolean` drops the properties without an edit.
+		].filter( Boolean ) as Array< string >;
 		const editedSiteEntities = orderedSiteProperties.map(
 			( property ) => ( {
 				kind: 'root',
@@ -63,9 +71,11 @@ export const useIsDirty = () => {
 	}, [ editedEntities, siteEdits, siteEntityConfig ] );
 
 	// Unchecked entities to be ignored by save function.
-	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+	const [ unselectedEntities, _setUnselectedEntities ] = useState<
+		Array< EntitySavedStatesRecord >
+	>( [] );
 
-	const setUnselectedEntities = (
+	const setUnselectedEntities: SetUnselectedEntities = (
 		{ kind, name, key, property },
 		checked
 	) => {

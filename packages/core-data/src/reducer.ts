@@ -668,7 +668,7 @@ export function userPatternCategories(
 }
 
 export function navigationFallbackId(
-	state: ItemId | null = null,
+	state: ItemId | null | undefined = null,
 	action: Action
 ) {
 	switch ( action.type ) {
@@ -734,7 +734,7 @@ export function defaultTemplates(
  * @return Updated state.
  */
 export function registeredPostMeta(
-	state: Record< string, Record< string, unknown > > = {},
+	state: Record< string, Record< string, unknown > | undefined > = {},
 	action: Action
 ) {
 	switch ( action.type ) {

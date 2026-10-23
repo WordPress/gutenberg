@@ -203,7 +203,7 @@ if ( ! function_exists( '_wp_preload_entity_actions' ) ) {
 	 * route as it loads, see `useEntityActions()` in
 	 * packages/editor/src/dataviews/entity-actions-loader.ts. The path must match the
 	 * request of the `getEntityActionsConfig` core data resolver, see
-	 * packages/core-data/src/resolvers.js.
+	 * packages/core-data/src/resolvers.ts.
 	 *
 	 * @param array                   $paths   REST API paths to preload.
 	 * @param WP_Block_Editor_Context $context Block editor context.

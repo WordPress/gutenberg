@@ -1,9 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
+import type * as ET from '../entity-types';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
+
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock<
+	( options: { path: string; parse?: boolean } ) => unknown
+>;
 
 function createTestRegistry() {
 	const registry = createRegistry();
@@ -30,7 +37,10 @@ function createTestRegistry() {
 		__unstable_rest_base: 'posts',
 		supportsPagination: true,
 		revisionKey: 'id',
-		getRevisionsUrl: ( parentId, revisionId ) =>
+		getRevisionsUrl: (
+			parentId: string | number,
+			revisionId?: string | number
+		) =>
 			`/wp/v2/posts/${ parentId }/revisions${
 				revisionId ? '/' + revisionId : ''
 			}`,
@@ -42,7 +52,7 @@ function createTestRegistry() {
 	return registry;
 }
 
-function createTestPost( id = 1, fields = [] ) {
+function createTestPost( id = 1, fields: Array< string > = [] ) {
 	const post = {
 		id,
 		author: 1,
@@ -65,26 +75,31 @@ function createTestPost( id = 1, fields = [] ) {
 	};
 
 	if ( fields.length > 0 ) {
+		// The tests read the subset of fields as the post they come from.
 		return Object.fromEntries(
-			fields.map( ( field ) => [ field, post[ field ] ] )
-		);
+			fields.map( ( field ) => [
+				field,
+				// The tests ask for fields the post has.
+				post[ field as keyof typeof post ],
+			] )
+		) as typeof post;
 	}
 
 	return post;
 }
 
 describe( 'getEntityRecord', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createTestRegistry();
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'should not make a request if the record is already in store', async () => {
 		const { getEntityRecord } = registry.resolveSelect( coreDataStore );
 		const post = createTestPost( 1 );
-		triggerFetch.mockResolvedValue( {
+		apiFetchMock.mockResolvedValue( {
 			async json() {
 				return post;
 			},
@@ -95,7 +110,7 @@ describe( 'getEntityRecord', () => {
 			getEntityRecord( 'postType', 'post', post.id, { context: 'edit' } )
 		).resolves.toEqual( post );
 
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 
 		await expect(
 			getEntityRecord( 'postType', 'post', post.id, {
@@ -118,20 +133,21 @@ describe( 'getEntityRecords', () => {
 		createTestPost( 3 ),
 	];
 
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createTestRegistry();
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'preserves collection when getEntityRecord resolves after getEntityRecords', async () => {
-		let resolveSlowFetch;
+		// The promise executor below assigns it synchronously.
+		let resolveSlowFetch!: ( value: unknown ) => void;
 		const slowFetchPromise = new Promise( ( resolve ) => {
 			resolveSlowFetch = resolve;
 		} );
 
-		triggerFetch.mockImplementation( ( { path } ) => {
+		apiFetchMock.mockImplementation( ( { path }: { path: string } ) => {
 			// Single post fetch (e.g. /wp/v2/posts/1): return slow promise.
 			if ( /\/wp\/v2\/posts\/\d+/.test( path ) ) {
 				return slowFetchPromise;
@@ -140,7 +156,7 @@ describe( 'getEntityRecords', () => {
 			return Promise.resolve( {
 				json: () => Promise.resolve( POSTS ),
 				headers: {
-					get: ( header ) => {
+					get: ( header: string ) => {
 						if ( header === 'X-WP-Total' ) {
 							return String( POSTS.length );
 						}
@@ -179,17 +195,18 @@ describe( 'getEntityRecords', () => {
 		const allPosts = registry
 			.select( coreDataStore )
 			.getEntityRecords( 'postType', 'post', { context: 'edit' } );
-		expect( allPosts.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
+		// Resolved above.
+		expect( allPosts!.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
 	} );
 
 	it( 'preserves collection when getEntityRecord is called after getEntityRecords', async () => {
-		triggerFetch.mockImplementation( ( { path } ) => {
+		apiFetchMock.mockImplementation( ( { path }: { path: string } ) => {
 			// Collection fetch.
 			if ( ! /\/wp\/v2\/posts\/\d+/.test( path ) ) {
 				return Promise.resolve( {
 					json: () => Promise.resolve( POSTS ),
 					headers: {
-						get: ( header ) => {
+						get: ( header: string ) => {
 							if ( header === 'X-WP-Total' ) {
 								return String( POSTS.length );
 							}
@@ -223,16 +240,17 @@ describe( 'getEntityRecords', () => {
 		const allPosts = registry
 			.select( coreDataStore )
 			.getEntityRecords( 'postType', 'post', { context: 'edit' } );
-		expect( allPosts.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
+		// Resolved above.
+		expect( allPosts!.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
 	} );
 } );
 
 describe( 'clearEntityRecordEdits', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createTestRegistry();
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'should return the persisted record after clearing edits', () => {
@@ -251,7 +269,14 @@ describe( 'clearEntityRecordEdits', () => {
 		} );
 
 		expect(
-			select.getEditedEntityRecord( 'postType', 'post', post.id ).slug
+			// The edited post is loaded, with its slug.
+			(
+				select.getEditedEntityRecord(
+					'postType',
+					'post',
+					post.id
+				) as unknown as ET.Post
+			 ).slug
 		).toBe( 'updated-slug' );
 
 		dispatch.clearEntityRecordEdits( 'postType', 'post', post.id );
@@ -268,21 +293,22 @@ describe( 'getRevisions', () => {
 	const RECORD_KEY = 1;
 	const REVISIONS = [ { id: 2 }, { id: 3 }, { id: 4 } ];
 
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createTestRegistry();
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'preserves all revisions when getRevision resolves after getRevisions', async () => {
 		const revision = { id: 1 };
-		let resolveSlowFetch;
+		// The promise executor below assigns it synchronously.
+		let resolveSlowFetch!: ( value: unknown ) => void;
 		const slowFetchPromise = new Promise( ( resolve ) => {
 			resolveSlowFetch = resolve;
 		} );
 
-		triggerFetch.mockImplementation( ( { path } ) => {
+		apiFetchMock.mockImplementation( ( { path }: { path: string } ) => {
 			if ( path && path.includes( 'revisions' ) ) {
 				// Single revision fetch: return slow promise.
 				if ( /revisions\/\d+/.test( path ) ) {
@@ -320,6 +346,7 @@ describe( 'getRevisions', () => {
 		const allRevisions = registry
 			.select( coreDataStore )
 			.getRevisions( KIND, NAME, RECORD_KEY, { context: 'edit' } );
+		// @ts-expect-error Bug: `getRevisions` is typed as the revisions state, not the revisions it returns.
 		expect( allRevisions.map( ( r ) => r.id ) ).toEqual( [ 2, 3, 4 ] );
 	} );
 } );

@@ -6649,153 +6649,17 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
+	"packages/core-data/src/components/entities-saved-states/entity-record-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/core-data/src/components/entities-saved-states/entity-type-list.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/hooks/use-is-dirty.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/index.jsx": {
+	"packages/core-data/src/components/entities-saved-states/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/test/use-is-dirty.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/get-footnotes-order.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/get-rich-text-values-cached.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-entity-record.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-entity-records.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-query-select.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-resource-permissions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/private-actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/actions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/can-user.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/deprecated-entity-logging.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/entity-provider.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/core-data/src/test/entity-sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/private-actions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/private-selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/rtc-rich-text-offset-space.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/store.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

@@ -1,10 +1,11 @@
+import type { Block } from '@wordpress/blocks';
 import getRichTextValuesCached from './get-rich-text-values-cached';
 
-const cache = new WeakMap();
+const cache = new WeakMap< Block, Array< string > >();
 
-function getBlockFootnotesOrder( block ) {
+function getBlockFootnotesOrder( block: Block ): Array< string > {
 	if ( ! cache.has( block ) ) {
-		const order = [];
+		const order: Array< string > = [];
 		for ( const value of getRichTextValuesCached( block ) ) {
 			if ( ! value ) {
 				continue;
@@ -13,17 +14,21 @@ function getBlockFootnotesOrder( block ) {
 			// replacements is a sparse array, use forEach to skip empty slots.
 			value.replacements.forEach( ( { type, attributes } ) => {
 				if ( type === 'core/footnote' ) {
-					order.push( attributes[ 'data-fn' ] );
+					// A footnote format names its footnote.
+					order.push( attributes![ 'data-fn' ] );
 				}
 			} );
 		}
 		cache.set( block, order );
 	}
 
-	return cache.get( block );
+	// Set above when missing.
+	return cache.get( block )!;
 }
 
-export default function getFootnotesOrder( blocks ) {
+export default function getFootnotesOrder(
+	blocks: Array< Block >
+): Array< string > {
 	// We can only separate getting order from blocks at the root level. For
 	// deeper inner blocks, this will not work since it's possible to have both
 	// inner blocks and block attributes, so order needs to be computed from the

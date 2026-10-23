@@ -41,7 +41,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
-		"src/index.js",
+		"src/index.ts",
 		"build/index.cjs",
 		"build-module/index.mjs"
 	],
