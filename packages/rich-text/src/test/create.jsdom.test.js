@@ -216,3 +216,91 @@ describe( 'create', () => {
 		).toEqual( 'test' );
 	} );
 } );
+
+describe( 'create with style property formats', () => {
+	const bareSpan = {
+		title: 'Bare Span',
+		tagName: 'span',
+		className: null,
+		attributes: { style: 'style' },
+		edit() {},
+	};
+	const inlineColor = {
+		title: 'Inline Color',
+		tagName: 'span',
+		className: null,
+		styleProperty: 'color',
+		attributes: { style: 'style' },
+		edit() {},
+	};
+
+	function registerStyleFormats() {
+		registerFormatType( 'test/bare-span', bareSpan );
+		registerFormatType( 'test/inline-color', inlineColor );
+	}
+
+	function unregisterStyleFormats() {
+		unregisterFormatType( 'test/bare-span' );
+		unregisterFormatType( 'test/inline-color' );
+	}
+
+	it( 'should identify a format by its style property', () => {
+		registerStyleFormats();
+		const result = create( {
+			html: '<span style="color: red;">a</span>',
+		} );
+		unregisterStyleFormats();
+		expect( result ).toEqual( {
+			formats: [
+				[
+					{
+						type: 'test/inline-color',
+						tagName: 'span',
+						attributes: { style: 'color: red;' },
+					},
+				],
+			],
+			replacements: [ , ],
+			text: 'a',
+		} );
+	} );
+
+	it( 'should fall back to the bare format if no style property matches', () => {
+		registerStyleFormats();
+		const result = create( {
+			html: '<span style="font-weight: 700;">a</span>',
+		} );
+		unregisterStyleFormats();
+		expect( result ).toEqual( {
+			formats: [
+				[
+					{
+						type: 'test/bare-span',
+						tagName: 'span',
+						attributes: { style: 'font-weight: 700;' },
+					},
+				],
+			],
+			replacements: [ , ],
+			text: 'a',
+		} );
+	} );
+
+	it( 'should fall back to the bare format without a style attribute', () => {
+		registerStyleFormats();
+		const result = create( { html: '<span>a</span>' } );
+		unregisterStyleFormats();
+		expect( result ).toEqual( {
+			formats: [
+				[
+					{
+						type: 'test/bare-span',
+						tagName: 'span',
+					},
+				],
+			],
+			replacements: [ , ],
+			text: 'a',
+		} );
+	} );
+} );

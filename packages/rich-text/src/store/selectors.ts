@@ -126,6 +126,61 @@ export function getFormatTypeForBareElement(
 }
 
 /**
+ * Gets the format type, if any, that can handle a bare element, given its
+ * tag name and inline style. A format type can identify itself for a bare
+ * element by a single CSS property (its `styleProperty` setting), which
+ * allows multiple format types to share the same tag name.
+ *
+ * @param state              Data state.
+ * @param bareElementTagName The tag name of the bare element to find a
+ *                           format type for.
+ * @param style              The inline `style` attribute value of the
+ *                           element.
+ *
+ * @example
+ * ```js
+ * import { __, sprintf } from '@wordpress/i18n';
+ * import { store as richTextStore } from '@wordpress/rich-text';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { getFormatTypeForStyleProperty } = useSelect(
+ *        ( select ) => select( richTextStore ),
+ *        []
+ *    );
+ *
+ *    const format = getFormatTypeForStyleProperty(
+ *        'span',
+ *        'color: red;'
+ *    );
+ *
+ *    return format && <p>{ sprintf( __( 'Format name: %s' ), format.name ) }</p>;
+ * };
+ * ```
+ *
+ * @return Format type.
+ */
+export function getFormatTypeForStyleProperty(
+	state: State,
+	bareElementTagName: string,
+	style: string
+): FormatType | undefined {
+	const properties = style
+		.split( ';' )
+		.map( ( declaration ) =>
+			declaration.split( ':' )[ 0 ].trim().toLowerCase()
+		)
+		.filter( Boolean );
+	return getFormatTypes( state ).find(
+		( { className, styleProperty, tagName } ) =>
+			className === null &&
+			bareElementTagName === tagName &&
+			!! styleProperty &&
+			properties.includes( styleProperty.toLowerCase() )
+	);
+}
+
+/**
  * Gets the format type, if any, that can handle an element, given its classes.
  *
  * @param state            Data state.

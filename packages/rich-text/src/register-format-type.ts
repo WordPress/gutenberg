@@ -46,6 +46,15 @@ export function registerFormatType(
 	}
 
 	if (
+		typeof formatType.styleProperty !== 'undefined' &&
+		( typeof formatType.styleProperty !== 'string' ||
+			formatType.styleProperty === '' )
+	) {
+		window.console.error( 'Format style properties must be strings.' );
+		return;
+	}
+
+	if (
 		( typeof formatType.className !== 'string' ||
 			formatType.className === '' ) &&
 		formatType.className !== null
@@ -67,16 +76,22 @@ export function registerFormatType(
 	}
 
 	if ( formatType.className === null ) {
-		const formatTypeForBareElement = select(
-			richTextStore
-		).getFormatTypeForBareElement( formatType.tagName );
+		const conflictingFormatType = select( richTextStore )
+			.getFormatTypes()
+			.find(
+				( existingFormatType ) =>
+					existingFormatType.className === null &&
+					existingFormatType.tagName === formatType.tagName &&
+					existingFormatType.styleProperty ===
+						formatType.styleProperty &&
+					existingFormatType.name !== 'core/unknown'
+			);
 
-		if (
-			formatTypeForBareElement &&
-			formatTypeForBareElement.name !== 'core/unknown'
-		) {
+		if ( conflictingFormatType ) {
 			window.console.error(
-				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ formatType.tagName }".`
+				formatType.styleProperty
+					? `Format "${ conflictingFormatType.name }" is already registered to handle bare tag name "${ formatType.tagName }" with style property "${ formatType.styleProperty }".`
+					: `Format "${ conflictingFormatType.name }" is already registered to handle bare tag name "${ formatType.tagName }".`
 			);
 			return;
 		}
