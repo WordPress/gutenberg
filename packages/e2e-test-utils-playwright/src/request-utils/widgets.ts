@@ -1,12 +1,13 @@
+import type { RequestUtils } from './index';
+import type { Sidebar, Widget } from './types';
+
 /**
  * Delete all the widgets in the widgets screen.
- *
- * @this {import('./index').RequestUtils}
  */
-export async function deleteAllWidgets() {
+export async function deleteAllWidgets( this: RequestUtils ) {
 	const [ widgets, sidebars ] = await Promise.all( [
-		this.rest( { path: '/wp/v2/widgets' } ),
-		this.rest( { path: '/wp/v2/sidebars' } ),
+		this.rest< Widget[] >( { path: '/wp/v2/widgets' } ),
+		this.rest< Sidebar[] >( { path: '/wp/v2/sidebars' } ),
 	] );
 
 	await this.batchRest(
@@ -31,12 +32,16 @@ export async function deleteAllWidgets() {
 /**
  * Add a widget block to the widget area.
  *
- * @this {import('./index').RequestUtils}
- * @param {string} serializedBlock The serialized content of the inserted block HTML.
- * @param {string} widgetAreaId    The ID of the widget area.
+ * @param this            - The request utilities instance.
+ * @param serializedBlock - The serialized content of the inserted block HTML.
+ * @param widgetAreaId    - The ID of the widget area.
  */
-export async function addWidgetBlock( serializedBlock, widgetAreaId ) {
-	const { id: blockId } = await this.rest( {
+export async function addWidgetBlock(
+	this: RequestUtils,
+	serializedBlock: string,
+	widgetAreaId: string
+) {
+	const { id: blockId } = await this.rest< Widget >( {
 		method: 'POST',
 		path: '/wp/v2/widgets',
 		data: {
@@ -48,7 +53,7 @@ export async function addWidgetBlock( serializedBlock, widgetAreaId ) {
 		},
 	} );
 
-	const { widgets } = await this.rest( {
+	const { widgets } = await this.rest< Sidebar >( {
 		path: `/wp/v2/sidebars/${ widgetAreaId }`,
 	} );
 
