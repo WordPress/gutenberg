@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState } from '@wordpress/element';
-import { SelectControl, VisuallyHidden } from '@wordpress/ui';
+import { Field, Select, SelectControl, VisuallyHidden } from '@wordpress/ui';
 
 const meta: Meta< typeof SelectControl > = {
 	title: 'Components/@wordpress-components/Selection & Input/Common/CustomSelectControl/Migration examples',
@@ -142,49 +142,44 @@ export const SelectedHints: Story = {
 	},
 };
 
-export const EmptyStringChoice: Story = {
+export const SmallSize: Story = {
 	render: function Render() {
 		const items = [
-			{ value: null, label: 'Clear selection' },
-			{ value: '', label: 'Use theme font' },
-			{ value: 'serif', label: 'Serif' },
+			{ value: '10', label: '10' },
+			{ value: '20', label: '20' },
+			{ value: '50', label: '50' },
 		];
-		const [ font, setFont ] = useState< string | null >( null );
-		const [ submitted, setSubmitted ] = useState( '' );
-		const selectedItem =
-			items.find( ( item ) => item.value === font ) ?? null;
+		const [ perPage, setPerPage ] = useState< string | null >( '20' );
 
 		return (
-			<form
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					setSubmitted(
-						JSON.stringify(
-							new FormData( event.currentTarget ).get( 'font' )
-						)
-					);
-				} }
-			>
-				<SelectControl
-					label="Font preference"
-					name="font"
-					required
-					items={ items }
-					value={ selectedItem }
-					onValueChange={ ( item ) => setFont( item?.value ?? null ) }
-					itemToStringValue={ ( item ) =>
-						item.value === null ? '' : `font:${ item.value }`
-					}
-				/>
+			<>
+				<Field.Root>
+					<Field.Label>Items per page</Field.Label>
+					<Select.Root
+						items={ items }
+						value={ perPage }
+						onValueChange={ setPerPage }
+					>
+						<Select.Trigger size="small" />
+						<Select.Popup width="content">
+							{ items.map( ( item ) => (
+								<Select.Item
+									key={ item.value }
+									value={ item.value }
+									size="small"
+								>
+									<Select.ItemLabel>
+										{ item.label }
+									</Select.ItemLabel>
+								</Select.Item>
+							) ) }
+						</Select.Popup>
+					</Select.Root>
+				</Field.Root>
 				<p>
-					Stored value: <code>{ JSON.stringify( font ) }</code>
+					Stored value: <code>{ JSON.stringify( perPage ) }</code>
 				</p>
-				<button type="submit">Submit preference</button>
-				<p>
-					Submitted font:{ ' ' }
-					<code>{ submitted || 'Not submitted' }</code>
-				</p>
-			</form>
+			</>
 		);
 	},
 };
