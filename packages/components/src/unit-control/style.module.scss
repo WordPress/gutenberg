@@ -76,6 +76,14 @@
 
 	&:not(:disabled) {
 		cursor: var(--wpds-cursor-control);
+
+		&:hover {
+			background-color: $gray-100;
+		}
+	}
+
+	&:focus {
+		@include mixins.outset-ring__focus();
 	}
 
 	&:where(.is-small) {
@@ -84,11 +92,7 @@
 		border-start-start-radius: 0;
 		border-end-start-radius: 0;
 
-		&:not(:disabled):hover {
-			background-color: $gray-100;
-		}
 		&:focus {
-			@include mixins.outset-ring__focus();
 			z-index: 1;
 		}
 	}
@@ -98,12 +102,5 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-
-		&:where(:not(:disabled)):hover {
-			background-color: $gray-100;
-		}
-		&:focus {
-			@include mixins.outset-ring__focus();
-		}
 	}
 }
