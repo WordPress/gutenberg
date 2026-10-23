@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Playwright config: Add a `WP_BASE_URLS` environment variable with a comma-separated list of sites. Each test worker runs its tests on its own site, the number of workers defaults to the number of sites, and global setup logs in to every site ([#85420](https://github.com/WordPress/gutenberg/pull/85420)).
-
 ## 37.0.0 (2026-10-20)
 
 ### Breaking Changes
