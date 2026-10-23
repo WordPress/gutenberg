@@ -1,4 +1,5 @@
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -10,6 +11,62 @@ import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
+
+/**
+ * Returns the ID of the template a template renders inside, when the template
+ * inheritance experiment is on and the template names one.
+ *
+ * @param {Object} [record] The edited template record.
+ * @return {string|undefined} The parent template ID.
+ */
+function getParentTemplateId( record ) {
+	const isEnabled = globalThis.IS_GUTENBERG_PLUGIN
+		? !! window.__experimentalTemplateInheritance
+		: false;
+	if (
+		! isEnabled ||
+		! record?.parent_template ||
+		! record.theme ||
+		record.parent_template === record.slug
+	) {
+		return undefined;
+	}
+	return `${ record.theme }//${ record.parent_template }`;
+}
+
+// Guards against runaway chains of parent templates.
+const MAX_TEMPLATE_DEPTH = 10;
+
+/**
+ * Returns the IDs of a template's ancestors, closest first, stopping at a
+ * parent that has not loaded, does not exist, or would make a cycle.
+ *
+ * @param {Function} select     Registry select.
+ * @param {string}   templateId The template ID.
+ * @return {string[]} The ancestor template IDs, closest first.
+ */
+function getTemplateAncestorIds( select, templateId ) {
+	const { getEditedEntityRecord, getEntityRecord } = select( coreStore );
+	const ancestors = [];
+	const seen = new Set( [ templateId ] );
+	let currentId = templateId;
+	while ( ancestors.length < MAX_TEMPLATE_DEPTH ) {
+		const parentId = getParentTemplateId(
+			getEditedEntityRecord( 'postType', TEMPLATE_POST_TYPE, currentId )
+		);
+		if (
+			! parentId ||
+			seen.has( parentId ) ||
+			! getEntityRecord( 'postType', TEMPLATE_POST_TYPE, parentId )
+		) {
+			break;
+		}
+		ancestors.push( parentId );
+		seen.add( parentId );
+		currentId = parentId;
+	}
+	return ancestors;
+}
 
 function Editor( {
 	postType,
@@ -33,6 +90,8 @@ function Editor( {
 	const {
 		post,
 		template,
+		inheritsTemplate,
+		templateChainKey,
 		hasLoadedPost,
 		error,
 		isBlockTheme,
@@ -65,15 +124,42 @@ function Editor( {
 					} )
 				: false;
 
+			// A template that names a parent template is edited inside it,
+			// the way a page is edited inside its template, and a page whose
+			// template has a parent is edited inside the whole chain. The
+			// outermost template is the one the editor renders, and the
+			// templates between it and the post are passed down as
+			// `templateChain`. Some callers pass a template as its own
+			// template, which means it has none.
+			const isEditingTemplate =
+				postType === TEMPLATE_POST_TYPE &&
+				( ! templateId || templateId === postId );
+			const innermostId = isEditingTemplate ? postId : templateId;
+			const ancestorIds = innermostId
+				? getTemplateAncestorIds( select, innermostId )
+				: [];
+			let _templateId = templateId;
+			let chain = [];
+			if ( ancestorIds.length ) {
+				_templateId = ancestorIds[ ancestorIds.length - 1 ];
+				chain = ancestorIds.slice( 0, -1 ).reverse();
+				if ( ! isEditingTemplate ) {
+					chain.push( templateId );
+				}
+			}
+
 			return {
 				post: getEntityRecord( ...postArgs ),
-				template: templateId
+				template: _templateId
 					? getEntityRecord(
 							'postType',
 							TEMPLATE_POST_TYPE,
-							templateId
+							_templateId
 						)
 					: undefined,
+				inheritsTemplate: isEditingTemplate && !! ancestorIds.length,
+				// Joined so that the selector returns a stable value.
+				templateChainKey: chain.join( '\n' ),
 				hasLoadedPost: hasFinishedResolution(
 					'getEntityRecord',
 					postArgs
@@ -89,6 +175,11 @@ function Editor( {
 			};
 		},
 		[ postType, postId, templateId ]
+	);
+
+	const templateChain = useMemo(
+		() => ( templateChainKey ? templateChainKey.split( '\n' ) : [] ),
+		[ templateChainKey ]
 	);
 
 	return (
@@ -109,10 +200,14 @@ function Editor( {
 				<ExperimentalEditorProvider
 					post={ post }
 					__unstableTemplate={ template }
+					templateChain={ templateChain }
 					settings={ settings }
 					initialEdits={ initialEdits }
 					initialViewport={ initialViewport }
-					renderingMode={ renderingMode }
+					renderingMode={
+						renderingMode ??
+						( inheritsTemplate ? 'template-locked' : undefined )
+					}
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>

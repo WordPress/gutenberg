@@ -47,6 +47,7 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { PrivateEntityProvider } = unlock( coreDataPrivateApis );
 
 const noop = () => {};
+const EMPTY_ARRAY = [];
 
 /**
  * These are global entities that are only there to split blocks into logical units
@@ -150,6 +151,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
+ * @param {Array}   [props.templateChain]                For the template inheritance experiment: the IDs of the templates between the rendered template and the post, outermost first. Each renders inside the previous one's Content block, and the post inside the last.
  *
  * @example
  * ```jsx
@@ -176,6 +178,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
+		templateChain = EMPTY_ARRAY,
 	} ) => {
 		const hasTemplate = !! template;
 		const {
@@ -252,10 +255,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
+		const renderedTemplateChain = shouldRenderTemplate
+			? templateChain
+			: EMPTY_ARRAY;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
-			// If it is a template, try to inherit the post type from the name.
-			if ( post.type === 'wp_template' ) {
+			// A template shown inside its parent template is the parent's
+			// content, the way a page is its template's content, so the
+			// parent's Content block renders it.
+			if ( post.type === 'wp_template' && shouldRenderTemplate ) {
+				postContext.postId = post.id;
+				postContext.postType = post.type;
+			} else if ( post.type === 'wp_template' ) {
+				// If it is a template, try to inherit the post type from the name.
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
@@ -286,8 +298,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					rootLevelPost.type === 'wp_template'
 						? rootLevelPost.slug
 						: undefined,
+				...( renderedTemplateChain.length && {
+					templateChain: renderedTemplateChain,
+				} ),
 			};
 		}, [
+			renderedTemplateChain,
 			shouldRenderTemplate,
 			post.id,
 			post.type,
@@ -462,7 +478,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
 									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
+										<DisableNonPageContentBlocks
+											templateSlotDepth={
+												renderedTemplateChain.length
+											}
+										/>
 									) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />

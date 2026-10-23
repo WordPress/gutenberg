@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import {
+	BlockContextProvider,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -85,7 +86,12 @@ function EditableContentLoaded( {
 	return <TagName { ...props } />;
 }
 
-function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
+function EditableContent( {
+	context = {},
+	tagName: TagName = 'div',
+	className = 'entry-content',
+	style,
+} ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -112,7 +118,7 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 		[ postType, postId ]
 	);
 
-	const blockProps = useBlockProps( { className: 'entry-content' } );
+	const blockProps = useBlockProps( { className, style } );
 
 	if ( ! hasLoadedRecord ) {
 		return <TagName { ...blockProps } />;
@@ -129,6 +135,95 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	);
 }
 
+const noop = () => {};
+
+// A template in a Content block renders in its place on the front end, with
+// no wrapper, so the wrapper here takes up no space either.
+const TEMPLATE_SLOT_STYLE = { display: 'contents' };
+
+/**
+ * Renders a child template inside its parent template's Content block, for the
+ * template inheritance experiment. The child's blocks are edited as the
+ * template they belong to, so they get the context a template is edited with,
+ * not the context of the post the parent wraps.
+ *
+ * @param {Object} props Props passed through to `EditableContent`.
+ */
+function ChildTemplateContent( props ) {
+	const { postId } = props.context;
+	const [ slug ] = useEntityProp( 'postType', 'wp_template', 'slug', postId );
+	const childContext = useMemo(
+		() => ( {
+			postId: undefined,
+			postType: undefined,
+			queryId: undefined,
+			templateChain: undefined,
+			templateSlug: slug,
+		} ),
+		[ slug ]
+	);
+	return (
+		<BlockContextProvider value={ childContext }>
+			<EditableContent
+				{ ...props }
+				className={ undefined }
+				style={ TEMPLATE_SLOT_STYLE }
+			/>
+		</BlockContextProvider>
+	);
+}
+
+/**
+ * Renders one template of a template inheritance chain inside the Content
+ * block of the template around it. The template is shown as it is, and its
+ * own Content block renders the next template in the chain, or the post at
+ * the end of it.
+ *
+ * @param {Object} props                    Component props.
+ * @param {Object} props.context            Block context.
+ * @param {string} [props.tagName]          The HTML tag name.
+ * @param {string} [props.layoutClassNames] Layout class names.
+ */
+function TemplateLayer( {
+	context,
+	tagName: TagName = 'div',
+	layoutClassNames,
+} ) {
+	const [ templateId, ...remainingChain ] = context.templateChain;
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template', {
+		id: templateId,
+	} );
+	const [ slug ] = useEntityProp(
+		'postType',
+		'wp_template',
+		'slug',
+		templateId
+	);
+	const layerContext = useMemo(
+		() => ( {
+			templateChain: remainingChain.length ? remainingChain : undefined,
+			templateSlug: slug,
+		} ),
+		// `remainingChain` is a new array on every render.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ remainingChain.join( '\n' ), slug ]
+	);
+	const blockProps = useBlockProps( {
+		className: layoutClassNames,
+		style: TEMPLATE_SLOT_STYLE,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput: noop,
+		onChange: noop,
+	} );
+	return (
+		<BlockContextProvider value={ layerContext }>
+			<TagName { ...innerBlocksProps } />
+		</BlockContextProvider>
+	);
+}
+
 function Content( props ) {
 	const {
 		context: { queryId, postType, postId } = {},
@@ -142,6 +237,10 @@ function Content( props ) {
 
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+
+	if ( postType === 'wp_template' ) {
+		return isEditable ? <ChildTemplateContent { ...props } /> : null;
+	}
 
 	return isEditable ? (
 		<EditableContent { ...props } />
@@ -227,11 +326,47 @@ export default function PostContentEdit( {
 	__unstableLayoutClassNames: layoutClassNames,
 	__unstableParentLayout: parentLayout,
 } ) {
-	const { postId: contextPostId, postType: contextPostType } = context;
-	const hasAlreadyRendered = useHasRecursion( contextPostId );
+	const {
+		postId: contextPostId,
+		postType: contextPostType,
+		templateChain,
+	} = context;
+	// A Content block holding a template from a template inheritance chain
+	// renders that template, so it is the template that must not recurse.
+	const layerTemplateId = templateChain?.length
+		? templateChain[ 0 ]
+		: undefined;
+	const recursionId = layerTemplateId
+		? `wp_template:${ layerTemplateId }`
+		: contextPostId;
+	const hasAlreadyRendered = useHasRecursion( recursionId );
 
-	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
+	if (
+		hasAlreadyRendered &&
+		( layerTemplateId || ( contextPostId && contextPostType ) )
+	) {
 		return <RecursionError />;
+	}
+
+	let content;
+	if ( layerTemplateId ) {
+		content = (
+			<TemplateLayer
+				context={ context }
+				tagName={ tagName }
+				layoutClassNames={ layoutClassNames }
+			/>
+		);
+	} else if ( contextPostId && contextPostType ) {
+		content = (
+			<Content
+				context={ context }
+				parentLayout={ parentLayout }
+				layoutClassNames={ layoutClassNames }
+			/>
+		);
+	} else {
+		content = <Placeholder layoutClassNames={ layoutClassNames } />;
 	}
 
 	const handleSelectTagName = ( value ) => {
@@ -245,16 +380,8 @@ export default function PostContentEdit( {
 				onSelectTagName={ handleSelectTagName }
 				clientId={ clientId }
 			/>
-			<RecursionProvider uniqueId={ contextPostId }>
-				{ contextPostId && contextPostType ? (
-					<Content
-						context={ context }
-						parentLayout={ parentLayout }
-						layoutClassNames={ layoutClassNames }
-					/>
-				) : (
-					<Placeholder layoutClassNames={ layoutClassNames } />
-				) }
+			<RecursionProvider uniqueId={ recursionId }>
+				{ content }
 			</RecursionProvider>
 		</>
 	);

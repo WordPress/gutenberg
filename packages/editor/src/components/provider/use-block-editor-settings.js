@@ -185,7 +185,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
 				select( editorStore )
 			);
-			const { getBlocksByName, getBlockAttributes } =
+			const { getBlocksByName, getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
@@ -212,7 +212,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
-					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
+					return (
+						getBlocksByName( 'core/post-content' ).find(
+							( clientId ) =>
+								getBlockEditingMode( clientId ) !== 'disabled'
+						) ?? ''
+					);
 				}
 
 				return (

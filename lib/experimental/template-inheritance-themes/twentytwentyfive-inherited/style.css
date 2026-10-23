@@ -1,0 +1,10 @@
+/*
+Theme Name: Twenty Twenty-Five Inherited
+Description: A child theme of Twenty Twenty-Five for testing the Gutenberg template inheritance experiment. The Index template holds the header and footer, and every other template renders inside its Content block. It only loads while the experiment is on. Temporary, for testing only.
+Template: twentytwentyfive
+Requires at least: 6.7
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: twentytwentyfive-inherited
+*/

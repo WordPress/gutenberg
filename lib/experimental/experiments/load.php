@@ -84,6 +84,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-template-inheritance',
+					'label'       => __( 'Template inheritance', 'gutenberg' ),
+					'description' => __( 'Lets a template have a parent template, the way a page has a template. The child template renders in place of the Content block in its parent.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-extensible-site-editor',
 					'label'       => __( 'Extensible Site Editor', 'gutenberg' ),
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
