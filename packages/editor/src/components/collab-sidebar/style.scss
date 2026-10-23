@@ -370,3 +370,17 @@ mark.wp-note {
 .editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
 	border-radius: $radius-round;
 }
+
+.editor-collab-sidebar-filters {
+	padding: $grid-unit-20 $grid-unit-20 0;
+}
+
+.editor-collab-sidebar-filters__search {
+	flex: 1;
+	min-width: 0;
+}
+
+.editor-collab-sidebar-panel__no-results {
+	margin: 0;
+	padding: $grid-unit-20 $grid-unit-20 0;
+}

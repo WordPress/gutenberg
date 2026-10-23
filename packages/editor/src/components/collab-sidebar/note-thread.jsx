@@ -80,6 +80,7 @@ export function NoteThread( {
 	onDiscard,
 	onDeleteNote,
 	isSelected,
+	expandReplies = false,
 	sidebarRef,
 	floating,
 	onKeyDown,
@@ -211,6 +212,8 @@ export function NoteThread( {
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
+	// Search can match a collapsed reply, so show them all while searching.
+	const showAllReplies = isSelected || expandReplies;
 
 	const noteExcerpt = getNoteExcerpt(
 		stripHTML( note.content?.rendered ),
@@ -301,7 +304,7 @@ export function NoteThread( {
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
 			/>
-			{ isSelected &&
+			{ showAllReplies &&
 				allReplies.map( ( reply ) => (
 					<Note
 						key={ reply.id }
@@ -313,7 +316,7 @@ export function NoteThread( {
 						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
-			{ ! isSelected && restReplies.length > 0 && (
+			{ ! showAllReplies && restReplies.length > 0 && (
 				<Stack
 					direction="row"
 					align="center"
@@ -341,7 +344,7 @@ export function NoteThread( {
 					</Button>
 				</Stack>
 			) }
-			{ ! isSelected && lastReply && (
+			{ ! showAllReplies && lastReply && (
 				<Note
 					note={ lastReply }
 					parentNote={ note }

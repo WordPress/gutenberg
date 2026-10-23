@@ -1,5 +1,7 @@
-import { Fragment, useContext, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { Fragment, useContext, useEffect, useMemo } from '@wordpress/element';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
 import {
@@ -17,11 +19,21 @@ import {
 	usePickNote,
 } from './hooks';
 import { AddNote } from './add-note';
+import {
+	DEFAULT_NOTES_FILTERS,
+	filterNotes,
+	hasActiveNotesFilters,
+} from './notes-filters';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	filters = DEFAULT_NOTES_FILTERS,
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -56,7 +68,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		// entry at the selected block's position so the board can float it
 		// alongside regular threads.
 		if ( ! isFloating || selectedNote !== 'new' ) {
-			return notes;
+			return filterNotes( notes, filters, selectedNote );
 		}
 		const newNoteThread = {
 			id: 'new',
@@ -79,11 +91,28 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		return out;
 	}, [
 		notes,
+		filters,
 		isFloating,
 		selectedNote,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
+
+	const isFiltered = hasActiveNotesFilters( filters );
+	const debouncedSpeak = useDebounce( speak, 500 );
+	useEffect( () => {
+		if ( ! isFiltered ) {
+			debouncedSpeak.cancel();
+			return;
+		}
+		debouncedSpeak(
+			sprintf(
+				/* translators: %d: Number of notes found. */
+				_n( '%d note found.', '%d notes found.', threads.length ),
+				threads.length
+			)
+		);
+	}, [ isFiltered, threads.length, debouncedSpeak ] );
 
 	const handleDelete = async ( note ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === note.id );
@@ -186,76 +215,90 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const isAddingNote =
 		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 
+	const showNoResults = isFiltered && ! isAddingNote && ! threads.length;
+	const expandReplies = filters.search.trim() !== '';
+
 	return (
-		<Stack
-			className="editor-collab-sidebar-panel"
-			role="tree"
-			direction="column"
-			gap="md"
-			justify="flex-start"
-			ref={ ( node ) => {
-				// Sometimes previous sidebar unmounts after the new one mounts.
-				// This ensures we always have the latest reference.
-				if ( node ) {
-					sidebarRef.current = node;
-				}
-			} }
-			aria-label={
-				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
-			}
-		>
-			{ isAddingNote && (
-				<AddNote
-					key={ selectedBlockClientId }
-					clientId={ selectedBlockClientId }
-					onSubmit={ onAddReply }
-					onDiscard={ onDiscard }
-					sidebarRef={ sidebarRef }
-				/>
+		<>
+			{ showNoResults && (
+				<Text
+					className="editor-collab-sidebar-panel__no-results"
+					render={ <p /> }
+				>
+					{ __( 'No notes found.' ) }
+				</Text>
 			) }
-			{ threads.map( ( thread, index ) => (
-				<Fragment key={ thread.id }>
-					{ index === firstResolvedIndex && (
-						<Stack
-							direction="row"
-							align="center"
-							justify="center"
-							gap="sm"
-							className="editor-collab-sidebar-panel__status-separator"
-						>
-							<Text variant="heading-sm" render={ <p /> }>
-								{ __( 'Resolved' ) }
-							</Text>
-						</Stack>
-					) }
-					<NoteThread
-						note={ thread }
-						onAddReply={ onAddReply }
+			<Stack
+				className="editor-collab-sidebar-panel"
+				role="tree"
+				direction="column"
+				gap="md"
+				justify="flex-start"
+				ref={ ( node ) => {
+					// Sometimes previous sidebar unmounts after the new one mounts.
+					// This ensures we always have the latest reference.
+					if ( node ) {
+						sidebarRef.current = node;
+					}
+				} }
+				aria-label={
+					isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
+				}
+			>
+				{ isAddingNote && (
+					<AddNote
+						key={ selectedBlockClientId }
+						clientId={ selectedBlockClientId }
+						onSubmit={ onAddReply }
 						onDiscard={ onDiscard }
-						onDeleteNote={ handleDelete }
-						onEditNote={ onEditNote }
-						isSelected={ selectedNote === thread.id }
 						sidebarRef={ sidebarRef }
-						floating={
-							isFloating
-								? {
-										y: notePositions[ thread.id ],
-										height: heights[ thread.id ],
-										registerThread,
-										unregisterThread,
-									}
-								: undefined
-						}
-						onKeyDown={ ( event ) =>
-							navigate(
-								event,
-								thread,
-								selectedNote === thread.id
-							)
-						}
 					/>
-				</Fragment>
-			) ) }
-		</Stack>
+				) }
+				{ threads.map( ( thread, index ) => (
+					<Fragment key={ thread.id }>
+						{ index === firstResolvedIndex && (
+							<Stack
+								direction="row"
+								align="center"
+								justify="center"
+								gap="sm"
+								className="editor-collab-sidebar-panel__status-separator"
+							>
+								<Text variant="heading-sm" render={ <p /> }>
+									{ __( 'Resolved' ) }
+								</Text>
+							</Stack>
+						) }
+						<NoteThread
+							note={ thread }
+							onAddReply={ onAddReply }
+							onDiscard={ onDiscard }
+							onDeleteNote={ handleDelete }
+							onEditNote={ onEditNote }
+							isSelected={ selectedNote === thread.id }
+							expandReplies={ expandReplies }
+							sidebarRef={ sidebarRef }
+							floating={
+								isFloating
+									? {
+											y: notePositions[ thread.id ],
+											height: heights[ thread.id ],
+											registerThread,
+											unregisterThread,
+										}
+									: undefined
+							}
+							onKeyDown={ ( event ) =>
+								navigate(
+									event,
+									thread,
+									selectedNote === thread.id
+								)
+							}
+						/>
+					</Fragment>
+				) ) }
+			</Stack>
+		</>
 	);
 }

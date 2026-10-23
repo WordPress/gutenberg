@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
+
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
