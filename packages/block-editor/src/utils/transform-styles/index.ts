@@ -1,20 +1,15 @@
 /// <reference path="./postcss-urlrebase.d.ts" />
-
-/**
- * External dependencies
- */
 import * as parsel from 'parsel-js';
 import Processor from 'postcss/lib/processor';
 import CssSyntaxError from 'postcss/lib/css-syntax-error';
 import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
-
-/**
- * Internal dependencies
- */
 import type { EditorStyle, TransformOptions } from './types';
 
-const cacheByWrapperSelector = new Map();
+const cacheByWrapperSelector = new Map<
+	string,
+	WeakMap< EditorStyle, ReturnType< typeof transformStyle > >
+>();
 
 const ROOT_SELECTOR_TOKENS = [
 	{ type: 'type', content: 'body' },
@@ -144,7 +139,7 @@ function transformStyle(
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
-			].filter( Boolean ) as import('postcss').AcceptedPlugin[]
+			].filter( Boolean ) as import( 'postcss' ).AcceptedPlugin[]
 		).process( css, {} ).css; // use sync PostCSS API
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {

@@ -28,12 +28,6 @@
 	}
 }
 
-.wp-block-query__enhanced-pagination-modal {
-	@include break-small() {
-		max-width: $break-mobile;
-	}
-}
-
 .block-editor-block-settings-menu__popover {
 	&.is-expanded {
 		overflow-y: scroll;
@@ -47,7 +41,7 @@
 		@include break-small() {
 			grid-template-columns: 1fr 1fr;
 		}
-		grid-gap: $grid-unit-15;
+		gap: $grid-unit-15;
 		min-width: $break-zoomed-in;
 		@include break-small() {
 			min-width: $break-mobile;
@@ -62,4 +56,14 @@
 // @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-query > .block-editor-media-placeholder.is-small {
 	min-height: 60px;
+}
+
+.block-library-query-inspector__taxonomy-control-path {
+	margin-inline-start: var(--wpds-dimension-gap-xs);
+	font-size: var(--wpds-typography-font-size-sm);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.block-library-query-inspector__taxonomy-control-limited-count {
+	padding-block: var(--wpds-dimension-padding-xs);
 }

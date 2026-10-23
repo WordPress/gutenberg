@@ -196,7 +196,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -250,7 +250,7 @@ jobs:
                   fi
 
             - name: Upload Changelog artifact
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
@@ -258,9 +258,15 @@ jobs:
     upload:
         name: Publish as trunk (and tag)
         runs-on: 'ubuntu-24.04'
-        permissions: {}
+        permissions:
+            contents: read
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog, get-release-metadata]
+        needs:
+            [
+                compute-should-update-trunk,
+                update-changelog,
+                get-release-metadata,
+            ]
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
@@ -271,6 +277,19 @@ jobs:
             VERSION: ${{ needs.get-release-metadata.outputs.version }}
 
         steps:
+            - name: Check out release tooling
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.workflow_sha }}
+                  sparse-checkout: tools/release
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
             - name: Install Subversion
               run: |
                   sudo apt-get update -y && sudo apt-get install -y subversion
@@ -299,51 +318,26 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: changelog trunk
                   path: trunk
 
-            - name: Check if SVN tag already exists
-              id: check_svn_tag
-              run: |
-                  svn_error_file="$(mktemp)"
-                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
-                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
-                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping release commit to avoid E150002."
-                    echo "exists=true" >> "$GITHUB_OUTPUT"
-                  else
-                    svn_status=$?
-                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
-                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
-                      echo "exists=false" >> "$GITHUB_OUTPUT"
-                    else
-                      cat "$svn_error_file" >&2
-                      rm -f "$svn_error_file"
-                      exit "$svn_status"
-                    fi
-                  fi
-                  rm -f "$svn_error_file"
-
-            - name: Commit the release
-              if: steps.check_svn_tag.outputs.exists != 'true'
-              working-directory: ./trunk
-              run: |
-                  svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
-                  svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-                  svn cp . "../tags/$VERSION"
-                  svn commit . "../tags/$VERSION" \
-                   -m "Releasing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                   --config-option=servers:global:http-timeout=600
+            - name: Publish and verify the release
+              run: node tools/release/publish-to-svn.mts "$GITHUB_WORKSPACE/trunk" trunk
 
     upload-tag:
         name: Publish as tag
         runs-on: 'ubuntu-24.04'
-        permissions: {}
+        permissions:
+            contents: read
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog, get-release-metadata]
+        needs:
+            [
+                compute-should-update-trunk,
+                update-changelog,
+                get-release-metadata,
+            ]
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
@@ -354,6 +348,19 @@ jobs:
             VERSION: ${{ needs.get-release-metadata.outputs.version }}
 
         steps:
+            - name: Check out release tooling
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.workflow_sha }}
+                  sparse-checkout: tools/release
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
             - name: Install Subversion
               run: |
                   sudo apt-get update -y && sudo apt-get install -y subversion
@@ -374,36 +381,10 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: changelog trunk
                   path: ${{ needs.get-release-metadata.outputs.version }}
 
-            - name: Check if SVN tag already exists
-              id: check_svn_tag
-              run: |
-                  svn_error_file="$(mktemp)"
-                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
-                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
-                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping import to avoid E150002."
-                    echo "exists=true" >> "$GITHUB_OUTPUT"
-                  else
-                    svn_status=$?
-                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
-                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
-                      echo "exists=false" >> "$GITHUB_OUTPUT"
-                    else
-                      cat "$svn_error_file" >&2
-                      rm -f "$svn_error_file"
-                      exit "$svn_status"
-                    fi
-                  fi
-                  rm -f "$svn_error_file"
-
-            - name: Add the new version directory and commit changes to the SVN repository
-              if: steps.check_svn_tag.outputs.exists != 'true'
-              run: |
-                  svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
-                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                  --config-option=servers:global:http-timeout=300
+            - name: Publish and verify the release
+              run: node tools/release/publish-to-svn.mts "$GITHUB_WORKSPACE/$VERSION" tag

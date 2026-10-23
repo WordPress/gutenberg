@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function getDirtyEntityRecords( page ) {
@@ -12,15 +9,10 @@ async function getDirtyEntityRecords( page ) {
 	);
 }
 
-async function enableShowTemplate( page, editor ) {
-	await page.evaluate( () => {
-		window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
-	} );
-	await editor.openDocumentSettingsSidebar();
-
+async function enableShowTemplate( page ) {
 	await page
-		.getByRole( 'region', { name: 'Editor settings' } )
-		.getByRole( 'button', { name: 'Template options' } )
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'View', exact: true } )
 		.click();
 
 	const showTemplateButton = page.getByRole( 'menuitemcheckbox', {
@@ -102,7 +94,7 @@ test.describe( 'Navigation passive rendering', () => {
 		} );
 
 		await admin.editPost( post.id );
-		await enableShowTemplate( page, editor );
+		await enableShowTemplate( page );
 
 		await expect(
 			editor.canvas.getByRole( 'document', {
@@ -124,5 +116,16 @@ test.describe( 'Navigation passive rendering', () => {
 		await expect
 			.poll( () => getDirtyEntityRecords( page ) )
 			.toEqual( [ { kind: 'postType', name: 'post', key: post.id } ] );
+
+		// Clear the preference in the page session too. The preference
+		// save is debounced and outlives the page, so it can land after
+		// the teardown's reset; this makes a late flush persist the
+		// cleared state instead of re-enabling Show template for every
+		// later post editor suite under a block theme.
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core', 'renderingModes', undefined );
+		} );
 	} );
 } );

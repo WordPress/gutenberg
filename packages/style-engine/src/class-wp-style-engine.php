@@ -22,6 +22,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 */
 	final class WP_Style_Engine {
 		/**
+		 * The values `background-clip` accepts.
+		 *
+		 * @var string[]
+		 */
+		const VALID_BACKGROUND_CLIP_VALUES = array( 'border-box', 'padding-box', 'content-box', 'text' );
+
+		/**
 		 * Style definitions that contain the instructions to parse/output valid Gutenberg styles from a block's attributes.
 		 *
 		 * For every style definition, the following properties are valid:
@@ -84,6 +91,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					'classnames'    => array(
 						'has-background' => true,
 					),
+				),
+				'backgroundClip'       => array(
+					'value_func' => array( self::class, 'get_background_clip_css_declarations' ),
+					'path'       => array( 'background', 'backgroundClip' ),
 				),
 			),
 			'color'      => array(
@@ -340,7 +351,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					'property_keys' => array(
 						'default' => 'text-shadow',
 					),
+					'css_vars'      => array(
+						'text-shadow' => '--wp--preset--text-shadow--$slug',
+					),
 					'path'          => array( 'typography', 'textShadow' ),
+					'classnames'    => array(
+						'has-$slug-text-shadow' => 'text-shadow',
+					),
 				),
 				'textTransform'  => array(
 					'property_keys' => array(
@@ -382,8 +399,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Generates a CSS var string, e.g., var(--wp--preset--color--background) from a preset string such as `var:preset|space|50`.
 		 *
-		 * @param string   $style_value  A single CSS preset value.
-		 * @param string[] $css_vars     An associate array of CSS var patterns used to generate the var string.
+		 * @param string   $style_value A single CSS preset value.
+		 * @param string[] $css_vars    An associate array of CSS var patterns used to generate the var string.
 		 *
 		 * @return string The css var, or an empty string if no match for slug found.
 		 */
@@ -404,7 +421,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Checks whether an incoming block style value is valid.
 		 *
-		 * @param string? $style_value  A single css preset value.
+		 * @param string? $style_value A single css preset value.
 		 *
 		 * @return bool
 		 */
@@ -415,11 +432,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Stores a CSS rule using the provided CSS selector and CSS declarations.
 		 *
-		 * @param string   $store_name       A valid store key.
-		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+		 * @param string                                    $store_name       A valid store key.
+		 * @param string                                    $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 		 * @param string[]|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
-		 *                                                                     or a WP_Style_Engine_CSS_Declarations object.
-		 * @param string   $rules_group        Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
+		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return void.
 		 */
@@ -693,6 +710,45 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				if ( null !== $value ) {
 					$css_declarations[ $style_definition['property_keys']['default'] ] = $value;
 				}
+			}
+
+			return $css_declarations;
+		}
+
+		/**
+		 * Style value parser that returns CSS declarations for background-clip.
+		 *
+		 * When the value is 'text', this also outputs the necessary vendor-prefixed
+		 * properties to clip the background to the text.
+		 *
+		 * @param string $style_value      A single raw style value from $block_styles array.
+		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 *
+		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
+		 */
+		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
+		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
+			if ( ! in_array( $style_value, static::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
+				return array();
+			}
+
+			$css_declarations = array(
+				'background-clip' => $style_value,
+			);
+
+			if ( 'text' === $style_value ) {
+				$css_declarations['-webkit-background-clip'] = 'text';
+				$css_declarations['-webkit-text-fill-color'] = 'transparent';
+			} else {
+				/*
+				 * Only the fill colour is restored. `-webkit-background-clip`
+				 * is an alias of `background-clip` in Chromium, so resetting it
+				 * here would discard the value set above. The fill colour is
+				 * inherited, so it needs its initial value rather than `unset`,
+				 * which would take a transparent fill from an ancestor clipping
+				 * to text.
+				 */
+				$css_declarations['-webkit-text-fill-color'] = 'currentColor';
 			}
 
 			return $css_declarations;

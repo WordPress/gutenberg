@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84852](https://github.com/WordPress/gutenberg/pull/84852)).
+
+## 4.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 4.56.0 (2026-09-23)
+
+## 4.55.0 (2026-09-10)
+
+## 4.54.0 (2026-08-26)
+
+## 4.53.0 (2026-08-12)
+
+
+## 4.52.0 (2026-07-29)
+
 ## 4.51.0 (2026-07-14)
 
 ### Enhancements

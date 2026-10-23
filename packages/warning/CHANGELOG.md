@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## 4.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85085](https://github.com/WordPress/gutenberg/pull/85085)).
+
+## 3.57.0 (2026-10-07)
+
+## 3.56.0 (2026-09-23)
+
+## 3.55.0 (2026-09-10)
+
+## 3.54.0 (2026-08-26)
+
+## 3.53.0 (2026-08-12)
+
+
+## 3.52.0 (2026-07-29)
+
 ## 3.51.0 (2026-07-14)
 
 ## 3.50.0 (2026-07-01)

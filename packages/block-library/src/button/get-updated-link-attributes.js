@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { NEW_TAB_REL, NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 
 /**

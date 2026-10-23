@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+## 8.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `data-wp-html` keeps the element's server-rendered content when its value is `{ "wpServerHtml": true }`, the stand-in for an `asDangerousHTML()` value in the page's data, whether it comes from `state`, `context` or a `data-wp-each` item ([#84889](https://github.com/WordPress/gutenberg/pull/84889)).
+-   Speed up hydration by only parsing object-like directive values as JSON and reading attributes with `getAttributeNames()` ([#81699](https://github.com/WordPress/gutenberg/pull/81699)).
+
+### Bug Fixes
+
+-   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
+-   `data-wp-html` now follows its value on every update and after navigation: tokens render, pending values keep the content, anything else empties the element. Throwing getters and functions no longer break rendering. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   `data-wp-html` is ignored, with a warning, when combined with `data-wp-text`, `data-wp-each` or `data-wp-router-region` on the same element. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Interactive islands inside server-rendered `data-wp-each-child` items are no longer hydrated twice. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Functions called from directive values restore the caller's scope when they throw. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo` and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 7.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Remove the `data-wp-ignore` directive. An element carrying it is now hydrated like any other element, and a warning is shown in development mode. Remove the attribute. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   Remove support for two-hyphen unique IDs, such as `data-wp-watch--id` or `data-wp-on--click--id`. Use three hyphens instead, such as `data-wp-watch---id` or `data-wp-on--click---id`. `data-wp-watch`, `data-wp-init`, and `data-wp-run` now skip directives with a suffix, and `data-wp-on`, `data-wp-on-window`, and `data-wp-on-document` now use the whole text after `--` as the event name. Both show a warning in development mode. The deprecated `data-wp-on-async` directives are unchanged. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   Applying `!` to a function in a directive value, such as `data-wp-bind--hidden="!actions.isOpen"`, no longer calls the function: the value resolves to `undefined`, with a warning in development mode. Use derived state defined with a getter instead. Negating values and getters is unchanged. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   The `evaluate` function passed to directive callbacks now accepts only the directive entry. Additional arguments, which were only forwarded to negated functions, are no longer accepted. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+
+### New Features
+
+-   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#83092](https://github.com/WordPress/gutenberg/pull/83092))
+
+### Enhancements
+
+-   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
+
+### Bug Fixes
+
+-   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Internal
+
+-   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+## 6.56.0 (2026-09-23)
+
+## 6.55.0 (2026-09-10)
+
+## 6.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project, replacing `tsconfig.test.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 6.53.0 (2026-08-12)
+
+## 6.52.0 (2026-07-29)
+
 ## 6.51.0 (2026-07-14)
 
 ## 6.50.0 (2026-07-01)

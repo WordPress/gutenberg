@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const jsxA11yPlugin = require( 'eslint-plugin-jsx-a11y' );
 
 module.exports = [

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
@@ -30,7 +23,15 @@ const UnconnectedToolsPanel = (
 	} = useToolsPanel( props );
 
 	return (
-		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
+		<Grid
+			{ ...toolsPanelProps }
+			columns={ 2 }
+			gap={ 4 }
+			columnGap="var(--wpds-dimension-gap-lg)"
+			rowGap="var(--wpds-dimension-gap-lg)"
+			templateColumns="repeat( 2, minmax(0, 1fr) )"
+			ref={ forwardedRef }
+		>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					label={ label }

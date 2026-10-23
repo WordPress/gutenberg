@@ -1,22 +1,16 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
+import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import { Text } from '../text';
-import { CONFIG } from '../utils';
 import type { GroupLabelProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 
 export const GroupLabel = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< GroupLabelProps, 'div', false >
->( function Group( props, ref ) {
+>( function Group( { className, ...props }, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
@@ -26,7 +20,7 @@ export const GroupLabel = forwardRef<
 	}
 
 	return (
-		<Styled.GroupLabel
+		<Ariakit.MenuGroupLabel
 			ref={ ref }
 			render={
 				// @ts-expect-error The `children` prop is passed
@@ -34,11 +28,12 @@ export const GroupLabel = forwardRef<
 					upperCase
 					variant="muted"
 					size="11px"
-					weight={ CONFIG.fontWeightEmphasis }
+					weight="var(--wpds-typography-font-weight-emphasis)"
 					lineHeight="16px"
 				/>
 			}
 			{ ...props }
+			className={ clsx( styles[ 'group-label' ], className ) }
 			store={ menuContext.store }
 		/>
 	);

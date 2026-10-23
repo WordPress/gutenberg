@@ -97,7 +97,7 @@
 
 	.dataviews-view-grid__media {
 		width: 100%;
-		aspect-ratio: 1/1;
+		aspect-ratio: var(--wp-dataviews-media-aspect-ratio, 1/1);
 		background-color: var(--wpds-color-background-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-md);
 		overflow: hidden;
@@ -132,6 +132,18 @@
 			border-radius: var(--wpds-border-radius-md);
 			box-shadow: none;
 			background: var(--wpds-color-background-surface-neutral);
+		}
+	}
+
+	// Fitting the whole media inside the box letterboxes it, so the box needs
+	// a background of its own for the item to still read as a unit. Only
+	// applied to `contain`: under `cover` the media covers the box, and a grey
+	// would only show through transparent images and while previews load.
+	&.has-media-fit-contain .dataviews-view-grid__media {
+		background-color: var(--wpds-color-background-surface-neutral);
+
+		img {
+			object-fit: contain;
 		}
 	}
 
@@ -262,4 +274,17 @@
 	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
 	padding: 0 var(--wpds-dimension-padding-2xl);
 	container-type: inline-size;
+}
+.dataviews-view-grid__bulk-actions-header {
+	position: sticky;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	flex-shrink: 0;
+	margin-bottom: var(--wpds-dimension-gap-lg);
+}
+
+.dataviews-view-grid__bulk-actions-header ~ * :focus {
+	// Keep focused cards and their controls below the sticky bulk toolbar.
+	scroll-margin-top: 52px;
 }

@@ -215,16 +215,9 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__preview-title {
-		line-height: 1.1;
-
-		&:focus {
-			box-shadow: none;
-		}
-
-		&:focus-visible {
-			@include block-toolbar-button-style__focus();
-			text-decoration: none;
-		}
+		display: flex;
+		align-items: baseline;
+		line-height: var(--wpds-typography-line-height-sm);
 
 		mark {
 			font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -233,18 +226,7 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 
 		span {
-			font-weight: normal;
-		}
-
-		.components-external-link__icon {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			padding: 0;
-			margin: -1px;
-			overflow: hidden;
-			clip: rect(0, 0, 0, 0); // specifically requested to be removed visually as well.
-			border: 0;
+			font-weight: 400;
 		}
 	}
 }

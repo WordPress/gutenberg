@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import border from './border';
 import color from './color';
 import dimensions from './dimensions';

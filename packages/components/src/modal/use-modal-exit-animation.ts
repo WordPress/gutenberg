@@ -1,26 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useReducedMotion } from '@wordpress/compose';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
-import { CONFIG } from '../utils';
-
-/**
- * Milliseconds used as a fallback when racing `animationend` against a timeout.
- *
- * Sourced from `CONFIG.transitionDuration`. This value is implicitly coupled to
- * the modal frame’s CSS `animation-duration` in `style.scss`, which uses the
- * WPDS `motion-duration-md` token. If either the token, the SCSS, or
- * `CONFIG.transitionDuration` changes, keep them aligned so exit timing stays correct.
- */
-const FRAME_ANIMATION_DURATION_MS = Number.parseInt(
-	CONFIG.transitionDuration
-);
 
 const EXIT_ANIMATION_NAME = 'components-modal__disappear-animation';
 
@@ -49,9 +29,16 @@ export function useModalExitAnimation() {
 					return;
 				}
 
+				// Read the rendered duration so the fallback follows the CSS motion token.
+				const animationDuration =
+					Number.parseFloat(
+						frameEl.ownerDocument.defaultView?.getComputedStyle(
+							frameEl
+						).animationDuration || '0'
+					) * 1000;
+
 				let handleAnimationEnd:
-					| undefined
-					| ( ( e: AnimationEvent ) => void );
+					undefined | ( ( e: AnimationEvent ) => void );
 
 				const startAnimation = () =>
 					new Promise< void >( ( animationResolve ) => {
@@ -73,8 +60,8 @@ export function useModalExitAnimation() {
 							() => timeoutResolve(),
 							// Allow an extra 20% of the animation duration for the
 							// animationend event to fire, in case the animation frame is
-							// slightly delayes by some other events in the event loop.
-							FRAME_ANIMATION_DURATION_MS * 1.2
+							// slightly delayed by some other events in the event loop.
+							animationDuration * 1.2
 						);
 					} );
 

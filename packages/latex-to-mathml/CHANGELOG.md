@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85084](https://github.com/WordPress/gutenberg/pull/85084)).
+
+## 1.25.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Write `columnalign` on the cells of `aligned`, `cases` and tagged equations, so the alignment is part of the MathML, and strip the classes temml adds for its own stylesheet ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
+
+## 1.24.0 (2026-09-23)
+
+## 1.23.0 (2026-09-10)
+
+## 1.22.0 (2026-08-26)
+
+## 1.21.0 (2026-08-12)
+
+
+## 1.20.0 (2026-07-29)
+
 ## 1.19.0 (2026-07-14)
 
 ## 1.18.0 (2026-07-01)

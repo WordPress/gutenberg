@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { FormattedFont } from './types';
 
 /**
@@ -15,7 +8,7 @@ import type { FormattedFont } from './types';
  * @return new object with formatted font weight
  */
 export function formatFontWeight(
-	fontWeight: FormattedFont | string | undefined
+	fontWeight?: FormattedFont | string
 ): FormattedFont {
 	if ( ! fontWeight ) {
 		return {};

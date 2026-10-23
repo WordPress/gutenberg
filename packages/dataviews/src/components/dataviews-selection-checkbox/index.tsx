@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { CheckboxControl } from '@wordpress/components';
+import { Checkbox } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
 
@@ -41,12 +34,12 @@ export default function DataViewsSelectionCheckbox< Item >( {
 		titleField?.getValue?.( { item } ) || __( '(no title)' );
 
 	return (
-		<CheckboxControl
+		<Checkbox
 			className={ SELECTION_CHECKBOX_CLASS }
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }
-			onChange={ () => {
+			onCheckedChange={ () => {
 				if ( disabled ) {
 					return;
 				}

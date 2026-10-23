@@ -1,41 +1,72 @@
-/**
- * Internal dependencies
- */
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../types';
+import type { ColumnSteps } from '@wordpress/grid';
 
 /**
- * Container width (px) below which the dashboard uses a single column.
- * Matches `@container widget-dashboard (max-width: …)` in widgets CSS.
- */
-export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN = 600;
-
-/**
- * Container width (px) below which the dashboard drops from four columns
- * to two. Above this threshold (and below the four-column cap) the
- * grid uses {@link WIDGET_DASHBOARD_COLUMN_COUNT}.
- */
-export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS = 960;
-
-/**
- * Resolves the dashboard grid column count from the widget surface
- * container width. Uses discrete steps (4 → 2 → 1), not viewport
- * media queries.
+ * Resolves the column count a host asked for. A finite number is floored,
+ * with a floor of one and no ceiling; a map keeps its finite positive
+ * entries, keyed by container width, each count floored the same way, and
+ * an `'auto'` step only when a floor is set, since the surface skips it
+ * otherwise. Anything else, or a map left with no entries, is unset. How
+ * many columns a surface can carry is the host's decision, not the
+ * package's.
  *
- * @param containerWidth Measured inline size of the dashboard grid container.
- * @return Column count for {@link @wordpress/grid} surfaces.
+ * @param columns        Host-provided `gridSettings.columns`, if any.
+ * @param minColumnWidth Host-provided `gridSettings.minColumnWidth`, if any.
+ * @return The count, the steps, or `undefined` when the host set none.
  */
-export function resolveDashboardColumnCount( containerWidth: number ): number {
-	if ( containerWidth <= 0 ) {
-		return WIDGET_DASHBOARD_COLUMN_COUNT;
+export function resolveDashboardColumns(
+	columns?: number | ColumnSteps,
+	minColumnWidth?: number
+): number | ColumnSteps | undefined {
+	if ( typeof columns === 'number' ) {
+		return Number.isFinite( columns )
+			? Math.max( 1, Math.floor( columns ) )
+			: undefined;
 	}
 
-	if ( containerWidth < WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN ) {
-		return 1;
+	if ( typeof columns !== 'object' || columns === null ) {
+		return undefined;
 	}
 
-	if ( containerWidth < WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS ) {
-		return 2;
+	const hasFloor =
+		resolveDashboardMinColumnWidth( minColumnWidth ) !== undefined;
+	const steps: ColumnSteps = {};
+	for ( const [ width, count ] of Object.entries( columns ) ) {
+		const from = Number( width );
+		if ( ! Number.isFinite( from ) || from < 0 ) {
+			continue;
+		}
+		if ( count === 'auto' ) {
+			if ( hasFloor ) {
+				steps[ from ] = 'auto';
+			}
+			continue;
+		}
+		if ( typeof count !== 'number' || ! Number.isFinite( count ) ) {
+			continue;
+		}
+		steps[ from ] = Math.max( 1, Math.floor( count ) );
 	}
 
-	return WIDGET_DASHBOARD_COLUMN_COUNT;
+	return Object.keys( steps ).length > 0 ? steps : undefined;
+}
+
+/**
+ * Resolves the per-column floor a host asked for. A finite positive value is
+ * the floor in pixels; anything else leaves it unset.
+ *
+ * @param minColumnWidth Host-provided `gridSettings.minColumnWidth`, if any.
+ * @return The floor in pixels, or `undefined` when the host set none.
+ */
+export function resolveDashboardMinColumnWidth(
+	minColumnWidth?: number
+): number | undefined {
+	if (
+		typeof minColumnWidth !== 'number' ||
+		! Number.isFinite( minColumnWidth ) ||
+		minColumnWidth <= 0
+	) {
+		return undefined;
+	}
+
+	return minColumnWidth;
 }

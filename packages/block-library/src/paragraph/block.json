@@ -29,15 +29,21 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"splitting": true,
-		"editableRoot": true,
 		"anchor": true,
 		"className": false,
+		"background": {
+			"backgroundClip": true,
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"style": true,
 			"width": true
 		},
+		"shadow": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -45,6 +51,10 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"spacing": {
 			"margin": true,
@@ -67,6 +77,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
+			"textShadow": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

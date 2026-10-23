@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../types';
 
 export default function isValidElements< Item >(

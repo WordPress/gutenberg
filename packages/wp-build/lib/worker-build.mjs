@@ -6,13 +6,9 @@
  *
  * @package
  */
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
-import esbuild from 'esbuild';
+import { buildWithConcurrency } from './build-concurrency.mjs';
 
 /**
  * Creates an esbuild plugin that redirects module loads based on filename patterns.
@@ -59,11 +55,20 @@ function createModuleRedirectPlugin( resolveMap ) {
 					matchedKey,
 					resolveMap[ matchedKey ]
 				);
+				const resolveDir = path.dirname( args.path );
+				// A relative specifier keeps the checkout path out of the source map.
+				const specifier =
+					'./' +
+					path
+						.relative( resolveDir, targetPath )
+						.split( path.sep )
+						.join( '/' );
 				return {
 					contents: `export { default } from ${ JSON.stringify(
-						targetPath
+						specifier
 					) };`,
 					loader: 'js',
+					resolveDir,
 				};
 			} );
 		},
@@ -173,7 +178,7 @@ export async function buildWorkers(
 		// Build ESM worker for build-module (primary for browser use).
 		if ( packageJson.module ) {
 			workerBuilds.push(
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: [ workerEntryPoint ],
 					outfile: path.join(
 						buildModuleDir,
@@ -215,7 +220,7 @@ export async function buildWorkers(
 		// unused or misleading CJS artifacts.
 		if ( packageJson.main ) {
 			workerBuilds.push(
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: [ workerEntryPoint ],
 					outfile: path.join( buildDir, `${ workerOutputName }.cjs` ),
 					bundle: true,
@@ -322,7 +327,7 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 
 	if ( packageJson.module ) {
 		retranspileBuilds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: [ workerCodeSrcFile ],
 				outdir: buildModuleDir,
 				outbase: srcDir,
@@ -337,7 +342,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -345,7 +349,7 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 
 	if ( packageJson.main ) {
 		retranspileBuilds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: [ workerCodeSrcFile ],
 				outdir: buildDir,
 				outbase: srcDir,
@@ -360,7 +364,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);

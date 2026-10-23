@@ -1,7 +1,7 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+const BACKUP_NOTICE =
+	/The backup of this post in your browser from .+ is different from the version below\./;
 
 test.describe( 'Autosave', () => {
 	test.beforeEach( async ( { admin, page } ) => {
@@ -19,7 +19,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -57,7 +57,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -68,6 +68,7 @@ test.describe( 'Autosave', () => {
 		await page.keyboard.type( ' after save' );
 
 		// Trigger local autosave.
+		await page.clock.setFixedTime( new Date( '2026-10-12T15:41:00Z' ) );
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -75,9 +76,9 @@ test.describe( 'Autosave', () => {
 		await page.reload();
 
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText(
-			'The backup of this post in your browser is different from the version below.'
+			'The backup of this post in your browser from October 12, 2026 3:41 pm is different from the version below.'
 		);
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -86,15 +87,106 @@ test.describe( 'Autosave', () => {
 			},
 		] );
 
-		await page
-			.getByRole( 'button', { name: 'Restore the backup' } )
-			.click();
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await expect(
+			page.getByText(
+				'Backup in this browser from October 12, 2026 3:41 pm',
+				{ exact: true }
+			)
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator(
+				'.is-revision-modified .revision-diff-added'
+			)
+		).toHaveText( 'after save' );
+
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'before save after save' },
 			},
 		] );
+		await expect(
+			page.locator( '.notices-inline-notices__notice' )
+		).toBeHidden();
+	} );
+
+	test( 'should keep the backup when its view is closed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await page.getByRole( 'button', { name: 'Exit' } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+		await expect(
+			page.locator( '.notices-inline-notices__notice' )
+		).toContainText( BACKUP_NOTICE );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
+	} );
+
+	test( 'should show the backup in blocks that read the post', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/post-excerpt' } );
+		await editor.insertBlock( { name: 'core/post-title' } );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).editPost( {
+				title: 'Saved title',
+				excerpt: 'Saved excerpt',
+			} )
+		);
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).editPost( {
+				title: 'Backup title',
+				excerpt: 'Backup excerpt',
+			} )
+		);
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await expect(
+			editor.canvas.locator( '.wp-block-post-excerpt__excerpt' )
+		).toHaveText( 'Backup excerpt' );
+		await expect(
+			editor.canvas.locator(
+				'.wp-block-post-title:not(.editor-post-title)'
+			)
+		).toHaveText( 'Backup title' );
 	} );
 
 	test( "shouldn't contaminate other posts", async ( {
@@ -104,7 +196,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -123,14 +215,12 @@ test.describe( 'Autosave', () => {
 
 		await page.reload();
 		await expect(
-			page.locator( '.components-notice__content' )
-		).toContainText(
-			'The backup of this post in your browser is different from the version below.'
-		);
+			page.locator( '.notices-inline-notices__notice' )
+		).toContainText( BACKUP_NOTICE );
 
 		await admin.createNewPost();
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toBeHidden();
 	} );
 
@@ -140,7 +230,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -175,7 +265,7 @@ test.describe( 'Autosave', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -248,7 +338,7 @@ test.describe( 'Autosave', () => {
 			.filter( { hasText: 'Draft saved' } );
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await pageUtils.pressKeys( 'primary+s' );
@@ -269,7 +359,7 @@ test.describe( 'Autosave', () => {
 		await pageUtils.pressKeys( 'primary+s' );
 
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText(
 			'Updating failed because you were offline. Please verify your connection and try again.'
 		);
@@ -284,7 +374,7 @@ test.describe( 'Autosave', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await editor.publishPost();
@@ -330,7 +420,7 @@ test.describe( 'Autosave', () => {
 
 		// Only remote autosave notice should be applied.
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText(
 			'There is an autosave of this post that is more recent than the version below.'
 		);
@@ -341,7 +431,7 @@ test.describe( 'Autosave', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'before save' );
 		await editor.publishPost();
@@ -378,7 +468,7 @@ test.describe( 'Autosave', () => {
 		await page.waitForFunction( () => window?.wp?.data );
 
 		const autosaveNotice = page
-			.locator( '.components-notice__content' )
+			.locator( '.notices-inline-notices__notice' )
 			.filter( {
 				hasText:
 					'There is an autosave of this post that is more recent than the version below.',

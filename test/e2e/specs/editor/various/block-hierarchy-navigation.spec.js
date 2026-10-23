@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const COLUMNS_BLOCK = [
@@ -45,7 +42,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( { name: 'core/columns' } );
 		await editor.canvas
-			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.locator( 'role=button[name="Three columns; equal split"i]' )
 			.click();
 
 		// Open the block inserter.
@@ -72,10 +69,6 @@ test.describe( 'Navigating the block hierarchy', () => {
 			.getByRole( 'gridcell', { name: 'Columns', exact: true } )
 			.click();
 
-		// Tweak the columns count.
-		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '3' );
-
-		// Wait for the new column block to appear in the list view
 		const column = listView.getByRole( 'gridcell', {
 			name: 'Column',
 			exact: true,
@@ -106,7 +99,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( { name: 'core/columns' } );
 		await editor.canvas
-			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.locator( 'role=button[name="Three columns; equal split"i]' )
 			.click();
 
 		// Open the block inserter.
@@ -141,13 +134,14 @@ test.describe( 'Navigating the block hierarchy', () => {
 		// Move focus to the sidebar area.
 		await pageUtils.pressKeys( 'ctrl+`' );
 
-		// Navigate to the block settings sidebar and tweak the column count.
-		const slider = page.getByRole( 'slider', { name: 'Columns' } );
-		// Ensure the block is selected and slider control is visible in the inspector.
-		await expect( slider ).toBeVisible();
+		// Navigate to the block settings sidebar.
+		const stackOnMobile = page.getByRole( 'checkbox', {
+			name: 'Stack on mobile',
+		} );
+		// Ensure the block is selected and its settings are visible in the inspector.
+		await expect( stackOnMobile ).toBeVisible();
 		await pageUtils.pressKeys( 'Tab', { times: 5 } );
-		await expect( slider ).toBeFocused();
-		await page.keyboard.press( 'ArrowRight' );
+		await expect( stackOnMobile ).toBeFocused();
 
 		// Navigate to the third column in the columns block via List View.
 		await pageUtils.pressKeys( 'ctrlShift+`', { times: 2 } );
@@ -172,7 +166,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'You say goodbye' );
 		await page.keyboard.press( 'Enter' );

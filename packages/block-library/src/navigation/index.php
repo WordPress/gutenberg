@@ -279,8 +279,14 @@ class WP_Navigation_Block_Renderer {
 
 		foreach ( $inner_blocks as $inner_block ) {
 			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
-			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
-			$is_list_item       = $p->next_tag( 'LI' );
+			// Skip hidden blocks (e.g. hidden via block visibility) that render
+			// as an empty string. Without this check, empty markup is mistaken
+			// for a non-list-item and incorrectly closes the open <ul>.
+			if ( '' === $inner_block_markup ) {
+				continue;
+			}
+			$p            = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -411,7 +417,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 6.5.0
 	 *
 	 * @param string $overlay_template_part_id The overlay template part ID in format "theme//slug".
-	 * @param array  $attributes                The block attributes.
+	 * @param array  $attributes               The block attributes.
 	 * @return WP_Block_List Returns the inner blocks for the overlay template part.
 	 */
 	private static function get_overlay_blocks_from_template_part( $overlay_template_part_id, $attributes ) {
@@ -512,7 +518,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 6.5.0
 	 *
 	 * @param array    $attributes The block attributes.
-	 * @param WP_Block $block The parsed block.
+	 * @param WP_Block $block      The parsed block.
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
 	private static function get_inner_blocks( $attributes, $block ) {
@@ -683,9 +689,14 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.0.0
 	 *
 	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
-	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay   Whether a custom overlay is used.
+	 * @param array $colors               The colors array.
 	 * @return array Returns the responsive container classes.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_css_classes: list<string>,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
 		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
@@ -710,8 +721,14 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors             The colors array.
 	 * @return string Returns the overlay inline styles.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_inline_styles: string,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
 		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
@@ -723,8 +740,8 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array         $attributes The block attributes.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param array         $attributes        The block attributes.
+	 * @param WP_Block_List $inner_blocks      The list of inner blocks.
 	 * @param string        $inner_blocks_html The markup for the inner blocks.
 	 * @return string Returns the container markup.
 	 */
@@ -815,6 +832,14 @@ class WP_Navigation_Block_Renderer {
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
 			';
+
+			// The default overlay displays every submenu it contains; a custom overlay
+			// opts out through the `disable-default-overlay` class on this container.
+			// Submenus inherit this flag to tell the two apart, derived from the same
+			// value as that class so the markup and the styles cannot disagree.
+			if ( $has_custom_overlay ) {
+				$responsive_container_directives .= ' ' . wp_interactivity_data_wp_context( array( 'hasCustomOverlay' => true ) );
+			}
 		}
 
 		// Don't apply overlay inline styles if using a custom overlay template part.
@@ -875,8 +900,8 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array         $attributes    The block attributes.
-	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
+	 * @param array         $attributes   The block attributes.
+	 * @param WP_Block_List $inner_blocks A list of inner blocks.
 	 * @return string Returns the navigation block markup.
 	 */
 	private static function get_nav_attributes( $attributes, $inner_blocks ) {
@@ -962,7 +987,7 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array         $attributes The block attributes.
+	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return string Returns the navigation wrapper markup.
 	 */
@@ -1030,6 +1055,10 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
+
+		// Submenu detection is memoized while a navigation block renders. Reset it so
+		// the result of a previously rendered navigation block is not reused for this one.
+		static::$has_submenus = false;
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
@@ -1610,6 +1639,10 @@ add_action( 'init', 'register_block_core_navigation' );
  * change those classes, so equivalent custom properties and a scoping class
  * are generated for each configured viewport layout.
  *
+ * The inner lists are built with `get_block_wrapper_attributes()`, so they also
+ * receive the generated `wp-custom-css-*` class. Remove it from those lists so
+ * custom CSS only targets the wrapper.
+ *
  * Currently this is required as a workaround because of how difficult it is for nav
  * child blocks to inherit styles through the complex responsive nav block html. The
  * bug in https://github.com/WordPress/gutenberg/issues/62690 also prevents inheritance.
@@ -1627,13 +1660,6 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 
 	$attributes = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
 	$style      = is_array( $attributes['style'] ?? null ) ? $attributes['style'] : array();
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style = gutenberg_resolve_style_state_aliases( $style, 'core/navigation' );
-	}
 
 	$global_settings          = wp_get_global_settings();
 	$viewport_settings        = $global_settings['viewport'] ?? null;
@@ -1672,6 +1698,14 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		$state_class = $matches[0];
 	}
 
+	$custom_css_class = null;
+	foreach ( $processor->class_list() as $class_name ) {
+		if ( str_starts_with( $class_name, 'wp-custom-css-' ) ) {
+			$custom_css_class = $class_name;
+			break;
+		}
+	}
+
 	$layout_class = null;
 	if ( ! empty( $styles ) ) {
 		$layout_class = wp_unique_id( 'wp-block-navigation-' );
@@ -1690,7 +1724,7 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		);
 	}
 
-	if ( null === $state_class && null === $layout_class ) {
+	if ( null === $state_class && null === $layout_class && null === $custom_css_class ) {
 		return $block_content;
 	}
 
@@ -1703,6 +1737,10 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 
 		if ( ! $processor->has_class( 'wp-block-navigation__container' ) ) {
 			continue;
+		}
+
+		if ( null !== $custom_css_class ) {
+			$processor->remove_class( $custom_css_class );
 		}
 
 		if ( null !== $layout_class ) {
@@ -1769,12 +1807,12 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
  *
- * @param array $menu_items               An array of menu items that represent
- *                                        an individual level of a menu.
- * @param array $menu_items_by_parent_id  An array keyed by the id of the
- *                                        parent menu where each element is an
- *                                        array of menu items that belong to
- *                                        that parent.
+ * @param array $menu_items              An array of menu items that represent
+ *                                       an individual level of a menu.
+ * @param array $menu_items_by_parent_id An array keyed by the id of the
+ *                                       parent menu where each element is an
+ *                                       array of menu items that belong to
+ *                                       that parent.
  * @return array An array of parsed block data.
  */
 function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
@@ -1874,7 +1912,7 @@ function block_core_navigation_get_classic_menu_fallback() {
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback_blocks() instead.
  *
- * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
+ * @param object $classic_nav_menu WP_Term The classic navigation object to convert.
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {

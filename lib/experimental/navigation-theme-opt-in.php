@@ -177,7 +177,7 @@ add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 )
  * Transformation depends on the menu item type. Link menu items are turned into
  * a `core/navigation-link` block. Block menu items are simply parsed.
  *
- * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
+ * @param array $menu_items              The menu items to convert, sorted by each menu item's menu order.
  * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
  *
  * @return array Updated menu items, sorted by each menu item's menu order.

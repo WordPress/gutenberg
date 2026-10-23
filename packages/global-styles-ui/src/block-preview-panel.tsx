@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-// @ts-expect-error: Not typed yet.
 import { BlockPreview } from '@wordpress/block-editor';
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
@@ -10,10 +6,6 @@ import {
 	privateApis as globalStylesEnginePrivateApis,
 	__unstableGeneratePreviewStateStyles as generatePreviewStateStyles,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { getVariationClassName } from './utils';
 import { unlock } from './lock-unlock';
 

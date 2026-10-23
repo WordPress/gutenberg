@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const createNavigationOverlay = async ( {
@@ -88,6 +85,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 
 			await page
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
@@ -108,6 +106,33 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await pageUtils.pressKeys( 'Escape' );
 			await expect( overlayMenuItem ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
+		} );
+
+		test( 'As a user I want a navigation block inserted into an overlay to keep the flex layout so block spacing applies', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await createNavigationOverlay( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes.layout
+					)
+				)
+				.toMatchObject( { type: 'flex', orientation: 'vertical' } );
 		} );
 	} );
 
@@ -144,6 +169,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
@@ -184,6 +210,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
@@ -235,6 +262,7 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
 				.click();
 
 			await editor.saveSiteEditorEntities();
