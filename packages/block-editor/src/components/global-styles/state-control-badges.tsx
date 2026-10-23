@@ -1,7 +1,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Infotip pattern; Popover is not allowlisted yet (same as widget-header-infotip).
-import { Badge, Icon, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
+import {
+	Badge,
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Infotip pattern; Popover is not allowlisted yet (same as widget-header-infotip).
+	Popover,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import type { StateControlBadgesProps, StyleStateOption } from './types';
 
 function getSummaryDescription(
