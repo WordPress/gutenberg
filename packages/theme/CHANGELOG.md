@@ -7,6 +7,10 @@
 -   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 
+### Enhancements
+
+-   Enforce the 3:1 focus-ring contrast target against neutral and brand surfaces after seed adjustment while preserving fill and foreground colors ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes
