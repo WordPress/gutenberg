@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `UnitControl`: Use a neutral text color for static unit labels.
+
 ## 43.0.0 (2026-10-20)
 
 ### Breaking Changes
