@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes

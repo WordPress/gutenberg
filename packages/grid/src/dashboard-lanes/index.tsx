@@ -26,6 +26,7 @@ import {
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
+import { resolveColumnCount } from '../shared/column-policy';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -177,17 +178,16 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				setGapPx( parsed );
 			}
 		}, [ container ] );
-		const effectiveColumns = useMemo( () => {
-			if ( ! minColumnWidth ) {
-				return columns ?? DEFAULT_COLUMNS;
-			}
-			const totalWidthPerColumn = minColumnWidth + gapPx;
-			const maxFit = Math.max(
-				1,
-				Math.floor( ( containerWidth + gapPx ) / totalWidthPerColumn )
-			);
-			return columns !== undefined ? Math.min( columns, maxFit ) : maxFit;
-		}, [ minColumnWidth, gapPx, containerWidth, columns ] );
+		const effectiveColumns = useMemo(
+			() =>
+				resolveColumnCount(
+					{ columns, minColumnWidth },
+					containerWidth,
+					gapPx,
+					DEFAULT_COLUMNS
+				),
+			[ minColumnWidth, gapPx, containerWidth, columns ]
+		);
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;

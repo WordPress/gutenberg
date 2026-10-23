@@ -114,6 +114,13 @@
 		"filePath": "library/aspect-ratio.svg"
 	},
 	{
+		"slug": "asterisk",
+		"label": "Asterisk",
+		"filePath": "library/asterisk.svg",
+		"collections": [ "core", "core-admin" ],
+		"keywords": [ "generic", "wildcard", "placeholder" ]
+	},
+	{
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
 		"filePath": "library/at-symbol.svg",
@@ -503,6 +510,11 @@
 		"collections": [ "core-admin" ]
 	},
 	{
+		"slug": "database",
+		"label": "Database",
+		"filePath": "library/database.svg"
+	},
+	{
 		"slug": "desktop",
 		"label": "Desktop",
 		"filePath": "library/desktop.svg",
@@ -587,6 +599,16 @@
 		"slug": "footer",
 		"label": "Footer",
 		"filePath": "library/footer.svg"
+	},
+	{
+		"slug": "form-input",
+		"label": "Form Input",
+		"filePath": "library/form-input.svg"
+	},
+	{
+		"slug": "form-select",
+		"label": "Form Select",
+		"filePath": "library/form-select.svg"
 	},
 	{
 		"slug": "format-bold",
