@@ -38,14 +38,12 @@ function CopyErrorButton( { error }: { error: Error } ) {
 		() => error.stack ?? String( error ),
 		() => {
 			setCopiedTick( ( tick ) => tick + 1 );
-			// The label stays "Copy error". The check is the visual
-			// confirmation, and this announcement is the accessible one.
 			speak( __( 'Copied to clipboard' ) );
 		}
 	);
 
 	return (
-		<Button ref={ ref } variant="outline" tone="neutral">
+		<Button ref={ ref } variant="outline" tone="brand">
 			<Button.Icon icon={ hasCopied ? check : copy } />
 			{ __( 'Copy error' ) }
 		</Button>
