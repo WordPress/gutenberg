@@ -477,8 +477,9 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	/*
 	 * Manual grids stack their children on mobile, as part of the grid interactivity
 	 * experiment, with a rule on the grid that reads each child's row span from this custom
-	 * property so that tall blocks stay tall. It is always set, so that a child doesn't
-	 * inherit the row span of a grid it is nested in.
+	 * property. Stacked rows are as tall as their content, so it doesn't make blocks taller:
+	 * it numbers the stacked rows the way the editor's tools do. It is always set, so that a
+	 * child doesn't inherit the row span of a grid it is nested in.
 	 */
 	if (
 		null === $viewport_overrides &&
@@ -1570,10 +1571,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		/*
 		 * Manual placement grids stack their children on mobile, as part of the grid
 		 * interactivity experiment, when they opt in with `stackOnMobile: true`: each
-		 * child becomes full width, in block order, and unrotated, and keeps the row span
-		 * it publishes as `--wp--grid-item--row-span`. The selector is repeated so that
-		 * the rules beat the grid's and each child's own rules, such as rotation, whatever
-		 * order the stylesheets end up in.
+		 * child becomes full width, in block order, and unrotated, and spans the rows it
+		 * publishes as `--wp--grid-item--row-span`. Stacked rows are as tall as their content,
+		 * so the span doesn't make blocks taller; it keeps the rows numbered like the editor's
+		 * stacked layouts. The selector is repeated so that the rules beat the grid's and each
+		 * child's own rules, such as rotation, whatever order the stylesheets end up in.
 		 */
 		$mobile_media_query = $responsive_media_queries['@mobile'] ?? null;
 		$mobile_layout      = array_replace(

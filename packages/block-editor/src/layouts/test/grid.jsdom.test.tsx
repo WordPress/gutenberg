@@ -447,6 +447,57 @@ describe( 'GridLayoutInspectorControls', () => {
 			expect( toggle ).toBeChecked();
 		} );
 
+		it( 'removes the mobile placements of the blocks when stacking is turned on', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const layout = { type: 'grid', isManualPlacement: true };
+			act( () => {
+				dispatch( blockEditorStore ).resetBlocks( [
+					{
+						clientId: PANEL_ID,
+						name: 'core/group',
+						isValid: true,
+						attributes: { layout },
+						innerBlocks: [
+							{
+								clientId: 'placed-on-mobile',
+								name: 'core/paragraph',
+								isValid: true,
+								attributes: {
+									style: {
+										layout: { columnStart: 2, rowStart: 1 },
+										'@mobile': {
+											layout: {
+												columnStart: 1,
+												columnSpan: 3,
+												rowStart: 2,
+												rowSpan: 1,
+											},
+										},
+									},
+								},
+								innerBlocks: [],
+							},
+						],
+					},
+				] );
+			} );
+			renderInspectorControls( { layout, onChange } );
+
+			await user.click(
+				screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( {
+				...layout,
+				stackOnMobile: true,
+			} );
+			expect(
+				unlock( select( blockEditorStore ) ).getBlockAttributes(
+					'placed-on-mobile'
+				).style
+			).toEqual( { layout: { columnStart: 2, rowStart: 1 } } );
+		} );
+
 		it( 'offers stacking on mobile in the mobile state but not in the tablet state', async () => {
 			const { setStyleStateViewport } = unlock(
 				dispatch( blockEditorStore )
@@ -645,7 +696,7 @@ describe( 'GridLayoutInspectorControls', () => {
 	} );
 } );
 
-describe( 'getMobileStackingStyle', () => {
+describe( 'getLayoutStyle in the mobile viewport', () => {
 	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
 		originalExperiment = window.__experimentalEnableGridInteractivity;
@@ -655,15 +706,28 @@ describe( 'getMobileStackingStyle', () => {
 		window.__experimentalEnableGridInteractivity = originalExperiment;
 	} );
 
+	const getMobileStyle = (
+		layout: Record< string, unknown >,
+		{
+			selector = '.my-container',
+			viewportOverrides = {},
+			viewport = '@mobile',
+		} = {}
+	) =>
+		grid.getLayoutStyle( {
+			blockName: 'core/group',
+			selector,
+			layout,
+			viewportOverrides,
+			viewport,
+		} );
+
 	it( 'stacks the children of manual placement grids, unrotated and keeping their row spans', () => {
 		expect(
-			grid.getMobileStackingStyle( {
-				selector: '.my-container',
-				layout: {
-					isManualPlacement: true,
-					columnCount: 3,
-					stackOnMobile: true,
-				},
+			getMobileStyle( {
+				isManualPlacement: true,
+				columnCount: 3,
+				stackOnMobile: true,
 			} )
 		).toBe(
 			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
@@ -673,41 +737,51 @@ describe( 'getMobileStackingStyle', () => {
 
 	it( 'repeats each selector of a selector list', () => {
 		expect(
-			grid.getMobileStackingStyle( {
-				selector: '.a,.b',
-				layout: { isManualPlacement: true, stackOnMobile: true },
-			} )
+			getMobileStyle(
+				{ isManualPlacement: true, stackOnMobile: true },
+				{ selector: '.a,.b' }
+			)
 		).toContain( '.a.a > *,.b.b > * {' );
 	} );
 
+	it( 'reads stacking from the mobile layout', () => {
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true, stackOnMobile: true },
+				{ viewportOverrides: { stackOnMobile: false } }
+			)
+		).toBe( '' );
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true },
+				{ viewportOverrides: { stackOnMobile: true } }
+			)
+		).toContain( 'grid-column: 1 / -1' );
+	} );
+
+	it( 'only stacks in the mobile viewport', () => {
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true, stackOnMobile: true },
+				{ viewport: '@tablet' }
+			)
+		).toBe( '' );
+	} );
+
 	it( 'does not stack grids that have not opted in, or auto placement grids', () => {
+		expect( getMobileStyle( { isManualPlacement: true } ) ).toBe( '' );
 		expect(
-			grid.getMobileStackingStyle( {
-				selector: '.my-container',
-				layout: { isManualPlacement: true },
-			} )
+			getMobileStyle( { isManualPlacement: true, stackOnMobile: false } )
 		).toBe( '' );
 		expect(
-			grid.getMobileStackingStyle( {
-				selector: '.my-container',
-				layout: { isManualPlacement: true, stackOnMobile: false },
-			} )
-		).toBe( '' );
-		expect(
-			grid.getMobileStackingStyle( {
-				selector: '.my-container',
-				layout: { columnCount: 3 },
-			} )
+			getMobileStyle( { columnCount: 3, stackOnMobile: true } )
 		).toBe( '' );
 	} );
 
 	it( 'does not stack without the grid interactivity experiment', () => {
 		window.__experimentalEnableGridInteractivity = false;
 		expect(
-			grid.getMobileStackingStyle( {
-				selector: '.my-container',
-				layout: { isManualPlacement: true, stackOnMobile: true },
-			} )
+			getMobileStyle( { isManualPlacement: true, stackOnMobile: true } )
 		).toBe( '' );
 	} );
 } );

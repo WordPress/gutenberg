@@ -1,8 +1,11 @@
 import { useCallback } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
+import { getRotateForState, getUpdatedRotateStyle } from '../../hooks/rotate';
 import { getGridGrowthUpdate } from './get-grid-row-updates';
 import {
 	getUnstackedMobileUpdates,
@@ -14,7 +17,9 @@ import type {
 	GridChild,
 	GridStyleLayout,
 } from './mobile-stacking';
-import type { BlockStyleState } from '../../hooks/types';
+import type { BlockStyle, BlockStyleState } from '../../hooks/types';
+
+const MOBILE_STATE: BlockStyleState = { viewport: '@mobile' };
 
 /**
  * A function that gets a grid item's style, the selected state and the grid's
@@ -33,13 +38,33 @@ export type GridChildStyleChange = (
 export type GridChildChange = GridStyleLayout | GridChildStyleChange;
 
 /**
+ * Returns whether an edit in the selected style state turns stacking off for
+ * the grid: any edit to a grid item on mobile while its grid is stacked does.
+ *
+ * @param selectedState  Selected block style state.
+ * @param gridAttributes The grid's attributes.
+ *
+ * @return Whether the edit turns stacking off.
+ */
+function isUnstackingEdit(
+	selectedState: BlockStyleState,
+	gridAttributes: GridBlockAttributes | null | undefined
+): boolean {
+	return (
+		selectedState?.viewport === '@mobile' &&
+		isGridStackedOnMobile( gridAttributes?.layout, gridAttributes?.style )
+	);
+}
+
+/**
  * Gets the block updates for a change to a grid item in the selected style
  * state.
  *
  * Editing a grid item on mobile while its grid is stacked first gives the grid
  * its own mobile layout, matching the stack, so that the edit has an effect
- * and nothing else moves. A manual grid also grows in the selected state when
- * the item ends up past its last row.
+ * and nothing else moves. Blocks rotated on mobile get a mobile rotation of 0,
+ * as the stack shows them unrotated. A manual grid also grows in the selected
+ * state when the item ends up past its last row.
  *
  * @param options
  * @param options.clientId       Client ID of the grid item.
@@ -70,15 +95,30 @@ export function getGridChildUpdates( {
 	children: GridChild[];
 } ): Record< string, GridBlockAttributes > {
 	let updates: Record< string, GridBlockAttributes > = {};
-	if (
-		selectedState?.viewport === '@mobile' &&
-		isGridStackedOnMobile( gridAttributes?.layout, gridAttributes?.style )
-	) {
+	if ( isUnstackingEdit( selectedState, gridAttributes ) ) {
 		updates = getUnstackedMobileUpdates( {
 			gridClientId,
 			gridAttributes,
 			children,
 		} );
+		// Stacked blocks are shown unrotated, so a block rotated on mobile
+		// gets a mobile rotation of 0, and nothing moves.
+		for ( const { clientId: childClientId, attributes } of children ) {
+			const childUpdate = updates[ childClientId ];
+			if (
+				childUpdate &&
+				getRotateForState(
+					attributes?.style as BlockStyle | undefined,
+					MOBILE_STATE
+				)
+			) {
+				childUpdate.style = getUpdatedRotateStyle(
+					childUpdate.style as BlockStyle,
+					0,
+					MOBILE_STATE
+				) as GridBlockStyle;
+			}
+		}
 	}
 	// The grid as it is after any unstacking.
 	const updatedGridAttributes: GridBlockAttributes = {
@@ -127,7 +167,9 @@ export function getGridChildUpdates( {
 /**
  * Returns a function that changes the placement or size of a grid item in
  * the selected style state, through `getGridChildUpdates`. The whole change is
- * one block update, so it is one undo step.
+ * one block update, so it is one undo step. When the change turns stacking
+ * off for the grid, a snackbar says so, since the grid's other blocks keep
+ * their place but are no longer stacked.
  *
  * @return Updates a grid item. `gridClientId` defaults to the item's parent, and is needed for a block being dropped into the grid from elsewhere.
  */
@@ -138,6 +180,7 @@ export function useUpdateGridChildLayout(): (
 ) => void {
 	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
 
 	return useCallback(
 		(
@@ -154,13 +197,15 @@ export function useUpdateGridChildLayout(): (
 			// A grid item's parent is its grid.
 			const targetGridClientId = ( gridClientId ??
 				getBlockRootClientId( clientId ) ) as string;
+			const selectedState = getSelectedBlockStyleState( clientId );
+			const gridAttributes = getBlockAttributes( targetGridClientId );
 			const updates = getGridChildUpdates( {
 				clientId,
 				style: getBlockAttributes( clientId )?.style,
 				change,
-				selectedState: getSelectedBlockStyleState( clientId ),
+				selectedState,
 				gridClientId: targetGridClientId,
-				gridAttributes: getBlockAttributes( targetGridClientId ),
+				gridAttributes,
 				children: getBlockOrder( targetGridClientId ).map(
 					( childClientId: string ) => ( {
 						clientId: childClientId,
@@ -173,7 +218,16 @@ export function useUpdateGridChildLayout(): (
 				updates,
 				/* uniqueByBlock: */ true
 			);
+			if ( isUnstackingEdit( selectedState, gridAttributes ) ) {
+				createInfoNotice(
+					__( 'Stack on mobile turned off for this grid.' ),
+					{
+						type: 'snackbar',
+						id: 'block-editor/grid-unstacked-on-mobile',
+					}
+				);
+			}
 		},
-		[ registry, updateBlockAttributes ]
+		[ registry, updateBlockAttributes, createInfoNotice ]
 	);
 }

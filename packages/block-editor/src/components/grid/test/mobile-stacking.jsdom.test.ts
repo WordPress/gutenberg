@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+	getMobilePlacementResets,
 	getStackedLayouts,
 	getUnstackedMobileUpdates,
 	isBlockHiddenOnMobile,
@@ -150,65 +151,6 @@ describe( 'getUnstackedMobileUpdates()', () => {
 		} );
 	} );
 
-	it( 'keeps children rotated on mobile unrotated, as the stack showed them', () => {
-		const updates = getUnstackedMobileUpdates( {
-			gridClientId: 'grid',
-			gridAttributes,
-			children: [
-				{ clientId: 'a', attributes: { style: { rotate: 30 } } },
-				{
-					clientId: 'b',
-					attributes: {
-						style: { '@mobile': { rotate: -45 } },
-					},
-				},
-				{
-					clientId: 'c',
-					attributes: {
-						style: { rotate: 30, '@tablet': { rotate: 15 } },
-					},
-				},
-			],
-		} );
-		expect( updates.a.style ).toEqual( {
-			rotate: 30,
-			'@mobile': {
-				layout: {
-					columnStart: 1,
-					columnSpan: 3,
-					rowStart: 1,
-					rowSpan: 1,
-				},
-				rotate: 0,
-			},
-		} );
-		expect( updates.b.style[ '@mobile' ].rotate ).toBe( 0 );
-		// Only the mobile rotation changes.
-		expect( updates.c.style ).toMatchObject( {
-			rotate: 30,
-			'@tablet': { rotate: 15 },
-			'@mobile': { rotate: 0 },
-		} );
-	} );
-
-	it( 'leaves the rotation of unrotated children alone', () => {
-		const updates = getUnstackedMobileUpdates( {
-			gridClientId: 'grid',
-			gridAttributes,
-			children: [
-				{ clientId: 'a', attributes: {} },
-				{
-					clientId: 'b',
-					attributes: {
-						style: { rotate: 30, '@mobile': { rotate: 0 } },
-					},
-				},
-			],
-		} );
-		expect( updates.a.style[ '@mobile' ] ).not.toHaveProperty( 'rotate' );
-		expect( updates.b.style[ '@mobile' ].rotate ).toBe( 0 );
-	} );
-
 	it( 'uses the mobile column count when the grid has one', () => {
 		const updates = getUnstackedMobileUpdates( {
 			gridClientId: 'grid',
@@ -272,13 +214,86 @@ describe( 'stacking with blocks hidden on mobile', () => {
 		expect( updates.grid.style[ '@mobile' ].layout.rowCount ).toBe( 2 );
 	} );
 
-	it( 'gets the stacked layouts of a block and its grid', () => {
-		expect( getStackedLayouts( gridAttributes, children, 'b' ) ).toEqual( {
-			child: { columnStart: 1, columnSpan: 2, rowStart: 2, rowSpan: 1 },
+	it( 'gets the stacked layouts of the blocks and their grid', () => {
+		expect( getStackedLayouts( gridAttributes, children ) ).toEqual( {
 			grid: { stackOnMobile: false, columnCount: 2, rowCount: 2 },
+			children: {
+				a: { columnStart: 1, columnSpan: 2, rowStart: 1, rowSpan: 1 },
+				b: { columnStart: 1, columnSpan: 2, rowStart: 2, rowSpan: 1 },
+			},
 		} );
+	} );
+} );
+
+describe( 'getMobilePlacementResets()', () => {
+	it( 'removes mobile placements, keeping other mobile values', () => {
 		expect(
-			getStackedLayouts( gridAttributes, children, 'hidden' ).child
-		).toBeUndefined();
+			getMobilePlacementResets( [
+				{
+					clientId: 'placed',
+					attributes: {
+						style: {
+							layout: { columnStart: 2, rowStart: 1 },
+							'@mobile': {
+								layout: {
+									columnStart: 1,
+									columnSpan: 2,
+									rowStart: 3,
+									rowSpan: 1,
+									box: {
+										left: 0.1,
+										top: 0,
+										width: 0.5,
+										height: 1,
+									},
+									selfStretch: 'fill',
+								},
+								color: { text: 'red' },
+							},
+						},
+					},
+				},
+			] )
+		).toEqual( {
+			placed: {
+				style: {
+					layout: { columnStart: 2, rowStart: 1 },
+					'@mobile': {
+						layout: { selfStretch: 'fill' },
+						color: { text: 'red' },
+					},
+				},
+			},
+		} );
+	} );
+
+	it( 'removes the objects that end up empty', () => {
+		expect(
+			getMobilePlacementResets( [
+				{
+					clientId: 'a',
+					attributes: {
+						style: { '@mobile': { layout: { rowStart: 2 } } },
+					},
+				},
+			] )
+		).toEqual( { a: { style: undefined } } );
+	} );
+
+	it( 'leaves blocks without a mobile placement out', () => {
+		expect(
+			getMobilePlacementResets( [
+				{ clientId: 'a', attributes: {} },
+				{
+					clientId: 'b',
+					attributes: {
+						style: {
+							layout: { rowStart: 2 },
+							'@mobile': { layout: { selfStretch: 'fit' } },
+						},
+					},
+				},
+			] )
+		).toEqual( {} );
 	} );
 } );
