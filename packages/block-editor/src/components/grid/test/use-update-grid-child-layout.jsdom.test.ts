@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getGridChildUpdates } from '../use-update-grid-child-layout';
-import { getUpdatedRotateStyle } from '../../../hooks/rotate';
+import { getUpdatedRotateStyle } from '../../../utils/rotation';
 import type { GridChildStyleChange } from '../use-update-grid-child-layout';
 import type { GridBlockStyle } from '../mobile-stacking';
 
