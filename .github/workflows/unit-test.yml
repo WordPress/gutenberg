@@ -56,10 +56,24 @@ jobs:
       run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
   unit-php:
-    name: PHP
+    name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
 
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
+
+    strategy:
+      # Don't let one PHP version's failure cancel the others -- each leg is
+      # independently useful signal, especially the first time some of these
+      # versions are tested in isolation on this branch.
+      fail-fast: false
+      matrix:
+        php: ['5.6', '7.0', '7.4']
+        multisite: [false, true]
+
+    env:
+      # This branch's wp-env can't set a PHP version, so pick the `phpunit` service's image
+      # directly. `wp-env run phpunit` passes this variable through to Docker Compose.
+      LOCAL_PHP: ${{ matrix.php }}-fpm
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -93,5 +107,10 @@ jobs:
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
-    - name: Running the tests
-      run: npm run test-php && npm run test-unit-php-multisite
+    - name: Running the tests (single site)
+      if: ${{ ! matrix.multisite }}
+      run: npm run test-php
+
+    - name: Running the tests (multisite)
+      if: ${{ matrix.multisite }}
+      run: npm run test-unit-php-multisite
