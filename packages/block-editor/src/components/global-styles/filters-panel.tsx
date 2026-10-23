@@ -9,7 +9,7 @@ import {
 	Dropdown,
 	Button,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -343,23 +343,25 @@ export default function FiltersPanel( {
 						renderContent={ () => (
 							<DropdownContentWrapper paddingSize="small">
 								<MenuGroup label={ __( 'Duotone' ) }>
-									<p>
-										{ __(
-											'Create a two-tone color effect without losing your original image.'
-										) }
-									</p>
-									<DuotonePicker
-										colorPalette={ colorPalette }
-										duotonePalette={ duotonePalette }
-										// TODO: Re-enable both when custom colors are supported for block-level styles.
-										disableCustomColors
-										disableCustomDuotone
-										value={ duotone }
-										selectedSlug={ duotoneSlug }
-										onChange={
-											setDuotoneWithInheritedCommit
-										}
-									/>
+									<Stack direction="column" gap="md">
+										<Text render={ <p /> }>
+											{ __(
+												'Create a two-tone color effect without losing your original image.'
+											) }
+										</Text>
+										<DuotonePicker
+											colorPalette={ colorPalette }
+											duotonePalette={ duotonePalette }
+											// TODO: Re-enable both when custom colors are supported for block-level styles.
+											disableCustomColors
+											disableCustomDuotone
+											value={ duotone }
+											selectedSlug={ duotoneSlug }
+											onChange={
+												setDuotoneWithInheritedCommit
+											}
+										/>
+									</Stack>
 								</MenuGroup>
 							</DropdownContentWrapper>
 						) }

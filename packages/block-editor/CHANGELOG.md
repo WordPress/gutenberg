@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   `DuotoneControl`: Announce the "Create a two-tone color effect" description for the duotone options to screen readers, and use `Text` from `@wordpress/ui` for the description in `DuotoneControl` and the duotone filters panel ([#85276](https://github.com/WordPress/gutenberg/pull/85276)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
