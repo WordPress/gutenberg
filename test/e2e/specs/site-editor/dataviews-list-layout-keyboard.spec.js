@@ -7,13 +7,21 @@ test.describe( 'Dataviews List Layout', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
+
+		/*
+		 * The tests expect only "Privacy Policy" then "Sample Page", newest first, so start
+		 * with no pages and give each an explicit date to keep their order stable.
+		 */
+		await requestUtils.deleteAllPages();
 		await requestUtils.createPage( {
 			title: 'Privacy Policy',
 			status: 'publish',
+			date: '2024-01-02T00:00:00',
 		} );
 		await requestUtils.createPage( {
 			title: 'Sample Page',
 			status: 'publish',
+			date: '2024-01-01T00:00:00',
 		} );
 	} );
 
@@ -29,11 +37,33 @@ test.describe( 'Dataviews List Layout', () => {
 		// Go to the pages page, as it has the list layout enabled by default.
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+		// Wait for the pages dataviews UI to fully load including:
+		// - the "Add filter" button, enabled only after post type fields are loaded
+		// - the actual pages in the list, appearing after a REST fetch finishes
+		// Only then we can start testing keyboard navigation around the full UI.
+		await page.getByRole( 'button', { name: 'Add filter' } ).waitFor();
+		await page.getByRole( 'grid' ).waitFor();
+
+		// Wait for Ariakit to auto-activate the first composite item; until
+		// then the items are not part of the tab sequence.
+		await page
+			.getByRole( 'grid' )
+			.locator( '[data-active-item]' )
+			.waitFor();
+
+		// The list layout previews the selected item in the editor canvas.
+		// Wait for it to mount so its load can't steal focus mid-test.
+		await page.locator( 'iframe[name="editor-canvas"]' ).waitFor();
 	} );
 
+	/*
+	 * These tests focus the search box instead of clicking it, since this branch's list
+	 * layout styles can break Chromium's hit-testing. Fixed upstream in WordPress/gutenberg#63299.
+	 */
 	test( 'Items list is reachable via TAB', async ( { page } ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -61,7 +91,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -90,7 +120,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -113,7 +143,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
@@ -154,7 +184,7 @@ test.describe( 'Dataviews List Layout', () => {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
-		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
+		await page.getByRole( 'searchbox', { name: 'Search' } ).focus();
 
 		// Tab until reaching the items list.
 		await page.keyboard.press( 'Tab' );
