@@ -1,5 +1,8 @@
 import { useSelect } from '@wordpress/data';
+import { getBlockSupport } from '@wordpress/blocks';
 import { useLayout } from '../block-list/layout';
+import { useBlockEditContext } from '../block-edit';
+import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
@@ -33,6 +36,44 @@ function useAlignmentSettings( isNoneOnly: boolean ): AlignmentSettings {
 			};
 		},
 		[ isNoneOnly ]
+	);
+}
+
+/**
+ * Whether the layout of the current block's parent can be edited by the user.
+ * When it cannot, alignments the layout withholds are not something to offer
+ * a way out of, so they are not listed as unavailable.
+ *
+ * @return False when the parent's layout has `allowEditing` set to false.
+ */
+function useIsParentLayoutEditable(): boolean {
+	const { clientId } = useBlockEditContext();
+	return useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return true;
+			}
+			const { getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			const parentName = rootClientId && getBlockName( rootClientId );
+			if ( ! rootClientId || ! parentName ) {
+				return true;
+			}
+			// Block support wins over theme settings, as in the layout panel.
+			const layoutSupport = getBlockSupport( parentName, 'layout' );
+			const [ layoutSettings ] = unlock(
+				select( blockEditorStore )
+			).getBlockSettings( rootClientId, 'layout' ) as [
+				{ allowEditing?: boolean } | undefined,
+			];
+			const { allowEditing = true } = {
+				...layoutSettings,
+				...( typeof layoutSupport === 'object' ? layoutSupport : {} ),
+			} as { allowEditing?: boolean };
+			return allowEditing;
+		},
+		[ clientId ]
 	);
 }
 
@@ -151,6 +192,7 @@ export function useAlignmentMenu(
 	const settings = useAlignmentSettings( isNoneOnly );
 	const layout = useLayout();
 	const [ globalLayout ] = useSettings( 'layout' );
+	const isParentLayoutEditable = useIsParentLayoutEditable();
 
 	if ( isNoneOnly ) {
 		return { enabled: EMPTY_ARRAY, unavailable: EMPTY_ARRAY };
@@ -163,7 +205,7 @@ export function useAlignmentMenu(
 		settings
 	).length;
 
-	if ( ! layoutOffersAlignments ) {
+	if ( ! layoutOffersAlignments || ! isParentLayoutEditable ) {
 		return { enabled, unavailable: EMPTY_ARRAY };
 	}
 
