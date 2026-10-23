@@ -15,6 +15,16 @@ Choose between Menu, Select, and Autocomplete based on what the options represen
 
 Use `content` to let the popup grow up to the available viewport width, `anchor` to match the trigger width, or `available` to fill the available width. All presets respect Menu's minimum width, which defaults to 160px, and the existing `--wp-ui-menu-min-width` and `--wp-ui-menu-max-width` overrides. A consumer can still set a fixed width with `className` or `style`.
 
+## Horizontal action menus
+
+Set `orientation="horizontal"` on `Menu.Root` for a compact row of icon or emoji actions. This changes both arrow-key navigation and layout. The popup keeps its surface and interaction states while its items opt out of the vertical alignment grid. Checked items use the neutral pressed-button appearance instead of a checkmark. Hover uses a neutral highlight, and keyboard focus has a separate ring.
+
+Keep these menus flat, with concise items. Use the default vertical layout for rich labels, descriptions, shortcuts, headings, and nested menus. Submenus retain their vertical layout.
+
+Items still require `Menu.ItemLabel`. For an emoji-only item, put the emoji in an `aria-hidden` span inside the label, give the item an `aria-label` and `label` for typeahead, and compose it with `Tooltip.Trigger`. Set `highlightItemOnHover={ false }` to keep pointer hover from moving keyboard focus.
+
+See the [compact horizontal action menu example](?path=/story/design-system-components-menu--compact-horizontal-action-menu), which uses independent checkbox items to match Notes reactions. Use radio items when actions are mutually exclusive.
+
 ## Quick reference
 
 <Markdown>{ `

@@ -8,6 +8,7 @@
 
 ### New Features
 
+-   `Menu.Root`: Add horizontal orientation for compact action menus ([#85289](https://github.com/WordPress/gutenberg/pull/85289)).
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 
 ### Enhancements

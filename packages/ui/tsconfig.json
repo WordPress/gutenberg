@@ -12,6 +12,7 @@
 	},
 	"files": [ "global.d.ts" ],
 	"include": [
+		"src/menu/stories/emoji-menu.tsx",
 		"src/**/test/**/*.ts",
 		"src/**/test/**/*.tsx",
 		"src/**/tests/**/*.ts",

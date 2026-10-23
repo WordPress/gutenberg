@@ -1,0 +1,5 @@
+.emoji {
+	font-size: var(--wpds-typography-font-size-xl);
+	line-height: 1;
+	forced-color-adjust: none;
+}
