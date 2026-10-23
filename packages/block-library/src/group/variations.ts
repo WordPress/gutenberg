@@ -80,10 +80,10 @@ const canvasVariation: BlockVariation = {
 					content: __( 'Anywhere.' ),
 					style: {
 						layout: {
-							columnStart: 2,
-							rowStart: 2,
-							columnSpan: 6,
-							rowSpan: 3,
+							columnStart: 5,
+							rowStart: 5,
+							columnSpan: 16,
+							rowSpan: 8,
 						},
 					},
 				},
@@ -94,10 +94,10 @@ const canvasVariation: BlockVariation = {
 					content: __( 'Blocks go where you put them.' ),
 					style: {
 						layout: {
-							columnStart: 6,
-							rowStart: 7,
-							columnSpan: 6,
-							rowSpan: 3,
+							columnStart: 16,
+							rowStart: 19,
+							columnSpan: 16,
+							rowSpan: 8,
 						},
 					},
 				},
