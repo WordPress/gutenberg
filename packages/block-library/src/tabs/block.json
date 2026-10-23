@@ -12,6 +12,10 @@
 			"type": "number",
 			"default": 0
 		},
+		"autoActivate": {
+			"type": "boolean",
+			"default": false
+		},
 		"editorActiveTabIndex": {
 			"type": "number",
 			"role": "local"

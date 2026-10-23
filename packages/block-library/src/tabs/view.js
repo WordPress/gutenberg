@@ -127,7 +127,7 @@ const { actions, state } = store(
 				}
 			},
 			/**
-			 * Moves focus to a specific tab without activating it.
+			 * Moves focus to a specific tab and optionally activates it.
 			 *
 			 * @param {number} tabIndex The index to move focus to.
 			 */
@@ -149,6 +149,9 @@ const { actions, state } = store(
 				const tabElement = document.getElementById( 'tab__' + tabId );
 				if ( tabElement ) {
 					tabElement.focus();
+					if ( getContext().autoActivate ) {
+						actions.setActiveTab( newIndex );
+					}
 				}
 			},
 			/**

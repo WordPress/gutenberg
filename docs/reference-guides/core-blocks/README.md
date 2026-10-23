@@ -1011,7 +1011,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
 -	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, heading, link, text), dimensions (minWidth), interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** activeTabIndex, editorActiveTabIndex
+-	**Attributes:** activeTabIndex, autoActivate, editorActiveTabIndex
 
 ## Tag Cloud
 
