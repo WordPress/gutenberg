@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import {
 	isGridItemHandleDrag,
 	startGridItemDrag,
+	startGridItemPointerDrag,
+	subscribeToGridItemPointerDrag,
 } from '../start-grid-item-drag';
 
 function setUp( { fromBody = false } = {} ) {
@@ -29,6 +31,7 @@ function setUp( { fromBody = false } = {} ) {
 		blockElement,
 		startDraggingBlocks,
 		stopDraggingBlocks,
+		isHandle: ! fromBody,
 	} );
 	return {
 		blockElement,
@@ -86,6 +89,50 @@ describe( 'startGridItemDrag', () => {
 		expect( blockElement ).not.toHaveStyle( { opacity: '0.5' } );
 		document.dispatchEvent( new window.Event( 'drop' ) );
 		expect( stopDraggingBlocks ).toHaveBeenCalledTimes( 1 );
+	} );
+} );
+
+describe( 'startGridItemPointerDrag', () => {
+	it( 'tells every listener which drop layer is under the touch', () => {
+		const blockElement = document.createElement( 'div' );
+		const handle = document.createElement( 'div' );
+		handle.setPointerCapture = vi.fn();
+		const dropLayer = document.createElement( 'div' );
+		dropLayer.className = 'block-editor-grid-visualizer__drop-layer';
+		const elementsFromPoint = vi.fn( () => [ handle, dropLayer ] );
+		document.elementsFromPoint = elementsFromPoint;
+		document.body.append( blockElement, handle, dropLayer );
+		const listeners = [ vi.fn(), vi.fn() ];
+		const unsubscribes = listeners.map( subscribeToGridItemPointerDrag );
+
+		startGridItemPointerDrag(
+			new window.PointerEvent( 'pointerdown', { pointerId: 1 } ),
+			{
+				clientId: 'block',
+				blockElement,
+				handle,
+				startDraggingBlocks: vi.fn(),
+				stopDraggingBlocks: vi.fn(),
+			}
+		);
+		document.dispatchEvent(
+			new window.PointerEvent( 'pointermove', {
+				pointerId: 1,
+				clientX: 10,
+				clientY: 20,
+			} )
+		);
+		unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+
+		expect( elementsFromPoint ).toHaveBeenCalledTimes( 1 );
+		for ( const listener of listeners ) {
+			expect( listener ).toHaveBeenCalledWith( {
+				type: 'move',
+				clientX: 10,
+				clientY: 20,
+				dropLayer,
+			} );
+		}
 	} );
 } );
 
