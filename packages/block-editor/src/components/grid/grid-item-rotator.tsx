@@ -4,7 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { rotateRight, Icon } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { GridItemHandle } from './grid-item-handle';
-import { getPointerAngle, getRotationFromPointer } from './rotation';
+import { getPointerAngle, getRotationFromPointer } from '../../utils/rotation';
 import { setInlineStyle } from './utils';
 
 interface GridItemRotatorProps {
