@@ -186,19 +186,28 @@
 	color: var(--wp-admin-theme-color, #3858e9);
 }
 
-// Style changes popover opened from the block card's indicator.
+// Style origins popover opened from the block card's indicator.
 // Same footprint as the small toggle button, so the card never shifts.
-.block-editor-style-changes-indicator,
-.block-editor-style-changes-indicator__placeholder {
+.block-editor-style-changes-indicator {
 	display: flex;
 	flex: none;
 	width: $button-size-small;
 	height: $button-size-small;
 }
 
+// Dashed when the block only inherits its styles. See `pathLength` on the path.
+.block-editor-style-changes-indicator__toggle.is-inherited-only .block-editor-style-changes-indicator__diamond {
+	stroke-dasharray: 1.5 1.5;
+	stroke-dashoffset: 0.75;
+}
+
 .block-editor-style-changes-indicator__content .components-popover__content {
 	width: 280px;
 	padding: $grid-unit-20;
+}
+
+.block-editor-style-changes:focus {
+	outline: none;
 }
 
 .block-editor-style-changes__group + .block-editor-style-changes__group {
@@ -215,24 +224,11 @@
 	color: $gray-900;
 }
 
-// Reads as a group heading with a chevron. The negative margin keeps the text
-// in line with the rows while leaving the focus ring room around it.
-.block-editor-style-changes__toggle.components-button.has-icon.has-text {
-	justify-content: space-between;
-	width: calc(100% + #{$grid-unit-10});
-	height: $button-size-small;
-	margin: -2px (-$grid-unit-05);
-	padding: 0 $grid-unit-05;
-	font-size: $default-font-size;
-	font-weight: var(--wpds-typography-font-weight-emphasis);
-	color: $gray-900;
-}
-
 .block-editor-style-changes__items {
 	display: flex;
 	flex-direction: column;
-	gap: $grid-unit-20;
-	margin: $grid-unit-20 0 0;
+	gap: $grid-unit-15;
+	margin: $grid-unit-15 0 0;
 	padding: 0;
 	list-style: none;
 }
@@ -242,17 +238,24 @@
 }
 
 .block-editor-style-changes__label {
-	flex: none;
+	min-width: 0;
 	font-size: $default-font-size;
 	line-height: $font-line-height-small;
 	color: $gray-900;
 }
 
-.block-editor-style-changes__value {
-	min-width: 0;
-	font-size: $default-font-size;
-	line-height: $font-line-height-small;
-	color: $gray-900;
+// Keeps the text in line with the label column edge while leaving the focus
+// ring room around it.
+.block-editor-style-changes__action.components-button {
+	flex: none;
+	margin-inline-end: -$grid-unit-05;
+	padding: 0 $grid-unit-05;
+}
+
+.block-editor-style-changes__reset-all {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: $grid-unit-15;
 }
 
 .block-editor-style-changes__source {
@@ -263,4 +266,11 @@
 	color: $gray-700;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+}
+
+.block-editor-style-changes__empty {
+	margin: $grid-unit-15 0 0;
+	font-size: $font-size-small;
+	line-height: $font-line-height-x-small;
+	color: $gray-700;
 }
