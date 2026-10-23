@@ -10,6 +10,7 @@ import {
 	useHasDimensionsPanel,
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import { useIsInFixedGridCell } from '../components/grid/use-is-in-fixed-grid-cell';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -86,7 +87,21 @@ export function DimensionsPanel( {
 }: DimensionsHookPanelProps ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
-	const isEnabled = useHasDimensionsPanel( settings, selectedState );
+	// In a grid cell with a fixed size, the block fills the cell, so the cell
+	// decides its height and its minimum height and aspect ratio have no
+	// effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
+	const panelSettings = isInFixedGridCell
+		? {
+				...settings,
+				dimensions: {
+					...settings?.dimensions,
+					minHeight: false,
+					aspectRatio: false,
+				},
+			}
+		: settings;
+	const isEnabled = useHasDimensionsPanel( panelSettings, selectedState );
 	const { style, className, layout }: DimensionsAttributes = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -161,7 +176,7 @@ export function DimensionsPanel( {
 			<StylesDimensionsPanel
 				as={ DimensionsInspectorControl }
 				panelId={ clientId }
-				settings={ settings }
+				settings={ panelSettings }
 				allowAxialBlockGap={ isAxialBlockGapAllowed(
 					layout,
 					defaultLayout
