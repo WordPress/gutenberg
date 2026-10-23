@@ -42,8 +42,8 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		self::delete_user( self::$subscriber_id );
 	}
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		add_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10, 3 );
 
@@ -52,13 +52,13 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		add_filter( "pre_transient_{$transient_name}", '__return_null' );
 	}
 
-	public function tearDown() {
+	public function tear_down() {
 		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
 		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
 		static::$request_args = array();
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	public function test_register_routes() {
