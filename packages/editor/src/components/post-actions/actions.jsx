@@ -1,82 +1,30 @@
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useMemo, useEffect } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-import { useSetAsHomepageAction } from './set-as-homepage';
-import { useSetAsPostsPageAction } from './set-as-posts-page';
+import { store as noticesStore } from '@wordpress/notices';
+import { useEntityActions } from '../../dataviews/entity-actions-loader';
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions } = useSelect(
-		( select ) => {
-			const { getEntityActions } = unlock( select( editorStore ) );
-			return {
-				defaultActions: getEntityActions( 'postType', postType ),
-			};
-		},
-		[ postType ]
-	);
+	const { actions: defaultActions, error } = useEntityActions( {
+		kind: 'postType',
+		name: postType,
+	} );
 
-	const shouldShowHomepageActions = useSelect(
-		( select ) => {
-			if ( postType !== 'page' ) {
-				return false;
-			}
-
-			const { getDefaultTemplateId, getEntityRecord, canUser } =
-				select( coreStore );
-			const canUpdateSettings = canUser( 'update', {
-				kind: 'root',
-				name: 'site',
-			} );
-
-			if ( ! canUpdateSettings ) {
-				return false;
-			}
-
-			// Note that resolved template for `front-page` is not necessarily a
-			// `front-page` template.
-			const frontPageTemplateId = getDefaultTemplateId( {
-				slug: 'front-page',
-			} );
-
-			if ( ! frontPageTemplateId ) {
-				return true;
-			}
-
-			// This won't trigger a second network request, getDefaultTemplateId
-			// will have received the whole template from the REST API.
-			const frontPageTemplate = getEntityRecord(
-				'postType',
-				'wp_template',
-				frontPageTemplateId
-			);
-
-			if ( ! frontPageTemplate ) {
-				return true;
-			}
-
-			// When there is a front page template, the front page cannot be
-			// changed. See
-			// https://developer.wordpress.org/themes/basics/template-hierarchy/
-			return frontPageTemplate.slug !== 'front-page';
-		},
-		[ postType ]
-	);
-
-	const setAsHomepageAction = useSetAsHomepageAction();
-	const setAsPostsPageAction = useSetAsPostsPageAction();
-
-	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
+	// Without its actions, a screen has no way to act on its items, so the
+	// notice stays until it is dismissed. Its id keeps a single notice per
+	// post type, however many components show the actions.
+	const { createErrorNotice } = useDispatch( noticesStore );
 	useEffect( () => {
-		registerPostTypeSchema( postType );
-	}, [ registerPostTypeSchema, postType ] );
+		if ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				id: `editor-actions-${ postType }`,
+				explicitDismiss: true,
+			} );
+		}
+	}, [ createErrorNotice, error, postType ] );
 
 	return useMemo( () => {
 		let actions = [ ...defaultActions ];
-		if ( shouldShowHomepageActions ) {
-			actions.push( setAsHomepageAction, setAsPostsPageAction );
-		}
 
 		// Ensure "Move to trash" is always the last action.
 		actions = actions.sort( ( a, b ) =>
@@ -144,12 +92,5 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		}
 
 		return actions;
-	}, [
-		context,
-		defaultActions,
-		onActionPerformed,
-		setAsHomepageAction,
-		setAsPostsPageAction,
-		shouldShowHomepageActions,
-	] );
+	}, [ context, defaultActions, onActionPerformed ] );
 }
