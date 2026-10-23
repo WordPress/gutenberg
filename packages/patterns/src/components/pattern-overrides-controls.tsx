@@ -10,12 +10,13 @@ import {
 	AllowOverridesModal,
 	DisallowOverridesModal,
 } from './allow-overrides-modal';
+import type { PatternOverridesControlsProps } from './types';
 
 function PatternOverridesControls( {
 	attributes,
 	setAttributes,
 	name: blockName,
-} ) {
+}: PatternOverridesControlsProps ) {
 	const controlId = useId();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
 		useState( false );
@@ -31,7 +32,7 @@ function PatternOverridesControls( {
 		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
 	const { updateBlockBindings } = useBlockBindingsUtils();
 
-	function updateBindings( isChecked, customName ) {
+	function updateBindings( isChecked: boolean, customName?: string ) {
 		if ( customName ) {
 			setAttributes( {
 				metadata: {

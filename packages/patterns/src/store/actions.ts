@@ -1,19 +1,32 @@
 import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import type { Block } from '@wordpress/blocks';
 import { PATTERN_SYNC_TYPES } from '../constants';
+import type { BlockMetadata } from '../types';
+import type {
+	PatternJSON,
+	PatternOverrides,
+	PatternsThunkArgs,
+	SetEditingPatternAction,
+} from './types';
 
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
  *
- * @param {string}             title        Pattern title.
- * @param {'full'|'unsynced'}  syncType     They way block is synced, 'full' or 'unsynced'.
- * @param {string|undefined}   [content]    Optional serialized content of blocks to convert to pattern.
- * @param {number[]|undefined} [categories] Ids of any selected categories.
+ * @param title      Pattern title.
+ * @param syncType   They way block is synced, 'fully' or 'unsynced'.
+ * @param content    Optional serialized content of blocks to convert to pattern.
+ * @param categories Ids of any selected categories.
  */
 export const createPattern =
-	( title, syncType, content, categories ) =>
-	async ( { registry } ) => {
+	(
+		title: string,
+		syncType: string | undefined,
+		content?: string,
+		categories?: Array< number >
+	) =>
+	async ( { registry }: PatternsThunkArgs ) => {
 		const meta =
 			syncType === PATTERN_SYNC_TYPES.unsynced
 				? {
@@ -38,15 +51,14 @@ export const createPattern =
 
 /**
  * Create a pattern from a JSON file.
- * @param {File}               file         The JSON file instance of the pattern.
- * @param {number[]|undefined} [categories] Ids of any selected categories.
+ * @param file       The JSON file instance of the pattern.
+ * @param categories Ids of any selected categories.
  */
 export const createPatternFromFile =
-	( file, categories ) =>
-	async ( { dispatch } ) => {
+	( file: File, categories?: Array< number > ) =>
+	async ( { dispatch }: PatternsThunkArgs ) => {
 		const fileContent = await file.text();
-		/** @type {import('./types').PatternJSON} */
-		let parsedContent;
+		let parsedContent: PatternJSON;
 		try {
 			parsedContent = JSON.parse( fileContent );
 		} catch {
@@ -77,28 +89,37 @@ export const createPatternFromFile =
 /**
  * Returns a generator converting a synced pattern block into a static block.
  *
- * @param {string} clientId The client ID of the block to attach.
+ * @param clientId The client ID of the block to attach.
  */
 export const convertSyncedPatternToStatic =
-	( clientId ) =>
-	( { registry } ) => {
+	( clientId: string ) =>
+	( { registry }: PatternsThunkArgs ) => {
+		// The action converts a pattern block that is in the editor.
 		const patternBlock = registry
 			.select( blockEditorStore )
-			.getBlock( clientId );
-		const existingOverrides = patternBlock.attributes?.content;
+			.getBlock( clientId )!;
+		// The pattern block keeps each named block's overridden attributes.
+		const existingOverrides = patternBlock.attributes?.content as
+			PatternOverrides | undefined;
 
-		function cloneBlocksAndRemoveBindings( blocks ) {
+		function cloneBlocksAndRemoveBindings(
+			blocks: Array< Block >
+		): Array< Block > {
 			return blocks.map( ( block ) => {
-				let metadata = block.attributes.metadata;
+				// Block attributes are untyped; every block may carry `metadata`.
+				let metadata = block.attributes.metadata as
+					BlockMetadata | undefined;
 				if ( metadata ) {
 					metadata = { ...metadata };
 					delete metadata.id;
 					delete metadata.bindings;
 					// Use overridden values of the pattern block if they exist.
-					if ( existingOverrides?.[ metadata.name ] ) {
+					// A block without a name reads the `undefined` key.
+					if ( existingOverrides?.[ metadata.name as string ] ) {
 						// Iterate over each overridden attribute.
 						for ( const [ attributeName, value ] of Object.entries(
-							existingOverrides[ metadata.name ]
+							// Checked above, under the same possibly `undefined` key.
+							existingOverrides[ metadata.name as string ]
 						) ) {
 							// Skip if the attribute does not exist in the block type.
 							if (
@@ -141,11 +162,14 @@ export const convertSyncedPatternToStatic =
 /**
  * Returns an action descriptor for SET_EDITING_PATTERN action.
  *
- * @param {string}  clientId  The clientID of the pattern to target.
- * @param {boolean} isEditing Whether the block should be in editing state.
- * @return {Object} Action descriptor.
+ * @param clientId  The clientID of the pattern to target.
+ * @param isEditing Whether the block should be in editing state.
+ * @return Action descriptor.
  */
-export function setEditingPattern( clientId, isEditing ) {
+export function setEditingPattern(
+	clientId: string,
+	isEditing: boolean
+): SetEditingPatternAction {
 	return {
 		type: 'SET_EDITING_PATTERN',
 		clientId,

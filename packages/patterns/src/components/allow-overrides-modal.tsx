@@ -3,13 +3,17 @@ import { Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useId } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import type {
+	AllowOverridesModalProps,
+	DisallowOverridesModalProps,
+} from './types';
 
 export function AllowOverridesModal( {
 	placeholder,
 	initialName = '',
 	onClose,
 	onSave,
-} ) {
+}: AllowOverridesModalProps ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( initialName );
 	const descriptionId = useId();
 
@@ -89,7 +93,10 @@ export function AllowOverridesModal( {
 	);
 }
 
-export function DisallowOverridesModal( { onClose, onSave } ) {
+export function DisallowOverridesModal( {
+	onClose,
+	onSave,
+}: DisallowOverridesModalProps ) {
 	const descriptionId = useId();
 
 	return (

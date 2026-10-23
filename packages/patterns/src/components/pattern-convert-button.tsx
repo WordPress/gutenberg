@@ -1,3 +1,4 @@
+import type { Block } from '@wordpress/blocks';
 import {
 	hasBlockSupport,
 	isReusableBlock,
@@ -17,21 +18,18 @@ import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
 import { PATTERN_SYNC_TYPES } from '../constants';
+import type { CreatePatternResult, PatternConvertButtonProps } from './types';
 
 /**
  * Menu control to convert block(s) to a pattern block.
  *
- * @param {Object}   props                        Component props.
- * @param {string[]} props.clientIds              Client ids of selected blocks.
- * @param {string}   props.rootClientId           ID of the currently selected top-level block.
- * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
- * @return {React.ComponentType} The menu control or null.
+ * @return The menu control or null.
  */
 export default function PatternConvertButton( {
 	clientIds,
 	rootClientId,
 	closeBlockSettingsMenu,
-} ) {
+}: PatternConvertButtonProps ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { replaceBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -58,7 +56,7 @@ export default function PatternConvertButton( {
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
 			// Check if the block has reusable support defined.
-			const hasReusableBlockSupport = ( blockName ) => {
+			const hasReusableBlockSupport = ( blockName: string ) => {
 				const blockType = getBlockType( blockName );
 				const hasParent = blockType && 'parent' in blockType;
 
@@ -73,7 +71,8 @@ export default function PatternConvertButton( {
 				!! select( coreStore ).getEntityRecord(
 					'postType',
 					'wp_block',
-					blocks[ 0 ].attributes.ref
+					// A pattern block's `ref` is its `wp_block` post ID.
+					blocks[ 0 ].attributes.ref as number
 				);
 
 			const isUnsyncedPattern =
@@ -108,7 +107,8 @@ export default function PatternConvertButton( {
 	);
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const getContent = useCallback(
-		() => serialize( getBlocksByClientId( clientIds ) ),
+		// Only reachable once `canConvert` found every block.
+		() => serialize( getBlocksByClientId( clientIds ) as Array< Block > ),
 		[ getBlocksByClientId, clientIds ]
 	);
 
@@ -116,7 +116,7 @@ export default function PatternConvertButton( {
 		return null;
 	}
 
-	const handleSuccess = ( { pattern } ) => {
+	const handleSuccess = ( { pattern }: CreatePatternResult ) => {
 		if ( pattern.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
 			if ( clientIds?.length === 1 ) {
 				const existingAttributes = getBlockAttributes( clientIds[ 0 ] );

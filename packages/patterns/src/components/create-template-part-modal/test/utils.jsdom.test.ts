@@ -1,16 +1,18 @@
 import { describe, expect, it } from 'vitest';
+import type { WpTemplatePart } from '@wordpress/core-data';
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from '../utils';
 
 describe( 'getUniqueTemplatePartTitle', () => {
 	it( 'should return the title if it is unique', () => {
 		const title = 'My Template Part';
+		// The function only reads the rendered titles.
 		const templateParts = [
 			{
 				title: {
 					rendered: 'Template Part With Another Title',
 				},
 			},
-		];
+		] as Array< WpTemplatePart >;
 
 		expect( getUniqueTemplatePartTitle( title, templateParts ) ).toBe(
 			title
@@ -19,6 +21,7 @@ describe( 'getUniqueTemplatePartTitle', () => {
 
 	it( 'should return the title with a suffix if it is not unique', () => {
 		const title = 'My Template Part';
+		// The function only reads the rendered titles.
 		const templateParts = [
 			{
 				title: {
@@ -30,7 +33,7 @@ describe( 'getUniqueTemplatePartTitle', () => {
 					rendered: 'My Template Part 2',
 				},
 			},
-		];
+		] as Array< WpTemplatePart >;
 
 		expect( getUniqueTemplatePartTitle( title, templateParts ) ).toBe(
 			'My Template Part 3'
