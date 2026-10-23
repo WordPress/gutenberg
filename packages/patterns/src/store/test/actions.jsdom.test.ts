@@ -13,6 +13,7 @@ import type { Block } from '@wordpress/blocks';
 import { createRegistry } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 import { convertSyncedPatternToStatic } from '../actions';
+import type { PatternsThunkArgs } from '../types';
 
 const PATTERN_OVERRIDES_BINDING = { source: 'core/pattern-overrides' };
 
@@ -67,7 +68,10 @@ function detachPattern(
 	} );
 	registry.dispatch( blockEditorStore ).resetBlocks( [ pattern ] );
 
-	convertSyncedPatternToStatic( pattern.clientId )( { registry } );
+	// The action only uses the registry.
+	convertSyncedPatternToStatic( pattern.clientId )( {
+		registry,
+	} as unknown as PatternsThunkArgs );
 
 	return registry.select( blockEditorStore ).getBlocks();
 }
