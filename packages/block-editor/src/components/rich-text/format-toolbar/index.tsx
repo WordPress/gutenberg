@@ -21,13 +21,13 @@ const TOOLBAR_FORMATS = [
 
 const DROPDOWN_FORMATS = [
 	'text-color',
+	'image',
+	'code',
+	'keyboard',
 	'strikethrough',
 	'superscript',
 	'subscript',
-	'code',
-	'keyboard',
 	'language',
-	'image',
 	'math',
 	'footnote',
 ];
