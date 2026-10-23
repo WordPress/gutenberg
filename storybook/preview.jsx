@@ -118,7 +118,7 @@ export const parameters = {
 				[
 					'Introduction',
 					'Contributing',
-					'Design System MCP',
+					'Using with AI',
 					'Foundations',
 					'Tokens',
 					'Theme',
