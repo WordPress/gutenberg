@@ -456,7 +456,7 @@ const cards: Array< {
 		illustration: 'adminui',
 		title: 'Admin UI',
 		packageName: '@wordpress/admin-ui',
-		body: 'Building blocks for consistent admin page layouts: pages, headers, sidebars and navigation.',
+		body: 'Building blocks for consistent admin page layouts and headers.',
 		storybookId: 'admin-ui-page--docs',
 		docsHref: `${ handbook }/packages-admin-ui/`,
 	},
