@@ -400,8 +400,8 @@ describe( 'vips utilities', () => {
 			expect( id ).toBe( 'item-1' );
 			expect( width ).toBe( 4000 );
 			expect( height ).toBe( 3000 );
-			expect( options.quality ).toBe( 0.8 );
-			expect( options.metadataSource.byteLength ).toBe( heicFile.size );
+			expect( options?.quality ).toBe( 0.8 );
+			expect( options?.metadataSource?.byteLength ).toBe( heicFile.size );
 		} );
 
 		it( 'declines without copying pixels when the image exceeds the interlaced budget', async () => {
