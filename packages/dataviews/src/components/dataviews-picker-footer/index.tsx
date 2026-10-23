@@ -13,7 +13,7 @@ import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
-import getActionButtonLabel from '../../utils/get-action-button-label';
+import getActionLabel from '../../utils/get-action-label';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -121,7 +121,7 @@ function ActionButtons< Item >( {
 				const eligibleItems = isEligible
 					? items.filter( ( item ) => isEligible( item ) )
 					: items;
-				const label = getActionButtonLabel( action, items );
+				const label = getActionLabel( action, items );
 				const variant = isPrimary ? 'primary' : 'tertiary';
 				const isInProgress = id === actionInProgress;
 

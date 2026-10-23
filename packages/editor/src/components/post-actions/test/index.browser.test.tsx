@@ -45,36 +45,50 @@ describe( 'PostActions', () => {
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'moves focus to a modal action and returns it after cancellation', async () => {
-		const user = userEvent.setup();
-		mockedUsePostActions.mockReturnValue( [
-			{
-				id: 'delete',
-				label: 'Delete',
-				RenderModal: ( {
-					closeModal,
-				}: {
-					closeModal?: () => void;
-				} ) => <button onClick={ closeModal }>Cancel</button>,
-			},
-		] );
-		await renderPostActions();
+	it.each( [ 'Delete', 'Delete……\u00a0' ] )(
+		'moves focus to modal action "%s" and returns it after cancellation',
+		async ( label ) => {
+			const user = userEvent.setup();
+			mockedUsePostActions.mockReturnValue( [
+				{
+					id: 'delete',
+					label,
+					RenderModal: ( {
+						closeModal,
+					}: {
+						closeModal?: () => void;
+					} ) => <button onClick={ closeModal }>Cancel</button>,
+				},
+				{ id: 'view', label: 'View', callback: () => {} },
+			] );
+			await renderPostActions();
 
-		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
-		await user.click( trigger );
-		await user.click(
-			await screen.findByRole( 'menuitem', { name: 'Delete' } )
-		);
+			const trigger = screen.getByRole( 'button', { name: 'Actions' } );
+			await user.click( trigger );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'View' } )
+			).toBeInTheDocument();
+			await user.click(
+				await screen.findByRole( 'menuitem', {
+					name: label === 'Delete' ? 'Delete…' : label.trim(),
+				} )
+			);
+			expect(
+				await screen.findByRole( 'dialog', { name: label.trim() } )
+			).toBeInTheDocument();
 
-		const cancelButton = await screen.findByRole( 'button', {
-			name: 'Cancel',
-		} );
-		await waitFor( () => expect( cancelButton ).toHaveFocus() );
+			const cancelButton = await screen.findByRole( 'button', {
+				name: 'Cancel',
+			} );
+			await waitFor( () => expect( cancelButton ).toHaveFocus() );
 
-		await user.click( cancelButton );
-		await waitFor( () => {
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
-		} );
-		expect( trigger ).toHaveFocus();
-	} );
+			await user.click( cancelButton );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
+			expect( trigger ).toHaveFocus();
+		}
+	);
 } );
