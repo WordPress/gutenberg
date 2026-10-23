@@ -41,6 +41,9 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >(
 					resetStyles[ 'box-sizing' ],
 					focusStyles[ 'outset-ring--focus-except-active' ],
 					variant !== 'unstyled' && styles.link,
+					variant !== 'unstyled' &&
+						shouldShowNewTabIndicator &&
+						styles[ 'link-with-icon' ],
 					variant !== 'unstyled' && styles[ `is-${ tone }` ],
 					variant === 'unstyled' && styles[ 'is-unstyled' ],
 					className
@@ -48,7 +51,14 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >(
 				target: target ?? ( openInNewTab ? '_blank' : undefined ),
 				children: (
 					<>
-						{ children }
+						{ shouldShowNewTabIndicator &&
+						variant !== 'unstyled' ? (
+							<span className={ styles[ 'link-contents' ] }>
+								{ children }
+							</span>
+						) : (
+							children
+						) }
 						{ shouldShowNewTabIndicator && (
 							<span
 								className={ styles[ 'link-icon' ] }

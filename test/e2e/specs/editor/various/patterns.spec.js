@@ -1004,6 +1004,61 @@ test.describe( 'Synced pattern', () => {
 		] );
 	} );
 
+	test( 'shows the saved edits after editing the original and going back', async ( {
+		page,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Synced pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Before Edit</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+		await editor.publishPost();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit original' } )
+			.click();
+
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Synced pattern',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.fill( 'After Edit' );
+		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Pattern updated.' } )
+		).toBeVisible();
+
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.getByText( 'After Edit' )
+		).toBeVisible();
+	} );
+
 	test( 'can be created, inserted, and converted to a regular block', async ( {
 		page,
 		editor,
@@ -1349,10 +1404,9 @@ test.describe( 'Synced pattern - entity navigation', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.openDocumentSettingsSidebar();
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
@@ -1471,6 +1525,18 @@ test.describe( 'Synced pattern - read-only access', () => {
 			`/wp-admin/post.php?post=${ postId }&action=edit`
 		);
 
+		// The pattern loads without a request the server refuses.
+		const refusedRequests = [];
+		page.on( 'response', ( response ) => {
+			if (
+				response.url().includes( '/wp/v2/blocks' ) &&
+				response.status() === 403
+			) {
+				refusedRequests.push( response.url() );
+			}
+		} );
+		await page.reload();
+
 		const editor = new Editor( { page } );
 		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
@@ -1499,6 +1565,7 @@ test.describe( 'Synced pattern - read-only access', () => {
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Edit original' } )
 		).toBeHidden();
+		expect( refusedRequests ).toEqual( [] );
 
 		await context.close();
 	} );
@@ -1562,5 +1629,67 @@ test.describe( 'Synced pattern - read-only access', () => {
 		).toBeVisible();
 
 		await context.close();
+	} );
+} );
+
+test.describe( 'Synced pattern - inserter categories', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		const editorUser = await requestUtils.createUser( {
+			username: 'patterneditor',
+			email: 'patterneditor@example.com',
+			password: 'patterneditorpassword',
+			roles: [ 'editor' ],
+		} );
+		await requestUtils.createBlock( {
+			title: 'Editor pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Editor pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+			author: editorUser.id,
+		} );
+		await requestUtils.createBlock( {
+			title: 'Administrator pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Administrator pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllUsers();
+	} );
+
+	test( 'lists every pattern under "Site patterns" and can filter them to the current user\'s', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
+
+		await page.getByRole( 'tab', { name: 'Site patterns' } ).click();
+		await expect(
+			page.getByRole( 'option', { name: 'Editor pattern' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'option', { name: 'Administrator pattern' } )
+		).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'Filter patterns' } ).click();
+		await page
+			.getByRole( 'group', { name: 'Author' } )
+			.getByRole( 'menuitemradio', { name: 'My patterns' } )
+			.click();
+		await expect(
+			page.getByRole( 'option', { name: 'Administrator pattern' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'option', { name: 'Editor pattern' } )
+		).toBeHidden();
 	} );
 } );
