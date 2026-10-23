@@ -1,6 +1,4 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
-// prettier-ignore
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
