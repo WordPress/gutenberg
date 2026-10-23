@@ -21,6 +21,7 @@ import { groupBlocks } from '../../utils/group-blocks';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
+import { CanvasContextMenu, useCanvasContextMenu } from './canvas-context-menu';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
@@ -92,6 +93,12 @@ export default function BlockTools( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
 		useShowBlockTools();
+	const {
+		onContextMenu,
+		onMouseDown: onContextMenuMouseDown,
+		menu: contextMenu,
+		closeMenu: closeContextMenu,
+	} = useCanvasContextMenu();
 	const pasteStyles = usePasteStyles();
 	const [ renamingBlockClientId, setRenamingBlockClientId ] =
 		useState( null );
@@ -298,6 +305,8 @@ export default function BlockTools( {
 		<div
 			{ ...props }
 			onKeyDown={ onKeyDown }
+			onContextMenu={ onContextMenu }
+			onMouseDown={ onContextMenuMouseDown }
 			// Popover slots cannot be unmounted during dragging because the
 			// will just be rendered in a fallback popover slot instead.
 			className={ clsx( props.className, {
@@ -348,6 +357,12 @@ export default function BlockTools( {
 					/>
 				) }
 			</InsertionPointOpenRef.Provider>
+			{ contextMenu && (
+				<CanvasContextMenu
+					menu={ contextMenu }
+					onClose={ closeContextMenu }
+				/>
+			) }
 			{ renamingBlockClientId && (
 				<BlockRenameModal
 					clientId={ renamingBlockClientId }

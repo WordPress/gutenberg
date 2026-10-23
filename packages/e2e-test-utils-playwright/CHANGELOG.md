@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Editor.setPreferences()`: Accept the `core` scope, so preferences stored there can be set ([#85474](https://github.com/WordPress/gutenberg/pull/85474)).
+
 ### Internal
 
 -   Convert the remaining viewport and widget utilities to TypeScript ([#84917](https://github.com/WordPress/gutenberg/pull/84917)).

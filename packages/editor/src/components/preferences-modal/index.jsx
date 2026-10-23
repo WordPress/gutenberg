@@ -103,7 +103,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="allowRightClickOverrides"
 									help={ __(
-										'Allows contextual List View menus via right-click, overriding browser defaults.'
+										'Allows contextual menus via right-click in the editor canvas and the List View, overriding browser defaults.'
 									) }
 									label={ __(
 										'Allow right-click contextual menus'
