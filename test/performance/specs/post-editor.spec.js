@@ -22,6 +22,7 @@ const results = {
 	focus: [],
 	firstFocus: [],
 	selectAll: [],
+	undo: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -392,6 +393,64 @@ test.describe( 'Post Editor Performance', () => {
 				// Save the results.
 				if ( i > throwaway ) {
 					results.selectAll.push( sum( keyDownEvents ) );
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Undoing a typed character', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraphs = canvas.getByRole( 'document', {
+				name: /Block: Paragraph/i,
+			} );
+
+			// Undo re-renders off-screen blocks in later tasks, after the key
+			// events, so this measures all main thread work until idle.
+			const session = await page.context().newCDPSession( page );
+			await session.send( 'Performance.enable' );
+			const getTaskDuration = async () => {
+				const { metrics } = await session.send(
+					'Performance.getMetrics'
+				);
+				return (
+					metrics.find( ( { name } ) => name === 'TaskDuration' )
+						.value * 1000
+				);
+			};
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				await paragraphs.nth( i ).click();
+				await page.keyboard.type( 'x' );
+
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+				const start = await getTaskDuration();
+
+				// Undo the typed character.
+				await page.keyboard.press( 'ControlOrMeta+z' );
+
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.undo.push( ( await getTaskDuration() ) - start );
 				}
 			}
 		} );
