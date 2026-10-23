@@ -1,8 +1,6 @@
 import type { PageUtils } from './';
 import type { DimensionsName, Viewport, ViewportDimensions } from './types';
 
-export type * from './types';
-
 /**
  * Predefined viewport dimensions to reference by name.
  */

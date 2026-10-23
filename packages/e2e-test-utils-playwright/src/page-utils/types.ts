@@ -21,12 +21,3 @@ export type ViewportDimensions = {
  * Valid argument type from which to derive viewport dimensions.
  */
 export type Viewport = DimensionsName | ViewportDimensions;
-
-/** @deprecated Use DimensionsName instead. */
-export type WPDimensionsName = DimensionsName;
-
-/** @deprecated Use ViewportDimensions instead. */
-export type WPViewportDimensions = ViewportDimensions;
-
-/** @deprecated Use Viewport instead. */
-export type WPViewport = Viewport;
