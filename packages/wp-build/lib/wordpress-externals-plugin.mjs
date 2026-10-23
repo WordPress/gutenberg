@@ -35,6 +35,51 @@ async function generateContentHash(
 }
 
 /**
+ * Check whether a module's source only imports exports of a package by name,
+ * with `import { … } from` and `export { … } from` statements: not the
+ * package's namespace object with `import * as` or `export *`, nor its default
+ * export. Errs towards `false`, as when the statements can't be told apart.
+ *
+ * @param {string} source    The module's source.
+ * @param {string} specifier The package's import specifier.
+ * @return {boolean} True if the module only imports exports by name.
+ */
+export function importsByNameOnlyInSource( source, specifier ) {
+	const statements = source.matchAll(
+		new RegExp(
+			`\\b(?:import|export)\\b([^;'"\`]*)\\bfrom\\s*['"]${ specifier.replace(
+				/[.*+?^${}()|[\]\\]/g,
+				'\\$&'
+			) }['"]`,
+			'g'
+		)
+	);
+	for ( const [ , clause ] of statements ) {
+		if (
+			! /^\s*(?:type\s+)?\{[^{}]*\}\s*$/.test( clause ) ||
+			/\bdefault\b/.test( clause )
+		) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
+ * Get the expression of the global exposing a script.
+ *
+ * @param {string} globalName The global variable name of the namespace, e.g. `wp`.
+ * @param {string} specifier  The script's import specifier, e.g. `@wordpress/blocks`.
+ * @return {string} The expression, e.g. `window.wp.blocks`.
+ */
+function getPackageGlobal( globalName, specifier ) {
+	// Extract package name after '@namespace/' prefix
+	// e.g., '@wordpress/blocks' or '@my-plugin/data'
+	const packagePath = specifier.split( '/' ).slice( 1 ).join( '/' );
+	return `window.${ globalName }.${ camelCase( packagePath ) }`;
+}
+
+/**
  * Create WordPress externals plugin for esbuild.
  * This plugin handles WordPress package externals and vendor libraries,
  * treating them as external dependencies available via global variables.
@@ -72,6 +117,46 @@ export function createWordpressExternalsPlugin(
 			setup( build ) {
 				const dependencies = new Set();
 				const moduleDependencies = new Map();
+
+				// The source of the files importing scripts, by path.
+				const importerSources = new Map();
+				build.onStart( () => {
+					importerSources.clear();
+				} );
+
+				/**
+				 * Check whether a file only imports exports of a script by name,
+				 * with `import { … } from` and `export { … } from` statements,
+				 * and not the script's namespace object itself: with
+				 * `import * as`, `export *`, a default import, `require` or a
+				 * dynamic import, it must be the namespace object as is.
+				 *
+				 * @param {import('esbuild').OnResolveArgs} args The resolve arguments.
+				 * @return {Promise<boolean>} True if the file only imports exports by name.
+				 */
+				async function importsByNameOnly( args ) {
+					if (
+						args.kind !== 'import-statement' ||
+						args.namespace !== 'file'
+					) {
+						return false;
+					}
+
+					if ( ! importerSources.has( args.importer ) ) {
+						importerSources.set(
+							args.importer,
+							readFile( args.importer, 'utf8' ).catch(
+								() => null
+							)
+						);
+					}
+					const source = await importerSources.get( args.importer );
+					if ( source === null ) {
+						return false;
+					}
+
+					return importsByNameOnlyInSource( source, args.path );
+				}
 
 				/**
 				 * Check if a package import is a script module.
@@ -180,8 +265,18 @@ export function createWordpressExternalsPlugin(
 							filter: new RegExp( `^${ packageName }$` ),
 						},
 						/** @param {import('esbuild').OnResolveArgs} args */
-						( args ) => {
+						async ( args ) => {
 							dependencies.add( config.handle );
+
+							if ( await importsByNameOnly( args ) ) {
+								return {
+									path: args.path,
+									namespace: 'external-by-name',
+									pluginData: {
+										global: `window.${ config.global }`,
+									},
+								};
+							}
 
 							return {
 								path: args.path,
@@ -197,7 +292,7 @@ export function createWordpressExternalsPlugin(
 					build.onResolve(
 						{ filter: externalConfig.pattern },
 						/** @param {import('esbuild').OnResolveArgs} args */
-						( args ) => {
+						async ( args ) => {
 							// Extract package name and subpath from import
 							// e.g., '@wordpress/blocks/sub/path' → packageName='@wordpress/blocks', subpath='sub/path'
 							const parts = args.path.split( '/' );
@@ -260,6 +355,19 @@ export function createWordpressExternalsPlugin(
 							if ( isScript ) {
 								dependencies.add( handle );
 
+								if ( await importsByNameOnly( args ) ) {
+									return {
+										path: args.path,
+										namespace: 'external-by-name',
+										pluginData: {
+											global: getPackageGlobal(
+												externalConfig.globalName,
+												args.path
+											),
+										},
+									};
+								}
+
 								return {
 									path: args.path,
 									namespace: 'package-external',
@@ -290,21 +398,30 @@ export function createWordpressExternalsPlugin(
 				build.onLoad(
 					{ filter: /.*/, namespace: 'package-external' },
 					/** @param {import('esbuild').OnLoadArgs} args */
-					( args ) => {
-						const globalName = args.pluginData.globalName;
-						// Extract package name after '@namespace/' prefix
-						// e.g., '@wordpress/blocks' or '@my-plugin/data'
-						const packagePath = args.path
-							.split( '/' )
-							.slice( 1 )
-							.join( '/' );
-						const camelCasedName = camelCase( packagePath );
+					( args ) => ( {
+						contents: `module.exports = ${ getPackageGlobal(
+							args.pluginData.globalName,
+							args.path
+						) };`,
+						loader: 'js',
+					} )
+				);
 
-						return {
-							contents: `module.exports = window.${ globalName }.${ camelCasedName };`,
-							loader: 'js',
-						};
-					}
+				/*
+				 * esbuild converts a CommonJS module for each file importing it, by
+				 * defining a getter on a new object for every export of the
+				 * module. Done for every file importing a script, this is costly
+				 * while the page loads. Files only reading exports by name get an
+				 * object inheriting from the global instead: there is nothing to
+				 * define, and reading an export calls no getter.
+				 */
+				build.onLoad(
+					{ filter: /.*/, namespace: 'external-by-name' },
+					/** @param {import('esbuild').OnLoadArgs} args */
+					( args ) => ( {
+						contents: `var value = ${ args.pluginData.global }; module.exports = value ? Object.create( value ) : value;`,
+						loader: 'js',
+					} )
 				);
 
 				build.onEnd(
