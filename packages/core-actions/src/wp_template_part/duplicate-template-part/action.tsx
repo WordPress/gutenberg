@@ -3,7 +3,6 @@ import { _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { unlock } from '../../lock-unlock';
 import type { Post, TemplatePart, ActionScriptParts } from '../../shared/types';

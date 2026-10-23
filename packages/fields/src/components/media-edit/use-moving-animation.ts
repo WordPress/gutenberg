@@ -17,21 +17,30 @@ function getAbsolutePosition( element: HTMLElement ) {
  *    as a destination point for the animation.
  *  - It restores the element to the previous position using a CSS transform
  *
- * @param triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * Only animates on reorder of same items.
+ * Cancels running animations when the set of items changes (e.g. an item is added or removed).
+ *
+ * @param index    Position of the element in the list; the animation runs when it changes.
+ * @param itemsKey Identifies the set of items in the list, regardless of order.
  */
-export default function useMovingAnimation(
-	triggerAnimationOnChange: unknown
-) {
+export default function useMovingAnimation( index: number, itemsKey: string ) {
 	const ref = useRef< HTMLDivElement >( null );
 	const previousRef = useRef< { top: number; left: number } >( undefined );
+	const previousItemsKeyRef = useRef( itemsKey );
 	// Capture position before DOM updates (during render).
 	// This runs synchronously during render, before layout effects.
 	if ( ref.current ) {
 		previousRef.current = getAbsolutePosition( ref.current );
 	}
 	useLayoutEffect( () => {
+		const hasItemsChanged = previousItemsKeyRef.current !== itemsKey;
+		previousItemsKeyRef.current = itemsKey;
 		const previous = previousRef.current;
 		if ( ! previous || ! ref.current ) {
+			return;
+		}
+		if ( hasItemsChanged ) {
+			ref.current.style.transform = '';
 			return;
 		}
 		if ( window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
@@ -63,8 +72,6 @@ export default function useMovingAnimation(
 			controller.stop();
 			controller.set( { x: 0, y: 0 } );
 		};
-		// triggerAnimationOnChange is intentionally the only dependency - we want to
-		// animate when this value changes, capturing position during render phase.
-	}, [ triggerAnimationOnChange ] );
+	}, [ index, itemsKey ] );
 	return ref;
 }
