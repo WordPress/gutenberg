@@ -11,6 +11,15 @@ const POPOVER_PROPS: { placement: 'bottom-start' } = {
 	placement: 'bottom-start',
 };
 
+// The formats shown directly in the toolbar, in the order they are listed.
+const TOOLBAR_FORMATS = [
+	'bold',
+	'italic',
+	'link',
+	'unknown',
+	'non-breaking-space',
+];
+
 // The formats shown in the "More" dropdown, in the order they are listed.
 // Unlike sorting by title, this order does not change with the locale.
 const DROPDOWN_FORMATS = [
@@ -102,14 +111,12 @@ const DropdownSlots = ( {
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link', 'unknown', 'non-breaking-space' ].map(
-				( format ) => (
-					<Slot
-						name={ `RichText.ToolbarControls.${ format }` }
-						key={ format }
-					/>
-				)
-			) }
+			{ TOOLBAR_FORMATS.map( ( format ) => (
+				<Slot
+					name={ `RichText.ToolbarControls.${ format }` }
+					key={ format }
+				/>
+			) ) }
 			<DropdownSlots />
 		</>
 	);
