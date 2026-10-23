@@ -923,6 +923,9 @@ function MediaEditorContent( {
 	}, [ clearEntityRecordEdits, id, onEditOriginal, originalId ] );
 
 	// A bare replacement has no image editor change, so OR the flag in explicitly.
+	// Named edits (`session.edits`) are session state that nothing saves, so
+	// `hasOutputEdits` leaves them out: counting them would enable Save for a
+	// change the save then drops.
 	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
