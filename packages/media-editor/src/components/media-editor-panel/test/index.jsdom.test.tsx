@@ -1,12 +1,25 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Slot, SlotFillProvider } from '@wordpress/components';
 import { createContext, useContext, useState } from '@wordpress/element';
+import warning from '@wordpress/warning';
 import MediaEditorPanel, {
 	MediaEditorPanelsProvider,
 	getPanelSlotName,
 	useMediaEditorPanels,
 } from '..';
+import type { MediaType } from '../../../utils';
+
+vi.mock( import( '@wordpress/warning' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+
+const mockedWarning = vi.mocked( warning );
 
 function Editor( { children }: { children: React.ReactNode } ) {
 	const { panels, contextValue } = useMediaEditorPanels();
@@ -32,6 +45,10 @@ function Editor( { children }: { children: React.ReactNode } ) {
 }
 
 describe( 'MediaEditorPanel', () => {
+	beforeEach( () => {
+		mockedWarning.mockClear();
+	} );
+
 	it( 'gives the editor a tab and renders its content there', () => {
 		render(
 			<Editor>
@@ -202,5 +219,84 @@ describe( 'MediaEditorPanel', () => {
 		expect(
 			screen.getByRole( 'region', { name: 'Fine' } )
 		).toHaveTextContent( 'Fine content' );
+	} );
+
+	it( 'names the plugin scope when rendered outside the editor', () => {
+		expect( () =>
+			render(
+				<MediaEditorPanel name="plugin/vignette" title="Vignette">
+					content
+				</MediaEditorPanel>
+			)
+		).toThrow( 'scope "media-editor"' );
+	} );
+
+	it( 'warns when two panels share a name', () => {
+		render(
+			<Editor>
+				<MediaEditorPanel name="plugin/same" title="First">
+					first
+				</MediaEditorPanel>
+				<MediaEditorPanel name="plugin/same" title="Second">
+					second
+				</MediaEditorPanel>
+			</Editor>
+		);
+
+		expect( mockedWarning ).toHaveBeenCalledWith(
+			expect.stringContaining( '"plugin/same"' )
+		);
+		expect( screen.getByTestId( 'tabs' ) ).toHaveTextContent(
+			/^plugin\/same$/
+		);
+	} );
+
+	it( 'warns about a media type the editor does not know', () => {
+		const unknownType = 'pdf' as unknown as MediaType[ 'type' ];
+		render(
+			<Editor>
+				<MediaEditorPanel
+					name="plugin/pdf"
+					title="PDF"
+					mediaTypes={ [ unknownType ] }
+				>
+					content
+				</MediaEditorPanel>
+			</Editor>
+		);
+
+		expect( mockedWarning ).toHaveBeenCalledWith(
+			expect.stringContaining( '"pdf"' )
+		);
+	} );
+
+	it( 'warns about a name without a namespace', () => {
+		render(
+			<Editor>
+				<MediaEditorPanel name="vignette" title="Vignette">
+					content
+				</MediaEditorPanel>
+			</Editor>
+		);
+
+		expect( mockedWarning ).toHaveBeenCalledWith(
+			expect.stringContaining( '"vignette"' )
+		);
+	} );
+
+	it( 'does not warn about a well-formed panel', () => {
+		render(
+			<Editor>
+				<MediaEditorPanel
+					name="plugin/vignette"
+					title="Vignette"
+					mediaTypes={ [ 'image' ] }
+				>
+					content
+				</MediaEditorPanel>
+			</Editor>
+		);
+
+		expect( mockedWarning ).not.toHaveBeenCalled();
 	} );
 } );
