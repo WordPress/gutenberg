@@ -110,7 +110,6 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		if ( ! adjacentThread ) {
 			selectNote( undefined );
 			toggleBlockHighlight( thread.blockClientId, false );
-			// Move focus to the related block.
 			relatedBlockElement?.focus();
 			return;
 		}
