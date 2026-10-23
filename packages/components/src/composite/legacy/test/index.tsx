@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { queryByAttribute, render, screen } from '@testing-library/react';
-import { press, waitFor } from '@ariakit/test';
+import { press, sleep, waitFor } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -274,8 +274,9 @@ describe.each( [
 		renderAndValidate( <Test /> );
 		const { item2 } = getOneDimensionalItems();
 
+		await sleep();
 		await press.Tab();
-		expect( item2 ).toHaveFocus();
+		await waitFor( () => expect( item2 ).toHaveFocus() );
 	} );
 } );
 
