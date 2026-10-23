@@ -6,9 +6,9 @@
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../hooks/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../rich-text" }
+		{ "path": "../rich-text/tsconfig.build.json" }
 	]
 }
