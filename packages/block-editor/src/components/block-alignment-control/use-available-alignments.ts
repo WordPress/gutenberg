@@ -2,11 +2,15 @@ import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useLayout } from '../block-list/layout';
 import { useBlockEditContext } from '../block-edit';
-import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
-import type { Layout, LayoutAlignment, LayoutType } from '../../layouts/types';
+import type {
+	Layout,
+	LayoutAlignment,
+	LayoutBlockSupport,
+	LayoutType,
+} from '../../layouts/types';
 import type { AlignmentMenu, AlignmentSettings } from './types';
 
 const EMPTY_ARRAY: never[] = [];
@@ -61,21 +65,19 @@ function useIsParentLayoutEditable(): boolean {
 			if ( ! rootClientId || ! parentName ) {
 				return true;
 			}
-			// Block support wins over theme settings, as in the layout panel.
-			const layoutSupport = getBlockSupport( parentName, 'layout' );
+			// Only the block type's support determines whether its layout is editable.
+			const layoutSupport =
+				getBlockSupport( parentName, 'layout' ) ||
+				getBlockSupport( parentName, '__experimentalLayout' );
 			if ( ! layoutSupport ) {
 				return false;
 			}
-			const [ layoutSettings ] = unlock(
-				select( blockEditorStore )
-			).getBlockSettings( rootClientId, 'layout' ) as [
-				{ allowEditing?: boolean } | undefined,
-			];
-			const { allowEditing = true } = {
-				...layoutSettings,
-				...( typeof layoutSupport === 'object' ? layoutSupport : {} ),
-			} as { allowEditing?: boolean };
-			return allowEditing;
+			const supportAllowEditing = ( layoutSupport as LayoutBlockSupport )
+				.allowEditing;
+			if ( typeof supportAllowEditing === 'boolean' ) {
+				return supportAllowEditing;
+			}
+			return true;
 		},
 		[ clientId ]
 	);
