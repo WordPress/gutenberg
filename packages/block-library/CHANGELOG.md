@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Group: Behind the `gutenberg-grid-interactivity` experiment, add a Canvas variation, a full width 12 by 12 manual placement grid where blocks are placed, sized and rotated on the canvas. Existing manual placement grids show as Canvas ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
+-   Group: Behind the `gutenberg-grid-interactivity` experiment, add a Canvas variation, a full width 32 by 32 manual placement grid where blocks are placed, sized and rotated on the canvas. Existing manual placement grids show as Canvas ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
