@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import inputRules from '../input-rules';
 import type { RichTextValue } from '@wordpress/rich-text';
+import inputRules from '../input-rules';
 import type {
 	RichTextEventListenerProps,
 	RichTextFormatType,
@@ -29,7 +29,10 @@ const backtickFormatType = {
 
 		return {
 			...value,
-			text: text.slice( 0, indexBefore ) + 'TRANSFORMED' + text.slice( start ),
+			text:
+				text.slice( 0, indexBefore ) +
+				'TRANSFORMED' +
+				text.slice( start ),
 		};
 	},
 } as RichTextFormatType;
