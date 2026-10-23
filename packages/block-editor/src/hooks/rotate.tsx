@@ -11,23 +11,24 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { useSettings } from '../components/use-settings';
+import { useUpdateGridChildLayout } from '../components/grid/use-update-grid-child-layout';
+import type { GridBlockStyle } from '../components/grid/mobile-stacking';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { isPlainObject } from '../utils/object';
 import {
 	fromPickerAngle,
-	normalizeAngle,
-	roundAngle,
+	getRotateForState,
+	getRotateStateStyle,
+	getRotateValue,
+	getStyleObject,
+	getUpdatedRotateStyle,
 	toPickerAngle,
 } from '../utils/rotation';
 import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
 import {
 	BlockStyleStateProvider,
-	DEFAULT_BLOCK_STYLE_STATE,
-	getStyleForState,
 	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
-	setStyleForState,
 } from './block-style-state';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -35,11 +36,6 @@ const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 export const ROTATE_SUPPORT_KEY = 'rotate';
 
 type BlockStyle = Record< string, any >;
-
-interface BlockStyleState {
-	viewport?: string;
-	pseudo?: string;
-}
 
 interface BlockAttributes {
 	style?: BlockStyle;
@@ -55,11 +51,6 @@ interface RotateEditProps {
 
 // Used for generating the instance ID.
 const ROTATE_BLOCK_PROPS_REFERENCE = {};
-
-// A number in decimal notation, as PHP's `is_numeric()` accepts it. Hex,
-// binary and octal strings such as `0x10`, which `Number()` would read, are
-// not rotations.
-const DECIMAL_NUMBER_PATTERN = /^\s*[+-]?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?\s*$/i;
 
 /**
  * Returns whether a block supports rotation. Blocks do unless they opt out
@@ -83,18 +74,6 @@ export function hasRotateSupport( nameOrType: string | BlockType ): boolean {
 }
 
 /**
- * Returns a block style attribute when it is an object, which is the only
- * kind of style attribute rotation is read from or written to.
- *
- * @param style Block style attribute.
- *
- * @return The style attribute, or undefined when it is not an object.
- */
-function getStyleObject( style: unknown ): BlockStyle | undefined {
-	return isPlainObject( style ) ? style : undefined;
-}
-
-/**
  * Returns whether rotation is edited and shown for a block: the block rotation
  * experiment is on and the block supports rotation.
  *
@@ -109,130 +88,6 @@ export function isRotateEnabled( nameOrType: string | BlockType ): boolean {
 	const { __experimentalEnableBlockRotation: isExperimentEnabled } =
 		window as Window & { __experimentalEnableBlockRotation?: boolean };
 	return !! isExperimentEnabled && hasRotateSupport( nameOrType );
-}
-
-/**
- * Reads a stored rotation, which is a number of degrees. Anything that is not
- * a finite number, or a string holding one in decimal notation, is ignored.
- * Matches `gutenberg_get_rotate_value()` in PHP.
- *
- * @param value Stored rotation.
- *
- * @return The rotation in (-180, 180], rounded to two decimals, or undefined.
- */
-export function getRotateValue( value: unknown ): number | undefined {
-	const angle =
-		typeof value === 'string' && DECIMAL_NUMBER_PATTERN.test( value )
-			? Number( value )
-			: value;
-	if ( typeof angle !== 'number' || ! Number.isFinite( angle ) ) {
-		return undefined;
-	}
-	return normalizeAngle( roundAngle( angle ) );
-}
-
-/**
- * Returns the state that holds rotation for a selected style state. Rotation
- * is stored per viewport only, so a pseudo state such as `:hover` is ignored.
- *
- * @param selectedState Selected block style state.
- *
- * @return The style state rotation is stored in.
- */
-function getRotateState( selectedState: BlockStyleState ): BlockStyleState {
-	return {
-		viewport: hasViewportBlockStyleState( selectedState )
-			? selectedState.viewport
-			: DEFAULT_BLOCK_STYLE_STATE.viewport,
-		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-	};
-}
-
-/**
- * Returns the styles of a block for the state rotation is stored in.
- *
- * @param style         Block style attribute.
- * @param selectedState Selected block style state.
- *
- * @return The styles of that state, if any.
- */
-function getRotateStateStyle(
-	style: BlockStyle | undefined,
-	selectedState: BlockStyleState
-): BlockStyle | undefined {
-	return getStyleObject(
-		getStyleForState(
-			getStyleObject( style ) ?? {},
-			getRotateState( selectedState )
-		)
-	);
-}
-
-/**
- * Returns the rotation a block has in a style state: the viewport's own
- * rotation when it sets one, otherwise the default rotation.
- *
- * @param style         Block style attribute.
- * @param selectedState Selected block style state.
- *
- * @return The rotation in degrees, in (-180, 180]. 0 when not rotated.
- */
-export function getRotateForState(
-	style: BlockStyle | undefined,
-	selectedState: BlockStyleState
-): number {
-	const defaultRotate =
-		getRotateValue( getStyleObject( style )?.rotate ) ?? 0;
-	if ( ! hasViewportBlockStyleState( selectedState ) ) {
-		return defaultRotate;
-	}
-	return (
-		getRotateValue( getRotateStateStyle( style, selectedState )?.rotate ) ??
-		defaultRotate
-	);
-}
-
-/**
- * Returns a block style attribute with the rotation of a style state set.
- *
- * In the default state, no rotation is stored as no value. In a viewport
- * state, 0 is kept, because it undoes the default rotation on that viewport.
- * An undefined angle removes the state's rotation.
- *
- * @param style         Block style attribute.
- * @param angle         Rotation in degrees.
- * @param selectedState Selected block style state.
- *
- * @return The updated block style attribute.
- *
- * @example
- * ```js
- * setAttributes( {
- * 	style: getUpdatedRotateStyle( attributes.style, 30, { viewport: '@mobile' } ),
- * } );
- * ```
- */
-export function getUpdatedRotateStyle(
-	style: BlockStyle | undefined,
-	angle: number | undefined,
-	selectedState: BlockStyleState
-): BlockStyle | undefined {
-	const baseStyle = getStyleObject( style );
-	const rotateState = getRotateState( selectedState );
-	const isViewportState = hasViewportBlockStyleState( rotateState );
-	let rotate = getRotateValue( angle );
-	if ( rotate === 0 && ! isViewportState ) {
-		rotate = undefined;
-	}
-
-	if ( ! isViewportState ) {
-		return cleanEmptyObject( { ...baseStyle, rotate } );
-	}
-
-	return setStyleForState( baseStyle ?? {}, rotateState, {
-		...getRotateStateStyle( baseStyle, rotateState ),
-		rotate,
-	} );
 }
 
 /**
@@ -311,17 +166,27 @@ function resetRotate( attributes: BlockAttributes ): BlockAttributes {
 }
 
 function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
-	const { blockEditingMode, selectedState } = useSelect(
+	const { blockEditingMode, selectedState, isStackedInGrid } = useSelect(
 		( select ) => {
-			const { getBlockEditingMode, getSelectedBlockStyleState } =
-				select( blockEditorStore );
+			const {
+				getBlockEditingMode,
+				getBlockRootClientId,
+				getSelectedBlockStyleState,
+				getStackedGridLayouts,
+			} = unlock( select( blockEditorStore ) );
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
 				blockEditingMode: getBlockEditingMode( clientId ),
 				selectedState: getSelectedBlockStyleState( clientId ),
+				// On mobile, a grid stacked on mobile shows its blocks
+				// unrotated.
+				isStackedInGrid:
+					!! rootClientId && !! getStackedGridLayouts( rootClientId ),
 			};
 		},
 		[ clientId ]
 	);
+	const updateGridChildLayout = useUpdateGridChildLayout();
 
 	if (
 		blockEditingMode !== 'default' ||
@@ -331,10 +196,26 @@ function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
 	}
 
 	const stateStyle = getRotateStateStyle( style, selectedState );
-	const updateRotate = ( angle: number | undefined ) =>
+	const updateRotate = ( angle: number | undefined ) => {
+		if ( isStackedInGrid ) {
+			// Like the rotate handle on the canvas, an edit turns stacking
+			// off for the grid first, so that it has a visible effect.
+			updateGridChildLayout(
+				clientId,
+				( childStyle, state ) =>
+					// The rotate helpers type the style loosely.
+					getUpdatedRotateStyle(
+						childStyle,
+						angle,
+						state
+					) as GridBlockStyle
+			);
+			return;
+		}
 		setAttributes( {
 			style: getUpdatedRotateStyle( style, angle, selectedState ),
 		} );
+	};
 
 	return (
 		// The provider scopes the panel's "Reset all" to the selected state.
@@ -353,7 +234,9 @@ function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
 					<AnglePickerControl
 						label={ __( 'Rotation' ) }
 						value={ toPickerAngle(
-							getRotateForState( style, selectedState )
+							isStackedInGrid
+								? 0
+								: getRotateForState( style, selectedState )
 						) }
 						onChange={ ( value ) =>
 							updateRotate( fromPickerAngle( value ) )
