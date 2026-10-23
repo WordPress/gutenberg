@@ -5,6 +5,7 @@ import type {
 	HTMLAttributes,
 	PointerEvent,
 } from 'react';
+import { speak } from '@wordpress/a11y';
 import { ResizableBox } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
@@ -106,10 +107,24 @@ export function GridRowResizer( { clientId }: GridRowResizerProps ) {
 				} }
 				onResizeStop={ ( _event, direction, _element, delta ) => {
 					setResize( null );
-					resizeRows(
+					const rowCount = resizeRows(
 						direction as Edge,
 						getRowDelta( delta.height )
 					);
+					// The row count label is only shown while resizing.
+					if ( rowCount ) {
+						speak(
+							sprintf(
+								/* translators: %d: Number of rows in a grid. */
+								_n(
+									'The grid now has %d row.',
+									'The grid now has %d rows.',
+									rowCount
+								),
+								rowCount
+							)
+						);
+					}
 				} }
 			>
 				{ resize && (
