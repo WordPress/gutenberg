@@ -84,6 +84,8 @@
 
 	&:focus {
 		@include mixins.outset-ring__focus();
+		// Reset the wp-admin forms.css focus box-shadow.
+		box-shadow: none;
 	}
 
 	&:where(.is-small) {
