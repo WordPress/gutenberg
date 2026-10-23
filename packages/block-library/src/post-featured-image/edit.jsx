@@ -162,8 +162,8 @@ export default function PostFeaturedImageEdit( {
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
-	// In a grid cell with a fixed size, the image fills the cell, so its own
-	// size settings have no effect.
+	// In a grid cell with a fixed size, the image fills the cell, cropped as
+	// needed, so only its scale has an effect.
 	const isInFixedGridCell = useIsInFixedGridCell( clientId );
 
 	const mediaUrl =
@@ -250,39 +250,33 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 			</InspectorControls>
-			{ ! isInFixedGridCell && (
-				<InspectorControls
-					group="dimensions"
-					resetAllFilter={ ( attrs ) => {
-						return getDimensionResetAttributes( {
-							attributes: attrs,
-							selectedState: selectedStyleState,
-							hasSelectedStyleState,
-							keys: [
-								'aspectRatio',
-								'height',
-								'objectFit',
-								'width',
-							],
-							defaultAttributes: {
-								aspectRatio: undefined,
-								height: undefined,
-								scale: undefined,
-								width: undefined,
-							},
-						} );
-					} }
-				>
-					<DimensionControls
-						clientId={ clientId }
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						media={ media }
-						selectedStyleState={ selectedStyleState }
-						hasSelectedStyleState={ hasSelectedStyleState }
-					/>
-				</InspectorControls>
-			) }
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => {
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							height: undefined,
+							scale: undefined,
+							width: undefined,
+						},
+					} );
+				} }
+			>
+				<DimensionControls
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					media={ media }
+					selectedStyleState={ selectedStyleState }
+					hasSelectedStyleState={ hasSelectedStyleState }
+					isInFixedGridCell={ isInFixedGridCell }
+				/>
+			</InspectorControls>
 			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -435,7 +429,7 @@ export default function PostFeaturedImageEdit( {
 			? height
 			: hasDimensionValue( width ) && 'auto',
 		width: hasDimensionValue( width ) ? width : !! aspectRatio && '100%',
-		objectFit: !! ( height || aspectRatio ) && scale,
+		objectFit: !! ( height || aspectRatio || isInFixedGridCell ) && scale,
 	};
 
 	/**
