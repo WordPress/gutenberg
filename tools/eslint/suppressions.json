@@ -4684,11 +4684,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/search/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/search/variations.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
