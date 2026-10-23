@@ -10,6 +10,7 @@ import {
 } from '@wordpress/element';
 import type { ReactNode } from 'react';
 import type { MediaType } from '../../utils';
+import MediaEditorPanelErrorBoundary from './error-boundary';
 
 /** What the sidebar hands a panel when it renders it. */
 export interface MediaEditorPanelFillProps {
@@ -122,7 +123,8 @@ export function useMediaEditorPanels() {
  * with its children. Core's Crop and Details panels are rendered with
  * this component; a plugin renders it from a `registerPlugin` callback
  * in the `media-editor` scope, where `useMediaEditor()` gives it the
- * session.
+ * session. Content that throws stays inside its tab, which names the
+ * failed panel; the rest of the editor keeps working.
  *
  * @param props
  * @param props.name
@@ -157,12 +159,14 @@ export default function MediaEditorPanel( {
 
 	return (
 		<Fill name={ getPanelSlotName( name ) }>
-			{ ( fillProps ) =>
-				typeof children === 'function'
-					? // The slot passes exactly these props; `Fill` types them loosely.
-						children( fillProps as MediaEditorPanelFillProps )
-					: children
-			}
+			{ ( fillProps ) => (
+				<MediaEditorPanelErrorBoundary title={ title }>
+					{ typeof children === 'function'
+						? // The slot passes exactly these props; `Fill` types them loosely.
+							children( fillProps as MediaEditorPanelFillProps )
+						: children }
+				</MediaEditorPanelErrorBoundary>
+			) }
 		</Fill>
 	);
 }
