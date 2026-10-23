@@ -10,6 +10,7 @@ import type {
 	ParentLayout,
 } from '../types';
 import type { BlockStyleState } from '../../../hooks/types';
+import { lock } from '../../../lock-unlock';
 
 // What the mocked block editor store returns, which tests can change.
 const mockStore = vi.hoisted(
@@ -36,14 +37,17 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	useSelect: vi.fn(
 		( mapSelect: ( ( select: unknown ) => unknown ) | object ) => {
 			if ( typeof mapSelect === 'function' ) {
-				return mapSelect( () => ( {
+				const selectors = {
 					getBlockRootClientId: () => 'root-client-id',
 					getBlockAttributes: ( clientId: string ) =>
 						mockStore.attributes[ clientId ] ?? {},
 					getBlockOrder: () => [],
 					getBlocksByClientId: () => [],
 					getSelectedBlockStyleState: () => mockStore.selectedState,
-				} ) );
+				};
+				// The grid isn't stacked on mobile.
+				lock( selectors, { getStackedGridLayouts: () => null } );
+				return mapSelect( () => selectors );
 			}
 
 			return {

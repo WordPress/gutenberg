@@ -25,6 +25,7 @@ import {
 	getExpandedBlock,
 	isDragging,
 	getBlockStyles,
+	getStackedGridLayouts,
 	isEditLockedBlock,
 	isMoveLockedBlock,
 	isRemoveLockedBlock,
@@ -1548,6 +1549,105 @@ describe( 'private selectors', () => {
 				'block-1': { color: 'red' },
 				'non-existent-block': undefined,
 			} );
+		} );
+	} );
+
+	describe( 'getStackedGridLayouts', () => {
+		// These tests run without a DOM.
+		beforeEach( () => {
+			vi.stubGlobal( 'window', {
+				__experimentalEnableGridInteractivity: true,
+			} );
+		} );
+		afterEach( () => {
+			vi.unstubAllGlobals();
+		} );
+
+		const stackedGrid = {
+			layout: {
+				type: 'grid',
+				isManualPlacement: true,
+				columnCount: 2,
+				stackOnMobile: true,
+			},
+		};
+		// Kept the same between states, like unchanged blocks in the store.
+		const tallBlock = { style: { layout: { rowSpan: 2 } } };
+		const gridOrder = [ 'a', 'b' ];
+		const getState = (
+			gridAttributes: BlockAttributes,
+			paragraphAttributes: BlockAttributes = { content: 'One' },
+			styleStateViewport = '@mobile'
+		) =>
+			partial< State >( {
+				styleStateViewport,
+				blocks: {
+					byClientId: new Map(
+						[ 'grid', 'a', 'b' ].map( ( clientId ) => [
+							clientId,
+							{ clientId },
+						] )
+					),
+					attributes: new Map( [
+						[ 'grid', gridAttributes ],
+						[ 'a', paragraphAttributes ],
+						[ 'b', tallBlock ],
+					] ),
+					order: new Map( [ [ 'grid', gridOrder ] ] ),
+				},
+			} );
+
+		it( 'gets the layouts of a grid stacked on mobile', () => {
+			expect(
+				getStackedGridLayouts( getState( stackedGrid ), 'grid' )
+			).toEqual( {
+				grid: { stackOnMobile: false, columnCount: 2, rowCount: 3 },
+				children: {
+					a: {
+						columnStart: 1,
+						columnSpan: 2,
+						rowStart: 1,
+						rowSpan: 1,
+					},
+					b: {
+						columnStart: 1,
+						columnSpan: 2,
+						rowStart: 2,
+						rowSpan: 2,
+					},
+				},
+			} );
+		} );
+
+		it( 'returns null outside the mobile viewport or for grids that do not stack', () => {
+			expect(
+				getStackedGridLayouts(
+					getState( stackedGrid, undefined, 'default' ),
+					'grid'
+				)
+			).toBeNull();
+			expect(
+				getStackedGridLayouts(
+					getState( {
+						layout: { type: 'grid', isManualPlacement: true },
+					} ),
+					'grid'
+				)
+			).toBeNull();
+		} );
+
+		it( 'keeps its result when a child changes in a way the stack does not read', () => {
+			const style = { layout: { rowSpan: 1 } };
+			const before = getStackedGridLayouts(
+				getState( stackedGrid, { content: 'One', style } ),
+				'grid'
+			);
+			expect(
+				getStackedGridLayouts(
+					getState( stackedGrid, { content: 'Two', style } ),
+					'grid'
+				)
+			).toBe( before );
 		} );
 	} );
 

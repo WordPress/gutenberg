@@ -38,6 +38,14 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import {
+	getStackedLayouts,
+	isGridStackedOnMobile,
+} from '../components/grid/mobile-stacking';
+import type {
+	GridBlockAttributes,
+	StackedGridLayouts,
+} from '../components/grid/mobile-stacking';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -959,6 +967,58 @@ export const getBlockStyles = createSelector(
 	( state: State, clientIds: string[] ) => [
 		...clientIds.map(
 			( clientId ) => state.blocks.attributes.get( clientId )?.style
+		),
+	]
+);
+
+/**
+ * Returns the layouts a grid and its children show on mobile when the grid
+ * is stacked there, so that the tools can work from the stack. The result
+ * stays the same while the grid's children change in ways the stack doesn't
+ * depend on, such as their content.
+ *
+ * @param state        Editor state.
+ * @param gridClientId Client ID of the grid.
+ *
+ * @return The stacked layouts, or `null` when the mobile viewport isn't selected or the grid doesn't stack on mobile.
+ */
+export const getStackedGridLayouts = createSelector(
+	( state: State, gridClientId: string ): StackedGridLayouts | null => {
+		// The layout and style attributes are objects when set.
+		const gridAttributes = getBlockAttributes(
+			state,
+			gridClientId
+		) as GridBlockAttributes | null;
+		if (
+			getStyleStateViewport( state ) !== '@mobile' ||
+			! isGridStackedOnMobile(
+				gridAttributes?.layout,
+				gridAttributes?.style
+			)
+		) {
+			return null;
+		}
+		return getStackedLayouts(
+			gridAttributes,
+			getBlockOrder( state, gridClientId ).map( ( clientId ) => ( {
+				clientId,
+				attributes: getBlockAttributes(
+					state,
+					clientId
+				) as GridBlockAttributes | null,
+			} ) )
+		);
+	},
+	( state: State, gridClientId: string ) => [
+		state.styleStateViewport,
+		state.blocks.attributes.get( gridClientId ),
+		state.blocks.order.get( gridClientId ),
+		// The stack reads each child's style and its block visibility.
+		...( state.blocks.order.get( gridClientId ) ?? [] ).flatMap(
+			( clientId ) => {
+				const attributes = state.blocks.attributes.get( clientId );
+				return [ attributes?.style, attributes?.metadata ];
+			}
 		),
 	]
 );
