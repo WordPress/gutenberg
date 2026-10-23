@@ -8,11 +8,9 @@ import * as SelectStories from '../../../../ui/src/form/primitives/select/storie
 
 # CustomSelectControl migration guide
 
-Migrate the legacy [`CustomSelectControl`](?path=/docs/components-customselectcontrol--docs) from `@wordpress/components` to [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui`. Prefer the complete control for standard labels and descriptions, including custom triggers and popup items. Use [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitives when you need a custom field layout, a small trigger, or item values outside the wrapper's string-or-null shape.
+Migrate from [`CustomSelectControl`](?path=/docs/components-customselectcontrol--docs) in `@wordpress/components` to [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`. `SelectControl` supports custom trigger content and styled items, so most migrations do not need lower-level components. Use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive only when you need the small size, a custom field layout, or item values that are not strings.
 
-## Convert options and callbacks
-
-Rename `key` to `value`, `name` to `label`, and `hint` (or `__experimentalHint`) to `description`. The controlled value is still an item object. `onValueChange` receives that item, or `null`, as its first argument and event details as its second argument. Remove the legacy `selectedItem` destructuring. The old change object's `highlightedIndex`, `inputValue`, `isOpen`, and `type` fields have no equivalent callback payload. Use `onOpenChange` separately if you track the popup state.
+## Basic migration
 
 Before:
 
@@ -34,99 +32,115 @@ function ImageSize() {
 			label="Image size"
 			options={ options }
 			value={ options.find( ( option ) => option.key === imageSize ) }
-			onChange={ ( { selectedItem } ) => setImageSize( selectedItem.key ) }
+			onChange={ ( { selectedItem } ) =>
+				setImageSize( selectedItem.key )
+			}
 		/>
 	);
 }
 ```
 
-After, using `SelectControl` from `@wordpress/ui`, with the stored application value shown below the control:
+After, with the stored value shown below the control:
 
 <Canvas of={ MigrationStories.StoredValue } sourceState="shown" />
 
-## Map props
+In each option, rename `key` to `value`, `name` to `label`, and `hint` (or `__experimentalHint`) to `description`. The selected `value` is still an item object. `onValueChange` receives the selected item, or `null`, instead of an object with a `selectedItem` property. The other fields of the legacy change object, such as `isOpen` and `highlightedIndex`, have no equivalent. Use `onOpenChange` if you need to know when the popup opens or closes.
+
+Object values are compared by identity by default. Pass an object from the current `items` array to `value`, as the example does by looking up the stored key on every render. If you keep a selected object across changes to `items` instead, supply `isItemEqualToValue={ ( item, value ) => item.value === value.value }`.
+
+## Prop mapping
 
 <Markdown>{ `
-
-| Legacy CustomSelectControl | @wordpress/ui | Consumer action |
+| Legacy control | New control | Notes |
 | --- | --- | --- |
-| \`options\` | \`items\` | Convert \`{ key, name }\` to \`{ value, label }\`. |
-| \`value\` | \`value\` | Pass an object from the current items, or \`null\` for no selection. |
-| \`onChange( { selectedItem } )\` | \`onValueChange( item, details )\` | Guard \`item\` before reading its properties. |
-| \`label\` | \`label\` | Keep a descriptive string. |
-| \`hideLabelFromVision\` | \`hideLabelFromVision\` | Retain the label even when visually hidden. |
-| \`describedBy\` | \`description\` | Pass description text, not an element ID. See [Preserve selected hints](#preserve-selected-hints). |
-| \`hint\`, \`__experimentalHint\` | Item \`description\` | Supplementary popup text. This does not add a selected hint to the trigger. |
-| \`showSelectedHint\`, \`__experimentalShowSelectedHint\` | \`trigger\` children | Render the selected hint explicitly and associate its description. |
-| Option \`style\`, \`className\` | Custom \`Item\` / \`ItemLabel\` props | Apply them in popup JSX. Extra item object fields do not apply styles automatically. |
-| \`onFocus\`, \`onBlur\`, \`onMouseOver\`, \`onMouseOut\` | \`SelectControl.Trigger\` props | Pass the trigger element through \`trigger\`. |
-| \`className\` | \`className\` or trigger \`className\` | Choose the field wrapper or trigger layout explicitly. Replace selectors tied to legacy markup. |
-| \`size="default"\` | \`size="default"\` | The wrapper also supports \`compact\`. |
-| \`size="small"\` | \`Select.Trigger size="small"\` | Use primitives when the small size is necessary. The wrapper excludes it. |
-| \`__next40pxDefaultSize\`, \`__nextUnconstrainedWidth\` | Remove | These obsolete opt-ins have no replacement. |
-
+| \`options\` | \`items\` | Convert \`{ key, name, hint }\` to \`{ value, label, description }\`. |
+| \`value\` | \`value\` | Pass an object from \`items\`, or \`null\` for no selection. |
+| \`onChange\` | \`onValueChange\` | Receives the item or \`null\`, followed by event details. Check for \`null\` before reading the item. |
+| \`label\` | \`label\` | Required plain string. \`hideLabelFromVision\` keeps it accessible while visually hidden. |
+| \`describedBy\` | \`description\` | Both take text. \`description\` is visible below the control. See [Show the selected hint](#show-the-selected-hint) to keep a hidden description. |
+| \`hint\`, \`__experimentalHint\` | Item \`description\` | Shown in the popup, not in the trigger. |
+| \`showSelectedHint\`, \`__experimentalShowSelectedHint\` | Trigger children | See [Show the selected hint](#show-the-selected-hint). |
+| Option \`style\`, \`className\` | \`SelectControl.Item\` and \`SelectControl.ItemLabel\` props | See [Style items](#style-items). |
+| \`onFocus\`, \`onBlur\`, \`onMouseOver\`, \`onMouseOut\` | \`trigger\` element props | See [Move event handlers to the trigger](#move-event-handlers-to-the-trigger). |
+| \`className\` | \`className\` or trigger \`className\` | The control class styles the field wrapper, and a trigger class styles the trigger. Update selectors that target the legacy markup. |
+| \`size="default"\` | \`size="default"\` | The control also supports \`size="compact"\`. |
+| \`size="small"\` | \`Select.Trigger size="small"\` | See [Use the small size](#use-the-small-size). |
+| \`__next40pxDefaultSize\`, \`__nextUnconstrainedWidth\` | Remove | These opt-ins do not apply to the new control. |
 ` }</Markdown>
 
-## Resolve the selection
+## Set an initial selection
 
-Legacy `CustomSelectControl` chooses the first option when `value` is omitted, without calling `onChange` on mount. An unavailable key displays the first option as a fallback. Do not apply assumptions about the native `SelectControl` to this component. Preserve the intended selection explicitly in your migration.
+When `value` is omitted, the legacy control selects the first option without calling `onChange`. The new control starts with no selection and shows its placeholder.
 
-The new control starts with no selection unless you supply `value` or `defaultValue`. To preserve the initial first choice in an uncontrolled control, use `defaultValue={ items[ 0 ] ?? null }`. For a controlled field, initialize the stored value deliberately and resolve it against the current items on each render.
+To keep the first option selected in an uncontrolled control, pass `defaultValue={ items[ 0 ] ?? null }`. In a controlled control, initialize the stored value explicitly.
 
-Legacy selection matching uses the option's key and its callback returns the original option object. New object values use reference equality by default. Use the same object from the current `items` array for `value` and custom `Item` values. When you retain an object across item refreshes, supply `isItemEqualToValue={ ( item, value ) => item.value === value.value }` or resolve the stored identifier against the refreshed items instead. Rebuilding the array is safe when you also resolve the selected object from that array, as in the example above.
+## Handle unavailable values
 
-A failed lookup must not become `undefined` in a controlled field. Choose a policy: `items.find( matchesStoredValue ) ?? null` displays the placeholder, while `items.find( matchesStoredValue ) ?? items[ 0 ] ?? null` deliberately preserves the legacy display fallback. These lookup expressions only choose the displayed selection. A change handler may still receive `null` when choices are removed, so decide whether that should clear application state. If an unavailable stored value must be cleared or replaced, update application state explicitly, or add a labeled item representing that value.
+When the stored value matches no option, the legacy control displays the first option. Decide what the new control should display instead, and never pass `undefined` as `value`:
 
-Handle `items={ [] }`, including an explicitly supplied empty custom-options array. Do not replace that array with defaults just because it is empty. Resolve the selection to `null` and guard it before accessing `.label` or `.description`. Disable the control or omit it when there are no choices, according to your interface's needs. The selected-hint example below lets you try an empty custom list while preserving the stored font. Its popup has no clearing action, so its change handler ignores `null` callbacks. In a field that offers clearing, handle that action explicitly instead.
+- `items.find( matchesStoredValue ) ?? null` shows the placeholder.
+- `items.find( matchesStoredValue ) ?? items[ 0 ] ?? null` shows the first item, like the legacy control.
 
-## Customize the trigger
+Either lookup only changes what is displayed, not the stored value. If an unavailable value should be cleared or replaced, update the stored value explicitly, or add an item that represents it. `onValueChange` may also receive `null` when the selected item is removed from `items`, so decide whether that should clear the stored value.
 
-Use `trigger={ <SelectControl.Trigger … /> }` for focus and mouse handlers, button attributes, a trigger class, or selected-value content. Props on that trigger override the wrapper's `size` and `placeholder`. Event handlers on the trigger do not require primitives. The final PresetInputControl migration uses this slot for focus and hover handlers.
+An empty `items` array, such as an empty list of custom options, should stay empty. Do not replace it with default options. Resolve the selection to `null`, check for `null` before reading `.label` or `.description`, and disable or omit the control when there are no choices. You can try an empty list in the [selected hint example](#show-the-selected-hint).
 
-Trigger children customize only the selected display. They can be static content or a function receiving the selected item. Guard nullable selections before reading a label. When no selection exists, leave children `undefined` to retain the normal placeholder. Popup item content is configured separately with the control's children.
+## Move event handlers to the trigger
+
+Pass focus and mouse handlers, button attributes, and trigger classes to a `SelectControl.Trigger` element in the `trigger` prop. Props on that element override the control's `size` and `placeholder`.
+
+Trigger children change how the selected value is displayed. They can be static content or a function that receives the selected item. Check that an item is selected before reading its label, and pass `undefined` as children when nothing is selected to keep the placeholder. Items in the popup are customized separately, as described in [Style items](#style-items).
 
 <Canvas of={ SelectControlStories.WithCustomTrigger } />
 
-## Style popup items
+## Style items
 
-For plain hints, set `description` on each item and let `SelectControl` render the standard popup. For custom styling, pass `SelectControl.Item` children, with each `value` referencing its corresponding object in `items`. Put a class or style affecting the entire row on `Item`. Put font previews or other label-only styling on `ItemLabel`, so the hint and selection indicator remain unaffected.
+For plain hints, set `description` on each item and let `SelectControl` render the popup. Other fields on an item object, such as `style` or `className`, are not applied automatically.
 
-Make `ItemLabel` the first direct child of every `Item`, followed by zero or more direct `ItemDescription` children. Use `ItemDescription` for supplementary text or non-interactive inline markup. Keep the primary label separate from the description. Supply a plain string `label` prop on custom items for typeahead, particularly when the visible label contains markup. The trigger label still comes from the selected item's `label` or custom trigger children, not the popup JSX.
+To style items, render `SelectControl.Item` children and set each `value` to the matching object from `items`. Put a class or style for the whole row on `SelectControl.Item`. Put a font preview or other style for the label only on `SelectControl.ItemLabel`, so the description and selection indicator are not affected.
 
-The selected-hint example combines custom popup styling with a separate trigger display. For other compositions, reuse the existing [grouped](?path=/story/design-system-components-form-selectcontrol--grouped) and [custom-item](?path=/story/design-system-components-form-selectcontrol--with-custom-items) examples.
+Inside each `SelectControl.Item`, render `SelectControl.ItemLabel` first, optionally followed by `SelectControl.ItemDescription` elements. Pass a plain-text `label` prop to each `SelectControl.Item` for typeahead, especially when the visible label contains markup. The trigger shows the selected item's `label` from `items` unless you supply trigger children.
 
-## Preserve selected hints
+The [selected hint example](#show-the-selected-hint) combines styled items with custom trigger content. See also the [grouped](?path=/story/design-system-components-form-selectcontrol--grouped) and [custom items](?path=/story/design-system-components-form-selectcontrol--with-custom-items) examples.
 
-Legacy `showSelectedHint` adds the selected option's hint to the trigger. Its `describedBy` prop contains text, with a generated "Currently selected: …" description when no text is provided. The new control does not generate that legacy description or copy an item's description into the trigger.
+## Show the selected hint
 
-FontFamilyControl preserves its selected hint by rendering it beside the selected label with `aria-hidden="true"`, then combining the hint and `describedBy` text in a visually hidden `Field.Description`. With the public wrapper, render that text in `VisuallyHidden` with a unique ID and pass the ID through `SelectControl.Trigger`'s `aria-describedby`. The wrapper's `description` prop accepts plain text and displays it below the field. Use primitives if you need to customize `Field.Description` itself. Keep the selected label visible, hide the duplicate visual hint from the accessibility tree, and include the hint in the associated description. If the hint should also be visible below the control, pass plain description text instead.
+With `showSelectedHint`, the legacy control shows the selected option's hint in the trigger. It also describes the trigger with the `describedBy` text, or with a generated "Currently selected: …" text when `describedBy` is not set. The new control does neither.
 
-These are description associations visible in the source and rendered markup. They do not establish the words or order spoken by a screen reader. Verify your consumer with its supported assistive technology when preserving announcements matters.
+To keep this behavior, render the hint in the trigger children with `aria-hidden="true"`, so that it is not announced twice. Then render the hint and any description text in a [`VisuallyHidden`](?path=/docs/design-system-components-visuallyhidden--docs) element with a unique ID, and pass that ID to `aria-describedby` on `SelectControl.Trigger`. If the description should also be visible, pass it to the `description` prop instead.
+
+How a screen reader announces the description depends on the screen reader. Test with assistive technology when the exact announcement matters.
+
+In the example below, use the button to switch to an empty list of options. The example has no item that clears the selection, so its change handler ignores `null`.
 
 <Canvas of={ MigrationStories.SelectedHints } sourceState="shown" />
 
-## Separate clearing from empty strings
+## Migrate empty-string options
 
-Use `null` for no selection. An item with `value: null` offers a clearing action in the popup, and its label takes precedence over the `placeholder`. A placeholder is display text when no value is selected, not a selectable item. Reuse the existing clearing example:
+Use `null` for no selection. An item with `value: null` lets the user clear the selection, and its label replaces the `placeholder`. The placeholder is only shown when nothing is selected. It is not an item.
 
 <Canvas of={ SelectControlStories.WithNullValueOption } />
 
-An empty string can instead be a real application choice, such as "Use theme font". Do not convert every empty key to `null`, and do not use `item?.value || fallback`, which loses that choice. Use nullish checks such as `item?.value ?? null`.
+An empty string can also be a real choice, such as "Use theme font". Do not convert every empty key to `null`. When reading the selected value, use `item?.value ?? null`, not `item?.value || fallback`, which discards `''`.
 
-By default, empty-string item values are treated as empty selections. To preserve a real `''` choice, provide `itemToStringValue` that returns a unique, nonempty string for that item and every ordinary choice. The example below prefixes ordinary values with `font:` and leaves the clearing item serialized as an empty string. Choose "Use theme font" and submit: the stored value remains `""`, while the submitted value is `"font:"`. Clear the selection and try submitting again: the required field prevents submission.
+By default, an item with `value: ''` is treated as no selection. To keep it as a real choice, pass an `itemToStringValue` function that returns a unique, non-empty string for each item that does not clear the selection. This also changes the value submitted with a form. In the example below, "Use theme font" is stored as `""` but submitted as `"font:"`, so convert the submitted value back in your form handler. The choice now also counts as a selection for `required`, while clearing the selection still blocks submission.
 
 <Canvas of={ MigrationStories.EmptyStringChoice } sourceState="shown" />
 
-Serialization changes `FormData` and required-field behavior. A nonempty serialization makes the real empty-string choice satisfy `required`, and the form submits that serialized value. The callback still receives the original item with `value: ''`. Adjust the form consumer to decode the submitted value, or adapt submission yourself if your application requires a different payload.
+## Preserve labels
 
-Mapping application values to nonempty identifiers and converting them in callbacks can also represent special choices. For example, PresetInputControl maps numeric indexes to strings for the wrapper. This is not a `FormData` compatibility fix: the form submits those identifiers unless you explicitly adapt submission.
+Pass a descriptive string to `label`, even if `hideLabelFromVision` is set. For a custom label element or field layout, compose the [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) and `Select` primitives.
 
-## Keep labels and disabled state
+## Disable the control
 
-Retain a meaningful `label` even with `hideLabelFromVision`. Use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) and `Select` primitives for a custom label element or field layout. Preserve inherited-value label styling on your own label class when a consumer needs it, as the migrated font controls do.
+Pass `disabled` to `SelectControl` to disable the whole control, or set `disabled: true` on an item to disable one choice. The legacy control has no `disabled` prop, so a wrapper that passed one through had no effect. Check such wrappers before forwarding their props to the new control. When composing primitives, pass `disabled` to both `Field.Root` and `Select.Root`.
 
-Use `disabled` on `SelectControl` to disable the selection, or `disabled: true` on an item to disable just that choice. Legacy `CustomSelectControl` has no declared `disabled` prop, so inspect any consumer wrapper that previously forwarded one rather than copying all its props to the new root. In a primitive composition, pass `disabled` to `Field.Root` and `Select.Root` so both the field presentation and selection behavior reflect it.
+## Use the small size
 
-Use `Select.Trigger size="small"` only when the consumer requires that size. FontFamilyControl and FontAppearanceControl retain primitives for their small size and custom field-label styling. Custom popup content and trigger events alone are supported by the complete wrapper. The existing minimal primitive example demonstrates the small trigger and small popup items:
+`SelectControl` supports the `default` and `compact` sizes. If a control needs the legacy `small` size, compose the `Select` primitive with `Select.Trigger size="small"` and `Select.Item size="small"`. This example shows both, along with the `minimal` variant, which the small size does not require:
 
 <Canvas of={ SelectStories.Minimal } />
+
+## Other checks
+
+The [SelectControl migration guide](?path=/docs/components-selectcontrol--migration-guide) describes further checks that also apply here, including popup sizing and popups inside existing overlays.
