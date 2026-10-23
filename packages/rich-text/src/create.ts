@@ -49,11 +49,10 @@ function toFormat( {
 	}
 
 	if ( ! formatType && attributes?.style ) {
-		formatType =
-			select( richTextStore ).getFormatTypeForStyleProperty(
-				tagName,
-				attributes.style
-			);
+		formatType = select( richTextStore ).getFormatTypeForStyleProperty(
+			tagName,
+			attributes.style
+		);
 	}
 
 	if ( ! formatType ) {
