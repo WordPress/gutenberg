@@ -45,6 +45,34 @@ function appendRequiredIndicator(
 
 const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
 
+type Validity = NonNullable< ControlWithErrorProps[ 'customValidity' ] >;
+
+function getValidity(
+	customValidity: ControlWithErrorProps[ 'customValidity' ],
+	validityTarget: ValidityTarget | null | undefined
+): Validity | undefined {
+	if ( customValidity?.type === 'validating' ) {
+		return customValidity;
+	}
+	if ( validityTarget?.validationMessage ) {
+		return { type: 'invalid', message: validityTarget.validationMessage };
+	}
+	return customValidity?.type === 'valid' ? customValidity : undefined;
+}
+
+function isSameValidity( a?: Validity, b?: Validity ) {
+	return a?.type === b?.type && a?.message === b?.message;
+}
+
+// A state updater that keeps the current value when nothing changed, so an
+// unchanged re-read doesn't re-render.
+function toValidity( nextValidity?: Validity ) {
+	return ( prevValidity?: Validity ) =>
+		isSameValidity( prevValidity, nextValidity )
+			? prevValidity
+			: nextValidity;
+}
+
 /**
  * A wrapper that adds inline validation feedback to a form control, based on
  * the native Constraint Validation API.
@@ -70,14 +98,7 @@ export const ControlWithError = forwardRef<
 	},
 	forwardedRef
 ) {
-	const [ errorMessage, setErrorMessage ] = useState< string | undefined >();
-	const [ statusMessage, setStatusMessage ] = useState<
-		| {
-				type: 'validating' | 'valid';
-				message?: string;
-		  }
-		| undefined
-	>();
+	const [ validity, setValidity ] = useState< Validity | undefined >();
 	const [ showMessage, setShowMessage ] = useState( false );
 	const [ isTouched, setIsTouched ] = useState( false );
 
@@ -93,7 +114,9 @@ export const ControlWithError = forwardRef<
 			// While async validation is pending, keep its indicator instead
 			// of showing a message its result may supersede.
 			if ( customValidity?.type !== 'validating' ) {
-				setErrorMessage( validityTarget?.validationMessage );
+				setValidity(
+					toValidity( getValidity( customValidity, validityTarget ) )
+				);
 			}
 			setShowMessage( true );
 			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
@@ -101,7 +124,7 @@ export const ControlWithError = forwardRef<
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
-	}, [ customValidity?.type, getValidityTarget ] );
+	}, [ customValidity, getValidityTarget ] );
 
 	// Suppress the native error popover, while keeping the focus behavior intact.
 	useEffect( () => {
@@ -158,64 +181,22 @@ export const ControlWithError = forwardRef<
 	}, [ getValidityTarget ] );
 
 	// Handle validity messages. Consumers pass an inline `getValidityTarget`,
-	// so this runs after every render. It only sets changed values: React can
-	// still schedule a render for an unchanged one, and in React 19 a render
-	// per keystroke trips its nested update limit, dropping typed input.
+	// so this runs after every render. React can schedule a render even for an
+	// unchanged value, and in React 19 one per keystroke trips its nested
+	// update limit, dropping typed input.
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
-		const updateErrorMessage = ( message?: string ) => {
-			if ( message !== errorMessage ) {
-				setErrorMessage( message );
-			}
-		};
-		const updateStatusMessage = ( status?: typeof statusMessage ) => {
-			if (
-				status?.type !== statusMessage?.type ||
-				status?.message !== statusMessage?.message
-			) {
-				setStatusMessage( status );
-			}
-		};
+		validityTarget?.setCustomValidity(
+			customValidity?.type === 'invalid'
+				? ( customValidity.message ?? '' )
+				: ''
+		);
 
-		if ( ! customValidity?.type ) {
-			validityTarget?.setCustomValidity( '' );
-			updateErrorMessage( validityTarget?.validationMessage );
-			updateStatusMessage( undefined );
-			return;
+		const nextValidity = getValidity( customValidity, validityTarget );
+		if ( ! isSameValidity( nextValidity, validity ) ) {
+			setValidity( nextValidity );
 		}
-
-		switch ( customValidity.type ) {
-			case 'validating': {
-				validityTarget?.setCustomValidity( '' );
-				updateErrorMessage( undefined );
-
-				updateStatusMessage( {
-					type: 'validating',
-					message: customValidity.message,
-				} );
-				break;
-			}
-			case 'valid': {
-				validityTarget?.setCustomValidity( '' );
-				updateErrorMessage( validityTarget?.validationMessage );
-
-				updateStatusMessage( {
-					type: 'valid',
-					message: customValidity.message,
-				} );
-				break;
-			}
-			case 'invalid': {
-				validityTarget?.setCustomValidity(
-					customValidity.message ?? ''
-				);
-				updateErrorMessage( validityTarget?.validationMessage );
-
-				updateStatusMessage( undefined );
-				break;
-			}
-		}
-	}, [ customValidity, getValidityTarget, errorMessage, statusMessage ] );
+	}, [ customValidity, getValidityTarget, validity ] );
 
 	// Show messages if field has been touched (i.e. has blurred at least once),
 	// or validation has been triggered by the consumer/user.
@@ -262,34 +243,22 @@ export const ControlWithError = forwardRef<
 		const isValidating = customValidity?.type === 'validating';
 		window.queueMicrotask( () => {
 			if ( ! isValidating ) {
-				setErrorMessage( validityTarget?.validationMessage );
+				setValidity(
+					toValidity( getValidity( customValidity, validityTarget ) )
+				);
 			}
 		} );
 	};
 
 	const messageId = useId();
 
-	const message = ( () => {
-		if ( errorMessage ) {
-			return (
-				<ValidityIndicator
-					id={ messageId }
-					type="invalid"
-					message={ errorMessage }
-				/>
-			);
-		}
-		if ( statusMessage?.type ) {
-			return (
-				<ValidityIndicator
-					id={ messageId }
-					type={ statusMessage.type }
-					message={ statusMessage.message }
-				/>
-			);
-		}
-		return null;
-	} )();
+	const message = validity ? (
+		<ValidityIndicator
+			id={ messageId }
+			type={ validity.type }
+			message={ validity.message }
+		/>
+	) : null;
 
 	const visibleMessage = showMessage ? message : null;
 

@@ -17,7 +17,7 @@
 
 ### Bug Fixes
 
--   `ControlWithError`: Stop re-rendering after every render of the wrapped control, which under React 19 hit the nested update limit while typing and dropped keystrokes.
+-   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
 
 ### Documentation
 
