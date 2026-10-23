@@ -3,6 +3,7 @@
 	"testsEnvironment": false,
 	"port": 8889,
 	"core": "WordPress/WordPress#7.0-branch",
+	"mariadbVersion": "11.8",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"config": {
