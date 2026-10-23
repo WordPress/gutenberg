@@ -95,6 +95,23 @@ describe( 'buildDockerComposeConfig', () => {
 		);
 	} );
 
+	it( 'should let Docker Compose choose the PHP version from WP_ENV_PHP_VERSION', () => {
+		const { services } = buildDockerComposeConfig( {
+			env: { development: CONFIG, tests: CONFIG },
+		} );
+
+		for ( const service of [ 'wordpress', 'tests-wordpress' ] ) {
+			expect( services[ service ].image ).toBe(
+				'wordpress:php${WP_ENV_PHP_VERSION:-8.0}'
+			);
+		}
+		for ( const service of [ 'cli', 'tests-cli' ] ) {
+			expect( services[ service ].image ).toBe(
+				'wordpress:cli-php${WP_ENV_PHP_VERSION:-8.0}'
+			);
+		}
+	} );
+
 	it( 'should create a separate database for each environment', () => {
 		const { services } = buildDockerComposeConfig( {
 			env: { development: CONFIG, tests: CONFIG },

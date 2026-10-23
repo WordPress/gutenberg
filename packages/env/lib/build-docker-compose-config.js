@@ -187,7 +187,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 						condition: 'service_healthy',
 					},
 				},
-				image: 'wordpress',
+				image: 'wordpress:php${WP_ENV_PHP_VERSION:-8.0}',
 				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'wordpress',
@@ -202,7 +202,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 						condition: 'service_healthy',
 					},
 				},
-				image: 'wordpress',
+				image: 'wordpress:php${WP_ENV_PHP_VERSION:-8.0}',
 				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
@@ -214,7 +214,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
-				image: 'wordpress:cli',
+				image: 'wordpress:cli-php${WP_ENV_PHP_VERSION:-8.0}',
 				volumes: developmentMounts,
 				user: cliUser,
 				environment: {
@@ -224,7 +224,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
-				image: 'wordpress:cli',
+				image: 'wordpress:cli-php${WP_ENV_PHP_VERSION:-8.0}',
 				volumes: testsMounts,
 				user: cliUser,
 				environment: {
