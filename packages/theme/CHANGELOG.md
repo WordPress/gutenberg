@@ -10,6 +10,7 @@
 ### Enhancements
 
 -   Enforce the 3:1 focus-ring contrast target against neutral and brand surfaces after seed adjustment while preserving fill and foreground colors ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+-   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
 
 ## 3.0.0 (2026-10-20)
 
