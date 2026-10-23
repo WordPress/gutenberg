@@ -24,6 +24,7 @@ import {
 	useNoteThreads,
 	usePickNote,
 } from './hooks';
+import { useNoteLock } from './use-note-lock';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
@@ -60,6 +61,7 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const { lockedActions } = useNoteLock();
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -133,7 +135,8 @@ function NotesSidebar( { postId, drafts } ) {
 			addNewNoteForBlock( clientId );
 		},
 		{
-			isDisabled: isClassicBlock || ! clientId,
+			isDisabled:
+				isClassicBlock || ! clientId || lockedActions.has( 'create' ),
 		}
 	);
 
@@ -149,7 +152,7 @@ function NotesSidebar( { postId, drafts } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
-			{ notes.length > 0 && (
+			{ notes.length > 0 && ! lockedActions.has( 'create' ) && (
 				<AddNoteToolbarButton
 					count={
 						notes.filter(

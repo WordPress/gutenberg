@@ -8,6 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { unlock } from '../../lock-unlock';
+import { useNoteLock } from './use-note-lock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -25,12 +26,15 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 		},
 		[ clientId ]
 	);
+	const { lockedActions } = useNoteLock();
 
 	if ( ! isValid || blockName === getUnregisteredTypeHandlerName() ) {
 		return null;
 	}
 
-	const isDisabled = isDistractionFree || blockName === 'core/freeform';
+	const isLocked = lockedActions.has( 'create' );
+	const isDisabled =
+		isDistractionFree || blockName === 'core/freeform' || isLocked;
 
 	let infoText;
 
@@ -38,6 +42,8 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 		infoText = __( 'Notes are disabled in distraction free mode.' );
 	} else if ( blockName === 'core/freeform' ) {
 		infoText = __( 'Convert to blocks to add notes.' );
+	} else if ( isLocked ) {
+		infoText = __( 'Notes are locked for this post.' );
 	}
 
 	return (

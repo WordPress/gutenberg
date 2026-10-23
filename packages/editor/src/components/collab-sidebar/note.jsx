@@ -15,6 +15,7 @@ import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { NoteReactions } from './reactions/note-reactions';
+import { useNoteLock } from './use-note-lock';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -59,6 +60,7 @@ export function Note( {
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
+	const { lockedActions } = useNoteLock();
 
 	const commentRef = useRef( null );
 	const rawContent = note?.content?.raw;
@@ -96,6 +98,7 @@ export function Note( {
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
+			action: 'edit',
 			isEligible: ( { status } ) =>
 				( ! isResolutionNote || hasUserText ) &&
 				! hasResolved( status ),
@@ -104,20 +107,32 @@ export function Note( {
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
+			// Reopening runs the resolution state machine in reverse.
+			action: 'resolve',
 			isEligible: ( { status } ) => canResolve && hasResolved( status ),
 			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
+			action: 'delete',
 			isEligible: ( { status } ) =>
 				canResolve || ( ! isResolutionNote && ! hasResolved( status ) ),
 			onClick: () => setActionState( 'delete' ),
 		},
 	];
-	const availableItems = menuItems.filter( ( item ) =>
+	const eligibleItems = menuItems.filter( ( item ) =>
 		item.isEligible( note )
 	);
+	const availableItems = eligibleItems.filter(
+		( item ) => ! lockedActions.has( item.action )
+	);
+	/*
+	 * A menu whose every item was removed by the status rules stays as a
+	 * disabled trigger, so the affordance is still discoverable. One emptied by
+	 * a lock is dropped entirely: there is nothing to come back to.
+	 */
+	const isLockedOut = eligibleItems.length > 0 && availableItems.length === 0;
 
 	const deleteConfirmMessage =
 		note.parent === 0
@@ -194,7 +209,7 @@ export function Note( {
 
 	const actions = isSelected ? (
 		<>
-			{ canResolve && onResolve && (
+			{ canResolve && onResolve && ! lockedActions.has( 'resolve' ) && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"
@@ -204,10 +219,12 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			<NoteActionsMenu
-				items={ availableItems }
-				buttonRef={ actionButtonRef }
-			/>
+			{ ! isLockedOut && (
+				<NoteActionsMenu
+					items={ availableItems }
+					buttonRef={ actionButtonRef }
+				/>
+			) }
 		</>
 	) : null;
 
@@ -227,9 +244,12 @@ export function Note( {
 					canReact={
 						isSelected &&
 						actionState !== 'edit' &&
-						! isThreadResolved
+						! isThreadResolved &&
+						! lockedActions.has( 'react' )
 					}
-					disabled={ isThreadResolved }
+					disabled={
+						isThreadResolved || lockedActions.has( 'react' )
+					}
 				/>
 			</div>
 			{ actionState === 'delete' && (

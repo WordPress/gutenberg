@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -13,6 +13,7 @@ import { focusNoteThread, hasFocusWithin } from './utils';
 import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useNoteLock } from './use-note-lock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -24,6 +25,22 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 	const { onCreate, onDiscard } = useNoteActions();
 	const isSubmittingRef = useRef( false );
 	const { initialValue, setDraft, hasDraft } = useNoteDraft( clientId );
+	const isCreateLocked = useNoteLock().lockedActions.has( 'create' );
+
+	// A lock applied after the form opened: drop what starting the note left behind.
+	useEffect( () => {
+		if ( isCreateLocked ) {
+			onDiscard( clientId );
+			toggleBlockHighlight( clientId, false );
+			selectNote( undefined );
+		}
+	}, [
+		isCreateLocked,
+		clientId,
+		onDiscard,
+		toggleBlockHighlight,
+		selectNote,
+	] );
 
 	/*
 	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
@@ -68,6 +85,10 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 		blockElement?.focus();
 		toggleBlockHighlight( clientId, false );
 	};
+
+	if ( isCreateLocked ) {
+		return null;
+	}
 
 	return (
 		<FloatingContainer
