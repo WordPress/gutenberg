@@ -21,7 +21,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
