@@ -8,6 +8,10 @@
 -   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
 -   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
 
+### Enhancements
+
+-   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget.
+
 ### Bug Fixes
 
 -   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
