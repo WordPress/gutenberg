@@ -67,19 +67,14 @@ export function useCanvasContextMenu() {
 	} = unlock( useSelect( blockEditorStore ) );
 	const { selectBlock } = useDispatch( blockEditorStore );
 
-	const onContextMenu = useCallback(
-		( event: MouseEvent ) => {
-			if (
-				event.defaultPrevented ||
-				! allowRightClickOverrides ||
-				// The cursor anchor would have to account for the scale of the
-				// canvas, which zoom out animates.
-				isZoomOut
-			) {
-				return;
+	// What a right-click on this target means, for the two handlers that have
+	// to agree on it.
+	const resolve = useCallback(
+		( target: Element ) => {
+			if ( ! allowRightClickOverrides || isZoomOut ) {
+				return undefined;
 			}
 
-			const target = event.target as Element;
 			const clientId =
 				target.closest< HTMLElement >( '[data-block]' )?.dataset.block;
 
@@ -88,7 +83,7 @@ export function useCanvasContextMenu() {
 				! canEditBlock( clientId ) ||
 				getBlockEditingMode( clientId ) !== 'default'
 			) {
-				return;
+				return undefined;
 			}
 
 			// A click within a selection of blocks acts on the whole selection,
@@ -115,8 +110,55 @@ export function useCanvasContextMenu() {
 				( target.closest( '[contenteditable="true"]' ) ||
 					target.closest( MEDIA_SELECTOR ) )
 			) {
+				return undefined;
+			}
+
+			return { clientId, selectedClientIds, isWithinBlockSelection };
+		},
+		[
+			allowRightClickOverrides,
+			canEditBlock,
+			getBlockEditingMode,
+			getSelectedBlockClientIds,
+			getSelectionEnd,
+			getSelectionStart,
+			isZoomOut,
+		]
+	);
+
+	const onMouseDown = useCallback(
+		( event: MouseEvent ) => {
+			// The secondary button places the caret too, which would collapse
+			// a selection of blocks to the clicked one while its own menu is
+			// opening. Preventing that default keeps the selection the menu
+			// was aimed at, as the List View does for the same reason. The
+			// default is left alone everywhere else, so an ordinary
+			// right-click still places the caret for the browser's own menu.
+			if (
+				event.button === 2 &&
+				resolve( event.target as Element )?.isWithinBlockSelection
+			) {
+				event.preventDefault();
+			}
+		},
+		[ resolve ]
+	);
+
+	const onContextMenu = useCallback(
+		( event: MouseEvent ) => {
+			if ( event.defaultPrevented ) {
 				return;
 			}
+
+			const target = event.target as Element;
+			const resolved = resolve( target );
+
+			if ( ! resolved ) {
+				return;
+			}
+
+			const { clientId, selectedClientIds, isWithinBlockSelection } =
+				resolved;
 
 			if ( ! isWithinBlockSelection ) {
 				// Without an initial position the block is selected but not
@@ -133,21 +175,12 @@ export function useCanvasContextMenu() {
 				anchor: getCursorAnchor( event, target ),
 			} );
 		},
-		[
-			allowRightClickOverrides,
-			canEditBlock,
-			getBlockEditingMode,
-			getSelectedBlockClientIds,
-			getSelectionEnd,
-			getSelectionStart,
-			isZoomOut,
-			selectBlock,
-		]
+		[ resolve, selectBlock ]
 	);
 
 	const closeMenu = useCallback( () => setMenu( null ), [] );
 
-	return { onContextMenu, menu, closeMenu };
+	return { onContextMenu, onMouseDown, menu, closeMenu };
 }
 
 /**

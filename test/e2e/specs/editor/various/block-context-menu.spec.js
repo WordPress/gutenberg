@@ -151,12 +151,20 @@ test.describe( 'block context menu', () => {
 		} );
 		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
 
-		// Right-clicking the text of a block collapses the selection to a
-		// caret before any handler sees it, so the selection is kept by
-		// right-clicking something that holds no text.
-		await editor.canvas
-			.locator( '[data-type="core/spacer"]' )
-			.click( { button: 'right' } );
+		// The secondary button would otherwise place a caret in the clicked
+		// paragraph, collapsing the selection the menu is for.
+		await paragraphs.last().click( { button: 'right' } );
+
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 3 );
 
 		await page
 			.getByRole( 'menu', { name: 'Options' } )

@@ -95,6 +95,7 @@ export default function BlockTools( {
 		useShowBlockTools();
 	const {
 		onContextMenu,
+		onMouseDown: onContextMenuMouseDown,
 		menu: contextMenu,
 		closeMenu: closeContextMenu,
 	} = useCanvasContextMenu();
@@ -305,6 +306,7 @@ export default function BlockTools( {
 			{ ...props }
 			onKeyDown={ onKeyDown }
 			onContextMenu={ onContextMenu }
+			onMouseDown={ onContextMenuMouseDown }
 			// Popover slots cannot be unmounted during dragging because the
 			// will just be rendered in a fallback popover slot instead.
 			className={ clsx( props.className, {
