@@ -76,15 +76,11 @@ npm run other:cherry-pick "Another Label"
 
 ### Can I preview the cherry-picks without changing anything?
 
-Yes! Pass the `--dry-run` flag:
+Yes! Pass `--dry-run` to list the PRs that would be cherry-picked without pushing, commenting, or removing labels:
 
 ```bash
 npm run other:cherry-pick -- --dry-run "Backport to Gutenberg RC"
 ```
-
-The script cherry-picks the PRs to find out which ones apply cleanly, lists them, and then resets the branch to where it started. It does not push, comment on PRs, or remove labels.
-
-Keep the `--` before `--dry-run`. Without it, npm treats `--dry-run` as its own option and the script runs for real.
 
 ### How can I use it for a Gutenberg plugin release?
 

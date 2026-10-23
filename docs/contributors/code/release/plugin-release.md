@@ -231,7 +231,7 @@ Behind the scenes, the script will:
 -   Add a comment to the PR indicating it’s been cherry-picked
 -   Remove the label `Backport to Gutenberg RC` from the PR
 
-To preview which PRs would be cherry-picked without pushing, commenting, or changing labels, add the `--dry-run` flag. Keep the `--` before it, or npm treats the flag as its own and the script runs for real:
+To preview the cherry-picks without pushing or changing PRs, add `--dry-run`:
 
 ```bash
 npm run other:cherry-pick -- --dry-run "Backport to Gutenberg RC"
