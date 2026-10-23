@@ -425,6 +425,7 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test( 'can search and filter notes in the "All notes" sidebar', async ( {
+		editor,
 		page,
 		blockNoteUtils,
 	} ) => {
@@ -450,22 +451,29 @@ test.describe( 'Block Notes', () => {
 			name: 'Note: Swap the image.',
 		} );
 
-		// Resolve the first note, then collapse it so it isn't kept visible
-		// as the selected thread.
 		await headingThread.click();
 		await page.getByRole( 'button', { name: 'Resolve' } ).click();
 		await expect(
 			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
 		).toBeVisible();
-		await headingThread.focus();
-		await page.keyboard.press( 'Escape' );
 
 		const search = sidebar.getByRole( 'searchbox', {
 			name: 'Search notes',
 		} );
-		await search.fill( 'IMAGE' );
+		await search.fill( 'HEADING' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+
+		await editor.canvas.getByText( 'Second block.' ).click();
 		await expect( imageThread ).toBeVisible();
-		await expect( headingThread ).toBeHidden();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await expect( imageThread ).toBeHidden();
+
+		await search.fill( 'admin' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeVisible();
 
 		await search.fill( 'nothing matches' );
 		await expect( sidebar.getByText( 'No notes found.' ) ).toBeVisible();
