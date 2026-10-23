@@ -8,7 +8,6 @@ import { useDispatch } from '@wordpress/data';
 import warning from '@wordpress/warning';
 import type { RefCallback } from 'react';
 import type { Block } from '@wordpress/blocks';
-import useMovingAnimation from '../../use-moving-animation';
 import { store as blockEditorStore } from '../../../store';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
@@ -135,7 +134,6 @@ export function useBlockProps<
 		className,
 		wrapperProps = {},
 		isAligned,
-		index,
 		mode,
 		name,
 		blockApiVersion,
@@ -201,7 +199,6 @@ export function useBlockProps<
 		useEventHandlers( { clientId, isSelected, isMultiSelected } ),
 		useIsHovered( { isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
-		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
 		useFlashEditableBlocks( {
 			clientId,
