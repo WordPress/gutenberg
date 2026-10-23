@@ -13,6 +13,7 @@
 import type { ActionScriptParts } from '../shared/types';
 import deletePost from './delete-post/action';
 import duplicatePost from './duplicate-post/action';
+import editPost from './edit-post/action';
 import moveToTrash from './move-to-trash/action';
 import orderPages from './order-pages/action';
 import permanentlyDelete from './permanently-delete/action';
@@ -25,6 +26,7 @@ import viewPostRevisions from './view-post-revisions/action';
 const actions = {
 	'delete-post': deletePost,
 	'duplicate-post': duplicatePost,
+	'edit-post': editPost,
 	'move-to-trash': moveToTrash,
 	'order-pages': orderPages,
 	'permanently-delete': permanentlyDelete,
