@@ -69,10 +69,8 @@ export const SelectedHints: Story = {
 				className: 'font-preview',
 			},
 		];
-		const [ hasOptions, setHasOptions ] = useState( true );
 		const [ font, setFont ] = useState< string | null >( 'serif' );
-		const customOptions = hasOptions ? options : [];
-		const items = customOptions.map( ( option ) => ( {
+		const items = options.map( ( option ) => ( {
 			value: option.key,
 			label: option.name,
 			description: option.hint,
@@ -99,8 +97,6 @@ export const SelectedHints: Story = {
 							setFont( item.value );
 						}
 					} }
-					disabled={ items.length === 0 }
-					placeholder="Choose a font"
 					trigger={
 						<SelectControl.Trigger
 							aria-describedby={ descriptionId }
@@ -141,14 +137,6 @@ export const SelectedHints: Story = {
 				<p>
 					Stored value: <code>{ JSON.stringify( font ) }</code>
 				</p>
-				<button
-					type="button"
-					onClick={ () => setHasOptions( ! hasOptions ) }
-				>
-					{ hasOptions
-						? 'Use empty custom options'
-						: 'Restore options' }
-				</button>
 			</>
 		);
 	},

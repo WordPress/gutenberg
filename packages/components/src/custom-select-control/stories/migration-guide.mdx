@@ -8,7 +8,7 @@ import * as SelectStories from '../../../../ui/src/form/primitives/select/storie
 
 # CustomSelectControl migration guide
 
-Migrate from [`CustomSelectControl`](?path=/docs/components-customselectcontrol--docs) in `@wordpress/components` to [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`. `SelectControl` supports custom trigger content and styled items, so most migrations do not need lower-level components. Use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive only when you need the small size, a custom field layout, or item values that are not strings.
+Migrate from [`CustomSelectControl`](?path=/docs/components-customselectcontrol--docs) in `@wordpress/components` to [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`. `SelectControl` supports custom trigger content and styled items, so most migrations do not need lower-level components. Use the [`Select`](?path=/docs/design-system-components-form-primitives-select--docs) primitive only when you need the small size or a custom field layout.
 
 ## Basic migration
 
@@ -83,7 +83,7 @@ When the stored value matches no option, the legacy control displays the first o
 
 Either lookup only changes what is displayed, not the stored value. If an unavailable value should be cleared or replaced, update the stored value explicitly, or add an item that represents it. `onValueChange` may also receive `null` when the selected item is removed from `items`, so decide whether that should clear the stored value.
 
-An empty `items` array, such as an empty list of custom options, should stay empty. Do not replace it with default options. Resolve the selection to `null`, check for `null` before reading `.label` or `.description`, and disable or omit the control when there are no choices. You can try an empty list in the [selected hint example](#show-the-selected-hint).
+An empty `items` array, such as an empty list of custom options, should stay empty. Do not replace it with default options. Resolve the selection to `null`, check for `null` before reading `.label` or `.description`, and disable or omit the control when there are no choices.
 
 ## Move event handlers to the trigger
 
@@ -111,8 +111,6 @@ To keep this behavior, render the hint in the trigger children with `aria-hidden
 
 How a screen reader announces the description depends on the screen reader. Test with assistive technology when the exact announcement matters.
 
-In the example below, use the button to switch to an empty list of options. The example has no item that clears the selection, so its change handler ignores `null`.
-
 <Canvas of={ MigrationStories.SelectedHints } sourceState="shown" />
 
 ## Migrate empty-string options
@@ -127,17 +125,15 @@ By default, an item with `value: ''` is treated as no selection. To keep it as a
 
 <Canvas of={ MigrationStories.EmptyStringChoice } sourceState="shown" />
 
-## Preserve labels
-
-Pass a descriptive string to `label`, even if `hideLabelFromVision` is set. For a custom label element or field layout, compose the [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) and `Select` primitives.
-
 ## Disable the control
 
-Pass `disabled` to `SelectControl` to disable the whole control, or set `disabled: true` on an item to disable one choice. The legacy control has no `disabled` prop, so a wrapper that passed one through had no effect. Check such wrappers before forwarding their props to the new control. When composing primitives, pass `disabled` to both `Field.Root` and `Select.Root`.
+Pass `disabled` to `SelectControl` to disable the whole control, or set `disabled: true` on an item to disable one choice. The legacy control has no `disabled` prop, so a wrapper that passed one through had no effect. Check such wrappers before forwarding their props to the new control. When composing primitives, pass `disabled` to both [`Field.Root`](?path=/docs/design-system-components-form-primitives-field--docs) and `Select.Root`.
 
 ## Use the small size
 
-`SelectControl` supports the `default` and `compact` sizes. If a control needs the legacy `small` size, compose the `Select` primitive with `Select.Trigger size="small"` and `Select.Item size="small"`. This example shows both, along with the `minimal` variant, which the small size does not require:
+`SelectControl` supports the `default` and `compact` sizes. Use the small size sparingly, for rare compact contexts such as a pagination control, and consider whether `compact` fits first. If a control needs the legacy `small` size, compose the `Select` primitive with `Select.Trigger size="small"` and `Select.Item size="small"`.
+
+This example shows both, along with the `minimal` variant. The small size does not require that variant. Use `minimal` sparingly as well, because users may not recognize its trigger as an interactive control:
 
 <Canvas of={ SelectStories.Minimal } />
 
