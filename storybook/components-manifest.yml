@@ -875,6 +875,7 @@
       - accessibleWhenDisabled
       - children
       - className
+      - href
       - icon
       - iconPosition
       - info
