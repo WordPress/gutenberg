@@ -11,7 +11,6 @@ const POPOVER_PROPS: { placement: 'bottom-start' } = {
 	placement: 'bottom-start',
 };
 
-// The formats shown directly in the toolbar, in the order they are listed.
 const TOOLBAR_FORMATS = [
 	'bold',
 	'italic',
@@ -20,8 +19,6 @@ const TOOLBAR_FORMATS = [
 	'non-breaking-space',
 ];
 
-// The formats shown in the "More" dropdown, in the order they are listed.
-// Unlike sorting by title, this order does not change with the locale.
 const DROPDOWN_FORMATS = [
 	'text-color',
 	'strikethrough',
