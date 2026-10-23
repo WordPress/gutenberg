@@ -201,9 +201,7 @@ const ROOT_CONTAINER = `
 // are applied to elements within the entire content area. To support elements that are
 // not part of the block previews, such as headings and layout for the block previews,
 // additional CSS rules need to be passed into the iframe. These are hard-coded below.
-// Note that button styles are unset, and then focus rules from the `Button` component are
-// applied to the `button` element, targeted via `.editor-style-book__example`.
-// This is to ensure that browser default styles for buttons are not applied to the previews.
+// Interactive examples use the same focus outline tokens as the `Button` component.
 export const STYLE_BOOK_IFRAME_STYLES = `
 	body {
 		position: relative;
@@ -241,8 +239,10 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.editor-style-book__example:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-		outline: 3px solid transparent;
+		/* Avoid a second ring on the selected example. */
+		box-shadow: none;
+		outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+		outline-offset: var(--wpds-border-width-focus);
 	}
 
 	.editor-style-book__duotone-example > div:first-child {
