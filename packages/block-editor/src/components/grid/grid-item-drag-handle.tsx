@@ -1,6 +1,6 @@
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { dragHandle, Icon } from '@wordpress/icons';
+import { dragHandle } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { GridItemHandle } from './grid-item-handle';
@@ -42,6 +42,7 @@ export function GridItemDragHandle( {
 		<GridItemHandle
 			className="block-editor-grid-item-handles__drag"
 			label={ __( 'Drag' ) }
+			icon={ dragHandle }
 			draggable
 			onPointerDown={ ( event ) => {
 				// Touch screens don't start the browser's drag and drop from
@@ -67,8 +68,6 @@ export function GridItemDragHandle( {
 					isHandle: true,
 				} );
 			} }
-		>
-			<Icon icon={ dragHandle } />
-		</GridItemHandle>
+		/>
 	);
 }
