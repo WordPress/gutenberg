@@ -1,8 +1,10 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 
 export type MediaSource = {
 	name: string;
