@@ -8,7 +8,9 @@ export interface UseDropZoneProps {
 	 */
 	isDisabled?: boolean;
 	/**
-	 * Called when dragging has started.
+	 * Called when dragging has started, on the first `dragenter` or
+	 * `dragover` in the document. A drag can start on a `dragover`, as
+	 * browsers can skip the `dragenter` in an iframe.
 	 */
 	onDragStart?: ( e: DragEvent ) => void;
 	/**
@@ -24,7 +26,9 @@ export interface UseDropZoneProps {
 	 */
 	onDragLeave?: ( e: DragEvent ) => void;
 	/**
-	 * Called when dragging has ended.
+	 * Called when dragging has ended, on a `dragend` or a drop in the zone,
+	 * or on the first `mousemove` with no button held, for drags that end
+	 * outside the document.
 	 */
 	onDragEnd?: ( e: MouseEvent ) => void;
 	/**

@@ -7,6 +7,7 @@
 -   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
 -   `useMergeRefs`: Accept disabled refs and object refs that start `undefined` ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
 -   `useDebounce`: Accept partial options ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
+-   `useDropZone`: Start a drag on the first `dragover` in the document when it got no `dragenter`, which browsers can skip in an iframe, so that `onDragEnd` is still called, and don't end a drag on a `mousemove` while a button is held ([#85412](https://github.com/WordPress/gutenberg/pull/85412)).
 
 ## 9.0.0 (2026-10-20)
 
