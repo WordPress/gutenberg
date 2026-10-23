@@ -28,9 +28,9 @@ export interface MediaEditorPanelRegistration {
 	title: string;
 	/**
 	 * Sort order among panels, ascending; ties sort by name. Core's Crop
-	 * is 10 and Details 20.
+	 * is 10 and Details 20, so a panel without an order follows them.
 	 *
-	 * @default 10
+	 * @default 100
 	 */
 	order?: number;
 	/**
@@ -56,7 +56,7 @@ const MediaEditorPanelsContext =
 
 export const MediaEditorPanelsProvider = MediaEditorPanelsContext.Provider;
 
-const DEFAULT_ORDER = 10;
+const DEFAULT_ORDER = 100;
 
 /**
  * The `registerPlugin` scope the editor mounts. A plugin registered with it
