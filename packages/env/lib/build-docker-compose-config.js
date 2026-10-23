@@ -106,8 +106,18 @@ module.exports = function buildDockerComposeConfig( config ) {
 				ports: [ '3306' ],
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
+					MYSQL_DATABASE: 'wordpress',
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
+			},
+			'tests-mysql': {
+				image: 'mariadb:${WP_ENV_MARIADB_VERSION:-latest}',
+				ports: [ '3306' ],
+				environment: {
+					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
+					MYSQL_DATABASE: 'tests-wordpress',
+				},
+				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
@@ -121,11 +131,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: developmentMounts,
 			},
 			'tests-wordpress': {
-				depends_on: [ 'mysql' ],
+				depends_on: [ 'tests-mysql' ],
 				image: 'wordpress',
 				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_HOST: 'tests-mysql',
 					WORDPRESS_DB_USER: 'root',
 					WORDPRESS_DB_PASSWORD: '',
 				},
@@ -147,6 +158,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: testsMounts,
 				user: cliUser,
 				environment: {
+					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_HOST: 'tests-mysql',
 					WORDPRESS_DB_USER: 'root',
 					WORDPRESS_DB_PASSWORD: '',
 				},
@@ -166,6 +179,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 					LOCAL_DIR: 'html',
 					WP_PHPUNIT__TESTS_CONFIG:
 						'/var/www/html/phpunit-wp-config.php',
+					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_HOST: 'tests-mysql',
 					WORDPRESS_DB_USER: 'root',
 					WORDPRESS_DB_PASSWORD: '',
 				},
@@ -175,6 +190,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
+			'mysql-test': {},
 			'phpunit-uploads': {},
 		},
 	};
