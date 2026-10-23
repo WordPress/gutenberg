@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the remaining viewport and widget utilities to TypeScript ([#84917](https://github.com/WordPress/gutenberg/pull/84917)).
+
 ## 3.1.0 (2026-10-20)
 
 ## 3.0.0 (2026-10-07)

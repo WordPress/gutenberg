@@ -187,26 +187,20 @@
 				}
 			}
 
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-brand-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral);
+			&[data-highlighted]:not([data-disabled]) {
+				background-color: var(--wpds-color-background-interactive-brand-strong-active);
+				color: var(--wpds-color-foreground-interactive-brand-strong-active);
 				outline: none; /* Disable user agent focus ring */
 
-				/*
-				 * Set the outline through the global CSS defense bridge, since
-				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
-				 */
 				@media ( forced-colors: active ) {
-					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+					forced-color-adjust: none;
+					background-color: Highlight;
+					color: HighlightText;
 				}
 			}
 
-			&[aria-disabled="true"] {
-				/* Background is brand-toned (see `[data-highlighted]` above); the
-				   foreground text stays neutral in every state. The disabled
-				   background currently resolves to transparent, but referencing the
-				   token keeps it in sync if its value ever changes. */
-				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
@@ -240,6 +234,8 @@
 		}
 
 		.item-label {
+			--_gcd-heading-color: currentColor;
+
 			min-width: 0;
 		}
 
@@ -247,8 +243,10 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
-		.item[aria-disabled="true"] .item-description {
+		.item[data-highlighted]:not([data-disabled]) .item-description,
+		.item[data-disabled] .item-description {
+			--_gcd-heading-color: currentColor;
+
 			color: inherit;
 		}
 
