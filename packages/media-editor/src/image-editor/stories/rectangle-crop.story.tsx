@@ -22,9 +22,9 @@ import { useCropperController } from '../react/hooks/use-cropper-controller';
 import {
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
-	DEFAULT_ASPECT_RATIOS,
 	ORIGINAL_ASPECT_RATIO,
 } from '../core/constants';
+import { DEFAULT_ASPECT_RATIOS } from '../../state';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,

@@ -32,7 +32,6 @@ export type {
 // the media editor's composite store).
 export {
 	DEFAULT_STATE,
-	DEFAULT_ASPECT_RATIOS,
 	ORIGINAL_ASPECT_RATIO,
 	cropperReducer,
 	enforceContainment,
