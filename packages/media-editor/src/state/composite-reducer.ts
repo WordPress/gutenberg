@@ -1,10 +1,10 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+import type { CropperState } from '../image-editor';
 import {
 	cropperReducer,
 	areCropperStatesEqual,
 	computeInscribedRect,
-	type CropperState,
-} from '../image-editor';
+} from '../image-editor/internals';
 import {
 	DEFAULT_CROP_OPTIONS,
 	type CropOptionsSlice,
