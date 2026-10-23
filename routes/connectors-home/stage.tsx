@@ -53,12 +53,13 @@ function ConnectorsPage() {
 	const renderableConnectors = connectors.filter(
 		( connector: ConnectorConfig ) => connector.render
 	);
-	const aiProviderPluginSlugs = Array.from(
+	const connectorPluginSlugs = Array.from(
 		new Set(
 			connectors
 				.filter(
 					( connector: ConnectorConfig ) =>
-						connector.type === 'ai_provider'
+						connector.type === 'ai_provider' ||
+						connector.type === 'mcp_server'
 				)
 				.map(
 					( connector: ConnectorConfig ) =>
@@ -83,7 +84,7 @@ function ConnectorsPage() {
 	if ( isAiPluginInstalled ) {
 		installedPluginSlugs.add( 'ai' );
 	}
-	const manualInstallPluginSlugs = [ 'ai', ...aiProviderPluginSlugs ].filter(
+	const manualInstallPluginSlugs = [ 'ai', ...connectorPluginSlugs ].filter(
 		( slug ) => ! installedPluginSlugs.has( slug )
 	);
 	const isEmpty = renderableConnectors.length === 0;

@@ -1,3 +1,5 @@
+import { Icon, wordpress } from '@wordpress/icons';
+
 // OpenAI logo as inline SVG
 export const OpenAILogo = () => (
 	<svg
@@ -52,6 +54,9 @@ export const DefaultConnectorLogo = () => (
 		/>
 	</svg>
 );
+
+// WordPress logo from the icon library
+export const WordPressLogo = () => <Icon icon={ wordpress } size={ 40 } />;
 
 // Akismet logo as inline SVG — extracted from the official akismet-refresh-logo.svg
 export const AkismetLogo = () => (
