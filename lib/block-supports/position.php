@@ -145,11 +145,25 @@ function gutenberg_render_position_support( $block_content, $block ) {
 	$viewport_settings        = $global_settings['viewport'] ?? null;
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 
-	$class_name      = wp_unique_id( 'wp-container-' );
-	$selector        = ".$class_name";
 	$position_styles = array();
 	$wrapper_classes = array();
 	$base_position   = $style_attribute['position'] ?? null;
+
+	/*
+	 * Derive the container class from the position styles rather than from a
+	 * counter, so that blocks resolving to the same CSS share a single rule in
+	 * the style engine store instead of emitting one rule per block instance.
+	 *
+	 * The hash covers the default state and every viewport state, since each
+	 * contributes rules scoped to this class.
+	 */
+	$position_hash_input = array( $base_position );
+	foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+		$position_hash_input[ $breakpoint ] = $style_attribute[ $breakpoint ]['position'] ?? null;
+	}
+
+	$class_name = gutenberg_unique_id_from_values( $position_hash_input, 'wp-container-' );
+	$selector   = ".$class_name";
 
 	// Default viewport (base) position styles.
 	$base_styles = gutenberg_get_position_support_styles(
