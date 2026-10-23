@@ -7,6 +7,7 @@ import {
 	useContext,
 	useEffect,
 	useId,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -317,18 +318,28 @@ function ViewTable< Item >( {
 	const tableSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
-	const [ tableHeaderHeight, setTableHeaderHeight ] = useState( 52 );
+	// Size the bulk actions toolbar to the header by writing to the DOM
+	// directly: it is correct on first paint and skips a re-render.
+	const syncBulkActionsHeight = () => {
+		const header = tableHeaderRef.current;
+		const overlay = bulkActionsRef.current;
+		if ( header && overlay ) {
+			overlay.style.setProperty(
+				'--wp-dataviews-table-header-height',
+				`${ header.getBoundingClientRect().height }px`
+			);
+		}
+	};
 	const resizeHeaderRef = useResizeObserver< HTMLTableSectionElement >(
-		( [ entry ] ) => {
-			setTableHeaderHeight( entry.borderBoxSize[ 0 ].blockSize );
-		},
-		{ box: 'border-box' }
+		syncBulkActionsHeight
 	);
 	const tableHeaderRefs = useMergeRefs( [ tableHeaderRef, resizeHeaderRef ] );
 	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const showBulkActions =
 		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
+	// The resize observer reports after the first paint, so measure on show.
+	useLayoutEffect( syncBulkActionsHeight, [ showBulkActions ] );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
 		const tableHead = tableHeaderRef.current;
@@ -475,11 +486,6 @@ function ViewTable< Item >( {
 					hidden={ ! showBulkActions }
 					inert={ inertValue( !! isLoading ) }
 					aria-busy={ isLoading }
-					style={
-						{
-							'--wp-dataviews-table-header-height': `${ tableHeaderHeight }px`,
-						} as CSSProperties
-					}
 				>
 					<BulkActionToolbar
 						onActionInProgressChange={ setIsActionInProgress }
