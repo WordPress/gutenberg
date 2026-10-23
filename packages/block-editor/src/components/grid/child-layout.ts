@@ -36,6 +36,44 @@ function getChildLayoutEntries( style: unknown ): [ string[], unknown ][] {
 }
 
 /**
+ * Returns the child layouts of a block style, keyed by the state they belong
+ * to: `layout` for the default layout, and the viewport state (such as
+ * `@mobile`) for each viewport's layout. The values are the style's own layout
+ * objects, so the result compares shallowly equal until a layout changes.
+ *
+ * @param style Block style attributes.
+ * @return The child layouts by state.
+ */
+export function getChildLayoutsByState(
+	style: unknown
+): Record< string, unknown > {
+	return Object.fromEntries(
+		getChildLayoutEntries( style ).map( ( [ path, layout ] ) => [
+			path[ 0 ],
+			layout,
+		] )
+	);
+}
+
+/**
+ * Builds a style attribute holding only the given child layouts, the reverse
+ * of `getChildLayoutsByState`.
+ *
+ * @param layouts The child layouts by state.
+ * @return A style attribute with the child layouts.
+ */
+export function getChildLayoutStyle(
+	layouts: Record< string, unknown >
+): Style {
+	return Object.fromEntries(
+		Object.entries( layouts ).map( ( [ state, layout ] ) => [
+			state,
+			state === 'layout' ? layout : { layout },
+		] )
+	);
+}
+
+/**
  * Gives a block the child layout (such as a grid item's position and span) of
  * another block whose place it takes, keeping any child layout it already has.
  *
