@@ -73,6 +73,8 @@ import {
 import { LinkPicker } from './components/link-picker';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
+import BlockCard from './components/block-card';
+import { BlockInspectorPreTabsFill } from './components/block-inspector/inspector-pre-tabs-slot-fill';
 import useListViewPanelState from './components/use-list-view-panel-state';
 import InnerContent from './components/inner-content';
 import { useNativeUndo, usesNativeUndo } from './utils/native-undo';
@@ -159,6 +161,8 @@ lock( privateApis, {
 	useNativeUndo,
 	usesNativeUndo,
 	isElementVisible,
+	BlockCard,
+	BlockInspectorPreTabsFill,
 	getPopulatedCategories,
 	searchItems,
 } );
