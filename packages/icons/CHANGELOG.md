@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `lockSmall`, `copySmall` and `pinSmall` icons. Their full-size counterparts `lock`, `copy` and `pin` have been optically rebalanced, so a bespoke small drawing is no longer needed ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Remove the `cautionFilled`, `helpFilled` and `plusCircleFilled` icons in favour of `caution`, `help` and `plusCircle`, which are drawn entirely in strokes and can therefore be stroke-weight balanced for their context ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Remove the `cancelCircleFilled` icon. It has no stroke-drawn counterpart; use `close` where a cancel affordance is needed ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Remove the `bellUnread` icon. Compose an unread indicator from the `bell` icon and a separately positioned dot instead, so the dot can be separated from the bell with a ring in the surrounding surface colour ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Rename the `lockOutline` icon to `lock`, replacing the previous `lock` icon. The stroke-drawn outline is the drawing that pairs with `unlock`, so it becomes the canonical lock ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### New Features
 
 -   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
