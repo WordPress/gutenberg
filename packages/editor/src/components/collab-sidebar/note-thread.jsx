@@ -87,12 +87,7 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const {
-		onCreate: onAddReply,
-		onEdit: onEditNote,
-		onDiscard,
-		onDelete: onDeleteNote,
-	} = useNoteActions();
+	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
 	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
@@ -202,7 +197,7 @@ export function NoteThread( {
 	}
 
 	function handleResolve() {
-		onEditNote( note, { status: 'approved' } );
+		onEdit( note, { status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
@@ -212,7 +207,7 @@ export function NoteThread( {
 	}
 
 	async function handleDelete( noteToDelete ) {
-		const deleted = await onDeleteNote( noteToDelete );
+		const deleted = await onDelete( noteToDelete );
 		// Leave the selection alone when the delete failed; the note is still there.
 		if ( ! deleted ) {
 			return;
@@ -319,7 +314,7 @@ export function NoteThread( {
 			<Note
 				note={ note }
 				isSelected={ isSelected }
-				onEditNote={ onEditNote }
+				onEditNote={ onEdit }
 				onDeleteNote={ handleDelete }
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
@@ -331,7 +326,7 @@ export function NoteThread( {
 						note={ reply }
 						parentNote={ note }
 						isSelected={ isSelected }
-						onEditNote={ onEditNote }
+						onEditNote={ onEdit }
 						onDeleteNote={ handleDelete }
 						isThreadResolved={ isThreadResolved }
 					/>
@@ -369,7 +364,7 @@ export function NoteThread( {
 					note={ lastReply }
 					parentNote={ note }
 					isSelected={ false }
-					onEditNote={ onEditNote }
+					onEditNote={ onEdit }
 					onDeleteNote={ handleDelete }
 					isThreadResolved={ isThreadResolved }
 				/>
@@ -377,8 +372,8 @@ export function NoteThread( {
 			{ isSelected && (
 				<NoteReply
 					note={ note }
-					onEditNote={ onEditNote }
-					onAddReply={ onAddReply }
+					onEditNote={ onEdit }
+					onAddReply={ onCreate }
 					onCancel={ ( event ) => {
 						// Prevent the parent onClick from being triggered.
 						event.stopPropagation();
