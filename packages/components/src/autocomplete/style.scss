@@ -10,10 +10,6 @@
 	}
 }
 
-.components-autocomplete__results {
-	@include composite-item.join-highlights('.components-autocomplete__result:is(:hover, :focus, .is-selected):not(:disabled, [aria-disabled="true"])');
-}
-
 .components-autocomplete__result.components-button {
 	display: flex;
 	height: auto;

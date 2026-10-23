@@ -6,9 +6,11 @@
 
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 
-### Bug Fixes
+### Enhancements
 
--   Autocomplete: Keep user mention slugs readable on highlighted options ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+
+### Bug Fixes
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).

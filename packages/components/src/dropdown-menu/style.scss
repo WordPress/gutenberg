@@ -12,10 +12,6 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
-	.components-dropdown-menu__menu-item:not(.is-icon-only) {
-		display: flex;
-	}
-
 	.components-dropdown-menu__menu-item,
 	.components-menu-item {
 		@include composite-item.menu-item;
