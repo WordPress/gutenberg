@@ -1,4 +1,11 @@
-import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	cloneSanitizedBlock,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
+
+const { isBlockAllowedInParent } = unlock( blocksPrivateApis );
 
 const transforms = {
 	from: [
@@ -6,6 +13,10 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ '*' ],
+			isMatch: ( {}, blocks ) =>
+				blocks.every( ( { name } ) =>
+					isBlockAllowedInParent( name, 'core/group' )
+				),
 			__experimentalConvert( blocks ) {
 				const alignments = [ 'wide', 'full' ];
 
