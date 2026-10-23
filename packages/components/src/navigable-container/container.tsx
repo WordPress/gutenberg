@@ -27,7 +27,7 @@ function getFocusableContext(
 	const focusables = finder.find( container );
 
 	const index = focusables.indexOf( target as HTMLElement );
-	if ( index > -1 ) {
+	if ( index > -1 || target === container ) {
 		return { index, target, focusables };
 	}
 	return null;
@@ -101,17 +101,20 @@ function UnforwardedNavigableContainer(
 			}
 
 			const { index, focusables } = context;
-			const nextIndex = cycle
-				? cycleValue( index, focusables.length, offset )
-				: index + offset;
+			let nextIndex = index + offset;
+			if ( index === -1 ) {
+				nextIndex = offset > 0 ? 0 : focusables.length - 1;
+			} else if ( cycle ) {
+				nextIndex = cycleValue( index, focusables.length, offset );
+			}
 
 			if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 				focusables[ nextIndex ].focus();
 				onNavigate( nextIndex, focusables[ nextIndex ] as HTMLElement );
 
-				// `preventDefault()` on tab to avoid having the browser move the focus
-				// after this component has already moved it.
-				if ( event.code === 'Tab' ) {
+				// Prevent scrolling when entering from the container, and keep
+				// Tab from moving focus again after navigation has handled it.
+				if ( index === -1 || event.code === 'Tab' ) {
 					event.preventDefault();
 				}
 			}

@@ -1,3 +1,5 @@
+$menu-item-highlighted: ':is(:hover, :focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"], [aria-expanded="true"])';
+
 @mixin highlight($priority: null) {
 	background-color: var(--wpds-color-background-interactive-brand-strong-active) $priority;
 	color: var(--wpds-color-foreground-interactive-brand-strong-active) $priority;
@@ -11,8 +13,20 @@
 	}
 }
 
+@mixin join-highlights($item-selector, $following-item-selector: $item-selector) {
+	> #{$item-selector}:has(+ #{$following-item-selector}) {
+		border-end-start-radius: 0;
+		border-end-end-radius: 0;
+	}
+
+	> #{$item-selector} + #{$following-item-selector} {
+		border-start-start-radius: 0;
+		border-start-end-radius: 0;
+	}
+}
+
 @mixin menu-item {
-	&:is(:hover, :focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"], [aria-expanded="true"]) {
+	&#{$menu-item-highlighted} {
 		// Popup colors take precedence over the underlying Button variant.
 		@include highlight(!important);
 

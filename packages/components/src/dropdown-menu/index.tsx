@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { menu } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';
@@ -53,6 +54,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		dropdownMenuProps,
 		'DropdownMenu'
 	);
+	const [ focusFirstItem, setFocusFirstItem ] = useState( true );
 
 	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
@@ -78,11 +80,35 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		},
 		popoverProps
 	);
+	const onPopoverFocusCapture = (
+		event: React.FocusEvent< HTMLDivElement >
+	) => {
+		popoverProps?.onFocusCapture?.( event );
+
+		if (
+			! focusFirstItem &&
+			popoverProps?.focusOnMount === undefined &&
+			event.target === event.currentTarget &&
+			event.currentTarget.ownerDocument.activeElement ===
+				event.currentTarget
+		) {
+			// Keep pointer-opened menus focused without highlighting an item.
+			event.currentTarget
+				.querySelector< HTMLElement >( '[role="menu"]' )
+				?.focus( { preventScroll: true } );
+		}
+	};
 
 	return (
 		<Dropdown
 			className={ className }
-			popoverProps={ mergedPopoverProps }
+			popoverProps={ {
+				...mergedPopoverProps,
+				focusOnMount:
+					popoverProps?.focusOnMount ??
+					( focusFirstItem ? 'firstElement' : true ),
+				onFocusCapture: onPopoverFocusCapture,
+			} }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
 					// A toggle disabled with `accessibleWhenDisabled` can still be
@@ -93,6 +119,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
+						setFocusFirstItem( true );
 						onToggle();
 					}
 				};
@@ -114,6 +141,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 						icon={ icon }
 						onClick={
 							( ( event ) => {
+								if ( ! isOpen ) {
+									setFocusFirstItem( event.detail === 0 );
+								}
 								onToggle();
 								if ( mergedToggleProps.onClick ) {
 									mergedToggleProps.onClick( event );
@@ -150,7 +180,11 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 				);
 
 				return (
-					<NavigableMenu { ...mergedMenuProps } role="menu">
+					<NavigableMenu
+						{ ...mergedMenuProps }
+						role="menu"
+						tabIndex={ mergedMenuProps.tabIndex ?? -1 }
+					>
 						{ isFunction( children ) ? children( props ) : null }
 						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (

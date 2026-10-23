@@ -2,6 +2,10 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/composite-item";
 
+$highlighted-menu-item: ".components-menu-item__button#{composite-item.$menu-item-highlighted}";
+$highlighted-control: ".components-dropdown-menu__menu-item:not(.is-icon-only)#{composite-item.$menu-item-highlighted}";
+$highlighted-item: ":is(.components-menu-item__button, .components-dropdown-menu__menu-item:not(.is-icon-only))#{composite-item.$menu-item-highlighted}";
+
 .components-dropdown {
 	display: inline-block;
 }
@@ -21,6 +25,20 @@
 			> .components-menu-item__button {
 				margin: $grid-unit-10;
 				width: auto;
+			}
+		}
+
+		// Standalone items have margins when groups are present. Only the
+		// generated controls still touch outside those groups.
+		&:has(.components-menu-group) [role="menu"] {
+			@include composite-item.join-highlights($highlighted-control, "#{$highlighted-control}:not(.has-separator)");
+		}
+
+		&:not(:has(.components-menu-group)) {
+			@include composite-item.join-highlights($highlighted-menu-item);
+
+			[role="menu"] {
+				@include composite-item.join-highlights($highlighted-item, "#{$highlighted-item}:not(.has-separator)");
 			}
 		}
 	}
