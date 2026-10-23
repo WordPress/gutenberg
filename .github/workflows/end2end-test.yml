@@ -155,7 +155,7 @@ jobs:
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  test/e2e/wp-env-instances.sh 3 ${{ matrix.part }} ${{ matrix.totalParts }}
+                  test/e2e/wp-env-instances.sh 3 ${{ matrix.part }} ${{ matrix.totalParts }} --fully-parallel
 
             - name: Archive blob reports (HTML)
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
