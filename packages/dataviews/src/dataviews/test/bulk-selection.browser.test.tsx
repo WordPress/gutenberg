@@ -310,6 +310,86 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 	}
 );
 
+it( 'keeps the table toolbar over a header that consumers offset', async () => {
+	const data = Array.from( { length: 20 }, ( _, index ) => ( {
+		...posts[ 0 ],
+		id: String( index ),
+		title: `Post ${ index }`,
+	} ) );
+	await render(
+		<div style={ { height: 300 } }>
+			<style>
+				{ '.offset-layout thead { inset-block-start: 40px; }' }
+			</style>
+			<DataViews
+				data={ data }
+				fields={ fields }
+				view={ { type: 'table', titleField: 'title', fields: [] } }
+				onChangeView={ () => {} }
+				actions={ actions }
+				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+				defaultLayouts={ { table: true } }
+			>
+				<DataViews.Layout className="offset-layout" />
+			</DataViews>
+		</div>
+	);
+	await userEvent.click(
+		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+	);
+	const header = document.querySelector( 'thead' )!;
+	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
+	const scroller = document.querySelector( '.dataviews-layout__container' )!;
+	for ( const scrollTop of [ 0, scroller.scrollHeight ] ) {
+		scroller.scrollTop = scrollTop;
+		await expect
+			.poll( () => toolbar.getBoundingClientRect().top )
+			.toBe( header.getBoundingClientRect().top );
+	}
+} );
+
+it( 'keeps the table toolbar below sticky page elements', async () => {
+	const data = Array.from( { length: 20 }, ( _, index ) => ( {
+		...posts[ 0 ],
+		id: String( index ),
+		title: `Post ${ index }`,
+	} ) );
+	await render(
+		<>
+			<div
+				data-testid="page-heading"
+				style={ {
+					position: 'sticky',
+					top: 0,
+					zIndex: 2,
+					height: 60,
+					background: '#fff',
+				} }
+			/>
+			<DataViews
+				data={ data }
+				fields={ fields }
+				view={ { type: 'table', titleField: 'title', fields: [] } }
+				onChangeView={ () => {} }
+				actions={ actions }
+				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+				defaultLayouts={ { table: true } }
+			/>
+		</>
+	);
+	await userEvent.click(
+		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+	);
+	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
+	// Scroll the page so the toolbar passes under the sticky heading.
+	window.scrollBy( 0, toolbar.getBoundingClientRect().top - 20 );
+	const { left, width } = toolbar.getBoundingClientRect();
+	await expect
+		.poll( () => document.elementFromPoint( left + width / 2, 40 ) )
+		.toBe( page.getByTestId( 'page-heading' ).element() );
+	window.scrollTo( 0, 0 );
+} );
+
 it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation and Tab', async () => {
 	const data = Array.from( { length: 8 }, ( _, index ) => ( {
 		...posts[ 0 ],

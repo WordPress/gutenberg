@@ -318,20 +318,24 @@ function ViewTable< Item >( {
 	const tableSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
-	// Size the bulk actions toolbar to the header by writing to the DOM
-	// directly: it is correct on first paint and skips a re-render.
-	const syncBulkActionsHeight = () => {
+	// Place the bulk actions toolbar over the header by writing to the DOM
+	// directly: it is correct on first paint and skips a re-render. The sticky
+	// offset is copied so the toolbar follows a header that consumers move.
+	const syncBulkActionsPosition = () => {
 		const header = tableHeaderRef.current;
 		const overlay = bulkActionsRef.current;
-		if ( header && overlay ) {
+		const win = header?.ownerDocument.defaultView;
+		if ( header && overlay && win ) {
 			overlay.style.setProperty(
 				'--wp-dataviews-table-header-height',
 				`${ header.getBoundingClientRect().height }px`
 			);
+			overlay.style.insetBlockStart =
+				win.getComputedStyle( header ).insetBlockStart;
 		}
 	};
 	const resizeHeaderRef = useResizeObserver< HTMLTableSectionElement >(
-		syncBulkActionsHeight
+		syncBulkActionsPosition
 	);
 	const tableHeaderRefs = useMergeRefs( [ tableHeaderRef, resizeHeaderRef ] );
 	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
@@ -339,7 +343,7 @@ function ViewTable< Item >( {
 	const showBulkActions =
 		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
 	// The resize observer reports after the first paint, so measure on show.
-	useLayoutEffect( syncBulkActionsHeight, [ showBulkActions ] );
+	useLayoutEffect( syncBulkActionsPosition, [ showBulkActions ] );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
 		const tableHead = tableHeaderRef.current;

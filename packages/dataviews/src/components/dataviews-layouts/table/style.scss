@@ -7,6 +7,9 @@
 	border-color: inherit;
 	border-collapse: collapse;
 	position: relative;
+	// Keep the sticky header's z-index inside the table, so the bulk actions
+	// toolbar (a sibling) covers it without rising above the page's own layers.
+	isolation: isolate;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin-bottom: auto;
 	background-color: inherit;
@@ -350,7 +353,7 @@
 	position: sticky;
 	inset-block-start: 0;
 	inset-inline-start: 0;
-	z-index: 2;
+	z-index: 1;
 	height: 0;
 	flex-shrink: 0;
 
