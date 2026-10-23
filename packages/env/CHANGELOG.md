@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations when the image has the script and the healthcheck user, and pings the server over TCP with `mariadb-admin` or `mysqladmin` otherwise, so images for older MariaDB versions also become healthy ([#75046](https://github.com/WordPress/gutenberg/pull/75046), [#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 -   Skip installing Xdebug unless it is enabled with `--xdebug`, since the latest Xdebug release requires PHP 8 and fails to install on older PHP versions ([#84776](https://github.com/WordPress/gutenberg/pull/84776)).
 
 ## 3.0.0 (2020-12-17)
