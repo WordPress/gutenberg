@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
 import BaseInputControl from '../';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
 

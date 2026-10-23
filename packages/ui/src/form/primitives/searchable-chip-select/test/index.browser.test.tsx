@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
-import { createRef } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import type { Item, ItemGroup } from '../types';
 import { SearchableChipSelect } from '../index';
@@ -16,6 +16,53 @@ describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
 	} );
+
+	it.each( [ 'controlled', 'uncontrolled' ] )(
+		'preserves selected chips when Escape is pressed with an empty search field (%s)',
+		async ( mode ) => {
+			const selectedItems = [ ITEMS[ 0 ], ITEMS[ 1 ] ];
+			const onValueChange = vi.fn();
+
+			function Example() {
+				const [ value, setValue ] = useState( selectedItems );
+
+				return (
+					<SearchableChipSelect
+						aria-label="Fruit"
+						items={ ITEMS }
+						{ ...( mode === 'controlled'
+							? { value }
+							: { defaultValue: selectedItems } ) }
+						onValueChange={ ( nextValue, eventDetails ) => {
+							onValueChange( nextValue, eventDetails );
+							setValue( nextValue );
+						} }
+					/>
+				);
+			}
+
+			await render( <Example /> );
+
+			const input = screen.getByRole( 'combobox', { name: 'Fruit' } );
+			await userEvent.click( input );
+			await expect.element( screen.getByRole( 'listbox' ) ).toBeVisible();
+			expect( input ).toHaveValue( '' );
+
+			await userEvent.keyboard( '{Escape}' );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'listbox', { hidden: true } )
+				).not.toBeInTheDocument();
+			} );
+			await userEvent.keyboard( '{Escape}' );
+
+			const chips = within( screen.getByRole( 'toolbar' ) );
+			expect( chips.getByText( 'Apple' ) ).toBeVisible();
+			expect( chips.getByText( 'Apricot' ) ).toBeVisible();
+			expect( input ).toHaveFocus();
+			expect( onValueChange ).not.toHaveBeenCalled();
+		}
+	);
 
 	it( 'describes default items without adding the description to a chip', async () => {
 		await render(

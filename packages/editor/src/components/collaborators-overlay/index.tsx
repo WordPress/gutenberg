@@ -1,4 +1,3 @@
-// @ts-expect-error No exported types
 import { privateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { Overlay } from './overlay';
@@ -30,7 +29,7 @@ export function CollaboratorsOverlay( {
 			{ ( {
 				containerRef,
 			}: {
-				containerRef: React.MutableRefObject< HTMLElement | null >;
+				containerRef: React.RefObject< HTMLElement | null >;
 			} ) => (
 				<Overlay
 					blockEditorDocument={ containerRef.current?.ownerDocument }

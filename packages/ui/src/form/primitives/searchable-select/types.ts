@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { ItemPopupWidth } from '../../../utils/css/item-popup';
 import type {
 	ComboboxCollectionProps,
@@ -76,6 +76,18 @@ export function hasGroupedItems(
 	return ( items ?? [] ).some( isItemGroup );
 }
 
+export type SearchableSelectTriggerProps = Omit<
+	ComboboxTriggerProps,
+	'children'
+> & {
+	/**
+	 * Custom trigger content, or a function that receives the selected item.
+	 * The function receives `null` when nothing is selected.
+	 * When omitted, the selected item's label or placeholder is shown.
+	 */
+	children?: ( ( item: Item | null ) => ReactNode ) | ReactNode;
+};
+
 export type SearchableSelectProps = Omit<
 	ComboboxRootProps< Item, false >,
 	'children' | 'items' | 'multiple' | 'grid'
@@ -117,29 +129,23 @@ export type SearchableSelectProps = Omit<
 		 */
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**
-		 * Text to show when no value is selected. This is overridden by `triggerContent`
-		 * if specified, or by a null item's label in `items`.
+		 * Text to show when no value is selected. This is overridden by custom trigger
+		 * children if specified, or by a null item's label in `items`.
 		 *
 		 * @default __( 'Select' )
 		 */
 		placeholder?: ComboboxTriggerProps[ 'placeholder' ];
 		/**
-		 * The custom trigger content to use instead of the default.
-		 *
-		 * The callback receives `null` when nothing is selected.
+		 * Optional trigger element, typically `<SearchableSelect.Trigger />` with
+		 * custom props such as `onFocus` or `onBlur`, or custom children.
+		 * When omitted, the default trigger is used. Props on this element
+		 * override the trigger's placeholder and accessible-label props.
 		 *
 		 * ```jsx
-		 * triggerContent={ ( value ) =>
-		 *   value ? (
-		 *     <span>
-		 *       <Icon icon={ wordpress } />
-		 *       { value.label }
-		 *     </span>
-		 *   ) : null
-		 * }
+		 * trigger={ <SearchableSelect.Trigger>{ ( item ) => item?.label }</SearchableSelect.Trigger> }
 		 * ```
 		 */
-		triggerContent?: ( ( value: Item | null ) => ReactNode ) | ReactNode;
+		trigger?: ReactElement< SearchableSelectTriggerProps >;
 		/**
 		 * The custom content to use instead of the default empty state,
 		 * which shows whenever there are no matching items.

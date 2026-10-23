@@ -4,6 +4,23 @@
 
 ### Bug Fixes
 
+-   `invalidateResolution`: Make `args` optional in the types, since a selector without arguments is invalidated without them ([#85254](https://github.com/WordPress/gutenberg/pull/85254)).
+
+### Internal
+
+-   `withDispatch`: Accept action creators with typed arguments in the `mapDispatchToProps` types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   Add the `ActionCreatorWithCustomDispatchSignature` type, which lets a generic action creator keep its type parameters through `dispatch` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+
+## 11.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 10.57.0 (2026-10-07)
+
+### Bug Fixes
+
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
 ## 10.56.0 (2026-09-23)
