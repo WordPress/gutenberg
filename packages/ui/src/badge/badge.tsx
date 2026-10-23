@@ -5,7 +5,6 @@ import { type BadgeProps } from './types';
 import styles from './style.module.scss';
 import { Text } from '../text';
 import { Icon } from '../icon';
-import * as Popover from '../popover';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
@@ -28,7 +27,7 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
 				{ ...props }
 				render={
 					infotip ? (
-						<Popover.Trigger
+						<infotip.popover.Trigger
 							className={ clsx(
 								styles[ 'infotip-trigger' ],
 								defenseStyles.button
@@ -57,10 +56,10 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
 		);
 
 		return infotip ? (
-			<Popover.Root>
+			<infotip.popover.Root>
 				{ badge }
-				{ infotip }
-			</Popover.Root>
+				{ infotip.popup }
+			</infotip.popover.Root>
 		) : (
 			badge
 		);
