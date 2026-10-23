@@ -133,7 +133,10 @@ export type Action =
 			Partial< EntityActionTarget > & {
 				invalidateCache?: boolean | null;
 			} )
-	| { type: 'RECEIVE_NAVIGATION_FALLBACK_ID'; fallbackId: ItemId | null }
+	| {
+			type: 'RECEIVE_NAVIGATION_FALLBACK_ID';
+			fallbackId: ItemId | null | undefined;
+	  }
 	| {
 			type: 'RECEIVE_REGISTERED_POST_META';
 			postType: string;
@@ -194,6 +197,14 @@ export type Action =
 	  };
 
 /**
+ * The store action of the given type.
+ */
+export type ActionOf< Type extends Action[ 'type' ] > = Extract<
+	Action,
+	{ type: Type }
+>;
+
+/**
  * An entity action, with the entity's record key that the entity reducer
  * injects. An action's own `key` overrides the injected one.
  */
@@ -243,27 +254,7 @@ export interface UsersState {
  * actions.
  */
 export type CoreDataThunkArgs = ThunkArgs<
-	typeof import( '.' ).store,
+	typeof import( './index' ).store,
 	typeof import( './private-selectors' ),
 	typeof import( './private-actions' )
 >;
-
-/**
- * A record received from the REST API.
- */
-export type RestRecord = Record< string, unknown > & {
-	_links?: RestLinks;
-};
-
-/**
- * The links of a REST API record that core data reads.
- */
-export interface RestLinks {
-	self?: Array< {
-		href?: string;
-		targetHints?: { allow?: ReadonlyArray< string > };
-	} >;
-	'version-history'?: Array< { href?: string } >;
-	'wp:user-global-styles'?: Array< { href?: string } >;
-	[ relation: string ]: unknown;
-}

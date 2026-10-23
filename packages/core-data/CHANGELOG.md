@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Convert the actions and the store entry point to TypeScript ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
 -   Convert the resolvers to TypeScript and add the store thunk arguments type ([#85069](https://github.com/WordPress/gutenberg/pull/85069)).
 -   Convert the entities config and the store reducer to TypeScript, and add the store `Action` type ([#85065](https://github.com/WordPress/gutenberg/pull/85065)).
 -   Convert the entity hooks, the entity providers and the parsed blocks cache to TypeScript ([#85063](https://github.com/WordPress/gutenberg/pull/85063)).

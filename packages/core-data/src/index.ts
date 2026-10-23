@@ -15,21 +15,39 @@ import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { dynamicActions, dynamicSelectors } from './dynamic-entities';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import type { GetRecordsHttpQuery, State } from './selectors';
+import type { Query } from './queried-data/types';
+import type { Action } from './private-types';
+import type {
+	DeleteEntityRecordOptions,
+	SaveEntityRecordOptions,
+} from './types';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
 // Instead of getEntityRecord, the consumer could use more user-friendly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
-const entitiesConfig = [
-	...rootEntitiesConfig,
-	...additionalEntityConfigLoaders.filter( ( config ) => !! config.name ),
-];
+const entitiesConfig: Array< { kind: string; name: string; plural?: string } > =
+	[
+		...rootEntitiesConfig,
+		...additionalEntityConfigLoaders.filter(
+			( config ): config is typeof config & { name: string } =>
+				!! config.name
+		),
+	];
 
-const entitySelectors = entitiesConfig.reduce( ( result, entity ) => {
+// The typed `dynamicSelectors` describe these, so their spread adds no types.
+const entitySelectors: object = entitiesConfig.reduce<
+	Record< string, Function >
+>( ( result, entity ) => {
 	const { kind, name, plural } = entity;
 
 	const getEntityRecordMethodName = getMethodName( kind, name );
-	result[ getEntityRecordMethodName ] = ( state, key, query ) => {
+	result[ getEntityRecordMethodName ] = (
+		state: State,
+		key?: string | number,
+		query?: GetRecordsHttpQuery
+	) => {
 		logEntityDeprecation( kind, name, getEntityRecordMethodName, {
 			isShorthandSelector: true,
 			alternativeFunctionName: 'getEntityRecord',
@@ -39,7 +57,10 @@ const entitySelectors = entitiesConfig.reduce( ( result, entity ) => {
 
 	if ( plural ) {
 		const getEntityRecordsMethodName = getMethodName( kind, plural, 'get' );
-		result[ getEntityRecordsMethodName ] = ( state, query ) => {
+		result[ getEntityRecordsMethodName ] = (
+			state: State,
+			query: GetRecordsHttpQuery
+		) => {
 			logEntityDeprecation( kind, name, getEntityRecordsMethodName, {
 				isShorthandSelector: true,
 				alternativeFunctionName: 'getEntityRecords',
@@ -50,10 +71,16 @@ const entitySelectors = entitiesConfig.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
+// The resolvers of the typed `dynamicSelectors`, so their spread adds no types.
+const entityResolvers: object = entitiesConfig.reduce<
+	Record< string, Function & { shouldInvalidate?: Function } >
+>( ( result, entity ) => {
 	const { kind, name, plural } = entity;
 	const getEntityRecordMethodName = getMethodName( kind, name );
-	result[ getEntityRecordMethodName ] = ( key, query ) => {
+	result[ getEntityRecordMethodName ] = (
+		key?: string | number,
+		query?: Query
+	) => {
 		logEntityDeprecation( kind, name, getEntityRecordMethodName, {
 			isShorthandSelector: true,
 			alternativeFunctionName: 'getEntityRecord',
@@ -63,24 +90,33 @@ const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
 
 	if ( plural ) {
 		const getEntityRecordsMethodName = getMethodName( kind, plural, 'get' );
-		result[ getEntityRecordsMethodName ] = ( ...args ) => {
+		result[ getEntityRecordsMethodName ] = (
+			...args: [ query?: Query ]
+		) => {
 			logEntityDeprecation( kind, plural, getEntityRecordsMethodName, {
 				isShorthandSelector: true,
 				alternativeFunctionName: 'getEntityRecords',
 			} );
 			return resolvers.getEntityRecords( kind, name, ...args );
 		};
-		result[ getEntityRecordsMethodName ].shouldInvalidate = ( action ) =>
-			resolvers.getEntityRecords.shouldInvalidate( action, kind, name );
+		result[ getEntityRecordsMethodName ].shouldInvalidate = (
+			action: Action
+		) => resolvers.getEntityRecords.shouldInvalidate( action, kind, name );
 	}
 	return result;
 }, {} );
 
-const entityActions = entitiesConfig.reduce( ( result, entity ) => {
+// The typed `dynamicActions` describe these, so their spread adds no types.
+const entityActions: object = entitiesConfig.reduce<
+	Record< string, Function >
+>( ( result, entity ) => {
 	const { kind, name } = entity;
 
 	const saveEntityRecordMethodName = getMethodName( kind, name, 'save' );
-	result[ saveEntityRecordMethodName ] = ( record, options ) => {
+	result[ saveEntityRecordMethodName ] = (
+		record: object,
+		options?: SaveEntityRecordOptions
+	) => {
 		logEntityDeprecation( kind, name, saveEntityRecordMethodName, {
 			isShorthandSelector: true,
 			alternativeFunctionName: 'saveEntityRecord',
@@ -89,7 +125,11 @@ const entityActions = entitiesConfig.reduce( ( result, entity ) => {
 	};
 
 	const deleteEntityRecordMethodName = getMethodName( kind, name, 'delete' );
-	result[ deleteEntityRecordMethodName ] = ( key, query, options ) => {
+	result[ deleteEntityRecordMethodName ] = (
+		key: string | number,
+		query?: Query | null,
+		options?: DeleteEntityRecordOptions
+	) => {
 		logEntityDeprecation( kind, name, deleteEntityRecordMethodName, {
 			isShorthandSelector: true,
 			alternativeFunctionName: 'deleteEntityRecord',

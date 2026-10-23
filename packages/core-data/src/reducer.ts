@@ -668,7 +668,7 @@ export function userPatternCategories(
 }
 
 export function navigationFallbackId(
-	state: ItemId | null = null,
+	state: ItemId | null | undefined = null,
 	action: Action
 ) {
 	switch ( action.type ) {
