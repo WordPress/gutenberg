@@ -67,8 +67,6 @@ After, using `SelectControl` from `@wordpress/ui`, with the stored application v
 
 ` }</Markdown>
 
-The legacy README mentions `__unstable-large`, but the current legacy type supports only `default` and `small`. Do not carry `__unstable-large` into the new control. `compact` is a supported new size, not an automatic equivalent of legacy `small`.
-
 ## Resolve the selection
 
 Legacy `CustomSelectControl` chooses the first option when `value` is omitted, without calling `onChange` on mount. An unavailable key displays the first option as a fallback. Do not apply assumptions about the native `SelectControl` to this component. Preserve the intended selection explicitly in your migration.
