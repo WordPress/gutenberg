@@ -42,8 +42,9 @@ final class SelectionTests: XCTestCase {
 		let second = editor.block( title: "Paragraph", content: "Delta echo foxtrot" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
 
-		// Select the second paragraph.
-		second.tap()
+		// Select the second paragraph, with the caret at the end of its line:
+		// a tap on the caret opens the edit menu instead of selecting a word.
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
 		let focused = web.textViews.matching( NSPredicate( format: "hasKeyboardFocus == true" ) ).firstMatch
 		XCTAssertTrue( focused.waitForExistence( timeout: 10 ), "The tap did not focus the paragraph" )
 
