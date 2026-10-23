@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `composer` service uses the `composer:2` image instead of the floating `composer` image, so a new major version of Composer can't break `wp-env run composer` ([#84777](https://github.com/WordPress/gutenberg/pull/84777)).
+
 ### Bug Fixes
 
 -   Skip installing Xdebug unless it is enabled with `--xdebug`, since the latest Xdebug release requires PHP 8 and fails to install on older PHP versions ([#84776](https://github.com/WordPress/gutenberg/pull/84776)).
