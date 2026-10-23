@@ -1,10 +1,8 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
-	"compilerOptions": {
-		"checkJs": false
-	},
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },
@@ -14,7 +12,7 @@
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date/tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
@@ -23,14 +21,5 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*",
-		"src/font-library/lib/**/*"
 	]
 }
