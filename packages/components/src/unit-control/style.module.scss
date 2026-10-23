@@ -101,6 +101,7 @@
 
 	&:where(:not(.is-small)) {
 		@include unit-label;
+		border-radius: var(--wpds-border-radius-sm);
 		display: flex;
 		justify-content: center;
 		align-items: center;
