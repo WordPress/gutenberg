@@ -148,8 +148,8 @@ interface DashboardGridLayoutItem {
 | -------------------- | ------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `layout`             | `DashboardGridLayoutItem[]`                | —        | Required. Positions and sizes keyed by child `key`.                                                                                                     |
 | `children`           | `ReactNode`                                | —        | Required. Each child needs a `key` matching a layout entry.                                                                                             |
-| `columns`            | `number`                                   | `6`      | Total columns (fixed mode).                                                                                                                             |
-| `minColumnWidth`     | `number`                                   | —        | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`.                                               |
+| `columns`            | `number \| ColumnSteps`                    | `6`      | Column count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`; a step can be `'auto'`). Caps the count when `minColumnWidth` is set. See [Columns](#columns). |
+| `minColumnWidth`     | `number`                                   | —        | Per-column floor in pixels: the count drops on narrow containers so no column is narrower, down to one. Alone, as many columns as fit.                 |
 | `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                             |
 | `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                           |
 | `editMode`           | `boolean`                                  | `false`  | Enables drag-to-reorder and resize handles.                                                                                                             |
@@ -179,9 +179,11 @@ while edit mode is on:
 | ---------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `actionableArea` | `ReactNode` | Content rendered above the draggable surface of the grid item. Useful for close buttons, menus, or links that must stay clickable in edit mode. |
 
-### Modes
+### Columns
 
-#### Fixed columns
+`columns` and `minColumnWidth` compose. Both surfaces measure their own width with a `ResizeObserver` and resolve the count from it.
+
+A number renders that many columns at every width:
 
 ```jsx
 <DashboardGrid layout={ layout } columns={ 12 }>
@@ -189,20 +191,39 @@ while edit mode is on:
 </DashboardGrid>
 ```
 
-#### Responsive
-
-Columns are computed from container width using `minColumnWidth` as
-the lower bound per column. A `ResizeObserver` recomputes on
-container resize.
+A `ColumnSteps` map renders a count from each container width up: one column from 0px, two from 600px, four from 960px.
 
 ```jsx
-<DashboardGrid layout={ layout } minColumnWidth={ 240 }>
+<DashboardGrid layout={ layout } columns={ { 0: 1, 600: 2, 960: 4 } }>
 	{ children }
 </DashboardGrid>
 ```
 
-In responsive mode, layout items can provide an `order` to control
-display order independently of array position.
+Below the smallest key, that step's count applies, so a map that starts at `0` states every width.
+
+`minColumnWidth` is a per-column floor in pixels. Alone, the surface fits as many columns of at least that width as the container allows. With `columns`, the count is capped by the number or the step, and lowered whenever a column would end up narrower than the floor.
+
+```jsx
+<DashboardGrid layout={ layout } columns={ 4 } minColumnWidth={ 240 }>
+	{ children }
+</DashboardGrid>
+```
+
+A step can be `'auto'`: from that width up there is no cap, and the floor alone decides the count. Below it the steps still fix the count. Without a floor, an `'auto'` step is skipped and the count below it holds.
+
+```jsx
+<DashboardGrid
+	layout={ layout }
+	columns={ { 0: 1, 600: 2, 960: 'auto' } }
+	minColumnWidth={ 240 }
+>
+	{ children }
+</DashboardGrid>
+```
+
+A count is rounded down and never below one. A count that is not a finite number, or a step that is neither a count nor `'auto'`, is ignored.
+
+Layout items can provide an `order` to control display order independently of array position.
 
 #### Edit mode
 
@@ -311,8 +332,8 @@ items flow around them; out-of-range values (negative, or beyond
 | -------------------- | ------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `layout`             | `DashboardLanesLayoutItem[]`               | —       | Required. Span and order keyed by child `key`.                                                                                                                                                          |
 | `children`           | `ReactNode`                                | —       | Required. Each child needs a `key` matching a layout entry.                                                                                                                                             |
-| `columns`            | `number`                                   | `6`     | Total lanes (fixed mode).                                                                                                                                                                               |
-| `minColumnWidth`     | `number`                                   | —       | If set, enables responsive mode: lane count derived from container width. Mutually exclusive with `columns`.                                                                                            |
+| `columns`            | `number \| ColumnSteps`                    | `6`     | Lane count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`; a step can be `'auto'`). Caps the count when `minColumnWidth` is set. See [Columns](#columns).                               |
+| `minColumnWidth`     | `number`                                   | —       | Per-lane floor in pixels: the count drops on narrow containers so no lane is narrower, down to one. Alone, as many lanes as fit.                                                                       |
 | `flowTolerance`      | `number`                                   | `16`    | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions.                     |
 | `rowUnit`            | `number`                                   | `4`     | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
 | `itemLimits`         | `Record< string, GridItemWidthLimits >`    | —       | Per-item minimum and maximum tile widths in pixels, keyed by layout item key. See [Size limits](#size-limits).                                                                                          |

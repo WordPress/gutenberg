@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+
+### Internal
+
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency, so fallbacks no longer require installing `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes
