@@ -18,7 +18,6 @@ import {
 import {
 	LinkControl,
 	store as blockEditorStore,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';
@@ -29,13 +28,23 @@ import CSSClassesSettingComponent from './css-classes-setting';
 import type { CSSClassesSettingProps } from './css-classes-setting';
 
 interface LinkValue {
-	url?: string;
+	url?: string | null;
 	type?: string;
 	id?: string | number;
 	opensInNewTab?: boolean;
 	nofollow?: boolean;
 	title?: string;
 	cssClasses?: string;
+}
+
+/**
+ * A page the link UI created.
+ */
+interface CreatedPage {
+	id: number;
+	type: string;
+	title: { rendered: string };
+	link: string;
 }
 
 interface InlineLinkUIProps {
@@ -60,12 +69,13 @@ const LINK_SETTINGS = [
 		title: __( 'Additional CSS class(es)' ),
 		render: (
 			setting: CSSClassesSettingProps[ 'setting' ],
-			value: CSSClassesSettingProps[ 'value' ],
+			value: Record< string, unknown > | undefined,
 			onChange: CSSClassesSettingProps[ 'onChange' ]
 		) => (
 			<CSSClassesSettingComponent
 				setting={ setting }
-				value={ value }
+				// The link format holds its CSS classes as a string.
+				value={ value as CSSClassesSettingProps[ 'value' ] }
 				onChange={ onChange }
 			/>
 		),
@@ -180,6 +190,7 @@ function InlineLinkUI( {
 			selectionChange( {
 				clientId: selectionStart.clientId,
 				identifier: selectionStart.attributeKey,
+				// @ts-expect-error Bug: the action reads `attributeKey` and `startOffset`, not `identifier` and `start`.
 				start: value.start + newText.length + 1,
 			} );
 
@@ -296,7 +307,9 @@ function InlineLinkUI( {
 	} );
 
 	async function handleCreate( pageTitle: string ) {
-		const page = await createPageEntity( {
+		// The suggestion is offered only with the setting.
+		// @ts-expect-error Bug: a failed save resolves without a page, which this reads.
+		const page: CreatedPage = await createPageEntity!( {
 			title: pageTitle,
 			status: 'draft',
 		} );

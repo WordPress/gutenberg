@@ -1,0 +1,53 @@
+import { tokenFallbacks } from '../lib/theme-tokens.mjs';
+import {
+	addFallbackToVar as _addFallbackToVar,
+	getTokenFallback as _getTokenFallback,
+} from './add-fallback-to-var.mjs';
+
+/**
+ * Replace bare `var(--wpds-*)` references in a CSS value string with
+ * `var(--wpds-*, <fallback>)` using the package's generated token
+ * fallback map.
+ *
+ * Existing fallbacks (i.e. var() calls that already contain a comma) are
+ * left untouched, making the function safe to run multiple times.
+ *
+ * This is a thin wrapper around the generic `addFallbackToVar` helper in
+ * `./add-fallback-to-var.mjs`, prebound to the package's token fallback
+ * map. Update the regex/replacement logic in that file, not here.
+ *
+ * Returns the value unchanged when `@wordpress/theme` is not installed.
+ *
+ * @param {string}  cssValue               A CSS declaration value.
+ * @param {Object}  [options]              Options.
+ * @param {boolean} [options.escapeQuotes] When true, escape `"` and `'` in
+ *                                         fallback values. Use this when the
+ *                                         input is JS/TS source so that
+ *                                         injected quotes don't break string
+ *                                         literals. JS will unescape them at
+ *                                         parse time, so the browser's CSS
+ *                                         engine still sees the correct value.
+ * @return {string}                        The value with fallbacks injected.
+ */
+export function addFallbackToVar( cssValue, options ) {
+	if ( ! tokenFallbacks ) {
+		return cssValue;
+	}
+	return _addFallbackToVar( cssValue, tokenFallbacks, options );
+}
+
+/**
+ * Whether design token fallbacks are available, i.e. whether
+ * `@wordpress/theme` is installed. The plugins do nothing without them.
+ */
+export const hasTokenFallbacks = tokenFallbacks !== undefined;
+
+/**
+ * Get the generated fallback for a design token.
+ *
+ * @param {string} tokenName CSS variable name.
+ * @return {string} The token fallback.
+ */
+export function getTokenFallback( tokenName ) {
+	return _getTokenFallback( tokenName, tokenFallbacks ?? {} );
+}
