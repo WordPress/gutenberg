@@ -151,11 +151,6 @@
 		"collections": [ "core", "core-admin" ]
 	},
 	{
-		"slug": "bell-unread",
-		"label": "Bell Unread",
-		"filePath": "library/bell-unread.svg"
-	},
-	{
 		"slug": "block-default",
 		"label": "Block Default",
 		"filePath": "library/block-default.svg",
@@ -216,12 +211,6 @@
 		"collections": [ "core", "core-admin" ]
 	},
 	{
-		"slug": "cancel-circle-filled",
-		"label": "Cancel Circle Filled",
-		"filePath": "library/cancel-circle-filled.svg",
-		"keywords": [ "close" ]
-	},
-	{
 		"slug": "caption",
 		"label": "Caption",
 		"filePath": "library/caption.svg"
@@ -255,12 +244,6 @@
 		"label": "Caution",
 		"filePath": "library/caution.svg",
 		"collections": [ "core" ],
-		"keywords": [ "alert", "exclamation", "warning" ]
-	},
-	{
-		"slug": "caution-filled",
-		"label": "Caution Filled",
-		"filePath": "library/caution-filled.svg",
 		"keywords": [ "alert", "exclamation", "warning" ]
 	},
 	{
@@ -429,11 +412,6 @@
 		"slug": "copy",
 		"label": "Copy",
 		"filePath": "library/copy.svg"
-	},
-	{
-		"slug": "copy-small",
-		"label": "Copy Small",
-		"filePath": "library/copy-small.svg"
 	},
 	{
 		"slug": "corner-all",
@@ -795,11 +773,6 @@
 		"collections": [ "core", "core-admin" ]
 	},
 	{
-		"slug": "help-filled",
-		"label": "Help Filled",
-		"filePath": "library/help-filled.svg"
-	},
-	{
 		"slug": "home",
 		"label": "Home",
 		"filePath": "library/home.svg",
@@ -1002,16 +975,6 @@
 		"filePath": "library/lock.svg"
 	},
 	{
-		"slug": "lock-outline",
-		"label": "Lock Outline",
-		"filePath": "library/lock-outline.svg"
-	},
-	{
-		"slug": "lock-small",
-		"label": "Lock Small",
-		"filePath": "library/lock-small.svg"
-	},
-	{
 		"slug": "login",
 		"label": "Login",
 		"filePath": "library/login.svg"
@@ -1181,11 +1144,6 @@
 		"collections": [ "core-admin" ]
 	},
 	{
-		"slug": "pin-small",
-		"label": "Pin Small",
-		"filePath": "library/pin-small.svg"
-	},
-	{
 		"slug": "play",
 		"label": "Play",
 		"filePath": "library/play.svg"
@@ -1217,11 +1175,6 @@
 		"label": "Plus Circle",
 		"filePath": "library/plus-circle.svg",
 		"collections": [ "core" ]
-	},
-	{
-		"slug": "plus-circle-filled",
-		"label": "Plus Circle Filled",
-		"filePath": "library/plus-circle-filled.svg"
 	},
 	{
 		"slug": "position-center",
