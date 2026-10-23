@@ -1,6 +1,6 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -12,13 +12,8 @@ import {
 	GridItemMovers,
 	GridItemRotator,
 	useUpdateGridChildLayout,
-	isGridStackedOnMobile,
-	getStackedLayouts,
 } from '../components/grid';
-import type {
-	GridBlockStyle,
-	GridChild,
-} from '../components/grid/mobile-stacking';
+import type { GridBlockStyle } from '../components/grid/mobile-stacking';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
@@ -171,9 +166,11 @@ export function getChildLayoutStyleRules( {
 
 	// Manual grids stack their children on mobile, as part of the grid
 	// interactivity experiment, with a rule on the grid that reads each
-	// child's row span from this custom property so that tall blocks stay
-	// tall. It is always set, so that a child doesn't inherit the row span of
-	// a grid it is nested in.
+	// child's row span from this custom property. Stacked rows are as tall as
+	// their content, so it doesn't make blocks taller: it numbers the stacked
+	// rows the way the editor's tools do (see the grid layout's stacking
+	// rules). It is always set, so that a child doesn't inherit the row span
+	// of a grid it is nested in.
 	if (
 		! hasViewportOverrides &&
 		isManualPlacement &&
@@ -553,33 +550,12 @@ function GridTools( {
 	// On mobile, a stacked grid shows every block full width, one after
 	// another. The tools work from that stack: the first edit gives the grid
 	// its own mobile layout matching it (see `useUpdateGridChildLayout`).
-	const isStackedOnMobile =
-		selectedState?.viewport === '@mobile' &&
-		isGridStackedOnMobile( parentLayout, parentStyle );
-	const siblings = useSelect(
-		( select ) => {
-			if ( ! isStackedOnMobile ) {
-				return undefined;
-			}
-			const { getBlockOrder, getBlocksByClientId } =
-				select( blockEditorStore );
-			// The grid's children exist.
-			return getBlocksByClientId(
-				getBlockOrder( rootClientId )
-			) as GridChild[];
-		},
-		[ isStackedOnMobile, rootClientId ]
-	);
-	const stackedLayouts = useMemo(
-		() =>
-			isStackedOnMobile && siblings
-				? getStackedLayouts(
-						{ layout: parentLayout, style: parentStyle },
-						siblings,
-						clientId
-					)
-				: null,
-		[ isStackedOnMobile, siblings, clientId, parentLayout, parentStyle ]
+	const stackedLayouts = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getStackedGridLayouts(
+				rootClientId
+			),
+		[ rootClientId ]
 	);
 	const updateGridChildLayout = useUpdateGridChildLayout();
 
@@ -591,7 +567,7 @@ function GridTools( {
 	const isViewportState = hasViewportBlockStyleState( selectedState );
 	// The layout the canvas shows for this block and its grid in the
 	// selected state.
-	const effectiveLayout = stackedLayouts?.child ?? {
+	const effectiveLayout = stackedLayouts?.children[ clientId ] ?? {
 		...style?.layout,
 		...( isViewportState
 			? // A style state holds the child layout it overrides.
@@ -611,7 +587,7 @@ function GridTools( {
 		...stackedLayouts?.grid,
 	};
 	// Stacked blocks are shown unrotated.
-	const rotate = isStackedOnMobile
+	const rotate = stackedLayouts
 		? 0
 		: getRotateForState( style, selectedState );
 	// Like the Rotation control in the block settings, the handle is only

@@ -37,15 +37,7 @@ import {
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
 import { getAlignmentGuides } from './get-alignment-guides';
-import {
-	getUnstackedMobileUpdates,
-	isGridStackedOnMobile,
-} from './mobile-stacking';
-import type {
-	GridBlockStyle,
-	GridChild,
-	GridStyleLayout,
-} from './mobile-stacking';
+import type { GridBlockStyle, GridStyleLayout } from './mobile-stacking';
 import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
 import { getMinimumInsertionRect } from './get-minimum-insertion-rect';
 import {
@@ -282,55 +274,29 @@ function ManualGridVisualizer( {
 		null
 	);
 
-	const { gridItemStyles, gridAttributes, viewport, stackedItems } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockOrder,
-					getBlockStyles,
-					getBlockAttributes,
-					getBlocksByClientId,
-					getSelectedBlockStyleState,
-				} = unlock( select( blockEditorStore ) );
-				const blockOrder = getBlockOrder( gridClientId );
-				const _gridAttributes = getBlockAttributes( gridClientId );
+	const { gridItemStyles, viewport, stackedLayouts } = useSelect(
+		( select ) => {
+			const {
+				getBlockOrder,
+				getBlockStyles,
+				getSelectedBlockStyleState,
+				getStackedGridLayouts,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				gridItemStyles: getBlockStyles( getBlockOrder( gridClientId ) ),
 				// The viewport is the same for every block.
-				const _viewport =
-					getSelectedBlockStyleState( gridClientId )?.viewport;
-				const isStacked =
-					_viewport === '@mobile' &&
-					isGridStackedOnMobile(
-						_gridAttributes?.layout,
-						_gridAttributes?.style
-					);
-				return {
-					gridItemStyles: getBlockStyles( blockOrder ),
-					gridAttributes: _gridAttributes,
-					viewport: _viewport,
-					// The stack depends on more than the blocks' styles, such
-					// as whether they are hidden on mobile.
-					stackedItems: isStacked
-						? // The grid's children exist.
-							( getBlocksByClientId( blockOrder ) as GridChild[] )
-						: undefined,
-				};
-			},
-			[ gridClientId ]
-		);
+				viewport: getSelectedBlockStyleState( gridClientId )?.viewport,
+				stackedLayouts: getStackedGridLayouts( gridClientId ),
+			};
+		},
+		[ gridClientId ]
+	);
 	const occupiedRects = useMemo( () => {
 		// Use the placement shown in the selected viewport: the stack when
 		// the grid is stacked on mobile, otherwise any viewport overrides.
 		let layouts: GridStyleLayout[];
-		if ( stackedItems ) {
-			const updates = getUnstackedMobileUpdates( {
-				gridClientId,
-				gridAttributes,
-				children: stackedItems,
-			} );
-			layouts = stackedItems.map(
-				( { clientId } ) =>
-					updates[ clientId ]?.style[ '@mobile' ].layout ?? {}
-			);
+		if ( stackedLayouts ) {
+			layouts = Object.values( stackedLayouts.children );
 		} else {
 			// The style attribute, and the viewport states in it, are objects
 			// when set.
@@ -366,13 +332,7 @@ function ManualGridVisualizer( {
 			);
 		}
 		return rects;
-	}, [
-		gridItemStyles,
-		gridAttributes,
-		viewport,
-		stackedItems,
-		gridClientId,
-	] );
+	}, [ gridItemStyles, viewport, stackedLayouts ] );
 
 	return (
 		<>

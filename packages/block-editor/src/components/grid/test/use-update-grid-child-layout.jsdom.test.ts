@@ -184,6 +184,60 @@ describe( 'getGridChildUpdates()', () => {
 			).toEqual( { rotate: -15 } );
 		} );
 
+		it( 'unrotates the blocks rotated on mobile when it unstacks a grid, as the stack showed them', () => {
+			const updates = getGridChildUpdates( {
+				clientId: 'unrotated',
+				style: undefined,
+				change: { columnSpan: 1 },
+				selectedState: MOBILE_STATE,
+				gridClientId: 'grid',
+				gridAttributes: manualGrid,
+				children: [
+					{ clientId: 'a', attributes: { style: { rotate: 30 } } },
+					{
+						clientId: 'b',
+						attributes: { style: { '@mobile': { rotate: -45 } } },
+					},
+					{
+						clientId: 'c',
+						attributes: {
+							style: { rotate: 30, '@tablet': { rotate: 15 } },
+						},
+					},
+					{
+						clientId: 'd',
+						attributes: {
+							style: { rotate: 30, '@mobile': { rotate: 0 } },
+						},
+					},
+					{ clientId: 'unrotated', attributes: {} },
+				],
+			} );
+			expect( updates.a?.style ).toEqual( {
+				rotate: 30,
+				'@mobile': {
+					layout: {
+						columnStart: 1,
+						columnSpan: 3,
+						rowStart: 1,
+						rowSpan: 1,
+					},
+					rotate: 0,
+				},
+			} );
+			expect( updates.b?.style?.[ '@mobile' ]?.rotate ).toBe( 0 );
+			// Only the mobile rotation changes.
+			expect( updates.c?.style ).toMatchObject( {
+				rotate: 30,
+				'@tablet': { rotate: 15 },
+				'@mobile': { rotate: 0 },
+			} );
+			expect( updates.d?.style?.[ '@mobile' ]?.rotate ).toBe( 0 );
+			expect(
+				updates.unrotated?.style?.[ '@mobile' ]
+			).not.toHaveProperty( 'rotate' );
+		} );
+
 		it( 'unstacks a grid stacked on mobile first, keeping the other blocks unrotated', () => {
 			const updates = getGridChildUpdates( {
 				clientId: 'b',
