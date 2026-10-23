@@ -1,6 +1,9 @@
 import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
 import { SelectControl } from '../';
+import { Stack } from '../../../stack';
+import { Text } from '../../../text';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
@@ -72,6 +75,52 @@ export const WithCustomPlaceholder: Story = {
 	args: {
 		...Default.args,
 		placeholder: 'Choose an item',
+	},
+};
+
+/**
+ * Preserve an empty string in application state by giving each choice a unique,
+ * non-empty serialization. The callback still receives the original item.
+ * This `itemToStringValue` serializer also changes the value submitted with a form.
+ */
+export const WithEmptyStringValue: Story = {
+	args: {
+		label: 'Position',
+		items: [
+			{ value: '', label: 'Default' },
+			{ value: 'sticky', label: 'Sticky' },
+		],
+		itemToStringValue: ( item ) =>
+			item.value === null ? '' : `option:${ item.value }`,
+	},
+	argTypes: {
+		value: { control: false },
+		defaultValue: { control: false },
+	},
+	render: function Template( args ) {
+		const [ position, setPosition ] = useState( '' );
+
+		return (
+			<Stack direction="column" gap="sm" align="start">
+				<SelectControl
+					{ ...args }
+					value={
+						args.items?.find(
+							( item ) => item.value === position
+						) ?? null
+					}
+					onValueChange={ ( item, eventDetails ) => {
+						if ( item && item.value !== null ) {
+							setPosition( item.value );
+						}
+						args.onValueChange?.( item, eventDetails );
+					} }
+				/>
+				<Text>
+					Stored value: <code>{ JSON.stringify( position ) }</code>
+				</Text>
+			</Stack>
+		);
 	},
 };
 

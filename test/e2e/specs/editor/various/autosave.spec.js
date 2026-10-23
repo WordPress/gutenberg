@@ -76,8 +76,8 @@ test.describe( 'Autosave', () => {
 		await page.reload();
 
 		await expect(
-			page.locator( '.components-notice__content' )
-		).toHaveText(
+			page.locator( '.notices-inline-notices__notice' )
+		).toContainText(
 			'The backup of this post in your browser from October 12, 2026 3:41 pm is different from the version below.'
 		);
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -108,7 +108,7 @@ test.describe( 'Autosave', () => {
 			},
 		] );
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toBeHidden();
 	} );
 
@@ -142,7 +142,7 @@ test.describe( 'Autosave', () => {
 			},
 		] );
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText( BACKUP_NOTICE );
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -215,12 +215,12 @@ test.describe( 'Autosave', () => {
 
 		await page.reload();
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText( BACKUP_NOTICE );
 
 		await admin.createNewPost();
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toBeHidden();
 	} );
 
@@ -359,7 +359,7 @@ test.describe( 'Autosave', () => {
 		await pageUtils.pressKeys( 'primary+s' );
 
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText(
 			'Updating failed because you were offline. Please verify your connection and try again.'
 		);
@@ -420,7 +420,7 @@ test.describe( 'Autosave', () => {
 
 		// Only remote autosave notice should be applied.
 		await expect(
-			page.locator( '.components-notice__content' )
+			page.locator( '.notices-inline-notices__notice' )
 		).toContainText(
 			'There is an autosave of this post that is more recent than the version below.'
 		);
@@ -468,7 +468,7 @@ test.describe( 'Autosave', () => {
 		await page.waitForFunction( () => window?.wp?.data );
 
 		const autosaveNotice = page
-			.locator( '.components-notice__content' )
+			.locator( '.notices-inline-notices__notice' )
 			.filter( {
 				hasText:
 					'There is an autosave of this post that is more recent than the version below.',
