@@ -838,16 +838,6 @@
 		"filePath": "library/inline-image.svg"
 	},
 	{
-		"slug": "insert-after",
-		"label": "Insert After",
-		"filePath": "library/insert-after.svg"
-	},
-	{
-		"slug": "insert-before",
-		"label": "Insert Before",
-		"filePath": "library/insert-before.svg"
-	},
-	{
 		"slug": "institution",
 		"label": "Institution",
 		"filePath": "library/institution.svg"
@@ -1107,11 +1097,6 @@
 		"slug": "not-found",
 		"label": "Not Found",
 		"filePath": "library/not-found.svg"
-	},
-	{
-		"slug": "offline",
-		"label": "Offline",
-		"filePath": "library/offline.svg"
 	},
 	{
 		"slug": "overlay-text",
