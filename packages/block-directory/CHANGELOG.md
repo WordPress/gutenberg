@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the design system outline for keyboard focus on downloadable block cards and update hover to use a subtle background tint ([#85307](https://github.com/WordPress/gutenberg/pull/85307)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
