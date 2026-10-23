@@ -30,6 +30,7 @@ export default function PreformattedEdit( {
 			onMerge={ mergeBlocks }
 			{ ...blockProps }
 			__unstablePastePlainText
+			__unstableDisableFormatInputRules
 			__unstableOnSplitAtDoubleLineEnd={
 				insertBlocksAfter
 					? () =>
