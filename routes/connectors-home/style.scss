@@ -9,12 +9,7 @@ $sticky-header-clearance: 120px;
 	margin: 0 auto;
 	padding: var(--wpds-dimension-padding-2xl);
 
-	.components-item {
-		padding: var(--wpds-dimension-padding-xl);
-		border-radius: var(--wpds-border-radius-lg);
-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-		background: var(--wpds-color-background-surface-neutral-strong);
-		overflow: hidden;
+	.connector-item {
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
@@ -83,6 +78,7 @@ $sticky-header-clearance: 120px;
 	}
 
 	&__help-text {
+		margin-block: var(--wpds-dimension-gap-md);
 		color: var(--wpds-color-foreground-content-neutral);
 	}
 
@@ -109,13 +105,9 @@ $sticky-header-clearance: 120px;
 			padding-inline-end: 130px;
 		}
 
-		.components-item {
-			padding: var(--wpds-dimension-padding-md);
-
-			.connector-item__header svg {
-				width: 32px;
-				height: 32px;
-			}
+		.connector-item__header svg {
+			width: 32px;
+			height: 32px;
 		}
 
 		// Stack badge and action button vertically on small screens.

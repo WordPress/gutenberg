@@ -1,7 +1,7 @@
-import { __experimentalItem as Item, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf, type TransformedText } from '@wordpress/i18n';
-import { InputControl, Link, Stack, Text } from '@wordpress/ui';
+import { Card, InputControl, Link, Stack, Text } from '@wordpress/ui';
 import type { ReactNode } from 'react';
 import type { ApiKeySource } from './types';
 
@@ -24,43 +24,50 @@ export function ConnectorItem( {
 }: ConnectorItemProps ) {
 	const headingId = useId();
 	return (
-		<Item className={ className } role="listitem">
-			<Stack
-				direction="column"
-				gap="lg"
-				role="group"
-				aria-labelledby={ headingId }
-			>
+		<Card.Root
+			className={ [ 'connector-item', className ]
+				.filter( Boolean )
+				.join( ' ' ) }
+			role="listitem"
+		>
+			<Card.Content>
 				<Stack
-					direction="row"
-					align="center"
+					direction="column"
 					gap="lg"
-					wrap="wrap"
-					className="connector-item__header"
+					role="group"
+					aria-labelledby={ headingId }
 				>
-					{ logo }
 					<Stack
-						direction="column"
-						className="connector-item__content"
+						direction="row"
+						align="center"
+						gap="lg"
+						wrap="wrap"
+						className="connector-item__header"
 					>
-						<Text
-							variant="heading-lg"
-							render={ <h2 id={ headingId } /> }
+						{ logo }
+						<Stack
+							direction="column"
+							className="connector-item__content"
 						>
-							{ name }
-						</Text>
-						<Text
-							variant="body-sm"
-							className="connector-item__description"
-						>
-							{ description }
-						</Text>
+							<Text
+								variant="heading-lg"
+								render={ <h2 id={ headingId } /> }
+							>
+								{ name }
+							</Text>
+							<Text
+								variant="body-sm"
+								className="connector-item__description"
+							>
+								{ description }
+							</Text>
+						</Stack>
+						{ actionArea }
 					</Stack>
-					{ actionArea }
+					{ children }
 				</Stack>
-				{ children }
-			</Stack>
-		</Item>
+			</Card.Content>
+		</Card.Root>
 	);
 }
 
