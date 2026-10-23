@@ -49,9 +49,18 @@ test.describe( 'Block Notes: floating notes', () => {
 	}
 
 	function getThread( page, content ) {
-		return getFloatingNotes( page ).getByRole( 'treeitem', {
-			name: `Note: ${ content }`,
-		} );
+		return (
+			getFloatingNotes( page )
+				.getByRole( 'listitem' )
+				.filter( { hasText: content } )
+				// Skip the new note form while it still holds the typed text.
+				.filter( {
+					hasNot: page.getByRole( 'textbox', {
+						name: 'New note',
+						exact: true,
+					} ),
+				} )
+		);
 	}
 
 	// Space reserved for the notes inside the canvas.
@@ -165,7 +174,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		// Expand the top thread, so the one below stays within the viewport.
 		await editor.selectBlocks( getParagraph( editor, 'First noted' ) );
-		await expect( firstThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( firstThread ).toHaveAttribute( 'aria-current', 'true' );
 
 		await expectAligned(
 			firstThread,
@@ -199,14 +208,14 @@ test.describe( 'Block Notes: floating notes', () => {
 		const bravoThread = getThread( page, 'Bravo note' );
 
 		// The last added note is selected; the one above moves up.
-		await expect( bravoThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( bravoThread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( bravoThread, getParagraph( editor, 'Bravo' ) );
 		await expectStacked( alphaThread, bravoThread );
 
 		// Selecting the other note anchors it instead; the one below moves
 		// down.
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( alphaThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( alphaThread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( alphaThread, getParagraph( editor, 'Alpha' ) );
 		await expectStacked( alphaThread, bravoThread );
 	} );
@@ -230,7 +239,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		const alphaThread = getThread( page, 'Alpha note' );
 		const bravoThread = getThread( page, 'Bravo note' );
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( alphaThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( alphaThread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectStacked( alphaThread, bravoThread );
 		const { height: initialHeight } = await alphaThread.boundingBox();
 
@@ -384,7 +393,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		// Focus the title first: deselecting the block collapses the thread,
 		// which re-measures on its own.
 		await title.click();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 		await expectAligned( thread, noted );
 		const { y: initialTop } = await noted.boundingBox();
 
@@ -535,7 +544,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 
 		const thread = getThread( page, 'Low note' );
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( thread, getParagraph( editor, 'Noted' ) );
 	} );
 
@@ -562,10 +571,14 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 
-		const form = getFloatingNotes( page ).getByRole( 'treeitem', {
-			name: 'New note',
-			exact: true,
-		} );
+		const form = getFloatingNotes( page )
+			.getByRole( 'listitem' )
+			.filter( {
+				has: page.getByRole( 'textbox', {
+					name: 'New note',
+					exact: true,
+				} ),
+			} );
 		const input = form.getByRole( 'textbox', {
 			name: 'New note',
 			exact: true,
@@ -595,7 +608,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		const threads = labels.map( ( label ) => getThread( page, label ) );
 		const selected = threads.at( -1 );
-		await expect( selected ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( selected ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( selected, getParagraph( editor, 'Four' ) );
 		for ( let i = 1; i < threads.length; i++ ) {
 			await expectStacked( threads[ i - 1 ], threads[ i ] );
@@ -635,7 +648,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.focus();
-		await expect( tallThread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( tallThread ).toHaveAttribute( 'aria-current', 'false' );
 
 		await expectAligned(
 			getThread( page, 'Alpha note' ),
@@ -662,13 +675,13 @@ test.describe( 'Block Notes: floating notes', () => {
 				.evaluate( ( root ) => root.scrollHeight );
 		const thread = getThread( page, 'Alpha note' );
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 		const expandedHeight = await getScrollHeight();
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.focus();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 
 		expect( await getScrollHeight() ).toBe( expandedHeight );
 	} );
@@ -706,7 +719,7 @@ test.describe( 'Block Notes: floating notes', () => {
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.focus();
 			await expect( getThread( page, 'Hotel note' ) ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'false'
 			);
 			await scrollCanvasTo( editor, 0 );
@@ -831,10 +844,10 @@ test.describe( 'Block Notes: floating notes', () => {
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.focus();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 			await expect( thread ).toBeInViewport( { ratio: FULLY_VISIBLE } );
 		} );
 
@@ -857,7 +870,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			// Adding the replies scrolled the thread to its reply form.
 			const thread = getThread( page, 'Tall note' );
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 			await thread.evaluate( ( element ) => {
 				element.scrollTop = 0;
 			} );
@@ -934,10 +947,14 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			// The selected text carries a draft marker until the note is sent,
 			// so the form anchors to it even once the canvas selection is gone.
-			const form = getFloatingNotes( page ).getByRole( 'treeitem', {
-				name: 'New note',
-				exact: true,
-			} );
+			const form = getFloatingNotes( page )
+				.getByRole( 'listitem' )
+				.filter( {
+					has: page.getByRole( 'textbox', {
+						name: 'New note',
+						exact: true,
+					} ),
+				} );
 			const mark = editor.canvas.locator( 'mark.wp-note[data-id="new"]' );
 			await expect( form ).toHaveClass( /is-floating/ );
 			await expectBelow( mark, paragraph );
@@ -995,9 +1012,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			const notes = getFloatingNotes( page );
 
 			// Resolve Note A.
-			const threadA = notes.getByRole( 'treeitem', {
-				name: 'Note: Note A',
-			} );
+			const threadA = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'Note A' } );
 			await threadA.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
 			// Resolving removes the note from the floating "Unresolved notes"
@@ -1005,9 +1022,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
-			const threadB = notes.getByRole( 'treeitem', {
-				name: 'Note: Note B',
-			} );
+			const threadB = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'Note B' } );
 			await expect( threadB ).toBeVisible();
 
 			// Both notes should still exist in metadata.
@@ -1034,9 +1051,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			const notes = getFloatingNotes( page );
 
 			// Resolve the first note.
-			const firstThread = notes.getByRole( 'treeitem', {
-				name: 'Note: First note',
-			} );
+			const firstThread = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'First note' } );
 			await firstThread.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
 			// Resolving removes the note from the floating "Unresolved notes"
@@ -1055,11 +1072,11 @@ test.describe( 'Block Notes: floating notes', () => {
 				.click();
 
 			// The second (unresolved) note should be the active one.
-			const secondThread = notes.getByRole( 'treeitem', {
-				name: 'Note: Second note',
-			} );
+			const secondThread = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'Second note' } );
 			await expect( secondThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'true'
 			);
 		} );
@@ -1400,10 +1417,14 @@ test.describe( 'Block Notes: floating notes', () => {
 				page.getByRole( 'textbox', { name: 'New note', exact: true } )
 			).toBeFocused();
 			await expect(
-				getFloatingNotes( page ).getByRole( 'treeitem', {
-					name: 'New note',
-					exact: true,
-				} )
+				getFloatingNotes( page )
+					.getByRole( 'listitem' )
+					.filter( {
+						has: page.getByRole( 'textbox', {
+							name: 'New note',
+							exact: true,
+						} ),
+					} )
 			).toBeVisible();
 		} );
 	} );

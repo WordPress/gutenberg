@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Notes sidebar: Expose the note threads as a list instead of a tree. The tree roles put screen readers into focus mode, which handed the arrow keys to the sidebar's own thread navigation, so a note's text could not be read with the usual reading keys. The selected thread is marked with `aria-current`, which a list item supports, rather than `aria-expanded`, which it does not. Threads no longer carry an `aria-label`, which screen readers handle inconsistently on a list item, and note avatars are now decorative, since the author's name follows them ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 
 ## 16.0.0 (2026-10-20)
 

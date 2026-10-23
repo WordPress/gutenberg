@@ -80,8 +80,7 @@ export function AddNote( {
 			className="editor-collab-sidebar-panel__add-note is-selected"
 			gap="md"
 			tabIndex={ 0 }
-			aria-label={ __( 'New note' ) }
-			role="treeitem"
+			role="listitem"
 			{ ...focusOutside }
 		>
 			<NoteCard>

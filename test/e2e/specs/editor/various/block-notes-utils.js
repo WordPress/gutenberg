@@ -146,9 +146,18 @@ class BlockNoteUtils {
 	 * @param {string} content Text of the thread's root note.
 	 */
 	getThread( content ) {
-		return this.#getNotesSurface().getByRole( 'treeitem', {
-			name: `Note: ${ content }`,
-		} );
+		return (
+			this.#getNotesSurface()
+				.getByRole( 'listitem' )
+				.filter( { hasText: content } )
+				// Skip the new note form while it still holds the typed text.
+				.filter( {
+					hasNot: this.#page.getByRole( 'textbox', {
+						name: 'New note',
+						exact: true,
+					} ),
+				} )
+		);
 	}
 
 	/**

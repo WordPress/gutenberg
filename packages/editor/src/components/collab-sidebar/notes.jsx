@@ -187,9 +187,14 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 
 	return (
+		/*
+		 * A list rather than a tree: tree roles put screen readers into focus
+		 * mode, which hands the arrow keys to the widget instead of leaving
+		 * them free to read the note text.
+		 */
 		<Stack
 			className="editor-collab-sidebar-panel"
-			role="tree"
+			role="list"
 			direction="column"
 			gap="md"
 			justify="flex-start"
@@ -222,6 +227,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 							justify="center"
 							gap="sm"
 							className="editor-collab-sidebar-panel__status-separator"
+							role="listitem"
 						>
 							<Text variant="heading-sm" render={ <p /> }>
 								{ __( 'Resolved' ) }
