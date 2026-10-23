@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Text color format: Replace the "Highlight" toolbar item with separate "Text color" and "Highlight color" items, each opening a single color palette ([#85296](https://github.com/WordPress/gutenberg/pull/85296)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -11,7 +15,6 @@
 ### Enhancements
 
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
--   Text color format: Replace the "Highlight" toolbar item with separate "Text color" and "Highlight color" items, each opening a single color palette.
 
 ### Internal
 
