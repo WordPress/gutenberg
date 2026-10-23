@@ -82,6 +82,8 @@ function Root( { className, ...settings }: BlockListProps ) {
 			pendingBlockVisibilityUpdatesPerRegistry
 				// The observer queues the updates before scheduling this.
 				.get( registry )!
+				// Empty the queue, so it doesn't grow for the whole session.
+				.splice( 0 )
 				.forEach( ( [ id, isIntersecting ] ) => {
 					updates[ id ] = isIntersecting;
 				} );
