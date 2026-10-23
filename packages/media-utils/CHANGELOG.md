@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `sideloadMedia`, previously only available as a private API ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
+
 ### Enhancements
 
 -   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
@@ -11,10 +15,6 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
-### New Features
-
--   Export `sideloadMedia`, previously only available as a private API ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
 
 ## 5.57.0 (2026-10-07)
 

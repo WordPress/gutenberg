@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Keep `progress` up to date on queue items, counting sub-size operations towards their parent ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
+
 ## 0.43.0 (2026-10-20)
 
 ### Breaking Changes
@@ -10,7 +14,6 @@
 
 ### Enhancements
 
--   Keep `progress` up to date on queue items, counting sub-size operations towards their parent ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
 -   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. Sub-sizes of animated GIF and WebP images, cropped ones included, keep their animation instead of flattening to the first frame unless the setting is `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 -   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
 
