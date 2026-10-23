@@ -1,7 +1,7 @@
 /*
  * The count takes the tab's color, so it follows every state the tab styles:
- * selected, hovered, focused, pressed, and disabled. Only an idle tab that can
- * be selected mutes it, as metadata quieter than the label.
+ * hovered, focused, pressed, and disabled. Only an idle, enabled tab mutes it,
+ * selected or not, as metadata quieter than the label.
  */
 .count {
 	margin-inline-start: var(--wpds-dimension-gap-xs);
@@ -9,7 +9,6 @@
 }
 
 [role="tab"]:not(
-	[aria-selected="true"],
 	[aria-disabled="true"],
 	:disabled,
 	:hover,
