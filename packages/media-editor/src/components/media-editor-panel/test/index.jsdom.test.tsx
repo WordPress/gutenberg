@@ -91,6 +91,39 @@ describe( 'MediaEditorPanel', () => {
 		).toBeDisabled();
 	} );
 
+	it( 'keeps one tab for a panel that passes a new mediaTypes array every render', () => {
+		// The editor re-renders whenever a panel announces itself, and a
+		// plugin rendered by `PluginArea` re-renders with it. An inline
+		// array must not make that a loop.
+		function EditorWithInlinePanel() {
+			const { panels, contextValue } = useMediaEditorPanels();
+			return (
+				<SlotFillProvider>
+					<MediaEditorPanelsProvider value={ contextValue }>
+						<output data-testid="tabs">
+							{ panels
+								.map( ( panel ) => panel.name )
+								.join( ',' ) }
+						</output>
+						<MediaEditorPanel
+							name="plugin/vignette"
+							title="Vignette"
+							mediaTypes={ [ 'image' ] }
+						>
+							content
+						</MediaEditorPanel>
+					</MediaEditorPanelsProvider>
+				</SlotFillProvider>
+			);
+		}
+
+		render( <EditorWithInlinePanel /> );
+
+		expect( screen.getByTestId( 'tabs' ) ).toHaveTextContent(
+			'plugin/vignette'
+		);
+	} );
+
 	it( 'removes its tab when unmounted', () => {
 		function Toggle() {
 			const [ shown, setShown ] = useState( true );

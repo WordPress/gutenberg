@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { Fill } from '@wordpress/components';
 import {
 	createContext,
@@ -78,7 +79,16 @@ export function useMediaEditorPanels() {
 		Record< string, MediaEditorPanelRegistration >
 	>( {} );
 	const register = useCallback( ( panel: MediaEditorPanelRegistration ) => {
-		setPanels( ( current ) => ( { ...current, [ panel.name ]: panel } ) );
+		setPanels( ( current ) => {
+			// Re-announcing unchanged details is a no-op, so a panel that
+			// passes a fresh `mediaTypes` array on every render does not
+			// re-render the editor, which would re-render the panel, and so
+			// on.
+			if ( fastDeepEqual( current[ panel.name ], panel ) ) {
+				return current;
+			}
+			return { ...current, [ panel.name ]: panel };
+		} );
 	}, [] );
 	const unregister = useCallback( ( name: string ) => {
 		setPanels( ( current ) => {
@@ -135,12 +145,15 @@ export default function MediaEditorPanel( {
 		);
 	}
 	const { register, unregister } = context;
-	// A layout effect, so the tab exists before the sidebar paints; the
+	// Layout effects, so the tab exists before the sidebar paints; the
 	// editor's first render otherwise shows an empty sidebar for a frame.
+	// Announcing and withdrawing are separate effects: the details may
+	// change on any render, but the tab only goes when the panel unmounts
+	// or changes its name.
 	useLayoutEffect( () => {
 		register( { name, title, order, mediaTypes } );
-		return () => unregister( name );
-	}, [ name, title, order, mediaTypes, register, unregister ] );
+	}, [ name, title, order, mediaTypes, register ] );
+	useLayoutEffect( () => () => unregister( name ), [ name, unregister ] );
 
 	return (
 		<Fill name={ getPanelSlotName( name ) }>
