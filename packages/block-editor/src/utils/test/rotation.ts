@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { fromPickerAngle, normalizeAngle, toPickerAngle } from '../rotation';
+import {
+	fromPickerAngle,
+	normalizeAngle,
+	roundAngle,
+	toPickerAngle,
+} from '../rotation';
 
 describe( 'normalizeAngle', () => {
 	it( 'keeps angles that are already in range', () => {
@@ -23,6 +28,15 @@ describe( 'normalizeAngle', () => {
 	} );
 } );
 
+describe( 'roundAngle', () => {
+	it( 'rounds to two decimals, halves away from zero', () => {
+		expect( roundAngle( 12.344 ) ).toBe( 12.34 );
+		expect( roundAngle( 12.345 ) ).toBe( 12.35 );
+		expect( roundAngle( -12.345 ) ).toBe( -12.35 );
+		expect( roundAngle( 1.005 ) ).toBe( 1.01 );
+	} );
+} );
+
 describe( 'toPickerAngle', () => {
 	it( 'converts a stored rotation to the picker range', () => {
 		expect( toPickerAngle( undefined ) ).toBe( 0 );
@@ -42,9 +56,12 @@ describe( 'fromPickerAngle', () => {
 		expect( fromPickerAngle( 360 ) ).toBe( 0 );
 	} );
 
-	it( 'accepts strings and rounds to whole degrees', () => {
+	it( 'accepts strings and rounds to two decimals', () => {
 		expect( fromPickerAngle( '45' ) ).toBe( 45 );
-		expect( fromPickerAngle( 12.6 ) ).toBe( 13 );
+		expect( fromPickerAngle( '12.5' ) ).toBe( 12.5 );
+		expect( fromPickerAngle( 12.6 ) ).toBe( 12.6 );
+		expect( fromPickerAngle( 12.345 ) ).toBe( 12.35 );
+		expect( fromPickerAngle( 359.999 ) ).toBe( 0 );
 	} );
 
 	it( 'treats values that are not numbers as no rotation', () => {
