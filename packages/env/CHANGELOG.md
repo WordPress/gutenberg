@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2 ([#46510](https://github.com/WordPress/gutenberg/pull/46510)).
+
+### Bug Fixes
+
+-   PHP 7.3 and 7.4 must use PHPUnit 9 ([#46510](https://github.com/WordPress/gutenberg/pull/46510)).
+
 ## 4.1.3 (2021-11-07)
 
 ### Bug Fix
