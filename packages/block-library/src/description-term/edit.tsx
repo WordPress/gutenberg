@@ -1,5 +1,4 @@
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import type { BlockEditProps, Block } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';

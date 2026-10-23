@@ -1,4 +1,3 @@
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, type Block } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';

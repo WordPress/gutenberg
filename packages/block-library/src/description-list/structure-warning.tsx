@@ -5,7 +5,6 @@ import { Notice } from '@wordpress/ui';
 import {
 	InspectorControls,
 	store as blockEditorStore,
-	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
 
 const DESCRIPTION_LIST = 'core/description-list';
