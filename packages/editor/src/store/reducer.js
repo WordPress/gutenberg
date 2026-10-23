@@ -526,6 +526,54 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the current editor intent (`edit`, `suggest`, `view`).
+ * The intent is intentionally session-scoped: it lives in the editor
+ * store, not in the preferences store, so reloading the editor always
+ * returns to the default `edit` intent. Persisting suggest/view across
+ * reloads is undesirable — it surprises the user and is the wrong default
+ * for most sessions.
+ *
+ * @param {'edit'|'suggest'|'view'} state  Current state.
+ * @param {Object}                  action Dispatched action.
+ * @return {'edit'|'suggest'|'view'} Updated state.
+ */
+export function editorIntent( state = 'edit', action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_INTENT':
+			return action.intent;
+	}
+	return state;
+}
+
+/**
+ * Post field proposals made while suggesting, keyed by proposal id (the post
+ * field, or `meta.<key>` for a meta key). Each holds the value the field had
+ * when the proposal was first made (`baseline`) and the proposed value. They
+ * are in-memory only: the record a reviewer acts on is the note each one is
+ * saved as. Cleared when another post is edited.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
+export function postFieldProposals( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_POST_FIELD_PROPOSAL':
+			return { ...state, [ action.id ]: action.proposal };
+		case 'CLEAR_POST_FIELD_PROPOSAL': {
+			if ( ! ( action.id in state ) ) {
+				return state;
+			}
+			const { [ action.id ]: _removed, ...rest } = state;
+			return rest;
+		}
+		case 'SET_EDITED_POST':
+			return Object.keys( state ).length ? {} : state;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -554,5 +602,7 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	editorIntent,
+	postFieldProposals,
 	dataviews: dataviewsReducer,
 } );
