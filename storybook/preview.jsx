@@ -118,6 +118,7 @@ export const parameters = {
 				[
 					'Introduction',
 					'Contributing',
+					'Design System MCP',
 					'Foundations',
 					'Tokens',
 					'Theme',
