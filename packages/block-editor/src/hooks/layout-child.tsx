@@ -27,11 +27,8 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from './block-style-state';
-import {
-	getRotateForState,
-	getUpdatedRotateStyle,
-	isRotateEnabled,
-} from './rotate';
+import { getRotateForState, getUpdatedRotateStyle } from '../utils/rotation';
+import { isRotateEnabled } from './rotate';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -650,7 +647,9 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
-	// The angle shown while the rotate handle is being dragged.
+	// The angle shown while the rotate handle is being dragged. The toolbar
+	// of handles turns with it. The grid visualizer is memoized, so it
+	// doesn't re-render for every degree.
 	const [ previewRotate, setPreviewRotate ] = useState< number | null >(
 		null
 	);
@@ -765,7 +764,6 @@ function GridTools( {
 					bounds={ resizerBounds }
 					onChange={ updateLayout }
 					parentLayout={ parentLayout }
-					angle={ previewRotate ?? rotate }
 				/>
 			) }
 			{ ( showDragHandle || showRotator || showDeleteHandle ) && (

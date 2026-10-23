@@ -7,6 +7,7 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
+import { memo } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import layoutChild from '../layout-child';
@@ -38,7 +39,7 @@ vi.mock(
 // rotation.
 vi.mock( import( '../../components/grid' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	GridVisualizer: () => <></>,
+	GridVisualizer: memo( () => <></> ),
 	GridItemResizer: () => <div data-testid="grid-item-resizer" />,
 	GridItemMovers: () => <></>,
 	GridItemHandles: ( { children }: { children: ReactNode } ) => (

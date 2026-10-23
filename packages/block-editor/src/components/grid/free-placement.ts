@@ -1,5 +1,5 @@
 import { getClosestTrack } from './utils';
-import { getRotatedBoundingRect } from './rotation';
+import { getRotatedBoundingRect } from '../../utils/rotation';
 import type { GridItemLayout } from './types';
 
 /**
