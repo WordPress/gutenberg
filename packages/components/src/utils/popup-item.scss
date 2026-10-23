@@ -1,0 +1,8 @@
+// Keep popup hover styling behind the current keyboard target without adding specificity.
+$inactive-hover-selectors: (
+	":is(.components-dropdown__content, .components-menu-group):has([role^='menuitem']:focus) [role^='menuitem']:not(:focus)",
+	":is(.components-dropdown__content, .components-menu-group):has(.components-menu-item__button[aria-selected='true']) .components-menu-item__button:not(:focus, [aria-selected='true'])",
+	".components-autocomplete__results:has([aria-selected='true']) .components-autocomplete__result:not(:focus, [aria-selected='true'])"
+);
+
+$hover-selector: ":hover:not(:where(#{$inactive-hover-selectors}))";

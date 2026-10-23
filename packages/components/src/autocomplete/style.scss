@@ -1,13 +1,11 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "../utils/composite-item";
+@use "../utils/popup-item";
 
-.components-autocomplete__popover {
-	@include composite-item.popup;
-
-	.components-popover__content {
-		padding: $grid-unit-10;
-		min-width: 200px;
-	}
+.components-autocomplete__popover .components-popover__content {
+	padding: $grid-unit-10;
+	min-width: 200px;
 }
 
 .components-autocomplete__result.components-button {
@@ -19,17 +17,12 @@
 	font-weight: var(--wpds-typography-font-weight-default);
 	position: relative;
 
-	&:focus {
-		outline: none;
-		box-shadow: none;
-	}
-
-	&:is(:hover, :focus-visible, .is-selected):not(:disabled, [aria-disabled="true"]) {
+	&:is(#{popup-item.$hover-selector}, :focus, .is-selected):not(:disabled, [aria-disabled="true"]) {
 		@include composite-item.highlight;
 	}
 
-	[data-keyboard-navigation]:not(:focus-within) &.is-selected,
-	&:focus-visible:not(:active) {
-		@include composite-item.focus;
+	&[aria-disabled="true"]:is(:focus, .is-selected) {
+		@include outset-ring__focus;
+		outline-offset: 0;
 	}
 }
