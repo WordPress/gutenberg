@@ -7,6 +7,7 @@ import type { Page, Browser } from '@playwright/test';
 import type { Metric } from 'web-vitals';
 
 type EventType =
+	| 'beforeinput'
 	| 'click'
 	| 'focus'
 	| 'focusin'

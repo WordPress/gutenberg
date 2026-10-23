@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Metrics.getEventDurations()`: Accept `beforeinput`.
+
 ### Internal
 
 -   Convert the remaining viewport and widget utilities to TypeScript ([#84917](https://github.com/WordPress/gutenberg/pull/84917)).

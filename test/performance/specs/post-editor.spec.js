@@ -22,6 +22,7 @@ const results = {
 	focus: [],
 	firstFocus: [],
 	selectAll: [],
+	insertBlock: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -393,6 +394,68 @@ test.describe( 'Post Editor Performance', () => {
 				if ( i > throwaway ) {
 					results.selectAll.push( sum( keyDownEvents ) );
 				}
+			}
+		} );
+	} );
+
+	test.describe( 'Inserting a block with Enter', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			// The first paragraph is near the top of the post, so nearly every
+			// block comes after the inserted one.
+			await canvas
+				.getByRole( 'document', { name: /Block: Paragraph/i } )
+				.first()
+				.click();
+			await page.keyboard.press( 'End' );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Split the paragraph at its end, inserting an empty one.
+				await page.keyboard.press( 'Enter' );
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-insert-block'
+				);
+
+				// Get the durations. Rich text splits the paragraph on
+				// `beforeinput`, not on `keydown`.
+				const [ keyDownEvents ] = metrics.getTypingEventDurations();
+				const beforeInputEvents =
+					metrics.getEventDurations( 'beforeinput' );
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.insertBlock.push(
+						sum( keyDownEvents ) + sum( beforeInputEvents )
+					);
+				}
+
+				// Fill the new paragraph, so the next Enter splits a
+				// paragraph with content again.
+				await page.keyboard.type( 'Paragraph' );
 			}
 		} );
 	} );
