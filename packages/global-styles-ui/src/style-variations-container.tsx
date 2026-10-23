@@ -10,7 +10,7 @@ import type {
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
 import { GlobalStylesContext } from './context';
-import { isVariationWithProperties, withUserCustomColorPresets } from './utils';
+import { isVariationWithProperties, withUserCustomPresets } from './utils';
 
 interface StyleVariationsContainerProps {
 	gap?: number;
@@ -106,7 +106,7 @@ function StyleVariationsContainer( {
 					...css,
 					...blocks,
 				};
-				return withUserCustomColorPresets(
+				return withUserCustomPresets(
 					{
 						...variation,
 						settings: variation.settings ?? {},

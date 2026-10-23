@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	getNewIndexFromPresets,
 	getValidPseudoStates,
-	withUserCustomColorPresets,
+	withUserCustomPresets,
 } from '../utils';
 
 const validPresets = {
@@ -70,7 +70,7 @@ describe( 'getValidPseudoStates', () => {
 	} );
 } );
 
-describe( 'withUserCustomColorPresets', () => {
+describe( 'withUserCustomPresets', () => {
 	const customColors = [
 		{ slug: 'my-blue', color: '#0000ff', name: 'MyBlue' },
 	];
@@ -90,8 +90,8 @@ describe( 'withUserCustomColorPresets', () => {
 		const variation = {
 			settings: { color: { palette: { theme: themeColors } } },
 		};
-		expect( withUserCustomColorPresets( variation, {} ) ).toBe( variation );
-		expect( withUserCustomColorPresets( variation, undefined ) ).toBe(
+		expect( withUserCustomPresets( variation, {} ) ).toBe( variation );
+		expect( withUserCustomPresets( variation, undefined ) ).toBe(
 			variation
 		);
 	} );
@@ -112,7 +112,7 @@ describe( 'withUserCustomColorPresets', () => {
 			},
 		};
 
-		expect( withUserCustomColorPresets( variation, user ) ).toEqual( {
+		expect( withUserCustomPresets( variation, user ) ).toEqual( {
 			title: 'Ember',
 			settings: {
 				color: {
@@ -130,9 +130,7 @@ describe( 'withUserCustomColorPresets', () => {
 			settings: { color: { palette: { custom: customColors } } },
 		};
 
-		expect(
-			withUserCustomColorPresets( { title: 'Default' }, user )
-		).toEqual( {
+		expect( withUserCustomPresets( { title: 'Default' }, user ) ).toEqual( {
 			title: 'Default',
 			settings: { color: { palette: { custom: customColors } } },
 		} );
@@ -149,9 +147,7 @@ describe( 'withUserCustomColorPresets', () => {
 			settings: { color: { palette: { custom: customColors } } },
 		};
 
-		expect( withUserCustomColorPresets( variation, user ) ).toBe(
-			variation
-		);
+		expect( withUserCustomPresets( variation, user ) ).toBe( variation );
 	} );
 
 	it( 'does not change a variation whose palette is a plain array', () => {
@@ -162,9 +158,7 @@ describe( 'withUserCustomColorPresets', () => {
 			settings: { color: { palette: { custom: customColors } } },
 		};
 
-		expect( withUserCustomColorPresets( variation, user ) ).toBe(
-			variation
-		);
+		expect( withUserCustomPresets( variation, user ) ).toBe( variation );
 	} );
 
 	it( 'keeps the user custom colors set on a block', () => {
@@ -189,7 +183,7 @@ describe( 'withUserCustomColorPresets', () => {
 			},
 		};
 
-		expect( withUserCustomColorPresets( variation, user ) ).toEqual( {
+		expect( withUserCustomPresets( variation, user ) ).toEqual( {
 			settings: {
 				color: { palette: { theme: themeColors } },
 				blocks: {
@@ -228,8 +222,6 @@ describe( 'withUserCustomColorPresets', () => {
 			},
 		};
 
-		expect( withUserCustomColorPresets( variation, user ) ).toBe(
-			variation
-		);
+		expect( withUserCustomPresets( variation, user ) ).toBe( variation );
 	} );
 } );

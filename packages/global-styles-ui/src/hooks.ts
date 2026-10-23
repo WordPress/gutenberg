@@ -18,7 +18,7 @@ import { GlobalStylesContext } from './context';
 import {
 	removePropertiesFromObject,
 	isVariationWithProperties,
-	withUserCustomColorPresets,
+	withUserCustomPresets,
 } from './utils';
 
 /**
@@ -236,7 +236,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 			? variationsByProperties
 					.filter( hasThemeVariation )
 					.map( ( variation ) =>
-						withUserCustomColorPresets( variation, userVariation )
+						withUserCustomPresets( variation, userVariation )
 					)
 			: [];
 	}, [ properties, userVariation, variationsFromTheme ] );

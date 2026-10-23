@@ -8,6 +8,7 @@ import {
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
 } from './utils/duotone';
+import { PRESET_METADATA } from './utils/common';
 import { resolveStyle } from './resolve-style';
 import { getVariationStyle } from './variation';
 import { lock } from './lock-unlock';
@@ -22,4 +23,5 @@ lock( privateApis, {
 	getDuotoneUnsetStylesheet,
 	resolveStyle,
 	getVariationStyle,
+	PRESET_METADATA,
 } );

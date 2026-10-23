@@ -9,7 +9,9 @@ import type {
 import { __ } from '@wordpress/i18n';
 import { unlock } from './lock-unlock';
 
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+const { getViewportBreakpoints, PRESET_METADATA } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 /**
  * State definition with value and label.
@@ -198,24 +200,23 @@ export function isVariationWithProperties(
 	return areGlobalStylesEqual( variationWithProperties, variation );
 }
 
-const CUSTOM_COLOR_PRESETS = [ 'palette', 'gradients', 'duotone' ] as const;
-
 /**
- * Adds the user's custom color presets to a color settings object, keeping
- * the presets it defines itself.
+ * Adds the user's custom presets to a settings object, keeping the presets it
+ * defines itself.
  *
- * @param color     The color settings to add to.
- * @param userColor The user's color settings.
- * @return The color settings with the user's custom presets.
+ * @param settings     The settings to add to.
+ * @param userSettings The user's settings.
+ * @return The settings with the user's custom presets.
  */
-function mergeCustomColorPresets( color: any, userColor: any ): any {
-	if ( ! userColor ) {
-		return color;
+function mergeCustomPresets( settings: any, userSettings: any ): any {
+	if ( ! userSettings ) {
+		return settings;
 	}
 
-	for ( const preset of CUSTOM_COLOR_PRESETS ) {
-		const userPresets = userColor[ preset ];
-		const variationPresets = color?.[ preset ];
+	for ( const { path } of PRESET_METADATA ) {
+		const [ group, key ] = path;
+		const userPresets = userSettings[ group ]?.[ key ];
+		const variationPresets = settings?.[ group ]?.[ key ];
 		const custom = Array.isArray( userPresets )
 			? undefined
 			: userPresets?.custom;
@@ -226,26 +227,29 @@ function mergeCustomColorPresets( color: any, userColor: any ): any {
 		) {
 			continue;
 		}
-		color = {
-			...color,
-			[ preset ]: { ...variationPresets, custom },
+		settings = {
+			...settings,
+			[ group ]: {
+				...settings?.[ group ],
+				[ key ]: { ...variationPresets, custom },
+			},
 		};
 	}
 
-	return color;
+	return settings;
 }
 
 /**
- * Copies the user's custom color presets (colors, gradients and duotones),
- * both global and per block, into a variation, so they are not lost when the
- * variation is applied. Presets the variation defines itself are left as they
- * are.
+ * Copies the user's custom presets (such as colors, font families, font sizes
+ * and shadows), both global and per block, into a variation, so they are not
+ * lost when the variation is applied. Presets the variation defines itself
+ * are left as they are.
  *
  * @param variation The variation to apply.
  * @param user      The current user config.
- * @return The variation with the user's custom color presets.
+ * @return The variation with the user's custom presets.
  */
-export function withUserCustomColorPresets< T extends GlobalStylesConfig >(
+export function withUserCustomPresets< T extends GlobalStylesConfig >(
 	variation: T,
 	user?: GlobalStylesConfig
 ): T {
@@ -254,33 +258,25 @@ export function withUserCustomColorPresets< T extends GlobalStylesConfig >(
 		return variation;
 	}
 
-	let settings = variation.settings;
-
-	const color = mergeCustomColorPresets(
-		settings?.color,
-		userSettings.color
-	);
-	if ( color !== settings?.color ) {
-		settings = { ...settings, color };
-	}
+	let settings = mergeCustomPresets( variation.settings, userSettings );
 
 	if ( userSettings.blocks ) {
 		for ( const [ blockName, userBlockSettings ] of Object.entries(
 			userSettings.blocks
 		) ) {
 			const blockSettings = settings?.blocks?.[ blockName ];
-			const blockColor = mergeCustomColorPresets(
-				blockSettings?.color,
-				userBlockSettings?.color
+			const mergedBlockSettings = mergeCustomPresets(
+				blockSettings,
+				userBlockSettings
 			);
-			if ( blockColor === blockSettings?.color ) {
+			if ( mergedBlockSettings === blockSettings ) {
 				continue;
 			}
 			settings = {
 				...settings,
 				blocks: {
 					...settings?.blocks,
-					[ blockName ]: { ...blockSettings, color: blockColor },
+					[ blockName ]: mergedBlockSettings,
 				},
 			};
 		}
