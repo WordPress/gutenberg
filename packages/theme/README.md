@@ -170,6 +170,8 @@ Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `
 
 The seed values guide the generated color ramps but are not guaranteed to appear unchanged in the resulting tokens. The ramp builder may adjust their lightness to meet its contrast targets.
 
+After resolving the seeds, the focus-ring color is checked against all three neutral surfaces and the brand surface at a 3:1 minimum. A failing color is adjusted together with its dependent strokes, while fill and foreground colors stay unchanged. These checks use the final RGB colors. Unreachable targets are reported through the existing ramp warnings.
+
 Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
 
 ```js
