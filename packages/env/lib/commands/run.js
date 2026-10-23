@@ -50,6 +50,7 @@ module.exports = async function run( { container, command, spinner, debug } ) {
  */
 function spawnCommandDirectly( { container, command, config, spinner } ) {
 	const composeCommand = [
+		'compose',
 		'-f',
 		config.dockerComposeConfigPath,
 		'run',
@@ -63,7 +64,7 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 		// cannot use it to spawn an interactive command. Thus, we run docker-
 		// compose on the CLI directly.
 		const childProc = spawn(
-			'docker-compose',
+			'docker',
 			composeCommand,
 			{
 				stdio: 'inherit',
