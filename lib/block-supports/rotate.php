@@ -184,4 +184,8 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
+// Remove the core filter to avoid rendering duplicate rotation styles.
+if ( function_exists( 'wp_render_rotate_support' ) ) {
+	remove_filter( 'render_block', 'wp_render_rotate_support' );
+}
 add_filter( 'render_block', 'gutenberg_render_rotate_support', 10, 2 );

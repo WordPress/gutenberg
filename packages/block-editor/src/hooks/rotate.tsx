@@ -17,6 +17,7 @@ import { isPlainObject } from '../utils/object';
 import {
 	fromPickerAngle,
 	normalizeAngle,
+	roundAngle,
 	toPickerAngle,
 } from '../utils/rotation';
 import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
@@ -127,15 +128,7 @@ export function getRotateValue( value: unknown ): number | undefined {
 	if ( typeof angle !== 'number' || ! Number.isFinite( angle ) ) {
 		return undefined;
 	}
-	// Round halves away from zero, after removing floating point noise, the
-	// way PHP's `round()` does: 1.005 is 1.01 and -12.345 is -12.35.
-	const rounded =
-		( Math.sign( angle ) *
-			Math.round(
-				Number( ( Math.abs( angle ) * 100 ).toPrecision( 15 ) )
-			) ) /
-		100;
-	return normalizeAngle( rounded );
+	return normalizeAngle( roundAngle( angle ) );
 }
 
 /**
