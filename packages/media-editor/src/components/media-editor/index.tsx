@@ -197,6 +197,11 @@ function MediaEditorSidebar( {
 						value={ tab.id }
 						tabIndex={ -1 }
 						className="media-editor__panel"
+						// A save reads the session once and then waits, so
+						// nothing in the open panel may act on it until it
+						// resolves. `inert` holds every panel still, whether
+						// or not it honours the `disabled` it is handed.
+						inert={ disabled }
 					>
 						<Stack direction="column" gap="lg">
 							{ tab.render() }
