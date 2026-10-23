@@ -225,6 +225,35 @@ test.describe( 'Inner blocks bindings to a read-only source', () => {
 		await expect( page.getByText( 'Own content' ) ).toBeHidden();
 	} );
 
+	test( 'previews the supplied blocks of a Group without its own', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				metadata: {
+					bindings: {
+						innerBlocks: {
+							source: 'testing/inner-blocks',
+							args: { text: 'From the source' },
+						},
+					},
+				},
+			},
+		} );
+
+		const group = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		await expect( group ).toContainText( 'From the source' );
+		// Not the placeholder to choose a layout for an empty Group.
+		await expect(
+			group.getByRole( 'button', { name: 'Stack' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'keeps the own blocks without a value', async ( {
 		admin,
 		editor,

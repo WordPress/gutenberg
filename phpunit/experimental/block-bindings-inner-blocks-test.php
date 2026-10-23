@@ -94,4 +94,32 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Nested own</p>', $output );
 		$this->assertStringNotContainsString( '>Own</p>', $output );
 	}
+
+	public function test_plain_text_value_keeps_own_inner_blocks() {
+		register_block_bindings_source(
+			'test/plain-text',
+			array(
+				'label'              => 'Test',
+				'get_value_callback' => function () {
+					return 'Plain text';
+				},
+			)
+		);
+		$block  = new WP_Block(
+			parse_blocks( '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/plain-text"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Own</p><!-- /wp:paragraph --></div><!-- /wp:group -->' )[0]
+		);
+		$output = $block->render();
+		unregister_block_bindings_source( 'test/plain-text' );
+
+		$this->assertStringContainsString( '>Own</p>', $output );
+		$this->assertStringNotContainsString( 'Plain text', $output );
+	}
+
+	public function test_removed_bindings_leave_no_empty_metadata() {
+		$blocks = gutenberg_block_bindings_remove_source(
+			parse_blocks( '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source"}}}} --><p>One</p><!-- /wp:paragraph -->' ),
+			'test/source'
+		);
+		$this->assertArrayNotHasKey( 'metadata', $blocks[0]['attrs'] );
+	}
 }

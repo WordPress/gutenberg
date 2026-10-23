@@ -28,6 +28,21 @@ function gutenberg_block_bindings_add_inner_blocks_support( $supported_attribute
 add_filter( 'block_bindings_supported_attributes', 'gutenberg_block_bindings_add_inner_blocks_support', 10, 2 );
 
 /**
+ * Returns whether a value supplies inner blocks: block markup, or an empty
+ * string for no inner blocks. Anything else, like the plain text of a field,
+ * leaves the block with its own inner blocks.
+ *
+ * @param mixed $value The value of the source.
+ * @return bool Whether the value supplies inner blocks.
+ */
+function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
+	return '' === $value || (
+		is_string( $value ) &&
+		'<!-- wp:' === substr( $value, strspn( $value, " \t\n\f\r" ), 8 )
+	);
+}
+
+/**
  * Removes the bindings to a source from blocks and their inner blocks.
  *
  * The blocks a source supplies are its value as a whole, so none of them is
@@ -46,6 +61,13 @@ function gutenberg_block_bindings_remove_source( $blocks, $source_name ) {
 				if ( isset( $binding['source'] ) && $binding['source'] === $source_name ) {
 					unset( $block['attrs']['metadata']['bindings'][ $name ] );
 				}
+			}
+			// Drop what's left empty, as the editor does.
+			if ( empty( $block['attrs']['metadata']['bindings'] ) ) {
+				unset( $block['attrs']['metadata']['bindings'] );
+			}
+			if ( empty( $block['attrs']['metadata'] ) ) {
+				unset( $block['attrs']['metadata'] );
 			}
 		}
 		$block['innerBlocks'] = gutenberg_block_bindings_remove_source( $block['innerBlocks'], $source_name );
@@ -78,7 +100,7 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 
 	// `__default` bindings don't bind inner blocks: only an explicit binding does.
 	$binding = $block_instance->parsed_block['attrs']['metadata']['bindings']['innerBlocks'] ?? null;
-	if ( ! is_string( $value ) || ! isset( $binding['source'] ) || $binding['source'] !== $source_name ) {
+	if ( ! gutenberg_block_bindings_is_inner_blocks_value( $value ) || ! isset( $binding['source'] ) || $binding['source'] !== $source_name ) {
 		return null;
 	}
 

@@ -827,11 +827,7 @@ function isSectionBlockCandidate( state: State, clientId: string ) {
 export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If this block is within the edited content-only section,
 	// it has no parent section — it's temporarily fully editable.
-	// So are bound inner blocks, apart from the sections around them.
-	if (
-		isWithinEditedContentOnlySection( state, clientId ) ||
-		isBoundInnerBlocks( state, clientId )
-	) {
+	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
 		return undefined;
 	}
 
@@ -841,6 +837,8 @@ export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If sections are nested, return the top level section block.
 	// Don't return early.
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		// Bound inner blocks are fully editable, apart from the sections
+		// around them. The bound block itself stays in its section.
 		if ( isBoundInnerBlocks( state, current ) ) {
 			break;
 		}

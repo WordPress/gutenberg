@@ -35,6 +35,34 @@ const PATTERN_OVERRIDES_SOURCE = 'core/pattern-overrides';
 const BINDINGS = { [ INNER_BLOCKS_BINDING_KEY ]: {} };
 
 /**
+ * Returns whether a value supplies inner blocks: block markup, or `''` for no
+ * inner blocks. Anything else, like the plain text of a field, leaves the
+ * block with its own inner blocks, as on the server.
+ *
+ * @param value The value of the source.
+ *
+ * @return Whether the value supplies inner blocks.
+ */
+function isInnerBlocksValue( value: unknown ): value is string {
+	return (
+		typeof value === 'string' &&
+		( value === '' || /^[ \t\n\f\r]*<!-- wp:/.test( value ) )
+	);
+}
+
+/**
+ * Serializes inner blocks with every block delimited, freeform ones included,
+ * so that the markup is a value that supplies them.
+ *
+ * @param blocks The inner blocks.
+ *
+ * @return The serialized inner blocks.
+ */
+function serializeInnerBlocks( blocks: Block[] ) {
+	return serialize( blocks, { isInnerBlocks: true } );
+}
+
+/**
  * Removes the bindings to a source from blocks and their inner blocks.
  *
  * The blocks a source supplies are its value as a whole, so none of them is
@@ -53,20 +81,27 @@ function removeBindings( blocks: Block[], sourceName: string ): Block[] {
 			{ bindings?: Record< string, { source?: string } > } | undefined;
 		const bindings = metadata?.bindings;
 		let attributes = block.attributes;
-		if ( bindings ) {
-			const otherBindings = Object.fromEntries(
-				Object.entries( bindings ).filter(
-					( [ , binding ] ) => binding?.source !== sourceName
-				)
-			);
+		const otherBindings = Object.entries( bindings ?? {} ).filter(
+			( [ , binding ] ) => binding?.source !== sourceName
+		);
+		if (
+			bindings &&
+			otherBindings.length < Object.keys( bindings ).length
+		) {
+			// Drop what's left empty, so the markup is the same as the block's
+			// would be without the bindings.
+			const { bindings: removed, ...otherMetadata } = metadata;
+			const nextMetadata = otherBindings.length
+				? {
+						...otherMetadata,
+						bindings: Object.fromEntries( otherBindings ),
+					}
+				: otherMetadata;
 			attributes = {
 				...attributes,
-				metadata: {
-					...metadata,
-					bindings: Object.keys( otherBindings ).length
-						? otherBindings
-						: undefined,
-				},
+				metadata: Object.keys( nextMetadata ).length
+					? nextMetadata
+					: undefined,
 			};
 		}
 		return {
@@ -191,7 +226,7 @@ export function useInnerBlocksPreview(
 	);
 	return useMemo(
 		() =>
-			typeof value === 'string'
+			isInnerBlocksValue( value )
 				? removeBindings( parse( value ), sourceName )
 				: undefined,
 		[ value, sourceName ]
@@ -271,15 +306,15 @@ export function useBoundInnerBlocks( clientId: string ) {
 		if ( syncedRef.current && syncedRef.current.value === override ) {
 			return syncedRef.current.blocks;
 		}
-		const blocks =
-			typeof override === 'string'
-				? removeBindings( parse( override ), PATTERN_OVERRIDES_SOURCE )
-				: // A new array, so that the inner blocks are reset to it.
-					[ ...ownBlocks ];
+		const blocks = isInnerBlocksValue( override )
+			? removeBindings( parse( override ), PATTERN_OVERRIDES_SOURCE )
+			: // A new array, so that the inner blocks are reset to it.
+				[ ...ownBlocks ];
 		syncedRef.current = {
 			value: override,
-			serialized:
-				typeof override === 'string' ? override : serialize( blocks ),
+			serialized: isInnerBlocksValue( override )
+				? override
+				: serializeInnerBlocks( blocks ),
 			blocks,
 		};
 		return blocks;
@@ -289,7 +324,7 @@ export function useBoundInnerBlocks( clientId: string ) {
 
 	const write = useCallback(
 		( blocks: Block[], isPersistent: boolean ) => {
-			const serialized = serialize( blocks );
+			const serialized = serializeInnerBlocks( blocks );
 			if ( serialized === syncedRef.current?.serialized ) {
 				return;
 			}
