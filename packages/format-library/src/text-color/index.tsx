@@ -1,8 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
+import { ColorIndicator } from '@wordpress/components';
 import {
-	Icon,
 	color as colorIcon,
 	textColor as textColorIcon,
 } from '@wordpress/icons';
@@ -74,6 +74,17 @@ const CONTROLS: {
 	},
 ];
 
+// The toolbar `Icon` wrapper sizes its glyph to 24px. `ColorIndicator` is a
+// 20px circle, so box it to the same footprint as the icon it replaces, or
+// the menu item text shifts when a color is active.
+function ColorIndicatorIcon( { colorValue }: { colorValue: string } ) {
+	return (
+		<span className="format-library-text-color-indicator">
+			<ColorIndicator colorValue={ colorValue } />
+		</span>
+	);
+}
+
 function TextColorEdit( {
 	value,
 	onChange,
@@ -105,12 +116,11 @@ function TextColorEdit( {
 		<>
 			{ CONTROLS.map( ( { name: controlName, property, title: controlTitle, icon } ) => {
 				const isPropertyActive = !! activeColors[ property ];
-				// Paint the glyph with the active color so the inverted
-				// (pressed) button background stays visible behind it.
-				const indicatorStyle =
-					isPropertyActive && colorIndicatorStyle
-						? { color: colorIndicatorStyle[ property ] }
-						: undefined;
+				// Show the active color in place of the icon.
+				const indicatorColor = isPropertyActive
+					? ( colorIndicatorStyle?.[ property ] ??
+						activeColors[ property ] )
+					: undefined;
 
 				return (
 					<RichTextToolbarButton
@@ -118,7 +128,15 @@ function TextColorEdit( {
 						name={ controlName }
 						className="format-library-text-color-button"
 						isActive={ isPropertyActive }
-						icon={ <Icon icon={ icon } style={ indicatorStyle } /> }
+						icon={
+							indicatorColor ? (
+								<ColorIndicatorIcon
+									colorValue={ indicatorColor }
+								/>
+							) : (
+								icon
+							)
+						}
 						title={ controlTitle }
 						// If has no colors to choose but a color is active
 						// remove that color onClick.
