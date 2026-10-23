@@ -33,9 +33,6 @@ export interface ConvertImageOptions {
 }
 
 /**
- * Options for resizing an image.
- */
-/**
  * Options for encoding raw pixels as a JPEG.
  */
 export interface EncodePixelsOptions {
@@ -51,6 +48,9 @@ export interface EncodePixelsOptions {
 	metadataSource?: ArrayBuffer;
 }
 
+/**
+ * Options for resizing an image.
+ */
 export interface ResizeImageOptions {
 	/**
 	 * Whether to use smart cropping (i.e. saliency-aware). Defaults to false.
