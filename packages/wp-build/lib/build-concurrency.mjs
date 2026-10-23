@@ -1,5 +1,5 @@
 import os from 'node:os';
-import esbuild from 'esbuild';
+import { build } from 'rolldown';
 
 /**
  * @typedef {Object} QueuedBuild
@@ -37,13 +37,48 @@ export function setBuildConcurrency( concurrency ) {
 }
 
 /**
- * Runs an esbuild build while respecting the global wp-build concurrency limit.
+ * Handle Rolldown logs, dropping the ones that don't apply to wp-build.
  *
- * @param {import('esbuild').BuildOptions} buildOptions Esbuild build options.
- * @return {Promise<import('esbuild').BuildResult>} Esbuild build result.
+ * @param {import('rolldown').LogLevel}           level          Log level.
+ * @param {import('rolldown').RolldownLog}        log            Log.
+ * @param {import('rolldown').LogOrStringHandler} defaultHandler Default log handler.
+ */
+function onLog( level, log, defaultHandler ) {
+	const isIgnored =
+		// Classic scripts expose their exports in the `outro`, not with `output.name`.
+		log.code === 'MISSING_NAME_OPTION_FOR_IIFE_EXPORT' ||
+		// The `jsx` option overrides the tsconfig's `jsx`, which is `preserve`
+		// for the type checker.
+		( log.code === 'CONFIGURATION_FIELD_CONFLICT' &&
+			log.message.includes( 'compilerOptions.jsx' ) ) ||
+		// Bundled dependencies using `eval`, or directives like 'use client', are
+		// not actionable.
+		( [ 'EVAL', 'MODULE_LEVEL_DIRECTIVE' ].includes( log.code ?? '' ) &&
+			!! log.id?.includes( '/node_modules/' ) );
+	if ( ! isIgnored ) {
+		defaultHandler( level, log );
+	}
+}
+
+/**
+ * Runs a Rolldown build while respecting the global wp-build concurrency limit.
+ *
+ * @param {import('rolldown').BuildOptions} buildOptions Rolldown build options.
+ * @return {Promise<import('rolldown').RolldownOutput>} Rolldown build output.
  */
 export function buildWithConcurrency( buildOptions ) {
-	return enqueueBuild( () => esbuild.build( buildOptions ) );
+	return enqueueBuild( () =>
+		build( {
+			onLog,
+			// Many builds run in parallel, which makes plugin timings meaningless.
+			checks: { pluginTimings: false },
+			...buildOptions,
+			transform: {
+				jsx: { runtime: 'automatic', importSource: 'react' },
+				...buildOptions.transform,
+			},
+		} )
+	);
 }
 
 /**
