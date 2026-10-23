@@ -19,6 +19,25 @@ export function normalizeAngle( angle: number ): number {
 }
 
 /**
+ * Rounds an angle to two decimals the way PHP's `round()` does: halves are
+ * rounded away from zero after removing floating point noise, so 1.005 is
+ * 1.01 and -12.345 is -12.35.
+ *
+ * @param angle Angle in degrees.
+ *
+ * @return The angle rounded to two decimals.
+ */
+export function roundAngle( angle: number ): number {
+	return (
+		( Math.sign( angle ) *
+			Math.round(
+				Number( ( Math.abs( angle ) * 100 ).toPrecision( 15 ) )
+			) ) /
+		100
+	);
+}
+
+/**
  * Converts a stored rotation to the [0, 360) range used by `AnglePickerControl`.
  *
  * @param rotate Stored rotation in degrees.
@@ -34,9 +53,9 @@ export function toPickerAngle( rotate: number | undefined ): number {
  *
  * @param value Angle in degrees, in [0, 360].
  *
- * @return The rotation in (-180, 180].
+ * @return The rotation in (-180, 180], rounded to two decimals.
  */
 export function fromPickerAngle( value: number | string | undefined ): number {
 	const angle = Number( value );
-	return Number.isFinite( angle ) ? normalizeAngle( Math.round( angle ) ) : 0;
+	return Number.isFinite( angle ) ? normalizeAngle( roundAngle( angle ) ) : 0;
 }
