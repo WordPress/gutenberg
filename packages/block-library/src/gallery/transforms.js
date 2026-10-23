@@ -26,6 +26,36 @@ const cloneInnerBlocks = ( innerBlocks ) =>
 	);
 
 /**
+ * Attributes that only make sense on a Gallery. Transforms to blocks that
+ * receive the images as inner blocks drop these, keeping the shared ones
+ * such as styles, anchor and class name.
+ *
+ * @param {Object} attributes Gallery block attributes.
+ * @return {Object} The attributes without the Gallery-specific ones.
+ */
+const omitGalleryAttributes = ( attributes ) => {
+	const {
+		allowResize,
+		aspectRatio,
+		caption,
+		columns,
+		dynamicContent,
+		fixedHeight,
+		ids,
+		imageCrop,
+		images,
+		linkTarget,
+		linkTo,
+		navigationButtonType,
+		randomOrder,
+		shortCodeTransforms,
+		sizeSlug,
+		...rest
+	} = attributes;
+	return rest;
+};
+
+/**
  * Third party block plugins don't have an easy way to detect if the
  * innerBlocks version of the Gallery is running when they run a
  * 3rdPartyBlock -> GalleryBlock transform so this transform filter
@@ -275,37 +305,65 @@ const transforms = {
 			// As above: with no inner blocks to clone, a dynamic gallery would
 			// transform into an empty grid.
 			isMatch: ( { dynamicContent } ) => ! dynamicContent,
-			transform: ( attributes, innerBlocks ) => {
-				const {
-					allowResize,
-					aspectRatio,
-					caption,
-					columns,
-					dynamicContent,
-					fixedHeight,
-					ids,
-					imageCrop,
-					images,
-					linkTarget,
-					linkTo,
-					navigationButtonType,
-					randomOrder,
-					shortCodeTransforms,
-					sizeSlug,
-					...rest
-				} = attributes;
-				return createBlock(
+			transform: ( attributes, innerBlocks ) =>
+				createBlock(
 					'core/group',
 					{
-						...rest,
+						...omitGalleryAttributes( attributes ),
 						layout: {
 							type: 'grid',
 							columnCount:
-								columns ??
+								attributes.columns ??
 								defaultColumnsNumber( innerBlocks.length ),
 						},
 					},
 					cloneInnerBlocks( innerBlocks )
+				),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/columns' ],
+			// With no images to distribute, as in a dynamic or empty gallery,
+			// this would produce empty columns. Skipping it lets the Columns
+			// block's generic transform wrap the gallery instead.
+			isMatch: ( { dynamicContent }, { innerBlocks } ) =>
+				! dynamicContent && innerBlocks.length > 0,
+			transform: ( attributes, innerBlocks ) => {
+				const { layout, align, ...rest } =
+					omitGalleryAttributes( attributes );
+				const columnCount = Math.min(
+					attributes.columns ??
+						defaultColumnsNumber( innerBlocks.length ),
+					innerBlocks.length
+				);
+				const columnWidth = +( 100 / columnCount ).toFixed( 2 );
+				// Deal the images into the columns in turn, so each row of
+				// the gallery stays a row across the columns.
+				const columnBlocks = Array.from(
+					{ length: columnCount },
+					( _, columnIndex ) =>
+						createBlock(
+							'core/column',
+							{ width: `${ columnWidth }%` },
+							cloneInnerBlocks(
+								innerBlocks.filter(
+									( _innerBlock, imageIndex ) =>
+										imageIndex % columnCount === columnIndex
+								)
+							)
+						)
+				);
+
+				return createBlock(
+					'core/columns',
+					{
+						...rest,
+						// Columns only supports the wide and full alignments.
+						align: [ 'wide', 'full' ].includes( align )
+							? align
+							: undefined,
+					},
+					columnBlocks
 				);
 			},
 		},

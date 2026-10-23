@@ -12,6 +12,7 @@
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
+-   Gallery: Transforming to Columns now spreads the images across one column per gallery column, instead of wrapping the whole gallery in a single column ([#85391](https://github.com/WordPress/gutenberg/pull/85391)).
 
 ## 12.0.0 (2026-10-20)
 
