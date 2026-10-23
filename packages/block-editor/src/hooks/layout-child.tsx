@@ -378,16 +378,15 @@ function useBlockPropsChildLayoutStyles( {
 	// A block in a manual placement grid stays in place while it is dragged,
 	// so the browser's drag image must not show. WebKit ignores the drag
 	// image set for a block when the drag starts on an image, and shows the
-	// image instead, so images leave the drag to the block.
+	// image instead, so images leave the drag to the block. Only the block's
+	// own image is covered, such as an Image block's or a Media & Text
+	// block's, not images in blocks nested inside it.
 	if (
 		parentLayout.type === 'grid' &&
 		parentLayout.isManualPlacement &&
 		window.__experimentalEnableGridInteractivity
 	) {
-		css += `${ selector } img { -webkit-user-drag: none; }`;
-		// A block inserted into cells of a fixed size gets enough of them for
-		// its placeholder, which then fills them rather than leaving a gap.
-		css += `@container style(--wp--style--grid-cells: fixed) { ${ selector } > .components-placeholder { min-height: 100%; } }`;
+		css += `${ selector } > img, ${ selector } > figure img { -webkit-user-drag: none; }`;
 	}
 
 	useStyleOverride( { css } );
