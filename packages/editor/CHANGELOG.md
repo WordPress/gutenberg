@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Use the `item_draft_saved` post type label for the notice shown after saving a draft, falling back to `Draft saved.` when the label is missing ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Use the `item_draft_saved` post type label for the notice shown after saving a draft, falling back to `Draft saved.` when the label is missing ([#85426](https://github.com/WordPress/gutenberg/pull/85426)).
 
 ### Bug Fixes
 
