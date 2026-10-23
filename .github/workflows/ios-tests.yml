@@ -50,7 +50,54 @@ jobs:
                   overwrite: true
 
     safari:
-        name: Safari on an iOS simulator
+        name: Safari on an iOS simulator (${{ matrix.attempt }})
+        # Temporary: 40 fresh runners to measure the flake rate. Drop before merge.
+        strategy:
+            fail-fast: false
+            matrix:
+                attempt:
+                    [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        30,
+                        31,
+                        32,
+                        33,
+                        34,
+                        35,
+                        36,
+                        37,
+                        38,
+                        39,
+                        40,
+                    ]
         # Safari and the iOS keyboard only run on Apple hardware.
         runs-on: macos-15
         needs: build
@@ -102,7 +149,7 @@ jobs:
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ always() }}
               with:
-                  name: ios-test-results
+                  name: ios-test-results-${{ matrix.attempt }}
                   path: |
                       test/ios/build/results.xcresult
                       test/ios/build/server.log
