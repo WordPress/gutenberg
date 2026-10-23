@@ -42,8 +42,8 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * The action of the `post_type_supports` module editing a post, for the
-	 * pages, templates, template parts, and patterns the user can edit, shown
-	 * before the others.
+	 * pages, templates, template parts, patterns, and navigation menus the
+	 * user can edit, shown before the others.
 	 */
 	const EDIT_POST = 'edit-post';
 
@@ -331,10 +331,29 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$this->assertSame( self::EDIT_POST, $this->get_action_ids( 'wp_block' )[0], 'Editors can edit patterns.' );
 		$this->assertNotContains( self::EDIT_POST, $this->get_action_ids( 'wp_template' ), 'Editors cannot edit templates.' );
 		$this->assertNotContains( self::EDIT_POST, $this->get_action_ids( 'wp_template_part' ), 'Editors cannot edit template parts.' );
+		$this->assertNotContains( self::EDIT_POST, $this->get_action_ids( 'wp_navigation' ), 'Editors cannot edit navigation menus.' );
 		$this->assertNotContains( self::EDIT_POST, $this->get_action_ids( 'post' ), 'The lists of the site editor do not show posts.' );
+
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame( self::EDIT_POST, $this->get_action_ids( 'wp_navigation' )[0], 'Administrators can edit navigation menus.' );
 
 		wp_set_current_user( self::$contributor_id );
 		$this->assertNotContains( self::EDIT_POST, $this->get_action_ids( 'page' ), 'Contributors cannot edit pages.' );
+	}
+
+	/**
+	 * Clicking a navigation menu in its list only previews it, so the edit
+	 * action is primary for navigation menus, and only for them.
+	 */
+	public function test_the_edit_action_is_only_primary_for_navigation_menus() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+
+		foreach ( array( 'page', 'wp_block', 'wp_template', 'wp_template_part', 'wp_navigation' ) as $post_type ) {
+			self::reset_registry();
+			$actions = array_column( wp_get_registered_entity_actions( 'postType', $post_type ), null, 'id' );
+			$this->assertSame( 'wp_navigation' === $post_type, $actions[ self::EDIT_POST ]['isPrimary'] ?? false, "Whether the edit action of $post_type is primary." );
+		}
 	}
 
 	/**

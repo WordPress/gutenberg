@@ -17,9 +17,10 @@
  * Registers the actions of WordPress core on each post type exposed in the
  * REST API, from what it supports and what the current user can do:
  *
- * - `edit-post`, for pages, templates, template parts, and patterns, when
- *   the user can edit them. It only signals it was performed: the list
- *   showing it opens the editor.
+ * - `edit-post`, for pages, templates, template parts, patterns, and
+ *   navigation menus, when the user can edit them. It only signals it was
+ *   performed: the list showing it opens the editor. It is primary for
+ *   navigation menus only.
  * - `quick-edit`, for pages, when the user can edit them. It only signals it
  *   was performed: the list showing it opens the quick edit form.
  * - `view-post`, for the viewable post types.
@@ -54,7 +55,7 @@ function register_core_entity_actions() {
 	$is_gutenberg   = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
 	$is_block_theme = wp_is_block_theme();
 	$design_types   = array( 'wp_block', 'wp_template', 'wp_template_part' );
-	$listed_types   = array_merge( array( 'page' ), $design_types );
+	$listed_types   = array_merge( array( 'page', 'wp_navigation' ), $design_types );
 	$definitions    = array();
 
 	// Each file is required in its own variable scope.
@@ -101,7 +102,13 @@ function register_core_entity_actions() {
 				// The id comes first, like in the actions registered directly.
 				$definitions[ $key ] = array_merge( array( 'id' => $id ), $require( __DIR__ . "/{$key}/action.php" ) );
 			}
-			wp_register_entity_actions( 'core', 'postType', $name, array( $definitions[ $key ] ), "@wordpress/core-actions/{$module}" );
+			$definition = $definitions[ $key ];
+			// Clicking a navigation menu in its list only previews it, so the
+			// list shows the action opening the editor as a button.
+			if ( 'post_type_supports/edit-post' === $key && 'wp_navigation' === $name ) {
+				$definition['isPrimary'] = true;
+			}
+			wp_register_entity_actions( 'core', 'postType', $name, array( $definition ), "@wordpress/core-actions/{$module}" );
 		}
 	}
 }

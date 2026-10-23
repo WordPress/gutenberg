@@ -17,7 +17,7 @@ Each action has a folder named after its id, with the data of the action in `act
 
 `src/index.php` registers the actions of each post type exposed in the REST API, on the `wp_entity_actions_api_init` action at priority 0, so a plugin hooking it at the default priority can remove or replace them:
 
--   `edit-post`, for pages, templates, template parts, and patterns, when the user can edit them. Only the lists show it.
+-   `edit-post`, for pages, templates, template parts, patterns, and navigation menus, when the user can edit them. Only the lists show it, as a primary action for navigation menus only.
 -   `quick-edit`, for pages, when the user can edit them. Only the lists show it.
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.

@@ -1,7 +1,7 @@
 <?php
 /**
- * The "Edit" action, for pages, templates, template parts, and patterns, when
- * the user can edit them. Only the lists show it. Its JavaScript parts
+ * The "Edit" action, for pages, templates, template parts, patterns, and
+ * navigation menus, when the user can edit them. Only the lists show it. Its JavaScript parts
  * (`icon`, `isEligible`, and `callback`) are in `action.tsx`, next to this
  * file.
  *
