@@ -398,7 +398,7 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	test.describe( 'Undoing a typed character', () => {
+	test.describe( 'Undoing and redoing typed characters', () => {
 		let draftId = null;
 
 		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
@@ -430,27 +430,38 @@ test.describe( 'Post Editor Performance', () => {
 				);
 			};
 
-			const samples = 10;
+			// Each iteration types in two paragraphs, making two undo levels,
+			// then measures undo, undo again and redo, one sample each.
+			const steps = [
+				'ControlOrMeta+z',
+				'ControlOrMeta+z',
+				'ControlOrMeta+Shift+z',
+			];
 			const throwaway = 1;
-			const iterations = samples + throwaway;
+			const iterations = 4 + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
-				await paragraphs.nth( i ).click();
+				await paragraphs.nth( i * 2 ).click();
 				await page.keyboard.type( 'x' );
+				await paragraphs.nth( i * 2 + 1 ).click();
+				await page.keyboard.type( 'y' );
 
-				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-				await page.waitForTimeout( BROWSER_IDLE_WAIT );
-				const start = await getTaskDuration();
+				for ( const step of steps ) {
+					// Wait for the browser to be idle before starting the monitoring.
+					// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+					await page.waitForTimeout( BROWSER_IDLE_WAIT );
+					const start = await getTaskDuration();
 
-				// Undo the typed character.
-				await page.keyboard.press( 'ControlOrMeta+z' );
+					await page.keyboard.press( step );
 
-				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+					// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+					await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
-				// Save the results.
-				if ( i > throwaway ) {
-					results.undo.push( ( await getTaskDuration() ) - start );
+					// Save the results.
+					if ( i > throwaway ) {
+						results.undo.push(
+							( await getTaskDuration() ) - start
+						);
+					}
 				}
 			}
 		} );
