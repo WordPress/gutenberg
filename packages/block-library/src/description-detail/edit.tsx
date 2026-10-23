@@ -48,7 +48,7 @@ export default function Edit( {
 				tagName="dd"
 				{ ...blockProps }
 				value={ content }
-				onChange={ ( newContent: string ) =>
+				onChange={ ( newContent: string | RichTextData ) =>
 					setAttributes( { content: newContent } )
 				}
 				onMerge={ mergeBlocks }
