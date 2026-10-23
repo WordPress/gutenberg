@@ -9,6 +9,14 @@
 	max-width: 100%;
 }
 
+.principle-card {
+	// Never more than two per row: half the row (minus half the gap) once two
+	// fit at 20rem or more, otherwise one per row.
+	flex: 1 1 max(20rem, calc(50% - var(--wpds-dimension-gap-lg) / 2));
+	min-width: min(20rem, 100%);
+	max-width: 100%;
+}
+
 .illustration {
 	display: block;
 	width: 100%;
