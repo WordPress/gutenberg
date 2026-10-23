@@ -1,0 +1,58 @@
+.preview {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	background: var(--wpds-color-background-surface-neutral);
+}
+
+.chrome {
+	flex-shrink: 0;
+	min-width: 0;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.url {
+	flex: 1;
+	min-width: 0;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-radius: var(--wpds-border-radius-lg);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.url-icon {
+	flex-shrink: 0;
+	fill: currentColor;
+}
+
+.url-text {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.url-badge {
+	flex-shrink: 1;
+	max-width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.actions {
+	flex-shrink: 0;
+}
+
+.iframe {
+	display: block;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	border: 0;
+	background-color: var(--wpds-color-background-surface-neutral);
+}

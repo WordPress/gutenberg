@@ -2,12 +2,9 @@ import { useNavigate, useSearch } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as editorPrivateApis,
-	store as editorStore,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	Button,
@@ -16,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { backup, seen } from '@wordpress/icons';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { ActivatePanel } from './activate-panel';
@@ -72,19 +69,6 @@ function Stage() {
 	const section = ( search.section ?? '/' ) as string;
 	const areRevisionsOpened = section.startsWith( '/revisions' );
 
-	// The canvas on this route is the editor in preview mode, and its
-	// revisions preview is driven by the editor store's styles path rather
-	// than this route's `section` search param. Keep the store in sync while
-	// the revisions screen is open so selecting a revision previews it in
-	// the canvas.
-	const { setStylesPath } = unlock( useDispatch( editorStore ) );
-	useEffect( () => {
-		if ( ! areRevisionsOpened ) {
-			return;
-		}
-		setStylesPath( section );
-		return () => setStylesPath( '/' );
-	}, [ areRevisionsOpened, section, setStylesPath ] );
 	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
 		search.preview === 'stylebook'
 	);
