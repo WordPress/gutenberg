@@ -48,6 +48,29 @@ export interface BlockLockSelection {
 }
 
 /**
+ * A `templateLock` attribute value.
+ */
+export type TemplateLock = 'all' | 'insert' | 'contentOnly' | false;
+
+/**
+ * The saved lock attributes of a block.
+ */
+export interface BlockLockState {
+	/**
+	 * The block's `lock` attribute, without locks inherited from a parent.
+	 */
+	lock?: BlockLock;
+	/**
+	 * The block's `templateLock` attribute.
+	 */
+	templateLock?: TemplateLock;
+	/**
+	 * Whether the block's type supports a template lock.
+	 */
+	supportsTemplateLock: boolean;
+}
+
+/**
  * Props of the block lock controls acting on a block.
  */
 export interface BlockLockControlProps {

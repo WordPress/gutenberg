@@ -136,7 +136,7 @@
 	},
 	"packages/block-editor/src/components/block-lock/modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		}
 	},
 	"packages/block-editor/src/components/block-lock/toolbar.tsx": {

@@ -33,6 +33,8 @@ const BlockSettingsMenuControlsSlot = ( {
 		isContentOnly,
 		canToggleSelectedBlocksVisibility,
 		canEdit,
+		canEditSelectedBlocks,
+		hasContentOnlyBlock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -56,6 +58,12 @@ const BlockSettingsMenuControlsSlot = ( {
 					hasBlockSupport( block.name, 'visibility', true )
 				),
 				canEdit: canEditBlock( ids[ 0 ] ),
+				canEditSelectedBlocks: ids.every( ( id ) =>
+					canEditBlock( id )
+				),
+				hasContentOnlyBlock: ids.some(
+					( id ) => getBlockEditingMode( id ) === 'contentOnly'
+				),
 			};
 		},
 		[ clientIds ]
@@ -63,7 +71,8 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	const { canLock } = useBlocksLock( selectedClientIds );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
-	const showLockButton = canLock && ! isContentOnly;
+	const showLockButton =
+		canLock && canEditSelectedBlocks && ! hasContentOnlyBlock;
 	const showRenameButton =
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 	const showVisibilityButton =
@@ -104,7 +113,7 @@ const BlockSettingsMenuControlsSlot = ( {
 								onClose={ fillProps?.onClose }
 							/>
 						) }
-						{ canEdit && showLockButton && (
+						{ showLockButton && (
 							<BlockLockMenuItem
 								clientIds={ selectedClientIds }
 							/>
