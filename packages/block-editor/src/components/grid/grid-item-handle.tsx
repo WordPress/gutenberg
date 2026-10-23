@@ -1,35 +1,42 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
+import { Button } from '@wordpress/components';
 
 interface GridItemHandleProps extends Omit<
-	ComponentPropsWithoutRef< 'div' >,
-	'title'
+	ComponentPropsWithoutRef< 'button' >,
+	'title' | 'type'
 > {
-	/** Shown when hovering the handle. */
+	/** The handle's accessible name, also shown when hovering it. */
 	label: string;
+	/** The handle's icon, when it shows no other content. */
+	icon?: ComponentProps< typeof Button >[ 'icon' ];
 }
 
 /**
- * A button in the toolbar of handles around a selected grid item.
+ * A handle in the toolbar of handles around a selected grid item, which drags
+ * or turns the block with a pointer.
  *
- * Handles only work with a pointer, so they are hidden from assistive
- * technology. Each action they start is also available from the keyboard
- * elsewhere.
+ * Like the drag handle in the block toolbar, it can't be reached with Tab or
+ * the arrow keys, because it only works with a pointer. Each action it starts
+ * is also available from the keyboard elsewhere.
  */
 export function GridItemHandle( {
 	label,
+	icon,
 	className,
 	children,
 	...props
 }: GridItemHandleProps ) {
 	return (
-		<div
+		<Button
 			{ ...props }
+			size="small"
+			icon={ icon }
+			label={ label }
 			className={ clsx( 'block-editor-grid-item-handle', className ) }
-			title={ label }
-			aria-hidden="true"
+			tabIndex={ -1 }
 		>
 			{ children }
-		</div>
+		</Button>
 	);
 }
