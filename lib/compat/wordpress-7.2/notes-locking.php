@@ -3,9 +3,9 @@
  * Locking for notes (block comments).
  *
  * A lock freezes note mutation while leaving notes readable. It is expressed
- * per action - `create`, `reply`, `edit`, `resolve` and `delete` - so a site can
- * either freeze notes entirely or preserve them selectively, for example by
- * disallowing deletion while review continues.
+ * per action - `create`, `reply`, `edit`, `resolve`, `delete` and `react` - so a
+ * site can either freeze notes entirely or preserve them selectively, for
+ * example by disallowing deletion while review continues.
  *
  * Two layers feed one predicate, `gutenberg_note_action_is_locked()`:
  *
@@ -29,14 +29,15 @@
  * Returns the note actions a lock can apply to.
  *
  * Reopening a note is classified as `resolve`: it is the same state machine
- * running in the opposite direction.
+ * running in the opposite direction. Trashing, spamming and restoring a note
+ * are classified as `delete`. Adding or removing an emoji reaction is `react`.
  *
  * @since 7.2.0
  *
  * @return string[] The action names.
  */
 function gutenberg_get_note_lock_actions() {
-	return array( 'create', 'reply', 'edit', 'resolve', 'delete' );
+	return array( 'create', 'reply', 'edit', 'resolve', 'delete', 'react' );
 }
 
 /**
@@ -72,7 +73,7 @@ function gutenberg_post_type_supports_notes( $post_type ) {
  *
  * @since 7.2.0
  *
- * @param string          $action  One of 'create', 'reply', 'edit', 'resolve', 'delete'.
+ * @param string          $action  One of 'create', 'reply', 'edit', 'resolve', 'delete', 'react'.
  * @param int|WP_Post     $post    The post the note belongs to.
  * @param WP_Comment|null $comment The existing note, when mutating one. Null on create.
  * @return bool Whether the action is locked.
@@ -84,8 +85,26 @@ function gutenberg_note_action_is_locked( $action, $post, $comment = null ) {
 		return false;
 	}
 
-	$locked = (bool) get_post_meta( $post->ID, '_wp_notes_locked', true );
+	return gutenberg_filter_note_action_lock(
+		(bool) get_post_meta( $post->ID, '_wp_notes_locked', true ),
+		$action,
+		$post,
+		$comment
+	);
+}
 
+/**
+ * Applies the `note_action_is_locked` filter to a lock value.
+ *
+ * @since 7.2.0
+ *
+ * @param bool            $locked  Whether the action is locked before filtering.
+ * @param string          $action  The action name.
+ * @param WP_Post         $post    The post the note belongs to.
+ * @param WP_Comment|null $comment The note being mutated, when there is one.
+ * @return bool Whether the action is locked.
+ */
+function gutenberg_filter_note_action_lock( $locked, $action, $post, $comment = null ) {
 	/**
 	 * Filters whether a note action is locked.
 	 *
@@ -96,9 +115,10 @@ function gutenberg_note_action_is_locked( $action, $post, $comment = null ) {
 	 * @since 7.2.0
 	 *
 	 * @param bool            $locked  Whether the action is locked. Defaults to the post's `_wp_notes_locked` meta.
-	 * @param string          $action  One of 'create', 'reply', 'edit', 'resolve', 'delete'.
+	 * @param string          $action  One of 'create', 'reply', 'edit', 'resolve', 'delete', 'react'.
 	 * @param WP_Post         $post    The post the note belongs to.
-	 * @param WP_Comment|null $comment The note being mutated, when there is one. Null on create.
+	 * @param WP_Comment|null $comment The note or reaction being mutated, when there is one. Null on
+	 *                                 create, and when the editor asks for the post-wide lock state.
 	 */
 	return (bool) apply_filters( 'note_action_is_locked', $locked, $action, $post, $comment );
 }
@@ -107,7 +127,8 @@ function gutenberg_note_action_is_locked( $action, $post, $comment = null ) {
  * Registers the `_wp_notes_locked` post meta on every post type that supports notes.
  *
  * Runs late on `init` so post types registered at the default priority are
- * already in place.
+ * already in place, and again on `rest_api_init` to pick up post types
+ * registered after that.
  *
  * @since 7.2.0
  */
@@ -133,7 +154,11 @@ function gutenberg_register_notes_lock_meta() {
 				 * review thread would defeat the point.
 				 */
 				'auth_callback'     => static function ( $allowed, $meta_key, $post_id ) {
-					return current_user_can( 'edit_others_posts' ) && current_user_can( 'edit_post', $post_id );
+					$post_type_object = get_post_type_object( get_post_type( $post_id ) );
+
+					return $post_type_object instanceof WP_Post_Type &&
+						current_user_can( $post_type_object->cap->edit_others_posts ) &&
+						current_user_can( 'edit_post', $post_id );
 				},
 			)
 		);
@@ -175,19 +200,36 @@ function gutenberg_normalize_note_comment_status( $status ) {
  * @return string[] The actions the request performs.
  */
 function gutenberg_get_note_request_actions( $request, $comment ) {
+	$is_reaction = $comment instanceof WP_Comment
+		? 'reaction' === $comment->comment_type
+		: 'reaction' === $request['type'];
+
+	if ( $is_reaction ) {
+		return array( 'react' );
+	}
+
 	if ( 'DELETE' === $request->get_method() ) {
 		return array( 'delete' );
 	}
 
 	// Creating a note: a resolution marker, a reply, or a new thread.
 	if ( ! $comment instanceof WP_Comment ) {
-		$meta = $request['meta'];
+		$actions = array( empty( $request['parent'] ) ? 'create' : 'reply' );
+		$meta    = $request['meta'];
 
 		if ( is_array( $meta ) && isset( $meta['_wp_note_status'] ) ) {
-			return array( 'resolve' );
+			/*
+			 * An empty resolution marker only records the status change. One
+			 * with text (reopen and reply), or one starting a thread, also adds
+			 * a note.
+			 */
+			if ( ! empty( $request['parent'] ) && '' === trim( (string) $request['content'] ) ) {
+				$actions = array();
+			}
+			$actions[] = 'resolve';
 		}
 
-		return empty( $request['parent'] ) ? array( 'create' ) : array( 'reply' );
+		return $actions;
 	}
 
 	$actions = array();
@@ -200,11 +242,17 @@ function gutenberg_get_note_request_actions( $request, $comment ) {
 	 * A status change is the resolve/reopen toggle rather than an edit. Only a
 	 * change counts: re-sending the status the note already has mutates nothing.
 	 */
-	if (
-		null !== $request['status'] &&
-		gutenberg_normalize_note_comment_status( $request['status'] ) !== gutenberg_normalize_note_comment_status( $comment->comment_approved )
-	) {
-		$actions[] = 'resolve';
+	if ( null !== $request['status'] ) {
+		$old_status = gutenberg_normalize_note_comment_status( $comment->comment_approved );
+		$new_status = gutenberg_normalize_note_comment_status( $request['status'] );
+
+		if ( $new_status !== $old_status ) {
+			// Trashing, spamming or restoring a note is a delete or its undo.
+			$is_removal = in_array( $old_status, array( 'trash', 'spam' ), true ) ||
+				in_array( $new_status, array( 'trash', 'spam' ), true );
+
+			$actions[] = $is_removal ? 'delete' : 'resolve';
+		}
 	}
 
 	// Any other field on the note (author, date, meta) counts as an edit.
@@ -249,14 +297,14 @@ function gutenberg_reject_locked_note_mutations( $response, $handler, $request )
 		// Item route: the note itself names the post.
 		$comment = get_comment( (int) $request['id'] );
 
-		if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+		if ( ! $comment instanceof WP_Comment || ! in_array( $comment->comment_type, array( 'note', 'reaction' ), true ) ) {
 			return $response;
 		}
 
 		$post_id = (int) $comment->comment_post_ID;
 	} else {
-		// Collection route: only note creation is in scope.
-		if ( 'note' !== $request['type'] ) {
+		// Collection route: only note and reaction creation are in scope.
+		if ( ! in_array( $request['type'], array( 'note', 'reaction' ), true ) ) {
 			return $response;
 		}
 
@@ -289,6 +337,10 @@ function gutenberg_reject_locked_note_mutations( $response, $handler, $request )
  * The editor uses this to hide affordances it knows the server will reject.
  * It is a courtesy only: enforcement lives in the REST layer.
  *
+ * Both outcomes of the `_wp_notes_locked` meta are computed, so the editor can
+ * follow a lock applied or lifted mid-session while still honoring the filter's
+ * exceptions.
+ *
  * @since 7.2.0
  *
  * @param array                   $settings       Default editor settings.
@@ -300,15 +352,21 @@ function gutenberg_add_notes_lock_editor_settings( $settings, $editor_context ) 
 		return $settings;
 	}
 
-	$locked = array();
+	$locked_actions = array(
+		'unlocked' => array(),
+		'locked'   => array(),
+	);
 
 	foreach ( gutenberg_get_note_lock_actions() as $action ) {
-		if ( gutenberg_note_action_is_locked( $action, $editor_context->post ) ) {
-			$locked[] = $action;
+		if ( gutenberg_filter_note_action_lock( false, $action, $editor_context->post ) ) {
+			$locked_actions['unlocked'][] = $action;
+		}
+		if ( gutenberg_filter_note_action_lock( true, $action, $editor_context->post ) ) {
+			$locked_actions['locked'][] = $action;
 		}
 	}
 
-	$settings['lockedNoteActions'] = $locked;
+	$settings['lockedNoteActions'] = $locked_actions;
 
 	return $settings;
 }
@@ -318,6 +376,7 @@ function gutenberg_add_notes_lock_editor_settings( $settings, $editor_context ) 
  */
 if ( ! function_exists( 'wp_note_action_is_locked' ) ) {
 	add_action( 'init', 'gutenberg_register_notes_lock_meta', 20 );
+	add_action( 'rest_api_init', 'gutenberg_register_notes_lock_meta' );
 	add_filter( 'rest_request_before_callbacks', 'gutenberg_reject_locked_note_mutations', 10, 3 );
 	add_filter( 'block_editor_settings_all', 'gutenberg_add_notes_lock_editor_settings', 10, 2 );
 }

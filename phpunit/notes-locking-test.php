@@ -485,27 +485,97 @@ class Tests_Notes_Locking extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The editor settings advertise the locked actions.
+	 * The editor settings advertise the locked actions for both lock states.
 	 */
 	public function test_editor_settings_expose_locked_actions(): void {
 		$context = new WP_Block_Editor_Context( array( 'post' => self::$post ) );
 
 		$settings = apply_filters( 'block_editor_settings_all', array(), $context );
 		$this->assertSame(
-			array(),
+			array(
+				'unlocked' => array(),
+				'locked'   => array( 'create', 'reply', 'edit', 'resolve', 'delete', 'react' ),
+			),
 			$settings['lockedNoteActions'],
-			'Expected no locked actions by default.'
+			'Expected nothing locked until the post is locked.'
 		);
 
-		$this->lock_post();
+		add_filter(
+			'note_action_is_locked',
+			static function ( $locked, $action ) {
+				if ( 'delete' === $action ) {
+					return true;
+				}
+				return 'react' === $action ? false : $locked;
+			},
+			10,
+			2
+		);
 		$settings = apply_filters( 'block_editor_settings_all', array(), $context );
 		$this->assertSame(
-			array( 'create', 'reply', 'edit', 'resolve', 'delete' ),
+			array(
+				'unlocked' => array( 'delete' ),
+				'locked'   => array( 'create', 'reply', 'edit', 'resolve', 'delete' ),
+			),
 			$settings['lockedNoteActions'],
-			'Expected every action to be locked.'
+			'Expected the filter to shape both lock states.'
+		);
+	}
+
+	/**
+	 * A resolution marker cannot be used to get around the create or reply lock.
+	 */
+	public function test_resolution_marker_does_not_bypass_create_or_reply_locks(): void {
+		$note_id = $this->seed_note();
+
+		add_filter(
+			'note_action_is_locked',
+			static function ( $locked, $action ) {
+				return in_array( $action, array( 'create', 'reply' ), true ) ? true : $locked;
+			},
+			10,
+			2
 		);
 
-		delete_post_meta( self::$post->ID, '_wp_notes_locked' );
+		$this->assertLocked(
+			$this->create_note(
+				array(
+					'content' => 'A new thread.',
+					'meta'    => array( '_wp_note_status' => 'resolved' ),
+				)
+			),
+			'Expected a top-level marker to count as creating a note.'
+		);
+		$this->assertLocked(
+			$this->create_note(
+				array(
+					'parent'  => $note_id,
+					'content' => 'Reopening with a reply.',
+					'meta'    => array( '_wp_note_status' => 'reopen' ),
+				)
+			),
+			'Expected a marker with text to count as a reply.'
+		);
+
+		$marker = $this->create_note(
+			array(
+				'parent'  => $note_id,
+				'content' => '',
+				'status'  => 'approved',
+				'meta'    => array( '_wp_note_status' => 'resolved' ),
+			)
+		);
+		$this->assertSame( 201, $marker->get_status(), 'Expected an empty marker to stay a resolve.' );
+	}
+
+	/**
+	 * Trashing a note through a status change counts as deleting it, and so
+	 * does restoring it.
+	 */
+	public function test_trash_and_restore_status_changes_count_as_delete(): void {
+		$note_id    = $this->seed_note();
+		$trashed_id = $this->seed_note( array( 'comment_approved' => 'trash' ) );
+
 		add_filter(
 			'note_action_is_locked',
 			static function ( $locked, $action ) {
@@ -514,11 +584,115 @@ class Tests_Notes_Locking extends WP_UnitTestCase {
 			10,
 			2
 		);
-		$settings = apply_filters( 'block_editor_settings_all', array(), $context );
-		$this->assertSame(
-			array( 'delete' ),
-			$settings['lockedNoteActions'],
-			'Expected only the filtered action to be locked.'
+
+		$this->assertLocked(
+			$this->update_note( $note_id, array( 'status' => 'trash' ) ),
+			'Expected trashing through the status to be locked.'
 		);
+		$this->assertLocked(
+			$this->update_note( $trashed_id, array( 'status' => 'hold' ) ),
+			'Expected restoring a trashed note to be locked.'
+		);
+
+		$resolved = $this->update_note( $note_id, array( 'status' => 'approved' ) );
+		$this->assertSame( 200, $resolved->get_status(), 'Expected resolving to stay open.' );
+	}
+
+	/**
+	 * A lock covers adding and removing reactions.
+	 */
+	public function test_locked_post_rejects_reactions(): void {
+		$note_id     = $this->seed_note();
+		$reaction_id = $this->seed_note(
+			array(
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_content'  => '1f44d',
+				'comment_approved' => '1',
+			)
+		);
+
+		$this->lock_post();
+
+		$this->assertLocked(
+			$this->create_note(
+				array(
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => '1f389',
+				)
+			),
+			'Expected adding a reaction to be locked.'
+		);
+		$this->assertLocked( $this->delete_note( $reaction_id ), 'Expected removing a reaction to be locked.' );
+	}
+
+	/**
+	 * Writing the lock meta checks the post type's own capability.
+	 */
+	public function test_lock_meta_write_uses_the_post_type_capabilities(): void {
+		register_post_type(
+			'gutenberg_product',
+			array(
+				'show_in_rest'    => true,
+				'supports'        => array( 'editor' => array( 'notes' => true ) ),
+				'capability_type' => 'product',
+				'map_meta_cap'    => true,
+			)
+		);
+		gutenberg_register_notes_lock_meta();
+
+		global $wp_rest_server;
+		$wp_rest_server = new WP_REST_Server();
+		do_action( 'rest_api_init', $wp_rest_server );
+
+		$product_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'gutenberg_product',
+				'post_status' => 'publish',
+				'post_author' => self::$author->ID,
+			)
+		);
+		$lock       = static function () use ( $product_id ): WP_REST_Response {
+			$request = new WP_REST_Request( 'POST', '/wp/v2/gutenberg_product/' . $product_id );
+			$request->set_param( 'meta', array( '_wp_notes_locked' => true ) );
+			return rest_get_server()->dispatch( $request );
+		};
+
+		$user = self::create_user( 'editor' );
+		foreach ( array( 'edit_products', 'edit_published_products' ) as $cap ) {
+			$user->add_cap( $cap );
+		}
+		wp_set_current_user( $user->ID );
+
+		$this->assertSame(
+			403,
+			$lock()->get_status(),
+			'Expected edit_others_posts alone not to be enough to lock a product.'
+		);
+
+		$user->add_cap( 'edit_others_products' );
+		$this->assertSame( 200, $lock()->get_status(), 'Expected edit_others_products to allow the lock.' );
+
+		unregister_post_type( 'gutenberg_product' );
+	}
+
+	/**
+	 * A post type registered after `init` still gets the lock meta.
+	 */
+	public function test_lock_meta_is_registered_for_late_post_types(): void {
+		register_post_type(
+			'gutenberg_late',
+			array( 'supports' => array( 'editor' => array( 'notes' => true ) ) )
+		);
+
+		do_action( 'rest_api_init', rest_get_server() );
+
+		$this->assertTrue(
+			registered_meta_key_exists( 'post', '_wp_notes_locked', 'gutenberg_late' ),
+			'Expected the meta on a post type registered late.'
+		);
+
+		unregister_post_type( 'gutenberg_late' );
 	}
 }
