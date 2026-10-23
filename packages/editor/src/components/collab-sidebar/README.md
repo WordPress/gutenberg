@@ -46,9 +46,9 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
       ├── AddNoteMenuItem                - slot fill in the block options menu
       ├── AddNoteToolbarButton           - slot fill in the block toolbar (once the post has notes)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + useNoteFocus + keyboard nav
+      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteFocus + keyboard nav + focusThreadOrAdjacent
       │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new'
-      │         └── NoteThread[]         - per thread
+      │         └── NoteThread[]         - per thread, calls useNoteActions
       │              └── <FloatingContainer>
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
       │                   │    └── NoteCard

@@ -22,12 +22,7 @@ import { store as editorStore } from '../../store';
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export function Notes( { notes, sidebarRef, isFloating = false } ) {
-	const {
-		onCreate: onAddReply,
-		onEdit: onEditNote,
-		onDiscard,
-		onDelete,
-	} = useNoteActions();
+	const { onDiscard } = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
@@ -207,8 +202,6 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 				<AddNote
 					key={ selectedBlockClientId }
 					clientId={ selectedBlockClientId }
-					onSubmit={ onAddReply }
-					onDiscard={ onDiscard }
 					sidebarRef={ sidebarRef }
 				/>
 			) }
@@ -229,10 +222,6 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 					) }
 					<NoteThread
 						note={ thread }
-						onAddReply={ onAddReply }
-						onDiscard={ onDiscard }
-						onDeleteNote={ onDelete }
-						onEditNote={ onEditNote }
 						focusThreadOrAdjacent={ focusThreadOrAdjacent }
 						isSelected={ selectedNote === thread.id }
 						sidebarRef={ sidebarRef }

@@ -18,7 +18,12 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { NoteDraftsContext, useNoteDraft, usePickNote } from './hooks';
+import {
+	NoteDraftsContext,
+	useNoteActions,
+	useNoteDraft,
+	usePickNote,
+} from './hooks';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
@@ -75,10 +80,6 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 
 export function NoteThread( {
 	note,
-	onEditNote,
-	onAddReply,
-	onDiscard,
-	onDeleteNote,
 	focusThreadOrAdjacent,
 	isSelected,
 	sidebarRef,
@@ -86,6 +87,12 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
+	const {
+		onCreate: onAddReply,
+		onEdit: onEditNote,
+		onDiscard,
+		onDelete: onDeleteNote,
+	} = useNoteActions();
 	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
@@ -251,8 +258,6 @@ export function NoteThread( {
 			<AddNote
 				key={ note.blockClientId }
 				clientId={ note.blockClientId }
-				onSubmit={ onAddReply }
-				onDiscard={ onDiscard }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
