@@ -2,8 +2,11 @@ import { Button, SearchControl } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 
 type NoteStatusFilter = 'all' | 'hold' | 'approved';
 
