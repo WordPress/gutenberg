@@ -352,8 +352,10 @@ function gutenberg_get_grid_item_box( $child_layout, $viewport_overrides = null 
 		}
 		$sanitized_box[ $key ] = (float) $value;
 	}
+	// The values are rounded, so the box can end a little past its cells, but no more.
 	if (
-		$sanitized_box['left'] < 0 || $sanitized_box['left'] > 100 ||
+		$sanitized_box['left'] < 0 || $sanitized_box['left'] > 1 ||
+		$sanitized_box['left'] + $sanitized_box['width'] > 1.001 ||
 		$sanitized_box['top'] < 0 || $sanitized_box['top'] > 100 ||
 		$sanitized_box['width'] <= 0 || $sanitized_box['width'] > 1 ||
 		$sanitized_box['height'] <= 0 || $sanitized_box['height'] > 1

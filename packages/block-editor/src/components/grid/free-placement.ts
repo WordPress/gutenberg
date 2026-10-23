@@ -9,6 +9,13 @@ import type { GridItemLayout } from './types';
  */
 export const EDGE_EPSILON = 1;
 
+/**
+ * How far past its cells, as a fraction of their width, a stored box can end.
+ * Box values are rounded, so a box that ends on its cells' edge can add up to
+ * a little more than them.
+ */
+const BOX_ROUNDING_TOLERANCE = 0.001;
+
 /** A grid track, in pixels from the start of the first track. */
 export interface GridTrack {
 	start: number;
@@ -452,7 +459,10 @@ export function getGridItemBox(
 				! Number.isFinite( box[ key ] )
 		) ||
 		box.left < 0 ||
-		box.left > 100 ||
+		box.left > 1 ||
+		// The values are rounded, so the box can end a little past its cells,
+		// but no more.
+		box.left + box.width > 1 + BOX_ROUNDING_TOLERANCE ||
 		box.top < 0 ||
 		box.top > 100 ||
 		box.width <= 0 ||
