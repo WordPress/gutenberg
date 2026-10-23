@@ -892,6 +892,7 @@ function MediaEditorContent( {
 			title: panel.title,
 			render: () => (
 				<Slot
+					bubblesVirtually
 					name={ getPanelSlotName( panel.name ) }
 					fillProps={ { disabled: isSaving } }
 				/>
@@ -906,23 +907,7 @@ function MediaEditorContent( {
 	) : null;
 
 	const children = (
-		<MediaEditorProvider
-			value={ media ?? undefined }
-			onChange={ handleChange }
-			settings={ {
-				// Disable the fields while saving, so the guard in
-				// `handleChange` is not silently swallowing typing.
-				// `readOnly` would swap the field's layout mid-save;
-				// disabled keeps it in place and greys it out.
-				fields: isSaving
-					? fields.map( ( field ) => ( {
-							...field,
-							isDisabled: true,
-						} ) )
-					: fields,
-				form,
-			} }
-		>
+		<>
 			<div className="media-editor">
 				{ ! media ? (
 					<div className="media-editor__loading">
@@ -1002,7 +987,7 @@ function MediaEditorContent( {
 			{ noticesPortalElement
 				? createPortal( snackbar, noticesPortalElement )
 				: snackbar }
-		</MediaEditorProvider>
+		</>
 	);
 
 	// Rebuilt each render, like the elements it replaces: consumers re-render
@@ -1031,40 +1016,65 @@ function MediaEditorContent( {
 		<MediaEditorFrameContext.Provider value={ contextValue }>
 			{ renderFrame( {
 				children: (
-					<SlotFillProvider>
-						<MediaEditorPanelsProvider value={ panelsContextValue }>
-							{ /* Core's panels and plugins' panels arrive the same
-							     way: components that announce a tab and fill it.
-							     `PluginArea` mounts `registerPlugin` callbacks for
-							     this scope here, inside the session provider, so
-							     plugin panels get the session from
-							     `useMediaEditor()`. Each panel's content renders
-							     at its slot in the sidebar, inside
-							     `MediaEditorProvider`. */ }
-							<MediaEditorPanel
-								name={ CROP_PANEL }
-								title={ __( 'Crop' ) }
-								order={ 10 }
-								mediaTypes={ CROP_MEDIA_TYPES }
+					<MediaEditorProvider
+						value={ media ?? undefined }
+						onChange={ handleChange }
+						settings={ {
+							// Disable the fields while saving, so the guard in
+							// `handleChange` is not silently swallowing typing.
+							// `readOnly` would swap the field's layout mid-save;
+							// disabled keeps it in place and greys it out.
+							fields: isSaving
+								? fields.map( ( field ) => ( {
+										...field,
+										isDisabled: true,
+									} ) )
+								: fields,
+							form,
+						} }
+					>
+						<SlotFillProvider>
+							<MediaEditorPanelsProvider
+								value={ panelsContextValue }
 							>
-								{ ( { disabled } ) => (
-									<CropPanelContent disabled={ disabled } />
-								) }
-							</MediaEditorPanel>
-							<MediaEditorPanel
-								name={ DETAILS_PANEL }
-								title={ __( 'Details' ) }
-								order={ 20 }
-							>
-								<MediaForm />
-							</MediaEditorPanel>
-							<PluginArea
-								scope="media-editor"
-								onError={ handlePluginError }
-							/>
-							{ children }
-						</MediaEditorPanelsProvider>
-					</SlotFillProvider>
+								{ /* Core's panels and plugins' panels arrive the same
+								     way: components that announce a tab and fill it.
+								     `PluginArea` mounts `registerPlugin` callbacks for
+								     this scope here, inside the session provider, so
+								     plugin panels get the session from
+								     `useMediaEditor()`. A panel's content renders in
+								     the panel's own React tree and is portaled into
+								     its tab, so a plugin's providers and error
+								     boundary reach it. `MediaEditorProvider` sits
+								     above the panels so Core's Details form finds
+								     its context there too. */ }
+								<MediaEditorPanel
+									name={ CROP_PANEL }
+									title={ __( 'Crop' ) }
+									order={ 10 }
+									mediaTypes={ CROP_MEDIA_TYPES }
+								>
+									{ ( { disabled } ) => (
+										<CropPanelContent
+											disabled={ disabled }
+										/>
+									) }
+								</MediaEditorPanel>
+								<MediaEditorPanel
+									name={ DETAILS_PANEL }
+									title={ __( 'Details' ) }
+									order={ 20 }
+								>
+									<MediaForm />
+								</MediaEditorPanel>
+								<PluginArea
+									scope="media-editor"
+									onError={ handlePluginError }
+								/>
+								{ children }
+							</MediaEditorPanelsProvider>
+						</SlotFillProvider>
+					</MediaEditorProvider>
 				),
 				isImage,
 				layout,

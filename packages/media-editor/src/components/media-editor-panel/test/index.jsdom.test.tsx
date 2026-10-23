@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Slot, SlotFillProvider } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 import MediaEditorPanel, {
 	MediaEditorPanelsProvider,
 	getPanelSlotName,
@@ -19,6 +19,7 @@ function Editor( { children }: { children: React.ReactNode } ) {
 				{ panels.map( ( panel ) => (
 					<section key={ panel.name } aria-label={ panel.title }>
 						<Slot
+							bubblesVirtually
 							name={ getPanelSlotName( panel.name ) }
 							fillProps={ { disabled: true } }
 						/>
@@ -153,6 +154,26 @@ describe( 'MediaEditorPanel', () => {
 		fireEvent.click( screen.getByRole( 'button', { name: 'hide' } ) );
 
 		expect( screen.getByTestId( 'tabs' ) ).toBeEmptyDOMElement();
+	} );
+
+	it( 'renders its content in its own tree, so a provider around the panel reaches it', () => {
+		const PluginContext = createContext( 'default' );
+		function ReadsContext() {
+			return <p>{ useContext( PluginContext ) }</p>;
+		}
+		render(
+			<Editor>
+				<PluginContext.Provider value="from the plugin">
+					<MediaEditorPanel name="plugin/context" title="Context">
+						<ReadsContext />
+					</MediaEditorPanel>
+				</PluginContext.Provider>
+			</Editor>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'Context' } )
+		).toHaveTextContent( 'from the plugin' );
 	} );
 
 	it( 'keeps a failing panel inside its tab', () => {
