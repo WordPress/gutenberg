@@ -11,7 +11,11 @@ import {
 	getInsertionSize,
 } from './get-inserted-block-rect';
 import type { InsertionPlacement } from './get-inserted-block-rect';
-import { copyChildLayout } from './child-layout';
+import {
+	copyChildLayout,
+	getChildLayoutStyle,
+	getChildLayoutsByState,
+} from './child-layout';
 import { setImmutably } from '../../utils/object';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes, GridItemLayout, GridTrack } from './types';
@@ -25,51 +29,56 @@ export function useGridLayoutSync( {
 	// in the first free cell after the selected block.
 	const isGridInteractivityEnabled =
 		!! window.__experimentalEnableGridInteractivity;
-	const {
-		gridLayout,
-		blockOrder,
-		selectedClientId,
-		selectedBlockStyle,
-		selectedBlockLayout,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getBlockOrder,
-				getBlockRootClientId,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
-			const _selectedClientId = getSelectedBlockClientId();
-			// A selected grid item positions itself through its style.
-			const selectedStyle = _selectedClientId
-				? (
-						getBlockAttributes( _selectedClientId ) as
-							GridItemAttributes | undefined
-					 )?.style
-				: undefined;
-			// With grid interactivity, blocks are placed next to the
-			// selected item of this grid, or where it was if they replace
-			// it, so only the style of this grid's items is needed.
-			const isSelectedItem =
-				isGridInteractivityEnabled &&
-				!! _selectedClientId &&
-				getBlockRootClientId( _selectedClientId ) === gridClientId;
-			return {
-				// The grid block exists, with its layout attribute.
-				gridLayout: ( (
-					getBlockAttributes( gridClientId ) as {
-						layout?: Layout;
-					}
-				 ).layout ?? {} ) as Layout,
-				blockOrder: getBlockOrder( gridClientId ),
-				selectedClientId: isSelectedItem ? _selectedClientId : null,
-				selectedBlockStyle: isSelectedItem ? selectedStyle : undefined,
-				selectedBlockLayout: isGridInteractivityEnabled
-					? undefined
-					: selectedStyle?.layout,
-			};
-		},
-		[ gridClientId, isGridInteractivityEnabled ]
+	const { gridLayout, blockOrder, selectedClientId, selectedBlockLayout } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockAttributes,
+					getBlockOrder,
+					getBlockRootClientId,
+					getSelectedBlockClientId,
+				} = select( blockEditorStore );
+				const _selectedClientId = getSelectedBlockClientId();
+				// With grid interactivity, blocks are placed next to the
+				// selected item of this grid, or where it was if they replace
+				// it, so only this grid's items are needed.
+				const isSelectedItem =
+					isGridInteractivityEnabled &&
+					!! _selectedClientId &&
+					getBlockRootClientId( _selectedClientId ) === gridClientId;
+				return {
+					// The grid block exists, with its layout attribute.
+					gridLayout: ( (
+						getBlockAttributes( gridClientId ) as {
+							layout?: Layout;
+						}
+					 ).layout ?? {} ) as Layout,
+					blockOrder: getBlockOrder( gridClientId ),
+					selectedClientId: isSelectedItem ? _selectedClientId : null,
+					// A selected grid item positions itself through its style.
+					selectedBlockLayout:
+						! isGridInteractivityEnabled && _selectedClientId
+							? (
+									getBlockAttributes( _selectedClientId ) as
+										GridItemAttributes | undefined
+								 )?.style?.layout
+							: undefined,
+				};
+			},
+			[ gridClientId, isGridInteractivityEnabled ]
+		);
+	// Only the selected item's layouts are needed, not the rest of its style,
+	// so that changing any other style of the item doesn't re-render the grid.
+	const selectedBlockLayouts = useSelect(
+		( select ) =>
+			selectedClientId
+				? getChildLayoutsByState(
+						select( blockEditorStore ).getBlockAttributes(
+							selectedClientId
+						)?.style
+					)
+				: null,
+		[ selectedClientId ]
 	);
 
 	const { getBlockAttributes, getBlockName, getBlockRootClientId } =
@@ -82,8 +91,15 @@ export function useGridLayoutSync( {
 	const gridElement = useBlockElement( gridClientId );
 
 	const selection = useMemo(
-		() => ( { clientId: selectedClientId, style: selectedBlockStyle } ),
-		[ selectedClientId, selectedBlockStyle ]
+		() => ( {
+			clientId: selectedClientId,
+			style: selectedBlockLayouts
+				? ( getChildLayoutStyle(
+						selectedBlockLayouts
+					) as GridItemAttributes[ 'style' ] )
+				: undefined,
+		} ),
+		[ selectedClientId, selectedBlockLayouts ]
 	);
 	const previousSelection = usePrevious( selection );
 	const selectedBlockRect = useMemo(
