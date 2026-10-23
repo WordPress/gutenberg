@@ -229,6 +229,29 @@ describe( 'layout', () => {
 			);
 		} );
 
+		it.each( [
+			[ 'flow', { type: 'default' } ],
+			[ 'constrained', { type: 'constrained', contentSize: '600px' } ],
+			[ 'flex', { type: 'flex', flexWrap: 'nowrap' } ],
+			[ 'grid', { type: 'grid', columnCount: 3 } ],
+		] )(
+			'outputs nothing for %s layouts without viewport styles',
+			( _name, layout ) => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							layout,
+							style: { spacing: { blockGap: '12px' } },
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			}
+		);
+
 		describe( 'mobile stacking', () => {
 			const manualGridLayout = {
 				type: 'grid',

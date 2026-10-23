@@ -178,21 +178,82 @@ export function getUnstackedMobileUpdates( {
 	return updates;
 }
 
+const PLACEMENT_KEYS = [ 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' ];
+
 /**
- * Gets the layouts a stacked grid and one of its children show on mobile: the
- * mobile layouts that `getUnstackedMobileUpdates` would give them.
+ * Builds the block updates that remove the mobile placement of a grid's
+ * children. A stacked grid ignores these placements, so turning stacking back
+ * on removes them, including the ones `getUnstackedMobileUpdates` wrote, and
+ * they don't stay in the content unused. Empty objects left behind are
+ * removed too.
+ *
+ * @param children The grid's children.
+ *
+ * @return Style updates, keyed by client ID, for the children that have a mobile placement.
+ */
+export function getMobilePlacementResets(
+	children: GridChild[]
+): Record< string, { style: GridBlockStyle | undefined } > {
+	const updates: Record< string, { style: GridBlockStyle | undefined } > = {};
+	for ( const { clientId, attributes } of children ) {
+		const style = attributes?.style;
+		const mobileStyle = style?.[ MOBILE_VIEWPORT ];
+		const mobileLayout = mobileStyle?.layout;
+		if (
+			! style ||
+			! mobileStyle ||
+			! mobileLayout ||
+			! PLACEMENT_KEYS.some( ( key ) =>
+				Object.hasOwn( mobileLayout, key )
+			)
+		) {
+			continue;
+		}
+		const nextMobileLayout = Object.fromEntries(
+			Object.entries( mobileLayout ).filter(
+				( [ key ] ) => ! PLACEMENT_KEYS.includes( key )
+			)
+		);
+		const { layout, ...nextMobileStyle } = mobileStyle;
+		if ( Object.keys( nextMobileLayout ).length ) {
+			nextMobileStyle.layout = nextMobileLayout;
+		}
+		const { [ MOBILE_VIEWPORT ]: mobile, ...nextStyle } = style;
+		if ( Object.keys( nextMobileStyle ).length ) {
+			nextStyle[ MOBILE_VIEWPORT ] = nextMobileStyle;
+		}
+		updates[ clientId ] = {
+			style: Object.keys( nextStyle ).length ? nextStyle : undefined,
+		};
+	}
+	return updates;
+}
+
+/**
+ * The layouts a stacked grid and its children show on mobile.
+ */
+export interface StackedGridLayouts {
+	grid: GridStyleLayout;
+	/**
+	 * Keyed by client ID. Blocks hidden on mobile take no place in the stack,
+	 * so they have no layout.
+	 */
+	children: Record< string, GridStyleLayout >;
+}
+
+/**
+ * Gets the layouts a stacked grid and its children show on mobile: the mobile
+ * layouts that `getUnstackedMobileUpdates` would give them.
  *
  * @param gridAttributes Attributes of the grid.
  * @param children       The grid's children, in block order.
- * @param clientId       Client ID of the child.
  *
- * @return The child's layout, `undefined` when it is hidden on mobile, and the grid's layout.
+ * @return The grid's layout, and its children's layouts.
  */
 export function getStackedLayouts(
 	gridAttributes: GridBlockAttributes | null | undefined,
-	children: GridChild[],
-	clientId: string
-): { child: GridStyleLayout | undefined; grid: GridStyleLayout } {
+	children: GridChild[]
+): StackedGridLayouts {
 	// Any key that isn't a child's client ID works for the grid.
 	const gridKey = Symbol( 'grid' );
 	const updates = getUnstackedMobileUpdates( {
@@ -200,8 +261,15 @@ export function getStackedLayouts(
 		gridAttributes,
 		children,
 	} );
+	const childLayouts: Record< string, GridStyleLayout > = {};
+	for ( const { clientId } of children ) {
+		if ( updates[ clientId ] ) {
+			childLayouts[ clientId ] =
+				updates[ clientId ].style[ MOBILE_VIEWPORT ].layout;
+		}
+	}
 	return {
-		child: updates[ clientId ]?.style[ MOBILE_VIEWPORT ].layout,
 		grid: updates[ gridKey ].style[ MOBILE_VIEWPORT ].layout,
+		children: childLayouts,
 	};
 }

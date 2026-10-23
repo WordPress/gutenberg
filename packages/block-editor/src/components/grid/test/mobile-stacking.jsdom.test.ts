@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+	getMobilePlacementResets,
 	getStackedLayouts,
 	getUnstackedMobileUpdates,
 	isBlockHiddenOnMobile,
@@ -213,13 +214,80 @@ describe( 'stacking with blocks hidden on mobile', () => {
 		expect( updates.grid.style[ '@mobile' ].layout.rowCount ).toBe( 2 );
 	} );
 
-	it( 'gets the stacked layouts of a block and its grid', () => {
-		expect( getStackedLayouts( gridAttributes, children, 'b' ) ).toEqual( {
-			child: { columnStart: 1, columnSpan: 2, rowStart: 2, rowSpan: 1 },
+	it( 'gets the stacked layouts of the blocks and their grid', () => {
+		expect( getStackedLayouts( gridAttributes, children ) ).toEqual( {
 			grid: { stackOnMobile: false, columnCount: 2, rowCount: 2 },
+			children: {
+				a: { columnStart: 1, columnSpan: 2, rowStart: 1, rowSpan: 1 },
+				b: { columnStart: 1, columnSpan: 2, rowStart: 2, rowSpan: 1 },
+			},
 		} );
+	} );
+} );
+
+describe( 'getMobilePlacementResets()', () => {
+	it( 'removes mobile placements, keeping other mobile values', () => {
 		expect(
-			getStackedLayouts( gridAttributes, children, 'hidden' ).child
-		).toBeUndefined();
+			getMobilePlacementResets( [
+				{
+					clientId: 'placed',
+					attributes: {
+						style: {
+							layout: { columnStart: 2, rowStart: 1 },
+							'@mobile': {
+								layout: {
+									columnStart: 1,
+									columnSpan: 2,
+									rowStart: 3,
+									rowSpan: 1,
+									selfStretch: 'fill',
+								},
+								color: { text: 'red' },
+							},
+						},
+					},
+				},
+			] )
+		).toEqual( {
+			placed: {
+				style: {
+					layout: { columnStart: 2, rowStart: 1 },
+					'@mobile': {
+						layout: { selfStretch: 'fill' },
+						color: { text: 'red' },
+					},
+				},
+			},
+		} );
+	} );
+
+	it( 'removes the objects that end up empty', () => {
+		expect(
+			getMobilePlacementResets( [
+				{
+					clientId: 'a',
+					attributes: {
+						style: { '@mobile': { layout: { rowStart: 2 } } },
+					},
+				},
+			] )
+		).toEqual( { a: { style: undefined } } );
+	} );
+
+	it( 'leaves blocks without a mobile placement out', () => {
+		expect(
+			getMobilePlacementResets( [
+				{ clientId: 'a', attributes: {} },
+				{
+					clientId: 'b',
+					attributes: {
+						style: {
+							layout: { rowStart: 2 },
+							'@mobile': { layout: { selfStretch: 'fit' } },
+						},
+					},
+				},
+			] )
+		).toEqual( {} );
 	} );
 } );

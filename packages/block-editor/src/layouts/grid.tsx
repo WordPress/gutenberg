@@ -13,7 +13,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -26,6 +26,8 @@ import {
 import { LAYOUT_DEFINITIONS } from './definitions';
 import { store as blockEditorStore } from '../store';
 import { startGridItemDrag } from '../components/grid/start-grid-item-drag';
+import { getMobilePlacementResets } from '../components/grid/mobile-stacking';
+import type { GridChild } from '../components/grid/mobile-stacking';
 import type {
 	ChildDragOptions,
 	Layout,
@@ -41,6 +43,42 @@ import type {
 type GridStyle = {
 	'@mobile'?: { layout?: { stackOnMobile?: boolean } };
 };
+
+/**
+ * Gets the CSS that stacks the children of a grid: each child becomes full
+ * width, in block order.
+ *
+ * Each child still spans as many rows as it does in the grid, reading the
+ * count from `--wp--grid-item--row-span`, which children of manual grids set.
+ * This doesn't make blocks taller, as stacked rows are as tall as their
+ * content. It numbers the stacked rows like the stacked layouts that the
+ * editor's tools work from and that turning stacking off writes (see
+ * `getUnstackedMobileUpdates`), as the tools read the rows from the canvas.
+ *
+ * @param selector The grid's CSS selector.
+ *
+ * @return CSS rules, without the media query.
+ */
+function getStackingStyle( selector: string ): string {
+	// The selector is repeated so that the rules beat the grid's and each
+	// child's own rules, whatever order the stylesheets end up in.
+	const gridSelector = selector
+		.split( ',' )
+		.map( ( subselector ) => `${ subselector }${ subselector }` )
+		.join( ',' );
+	const childSelector = selector
+		.split( ',' )
+		.map( ( subselector ) => `${ subselector }${ subselector } > *` )
+		.join( ',' );
+	// Stacked blocks are sized by their content again, so the grid stops
+	// taking its height from its width, its rows stop being the same height,
+	// and it tells its children that their cells are no longer fixed, so
+	// blocks that fill fixed cells keep their own size.
+	return (
+		`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }` +
+		`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }`
+	);
+}
 
 const RANGE_CONTROL_MAX_VALUES: Record< string, number > = {
 	px: 600,
@@ -159,7 +197,11 @@ export default {
 			},
 			[ clientId ]
 		);
-		const { updateBlockAttributes } = useDispatch( blockEditorStore );
+		const registry = useRegistry();
+		const {
+			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = useDispatch( blockEditorStore );
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -200,20 +242,44 @@ export default {
 			} );
 			if ( mobileStackOverride === undefined || ! clientId ) {
 				onChange( nextLayout );
+			} else {
+				// The mobile layout's own setting would keep overriding the
+				// toggle, so it is removed in the same change.
+				updateBlockAttributes( clientId, {
+					layout: nextLayout,
+					style: cleanEmptyObject(
+						setImmutably(
+							style,
+							[ '@mobile', 'layout', 'stackOnMobile' ],
+							undefined
+						)
+					),
+				} );
+			}
+			if ( ! value || ! clientId ) {
 				return;
 			}
-			// The mobile layout's own setting would keep overriding the
-			// toggle, so it is removed in the same change.
-			updateBlockAttributes( clientId, {
-				layout: nextLayout,
-				style: cleanEmptyObject(
-					setImmutably(
-						style,
-						[ '@mobile', 'layout', 'stackOnMobile' ],
-						undefined
-					)
-				),
-			} );
+			// A stacked grid ignores its blocks' mobile placements, such as
+			// the ones written when stacking was turned off, so they are
+			// removed in the same undo step.
+			const { getBlockOrder, getBlockAttributes } =
+				registry.select( blockEditorStore );
+			const childUpdates = getMobilePlacementResets(
+				getBlockOrder( clientId ).map(
+					( childClientId: string ): GridChild => ( {
+						clientId: childClientId,
+						attributes: getBlockAttributes( childClientId ),
+					} )
+				)
+			);
+			if ( Object.keys( childUpdates ).length ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes(
+					Object.keys( childUpdates ),
+					childUpdates,
+					/* uniqueByBlock: */ true
+				);
+			}
 		};
 		const resetGridType = () =>
 			onChange(
@@ -340,6 +406,7 @@ export default {
 		selector,
 		layout = {},
 		viewportOverrides,
+		viewport,
 		style,
 		blockName,
 		hasBlockGapSupport,
@@ -551,53 +618,18 @@ export default {
 				blockGapValue
 			);
 		}
-		return output;
-	},
-	/**
-	 * Gets the CSS that stacks the children of a manual placement grid on
-	 * mobile, as part of the grid interactivity experiment, when the grid
-	 * has opted in with `stackOnMobile: true`. Each child becomes full
-	 * width, in block order, and keeps its row span, which it publishes as
-	 * `--wp--grid-item--row-span`.
-	 *
-	 * @param options
-	 * @param options.selector The grid's CSS selector.
-	 * @param options.layout   The grid's layout in the mobile state.
-	 *
-	 * @return CSS rules, without the media query.
-	 */
-	getMobileStackingStyle( {
-		selector,
-		layout = {},
-	}: {
-		selector: string;
-		layout?: Layout;
-	} ): string {
+
+		// Manual grids stack their children on mobile when they opt in, as
+		// part of the grid interactivity experiment. Placement can be
+		// switched to auto in the mobile state, so the mobile layout decides.
 		if (
-			! layout.isManualPlacement ||
-			layout.stackOnMobile !== true ||
-			! window.__experimentalEnableGridInteractivity
+			viewport === '@mobile' &&
+			hasSameSizeCells &&
+			effectiveLayout.stackOnMobile === true
 		) {
-			return '';
+			output += getStackingStyle( selector );
 		}
-		// The selector is repeated so that the rules beat the grid's and each
-		// child's own rules, whatever order the stylesheets end up in.
-		const gridSelector = selector
-			.split( ',' )
-			.map( ( subselector ) => `${ subselector }${ subselector }` )
-			.join( ',' );
-		const childSelector = selector
-			.split( ',' )
-			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
-			.join( ',' );
-		// Stacked blocks are sized by their content again, so the grid stops
-		// taking its height from its width, its rows stop being the same
-		// height, and it tells its children that their cells are no longer
-		// fixed, so blocks that fill fixed cells keep their own size.
-		return (
-			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }` +
-			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }`
-		);
+		return output;
 	},
 	getOrientation(): string {
 		return 'horizontal';
