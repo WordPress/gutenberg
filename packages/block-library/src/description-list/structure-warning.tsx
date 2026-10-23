@@ -18,7 +18,9 @@ type StructureIssue =
 	| 'invalid-end'
 	| null;
 
-function getStructureIssue( blockNames: string[] ): StructureIssue {
+function getStructureIssue(
+	blockNames: Array< string | null >
+): StructureIssue {
 	if ( blockNames.length === 0 ) {
 		return null;
 	}

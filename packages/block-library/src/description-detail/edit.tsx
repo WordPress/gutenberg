@@ -12,11 +12,11 @@ type DescriptionListItemAttributes = {
 
 type DescriptionListItemEditProps =
 	BlockEditProps< DescriptionListItemAttributes > & {
-		mergeBlocks?: ( clientIdA: string, clientIdB: string ) => void;
+		mergeBlocks?: ( forward: boolean ) => void;
 		onReplace?: (
-			blocks: Block[],
+			blocks: Block | Block[],
 			indexToSelect?: number,
-			initialPosition?: number
+			initialPosition?: number | null
 		) => void;
 		onRemove?: () => void;
 	};
