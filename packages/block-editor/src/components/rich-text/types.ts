@@ -221,6 +221,12 @@ export type RichTextOwnProps<
 	__unstableEmbedURLOnPaste?: boolean;
 	disableLineBreaks?: boolean;
 	__unstableAllowPrefixTransformations?: boolean;
+	/**
+	 * When true, format types' `__unstableInputRule` handlers (e.g. the
+	 * backtick-to-code transform) are skipped for this field. Prefix block
+	 * transforms are unaffected.
+	 */
+	__unstableDisableFormatInputRules?: boolean;
 	readOnly?: boolean;
 };
 
@@ -243,6 +249,7 @@ export type RichTextEventListenerProps = {
 	getValue: () => RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	__unstableAllowPrefixTransformations?: boolean;
+	__unstableDisableFormatInputRules?: boolean;
 	formatTypes: RichTextFormatType[];
 	onReplace?: RichTextOwnProps[ 'onReplace' ];
 	selectionChange: (

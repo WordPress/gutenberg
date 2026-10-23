@@ -23,6 +23,7 @@ export default function CodeEdit( {
 				aria-label={ __( 'Code' ) }
 				preserveWhiteSpace
 				__unstablePastePlainText
+				__unstableDisableFormatInputRules
 				__unstableOnSplitAtDoubleLineEnd={
 					insertBlocksAfter
 						? () =>
