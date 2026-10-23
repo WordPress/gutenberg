@@ -8,6 +8,13 @@
 -   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
 -   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
 
+### Enhancements
+
+-   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `wordCount`: redraw the number sign to match `postCommentsCount` ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `customPostType`: draw the asterisk with six spokes, matching the one in [#85442](https://github.com/WordPress/gutenberg/pull/85442) ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+
 ### Bug Fixes
 
 -   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
