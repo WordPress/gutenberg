@@ -42,9 +42,10 @@ function useAlignmentSettings( isNoneOnly: boolean ): AlignmentSettings {
 /**
  * Whether the layout of the current block's parent can be edited by the user.
  * When it cannot, alignments the layout withholds are not something to offer
- * a way out of, so they are not listed as unavailable.
+ * a way out of, so they are not listed as unavailable. A parent without layout
+ * support has no layout setting to change, so the same applies.
  *
- * @return False when the parent's layout has `allowEditing` set to false.
+ * @return False when the parent lacks layout support or has `allowEditing` set to false.
  */
 function useIsParentLayoutEditable(): boolean {
 	const { clientId } = useBlockEditContext();
@@ -62,6 +63,9 @@ function useIsParentLayoutEditable(): boolean {
 			}
 			// Block support wins over theme settings, as in the layout panel.
 			const layoutSupport = getBlockSupport( parentName, 'layout' );
+			if ( ! layoutSupport ) {
+				return false;
+			}
 			const [ layoutSettings ] = unlock(
 				select( blockEditorStore )
 			).getBlockSettings( rootClientId, 'layout' ) as [

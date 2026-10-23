@@ -455,13 +455,13 @@ describe( 'BlockAlignmentUI under a parent with an uneditable layout', () => {
 		unregisterBlockType( 'test/child' );
 	} );
 
-	async function menuItemsFor( layoutSupport: Record< string, unknown > ) {
+	async function menuItemsFor( layoutSupport?: Record< string, unknown > ) {
 		registerBlockType( 'test/locked-parent', {
 			title: 'Locked parent',
 			apiVersion: 3,
 			attributes: {},
 			category: 'text',
-			supports: { layout: layoutSupport },
+			supports: layoutSupport ? { layout: layoutSupport } : {},
 		} );
 		registerBlockType( 'test/child', {
 			title: 'Child',
@@ -505,6 +505,15 @@ describe( 'BlockAlignmentUI under a parent with an uneditable layout', () => {
 		expect( await menuItemsFor( { allowEditing: true } ) ).toContain(
 			'Wide widthNot available'
 		);
+	} );
+
+	test( 'omits unavailable alignments when the parent has no layout support', async () => {
+		expect( await menuItemsFor( undefined ) ).toEqual( [
+			'None',
+			'Align left',
+			'Align center',
+			'Align right',
+		] );
 	} );
 
 	test( 'omits unavailable alignments when the layout is not editable', async () => {
