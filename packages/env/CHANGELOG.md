@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Enhancements
 
 -   The `composer` service uses the `composer:2` image instead of the floating `composer` image, so a new major version of Composer can't break `wp-env run composer` ([#84441](https://github.com/WordPress/gutenberg/pull/84441)).
