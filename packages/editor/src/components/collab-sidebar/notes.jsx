@@ -17,6 +17,7 @@ import {
 	usePickNote,
 } from './hooks';
 import { AddNote } from './add-note';
+import { DEFAULT_NOTES_FILTERS, hasActiveNotesFilters } from './notes-filters';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
@@ -25,8 +26,7 @@ export function Notes( {
 	notes,
 	sidebarRef,
 	isFloating = false,
-	isFiltered = false,
-	expandReplies = false,
+	filters = DEFAULT_NOTES_FILTERS,
 } ) {
 	const {
 		onCreate: onAddReply,
@@ -192,8 +192,9 @@ export function Notes( {
 	const isAddingNote =
 		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 
-	// When filters hide every thread, say so instead of an empty list.
-	const showNoResults = isFiltered && ! isAddingNote && ! threads.length;
+	const showNoResults =
+		hasActiveNotesFilters( filters ) && ! isAddingNote && ! threads.length;
+	const expandReplies = filters.search.trim() !== '';
 
 	return (
 		<Stack

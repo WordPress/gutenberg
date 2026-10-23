@@ -212,7 +212,7 @@ export function NoteThread( {
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
-	// A filter can match a collapsed reply, so show them all while filtering.
+	// Search can match a collapsed reply, so show them all while searching.
 	const showAllReplies = isSelected || expandReplies;
 
 	const noteExcerpt = getNoteExcerpt(

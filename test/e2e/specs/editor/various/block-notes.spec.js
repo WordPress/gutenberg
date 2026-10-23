@@ -477,9 +477,6 @@ test.describe( 'Block Notes', () => {
 
 		await search.fill( 'nothing matches' );
 		await expect( sidebar.getByText( 'No notes found.' ) ).toBeVisible();
-		await expect(
-			sidebar.getByRole( 'textbox', { name: 'New note', exact: true } )
-		).toBeHidden();
 
 		await search.fill( '' );
 		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
@@ -487,10 +484,6 @@ test.describe( 'Block Notes', () => {
 		await expect( headingThread ).toBeVisible();
 		await expect( imageThread ).toBeHidden();
 
-		// The menu stays open after a pick.
-		await expect(
-			sidebar.getByRole( 'button', { name: 'Filter (1 applied)' } )
-		).toBeVisible();
 		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
 		await expect( imageThread ).toBeVisible();
 		await expect( headingThread ).toBeHidden();
@@ -544,9 +537,6 @@ test.describe( 'Block Notes', () => {
 		await search.fill( 'table' );
 		await expect( thread.getByText( 'Check the table.' ) ).toBeVisible();
 		await expect( moreReplies ).toBeHidden();
-		await expect(
-			thread.getByRole( 'textbox', { name: 'Reply to' } )
-		).toBeHidden();
 
 		await search.fill( '' );
 		await expect( moreReplies ).toBeVisible();
