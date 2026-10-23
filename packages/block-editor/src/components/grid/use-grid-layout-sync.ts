@@ -1,3 +1,4 @@
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
@@ -80,7 +81,7 @@ export function useGridLayoutSync( {
 		[ selectedClientId ]
 	);
 
-	const { getBlockAttributes, getBlockRootClientId } =
+	const { getBlockAttributes, getBlockName, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { wasBlockJustInsertedFromInserter } = unlock(
 		useSelect( blockEditorStore )
@@ -338,6 +339,26 @@ export function useGridLayoutSync( {
 				}
 			}
 
+			// An aligned block gets a wrapper in the editor that becomes the
+			// grid item and ignores the block's place, so blocks lose their
+			// alignment when they enter a manual grid, as part of the grid
+			// interactivity experiment. It isn't restored if they leave.
+			if ( isGridInteractivityEnabled ) {
+				for ( const clientId of blockOrder ) {
+					if (
+						// The grid's blocks exist, so they have attributes and names.
+						( getBlockAttributes( clientId ) as GridItemAttributes )
+							.align &&
+						hasBlockSupport( getBlockName( clientId )!, 'align' )
+					) {
+						updates[ clientId ] = {
+							...updates[ clientId ],
+							align: undefined,
+						};
+					}
+				}
+			}
+
 			// Ensure there's enough rows to fit all blocks.
 			const bottomMostRow = Math.max(
 				...occupiedRects.map( ( r ) => r.rowEnd )
@@ -460,6 +481,7 @@ export function useGridLayoutSync( {
 		// These won't change, but the linter thinks they might:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
+		getBlockName,
 		getBlockRootClientId,
 		wasBlockJustInsertedFromInserter,
 		updateBlockAttributes,
