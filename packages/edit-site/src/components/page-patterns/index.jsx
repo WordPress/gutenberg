@@ -18,7 +18,6 @@ import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
-import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
@@ -124,14 +123,13 @@ export default function DataviewsPatterns() {
 		postType: PATTERN_TYPES.user,
 		context: 'list',
 	} );
-	const editAction = useEditPostAction();
-
-	const actions = useMemo( () => {
-		if ( postType === TEMPLATE_PART_POST_TYPE ) {
-			return [ editAction, ...templatePartActions ].filter( Boolean );
-		}
-		return [ editAction, ...patternActions ].filter( Boolean );
-	}, [ editAction, postType, templatePartActions, patternActions ] );
+	// The "Edit" action comes from the server, first, and opens the pattern
+	// or template part with the entity navigator the app sets, see
+	// `useSetEntityNavigator`.
+	const actions =
+		postType === TEMPLATE_PART_POST_TYPE
+			? templatePartActions
+			: patternActions;
 	const settings = usePatternSettings();
 	const { title, description } = usePagePatternsHeader(
 		postType,
