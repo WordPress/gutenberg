@@ -8,7 +8,7 @@
  */
 
 // React surface.
-export { useCropperReducer, buildCropperSetters } from './react/hooks';
+export { useCropperController, buildCropperSetters } from './react/hooks';
 export { Cropper, CropperProvider, useCropper } from './react/components';
 export type { CropperController, CropperSetters } from './react/hooks';
 export type { CropperProps } from './react/components';

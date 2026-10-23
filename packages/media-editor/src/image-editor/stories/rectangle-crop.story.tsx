@@ -18,7 +18,7 @@ import {
 	download as downloadIcon,
 } from '@wordpress/icons';
 import { Cropper } from '../react/components/cropper';
-import { useCropperReducer } from '../react/hooks/use-cropper-reducer';
+import { useCropperController } from '../react/hooks/use-cropper-controller';
 import {
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
@@ -147,7 +147,7 @@ type Story = StoryObj< typeof Cropper >;
  * Default story. Basic cropper with a sample image, no controls.
  */
 const DefaultComponent = () => {
-	const controller = useCropperReducer();
+	const controller = useCropperController();
 
 	return (
 		<div>
@@ -176,7 +176,7 @@ export const Default: Story = {
  * Full interactive demo with controls.
  */
 const WithControlsComponent = () => {
-	const controller = useCropperReducer();
+	const controller = useCropperController();
 	const {
 		state,
 		setRotation,
@@ -552,7 +552,7 @@ export const WithControls: Story = {
  * or verify the camera and render paths agree.
  */
 const DebugComponent = () => {
-	const controller = useCropperReducer();
+	const controller = useCropperController();
 	const {
 		state,
 		setRotation,
