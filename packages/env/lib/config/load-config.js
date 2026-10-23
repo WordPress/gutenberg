@@ -115,7 +115,7 @@ module.exports = async function loadConfig(
 		configDirectoryPath,
 		workDirectoryPath: cacheDirectoryPath,
 		customConfigPath,
-		testsEnvironment: config.testsEnvironment !== false,
+		testsEnvironment: config.testsEnvironment === true,
 		detectedLocalConfig: await hasLocalConfig( [
 			configFilePath,
 			getConfigFilePath(
