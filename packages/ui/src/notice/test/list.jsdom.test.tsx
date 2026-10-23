@@ -77,16 +77,24 @@ describe( 'Notice.List', () => {
 		);
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved\. Your draft has been saved\.$/
+				/^Draft saved Your draft has been saved\.$/
 			)
 		);
 		// Dispatch without moving focus so this isolates descendant text updates.
 		fireEvent.click( screen.getByRole( 'button', { name: 'Publish' } ) );
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved\. Your changes are now public\.$/
+				/^Draft saved Your changes are now public\.$/
 			)
 		);
+		const announcement = within( screen.getByRole( 'status' ) ).getByText(
+			'Draft saved Your changes are now public.'
+		);
+		expect( announcement ).toHaveTextContent(
+			'Draft saved\nYour changes are now public.',
+			{ normalizeWhitespace: false }
+		);
+		expect( announcement ).toHaveProperty( 'childNodes.length', 1 );
 	} );
 
 	it( 'supports explicit messages, urgency independent of intent, and opting out', async () => {
@@ -100,16 +108,73 @@ describe( 'Notice.List', () => {
 					spokenMessage="Your session expires soon."
 				/>
 				<Message politeness="off">Do not announce this notice.</Message>
+				<Message spokenMessage="">Skip this announcement too.</Message>
 			</Notice.List>
 		);
 		await waitFor( () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved\. Your draft has been saved\.$/
+				/^Draft saved Your draft has been saved\.$/
 			);
 			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
 				/^Your session expires soon\.$/
 			);
 		} );
+	} );
+
+	it( 'omits hidden descendants from announcements', async () => {
+		const { rerender } = render( <Notice.List /> );
+		const renderNotice = ( isHidden: boolean ) => (
+			<Notice.List>
+				<Notice.Root>
+					<Notice.Title>
+						Saved<span aria-hidden="true">Decorative title</span>
+					</Notice.Title>
+					<Notice.Description>
+						Public message.
+						<span hidden={ isHidden }>
+							<strong>Hidden detail.</strong>
+						</span>
+						<span aria-hidden={ isHidden }>
+							<strong>Excluded detail.</strong>
+						</span>
+					</Notice.Description>
+				</Notice.Root>
+			</Notice.List>
+		);
+		rerender( renderNotice( true ) );
+		const status = screen.getByRole( 'status' );
+		await waitFor( () =>
+			expect( status ).toHaveTextContent( 'Public message.' )
+		);
+		expect( status ).not.toHaveTextContent( /Decorative|Hidden|Excluded/ );
+		rerender( renderNotice( false ) );
+		await waitFor( () =>
+			expect( status ).toHaveTextContent(
+				/Hidden detail\..*Excluded detail\./
+			)
+		);
+		expect( status ).not.toHaveTextContent( 'Decorative title' );
+	} );
+
+	it( 'keeps localized title punctuation unchanged', async () => {
+		const { rerender } = render( <Notice.List /> );
+		rerender(
+			<Notice.List>
+				<Notice.Root>
+					<Notice.Title>تم الحفظ؟</Notice.Title>
+					<Notice.Description>تم حفظ المسودة.</Notice.Description>
+				</Notice.Root>
+			</Notice.List>
+		);
+		const status = screen.getByRole( 'status' );
+		await waitFor( () =>
+			expect( status ).toHaveTextContent(
+				/^تم الحفظ؟\nتم حفظ المسودة\.$/,
+				{
+					normalizeWhitespace: false,
+				}
+			)
+		);
 	} );
 
 	it( 'suppresses updates while focus is inside and does not replay them on blur', async () => {
@@ -133,7 +198,7 @@ describe( 'Notice.List', () => {
 		rerender( renderNotices( 3 ) );
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved\. Your draft has been saved\.$/
+				/^Draft saved Your draft has been saved\.$/
 			)
 		);
 	} );
@@ -153,7 +218,7 @@ describe( 'Notice.List', () => {
 		);
 		const status = screen.getByRole( 'status' );
 		const remainingMessage = within( status ).getByText(
-			'Draft saved. Another draft was saved.'
+			'Draft saved Another draft was saved.'
 		);
 		rerender(
 			<Notice.List>
@@ -162,13 +227,11 @@ describe( 'Notice.List', () => {
 		);
 		await waitFor( () =>
 			expect( status ).toHaveTextContent(
-				/^Draft saved\. Another draft was saved\.$/
+				/^Draft saved Another draft was saved\.$/
 			)
 		);
 		expect(
-			within( status ).getByText(
-				'Draft saved. Another draft was saved.'
-			)
+			within( status ).getByText( 'Draft saved Another draft was saved.' )
 		).toBe( remainingMessage );
 	} );
 } );

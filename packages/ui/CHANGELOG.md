@@ -9,7 +9,7 @@
 ### New Features
 
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
--   `Notice.List`: Add announcements for added and changed notices, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
+-   `Notice.List`: Add announcements for added and changed notices, excluding hidden content, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
 
 
 ### Enhancements
