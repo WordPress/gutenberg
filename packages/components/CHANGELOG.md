@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `UnitControl`: Use a neutral text color for static unit labels.
+-   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
 
 ## 43.0.0 (2026-10-20)
 
