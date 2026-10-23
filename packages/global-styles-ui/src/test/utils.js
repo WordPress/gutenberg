@@ -81,9 +81,6 @@ describe( 'withUserCustomPresets', () => {
 			name: 'MyGradient',
 		},
 	];
-	const customDuotones = [
-		{ slug: 'my-duotone', colors: [ '#000', '#fff' ], name: 'MyDuotone' },
-	];
 	const themeColors = [ { slug: 'base', color: '#ffffff', name: 'Base' } ];
 
 	it( 'returns the variation unchanged when the user has no custom presets', () => {
@@ -96,55 +93,127 @@ describe( 'withUserCustomPresets', () => {
 		);
 	} );
 
-	it( 'keeps the user custom colors, gradients and duotones', () => {
-		const variation = {
+	it.each( [
+		[ 'color', 'palette' ],
+		[ 'color', 'gradients' ],
+		[ 'color', 'duotone' ],
+		[ 'shadow', 'presets' ],
+		[ 'typography', 'fontSizes' ],
+		[ 'typography', 'fontFamilies' ],
+		[ 'typography', 'textShadowPresets' ],
+		[ 'spacing', 'spacingSizes' ],
+		[ 'border', 'radiusSizes' ],
+		[ 'dimensions', 'dimensionSizes' ],
+	] )( 'keeps the user custom %s.%s presets', ( group, key ) => {
+		const custom = [ { slug: 'my-preset', name: 'My preset' } ];
+		const user = { settings: { [ group ]: { [ key ]: { custom } } } };
+
+		expect( withUserCustomPresets( { title: 'Ember' }, user ) ).toEqual( {
 			title: 'Ember',
-			settings: { color: { palette: { theme: themeColors } } },
-			styles: { color: { background: 'red' } },
+			settings: { [ group ]: { [ key ]: { custom } } },
+		} );
+	} );
+
+	it( 'keeps the user custom fonts, font sizes and shadows', () => {
+		const customFontFamilies = [
+			{ slug: 'my-font', fontFamily: 'My Font', name: 'My Font' },
+		];
+		const customFontSizes = [
+			{ slug: 'my-size', size: '20px', name: 'My size' },
+		];
+		const customShadows = [
+			{
+				slug: 'my-shadow',
+				shadow: '1px 1px 1px #000',
+				name: 'My shadow',
+			},
+		];
+		const customTextShadows = [
+			{
+				slug: 'my-text-shadow',
+				textShadow: '1px 1px 1px #000',
+				name: 'My text shadow',
+			},
+		];
+		const themeFontSizes = [
+			{ slug: 'small', size: '14px', name: 'Small' },
+		];
+		const variation = {
+			settings: {
+				typography: {
+					fluid: true,
+					fontSizes: { theme: themeFontSizes },
+				},
+			},
 		};
 		const user = {
 			settings: {
-				color: {
-					palette: { custom: customColors },
-					gradients: { custom: customGradients },
-					duotone: { custom: customDuotones },
+				typography: {
+					fontFamilies: { custom: customFontFamilies },
+					fontSizes: { custom: customFontSizes },
+					textShadowPresets: { custom: customTextShadows },
+				},
+				shadow: { presets: { custom: customShadows } },
+			},
+		};
+
+		expect( withUserCustomPresets( variation, user ) ).toEqual( {
+			settings: {
+				typography: {
+					fluid: true,
+					fontFamilies: { custom: customFontFamilies },
+					fontSizes: {
+						theme: themeFontSizes,
+						custom: customFontSizes,
+					},
+					textShadowPresets: { custom: customTextShadows },
+				},
+				shadow: { presets: { custom: customShadows } },
+			},
+		} );
+	} );
+
+	it( 'keeps the custom font sizes the variation defines itself', () => {
+		const variationFontSizes = [
+			{ slug: 'variation', size: '30px', name: 'Variation' },
+		];
+		const userFontSizes = [
+			{ slug: 'my-size', size: '20px', name: 'Mine' },
+		];
+		const userFontFamilies = [
+			{ slug: 'my-font', fontFamily: 'My Font', name: 'My Font' },
+		];
+		const variation = {
+			settings: {
+				typography: { fontSizes: { custom: variationFontSizes } },
+			},
+		};
+		const user = {
+			settings: {
+				typography: {
+					fontSizes: { custom: userFontSizes },
+					fontFamilies: { custom: userFontFamilies },
 				},
 			},
 		};
 
 		expect( withUserCustomPresets( variation, user ) ).toEqual( {
-			title: 'Ember',
 			settings: {
-				color: {
-					palette: { theme: themeColors, custom: customColors },
-					gradients: { custom: customGradients },
-					duotone: { custom: customDuotones },
+				typography: {
+					fontSizes: { custom: variationFontSizes },
+					fontFamilies: { custom: userFontFamilies },
 				},
 			},
-			styles: { color: { background: 'red' } },
 		} );
 	} );
 
-	it( 'adds the user custom colors to a variation without settings', () => {
+	it( 'ignores user settings that are not presets', () => {
+		const variation = { settings: { typography: { fluid: false } } };
 		const user = {
-			settings: { color: { palette: { custom: customColors } } },
-		};
-
-		expect( withUserCustomPresets( { title: 'Default' }, user ) ).toEqual( {
-			title: 'Default',
-			settings: { color: { palette: { custom: customColors } } },
-		} );
-	} );
-
-	it( 'keeps the custom colors the variation defines itself', () => {
-		const variationColors = [
-			{ slug: 'variation', color: '#ff0000', name: 'Variation' },
-		];
-		const variation = {
-			settings: { color: { palette: { custom: variationColors } } },
-		};
-		const user = {
-			settings: { color: { palette: { custom: customColors } } },
+			settings: {
+				typography: { fluid: true },
+				layout: { contentSize: '800px' },
+			},
 		};
 
 		expect( withUserCustomPresets( variation, user ) ).toBe( variation );
