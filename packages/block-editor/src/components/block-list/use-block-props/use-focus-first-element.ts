@@ -30,6 +30,15 @@ export function useFocusFirstElement( {
 	const ref = useRef< HTMLElement >( null );
 	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
 		unlock( useSelect( blockEditorStore ) );
+	// Reselecting a block can request focus without changing its initial position.
+	const { selectionRequest } = useSelect(
+		( select ) => ( {
+			selectionRequest: unlock(
+				select( blockEditorStore )
+			).getBlockSelectionRequest( clientId ),
+		} ),
+		[ clientId ]
+	);
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -51,9 +60,12 @@ export function useFocusFirstElement( {
 
 		const { ownerDocument } = ref.current;
 
-		// Do not focus the block if it already contains the active element.
-		// A loaded document has an active element, the body at least.
-		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement! ) ) {
+		// An iframe can retain its active element after focus leaves the canvas.
+		// Only skip focusing if the block actually has focus.
+		if (
+			ownerDocument.hasFocus() &&
+			isInsideRootBlock( ref.current, ownerDocument.activeElement! )
+		) {
 			return;
 		}
 
@@ -103,6 +115,7 @@ export function useFocusFirstElement( {
 		const selection = ownerDocument.defaultView!.getSelection()!;
 		const { clientId: selectionClientId, offset } = getSelectionStart();
 		const hasCaret =
+			ownerDocument.hasFocus() &&
 			activeElement?.isContentEditable &&
 			activeElement.contains( target ) &&
 			!! selection.anchorNode &&
@@ -114,7 +127,15 @@ export function useFocusFirstElement( {
 		if ( ! ( hasCaret && isDeliberate ) ) {
 			placeCaretAtHorizontalEdge( target, isReverse );
 		}
-	}, [ initialPosition, clientId ] );
+	}, [
+		initialPosition,
+		clientId,
+		selectionRequest,
+		getSelectionStart,
+		isBlockSelected,
+		isMultiSelecting,
+		isZoomOut,
+	] );
 
 	return ref;
 }
