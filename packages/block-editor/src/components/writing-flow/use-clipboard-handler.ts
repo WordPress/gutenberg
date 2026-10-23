@@ -316,25 +316,6 @@ export default function useClipboardHandler() {
 					return;
 				}
 
-				// Pasting over an entirely selected block replaces it, the
-				// equivalent of pasting into an empty block.
-				if (
-					! hasMultiSelection() &&
-					isBlockEntirelySelected(
-						( event.target as Element ).ownerDocument,
-						selectedBlockClientIds[ 0 ]
-					)
-				) {
-					replaceBlocks(
-						selectedBlockClientIds,
-						blocks,
-						blocks.length - 1,
-						-1
-					);
-					event.preventDefault();
-					return;
-				}
-
 				const [ firstSelectedClientId ] = selectedBlockClientIds;
 				const rootClientId = getBlockRootClientId(
 					firstSelectedClientId
@@ -370,7 +351,24 @@ export default function useClipboardHandler() {
 					}
 				}
 
-				__unstableSplitSelection( newBlocks );
+				// Pasting over an entirely selected block replaces it, the
+				// equivalent of pasting into an empty block.
+				if (
+					! hasMultiSelection() &&
+					isBlockEntirelySelected(
+						( event.target as Element ).ownerDocument,
+						firstSelectedClientId
+					)
+				) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						newBlocks,
+						newBlocks.length - 1,
+						-1
+					);
+				} else {
+					__unstableSplitSelection( newBlocks );
+				}
 				event.preventDefault();
 			}
 		}
