@@ -2527,6 +2527,184 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Button inside the menu', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+		} );
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllMenus(),
+				requestUtils.deleteAllPages(),
+			] );
+		} );
+
+		test( 'shows the content settings panel in the sidebar', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://wordpress.org/">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A Button in a menu edits like the links beside it.
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'heading', { name: 'Settings' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Text' } )
+			).toHaveValue( 'Testing' );
+			await expect(
+				settings.getByRole( 'button', { name: /^Link to/ } )
+			).toHaveText( /wordpress\.org/ );
+			await expect(
+				settings.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).toBeVisible();
+		} );
+
+		test( 'offers pages first when picking a link', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const linkPicker = settings.getByRole( 'button', {
+				name: /^Link to/,
+			} );
+			await expect( linkPicker ).toHaveText( /Add link/ );
+			// Without a link there is nothing to open in a new tab.
+			const newTabCheckbox = settings.getByRole( 'checkbox', {
+				name: 'Open in new tab',
+			} );
+			await expect( newTabCheckbox ).toBeHidden();
+			await linkPicker.click();
+
+			// Like a navigation link, the picker suggests pages before
+			// anything is typed, not posts or terms.
+			const searchInput = page.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			await expect( searchInput ).toBeFocused();
+			const firstResult = page.getByRole( 'option', {
+				name: /Test Page 1/,
+			} );
+			await expect( firstResult ).toBeVisible();
+			await expect(
+				page.getByRole( 'option', { name: /Uncategorized/ } )
+			).toBeHidden();
+
+			await firstResult.click();
+
+			// The preview shows the page, and the button links to it.
+			await expect( linkPicker ).toHaveText( /Test Page 1/ );
+			await expect( linkPicker ).toHaveText( /Page/ );
+			const clientId = await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.getAttribute( 'data-block' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						( id ) =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getBlockAttributes( id ).url,
+						clientId
+					)
+				)
+				.toMatch( /test-page-1/ );
+			await expect( newTabCheckbox ).toBeVisible();
+		} );
+
+		test( 'strips an anchor tag typed into the Text field', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			const button = editor.canvas.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+			} );
+			await button.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A link inside the button's own link is invalid HTML. The canvas
+			// strips the tag as it is typed, and the sidebar must do the same.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } )
+				.fill( '<a href="https://example.com/">Nested</a> link' );
+			await expect( button.getByRole( 'textbox' ) ).toHaveText(
+				'Nested link'
+			);
+			const clientId = await button.getAttribute( 'data-block' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						( id ) =>
+							String(
+								window.wp.data
+									.select( 'core/block-editor' )
+									.getBlockAttributes( id ).text
+							),
+						clientId
+					)
+				)
+				.toBe( 'Nested link' );
+		} );
+	} );
 } );
 
 class Navigation {

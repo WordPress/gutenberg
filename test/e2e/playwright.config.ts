@@ -44,6 +44,12 @@ const config = defineConfig( {
 			]
 		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
 	workers: 1,
+	use: {
+		...baseConfig.use,
+		// Recording a trace for every test costs about a third of the CPU, so
+		// only record one when a failed test is retried.
+		trace: 'on-first-retry',
+	},
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
