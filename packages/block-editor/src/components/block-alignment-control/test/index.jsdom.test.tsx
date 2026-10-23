@@ -459,12 +459,14 @@ describe( 'BlockAlignmentUI under a parent with an uneditable layout', () => {
 		registerBlockType( 'test/locked-parent', {
 			title: 'Locked parent',
 			apiVersion: 3,
+			attributes: {},
 			category: 'text',
 			supports: { layout: layoutSupport },
 		} );
 		registerBlockType( 'test/child', {
 			title: 'Child',
 			apiVersion: 3,
+			attributes: {},
 			category: 'text',
 		} );
 		const child = createBlock( 'test/child' );
@@ -478,7 +480,11 @@ describe( 'BlockAlignmentUI under a parent with an uneditable layout', () => {
 				} }
 			>
 				<BlockEditContextProvider
-					value={ { clientId: child.clientId } }
+					value={ {
+						name: 'test/child',
+						isSelected: false,
+						clientId: child.clientId,
+					} }
 				>
 					<BlockAlignmentUI
 						onChange={ vi.fn() }
