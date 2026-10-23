@@ -3,8 +3,9 @@ import { useMemo, useState } from '@wordpress/element';
 import { FormTokenField } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
+import type { CategorySelectorProps } from './types';
 
-const unescapeString = ( arg ) => {
+const unescapeString = ( arg: string ) => {
 	return decodeEntities( arg );
 };
 
@@ -14,7 +15,7 @@ export default function CategorySelector( {
 	categoryTerms,
 	onChange,
 	categoryMap,
-} ) {
+}: CategorySelectorProps ) {
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
@@ -32,8 +33,11 @@ export default function CategorySelector( {
 			.sort( ( a, b ) => a.localeCompare( b ) );
 	}, [ search, categoryMap ] );
 
-	function handleChange( termNames ) {
-		const uniqueTerms = termNames.reduce( ( terms, newTerm ) => {
+	function handleChange( termNames: Array< unknown > ) {
+		// The values and suggestions are strings, so the tokens are too.
+		const uniqueTerms = ( termNames as Array< string > ).reduce<
+			Array< string >
+		>( ( terms, newTerm ) => {
 			if (
 				! terms.some(
 					( term ) => term.toLowerCase() === newTerm.toLowerCase()
