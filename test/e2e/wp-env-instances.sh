@@ -61,6 +61,12 @@ echo "::endgroup::"
 nproc > "$work/usage.log"
 vmstat -S M 30 >> "$work/usage.log" &
 vmstat_pid=$!
+# Every 30 seconds, CPU use by command over a 5 second window.
+while true; do
+	top -b -n 2 -d 5 -w 512 | awk '/^top -/ { n++ } n == 2 && $1 ~ /^[0-9]+$/ { cpu[ $12 ] += $9 } END { print "--"; for ( c in cpu ) print c, cpu[ c ] }' >> "$work/processes.log"
+	sleep 25
+done &
+top_pid=$!
 
 pids=()
 for site in $( seq 1 "$sites" ); do
@@ -84,9 +90,12 @@ for site in $( seq 1 "$sites" ); do
 	echo "::endgroup::"
 done
 
-kill "$vmstat_pid"
+kill "$vmstat_pid" "$top_pid"
 echo "::group::CPU and memory"
 cat "$work/usage.log"
+echo "::endgroup::"
+echo "::group::Average CPU by command (100 = one core)"
+awk '$1 == "--" { samples++; next } { sum[ $1 ] += $2 } END { for ( c in sum ) printf "%6.0f %s\n", sum[ c ] / samples, c }' "$work/processes.log" | sort -rn | head -20
 echo "::endgroup::"
 
 exit $status
