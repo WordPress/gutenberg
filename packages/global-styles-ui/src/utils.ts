@@ -241,9 +241,8 @@ function mergeCustomPresets( settings: any, userSettings: any ): any {
 
 /**
  * Copies the user's custom presets (such as colors, font families, font sizes
- * and shadows), both global and per block, into a variation, so they are not
- * lost when the variation is applied. Presets the variation defines itself
- * are left as they are.
+ * and shadows) into a variation, so they are not lost when the variation is
+ * applied. Presets the variation defines itself are left as they are.
  *
  * @param variation The variation to apply.
  * @param user      The current user config.
@@ -253,34 +252,7 @@ export function withUserCustomPresets< T extends GlobalStylesConfig >(
 	variation: T,
 	user?: GlobalStylesConfig
 ): T {
-	const userSettings = user?.settings;
-	if ( ! userSettings ) {
-		return variation;
-	}
-
-	let settings = mergeCustomPresets( variation.settings, userSettings );
-
-	if ( userSettings.blocks ) {
-		for ( const [ blockName, userBlockSettings ] of Object.entries(
-			userSettings.blocks
-		) ) {
-			const blockSettings = settings?.blocks?.[ blockName ];
-			const mergedBlockSettings = mergeCustomPresets(
-				blockSettings,
-				userBlockSettings
-			);
-			if ( mergedBlockSettings === blockSettings ) {
-				continue;
-			}
-			settings = {
-				...settings,
-				blocks: {
-					...settings?.blocks,
-					[ blockName ]: mergedBlockSettings,
-				},
-			};
-		}
-	}
+	const settings = mergeCustomPresets( variation.settings, user?.settings );
 
 	if ( settings === variation.settings ) {
 		return variation;

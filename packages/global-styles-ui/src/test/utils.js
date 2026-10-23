@@ -74,13 +74,6 @@ describe( 'withUserCustomPresets', () => {
 	const customColors = [
 		{ slug: 'my-blue', color: '#0000ff', name: 'MyBlue' },
 	];
-	const customGradients = [
-		{
-			slug: 'my-gradient',
-			gradient: 'linear-gradient(#fff, #000)',
-			name: 'MyGradient',
-		},
-	];
 	const themeColors = [ { slug: 'base', color: '#ffffff', name: 'Base' } ];
 
 	it( 'returns the variation unchanged when the user has no custom presets', () => {
@@ -225,70 +218,6 @@ describe( 'withUserCustomPresets', () => {
 		};
 		const user = {
 			settings: { color: { palette: { custom: customColors } } },
-		};
-
-		expect( withUserCustomPresets( variation, user ) ).toBe( variation );
-	} );
-
-	it( 'keeps the user custom colors set on a block', () => {
-		const variation = {
-			settings: {
-				color: { palette: { theme: themeColors } },
-				blocks: {
-					'core/paragraph': { typography: { fontSize: '1rem' } },
-				},
-			},
-		};
-		const user = {
-			settings: {
-				blocks: {
-					'core/paragraph': {
-						color: { palette: { custom: customColors } },
-					},
-					'core/heading': {
-						color: { gradients: { custom: customGradients } },
-					},
-				},
-			},
-		};
-
-		expect( withUserCustomPresets( variation, user ) ).toEqual( {
-			settings: {
-				color: { palette: { theme: themeColors } },
-				blocks: {
-					'core/paragraph': {
-						typography: { fontSize: '1rem' },
-						color: { palette: { custom: customColors } },
-					},
-					'core/heading': {
-						color: { gradients: { custom: customGradients } },
-					},
-				},
-			},
-		} );
-	} );
-
-	it( 'keeps the block custom colors the variation defines itself', () => {
-		const variationColors = [
-			{ slug: 'variation', color: '#ff0000', name: 'Variation' },
-		];
-		const variation = {
-			settings: {
-				blocks: {
-					'core/paragraph': {
-						color: { palette: { custom: variationColors } },
-					},
-				},
-			},
-		};
-		const user = {
-			settings: {
-				blocks: {
-					'core/paragraph': {
-						color: { palette: { custom: customColors } },
-					},
-				},
-			},
 		};
 
 		expect( withUserCustomPresets( variation, user ) ).toBe( variation );
