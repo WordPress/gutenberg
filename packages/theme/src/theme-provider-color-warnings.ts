@@ -3,8 +3,10 @@ import { getContrast } from './color-ramps/lib/color-utils.ts';
 import type { Ramp, RampResult } from './color-ramps/lib/types.ts';
 import {
 	getSemanticColorCustomProperty,
+	MINIMUM_NON_TEXT_CONTRAST,
 	MINIMUM_TEXT_CONTRAST,
 	SEMANTIC_COLOR_CONTRAST_PAIRS,
+	SEMANTIC_FOCUS_CONTRAST_PAIRS,
 	type SemanticColorToken,
 } from './semantic-color-contrast-pairs.ts';
 
@@ -47,7 +49,17 @@ export function collectThemeProviderColorWarnings(
 	for ( const {
 		background: backgroundToken,
 		foreground: foregroundToken,
-	} of SEMANTIC_COLOR_CONTRAST_PAIRS ) {
+		requiredContrast,
+	} of [
+		...SEMANTIC_COLOR_CONTRAST_PAIRS.map( ( pair ) => ( {
+			...pair,
+			requiredContrast: MINIMUM_TEXT_CONTRAST,
+		} ) ),
+		...SEMANTIC_FOCUS_CONTRAST_PAIRS.map( ( pair ) => ( {
+			...pair,
+			requiredContrast: MINIMUM_NON_TEXT_CONTRAST,
+		} ) ),
+	] ) {
 		const backgroundColor = colorValues.get(
 			getSemanticColorCustomProperty( backgroundToken )
 		);
@@ -64,14 +76,14 @@ export function collectThemeProviderColorWarnings(
 			foregroundColor
 		);
 
-		if ( achievedContrast < MINIMUM_TEXT_CONTRAST ) {
+		if ( achievedContrast < requiredContrast ) {
 			warnings.push( {
 				type: 'contrast',
 				backgroundToken,
 				backgroundColor,
 				foregroundToken,
 				foregroundColor,
-				requiredContrast: MINIMUM_TEXT_CONTRAST,
+				requiredContrast,
 				achievedContrast,
 			} );
 		}
