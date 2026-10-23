@@ -147,6 +147,78 @@ test.describe( 'Search', () => {
 		);
 	} );
 
+	test( "stops dragging at the block's own minimum when it is smaller", async ( {
+		page,
+		editor,
+	} ) => {
+		// The overlay takes its floor from the wrapper's resolved min-width, so
+		// a minimum below the editor's default still has to hold.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: {
+				style: { dimensions: { minWidth: '50px', width: '400px' } },
+			},
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Search' } )
+			.click();
+
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		const box = await handle.boundingBox();
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		await page.mouse.move(
+			box.x + box.width / 2 - 500,
+			box.y + box.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+
+		const [ block ] = await editor.getBlocks();
+		expect( parseInt( block.attributes.style.dimensions.width, 10 ) ).toBe(
+			50
+		);
+	} );
+
+	test( "does not drag wider than the block's container", async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '300px' } } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Search' } )
+			.click();
+
+		const containerWidth = await editor.canvas
+			.locator( '.wp-block-search' )
+			.evaluate( ( node ) => node.clientWidth );
+
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		const box = await handle.boundingBox();
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		await page.mouse.move(
+			box.x + box.width / 2 + 1200,
+			box.y + box.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+
+		const [ block ] = await editor.getBlocks();
+		expect(
+			parseInt( block.attributes.style.dimensions.width, 10 )
+		).toBeLessThanOrEqual( containerWidth );
+	} );
+
 	test( 'keeps the handles on the block when it is narrower than the minimum', async ( {
 		editor,
 	} ) => {

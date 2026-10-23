@@ -26,11 +26,16 @@ const migrateWidth = ( attributes: SearchDeprecatedAttributes ) => {
 	const { width, widthUnit, ...otherAttributes } = attributes;
 
 	// A block that already carries a block support width keeps it. The server
-	// reads `style.dimensions.width` before the legacy attributes, so the
-	// editor has to resolve the two the same way. Returning without a width
-	// still drops the legacy attributes, which is the point for the shapes
-	// that never rendered.
-	if ( ! width || ! widthUnit || otherAttributes.style?.dimensions?.width ) {
+	// reads `style.dimensions.width` before the legacy attributes, and counts
+	// it as answered on the same terms, a non-empty string, so that a value it
+	// would ignore does not silently drop the legacy pair the front end is
+	// still rendering from. Returning without a width drops that pair anyway,
+	// which is the point for the shapes that never rendered.
+	const supportWidth = otherAttributes.style?.dimensions?.width;
+	const hasSupportWidth =
+		typeof supportWidth === 'string' && supportWidth !== '';
+
+	if ( ! width || ! widthUnit || hasSupportWidth ) {
 		return otherAttributes;
 	}
 

@@ -36,7 +36,9 @@
 	}
 }
 
-// Mirrors MIN_WIDTH in utils.js, as a stylesheet rule so a minimum width from Global Styles can win.
+// The default minimum width, as a stylesheet rule so a minimum width from
+// Global Styles can win. The resize overlay reads the resolved value, so this
+// is the only place the number lives.
 :where(.wp-block-search__inside-wrapper) {
 	min-width: 220px;
 }

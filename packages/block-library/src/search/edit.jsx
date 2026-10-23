@@ -28,7 +28,6 @@ import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
 import { Path, SVG } from '@wordpress/primitives';
-import { MIN_WIDTH } from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // Help text describing each wrapper element option. Kept local to the block
@@ -145,11 +144,26 @@ export default function SearchEdit( {
 	// flow would overwrite whatever CSS resolved to. Measuring the wrapper and
 	// sizing the overlay to match keeps the handles in place without the box
 	// owning the width.
-	const [ wrapperSize, setWrapperSize ] = useState( null );
+	const [ wrapperBox, setWrapperBox ] = useState( null );
 	const observeWrapper = useResizeObserver(
 		( [ entry ] ) => {
-			const { offsetWidth, offsetHeight } = entry.target;
-			setWrapperSize( { width: offsetWidth, height: offsetHeight } );
+			const { offsetWidth, offsetHeight, parentElement } = entry.target;
+			// The overlay has to mirror the limits the wrapper will honour, not
+			// just its size, or a drag runs past them and the handle leaves the
+			// block. The resolved `min-width` already covers both the editor's
+			// default floor and a smaller minimum set on the block, and
+			// `max-width: 100%` caps the wrapper to its container.
+			const minWidth = parseFloat(
+				entry.target.ownerDocument.defaultView.getComputedStyle(
+					entry.target
+				).minWidth
+			);
+			setWrapperBox( {
+				width: offsetWidth,
+				height: offsetHeight,
+				minWidth: Number.isNaN( minWidth ) ? undefined : minWidth,
+				maxWidth: parentElement?.clientWidth,
+			} );
 		},
 		{ box: 'border-box' }
 	);
@@ -578,24 +592,20 @@ export default function SearchEdit( {
 						width: temporaryWidth ?? widthStyle,
 					} }
 				>
-					{ isSelected && wrapperSize && (
+					{ isSelected && wrapperBox && (
 						<ResizableBox
 							className="wp-block-search__resizer"
-							size={ wrapperSize }
+							size={ {
+								width: wrapperBox.width,
+								height: wrapperBox.height,
+							} }
 							// re-resizable writes `position: relative` inline,
 							// so only an inline style can override it.
 							// Placement lives in the stylesheet, where it gets
 							// flipped for RTL.
 							style={ { position: 'absolute' } }
-							// Applied only when the block is already at least
-							// this wide, otherwise the overlay would be wider
-							// than the block and the handles would hang past
-							// its edge.
-							minWidth={
-								wrapperSize.width >= MIN_WIDTH
-									? MIN_WIDTH
-									: undefined
-							}
+							minWidth={ wrapperBox.minWidth }
+							maxWidth={ wrapperBox.maxWidth }
 							enable={ getResizableSides() }
 							onResizeStart={ () => toggleSelection( false ) }
 							onResize={ ( event, direction, elt ) =>
