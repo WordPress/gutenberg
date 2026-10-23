@@ -69,7 +69,7 @@ import {
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
-import { evalAspectRatio, mediaPosition } from './utils';
+import { evalAspectRatio, mediaPosition, getDimensionsTools } from './utils';
 
 const {
 	DimensionsTool,
@@ -720,60 +720,56 @@ export default function Image( {
 		);
 	};
 
-	const dimensionsControl =
-		showDimensionsControls &&
-		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
-			<DimensionsTool
-				key={ selectedStyleStateKey }
-				panelId={ clientId }
-				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
-				onChange={ ( { aspectRatio: newAspectRatio } ) => {
-					setDimensionAttributes( {
-						aspectRatio: newAspectRatio,
-						scale: 'cover',
-					} );
-				} }
-				defaultAspectRatio="auto"
-				tools={ [ 'aspectRatio' ] }
-			/>
-		) : (
-			<DimensionsTool
-				key={ selectedStyleStateKey }
-				panelId={ clientId }
-				value={ {
-					width: activeWidth,
-					height: activeHeight,
-					scale: activeScale,
-					aspectRatio: activeAspectRatio,
-				} }
-				onChange={ ( {
-					width: newWidth,
+	const hasCustomWidth =
+		activeWidth !== undefined &&
+		activeWidth !== null &&
+		activeWidth !== 'auto';
+	const hasCustomHeight =
+		activeHeight !== undefined &&
+		activeHeight !== null &&
+		activeHeight !== 'auto';
+	const hasCustomDimensions = hasCustomWidth || hasCustomHeight;
+
+	const dimensionsTools = getDimensionsTools( {
+		parentLayoutType,
+		hasCustomDimensions,
+		isWideAligned,
+	} );
+
+	const dimensionsControl = showDimensionsControls && (
+		<DimensionsTool
+			key={ selectedStyleStateKey }
+			panelId={ clientId }
+			value={ {
+				width: activeWidth,
+				height: activeHeight,
+				scale: activeScale,
+				aspectRatio: activeAspectRatio,
+			} }
+			onChange={ ( {
+				width: newWidth,
+				height: newHeight,
+				scale: newScale,
+				aspectRatio: newAspectRatio,
+			} ) => {
+				setDimensionAttributes( {
+					// CSS includes `height: auto`, but we need
+					// `width: auto` to fix the aspect ratio when
+					// only height is set due to the width and
+					// height attributes set via the server.
+					width: ! newWidth && newHeight ? 'auto' : newWidth,
 					height: newHeight,
-					scale: newScale,
 					aspectRatio: newAspectRatio,
-				} ) => {
-					setDimensionAttributes( {
-						// CSS includes `height: auto`, but we need
-						// `width: auto` to fix the aspect ratio when
-						// only height is set due to the width and
-						// height attributes set via the server.
-						width: ! newWidth && newHeight ? 'auto' : newWidth,
-						height: newHeight,
-						aspectRatio: newAspectRatio,
-						scale: newScale,
-					} );
-				} }
-				defaultScale="cover"
-				defaultAspectRatio="auto"
-				scaleOptions={ scaleOptions }
-				unitsOptions={ dimensionsUnitsOptions }
-				tools={
-					isWideAligned
-						? [ 'aspectRatio', 'scale' ]
-						: [ 'aspectRatio', 'widthHeight', 'scale' ]
-				}
-			/>
-		) );
+					scale: newScale,
+				} );
+			} }
+			defaultScale="cover"
+			defaultAspectRatio="auto"
+			scaleOptions={ scaleOptions }
+			unitsOptions={ dimensionsUnitsOptions }
+			tools={ dimensionsTools }
+		/>
+	);
 
 	const resetSettings = () => {
 		setAttributes( {
