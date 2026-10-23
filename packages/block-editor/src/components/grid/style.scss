@@ -507,39 +507,44 @@
 // A small block toolbar outside the block, under its lowest corner and clear
 // of the resize handle in the middle of the bottom side. It is placed by
 // `getCornerToolbarStyle()`.
-.block-editor-grid-item-handles__toolbar {
+.block-editor-grid-item-handles__toolbar.components-accessible-toolbar {
 	position: absolute;
 	display: flex;
 	// The same border as the block toolbar. No stroke token is as dark.
 	border: var(--wpds-border-width-xs) solid $gray-900;
 	border-radius: var(--wpds-border-radius-sm);
 	background: var(--wpds-color-background-surface-neutral-strong);
-}
 
-.block-editor-grid-item-handle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-width: $button-size-small;
-	height: $button-size-small;
-	color: var(--wpds-color-foreground-interactive-neutral);
-	cursor: var(--wpds-cursor-control);
-	touch-action: none;
-	// A press on a handle drags or turns the block, and never selects text.
-	user-select: none;
-	-webkit-touch-callout: none;
+	// Specificity to override the sizes `Toolbar` gives its buttons, which
+	// are those of the block toolbar.
+	.block-editor-grid-item-handle.block-editor-grid-item-handle.block-editor-grid-item-handle {
+		min-width: $button-size-small;
+		height: $button-size-small;
+		padding: 0;
+		color: var(--wpds-color-foreground-interactive-neutral);
+		touch-action: none;
+		// A press on a handle drags or turns the block, and never selects text.
+		user-select: none;
+		-webkit-touch-callout: none;
 
-	&:hover {
-		color: var(--wp-admin-theme-color);
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+
+		// The focus ring, inside the button.
+		&::before {
+			inset: $border-width-focus-fallback;
+			height: auto;
+		}
 	}
-}
 
-.block-editor-grid-item-handles__drag,
-.block-editor-grid-item-handles__rotate {
-	cursor: grab;
+	.block-editor-grid-item-handles__drag.block-editor-grid-item-handles__drag,
+	.block-editor-grid-item-handles__rotate.block-editor-grid-item-handles__rotate {
+		cursor: grab;
 
-	&:active {
-		cursor: grabbing;
+		&:active {
+			cursor: grabbing;
+		}
 	}
 }
 

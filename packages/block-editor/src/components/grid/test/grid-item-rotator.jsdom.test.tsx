@@ -51,7 +51,7 @@ function renderRotator( props: { angle?: number } = {} ) {
 			/>
 		</div>
 	);
-	const handle = screen.getByTitle( 'Rotate' );
+	const handle = screen.getByRole( 'button', { name: 'Rotate' } );
 	return { ...view, handle, onChange, onPreview };
 }
 
