@@ -92,7 +92,6 @@
 	align-items: center;
 
 	&::after {
-		content: attr(data-label);
 		content: attr(data-label) / "";
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		height: 0;
