@@ -275,16 +275,15 @@ function useMediaEditorFrameContext(): MediaEditorFrameContextValue {
 }
 
 /**
- * Core's Crop panel. The aspect-ratio presets are the host's, so they come
- * from the frame context rather than from the session.
+ * Core's Crop panel, built on what a plugin's panel gets, so the editor
+ * itself proves the panel context is enough to build a panel with.
  *
  * @param props
  * @param props.disabled
  */
 function CropPanelContent( { disabled }: MediaEditorPanelFillProps ) {
-	const { aspectRatioPresets } = useMediaEditorFrameContext();
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
-		useCropOptions( { aspectRatioPresets } );
+		useMediaEditorPanelContext();
 	return (
 		<MediaEditorCropPanel
 			aspectRatioValue={ aspectRatioValue }
