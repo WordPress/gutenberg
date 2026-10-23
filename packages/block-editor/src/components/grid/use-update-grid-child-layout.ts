@@ -5,7 +5,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
-import { getRotateForState, getUpdatedRotateStyle } from '../../hooks/rotate';
+import { getRotateForState, getUpdatedRotateStyle } from '../../utils/rotation';
 import { getGridGrowthUpdate } from './get-grid-row-updates';
 import {
 	getUnstackedMobileUpdates,

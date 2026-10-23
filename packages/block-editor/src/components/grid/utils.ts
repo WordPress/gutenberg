@@ -6,7 +6,7 @@ import type {
 	GridSibling,
 	GridTrack,
 } from './types';
-import { getRotatedBoundingRect } from './rotation';
+import { getRotatedBoundingRect } from '../../utils/rotation';
 
 export function range( start: number, length: number ) {
 	return Array.from( { length }, ( _, i ) => start + i );

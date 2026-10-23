@@ -11,6 +11,8 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { useSettings } from '../components/use-settings';
+import { useUpdateGridChildLayout } from '../components/grid/use-update-grid-child-layout';
+import type { GridBlockStyle } from '../components/grid/mobile-stacking';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { isPlainObject } from '../utils/object';
@@ -164,17 +166,27 @@ function resetRotate( attributes: BlockAttributes ): BlockAttributes {
 }
 
 function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
-	const { blockEditingMode, selectedState } = useSelect(
+	const { blockEditingMode, selectedState, isStackedInGrid } = useSelect(
 		( select ) => {
-			const { getBlockEditingMode, getSelectedBlockStyleState } =
-				select( blockEditorStore );
+			const {
+				getBlockEditingMode,
+				getBlockRootClientId,
+				getSelectedBlockStyleState,
+				getStackedGridLayouts,
+			} = unlock( select( blockEditorStore ) );
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
 				blockEditingMode: getBlockEditingMode( clientId ),
 				selectedState: getSelectedBlockStyleState( clientId ),
+				// On mobile, a grid stacked on mobile shows its blocks
+				// unrotated.
+				isStackedInGrid:
+					!! rootClientId && !! getStackedGridLayouts( rootClientId ),
 			};
 		},
 		[ clientId ]
 	);
+	const updateGridChildLayout = useUpdateGridChildLayout();
 
 	if (
 		blockEditingMode !== 'default' ||
@@ -184,10 +196,26 @@ function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
 	}
 
 	const stateStyle = getRotateStateStyle( style, selectedState );
-	const updateRotate = ( angle: number | undefined ) =>
+	const updateRotate = ( angle: number | undefined ) => {
+		if ( isStackedInGrid ) {
+			// Like the rotate handle on the canvas, an edit turns stacking
+			// off for the grid first, so that it has a visible effect.
+			updateGridChildLayout(
+				clientId,
+				( childStyle, state ) =>
+					// The rotate helpers type the style loosely.
+					getUpdatedRotateStyle(
+						childStyle,
+						angle,
+						state
+					) as GridBlockStyle
+			);
+			return;
+		}
 		setAttributes( {
 			style: getUpdatedRotateStyle( style, angle, selectedState ),
 		} );
+	};
 
 	return (
 		// The provider scopes the panel's "Reset all" to the selected state.
@@ -206,7 +234,9 @@ function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
 					<AnglePickerControl
 						label={ __( 'Rotation' ) }
 						value={ toPickerAngle(
-							getRotateForState( style, selectedState )
+							isStackedInGrid
+								? 0
+								: getRotateForState( style, selectedState )
 						) }
 						onChange={ ( value ) =>
 							updateRotate( fromPickerAngle( value ) )

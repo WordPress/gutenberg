@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getGridItemMeasurements } from '../utils';
-import { getRotatedBoundingRect } from '../rotation';
+import { getRotatedBoundingRect } from '../../../utils/rotation';
 
 interface ChildBox {
 	clientId: string;

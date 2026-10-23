@@ -5,7 +5,7 @@ import { rotateRight, Icon } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { GridItemHandle } from './grid-item-handle';
-import { getPointerAngle, getRotationFromPointer } from './rotation';
+import { getPointerAngle, getRotationFromPointer } from '../../utils/rotation';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 import { setInlineStyle } from './utils';
 

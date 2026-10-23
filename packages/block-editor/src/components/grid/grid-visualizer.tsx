@@ -29,7 +29,7 @@ import {
 	getGridRectFromPixelRect,
 	getInserterDragBlockNames,
 } from './utils';
-import { getRotatedBoundingRect } from './rotation';
+import { getRotatedBoundingRect } from '../../utils/rotation';
 import { useInserterDragBlockNames } from './use-inserter-drag-block-names';
 import { parseDropEvent } from '../use-on-block-drop';
 import {

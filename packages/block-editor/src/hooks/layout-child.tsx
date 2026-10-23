@@ -24,11 +24,8 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from './block-style-state';
-import {
-	getRotateForState,
-	getUpdatedRotateStyle,
-	isRotateEnabled,
-} from './rotate';
+import { getRotateForState, getUpdatedRotateStyle } from '../utils/rotation';
+import { isRotateEnabled } from './rotate';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -538,10 +535,13 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
-	// The angle shown while the rotate handle is being dragged.
-	const [ previewRotate, setPreviewRotate ] = useState< number | null >(
-		null
-	);
+	// Whether the angle previewed while the rotate handle is being dragged
+	// rotates the block, or null when nothing is previewed. Only this is kept
+	// here, not the angle, so that rotating doesn't re-render the grid tools,
+	// including the visualizer, for every degree.
+	const [ isPreviewRotated, setIsPreviewRotated ] = useState<
+		boolean | null
+	>( null );
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
@@ -595,7 +595,7 @@ function GridTools( {
 	// `:hover`, since rotation is stored per viewport.
 	// The resizer sizes the block from pointer movement along the screen's
 	// axes, not the block's, so it is hidden while the block is rotated.
-	const isRotated = !! ( previewRotate ?? rotate );
+	const isRotated = isPreviewRotated ?? !! rotate;
 	const showRotator =
 		isManualGrid &&
 		! isBlockItselfCurrentlyHidden &&
@@ -643,14 +643,15 @@ function GridTools( {
 					bounds={ resizerBounds }
 					onChange={ updateLayout }
 					parentLayout={ parentLayout }
-					angle={ previewRotate ?? rotate }
 				/>
 			) }
 			{ showRotator && (
 				<GridItemRotator
 					clientId={ clientId }
 					angle={ rotate }
-					onPreview={ setPreviewRotate }
+					onPreview={ ( angle ) =>
+						setIsPreviewRotated( angle === null ? null : !! angle )
+					}
 					onChange={ updateRotate }
 				/>
 			) }
