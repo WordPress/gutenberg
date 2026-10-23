@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+import { Toolbar } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { getCornerToolbarStyle, getLowestCorner } from '../../utils/rotation';
@@ -57,8 +59,9 @@ export function GridItemHandles( {
 			additionalStyles={ overlayStyle }
 		>
 			<div className="block-editor-grid-item-handles__box">
-				<div
+				<Toolbar
 					className="block-editor-grid-item-handles__toolbar"
+					label={ __( 'Block handles' ) }
 					style={ getCornerToolbarStyle(
 						angle,
 						corner,
@@ -66,7 +69,7 @@ export function GridItemHandles( {
 					) }
 				>
 					{ children }
-				</div>
+				</Toolbar>
 			</div>
 		</BlockPopoverCover>
 	);

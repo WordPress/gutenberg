@@ -1,7 +1,7 @@
 import type { PointerEvent } from 'react';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { rotateRight, Icon } from '@wordpress/icons';
+import { rotateRight } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { GridItemHandle } from './grid-item-handle';
 import { getPointerAngle, getRotationFromPointer } from '../../utils/rotation';
@@ -118,7 +118,7 @@ export function GridItemRotator( {
 		}
 	}
 
-	function startRotation( event: PointerEvent< HTMLDivElement > ) {
+	function startRotation( event: PointerEvent< HTMLButtonElement > ) {
 		const box = event.currentTarget.closest(
 			'.block-editor-grid-item-handles__box'
 		);
@@ -182,6 +182,8 @@ export function GridItemRotator( {
 		<GridItemHandle
 			className="block-editor-grid-item-handles__rotate"
 			label={ __( 'Rotate' ) }
+			// While rotating, the handle shows the angle instead.
+			icon={ previewAngle === null ? rotateRight : undefined }
 			onPointerDown={ startRotation }
 			onPointerMove={ ( event ) => {
 				// When a pointer is pressed while the browser thinks
@@ -231,10 +233,7 @@ export function GridItemRotator( {
 				setPreview( null );
 			} }
 		>
-			{ /* While rotating, the handle shows the angle instead. */ }
-			{ previewAngle === null ? (
-				<Icon icon={ rotateRight } />
-			) : (
+			{ previewAngle !== null && (
 				<span className="block-editor-grid-item-handles__angle">
 					{ sprintf(
 						/* translators: %d: Rotation angle in degrees. */

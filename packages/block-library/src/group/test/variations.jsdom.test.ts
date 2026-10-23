@@ -1,11 +1,11 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import type { BlockVariation } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import variations, { registerCanvasVariation } from '../variations';
 
 declare global {
 	interface Window {
@@ -15,15 +15,31 @@ declare global {
 
 const TEST_BLOCK = 'test/group';
 
-async function getVariations( {
+function registerGroup( {
 	isGridInteractivityEnabled,
 }: {
 	isGridInteractivityEnabled: boolean;
-} ): Promise< BlockVariation[] > {
-	vi.resetModules();
+} ) {
 	window.__experimentalEnableGridInteractivity = isGridInteractivityEnabled;
-	const { default: variations } = await import( '../variations' );
-	return variations;
+	registerBlockType( TEST_BLOCK, {
+		apiVersion: 3,
+		title: 'Test group',
+		category: 'design',
+		attributes: {
+			align: { type: 'string' },
+			layout: { type: 'object' },
+		},
+		variations,
+		edit: () => null,
+		save: () => null,
+	} );
+	registerCanvasVariation( TEST_BLOCK );
+}
+
+function getVariationNames() {
+	return select( blocksStore )
+		.getBlockVariations( TEST_BLOCK )
+		?.map( ( { name } ) => name );
 }
 
 describe( 'Group variations', () => {
@@ -34,20 +50,17 @@ describe( 'Group variations', () => {
 		}
 	} );
 
-	it( 'offers Canvas only with the grid interactivity experiment', async () => {
-		const withoutExperiment = await getVariations( {
-			isGridInteractivityEnabled: false,
-		} );
-		expect( withoutExperiment.map( ( { name } ) => name ) ).not.toContain(
-			'group-canvas'
-		);
+	// The flag changes after the module has loaded, as when a script sets it
+	// late, so the variation has to be registered with the block.
+	it( 'offers Canvas only with the grid interactivity experiment', () => {
+		registerGroup( { isGridInteractivityEnabled: false } );
+		expect( getVariationNames() ).not.toContain( 'group-canvas' );
+		unregisterBlockType( TEST_BLOCK );
 
-		const withExperiment = await getVariations( {
-			isGridInteractivityEnabled: true,
-		} );
-		const canvas = withExperiment.find(
-			( { name } ) => name === 'group-canvas'
-		);
+		registerGroup( { isGridInteractivityEnabled: true } );
+		const canvas = select( blocksStore )
+			.getBlockVariations( TEST_BLOCK )
+			?.find( ( { name } ) => name === 'group-canvas' );
 		expect( canvas?.title ).toBe( 'Canvas' );
 		expect( canvas?.attributes ).toEqual( {
 			align: 'full',
@@ -58,24 +71,11 @@ describe( 'Group variations', () => {
 				isManualPlacement: true,
 			},
 		} );
+		expect( canvas?.example ).toHaveProperty( 'innerBlocks' );
 	} );
 
-	it( 'shows manual grids as Canvas and other grids as Grid', async () => {
-		const variations = await getVariations( {
-			isGridInteractivityEnabled: true,
-		} );
-		registerBlockType( TEST_BLOCK, {
-			apiVersion: 3,
-			title: 'Test group',
-			category: 'design',
-			attributes: {
-				align: { type: 'string' },
-				layout: { type: 'object' },
-			},
-			variations,
-			edit: () => null,
-			save: () => null,
-		} );
+	it( 'shows manual grids as Canvas and other grids as Grid', () => {
+		registerGroup( { isGridInteractivityEnabled: true } );
 		const { getActiveBlockVariation } = select( blocksStore );
 
 		expect(

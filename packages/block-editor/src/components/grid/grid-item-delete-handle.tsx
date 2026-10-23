@@ -1,8 +1,8 @@
+import { ToolbarButton } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { trash, Icon } from '@wordpress/icons';
+import { trash } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
-import { GridItemHandle } from './grid-item-handle';
 
 interface GridItemDeleteHandleProps {
 	/** Client ID of the grid item. */
@@ -10,7 +10,10 @@ interface GridItemDeleteHandleProps {
 }
 
 /**
- * A handle that deletes a selected grid item.
+ * A button that deletes a selected grid item, in its toolbar of handles.
+ *
+ * Unlike the handles that drag or turn the block, it is a toolbar item, so it
+ * can be reached from the keyboard.
  */
 export function GridItemDeleteHandle( {
 	clientId,
@@ -18,13 +21,12 @@ export function GridItemDeleteHandle( {
 	const { removeBlock } = useDispatch( blockEditorStore );
 
 	return (
-		// Keyboard users delete blocks from the block toolbar's options menu.
-		<GridItemHandle
-			className="block-editor-grid-item-handles__delete"
+		<ToolbarButton
+			className="block-editor-grid-item-handle block-editor-grid-item-handles__delete"
+			size="small"
+			icon={ trash }
 			label={ __( 'Delete' ) }
 			onClick={ () => removeBlock( clientId, true ) }
-		>
-			<Icon icon={ trash } />
-		</GridItemHandle>
+		/>
 	);
 }
