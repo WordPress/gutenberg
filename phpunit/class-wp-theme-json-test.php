@@ -3593,7 +3593,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$reflection_class = new ReflectionClass( WP_Theme_JSON_Gutenberg::class );
 
 		$get_property_value_method = $reflection_class->getMethod( 'get_property_value' );
-		$get_property_value_method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$get_property_value_method->setAccessible( true );
+		}
 		$result = $get_property_value_method->invoke( null, $styles, $path );
 
 		$this->assertSame( '', $result );
@@ -5452,7 +5454,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 
 		$this->assertSame( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
 	}
@@ -5777,7 +5781,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_style_variation_selector' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$actual = $func->invoke( null, 'custom', $selector );
 
@@ -5857,7 +5863,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'scope_style_node_selectors' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$node = array(
 			'name'      => 'core/image',
@@ -5904,7 +5912,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -5938,7 +5948,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -5980,7 +5992,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -6032,7 +6046,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
 
 		$func = $theme_json->getMethod( 'get_block_nodes' );
-		$func->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$func->setAccessible( true );
+		}
 
 		$theme_json = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
