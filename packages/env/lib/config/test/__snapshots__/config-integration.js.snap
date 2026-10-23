@@ -80,7 +80,6 @@ exports[`Config Integration > should load local and override configuration files
     "afterStart": null,
   },
   "name": "gutenberg",
-  "runtime": undefined,
   "testsEnvironment": true,
   "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
@@ -166,7 +165,6 @@ exports[`Config Integration > should load local configuration file 1`] = `
     "afterStart": "test",
   },
   "name": "gutenberg",
-  "runtime": undefined,
   "testsEnvironment": true,
   "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
@@ -252,7 +250,6 @@ exports[`Config Integration > should use default configuration 1`] = `
     "afterStart": null,
   },
   "name": "gutenberg",
-  "runtime": undefined,
   "testsEnvironment": true,
   "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
@@ -340,7 +337,6 @@ exports[`Config Integration > should use environment variables over local and ov
     "afterStart": "test",
   },
   "name": "gutenberg",
-  "runtime": undefined,
   "testsEnvironment": true,
   "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }

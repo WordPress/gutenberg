@@ -33,6 +33,7 @@ const mergeConfigs = require( './merge-configs' );
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterDestroy The script to run after the "destroy" command has completed.
+ * @property {string}                               [runtime]                     The runtime to use ("docker" or "playground").
  * @property {Object.<string, WPEnvironmentConfig>} env                           The environment-specific configuration options.
  */
 
