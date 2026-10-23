@@ -20,6 +20,7 @@ let mockSaveResult: {
 	},
 };
 const mockOnUpdate = vi.fn();
+let mockOnUndo: ( () => void ) | undefined;
 const mockOnClose = vi.fn();
 const mockCloseMediaEditorModal = vi.fn();
 const mockCreateSuccessNotice = vi.fn();
@@ -86,6 +87,7 @@ vi.mock( import( '../../media-editor' ), async () => {
 describe( 'MediaEditorModal', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
+		mockOnUndo = undefined;
 		mockSaveResult = {
 			id: 11,
 			url: 'edited.jpg',
@@ -101,6 +103,7 @@ describe( 'MediaEditorModal', () => {
 				isOpen: () => true,
 				getId: () => 10,
 				getOnUpdate: () => mockOnUpdate,
+				getOnUndo: () => mockOnUndo,
 				getOnClose: () => mockOnClose,
 			} ) )
 		);
@@ -111,7 +114,7 @@ describe( 'MediaEditorModal', () => {
 		);
 	} );
 
-	it( 'shows an undo snackbar after saving dirty image editor state', () => {
+	it( 'restores the previous attachment when no Undo callback is supplied', () => {
 		render( <MediaEditorModal /> );
 
 		fireEvent.click(
@@ -146,6 +149,20 @@ describe( 'MediaEditorModal', () => {
 			id: 10,
 			url: 'original.jpg',
 		} );
+	} );
+
+	it( "uses the caller's Undo callback after saving an attachment change", () => {
+		mockOnUndo = vi.fn();
+		render( <MediaEditorModal /> );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Save result' } )
+		);
+		const noticeOptions = mockCreateSuccessNotice.mock.calls[ 0 ][ 1 ];
+		noticeOptions.actions[ 0 ].onClick();
+
+		expect( mockOnUndo ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnUpdate ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not show the image edited snackbar for metadata-only saves', () => {

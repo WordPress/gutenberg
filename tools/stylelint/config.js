@@ -6,22 +6,13 @@ module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
 	plugins: [
 		'stylelint-plugin-logical-css',
-		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values',
 	],
 	reportNeedlessDisables: true,
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
-		'declaration-property-value-allowed-list': [
-			{
-				'flex-direction': '/^(?!(row|column)-reverse).*$/',
-			},
-			{
-				message: ( property, value ) =>
-					`Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`,
-			},
-		],
 		'declaration-property-value-disallowed-list': [
 			{
 				'/.*/': [
@@ -30,9 +21,17 @@ module.exports = {
 					'/\\$font-weight-medium/',
 				],
 				cursor: [ 'pointer' ],
+				'flex-direction': [ '/^(row|column)-reverse/' ],
 			},
 			{
 				message: ( property, value ) => {
+					switch ( property ) {
+						case 'flex-direction':
+							return `Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`;
+						case 'cursor':
+							return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+					}
+					// The remaining patterns apply to every property, so tell them apart by value.
 					if (
 						value.includes( '$font-weight-regular' ) ||
 						value.includes( '$font-weight-medium' )
@@ -43,9 +42,6 @@ module.exports = {
 							? '$font-weight-regular'
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
-					}
-					if ( property === 'cursor' ) {
-						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}
 					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
 				},
@@ -174,6 +170,38 @@ module.exports = {
 			rules: {
 				// Re-add no-duplicate-selectors rule for CSS because it is disabled by stylelint-config-recommended-scss v17
 				'no-duplicate-selectors': true,
+			},
+		},
+		{
+			/*
+			 * The admin design tokens experiment ships inside a cascade layer, and
+			 * layer priority REVERSES for `!important`: a layered `!important`
+			 * beats a third-party plugin's *unlayered* `!important`, even when the
+			 * plugin's stylesheet loads later. Allowing one would silently break
+			 * overrides the ecosystem has relied on for years. Normal declarations
+			 * are safe, since unlayered plugin CSS still wins.
+			 *
+			 * DELETE WHEN: `lib/experimental/wpds-admin/` is removed.
+			 */
+			files: [ 'lib/experimental/wpds-admin/**/*.css' ],
+			rules: {
+				'declaration-no-important': true,
+			},
+		},
+		{
+			/*
+			 * The single exception. `99-overrides.css` exists only to cancel
+			 * `!important` declarations in WordPress's admin CSS, which survive
+			 * being demoted into a lower layer because importance is compared
+			 * before layer order. Every rule in that file must cancel a specific
+			 * WordPress `!important` and record what would let it be deleted. Do
+			 * not widen this exception to any other file.
+			 *
+			 * DELETE WHEN: `lib/experimental/wpds-admin/` is removed.
+			 */
+			files: [ 'lib/experimental/wpds-admin/css/99-overrides.css' ],
+			rules: {
+				'declaration-no-important': null,
 			},
 		},
 	],

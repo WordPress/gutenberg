@@ -12,7 +12,10 @@ import type { SelectItemLabelProps } from './types';
  * value) or from `Select.Trigger` children.
  */
 export const ItemLabel = forwardRef< HTMLDivElement, SelectItemLabelProps >(
-	function ItemLabel( { children, className, render, ...restProps }, ref ) {
+	function UnforwardedItemLabel(
+		{ children, className, render, ...restProps },
+		ref
+	) {
 		return (
 			<Text
 				ref={ ref }

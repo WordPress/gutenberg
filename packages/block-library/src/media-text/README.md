@@ -42,17 +42,27 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`heading`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
   - [`button`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
+  - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - [`allowedBlocks`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
@@ -65,6 +75,13 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `postId`
 - `postType`
+
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **filter**:
+  - duotone: `.wp-block-media-text > .wp-block-media-text__media img, .wp-block-media-text > .wp-block-media-text__media video`
 
 ## Block Markup
 

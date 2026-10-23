@@ -1,8 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { logged } from '@wordpress/deprecated';
 import CircularOptionPicker from '..';
 
 const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
@@ -24,14 +23,6 @@ function getOption( name: string ) {
 }
 
 describe( 'CircularOptionPicker', () => {
-	beforeEach( () => {
-		delete logged[ AS_BUTTONS_DEPRECATION ];
-	} );
-
-	afterEach( () => {
-		delete logged[ AS_BUTTONS_DEPRECATION ];
-	} );
-
 	it( 'should preserve toggle-button semantics when an option is rendered without a picker', async () => {
 		await render(
 			<CircularOptionPicker.Option

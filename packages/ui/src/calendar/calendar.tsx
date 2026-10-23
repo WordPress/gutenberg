@@ -17,7 +17,7 @@ import type { CalendarProps, OnValueChangeHandler } from './types';
  * support, and customizable labels for internationalization.
  */
 export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
-	function Calendar(
+	function UnforwardedCalendar(
 		{
 			defaultValue,
 			value: valueProp,

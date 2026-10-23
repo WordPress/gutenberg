@@ -3,10 +3,7 @@ import { useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import {
-	store as patternsStore,
-	// @ts-expect-error - No type declarations available for @wordpress/patterns
-} from '@wordpress/patterns';
+import { store as patternsStore } from '@wordpress/patterns';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**

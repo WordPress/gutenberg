@@ -5,8 +5,10 @@ import { Button, Modal } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { kebabCase } from '@wordpress/kebab-case';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 
@@ -46,14 +48,14 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 
 	return (
 		<>
-			<Menu.Root disabled={ ! actions.length }>
+			<Menu.Root>
 				<Menu.Trigger
+					disabled={ ! actions.length }
 					render={
 						<Button
 							size="small"
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
-							disabled={ ! actions.length }
 							accessibleWhenDisabled
 							className="editor-all-actions-button"
 						/>

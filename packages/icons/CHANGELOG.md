@@ -2,14 +2,58 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `insertBefore` and `insertAfter` icons. These were old Dashicons that were never used; use `create` or `plus` instead ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+-   Remove the `offline` icon. It was added in error for a React Native client that is no longer used, so it has no direct replacement; `info` or `error` can stand in ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+
+### New Features
+
+-   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Enhancements
+
+-   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
+
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
+## 19.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `tag`, `termCount`, `termName` and `postTerms`: mirror the tag so it leans the same way as the other angled icons, such as `brush`, `pin` and `plugins`. The number in `termCount` stays readable ([#84675](https://github.com/WordPress/gutenberg/pull/84675)).
+-   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
+
+## 18.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Stroke-based icons now scale their stroke width with their size. A 1.5-unit stroke renders at 1px for a 16px icon, 1.25px for a 20px icon, and 1.5px for a 24px icon ([#84081](https://github.com/WordPress/gutenberg/pull/84081)).
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
 
 ### Enhancements
-
+-   Add initial search keywords to the icon manifest to improve icon discoverability ([#83884](https://github.com/WordPress/gutenberg/pull/83884)).
 -   `formatBold`: draw the B with heavier vertical strokes so it reads as bold at a glance ([#83321](https://github.com/WordPress/gutenberg/pull/83321)).
 -   `justifySpaceBetween` and `justifySpaceEvenly`: redraw so the two icons share one construction with the new `justifySpaceAround`, differing only in where the blocks sit ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
+-   `headingLevel1` to `headingLevel6`: enlarge the drawings to improve their optical balance with the rest of the set ([#83268](https://github.com/WordPress/gutenberg/pull/83268)).
+-   `manifest.json`: Add optional `keywords` property to improve discoverability. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+-   `blockDefault` and `typography`: redraw. `blockDefault` outlines its two tabs rather than filling them, and `typography` redraws the lowercase "a" ([#84073](https://github.com/WordPress/gutenberg/pull/84073)).
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
 ## 17.0.0 (2026-09-23)
 
@@ -119,7 +163,7 @@
 
 ### Breaking Changes
 
-- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+-   Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
 
 ## 12.2.0 (2026-04-15)
 

@@ -11,7 +11,7 @@ import useGlobalStylesRevisions from '../use-global-styles-revisions';
 
 globalThis.wpVitest.mockMatchMedia();
 
-vi.mock( '@wordpress/data/src/components/use-select', () => ( {
+vi.mock( import( '../../../../data/src/components/use-select' ), () => ( {
 	default: vi.fn(),
 } ) );
 

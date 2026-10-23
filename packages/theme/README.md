@@ -9,32 +9,66 @@ This package is not a WordPress block theme, site theme, or `theme.json` API. It
 
 ## Documentation
 
-This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
+This README is the entry point for package consumers. It covers how to load design tokens and use `ThemeProvider`.
 
 - To use design tokens and `ThemeProvider`, start here.
 - To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 - To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+- To validate token usage or inject fallback values at build time, see [`@wordpress/theme-build-tools`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme-build-tools/README.md).
 
 ## Public API
 
-| Entrypoint | Supported use |
-| --- | --- |
-| `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
-| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
-| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
-| Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
-| Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
+| Entrypoint                           | Supported use                                                                                                                                                         |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@wordpress/theme`                   | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document.                                                                                                |
+| `@wordpress/theme/design-tokens.js`  | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles.                                                                    |
 
 The `privateApis` export exists for temporary compatibility with older WordPress bundles. It is not a supported consumer API. Token source JSON, ramp builders, generated fallback maps, and other paths not listed in the package's `exports` are implementation details.
 
-Runtime APIs supplied by WordPress follow its [backward compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). Installing a newer npm package does not upgrade the runtime supplied by WordPress. Check the target WordPress version before using a runtime API. Tooling subpaths use the installed npm package. Removing or renaming semantic tokens is a compatibility change; meaningful value changes belong in the changelog.
+Runtime APIs supplied by WordPress follow its [backward compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). Installing a newer npm package does not upgrade the runtime supplied by WordPress. Check the target WordPress version before using a runtime API. Tooling entrypoints such as `@wordpress/theme/design-tokens.js` and `@wordpress/theme-build-tools` use the installed npm packages. Removing or renaming semantic tokens is a compatibility change; meaningful value changes belong in the changelog.
 
 To inspect token names in development tooling:
 
 ```js
-import tokenNames from '@wordpress/theme/design-tokens.js';
+import { tokens } from '@wordpress/theme/design-tokens.js';
 
+const tokenNames = Object.keys( tokens );
 const isKnownToken = tokenNames.includes( '--wpds-dimension-gap-sm' );
+```
+
+To inspect token metadata and default values:
+
+```js
+import { tokens, groups } from '@wordpress/theme/design-tokens.js';
+
+const brand = tokens[ '--wpds-color-background-interactive-brand-strong' ];
+// brand.modes.default.css: '#3858e9'
+// brand.fallback: 'var(--wp-admin-theme-color, #3858e9)'
+
+const radiusTokenNames = groups.border.groups.radius.tokens;
+const fontFamilyTokenNames = groups.typography.groups[ 'font-family' ].tokens;
+```
+
+`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, containing the resolved DTCG `$value` and CSS string `css`. `group` identifies the top-level namespace, such as `border`, `color`, or `typography`.
+
+`groups` preserves the source token hierarchy, keyed by top-level namespace. Each group has a `tokens` array of CSS custom property names belonging directly to it and a `groups` object containing its child groups. These are empty when the group has no direct tokens or children, respectively. A group that has a `$description` in the token source also exposes it as `$description`, for example `groups.dimension.groups.gap.$description`.
+
+`modes.default` contains build-time defaults and does not reflect theme overrides. Use CSS custom properties to follow the current theme. `fallback` is the expression used by the build plugins when a token variable is unavailable and can differ from the default value, as shown above.
+
+Literal token types are preserved in TypeScript declarations, allowing narrowing by `$type`.
+
+To build a fallback map for a custom plugin:
+
+```js
+import { tokens } from '@wordpress/theme/design-tokens.js';
+
+const tokenFallbacks = Object.fromEntries(
+	Object.entries( tokens ).map( ( [ name, token ] ) => [
+		name,
+		token.fallback,
+	] )
+);
 ```
 
 ## Design Tokens
@@ -74,7 +108,7 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
-The package's JavaScript entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
+The package's JavaScript entrypoints are ESM-only and require Node.js `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
 
 TypeScript consumers require TypeScript 5 or newer.
 
@@ -84,7 +118,7 @@ If your application renders React content into additional documents (an iframe, 
 
 ### Developer Tools
 
-Use the [Stylelint plugins](#stylelint-plugins) to validate token usage and the [build plugins](#build-plugins) to inject generated fallback values. `@wordpress/build` enables the build plugins automatically when `@wordpress/theme` is installed.
+The [`@wordpress/theme-build-tools`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/theme-build-tools/README.md) package provides Stylelint plugins to validate token usage and build plugins to inject generated fallback values. `@wordpress/build` applies the build plugins automatically.
 
 ### Accessibility
 
@@ -238,7 +272,7 @@ When you render React content into a different document (typically an iframe), t
 
     For custom iframes, the consumer is responsible for loading it in the iframe document. Within WordPress, enqueue the `wp-theme` stylesheet for that document. Outside WordPress, import `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or inject the CSS string directly.
 
-2.  **Dynamically injected component styles are routed to the iframe document.** Some `@wordpress/components` styles are injected into the document at runtime rather than shipped as static CSS — for example Emotion-based styles, and styles from CSS modules built with `@wordpress/build`. `StyleProvider` tells that machinery which document's `<head>` to inject into. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>`.
+2.  **CSS Module styles are registered in the iframe document.** Styles from CSS Modules built with `@wordpress/build` are injected at runtime through `@wordpress/style-runtime`. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>` so registered styles reach that document's `<head>` before children measure layout.
 
 The canonical pattern combines both with a `<ThemeProvider isRoot>` to apply any overrides to the iframe's `:root`:
 
@@ -277,119 +311,12 @@ This step will:
 2. Generate primitive tokens.
 3. Build CSS and JavaScript token files.
 4. Update the design tokens documentation.
-5. Format all generated files.
+5. Generate complete Figma border collection mode files in `prebuilt/figma`.
+6. Format all generated files.
 
 The files generated in this step will all be committed to the repo.
 
 After the prebuild step, the package will be built into its final form via the repo's standard package build script.
-
-## Stylelint Plugins
-
-These rules validate design token usage in CSS. Enable them in your Stylelint configuration:
-
-```json
-{
-	"plugins": [
-		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
-		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
-		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
-	],
-	"rules": {
-		"plugin-wpds/no-unknown-ds-tokens": true,
-		"plugin-wpds/no-setting-wpds-custom-properties": true,
-		"plugin-wpds/no-token-fallback-values": true
-	}
-}
-```
-
-### `plugin-wpds/no-unknown-ds-tokens`
-
-Reports references to unknown `--wpds-*` tokens.
-
-### `plugin-wpds/no-setting-wpds-custom-properties`
-
-Reports definitions or overrides in the `--wpds-*` namespace.
-
-### `plugin-wpds/no-token-fallback-values`
-
-Reports manual fallbacks that can drift from the generated values.
-
-## Build Plugins
-
-The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
-
-`@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
-
-| Export                                                                  | Tool          | Scope |
-| ----------------------------------------------------------------------- | ------------- | ----- |
-| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`           | PostCSS       | CSS   |
-| `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks` | Lightning CSS | CSS   |
-| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`           | esbuild       | JS/TS |
-| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
-
-Existing fallbacks are unchanged. An unknown token in a bare reference in transformed values fails the build.
-
-The JavaScript plugins treat token references in string values, JSX attribute values, and static template parts as CSS. This includes tagged templates such as `String.raw`. They leave comments, regular expressions, property names, module paths, JSX text, and TypeScript types unchanged. Token names assembled across template expressions are not resolved. As before, a token reference in a runtime message string is also treated as CSS.
-
-Files the JavaScript parser cannot read are left unchanged for the downstream compiler. To add fallbacks in Vite files that use custom syntax, configure the syntax-stripping plugin with `enforce: 'pre'` and list it before the token fallback plugin.
-
-Both JavaScript plugins preserve source maps. The Vite plugin runs before JavaScript and TypeScript compilation and supports module IDs with query strings. It skips `?raw` and `?url` imports so their exported file contents and URLs stay unchanged.
-
-### PostCSS
-
-```js
-// postcss.config.mjs
-import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
-
-export default {
-	plugins: [ dsTokenFallbacks ],
-};
-```
-
-### Lightning CSS
-
-```js
-import { transform, composeVisitors } from 'lightningcss';
-import dsTokenFallbacks from '@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks';
-
-const { code } = transform( {
-	filename: 'styles.css',
-	code: Buffer.from( css ),
-	visitor: composeVisitors( [ dsTokenFallbacks ] ),
-} );
-```
-
-The visitor preserves CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references such as `var(--wpds-dimension-gap-sm from global)` when it adds a fallback. Custom properties inside generated fallbacks, including `--wp-admin-*` variables, also remain global so admin overrides still apply.
-
-### esbuild
-
-```js
-import dsTokenFallbacks from '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks';
-
-await esbuild.build( {
-	plugins: [ dsTokenFallbacks ],
-	// …
-} );
-```
-
-### Vite
-
-The Vite setup uses both the Vite plugin (for JS/TS) and the PostCSS plugin (for CSS):
-
-```ts
-// vite.config.ts
-import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
-import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
-
-export default defineConfig( {
-	plugins: [ dsTokenFallbacksJs() ],
-	css: {
-		postcss: {
-			plugins: [ dsTokenFallbacks ],
-		},
-	},
-} );
-```
 
 ## Contributing to this package
 
