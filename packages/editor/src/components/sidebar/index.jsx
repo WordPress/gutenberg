@@ -63,8 +63,13 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 			 * The title is not a block, so it never reaches the block
 			 * inspector. While it has focus the block tab describes it
 			 * instead of reporting that nothing is selected.
+			 *
+			 * Only in the visual editor: the code editor has its own raw title
+			 * field and unselects every block, so there the block tab really
+			 * does have nothing to describe.
 			 */
 			isDescribingPostTitle:
+				select( editorStore ).getEditorMode() === 'visual' &&
 				unlock( select( editorStore ) ).isEditingPostTitle() &&
 				! select( blockEditorStore ).getBlockSelectionStart(),
 		};

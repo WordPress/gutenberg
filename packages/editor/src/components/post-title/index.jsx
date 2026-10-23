@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -50,6 +50,23 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		useDispatch( blockEditorStore );
 	const { setIsEditingPostTitle } = unlock( useDispatch( editorStore ) );
 
+	const hasSelectedBlock = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockSelectionStart(),
+		[]
+	);
+
+	/*
+	 * Selecting a block is what supersedes the title, so the flag is cleared
+	 * here rather than on blur. Blurring the title does not mean it stopped
+	 * being what the sidebar describes — opening the Block tab moves focus out
+	 * of it — but selecting a block gives the inspector something of its own.
+	 */
+	useEffect( () => {
+		if ( hasSelectedBlock ) {
+			setIsEditingPostTitle( false );
+		}
+	}, [ hasSelectedBlock, setIsEditingPostTitle ] );
+
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
 
@@ -88,12 +105,8 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		setIsSelected( true );
 		/*
 		 * Clearing the block selection leaves nothing for the sidebar to
-		 * describe, so record that the title is what is being edited.
-		 *
-		 * This is deliberately not cleared on blur. Opening the sidebar's Block
-		 * tab moves focus out of the title, so a blur would unset this before
-		 * the tab it feeds could render. Selecting a block is what supersedes
-		 * it, and the sidebar already checks for that.
+		 * describe, so record that the title is what is being edited. The
+		 * effect above clears it again once a block is selected.
 		 */
 		setIsEditingPostTitle( true );
 		clearSelectedBlock();
