@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import type { Modal } from '@wordpress/components';
 import type { Block as PatternRecord, Term } from '@wordpress/core-data';
-import type { PatternCategoryMap } from '../types';
+import type { BlockMetadata, PatternCategoryMap } from '../types';
 
 /**
  * The modal props a modal component passes on to its `Modal`.
@@ -125,4 +125,44 @@ export interface RenamePatternCategoryModalProps extends PassedModalProps {
 	onClose: () => void;
 	onError?: () => void;
 	onSuccess?: ( savedRecord: Term< 'edit' > | undefined ) => void;
+}
+
+export interface PatternsMenuItemsProps {
+	rootClientId?: string;
+}
+
+export interface PatternConvertButtonProps {
+	/**
+	 * Client ids of selected blocks.
+	 */
+	clientIds: Array< string >;
+	/**
+	 * ID of the currently selected top-level block.
+	 */
+	rootClientId?: string;
+	/**
+	 * Callback to close the block settings menu dropdown.
+	 */
+	closeBlockSettingsMenu: () => void;
+}
+
+export interface PatternsManageButtonProps {
+	clientId: string;
+	onClose?: () => void;
+}
+
+export interface PatternOverridesControlsProps {
+	attributes: {
+		metadata?: BlockMetadata;
+		href?: string;
+	};
+	setAttributes: ( attributes: { metadata: BlockMetadata } ) => void;
+	name: string;
+}
+
+export interface ResetOverridesControlProps {
+	attributes: {
+		metadata?: BlockMetadata;
+	};
+	clientId: string;
 }
