@@ -620,6 +620,42 @@ describe( 'GridLayoutInspectorControls', () => {
 				} );
 			} );
 
+			it( 'keeps blocks in place when the count is reset', async () => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				renderInspectorControls( {
+					layout: { ...layout, columnCount: 5 },
+					onChange,
+				} );
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Layout options' } )
+				);
+				await user.click(
+					screen.getByRole( 'menuitem', {
+						name: 'Columns and rows, reset to default',
+					} )
+				);
+
+				// The default count of a manual grid is 3, and three of the four
+				// rows of five columns keep it about as tall.
+				expect( onChange ).toHaveBeenCalledWith( {
+					...layout,
+					columnCount: 3,
+					rowCount: 3,
+				} );
+				const childLayout = unlock(
+					select( blockEditorStore )
+				).getBlockAttributes( 'child' ).style.layout;
+				expect( childLayout ).toEqual(
+					expect.objectContaining( {
+						columnStart: 1,
+						rowStart: 1,
+						box: expect.any( Object ),
+					} )
+				);
+			} );
+
 			it( 'only changes the count where the cells are not fixed', async () => {
 				mockGridElement.current?.style.setProperty(
 					'--wp--style--grid-cells',
@@ -670,6 +706,62 @@ describe( 'GridLayoutInspectorControls', () => {
 					expect.objectContaining( { columnCount: 12 } )
 				);
 			} );
+		} );
+
+		it( 'keeps the column count when the grid type is switched', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const renderLayout = ( layout: Record< string, unknown > ) => (
+				<ToolsPanel
+					label="Layout"
+					resetAll={ vi.fn() }
+					panelId={ PANEL_ID }
+				>
+					<GridLayoutInspectorControls
+						clientId={ PANEL_ID }
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				</ToolsPanel>
+			);
+			const { rerender } = render(
+				renderLayout( {
+					type: 'grid',
+					isManualPlacement: true,
+					columnCount: 6,
+					rowCount: 2,
+				} )
+			);
+			// The count changed after the control was shown.
+			rerender(
+				renderLayout( {
+					type: 'grid',
+					isManualPlacement: true,
+					columnCount: 8,
+					rowCount: 2,
+				} )
+			);
+
+			await user.click(
+				await screen.findByRole( 'radio', { name: 'Auto' } )
+			);
+			expect( onChange ).toHaveBeenLastCalledWith(
+				expect.objectContaining( {
+					columnCount: 8,
+					isManualPlacement: undefined,
+				} )
+			);
+
+			rerender( renderLayout( { type: 'grid', columnCount: 5 } ) );
+			await user.click(
+				await screen.findByRole( 'radio', { name: 'Manual' } )
+			);
+			expect( onChange ).toHaveBeenLastCalledWith(
+				expect.objectContaining( {
+					columnCount: 5,
+					isManualPlacement: true,
+				} )
+			);
 		} );
 
 		it( 'does not offer stacking on mobile for auto placement grids', async () => {

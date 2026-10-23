@@ -415,6 +415,15 @@ class GridDragUtils {
 		await this.page.mouse.move( from.x + 5, from.y + 5, { steps: 5 } );
 		await this.page.mouse.move( to.x, to.y, { steps: 20 } );
 		await beforeDrop?.();
+		// The grid follows the pointer once per animation frame.
+		await this.page.evaluate(
+			() =>
+				new Promise( ( resolve ) =>
+					window.requestAnimationFrame( () =>
+						window.requestAnimationFrame( resolve )
+					)
+				)
+		);
 		const landing = ( await this.landingPreview.count() )
 			? await this.landingPreview.boundingBox()
 			: null;

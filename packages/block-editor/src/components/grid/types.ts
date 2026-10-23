@@ -1,4 +1,4 @@
-import type { CSSProperties, Ref } from 'react';
+import type { CSSProperties, Ref, RefObject } from 'react';
 import type { Layout } from '../../layouts/types';
 import type { AlignmentGuide } from './get-alignment-guides';
 import type { GridItemBox, GridPlacement } from './free-placement';
@@ -221,12 +221,29 @@ export interface GridVisualizerDropLayerProps {
 	gridElement: Element;
 	/** Grid info, from `getGridInfo`. */
 	gridInfo: GridInfo;
-	/** Called with the drop target, or null. */
-	setDropTarget: ( target: GridDropTarget | null ) => void;
+}
+
+/**
+ * A move of a drag over a manual grid's drop layer, with what the drag's data
+ * said when it happened.
+ */
+export interface GridDropLayerMove {
+	clientX: number;
+	clientY: number;
+	/** Whether Shift was held, to snap a block placed freely. */
+	shiftKey: boolean;
+	/** Whether the block is dragged by a drag handle. */
+	isHandleDrag: boolean;
+	/** Client ID of the dragged block, if it can be placed in the grid. */
+	srcClientId: string | null;
+	/** Whether the drag is of blocks from an inserter that the grid allows. */
+	isInserterDrag: boolean;
 }
 
 export interface GridDropIndicatorProps {
 	dropTarget: GridDropTarget;
+	/** Ref to the landing preview, which is moved without rendering. */
+	landingRef: RefObject< HTMLDivElement | null >;
 }
 
 export interface AutoGridVisualizerProps {

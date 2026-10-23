@@ -386,6 +386,18 @@ describe( 'layout child', () => {
 				getGridItemBox( { box: { ...box, left: -0.01 } } )
 			).toBeUndefined();
 			expect(
+				getGridItemBox( { box: { ...box, left: 1.5, width: 0.1 } } )
+			).toBeUndefined();
+			expect(
+				getGridItemBox( { box: { ...box, left: 0.5, width: 0.6 } } )
+			).toBeUndefined();
+			// Rounded values can end a little past the cells.
+			expect(
+				getGridItemBox( {
+					box: { ...box, left: 0.1563, width: 0.8438 },
+				} )
+			).toBeDefined();
+			expect(
 				getGridItemBox( {
 					// A stored attribute can hold any value.
 					box: { ...box, height: '0.5' as unknown as number },

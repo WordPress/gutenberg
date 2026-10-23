@@ -2174,6 +2174,48 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'width' => 2 ) ) ) ), 'A box wider than its cells should be ignored.' );
 		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'height' => '0.5' ) ) ) ), 'A box with numeric strings should be ignored, as in the editor.' );
 		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'left' => -0.01 ) ) ) ), 'A box that starts before its cells should be ignored.' );
+		$this->assertNull(
+			gutenberg_get_grid_item_box(
+				array(
+					'box' => array_merge(
+						$box,
+						array(
+							'left'  => 1.5,
+							'width' => 0.1,
+						)
+					),
+				)
+			),
+			'A box that starts after its cells should be ignored.'
+		);
+		$this->assertNull(
+			gutenberg_get_grid_item_box(
+				array(
+					'box' => array_merge(
+						$box,
+						array(
+							'left'  => 0.5,
+							'width' => 0.6,
+						)
+					),
+				)
+			),
+			'A box that ends past its cells should be ignored.'
+		);
+		$this->assertNotNull(
+			gutenberg_get_grid_item_box(
+				array(
+					'box' => array_merge(
+						$box,
+						array(
+							'left'  => 0.1563,
+							'width' => 0.8438,
+						)
+					),
+				)
+			),
+			'A box whose rounded values end a little past its cells should be kept.'
+		);
 	}
 
 	/**
