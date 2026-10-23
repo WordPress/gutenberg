@@ -24,7 +24,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	backup,
 	close,
@@ -597,7 +597,24 @@ function MediaEditorContent( {
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
-	const { removeAllNotices } = useDispatch( noticesStore );
+	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
+	// `PluginArea` drops a plugin whose render callback throws; say so where
+	// the editor's other notices appear, as the post editor does.
+	const handlePluginError = useCallback(
+		( name: string ) => {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: plugin name */
+					__(
+						'The "%s" plugin has encountered an error and cannot be rendered.'
+					),
+					name
+				),
+				{ type: 'snackbar', context: MEDIA_EDITOR_NOTICES_CONTEXT }
+			);
+		},
+		[ createErrorNotice ]
+	);
 
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
@@ -1041,7 +1058,10 @@ function MediaEditorContent( {
 							>
 								<MediaForm />
 							</MediaEditorPanel>
-							<PluginArea scope="media-editor" />
+							<PluginArea
+								scope="media-editor"
+								onError={ handlePluginError }
+							/>
 							{ children }
 						</MediaEditorPanelsProvider>
 					</SlotFillProvider>

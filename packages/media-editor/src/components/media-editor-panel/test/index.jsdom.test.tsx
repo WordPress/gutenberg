@@ -154,4 +154,32 @@ describe( 'MediaEditorPanel', () => {
 
 		expect( screen.getByTestId( 'tabs' ) ).toBeEmptyDOMElement();
 	} );
+
+	it( 'keeps a failing panel inside its tab', () => {
+		function Broken(): never {
+			throw new Error( 'Broken panel' );
+		}
+		render(
+			<Editor>
+				<MediaEditorPanel name="plugin/broken" title="Broken">
+					<Broken />
+				</MediaEditorPanel>
+				<MediaEditorPanel name="plugin/fine" title="Fine">
+					<p>Fine content</p>
+				</MediaEditorPanel>
+			</Editor>
+		);
+
+		// React reports the error it handed to the boundary.
+		expect( console ).toHaveErrored();
+		expect( screen.getByTestId( 'tabs' ) ).toHaveTextContent(
+			'plugin/broken,plugin/fine'
+		);
+		expect(
+			screen.getByRole( 'region', { name: 'Broken' } )
+		).toHaveTextContent( 'The "Broken" panel could not be shown' );
+		expect(
+			screen.getByRole( 'region', { name: 'Fine' } )
+		).toHaveTextContent( 'Fine content' );
+	} );
 } );
