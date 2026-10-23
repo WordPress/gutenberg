@@ -114,6 +114,13 @@
 		"filePath": "library/aspect-ratio.svg"
 	},
 	{
+		"slug": "asterisk",
+		"label": "Asterisk",
+		"filePath": "library/asterisk.svg",
+		"collections": [ "core", "core-admin" ],
+		"keywords": [ "generic", "wildcard", "placeholder" ]
+	},
+	{
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
 		"filePath": "library/at-symbol.svg",
@@ -557,7 +564,7 @@
 		"slug": "error",
 		"label": "Error",
 		"filePath": "library/error.svg",
-		"collections": [ "core" ],
+		"collections": [ "core", "core-admin" ],
 		"keywords": [ "alert", "caution", "exclamation", "warning" ]
 	},
 	{
@@ -823,22 +830,12 @@
 		"slug": "info",
 		"label": "Info",
 		"filePath": "library/info.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "inline-image",
 		"label": "Inline Image",
 		"filePath": "library/inline-image.svg"
-	},
-	{
-		"slug": "insert-after",
-		"label": "Insert After",
-		"filePath": "library/insert-after.svg"
-	},
-	{
-		"slug": "insert-before",
-		"label": "Insert Before",
-		"filePath": "library/insert-before.svg"
 	},
 	{
 		"slug": "institution",
@@ -1102,11 +1099,6 @@
 		"filePath": "library/not-found.svg"
 	},
 	{
-		"slug": "offline",
-		"label": "Offline",
-		"filePath": "library/offline.svg"
-	},
-	{
 		"slug": "overlay-text",
 		"label": "Overlay Text",
 		"filePath": "library/overlay-text.svg"
@@ -1249,7 +1241,8 @@
 	{
 		"slug": "post-comments",
 		"label": "Post Comments",
-		"filePath": "library/post-comments.svg"
+		"filePath": "library/post-comments.svg",
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "post-comments-count",
