@@ -13,6 +13,10 @@
 -   Add an optional `preserveAnimation` option to `resizeImage`. A resize of an animated image then keeps every frame, re-encoded with `gifsave` settings tuned for speed and size (`effort: 2`, `interframe_maxerror: 8`), instead of flattening to the first frame. Cropped resizes cut every frame with the same rectangle. An animation whose decoded frames would not fit the WASM heap flattens too, so the resize degrades rather than failing ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 -   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
 
+### New Features
+
+-   Add `encodePixelsAsJpeg` and its worker counterpart `vipsEncodePixelsAsJpeg`, which encode raw RGBA pixels as a JPEG while copying the EXIF block from the image file they were decoded from ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
+
 ## 4.3.0 (2026-10-07)
 
 ## 4.2.0 (2026-09-23)
