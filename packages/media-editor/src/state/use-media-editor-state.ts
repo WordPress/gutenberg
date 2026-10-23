@@ -109,12 +109,18 @@ export interface MediaEditorSession {
 	 * default geometry and crop options, no edits. Keeps the image.
 	 */
 	reset: () => void;
-	/** The named edits other than crop, keyed by edit name. */
+	/**
+	 * The named edits other than crop, keyed by edit name. Session state
+	 * for the editor's own edit pipeline, not an extension API: undoable
+	 * and cleared by `reset`, but not counted by `hasOutputEdits` and not
+	 * saved.
+	 */
 	edits: EditsSlice;
 	/**
 	 * Set a named edit, or remove it by passing `undefined`. Recorded
 	 * in the session history like any crop change. Setting a value
-	 * equal in content to the current one is a no-op.
+	 * equal in content to the current one is a no-op. See `edits` for
+	 * what the editor does, and does not, do with one.
 	 */
 	setEdit: ( name: string, value: EditValue | undefined ) => void;
 	/**
@@ -131,7 +137,8 @@ export interface MediaEditorSession {
 	isDirty: boolean;
 	/**
 	 * Whether the edits change the saved image, so saving has to
-	 * produce new image output rather than only metadata.
+	 * produce new image output rather than only metadata. Geometry
+	 * counts; named edits do not until the edit pipeline applies them.
 	 */
 	hasOutputEdits: boolean;
 	/** Whether there's an undoable change in history. */

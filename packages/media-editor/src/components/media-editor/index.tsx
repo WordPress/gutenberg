@@ -6,8 +6,11 @@ import {
 	MenuItem,
 	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
+	Slot,
+	SlotFillProvider,
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
+import { PluginArea } from '@wordpress/plugins';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -18,10 +21,11 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	backup,
 	close,
@@ -51,7 +55,14 @@ import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaForm from '../media-form';
-import { getMediaTypeFromMimeType } from '../../utils';
+import MediaEditorPanel, {
+	MEDIA_EDITOR_PLUGIN_SCOPE,
+	MediaEditorPanelsProvider,
+	getPanelSlotName,
+	useMediaEditorPanels,
+	type MediaEditorPanelFillProps,
+} from '../media-editor-panel';
+import { getMediaTypeFromMimeType, type MediaType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
@@ -78,10 +89,13 @@ const PLACEMENT_CONTROL_IDLE_MS = 300;
  * whether one is, so a further panel is a new id here and a new entry in the
  * tab list — not a change to the state's shape.
  */
-const DETAILS_PANEL = 'details';
+const DETAILS_PANEL = 'core/details';
 
 /** Identifier for the crop panel. Images only; other media has nothing to crop. */
-const CROP_PANEL = 'crop';
+const CROP_PANEL = 'core/crop';
+
+/** Crop applies to images only; other media has nothing to crop. */
+const CROP_MEDIA_TYPES = [ 'image' ] as const;
 
 interface MediaEditorTab {
 	id: string;
@@ -184,6 +198,11 @@ function MediaEditorSidebar( {
 						value={ tab.id }
 						tabIndex={ -1 }
 						className="media-editor__panel"
+						// A save reads the session once and then waits, so
+						// nothing in the open panel may act on it until it
+						// resolves. `inert` holds every panel still, whether
+						// or not it honours the `disabled` it is handed.
+						inert={ disabled }
 					>
 						<Stack direction="column" gap="lg">
 							{ tab.render() }
@@ -203,6 +222,7 @@ function MediaEditorSidebar( {
  */
 interface MediaEditorFrameContextValue {
 	isImage: boolean;
+	mediaType: MediaType[ 'type' ];
 	isSaving: boolean;
 	hasMedia: boolean;
 	hasChanges: boolean;
@@ -252,6 +272,26 @@ function useMediaEditorFrameContext(): MediaEditorFrameContextValue {
 		);
 	}
 	return context;
+}
+
+/**
+ * Core's Crop panel, built on what a plugin's panel gets, so the editor
+ * itself proves the panel context is enough to build a panel with.
+ *
+ * @param props
+ * @param props.disabled
+ */
+function CropPanelContent( { disabled }: MediaEditorPanelFillProps ) {
+	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
+		useMediaEditorPanelContext();
+	return (
+		<MediaEditorCropPanel
+			aspectRatioValue={ aspectRatioValue }
+			onAspectRatioChange={ setAspectRatioValue }
+			aspectRatioOptions={ aspectRatioOptions }
+			disabled={ disabled }
+		/>
+	);
 }
 
 export interface HeaderActionsProps {
@@ -564,7 +604,24 @@ function MediaEditorContent( {
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
-	const { removeAllNotices } = useDispatch( noticesStore );
+	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
+	// `PluginArea` drops a plugin whose render callback throws; say so where
+	// the editor's other notices appear, as the post editor does.
+	const handlePluginError = useCallback(
+		( name: string ) => {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: plugin name */
+					__(
+						'The "%s" plugin has encountered an error and cannot be rendered.'
+					),
+					name
+				),
+				{ type: 'snackbar', context: MEDIA_EDITOR_NOTICES_CONTEXT }
+			);
+		},
+		[ createErrorNotice ]
+	);
 
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
@@ -700,6 +757,9 @@ function MediaEditorContent( {
 	}, [ clearEntityRecordEdits, id ] );
 
 	// A bare replacement has no cropper diff, so OR the flag in explicitly.
+	// Named edits (`session.edits`) are session state that nothing saves, so
+	// `hasOutputEdits` leaves them out: counting them would enable Save for a
+	// change the save then drops.
 	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
@@ -728,8 +788,6 @@ function MediaEditorContent( {
 			setActivePanel( isWide ? lastPanelRef.current : null );
 		}
 	}, [ isWide, isImage ] );
-	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
-		useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		session,
 		id,
@@ -830,32 +888,26 @@ function MediaEditorContent( {
 			/>
 		) : null;
 
-	// Crop leads, since it is what the docked panel opens on. Non-image media
-	// has nothing to crop and gets Details alone, which is why the sidebar
-	// takes this list rather than deriving it.
-	const tabs: MediaEditorTab[] = [
-		...( isImage
-			? [
-					{
-						id: CROP_PANEL,
-						title: __( 'Crop' ),
-						render: () => (
-							<MediaEditorCropPanel
-								aspectRatioValue={ aspectRatioValue }
-								onAspectRatioChange={ setAspectRatioValue }
-								aspectRatioOptions={ aspectRatioOptions }
-								disabled={ isSaving }
-							/>
-						),
-					},
-				]
-			: [] ),
-		{
-			id: DETAILS_PANEL,
-			title: __( 'Details' ),
-			render: () => <MediaForm />,
-		},
-	];
+	// The mounted panels that apply to this media, in panel order: Crop
+	// leads for images, since it is what the docked panel opens on, and
+	// non-image media gets Details alone.
+	const { panels, contextValue: panelsContextValue } = useMediaEditorPanels();
+	const tabs: MediaEditorTab[] = panels
+		.filter(
+			( panel ) =>
+				! panel.mediaTypes || panel.mediaTypes.includes( mediaType )
+		)
+		.map( ( panel ) => ( {
+			id: panel.name,
+			title: panel.title,
+			render: () => (
+				<Slot
+					bubblesVirtually
+					name={ getPanelSlotName( panel.name ) }
+					fillProps={ { disabled: isSaving } }
+				/>
+			),
+		} ) );
 
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
@@ -865,23 +917,7 @@ function MediaEditorContent( {
 	) : null;
 
 	const children = (
-		<MediaEditorProvider
-			value={ media ?? undefined }
-			onChange={ handleChange }
-			settings={ {
-				// Disable the fields while saving, so the guard in
-				// `handleChange` is not silently swallowing typing.
-				// `readOnly` would swap the field's layout mid-save;
-				// disabled keeps it in place and greys it out.
-				fields: isSaving
-					? fields.map( ( field ) => ( {
-							...field,
-							isDisabled: true,
-						} ) )
-					: fields,
-				form,
-			} }
-		>
+		<>
 			<div className="media-editor">
 				{ ! media ? (
 					<div className="media-editor__loading">
@@ -922,7 +958,7 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ !! activePanel && (
+						{ !! activePanel && tabs.length > 0 && (
 							<MediaEditorSidebar
 								tabs={ tabs }
 								// Swapping the edited media can drop the Crop
@@ -961,13 +997,14 @@ function MediaEditorContent( {
 			{ noticesPortalElement
 				? createPortal( snackbar, noticesPortalElement )
 				: snackbar }
-		</MediaEditorProvider>
+		</>
 	);
 
 	// Rebuilt each render, like the elements it replaces: consumers re-render
 	// as they always did, but the cluster component types stay stable.
 	const contextValue: MediaEditorFrameContextValue = {
 		isImage,
+		mediaType,
 		isSaving,
 		hasMedia: !! media,
 		hasChanges,
@@ -989,7 +1026,67 @@ function MediaEditorContent( {
 	return (
 		<MediaEditorFrameContext.Provider value={ contextValue }>
 			{ renderFrame( {
-				children,
+				children: (
+					<MediaEditorProvider
+						value={ media ?? undefined }
+						onChange={ handleChange }
+						settings={ {
+							// Disable the fields while saving, so the guard in
+							// `handleChange` is not silently swallowing typing.
+							// `readOnly` would swap the field's layout mid-save;
+							// disabled keeps it in place and greys it out.
+							fields: isSaving
+								? fields.map( ( field ) => ( {
+										...field,
+										isDisabled: true,
+									} ) )
+								: fields,
+							form,
+						} }
+					>
+						<SlotFillProvider>
+							<MediaEditorPanelsProvider
+								value={ panelsContextValue }
+							>
+								{ /* Core's panels and plugins' panels arrive the same
+								     way: components that announce a tab and fill it.
+								     `PluginArea` mounts `registerPlugin` callbacks for
+								     this scope here, inside the session provider, so
+								     plugin panels get the session from
+								     `useMediaEditor()`. A panel's content renders in
+								     the panel's own React tree and is portaled into
+								     its tab, so a plugin's providers and error
+								     boundary reach it. `MediaEditorProvider` sits
+								     above the panels so Core's Details form finds
+								     its context there too. */ }
+								<MediaEditorPanel
+									name={ CROP_PANEL }
+									title={ __( 'Crop' ) }
+									order={ 10 }
+									mediaTypes={ CROP_MEDIA_TYPES }
+								>
+									{ ( { disabled } ) => (
+										<CropPanelContent
+											disabled={ disabled }
+										/>
+									) }
+								</MediaEditorPanel>
+								<MediaEditorPanel
+									name={ DETAILS_PANEL }
+									title={ __( 'Details' ) }
+									order={ 20 }
+								>
+									<MediaForm />
+								</MediaEditorPanel>
+								<PluginArea
+									scope={ MEDIA_EDITOR_PLUGIN_SCOPE }
+									onError={ handlePluginError }
+								/>
+								{ children }
+							</MediaEditorPanelsProvider>
+						</SlotFillProvider>
+					</MediaEditorProvider>
+				),
 				isImage,
 				layout,
 				onRequestClose: handleRequestClose,
@@ -1017,5 +1114,82 @@ export function MediaEditor( props: MediaEditorProps ) {
 MediaEditor.HeaderActions = HeaderActions;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
+
+/**
+ * What a sidebar panel may read and do. The session has far more, the
+ * cropper controller with its state shape, gestures and image loading, and
+ * public means frozen: adding to this later costs nothing, removing from
+ * the session would need a deprecation cycle.
+ */
+export interface MediaEditorPanelContextValue {
+	/** `image`, `video`, `audio` or `application`. */
+	mediaType: MediaType[ 'type' ];
+	isImage: boolean;
+	/** `true` while a save runs. */
+	isSaving: boolean;
+	/** Whether there is anything to save. */
+	hasChanges: boolean;
+	/** The selected aspect-ratio preset's key. */
+	aspectRatioValue: string;
+	/** Free and Original, then the host's presets or the defaults. */
+	aspectRatioOptions: AspectRatioPreset[];
+	setAspectRatioValue: ( presetKey: string ) => void;
+	/** A quarter turn: `1` clockwise, `-1` anticlockwise. */
+	rotate: ( direction: 1 | -1 ) => void;
+	flipHorizontal: () => void;
+	flipVertical: () => void;
+}
+
+/**
+ * The editor as a sidebar panel sees it. A panel reads state and drives the
+ * session through this rather than through the session itself.
+ *
+ * Must be used within `MediaEditor`.
+ *
+ * @return What the panel may read and do.
+ */
+export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
+	const { mediaType, isImage, isSaving, hasChanges, aspectRatioPresets } =
+		useMediaEditorFrameContext();
+	const { cropper } = useMediaEditor();
+	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
+		useCropOptions( { aspectRatioPresets } );
+	const { snapRotate90, setFlip } = cropper;
+	const { flip } = cropper.state;
+	return useMemo(
+		() => ( {
+			mediaType,
+			isImage,
+			isSaving,
+			hasChanges,
+			aspectRatioValue,
+			aspectRatioOptions,
+			setAspectRatioValue,
+			rotate: snapRotate90,
+			flipHorizontal: () =>
+				setFlip( {
+					horizontal: ! flip.horizontal,
+					vertical: flip.vertical,
+				} ),
+			flipVertical: () =>
+				setFlip( {
+					horizontal: flip.horizontal,
+					vertical: ! flip.vertical,
+				} ),
+		} ),
+		[
+			mediaType,
+			isImage,
+			isSaving,
+			hasChanges,
+			aspectRatioValue,
+			aspectRatioOptions,
+			setAspectRatioValue,
+			snapRotate90,
+			setFlip,
+			flip,
+		]
+	);
+}
 
 export default MediaEditor;

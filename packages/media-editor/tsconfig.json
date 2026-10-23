@@ -25,8 +25,10 @@
 		{ "path": "../keyboard-shortcuts/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../plugins" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../ui/tsconfig.build.json" }
+		{ "path": "../ui/tsconfig.build.json" },
+		{ "path": "../warning/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [

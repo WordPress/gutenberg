@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaEditor` builds its sidebar tabs from mounted `MediaEditorPanel` components and mounts plugins registered with `registerPlugin` in the `media-editor` scope inside the editor's session provider. Core's Crop and Details are two such panels. A panel's content renders in the panel's own React tree, a panel that throws keeps the failure inside its tab, and common mistakes warn in development ([#84664](https://github.com/WordPress/gutenberg/pull/84664)).
+
+### Internal
+
+-   Add `@wordpress/plugins` and `@wordpress/warning` as dependencies ([#84664](https://github.com/WordPress/gutenberg/pull/84664)).
+
 ## 0.21.0 (2026-10-20)
 
 ### Breaking Changes
