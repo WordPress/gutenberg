@@ -18,7 +18,6 @@ import {
 	NotesFilters,
 	filterNotes,
 	hasActiveNotesFilters,
-	sanitizeNotesFilters,
 	shouldExpandReplies,
 } from './notes-filters';
 import { store as editorStore } from '../../store';
@@ -83,11 +82,7 @@ function NotesSidebar( { postId, drafts } ) {
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
 	const areNotesHidden = notesDisplayMode === 'hidden';
-	const [ storedFilters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
-	const filters = useMemo(
-		() => sanitizeNotesFilters( notes, storedFilters ),
-		[ notes, storedFilters ]
-	);
+	const [ filters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
 	const filteredNotes = useMemo(
 		() => filterNotes( notes, filters, selectedNoteId ),
 		[ notes, filters, selectedNoteId ]
@@ -197,7 +192,6 @@ function NotesSidebar( { postId, drafts } ) {
 				>
 					{ notes.length > 0 && (
 						<NotesFilters
-							notes={ notes }
 							filters={ filters }
 							onChange={ setFilters }
 						/>

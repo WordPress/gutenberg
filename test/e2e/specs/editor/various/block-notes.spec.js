@@ -479,7 +479,7 @@ test.describe( 'Block Notes', () => {
 		await expect( headingThread ).toBeVisible();
 		await expect( imageThread ).toBeHidden();
 
-		// The menu stays open, so Status and Author can both be set.
+		// The menu stays open after a pick.
 		await expect(
 			sidebar.getByRole( 'button', { name: 'Filter (1 applied)' } )
 		).toBeVisible();
