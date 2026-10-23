@@ -15,14 +15,14 @@
 	position: relative;
 	cursor: text;
 
+	&:focus {
+		@include outset-ring__focus();
+	}
+
 	// Increase placeholder opacity to meet contrast ratios.
 	&[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
-}
-
-.wp-block-button__link:focus {
-	@include outset-ring__focus();
 }
 
 // Display "table" is used because the button container should only wrap the content and not takes the full width.

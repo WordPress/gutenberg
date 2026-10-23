@@ -4,11 +4,11 @@
 
 ### Enhancements
 
+-   Button: Use the design-system outline for the block wrapper's focus styling.
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
 
--   Button: Restore a visible focus ring when editing button text.
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
