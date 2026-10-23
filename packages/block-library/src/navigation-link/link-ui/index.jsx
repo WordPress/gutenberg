@@ -75,7 +75,9 @@ function UnforwardedLinkUI( props, ref ) {
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
 	const link = useMemo(
 		() => ( {
-			url,
+			// An empty URL equals the empty search input, which turns the
+			// initial suggestions off, so treat it as no URL.
+			url: url || undefined,
 			opensInNewTab,
 			title: label && stripHTML( label ),
 			entityTitle: entityRecord?.title?.rendered || entityRecord?.name,
@@ -143,7 +145,9 @@ function UnforwardedLinkUI( props, ref ) {
 	const canAddBlock = blockEditingMode !== 'disabled';
 	const canAddPage = useSelect(
 		( select ) => {
-			if ( ! canAddBlock || type !== 'page' ) {
+			// An unset type (e.g. after detaching the link) behaves like a
+			// page link, as the page creator assumes below.
+			if ( ! canAddBlock || ( type && type !== 'page' ) ) {
 				return false;
 			}
 
