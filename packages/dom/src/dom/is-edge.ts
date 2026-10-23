@@ -107,11 +107,11 @@ export default function isEdge(
 	const containerRect = container.getBoundingClientRect();
 
 	// The selection is on the edge line. To check if it is at the horizontal
-	// edge of that line, we insert a test selection at the container's edge on
-	// that line and check if the selections have the same position. This
-	// proves better than a DOM-based calculation, since it ignores empty text
-	// nodes and a trailing line break element. The line is within the viewport
-	// when the selection is; otherwise the browser handles the key.
+	// edge of that line, we hit-test a point at the container's edge on that
+	// line and check if the caret there has the same position. This proves
+	// better than a DOM-based calculation, since it ignores empty text nodes
+	// and a trailing line break element. The line is within the viewport when
+	// the selection is; otherwise the browser handles the key.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? rangeRect.top + 1 : rangeRect.bottom - 1;
 
