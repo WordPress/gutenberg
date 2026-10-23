@@ -4,8 +4,13 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import EntityRecordItem from './entity-record-item';
 import { STORE_NAME } from '../../name';
+import type { store as coreStore } from '../../';
+import type { EntitySavedStatesRecord, EntityTypeListProps } from './types';
 
-function getEntityDescription( entity, count ) {
+function getEntityDescription(
+	entity: string | undefined,
+	count: number
+): string | void {
 	switch ( entity ) {
 		case 'site':
 			return 1 === count
@@ -21,11 +26,16 @@ function getEntityDescription( entity, count ) {
 	}
 }
 
-function GlobalStylesDescription( { record } ) {
+function GlobalStylesDescription( {
+	record,
+}: {
+	record: EntitySavedStatesRecord;
+} ) {
 	const { editedRecord, savedRecord } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getEntityRecord } =
-				select( STORE_NAME );
+				// The store is selected by name, which carries no store types.
+				select( STORE_NAME as unknown as typeof coreStore );
 			return {
 				editedRecord: getEditedEntityRecord(
 					record.kind,
@@ -58,7 +68,13 @@ function GlobalStylesDescription( { record } ) {
 	) : null;
 }
 
-function EntityDescription( { record, count } ) {
+function EntityDescription( {
+	record,
+	count,
+}: {
+	record: EntitySavedStatesRecord;
+	count: number;
+} ) {
 	if ( 'globalStyles' === record?.name ) {
 		return null;
 	}
@@ -70,12 +86,13 @@ export default function EntityTypeList( {
 	list,
 	unselectedEntities,
 	setUnselectedEntities,
-} ) {
+}: EntityTypeListProps ) {
 	const count = list.length;
 	const firstRecord = list[ 0 ];
 	const entityConfig = useSelect(
 		( select ) =>
-			select( STORE_NAME ).getEntityConfig(
+			// The store is selected by name, which carries no store types.
+			select( STORE_NAME as unknown as typeof coreStore ).getEntityConfig(
 				firstRecord.kind,
 				firstRecord.name
 			),
