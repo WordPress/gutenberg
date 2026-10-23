@@ -5,7 +5,6 @@ import isSelectionForward from './is-selection-forward';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
-import { scrollIfNoRange } from './scroll-if-no-range';
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
@@ -112,15 +111,18 @@ export default function isEdge(
 	// that line and check if the selections have the same position. This
 	// proves better than a DOM-based calculation, since it ignores empty text
 	// nodes and a trailing line break element. The line is within the viewport
-	// when the selection is, so the test point can be hit-tested.
+	// when the selection is; otherwise the browser handles the key.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? rangeRect.top + 1 : rangeRect.bottom - 1;
 
-	const testRange = scrollIfNoRange( container, isReverse, () =>
-		hiddenCaretRangeFromPoint( ownerDocument, x, y, container )
+	const testRange = hiddenCaretRangeFromPoint(
+		ownerDocument,
+		x,
+		y,
+		container
 	);
 
-	if ( ! testRange ) {
+	if ( ! testRange || ! container.contains( testRange.startContainer ) ) {
 		return false;
 	}
 
