@@ -10,7 +10,7 @@
  * the post types that are not registered.
  *
  * A path must match the request of the `getFieldsConfig` core data resolver,
- * see packages/core-data/src/resolvers.js.
+ * see packages/core-data/src/resolvers.ts.
  *
  * @param string[] $post_types The post types.
  * @return string[] One path of the `wp/v2/entity-fields` route per post type, in the
@@ -156,11 +156,11 @@ add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_site_edit
  * @return array Filtered preload paths.
  */
 function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
-	// Complete list of fields expected by packages/core-data/src/entities.js.
+	// Complete list of fields expected by packages/core-data/src/entities.ts.
 	// The preloaded list must match entities.js exactly (same fields, same
 	// order) or the browser discards the preloaded response, so any field
 	// added to entities.js has to be reflected here too.
-	// @see packages/core-data/src/entities.js rootEntitiesConfig.__unstableBase
+	// @see packages/core-data/src/entities.ts rootEntitiesConfig.__unstableBase
 	$root_fields = 'description,generate_animated_image_subsizes,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front';
 
 	foreach ( $paths as $key => $path ) {
