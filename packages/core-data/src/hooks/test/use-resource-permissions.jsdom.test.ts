@@ -3,26 +3,33 @@ import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = vi.mocked( triggerFetch );
+
 describe( 'useResourcePermissions', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
 
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( async () => ( {
 			headers: new Headers( {
 				allow: 'POST',
 			} ),
 		} ) );
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result, Props >(
+		hook: ( props: Props ) => Result,
+		options: { initialProps?: Props } = {}
+	) {
+		const Wrapper = ( { children }: { children?: ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
@@ -104,7 +111,7 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'normalizes id-less entity resources before resolving permissions', async () => {
-		triggerFetch.mockImplementation( ( options ) => {
+		apiFetchMock.mockImplementation( async ( options ) => {
 			if ( options.path === '/wp/v2/types?context=view' ) {
 				return {
 					wp_navigation: {
@@ -147,7 +154,7 @@ describe( 'useResourcePermissions', () => {
 		);
 
 		expect(
-			triggerFetch.mock.calls.filter(
+			apiFetchMock.mock.calls.filter(
 				( [ options ] ) => options.path === '/wp/v2/navigation'
 			)
 		).toHaveLength( 1 );
@@ -186,13 +193,8 @@ describe( 'useResourcePermissions', () => {
 
 	it( 'should warn when called with incorrect arguments signature', () => {
 		renderHookWithRegistry( () =>
-			useResourcePermissions(
-				{
-					kind: 'root',
-					name: 'user',
-				},
-				1
-			)
+			// @ts-expect-error An ID beside an entity resource; one line, as TS 6 and 7 flag different lines.
+			useResourcePermissions( { kind: 'root', name: 'user' }, 1 )
 		);
 
 		expect( console ).toHaveWarnedWith(

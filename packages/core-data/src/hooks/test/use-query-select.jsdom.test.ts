@@ -14,12 +14,18 @@ import {
 } from '@wordpress/data';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import useQuerySelect from '../use-query-select';
+
+// The selectors of a store, queried by its name.
+type Query = (
+	storeName: string
+) => Record< string, ( ...args: Array< unknown > ) => unknown >;
 
 /* eslint-disable @wordpress/wp-global-usage */
 describe( 'useQuerySelect', () => {
 	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeAll( () => {
 		// Do not run hook in development mode; it will call `mapSelect` an extra time.
@@ -31,8 +37,11 @@ describe( 'useQuerySelect', () => {
 		registry.registerStore( 'testStore', {
 			reducer: () => ( { foo: 'bar' } ),
 			selectors: {
-				getFoo: ( state ) => state.foo,
-				testSelector: ( state, key ) => state[ key ],
+				getFoo: ( state: { foo: string } ) => state.foo,
+				testSelector: (
+					state: Record< string, string >,
+					key: string
+				) => state[ key ],
 			},
 		} );
 	} );
@@ -41,8 +50,11 @@ describe( 'useQuerySelect', () => {
 		globalThis.SCRIPT_DEBUG = initialScriptDebug;
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result, Props >(
+		hook: ( props: Props ) => Result,
+		options: { initialProps?: Props } = {}
+	) {
+		const Wrapper = ( { children }: { children?: ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
@@ -67,8 +79,8 @@ describe( 'useQuerySelect', () => {
 	} );
 
 	it( 'uses memoized selectors', () => {
-		const selectors = [];
-		const mapSelect = ( query ) => {
+		const selectors: Array< unknown > = [];
+		const mapSelect = ( query: Query ) => {
 			selectors.push( query( 'testStore' ) );
 			selectors.push( query( 'testStore' ) );
 			return null;
@@ -99,7 +111,10 @@ describe( 'useQuerySelect', () => {
 
 	it( 'returns the expected "response" details – no resolvers and arguments', () => {
 		const { result } = renderHookWithRegistry( () =>
-			useQuerySelect( ( query ) => query( 'testStore' ).getFoo(), [] )
+			useQuerySelect(
+				( query: Query ) => query( 'testStore' ).getFoo(),
+				[]
+			)
 		);
 
 		expect( result.current ).toEqual( {
@@ -121,7 +136,7 @@ describe( 'useQuerySelect', () => {
 					return state;
 				},
 				actions: {
-					receiveFoo: ( value ) => ( {
+					receiveFoo: ( value: number ) => ( {
 						type: 'RECEIVE_FOO',
 						value,
 					} ),
@@ -129,11 +144,18 @@ describe( 'useQuerySelect', () => {
 				resolvers: {
 					getResolvedFoo:
 						() =>
-						( { dispatch } ) =>
+						( {
+							dispatch,
+						}: {
+							dispatch: { receiveFoo: ( value: number ) => void };
+						} ) =>
 							dispatch.receiveFoo( 5 ),
 				},
 				selectors: {
-					getResolvedFoo: ( state, arg ) => state.resolvedFoo + arg,
+					getResolvedFoo: (
+						state: { resolvedFoo: number },
+						arg: number
+					) => state.resolvedFoo + arg,
 				},
 			} )
 		);
@@ -141,7 +163,8 @@ describe( 'useQuerySelect', () => {
 		const renderResolvedFoo = () =>
 			renderHookWithRegistry( () =>
 				useQuerySelect(
-					( query ) => query( 'resolverStore' ).getResolvedFoo( 10 ),
+					( query: Query ) =>
+						query( 'resolverStore' ).getResolvedFoo( 10 ),
 					[]
 				)
 			);

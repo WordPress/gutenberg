@@ -6709,37 +6709,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/hooks/test/use-entity-record.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-entity-records.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-query-select.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-resource-permissions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/private-actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/can-user.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/deprecated-entity-logging.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -6762,11 +6732,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/test/private-selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/test/rtc-rich-text-offset-space.jsdom.test.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6776,11 +6741,6 @@
 		}
 	},
 	"packages/core-data/src/test/selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/store.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
