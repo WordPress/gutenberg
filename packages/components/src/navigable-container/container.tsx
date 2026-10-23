@@ -21,13 +21,14 @@ function cycleValue( value: number, total: number, offset: number ) {
 function getFocusableContext(
 	container: HTMLElement,
 	target: Element,
-	tabbableOnly: boolean
+	tabbableOnly: boolean,
+	allowContainer: boolean
 ) {
 	const finder = tabbableOnly ? focus.tabbable : focus.focusable;
 	const focusables = finder.find( container );
 
 	const index = focusables.indexOf( target as HTMLElement );
-	if ( index > -1 ) {
+	if ( index > -1 || ( allowContainer && target === container ) ) {
 		return { index, target, focusables };
 	}
 	return null;
@@ -76,7 +77,10 @@ function UnforwardedNavigableContainer(
 				const targetHasMenuItemRole =
 					!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
-				if ( targetHasMenuItemRole ) {
+				if (
+					targetHasMenuItemRole ||
+					( ! onlyBrowserTabstops && event.target === container )
+				) {
 					event.preventDefault();
 				}
 			}
@@ -94,24 +98,34 @@ function UnforwardedNavigableContainer(
 			const context = getFocusableContext(
 				container!,
 				activeElement,
-				!! onlyBrowserTabstops
+				!! onlyBrowserTabstops,
+				! onlyBrowserTabstops &&
+					[
+						'ArrowDown',
+						'ArrowUp',
+						'ArrowLeft',
+						'ArrowRight',
+					].includes( event.code )
 			);
 			if ( ! context ) {
 				return;
 			}
 
 			const { index, focusables } = context;
-			const nextIndex = cycle
-				? cycleValue( index, focusables.length, offset )
-				: index + offset;
+			let nextIndex = index + offset;
+			if ( index === -1 ) {
+				nextIndex = offset > 0 ? 0 : focusables.length - 1;
+			} else if ( cycle ) {
+				nextIndex = cycleValue( index, focusables.length, offset );
+			}
 
 			if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 				focusables[ nextIndex ].focus();
 				onNavigate( nextIndex, focusables[ nextIndex ] as HTMLElement );
 
-				// `preventDefault()` on tab to avoid having the browser move the focus
-				// after this component has already moved it.
-				if ( event.code === 'Tab' ) {
+				// Prevent scrolling when entering from the container, and keep
+				// Tab from moving focus again after navigation has handled it.
+				if ( index === -1 || event.code === 'Tab' ) {
 					event.preventDefault();
 				}
 			}
