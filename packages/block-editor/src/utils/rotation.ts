@@ -1,5 +1,4 @@
-import { isPlainObject } from './object';
-import { cleanEmptyObject } from '../hooks/utils';
+import { cleanEmptyObject, isPlainObject } from './object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
