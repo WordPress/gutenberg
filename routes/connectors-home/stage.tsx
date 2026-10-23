@@ -8,7 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { Notice, Stack, Text } from '@wordpress/ui';
+import { Link, Notice, Stack, Text } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
@@ -168,19 +168,22 @@ function ConnectorsPage() {
 					</Stack>
 				) }
 				{ canInstallPlugins && ! isFileModDisabled && (
-					<p className="connectors-page__help-text">
+					<Text
+						variant="body-md"
+						className="connectors-page__help-text"
+						render={ <p /> }
+					>
 						{ createInterpolateElement(
 							__(
 								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
 							),
 							{
 								a: (
-									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="plugin-install.php?s=connector&tab=search&type=tag" />
+									<Link href="plugin-install.php?s=connector&tab=search&type=tag" />
 								),
 							}
 						) }
-					</p>
+					</Text>
 				) }
 			</div>
 		</Page>
