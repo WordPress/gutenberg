@@ -14,6 +14,7 @@ import type { CurriedSelectorsOf } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	__experimentalUseDropZone as useDropZone,
+	useEvent,
 	useMergeRefs,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -42,6 +43,7 @@ import {
 	isGridItemHandleDrag,
 	subscribeToGridItemPointerDrag,
 } from './start-grid-item-drag';
+import type { GridItemPointerDragEvent } from './start-grid-item-drag';
 import { getAlignmentGuides } from './get-alignment-guides';
 import type { GridBlockStyle, GridStyleLayout } from './mobile-stacking';
 import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
@@ -917,29 +919,23 @@ function GridVisualizerDropLayer( {
 	// A touch drag from a drag handle doesn't use the browser's drag and
 	// drop, so it is followed here. The layer of the innermost grid under the
 	// touch takes it, as a drop zone would.
-	useEffect( () => {
-		return subscribeToGridItemPointerDrag(
-			( { type, clientX, clientY } ) => {
-				const layer = layerRef.current;
-				const isOverLayer =
-					!! layer &&
-					layer.ownerDocument
-						.elementsFromPoint( clientX, clientY )
-						.find( ( element ) =>
-							element.classList.contains(
-								'block-editor-grid-visualizer__drop-layer'
-							)
-						) === layer;
-				if ( type === 'move' && isOverLayer ) {
-					updateDropTarget( { clientX, clientY }, true );
-				} else if ( type === 'drop' && isOverLayer ) {
-					dropOnTarget();
-				} else {
-					clearDropTarget();
-				}
+	const onPointerDrag = useEvent(
+		( { type, clientX, clientY, dropLayer }: GridItemPointerDragEvent ) => {
+			const isOverLayer =
+				!! layerRef.current && dropLayer === layerRef.current;
+			if ( type === 'move' && isOverLayer ) {
+				updateDropTarget( { clientX, clientY }, true );
+			} else if ( type === 'drop' && isOverLayer ) {
+				dropOnTarget();
+			} else {
+				clearDropTarget();
 			}
-		);
-	} );
+		}
+	);
+	useEffect(
+		() => subscribeToGridItemPointerDrag( onPointerDrag ),
+		[ onPointerDrag ]
+	);
 
 	return (
 		<div
