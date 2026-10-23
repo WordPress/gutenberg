@@ -26,6 +26,7 @@ export interface WPRawPerformanceResults {
 	firstFocus: number[];
 	selectAll: number[];
 	undo: number[];
+	redo: number[];
 	inserterOpen: number[];
 	inserterSearch: number[];
 	inserterHover: number[];
@@ -72,6 +73,7 @@ export interface WPPerformanceResults {
 	firstFocus?: PerformanceStats;
 	selectAll?: PerformanceStats;
 	undo?: PerformanceStats;
+	redo?: PerformanceStats;
 	inserterOpen?: PerformanceStats;
 	inserterSearch?: PerformanceStats;
 	inserterHover?: PerformanceStats;
@@ -120,6 +122,7 @@ export function curateResults(
 		firstFocus: stats( results.firstFocus ),
 		selectAll: stats( results.selectAll ),
 		undo: stats( results.undo ),
+		redo: stats( results.redo ),
 		inserterOpen: stats( results.inserterOpen ),
 		inserterSearch: stats( results.inserterSearch ),
 		inserterHover: stats( results.inserterHover ),

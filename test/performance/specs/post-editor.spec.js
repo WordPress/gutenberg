@@ -23,6 +23,7 @@ const results = {
 	firstFocus: [],
 	selectAll: [],
 	undo: [],
+	redo: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -433,9 +434,9 @@ test.describe( 'Post Editor Performance', () => {
 			// Each iteration types in two paragraphs, making two undo levels,
 			// then measures undo, undo again and redo, one sample each.
 			const steps = [
-				'ControlOrMeta+z',
-				'ControlOrMeta+z',
-				'ControlOrMeta+Shift+z',
+				[ 'ControlOrMeta+z', 'undo' ],
+				[ 'ControlOrMeta+z', 'undo' ],
+				[ 'ControlOrMeta+Shift+z', 'redo' ],
 			];
 			const throwaway = 1;
 			const iterations = 4 + throwaway;
@@ -445,20 +446,20 @@ test.describe( 'Post Editor Performance', () => {
 				await paragraphs.nth( i * 2 + 1 ).click();
 				await page.keyboard.type( 'y' );
 
-				for ( const step of steps ) {
+				for ( const [ key, metric ] of steps ) {
 					// Wait for the browser to be idle before starting the monitoring.
 					// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 					await page.waitForTimeout( BROWSER_IDLE_WAIT );
 					const start = await getTaskDuration();
 
-					await page.keyboard.press( step );
+					await page.keyboard.press( key );
 
 					// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 					await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 					// Save the results.
 					if ( i > throwaway ) {
-						results.undo.push(
+						results[ metric ].push(
 							( await getTaskDuration() ) - start
 						);
 					}
