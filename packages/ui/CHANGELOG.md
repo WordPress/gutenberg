@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items and their supporting content, and join the touching corners of consecutive highlighted rows. Open submenu parents retain their subtle background at rest ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
+-   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items and their supporting content ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ### Documentation

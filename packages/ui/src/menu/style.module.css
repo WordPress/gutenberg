@@ -175,7 +175,7 @@
 				grid-template-columns: subgrid;
 			}
 
-			&[data-popup-open]:not(:hover, [data-highlighted], [data-disabled], [aria-disabled="true"]) {
+			&[data-popup-open]:not([data-highlighted], [data-disabled], [aria-disabled="true"]) {
 				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 
 				@media ( forced-colors: active ) {
@@ -184,7 +184,7 @@
 			}
 
 			/* Link items expose aria-disabled without a data-disabled state. */
-			&:is(:hover, [data-highlighted]):not([data-disabled], [aria-disabled="true"]) {
+			&[data-highlighted]:not([data-disabled], [aria-disabled="true"]) {
 				--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-strong-active);
 
 				background-color: var(--wpds-color-background-interactive-brand-strong-active);
@@ -197,28 +197,6 @@
 					forced-color-adjust: none;
 					background-color: Highlight;
 					color: HighlightText;
-				}
-			}
-
-			/* Join consecutive filled rows, including resting submenu parents. */
-			&:is(:hover, [data-highlighted], [data-popup-open]):not([data-disabled], [aria-disabled="true"]) {
-				&:has(+ .item:is(:hover, [data-highlighted], [data-popup-open]):not([data-disabled], [aria-disabled="true"])) {
-					--_gcd-a-border-radius: var(--wpds-border-radius-sm) var(--wpds-border-radius-sm) 0 0;
-
-					border-end-start-radius: 0;
-					border-end-end-radius: 0;
-				}
-
-				& + .item:is(:hover, [data-highlighted], [data-popup-open]):not([data-disabled], [aria-disabled="true"]) {
-					--_gcd-a-border-radius: 0 0 var(--wpds-border-radius-sm) var(--wpds-border-radius-sm);
-
-					border-start-start-radius: 0;
-					border-start-end-radius: 0;
-
-					/* The link defense uses a shorthand, including for middle rows. */
-					&:has(+ .item:is(:hover, [data-highlighted], [data-popup-open]):not([data-disabled], [aria-disabled="true"])) {
-						--_gcd-a-border-radius: 0;
-					}
 				}
 			}
 
@@ -408,25 +386,8 @@
 			content: "\2196";
 		}
 
-		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-description,
-		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-suffix,
-		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-shortcut,
-		.item[data-popup-open]:not([data-disabled], [aria-disabled="true"]) .item-trailing,
-		.item:hover:not([data-disabled], [aria-disabled="true"]) .item-description,
-		.item:hover:not([data-disabled], [aria-disabled="true"]) .item-suffix,
-		.item:hover:not([data-disabled], [aria-disabled="true"]) .item-shortcut,
-		.item:hover:not([data-disabled], [aria-disabled="true"]) .item-trailing,
-		.item:hover:not([data-disabled], [aria-disabled="true"]) .item-selection-indicator,
-		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-description,
-		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-suffix,
-		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-shortcut,
-		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-trailing,
-		.item[data-highlighted]:not([data-disabled], [aria-disabled="true"]) .item-selection-indicator,
-		.item:is([data-disabled], [aria-disabled="true"]) .item-description,
-		.item:is([data-disabled], [aria-disabled="true"]) .item-suffix,
-		.item:is([data-disabled], [aria-disabled="true"]) .item-shortcut,
-		.item:is([data-disabled], [aria-disabled="true"]) .item-trailing,
-		.item:is([data-disabled], [aria-disabled="true"]) .item-selection-indicator {
+		.item:is([data-highlighted], [data-popup-open], [data-disabled], [aria-disabled="true"]) :is(.item-description, .item-suffix, .item-shortcut, .item-trailing),
+		.item:is([data-highlighted], [data-disabled], [aria-disabled="true"]) .item-selection-indicator {
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;
