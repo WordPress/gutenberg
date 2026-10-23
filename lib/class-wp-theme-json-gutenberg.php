@@ -371,6 +371,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.9.0 Renamed from `ALLOWED_TOP_LEVEL_KEYS` to `VALID_TOP_LEVEL_KEYS`,
 	 *              added the `customTemplates` and `templateParts` values.
 	 * @since 6.3.0 Added the `description` value.
+	 * @since 7.2.0 Added the `templates` value.
 	 * @var string[]
 	 */
 	const VALID_TOP_LEVEL_KEYS = array(
@@ -381,6 +382,7 @@ class WP_Theme_JSON_Gutenberg {
 		'settings',
 		'styles',
 		'templateParts',
+		'templates',
 		'title',
 		'slug',
 		'version',
@@ -2302,6 +2304,33 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 		return $custom_templates;
+	}
+
+	/**
+	 * Returns the data the active theme declares about its templates.
+	 *
+	 * A template names the template it is rendered inside, whose post content
+	 * block is where it renders, so that a header and a footer live in one
+	 * template instead of being repeated in every one.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return array<string, array{template: string}> The data of each template, keyed by the name of its file.
+	 */
+	public function get_templates() {
+		$templates = array();
+		if ( ! isset( $this->theme_json['templates'] ) || ! is_array( $this->theme_json['templates'] ) ) {
+			return $templates;
+		}
+
+		foreach ( $this->theme_json['templates'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$templates[ $item['name'] ] = array(
+					'template' => $item['template'] ?? '',
+				);
+			}
+		}
+		return $templates;
 	}
 
 	/**

@@ -1,0 +1,15 @@
+/*
+Theme Name: Template Inheritance
+Theme URI: https://github.com/wordpress/gutenberg/
+Author: the WordPress team
+Description: Test theme whose templates are rendered inside a shared layout template, so the header and the footer live in one template instead of being repeated in every one.
+Requires at least: 6.0
+Tested up to: 6.9
+Requires PHP: 7.2
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: template-inheritance
+Template Inheritance WordPress Theme, (C) 2026 WordPress.org
+Template Inheritance is distributed under the terms of the GNU GPL.
+*/

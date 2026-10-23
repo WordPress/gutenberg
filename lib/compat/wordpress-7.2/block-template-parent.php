@@ -8,10 +8,16 @@
  * template only carries what is particular to it and the header, the footer
  * and whatever else surrounds it live in one place.
  *
- * The assignment is stored in the `_wp_page_template` post meta of the
- * template's own post, the same meta a page uses to name its template, so
- * `get_page_template_slug()` reads it and the REST field is called `template`
- * like the one on a post.
+ * A theme names the template each of its templates is rendered inside in the
+ * `templates` section of its `theme.json`, so a theme works that way on
+ * activation with nothing to set up.
+ *
+ * A site overrides what the theme names, including rendering a template on its
+ * own, from the editor. The choice is stored in the `_wp_page_template` post
+ * meta of the template's own post, the same meta a page uses to name its
+ * template, so the REST field is called `template` like the one on a post. The
+ * meta is `default` when the site renders the template on its own, and absent
+ * when the site has made no choice and the theme's one stands.
  *
  * @package gutenberg
  */
@@ -127,25 +133,47 @@ function gutenberg_get_block_template_read( $template_id ) {
 }
 
 /**
+ * Returns the slug of the template the active theme renders a template inside.
+ *
+ * @param string $template_slug Slug of the template, the name of its file.
+ * @return string Slug of the template the theme renders it inside, or an empty string when it names none.
+ */
+function gutenberg_get_theme_block_template_parent_slug( $template_slug ) {
+	$templates = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_templates();
+
+	return $templates[ $template_slug ]['template'] ?? '';
+}
+
+/**
  * Returns the slug of the template a template is rendered inside.
+ *
+ * The site's own choice, stored on the template's post, stands for the one the
+ * theme names, including when the site renders the template on its own.
  *
  * @param WP_Block_Template|null $template Template to read the assignment from.
  * @return string Slug of the template it is rendered inside, or an empty string when it is rendered on its own.
  */
 function gutenberg_get_block_template_parent_slug( $template ) {
-	if ( ! $template instanceof WP_Block_Template || empty( $template->wp_id ) ) {
+	if ( ! $template instanceof WP_Block_Template ) {
 		return '';
 	}
 
-	$slug = get_page_template_slug( $template->wp_id );
+	if ( ! empty( $template->wp_id ) ) {
+		$slug = get_post_meta( $template->wp_id, '_wp_page_template', true );
 
-	// `get_page_template_slug()` answers `false` for a post that has no meta,
-	// and the default template is spelled as an empty string.
-	if ( ! is_string( $slug ) || 'default' === $slug ) {
+		// The meta is absent, so the site has made no choice and the one the
+		// theme names stands.
+		if ( is_string( $slug ) && '' !== $slug ) {
+			return 'default' === $slug ? '' : $slug;
+		}
+	}
+
+	// Only the active theme has a `theme.json` to read.
+	if ( get_stylesheet() !== $template->theme ) {
 		return '';
 	}
 
-	return $slug;
+	return gutenberg_get_theme_block_template_parent_slug( $template->slug );
 }
 
 /**
@@ -351,19 +379,11 @@ add_filter( 'template_include', 'gutenberg_render_block_template_inside_parent' 
  * @return string Slug of the template it is rendered inside, or an empty string when it is rendered on its own.
  */
 function gutenberg_get_block_template_parent_field( $item ) {
-	if ( isset( $item['wp_id'] ) ) {
-		$slug = get_page_template_slug( (int) $item['wp_id'] );
-
-		return is_string( $slug ) && 'default' !== $slug ? $slug : '';
+	if ( ! isset( $item['id'] ) ) {
+		return '';
 	}
 
-	// `wp_id` belongs to the `edit` context, so a response that leaves it out
-	// is answered from the template itself.
-	if ( isset( $item['id'] ) ) {
-		return gutenberg_get_block_template_parent_slug( get_block_template( $item['id'], 'wp_template' ) );
-	}
-
-	return '';
+	return gutenberg_get_block_template_parent_slug( gutenberg_get_block_template_read( $item['id'] ) );
 }
 
 /**
@@ -384,13 +404,12 @@ function gutenberg_update_block_template_parent_field( $value, $template ) {
 		);
 	}
 
-	if ( '' === $value ) {
-		delete_post_meta( $template->wp_id, '_wp_page_template' );
-
-		return true;
-	}
-
-	update_post_meta( $template->wp_id, '_wp_page_template', $value );
+	/*
+	 * `default` rather than an empty string, so that a site rendering a
+	 * template on its own is told apart from one that has made no choice and
+	 * takes the template its theme names.
+	 */
+	update_post_meta( $template->wp_id, '_wp_page_template', '' === $value ? 'default' : $value );
 
 	return true;
 }

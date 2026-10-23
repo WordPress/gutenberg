@@ -28,6 +28,13 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	 */
 	private $template_post_ids = array();
 
+	/**
+	 * The theme directories of the site, restored on tear down.
+	 *
+	 * @var string[]|null
+	 */
+	private $original_theme_directories = null;
+
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 	}
@@ -42,7 +49,48 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		}
 		$this->template_post_ids = array();
 
+		if ( null !== $this->original_theme_directories ) {
+			$GLOBALS['wp_theme_directories']  = $this->original_theme_directories;
+			$this->original_theme_directories = null;
+			remove_filter( 'theme_root', array( $this, 'filter_test_theme_root' ) );
+			remove_filter( 'stylesheet_root', array( $this, 'filter_test_theme_root' ) );
+			remove_filter( 'template_root', array( $this, 'filter_test_theme_root' ) );
+			wp_clean_themes_cache();
+			unset( $GLOBALS['wp_themes'] );
+			_gutenberg_clean_theme_json_caches();
+		}
+
 		parent::tear_down();
+	}
+
+	/**
+	 * The directory of the test themes.
+	 *
+	 * @return string The path of the directory.
+	 */
+	public function filter_test_theme_root() {
+		return dirname( __DIR__ ) . '/test/gutenberg-test-themes';
+	}
+
+	/**
+	 * Activates the test theme whose templates are rendered inside its layout
+	 * template.
+	 */
+	private function switch_to_template_inheritance_theme() {
+		$this->original_theme_directories = $GLOBALS['wp_theme_directories'];
+		// `/themes` is necessary as the theme functions assume it is the root
+		// when there is only one.
+		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->filter_test_theme_root() );
+
+		add_filter( 'theme_root', array( $this, 'filter_test_theme_root' ) );
+		add_filter( 'stylesheet_root', array( $this, 'filter_test_theme_root' ) );
+		add_filter( 'template_root', array( $this, 'filter_test_theme_root' ) );
+
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+		_gutenberg_clean_theme_json_caches();
+
+		switch_theme( 'template-inheritance' );
 	}
 
 	/**
@@ -485,5 +533,136 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayNotHasKey( 'template', $response->get_data() );
 		$this->assertArrayNotHasKey( 'has_content_slot', $response->get_data() );
+	}
+
+	public function test_a_theme_names_the_template_its_templates_are_rendered_inside() {
+		$this->switch_to_template_inheritance_theme();
+
+		$this->assertSame(
+			'layout',
+			gutenberg_get_block_template_parent_slug(
+				get_block_template( 'template-inheritance//404', 'wp_template' )
+			),
+			'A template of the theme is rendered inside the one its theme.json names.'
+		);
+		$this->assertSame(
+			'',
+			gutenberg_get_block_template_parent_slug(
+				get_block_template( 'template-inheritance//layout', 'wp_template' )
+			),
+			'The layout template itself is rendered on its own.'
+		);
+	}
+
+	public function test_a_theme_declaration_renders_the_template_inside_it() {
+		$this->switch_to_template_inheritance_theme();
+
+		$template = get_block_template( 'template-inheritance//404', 'wp_template' );
+		$resolved = gutenberg_resolve_block_template_parents( $template->id, $template->content );
+
+		$this->assertStringContainsString( '"slug":"header"', $resolved );
+		$this->assertStringContainsString( 'Nothing here', $resolved );
+		$this->assertStringContainsString( '"slug":"footer"', $resolved );
+		$this->assertStringNotContainsString( 'wp:post-content', $resolved );
+	}
+
+	public function test_the_template_of_the_post_wins_over_the_theme_declaration() {
+		$this->switch_to_template_inheritance_theme();
+		$this->create_template( 'other-layout', '<!-- wp:post-content /-->' );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => '404',
+				'post_title'   => '404',
+				'post_content' => '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+				'post_status'  => 'publish',
+			)
+		);
+		wp_set_post_terms( $post_id, get_stylesheet(), 'wp_theme' );
+		update_post_meta( $post_id, '_wp_page_template', 'other-layout' );
+		$this->template_post_ids[] = $post_id;
+
+		$this->assertSame(
+			'other-layout',
+			gutenberg_get_block_template_parent_slug(
+				get_block_template( 'template-inheritance//404', 'wp_template' )
+			)
+		);
+	}
+
+	public function test_a_template_can_be_rendered_on_its_own_against_the_theme_declaration() {
+		$this->switch_to_template_inheritance_theme();
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => '404',
+				'post_title'   => '404',
+				'post_content' => '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+				'post_status'  => 'publish',
+			)
+		);
+		wp_set_post_terms( $post_id, get_stylesheet(), 'wp_theme' );
+		update_post_meta( $post_id, '_wp_page_template', 'default' );
+		$this->template_post_ids[] = $post_id;
+
+		$template = get_block_template( 'template-inheritance//404', 'wp_template' );
+
+		$this->assertSame(
+			'',
+			gutenberg_get_block_template_parent_slug( $template ),
+			'The template of the post is the default one, so the theme declaration no longer applies.'
+		);
+		$this->assertNull( gutenberg_resolve_block_template_parents( $template->id, $template->content ) );
+	}
+
+	public function test_reverting_a_template_restores_the_theme_declaration() {
+		wp_set_current_user( self::$admin_id );
+		$this->switch_to_template_inheritance_theme();
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/template-inheritance//404' );
+		$request->set_body_params( array( 'template' => '' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( '', $response->get_data()['template'], 'The site renders the template on its own.' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/template-inheritance//404' );
+		$request->set_body_params( array( 'source' => 'theme' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame(
+			'layout',
+			$response->get_data()['template'],
+			'Reverting the template to the one of the theme drops the choice of the site with it.'
+		);
+	}
+
+	public function test_the_declaration_of_another_theme_is_not_read() {
+		$this->switch_to_template_inheritance_theme();
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => '404',
+				'post_title'   => '404',
+				'post_content' => '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+				'post_status'  => 'publish',
+			)
+		);
+		wp_set_post_terms( $post_id, 'another-theme', 'wp_theme' );
+		$this->template_post_ids[] = $post_id;
+
+		$this->assertSame(
+			'',
+			gutenberg_get_block_template_parent_slug( get_block_template( 'another-theme//404', 'wp_template' ) ),
+			'Only the theme.json of the active theme is read.'
+		);
+	}
+
+	public function test_the_rest_response_reports_the_theme_declaration() {
+		wp_set_current_user( self::$admin_id );
+		$this->switch_to_template_inheritance_theme();
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/template-inheritance//404' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 'layout', $response->get_data()['template'] );
 	}
 }
