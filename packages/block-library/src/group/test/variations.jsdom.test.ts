@@ -23,8 +23,7 @@ async function getVariations( {
 	vi.resetModules();
 	window.__experimentalEnableGridInteractivity = isGridInteractivityEnabled;
 	const { default: variations } = await import( '../variations' );
-	// The JavaScript module infers `scope` as `string[]`, wider than `BlockVariationScope[]`.
-	return variations as BlockVariation[];
+	return variations;
 }
 
 describe( 'Group variations', () => {
