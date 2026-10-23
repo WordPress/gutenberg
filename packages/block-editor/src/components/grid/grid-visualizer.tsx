@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useRef,
 	forwardRef,
+	memo,
 	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -71,7 +72,7 @@ import type {
 	ManualGridVisualizerProps,
 } from './types';
 
-export function GridVisualizer( {
+function GridVisualizerPure( {
 	clientId,
 	contentRef,
 	parentLayout,
@@ -106,6 +107,11 @@ export function GridVisualizer( {
 		/>
 	);
 }
+
+// Memoized, as it does work for every cell and grid item on each render,
+// while the grid item tools around it re-render often, for example for each
+// degree of a rotation preview.
+export const GridVisualizer = memo( GridVisualizerPure );
 
 const GridVisualizerGrid = forwardRef(
 	(
