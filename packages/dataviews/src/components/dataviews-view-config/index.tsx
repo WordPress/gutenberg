@@ -13,8 +13,11 @@ import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
