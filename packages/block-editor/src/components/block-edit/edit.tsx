@@ -57,7 +57,16 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
 	);
-	const { bindableAttributes } = useContext( PrivateBlockContext );
+	const { bindableAttributes: supportedAttributes } =
+		useContext( PrivateBlockContext );
+	// Inner blocks aren't an attribute: the inner blocks resolve their binding.
+	const bindableAttributes = useMemo(
+		() =>
+			( supportedAttributes as string[] | undefined )?.filter(
+				( attributeName ) => attributeName !== INNER_BLOCKS_BINDING_KEY
+			),
+		[ supportedAttributes ]
+	);
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		return {
@@ -112,8 +121,6 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				const source = registeredSources[ sourceName as string ];
 				if (
 					! source ||
-					// Inner blocks aren't an attribute.
-					attributeName === INNER_BLOCKS_BINDING_KEY ||
 					! bindableAttributes?.includes( attributeName )
 				) {
 					continue;
@@ -200,7 +207,6 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
-						attributeName === INNER_BLOCKS_BINDING_KEY ||
 						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;

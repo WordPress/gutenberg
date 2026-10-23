@@ -45,7 +45,6 @@ import { getAllowedFormats, isEmpty } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
-import { isInnerBlocksBindingEnabled } from '../inner-blocks/use-bound-inner-blocks';
 import { unlock } from '../../lock-unlock';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 import type { BlockSelection, Selection } from '../../store/types';
@@ -70,33 +69,6 @@ const {
 	RichTextShortcut: UntypedRichTextShortcut,
 	RichTextInputEvent: UntypedRichTextInputEvent,
 } = unlock( richTextPrivateApis );
-
-function useIsWithinEditableBoundInnerBlocksSelect(
-	clientId: string,
-	isNeeded: boolean
-) {
-	return useSelect(
-		( select ) =>
-			isNeeded &&
-			unlock(
-				select( blockEditorStore )
-			).isWithinEditableBoundInnerBlocks( clientId ),
-		[ clientId, isNeeded ]
-	);
-}
-
-function useIsNotWithinBoundInnerBlocks() {
-	return false;
-}
-
-/**
- * Whether the block is within editable bound inner blocks, whose content can be
- * edited even inside a synced pattern. Without inner blocks bindings, it never
- * is, and nothing is selected.
- */
-const useIsWithinEditableBoundInnerBlocks = isInnerBlocksBindingEnabled()
-	? useIsWithinEditableBoundInnerBlocksSelect
-	: useIsNotWithinBoundInnerBlocks;
 
 // The private APIs are untyped, so type the components this re-exports.
 const RichTextShortcut =
@@ -320,16 +292,21 @@ function RichTextWrapper(
 	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
 	const hasOverrideEnabled =
 		blockBindings?.__default?.source === 'core/pattern-overrides';
-	const isWithinEditableBoundInnerBlocks =
-		useIsWithinEditableBoundInnerBlocks(
-			clientId,
-			isInsidePatternOverrides && ! hasOverrideEnabled
-		);
+
+	const isWithinBoundInnerBlocks = useSelect(
+		( select ) =>
+			isInsidePatternOverrides &&
+			! hasOverrideEnabled &&
+			unlock( select( blockEditorStore ) ).isWithinBoundInnerBlocks(
+				clientId
+			),
+		[ isInsidePatternOverrides, hasOverrideEnabled, clientId ]
+	);
 
 	const shouldDisableForPattern =
 		isInsidePatternOverrides &&
 		! hasOverrideEnabled &&
-		! isWithinEditableBoundInnerBlocks;
+		! isWithinBoundInnerBlocks;
 
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;

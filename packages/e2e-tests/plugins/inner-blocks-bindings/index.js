@@ -1,25 +1,17 @@
 const { registerBlockBindingsSource } = wp.blocks;
-
-const FIELD = 'inner_blocks_field';
+const { escapeHTML } = wp.escapeHtml;
 
 registerBlockBindingsSource( {
-	name: 'testing/inner-blocks-field',
-	getValues( { select, context } ) {
-		const value = select( 'core' ).getEditedEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		)?.meta?.[ FIELD ];
-		// An empty field has no inner blocks to supply.
-		return { innerBlocks: value || undefined };
+	name: 'testing/inner-blocks',
+	getValues( { bindings } ) {
+		const text = bindings.innerBlocks?.args?.text;
+		return {
+			innerBlocks:
+				typeof text === 'string'
+					? `<!-- wp:paragraph --><p>${ escapeHTML(
+							text
+						) }</p><!-- /wp:paragraph -->`
+					: undefined,
+		};
 	},
-	setValues( { dispatch, context, bindings } ) {
-		dispatch( 'core' ).editEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId,
-			{ meta: { [ FIELD ]: bindings.innerBlocks.newValue } }
-		);
-	},
-	canUserEditValue: ( { context } ) => !! context?.postId,
 } );

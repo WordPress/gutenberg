@@ -337,7 +337,6 @@ describe( 'state', () => {
 							} )
 						) as BlocksState[ 'tree' ],
 						controlledInnerBlocks: new Set(),
-						boundInnerBlocks: new Map(),
 						blockEditingModes: new Map(),
 					} )
 				);
@@ -398,7 +397,6 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
-					boundInnerBlocks: new Map(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -443,7 +441,6 @@ describe( 'state', () => {
 							} )
 						) as BlocksState[ 'tree' ],
 						controlledInnerBlocks: new Set(),
-						boundInnerBlocks: new Map(),
 						blockEditingModes: new Map(),
 					} )
 				);
@@ -504,7 +501,6 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
-					boundInnerBlocks: new Map(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -578,7 +574,6 @@ describe( 'state', () => {
 						),
 						tree: new Map(),
 						controlledInnerBlocks: new Set(),
-						boundInnerBlocks: new Map(),
 						blockEditingModes: new Map(),
 					} )
 				);
@@ -675,7 +670,6 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
-					boundInnerBlocks: new Map(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -753,7 +747,6 @@ describe( 'state', () => {
 							} )
 						) as BlocksState[ 'tree' ],
 						controlledInnerBlocks: new Set(),
-						boundInnerBlocks: new Map(),
 						blockEditingModes: new Map(),
 					} )
 				);
@@ -808,7 +801,6 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
-					boundInnerBlocks: new Map(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -831,7 +823,6 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: new Map(),
 				controlledInnerBlocks: new Set(),
-				boundInnerBlocks: new Map(),
 				blockEditingModes: new Map(),
 			} );
 		} );
@@ -2470,7 +2461,6 @@ describe( 'state', () => {
 							} )
 						),
 						controlledInnerBlocks: new Set( [ 'reusable-id' ] ),
-						boundInnerBlocks: new Map(),
 						parents: new Map(
 							Object.entries( {
 								'group-id': '',

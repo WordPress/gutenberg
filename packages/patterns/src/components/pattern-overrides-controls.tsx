@@ -8,14 +8,11 @@ import { BaseControl, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { PATTERN_OVERRIDES_BINDING_SOURCE } from '../constants';
-import type { Binding } from '../types';
 import {
 	AllowOverridesModal,
 	DisallowOverridesModal,
 } from './allow-overrides-modal';
 import type { PatternOverridesControlsProps } from './types';
-
-const INNER_BLOCKS = 'innerBlocks';
 
 function PatternOverridesControls( {
 	attributes,
@@ -27,41 +24,27 @@ function PatternOverridesControls( {
 		useState( false );
 	const [ showDisallowOverridesModal, setShowDisallowOverridesModal ] =
 		useState( false );
-	const supportedAttributes = useSelect(
+
+	// Blocks whose inner blocks can be bound are overridden as a whole, so
+	// they bind their inner blocks rather than their attributes.
+	const bindingKey = useSelect(
 		( select ) =>
 			(
 				select( blockEditorStore ).getSettings()
 					.__experimentalBlockBindingsSupportedAttributes as
-					Record< string, Array< string > > | undefined
-			 )?.[ blockName ],
+					Record< string, string[] > | undefined
+			 )?.[ blockName ]?.includes( 'innerBlocks' )
+				? 'innerBlocks'
+				: '__default',
 		[ blockName ]
 	);
-
-	// `__default` only binds the attributes, so the inner blocks are bound on
-	// their own.
-	const canOverrideInnerBlocks =
-		!! supportedAttributes?.includes( INNER_BLOCKS );
-	const canOverrideAttributes =
-		! canOverrideInnerBlocks ||
-		!! supportedAttributes?.some(
-			( attributeName ) => attributeName !== INNER_BLOCKS
-		);
 	const hasName = !! attributes.metadata?.name;
-	const defaultBindings = attributes.metadata?.bindings?.__default;
-	const innerBlocksBindings = attributes.metadata?.bindings?.[ INNER_BLOCKS ];
+	const defaultBindings = attributes.metadata?.bindings?.[ bindingKey ];
 	const hasOverrides =
-		hasName &&
-		[ defaultBindings, innerBlocksBindings ].some(
-			( binding ) => binding?.source === PATTERN_OVERRIDES_BINDING_SOURCE
-		);
-	const isConnectedToOtherSources = [
-		defaultBindings,
-		innerBlocksBindings,
-	].some(
-		( binding ) =>
-			binding?.source &&
-			binding.source !== PATTERN_OVERRIDES_BINDING_SOURCE
-	);
+		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
+	const isConnectedToOtherSources =
+		defaultBindings?.source &&
+		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
 	const { updateBlockBindings } = useBlockBindingsUtils();
 
 	function updateBindings( isChecked: boolean, customName?: string ) {
@@ -74,29 +57,11 @@ function PatternOverridesControls( {
 			} );
 		}
 
-		const bindings: Record< string, Binding | undefined > = {};
-		if ( isChecked ) {
-			if ( canOverrideAttributes ) {
-				bindings.__default = {
-					source: PATTERN_OVERRIDES_BINDING_SOURCE,
-				};
-			}
-			if ( canOverrideInnerBlocks ) {
-				bindings[ INNER_BLOCKS ] = {
-					source: PATTERN_OVERRIDES_BINDING_SOURCE,
-				};
-			}
-		} else {
-			// Only remove the existing bindings, as removing a missing one
-			// would add it as `undefined`.
-			if ( defaultBindings ) {
-				bindings.__default = undefined;
-			}
-			if ( innerBlocksBindings ) {
-				bindings[ INNER_BLOCKS ] = undefined;
-			}
-		}
-		updateBlockBindings( bindings );
+		updateBlockBindings( {
+			[ bindingKey ]: isChecked
+				? { source: PATTERN_OVERRIDES_BINDING_SOURCE }
+				: undefined,
+		} );
 	}
 
 	// Avoid overwriting other (e.g. meta) bindings.

@@ -185,7 +185,6 @@ export const getInsertBlockTypeDependants: (
 			getSectionRootClientId( state ),
 			isSectionBlock( state, rootClientId! ),
 			getParentSectionBlock( state, rootClientId! ),
-			state.blocks.boundInnerBlocks,
 		];
 	};
 

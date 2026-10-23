@@ -37,7 +37,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-inner-blocks-bindings',
 					'label'       => __( 'Inner blocks bindings', 'gutenberg' ),
-					'description' => __( 'Enables Group and Column blocks whose inner blocks come from a block bindings source, such as editable areas in synced patterns.', 'gutenberg' ),
+					'description' => __( 'Lets each instance of a synced pattern change the blocks inside a Group or Column block that allows overrides.', 'gutenberg' ),
 				),
 			),
 		),

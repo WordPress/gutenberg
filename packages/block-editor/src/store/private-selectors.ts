@@ -827,7 +827,11 @@ function isSectionBlockCandidate( state: State, clientId: string ) {
 export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If this block is within the edited content-only section,
 	// it has no parent section — it's temporarily fully editable.
-	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
+	// So are bound inner blocks, apart from the sections around them.
+	if (
+		isWithinEditedContentOnlySection( state, clientId ) ||
+		isBoundInnerBlocks( state, clientId )
+	) {
 		return undefined;
 	}
 
@@ -837,11 +841,7 @@ export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If sections are nested, return the top level section block.
 	// Don't return early.
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
-		// Editable bound inner blocks aren't part of the sections around them.
-		if (
-			state.blocks.boundInnerBlocks?.size &&
-			isEditableBoundInnerBlocks( state, current )
-		) {
+		if ( isBoundInnerBlocks( state, current ) ) {
 			break;
 		}
 		if ( isSectionBlockCandidate( state, current ) ) {
@@ -852,71 +852,36 @@ export const getParentSectionBlock = ( state: State, clientId: string ) => {
 };
 
 /**
- * Returns what identifies the most recent block change, or the change it
- * derives from, like the edit that writing bound inner blocks back to their
- * source follows. A controller of blocks that reported a change reports the
- * changes derived from it as part of it.
- *
- * @param state Global application state.
- *
- * @return The change, as an object to compare by identity.
- */
-export function getLastBlockChangeOrigin( state: State ): object {
-	return state.blocks.derivedFrom ?? state.blocks;
-}
-
-/**
- * Returns the binding of a block whose inner blocks are bound to a source.
+ * Returns whether the inner blocks of a block are bound to a source that
+ * controls them, such as the pattern overrides of a synced pattern instance.
  *
  * @param state    Global application state.
  * @param clientId Client Id of the block.
  *
- * @return The binding, if the block's inner blocks are bound.
+ * @return Whether the block's inner blocks are bound.
  */
-export function getBoundInnerBlocks( state: State, clientId: string ) {
-	return state.blocks.boundInnerBlocks?.get( clientId );
-}
-
-/**
- * Returns whether the inner blocks of a block are bound to a source and can be
- * edited: the source allows it, and the block itself isn't disabled.
- *
- * @param state    Global application state.
- * @param clientId Client Id of the block.
- *
- * @return Whether the block's bound inner blocks can be edited.
- */
-export function isEditableBoundInnerBlocks( state: State, clientId: string ) {
+export function isBoundInnerBlocks( state: State, clientId: string ) {
 	return (
-		!! state.blocks.boundInnerBlocks?.get( clientId )?.editable &&
-		getBlockEditingMode( state, clientId ) !== 'disabled'
+		!! state.blocks.controlledInnerBlocks?.has( clientId ) &&
+		!! state.blocks.attributes?.get( clientId )?.metadata?.bindings
+			?.innerBlocks
 	);
 }
 
 /**
- * Returns whether a block is within editable bound inner blocks: of its synced
- * pattern and bound block ancestors, the closest one is a bound block whose
- * inner blocks can be edited.
+ * Returns whether a block is within bound inner blocks of the synced pattern
+ * it's in.
  *
  * @param state    Global application state.
  * @param clientId Client Id of the block.
  *
- * @return Whether the block is within editable bound inner blocks.
+ * @return Whether the block is within bound inner blocks.
  */
-export function isWithinEditableBoundInnerBlocks(
-	state: State,
-	clientId: string
-) {
-	if ( ! state.blocks.boundInnerBlocks?.size ) {
-		return false;
-	}
+export function isWithinBoundInnerBlocks( state: State, clientId: string ) {
 	let parent = state.blocks.parents.get( clientId );
-	while ( parent ) {
-		if ( state.blocks.boundInnerBlocks.has( parent ) ) {
-			return isEditableBoundInnerBlocks( state, parent );
-		}
-		if ( getBlockName( state, parent ) === 'core/block' ) {
-			return false;
+	while ( parent && getBlockName( state, parent ) !== 'core/block' ) {
+		if ( isBoundInnerBlocks( state, parent ) ) {
+			return true;
 		}
 		parent = state.blocks.parents.get( parent );
 	}

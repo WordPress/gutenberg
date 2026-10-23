@@ -8,48 +8,35 @@
  */
 
 /**
- * Registers a block bindings source that supplies inner blocks from a custom
- * field, in the server and in the client.
+ * Registers a read-only block bindings source that supplies a paragraph with
+ * the text of its arguments as inner blocks, in the server and in the client.
  */
-function gutenberg_test_inner_blocks_bindings_registration() {
-	register_meta(
-		'post',
-		'inner_blocks_field',
-		array(
-			'default'      => '',
-			'show_in_rest' => true,
-			'single'       => true,
-			'type'         => 'string',
-		)
-	);
-
+function gutenberg_test_inner_blocks_bindings_register() {
 	register_block_bindings_source(
-		'testing/inner-blocks-field',
+		'testing/inner-blocks',
 		array(
-			'label'              => 'Inner Blocks Field',
-			'get_value_callback' => function ( $source_args, $block_instance ) {
-				if ( empty( $block_instance->context['postId'] ) ) {
+			'label'              => 'Test inner blocks',
+			'get_value_callback' => function ( $source_args ) {
+				if ( ! isset( $source_args['text'] ) || ! is_string( $source_args['text'] ) ) {
 					return null;
 				}
-				$value = get_post_meta( $block_instance->context['postId'], 'inner_blocks_field', true );
-				return '' === $value ? null : $value;
+				return '<!-- wp:paragraph --><p>' . esc_html( $source_args['text'] ) . '</p><!-- /wp:paragraph -->';
 			},
-			'uses_context'       => array( 'postId', 'postType' ),
 		)
 	);
 
 	wp_register_script(
 		'gutenberg-test-inner-blocks-bindings',
 		plugins_url( 'inner-blocks-bindings/index.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-core-data' ),
+		array( 'wp-blocks', 'wp-escape-html' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'inner-blocks-bindings/index.js' ),
 		true
 	);
 }
-add_action( 'init', 'gutenberg_test_inner_blocks_bindings_registration' );
+add_action( 'init', 'gutenberg_test_inner_blocks_bindings_register' );
 
 /**
- * Enqueues the client source in the editor.
+ * Enqueues the client side of the source in the editor.
  */
 function gutenberg_test_inner_blocks_bindings_enqueue() {
 	wp_enqueue_script( 'gutenberg-test-inner-blocks-bindings' );

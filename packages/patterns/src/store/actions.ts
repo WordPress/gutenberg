@@ -2,7 +2,6 @@ import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { Block } from '@wordpress/blocks';
-import { parseInnerBlocksOverride } from '../api';
 import {
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 	PATTERN_SYNC_TYPES,
@@ -14,11 +13,6 @@ import type {
 	PatternsThunkArgs,
 	SetEditingPatternAction,
 } from './types';
-
-/**
- * How many overridden inner blocks can be nested, as on the server.
- */
-const MAX_NESTED_INNER_BLOCKS_OVERRIDES = 8;
 
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
@@ -110,68 +104,47 @@ export const convertSyncedPatternToStatic =
 		// The pattern block keeps each named block's overridden attributes.
 		const existingOverrides = patternBlock.attributes?.content as
 			PatternOverrides | undefined;
-		// The blocks whose inner blocks can be bound, as in the editor.
-		const supportedAttributes = registry
-			.select( blockEditorStore )
-			.getSettings().__experimentalBlockBindingsSupportedAttributes as
-			Record< string, Array< string > > | undefined;
 
-		/**
-		 * Clones blocks with the overrides of the pattern instance applied,
-		 * and without bindings.
-		 *
-		 * The blocks of overridden inner blocks belong to the instance: as in
-		 * the editor and on the frontend, only the ones bound to pattern
-		 * overrides take its overrides, and their other bindings stay.
-		 *
-		 * @param blocks         The blocks.
-		 * @param ancestorValues The serialized overridden inner blocks the
-		 *                       blocks are nested in.
-		 *
-		 * @return The cloned blocks.
-		 */
+		const { areInnerBlocksControlled, getBlocks } =
+			registry.select( blockEditorStore );
+
+		// The blocks of overridden inner blocks are overridden as a whole, so
+		// they get no overrides of their own.
 		function cloneBlocksAndRemoveBindings(
 			blocks: Array< Block >,
-			ancestorValues: Array< string > = []
+			overrides = existingOverrides
 		): Array< Block > {
-			const isOverriddenInnerBlocks = ancestorValues.length > 0;
 			return blocks.map( ( block ) => {
 				// Block attributes are untyped; every block may carry `metadata`.
 				let metadata = block.attributes.metadata as
 					BlockMetadata | undefined;
-				let overriddenInnerBlocks: Array< Block > | undefined;
+				let innerBlocks;
 				if ( metadata ) {
-					const { bindings } = metadata;
+					// Bound inner blocks hold what the instance shows: their
+					// override, or their own inner blocks without one.
+					if (
+						metadata.bindings?.innerBlocks?.source ===
+							PATTERN_OVERRIDES_BINDING_SOURCE &&
+						areInnerBlocksControlled( block.clientId )
+					) {
+						innerBlocks = cloneBlocksAndRemoveBindings(
+							getBlocks( block.clientId ),
+							{}
+						);
+					}
 					metadata = { ...metadata };
 					delete metadata.id;
 					delete metadata.bindings;
-					const otherBindings = Object.entries(
-						bindings ?? {}
-					).filter(
-						( [ , binding ] ) =>
-							binding?.source !== PATTERN_OVERRIDES_BINDING_SOURCE
-					);
-					if ( isOverriddenInnerBlocks && otherBindings.length ) {
-						metadata.bindings = Object.fromEntries( otherBindings );
-					}
-					const isOverridable =
-						! isOverriddenInnerBlocks ||
-						otherBindings.length <
-							Object.keys( bindings ?? {} ).length;
 					// Use overridden values of the pattern block if they exist.
 					// A block without a name reads the `undefined` key.
-					if (
-						isOverridable &&
-						existingOverrides?.[ metadata.name as string ]
-					) {
+					if ( overrides?.[ metadata.name as string ] ) {
 						// Iterate over each overridden attribute.
 						for ( const [ attributeName, value ] of Object.entries(
 							// Checked above, under the same possibly `undefined` key.
-							existingOverrides[ metadata.name as string ]
+							overrides[ metadata.name as string ]
 						) ) {
-							// Skip the inner blocks, and attributes that don't exist in the block type.
+							// Skip if the attribute does not exist in the block type.
 							if (
-								attributeName === 'innerBlocks' ||
 								! getBlockType( block.name )?.attributes[
 									attributeName
 								]
@@ -180,36 +153,6 @@ export const convertSyncedPatternToStatic =
 							}
 							// Update the block attribute with the override value.
 							block.attributes[ attributeName ] = value;
-						}
-						const innerBlocksValue =
-							existingOverrides[ metadata.name as string ]
-								.innerBlocks;
-						// As on the server, overridden inner blocks aren't
-						// expanded inside themselves, nor nested too deep: the
-						// block keeps its own inner blocks instead.
-						const parsedInnerBlocks =
-							typeof innerBlocksValue === 'string' &&
-							bindings?.innerBlocks?.source ===
-								PATTERN_OVERRIDES_BINDING_SOURCE &&
-							supportedAttributes?.[ block.name ]?.includes(
-								'innerBlocks'
-							) &&
-							ancestorValues.length <
-								MAX_NESTED_INNER_BLOCKS_OVERRIDES &&
-							! ancestorValues.includes( innerBlocksValue )
-								? parseInnerBlocksOverride( innerBlocksValue )
-								: undefined;
-						if ( parsedInnerBlocks ) {
-							// The blocks inside them are overridden too.
-							overriddenInnerBlocks =
-								cloneBlocksAndRemoveBindings(
-									parsedInnerBlocks,
-									// Only a string is parsed.
-									[
-										...ancestorValues,
-										innerBlocksValue as string,
-									]
-								);
 						}
 					}
 				}
@@ -221,18 +164,16 @@ export const convertSyncedPatternToStatic =
 								? metadata
 								: undefined,
 					},
-					overriddenInnerBlocks ??
+					innerBlocks ??
 						cloneBlocksAndRemoveBindings(
 							block.innerBlocks,
-							ancestorValues
+							overrides
 						)
 				);
 			} );
 		}
 
-		const patternInnerBlocks = registry
-			.select( blockEditorStore )
-			.getBlocks( patternBlock.clientId );
+		const patternInnerBlocks = getBlocks( patternBlock.clientId );
 
 		registry
 			.dispatch( blockEditorStore )
