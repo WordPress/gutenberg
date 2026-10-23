@@ -61,6 +61,7 @@ import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaForm from '../media-form';
 import MediaEditorPanel, {
+	MEDIA_EDITOR_PLUGIN_SCOPE,
 	MediaEditorPanelsProvider,
 	getPanelSlotName,
 	useMediaEditorPanels,
@@ -1257,7 +1258,7 @@ function MediaEditorContent( {
 									<MediaForm />
 								</MediaEditorPanel>
 								<PluginArea
-									scope="media-editor"
+									scope={ MEDIA_EDITOR_PLUGIN_SCOPE }
 									onError={ handlePluginError }
 								/>
 								{ children }
