@@ -416,6 +416,13 @@ export default {
 				selector,
 				'.is-layout-grid'
 			) }) { --wp--style--grid-cells: auto; }`;
+			// A block inserted into cells of a fixed size gets enough of them
+			// for its placeholder, which then fills them rather than leaving a
+			// gap. One rule for the grid covers all its children.
+			output += `@container style(--wp--style--grid-cells: fixed) { ${ appendSelectors(
+				selector,
+				'> * > .components-placeholder'
+			) } { min-height: 100%; } }`;
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.

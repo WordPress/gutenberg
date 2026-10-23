@@ -111,7 +111,8 @@ describe( 'getLayoutStyle', () => {
 		it( 'should size manual placement grids by their width and tell their children the cells are fixed', () => {
 			const expected =
 				`.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; --wp--style--grid-cells: fixed; }` +
-				`:where(.my-container .is-layout-grid) { --wp--style--grid-cells: auto; }`;
+				`:where(.my-container .is-layout-grid) { --wp--style--grid-cells: auto; }` +
+				`@container style(--wp--style--grid-cells: fixed) { .my-container > * > .components-placeholder { min-height: 100%; } }`;
 
 			const result = grid.getLayoutStyle( {
 				selector: '.my-container',
@@ -183,7 +184,7 @@ describe( 'getLayoutStyle', () => {
 				'grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr);'
 			);
 			expect( result ).not.toContain( 'aspect-ratio' );
-			expect( result ).not.toContain( '--wp--style--grid-cells: fixed' );
+			expect( result ).not.toContain( '--wp--style--grid-cells: fixed;' );
 			// A grid nested inside it still describes its own cells.
 			expect( result ).toContain(
 				':where(.my-container .is-layout-grid) { --wp--style--grid-cells: auto; }'
