@@ -14,9 +14,10 @@ interface ResizeGridRows {
 	 */
 	getRowCount: ( edge: GridEdge, rowDelta: number ) => number;
 	/**
-	 * Applies a resize.
+	 * Applies a resize, and gives the new row count, or `undefined` when
+	 * nothing changes.
 	 */
-	resizeRows: ( edge: GridEdge, rowDelta: number ) => void;
+	resizeRows: ( edge: GridEdge, rowDelta: number ) => number | undefined;
 }
 
 /**
@@ -27,7 +28,7 @@ interface ResizeGridRows {
  *
  * @param gridClientId Client ID of the grid.
  *
- * @return `getRowCount` gives the row count a resize would lead to, and `resizeRows` applies it.
+ * @return `getRowCount` gives the row count a resize would lead to, and `resizeRows` applies it and gives the new row count.
  */
 export function useResizeGridRows( gridClientId: string ): ResizeGridRows {
 	const registry = useRegistry();
@@ -60,17 +61,18 @@ export function useResizeGridRows( gridClientId: string ): ResizeGridRows {
 	const resizeRows = useCallback(
 		( edge: GridEdge, rowDelta: number ) => {
 			if ( ! rowDelta ) {
-				return;
+				return undefined;
 			}
-			const { updates } = getResize( edge, rowDelta );
+			const { rowCount, updates } = getResize( edge, rowDelta );
 			if ( ! updates ) {
-				return;
+				return undefined;
 			}
 			updateBlockAttributes(
 				Object.keys( updates ),
 				updates,
 				/* uniqueByBlock: */ true
 			);
+			return rowCount;
 		},
 		[ getResize, updateBlockAttributes ]
 	);
