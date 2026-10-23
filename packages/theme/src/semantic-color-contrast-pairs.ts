@@ -113,7 +113,7 @@ export const MINIMUM_NON_TEXT_CONTRAST = 3;
 
 // These colors identify focus through a ring or a solid item highlight. Check
 // every supported neutral surface and the public brand surface using the final
-// colors, including any focus-ring correction.
+// colors after seed adjustment.
 export const SEMANTIC_FOCUS_CONTRAST_PAIRS = (
 	[
 		'background.surface.neutral',

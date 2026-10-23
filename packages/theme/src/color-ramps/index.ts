@@ -7,11 +7,7 @@ import type {
 	RampDirection,
 	Ramp,
 } from './lib/types.ts';
-import {
-	getContrast,
-	parseSeedColor,
-	clampToGamut,
-} from './lib/color-utils.ts';
+import { getContrast } from './lib/color-utils.ts';
 import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
 export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
@@ -66,23 +62,7 @@ export function buildAccentRamp(
 	}
 
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
-	return buildRamp( seed, ACCENT_RAMP_CONFIG, {
-		...bgRampInfo,
-		getAdditionalReferenceColors: bgRamp
-			? ( ramp ) => ( {
-					stroke3: [
-						bgRamp.ramp.surface1,
-						bgRamp.ramp.surface2,
-						bgRamp.ramp.surface3,
-						// Together with the existing surface3 reference, this
-						// covers the brand surface after light/dark swapping.
-						ramp.surface1,
-					].map( ( color ) =>
-						clampToGamut( parseSeedColor( color ) )
-					),
-				} )
-			: undefined,
-	} );
+	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
 }
 
 /**

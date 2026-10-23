@@ -170,8 +170,6 @@ Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `
 
 The seed values guide the generated color ramps but are not guaranteed to appear unchanged in the resulting tokens. The ramp builder may adjust their lightness to meet its contrast targets.
 
-After resolving the seeds, the focus-ring color is checked against all three neutral surfaces and the brand surface at a 3:1 minimum. A failing color is adjusted together with its dependent strokes, while fill and foreground colors stay unchanged. These checks use the final RGB colors. Unreachable targets are reported through the existing ramp warnings.
-
 Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
 
 ```js
@@ -190,7 +188,9 @@ Use `onColorWarnings` to receive structured warnings after the provider calculat
 
 The callback reports failures from the generated ramp checks and a defined set of semantic foreground/background pairs. It does not validate every possible token pairing. It receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
-The contrast warnings also cover the focus-ring color and the resting and active strong brand fills against all three neutral surfaces and the brand surface at a 3:1 minimum. They use the final generated colors after seed adjustments and any focus-ring correction. Fill colors are not adjusted by these checks. Text pairs retain their 4.5:1 minimum.
+The contrast warnings also cover the focus-ring color and the resting and active strong brand fills against all three neutral surfaces and the brand surface at a 3:1 minimum. They use the final generated colors after seed adjustments. These checks report failures without adjusting the colors. Text pairs retain their 4.5:1 minimum.
+
+For example, with the default primary `#3858e9` and background `#1e1e1e`, the resting strong brand fill has 2.97:1 contrast against `background.surface.neutral` and 2.76:1 against `background.surface.neutral-strong`. The focus ring, active fill, and text pairs still meet their targets. Choose a different primary or background seed to resolve the reported pair; for example, the default primary with background `#000000` meets these checked contrast targets.
 
 ### TypeScript props and warnings
 

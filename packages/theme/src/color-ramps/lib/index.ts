@@ -22,23 +22,18 @@ import type {
 } from './types.ts';
 import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
-type AdditionalReferenceColors = Partial<
-	Record< keyof Ramp, readonly PlainColorObject[] >
->;
-
 /**
  * Calculate a complete color ramp based on the provided configuration.
  *
- * @param params                           - The calculation parameters
- * @param params.seed                      - The base color to build the ramp from
- * @param params.sortedSteps               - Steps sorted in dependency order
- * @param params.config                    - Ramp configuration defining contrast requirements
- * @param params.mainDir                   - Primary direction for the ramp (lighter/darker)
- * @param params.oppDir                    - Opposite direction from mainDir
- * @param params.pinLightness              - Optional lightness override for a given step
+ * @param params                       - The calculation parameters
+ * @param params.seed                  - The base color to build the ramp from
+ * @param params.sortedSteps           - Steps sorted in dependency order
+ * @param params.config                - Ramp configuration defining contrast requirements
+ * @param params.mainDir               - Primary direction for the ramp (lighter/darker)
+ * @param params.oppDir                - Opposite direction from mainDir
+ * @param params.pinLightness          - Optional lightness override for a given step
  * @param params.pinLightness.stepName
  * @param params.pinLightness.value
- * @param params.additionalReferenceColors
  * @return Object containing ramp results and satisfaction status
  */
 function calculateRamp( {
@@ -48,7 +43,6 @@ function calculateRamp( {
 	mainDir,
 	oppDir,
 	pinLightness,
-	additionalReferenceColors,
 }: {
 	seed: PlainColorObject;
 	sortedSteps: ( keyof Ramp )[];
@@ -59,7 +53,6 @@ function calculateRamp( {
 		stepName: keyof Ramp;
 		value: number;
 	};
-	additionalReferenceColors?: AdditionalReferenceColors;
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
 	let warnings: ( keyof Ramp )[] | undefined;
@@ -71,7 +64,6 @@ function calculateRamp( {
 	// when other colors reference them.
 	const calculatedColors = new Map< keyof Ramp | 'seed', PlainColorObject >();
 	calculatedColors.set( 'seed', seed );
-	const serializedSteps = new Set< keyof Ramp >();
 
 	for ( const stepName of sortedSteps ) {
 		const {
@@ -85,11 +77,6 @@ function calculateRamp( {
 			contrast.reference,
 			...( contrast.additionalReferences ?? [] ),
 		];
-		const requireSerializedContrast =
-			!! additionalReferenceColors?.[ stepName ]?.length ||
-			referenceNames.some(
-				( name ) => name !== 'seed' && serializedSteps.has( name )
-			);
 		const referenceColors = referenceNames.map( ( referenceName ) => {
 			const referenceColor = calculatedColors.get( referenceName );
 			if ( ! referenceColor ) {
@@ -97,15 +84,8 @@ function calculateRamp( {
 					`Reference color for step ${ stepName } not found: ${ referenceName }`
 				);
 			}
-			return requireSerializedContrast
-				? clampToGamut(
-						parseSeedColor( getColorString( referenceColor ) )
-					)
-				: referenceColor;
+			return referenceColor;
 		} );
-		referenceColors.push(
-			...( additionalReferenceColors?.[ stepName ] ?? [] )
-		);
 
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
@@ -116,17 +96,11 @@ function calculateRamp( {
 				);
 			}
 
-			const adjustedTarget = requireSerializedContrast
-				? contrast.target
-				: adjustContrastTarget( contrast.target );
+			const adjustedTarget = adjustContrastTarget( contrast.target );
 			const candidateMeetsTarget = referenceColors.every(
 				( referenceColor ) =>
-					getContrast(
-						referenceColor,
-						requireSerializedContrast
-							? getColorString( candidateColor )
-							: candidateColor
-					) >= adjustedTarget
+					getContrast( referenceColor, candidateColor ) >=
+					adjustedTarget
 			);
 			// If the candidate meets every contrast requirement, use it.
 			if ( candidateMeetsTarget ) {
@@ -171,9 +145,7 @@ function calculateRamp( {
 				: tightest
 		);
 
-		const adjustedTarget = requireSerializedContrast
-			? contrast.target
-			: adjustContrastTarget( contrast.target );
+		const adjustedTarget = adjustContrastTarget( contrast.target );
 
 		// Define the lightness constraint, if needed.
 		let lightnessConstraint;
@@ -198,7 +170,6 @@ function calculateRamp( {
 			{
 				lightnessConstraint,
 				taperChromaOptions,
-				requireSerializedContrast,
 			}
 		);
 
@@ -216,9 +187,6 @@ function calculateRamp( {
 
 		// Store calculated color for future dependencies
 		calculatedColors.set( stepName, searchResults.color );
-		if ( requireSerializedContrast ) {
-			serializedSteps.add( stepName );
-		}
 
 		// Add to results
 		rampResults[ stepName ] = getColorString( searchResults.color );
@@ -245,7 +213,6 @@ export function buildRamp(
 		mainDirection,
 		pinLightness,
 		rescaleToFitContrastTargets = true,
-		getAdditionalReferenceColors,
 	}: {
 		mainDirection?: RampDirection;
 		pinLightness?: {
@@ -253,9 +220,6 @@ export function buildRamp(
 			value: number;
 		};
 		rescaleToFitContrastTargets?: boolean;
-		getAdditionalReferenceColors?: (
-			ramp: Ramp
-		) => AdditionalReferenceColors;
 	} = {}
 ): RampResult {
 	// Parse and validate here: the single point where user-supplied color strings enter.
@@ -305,7 +269,6 @@ export function buildRamp(
 
 	let bestRamp = rampResults;
 	let bestWarnings = warnings;
-	let finalSeed = seed;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
@@ -357,41 +320,6 @@ export function buildRamp(
 			mainDir,
 			oppDir,
 			pinLightness,
-		} );
-		bestRamp = finalResult.rampResults;
-		bestWarnings = finalResult.warnings;
-		finalSeed = bestSeed;
-	}
-
-	// Fit the seed to the original ramp targets first. A focus constraint must
-	// not move the seed and change otherwise accessible fill/foreground pairs.
-	const additionalReferenceColors =
-		getAdditionalReferenceColors?.( bestRamp );
-	const needsFinalConstraints = Object.entries(
-		additionalReferenceColors ?? {}
-	).some( ( [ rawStep, extraRefs ] ) => {
-		const step = rawStep as keyof Ramp;
-		const contrast = config[ step ].contrast;
-		const internalRefs = [
-			contrast.reference,
-			...( contrast.additionalReferences ?? [] ),
-		].map( ( name ) =>
-			name === 'seed' ? getColorString( finalSeed ) : bestRamp[ name ]
-		);
-		return [ ...internalRefs, ...( extraRefs ?? [] ) ].some(
-			( reference ) =>
-				getContrast( bestRamp[ step ], reference ) < contrast.target
-		);
-	} );
-	if ( needsFinalConstraints ) {
-		const finalResult = calculateRamp( {
-			seed: finalSeed,
-			sortedSteps,
-			config,
-			mainDir,
-			oppDir,
-			pinLightness,
-			additionalReferenceColors,
 		} );
 		bestRamp = finalResult.rampResults;
 		bestWarnings = finalResult.warnings;
