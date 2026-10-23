@@ -19,7 +19,7 @@ export async function deactivatePlugin( slug ) {
 		return;
 	}
 	// Retry here, since this usually runs in an `afterAll` hook, which `retryTimes()` doesn't re-run.
-	const maxAttempts = 3;
+	const maxAttempts = 2;
 	for ( let attempt = 1; attempt <= maxAttempts; attempt++ ) {
 		// A previous attempt may have actually deactivated the plugin
 		// server-side and only timed out waiting for the row to

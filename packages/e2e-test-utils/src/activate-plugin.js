@@ -22,7 +22,7 @@ export async function activatePlugin( slug ) {
 		return;
 	}
 	// Retry here, since this usually runs in a `beforeAll` hook, which `retryTimes()` doesn't re-run.
-	const maxAttempts = 3;
+	const maxAttempts = 2;
 	for ( let attempt = 1; attempt <= maxAttempts; attempt++ ) {
 		// A previous attempt may have actually activated the plugin
 		// server-side and only timed out waiting for the row to
