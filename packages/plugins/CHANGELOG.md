@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PluginArea` subscribes to plugin registration under a namespace of its own, so unmounting one instance no longer stops other mounted instances from updating when a plugin is registered or unregistered ([#84664](https://github.com/WordPress/gutenberg/pull/84664)).
+
 ## 8.2.0 (2026-11-18)
 
 ## 8.1.0 (2026-11-04)
