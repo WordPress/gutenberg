@@ -75,9 +75,9 @@ class Tests_Extensible_Site_Editor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The extensible site editor sets no entity navigator, so it removes the
-	 * "Edit" action of pages, templates, template parts, and patterns, after
-	 * core registers it at priority 0.
+	 * The lists of pages, templates, template parts, and patterns of the
+	 * extensible site editor set no entity navigator, so the experiment
+	 * removes their "Edit" action, after core registers it at priority 0.
 	 *
 	 * @dataProvider data_post_types_with_the_edit_action
 	 *
@@ -101,7 +101,20 @@ class Tests_Extensible_Site_Editor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The post types core registers the edit action for.
+	 * The navigation list of the extensible site editor sets an entity
+	 * navigator, so the experiment keeps the "Edit" action of navigation
+	 * menus.
+	 */
+	public function test_the_edit_action_of_navigation_menus_is_kept() {
+		wp_set_current_user( self::$admin_id );
+		add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_entity_actions', self::$priority );
+
+		$this->assertContains( 'edit-post', $this->get_action_ids( 'wp_navigation' ) );
+	}
+
+	/**
+	 * The post types core registers the edit action for, and the experiment
+	 * unregisters it for.
 	 *
 	 * @return array[] The post type of each test.
 	 */
