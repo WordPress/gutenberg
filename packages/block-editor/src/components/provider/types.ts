@@ -5,6 +5,7 @@ import type { DataRegistry } from '@wordpress/data';
 import type { BlockEventHandlers } from '../writing-flow/types';
 import type {
 	BlockSelection,
+	BoundInnerBlocks,
 	InitialPosition,
 	Settings,
 } from '../../store/types';
@@ -88,6 +89,12 @@ export interface UseBlockSyncProps {
 	 * Called when a non-persistent change has been made.
 	 */
 	onInput?: OnBlockUpdate;
+	/**
+	 * For an inner block controller whose inner blocks are bound to a source:
+	 * the binding. The controller then keeps its own inner blocks as the ones
+	 * its parents see.
+	 */
+	boundInnerBlocks?: BoundInnerBlocks;
 }
 
 /**
