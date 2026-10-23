@@ -52,6 +52,7 @@ export function CollaboratorsList( {
 			placement="bottom"
 			offset={ 8 }
 			shift
+			resize={ false }
 			className="editor-collaborators-presence__list"
 			onClose={ () => setIsPopoverVisible( false ) }
 		>
