@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/search",
+		"attrs": {
+			"label": "Search",
+			"width": 350,
+			"widthUnit": "px",
+			"buttonText": "Search"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]
