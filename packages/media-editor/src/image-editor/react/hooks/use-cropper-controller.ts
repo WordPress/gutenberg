@@ -47,6 +47,9 @@ export interface CropperController extends CropperSetters {
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
 	/**
+	 * Plumbing for `Cropper`, which calls it on every size change. Not part
+	 * of the consumer contract; a composite store provides it for `Cropper`.
+	 *
 	 * Report the current rendered image size to the controller. The
 	 * Cropper component calls this on visualSize changes; composite
 	 * controllers use it to compute aspect-ratio reshapes. The pure
@@ -54,6 +57,9 @@ export interface CropperController extends CropperSetters {
 	 */
 	setVisualSize: ( size: Size ) => void;
 	/**
+	 * Plumbing for `Cropper`, which calls it on viewport changes. Not part
+	 * of the consumer contract; a composite store provides it for `Cropper`.
+	 *
 	 * Adjust the cropRect in response to a viewport change (window
 	 * resize, canvas resize). Behaves like `setCropRect` but, in
 	 * composite controllers, does NOT record an undo entry — viewport
