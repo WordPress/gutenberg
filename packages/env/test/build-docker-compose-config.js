@@ -77,5 +77,28 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( dockerConfig.services.mysql.image ).toBe(
 			'mariadb:${WP_ENV_MARIADB_VERSION:-latest}'
 		);
+		expect( dockerConfig.services[ 'tests-mysql' ].image ).toBe(
+			'mariadb:${WP_ENV_MARIADB_VERSION:-latest}'
+		);
+	} );
+
+	it( 'should create a separate database for each environment', () => {
+		const { services } = buildDockerComposeConfig( CONFIG );
+
+		expect( services.mysql.environment.MYSQL_DATABASE ).toBe( 'wordpress' );
+		expect( services[ 'tests-mysql' ].environment.MYSQL_DATABASE ).toBe(
+			'tests-wordpress'
+		);
+		expect( services[ 'tests-mysql' ].volumes ).toEqual( [
+			'mysql-test:/var/lib/mysql',
+		] );
+		for ( const service of [ 'tests-wordpress', 'tests-cli', 'phpunit' ] ) {
+			expect( services[ service ].environment ).toEqual(
+				expect.objectContaining( {
+					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_HOST: 'tests-mysql',
+				} )
+			);
+		}
 	} );
 } );
