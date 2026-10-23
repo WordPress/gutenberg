@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the store, `isOverridableBlock`, the constants and `lock-unlock` to TypeScript ([#85253](https://github.com/WordPress/gutenberg/pull/85253)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

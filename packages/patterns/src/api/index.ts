@@ -1,11 +1,13 @@
+import type { BlockWithMetadata } from '../types';
+
 /**
  * Determines whether a block is overridable.
  *
- * @param {WPBlock} block The block to test.
+ * @param block The block to test.
  *
- * @return {boolean} `true` if a block is overridable, `false` otherwise.
+ * @return `true` if a block is overridable, `false` otherwise.
  */
-export function isOverridableBlock( block ) {
+export function isOverridableBlock( block: BlockWithMetadata ): boolean {
 	return (
 		!! block.attributes.metadata?.name &&
 		!! block.attributes.metadata?.bindings &&
