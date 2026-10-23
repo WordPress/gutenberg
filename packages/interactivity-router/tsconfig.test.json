@@ -9,6 +9,7 @@
 	},
 	"files": [
 		"global.d.ts",
+		"src/assets/test/dynamic-importmap.jsdom.test.ts",
 		"src/assets/test/script-modules.jsdom.test.ts",
 		"src/assets/test/scs.test.ts",
 		"src/assets/test/styles.jsdom.test.ts",
