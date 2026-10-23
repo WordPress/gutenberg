@@ -3258,9 +3258,6 @@
 		},
 		"react-hooks/refs": {
 			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/use-convert-classic-menu-to-block-menu.js": {

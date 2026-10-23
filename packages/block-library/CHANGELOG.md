@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Navigation: Preserve input focus and edits while creating a menu from inline blocks ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
 -   Page List: Keep page items visible in the Navigation sidebar during content-only editing ([#85357](https://github.com/WordPress/gutenberg/pull/85357)).
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
