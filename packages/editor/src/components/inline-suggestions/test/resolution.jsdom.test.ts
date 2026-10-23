@@ -230,6 +230,26 @@ describe( 'resolving nested suggestions', () => {
 			expect( [ ...effect.affected ] ).toEqual( [ [ '5', 'shrunk' ] ] );
 			expect( findSuggestionText( effect.value, 5 ) ).toBe( 'bc' );
 		} );
+
+		it( 'resolves a replacement’s halves together', () => {
+			const value = rtd(
+				`a${ mark( 'add', 8, 'NEW' ) }${ mark( 'del', 8, 'old' ) }z`
+			);
+			expect(
+				resolveInlineSuggestion( value, {
+					id: 8,
+					suggestionType: 'replace',
+					decision: 'accept',
+				} ).value.toHTMLString()
+			).toBe( 'aNEWz' );
+			expect(
+				resolveInlineSuggestion( value, {
+					id: 8,
+					suggestionType: 'replace',
+					decision: 'reject',
+				} ).value.toHTMLString()
+			).toBe( 'aoldz' );
+		} );
 	} );
 
 	describe( 'rebaseFormatOriginal', () => {

@@ -360,6 +360,33 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
+	it( 'summarizes a type-over as one Replace line', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+					text: 'my',
+					deletedText: 'your',
+				},
+			] )
+		).toEqual( [ { label: 'Replace:', value: '“your” → “my”' } ] );
+	} );
+
+	it( 'summarizes a type-over whose new text was backspaced away as Delete', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+					deletedText: 'your',
+				},
+			] )
+		).toEqual( [ { label: 'Delete:', value: '“your”' } ] );
+	} );
+
 	it( 'summarizes an inline-suggestion format op with its direction', () => {
 		// A format suggestion changes only markup, so it surfaces which
 		// formats changed (from the captured before/after run HTML) rather
@@ -894,5 +921,33 @@ describe( 'summarizeOperations', () => {
 				},
 			] )
 		).toEqual( [ { label: 'Change:', value: 'style' } ] );
+	} );
+
+	it( 'summarizes a post title suggestion as before and after', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: 'Old title',
+					after: 'New title',
+				},
+			] )
+		).toEqual( [
+			{ label: 'Title:', value: '“Old title” → “New title”' },
+		] );
+	} );
+
+	it( 'quotes only the proposed title when the post had none', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: '',
+					after: 'Fresh title',
+				},
+			] )
+		).toEqual( [ { label: 'Title:', value: '“Fresh title”' } ] );
 	} );
 } );
