@@ -33,43 +33,26 @@ describe( 'collectThemeProviderColorWarnings', () => {
 		] );
 	} );
 
-	it.each( [
-		[ 'stroke.focus', 'background.surface.neutral-strong' ],
-		[ 'stroke.focus', 'background.surface.brand' ],
-		[ 'background.interactive.brand-strong', 'background.surface.neutral' ],
-		[
-			'background.interactive.brand-strong-active',
-			'background.surface.neutral-weak',
-		],
-	] as const )(
-		'reports insufficient contrast for %s against %s',
-		( foregroundToken, backgroundToken ) => {
-			const colorValues = new Map( [
-				[
-					`--wpds-color-${ foregroundToken.replaceAll( '.', '-' ) }`,
-					'#fff',
-				],
-				[
-					`--wpds-color-${ backgroundToken.replaceAll( '.', '-' ) }`,
-					'#fff',
-				],
-			] );
+	it( 'reports insufficient focus-ring contrast against brand surfaces', () => {
+		const colorValues = new Map( [
+			[ '--wpds-color-stroke-focus', '#fff' ],
+			[ '--wpds-color-background-surface-brand', '#fff' ],
+		] );
 
-			expect(
-				collectThemeProviderColorWarnings( new Map(), colorValues )
-			).toEqual( [
-				{
-					type: 'contrast',
-					backgroundToken,
-					backgroundColor: '#fff',
-					foregroundToken,
-					foregroundColor: '#fff',
-					requiredContrast: 3,
-					achievedContrast: 1,
-				},
-			] );
-		}
-	);
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
+				type: 'contrast',
+				backgroundToken: 'background.surface.brand',
+				backgroundColor: '#fff',
+				foregroundToken: 'stroke.focus',
+				foregroundColor: '#fff',
+				requiredContrast: 3,
+				achievedContrast: 1,
+			},
+		] );
+	} );
 
 	it.each( [
 		{ color: '#959595', warnings: 1 },

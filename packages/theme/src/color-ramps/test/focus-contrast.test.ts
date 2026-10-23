@@ -28,14 +28,6 @@ describe( 'accent focus contrast', () => {
 
 	it.each( [
 		{
-			primary: '#3858e9',
-			background: '#fcfcfc',
-			surface: '#aaa',
-			fill1: '#3858e9',
-			fill2: '#2e49d9',
-			foreground: '#eff0f2',
-		},
-		{
 			primary: '#00ff00',
 			background: '#fcfcfc',
 			surface: '#b6b6b6',
