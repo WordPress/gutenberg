@@ -22,10 +22,12 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 	}
 
 	/**
-	 * The `$post` argument is intentionally omitted so that changes are reflected when previewing a post.
+	 * Omit the `$post` argument for the current post so that unsaved title changes are reflected in previews.
 	 * See: https://github.com/WordPress/gutenberg/pull/37622#issuecomment-1000932816.
 	 */
-	$title = get_the_title();
+	$title = (int) get_the_ID() === (int) $block->context['postId']
+		? get_the_title()
+		: get_the_title( $block->context['postId'] );
 
 	if ( ! $title ) {
 		return '';
