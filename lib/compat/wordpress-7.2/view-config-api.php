@@ -19,48 +19,65 @@
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
 function _gutenberg_add_form_fields_to_wp_template_view_config( $data ) {
+	$fields = array(
+		array(
+			'id'     => 'description',
+			'layout' => array(
+				'type'          => 'panel',
+				'labelPosition' => 'top',
+			),
+		),
+		array(
+			'id'     => 'description_readonly',
+			'layout' => array(
+				'type'          => 'regular',
+				'labelPosition' => 'none',
+			),
+		),
+	);
+
+	/*
+	 * The template a template is rendered inside is behind an experiment, and
+	 * the field reads a REST field that is only registered with it, so the form
+	 * leaves it out until the experiment is on. The list is pinned as a whole,
+	 * which is why the member is dropped here rather than added by the feature.
+	 */
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-template-inheritance' ) ) {
+		$fields[] = 'template';
+	}
+
+	$fields = array_merge(
+		$fields,
+		array(
+			array(
+				'id'     => 'reading_settings',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+			// The following fields are only meaningful in the `home`/`index`
+			// template summary. They edit other entities (`root/site` and the
+			// posts page); the editor merges those records into the form data
+			// under a namespace and controls when the fields are shown.
+			'posts_page_title',
+			'posts_per_page',
+			'default_comment_status',
+		)
+	);
+
 	return $data->replace(
 		array(
 			'form' => array(
-				'fields' => array(
-					array(
-						'id'     => 'description',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
-						),
-					),
-					array(
-						'id'     => 'description_readonly',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'template',
-					array(
-						'id'     => 'reading_settings',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					array(
-						'id'     => 'last_edited_date',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'none',
-						),
-					),
-					'revisions',
-					// The following fields are only meaningful in the `home`/`index`
-					// template summary. They edit other entities (`root/site` and the
-					// posts page); the editor merges those records into the form data
-					// under a namespace and controls when the fields are shown.
-					'posts_page_title',
-					'posts_per_page',
-					'default_comment_status',
-				),
+				'fields' => $fields,
 			),
 		),
 		1
