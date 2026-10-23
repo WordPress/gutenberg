@@ -175,35 +175,40 @@
 				grid-template-columns: subgrid;
 			}
 
-			&[data-popup-open]:not([data-disabled]) {
+			&[data-popup-open]:not([data-highlighted], [data-disabled], [aria-disabled="true"]) {
 				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 
 				@media ( forced-colors: active ) {
 					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
-					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
 				}
 			}
 
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-brand-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral);
+			/* Link items expose aria-disabled without a data-disabled state. */
+			&[data-highlighted]:not([data-disabled], [aria-disabled="true"]) {
+				--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-strong-active);
+
+				background-color: var(--wpds-color-background-interactive-brand-strong-active);
+				color: var(--wpds-color-foreground-interactive-brand-strong-active);
 				outline: none;
 
-				/*
-				 * Set the outline through the global CSS defense bridge, since
-				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
-				 */
 				@media ( forced-colors: active ) {
-					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
-					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
+					--_gcd-a-color: HighlightText;
+
+					forced-color-adjust: none;
+					background-color: Highlight;
+					color: HighlightText;
 				}
 			}
 
-			&[aria-disabled="true"] {
-				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
+			&:is([data-disabled], [aria-disabled="true"]) {
+				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
+					--_gcd-a-color: GrayText;
+
 					color: GrayText;
 				}
 			}
@@ -381,16 +386,8 @@
 			content: "\2196";
 		}
 
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-shortcut,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-trailing,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
-		.item[aria-disabled="true"] .item-description,
-		.item[aria-disabled="true"] .item-suffix,
-		.item[aria-disabled="true"] .item-shortcut,
-		.item[aria-disabled="true"] .item-trailing,
-		.item[aria-disabled="true"] .item-selection-indicator {
+		.item:is([data-highlighted], [data-popup-open], [data-disabled], [aria-disabled="true"]) :is(.item-description, .item-suffix, .item-shortcut, .item-trailing),
+		.item:is([data-highlighted], [data-disabled], [aria-disabled="true"]) .item-selection-indicator {
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;
