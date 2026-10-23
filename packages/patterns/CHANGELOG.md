@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The package now bundles TypeScript types ([#85256](https://github.com/WordPress/gutenberg/pull/85256)).
+
 ### Internal
 
 -   Convert the store, `isOverridableBlock`, the constants and `lock-unlock` to TypeScript ([#85253](https://github.com/WordPress/gutenberg/pull/85253)).
