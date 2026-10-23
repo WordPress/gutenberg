@@ -9,7 +9,9 @@ import type {
 import { __ } from '@wordpress/i18n';
 import { unlock } from './lock-unlock';
 
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+const { getViewportBreakpoints, PRESET_METADATA } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 /**
  * State definition with value and label.
@@ -196,6 +198,67 @@ export function isVariationWithProperties(
 	);
 
 	return areGlobalStylesEqual( variationWithProperties, variation );
+}
+
+/**
+ * Adds the user's custom presets to a settings object, keeping the presets it
+ * defines itself.
+ *
+ * @param settings     The settings to add to.
+ * @param userSettings The user's settings.
+ * @return The settings with the user's custom presets.
+ */
+function mergeCustomPresets( settings: any, userSettings: any ): any {
+	if ( ! userSettings ) {
+		return settings;
+	}
+
+	for ( const { path } of PRESET_METADATA ) {
+		const [ group, key ] = path;
+		const userPresets = userSettings[ group ]?.[ key ];
+		const variationPresets = settings?.[ group ]?.[ key ];
+		const custom = Array.isArray( userPresets )
+			? undefined
+			: userPresets?.custom;
+		if (
+			! custom ||
+			Array.isArray( variationPresets ) ||
+			variationPresets?.custom
+		) {
+			continue;
+		}
+		settings = {
+			...settings,
+			[ group ]: {
+				...settings?.[ group ],
+				[ key ]: { ...variationPresets, custom },
+			},
+		};
+	}
+
+	return settings;
+}
+
+/**
+ * Copies the user's custom presets (such as colors, font families, font sizes
+ * and shadows) into a variation, so they are not lost when the variation is
+ * applied. Presets the variation defines itself are left as they are.
+ *
+ * @param variation The variation to apply.
+ * @param user      The current user config.
+ * @return The variation with the user's custom presets.
+ */
+export function withUserCustomPresets< T extends GlobalStylesConfig >(
+	variation: T,
+	user?: GlobalStylesConfig
+): T {
+	const settings = mergeCustomPresets( variation.settings, user?.settings );
+
+	if ( settings === variation.settings ) {
+		return variation;
+	}
+
+	return { ...variation, settings };
 }
 
 function getFontFamilyFromSetting( fontFamilies: any[], setting: string ): any {
