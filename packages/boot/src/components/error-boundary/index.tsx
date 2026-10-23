@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { Component } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { Component, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { EmptyState } from '@wordpress/ui';
+import { Button, EmptyState } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { caution } from '@wordpress/icons';
+import { caution, check, copy } from '@wordpress/icons';
 import styles from './style.module.scss';
 
 interface Props {
@@ -15,11 +15,38 @@ interface State {
 	error: Error | null;
 }
 
+const COPY_FEEDBACK_TIMEOUT = 2000;
+
 function CopyErrorButton( { error }: { error: Error } ) {
-	const ref = useCopyToClipboard( () => error.stack ?? String( error ) );
+	// Each successful copy bumps this so the check stays up for a fresh
+	// interval, including when Copy error is used again while it is showing.
+	const [ copiedTick, setCopiedTick ] = useState( 0 );
+	const hasCopied = copiedTick > 0;
+
+	useEffect( () => {
+		if ( copiedTick === 0 ) {
+			return;
+		}
+		const timeoutId = setTimeout(
+			() => setCopiedTick( 0 ),
+			COPY_FEEDBACK_TIMEOUT
+		);
+		return () => clearTimeout( timeoutId );
+	}, [ copiedTick ] );
+
+	const ref = useCopyToClipboard(
+		() => error.stack ?? String( error ),
+		() => {
+			setCopiedTick( ( tick ) => tick + 1 );
+			// The label stays "Copy error". The check is the visual
+			// confirmation, and this announcement is the accessible one.
+			speak( __( 'Copied to clipboard' ) );
+		}
+	);
 
 	return (
-		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
+		<Button ref={ ref } variant="outline" tone="neutral">
+			<Button.Icon icon={ hasCopied ? check : copy } />
 			{ __( 'Copy error' ) }
 		</Button>
 	);
