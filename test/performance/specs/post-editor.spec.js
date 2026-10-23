@@ -1,5 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect, Metrics } from '@wordpress/e2e-test-utils-playwright';
 import { PerfUtils } from '../fixtures';
 import { sum } from '../utils.js';
 
@@ -398,7 +398,7 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	test.describe( 'Undoing and redoing typed characters', () => {
+	test.describe( 'Undoing and redoing block changes', () => {
 		let draftId = null;
 
 		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
@@ -412,9 +412,11 @@ test.describe( 'Post Editor Performance', () => {
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
-			const paragraphs = canvas.getByRole( 'document', {
-				name: /Block: Paragraph/i,
-			} );
+			// Focus the canvas so the undo shortcuts reach the editor.
+			await canvas
+				.getByRole( 'document', { name: /Block: Paragraph/i } )
+				.first()
+				.click();
 
 			// Undo re-renders off-screen blocks in later tasks, after the key
 			// events, so this measures all main thread work until idle.
@@ -430,37 +432,90 @@ test.describe( 'Post Editor Performance', () => {
 				);
 			};
 
-			// Each iteration types in two paragraphs, making two undo levels,
-			// then measures undo, undo again and redo, one sample each.
+			// Idle once three idle periods in a row have time left, so no work
+			// is left, such as blocks updating in idle time. With the caret in
+			// the canvas, the browser draws every frame, so periods are short.
+			const waitForIdle = () =>
+				page.evaluate(
+					() =>
+						new Promise( ( resolve ) => {
+							let idlePeriods = 0;
+							const check = ( deadline ) => {
+								idlePeriods =
+									deadline.timeRemaining() > 10
+										? idlePeriods + 1
+										: 0;
+								if ( idlePeriods === 3 ) {
+									resolve();
+								} else {
+									window.requestIdleCallback( check );
+								}
+							};
+							window.requestIdleCallback( check );
+						} )
+				);
+
+			// Which of the two edited paragraphs have a drop cap.
+			const getDropCaps = ( clientIds ) =>
+				page.evaluate(
+					( ids ) =>
+						ids.map(
+							( id ) =>
+								!! window.wp.data
+									.select( 'core/block-editor' )
+									.getBlockAttributes( id ).dropCap
+						),
+					clientIds
+				);
+
+			// Each step and which paragraphs have a drop cap after it.
 			const steps = [
-				'ControlOrMeta+z',
-				'ControlOrMeta+z',
-				'ControlOrMeta+Shift+z',
+				[ 'ControlOrMeta+z', [ true, false ] ],
+				[ 'ControlOrMeta+z', [ false, false ] ],
+				[ 'ControlOrMeta+Shift+z', [ true, false ] ],
 			];
 			const throwaway = 1;
 			const iterations = 4 + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
-				await paragraphs.nth( i * 2 ).click();
-				await page.keyboard.type( 'x' );
-				await paragraphs.nth( i * 2 + 1 ).click();
-				await page.keyboard.type( 'y' );
+				// Two undo levels: a drop cap on one paragraph, then another.
+				const clientIds = await page.evaluate( ( index ) => {
+					const { select, dispatch } = window.wp.data;
+					const ids = select( 'core/block-editor' )
+						.getBlockOrder()
+						.slice( index, index + 2 );
+					for ( const id of ids ) {
+						dispatch( 'core/block-editor' ).updateBlockAttributes(
+							id,
+							{ dropCap: true }
+						);
+					}
+					return ids;
+				}, i * 2 );
+				expect( await getDropCaps( clientIds ) ).toEqual( [
+					true,
+					true,
+				] );
+				expect(
+					await page.evaluate( () =>
+						window.wp.data.select( 'core' ).hasUndo()
+					)
+				).toBe( true );
 
-				for ( const step of steps ) {
-					// Wait for the browser to be idle before starting the monitoring.
-					// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-					await page.waitForTimeout( BROWSER_IDLE_WAIT );
+				for ( const [ key, dropCaps ] of steps ) {
+					await waitForIdle();
 					const start = await getTaskDuration();
 
-					await page.keyboard.press( step );
+					await page.keyboard.press( key );
+					await waitForIdle();
 
-					// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-					await page.waitForTimeout( BROWSER_IDLE_WAIT );
+					const duration = ( await getTaskDuration() ) - start;
+					expect( await getDropCaps( clientIds ) ).toEqual(
+						dropCaps
+					);
 
 					// Save the results.
 					if ( i > throwaway ) {
-						results.undo.push(
-							( await getTaskDuration() ) - start
-						);
+						results.undo.push( duration );
 					}
 				}
 			}
