@@ -13,7 +13,7 @@ import type { ColorObject, ColorProperty } from './inline';
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
 const name = 'core/text-color';
-const title = __( 'Text color' );
+const title = __( 'Highlight' );
 
 const EMPTY_ARRAY: ColorObject[] = [];
 
