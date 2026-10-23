@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { pasteHandler, serialize } from '@wordpress/blocks';
+import { isPlainTextPaste } from '../paste-handler';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
@@ -448,5 +449,69 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.width ).toBeUndefined();
 		expect( result.attributes.height ).toBeUndefined();
+	} );
+} );
+
+describe( 'isPlainTextPaste', () => {
+	it( 'is true for plain text without an HTML version', () => {
+		expect( isPlainTextPaste( { plainText: '# 3 reasons why' } ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'is false without a plain text version', () => {
+		expect( isPlainTextPaste( { HTML: '<p>Hello</p>' } ) ).toBe( false );
+		expect( isPlainTextPaste( {} ) ).toBe( false );
+	} );
+
+	it( 'is true when the HTML version has no formatting', () => {
+		expect(
+			isPlainTextPaste( {
+				HTML: '<span style="color: red"># 3 reasons why</span>',
+				plainText: '# 3 reasons why',
+			} )
+		).toBe( true );
+	} );
+
+	it( 'ignores the meta tag and Windows markers around the HTML', () => {
+		expect(
+			isPlainTextPaste( {
+				HTML: `<html>\n<body>\n<!--StartFragment--><meta charset='utf-8'><span style="color: red"># 3 reasons why</span><!--EndFragment-->\n</body>\n</html>`,
+				plainText: '# 3 reasons why',
+			} )
+		).toBe( true );
+	} );
+
+	it( 'treats Slack paragraph breaks as plain text', () => {
+		expect(
+			isPlainTextPaste( {
+				HTML: '<span>One<span data-stringify-type="paragraph-break"></span>Two</span>',
+				plainText: 'One\n\nTwo',
+			} )
+		).toBe( true );
+	} );
+
+	it( 'is false when the HTML version has formatting', () => {
+		expect(
+			isPlainTextPaste( {
+				HTML: '<h1>3 reasons why</h1>',
+				plainText: '3 reasons why',
+			} )
+		).toBe( false );
+		expect(
+			isPlainTextPaste( {
+				HTML: '<span>3 <strong>reasons</strong> why</span>',
+				plainText: '3 reasons why',
+			} )
+		).toBe( false );
+	} );
+
+	it( 'is false for serialised blocks', () => {
+		const serialised =
+			'<!-- wp:paragraph -->\n<p>Hello</p>\n<!-- /wp:paragraph -->';
+		expect( isPlainTextPaste( { plainText: serialised } ) ).toBe( false );
+		expect(
+			isPlainTextPaste( { HTML: serialised, plainText: serialised } )
+		).toBe( false );
 	} );
 } );

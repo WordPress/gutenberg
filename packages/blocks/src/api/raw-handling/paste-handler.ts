@@ -71,6 +71,93 @@ function filterInlineHTML( HTML: string ): string {
 }
 
 /**
+ * Strips what the clipboard wraps copied HTML in: meta tags and the Windows
+ * html, body and fragment markers.
+ *
+ * @param HTML The HTML as read from the clipboard.
+ *
+ * @return The HTML without the wrappers.
+ */
+function stripClipboardWrappers( HTML: string ): string {
+	// First of all, strip any meta tags.
+	HTML = HTML.replace( /<meta[^>]+>/g, '' );
+	// Strip Windows markers.
+	HTML = HTML.replace(
+		/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
+		''
+	);
+	return HTML.replace(
+		/(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i,
+		''
+	);
+}
+
+/**
+ * Normalises unwrapped clipboard HTML before it is classified as plain text,
+ * inline content or blocks.
+ *
+ * @param HTML The HTML without clipboard wrappers.
+ *
+ * @return The normalised HTML.
+ */
+function normaliseClipboardHTML( HTML: string ): string {
+	// Normalize unicode to use composed characters.
+	// Not normalizing the content will only affect older browsers and won't
+	// entirely break the app.
+	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+	// See: https://core.trac.wordpress.org/ticket/30130
+	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
+	HTML = HTML.normalize();
+
+	// Must be run before checking if it's inline content.
+	return deepFilterHTML( HTML, [ slackParagraphCorrector ] );
+}
+
+/**
+ * Whether normalised clipboard content counts as plain text, which the paste
+ * handler then parses as Markdown:
+ * * There is a plain text version.
+ * * There is no HTML version, or it has no formatting.
+ *
+ * @param HTML      The normalised HTML.
+ * @param plainText The plain text version.
+ *
+ * @return Whether the content is plain text.
+ */
+function isPlainClipboardContent( HTML: string, plainText: string ): boolean {
+	return !! plainText && ( ! HTML || isPlain( HTML ) );
+}
+
+/**
+ * Whether the paste handler would read the clipboard as plain text and parse
+ * it as Markdown, rather than as HTML or as serialised blocks. Lets a plain
+ * text field keep such a paste verbatim: the Markdown conversion consumes
+ * characters like `#` or `**` that the field has no formatting to carry.
+ *
+ * Answers `false` for any serialised blocks, while the handler still falls
+ * back to the plain text path when they parse to a single freeform block.
+ *
+ * @param options
+ * @param options.HTML      The HTML as read from the clipboard.
+ * @param options.plainText The plain text as read from the clipboard.
+ *
+ * @return Whether the clipboard holds plain text.
+ */
+export function isPlainTextPaste( {
+	HTML = '',
+	plainText = '',
+}: Pick< RawHandlerOptions, 'HTML' | 'plainText' > ): boolean {
+	HTML = stripClipboardWrappers( HTML );
+
+	// Serialised blocks are parsed as blocks, whatever their source.
+	if ( ( HTML || plainText ).indexOf( '<!-- wp:' ) !== -1 ) {
+		return false;
+	}
+
+	return isPlainClipboardContent( normaliseClipboardHTML( HTML ), plainText );
+}
+
+/**
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param options
@@ -94,17 +181,7 @@ export function pasteHandler( {
 	log( 'Received HTML (pasteHandler):\n\n', HTML );
 	log( 'Received plain text (pasteHandler):\n\n', plainText );
 
-	// First of all, strip any meta tags.
-	HTML = HTML.replace( /<meta[^>]+>/g, '' );
-	// Strip Windows markers.
-	HTML = HTML.replace(
-		/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
-		''
-	);
-	HTML = HTML.replace(
-		/(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i,
-		''
-	);
+	HTML = stripClipboardWrappers( HTML );
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {
@@ -122,21 +199,9 @@ export function pasteHandler( {
 		}
 	}
 
-	// Normalize unicode to use composed characters.
-	// Not normalizing the content will only affect older browsers and won't
-	// entirely break the app.
-	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
-	// See: https://core.trac.wordpress.org/ticket/30130
-	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
-	HTML = HTML.normalize();
+	HTML = normaliseClipboardHTML( HTML );
 
-	// Must be run before checking if it's inline content.
-	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
-
-	// Consider plain text if:
-	// * There is a plain text version.
-	// * There is no HTML version, or it has no formatting.
-	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+	const isPlainText = isPlainClipboardContent( HTML, plainText );
 
 	if ( isPlainText && isLatexMathMode( plainText ) ) {
 		return [ createBlock( 'core/math', { latex: plainText } ) ];

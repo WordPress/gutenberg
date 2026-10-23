@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   `PostTitle`: Keep plain text as pasted instead of parsing it as Markdown, which dropped characters like `#` and `**` from the title. The lines after the first still become blocks when the title is empty ([#85466](https://github.com/WordPress/gutenberg/pull/85466)).
 
 ## 16.0.0 (2026-10-20)
 
