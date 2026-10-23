@@ -6,7 +6,6 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState } from '@wordpress/element';
@@ -21,7 +20,6 @@ import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
-import { unlock } from '../../lock-unlock';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
@@ -48,8 +46,6 @@ type BoxValues = ComponentProps< typeof BoxControl >[ 'values' ];
 type BoxSides = ComponentProps< typeof BoxControl >[ 'sides' ];
 type SpacingValues = ComponentProps< typeof SpacingSizesControl >[ 'values' ];
 type SpacingSides = ComponentProps< typeof SpacingSizesControl >[ 'sides' ];
-
-const { unpackBoxShorthand } = unlock( componentsPrivateApis );
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -230,6 +226,46 @@ function getNumericPlaceholder(
 	}
 	const [ quantity ] = parseQuantityAndUnitFromRawValue( rawValue );
 	return quantity;
+}
+
+/**
+ * Expands a CSS spacing shorthand without splitting values inside CSS functions.
+ *
+ * @param value The padding or margin shorthand.
+ * @return The values for each side.
+ */
+function unpackBoxShorthand( value: string ): SpacingSidesValue {
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+
+	for ( const char of value.trim() ) {
+		if ( char === '(' ) {
+			depth++;
+			current += char;
+		} else if ( char === ')' ) {
+			depth = Math.max( 0, depth - 1 );
+			current += char;
+		} else if ( /\s/.test( char ) && depth === 0 ) {
+			if ( current ) {
+				parts.push( current );
+				current = '';
+			}
+		} else {
+			current += char;
+		}
+	}
+
+	if ( current ) {
+		parts.push( current );
+	}
+
+	if ( parts.length >= 2 && parts.length <= 4 ) {
+		const [ top, right = top, bottom = top, left = right ] = parts;
+		return { top, right, bottom, left };
+	}
+
+	return { top: value, right: value, bottom: value, left: value };
 }
 
 function splitStyleValue(

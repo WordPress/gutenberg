@@ -23,7 +23,6 @@
 
 ### Internal
 
--   Share the CSS box shorthand unpacker with internal spacing controls through private APIs ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
 -   `ColorIndicator`: Make `colorValue` optional, and `MenuItem`: Accept `isPressed` in the props types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 -   `MenuItem`: Accept `accessibleWhenDisabled` in the props types ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).

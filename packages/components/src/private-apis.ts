@@ -12,12 +12,10 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
-import { unpackBoxShorthand } from './border-box-control/utils';
 
 export const privateApis = {};
 lock( privateApis, {
 	ContentEditableControl,
-	unpackBoxShorthand,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
