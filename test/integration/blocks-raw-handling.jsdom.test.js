@@ -489,6 +489,34 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should convert a description list', () => {
+		const transformed = serialize(
+			pasteHandler( {
+				HTML: '<dl><dt>Term A</dt><dd>Description <strong>A</strong></dd><div><dt>Term B</dt><dd>Description B</dd></div></dl>',
+				plainText: 'Term A\nDescription A\nTerm B\nDescription B',
+			} )
+		);
+
+		expect( transformed ).toBe( `<!-- wp:description-list -->
+<dl class="wp-block-description-list"><!-- wp:description-term -->
+<dt class="wp-block-description-term">Term A</dt>
+<!-- /wp:description-term -->
+
+<!-- wp:description-detail -->
+<dd class="wp-block-description-detail">Description <strong>A</strong></dd>
+<!-- /wp:description-detail -->
+
+<!-- wp:description-term -->
+<dt class="wp-block-description-term">Term B</dt>
+<!-- /wp:description-term -->
+
+<!-- wp:description-detail -->
+<dd class="wp-block-description-detail">Description B</dd>
+<!-- /wp:description-detail --></dl>
+<!-- /wp:description-list -->` );
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
@@ -650,6 +678,30 @@ describe( 'rawHandler', () => {
 			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a description list with grouped items', () => {
+		const HTML = `<dl>
+	<div>
+		<dt>Term</dt>
+		<dd>Description A</dd>
+		<dd>Description B</dd>
+	</div>
+</dl>`;
+		expect( serialize( rawHandler( { HTML } ) ) )
+			.toBe( `<!-- wp:description-list -->
+<dl class="wp-block-description-list"><!-- wp:description-term -->
+<dt class="wp-block-description-term">Term</dt>
+<!-- /wp:description-term -->
+
+<!-- wp:description-detail -->
+<dd class="wp-block-description-detail">Description A</dd>
+<!-- /wp:description-detail -->
+
+<!-- wp:description-detail -->
+<dd class="wp-block-description-detail">Description B</dd>
+<!-- /wp:description-detail --></dl>
+<!-- /wp:description-list -->` );
 	} );
 
 	it( 'should not strip any text-level elements', () => {
