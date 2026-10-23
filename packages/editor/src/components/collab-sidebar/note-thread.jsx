@@ -79,6 +79,7 @@ export function NoteThread( {
 	onAddReply,
 	onDiscard,
 	onDeleteNote,
+	focusThreadOrAdjacent,
 	isSelected,
 	sidebarRef,
 	floating,
@@ -199,8 +200,25 @@ export function NoteThread( {
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
-			focusNoteThread( note.id, sidebarRef.current );
+			focusThreadOrAdjacent( note, { ...note, status: 'approved' } );
 		}
+	}
+
+	async function handleDelete( noteToDelete ) {
+		const deleted = await onDeleteNote( noteToDelete );
+		// Leave the selection alone when the delete failed; the note is still there.
+		if ( ! deleted ) {
+			return;
+		}
+
+		if ( noteToDelete.parent !== 0 ) {
+			// Move focus to the parent thread when a reply was deleted.
+			selectNote( noteToDelete.parent );
+			focusNoteThread( noteToDelete.parent, sidebarRef.current );
+			return;
+		}
+
+		focusThreadOrAdjacent( note, null );
 	}
 
 	const allReplies = note?.reply || [];
@@ -297,7 +315,7 @@ export function NoteThread( {
 				note={ note }
 				isSelected={ isSelected }
 				onEditNote={ onEditNote }
-				onDeleteNote={ onDeleteNote }
+				onDeleteNote={ handleDelete }
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
 			/>
@@ -309,7 +327,7 @@ export function NoteThread( {
 						parentNote={ note }
 						isSelected={ isSelected }
 						onEditNote={ onEditNote }
-						onDeleteNote={ onDeleteNote }
+						onDeleteNote={ handleDelete }
 						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
@@ -347,7 +365,7 @@ export function NoteThread( {
 					parentNote={ note }
 					isSelected={ false }
 					onEditNote={ onEditNote }
-					onDeleteNote={ onDeleteNote }
+					onDeleteNote={ handleDelete }
 					isThreadResolved={ isThreadResolved }
 				/>
 			) }
@@ -360,7 +378,7 @@ export function NoteThread( {
 						// Prevent the parent onClick from being triggered.
 						event.stopPropagation();
 						onDeselectNote();
-						focusNoteThread( note.id, sidebarRef.current );
+						focusThreadOrAdjacent( note, note );
 					} }
 				/>
 			) }
