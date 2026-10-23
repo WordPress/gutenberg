@@ -26,7 +26,8 @@ export default function OverridesPanel() {
 	const clientIdsWithOverrides = useMemo( () => {
 		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw ?? {} );
 		return allClientIds.filter( ( clientId ) => {
-			const block = getBlock( clientId );
+			// The IDs come from the same store, so each block exists.
+			const block = getBlock( clientId )!;
 			return (
 				supportedBlockTypes.includes( block.name ) &&
 				isOverridableBlock( block )
