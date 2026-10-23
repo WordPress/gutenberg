@@ -3,7 +3,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, Spinner } from '@wordpress/components';
+import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -52,7 +52,7 @@ const MainContent = ( {
 	}
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	const description = navigationMenu
@@ -60,10 +60,10 @@ const MainContent = ( {
 				/* translators: %s: The name of a menu. */
 				__( 'Structure for Navigation Menu: %s' ),
 				navigationMenu?.title || __( 'Untitled menu' )
-		  )
+			)
 		: __(
 				'You have not yet created any menus. Displaying a list of your Pages'
-		  );
+			);
 
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">

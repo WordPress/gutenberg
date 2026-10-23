@@ -1,7 +1,7 @@
 import {
 	ToggleControl,
-	SelectControl,
-	Spinner,
+	SelectControl as WCSelectControl,
+	Spinner as WCSpinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -108,7 +108,7 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 							setAttributes( { type: 'monthly' } )
 						}
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Group by' ) }
 							options={ [
 								{ label: __( 'Year' ), value: 'yearly' },
@@ -126,7 +126,7 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 			</InspectorControls>
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

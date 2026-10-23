@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { ItemPopupWidth } from '../../../utils/css/item-popup';
 import type {
 	ComboboxCollectionProps,
@@ -6,6 +6,7 @@ import type {
 	ComboboxInputProps,
 	ComboboxItemProps,
 	ComboboxRootProps,
+	ComboboxStatusProps,
 	ComboboxTriggerProps,
 } from '../combobox/types';
 
@@ -13,6 +14,14 @@ export type Item = {
 	label: string;
 	value: string;
 	disabled?: boolean;
+	/**
+	 * Supplementary text for the item in the popup.
+	 */
+	description?: string;
+	/**
+	 * When `true`, the item renders in the list footer, not the main list,
+	 * when it is in the filtered items.
+	 */
 	creatable?: boolean;
 };
 
@@ -24,6 +33,9 @@ export type ItemGroup = {
 };
 
 export type SearchableSelectItemProps = Omit< ComboboxItemProps, 'value' > & {
+	/**
+	 * The option item this list item represents.
+	 */
 	value: Item;
 };
 
@@ -31,22 +43,12 @@ export function isItemGroup( item: Item | ItemGroup ): item is ItemGroup {
 	return 'items' in item && Array.isArray( item.items );
 }
 
-export function isItem( item: Item | ItemGroup ): item is Item {
-	return ! isItemGroup( item );
-}
-
 export function isCreatableItem( item: Item ): item is CreatableItem {
 	return item.creatable === true;
 }
 
-export function findCreatableItem(
-	items: Item[] | ItemGroup[] | undefined
-): CreatableItem | undefined {
-	return findCreatableItems( items )[ 0 ];
-}
-
 export function findCreatableItems(
-	items: Item[] | ItemGroup[] | undefined
+	items: ReadonlyArray< Item | ItemGroup > | undefined
 ): CreatableItem[] {
 	if ( ! items ) {
 		return [];
@@ -69,87 +71,22 @@ export function findCreatableItems(
 }
 
 export function hasGroupedItems(
-	items: Item[] | ItemGroup[] | undefined
+	items: ReadonlyArray< Item | ItemGroup > | undefined
 ): boolean {
 	return ( items ?? [] ).some( isItemGroup );
 }
 
-export function shouldSkipCollectionEntry(
-	entry: Item | ItemGroup,
-	creatableItem: CreatableItem | undefined
-): boolean {
-	if ( ! creatableItem ) {
-		return false;
-	}
-
-	if ( isItem( entry ) ) {
-		return isCreatableItem( entry );
-	}
-
-	return (
-		entry.items.length > 0 &&
-		entry.items.every( ( item ) => isCreatableItem( item ) )
-	);
-}
-
-export function normalizeRootItems(
-	items: Item[] | ItemGroup[] | undefined
-): Item[] | ItemGroup[] | undefined {
-	if ( ! items ) {
-		return items;
-	}
-
-	if ( ! hasGroupedItems( items ) ) {
-		const flatItems = items as Item[];
-		const creatableItems = flatItems.filter( isCreatableItem );
-		const regularItems = flatItems.filter(
-			( item ) => ! isCreatableItem( item )
-		);
-
-		return [ ...regularItems, ...creatableItems ];
-	}
-
-	const creatableItem = findCreatableItem( items );
-
-	if ( ! creatableItem ) {
-		return items;
-	}
-
-	const groupsWithoutCreatable: ItemGroup[] = [];
-	let creatableOnlyGroup: ItemGroup | undefined;
-
-	for ( const entry of items ) {
-		if ( ! isItemGroup( entry ) ) {
-			continue;
-		}
-
-		const regularItems = entry.items.filter(
-			( item ) => ! isCreatableItem( item )
-		);
-		const isCreatableOnly =
-			entry.items.length > 0 &&
-			entry.items.every( ( item ) => isCreatableItem( item ) );
-
-		if ( isCreatableOnly ) {
-			creatableOnlyGroup = entry;
-			continue;
-		}
-
-		if ( regularItems.length > 0 ) {
-			groupsWithoutCreatable.push( {
-				...entry,
-				items: regularItems,
-			} );
-		}
-	}
-
-	const creatableGroup = creatableOnlyGroup ?? {
-		label: '',
-		items: [ creatableItem ],
-	};
-
-	return [ ...groupsWithoutCreatable, creatableGroup ];
-}
+export type SearchableSelectTriggerProps = Omit<
+	ComboboxTriggerProps,
+	'children'
+> & {
+	/**
+	 * Custom trigger content, or a function that receives the selected item.
+	 * The function receives `null` when nothing is selected.
+	 * When omitted, the selected item's label or placeholder is shown.
+	 */
+	children?: ( ( item: Item | null ) => ReactNode ) | ReactNode;
+};
 
 export type SearchableSelectProps = Omit<
 	ComboboxRootProps< Item, false >,
@@ -182,7 +119,8 @@ export type SearchableSelectProps = Omit<
 		 * flat list of items. Grouped items require a custom `children` renderer.
 		 *
 		 * Mark a creatable action with `creatable: true`. It renders in the
-		 * list footer and is excluded from the main list automatically.
+		 * list footer, not the main list, when it is in the filtered items.
+		 * Handle the creation of the item in `onValueChange`.
 		 */
 		items?: Item[] | ItemGroup[];
 		/**
@@ -191,34 +129,32 @@ export type SearchableSelectProps = Omit<
 		 */
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**
-		 * Text to show when no value is selected. This is overridden by `triggerContent`
-		 * if specified, or by a null item's label in `items`.
+		 * Text to show when no value is selected. This is overridden by custom trigger
+		 * children if specified, or by a null item's label in `items`.
 		 *
 		 * @default __( 'Select' )
 		 */
 		placeholder?: ComboboxTriggerProps[ 'placeholder' ];
 		/**
-		 * The custom trigger content to use instead of the default.
-		 *
-		 * The callback receives `null` when nothing is selected.
+		 * Optional trigger element, typically `<SearchableSelect.Trigger />` with
+		 * custom props such as `onFocus` or `onBlur`, or custom children.
+		 * When omitted, the default trigger is used. Props on this element
+		 * override the trigger's placeholder and accessible-label props.
 		 *
 		 * ```jsx
-		 * triggerContent={ ( value ) =>
-		 *   value ? (
-		 *     <span>
-		 *       <Icon icon={ wordpress } />
-		 *       { value.label }
-		 *     </span>
-		 *   ) : null
-		 * }
+		 * trigger={ <SearchableSelect.Trigger>{ ( item ) => item?.label }</SearchableSelect.Trigger> }
 		 * ```
 		 */
-		triggerContent?: ( ( value: Item | null ) => ReactNode ) | ReactNode;
+		trigger?: ReactElement< SearchableSelectTriggerProps >;
 		/**
 		 * The custom content to use instead of the default empty state,
 		 * which shows whenever there are no matching items.
 		 */
 		emptyContent?: ComboboxEmptyProps[ 'children' ];
+		/**
+		 * Content for the list status live region. The region stays mounted.
+		 */
+		statusContent?: ComboboxStatusProps[ 'children' ];
 		/**
 		 * The placeholder text to use for the search input.
 		 */

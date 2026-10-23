@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { createRequire } from 'node:module';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
@@ -38,19 +39,61 @@ describe( 'executeLifecycleScript', () => {
 	} );
 
 	it( 'should throw LifecycleScriptError when process errors', async () => {
-		try {
-			await executeLifecycleScript(
-				'test',
-				{
-					lifecycleScripts: {
-						test: 'node -vvvvvvv',
-					},
+		const execution = executeLifecycleScript(
+			'test',
+			{
+				lifecycleScripts: {
+					test: 'node -vvvvvvv',
 				},
+			},
+			spinner
+		);
+		await expect( execution ).rejects.toBeInstanceOf(
+			LifecycleScriptError
+		);
+		await expect( execution ).rejects.toThrow(
+			/test Error:\n.*bad option/
+		);
+	} );
+
+	it( 'includes all stderr when the process fails', async () => {
+		const childProcess = new EventEmitter();
+		childProcess.stdout = new EventEmitter();
+		childProcess.stderr = new EventEmitter();
+
+		const childProcessModule = require( 'node:child_process' );
+		const exec = vi
+			.spyOn( childProcessModule, 'exec' )
+			.mockReturnValue( childProcess );
+		const modulePath = require.resolve( '../execute-lifecycle-script' );
+		delete require.cache[ modulePath ];
+		const {
+			LifecycleScriptError: MockedLifecycleScriptError,
+			executeLifecycleScript: executeLifecycleScriptWithMock,
+		} = require( modulePath );
+
+		try {
+			const execution = executeLifecycleScriptWithMock(
+				'test',
+				{ lifecycleScripts: { test: 'failing-command' } },
 				spinner
 			);
-		} catch ( error ) {
-			expect( error ).toBeInstanceOf( LifecycleScriptError );
-			expect( error.message ).toMatch( /test Error:\n.*bad option/ );
+
+			childProcess.stderr.emit( 'data', 'first line\n' );
+			childProcess.emit( 'exit', 1 );
+			childProcess.stderr.emit( 'data', 'last line\n' );
+			childProcess.emit( 'close', 1 );
+
+			await expect( execution ).rejects.toMatchObject( {
+				event: 'test',
+				message: 'test Error:\nfirst line\nlast line',
+			} );
+			await expect( execution ).rejects.toBeInstanceOf(
+				MockedLifecycleScriptError
+			);
+		} finally {
+			exec.mockRestore();
+			delete require.cache[ modulePath ];
 		}
 	} );
 } );

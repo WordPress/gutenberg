@@ -6,11 +6,13 @@ import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
+	Popover,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
+import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
@@ -44,8 +46,7 @@ function withEditorAssets( FieldEdit: any ) {
 			<div
 				aria-busy={ ! isReady || undefined }
 				style={ ! isReady ? { opacity: 0.6 } : undefined }
-				// @ts-expect-error inert not typed properly
-				inert={ ! isReady ? 'true' : undefined }
+				inert={ inertValue( ! isReady ) }
 			>
 				<FieldEdit { ...props } />
 			</div>
@@ -59,15 +60,20 @@ interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
 	closeModal: () => void;
+	quickEditForm: Form | undefined;
 }
 
 export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
+	quickEditForm,
 }: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
 
+	const [ modalElement, setModalElement ] = useState< HTMLDivElement | null >(
+		null
+	);
 	const [ localEdits, setLocalEdits ] = useState< Record< string, any > >(
 		{}
 	);
@@ -142,66 +148,22 @@ export function QuickEditModal( {
 		[ _fields, canSwitchTemplate ]
 	);
 
-	const form = useMemo( () => {
-		const allFields: Form[ 'fields' ] = [
-			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
-			},
-			{
-				id: 'status',
-				label: __( 'Status' ),
-				layout: {
-					type: 'panel',
-					summary: 'status',
-				},
-				children: [
-					{
-						id: 'status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'scheduled_date',
-					'password',
-				],
-			},
-			'author',
-			'date',
-			'slug',
-			'parent',
-			{
-				id: 'discussion',
-				label: __( 'Discussion' ),
-				layout: {
-					type: 'panel',
-					summary: 'discussion',
-				},
-				children: [
-					{
-						id: 'comment_status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'ping_status',
-				],
-			},
-			'template',
-		];
-
+	const form = useMemo( (): Form => {
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
 		return {
-			layout: {
-				type: 'panel' as const,
-			},
-			fields: isBulk
-				? allFields.filter( ( field ) =>
-						fieldsWithBulkEditSupport.includes(
-							typeof field === 'string' ? field : field.id
-						)
-				  )
-				: allFields,
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
 		};
-	}, [ isBulk ] );
+	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
 		const currentData: Record< string, any > = {
@@ -250,6 +212,8 @@ export function QuickEditModal( {
 
 	return (
 		<Modal
+			ref={ setModalElement }
+			size="small"
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
 			onRequestClose={ closeModal }
@@ -288,6 +252,9 @@ export function QuickEditModal( {
 					{ __( 'Done' ) }
 				</Button>
 			</HStack>
+			{ modalElement &&
+				// Keep popovers inside modal isolation but outside the clipped frame.
+				createPortal( <Popover.Slot />, modalElement ) }
 		</Modal>
 	);
 }

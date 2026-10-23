@@ -78,8 +78,7 @@ export function useCollaboratorNotifications(
 			select( preferencesStore ).get( 'core', name ) ?? true;
 		return {
 			postStatus: getCurrentPostAttribute( 'status' ) as
-				| string
-				| undefined,
+				string | undefined,
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			showJoinNotifications: getNotificationPreference(
 				'showCollaborationJoinNotifications'

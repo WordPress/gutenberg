@@ -5,7 +5,8 @@ import Button from '../../button';
 import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Components/BorderBoxControl',
+	id: 'components-borderboxcontrol',
+	title: 'Components/@wordpress-components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },

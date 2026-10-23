@@ -138,7 +138,7 @@ function PrivateExcerpt() {
 							templateTypes:
 								select( coreStore ).getCurrentTheme()
 									?.default_template_types,
-					  } )?.description
+						} )?.description
 					: undefined;
 			// For post types that use excerpt as description, we do not abide
 			// by the `isEnabled` panel flag in order to render them as text.

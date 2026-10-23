@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"rootDir": ".",
@@ -21,6 +21,7 @@
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
+		{ "path": "../../packages/patterns/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],

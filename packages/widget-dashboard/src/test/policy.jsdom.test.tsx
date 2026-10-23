@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import '@testing-library/jest-dom/vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
@@ -278,18 +277,22 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'keeps the tile fixed when move is denied', async () => {
+	it( 'omits the drag activator while preserving permitted controls when move is denied', async () => {
 		/* eslint-disable testing-library/no-container, testing-library/no-node-access */
 		const { container } = render(
 			<Harness canPerform={ deny( 'move' ) } editMode />
 		);
-		await screen.findByTestId( 'label' );
+		const content = await screen.findByTestId( 'label' );
 
 		const activator = container.querySelector(
 			'[aria-roledescription="sortable"]'
 		);
-		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( activator ).toBeNull();
+		expect( content.closest( '[aria-disabled="true"]' ) ).toBeNull();
 		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
+		expect(
+			screen.getByRole( 'button', { name: 'Widget options' } )
+		).toBeEnabled();
 	} );
 
 	it( 'treats a non-boolean answer as a denial on every surface', async () => {
@@ -302,16 +305,17 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		const { container } = render(
 			<Harness canPerform={ canPerform } editMode />
 		);
-		await screen.findByTestId( 'label' );
+		const content = await screen.findByTestId( 'label' );
 
 		const activator = container.querySelector(
 			'[aria-roledescription="sortable"]'
 		);
-		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( activator ).toBeNull();
+		expect( content.closest( '[aria-disabled="true"]' ) ).toBeNull();
 		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
 		expect(
 			screen.getByRole( 'button', { name: 'Widget options' } )
-		).toBeInTheDocument();
+		).toBeEnabled();
 	} );
 
 	it( 'renders the widget read-only and without attribute controls when edit is denied', async () => {

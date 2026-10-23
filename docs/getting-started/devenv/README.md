@@ -4,10 +4,9 @@ This guide will help you set up the right development environment to create bloc
 
 A block development environment includes the tools you need on your computer to successfully develop for the Block Editor. The three essential requirements are:
 
-- [Block Development Environment](#block-development-environment)
-    - [Code editor](#code-editor)
-    - [Node.js development tools](#node-js-development-tools)
-    - [Local WordPress environment](#local-wordpress-environment)
+- [Code editor](#code-editor)
+- [Node.js development tools](#node-js-development-tools)
+- [Local WordPress environment](#local-wordpress-environment)
 
 <div class="callout callout-info">
     To contribute to the Gutenberg project itself, refer to the additional documentation in the <a href="https://developer.wordpress.org/block-editor/contributors/code/getting-started-with-code-contribution">code contribution guide</a>.

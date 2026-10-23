@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { Spinner, Popover } from '@wordpress/components';
+import { Spinner as WCSpinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -10,6 +10,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
+import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
@@ -19,6 +20,7 @@ import {
 	useHasAPossibleBulkAction,
 	hasAPossibleBulkAction,
 	BulkSelectionCheckbox,
+	BulkActionToolbar,
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
@@ -32,6 +34,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
+import getTableColumns from '../utils/get-table-columns';
 import useSelectionProps from '../utils/use-selection-props';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -140,7 +143,7 @@ function TableRow< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
-	const columns = view.fields ?? [];
+	const columns = getTableColumns( view, fields );
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
@@ -309,13 +312,42 @@ function ViewTable< Item >( {
 	} );
 
 	const tableNoticeId = useId();
+	const tableHeaderRef = useRef< HTMLTableSectionElement >( null );
+	const tableSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
+	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const showBulkActions =
+		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
+	const hadSelectionRef = useRef( false );
+	useEffect( () => {
+		const tableHead = tableHeaderRef.current;
+		const ownerDocument = tableHead?.ownerDocument;
+		if (
+			showBulkActions &&
+			tableHead?.contains( ownerDocument?.activeElement ?? null )
+		) {
+			bulkSelectionRef.current?.focus();
+		} else if (
+			hadSelectionRef.current &&
+			! showBulkActions &&
+			( ownerDocument?.activeElement === ownerDocument?.body ||
+				bulkActionsRef.current?.contains(
+					ownerDocument?.activeElement ?? null
+				) )
+		) {
+			tableSelectionRef.current?.focus();
+		}
+		hadSelectionRef.current = showBulkActions;
+	}, [ showBulkActions ] );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
 		enabledHorizontal: !! actions?.length,
 	} );
 
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const disableHeaderControls = showBulkActions;
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -338,6 +370,9 @@ function ViewTable< Item >( {
 	const handleHeaderContextMenu = ( event: React.MouseEvent ) => {
 		event.preventDefault();
 		event.stopPropagation();
+		if ( disableHeaderControls ) {
+			return;
+		}
 		const virtualAnchor = {
 			getBoundingClientRect: () => ( {
 				x: event.clientX,
@@ -369,7 +404,12 @@ function ViewTable< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
-	const columns = view.fields ?? [];
+	const columns = getTableColumns( view, fields );
+	const columnCount =
+		columns.length +
+		( hasPrimaryColumn ? 1 : 0 ) +
+		( hasBulkActions ? 1 : 0 ) +
+		( actions?.length ? 1 : 0 );
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -398,7 +438,7 @@ function ViewTable< Item >( {
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
 	} as CSSProperties;
-	if ( ! hasData ) {
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -428,8 +468,7 @@ function ViewTable< Item >( {
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
+				inert={ inertValue( ! isInfiniteScroll && isLoading ) }
 			>
 				<colgroup>
 					{ hasBulkActions && (
@@ -465,6 +504,7 @@ function ViewTable< Item >( {
 					</Popover>
 				) }
 				<thead
+					ref={ tableHeaderRef }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -478,17 +518,35 @@ function ViewTable< Item >( {
 								scope="col"
 								onContextMenu={ handleHeaderContextMenu }
 							>
-								<BulkSelectionCheckbox
-									selection={ selection }
-									onChangeSelection={ onChangeSelection }
-									data={ data }
-									actions={ actions }
-									getItemId={ getItemId }
-								/>
+								<div
+									inert={ inertValue(
+										disableHeaderControls
+									) }
+									aria-hidden={
+										disableHeaderControls || undefined
+									}
+								>
+									<BulkSelectionCheckbox
+										checkboxRef={ tableSelectionRef }
+										selection={ selection }
+										onChangeSelection={ onChangeSelection }
+										data={ data }
+										actions={ actions }
+										getItemId={ getItemId }
+									/>
+								</div>
 							</th>
 						) }
 						{ hasPrimaryColumn && (
-							<th scope="col">
+							<th
+								scope="col"
+								aria-sort={
+									view.sort?.field === titleField?.id &&
+									view.sort
+										? sortValues[ view.sort.direction ]
+										: undefined
+								}
+							>
 								{ titleField && (
 									<ColumnHeaderMenu
 										ref={ headerMenuRef(
@@ -496,6 +554,7 @@ function ViewTable< Item >( {
 											0
 										) }
 										fieldId={ titleField.id }
+										isCovered={ disableHeaderControls }
 										view={ view }
 										fields={ fields }
 										onChangeView={ onChangeView }
@@ -504,15 +563,15 @@ function ViewTable< Item >( {
 										canMove={ false }
 										canInsertLeft={
 											isRtl
-												? view.layout?.enableMoving ??
-												  true
+												? ( view.layout?.enableMoving ??
+													true )
 												: false
 										}
 										canInsertRight={
 											isRtl
 												? false
-												: view.layout?.enableMoving ??
-												  true
+												: ( view.layout?.enableMoving ??
+													true )
 										}
 									/>
 								) }
@@ -551,6 +610,7 @@ function ViewTable< Item >( {
 									<ColumnHeaderMenu
 										ref={ headerMenuRef( column, index ) }
 										fieldId={ column }
+										isCovered={ disableHeaderControls }
 										view={ view }
 										fields={ fields }
 										onChangeView={ onChangeView }
@@ -568,8 +628,7 @@ function ViewTable< Item >( {
 								className={ clsx(
 									'dataviews-view-table__actions-column',
 									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
+										'dataviews-view-table__actions-column--sticky': true,
 										'dataviews-view-table__actions-column--stuck':
 											! isHorizontalScrollEnd,
 									}
@@ -581,6 +640,29 @@ function ViewTable< Item >( {
 							</th>
 						) }
 					</tr>
+					{ ( hasBulkActions || isActionInProgress ) && (
+						<tr
+							className="dataviews-view-table__bulk-actions-row"
+							hidden={ ! showBulkActions }
+						>
+							<td colSpan={ columnCount }>
+								<div
+									className="dataviews-view-table__bulk-actions-overlay"
+									ref={ bulkActionsRef }
+									inert={ inertValue( !! isLoading ) }
+								>
+									<BulkActionToolbar
+										onActionInProgressChange={
+											setIsActionInProgress
+										}
+										selectionCheckboxRef={
+											bulkSelectionRef
+										}
+									/>
+								</div>
+							</td>
+						</tr>
+					) }
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
@@ -589,12 +671,7 @@ function ViewTable< Item >( {
 							<tbody key={ `group-${ groupName }` }>
 								<tr className="dataviews-view-table__group-header-row">
 									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											( hasBulkActions ? 1 : 0 ) +
-											( actions?.length ? 1 : 0 )
-										}
+										colSpan={ columnCount }
 										className="dataviews-view-table__group-header-cell"
 									>
 										{ view.groupBy?.showLabel === false
@@ -604,7 +681,7 @@ function ViewTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {
@@ -701,7 +778,7 @@ function ViewTable< Item >( {
 			{ isInfiniteScroll && isLoading && (
 				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">
-						<Spinner />
+						<WCSpinner />
 					</p>
 				</div>
 			) }

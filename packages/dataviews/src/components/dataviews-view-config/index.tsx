@@ -5,7 +5,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -13,8 +13,11 @@ import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
@@ -25,7 +28,7 @@ const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	className: 'dataviews-config__popover',
 	placement: 'bottom-end',
 	offset: 9,
-};
+} as const;
 
 export function ViewTypeMenu() {
 	const { view, onChangeView, defaultLayouts } =
@@ -111,7 +114,7 @@ function SortFieldControl() {
 	}, [ fields ] );
 
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
 			options={ orderOptions }

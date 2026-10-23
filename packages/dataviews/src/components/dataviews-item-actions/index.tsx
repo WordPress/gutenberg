@@ -5,8 +5,11 @@ import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 
@@ -234,18 +237,15 @@ function CompactItemActions< Item >( {
 	);
 	return (
 		<>
-			{ /* The `disabled` prop on `Menu.Root` (rather than on the trigger)
-			     keeps the menu from opening while letting the trigger button
-			     stay focusable via its own `accessibleWhenDisabled`. */ }
-			<Menu.Root disabled={ ! actions.length }>
+			<Menu.Root>
 				<Menu.Trigger
+					disabled={ ! actions.length }
 					render={
 						<Button
 							size={ isSmall ? 'small' : 'compact' }
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
 							accessibleWhenDisabled
-							disabled={ ! actions.length }
 							className="dataviews-all-actions-button"
 						/>
 					}

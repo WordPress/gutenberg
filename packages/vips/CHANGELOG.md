@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Add an optional `preserveAnimation` option to `resizeImage`. A resize of an animated image then keeps every frame, re-encoded with `gifsave` settings tuned for speed and size (`effort: 2`, `interframe_maxerror: 8`), instead of flattening to the first frame. Cropped resizes cut every frame with the same rectangle. An animation whose decoded frames would not fit the WASM heap flattens too, so the resize degrades rather than failing ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+-   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
+
+## 4.3.0 (2026-10-07)
+
+## 4.2.0 (2026-09-23)
+
+## 4.1.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   Keep indexed (palette) PNGs indexed when resizing, compressing, converting, or rotating them, instead of re-encoding them as truecolour, which made sub-sizes several times larger than the original. The image quality setting is not applied to the resulting palette, since PNG output stays lossless. Reported against core as https://core.trac.wordpress.org/ticket/65922 ([#81895](https://github.com/WordPress/gutenberg/issues/81895)).

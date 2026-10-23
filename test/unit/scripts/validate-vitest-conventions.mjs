@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import {
 	existsSync,
 	mkdtempSync,
@@ -16,7 +15,6 @@ import {
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
-import { resolvePackageBin } from './resolve-package-bin.mjs';
 import { resolveTypeRoots } from './resolve-type-roots.mjs';
 import {
 	findVitestIsolationOptOuts,
@@ -34,12 +32,6 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const require = createRequire( import.meta.url );
-const migration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
 const policyExceptions = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/vitest-policy-exceptions.json' ),
@@ -47,8 +39,7 @@ const policyExceptions = JSON.parse(
 	)
 );
 const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	migration
+	discoverTestFiles( ROOT_DIR )
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const vitestTestSet = new Set( vitestTests );
@@ -56,11 +47,14 @@ const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
-		cwd: ROOT_DIR,
-		nodir: true,
-	} ),
-	...globSync( 'test/unit/scripts/*.mjs', {
+	...globSync(
+		'test/unit/config/**/*.vitest*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
+		{
+			cwd: ROOT_DIR,
+			nodir: true,
+		}
+	),
+	...globSync( 'test/unit/scripts/*.{mjs,mts}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
@@ -222,14 +216,49 @@ function getTypecheckConfigPath( testFile ) {
 		directory = path.dirname( directory );
 	}
 
-	return path.join( ROOT_DIR, 'tsconfig.base.json' );
+	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/tsconfig.base.json' );
+}
+
+const diagnosticsHost = {
+	getCanonicalFileName: ( fileName ) => fileName,
+	getCurrentDirectory: () => ROOT_DIR,
+	getNewLine: () => '\n',
+};
+
+function runTypecheck( configPath ) {
+	const config = typescript.getParsedCommandLineOfConfigFile(
+		configPath,
+		{},
+		{
+			...typescript.sys,
+			onUnRecoverableConfigFileDiagnostic: ( diagnostic ) => {
+				throw new Error(
+					typescript.formatDiagnostics(
+						[ diagnostic ],
+						diagnosticsHost
+					)
+				);
+			},
+		}
+	);
+	const host = typescript.createCompilerHost( config.options );
+	// Match the CLI's parsing mode for a typecheck without editor tooling.
+	host.jsDocParsingMode = typescript.JSDocParsingMode.ParseForTypeErrors;
+	const program = typescript.createProgram( {
+		rootNames: config.fileNames,
+		options: config.options,
+		projectReferences: config.projectReferences,
+		configFileParsingDiagnostics: config.errors,
+		host,
+	} );
+	return typescript.getPreEmitDiagnostics( program );
 }
 
 let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
 	const projectTypescriptTests = vitestTestsByProject[ projectName ].filter(
-		( file ) => /\.tsx?$/.test( file )
+		( file ) => /\.[cm]?tsx?$/.test( file )
 	);
 	if ( ! projectTypescriptTests.length ) {
 		continue;
@@ -274,6 +303,19 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			temporaryDirectory,
 			'compatibility.d.ts'
 		);
+		const setupTypeFiles = [];
+		if ( projectName === 'browser' ) {
+			setupTypeFiles.push(
+				path.join( ROOT_DIR, 'test/unit/config/browser.vitest.js' )
+			);
+		} else if ( projectName === 'jsdom' ) {
+			setupTypeFiles.push(
+				path.join(
+					ROOT_DIR,
+					'test/unit/config/testing-library.vitest.js'
+				)
+			);
+		}
 		const typecheckConfig = {
 			extends: baseConfigPath,
 			compilerOptions: {
@@ -287,25 +329,17 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				noEmit: true,
 				rootDir: ROOT_DIR,
 				typeRoots: [
-					path.join( ROOT_DIR, 'typings' ),
-					path.join( ROOT_DIR, 'test/unit/typings' ),
+					path.join( ROOT_DIR, 'tools/monorepo/typings' ),
 					...resolveTypeRoots(
 						[ ...commonTypes, 'node' ],
 						( specifier ) => require.resolve( specifier )
 					),
 				],
-				types:
-					projectName === 'jsdom'
-						? [
-								...commonTypes,
-								...( needsNodeTypes ? [ 'node' ] : [] ),
-								'gutenberg-vitest-test-env',
-						  ]
-						: [
-								...commonTypes,
-								'node',
-								'gutenberg-vitest-test-env',
-						  ],
+				types: [
+					...commonTypes,
+					...( needsNodeTypes ? [ 'node' ] : [] ),
+					'gutenberg-vitest-test-env',
+				],
 			},
 			// Package configs often include every source, story, and test file.
 			// This validator owns an exact routed-test set, so do not inherit
@@ -321,14 +355,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			} ) ),
 			files: [
 				compatibilityTypesPath,
-				...( projectName === 'jsdom'
-					? [
-							path.join(
-								ROOT_DIR,
-								'test/unit/config/testing-library.vitest.js'
-							),
-					  ]
-					: [] ),
+				...setupTypeFiles,
 				...typescriptTests.map( ( file ) =>
 					path.join( ROOT_DIR, file )
 				),
@@ -345,38 +372,27 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 					"declare module 'deep-freeze' { export default function deepFreeze<T>(value: T): T; }",
 				].join( '\n' )
 			);
-			const typecheckArguments = [
-				resolvePackageBin( 'typescript', 'tsc6' ),
-				'--project',
-				configPath,
-				'--pretty',
-				'false',
-			];
-			const runTypecheck = () =>
-				spawnSync( process.execPath, typecheckArguments, {
-					cwd: ROOT_DIR,
-					encoding: 'utf8',
-				} );
 			writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
-			let result = runTypecheck();
+			let diagnostics = runTypecheck( configPath );
 
-			const output = `${ result.stdout ?? '' }${ result.stderr ?? '' }`;
-			if ( result.status !== 0 && /TS63(?:05|10)/.test( output ) ) {
+			if (
+				diagnostics.some(
+					( { code } ) => code === 6305 || code === 6310
+				)
+			) {
 				// A dependency cycle can make TypeScript treat routed tests as
 				// source files owned by a referenced package project. The package
 				// declarations were built before this check, so fall back to normal
 				// module resolution when that project-ownership check fails.
 				typecheckConfig.references = [];
 				writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
-				result = runTypecheck();
+				diagnostics = runTypecheck( configPath );
 			}
 
-			if ( result.error ) {
-				throw result.error;
-			}
-			if ( result.status !== 0 ) {
-				process.stderr.write( result.stdout ?? '' );
-				process.stderr.write( result.stderr ?? '' );
+			if ( diagnostics.length ) {
+				process.stderr.write(
+					typescript.formatDiagnostics( diagnostics, diagnosticsHost )
+				);
 				throw new Error( 'TypeScript test graph validation failed.' );
 			}
 		} finally {

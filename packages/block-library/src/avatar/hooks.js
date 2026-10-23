@@ -37,7 +37,7 @@ export function useCommentAvatar( { commentId } ) {
 		maxSize,
 		alt: authorName
 			? // translators: %s: Author name.
-			  sprintf( __( '%s Avatar' ), authorName )
+				sprintf( __( '%s Avatar' ), authorName )
 			: __( 'Default Avatar' ),
 	};
 }
@@ -77,7 +77,7 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		maxSize,
 		alt: authorDetails
 			? // translators: %s: Author name.
-			  sprintf( __( '%s Avatar' ), authorDetails?.name )
+				sprintf( __( '%s Avatar' ), authorDetails?.name )
 			: __( 'Default Avatar' ),
 	};
 }

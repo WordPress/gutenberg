@@ -19,7 +19,7 @@ export function useStylesId( { templateId }: { templateId?: string } = {} ) {
 						'postType',
 						'wp_template',
 						templateId
-				  )
+					)
 				: null;
 
 			return {

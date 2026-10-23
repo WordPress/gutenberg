@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -26,8 +26,11 @@ import {
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { getFilename } from '@wordpress/url';
 import MediaContainer from './media-container';
 import {
+	ALLOWED_MEDIA_TYPES,
 	DEFAULT_MEDIA_SIZE_SLUG,
 	WIDTH_CONSTRAINT_PERCENTAGE,
 	LINK_DESTINATION_NONE,
@@ -36,6 +39,7 @@ import {
 } from './constants';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -221,7 +225,7 @@ function MediaTextEdit( {
 								{
 									context: 'view',
 								}
-						  )
+							)
 						: undefined,
 			};
 		},
@@ -240,7 +244,7 @@ function MediaTextEdit( {
 								{
 									context: 'view',
 								}
-						  )
+							)
 						: null,
 			};
 		},
@@ -331,6 +335,46 @@ function MediaTextEdit( {
 		} );
 	};
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const onUploadError = ( message ) => {
+		createErrorNotice( message, { type: 'snackbar' } );
+	};
+
+	const mediaInspectorPanel = isSelected ? (
+		<InspectorControls group="content">
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				resetAll={ () => onSelectMedia( undefined ) }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Media' ) }
+					hasValue={ () => !! mediaUrl || !! useFeaturedImage }
+					onDeselect={ () => onSelectMedia( undefined ) }
+					isShownByDefault
+				>
+					<MediaControl
+						mediaId={ mediaId }
+						mediaUrl={ mediaUrl || featuredImageURL }
+						filename={
+							image?.media_details?.sizes?.full?.file ||
+							image?.slug ||
+							getFilename( mediaUrl )
+						}
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onSelect={ onSelectMedia }
+						onError={ onUploadError }
+						onReset={ () => onSelectMedia( undefined ) }
+						useFeaturedImage={ useFeaturedImage }
+						onToggleFeaturedImage={ toggleUseFeaturedImage }
+						emptyLabel={ __( 'Add media' ) }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	) : null;
 
 	const mediaTextGeneralSettings = (
 		<ToolsPanel
@@ -480,6 +524,7 @@ function MediaTextEdit( {
 
 	return (
 		<>
+			{ mediaInspectorPanel }
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
 				{ blockEditingMode === 'default' && (

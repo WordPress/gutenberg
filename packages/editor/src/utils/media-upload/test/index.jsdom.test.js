@@ -8,19 +8,19 @@ import {
 	reset,
 } from '../../../components/upload-progress-snackbar/tracker';
 
-vi.mock( '@wordpress/media-utils', () => ( {
+vi.mock( import( '@wordpress/media-utils' ), () => ( {
 	uploadMedia: vi.fn(),
 } ) );
 
 // The module under test only reaches the stores through `select`/`dispatch`,
 // so they stand in for the whole data layer here - importing the real editor
 // store pulls in most of the editor.
-vi.mock( '@wordpress/data', () => ( {
+vi.mock( import( '@wordpress/data' ), () => ( {
 	select: vi.fn(),
 	dispatch: vi.fn(),
 } ) );
-vi.mock( '@wordpress/core-data', () => ( { store: 'core' } ) );
-vi.mock( '../../../store', () => ( { store: 'core/editor' } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( { store: 'core' } ) );
+vi.mock( import( '../../../store' ), () => ( { store: 'core/editor' } ) );
 
 function file( name ) {
 	return new window.File( [ 'x' ], name, { type: 'image/png' } );

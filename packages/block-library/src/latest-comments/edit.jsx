@@ -1,8 +1,8 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	SelectControl,
-	Spinner,
+	SelectControl as WCSelectControl,
+	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -106,7 +106,7 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						}
 						isShownByDefault
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Display content' ) }
 							value={ displayContent }
 							options={ [
@@ -145,7 +145,7 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 			</InspectorControls>
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

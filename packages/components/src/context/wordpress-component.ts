@@ -22,12 +22,12 @@ export type WordPressComponentProps<
 > = P &
 	( T extends React.ElementType
 		? // The `children` prop is being explicitly omitted since it is otherwise implicitly added
-		  // by `ComponentPropsWithRef`. The context is that components should require the `children`
-		  // prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
-		  Omit<
+			// by `ComponentPropsWithRef`. The context is that components should require the `children`
+			// prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+			Omit<
 				React.ComponentPropsWithoutRef< T >,
 				'as' | keyof P | 'children'
-		  >
+			>
 		: {} ) &
 	( IsPolymorphic extends true
 		? {
@@ -36,7 +36,7 @@ export type WordPressComponentProps<
 					| T
 					| keyof React.JSX.IntrinsicElements
 					| React.JSXElementConstructor< any >;
-		  }
+			}
 		: {} );
 
 export type WordPressComponent<
@@ -67,7 +67,7 @@ export type WordPressComponent<
 						'as' | keyof O | 'children'
 					>
 			): React.ReactNode;
-	  }
+		}
 	: unknown ) & {
 	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
 	displayName?: string;
@@ -82,13 +82,20 @@ export type WordPressComponent<
 	selector?: `.${ string }`;
 };
 
+type RefProps< ForwardsRef extends boolean > = ForwardsRef extends true
+	? Pick< React.RefAttributes< any >, 'ref' >
+	: {};
+
 export type WordPressComponentFromProps<
 	Props,
 	ForwardsRef extends boolean = true,
-> = Props extends WordPressComponentProps< infer P, infer T, infer I >
-	? WordPressComponent<
-			T,
-			P & ( ForwardsRef extends true ? React.RefAttributes< any > : {} ),
-			I
-	  >
-	: never;
+> = 'as' extends keyof Props
+	? // When `Props` includes `as`, treat the component as polymorphic and
+		// reverse-infer `P` / `T` from the component props.
+		Props extends WordPressComponentProps< infer P, infer T, true >
+		? WordPressComponent< T, P & RefProps< ForwardsRef >, true >
+		: never
+	: // Otherwise, keep `Props` intact and force types non-polymorphic, since
+		// reverse-inferring `T`/`IsPolymorphic` widens them (`ElementType | null`
+		// and `boolean`), leaving the connected type open to arbitrary props.
+		WordPressComponent< null, Props & RefProps< ForwardsRef >, false >;

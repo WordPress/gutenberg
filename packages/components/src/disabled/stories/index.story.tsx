@@ -8,7 +8,7 @@ import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Utilities/Disabled',
+	title: 'Components/@wordpress-components/Utilities/Disabled',
 	id: 'components-disabled',
 	component: Disabled,
 	argTypes: {

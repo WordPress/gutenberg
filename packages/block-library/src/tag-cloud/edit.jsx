@@ -2,8 +2,8 @@ import {
 	Flex,
 	FlexItem,
 	ToggleControl,
-	SelectControl,
-	Spinner,
+	SelectControl as WCSelectControl,
+	Spinner as WCSpinner,
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -131,7 +131,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 					}
 					isShownByDefault
 				>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Taxonomy' ) }
 						options={ getTaxonomyOptions() }
 						value={ taxonomy }
@@ -237,7 +237,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			{ inspectorControls }
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

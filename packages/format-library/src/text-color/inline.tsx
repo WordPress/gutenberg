@@ -12,18 +12,37 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type {
-	ColorObject,
-	ColorPickerProps,
-	InlineColorUIProps,
-} from '../types';
 import { textColor as settings, transparentValue } from './index';
+
+/**
+ * A colour entry from the `color.palette` theme setting.
+ */
+export interface ColorObject {
+	slug: string;
+	color: string;
+	name: string;
+}
+
+interface InlineColorUIProps {
+	name: string;
+	isActive: boolean;
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	onClose: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
+interface ColorPickerProps {
+	name: string;
+	property: 'color' | 'backgroundColor';
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+}
 
 const TABS = [
 	{ name: 'color', title: __( 'Text' ) },
@@ -72,7 +91,8 @@ export function parseClassName(
 					colorSettings,
 					colorSlug
 				);
-				accumulator.color = colorObject.color;
+				// Without a custom color, an unknown slug gives no color.
+				accumulator.color = colorObject.color as string | undefined;
 			}
 			return accumulator;
 		}, {} );
@@ -185,7 +205,7 @@ export default function InlineColorUI( {
 	isActive,
 }: InlineColorUIProps ) {
 	/*
-	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * `isActive` is not part of `FormatType`, but `useAnchor` reads it
 	 * dynamically. Hoisting the object out of the call avoids excess property
 	 * checking, which only applies to object literals passed inline.
 	 */

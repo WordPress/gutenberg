@@ -1,6 +1,6 @@
 module.exports = {
-	'*.{cjs,js,json,jsx,mjs,ts,tsx,yml,yaml}': [ 'wp-scripts format' ],
-	'**/*.{cjs,js,jsx,mjs,ts,tsx}': [
+	'*.{cjs,cts,js,json,jsx,mjs,mts,ts,tsx,yml,yaml}': [ 'wp-scripts format' ],
+	'**/*.{cjs,cts,js,jsx,mjs,mts,ts,tsx}': [
 		() => 'npm run prelint:js',
 		'node ./tools/eslint/lint-js.cjs',
 	],
@@ -9,7 +9,7 @@ module.exports = {
 	'packages/*/package.json': [ 'wp-scripts lint-pkg-json' ],
 	'{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}':
 		[ 'npm run docs:gen' ],
-	'packages/**/*.{js,jsx,ts,tsx,json}': [
+	'packages/**/*.{cjs,cts,js,jsx,mjs,mts,ts,tsx,json}': [
 		'npm run docs:api-ref',
 		'npm run docs:blocks',
 		'npm run docs:blocks-detail',

@@ -155,10 +155,10 @@ export function assertRead( file, metric ) {
 				reason: missing.length
 					? `Read ${ found } of ${
 							expected.length
-					  } landmarks in ${ file }, missing "${ missing[ 0 ].slice(
+						} landmarks in ${ file }, missing "${ missing[ 0 ].slice(
 							0,
 							40
-					  ) }"`
+						) }"`
 					: `Read ${ file } through`,
 			};
 		},

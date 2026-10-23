@@ -1,7 +1,6 @@
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import deprecated from './deprecated';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
@@ -10,9 +9,6 @@ import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
 import variations from './variations';
-import { unlock } from '../lock-unlock';
-
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -61,34 +57,6 @@ export const settings = {
 	transforms,
 	variations,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'label',
-			label: __( 'Label' ),
-			type: 'text',
-			Edit: 'rich-text',
-		},
-		{
-			id: 'link',
-			label: __( 'Link' ),
-			type: 'url',
-			Edit: 'link',
-			getValue: ( { item } ) => ( {
-				url: item.url,
-				rel: item.rel,
-			} ),
-			setValue: ( { value } ) => ( {
-				url: value.url,
-				rel: value.rel,
-			} ),
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'label', 'link' ],
-	};
-}
 
 export const init = () => {
 	addFilter(

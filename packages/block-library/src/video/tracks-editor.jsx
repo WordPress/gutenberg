@@ -9,13 +9,13 @@ import {
 	Dropdown,
 	Button,
 	TextControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import {
 	MediaUpload,
 	MediaUploadCheck,
@@ -25,9 +25,6 @@ import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
-import { unlock } from '../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const ALLOWED_TYPES = [ 'text/vtt' ];
 
@@ -58,7 +55,9 @@ function TrackList( { tracks, onEditPress } ) {
 			>
 				<span>{ track.label }</span>
 				<HStack justify="flex-end">
-					{ track.default && <WCBadge>{ __( 'Default' ) }</WCBadge> }
+					{ track.default && (
+						<Badge intent="none">{ __( 'Default' ) }</Badge>
+					) }
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -136,7 +135,7 @@ function SingleTrackEditor( {
 				/>
 			</Grid>
 			<VStack spacing="4">
-				<SelectControl
+				<WCSelectControl
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }

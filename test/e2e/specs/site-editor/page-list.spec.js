@@ -89,7 +89,10 @@ test.describe( 'Page List', () => {
 						} );
 
 					await mediaLibrary
-						.getByRole( 'button', { name: 'Select', exact: true } )
+						.getByRole( 'button', {
+							name: 'Set featured image',
+							exact: true,
+						} )
 						.click();
 				},
 				assertInitialState: async ( page ) => {
@@ -105,7 +108,7 @@ test.describe( 'Page List', () => {
 						name: 'Set featured image',
 					} );
 					await expect( placeholder ).toBeHidden();
-					const img = page.locator( '.fields__media-edit-thumbnail' );
+					const img = page.locator( '.media-edit__thumbnail' );
 					await expect( img ).toBeVisible();
 				},
 			},
@@ -366,7 +369,7 @@ test.describe( 'Page List', () => {
 					// Targets newly created pages which are published by default.
 					has: page.getByRole( 'cell', { name: 'Published' } ),
 				} );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -412,9 +415,7 @@ test.describe( 'Page List', () => {
 			await expect( updatedStatus ).toBeVisible();
 
 			// Verify featured image placeholder is gone (image was set)
-			const imagePlaceholder = row.locator(
-				'.fields__media-edit-placeholder'
-			);
+			const imagePlaceholder = row.locator( '.media-edit__placeholder' );
 			await expect( imagePlaceholder ).toBeHidden();
 
 			// Reset the page to its original state
@@ -441,7 +442,7 @@ test.describe( 'Page List', () => {
 		// 	expect( await selectedItems.all() ).toHaveLength( 2 );
 
 		// 	const imagePlaceholders = selectedItems.locator(
-		// 		'.fields__media-edit-placeholder',
+		// 		'.media-edit__placeholder',
 		// 		{ strict: false }
 		// 	);
 
@@ -575,6 +576,89 @@ test.describe( 'Page List', () => {
 		} );
 	} );
 
+	test.describe( 'Bulk Quick Edit', () => {
+		test( 'keeps bulk-editable fields accessible after table sorting', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			const table = page.getByRole( 'table' );
+			await page.getByRole( 'button', { name: 'View options' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Sort by' } )
+				.selectOption( { label: 'Title' } );
+			await page.keyboard.press( 'Escape' );
+			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			// The extensible site editor keeps the selection in the URL, so
+			// the checkbox only flips once the route has re-rendered.
+			const bulkActions = table.getByRole( 'cell', {
+				name: /items selected/,
+			} );
+			await expect(
+				bulkActions.getByRole( 'checkbox', { name: 'Deselect all' } )
+			).toBeChecked();
+			await bulkActions
+				.getByRole( 'button', { name: 'Bulk edit' } )
+				.click();
+
+			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			await expect( modal ).toContainText(
+				'Changes will be applied to all selected pages.'
+			);
+			for ( const name of [
+				'Edit Status',
+				'Edit Date',
+				'Edit Author',
+				'Edit Discussion',
+			] ) {
+				await expect(
+					modal.getByRole( 'button', { name } )
+				).toBeVisible();
+			}
+			await modal.getByRole( 'button', { name: 'Edit Status' } ).click();
+			const pending = page.getByRole( 'radio', {
+				name: 'Pending Review',
+			} );
+			await pending.check();
+			await expect( pending ).toBeChecked();
+			await page.keyboard.press( 'Escape' );
+			await expect(
+				modal.getByRole( 'button', { name: 'Edit Status' } )
+			).toBeFocused();
+		} );
+
+		test( 'keeps mobile grid selection visible and restores focus after cancelling', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( { width: 390, height: 844 } );
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Grid' } ).click();
+			await page.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			const selection = page.getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} );
+			await expect( selection ).toBeChecked();
+			const toolbar = page.locator( '.dataviews-bulk-actions' );
+			await toolbar.getByRole( 'button', { name: 'Actions' } ).click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Bulk edit' } )
+			).toBeVisible();
+			await expect( selection ).toBeInViewport( { ratio: 1 } );
+			await expect(
+				toolbar.getByText( /items selected/ )
+			).toBeInViewport( { ratio: 1 } );
+			await page.keyboard.press( 'Escape' );
+			await toolbar.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect(
+				page.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			).toBeFocused();
+		} );
+	} );
+
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {
 		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
 		// UTC-5 offset means the displayed time should be 5 hours earlier.
@@ -612,7 +696,7 @@ test.describe( 'Page List', () => {
 			const row = page.getByRole( 'row', {
 				name: new RegExp( PAGE_TITLE ),
 			} );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
 
 			// Open the date field for editing.
 			const editButton = page.getByRole( 'button', {

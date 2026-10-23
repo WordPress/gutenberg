@@ -21,10 +21,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   used in the repository (PHP, JS, styles...).
     │
     ├── .browserslistrc
-    ├── babel.config.js
     ├── jsconfig.json
     ├── tsconfig.json
-    ├── tsconfig.base.json
+    ├── tsconfig.build.json
     ├── webpack.config.js
     │   Transpilation and bundling Config files.
     │

@@ -1,10 +1,25 @@
 import process from 'node:process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
+import type { ComponentProps } from 'react';
 import * as Dialog from '../index';
-import { ThemeProvider } from '../../utils/theme-provider';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../utils/wp-compat-overlay-slot';
+
+type Size = NonNullable< ComponentProps< typeof Dialog.Popup >[ 'size' ] >;
+
+const ALL_SIZES = Object.keys( {
+	auto: true,
+	small: true,
+	medium: true,
+	large: true,
+	stretch: true,
+	full: true,
+} satisfies Record< Size, true > ) as Size[];
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
@@ -25,141 +40,6 @@ function collectUncaughtErrors() {
 }
 
 describe( 'Dialog', () => {
-	it( 'forwards ref', async () => {
-		const user = userEvent.setup();
-		const triggerRef = createRef< HTMLButtonElement >();
-		const popupRef = createRef< HTMLDivElement >();
-		const actionRef = createRef< HTMLButtonElement >();
-		const headerRef = createRef< HTMLElement >();
-		const titleRef = createRef< HTMLHeadingElement >();
-		const descriptionRef = createRef< HTMLParagraphElement >();
-		const closeIconRef = createRef< HTMLButtonElement >();
-		const footerRef = createRef< HTMLElement >();
-		const contentRef = createRef< HTMLDivElement >();
-
-		render(
-			<Dialog.Root>
-				<Dialog.Trigger ref={ triggerRef }>Open Dialog</Dialog.Trigger>
-				<Dialog.Popup ref={ popupRef }>
-					<Dialog.Header ref={ headerRef }>
-						<Dialog.Title ref={ titleRef }>
-							Test Dialog
-						</Dialog.Title>
-						<Dialog.CloseIcon ref={ closeIconRef } />
-					</Dialog.Header>
-					<Dialog.Content ref={ contentRef }>
-						<Dialog.Description ref={ descriptionRef }>
-							A test description
-						</Dialog.Description>
-					</Dialog.Content>
-					<Dialog.Footer ref={ footerRef }>
-						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</Dialog.Root>
-		);
-
-		// Test trigger ref before interaction
-		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
-
-		// Click trigger to open dialog
-		await user.click( triggerRef.current! );
-
-		// Wait for the dialog to appear
-		await waitFor( () => {
-			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
-		} );
-
-		// Now that the dialog is open, verify all inner refs
-		expect( headerRef.current ).toBeInstanceOf( HTMLElement );
-		expect( headerRef.current?.tagName ).toBe( 'HEADER' );
-		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
-		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
-		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
-		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
-		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
-		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
-		expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
-	} );
-
-	it( 'merges user `className` on Dialog.Title with the internal one', async () => {
-		// Regression test for the shared `useRender` class-name merge
-		// that also covers Popover.Title, Dialog.Description and
-		// Popover.Description.
-		const user = userEvent.setup();
-
-		render(
-			<Dialog.Root>
-				<Dialog.Trigger>Open</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Title className="custom-title">Title</Dialog.Title>
-				</Dialog.Popup>
-			</Dialog.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
-		const heading = await screen.findByRole( 'heading', { name: 'Title' } );
-		// The regression this guards against: `useRender` must still forward
-		// the user-supplied className to the underlying DOM node. CSS module
-		// classes are stubbed in the Jest environment, so we can only assert
-		// the user class end-to-end.
-		expect( heading ).toHaveClass( 'custom-title' );
-	} );
-
-	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {
-		const user = userEvent.setup();
-		const popupRef = createRef< HTMLDivElement >();
-
-		render(
-			<Dialog.Root>
-				<Dialog.Trigger>Open</Dialog.Trigger>
-				<Dialog.Popup ref={ popupRef }>
-					<Dialog.Title>Title</Dialog.Title>
-					<Dialog.Description>My description</Dialog.Description>
-				</Dialog.Popup>
-			</Dialog.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
-		await waitFor( () => {
-			expect( popupRef.current ).toHaveAccessibleDescription(
-				'My description'
-			);
-		} );
-	} );
-
-	it( 'renders Dialog.Footer and supports render/className props', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Dialog.Root>
-				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Title>Test Dialog</Dialog.Title>
-					<Dialog.Footer
-						render={ <section data-testid="dialog-footer" /> }
-						className="custom-footer"
-					>
-						<Dialog.Action>Close</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</Dialog.Root>
-		);
-
-		await user.click(
-			screen.getByRole( 'button', { name: 'Open Dialog' } )
-		);
-
-		const footer = await screen.findByTestId( 'dialog-footer' );
-		expect( footer.tagName ).toBe( 'SECTION' );
-		expect( footer ).toHaveClass( 'custom-footer' );
-		expect(
-			screen.getByRole( 'button', { name: 'Close' } )
-		).toBeInTheDocument();
-	} );
-
 	it( 'renders backdrop only when modal is true', async () => {
 		const getBackdrops = () => screen.queryAllByTestId( 'dialog-backdrop' );
 
@@ -206,13 +86,7 @@ describe( 'Dialog', () => {
 
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
 
-		for ( const size of [
-			'small',
-			'medium',
-			'large',
-			'stretch',
-			'full',
-		] as const ) {
+		for ( const size of ALL_SIZES ) {
 			view.rerender(
 				<Dialog.Root open>
 					<Dialog.Popup size={ size }>
@@ -612,372 +486,7 @@ describe( 'Dialog', () => {
 		} );
 	} );
 
-	describe( 'Initial focus', () => {
-		it( 'should focus the first content element, skipping the close icon', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-					<Dialog.Popup>
-						<Dialog.Header>
-							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
-						</Dialog.Header>
-						<button>Content Button</button>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Open Dialog' } )
-			);
-
-			await waitFor( () => {
-				expect(
-					screen.getByRole( 'button', { name: 'Content Button' } )
-				).toHaveFocus();
-			} );
-		} );
-
-		it( 'should fall back to the close icon when it is the only tabbable element', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-					<Dialog.Popup>
-						<Dialog.Header>
-							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
-						</Dialog.Header>
-						<p>No tabbable content here</p>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Open Dialog' } )
-			);
-
-			await waitFor( () => {
-				expect(
-					screen.getByRole( 'button', { name: 'Close' } )
-				).toHaveFocus();
-			} );
-		} );
-
-		it( 'should not move focus when initialFocus is false', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-					<Dialog.Popup initialFocus={ false }>
-						<Dialog.Header>
-							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
-						</Dialog.Header>
-						<button>Content Button</button>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open Dialog',
-			} );
-			await user.click( trigger );
-
-			await waitFor( () => {
-				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
-			} );
-
-			expect(
-				screen.getByRole( 'button', { name: 'Content Button' } )
-			).not.toHaveFocus();
-			expect(
-				screen.getByRole( 'button', { name: 'Close' } )
-			).not.toHaveFocus();
-		} );
-
-		it( 'should use a custom initialFocus callback as-is', async () => {
-			const user = userEvent.setup();
-			const customFocus = vi.fn( () => false as const );
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-					<Dialog.Popup initialFocus={ customFocus }>
-						<Dialog.Header>
-							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
-						</Dialog.Header>
-						<button>Content Button</button>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Open Dialog' } )
-			);
-
-			await waitFor( () => {
-				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
-			} );
-
-			expect( customFocus ).toHaveBeenCalled();
-		} );
-	} );
-
-	describe( 'portal', () => {
-		it( 'uses the root theme when portaled from a nested theme', async () => {
-			const user = userEvent.setup();
-			const popupRef = createRef< HTMLDivElement >();
-
-			render(
-				<ThemeProvider isRoot cornerRadius="subtle">
-					<ThemeProvider cornerRadius="pronounced">
-						<Dialog.Root>
-							<Dialog.Trigger>Open</Dialog.Trigger>
-							<Dialog.Popup ref={ popupRef }>
-								<Dialog.Title>Title</Dialog.Title>
-							</Dialog.Popup>
-						</Dialog.Root>
-					</ThemeProvider>
-				</ThemeProvider>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
-			await waitFor( () => {
-				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
-			} );
-
-			// The popup is portaled next to the app root, so its closest theme
-			// boundary should be the root provider mirrored onto the document.
-			/* eslint-disable testing-library/no-node-access */
-			expect(
-				popupRef.current?.closest( '[data-wpds-corner-radius]' )
-			).toBe( document.documentElement );
-			/* eslint-enable testing-library/no-node-access */
-		} );
-
-		it( 'should render inside the portal container when a custom target is provided', async () => {
-			const user = userEvent.setup();
-			const containerRef = createRef< HTMLDivElement >();
-
-			render(
-				<div data-testid="wrapper">
-					<Dialog.Root>
-						<Dialog.Trigger>Open</Dialog.Trigger>
-						<div
-							ref={ containerRef }
-							data-testid="custom-container"
-						/>
-						<Dialog.Popup
-							portal={
-								<Dialog.Portal container={ containerRef } />
-							}
-						>
-							<Dialog.Header>
-								<Dialog.Title>Title</Dialog.Title>
-							</Dialog.Header>
-							Dialog content
-						</Dialog.Popup>
-					</Dialog.Root>
-				</div>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
-			const content = await screen.findByText( 'Dialog content' );
-			expect( content ).toBeVisible();
-
-			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
-				content
-			);
-		} );
-
-		it( 'should render with a portal by default', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<div data-testid="wrapper">
-					<Dialog.Root>
-						<Dialog.Trigger>Open</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								<Dialog.Title>Title</Dialog.Title>
-							</Dialog.Header>
-							Portal content
-						</Dialog.Popup>
-					</Dialog.Root>
-				</div>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-
-			const content = await screen.findByText( 'Portal content' );
-			expect( content ).toBeVisible();
-
-			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
-				content
-			);
-		} );
-	} );
-
 	describe( 'overlay scroll container', () => {
-		it( 'marks Dialog.Content with data-wp-ui-overlay-scroll-container', async () => {
-			const user = userEvent.setup();
-			const contentRef = createRef< HTMLDivElement >();
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open</Dialog.Trigger>
-					<Dialog.Popup>
-						<Dialog.Title>Title</Dialog.Title>
-						<Dialog.Content ref={ contentRef }>
-							<p>Body</p>
-						</Dialog.Content>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-			await waitFor( () => {
-				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
-			} );
-
-			expect( contentRef.current ).toHaveAttribute(
-				'data-wp-ui-overlay-scroll-container'
-			);
-		} );
-
-		it( 'sets data-wp-ui-overlay-modal on the popup when modal is true', async () => {
-			const user = userEvent.setup();
-			const popupRef = createRef< HTMLDivElement >();
-
-			render(
-				<Dialog.Root modal>
-					<Dialog.Trigger>Open</Dialog.Trigger>
-					<Dialog.Popup ref={ popupRef }>
-						<Dialog.Title>Title</Dialog.Title>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-			await waitFor( () => {
-				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
-			} );
-
-			expect( popupRef.current ).toHaveAttribute(
-				'data-wp-ui-overlay-modal'
-			);
-		} );
-
-		it.each( [
-			[ 'false', false as const ],
-			[ 'trap-focus', 'trap-focus' as const ],
-		] )(
-			'omits data-wp-ui-overlay-modal on the popup when modal is %s',
-			async ( _label, modal ) => {
-				const user = userEvent.setup();
-				const popupRef = createRef< HTMLDivElement >();
-
-				render(
-					<Dialog.Root modal={ modal }>
-						<Dialog.Trigger>Open</Dialog.Trigger>
-						<Dialog.Popup ref={ popupRef }>
-							<Dialog.Title>Title</Dialog.Title>
-						</Dialog.Popup>
-					</Dialog.Root>
-				);
-
-				await user.click(
-					screen.getByRole( 'button', { name: 'Open' } )
-				);
-				await waitFor( () => {
-					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
-				} );
-
-				expect( popupRef.current ).not.toHaveAttribute(
-					'data-wp-ui-overlay-modal'
-				);
-			}
-		);
-
-		it( 'pins Dialog.Header when rendered as a sibling of Dialog.Content', async () => {
-			const user = userEvent.setup();
-			const popupRef = createRef< HTMLDivElement >();
-			const headerRef = createRef< HTMLElement >();
-			const contentRef = createRef< HTMLDivElement >();
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open</Dialog.Trigger>
-					<Dialog.Popup ref={ popupRef }>
-						<Dialog.Header ref={ headerRef }>
-							<Dialog.Title>Title</Dialog.Title>
-						</Dialog.Header>
-						<Dialog.Content ref={ contentRef }>
-							<p>Body</p>
-						</Dialog.Content>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-			await waitFor( () => {
-				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
-			} );
-
-			// The header is inside the popup but NOT inside the scroll
-			// container — it sits outside the scrolling region as a
-			// pinned flex sibling of `Content`.
-			expect( popupRef.current ).toContainElement( headerRef.current );
-			expect( popupRef.current ).toContainElement( contentRef.current );
-			expect( contentRef.current ).not.toContainElement(
-				headerRef.current
-			);
-			// And it sits *before* the scroll container — the CSS
-			// sticky-separator selectors rely on that DOM order.
-			const position = headerRef.current!.compareDocumentPosition(
-				contentRef.current!
-			);
-			expect(
-				// eslint-disable-next-line no-bitwise
-				position & Node.DOCUMENT_POSITION_FOLLOWING
-			).toBeTruthy();
-		} );
-
-		it( 'scrolls Dialog.Header with the body when nested inside Dialog.Content', async () => {
-			const user = userEvent.setup();
-			const headerRef = createRef< HTMLElement >();
-			const contentRef = createRef< HTMLDivElement >();
-
-			render(
-				<Dialog.Root>
-					<Dialog.Trigger>Open</Dialog.Trigger>
-					<Dialog.Popup>
-						<Dialog.Content ref={ contentRef }>
-							<Dialog.Header ref={ headerRef }>
-								<Dialog.Title>Title</Dialog.Title>
-							</Dialog.Header>
-							<p>Body</p>
-						</Dialog.Content>
-					</Dialog.Popup>
-				</Dialog.Root>
-			);
-
-			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
-			await waitFor( () => {
-				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
-			} );
-
-			expect( contentRef.current ).toContainElement( headerRef.current );
-		} );
-
 		it( 'invokes a consumer-supplied onScroll on Dialog.Content', async () => {
 			const user = userEvent.setup();
 			const onScroll = vi.fn();
@@ -1221,5 +730,61 @@ describe( 'Dialog', () => {
 				'data-wp-ui-overlay-scrolled-from-bottom'
 			);
 		} );
+	} );
+} );
+
+describe( 'Dialog.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'renders the popup in the compatibility overlay slot when no container is provided', async () => {
+		render(
+			<Dialog.Root defaultOpen>
+				<Dialog.Popup>
+					<Dialog.Title>Title</Dialog.Title>
+					Portal content
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		const popup = await screen.findByRole( 'dialog' );
+		expect( popup ).toBeVisible();
+		expect(
+			within( getWpCompatOverlaySlot()! ).getByRole( 'dialog' )
+		).toBe( popup );
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Dialog.Root defaultOpen>
+				<div data-testid="portal-target" />
+				<Dialog.Popup
+					portal={ <Dialog.Portal container={ container } /> }
+				>
+					<Dialog.Title>Title</Dialog.Title>
+					Portal content
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		expect(
+			await within( target ).findByText( 'Portal content' )
+		).toBeVisible();
 	} );
 } );

@@ -1,6 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
-import { Button, Spinner, CheckboxControl } from '@wordpress/components';
+import {
+	Button,
+	Spinner as WCSpinner,
+	CheckboxControl as WCCheckboxControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useConstrainedTabbing,
@@ -173,11 +177,11 @@ export default function PostPublishPanel( {
 					</PostPublishPanelPostpublish>
 				) }
 				{ isSaving && (
-					<Spinner data-testid="post-publish-panel-spinner" />
+					<WCSpinner data-testid="post-publish-panel-spinner" />
 				) }
 			</div>
 			<div className="editor-post-publish-panel__footer">
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ __( 'Always show pre-publish checks.' ) }
 					checked={ isPublishSidebarEnabled }
 					onChange={ onTogglePublishSidebar }

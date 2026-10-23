@@ -37,7 +37,7 @@ vi.mock(
 	() =>
 		( {
 			isBlobURL: ( url: string ) => url.startsWith( 'blob:' ),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 describe( 'useUploadStatus', () => {

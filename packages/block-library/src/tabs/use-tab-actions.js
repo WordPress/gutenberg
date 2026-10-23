@@ -33,7 +33,7 @@ export default function useTabActions( tabsClientId ) {
 		const tabPanels = tabsClientId
 			? getBlocks( tabsClientId ).find(
 					( block ) => block.name === 'core/tab-panels'
-			  )
+				)
 			: undefined;
 
 		return {

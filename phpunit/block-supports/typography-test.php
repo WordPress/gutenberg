@@ -284,6 +284,39 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a classname is generated for a text shadow preset.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_classname_for_text_shadow() {
+		$this->test_block_name = 'test/text-shadow-with-class';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'textShadow' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+		$block_atts = array( 'textShadow' => 'light' );
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
+		$expected = array( 'class' => 'has-light-text-shadow' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
 	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
 	 *
 	 * @covers ::wp_get_typography_font_size_value
@@ -1130,7 +1163,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param mixed $expected  An expected return value.
 	 */
 	public function test_valid_size_wp_get_typography_value_and_unit( $raw_value, $expected ) {
-		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value ) );
+		$this->assertSame( $expected, gutenberg_get_typography_value_and_unit( $raw_value ) );
 	}
 
 	/**
@@ -1155,14 +1188,14 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: `"10"`'                               => array(
 				'raw_value' => '10',
 				'expected'  => array(
-					'value' => 10,
+					'value' => 10.0,
 					'unit'  => 'px',
 				),
 			),
 			'size: `11`'                                 => array(
 				'raw_value' => 11,
 				'expected'  => array(
-					'value' => 11,
+					'value' => 11.0,
 					'unit'  => 'px',
 				),
 			),
@@ -1176,21 +1209,21 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: `"12rem"`'                            => array(
 				'raw_value' => '12rem',
 				'expected'  => array(
-					'value' => 12,
+					'value' => 12.0,
 					'unit'  => 'rem',
 				),
 			),
 			'size: `"12px"`'                             => array(
 				'raw_value' => '12px',
 				'expected'  => array(
-					'value' => 12,
+					'value' => 12.0,
 					'unit'  => 'px',
 				),
 			),
 			'size: `"12em"`'                             => array(
 				'raw_value' => '12em',
 				'expected'  => array(
-					'value' => 12,
+					'value' => 12.0,
 					'unit'  => 'em',
 				),
 			),

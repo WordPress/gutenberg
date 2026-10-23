@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+
+### Internal
+
+-   Type the `spacing.spacingSizes` and `border.radiusSizes` settings ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   Accept the boolean and sides forms of the `padding`, `margin` and `blockGap` spacing settings, and `false` for the unsupported `contentSize` and `wideSize` layout settings ([#84989](https://github.com/WordPress/gutenberg/pull/84989)).
+
+## 2.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Stop normalizing deprecated style state aliases and falling back to legacy style paths; global styles must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
+
+### New Features
+
+-   Add `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and `::placeholder` support for the `textInput` element ([#71634](https://github.com/WordPress/gutenberg/pull/71634)).
+
+### Enhancements
+
+-   `__unstableGeneratePreviewStateStyles` accepts an element name, such as `link`, as well as a block name ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
+
+## 1.24.0 (2026-10-07)
+
+### New Features
+
+-   Accept `background.backgroundClip` as a valid theme.json setting ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+### Bug Fixes
+
+-   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 1.23.0 (2026-09-23)
+
+### New Features
+
+-   Add text shadow settings and presets ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+### Bug Fixes
+
+-   `generateGlobalStyles`: Treat a missing `spacing.blockGap` setting like a `null` one, as the server's `isset()` check does. WordPress stores `null` for themes that do not opt into block gap, but `getSetting` returns `undefined` for it, so the editor considered block gap supported and rendered the global block gap instead of the fallback gap styles the front end renders, such as the Columns block's `2em` default ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+
+## 1.22.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   `getResolvedValue`: Return a copy when resolving a theme-relative (`file:./…`) URL instead of writing the resolved URL onto the given object, which could be the caller's own value or, via a `ref`, an object aliased by the user or theme config ([#82278](https://github.com/WordPress/gutenberg/pull/82278)).

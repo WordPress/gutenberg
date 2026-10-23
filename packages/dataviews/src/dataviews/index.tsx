@@ -6,8 +6,8 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+import deprecated from '@wordpress/deprecated';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -19,13 +19,13 @@ import {
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { BulkActionsFooter } from '../components/dataviews-bulk-actions';
 import { DataViewsPagination } from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import usePageClamp from '../hooks/use-page-clamp';
@@ -110,6 +110,7 @@ function DataViews< Item >( {
 	empty,
 	onReset,
 }: DataViewsProps< Item > ) {
+	useEnableWpCompatOverlaySlot();
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
@@ -136,15 +137,7 @@ function DataViews< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
-	const [ containerWidth, setContainerWidth ] = useState( 0 );
-	const resizeObserverRef = useResizeObserver(
-		( resizeObserverEntries: any ) => {
-			setContainerWidth(
-				resizeObserverEntries[ 0 ].borderBoxSize[ 0 ].inlineSize
-			);
-		},
-		{ box: 'border-box' }
-	);
+	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
@@ -277,7 +270,7 @@ function DataViews< Item >( {
  */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActionsFooter;
+	BulkActionToolbar: () => React.JSX.Element;
 	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
@@ -289,7 +282,13 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Footer: typeof DataViewsFooter;
 };
 
-DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
+DataViewsSubComponents.BulkActionToolbar =
+	function DeprecatedBulkActionToolbar() {
+		deprecated( 'DataViews.BulkActionToolbar', {
+			hint: 'Remove this component from your composition. Built-in table and grid layouts render bulk actions automatically.',
+		} );
+		return <></>;
+	};
 DataViewsSubComponents.Filters = Filters;
 DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;

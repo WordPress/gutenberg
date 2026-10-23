@@ -35,6 +35,19 @@ export function taperChroma(
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
+	return createChromaTaper( seed, options )( lTarget );
+}
+
+/**
+ * Prepare a chroma taper for repeated target-lightness calculations.
+ *
+ * @param seed    Seed color in OKLCH.
+ * @param options Chroma taper options.
+ */
+export function createChromaTaper(
+	seed: PlainColorObject,
+	options: TaperChromaOptions = {}
+): ( lTarget: number ) => { l: number; c: number } | PlainColorObject {
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
@@ -55,46 +68,44 @@ export function taperChroma(
 			hSeed = normalizeHue( options.hueFallback );
 		} else {
 			// Respect achromatic intent: grayscale at target L
-			return {
+			return ( lTarget ) => ( {
 				space: OKLCH,
 				coords: [ clamp01( lTarget ), 0, 0 ],
 				alpha: 1,
-			};
+			} );
 		}
 	}
 
-	// Capacity at seed and target
+	// Capacity at seed
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut );
-	const cmaxTarget = getCachedMaxChromaAtLH(
-		clamp01( lTarget ),
-		hSeed,
-		gamut
-	);
+	const cmaxSeed = getMaxChromaAtLH( lSeed, hSeed, gamut );
 
 	// Seed vividness ratio (hue-fair normalization)
-	let seedRelative = 0;
 	const denom = cmaxSeed > 0 ? cmaxSeed : 1e-6;
-	seedRelative = clamp01( cSeed / denom );
+	const seedRelative = clamp01( cSeed / denom );
+	const seedCarry = Math.pow( seedRelative, clamp01( carry ) );
 
-	// Intended chroma from local capacity, tempered by seed vividness
-	const cIntendedBase = alpha * cmaxTarget;
-	const cWithCarry =
-		cIntendedBase * Math.pow( seedRelative, clamp01( carry ) );
+	return ( lTarget ) => {
+		const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
-	// Gentle, symmetric desaturation vs distance in L
-	const t = continuousTaper( lSeed, lTarget, {
-		radiusLight,
-		radiusDark,
-		kLight,
-		kDark,
-	} );
-	const cPlanned = cWithCarry * t;
+		// Intended chroma from local capacity, tempered by seed vividness
+		const cIntendedBase = alpha * cmaxTarget;
+		const cWithCarry = cIntendedBase * seedCarry;
 
-	// Downward-only clamp (preserve L & H)
-	const lOut = clamp01( lTarget );
+		// Gentle, symmetric desaturation vs distance in L
+		const t = continuousTaper( lSeed, lTarget, {
+			radiusLight,
+			radiusDark,
+			kLight,
+			kDark,
+		} );
+		const cPlanned = cWithCarry * t;
 
-	return { l: lOut, c: cPlanned };
+		// Downward-only clamp (preserve L & H)
+		const lOut = clamp01( lTarget );
+
+		return { l: lOut, c: cPlanned };
+	};
 }
 
 /* ---------------- helpers & caches ---------------- */
@@ -151,57 +162,19 @@ function continuousTaper(
 	return 1 - ( 1 - opts.kDark ) * w;
 }
 
-/* ---- chroma-capacity queries with small caches ---- */
+/* ---- chroma-capacity queries ---- */
 
 // Leave headroom above sRGB's maximum chroma of about 0.32.
 const MAX_CHROMA = 0.45;
-const maxChromaCache = new Map< string, number >();
-
-function quantize( x: number, step: number ): number {
-	const k = Math.round( x / step );
-	return k * step;
-}
-
-function getCachedMaxChromaAtLH(
+function getMaxChromaAtLH(
 	l: number,
 	h: number,
 	gamutSpace: ColorSpace
 ): number {
-	const lQuantized = quantize( l, 0.05 );
-	const hQuantized = quantize( normalizeHue( h ), 10 );
-	const key = `${ gamutSpace.id }|L:${ lQuantized }|H:${ hQuantized }`;
-	const hit = maxChromaCache.get( key );
-	if ( typeof hit === 'number' ) {
-		return hit;
-	}
-
-	const computed = maxInGamutChromaAtLH(
-		lQuantized,
-		hQuantized,
-		gamutSpace,
-		MAX_CHROMA
-	);
-	maxChromaCache.set( key, computed );
-	return computed;
-}
-
-/**
- * Find the max in-gamut chroma at fixed (L,H) in the target gamut
- * @param l
- * @param h
- * @param gamutSpace
- * @param cap
- */
-function maxInGamutChromaAtLH(
-	l: number,
-	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
-): number {
 	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
-		coords: [ l, cap, h ],
+		coords: [ clamp01( l ), MAX_CHROMA, normalizeHue( h ) ],
 		alpha: 1,
 	};
 

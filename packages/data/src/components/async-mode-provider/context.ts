@@ -3,10 +3,6 @@ import { createContext } from '@wordpress/element';
 export const Context = createContext( false );
 Context.displayName = 'AsyncModeContext';
 
-const { Consumer, Provider } = Context;
-
-export const AsyncModeConsumer = Consumer;
-
 /**
  * Context Provider Component used to switch the data module component rerendering
  * between Sync and Async modes.
@@ -41,4 +37,4 @@ export const AsyncModeConsumer = Consumer;
  *
  * @param {boolean} props.value Enable Async Mode.
  */
-export default Provider;
+export default Context.Provider;

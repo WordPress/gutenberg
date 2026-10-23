@@ -34,6 +34,7 @@ EXCLUDED_PACKAGES=(
 	nux
 	postcss-themes
 	preferences-persistence
+	react-inert-value
 	report-flaky-tests
 	reusable-blocks
 	route

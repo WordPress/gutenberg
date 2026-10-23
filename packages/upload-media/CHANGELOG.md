@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+## 0.43.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. Sub-sizes of animated GIF and WebP images, cropped ones included, keep their animation instead of flattening to the first frame unless the setting is `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+-   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
+
+### Internal
+
+-   Remove unused internal filename helpers and the orphaned URL dependency ([#85094](https://github.com/WordPress/gutenberg/pull/85094)).
+-   Convert the private actions tests to TypeScript ([#84930](https://github.com/WordPress/gutenberg/pull/84930)).
+
+## 0.42.0 (2026-10-07)
+
+## 0.41.0 (2026-09-23)
+
+### New Features
+
+-   Add the `isHeicFile` export, which recognizes a HEIC/HEIF image from its file header rather than from the MIME type the browser infers from the file name ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+
+### Bug Fixes
+
+-   Detect HEIC uploads from the file header rather than the file name, so a HEIC file with a wrong extension or an empty MIME type is converted instead of leaving the upload stuck, and abandon a stalled `ImageDecoder` decode after a timeout instead of hanging the upload ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+-   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+
+## 0.40.0 (2026-09-10)
+
+### Bug Fixes
+
+-   A HEIC file that fails to convert for a reason other than a missing decoder, such as a damaged or truncated file or a canvas that could not be created, is no longer reported as the browser being unable to read HEIC. That message names a browser that would decode HEIC instead, which is no help when the codec was never the problem. It is now kept for the one case that earns it, where no decoding strategy is available at all; everything else reports a processing error ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
 ### Internal
 
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).

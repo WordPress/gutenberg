@@ -47,7 +47,9 @@ export default function HelloDolly() {
 		<Stack align="center" justify="center" className={ styles.root }>
 			<Text variant="body-xl" render={ <p /> } className={ styles.quote }>
 				<VisuallyHidden render={ <span /> }>
-					{ __( 'Quote from Hello Dolly song, by Jerry Herman:' ) }{ ' ' }
+					{ __(
+						'Quote from Hello Dolly song, by Jerry Herman:'
+					) }{ ' ' }
 				</VisuallyHidden>
 				<span dir="ltr" lang="en">
 					{ quote }

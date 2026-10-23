@@ -2,6 +2,86 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Enhancements
+
+-   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
+
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
+## 19.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `tag`, `termCount`, `termName` and `postTerms`: mirror the tag so it leans the same way as the other angled icons, such as `brush`, `pin` and `plugins`. The number in `termCount` stays readable ([#84675](https://github.com/WordPress/gutenberg/pull/84675)).
+-   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
+
+## 18.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Stroke-based icons now scale their stroke width with their size. A 1.5-unit stroke renders at 1px for a 16px icon, 1.25px for a 20px icon, and 1.5px for a 24px icon ([#84081](https://github.com/WordPress/gutenberg/pull/84081)).
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### New Features
+
+-   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
+
+### Enhancements
+-   Add initial search keywords to the icon manifest to improve icon discoverability ([#83884](https://github.com/WordPress/gutenberg/pull/83884)).
+-   `formatBold`: draw the B with heavier vertical strokes so it reads as bold at a glance ([#83321](https://github.com/WordPress/gutenberg/pull/83321)).
+-   `justifySpaceBetween` and `justifySpaceEvenly`: redraw so the two icons share one construction with the new `justifySpaceAround`, differing only in where the blocks sit ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
+-   `headingLevel1` to `headingLevel6`: enlarge the drawings to improve their optical balance with the rest of the set ([#83268](https://github.com/WordPress/gutenberg/pull/83268)).
+-   `manifest.json`: Add optional `keywords` property to improve discoverability. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+-   `blockDefault` and `typography`: redraw. `blockDefault` outlines its two tabs rather than filling them, and `typography` redraws the lowercase "a" ([#84073](https://github.com/WordPress/gutenberg/pull/84073)).
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 17.0.0 (2026-09-23)
+
+### Breaking Changes
+
+-   A further 236 icons are now stroke-based. Use CSS `color` rather than `fill` to recolor them. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+
+### New Features
+
+-   Add the `fullscreenExit`, `justifySpaceEvenly` and `reaction` icons ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
+
+### Enhancements
+
+-   Redraw a further 236 icons as stroke-based for variable stroke-width support, following the convention introduced in [#78808](https://github.com/WordPress/gutenberg/pull/78808), and refine the already stroke-based `image` and `commentAuthorAvatar` drawings. Most retain their original footprint; the table icons, `capturePhoto`, and `image` are slightly smaller, and several drawings in the final batch change by design. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+-   `manifest.json`: The `public` property is now a tri-state. Omitting it keeps an icon in the JS library only; `true` ships it to WordPress Core and exposes it through the icons REST API, making it selectable in the Icon block; `false` ships it and registers it in the `core` collection for server-side use via `wp_get_icon()`, while hiding it from the REST API and the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634))
+-   `manifest.json`: The `public` field now only controls whether an icon ships to WordPress Core ([#83277](https://github.com/WordPress/gutenberg/pull/83277)).
+-   The `brush`, `dashboard`, `link`, `media`, `page`, `pin`, `plugins`, `sites`, `tool`, `update` and `wordpress` icons now ship to WordPress Core as non-public icons: they are registered in the `core` collection and stay available to server-side code via `wp_get_icon()`, but are not exposed through the icons REST API and are not selectable in the Icon block. ([#82634](https://github.com/WordPress/gutenberg/pull/82634), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
+-   `manifest.json`: New `collections` property, listing the collections an icon is registered in once it ships to WordPress Core. It replaces the `public` property and introduces the `core-admin` collection, which is not public and holds the icons the WordPress admin interface renders. ([#83261](https://github.com/WordPress/gutenberg/pull/83261), [#79451](https://github.com/WordPress/gutenberg/pull/79451))
+-   `comment` and `plugins`: redraw for better optical balance ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
+-   `brush` and `media`: redraw. `brush` becomes a wide paintbrush rather than a pencil, which the existing `pencil` icon already covers, and `media` becomes a camera with music notes so it is no longer easily confused with `image` ([#83338](https://github.com/WordPress/gutenberg/pull/83338)).
+
+### Bug Fixes
+
+-   `cornerBottomLeft`, `cornerBottomRight`, `cornerTopLeft`, `cornerTopRight`, `sidesBottom`, `sidesHorizontal`, `sidesLeft`, `sidesRight`, `sidesTop` and `sidesVertical`: dim the rest of the box again, so each variant reads as one highlighted side or corner rather than a plain box. The dimming was dropped when these were redrawn as stroke icons. ([#82940](https://github.com/WordPress/gutenberg/pull/82940))
+-   Correct malformed drawings for `formatIndent`, `formatIndentRTL`, `formatOutdent`, `formatOutdentRTL`, `lock`, and `post`, and restore the missing second bar in `pause`. ([#82540](https://github.com/WordPress/gutenberg/pull/82540), [#82754](https://github.com/WordPress/gutenberg/pull/82754))
+
+### Internal
+
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
+-   Run rendered icon tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
+
+## 16.0.0 (2026-09-10)
+
 ### Breaking Changes
 
 -   The `search` icon is now stroke-based. Use CSS `color` rather than `fill` to recolor it. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
@@ -78,7 +158,7 @@
 
 ### Breaking Changes
 
-- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+-   Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
 
 ## 12.2.0 (2026-04-15)
 

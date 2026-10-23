@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
 		"types": [ "gutenberg-vitest-test-env", "react-css-custom-properties" ]
 	},
@@ -10,6 +10,6 @@
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis/tsconfig.build.json" }
 	]
 }

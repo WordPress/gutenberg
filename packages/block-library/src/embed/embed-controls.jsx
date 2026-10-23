@@ -14,10 +14,10 @@ function getResponsiveHelp( checked ) {
 	return checked
 		? __(
 				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
+			)
 		: __(
 				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
+			);
 }
 
 const EmbedControls = ( {

@@ -1,8 +1,9 @@
 import { createContext, useContext } from '@wordpress/element';
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 
 type MenuContextValue = {
 	isSubmenu: boolean;
+	submenuTriggerRef?: RefObject< HTMLDivElement | null >;
 };
 
 const MenuContext = createContext< MenuContextValue >( {
@@ -10,6 +11,12 @@ const MenuContext = createContext< MenuContextValue >( {
 } );
 
 const useMenuContext = () => useContext( MenuContext );
+
+const MenuGroupContext = createContext< 'group' | 'radio-group' | null >(
+	null
+);
+
+const useMenuGroupContext = () => useContext( MenuGroupContext );
 
 type MenuItemContentContextValue = {
 	labelId?: string;
@@ -23,7 +30,9 @@ const useMenuItemContentContext = () => useContext( MenuItemContentContext );
 
 export {
 	MenuContext,
+	MenuGroupContext,
 	MenuItemContentContext,
 	useMenuContext,
+	useMenuGroupContext,
 	useMenuItemContentContext,
 };

@@ -1,6 +1,4 @@
-import { useEffect } from '@wordpress/element';
 import { useStateWithHistory } from '@wordpress/compose';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
@@ -8,21 +6,17 @@ import {
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
-import { editorStyles } from '../editor-styles';
-import './style.css';
+import { contentStyles } from '../editor-styles';
+import styles from './style.module.css';
 
-export default function EditorWithUndoRedo() {
+export default function EditorWithUndoRedo( { direction = 'ltr' } ) {
 	const { value, setValue, hasUndo, hasRedo, undo, redo } =
 		useStateWithHistory( { blocks: [] } );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			className="editor-with-undo-redo"
+			className={ styles.root }
 			onKeyDown={ ( event ) => event.stopPropagation() }
 		>
 			<BlockEditorProvider
@@ -38,7 +32,7 @@ export default function EditorWithUndoRedo() {
 					hasFixedToolbar: true,
 				} }
 			>
-				<div className="editor-with-undo-redo__toolbar">
+				<div className={ styles.toolbar }>
 					<Button
 						onClick={ undo }
 						disabled={ ! hasUndo }
@@ -57,7 +51,10 @@ export default function EditorWithUndoRedo() {
 					/>
 					<BlockToolbar hideDragHandle />
 				</div>
-				<BlockCanvas height="100%" styles={ editorStyles } />
+				<BlockCanvas
+					height="100%"
+					styles={ contentStyles[ direction ] }
+				/>
 			</BlockEditorProvider>
 		</div>
 	);

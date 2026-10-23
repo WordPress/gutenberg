@@ -207,7 +207,7 @@ interface AddCustomTemplateModalContentProps {
 	onSelect: ( template: any ) => void;
 	entityForSuggestions: EntityForSuggestions;
 	onBack: () => void;
-	containerRef: React.RefObject< HTMLDivElement >;
+	containerRef: React.RefObject< HTMLDivElement | null >;
 }
 
 function AddCustomTemplateModalContent( {

@@ -100,7 +100,7 @@ export default function SidebarNavigationScreen( {
 									__( 'Previewing %1$s: %2$s' ),
 									previewingThemeName,
 									title
-							  ) }
+								) }
 					</Heading>
 					{ actions && (
 						<div className="edit-site-sidebar-navigation-screen__actions">

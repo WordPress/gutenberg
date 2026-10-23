@@ -299,7 +299,9 @@ test.describe( 'Widgets Customizer', () => {
 		const headingBlock = page.locator(
 			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
-		await expect( headingBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( headingBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should clear block selection', async ( {
@@ -372,8 +374,11 @@ test.describe( 'Widgets Customizer', () => {
 		const legacyWidgetBlock =
 			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
-			.locator( 'role=combobox[name="Legacy widget"i]' )
-			.selectOption( 'test_widget' );
+			.getByRole( 'combobox', { name: 'Legacy widget', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Test Widget', exact: true } )
+			.click();
 
 		await expect(
 			legacyWidgetBlock.locator(
@@ -583,7 +588,7 @@ test.describe( 'Widgets Customizer', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).click();
@@ -639,6 +644,152 @@ test.describe( 'Widgets Customizer', () => {
 		await expect(
 			page.getByRole( 'dialog' ).getByRole( 'textbox' )
 		).toHaveText( 'hello' );
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/52328.
+	test( 'should open the welcome guide from the Options menu', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const welcomeGuideHeading = page.getByRole( 'heading', {
+			name: 'Welcome to block Widgets',
+			level: 1,
+		} );
+		await expect( welcomeGuideHeading ).toBeHidden();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+		// The welcome guide is not a preference, so the item is a plain menu
+		// item rather than a `menuitemcheckbox`.
+		await page.getByRole( 'menuitem', { name: 'Welcome Guide' } ).click();
+
+		await expect( welcomeGuideHeading ).toBeVisible();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/57678.
+	test( 'should keep the undo and redo buttons focusable when there is nothing to undo or redo', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+
+		// The buttons are announced as disabled, but they must not be
+		// natively disabled, otherwise they could not receive focus.
+		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect( redoButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect( undoButton ).toHaveJSProperty( 'disabled', false );
+		await expect( redoButton ).toHaveJSProperty( 'disabled', false );
+
+		await undoButton.focus();
+		await expect( undoButton ).toBeFocused();
+		await redoButton.focus();
+		await expect( redoButton ).toBeFocused();
+	} );
+
+	test( 'should navigate the document tools with the arrow keys', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+		const inserterToggle = documentTools.getByRole( 'button', {
+			name: 'Add block',
+		} );
+		const optionsToggle = documentTools.getByRole( 'button', {
+			name: 'Options',
+		} );
+
+		await undoButton.focus();
+		await expect( undoButton ).toBeFocused();
+
+		// The disabled undo and redo buttons are part of the arrow keys
+		// navigation, like in the other editors.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( redoButton ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( inserterToggle ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( optionsToggle ).toBeFocused();
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( undoButton ).toBeFocused();
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect( optionsToggle ).toBeFocused();
+		await page.keyboard.press( 'Home' );
+		await expect( undoButton ).toBeFocused();
+		await page.keyboard.press( 'End' );
+		await expect( optionsToggle ).toBeFocused();
+
+		// The toolbar is a single tab stop.
+		await page.keyboard.press( 'Tab' );
+		await expect( documentTools.locator( ':focus' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'should undo and redo changes from the document tools', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+		const paragraphBlock = page.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		await widgetsCustomizerPage.addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+		await expect( paragraphBlock ).toHaveText( 'First Paragraph' );
+		await expect( undoButton ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		await undoButton.click();
+		await expect(
+			paragraphBlock.filter( { hasText: 'First Paragraph' } )
+		).toHaveCount( 0 );
+		await expect( redoButton ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		await redoButton.click();
+		await expect( paragraphBlock ).toHaveText( 'First Paragraph' );
+		await expect( redoButton ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 } );
 

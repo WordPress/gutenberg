@@ -44,7 +44,9 @@ See **Field Types** for the full pipeline.
 
 ### Host capabilities
 
-`WidgetHostProvider` / `useWidgetHost`: the seam through which the embedding application provides what only it knows. Every capability is optional, and an absent one degrades to the host-agnostic behavior. The first is `links`: recognition of the application's own routes plus its router's link primitive, so a matched action link navigates client-side.
+`HostLink` is the anchor consumers mount for a link target, and the only piece of the seam most of them touch. It reads the host's `links` capability and mounts the application's own link or a plain anchor, so no consumer branches on it.
+
+`WidgetHostProvider` / `useWidgetHost`: the seam itself, through which the embedding application provides what only it knows. Every capability is optional, and an absent one degrades to the host-agnostic behavior. `links` is the first: recognition of the application's own routes plus its router's link primitive. Applications mount the provider; the hook reads the bag directly, for a capability no component covers yet.
 
 See **Widget Host** for the contract.
 

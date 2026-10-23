@@ -11,7 +11,8 @@ import type { DataFormControlProps } from '../../../types';
 
 vi.mock(
 	import( '@wordpress/a11y' ),
-	() => ( { speak: vi.fn() } ) as unknown as typeof import('@wordpress/a11y')
+	() =>
+		( { speak: vi.fn() } ) as unknown as typeof import( '@wordpress/a11y' )
 );
 
 globalThis.wpVitest.mockMatchMedia();
@@ -358,9 +359,6 @@ describe( 'DateControl', () => {
 		const august25 = screen.getByRole( 'button', {
 			name: /august 25, 2026/i,
 		} );
-		await user.click( august25 );
-		// The first click extends the existing range. Clicking its new end again
-		// starts the replacement range from that day.
 		await user.click( august25 );
 		await user.click(
 			screen.getByRole( 'button', { name: /august 27, 2026/i } )

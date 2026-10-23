@@ -28,7 +28,6 @@ describe( 'TreeGridCell', () => {
 		).toThrow(
 			'TreeGridCell must be rendered as a cell in a row that belongs to an element with role="treegrid".'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'supports a custom semantic treegrid structure without a TreeGrid parent', () => {
