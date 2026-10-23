@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the `item_draft_saved` post type label for the notice shown after saving a draft, falling back to `Draft saved.` when the label is missing ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

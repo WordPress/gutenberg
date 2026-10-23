@@ -48,7 +48,8 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		shouldShowLink = false;
 	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = __( 'Draft saved.' );
+		noticeMessage =
+			postType?.labels?.item_draft_saved ?? __( 'Draft saved.' );
 		isDraft = true;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice.
