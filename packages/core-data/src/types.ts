@@ -288,3 +288,110 @@ export interface EntityConfig {
 	syncConfig?: SyncConfig;
 	meta?: Record< string, unknown >;
 }
+
+/**
+ * A function to call instead of `apiFetch()`, such as a batch's `add`.
+ */
+export type EntityRecordFetch = ( options: {
+	path: string;
+	method?: string;
+	data?: unknown;
+} ) => Promise< unknown >;
+
+/**
+ * Options of `editEntityRecord`.
+ */
+export interface EditEntityRecordOptions {
+	/**
+	 * Whether to ignore the edit in undo history or not.
+	 */
+	undoIgnore?: boolean;
+	/**
+	 * Whether the edit is transient (e.g. typing). Transient edits are staged
+	 * and eventually merged into the preceding undo level instead of creating
+	 * a new one.
+	 */
+	isCached?: boolean;
+}
+
+/**
+ * Options of `deleteEntityRecord`.
+ */
+export interface DeleteEntityRecordOptions {
+	/**
+	 * Internal use only. Function to call instead of `apiFetch()`. Must return
+	 * a promise.
+	 */
+	__unstableFetch?: EntityRecordFetch;
+	/**
+	 * If false, this action suppresses all the exceptions. Defaults to false.
+	 */
+	throwOnError?: boolean;
+}
+
+/**
+ * Options of `saveEntityRecord`.
+ */
+export interface SaveEntityRecordOptions extends DeleteEntityRecordOptions {
+	/**
+	 * Whether this is an autosave.
+	 */
+	isAutosave?: boolean;
+}
+
+/**
+ * The actions a `__experimentalBatch` request can call.
+ */
+export interface BatchActions {
+	saveEntityRecord: (
+		kind: string,
+		name: string,
+		record: object,
+		options?: SaveEntityRecordOptions
+	) => Promise< RestRecord | undefined >;
+	saveEditedEntityRecord: (
+		kind: string,
+		name: string,
+		recordId?: string | number,
+		options?: SaveEntityRecordOptions
+	) => Promise< RestRecord | undefined >;
+	deleteEntityRecord: (
+		kind: string,
+		name: string,
+		recordId: string | number,
+		query?: Record< string, unknown > | null,
+		options?: DeleteEntityRecordOptions
+	) => Promise< unknown >;
+}
+
+/**
+ * A request of a `__experimentalBatch` call.
+ */
+export type BatchRequest = ( api: BatchActions ) => unknown;
+
+/**
+ * The resolved results of the requests of a `__experimentalBatch` call.
+ */
+export type BatchResults< Requests extends Array< BatchRequest > > = {
+	[ Index in keyof Requests ]: Awaited< ReturnType< Requests[ Index ] > >;
+};
+
+/**
+ * A record received from the REST API.
+ */
+export type RestRecord = Record< string, unknown > & {
+	_links?: RestLinks;
+};
+
+/**
+ * The links of a REST API record that core data reads.
+ */
+export interface RestLinks {
+	self?: Array< {
+		href?: string;
+		targetHints?: { allow?: ReadonlyArray< string > };
+	} >;
+	'version-history'?: Array< { href?: string } >;
+	'wp:user-global-styles'?: Array< { href?: string } >;
+	[ relation: string ]: unknown;
+}
