@@ -39,11 +39,18 @@ sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$content/plugins/sqlite-database-i
 	-e 's#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#' \
 	"$content/plugins/sqlite-database-integration/db.copy" > "$content/db.php"
 
-# The same mappings as .wp-env.test.json. A local folder that has a download
-# mapped inside it becomes a real folder of links, so the download lands in
-# the site rather than in the checkout.
+# The same plugins, themes and mappings as .wp-env.test.json. A local folder
+# that has a download mapped inside it becomes a real folder of links, so the
+# download lands in the site rather than in the checkout.
 node -e '
-	const mappings = require( "./.wp-env.test.json" ).mappings;
+	const config = require( "./.wp-env.test.json" );
+	const mappings = { ...config.mappings };
+	for ( const type of [ "plugins", "themes" ] ) {
+		for ( const source of config[ type ] ) {
+			const name = source === "." ? "gutenberg" : source.split( "/" ).pop();
+			mappings[ `wp-content/${ type }/${ name }` ] ??= source;
+		}
+	}
 	const targets = Object.keys( mappings ).sort();
 	for ( const target of targets ) {
 		const source = mappings[ target ];
@@ -138,7 +145,13 @@ for site in $( seq 1 "$sites" ); do
 	dir="$work/site-$site"
 	cp -a "$base" "$dir"
 	port=$( "$php" -r '$s = stream_socket_server( "tcp://127.0.0.1:0" ); echo explode( ":", stream_socket_get_name( $s, false ) )[1];' )
-	PHP_CLI_SERVER_WORKERS=4 "$php" -d memory_limit=512M -S "127.0.0.1:$port" -t "$dir" "$dir/router.php" > "$work/server-$site.log" 2>&1 &
+	# Restart the server when it exits: unlike Apache, it doesn't replace a
+	# PHP process that a test kills on purpose.
+	while true; do
+		PHP_CLI_SERVER_WORKERS=4 "$php" -d memory_limit=512M -S "127.0.0.1:$port" -t "$dir" "$dir/router.php" >> "$work/server-$site.log" 2>&1 || true
+		echo "server exited, restarting" >> "$work/server-$site.log"
+		sleep 0.2
+	done &
 	until curl -s -o /dev/null "http://127.0.0.1:$port/wp-login.php"; do
 		sleep 0.2
 	done
@@ -151,7 +164,7 @@ for site in $( seq 1 "$sites" ); do
 	fi
 	(
 		cd "$root/test/e2e"
-		WP_BASE_URL="http://127.0.0.1:$port" \
+		WP_BASE_URL="http://localhost:$port" \
 		WP_ARTIFACTS_PATH="$root/test/e2e/artifacts/site-$site" \
 		PLAYWRIGHT_BLOB_OUTPUT_FILE="$root/test/e2e/blob-report/report-$shard.zip" \
 			${display[@]+"${display[@]}"} npx playwright test --config playwright.config.ts --shard="$shard/$(( total * sites ))" "$@"
