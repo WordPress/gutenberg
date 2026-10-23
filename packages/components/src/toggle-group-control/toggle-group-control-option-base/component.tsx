@@ -100,8 +100,7 @@ function ToggleGroupControlOptionBase(
 	// that pressing an option doesn't change the width of the control.
 	const buttonContentProps = {
 		className: styles[ 'button-content' ],
-		'data-label':
-			! isIcon && typeof children === 'string' ? children : undefined,
+		'data-label': typeof children === 'string' ? children : undefined,
 	};
 
 	const labelRef = useRef< HTMLDivElement >( null );
