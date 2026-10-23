@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Bundle and transpile with Rolldown instead of esbuild. Inlined helpers shared by several transpiled files, like the style runtime of CSS modules, are emitted once per package in `build/_chunks/` and `build-module/_chunks/`, instead of being copied into every file.
 -   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency, so fallbacks no longer require installing `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
 
