@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import inputRules from '../input-rules';
-import type { RichTextFormatType, RichTextValue } from '@wordpress/rich-text';
-import type { RichTextEventListenerProps } from '../../types';
+import type { RichTextValue } from '@wordpress/rich-text';
+import type {
+	RichTextEventListenerProps,
+	RichTextFormatType,
+} from '../../types';
 
 /**
  * A stand-in for the real `core/code` format's `__unstableInputRule`: it
