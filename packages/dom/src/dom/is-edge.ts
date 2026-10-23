@@ -99,23 +99,21 @@ export default function isEdge(
 		return false;
 	}
 
+	if ( onlyVertical ) {
+		return true;
+	}
+
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
 	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
 	const containerRect = container.getBoundingClientRect();
 
-	// To check if a selection is at the edge, we insert a test selection at the
-	// edge of the container and check if the selections have the same vertical
-	// or horizontal position. If they do, the selection is at the edge.
-	// This method proves to be better than a DOM-based calculation for the
-	// horizontal edge, since it ignores empty textnodes and a trailing line
-	// break element. In other words, we need to check visual positioning, not
-	// DOM positioning.
-	// It also proves better than using the computed style for the vertical
-	// edge, because we cannot know the padding and line height reliably in
-	// pixels. `getComputedStyle` may return a value with different units.
+	// The selection is on the edge line. To check if it is at the horizontal
+	// edge of that line, we insert a test selection at the container's edge on
+	// that line and check if the selections have the same position. This
+	// proves better than a DOM-based calculation, since it ignores empty text
+	// nodes and a trailing line break element. The line is within the viewport
+	// when the selection is, so the test point can be hit-tested.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
-	// The selection is on the edge line, so test that line: it is within the
-	// viewport when the selection is.
 	const y = isReverse ? rangeRect.top + 1 : rangeRect.bottom - 1;
 
 	const testRange = scrollIfNoRange( container, isReverse, () =>
@@ -142,7 +140,5 @@ export default function isEdge(
 	const hasVerticalDiff = Math.abs( verticalDiff ) <= 1;
 	const hasHorizontalDiff = Math.abs( horizontalDiff ) <= 1;
 
-	return onlyVertical
-		? hasVerticalDiff
-		: hasVerticalDiff && hasHorizontalDiff;
+	return hasVerticalDiff && hasHorizontalDiff;
 }
