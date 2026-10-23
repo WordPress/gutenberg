@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+
 ### Enhancements
 
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+
+### Bug Fixes
+
+-   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 
 ### Internal
 
@@ -20,7 +28,6 @@
 
 ### New Features
 
--   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 -   Support importing `.svg` files from JavaScript. The SVG is inlined into the bundle (and into transpiled packages) and the import resolves to a `data:` URI ([#85147](https://github.com/WordPress/gutenberg/pull/85147)).
 -   Add a `{prefix}_{page_slug}_wp_admin_preload_paths` filter to the generated wp-admin page template, so a page can preload the REST API requests its JavaScript issues on mount ([#77353](https://github.com/WordPress/gutenberg/pull/77353)).
 
@@ -32,7 +39,6 @@
 ### Bug Fixes
 
 -   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
--   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 -   Add `generate_animated_image_subsizes` to the page template `/?_fields=` preload path, keeping it in sync with the `_fields` list in `@wordpress/core-data` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
 ### Internal
