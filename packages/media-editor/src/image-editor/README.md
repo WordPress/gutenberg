@@ -5,17 +5,17 @@
 The image editor is the cropper engine used by the media editor:
 
 -   **Core:** state, camera math, containment, source-region, transforms, and canvas export.
--   **React:** `<Cropper>`, `useCropperReducer`, and the optional `CropperProvider` / `useCropper` context wrapper.
+-   **React:** `<Cropper>`, `useCropperController`, and the optional `CropperProvider` / `useCropper` context wrapper.
 
-`useCropperReducer` does not provide undo/redo. The media editor's composite state layer adds history and sidebar crop options on top of the cropper reducer.
+`useCropperController` does not provide undo/redo. The media editor's composite state layer adds history and sidebar crop options on top of the cropper reducer.
 
 ## Quick Start
 
 ```tsx
-import { Cropper, useCropperReducer } from '../image-editor';
+import { Cropper, useCropperController } from '../image-editor';
 
 function ImageCropper() {
-	const controller = useCropperReducer();
+	const controller = useCropperController();
 
 	return (
 		<div style={ { width: 600, height: 400 } }>
@@ -31,7 +31,7 @@ function ImageCropper() {
 }
 ```
 
-`useCropperReducer` returns a controller object with the current `state`, named setters, `reset`, `isDirty`, and `getCroppedImage`.
+`useCropperController` returns a controller object with the current `state`, named setters, `reset`, `isDirty`, and `getCroppedImage`.
 
 ## Internal APIs
 
@@ -39,13 +39,13 @@ function ImageCropper() {
 
 Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `aspectRatio`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart`, and `onGestureEnd`.
 
-### `useCropperReducer( initialState? )`
+### `useCropperController( initialState? )`
 
 Pure React state hook for the cropper reducer. Returns a `CropperController`: current state, named setters, `reset`, `isDirty`, and `getCroppedImage`.
 
 ### `CropperProvider` / `useCropper`
 
-Convenience context wrapper around `useCropperReducer` for component trees that need shared cropper state.
+Convenience context wrapper around `useCropperController` for component trees that need shared cropper state.
 
 ## Core Helpers
 

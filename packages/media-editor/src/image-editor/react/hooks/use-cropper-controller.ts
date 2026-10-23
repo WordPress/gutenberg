@@ -75,7 +75,8 @@ function areCropperImagesEqual(
 }
 
 /**
- * Pure reducer hook for the image cropper.
+ * Controller hook for the image cropper: the state, the named setters and
+ * the export helpers, without history.
  *
  * Wraps the framework-agnostic `cropperReducer` and exposes named
  * setters (built from the shared `buildCropperSetters` factory).
@@ -86,7 +87,7 @@ function areCropperImagesEqual(
  * @param initialState Optional partial state to merge with DEFAULT_STATE.
  * @return The cropper controller — state, setters, and helpers.
  */
-export function useCropperReducer(
+export function useCropperController(
 	initialState?: Partial< CropperState >
 ): CropperController {
 	const [ state, dispatch ] = useReducer(
