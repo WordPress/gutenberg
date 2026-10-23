@@ -52,6 +52,10 @@ or via npm script:
 }
 ```
 
+### Build Concurrency
+
+By default, `wp-build` limits concurrent `esbuild` build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
+
 ### Testing Generated Styles
 
 Generated CSS output skips automatic style injection in Node-based environments
@@ -440,6 +444,18 @@ This configuration:
 - **Dependencies**: `@wordpress/*` packages are always externalized to `wp.*` globals
 - **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
 - **Asset files**: `.asset.php` files are always generated for WordPress dependency management
+
+## SVG imports
+
+SVG files can be imported from JavaScript. The file is inlined into the JavaScript and the import resolves to a `data:` URI:
+
+```js
+import logo from './logo.svg';
+
+const Example = () => <img src={ logo } alt="" />;
+```
+
+Because the SVG travels with the JavaScript, it works in bundles and in transpiled packages (`build/`, `build-module/`) without a public path or an extra file to ship. Other image formats are not supported yet.
 
 ## Output Structure
 

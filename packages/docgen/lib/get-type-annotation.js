@@ -1,11 +1,11 @@
 // See https://babeljs.io/docs/en/babel-types.
-const { types: babelTypes } = require( '@babel/core' );
+const babelTypes = require( '@babel/types' );
 
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
 /** @typedef {babelTypes.TSType} TypeAnnotation */
 /** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
-/** @typedef {import('@babel/core').Node} ASTNode */
+/** @typedef {import('@babel/types').Node} ASTNode */
 
 /**
  * @param {ExtendedTypeAnnotation} typeAnnotation
