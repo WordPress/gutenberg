@@ -1,20 +1,28 @@
-import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
-import { getValueFromObjectPath } from '../../../utils/object';
+import { getValueFromObjectPath, isPlainObject } from '../../../utils/object';
 import { getStyleLabel } from '../style-labels';
-import {
-	formatStyleValue,
-	formatBorderShorthand,
-	formatBorderRadius,
-	formatSpacingShorthand,
-	formatBlockGap,
-} from '../format-style-value';
+
+type StyleObject = Record< string, unknown >;
+
+export interface StyleSource {
+	layer: string;
+}
+
+export interface StyleChangeRow {
+	key: string;
+	path: string[];
+	label: string;
+	status: 'override' | 'local' | 'inherited';
+	sourceLabel: string | null;
+	value: unknown;
+	inheritedValue?: unknown;
+}
 
 // Low to high precedence, mirroring the `resolveStyle` merge order.
 const LAYER_ORDER = [ 'root', 'element', 'block', 'blockVariation' ];
 
 // Preset attributes a block stores outside `style`, keyed to the style path
 // they set and the preset type their slug belongs to.
-const PRESET_ATTRIBUTES = {
+const PRESET_ATTRIBUTES: Record< string, { path: string[]; type: string } > = {
 	textColor: { path: [ 'color', 'text' ], type: 'color' },
 	backgroundColor: { path: [ 'color', 'background' ], type: 'color' },
 	gradient: { path: [ 'color', 'gradient' ], type: 'gradient' },
@@ -30,15 +38,19 @@ const PRESET_ATTRIBUTES = {
  * are written in the `var:preset|type|slug` form so they format like any
  * other preset value.
  *
- * @param {Object} attributes Block attributes.
- * @return {Object} Local style values.
+ * @param attributes Block attributes.
+ * @return Local style values.
  */
-export function getLocalStyle( attributes = {} ) {
-	const style = structuredClone( attributes.style ?? {} );
+export function getLocalStyle(
+	attributes: Record< string, unknown > | null = {}
+): StyleObject {
+	const style: Record< string, StyleObject > = structuredClone(
+		isPlainObject( attributes?.style ) ? attributes.style : {}
+	) as Record< string, StyleObject >;
 	for ( const [ attribute, { path, type } ] of Object.entries(
 		PRESET_ATTRIBUTES
 	) ) {
-		const slug = attributes[ attribute ];
+		const slug = attributes?.[ attribute ];
 		if ( ! slug ) {
 			continue;
 		}
@@ -55,10 +67,10 @@ export function getLocalStyle( attributes = {} ) {
  * Whether a style value is set: not empty, and for an object, holding at
  * least one set value.
  *
- * @param {unknown} value Style value.
- * @return {boolean} Whether the value is set.
+ * @param value Style value.
+ * @return Whether the value is set.
  */
-function isSet( value ) {
+function isSet( value: unknown ): boolean {
 	if ( value === undefined || value === null || value === '' ) {
 		return false;
 	}
@@ -73,12 +85,15 @@ function isSet( value ) {
  * padding can draw its sides from several layers; the highest precedence one
  * is the one a reset would fall back to first.
  *
- * @param {Object} sources Source map from `resolveStyle`, keyed by leaf path.
- * @param {string} key     Style path joined with dots.
- * @return {?{ source: Object, leafKey: string }} Winning source and the leaf it was read from.
+ * @param sources Source map from `resolveStyle`, keyed by leaf path.
+ * @param key     Style path joined with dots.
+ * @return Winning source and the leaf it was read from.
  */
-function getWinningSource( sources, key ) {
-	let winner = null;
+function getWinningSource(
+	sources: Record< string, StyleSource > | undefined,
+	key: string
+): { source: StyleSource; leafKey: string } | null {
+	let winner: { source: StyleSource; leafKey: string } | null = null;
 	for ( const [ leafKey, source ] of Object.entries( sources ?? {} ) ) {
 		if ( leafKey !== key && ! leafKey.startsWith( `${ key }.` ) ) {
 			continue;
@@ -104,11 +119,14 @@ const NO_VALUE_KEYWORDS = [ 'inherit', 'none', 'transparent none' ];
  * Whether a resolved value is worth a row: set, and not a keyword that only
  * hands the value on.
  *
- * @param {unknown} value Style value.
- * @return {boolean} Whether the value is real.
+ * @param value Style value.
+ * @return Whether the value is real.
  */
-function hasRealValue( value ) {
-	return isSet( value ) && ! NO_VALUE_KEYWORDS.includes( value );
+function hasRealValue( value: unknown ): boolean {
+	return (
+		isSet( value ) &&
+		! ( typeof value === 'string' && NO_VALUE_KEYWORDS.includes( value ) )
+	);
 }
 
 // Style paths in the order of the inspector controls that set them. Paths not
@@ -139,7 +157,7 @@ const INSPECTOR_ORDER = [
 	'shadow',
 ];
 
-function getInspectorIndex( key ) {
+function getInspectorIndex( key: string ): number {
 	const index = INSPECTOR_ORDER.indexOf( key );
 	return index === -1 ? INSPECTOR_ORDER.length : index;
 }
@@ -151,10 +169,10 @@ const BORDER_PARTS = [ 'width', 'style', 'color' ];
  * border control sets them together. Only rows that share a status and a
  * source fold, so no row's source is lost.
  *
- * @param {Array} rows Rows from one status group.
- * @return {Array} Rows with the border parts folded where they can be.
+ * @param rows Rows from one status group.
+ * @return Rows with the border parts folded where they can be.
  */
-function foldBorderRows( rows ) {
+function foldBorderRows( rows: StyleChangeRow[] ): StyleChangeRow[] {
 	const parts = rows.filter( ( row ) =>
 		BORDER_PARTS.some( ( part ) => row.key === `border.${ part }` )
 	);
@@ -168,11 +186,11 @@ function foldBorderRows( rows ) {
 	) {
 		return rows;
 	}
-	const collect = ( field ) =>
+	const collect = ( field: 'value' | 'inheritedValue' ) =>
 		Object.fromEntries(
 			parts.map( ( row ) => [ row.path[ 1 ], row[ field ] ] )
 		);
-	const border = {
+	const border: StyleChangeRow = {
 		...parts[ 0 ],
 		key: 'border',
 		path: [ 'border' ],
@@ -198,13 +216,13 @@ function foldBorderRows( rows ) {
  * An inherited value whose source cannot be named is left out rather than
  * shown with a guessed source.
  *
- * @param {Object}                                       args
- * @param {Array}                                        args.paths          `{ path, isSupported }` entries to consider.
- * @param {Object}                                       args.localStyle     Values the block sets, from `getLocalStyle`.
- * @param {Object}                                       args.inheritedStyle Merged value from `resolveStyle`.
- * @param {Object}                                       args.sources        Source map from `resolveStyle`.
- * @param {(source: Object, context: Object) => ?string} args.describeSource Names a source for a path and the leaf it was read from.
- * @return {Array} Rows, local ones first, each group in inspector order.
+ * @param args
+ * @param args.paths          `{ path, isSupported }` entries to consider.
+ * @param args.localStyle     Values the block sets, from `getLocalStyle`.
+ * @param args.inheritedStyle Merged value from `resolveStyle`.
+ * @param args.sources        Source map from `resolveStyle`.
+ * @param args.describeSource Names a source for a path and the leaf it was read from.
+ * @return Rows, local ones first, each group in inspector order.
  */
 export function getStyleChangeRows( {
 	paths,
@@ -212,8 +230,17 @@ export function getStyleChangeRows( {
 	inheritedStyle,
 	sources,
 	describeSource,
-} ) {
-	const rows = [];
+}: {
+	paths: { path: string[]; isSupported: boolean }[];
+	localStyle: StyleObject;
+	inheritedStyle?: StyleObject;
+	sources: Record< string, StyleSource >;
+	describeSource: (
+		source: StyleSource,
+		context: { path: string[]; leafKey: string }
+	) => string | null;
+} ): StyleChangeRow[] {
+	const rows: StyleChangeRow[] = [];
 	for ( const { path, isSupported: supported } of paths ) {
 		const key = path.join( '.' );
 		const localValue = getValueFromObjectPath( localStyle, path );
@@ -252,9 +279,9 @@ export function getStyleChangeRows( {
 			...( sourceLabel && { inheritedValue } ),
 		} );
 	}
-	const ofStatus = ( status ) =>
+	const ofStatus = ( status: StyleChangeRow[ 'status' ] ) =>
 		foldBorderRows( rows.filter( ( row ) => row.status === status ) );
-	const inInspectorOrder = ( list ) =>
+	const inInspectorOrder = ( list: StyleChangeRow[] ) =>
 		list.sort(
 			( a, b ) => getInspectorIndex( a.key ) - getInspectorIndex( b.key )
 		);
@@ -267,58 +294,69 @@ export function getStyleChangeRows( {
 	];
 }
 
-const BORDER_SIDE_KEYS = [
-	'border.top',
-	'border.right',
-	'border.bottom',
-	'border.left',
-];
-
 /**
- * Whether a style path holds a colour or gradient, so its value can show a
- * swatch.
+ * Returns the style paths a reset of a row clears. A folded Border row stands
+ * for its width, style and colour parts.
  *
- * @param {string[]} path Style path.
- * @return {boolean} Whether the path is a colour.
+ * @param row Row from `getStyleChangeRows`.
+ * @return Style paths to clear.
  */
-function isColorPath( path ) {
-	const last = path[ path.length - 1 ];
-	if ( last === 'color' ) {
-		return true;
-	}
-	return (
-		path[ path.length - 2 ] === 'color' &&
-		[ 'text', 'background', 'gradient' ].includes( last )
-	);
+function getRowStylePaths( row: StyleChangeRow ): string[][] {
+	return row.key === 'border'
+		? BORDER_PARTS.map( ( part ) => [ 'border', part ] )
+		: [ row.path ];
 }
 
 /**
- * Returns how a row's value reads: readable text, and a CSS colour for a
- * swatch where the path is a colour.
+ * Deletes the value at a path, then any parent the delete leaves empty.
  *
- * @param {string[]} path  Style path.
- * @param {unknown}  value Raw style value.
- * @return {{ text: string, color?: string }} Display parts.
+ * @param object Object to change in place.
+ * @param path   Path of the value to delete.
  */
-export function getStyleValueDisplay( path, value ) {
-	const key = path.join( '.' );
-	let text;
-	if ( key === 'border' || BORDER_SIDE_KEYS.includes( key ) ) {
-		text = formatBorderShorthand( value );
-	} else if ( key === 'border.radius' ) {
-		text = formatBorderRadius( value );
-	} else if ( key === 'spacing.padding' || key === 'spacing.margin' ) {
-		text = formatSpacingShorthand( value );
-	} else if ( key === 'spacing.blockGap' ) {
-		text = formatBlockGap( value );
-	} else if ( value && typeof value === 'object' && value.url ) {
-		text = value.title || value.url.split( '/' ).pop();
-	} else {
-		text = formatStyleValue( value );
+function unsetPath( object: unknown, path: string[] ) {
+	const [ key, ...rest ] = path;
+	if ( ! isPlainObject( object ) || ! ( key in object ) ) {
+		return;
 	}
-	const color =
-		isColorPath( path ) && typeof value === 'string'
-			? getCSSValueFromRawStyle( value )
-			: undefined;
-	return { text, color };
+	if ( rest.length ) {
+		unsetPath( object[ key ], rest );
+		const child = object[ key ];
+		if ( ! isPlainObject( child ) || Object.keys( child ).length ) {
+			return;
+		}
+	}
+	delete object[ key ];
+}
+
+/**
+ * Returns the attributes that reset the given rows on a block, so each style
+ * falls back to the value it inherits. Paths outside the rows, such as
+ * `style.css` and state styles, are kept.
+ *
+ * @param attributes Block attributes.
+ * @param rows       Rows set on the block, from `getStyleChangeRows`.
+ * @return Attributes to pass to `updateBlockAttributes`.
+ */
+export function getResetAttributes(
+	attributes: Record< string, unknown > | null,
+	rows: StyleChangeRow[]
+): Record< string, unknown > {
+	const style = structuredClone(
+		isPlainObject( attributes?.style ) ? attributes.style : {}
+	);
+	const nextAttributes: Record< string, unknown > = {};
+	for ( const row of rows ) {
+		for ( const path of getRowStylePaths( row ) ) {
+			unsetPath( style, path );
+			for ( const [ attribute, preset ] of Object.entries(
+				PRESET_ATTRIBUTES
+			) ) {
+				if ( preset.path.join( '.' ) === path.join( '.' ) ) {
+					nextAttributes[ attribute ] = undefined;
+				}
+			}
+		}
+	}
+	nextAttributes.style = Object.keys( style ).length ? style : undefined;
+	return nextAttributes;
 }

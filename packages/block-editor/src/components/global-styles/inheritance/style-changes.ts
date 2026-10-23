@@ -6,6 +6,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../../../store';
 import { getValueFromObjectPath } from '../../../utils/object';
 import {
@@ -14,6 +15,7 @@ import {
 } from '../inherited-value-context';
 import { getStyleSourceLabel } from './source-label';
 import { getLocalStyle, getStyleChangeRows } from './style-change-rows';
+import type { StyleChangeRow } from './style-change-rows';
 
 const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 
@@ -24,15 +26,16 @@ const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ];
  * duotone under `color.duotone`, so its local value would never line up.
  */
 const STYLE_PATHS = ( () => {
-	const properties = {
-		...__EXPERIMENTAL_STYLE_PROPERTY,
-		blockGap: {
-			value: [ 'spacing', 'blockGap' ],
-			support: [ 'spacing', 'blockGap' ],
-		},
-		shadow: { value: [ 'shadow' ], support: [ 'shadow' ] },
-	};
-	const paths = new Map();
+	const properties: Record< string, { value: string[]; support: string[] } > =
+		{
+			...__EXPERIMENTAL_STYLE_PROPERTY,
+			blockGap: {
+				value: [ 'spacing', 'blockGap' ],
+				support: [ 'spacing', 'blockGap' ],
+			},
+			shadow: { value: [ 'shadow' ], support: [ 'shadow' ] },
+		};
+	const paths = new Map< string, { path: string[]; support: string[] } >();
 	for ( const { value, support } of Object.values( properties ) ) {
 		const path =
 			value[ 0 ] === 'border' && BORDER_SIDES.includes( value[ 1 ] )
@@ -54,11 +57,11 @@ const STYLE_PATHS = ( () => {
 /**
  * Whether a block supports the control for a style path.
  *
- * @param {string}   blockName Block name.
- * @param {string[]} support   Block support path.
- * @return {boolean} Whether the support is on.
+ * @param blockName Block name.
+ * @param support   Block support path.
+ * @return Whether the support is on.
  */
-function isSupported( blockName, support ) {
+function isSupported( blockName: string, support: string[] ): boolean {
 	const value = getBlockSupport( blockName, support );
 	if ( value ) {
 		return true;
@@ -77,18 +80,26 @@ function isSupported( blockName, support ) {
  * Finds which element layer supplied a leaf, highest precedence first, by
  * reading the same Global Styles data `resolveStyle` merged.
  *
- * @param {?Object}  globalStyles Global Styles config.
- * @param {string[]} elements     Element layers, low to high precedence.
- * @param {string}   leafKey      Leaf path joined with dots.
- * @return {?string} Element name, or `undefined`.
+ * @param globalStyles Global Styles config.
+ * @param elements     Element layers, low to high precedence.
+ * @param leafKey      Leaf path joined with dots.
+ * @return Element name, or `undefined`.
  */
-function findElementForLeaf( globalStyles, elements, leafKey ) {
+function findElementForLeaf(
+	globalStyles: GlobalStylesConfig | null,
+	elements: string[],
+	leafKey: string
+): string | undefined {
 	return [ ...elements ]
 		.reverse()
 		.find(
 			( element ) =>
 				getValueFromObjectPath(
-					globalStyles?.styles?.elements?.[ element ],
+					(
+						globalStyles?.styles?.elements as
+							| Record< string, Record< string, unknown > >
+							| undefined
+					 )?.[ element ],
 					leafKey
 				) !== undefined
 		);
@@ -99,17 +110,21 @@ function findElementForLeaf( globalStyles, elements, leafKey ) {
  * render inside a `BlockEditContextProvider` for the block, as
  * `useResolvedStyle` reads the client ID from it.
  *
- * @param {string} clientId Block client ID.
- * @return {Array} Rows from `getStyleChangeRows`.
+ * @param clientId Block client ID.
+ * @return Rows from `getStyleChangeRows`.
  */
-export function useStyleChangeRows( clientId ) {
+export function useStyleChangeRows( clientId: string ): StyleChangeRow[] {
 	const { blockName, attributes, registeredStyles } = useSelect(
 		( select ) => {
-			const name = select( blockEditorStore ).getBlockName( clientId );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const name: string | null = getBlockName( clientId );
 			return {
 				blockName: name,
-				attributes:
-					select( blockEditorStore ).getBlockAttributes( clientId ),
+				attributes: getBlockAttributes( clientId ) as Record<
+					string,
+					unknown
+				> | null,
 				registeredStyles: name
 					? select( blocksStore ).getBlockStyles( name )
 					: undefined,
@@ -117,7 +132,7 @@ export function useStyleChangeRows( clientId ) {
 		},
 		[ clientId ]
 	);
-	const className = attributes?.className;
+	const className = attributes?.className as string | undefined;
 	const { value: inheritedStyle, sources } = useResolvedStyle(
 		blockName,
 		className

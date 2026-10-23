@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
 	getLocalStyle,
+	getResetAttributes,
 	getStyleChangeRows,
-	getStyleValueDisplay,
 } from '../style-change-rows';
+import type { StyleChangeRow, StyleSource } from '../style-change-rows';
 
-const describeSource = ( source ) => `${ source.layer } source`;
+const describeSource = ( source: StyleSource ) => `${ source.layer } source`;
 
 const PATHS = [
 	{ path: [ 'color', 'text' ], isSupported: true },
@@ -256,9 +257,6 @@ describe( 'getStyleChangeRows', () => {
 				value: border,
 			} ),
 		] );
-		expect(
-			getStyleValueDisplay( rows[ 0 ].path, rows[ 0 ].value ).text
-		).toBe( '1px solid currentColor' );
 	} );
 
 	it( 'keeps border parts apart when their sources differ', () => {
@@ -282,46 +280,69 @@ describe( 'getStyleChangeRows', () => {
 	} );
 } );
 
-describe( 'getStyleValueDisplay', () => {
-	it( 'shows the CSS inherit keyword as it is', () => {
-		expect(
-			getStyleValueDisplay( [ 'typography', 'fontSize' ], 'inherit' )
-		).toEqual( { text: 'inherit', color: undefined } );
+describe( 'getResetAttributes', () => {
+	const row = ( path: string[] ): StyleChangeRow => ( {
+		key: path.join( '.' ),
+		path,
+		label: path.join( '.' ),
+		status: 'local',
+		sourceLabel: null,
+		value: undefined,
 	} );
 
-	it( 'names a preset and gives a colour a swatch', () => {
+	it( 'clears one style and keeps the rest', () => {
 		expect(
-			getStyleValueDisplay(
-				[ 'color', 'background' ],
-				'var:preset|color|accent-5'
+			getResetAttributes(
+				{
+					style: {
+						color: { text: '#c0f', background: '#fff' },
+						css: 'color: red;',
+					},
+				},
+				[ row( [ 'color', 'text' ] ) ]
 			)
 		).toEqual( {
-			text: 'Accent 5',
-			color: 'var(--wp--preset--color--accent-5)',
+			style: { color: { background: '#fff' }, css: 'color: red;' },
 		} );
 	} );
 
-	it( 'gives no swatch to a value that is not a colour', () => {
+	it( 'clears the preset attribute that sets the style', () => {
 		expect(
-			getStyleValueDisplay( [ 'typography', 'lineHeight' ], '1.6' )
-		).toEqual( { text: '1.6', color: undefined } );
+			getResetAttributes( { textColor: 'vivid-red' }, [
+				row( [ 'color', 'text' ] ),
+			] )
+		).toEqual( { textColor: undefined, style: undefined } );
 	} );
 
-	it( 'shortens composite values', () => {
+	it( 'clears every part of a folded Border row', () => {
 		expect(
-			getStyleValueDisplay( [ 'spacing', 'padding' ], {
-				top: '1rem',
-				right: '2rem',
-				bottom: '1rem',
-				left: '2rem',
-			} ).text
-		).toBe( '1rem 2rem' );
+			getResetAttributes(
+				{
+					borderColor: 'accent-1',
+					style: {
+						border: { width: '1px', style: 'solid', radius: '4px' },
+					},
+				},
+				[ row( [ 'border' ] ) ]
+			)
+		).toEqual( {
+			borderColor: undefined,
+			style: { border: { radius: '4px' } },
+		} );
+	} );
+
+	it( 'resets several rows at once', () => {
 		expect(
-			getStyleValueDisplay( [ 'border', 'top' ], {
-				width: '1px',
-				style: 'solid',
-				color: '#000',
-			} ).text
-		).toBe( '1px solid #000' );
+			getResetAttributes(
+				{
+					fontSize: 'large',
+					style: { spacing: { padding: { top: '1rem' } } },
+				},
+				[
+					row( [ 'typography', 'fontSize' ] ),
+					row( [ 'spacing', 'padding' ] ),
+				]
+			)
+		).toEqual( { fontSize: undefined, style: undefined } );
 	} );
 } );
