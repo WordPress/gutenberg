@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Flex layout: Add Space around and Space evenly justification options, using a select control with icons and labels in the Layout panel ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+-   `JustifyContentControl`: Include Space around and Space evenly in the default controls ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+
 ### Enhancements
 
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
@@ -43,8 +48,6 @@
 
 ### New Features
 
--   Flex layout: Add Space around and Space evenly justification options, using a select control with icons and labels in the Layout panel ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
--   `JustifyContentControl`: Include Space around and Space evenly in the default controls ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
 -   Typography: Add a Gradient control that fills the text with a gradient, shown when `settings.background.backgroundClip` allows the `text` value, or when the block declares the support and a theme has not set it ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 -   Background: Add a Clip control for choosing the box a background is painted into, shown when `settings.background.backgroundClip` allows a value other than `text` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
