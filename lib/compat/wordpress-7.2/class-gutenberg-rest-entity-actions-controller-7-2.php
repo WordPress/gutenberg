@@ -183,14 +183,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 		$kind = $request->get_param( 'kind' );
 		$name = $request->get_param( 'name' );
 
-		$script_modules = array();
-		foreach ( wp_get_registered_entity_action_modules( $kind, $name ) as $module => $action_ids ) {
-			$script_modules[] = array(
-				// A numeric module id is an integer as an array key.
-				'id'      => (string) $module,
-				'actions' => array_values( $action_ids ),
-			);
-		}
+		$script_modules = wp_get_registered_entity_action_modules( $kind, $name );
 
 		$response = array(
 			'kind'           => $kind,
