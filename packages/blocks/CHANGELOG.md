@@ -9,7 +9,7 @@
 
 ### Internal
 
--   Add the private `isPlainTextPaste` API, which tells whether `pasteHandler` reads a clipboard as plain text and parses it as Markdown ([#78956](https://github.com/WordPress/gutenberg/issues/78956)).
+-   Add the private `isPlainTextPaste` API, which tells whether `pasteHandler` reads a clipboard as plain text and parses it as Markdown ([#85466](https://github.com/WordPress/gutenberg/pull/85466)).
 
 ## 17.0.0 (2026-10-20)
 
