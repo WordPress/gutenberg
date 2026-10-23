@@ -219,7 +219,7 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	/**
 	 * @return array[] Context and link combinations.
 	 */
-	public function data_render_with_post_context() {
+	public static function data_render_with_post_context() {
 		return array(
 			'different global post'       => array( true, false ),
 			'different global post, link' => array( true, true ),
