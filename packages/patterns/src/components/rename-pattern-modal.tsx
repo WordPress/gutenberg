@@ -1,6 +1,7 @@
 import { Button, Modal, TextControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Block as PatternRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -45,13 +46,13 @@ export default function RenamePatternModal( {
 			setName( '' );
 			onClose?.();
 
-			const savedRecord = await saveSpecifiedEntityEdits(
+			const savedRecord = ( await saveSpecifiedEntityEdits(
 				'postType',
 				pattern.type,
 				pattern.id,
 				[ 'title' ],
 				{ throwOnError: true }
-			);
+			) ) as PatternRecord< 'edit' >;
 
 			onSuccess?.( savedRecord );
 

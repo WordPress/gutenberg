@@ -1,5 +1,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Term } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { CATEGORY_SLUG } from './components/category-selector';
 import type {
@@ -72,12 +73,12 @@ export function useAddPatternCategory(): {
 			const termData = existingTerm
 				? { name: existingTerm.label, slug: existingTerm.name }
 				: { name: term };
-			const newTerm = await saveEntityRecord(
+			const newTerm = ( await saveEntityRecord(
 				'taxonomy',
 				CATEGORY_SLUG,
 				termData,
 				{ throwOnError: true }
-			);
+			) ) as Term< 'edit' >;
 			invalidateResolution( 'getUserPatternCategories' );
 			return newTerm.id;
 		} catch ( error ) {

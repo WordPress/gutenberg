@@ -1,6 +1,7 @@
 import { Modal, Button, TextControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Term } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useId, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -83,7 +84,8 @@ export default function RenamePatternCategoryModal( {
 			// normalized for use alongside template part areas, core pattern
 			// categories etc. As a result we won't just destructure the passed
 			// category object.
-			const savedRecord = await saveEntityRecord(
+			// Without `throwOnError`, a failed save resolves to `undefined`.
+			const savedRecord = ( await saveEntityRecord(
 				'taxonomy',
 				CATEGORY_SLUG,
 				{
@@ -91,7 +93,7 @@ export default function RenamePatternCategoryModal( {
 					slug: category.slug,
 					name,
 				}
-			);
+			) ) as Term< 'edit' > | undefined;
 
 			invalidateResolution( 'getUserPatternCategories' );
 			onSuccess?.( savedRecord );

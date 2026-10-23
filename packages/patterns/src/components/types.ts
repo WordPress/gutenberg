@@ -124,5 +124,5 @@ export interface RenamePatternCategoryModalProps extends PassedModalProps {
 	};
 	onClose: () => void;
 	onError?: () => void;
-	onSuccess?: ( savedRecord: Term< 'edit' > ) => void;
+	onSuccess?: ( savedRecord: Term< 'edit' > | undefined ) => void;
 }
