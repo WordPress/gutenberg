@@ -25,6 +25,7 @@
 
 ### Enhancements
 
+-   Expose a script's exports on its global as read-only data properties, holding the same values, instead of esbuild's getters, which forwarded to the getters of the module's own exports. Every use of a script's export by another script went through them, which was costly while the page loads ([#85180](https://github.com/WordPress/gutenberg/pull/85180)).
 -   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 
 ### Bug Fixes
