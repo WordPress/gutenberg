@@ -72,6 +72,7 @@ export const code = {
 					onUse={ onClick }
 				/>
 				<RichTextToolbarButton
+					name="code"
 					icon={ codeIcon }
 					title={ title }
 					onClick={ onClick }

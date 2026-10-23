@@ -194,6 +194,7 @@ function Edit( {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="math"
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }
