@@ -293,14 +293,22 @@ export default {
 					minimumColumnWidth: resetLayout?.minimumColumnWidth,
 				} )
 			);
-		const resetColumnsAndRows = () =>
+		const resetColumnsAndRows = () => {
+			const columnCount = resetLayout?.columnCount ?? defaultColumnCount;
+			// A manual grid with cells of a fixed size keeps its blocks where
+			// they are, as when the count is typed, and gets as many rows as
+			// keep it about as tall.
+			if ( changeGridColumnCount( layout, columnCount, onChange ) ) {
+				return;
+			}
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
+					columnCount,
 					rowCount: resetLayout?.rowCount,
 				} )
 			);
+		};
 		const resetMinimumColumnWidth = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -944,7 +952,10 @@ function GridLayoutTypeControl( { layout, onChange }: LayoutControlProps ) {
 		}
 		onChange( {
 			...layout,
-			columnCount: value === 'manual' ? tempColumnCount : tempColumnCount,
+			// The column count is kept, so that a manual grid's blocks keep
+			// the places they were given for it. Only an auto grid without a
+			// count takes the saved one.
+			columnCount: columnCount || tempColumnCount,
 			rowCount: value === 'manual' ? tempRowCount : undefined,
 			isManualPlacement: value === 'manual' ? true : undefined,
 			minimumColumnWidth:
