@@ -234,6 +234,47 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_supports_legacy_grid_default_columns() {
+		$attributes = array(
+			'displayFeaturedImage' => false,
+			'postsToShow'          => 5,
+			'orderBy'              => 'date',
+			'order'                => 'DESC',
+			'excerptLength'        => 0,
+			'postLayout'           => 'grid',
+		);
+
+		$markup = gutenberg_render_block_core_latest_posts( $attributes );
+
+		$this->assertStringContainsString( 'is-grid', $markup );
+		$this->assertStringContainsString( 'columns-3', $markup );
+		$this->assertStringNotContainsString( 'has-native-responsive-grid', $markup );
+	}
+
+	/**
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_does_not_apply_legacy_columns_to_layout_support() {
+		$attributes = array(
+			'displayFeaturedImage' => false,
+			'postsToShow'          => 5,
+			'orderBy'              => 'date',
+			'order'                => 'DESC',
+			'excerptLength'        => 0,
+			'layout'               => array(
+				'type' => 'grid',
+			),
+		);
+
+		$markup = gutenberg_render_block_core_latest_posts( $attributes );
+
+		$this->assertStringContainsString( 'is-grid', $markup );
+		$this->assertStringNotContainsString( 'columns-3', $markup );
+	}
+
+	/**
 	 * Tests that recursion is prevented when a Latest Posts block displays itself.
 	 *
 	 * When a Latest Posts block is added to a post and that post is then displayed
