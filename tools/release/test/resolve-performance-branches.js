@@ -258,8 +258,8 @@ describe( 'resolveShards', () => {
 		.readdirSync(
 			path.join( __dirname, '../../../test/performance/specs' )
 		)
-		.filter( ( file ) => file.endsWith( '.spec.js' ) )
-		.map( ( file ) => path.basename( file, '.spec.js' ) );
+		.filter( ( file ) => /\.spec\.[jt]s$/.test( file ) )
+		.map( ( file ) => file.replace( /\.spec\.[jt]s$/, '' ) );
 
 	it( 'covers every spec file in the repository exactly once', () => {
 		const shards = resolveShards( specs );
