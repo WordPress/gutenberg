@@ -156,15 +156,13 @@ const inputRules: RichTextEventListener = ( props ) => ( element ) => {
 
 		const transformed = __unstableDisableFormatInputRules
 			? preventEventDiscovery( value )
-			: formatTypes.reduce(
-				( accumulator, { __unstableInputRule } ) => {
+			: formatTypes.reduce( ( accumulator, { __unstableInputRule } ) => {
 					if ( __unstableInputRule ) {
 						accumulator = __unstableInputRule( accumulator );
 					}
 
 					return accumulator;
-				}, preventEventDiscovery( value )
-			);
+				}, preventEventDiscovery( value ) );
 
 		const {
 			__unstableMarkLastChangeAsPersistent,
