@@ -35,6 +35,7 @@
 -   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
 -   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items and their supporting content ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 
 ### Bug Fixes
 
