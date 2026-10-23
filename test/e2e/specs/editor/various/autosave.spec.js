@@ -112,6 +112,65 @@ test.describe( 'Autosave', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should keep the current content as a revision when restoring the backup', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+
+		// Make a backup, then edit further and autosave. A draft's autosave
+		// updates the post without adding a revision.
+		await page.keyboard.type( ' backup' );
+		const backup = await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.autosave( { local: true } );
+			const key = Object.keys( window.sessionStorage )[ 0 ];
+			return [ key, window.sessionStorage.getItem( key ) ];
+		} );
+		await page.keyboard.type( ' newer' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+
+		// The older backup is left behind, as by another tab.
+		await page.evaluate(
+			( [ key, value ] ) => window.sessionStorage.setItem( key, value ),
+			backup
+		);
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save backup' },
+			},
+		] );
+
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }/revisions`,
+			params: { context: 'edit' },
+		} );
+		expect( revisions[ 0 ].content.raw ).toContain(
+			'before save backup newer'
+		);
+	} );
+
 	test( 'should keep the backup when its view is closed', async ( {
 		editor,
 		page,
