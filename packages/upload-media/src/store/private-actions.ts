@@ -929,19 +929,8 @@ export function prepareItem( id: QueueItemId ) {
 			// source EXIF block carries over into the JPEG; the canvas
 			// encoder used otherwise produces a JPEG without metadata.
 			const encode: JpegEncoder | undefined = isClientSideMediaSupported()
-				? async ( canvas, quality ) =>
-						exceedsClientProcessingMemory( {
-							width: canvas.width,
-							height: canvas.height,
-							interlaced: false,
-						} )
-							? null
-							: vipsEncodeCanvasAsJpeg(
-									id,
-									canvas,
-									heicFile,
-									quality
-								)
+				? ( canvas, quality ) =>
+						vipsEncodeCanvasAsJpeg( id, canvas, heicFile, quality )
 				: undefined;
 			try {
 				heicJpeg = await canvasConvertToJpeg(

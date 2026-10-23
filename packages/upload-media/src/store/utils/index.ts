@@ -1,3 +1,4 @@
+import { exceedsClientProcessingMemory } from '../../feature-detection';
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
@@ -136,21 +137,30 @@ export async function vipsConvertImageFormat(
  * Encodes a decoded canvas as a JPEG using vips in a web worker, copying the
  * EXIF block from the source file the canvas was decoded from.
  *
+ * Declines with null when the image is too large to hold in wasm-vips memory.
+ * The raw pixels can't be shrunk on load, so the tighter interlaced budget
+ * applies.
+ *
  * @param id      Queue item ID.
  * @param canvas  Canvas holding the decoded, upright image.
  * @param source  The image file the canvas was decoded from.
  * @param quality JPEG quality (0-1).
- * @return JPEG data.
+ * @return JPEG data, or null if the image is too large.
  */
 export async function vipsEncodeCanvasAsJpeg(
 	id: QueueItemId,
 	canvas: OffscreenCanvas,
 	source: File,
 	quality: number
-): Promise< Blob > {
+): Promise< Blob | null > {
+	const { width, height } = canvas;
+	if (
+		exceedsClientProcessingMemory( { width, height, interlaced: true } )
+	) {
+		return null;
+	}
 	const { vipsEncodePixelsAsJpeg: encodePixelsAsJpeg } =
 		await loadVipsModule();
-	const { width, height } = canvas;
 	const ctx = canvas.getContext( '2d' );
 	if ( ! ctx ) {
 		throw new Error( 'Could not get canvas 2d context' );
