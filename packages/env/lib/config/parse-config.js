@@ -398,7 +398,10 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
 	}
 	if ( rawConfig.runtime !== undefined ) {
-		const availableRuntimes = [ 'docker', 'playground' ];
+		// Required here rather than at the top of the file to avoid a circular
+		// dependency: the runtime modules load the config modules.
+		const { getAvailableRuntimes } = require( '../runtime' );
+		const availableRuntimes = getAvailableRuntimes();
 		if ( ! availableRuntimes.includes( rawConfig.runtime ) ) {
 			throw new ValidationError(
 				`Invalid ${ configFile }: "runtime" must be one of: ${ availableRuntimes.join(
