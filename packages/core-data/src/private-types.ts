@@ -13,7 +13,7 @@ import type {
 	ReceiveItemsAction,
 	RemoveItemsAction,
 } from './queried-data/types';
-import type { EntityConfig, EntityProviderProps } from './types';
+import type { EntityConfig, EntityProviderProps, RestRecord } from './types';
 
 /**
  * The IDs of the provided entities, by kind and name, and their revisions
@@ -140,7 +140,7 @@ export type Action =
 	| {
 			type: 'RECEIVE_REGISTERED_POST_META';
 			postType: string;
-			registeredPostMeta: Record< string, unknown >;
+			registeredPostMeta: Record< string, unknown > | undefined;
 	  }
 	| {
 			type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS';
@@ -258,3 +258,75 @@ export type CoreDataThunkArgs = ThunkArgs<
 	typeof import( './private-selectors' ),
 	typeof import( './private-actions' )
 >;
+
+/**
+ * A modifier to apply to a media item.
+ */
+export interface MediaEditModifier {
+	/**
+	 * The type of modifier.
+	 */
+	type: string;
+	/**
+	 * The arguments of the modifier.
+	 */
+	args: Record< string, unknown >;
+}
+
+/**
+ * Edits to apply to a duplicated media item.
+ */
+export interface MediaEdits {
+	/**
+	 * The URL of the media item.
+	 */
+	src: string;
+	/**
+	 * The modifiers to apply to the media item.
+	 */
+	modifiers?: Array< MediaEditModifier >;
+}
+
+/**
+ * The attachment the REST API responds with when editing a media item.
+ */
+export type EditedMediaRecord = RestRecord & {
+	id: number;
+	source_url: string;
+};
+
+/**
+ * A dirty record to save, or an edited property of the site entity.
+ */
+export interface SavableRecord {
+	kind: string;
+	name: string;
+	key?: string | number;
+	property?: string;
+}
+
+/**
+ * Options of `saveDirtyEntities`.
+ */
+export interface SaveDirtyEntitiesOptions {
+	/**
+	 * Callback when saving happens.
+	 */
+	onSave?: () => unknown;
+	/**
+	 * Array of dirty entities.
+	 */
+	dirtyEntityRecords?: Array< SavableRecord >;
+	/**
+	 * Array of entities to skip saving.
+	 */
+	entitiesToSkip?: Array< SavableRecord >;
+	/**
+	 * Callback when the actions is called. It should be consolidated with `onSave`.
+	 */
+	close?: ( entities: Array< SavableRecord > ) => void;
+	/**
+	 * Optional custom success notice content. Defaults to 'Site updated.'.
+	 */
+	successNoticeContent?: string;
+}

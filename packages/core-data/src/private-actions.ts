@@ -3,20 +3,33 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import type { ConnectionStatus } from '@wordpress/sync';
 import { STORE_NAME } from './name';
 import { getEntitySyncManager } from './entity-sync';
 import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
+import type {
+	ActionOf,
+	CoreDataThunkArgs,
+	EditedMediaRecord,
+	MediaEdits,
+	SaveDirtyEntitiesOptions,
+} from './private-types';
+import type { DeleteEntityRecordOptions, EntityConfig } from './types';
 
 /**
  * Returns an action object used in signalling that the registered post meta
  * fields for a post type have been received.
  *
- * @param {string} postType           Post type slug.
- * @param {Object} registeredPostMeta Registered post meta.
+ * @param postType           Post type slug.
+ * @param registeredPostMeta Registered post meta.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function receiveRegisteredPostMeta( postType, registeredPostMeta ) {
+export function receiveRegisteredPostMeta(
+	postType: string,
+	registeredPostMeta: Record< string, unknown > | undefined
+): ActionOf< 'RECEIVE_REGISTERED_POST_META' > {
 	return {
 		type: 'RECEIVE_REGISTERED_POST_META',
 		postType,
@@ -25,35 +38,27 @@ export function receiveRegisteredPostMeta( postType, registeredPostMeta ) {
 }
 
 /**
- * @typedef {Object} Modifier
- * @property {string} [type] - The type of modifier.
- * @property {Object} [args] - The arguments of the modifier.
- */
-
-/**
- * @typedef {Object} Edits
- * @property {string}     [src]       - The URL of the media item.
- * @property {Modifier[]} [modifiers] - The modifiers to apply to the media item.
- */
-
-/**
  * Duplicates a media (attachment) entity record and, optionally, modifies it.
  *
- * @param {string}   recordId                Entity record ID.
- * @param {Edits}    edits                   Edits to apply to the record.
- * @param {Object}   options                 Options object.
- * @param {Function} options.__unstableFetch Custom fetch function.
- * @param {boolean}  options.throwOnError    Whether to throw an error if the request fails.
+ * @param recordId                Entity record ID.
+ * @param edits                   Edits to apply to the record.
+ * @param options                 Options object.
+ * @param options.__unstableFetch Custom fetch function.
+ * @param options.throwOnError    Whether to throw an error if the request fails.
  *
- * @return {Promise} Promise resolving to the updated record.
+ * @return Promise resolving to the updated record.
  */
 export const editMediaEntity =
 	(
-		recordId,
-		edits = {},
-		{ __unstableFetch = apiFetch, throwOnError = false } = {}
+		recordId: string | number,
+		// The endpoint rejects the empty default, which only a call without edits sends.
+		edits: MediaEdits | Record< string, never > = {},
+		{
+			__unstableFetch = apiFetch,
+			throwOnError = false,
+		}: DeleteEntityRecordOptions = {}
 	) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		if ( ! recordId ) {
 			return;
 		}
@@ -61,7 +66,8 @@ export const editMediaEntity =
 		const kind = 'postType';
 		const name = 'attachment';
 
-		const configs = await resolveSelect.getEntitiesConfig( kind );
+		const configs: Array< EntityConfig > =
+			await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -76,8 +82,8 @@ export const editMediaEntity =
 			{ exclusive: true }
 		);
 
-		let updatedRecord;
-		let error;
+		let updatedRecord: EditedMediaRecord | undefined;
+		let error: unknown;
 		let hasError = false;
 
 		try {
@@ -90,13 +96,14 @@ export const editMediaEntity =
 
 			try {
 				const path = `${ entityConfig.baseURL }/${ recordId }/edit`;
-				const newRecord = await __unstableFetch( {
+				// The REST API responds with the duplicated attachment.
+				const newRecord = ( await __unstableFetch( {
 					path,
 					method: 'POST',
 					data: {
 						...edits,
 					},
-				} );
+				} ) ) as EditedMediaRecord | undefined;
 
 				if ( newRecord ) {
 					dispatch.receiveEntityRecords(
@@ -135,11 +142,13 @@ export const editMediaEntity =
 /**
  * Returns an action object used to receive editor settings.
  *
- * @param {Object} settings Editor settings object.
+ * @param settings Editor settings object.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function receiveEditorSettings( settings ) {
+export function receiveEditorSettings(
+	settings: Record< string, unknown >
+): ActionOf< 'RECEIVE_EDITOR_SETTINGS' > {
 	return {
 		type: 'RECEIVE_EDITOR_SETTINGS',
 		settings,
@@ -149,11 +158,13 @@ export function receiveEditorSettings( settings ) {
 /**
  * Returns an action object used to receive editor assets.
  *
- * @param {Object} assets Editor assets object.
+ * @param assets Editor assets object.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function receiveEditorAssets( assets ) {
+export function receiveEditorAssets(
+	assets: Record< string, unknown >
+): ActionOf< 'RECEIVE_EDITOR_ASSETS' > {
 	return {
 		type: 'RECEIVE_EDITOR_ASSETS',
 		assets,
@@ -164,13 +175,13 @@ export function receiveEditorAssets( assets ) {
  * Returns an action object used to set whether collaboration is supported.
  * When set to false, also disconnects all sync entities.
  *
- * @param {boolean} supported Whether collaboration is supported.
+ * @param supported Whether collaboration is supported.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export const setCollaborationSupported =
-	( supported ) =>
-	( { dispatch } ) => {
+	( supported: boolean ) =>
+	( { dispatch }: CoreDataThunkArgs ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 		if ( ! supported ) {
 			getEntitySyncManager()?.unloadAll();
@@ -180,13 +191,17 @@ export const setCollaborationSupported =
 /**
  * Returns an action object used to receive view config.
  *
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {Object} config View config object.
+ * @param kind   Entity kind.
+ * @param name   Entity name.
+ * @param config View config object.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function receiveViewConfig( kind, name, config ) {
+export function receiveViewConfig(
+	kind: string,
+	name: string,
+	config: Record< string, unknown >
+): ActionOf< 'RECEIVE_VIEW_CONFIG' > {
 	return {
 		type: 'RECEIVE_VIEW_CONFIG',
 		kind,
@@ -198,13 +213,17 @@ export function receiveViewConfig( kind, name, config ) {
 /**
  * Returns an action object used to receive the fields config of an entity.
  *
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {Object} config Fields config, as returned by the `/wp/v2/entity-fields` route.
+ * @param kind   Entity kind.
+ * @param name   Entity name.
+ * @param config Fields config, as returned by the `/wp/v2/entity-fields` route.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function receiveFieldsConfig( kind, name, config ) {
+export function receiveFieldsConfig(
+	kind: string,
+	name: string,
+	config: FieldsConfig
+): ActionOf< 'RECEIVE_FIELDS_CONFIG' > {
 	return {
 		type: 'RECEIVE_FIELDS_CONFIG',
 		kind,
@@ -216,13 +235,17 @@ export function receiveFieldsConfig( kind, name, config ) {
 /**
  * Returns an action object used to receive the actions config of an entity.
  *
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {Object} config Actions config, as returned by the `/wp/v2/entity-actions` route.
+ * @param kind   Entity kind.
+ * @param name   Entity name.
+ * @param config Actions config, as returned by the `/wp/v2/entity-actions` route.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function receiveEntityActionsConfig( kind, name, config ) {
+export function receiveEntityActionsConfig(
+	kind: string,
+	name: string,
+	config: EntityActionsConfig
+): ActionOf< 'RECEIVE_ENTITY_ACTIONS_CONFIG' > {
 	return {
 		type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
 		kind,
@@ -236,13 +259,13 @@ export function receiveEntityActionsConfig( kind, name, config ) {
  * it syncs, so the level takes its place in core-data's undo history next to
  * the edits core-data records itself.
  *
- * @param {string}        kind     Kind of the record.
- * @param {string}        name     Name of the record.
- * @param {number|string} recordId Id of the record.
+ * @param kind     Kind of the record.
+ * @param name     Name of the record.
+ * @param recordId Id of the record.
  */
 export const recordSyncUndoLevel =
-	( kind, name, recordId ) =>
-	( { select, dispatch } ) => {
+	( kind: string, name: string, recordId: number | string ) =>
+	( { select, dispatch }: CoreDataThunkArgs ) => {
 		select
 			.getUndoManager()
 			.addRecord( createSyncUndoLevelRecord( kind, name, recordId ) );
@@ -257,14 +280,19 @@ export const recordSyncUndoLevel =
 /**
  * Returns an action object used to set the sync connection status for an entity or collection.
  *
- * @param {string}             kind   Kind of the entity.
- * @param {string}             name   Name of the entity.
- * @param {number|string|null} key    The entity key, or null for collections.
- * @param {Object|null}        status The connection state object or null on unload.
+ * @param kind   Kind of the entity.
+ * @param name   Name of the entity.
+ * @param key    The entity key, or null for collections.
+ * @param status The connection state object or null on unload.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setSyncConnectionStatus( kind, name, key, status ) {
+export function setSyncConnectionStatus(
+	kind: string,
+	name: string,
+	key: number | string | null,
+	status: ConnectionStatus | null
+): ActionOf< 'CLEAR_SYNC_CONNECTION_STATUS' | 'SET_SYNC_CONNECTION_STATUS' > {
 	if ( ! status ) {
 		return {
 			type: 'CLEAR_SYNC_CONNECTION_STATUS',
@@ -286,12 +314,12 @@ export function setSyncConnectionStatus( kind, name, key, status ) {
 /**
  * Save entity records marked as dirty.
  *
- * @param {Object}   options                        Options for the action.
- * @param {Function} [options.onSave]               Callback when saving happens.
- * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
- * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
- * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
- * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
+ * @param options                      Options for the action.
+ * @param options.onSave               Callback when saving happens.
+ * @param options.dirtyEntityRecords   Array of dirty entities.
+ * @param options.entitiesToSkip       Array of entities to skip saving.
+ * @param options.close                Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param options.successNoticeContent Optional custom success notice content. Defaults to 'Site updated.'.
  */
 export const saveDirtyEntities =
 	( {
@@ -300,8 +328,8 @@ export const saveDirtyEntities =
 		entitiesToSkip = [],
 		close,
 		successNoticeContent,
-	} = {} ) =>
-	( { registry } ) => {
+	}: SaveDirtyEntitiesOptions = {} ) =>
+	( { registry }: CoreDataThunkArgs ): Promise< unknown > => {
 		const PUBLISH_ON_SAVE_ENTITIES = [
 			{ kind: 'postType', name: 'wp_navigation' },
 		];
@@ -322,11 +350,12 @@ export const saveDirtyEntities =
 			}
 		);
 		close?.( entitiesToSave );
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
+		const siteItemsToSave: Array< string > = [];
+		const pendingSavedRecords: Array< Promise< unknown > > = [];
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
+				// Site entries name the edited property.
+				siteItemsToSave.push( property! );
 			} else {
 				if (
 					PUBLISH_ON_SAVE_ENTITIES.some(
@@ -430,7 +459,7 @@ export const saveDirtyEntities =
 					)
 			);
 
-		function ensureError( error ) {
+		function ensureError( error: unknown ): Error {
 			if ( error instanceof Error ) {
 				return error;
 			}
@@ -438,20 +467,26 @@ export const saveDirtyEntities =
 			// Expect certain errors to be plain objects with a `message`
 			// property, such as those thrown by `apiFetch`. Otherwise, do our
 			// best to infer a message via duck typing.
-			let message;
+			let message: string | undefined;
 			if ( ! error ) {
-			} else if ( typeof error.message === 'string' ) {
-				message = error.message;
+				// The checks below read the error by duck typing.
+			} else if (
+				typeof ( error as { message?: unknown } ).message === 'string'
+			) {
+				message = ( error as { message: string } ).message;
 			} else if ( typeof error === 'string' ) {
 				message = error;
 			} else if (
 				// Only consider own method, lest we erroneously end up calling
 				// `Object#toString` at the end of the prototype chain, thereby
 				// returning `"[object Object]"`.
-				Object.hasOwn( error, 'toString' ) &&
-				typeof error.toString === 'function'
+				Object.hasOwn( error as object, 'toString' ) &&
+				typeof ( error as { toString?: unknown } ).toString ===
+					'function'
 			) {
-				const result = error.toString();
+				const result = (
+					error as { toString: () => unknown }
+				 ).toString();
 				if ( typeof result === 'string' ) {
 					message = result;
 				}

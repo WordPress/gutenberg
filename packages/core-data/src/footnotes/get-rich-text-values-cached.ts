@@ -1,4 +1,6 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import type { Block } from '@wordpress/blocks';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { unlock } from '../lock-unlock';
 
 // TODO: The following line should have been:
@@ -11,11 +13,17 @@ import { unlock } from '../lock-unlock';
 // to prevent native code from failing.
 //
 // Fix once https://github.com/WordPress/gutenberg/issues/52692 is closed.
-let unlockedApis;
+let unlockedApis: {
+	getRichTextValues: (
+		blocks: Array< Block >
+	) => Array< RichTextValue | undefined >;
+};
 
-const cache = new WeakMap();
+const cache = new WeakMap< Block, Array< RichTextValue | undefined > >();
 
-export default function getRichTextValuesCached( block ) {
+export default function getRichTextValuesCached(
+	block: Block
+): Array< RichTextValue | undefined > {
 	if ( ! unlockedApis ) {
 		unlockedApis = unlock( blockEditorPrivateApis );
 	}
@@ -24,5 +32,6 @@ export default function getRichTextValuesCached( block ) {
 		const values = unlockedApis.getRichTextValues( [ block ] );
 		cache.set( block, values );
 	}
-	return cache.get( block );
+	// Set above when missing.
+	return cache.get( block )!;
 }

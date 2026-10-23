@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
 -   Convert the entities saved states components to TypeScript ([#85075](https://github.com/WordPress/gutenberg/pull/85075)).
 -   Convert the selectors test to TypeScript ([#85074](https://github.com/WordPress/gutenberg/pull/85074)).
 -   Convert the hook and store tests to TypeScript ([#85071](https://github.com/WordPress/gutenberg/pull/85071)).

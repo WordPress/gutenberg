@@ -3,6 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import type { Mock } from 'vitest';
 import { store as coreStore } from '..';
 import {
 	editMediaEntity,
@@ -11,6 +12,31 @@ import {
 } from '../private-actions';
 import { getEntitySyncManager } from '../entity-sync';
 import { unlock } from '../lock-unlock';
+import type { EntitySyncManager } from '../entity-sync';
+import type * as ET from '../entity-types';
+import type { CoreDataThunkArgs } from '../private-types';
+
+// The request options the tests read.
+type FetchOptions = {
+	path: string;
+	method?: string;
+	data?: Record< string, unknown >;
+	headers?: Record< string, string >;
+};
+
+// The tests stub REST responses and errors in place of typed requests.
+const apiFetchMock = apiFetch as unknown as Mock<
+	( options: FetchOptions ) => unknown
+>;
+
+/**
+ * Types the mocks an action runs with, which provide only what it uses.
+ *
+ * @param args The mocked thunk arguments.
+ */
+function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
+	return args as unknown as CoreDataThunkArgs;
+}
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
@@ -19,11 +45,15 @@ vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
 } ) );
 
 describe( 'editMediaEntity', () => {
-	let dispatch;
-	let resolveSelect;
+	let dispatch: Mock & {
+		receiveEntityRecords: Mock;
+		__unstableAcquireStoreLock: Mock;
+		__unstableReleaseStoreLock: Mock;
+	};
+	let resolveSelect: { getEntitiesConfig: Mock };
 
 	beforeEach( () => {
-		apiFetch.mockReset();
+		apiFetchMock.mockReset();
 		dispatch = Object.assign( vi.fn(), {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn( () => 'test-lock' ),
@@ -41,10 +71,15 @@ describe( 'editMediaEntity', () => {
 	} );
 
 	it( 'should return early when recordId is not provided', async () => {
-		const result = await editMediaEntity( null )( {
-			dispatch,
-			resolveSelect,
-		} );
+		const result = await editMediaEntity(
+			// @ts-expect-error Tests the guard against a missing record ID.
+			null
+		)(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( result ).toBeUndefined();
 		expect( dispatch.__unstableAcquireStoreLock ).not.toHaveBeenCalled();
@@ -54,10 +89,12 @@ describe( 'editMediaEntity', () => {
 	it( 'should return early when entity config is not found', async () => {
 		resolveSelect.getEntitiesConfig.mockReturnValue( [] );
 
-		const result = await editMediaEntity( 123 )( {
-			dispatch,
-			resolveSelect,
-		} );
+		const result = await editMediaEntity( 123 )(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( result ).toBeUndefined();
 		expect( dispatch.__unstableAcquireStoreLock ).not.toHaveBeenCalled();
@@ -78,15 +115,17 @@ describe( 'editMediaEntity', () => {
 			modified: true,
 		};
 
-		apiFetch.mockResolvedValue( updatedRecord );
+		apiFetchMock.mockResolvedValue( updatedRecord );
 
 		const result = await editMediaEntity(
 			recordId,
 			edits
-		)( {
-			dispatch,
-			resolveSelect,
-		} );
+		)(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledWith(
 			'core',
@@ -137,11 +176,11 @@ describe( 'editMediaEntity', () => {
 		const edits = { src: 'https://example.com/image.jpg' };
 		const apiError = new Error( 'API error' );
 
-		apiFetch.mockRejectedValue( apiError );
+		apiFetchMock.mockRejectedValue( apiError );
 
 		const result = await editMediaEntity( recordId, edits, {
 			throwOnError: false,
-		} )( { dispatch, resolveSelect } );
+		} )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
@@ -170,13 +209,15 @@ describe( 'editMediaEntity', () => {
 		const edits = { src: 'https://example.com/image.jpg' };
 		const apiError = new Error( 'API error' );
 
-		apiFetch.mockRejectedValue( apiError );
+		apiFetchMock.mockRejectedValue( apiError );
 
 		await expect(
-			editMediaEntity( recordId, edits, { throwOnError: true } )( {
-				dispatch,
-				resolveSelect,
-			} )
+			editMediaEntity( recordId, edits, { throwOnError: true } )(
+				thunkArgs( {
+					dispatch,
+					resolveSelect,
+				} )
+			)
 		).rejects.toEqual( apiError );
 
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledWith(
@@ -191,7 +232,7 @@ describe( 'editMediaEntity', () => {
 
 		await editMediaEntity( recordId, edits, {
 			__unstableFetch: customFetch,
-		} )( { dispatch, resolveSelect } );
+		} )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( customFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media/123/edit',
@@ -205,15 +246,17 @@ describe( 'editMediaEntity', () => {
 		const recordId = 123;
 		const edits = { src: 'https://example.com/image.jpg' };
 
-		apiFetch.mockResolvedValue( null );
+		apiFetchMock.mockResolvedValue( null );
 
 		const result = await editMediaEntity(
 			recordId,
 			edits
-		)( {
-			dispatch,
-			resolveSelect,
-		} );
+		)(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
 		expect( result ).toBeUndefined();
@@ -222,7 +265,7 @@ describe( 'editMediaEntity', () => {
 
 describe( 'setCollaborationSupported', () => {
 	afterEach( () => {
-		getEntitySyncManager.mockReset();
+		vi.mocked( getEntitySyncManager ).mockReset();
 	} );
 
 	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
@@ -230,9 +273,12 @@ describe( 'setCollaborationSupported', () => {
 			unloadAll: vi.fn(),
 		};
 		const dispatch = vi.fn();
-		getEntitySyncManager.mockReturnValue( syncManager );
+		vi.mocked( getEntitySyncManager ).mockReturnValue(
+			// The stub provides only what the actions use.
+			syncManager as unknown as EntitySyncManager
+		);
 
-		setCollaborationSupported( false )( { dispatch } );
+		setCollaborationSupported( false )( thunkArgs( { dispatch } ) );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SET_COLLABORATION_SUPPORTED',
@@ -248,7 +294,11 @@ describe( 'recordSyncUndoLevel', () => {
 		const select = { getUndoManager: () => undoManager };
 		const dispatch = vi.fn();
 
-		recordSyncUndoLevel( 'postType', 'post', 1 )( { select, dispatch } );
+		recordSyncUndoLevel(
+			'postType',
+			'post',
+			1
+		)( thunkArgs( { select, dispatch } ) );
 
 		expect( undoManager.addRecord ).toHaveBeenCalledTimes( 1 );
 		const [ record ] = undoManager.addRecord.mock.calls[ 0 ];
@@ -268,7 +318,7 @@ describe( 'recordSyncUndoLevel', () => {
 
 describe( 'saveDirtyEntities', () => {
 	beforeEach( () => {
-		apiFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	const postTypeConfig = {
@@ -319,23 +369,30 @@ describe( 'saveDirtyEntities', () => {
 		return registry;
 	}
 
-	const hasEdits = ( registry ) =>
+	const hasEdits = ( registry: ReturnType< typeof createRegistry > ) =>
 		registry
 			.select( coreStore )
 			.hasEditsForEntityRecord( 'postType', 'post', postId );
 
-	const getContent = ( registry ) =>
-		registry
-			.select( coreStore )
-			.getEditedEntityRecord( 'postType', 'post', postId ).content;
+	const getContent = ( registry: ReturnType< typeof createRegistry > ) =>
+		// The test post is loaded, with its content.
+		(
+			registry
+				.select( coreStore )
+				.getEditedEntityRecord(
+					'postType',
+					'post',
+					postId
+				) as unknown as ET.Post
+		 ).content;
 
-	const getMethod = ( options ) =>
+	const getMethod = ( options: FetchOptions ) =>
 		options.headers?.[ 'X-HTTP-Method-Override' ] ||
 		options.method ||
 		'GET';
 
 	it( 'saves modified entities', async () => {
-		apiFetch.mockImplementation( async ( options ) => {
+		apiFetchMock.mockImplementation( async ( options: FetchOptions ) => {
 			const method = getMethod( options );
 			const { path, data } = options;
 
@@ -373,7 +430,7 @@ describe( 'saveDirtyEntities', () => {
 	} );
 
 	it( 'shows a notice to convey errors', async () => {
-		apiFetch.mockImplementation( async ( options ) => {
+		apiFetchMock.mockImplementation( async ( options: FetchOptions ) => {
 			const method = getMethod( options );
 			const { path } = options;
 
@@ -403,7 +460,7 @@ describe( 'saveDirtyEntities', () => {
 		const registry = createRegistryWithStoresAndEditedPost();
 
 		// Throw an object with a `message` property
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw {
 				message: 'Lorem ipsum',
 			};
@@ -421,7 +478,7 @@ describe( 'saveDirtyEntities', () => {
 		} );
 
 		// Throw an object with an empty `message` property
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw {
 				message: '',
 			};
@@ -439,7 +496,7 @@ describe( 'saveDirtyEntities', () => {
 		} );
 
 		// Throw an actual error
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw new Error( 'Dolor sit amet' );
 		} );
 
@@ -455,7 +512,7 @@ describe( 'saveDirtyEntities', () => {
 		} );
 
 		// Throw a string
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw 'Consectetur adipiscing elit';
 		} );
 
@@ -471,7 +528,7 @@ describe( 'saveDirtyEntities', () => {
 		} );
 
 		// Throw an object implementing `toString`
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw {
 				toString() {
 					return 'Sed do eiusmod tempor incididunt';
@@ -491,7 +548,7 @@ describe( 'saveDirtyEntities', () => {
 		} );
 
 		// Throw something with no clear message
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw {};
 		} );
 
@@ -508,7 +565,7 @@ describe( 'saveDirtyEntities', () => {
 	} );
 
 	it( 'aborts if `onSave` fails', async () => {
-		apiFetch.mockImplementation( async () => {
+		apiFetchMock.mockImplementation( async () => {
 			throw {
 				code: 'unknown_path',
 				message: 'Unknown path',
@@ -536,7 +593,7 @@ describe( 'saveDirtyEntities', () => {
 	} );
 
 	it( 'honors the `successNoticeContent` prop', async () => {
-		apiFetch.mockImplementation( async ( options ) => {
+		apiFetchMock.mockImplementation( async ( options: FetchOptions ) => {
 			const { data } = options;
 			return { ...post, ...data };
 		} );
