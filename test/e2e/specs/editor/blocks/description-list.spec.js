@@ -824,7 +824,7 @@ test.describe( 'Description List', () => {
 				},
 				{
 					name: 'core/description-detail',
-					attributes: { content: 'two' },
+					attributes: { content: '<strong>two</strong>' },
 				},
 			],
 		} );
@@ -840,7 +840,329 @@ test.describe( 'Description List', () => {
 				innerBlocks: [
 					{
 						name: 'core/description-term',
+						attributes: {
+							content: 'one<strong>two</strong>',
+						},
+					},
+					{ name: 'core/description-detail' },
+				],
+			},
+		] );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const selection = window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectionStart();
+					return selection.offset;
+				} )
+			)
+			.toBe( 3 );
+	} );
+
+	test( 'should preserve the trailing detail on Delete and undo the merge in one step', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'one' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'two' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Term' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Delete' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
 						attributes: { content: 'onetwo' },
+					},
+					{ name: 'core/description-detail' },
+				],
+			},
+		] );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectionStart().offset
+				)
+			)
+			.toBe( 3 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/description-detail',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'onetwo' },
+					},
+					{ name: 'core/description-detail' },
+				],
+			},
+		] );
+	} );
+
+	test( 'should preserve the leading term when Backspace removes a formatted empty term', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: '<strong></strong>' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'two' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Detail' } )
+			.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{ name: 'core/description-term' },
+					{
+						name: 'core/description-detail',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const blockEditor =
+						window.wp.data.select( 'core/block-editor' );
+					const selection = blockEditor.getSelectionStart();
+					return {
+						name: blockEditor.getBlockName( selection.clientId ),
+						offset: selection.offset,
+					};
+				} )
+			)
+			.toEqual( { name: 'core/description-detail', offset: 0 } );
+	} );
+
+	test( 'should not change the first term on Backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'one' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'two' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Term' } )
+			.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/description-detail',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should merge consecutive terms without adding a boundary block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'one' },
+				},
+				{
+					name: 'core/description-term',
+					attributes: { content: 'two' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'three' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Term' } )
+			.last()
+			.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'onetwo' },
+					},
+					{
+						name: 'core/description-detail',
+						attributes: { content: 'three' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should merge a middle detail without adding a boundary block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'one' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'two' },
+				},
+				{
+					name: 'core/description-term',
+					attributes: { content: 'three' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'four' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Detail' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'onetwo' },
+					},
+					{
+						name: 'core/description-term',
+						attributes: { content: 'three' },
+					},
+					{
+						name: 'core/description-detail',
+						attributes: { content: 'four' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should merge consecutive details without adding a boundary block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'one' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'two' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: { content: 'three' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Detail' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Delete' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{ name: 'core/description-term' },
+					{
+						name: 'core/description-detail',
+						attributes: { content: 'twothree' },
 					},
 				],
 			},

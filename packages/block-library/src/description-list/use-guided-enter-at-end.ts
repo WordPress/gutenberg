@@ -2,7 +2,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, type Block } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { RichTextData } from '@wordpress/rich-text';
+import isEmptyRichTextContent from './is-empty-rich-text-content';
 
 type DescriptionListChildBlockName =
 	'core/description-term' | 'core/description-detail';
@@ -10,21 +10,6 @@ type DescriptionListChildBlockName =
 const DESCRIPTION_TERM = 'core/description-term';
 const DESCRIPTION_DETAIL = 'core/description-detail';
 const PARAGRAPH = 'core/paragraph';
-
-function isEmptyRichTextContent( content: unknown ) {
-	if ( content instanceof RichTextData ) {
-		return content.toPlainText().trim().length === 0;
-	}
-
-	if ( typeof content === 'string' ) {
-		return (
-			RichTextData.fromHTMLString( content ).toPlainText().trim()
-				.length === 0
-		);
-	}
-
-	return content === undefined || content === null;
-}
 
 export default function useGuidedEnterAtEnd( {
 	blockName,

@@ -3,6 +3,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 import type { BlockEditProps, Block } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';
 import useGuidedEnterAtEnd from '../description-list/use-guided-enter-at-end';
+import useStructurePreservingMerge from '../description-list/use-structure-preserving-merge';
 import DescriptionListStructureWarning from '../description-list/structure-warning';
 
 type DescriptionListItemAttributes = {
@@ -36,6 +37,7 @@ export default function Edit( {
 		blockName: 'core/description-term',
 		clientId,
 	} );
+	const onMerge = useStructurePreservingMerge( { clientId, mergeBlocks } );
 
 	return (
 		<>
@@ -51,7 +53,7 @@ export default function Edit( {
 				onChange={ ( newContent: string | RichTextData ) =>
 					setAttributes( { content: newContent } )
 				}
-				onMerge={ mergeBlocks }
+				onMerge={ mergeBlocks ? onMerge : undefined }
 				onReplace={ onReplace }
 				onRemove={ onRemove }
 				placeholder={ placeholder || __( 'Term' ) }
