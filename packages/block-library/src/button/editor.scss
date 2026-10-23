@@ -1,4 +1,4 @@
-@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .wp-block[data-align="center"] > .wp-block-button {
 	text-align: center;
@@ -15,19 +15,14 @@
 	position: relative;
 	cursor: text;
 
-	// Add outline to button on focus to indicate focus-state
-	&:focus {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px var(--wp-admin-theme-color);
-
-		// Windows' High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-		outline-offset: -2px;
-	}
-
 	// Increase placeholder opacity to meet contrast ratios.
 	&[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
+}
+
+.wp-block-button__link:focus {
+	@include outset-ring__focus();
 }
 
 // Display "table" is used because the button container should only wrap the content and not takes the full width.
