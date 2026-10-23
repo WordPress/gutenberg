@@ -37,6 +37,9 @@
 		// This in turn prevents layout shift due to layout styles removing margins from first and last children.
 		margin-block-start: 0;
 		margin-block-end: 0;
+
+		// Keep long placeholders clear of the absolutely positioned inserter.
+		padding-inline-end: $button-size-small + $grid-unit-10;
 	}
 
 	// Dropzone.
@@ -53,7 +56,7 @@
 .block-editor-default-block-appender .block-editor-inserter {
 	position: absolute;
 	top: 0;
-	right: 0;
+	inset-inline-end: 0;
 	line-height: 0;
 
 	&:disabled {
