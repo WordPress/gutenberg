@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -25,7 +25,22 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 	const { onCreate, onDiscard } = useNoteActions();
 	const isSubmittingRef = useRef( false );
 	const { initialValue, setDraft, hasDraft } = useNoteDraft( clientId );
-	const { lockedActions } = useNoteLock();
+	const isCreateLocked = useNoteLock().lockedActions.has( 'create' );
+
+	// A lock applied after the form opened: drop what starting the note left behind.
+	useEffect( () => {
+		if ( isCreateLocked ) {
+			onDiscard( clientId );
+			toggleBlockHighlight( clientId, false );
+			selectNote( undefined );
+		}
+	}, [
+		isCreateLocked,
+		clientId,
+		onDiscard,
+		toggleBlockHighlight,
+		selectNote,
+	] );
 
 	/*
 	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
@@ -71,12 +86,7 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 		toggleBlockHighlight( clientId, false );
 	};
 
-	/*
-	 * A lock applied after the form opened leaves a stale `'new'` selection
-	 * behind, so the form is gated on render rather than only at its entry
-	 * points.
-	 */
-	if ( lockedActions.has( 'create' ) ) {
+	if ( isCreateLocked ) {
 		return null;
 	}
 
