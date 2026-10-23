@@ -113,7 +113,7 @@ export function getDimensionsTools( {
 	hasCustomDimensions,
 	isWideAligned,
 } ) {
-	if ( SIZED_LAYOUTS.includes( parentLayoutType ) ) {
+	if ( parentLayoutType && SIZED_LAYOUTS.includes( parentLayoutType ) ) {
 		return hasCustomDimensions
 			? [ 'aspectRatio', 'widthHeight' ]
 			: [ 'aspectRatio' ];
