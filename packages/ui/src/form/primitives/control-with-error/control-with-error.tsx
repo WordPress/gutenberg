@@ -64,15 +64,6 @@ function isSameValidity( a?: Validity, b?: Validity ) {
 	return a?.type === b?.type && a?.message === b?.message;
 }
 
-// A state updater that keeps the current value when nothing changed, so an
-// unchanged re-read doesn't re-render.
-function toValidity( nextValidity?: Validity ) {
-	return ( prevValidity?: Validity ) =>
-		isSameValidity( prevValidity, nextValidity )
-			? prevValidity
-			: nextValidity;
-}
-
 /**
  * A wrapper that adds inline validation feedback to a form control, based on
  * the native Constraint Validation API.
@@ -114,9 +105,7 @@ export const ControlWithError = forwardRef<
 			// While async validation is pending, keep its indicator instead
 			// of showing a message its result may supersede.
 			if ( customValidity?.type !== 'validating' ) {
-				setValidity(
-					toValidity( getValidity( customValidity, validityTarget ) )
-				);
+				setValidity( getValidity( customValidity, validityTarget ) );
 			}
 			setShowMessage( true );
 			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
@@ -180,10 +169,10 @@ export const ControlWithError = forwardRef<
 		};
 	}, [ getValidityTarget ] );
 
-	// Handle validity messages. Consumers pass an inline `getValidityTarget`,
-	// so this runs after every render. React can schedule a render even for an
-	// unchanged value, and in React 19 one per keystroke trips its nested
-	// update limit, dropping typed input.
+	// Re-read the native validity after every render, since the target's value
+	// and constraints can change without a prop change here. Only set state
+	// when the result differs, or each render schedules another.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
 		validityTarget?.setCustomValidity(
@@ -196,7 +185,7 @@ export const ControlWithError = forwardRef<
 		if ( ! isSameValidity( nextValidity, validity ) ) {
 			setValidity( nextValidity );
 		}
-	}, [ customValidity, getValidityTarget, validity ] );
+	} );
 
 	// Show messages if field has been touched (i.e. has blurred at least once),
 	// or validation has been triggered by the consumer/user.
@@ -243,9 +232,7 @@ export const ControlWithError = forwardRef<
 		const isValidating = customValidity?.type === 'validating';
 		window.queueMicrotask( () => {
 			if ( ! isValidating ) {
-				setValidity(
-					toValidity( getValidity( customValidity, validityTarget ) )
-				);
+				setValidity( getValidity( customValidity, validityTarget ) );
 			}
 		} );
 	};
