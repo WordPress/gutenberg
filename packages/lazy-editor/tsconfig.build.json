@@ -1,0 +1,20 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"compilerOptions": {
+		"types": [ "style-imports" ]
+	},
+	"references": [
+		{ "path": "../asset-loader/tsconfig.build.json" },
+		{ "path": "../block-editor/tsconfig.build.json" },
+		{ "path": "../blocks" },
+		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../core-data/tsconfig.build.json" },
+		{ "path": "../data/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../editor/tsconfig.build.json" },
+		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../private-apis/tsconfig.build.json" }
+	]
+}
