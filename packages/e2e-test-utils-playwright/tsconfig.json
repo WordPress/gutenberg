@@ -9,8 +9,6 @@
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,
-		"emitDeclarationOnly": false,
-		"allowJs": true,
-		"checkJs": false
+		"emitDeclarationOnly": false
 	}
 }
