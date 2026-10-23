@@ -22,7 +22,6 @@
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/react-inert-value/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
-		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

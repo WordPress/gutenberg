@@ -85,9 +85,7 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -192,7 +190,7 @@ export function NoteThread( {
 
 	function onDeselectNote() {
 		selectNote( undefined );
-		toggleBlockSpotlight( note.blockClientId, false );
+		toggleBlockHighlight( note.blockClientId, false );
 	}
 
 	function handleResolve() {

@@ -18,6 +18,7 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.

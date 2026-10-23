@@ -7,7 +7,7 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../hooks" },
+		{ "path": "../hooks/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../rich-text" }
 	]

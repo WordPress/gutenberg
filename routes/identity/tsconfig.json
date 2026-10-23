@@ -11,7 +11,6 @@
 	},
 	"references": [
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
-		{ "path": "../../packages/components/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
@@ -21,7 +20,6 @@
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/react-inert-value/tsconfig.build.json" },
-		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

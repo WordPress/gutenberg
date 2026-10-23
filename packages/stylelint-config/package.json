@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "26.1.0",
+	"version": "27.0.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -42,7 +42,7 @@
 	},
 	"dependencies": {
 		"@stylistic/stylelint-plugin": "^5.2.1",
-		"@wordpress/theme": "file:../theme",
+		"@wordpress/theme-build-tools": "file:../theme-build-tools",
 		"stylelint-config-recommended": "^18.0.0",
 		"stylelint-config-recommended-scss": "^17.0.1"
 	},

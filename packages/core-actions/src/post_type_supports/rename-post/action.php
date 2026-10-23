@@ -8,7 +8,7 @@
  */
 
 return array(
-	'label'             => __( 'Rename…', 'gutenberg' ),
-	'modalHeader'       => __( 'Rename', 'gutenberg' ),
+	'label'             => __( 'Rename…' ),
+	'modalHeader'       => __( 'Rename' ),
 	'modalFocusOnMount' => 'firstContentElement',
 );

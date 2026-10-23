@@ -9,7 +9,7 @@
 		.popup {
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
-			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
+			--wp-ui-menu-max-width: var(--_wp-ui-item-popup-max-width, var(--available-width));
 			/*
 			 * `--wp-ui-menu-item-padding-inline` is left unset so a consumer
 			 * override still sets both edges; these are the fallbacks.

@@ -9,7 +9,7 @@
  */
 
 return array(
-	'label'             => __( 'Set as homepage…', 'gutenberg' ),
-	'modalHeader'       => __( 'Set as homepage', 'gutenberg' ),
+	'label'             => __( 'Set as homepage…' ),
+	'modalHeader'       => __( 'Set as homepage' ),
 	'modalFocusOnMount' => 'firstContentElement',
 );

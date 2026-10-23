@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { View } from '../../view';
 import { Grid } from '..';
-import CONFIG from '../../utils/config-values';
 
 describe( 'props', () => {
 	const readStyle = () => getComputedStyle( screen.getByTestId( 'grid' ) );
@@ -28,9 +27,7 @@ describe( 'props', () => {
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
 		expectEqualTracks( style.gridTemplateColumns, 2 );
-		expect( style.gap ).toBe(
-			`${ Number.parseFloat( CONFIG.gridBase ) * 3 }px`
-		);
+		expect( style.gap ).toBe( '12px' );
 	} );
 
 	test( 'should render gap', async () => {
@@ -45,9 +42,7 @@ describe( 'props', () => {
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
 		expectEqualTracks( style.gridTemplateColumns, 3 );
-		expect( style.gap ).toBe(
-			`${ Number.parseFloat( CONFIG.gridBase ) * 4 }px`
-		);
+		expect( style.gap ).toBe( '16px' );
 	} );
 
 	test( 'should render custom columns', async () => {

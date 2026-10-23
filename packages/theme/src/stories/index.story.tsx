@@ -108,7 +108,13 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 							boxShadow: '0 0 0.5rem 0 rgba(0, 0, 0, 0.1)',
 						} }
 					>
-						<div>
+						<div
+							style={ {
+								display: 'flex',
+								alignItems: 'center',
+								gap: '0.5rem',
+							} }
+						>
 							<input
 								type="color"
 								id={ id }

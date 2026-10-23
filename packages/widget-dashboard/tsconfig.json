@@ -21,7 +21,7 @@
 		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../viewport" },
+		{ "path": "../viewport/tsconfig.build.json" },
 		{ "path": "../widget-primitives/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.

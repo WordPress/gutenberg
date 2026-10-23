@@ -234,17 +234,6 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 	}, [ properties, userVariation, variationsFromTheme ] );
 }
 
-const propertiesToFilter = [ 'color' ];
-
-/**
- * Hook to get color variations using the full Gutenberg implementation.
- */
-export function useColorVariations(): StyleVariation[] {
-	return useCurrentMergeThemeStyleVariationsWithUserConfig(
-		propertiesToFilter
-	);
-}
-
 /**
  * Resolves `ref` pointers and theme-relative (`file:./…`) URLs in a style
  * object's `background` sub-tree, for display. The Global Styles screens
@@ -279,4 +268,26 @@ export function useStyleWithResolvedBackground(
 		}
 		return { ...style, background };
 	}, [ style, merged ] );
+}
+
+/**
+ * Whether the current user may edit custom CSS in Global Styles.
+ *
+ * The capability is reported as a link on the global styles record rather
+ * than as a user capability.
+ */
+export function useCanEditCSS(): boolean {
+	return useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return !! ( globalStyles as GlobalStylesConfig )?._links?.[
+			'wp:action-edit-css'
+		];
+	}, [] );
 }

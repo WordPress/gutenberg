@@ -12,7 +12,6 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../vips/tsconfig.build.json" },
 		{ "path": "../video-conversion/tsconfig.build.json" }
 	],

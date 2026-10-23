@@ -12,6 +12,6 @@
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../plugins" },
 		{ "path": "../preferences/tsconfig.build.json" },
-		{ "path": "../viewport" }
+		{ "path": "../viewport/tsconfig.build.json" }
 	]
 }

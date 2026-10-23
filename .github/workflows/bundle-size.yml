@@ -109,7 +109,7 @@ jobs:
         # Runs even when the build failed, so a stale size report is cleared.
         # Skipped on a fork, whose token cannot write a comment.
         if: ${{ !cancelled() && github.event.pull_request.head.repo.full_name == github.repository }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write

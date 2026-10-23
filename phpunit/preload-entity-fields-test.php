@@ -4,10 +4,8 @@
  *
  * @package gutenberg
  *
- * @covers ::_gutenberg_get_post_type_fields_preload_paths
- * @covers ::_gutenberg_get_site_editor_screen_post_types
+ * @covers ::_wp_add_entity_preload_paths
  * @covers ::_gutenberg_preload_entity_fields
- * @covers ::gutenberg_dataform_inspector_preload_paths
  */
 class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 
@@ -17,11 +15,11 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The post editor leaves the fields to the DataForm inspector experiment,
-	 * the only part of it that reads them, whatever its `p` query arg.
+	 * The post editor preloads the fields of the edited post type, which the
+	 * post summary of its inspector reads, whatever its `p` query arg.
 	 */
-	public function test_the_post_editor_does_not_preload_the_fields() {
-		$_GET['p'] = '/page';
+	public function test_the_post_editor_preloads_the_fields_of_the_post_type() {
+		$_GET['p'] = '/wp_template';
 		$post      = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
 		$context   = new WP_Block_Editor_Context(
 			array(
@@ -30,31 +28,9 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $context ) );
-	}
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
 
-	/**
-	 * The DataForm inspector experiment preloads the fields of the edited post
-	 * type, which its post summary reads, with the path the `getFieldsConfig`
-	 * core data resolver requests.
-	 */
-	public function test_the_dataform_inspector_preloads_the_fields_of_the_post_type() {
-		// The experiment loads its preloading only when it is enabled.
-		if ( ! function_exists( 'gutenberg_dataform_inspector_preload_paths' ) ) {
-			require_once dirname( __DIR__ ) . '/lib/experimental/dataform-inspector-preload.php';
-			remove_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_dataform_inspector_preload_paths' );
-		}
-		$post    = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
-		$context = new WP_Block_Editor_Context(
-			array(
-				'name' => 'core/edit-post',
-				'post' => $post,
-			)
-		);
-
-		$paths = gutenberg_dataform_inspector_preload_paths( array(), $context );
-
-		$this->assertContains( '/wp/v2/entity-fields?kind=postType&name=page', $paths );
+		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), $paths );
 	}
 
 	/**
@@ -147,5 +123,46 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $site_editor ) );
 		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $no_post ) );
 		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $widgets ) );
+	}
+
+	/**
+	 * An empty value that is not an array, left by an earlier callback,
+	 * becomes an array so the fields are still preloaded.
+	 *
+	 * @dataProvider data_empty_paths
+	 *
+	 * @param mixed $paths The paths an earlier callback returned.
+	 */
+	public function test_empty_paths_that_are_not_an_array_become_an_array( $paths ) {
+		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
+
+		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), _gutenberg_preload_entity_fields( $paths, $context ) );
+	}
+
+	/**
+	 * Data provider for test_empty_paths_that_are_not_an_array_become_an_array().
+	 *
+	 * @return array[]
+	 */
+	public function data_empty_paths() {
+		return array(
+			'null'         => array( null ),
+			'false'        => array( false ),
+			'empty string' => array( '' ),
+		);
+	}
+
+	/**
+	 * Paths that are neither an array nor empty, or a context that is not a
+	 * block editor context, are returned unchanged.
+	 */
+	public function test_unexpected_arguments_are_returned_unchanged() {
+		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
+		$object  = new stdClass();
+
+		$this->assertSame( 'not paths', _gutenberg_preload_entity_fields( 'not paths', $context ) );
+		$this->assertSame( $object, _gutenberg_preload_entity_fields( $object, $context ) );
+		$this->assertSame( array( '/wp/v2/types' ), _gutenberg_preload_entity_fields( array( '/wp/v2/types' ) ) );
+		$this->assertSame( array(), _gutenberg_preload_entity_fields( null ) );
 	}
 }

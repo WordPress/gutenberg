@@ -1,10 +1,18 @@
 import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
-import type { Ref, RefCallback } from 'react';
+import type { Ref, RefCallback, RefObject } from 'react';
+
+// A ref to merge. A falsy value disables it, and an object ref may start out
+// `undefined`.
+type MergeableRef< T > =
+	Ref< T > | RefObject< T | null | undefined > | false | undefined;
 
 // Returns a cleanup function if the ref callback returned one (React 19 ref
 // callback cleanup pattern), otherwise `undefined`. Object refs never have a
 // cleanup and only set `.current`.
-function assignRef< T >( ref: Ref< T >, value: T ): ( () => void ) | undefined {
+function assignRef< T >(
+	ref: MergeableRef< T >,
+	value: T | null
+): ( () => void ) | undefined {
 	if ( typeof ref === 'function' ) {
 		const returned = ref( value );
 		return typeof returned === 'function' ? returned : undefined;
@@ -17,7 +25,7 @@ function assignRef< T >( ref: Ref< T >, value: T ): ( () => void ) | undefined {
 // Tear down a ref at the given index: prefer the stored cleanup; otherwise
 // fall back to calling the ref with `null`.
 function detachRef< T >(
-	ref: Ref< T >,
+	ref: MergeableRef< T >,
 	index: number,
 	cleanups: Array< ( () => void ) | undefined >
 ): void {
@@ -74,12 +82,14 @@ function detachRef< T >(
  * @return The merged ref callback.
  */
 export default function useMergeRefs< T >(
-	refs: Ref< T >[]
+	refs: Array<
+		Ref< T > | RefObject< T | null | undefined > | false | undefined
+	>
 ): RefCallback< T > {
 	const elementRef = useRef< T | null >( null );
 	// The refs that are attached to the element: set when the element
 	// attaches, and kept in sync when a changed ref is swapped on render.
-	const attachedRefsRef = useRef< Ref< T >[] >( [] );
+	const attachedRefsRef = useRef< MergeableRef< T >[] >( [] );
 	const currentRefsRef = useRef( refs );
 	// Position-indexed cleanups returned by inner ref callbacks. A slot is
 	// `undefined` when the ref at that position did not return a cleanup (or

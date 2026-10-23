@@ -91,6 +91,7 @@
 		&::before {
 			top: var(--wpds-dimension-padding-md);
 			inset-inline-start: 0;
+			z-index: 1;
 			width: var(--wp-admin-border-width-focus);
 			height: max(0px, calc(var(--selected-height, 0) * 1px - 2 * var(--wpds-dimension-padding-md)));
 			transform: translateY(calc(var(--selected-top, 0) * 1px));
@@ -100,79 +101,74 @@
 }
 
 .tab {
-	& {
-		/* Resets */
-		border-radius: 0;
-		background: transparent;
-		border: none;
-		box-shadow: none;
+	/* Resets */
+	border-radius: 0;
+	background: transparent;
+	border: none;
+	box-shadow: none;
 
-		flex: 1 0 auto;
-		white-space: nowrap;
-		display: flex;
-		align-items: center;
-		/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
-		cursor: pointer;
-		line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
-		font-family: $font-family-body;
-		font-weight: 400;
-		font-size: $font-size-medium;
-		color: var(--wpds-color-foreground-interactive-neutral);
+	flex: 1 0 auto;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
+	cursor: pointer;
+	line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
+	font-family: $font-family-body;
+	font-weight: 400;
+	font-size: $font-size-medium;
+	color: var(--wpds-color-foreground-interactive-neutral);
 
-		&:is([aria-selected="true"], [aria-disabled="true"]) {
-			cursor: default;
-		}
+	&:is([aria-selected="true"], [aria-disabled="true"]) {
+		cursor: default;
+	}
 
-		&[aria-disabled="true"] {
-			color: var(--wpds-color-foreground-interactive-neutral-disabled);
-		}
+	&[aria-disabled="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
 
-		&:not([aria-disabled="true"]):is(
-			:not([aria-selected="true"]):hover,
-			:not([aria-selected="true"]):active,
-			[data-focus-visible]
-		) {
-			color: var(--wpds-color-foreground-interactive-neutral-active);
+	&:not([aria-disabled="true"]):is(
+		:not([aria-selected="true"]):hover,
+		:not([aria-selected="true"]):active,
+		[data-focus-visible]
+	) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 
-			&::after,
-			& .tab-children::after {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-				opacity: 1;
-			}
-		}
-
-		&:focus:not(:disabled) {
-			box-shadow: none;
-			outline: none;
-		}
-
-		// Interaction background and focus indicator.
-		position: relative;
-		isolation: isolate;
-		&::after,
-		& .tab-children::after {
-			position: absolute;
-			z-index: -1;
-			pointer-events: none;
-
-			// Draw the indicator.
-			// Outline works for Windows high contrast mode as well.
-			outline: var(--wp-admin-border-width-focus) solid transparent;
-			border-radius: $radius-small;
-
-			// Animation
-			opacity: 0;
-
-			@media not (prefers-reduced-motion) {
-				transition: opacity 0.1s linear;
-			}
-		}
-
-		&[data-focus-visible]::after,
-		&[data-focus-visible] .tab-children::after {
-			outline-color: $components-color-accent;
+		&::after {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 			opacity: 1;
 		}
+	}
+
+	&:focus:not(:disabled) {
+		box-shadow: none;
+		outline: none;
+	}
+
+	// Interaction background and focus indicator.
+	position: relative;
+	isolation: isolate;
+	&::after {
+		position: absolute;
+		z-index: -1;
+		pointer-events: none;
+
+		// Draw the indicator.
+		// Outline works for Windows high contrast mode as well.
+		outline: var(--wp-admin-border-width-focus) solid transparent;
+		border-radius: $radius-small;
+
+		// Animation
+		opacity: 0;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
+	}
+
+	&[data-focus-visible]::after {
+		outline-color: $components-color-accent;
+		opacity: 1;
 	}
 
 	[aria-orientation="horizontal"] & {
@@ -189,6 +185,12 @@
 	[aria-orientation="vertical"] & {
 		padding: var(--wpds-dimension-padding-md);
 		min-height: var(--wpds-dimension-size-lg);
+
+		&::after {
+			content: "";
+			inset: 0;
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+		}
 	}
 }
 
@@ -202,14 +204,7 @@
 		justify-content: center;
 	}
 	[aria-orientation="vertical"] & {
-		flex-grow: 0;
-		position: relative;
 		justify-content: start;
-
-		&::after {
-			content: "";
-			inset: calc(-1 * var(--wpds-dimension-padding-xs));
-		}
 	}
 }
 

@@ -23,7 +23,7 @@
 		{ "path": "../../packages/preferences/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
-		{ "path": "../../packages/viewport" },
+		{ "path": "../../packages/viewport/tsconfig.build.json" },
 		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" },
 		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
 	],

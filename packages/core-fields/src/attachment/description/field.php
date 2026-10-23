@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Description', 'gutenberg' ),
+	'label'         => __( 'Description' ),
 	'Edit'          => array(
 		'control' => 'textarea',
 		'rows'    => 5,

@@ -8,7 +8,7 @@
  */
 
 return array(
-	'label'             => _x( 'Duplicate…', 'action label', 'gutenberg' ),
-	'modalHeader'       => _x( 'Duplicate pattern', 'action label', 'gutenberg' ),
+	'label'             => _x( 'Duplicate…', 'action label' ),
+	'modalHeader'       => _x( 'Duplicate pattern', 'action label' ),
 	'modalFocusOnMount' => 'firstContentElement',
 );

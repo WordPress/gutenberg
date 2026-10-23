@@ -257,7 +257,7 @@ _Parameters_
 
 - _fn_ `TFunc`: The function to debounce.
 - _wait_ `number`: The number of milliseconds to delay.
-- _options_ `DebounceOptions`: The options object.
+- _options_ `Partial< DebounceOptions >`: The options object.
 
 _Returns_
 
@@ -476,7 +476,7 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
-- _refs_ `Ref< T >[]`: The refs to be merged.
+- _refs_ `Array< Ref< T > | RefObject< T | null | undefined > | false | undefined >`: The refs to be merged.
 
 _Returns_
 
