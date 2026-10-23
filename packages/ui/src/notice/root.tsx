@@ -32,16 +32,32 @@ function readMessage( root: HTMLElement ) {
 					element.closest( CONTENT_BOUNDARY ) === root &&
 					! element.closest( '[hidden], [aria-hidden="true"]' )
 			)
-			.map( ( element ) => element.textContent?.trim() )
+			.map( ( element ) => {
+				const walker = element.ownerDocument.createTreeWalker(
+					element,
+					NodeFilter.SHOW_TEXT,
+					{
+						acceptNode( node ) {
+							return node.parentElement?.closest(
+								'[hidden], [aria-hidden="true"]'
+							)
+								? NodeFilter.FILTER_REJECT
+								: NodeFilter.FILTER_ACCEPT;
+						},
+					}
+				);
+				let text = '';
+				while ( walker.nextNode() ) {
+					text += walker.currentNode.textContent;
+				}
+				return text.trim();
+			} )
 			.filter( Boolean )
 			.join( ' ' );
 	}
-	const title = readText( 'title' );
-	const description = readText( 'description' );
-	const separator = /[.!?。！？…]$/u.test( title ) ? ' ' : '. ';
-	return title && description
-		? title + separator + description
-		: title || description;
+	return [ readText( 'title' ), readText( 'description' ) ]
+		.filter( Boolean )
+		.join( '\n' );
 }
 
 /**
