@@ -29,3 +29,59 @@ control in `@wordpress/dataviews` for the canonical assembly).
 ```
 
 ## Props
+
+### `className`
+
+ - Type: `string`
+ - Required: No
+
+### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Whether the field is non-editable. A disabled field exposes
+`aria-disabled`, leaves the tab order, and keeps focus if it had it.
+
+### `hideLabelFromVision`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+If true, the label will only be visible to screen readers.
+
+### `help`
+
+ - Type: `ReactNode`
+ - Required: No
+
+Additional description for the control.
+
+Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+
+### `label`
+
+ - Type: `string`
+ - Required: Yes
+
+Label text for the control.
+
+### `placeholder`
+
+ - Type: `string`
+ - Required: No
+
+Placeholder text shown while the element has no content. Exposed to
+assistive technology via `aria-placeholder` and drawn by the stylesheet
+when the element is empty.
+
+### `required`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+Whether the field is required. Exposed to assistive technology via
+`aria-required`.
