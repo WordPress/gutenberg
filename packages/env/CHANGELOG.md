@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2 ([#46510](https://github.com/WordPress/gutenberg/pull/46510)).
+-   The `composer` service uses the `composer:2` image instead of the floating `composer` image, so a new major version of Composer can't break `wp-env run composer` ([#84406](https://github.com/WordPress/gutenberg/pull/84406)).
 
 ### Bug Fixes
 
