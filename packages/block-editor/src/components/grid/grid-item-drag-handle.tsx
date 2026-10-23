@@ -81,6 +81,7 @@ export function GridItemDragHandle( {
 							blockElement,
 							startDraggingBlocks,
 							stopDraggingBlocks,
+							isHandle: true,
 						} );
 					} }
 				>

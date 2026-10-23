@@ -8,13 +8,19 @@ import type { ChildDragOptions } from '../../layouts/types';
 const HANDLE_DRAG_TYPE = 'wp-grid-item-handle';
 
 /**
- * Where a touch drag from a grid item's drag handle is, and whether it is
- * moving, dropped, or cancelled.
+ * The class of a grid's drop layer, which takes the drags over that grid.
+ */
+const DROP_LAYER_CLASS = 'block-editor-grid-visualizer__drop-layer';
+
+/**
+ * Where a touch drag from a grid item's drag handle is, whether it is moving,
+ * dropped, or cancelled, and the drop layer of the innermost grid under it.
  */
 export interface GridItemPointerDragEvent {
 	type: 'move' | 'drop' | 'cancel';
 	clientX: number;
 	clientY: number;
+	dropLayer: Element | undefined;
 }
 
 /**
@@ -50,6 +56,7 @@ export function isGridItemHandleDrag( event: DragEvent ) {
  * @param options.blockElement        The block's element in the canvas.
  * @param options.startDraggingBlocks Marks blocks as being dragged.
  * @param options.stopDraggingBlocks  Marks the drag as over.
+ * @param options.isHandle            Whether the drag starts from the drag handle.
  */
 export function startGridItemDrag(
 	event: DragEvent,
@@ -59,7 +66,11 @@ export function startGridItemDrag(
 		blockElement,
 		startDraggingBlocks,
 		stopDraggingBlocks,
-	}: ChildDragOptions
+		isHandle = false,
+	}: ChildDragOptions & {
+		/** Whether the drag starts from the drag handle. */
+		isHandle?: boolean;
+	}
 ) {
 	// A `dragstart` event always has drag data, and starts on the block or
 	// on its handle.
@@ -76,7 +87,7 @@ export function startGridItemDrag(
 			srcRootClientId: rootClientId,
 		} )
 	);
-	if ( target !== blockElement ) {
+	if ( isHandle ) {
 		dataTransfer.setData( HANDLE_DRAG_TYPE, '1' );
 	}
 
@@ -206,12 +217,19 @@ export function startGridItemPointerDrag(
 	const originalOpacity = blockElement.style.opacity;
 	let isStarted = false;
 
+	// The drop layers are in the handle's document. The topmost one under the
+	// touch is looked up once for all the grids.
 	function notify(
 		type: GridItemPointerDragEvent[ 'type' ],
 		{ clientX, clientY }: Pick< PointerEvent, 'clientX' | 'clientY' >
 	) {
+		const dropLayer = ownerDocument
+			.elementsFromPoint( clientX, clientY )
+			.find( ( element ) =>
+				element.classList.contains( DROP_LAYER_CLASS )
+			);
 		for ( const listener of pointerDragListeners ) {
-			listener( { type, clientX, clientY } );
+			listener( { type, clientX, clientY, dropLayer } );
 		}
 	}
 
