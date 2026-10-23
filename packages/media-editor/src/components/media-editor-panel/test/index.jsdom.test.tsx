@@ -89,7 +89,7 @@ describe( 'MediaEditorPanel', () => {
 		);
 
 		expect( screen.getByTestId( 'tabs' ) ).toHaveTextContent(
-			'core/crop,plugin/a,plugin/b,core/details'
+			'core/crop,core/details,plugin/a,plugin/b'
 		);
 	} );
 
