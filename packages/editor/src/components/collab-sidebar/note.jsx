@@ -244,9 +244,12 @@ export function Note( {
 					canReact={
 						isSelected &&
 						actionState !== 'edit' &&
-						! isThreadResolved
+						! isThreadResolved &&
+						! lockedActions.has( 'react' )
 					}
-					disabled={ isThreadResolved }
+					disabled={
+						isThreadResolved || lockedActions.has( 'react' )
+					}
 				/>
 			</div>
 			{ actionState === 'delete' && (

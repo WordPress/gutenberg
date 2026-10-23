@@ -13,11 +13,13 @@ vi.mock( import( '../../../store' ), () => ( {
 	store: 'core/editor' as unknown as EditorStore,
 } ) );
 
+const ALL_ACTIONS = [ 'create', 'reply', 'edit', 'resolve', 'delete', 'react' ];
+
 function renderWithState( {
 	lockedNoteActions,
 	meta,
 }: {
-	lockedNoteActions?: string[];
+	lockedNoteActions?: { unlocked?: string[]; locked?: string[] };
 	meta?: Record< string, unknown >;
 } ) {
 	( useSelect as Mock ).mockImplementation(
@@ -40,9 +42,9 @@ describe( 'useNoteLock', () => {
 		expect( isFullyLocked ).toBe( false );
 	} );
 
-	it( 'locks the actions the editor settings list', () => {
+	it( 'locks the actions the snapshot lists for an unlocked post', () => {
 		const { lockedActions, isFullyLocked } = renderWithState( {
-			lockedNoteActions: [ 'delete' ],
+			lockedNoteActions: { unlocked: [ 'delete' ], locked: ALL_ACTIONS },
 		} );
 
 		expect( lockedActions.has( 'delete' ) ).toBe( true );
@@ -52,28 +54,48 @@ describe( 'useNoteLock', () => {
 
 	it( 'reports a full lock only once every action is locked', () => {
 		const { isFullyLocked } = renderWithState( {
-			lockedNoteActions: [ 'create', 'reply', 'edit', 'resolve' ],
+			lockedNoteActions: {
+				unlocked: [ 'create', 'reply', 'edit', 'resolve', 'delete' ],
+			},
 		} );
 
 		expect( isFullyLocked ).toBe( false );
 	} );
 
-	it( 'locks everything when the post meta is set, whatever the snapshot says', () => {
+	it( 'follows the snapshot for a locked post once the meta is set', () => {
 		const { lockedActions, isFullyLocked } = renderWithState( {
-			lockedNoteActions: [],
+			lockedNoteActions: { unlocked: [], locked: ALL_ACTIONS },
 			meta: { _wp_notes_locked: true },
 		} );
 
 		expect( isFullyLocked ).toBe( true );
 		expect( lockedActions.has( 'create' ) ).toBe( true );
-		expect( lockedActions.has( 'delete' ) ).toBe( true );
 	} );
 
-	it( 'ignores an unset post meta', () => {
-		const { isFullyLocked } = renderWithState( {
+	it( 'keeps the exceptions a filter carves out of a locked post', () => {
+		const { lockedActions, isFullyLocked } = renderWithState( {
+			lockedNoteActions: { unlocked: [], locked: [] },
+			meta: { _wp_notes_locked: true },
+		} );
+
+		expect( lockedActions.size ).toBe( 0 );
+		expect( isFullyLocked ).toBe( false );
+	} );
+
+	it( 'unlocks once the meta is cleared mid-session', () => {
+		const { lockedActions } = renderWithState( {
+			lockedNoteActions: { unlocked: [], locked: ALL_ACTIONS },
 			meta: { _wp_notes_locked: false },
 		} );
 
-		expect( isFullyLocked ).toBe( false );
+		expect( lockedActions.size ).toBe( 0 );
+	} );
+
+	it( 'locks everything for a locked post without a snapshot', () => {
+		const { isFullyLocked } = renderWithState( {
+			meta: { _wp_notes_locked: true },
+		} );
+
+		expect( isFullyLocked ).toBe( true );
 	} );
 } );

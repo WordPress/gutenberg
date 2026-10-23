@@ -3324,7 +3324,17 @@ test.describe( 'Block Notes', () => {
 							.select( 'core/editor' )
 							.getEditorSettings().lockedNoteActions
 				)
-			).toEqual( [ 'create', 'reply', 'edit', 'resolve', 'delete' ] );
+			).toEqual( {
+				unlocked: [],
+				locked: [
+					'create',
+					'reply',
+					'edit',
+					'resolve',
+					'delete',
+					'react',
+				],
+			} );
 
 			await editor.selectBlocks(
 				editor.canvas
