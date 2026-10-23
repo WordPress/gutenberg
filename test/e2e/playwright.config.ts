@@ -43,7 +43,6 @@ const config = defineConfig( {
 				[ '@flakiness/playwright', flakinessOptions ],
 			]
 		: [ [ 'list' ], [ '@flakiness/playwright', flakinessOptions ] ],
-	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),

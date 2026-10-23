@@ -2,6 +2,19 @@ const path = require( 'path' );
 const { defineConfig, devices } = require( '@playwright/test' );
 
 process.env.WP_ARTIFACTS_PATH ??= path.join( process.cwd(), 'artifacts' );
+
+// With a comma-separated list of sites in `WP_BASE_URLS`, each worker runs
+// its tests on its own site, so tests can run in parallel.
+const sites = process.env.WP_BASE_URLS?.split( ',' );
+if ( sites ) {
+	const index = Number( process.env.TEST_PARALLEL_INDEX ?? 0 );
+	process.env.WP_BASE_URL = sites[ index ];
+	process.env.STORAGE_STATE_PATH = path.join(
+		process.env.WP_ARTIFACTS_PATH,
+		`storage-states/admin-${ index }.json`
+	);
+}
+
 process.env.STORAGE_STATE_PATH ??= path.join(
 	process.env.WP_ARTIFACTS_PATH,
 	'storage-states/admin.json'
@@ -13,7 +26,7 @@ const config = defineConfig( {
 	reporter: process.env.CI ? [ [ 'github' ] ] : [ [ 'list' ] ],
 	forbidOnly: !! process.env.CI,
 	// fullyParallel: false,
-	workers: 1,
+	workers: sites?.length ?? 1,
 	retries: process.env.CI ? 2 : 0,
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
 	// Don't report slow test "files", as we will be running our tests in serial.
