@@ -5,22 +5,40 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import usePostContentBlockTypes from './use-post-content-block-types';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
+ *
+ * @param {Object} props                     Component props.
+ * @param {number} [props.templateSlotDepth] For the template inheritance experiment: how many templates are nested inside the rendered template. Their Content block slots are locked, and only the post's blocks inside the innermost one are editable.
  */
-export default function DisableNonPageContentBlocks() {
+export default function DisableNonPageContentBlocks( {
+	templateSlotDepth = 0,
+} ) {
 	const postContentBlockTypes = usePostContentBlockTypes();
-	const { contentOnlyIds, templateParts } = useSelect(
+	const { contentOnlyIds, slotIds, templateParts } = useSelect(
 		( select ) => {
-			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			const { getPostBlocksByName, getTemplateChainBlocks } = unlock(
+				select( editorStore )
+			);
 			const { getBlocksByName } = select( blockEditorStore );
+			const chainBlocks = templateSlotDepth
+				? getTemplateChainBlocks(
+						postContentBlockTypes,
+						templateSlotDepth
+					)
+				: null;
 			return {
-				contentOnlyIds: getPostBlocksByName( postContentBlockTypes ),
+				contentOnlyIds: chainBlocks
+					? chainBlocks.postBlockIds
+					: getPostBlocksByName( postContentBlockTypes ),
+				slotIds: chainBlocks ? chainBlocks.slotIds : EMPTY_ARRAY,
 				templateParts: getBlocksByName( 'core/template-part' ),
 			};
 		},
-		[ postContentBlockTypes ]
+		[ postContentBlockTypes, templateSlotDepth ]
 	);
 	// This is a separate `useSelect` because `templatePartChildren` is
 	// derived via flatMap, which always produces a new array. Combining it
@@ -100,6 +118,11 @@ export default function DisableNonPageContentBlocks() {
 		} = registry.dispatch( blockEditorStore );
 
 		const nextModes = new Map();
+		// The Content blocks that hold the templates of a chain are locked,
+		// and so is everything inside them that isn't the post's.
+		for ( const clientId of slotIds ) {
+			nextModes.set( clientId, 'disabled' );
+		}
 		for ( const clientId of contentOnlyIds ) {
 			nextModes.set( clientId, 'contentOnly' );
 		}
@@ -126,7 +149,7 @@ export default function DisableNonPageContentBlocks() {
 				}
 			}
 		} );
-	}, [ contentOnlyIds, templatePartChildren, registry ] );
+	}, [ contentOnlyIds, slotIds, templatePartChildren, registry ] );
 
 	// Unset on unmount only. Dependency changes are reconciled above.
 	useEffect( () => {

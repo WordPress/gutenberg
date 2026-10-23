@@ -57,6 +57,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `postId`
 - `postType`
 - `queryId`
+- `templateChain`
 
 ## Block Markup
 

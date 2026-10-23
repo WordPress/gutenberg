@@ -230,8 +230,23 @@ function gutenberg_template_inheritance_compose( $template ) {
 add_filter( 'template_include', 'gutenberg_template_inheritance_compose', 20 );
 
 /**
+ * Rendered child templates waiting to replace their Content block's
+ * placeholder, keyed by placeholder.
+ *
+ * @global string[] $gutenberg_template_inheritance_rendered
+ */
+$GLOBALS['gutenberg_template_inheritance_rendered'] = array();
+
+/**
  * Makes the Content block render the next queued child template, when there
  * is one, instead of the post content.
+ *
+ * The child template takes the Content block's place with no wrapper, so its
+ * markup lands exactly as it would if it were written into the parent. The
+ * Content block's own settings, such as its tag name and styles, don't apply
+ * to a child template. Block supports run on what a render callback returns,
+ * so the callback returns a placeholder, and the child replaces it once they
+ * have run. See `gutenberg_template_inheritance_replace_placeholder()`.
  *
  * @param array  $args       The block type registration arguments.
  * @param string $block_name The block type name.
@@ -244,7 +259,8 @@ function gutenberg_template_inheritance_post_content_args( $args, $block_name ) 
 
 	$render_post_content     = $args['render_callback'];
 	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $render_post_content ) {
-		global $gutenberg_template_inheritance_slots;
+		global $gutenberg_template_inheritance_slots, $gutenberg_template_inheritance_rendered;
+		static $slot_count = 0;
 
 		// A Content block inside a Query Loop always shows the post's content.
 		if ( empty( $gutenberg_template_inheritance_slots ) || isset( $block->context['queryId'] ) ) {
@@ -252,25 +268,42 @@ function gutenberg_template_inheritance_post_content_args( $args, $block_name ) 
 		}
 
 		$child_template = array_shift( $gutenberg_template_inheritance_slots );
-		$inner_html     = do_blocks( do_shortcode( $child_template ) );
+		$placeholder    = '{{gutenberg-template-slot-' . ++$slot_count . '}}';
 
-		$tag_name = 'div';
-		if ( isset( $attributes['tagName'] ) && is_string( $attributes['tagName'] ) ) {
-			$allowed_tag_names   = array( 'div', 'main', 'section', 'article' );
-			$normalized_tag_name = strtolower( $attributes['tagName'] );
-			if ( in_array( $normalized_tag_name, $allowed_tag_names, true ) ) {
-				$tag_name = $normalized_tag_name;
-			}
-		}
+		$gutenberg_template_inheritance_rendered[ $placeholder ] = do_blocks( do_shortcode( $child_template ) );
 
-		return sprintf(
-			'<%1$s %2$s>%3$s</%1$s>',
-			$tag_name,
-			get_block_wrapper_attributes(),
-			$inner_html
-		);
+		return $placeholder;
 	};
 
 	return $args;
 }
 add_filter( 'register_block_type_args', 'gutenberg_template_inheritance_post_content_args', 20, 2 );
+
+/**
+ * Swaps a Content block's placeholder for the child template rendered into
+ * it, after block supports have run.
+ *
+ * @global string[] $gutenberg_template_inheritance_rendered
+ *
+ * @param string $block_content The rendered block content.
+ * @return string The rendered child template, or the block content unchanged.
+ */
+function gutenberg_template_inheritance_replace_placeholder( $block_content ) {
+	global $gutenberg_template_inheritance_rendered;
+
+	if ( isset( $gutenberg_template_inheritance_rendered[ $block_content ] ) ) {
+		$child_html = $gutenberg_template_inheritance_rendered[ $block_content ];
+		unset( $gutenberg_template_inheritance_rendered[ $block_content ] );
+		return $child_html;
+	}
+
+	return $block_content;
+}
+add_filter( 'render_block_core/post-content', 'gutenberg_template_inheritance_replace_placeholder', PHP_INT_MAX );
+
+/*
+ * Registers a child theme of Twenty Twenty-Five whose templates inherit from
+ * its Index template, so the experiment can be tried without building a
+ * theme. Temporary, for testing: remove before this experiment merges.
+ */
+register_theme_directory( __DIR__ . '/template-inheritance-themes' );

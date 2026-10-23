@@ -92,9 +92,11 @@ class Gutenberg_Template_Inheritance_Test extends WP_UnitTestCase {
 		$html = do_blocks( $_wp_current_template_content );
 
 		$this->assertMatchesRegularExpression(
-			'#<p>Shell</p>\s*<div class="wp-block-post-content[^"]*">\s*<p>Blog</p>\s*<div class="wp-block-post-content[^"]*">\s*<p>Single</p>\s*</div>\s*</div>#',
-			$html
+			'#<p>Shell</p>\s*<p>Blog</p>\s*<p>Single</p>#',
+			$html,
+			'Each child template should render in place of its parent\'s Content block, with no wrapper.'
 		);
+		$this->assertStringNotContainsString( 'gutenberg-template-slot', $html );
 		$this->assertSame( array(), $GLOBALS['gutenberg_template_inheritance_slots'] );
 	}
 

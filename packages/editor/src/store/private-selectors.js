@@ -41,6 +41,21 @@ const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 const RENDERING_MODES = [ 'post-only', 'template-locked' ];
 
 /**
+ * Returns the first Content block that isn't disabled. With template
+ * inheritance, the Content blocks that hold the templates around the post are
+ * disabled, and the post's own Content block is further in.
+ *
+ * @param {Object} blockEditorSelectors The block editor store selectors.
+ * @return {string|undefined} The Content block client ID.
+ */
+function getEditablePostContentClientId( blockEditorSelectors ) {
+	const { getBlocksByName, getBlockEditingMode } = blockEditorSelectors;
+	return getBlocksByName( 'core/post-content' ).find(
+		( clientId ) => getBlockEditingMode( clientId ) !== 'disabled'
+	);
+}
+
+/**
  * Get the inserter.
  *
  * @param {Object} state Global application state.
@@ -56,13 +71,13 @@ export const getInserter = createRegistrySelector( ( select ) =>
 
 			if ( getRenderingMode( state ) === 'template-locked' ) {
 				const {
-					getBlocksByName,
 					getSelectedBlockClientId,
 					getBlockParents,
 					getBlockOrder,
 				} = select( blockEditorStore );
-				const [ postContentClientId ] =
-					getBlocksByName( 'core/post-content' );
+				const postContentClientId = getEditablePostContentClientId(
+					select( blockEditorStore )
+				);
 				if ( postContentClientId ) {
 					const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -93,14 +108,11 @@ export const getInserter = createRegistrySelector( ( select ) =>
 			return EMPTY_INSERTION_POINT;
 		},
 		( state ) => {
-			const {
-				getBlocksByName,
-				getSelectedBlockClientId,
-				getBlockParents,
-				getBlockOrder,
-			} = select( blockEditorStore );
-			const [ postContentClientId ] =
-				getBlocksByName( 'core/post-content' );
+			const { getSelectedBlockClientId, getBlockParents, getBlockOrder } =
+				select( blockEditorStore );
+			const postContentClientId = getEditablePostContentClientId(
+				select( blockEditorStore )
+			);
 			const selectedBlockClientId = getSelectedBlockClientId();
 			return [
 				state.blockInserterPanel,
@@ -218,6 +230,96 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 				getBlockParents( id )
 			);
 			return [ clientIds, ...parentsOfClientIds ];
+		}
+	)
+);
+
+const EMPTY_TEMPLATE_CHAIN_BLOCKS = { slotIds: [], postBlockIds: [] };
+
+/**
+ * For the template inheritance experiment: finds the blocks that make up a
+ * chain of nested templates. Each template in the chain renders in the
+ * top-most Content block of the template around it. Those Content blocks are
+ * the slots. The post's blocks are then the top-most blocks of the given names
+ * inside the innermost slot, as `getPostBlocksByName` finds them in a single
+ * template.
+ *
+ * @param {Object}          state      Global application state.
+ * @param {string|string[]} blockNames Block names of the post's blocks.
+ * @param {number}          depth      How many templates are nested inside the rendered template.
+ *
+ * @return {{slotIds: string[], postBlockIds: string[]}} Client IDs of the slots, outermost first, and of the post's blocks.
+ */
+export const getTemplateChainBlocks = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames, depth ) => {
+			if ( ! depth ) {
+				return EMPTY_TEMPLATE_CHAIN_BLOCKS;
+			}
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+
+			// Finds the top-most blocks of the given names below `scopeId`,
+			// skipping those inside a Query Loop.
+			const findTopMost = ( names, scopeId ) =>
+				getBlocksByName( names ).filter( ( clientId ) => {
+					const parents = getBlockParents( clientId );
+					const scopeIndex = scopeId
+						? parents.indexOf( scopeId )
+						: -1;
+					if ( scopeId && scopeIndex === -1 ) {
+						return false;
+					}
+					return parents
+						.slice( scopeIndex + 1 )
+						.every( ( parentClientId ) => {
+							const parentName = getBlockName( parentClientId );
+							return (
+								parentName !== 'core/query' &&
+								! names.includes( parentName )
+							);
+						} );
+				} );
+
+			const slotIds = [];
+			let scopeId = '';
+			for ( let i = 0; i < depth; i++ ) {
+				const [ slotId ] = findTopMost(
+					[ 'core/post-content' ],
+					scopeId
+				);
+				if ( ! slotId ) {
+					break;
+				}
+				slotIds.push( slotId );
+				scopeId = slotId;
+			}
+
+			return {
+				slotIds,
+				postBlockIds:
+					slotIds.length === depth
+						? findTopMost( blockNames, scopeId )
+						: [],
+			};
+		},
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents } =
+				select( blockEditorStore );
+			const clientIds = getBlocksByName( [
+				...blockNames,
+				'core/post-content',
+			] );
+			return [
+				clientIds,
+				...clientIds.map( ( id ) => getBlockParents( id ) ),
+			];
 		}
 	)
 );
