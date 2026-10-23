@@ -2,12 +2,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { BlockType } from '@wordpress/blocks';
 import rotate, {
 	getRotateCSS,
-	getRotateForState,
-	getRotateValue,
-	getUpdatedRotateStyle,
 	hasRotateSupport,
 	isRotateEnabled,
 } from '../rotate';
+import {
+	getRotateForState,
+	getRotateValue,
+	getUpdatedRotateStyle,
+} from '../../utils/rotation';
 
 const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
 const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
