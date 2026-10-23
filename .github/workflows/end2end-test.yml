@@ -151,9 +151,9 @@ jobs:
                   workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium firefox webkit
 
-            - name: Install WordPress and start three servers
+            - name: Install WordPress and start two servers
               run: |
-                  urls=$( test/e2e/wp-env-instances.sh 3 )
+                  urls=$( test/e2e/wp-env-instances.sh 2 )
                   echo "WP_BASE_URLS=$urls" >> "$GITHUB_ENV"
 
             - name: Run the tests
