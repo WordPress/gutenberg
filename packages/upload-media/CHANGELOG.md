@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Keep `progress` up to date on queue items, counting sub-size operations towards their parent ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
+
 ## 0.43.0 (2026-10-20)
 
 ### Breaking Changes

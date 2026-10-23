@@ -10,6 +10,7 @@ import {
 	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
+	type QueueItemId,
 	type RemoveAction,
 	type ResumeItemAction,
 	type ResumeQueueAction,
@@ -29,6 +30,52 @@ import {
 } from './constants';
 
 const noop = () => {};
+
+/**
+ * Recomputes the progress of a top-level item.
+ *
+ * Progress is the share of operations finished out of all operations seen so
+ * far, the item's own and those of its sub-size items. Sub-sizes are only
+ * queued once the original has uploaded, which grows the total, so progress
+ * never moves backwards.
+ *
+ * @param queue Upload queue.
+ * @param id    ID of the item, or of a sub-size item whose parent to update.
+ *
+ * @return Updated queue.
+ */
+function withProgress( queue: QueueItem[], id?: QueueItemId ): QueueItem[] {
+	let item = queue.find( ( { id: itemId } ) => itemId === id );
+	if ( item?.parentId ) {
+		const parentId = item.parentId;
+		item = queue.find( ( { id: itemId } ) => itemId === parentId );
+	}
+	if ( ! item || item.parentId ) {
+		return queue;
+	}
+
+	const completed = item.completedOperations ?? 0;
+	let remaining = item.operations?.length ?? 0;
+	for ( const child of queue ) {
+		if ( child.parentId === item.id ) {
+			remaining += child.operations?.length ?? 0;
+		}
+	}
+
+	const total = completed + remaining;
+	const progress = Math.max(
+		item.progress ?? 0,
+		total ? Math.round( ( completed / total ) * 100 ) : 0
+	);
+	if ( progress === item.progress ) {
+		return queue;
+	}
+
+	const target = item;
+	return queue.map( ( queueItem ) =>
+		queueItem === target ? { ...queueItem, progress } : queueItem
+	);
+}
 
 const DEFAULT_STATE: State = {
 	queue: [],
@@ -66,7 +113,7 @@ type Action =
 function reducer(
 	state = DEFAULT_STATE,
 	action: Action = { type: Type.Unknown }
-) {
+): State {
 	switch ( action.type ) {
 		case Type.PauseQueue: {
 			return {
@@ -111,7 +158,10 @@ function reducer(
 		case Type.Add:
 			return {
 				...state,
-				queue: [ ...state.queue, action.item ],
+				queue: withProgress(
+					[ ...state.queue, action.item ],
+					action.item.id
+				),
 			};
 
 		case Type.Cancel: {
@@ -184,11 +234,18 @@ function reducer(
 				),
 			};
 
-		case Type.Remove:
+		case Type.Remove: {
+			const parentId = state.queue.find(
+				( item ) => item.id === action.id
+			)?.parentId;
 			return {
 				...state,
-				queue: state.queue.filter( ( item ) => item.id !== action.id ),
+				queue: withProgress(
+					state.queue.filter( ( item ) => item.id !== action.id ),
+					parentId
+				),
 			};
+		}
 
 		case Type.OperationStart: {
 			return {
@@ -207,55 +264,77 @@ function reducer(
 		case Type.AddOperations:
 			return {
 				...state,
-				queue: state.queue.map( ( item ): QueueItem => {
-					if ( item.id !== action.id ) {
-						return item;
-					}
+				queue: withProgress(
+					state.queue.map( ( item ): QueueItem => {
+						if ( item.id !== action.id ) {
+							return item;
+						}
 
-					return {
-						...item,
-						operations: [
-							...( item.operations || [] ),
-							...action.operations,
-						],
-					};
-				} ),
+						return {
+							...item,
+							operations: [
+								...( item.operations || [] ),
+								...action.operations,
+							],
+						};
+					} ),
+					action.id
+				),
 			};
 
-		case Type.OperationFinish:
+		case Type.OperationFinish: {
+			// Sub-size operations count towards their parent's progress.
+			const finished = state.queue.find(
+				( item ) => item.id === action.id
+			);
+			const progressId = finished?.parentId ?? action.id;
+
+			const queue = state.queue.map( ( item ): QueueItem => {
+				let updated = item;
+
+				if ( item.id === progressId ) {
+					updated = {
+						...updated,
+						completedOperations:
+							( item.completedOperations ?? 0 ) + 1,
+					};
+				}
+
+				if ( item.id !== action.id ) {
+					return updated;
+				}
+
+				const operations = item.operations
+					? item.operations.slice( 1 )
+					: [];
+
+				// Prevent an empty object if there's no attachment data.
+				const attachment =
+					item.attachment || action.item.attachment
+						? {
+								...item.attachment,
+								...action.item.attachment,
+							}
+						: undefined;
+
+				return {
+					...updated,
+					currentOperation: undefined,
+					operations,
+					...action.item,
+					attachment,
+					additionalData: {
+						...item.additionalData,
+						...action.item.additionalData,
+					},
+				};
+			} );
+
 			return {
 				...state,
-				queue: state.queue.map( ( item ): QueueItem => {
-					if ( item.id !== action.id ) {
-						return item;
-					}
-
-					const operations = item.operations
-						? item.operations.slice( 1 )
-						: [];
-
-					// Prevent an empty object if there's no attachment data.
-					const attachment =
-						item.attachment || action.item.attachment
-							? {
-									...item.attachment,
-									...action.item.attachment,
-								}
-							: undefined;
-
-					return {
-						...item,
-						currentOperation: undefined,
-						operations,
-						...action.item,
-						attachment,
-						additionalData: {
-							...item.additionalData,
-							...action.item.additionalData,
-						},
-					};
-				} ),
+				queue: withProgress( queue, progressId ),
 			};
+		}
 
 		case Type.CacheBlobUrl: {
 			const blobUrls = state.blobUrls[ action.id ] || [];

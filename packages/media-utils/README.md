@@ -33,6 +33,22 @@ Private `@wordpress/media-utils` APIs.
 
 Undocumented declaration.
 
+### sideloadMedia
+
+Uploads a file to the server without creating an attachment.
+
+Returns sub-size data instead of a full attachment. The client accumulates this data and sends it to the finalize endpoint.
+
+_Parameters_
+
+- _$0_ `SideloadMediaArgs`: Parameters object passed to the function.
+- _$0.file_ `SideloadMediaArgs[ 'file' ]`: Media File to Save.
+- _$0.attachmentId_ `SideloadMediaArgs[ 'attachmentId' ]`: Parent attachment ID.
+- _$0.additionalData_ `SideloadMediaArgs[ 'additionalData' ]`: Additional data to include in the request.
+- _$0.signal_ `SideloadMediaArgs[ 'signal' ]`: Abort signal.
+- _$0.onSuccess_ `SideloadMediaArgs[ 'onSuccess' ]`: Function called when the sideload completes with sub-size data.
+- _$0.onError_ `SideloadMediaArgs[ 'onError' ]`: Function called when an error happens.
+
 ### SubSizeData
 
 Undocumented declaration.

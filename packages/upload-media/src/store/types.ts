@@ -50,7 +50,10 @@ export interface QueueItem {
 	error?: Error;
 	retryCount?: number;
 	nextRetryTimestamp?: number;
+	// Upload progress (0-100), counting sub-size items towards their parent.
 	progress?: number;
+	// Operations finished so far, including those of sub-size items.
+	completedOperations?: number;
 	batchId?: string;
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
