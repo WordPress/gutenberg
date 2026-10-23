@@ -112,6 +112,39 @@ _Returns_
 
 - `FormatType | undefined`: Format type.
 
+### getFormatTypeForStyleProperty
+
+Gets the format type, if any, that can handle a bare element, given its tag name and inline style. A format type can identify itself for a bare element by a single CSS property (its `styleProperty` setting), which allows multiple format types to share the same tag name.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as richTextStore } from '@wordpress/rich-text';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { getFormatTypeForStyleProperty } = useSelect(
+		( select ) => select( richTextStore ),
+		[]
+	);
+
+	const format = getFormatTypeForStyleProperty( 'span', 'color: red;' );
+
+	return format && <p>{ sprintf( __( 'Format name: %s' ), format.name ) }</p>;
+};
+```
+
+_Parameters_
+
+- _state_ `State`: Data state.
+- _bareElementTagName_ `string`: The tag name of the bare element to find a format type for.
+- _style_ `string`: The inline `style` attribute value of the element.
+
+_Returns_
+
+- `FormatType | undefined`: Format type.
+
 ### getFormatTypes
 
 Returns all the available format types.
