@@ -187,7 +187,7 @@
 				}
 			}
 
-			&[data-highlighted]:not([data-disabled]) {
+			&:is(:hover, [data-highlighted]):not([data-disabled]) {
 				background-color: var(--wpds-color-background-interactive-brand-strong-active);
 				color: var(--wpds-color-foreground-interactive-brand-strong-active);
 				outline: none; /* Disable user agent focus ring */
@@ -196,6 +196,19 @@
 					forced-color-adjust: none;
 					background-color: Highlight;
 					color: HighlightText;
+				}
+			}
+
+			/* Grid cells are horizontal siblings, so do not join their block edges. */
+			&:is(:hover, [data-highlighted]):not([data-disabled], [role="gridcell"]) {
+				&:has(+ .item:is(:hover, [data-highlighted]):not([data-disabled], [role="gridcell"])) {
+					border-end-start-radius: 0;
+					border-end-end-radius: 0;
+				}
+
+				& + .item:is(:hover, [data-highlighted]):not([data-disabled], [role="gridcell"]) {
+					border-start-start-radius: 0;
+					border-start-end-radius: 0;
 				}
 			}
 
@@ -243,7 +256,7 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item[data-highlighted]:not([data-disabled]) .item-description,
+		.item:is(:hover, [data-highlighted]):not([data-disabled]) .item-description,
 		.item[data-disabled] .item-description {
 			--_gcd-heading-color: currentColor;
 
