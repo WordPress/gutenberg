@@ -101,6 +101,7 @@ const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
+const EXTERNALS = WP_PLUGIN_CONFIG.externals || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
 // Capability required to view a generated page when the page config does not
@@ -150,7 +151,8 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
 	SCRIPT_GLOBAL,
 	EXTERNAL_NAMESPACES,
-	HANDLE_PREFIX
+	HANDLE_PREFIX,
+	EXTERNALS
 );
 
 const styleRuntimeRequire = createNodeRequire( import.meta.url );
