@@ -218,7 +218,7 @@ return array(
 	'error'               => array(
 		'label'       => _x( 'Error', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/error.svg',
-		'collections' => array( 'core' ),
+		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'caution', 'icon keyword', 'gutenberg' ), _x( 'exclamation', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
 	),
 	'external'            => array(
@@ -265,7 +265,7 @@ return array(
 	'info'                => array(
 		'label'       => _x( 'Info', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/info.svg',
-		'collections' => array( 'core' ),
+		'collections' => array( 'core', 'core-admin' ),
 	),
 	'key'                 => array(
 		'label'       => _x( 'Key', 'icon label', 'gutenberg' ),
@@ -362,6 +362,11 @@ return array(
 		'label'       => _x( 'Plus Circle', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/plus-circle.svg',
 		'collections' => array( 'core' ),
+	),
+	'post-comments'       => array(
+		'label'       => _x( 'Post Comments', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/post-comments.svg',
+		'collections' => array( 'core', 'core-admin' ),
 	),
 	'previous'            => array(
 		'label'       => _x( 'Previous', 'icon label', 'gutenberg' ),
