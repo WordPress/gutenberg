@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Error boundary: Confirm a copied error on the button, and announce the result.
+-   Error boundary: Confirm success or failure when copying an error, and announce the result.
 
 ## 0.25.0 (2026-10-20)
 

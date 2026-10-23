@@ -2,9 +2,10 @@ import type { ReactNode } from 'react';
 import { speak } from '@wordpress/a11y';
 import { Component, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, EmptyState } from '@wordpress/ui';
+import { Button } from '@wordpress/components';
+import { EmptyState } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { caution, check, copy } from '@wordpress/icons';
+import { caution, check, copy, error as errorIcon } from '@wordpress/icons';
 import styles from './style.module.scss';
 
 interface Props {
@@ -17,34 +18,54 @@ interface State {
 
 const COPY_FEEDBACK_TIMEOUT = 2000;
 
+type CopyResult = 'idle' | 'copied' | 'error';
+
+const RESULT_ICON = {
+	idle: copy,
+	copied: check,
+	error: errorIcon,
+};
+
 function CopyErrorButton( { error }: { error: Error } ) {
-	// Each successful copy bumps this so the check stays up for a fresh
-	// interval, including when Copy error is used again while it is showing.
-	const [ copiedTick, setCopiedTick ] = useState( 0 );
-	const hasCopied = copiedTick > 0;
+	// Bump the id on every result so a repeat of the same outcome restarts
+	// the time the icon stays visible.
+	const [ feedback, setFeedback ] = useState< {
+		result: CopyResult;
+		id: number;
+	} >( { result: 'idle', id: 0 } );
 
 	useEffect( () => {
-		if ( copiedTick === 0 ) {
+		if ( feedback.result === 'idle' ) {
 			return;
 		}
 		const timeoutId = setTimeout(
-			() => setCopiedTick( 0 ),
+			() => setFeedback( { result: 'idle', id: 0 } ),
 			COPY_FEEDBACK_TIMEOUT
 		);
 		return () => clearTimeout( timeoutId );
-	}, [ copiedTick ] );
+	}, [ feedback ] );
+
+	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
+		setFeedback( ( current ) => ( {
+			result,
+			id: current.id + 1,
+		} ) );
+		speak( message );
+	}
 
 	const ref = useCopyToClipboard(
 		() => error.stack ?? String( error ),
-		() => {
-			setCopiedTick( ( tick ) => tick + 1 );
-			speak( __( 'Copied to clipboard' ) );
-		}
+		() => report( 'copied', __( 'Copied to clipboard' ) ),
+		() => report( 'error', __( "Couldn't copy to clipboard." ) )
 	);
 
 	return (
-		<Button ref={ ref } variant="outline" tone="brand">
-			<Button.Icon icon={ hasCopied ? check : copy } />
+		<Button
+			__next40pxDefaultSize
+			variant="secondary"
+			ref={ ref }
+			icon={ RESULT_ICON[ feedback.result ] }
+		>
 			{ __( 'Copy error' ) }
 		</Button>
 	);
