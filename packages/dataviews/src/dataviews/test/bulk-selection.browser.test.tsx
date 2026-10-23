@@ -1,7 +1,7 @@
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import { afterEach, beforeEach, expect, it } from 'vitest';
-import { useState } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
 import type { Action, Field, View } from '../../types';
@@ -262,6 +262,51 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 				} )
 			)
 			.toHaveFocus();
+	}
+);
+
+it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
+	'sizes the %s table toolbar to the header before the first paint',
+	async ( density ) => {
+		const heights: Array< { toolbar: number; header: number } > = [];
+		// Layout effects of a later sibling run after the table commits and
+		// before the browser paints, so this records the first painted frame.
+		function MeasureFirstFrame() {
+			useLayoutEffect( () => {
+				heights.push( {
+					toolbar: document
+						.querySelector( '.dataviews-bulk-actions' )!
+						.getBoundingClientRect().height,
+					header: document
+						.querySelector( 'thead' )!
+						.getBoundingClientRect().height,
+				} );
+			}, [] );
+			return null;
+		}
+		await render(
+			<>
+				<DataViews
+					data={ posts }
+					fields={ fields }
+					view={ {
+						type: 'table',
+						titleField: 'title',
+						fields: [ 'author' ],
+						layout: { density },
+					} }
+					onChangeView={ () => {} }
+					actions={ actions }
+					selection={ [ '1' ] }
+					onChangeSelection={ () => {} }
+					paginationInfo={ { totalItems: 2, totalPages: 1 } }
+					defaultLayouts={ { table: true } }
+				/>
+				<MeasureFirstFrame />
+			</>
+		);
+		expect( heights ).toHaveLength( 1 );
+		expect( heights[ 0 ].toolbar ).toBe( heights[ 0 ].header );
 	}
 );
 
