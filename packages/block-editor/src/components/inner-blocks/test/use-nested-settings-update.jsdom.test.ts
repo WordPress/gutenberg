@@ -23,7 +23,7 @@ async function getSettings( {
 	captureToolbars,
 	layout,
 }: {
-	captureToolbars: boolean;
+	captureToolbars: boolean | undefined;
 	layout: Record< string, unknown >;
 } ) {
 	const registry = createRegistry();
@@ -79,12 +79,20 @@ describe( 'useNestedSettingsUpdate', () => {
 			originalExperiment;
 	} );
 
-	it( 'captures toolbars when the layout does', async () => {
+	it( "captures toolbars when the layout does and the block doesn't say", async () => {
+		const settings = await getSettings( {
+			captureToolbars: undefined,
+			layout: { type: 'grid', isManualPlacement: true },
+		} );
+		expect( settings.__experimentalCaptureToolbars ).toBe( true );
+	} );
+
+	it( "doesn't capture toolbars when the block says not to, whatever its layout", async () => {
 		const settings = await getSettings( {
 			captureToolbars: false,
 			layout: { type: 'grid', isManualPlacement: true },
 		} );
-		expect( settings.__experimentalCaptureToolbars ).toBe( true );
+		expect( settings.__experimentalCaptureToolbars ).toBe( false );
 	} );
 
 	it( 'captures toolbars when the block does', async () => {
