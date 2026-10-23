@@ -583,6 +583,14 @@ async function bundlePackage( packageName, options = {} ) {
 			if ( packageJson.wpScriptDefaultExport ) {
 				footerJs += `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }\n`;
 			}
+			/*
+			 * esbuild exposes the namespace's exports as getters, which forward to
+			 * the getters of the module's own exports. Every use of a script's
+			 * export by another script goes through them, which is costly while
+			 * the page loads, before the code is optimized. Replace them with
+			 * read-only data properties holding the same values.
+			 */
+			footerJs += `if (${ globalName } && ${ globalName }.__esModule) { ${ globalName } = (function (namespace) { var exports = Object.defineProperty({}, '__esModule', { value: true }); for (var key of Object.keys(namespace)) { Object.defineProperty(exports, key, { value: namespace[key], enumerable: true }); } return exports; })(${ globalName }); }\n`;
 			footerJs += `(window.${ scriptGlobal } ||= {}).${ globalMember } = ${ scriptGlobal }.${ globalMember };\n`;
 		}
 		footerJs += '})();';

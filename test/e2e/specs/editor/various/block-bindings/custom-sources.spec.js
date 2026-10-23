@@ -512,6 +512,45 @@ test.describe( 'Registered sources', () => {
 				).toBeHidden();
 			} );
 
+			test.describe( 'button inside a Navigation block', () => {
+				test.afterAll( async ( { requestUtils } ) => {
+					await requestUtils.deleteAllMenus();
+				} );
+
+				test( 'disables the Text field in the sidebar', async ( {
+					editor,
+					page,
+					requestUtils,
+				} ) => {
+					const menu = await requestUtils.createNavigationMenu( {
+						title: 'Header Menu',
+						content:
+							'<!-- wp:buttons --><div class="wp-block-buttons">' +
+							'<!-- wp:button {"metadata":{"bindings":{"text":{"source":"testing/can-user-edit-false","args":{"key":"text_field"}}}}} --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">button default text</a></div><!-- /wp:button -->' +
+							'</div><!-- /wp:buttons -->',
+					} );
+					await editor.insertBlock( {
+						name: 'core/navigation',
+						attributes: { ref: menu.id },
+					} );
+					await editor.canvas
+						.getByRole( 'document', {
+							name: 'Block: Button',
+							exact: true,
+						} )
+						.click();
+					await editor.openDocumentSettingsSidebar();
+
+					// The canvas is read-only for this source, so the
+					// sidebar's Text field is too.
+					await expect(
+						page
+							.getByRole( 'region', { name: 'Editor settings' } )
+							.getByRole( 'textbox', { name: 'Text' } )
+					).toBeDisabled();
+				} );
+			} );
+
 			test( 'image', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/image',

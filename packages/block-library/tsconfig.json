@@ -1,11 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env" ],
-		"strictNullChecks": true
+		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
 	},
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../autop/tsconfig.build.json" },
@@ -22,7 +22,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
-		{ "path": "../patterns" },
+		{ "path": "../patterns/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../hooks/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
@@ -43,6 +43,5 @@
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
-	],
-	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+	]
 }

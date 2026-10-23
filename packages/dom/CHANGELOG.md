@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `isVerticalEdge` and `isHorizontalEdge`: No longer scroll the page to find the edge, and find the vertical edge when it is just outside the viewport ([#85408](https://github.com/WordPress/gutenberg/pull/85408)).
 -   Make the `inline` argument to `removeInvalidHTML` optional in its types, matching existing behavior ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
 
 ### Internal

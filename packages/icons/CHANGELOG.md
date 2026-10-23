@@ -4,8 +4,13 @@
 
 ### New Features
 
+-   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
 -   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
 -   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Enhancements
+
+-   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
 
 ### Bug Fixes
 
