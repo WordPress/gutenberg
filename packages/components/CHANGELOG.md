@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
 -   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
