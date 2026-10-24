@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockTerminateVipsWorker = vi.fn();
+let finishConvert: ( buffer: ArrayBuffer ) => void = () => {};
+const mockConvertImageFormat = vi.fn(
+	() =>
+		new Promise< ArrayBuffer >( ( resolve ) => {
+			finishConvert = resolve;
+		} )
+);
 
 vi.mock(
 	import( '@wordpress/vips/worker' ),
@@ -8,6 +15,7 @@ vi.mock(
 		( {
 			terminateVipsWorker: mockTerminateVipsWorker,
 			vipsEnsureJxlSupport: vi.fn( () => Promise.resolve() ),
+			vipsConvertImageFormat: mockConvertImageFormat,
 		} ) as unknown as typeof import( '@wordpress/vips/worker' )
 );
 
@@ -84,6 +92,28 @@ describe( 'maybeRecycleVipsWorker', () => {
 		).rejects.toThrow( 'decode failed' );
 
 		exhaustRecycleBudget( utils );
+		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
+	} );
+	it( 'defers recycling while a transcode is in flight', async () => {
+		const utils = await loadUtils();
+
+		const png = new File( [ 'x' ], 'photo.png', { type: 'image/png' } );
+		const transcode = utils.vipsConvertImageFormat(
+			'id',
+			png,
+			'image/webp'
+		);
+		await vi.waitFor( () =>
+			expect( mockConvertImageFormat ).toHaveBeenCalled()
+		);
+
+		exhaustRecycleBudget( utils );
+		expect( mockTerminateVipsWorker ).not.toHaveBeenCalled();
+
+		finishConvert( new ArrayBuffer( 1 ) );
+		await transcode;
+
+		utils.maybeRecycleVipsWorker( 0 );
 		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

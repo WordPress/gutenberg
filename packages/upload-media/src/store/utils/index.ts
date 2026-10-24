@@ -102,24 +102,23 @@ function loadVipsModule(): Promise<
 }
 
 /**
- * Runs vips work with JPEG XL support loaded when an input or output is JXL.
+ * Runs a call into the vips worker, holding the worker so a recycle cannot
+ * drop it mid-call.
  *
- * The worker is held so a recycle cannot drop the JXL library between
- * loading it and using it.
+ * Loads JPEG XL support first when an input or output is JXL.
  *
- * @param types    MIME types the work reads or writes.
- * @param callback Vips work to run.
+ * @param types    MIME types the call reads or writes.
+ * @param callback Vips call to run.
  * @return The callback's result.
  */
-async function withJxlSupportFor< T >(
+function runVipsCall< T >(
 	types: string[],
 	callback: () => Promise< T >
 ): Promise< T > {
-	if ( ! types.includes( 'image/jxl' ) ) {
-		return callback();
-	}
 	return withVipsWorkerHeld( async () => {
-		await vipsEnsureJxlSupport();
+		if ( types.includes( 'image/jxl' ) ) {
+			await vipsEnsureJxlSupport();
+		}
 		return callback();
 	} );
 }
@@ -147,7 +146,7 @@ export async function vipsConvertImageFormat(
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
 		await loadVipsModule();
-	const buffer = await withJxlSupportFor( [ file.type, type ], async () =>
+	const buffer = await runVipsCall( [ file.type, type ], async () =>
 		convertImageFormat(
 			id,
 			await file.arrayBuffer(),
@@ -196,10 +195,13 @@ export async function vipsEncodeCanvasAsJpeg(
 		throw new Error( 'Could not get canvas 2d context' );
 	}
 	const pixels = ctx.getImageData( 0, 0, width, height ).data.buffer;
-	const buffer = await encodePixelsAsJpeg( id, pixels, width, height, {
-		quality,
-		metadataSource: await source.arrayBuffer(),
-	} );
+	const metadataSource = await source.arrayBuffer();
+	const buffer = await runVipsCall( [], () =>
+		encodePixelsAsJpeg( id, pixels, width, height, {
+			quality,
+			metadataSource,
+		} )
+	);
 	return new Blob( [ buffer as ArrayBuffer ], { type: 'image/jpeg' } );
 }
 
@@ -217,7 +219,7 @@ export async function vipsCompressImage(
 	options: VipsConvertOptions = {}
 ) {
 	const { vipsCompressImage: compressImage } = await loadVipsModule();
-	const buffer = await withJxlSupportFor( [ file.type ], async () =>
+	const buffer = await runVipsCall( [ file.type ], async () =>
 		compressImage( id, await file.arrayBuffer(), file.type, options )
 	);
 	return new File(
@@ -239,7 +241,8 @@ export async function vipsHasTransparency( url: string ) {
 	if ( ! response.ok ) {
 		throw new Error( `Failed to fetch image: ${ response.status }` );
 	}
-	return hasTransparency( await response.arrayBuffer() );
+	const buffer = await response.arrayBuffer();
+	return runVipsCall( [], () => hasTransparency( buffer ) );
 }
 
 /**
@@ -251,7 +254,7 @@ export async function vipsHasTransparency( url: string ) {
  */
 export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
 	const { vipsGetUltraHdrInfo: getUltraHdrInfo } = await loadVipsModule();
-	return getUltraHdrInfo( buffer );
+	return runVipsCall( [], () => getUltraHdrInfo( buffer ) );
 }
 
 /**
@@ -289,7 +292,7 @@ export async function vipsResizeImage(
 
 	const { vipsResizeImage: resizeImage } = await loadVipsModule();
 	const { buffer, width, height, originalWidth, originalHeight } =
-		await withJxlSupportFor( [ file.type ], async () =>
+		await runVipsCall( [ file.type ], async () =>
 			resizeImage( id, await file.arrayBuffer(), file.type, resize, {
 				smartCrop,
 				quality,
@@ -363,7 +366,7 @@ export async function vipsRotateImage(
 	}
 
 	const { vipsRotateImage: rotateImage } = await loadVipsModule();
-	const { buffer, width, height } = await withJxlSupportFor(
+	const { buffer, width, height } = await runVipsCall(
 		[ file.type ],
 		async () =>
 			rotateImage( id, await file.arrayBuffer(), file.type, orientation )
@@ -437,18 +440,16 @@ export function terminateVipsWorker(): void {
 }
 
 /**
- * Number of vips operations in flight outside of the queue's ResizeCrop and
- * Rotate operations, which `getActiveImageProcessingCount()` already counts.
+ * Number of calls into the vips worker in flight.
  */
 let heldVipsOperations = 0;
 
 /**
  * Runs vips work that the worker must not be recycled during.
  *
- * Use this for vips calls made outside ResizeCrop and Rotate, such as JPEG XL
- * work in a transcode. Recycling mid-call would drop the in-flight request,
- * and drop worker-side state such as JXL support that a later call in the
- * same callback relies on.
+ * Every vips wrapper in this file runs through it. Recycling mid-call would
+ * drop the in-flight request, and drop worker-side state such as JXL support
+ * that a later call in the same callback relies on.
  *
  * @param callback Vips work to run.
  * @return The callback's result.
