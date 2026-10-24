@@ -4,6 +4,11 @@ const policy = window.trustedTypes?.createPolicy( 'directive-html', {
 	createHTML: ( html ) => html,
 } );
 
+// Matches the server's token representation for fallback creation cases.
+const serverHTML = { wpServerHtml: true };
+// Supplies unique item IDs for the created list items.
+let itemId = 0;
+
 const { state } = store( 'directive-html', {
 	state: {
 		html: null,
@@ -16,8 +21,52 @@ const { state } = store( 'directive-html', {
 		empty: null,
 		list: [ 'a', 'b' ],
 		hydration: 'hydrated',
+		/** Items whose individual values are server HTML representations. */
+		fallbackItems: [],
+		/** Items bound to the client getter registered by the fixture. */
+		lazyItems: [],
+		/** Items whose fallback contains an inert script fixture. */
+		scriptItems: [],
 	},
 	actions: {
+		/** Adds one item whose pending representation should show its fallback. */
+		addFallback() {
+			state.fallbackItems.push( {
+				id: ++itemId,
+				html: serverHTML,
+			} );
+		},
+		/** Adds two fallback items in the same reactive update. */
+		addTwoFallbacks() {
+			state.fallbackItems.push(
+				{ id: ++itemId, html: serverHTML },
+				{ id: ++itemId, html: serverHTML }
+			);
+		},
+		/** Adds an item whose value remains pending until its getter is registered. */
+		addLazyItem() {
+			state.lazyItems.push( { id: ++itemId } );
+		},
+		/** Registers the late trusted HTML getter for the pending item. */
+		registerLazy() {
+			store( 'directive-html', {
+				state: {
+					/** Resolves the pending value to trusted markup. */
+					get lazy() {
+						return asDangerousHTML(
+							policy.createHTML( '<b>Late</b>' )
+						);
+					},
+				},
+			} );
+		},
+		/** Adds two items whose fallback includes a script that must stay inert. */
+		addScriptItems() {
+			state.scriptItems.push(
+				{ id: ++itemId, html: serverHTML },
+				{ id: ++itemId, html: serverHTML }
+			);
+		},
 		setHtml() {
 			state.html = asDangerousHTML(
 				'<strong data-testid="rendered-strong">Rendered HTML</strong>'

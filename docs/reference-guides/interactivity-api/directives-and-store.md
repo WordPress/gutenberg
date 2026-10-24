@@ -400,7 +400,6 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
