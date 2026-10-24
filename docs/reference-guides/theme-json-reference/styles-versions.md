@@ -41,6 +41,7 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `typography.textIndent`           |       7.0        |        7.0         |
 | `typography.textShadow`           |       7.1        |        N/A         |
 | `typography.textTransform`        |       5.9        |        6.0         |
+| `typography.textWrap`             |       7.2        |        N/A         |
 | `typography.writingMode`          |       6.3        |        6.3         |
 | `spacing.padding`                 |       5.9        |        5.9         |
 | `spacing.padding.top`             |       5.8        |        5.9         |
