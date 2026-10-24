@@ -5,7 +5,6 @@
 ### Breaking Changes
 
 -   Remove the `insertBefore` and `insertAfter` icons. These were old Dashicons that were never used; use `create` or `plus` instead ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
--   Remove the `offline` icon. It was added in error for a React Native client that is no longer used, so it has no direct replacement; `info` or `error` can stand in ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
 
 ### New Features
 

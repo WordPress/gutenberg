@@ -1099,6 +1099,11 @@
 		"filePath": "library/not-found.svg"
 	},
 	{
+		"slug": "offline",
+		"label": "Offline",
+		"filePath": "library/offline.svg"
+	},
+	{
 		"slug": "overlay-text",
 		"label": "Overlay Text",
 		"filePath": "library/overlay-text.svg"
