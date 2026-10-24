@@ -38,6 +38,7 @@
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 -   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
 -   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
+-   Latest Posts: Keep same-named categories selectable independently and preserve their IDs when removing a category filter ([#84840](https://github.com/WordPress/gutenberg/pull/84840)).
 -   Search: Show the button's full focus outline when the search field is collapsed ([#84685](https://github.com/WordPress/gutenberg/pull/84685)).
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
 -   Navigation Link: Apply the "Open in new tab" setting from the link popover. Clicking Apply dropped the change, so the setting could only be changed from the block settings sidebar. The Submenu block had the same problem ([#83506](https://github.com/WordPress/gutenberg/pull/83506)).
