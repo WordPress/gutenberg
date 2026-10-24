@@ -83,6 +83,55 @@ async function runOperation( vips: typeof import( '../' ) ) {
 	);
 }
 
+/**
+ * Runs an operation that writes JXL.
+ *
+ * @param vips The module under test.
+ */
+async function runJxlOperation( vips: typeof import( '../' ) ) {
+	const buffer = await new File( [ 'x' ], 'x.jpg', {
+		type: 'image/jpeg',
+	} ).arrayBuffer();
+	await vips.convertImageFormat(
+		'itemId',
+		buffer,
+		'image/jpeg',
+		'image/jxl'
+	);
+}
+
+/**
+ * Builds a vips instance whose init the test resolves by hand.
+ *
+ * @return The instance, and a function resolving its init.
+ */
+function deferredInstance() {
+	let resolveInit: () => void = () => {};
+	const instance = {
+		Image: {
+			newFromBuffer: vi.fn( () => new MockImage() ),
+			newFromMemory: vi.fn( () => ( {
+				extractBand: () => ( {
+					copy: () => ( {
+						jpegsaveBuffer: () => ( { buffer: '' } ),
+					} ),
+				} ),
+			} ) ),
+		},
+		Interpretation: { srgb: 'srgb' },
+		BandFormat: { uchar: 'uchar' },
+		Cache: { max: vi.fn() },
+		shutdown: vi.fn(),
+	};
+	mockVipsFactory.mockImplementationOnce(
+		() =>
+			new Promise( ( resolve ) => {
+				resolveInit = () => resolve( instance );
+			} ) as never
+	);
+	return { instance, resolveInit: () => resolveInit() };
+}
+
 describe( 'JPEG XL support', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
@@ -104,7 +153,7 @@ describe( 'JPEG XL support', () => {
 		expect( initCalls() ).toHaveLength( 1 );
 
 		vips.setJxlWasm( new ArrayBuffer( 8 ) );
-		await runOperation( vips );
+		await runJxlOperation( vips );
 
 		expect( initCalls() ).toEqual( [
 			[ 'vips-heif.wasm' ],
@@ -113,6 +162,17 @@ describe( 'JPEG XL support', () => {
 		// The discarded instance holds a large WASM heap; dropping the promise
 		// without shutting it down would strand it for the worker's lifetime.
 		expect( mockShutdown ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'keeps using a plain instance for work that does not need JXL', async () => {
+		const vips = await loadVips();
+
+		await runOperation( vips );
+		vips.setJxlWasm( new ArrayBuffer( 8 ) );
+		await runOperation( vips );
+
+		expect( initCalls() ).toEqual( [ [ 'vips-heif.wasm' ] ] );
+		expect( mockShutdown ).not.toHaveBeenCalled();
 	} );
 
 	it( 'reuses the JXL-enabled instance instead of rebuilding it', async () => {
@@ -148,16 +208,68 @@ describe( 'JPEG XL support', () => {
 		);
 
 		vips.setJxlWasm( new ArrayBuffer( 8 ) );
-		await expect( runOperation( vips ) ).rejects.toThrow(
+		await expect( runJxlOperation( vips ) ).rejects.toThrow(
 			'failed to load vips-jxl.wasm'
 		);
 
-		// The next call must retry rather than replay the failure.
+		// Work that does not need JXL must not keep hitting the broken
+		// library, and JXL work must retry it rather than replay the failure.
 		await expect( runOperation( vips ) ).resolves.not.toThrow();
+		await expect( runJxlOperation( vips ) ).resolves.not.toThrow();
 		expect( initCalls() ).toEqual( [
 			[ 'vips-heif.wasm', 'vips-jxl.wasm' ],
+			[ 'vips-heif.wasm' ],
 			[ 'vips-heif.wasm', 'vips-jxl.wasm' ],
 		] );
+	} );
+
+	it( 'shuts a retired instance down without waiting for the new one to go idle', async () => {
+		const vips = await loadVips();
+
+		await runOperation( vips );
+		vips.setJxlWasm( new ArrayBuffer( 8 ) );
+
+		// The JXL instance stays busy while it is still starting.
+		const { resolveInit } = deferredInstance();
+		const jxlOperation = runJxlOperation( vips );
+
+		await vi.waitFor( () =>
+			expect( mockShutdown ).toHaveBeenCalledTimes( 1 )
+		);
+
+		resolveInit();
+		await jxlOperation;
+	} );
+
+	it( 'keeps a retired instance alive while a JPEG encode uses it', async () => {
+		const vips = await loadVips();
+		const { instance, resolveInit } = deferredInstance();
+
+		const encode = vips.encodePixelsAsJpeg(
+			'itemId',
+			new ArrayBuffer( 16 ),
+			2,
+			2
+		);
+		await vi.waitFor( () => expect( initCalls() ).toHaveLength( 1 ) );
+
+		vips.setJxlWasm( new ArrayBuffer( 8 ) );
+		const jxlOperation = runJxlOperation( vips );
+		await vi.waitFor( () => expect( initCalls() ).toHaveLength( 2 ) );
+
+		expect( instance.shutdown ).not.toHaveBeenCalled();
+
+		resolveInit();
+		await Promise.all( [ encode, jxlOperation ] );
+
+		await vi.waitFor( () =>
+			expect( instance.shutdown ).toHaveBeenCalledTimes( 1 )
+		);
+		expect(
+			instance.shutdown.mock.invocationCallOrder[ 0 ]
+		).toBeGreaterThan(
+			instance.Image.newFromMemory.mock.invocationCallOrder[ 0 ]
+		);
 	} );
 	it( 'shares a pending JXL-enabled init between concurrent operations', async () => {
 		/*
@@ -199,7 +311,7 @@ describe( 'JPEG XL support', () => {
 		await vi.waitFor( () => expect( initCalls() ).toHaveLength( 1 ) );
 
 		vips.setJxlWasm( new ArrayBuffer( 8 ) );
-		const jxlOperation = runOperation( vips );
+		const jxlOperation = runJxlOperation( vips );
 
 		resolveFirstInit();
 		await Promise.all( [ plainOperation, jxlOperation ] );

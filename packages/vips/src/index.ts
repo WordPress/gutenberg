@@ -26,7 +26,29 @@ interface EmscriptenModule {
 
 let cleanup: () => void;
 
-let vipsPromise: Promise< typeof Vips > | undefined;
+/**
+ * A vips instance, and the operations using it.
+ */
+interface VipsInstance {
+	promise: Promise< typeof Vips >;
+	/**
+	 * Whether the instance was started with the JXL dynamic library. Known
+	 * when the init starts, so an operation arriving mid-init can tell whether
+	 * the pending instance will do.
+	 */
+	hasJxl: boolean;
+	/**
+	 * Operations holding the instance. A retired instance is shut down once
+	 * this reaches 0, so it is never shut down under an operation using it.
+	 */
+	users: number;
+	retired: boolean;
+}
+
+/**
+ * The instance new operations use.
+ */
+let currentVips: VipsInstance | undefined;
 
 /**
  * Inlined bytes of the lazily loaded vips-jxl.wasm module.
@@ -40,35 +62,12 @@ let vipsPromise: Promise< typeof Vips > | undefined;
 let jxlWasmBytes: ArrayBuffer | undefined;
 
 /**
- * Whether the current `vipsPromise` was started with the JXL dynamic library.
+ * Whether the last instance started with the JXL library failed to come up.
  *
- * Set when the init starts, not when it resolves, so a second caller arriving
- * mid-init waits for that JXL-enabled instance instead of retiring it. If JXL
- * becomes available after vips was initialized without it, the instance is
- * retired so the next call reinitializes with JXL support included.
+ * Operations that do not need JXL then start a plain instance, so a broken
+ * JXL library only fails JXL work. A JXL operation still retries it.
  */
-let vipsPromiseHasJxl = false;
-
-/**
- * Number of operations currently using a vips instance.
- *
- * Counted from before the instance is requested until the operation finishes,
- * so a retired instance is never shut down while an operation still holds it.
- */
-let activeVipsUsers = 0;
-
-/**
- * Instances replaced by a JXL-enabled one, waiting for their users to finish.
- */
-const retiredVips: Promise< typeof Vips >[] = [];
-
-/**
- * Counter identifying the current vips initialization attempt.
- *
- * A failed init must only clear `vipsPromise` if it is still the current one;
- * a later attempt may already have replaced it.
- */
-let vipsInitGeneration = 0;
+let jxlInitFailed = false;
 
 /**
  * Sets the inlined bytes of the vips-jxl.wasm module.
@@ -86,35 +85,92 @@ let vipsInitGeneration = 0;
  */
 export function setJxlWasm( bytes: ArrayBuffer ): void {
 	jxlWasmBytes = bytes;
+	jxlInitFailed = false;
 }
 
 /**
- * Marks the start of an operation that uses a vips instance.
+ * Shuts down a retired instance once no operation is using it. Each holds a
+ * large WASM heap that would otherwise be stranded for the worker's lifetime.
  *
- * Call before `getVips()` and pair with `releaseVips()` in a `finally`.
+ * @param instance The instance.
  */
-function holdVips(): void {
-	activeVipsUsers++;
-}
-
-/**
- * Marks the end of an operation that used a vips instance.
- *
- * Shuts down retired instances once nothing is using them anymore. Each holds
- * a large WASM heap that would otherwise be stranded for the worker's lifetime.
- */
-function releaseVips(): void {
-	activeVipsUsers--;
-	if ( activeVipsUsers > 0 ) {
+function maybeShutDownVips( instance: VipsInstance ): void {
+	if ( ! instance.retired || instance.users > 0 ) {
 		return;
 	}
-	for ( const staleVips of retiredVips.splice( 0 ) ) {
-		staleVips.then(
-			( instance ) => instance.shutdown(),
-			// Nothing to reclaim if the stale instance never came up.
-			() => {}
+	instance.promise.then(
+		( vips ) => vips.shutdown(),
+		// Nothing to reclaim if the instance never came up.
+		() => {}
+	);
+}
+
+/**
+ * Takes a vips instance for one operation.
+ *
+ * Reuses the current instance unless the operation needs JXL and the instance
+ * was started without it, in which case the instance is retired and a
+ * JXL-enabled one started. Call `release()` in a `finally` once done.
+ *
+ * @param needsJxl Whether the operation reads or writes JXL.
+ * @return The instance, and a function to release it.
+ */
+function leaseVips( needsJxl: boolean ): {
+	vips: Promise< typeof Vips >;
+	release: () => void;
+} {
+	if ( currentVips && needsJxl && jxlWasmBytes && ! currentVips.hasJxl ) {
+		currentVips.retired = true;
+		maybeShutDownVips( currentVips );
+		currentVips = undefined;
+	}
+
+	if ( ! currentVips ) {
+		currentVips = startVips(
+			Boolean( jxlWasmBytes ) && ( needsJxl || ! jxlInitFailed )
 		);
 	}
+
+	const instance = currentVips;
+	instance.users++;
+
+	let released = false;
+	return {
+		vips: instance.promise,
+		release: () => {
+			if ( released ) {
+				return;
+			}
+			released = true;
+			instance.users--;
+			maybeShutDownVips( instance );
+		},
+	};
+}
+
+/**
+ * Whether a buffer holds a JPEG XL image, either a naked codestream or an
+ * ISOBMFF container.
+ *
+ * @param buffer Image buffer.
+ * @return Whether the buffer is JXL.
+ */
+function isJxlBuffer( buffer: ArrayBuffer ): boolean {
+	const bytes = new Uint8Array(
+		buffer,
+		0,
+		Math.min( 12, buffer.byteLength )
+	);
+	if ( bytes[ 0 ] === 0xff && bytes[ 1 ] === 0x0a ) {
+		return true;
+	}
+	const container = [
+		0, 0, 0, 0x0c, 0x4a, 0x58, 0x4c, 0x20, 0x0d, 0x0a, 0x87, 0x0a,
+	];
+	return (
+		bytes.length === container.length &&
+		container.every( ( byte, i ) => bytes[ i ] === byte )
+	);
 }
 
 /**
@@ -212,37 +268,29 @@ function getWasmUrl( bytes: Uint8Array< ArrayBuffer > | ArrayBuffer ): string {
 }
 
 /**
- * Instantiates and returns a new vips instance.
+ * Starts a new vips instance.
  *
- * Reuses any existing instance. If a JXL WASM URL has been set but the
- * current instance was initialized without it, the instance is discarded
- * and recreated with JXL dynamic library support.
+ * @param withJxl Whether to load the JXL dynamic library.
+ * @return The instance.
  */
-async function getVips(): Promise< typeof Vips > {
-	// If JXL is now available but vips was initialized without it, retire the
-	// existing instance so the next init picks up the dynamic library. Other
-	// operations may still be using it, so `releaseVips()` shuts it down once
-	// they finish.
-	if ( jxlWasmBytes && vipsPromise && ! vipsPromiseHasJxl ) {
-		retiredVips.push( vipsPromise );
-		vipsPromise = undefined;
-	}
-
-	if ( vipsPromise ) {
-		return await vipsPromise;
-	}
-
-	const withJxl = Boolean( jxlWasmBytes );
+function startVips( withJxl: boolean ): VipsInstance {
 	const dynamicLibraries = [ 'vips-heif.wasm' ];
 	if ( withJxl ) {
 		dynamicLibraries.push( 'vips-jxl.wasm' );
 	}
 
-	const initGeneration = ++vipsInitGeneration;
+	// The promise is assigned below, as its failure handling refers back to
+	// the instance.
+	const instance = {
+		hasJxl: withJxl,
+		users: 0,
+		retired: false,
+	} as VipsInstance;
 
-	const instancePromise: Promise< typeof Vips > = ( async () => {
+	instance.promise = ( async () => {
+		let vipsInstance: typeof Vips;
 		try {
-			return await Vips( {
+			vipsInstance = await Vips( {
 				// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
 				// JXL is loaded on demand when a JXL image is processed, via
 				// setJxlWasm() which is called from the main thread after the
@@ -284,28 +332,31 @@ async function getVips(): Promise< typeof Vips > {
 				},
 			} );
 		} catch ( error ) {
-			// Drop the rejected promise so the next call retries instead of
+			// Drop the failed instance so the next call retries instead of
 			// replaying this failure for the rest of the worker's life.
-			if ( vipsInitGeneration === initGeneration ) {
-				vipsPromise = undefined;
-				vipsPromiseHasJxl = false;
+			if ( currentVips === instance ) {
+				currentVips = undefined;
+			}
+			if ( withJxl ) {
+				jxlInitFailed = true;
 			}
 			throw error;
 		}
+
+		if ( withJxl ) {
+			jxlInitFailed = false;
+		}
+
+		// Disable the operation cache to prevent out-of-memory crashes
+		// during repeated image processing. libvips caches results from
+		// previous operations which accumulates WASM memory over time.
+		// See https://github.com/WordPress/gutenberg/issues/76706
+		vipsInstance.Cache.max( 0 );
+
+		return vipsInstance;
 	} )();
 
-	vipsPromise = instancePromise;
-	vipsPromiseHasJxl = withJxl;
-
-	const vipsInstance = await instancePromise;
-
-	// Disable the operation cache to prevent out-of-memory crashes
-	// during repeated image processing. libvips caches results from
-	// previous operations which accumulates WASM memory over time.
-	// See https://github.com/WordPress/gutenberg/issues/76706
-	vipsInstance.Cache.max( 0 );
-
-	return vipsInstance;
+	return instance;
 }
 
 /**
@@ -353,7 +404,9 @@ export async function convertImageFormat(
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
-	holdVips();
+	const lease = leaseVips(
+		'image/jxl' === inputType || 'image/jxl' === outputType
+	);
 
 	try {
 		let strOptions = '';
@@ -375,7 +428,7 @@ export async function convertImageFormat(
 			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
 
-		const vips = await getVips();
+		const vips = await lease.vips;
 		const image = vips.Image.newFromBuffer(
 			buffer,
 			strOptions,
@@ -446,7 +499,7 @@ export async function convertImageFormat(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
-		releaseVips();
+		lease.release();
 	}
 }
 
@@ -971,10 +1024,10 @@ export async function resizeImage(
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
-	holdVips();
+	const lease = leaseVips( 'image/jxl' === type );
 
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
@@ -1150,7 +1203,7 @@ export async function resizeImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
-		releaseVips();
+		lease.release();
 	}
 }
 
@@ -1179,9 +1232,9 @@ interface UltraHdrInfo {
 export async function getUltraHdrInfo(
 	buffer: ArrayBuffer
 ): Promise< UltraHdrInfo | null > {
-	holdVips();
+	const lease = leaseVips( false );
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 		const image = vips.Image.uhdrloadBuffer( buffer );
 		if ( ! image.gainmap ) {
 			cleanup?.();
@@ -1213,7 +1266,7 @@ export async function getUltraHdrInfo(
 		cleanup?.();
 		return null;
 	} finally {
-		releaseVips();
+		lease.release();
 	}
 }
 
@@ -1249,10 +1302,10 @@ export async function rotateImage(
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
-	holdVips();
+	const lease = leaseVips( 'image/jxl' === type );
 
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
@@ -1344,7 +1397,7 @@ export async function rotateImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
-		releaseVips();
+		lease.release();
 	}
 }
 
@@ -1365,9 +1418,9 @@ export async function rotateImage(
 export async function hasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
-	holdVips();
+	const lease = leaseVips( isJxlBuffer( buffer ) );
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 		const image = vips.Image.newFromBuffer( buffer );
 
 		if ( ! image.hasAlpha() ) {
@@ -1387,7 +1440,7 @@ export async function hasTransparency(
 
 		return minAlpha < opaqueValue;
 	} finally {
-		releaseVips();
+		lease.release();
 	}
 }
 
@@ -1417,9 +1470,10 @@ export async function encodePixelsAsJpeg(
 	const { quality = 0.82, metadataSource } = options;
 
 	inProgressOperations.add( id );
+	const lease = leaseVips( false );
 
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 
 		// JPEG has no alpha channel and decoded photo pixels are opaque, so
 		// the alpha band is dropped rather than flattened.
@@ -1455,6 +1509,7 @@ export async function encodePixelsAsJpeg(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		lease.release();
 	}
 }
 
