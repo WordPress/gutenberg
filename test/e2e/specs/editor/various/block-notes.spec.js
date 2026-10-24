@@ -284,12 +284,12 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'listitem' )
 			.filter( { hasText: 'Test comment to resolve.' } );
 		await thread.click();
-		await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+		await expect( thread ).toHaveClass( /is-selected/ );
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
 		await expect( thread ).toBeFocused();
-		await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+		await expect( thread ).not.toHaveClass( /is-selected/ );
 
 		await thread.click();
 		await expect( resolveButton ).toBeDisabled();
@@ -377,10 +377,7 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'listitem' )
 			.filter( { hasText: 'Note to resolve.' } );
 		await resolvedThread.click();
-		await expect( resolvedThread ).toHaveAttribute(
-			'aria-current',
-			'true'
-		);
+		await expect( resolvedThread ).toHaveClass( /is-selected/ );
 		await page.getByRole( 'button', { name: 'Resolve' } ).click();
 
 		// The divider appearing confirms the resolve completed and now labels
@@ -473,6 +470,10 @@ test.describe( 'Block Notes', () => {
 			.click();
 		await expect( secondThread ).toContainText( 'A reply' );
 		await expect( secondThread.getByRole( 'listitem' ) ).toHaveCount( 0 );
+
+		// VoiceOver repeats `aria-current` on every element in the thread.
+		await expect( secondThread ).toHaveClass( /is-selected/ );
+		await expect( secondThread ).not.toHaveAttribute( 'aria-current' );
 	} );
 
 	test( 'clearing the block selection does not select an orphaned note', async ( {
@@ -516,9 +517,11 @@ test.describe( 'Block Notes', () => {
 			.click();
 		await expect( anotherBlock ).not.toHaveClass( /is-selected/ );
 
-		await expect( sidebar.locator( '[aria-current="true"]' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			sidebar.locator(
+				'.editor-collab-sidebar-panel__thread.is-selected'
+			)
+		).toHaveCount( 0 );
 	} );
 
 	test( 'selecting a block or note marks it as an active', async ( {
@@ -550,7 +553,7 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'list' );
 		const threads = threadsContainer.getByRole( 'listitem' );
 		const activeThread = threadsContainer.locator(
-			'[aria-current="true"]'
+			'.editor-collab-sidebar-panel__thread.is-selected'
 		);
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Reply to',
@@ -611,10 +614,7 @@ test.describe( 'Block Notes', () => {
 		 * The form unmounts on selection, but `useFocusOutside` still runs its
 		 * queued blur callback. It must not clear the newly selected thread.
 		 */
-		await expect( existingThread ).toHaveAttribute(
-			'aria-current',
-			'true'
-		);
+		await expect( existingThread ).toHaveClass( /is-selected/ );
 	} );
 
 	test.describe( 'Keyboard', () => {
@@ -661,7 +661,7 @@ test.describe( 'Block Notes', () => {
 					await expect(
 						thread,
 						'note should be expanded with $keyToExpand key'
-					).toHaveAttribute( 'aria-current', 'true' );
+					).toHaveClass( /is-selected/ );
 
 					// The related block should be selected, but the focus should remain on the note.
 					await expect(
@@ -674,7 +674,7 @@ test.describe( 'Block Notes', () => {
 					await expect(
 						thread,
 						'note should be collapsed with $keyToCollapse key'
-					).toHaveAttribute( 'aria-current', 'false' );
+					).not.toHaveClass( /is-selected/ );
 				} );
 			}
 		);
@@ -774,11 +774,11 @@ test.describe( 'Block Notes', () => {
 				.filter( { hasText: 'Test comment escape' } );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 
 			// Collapse the note with Escape key.
 			await page.keyboard.press( 'Escape' );
-			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+			await expect( thread ).not.toHaveClass( /is-selected/ );
 		} );
 
 		test( 'should keep a note collapsed while editing the same block', async ( {
@@ -799,13 +799,13 @@ test.describe( 'Block Notes', () => {
 
 			await thread.click();
 			await page.keyboard.press( 'Escape' );
-			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+			await expect( thread ).not.toHaveClass( /is-selected/ );
 
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.click();
 			await page.keyboard.type( ' edited' );
-			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+			await expect( thread ).not.toHaveClass( /is-selected/ );
 		} );
 
 		test( 'should collapse a note after canceling note form', async ( {
@@ -826,9 +826,9 @@ test.describe( 'Block Notes', () => {
 				.filter( { hasText: 'Test comment' } );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 			await thread.getByRole( 'button', { name: 'Cancel' } ).click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+			await expect( thread ).not.toHaveClass( /is-selected/ );
 			await expect( thread ).toBeFocused();
 		} );
 
@@ -854,11 +854,11 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 			await expect( block ).toHaveClass( /is-highlighted/ );
 			await page.keyboard.press( 'Shift+Tab' );
 			await expect( thread ).not.toBeFocused();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+			await expect( thread ).not.toHaveClass( /is-selected/ );
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
 		} );
 
@@ -938,7 +938,7 @@ test.describe( 'Block Notes', () => {
 			await thread
 				.getByRole( 'button', { name: '1 more reply' } )
 				.click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 			await expect( thread ).toBeFocused();
 		} );
 
@@ -1434,7 +1434,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'listitem' )
 				.filter( { hasText: 'Test comment for resolved reactions' } );
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionPill = sidebar.getByRole( 'button', {
@@ -1478,7 +1478,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			const thread = blockNoteUtils.getThread( 'Selection persistence' );
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await expect(
@@ -1488,7 +1488,7 @@ test.describe( 'Block Notes', () => {
 			// Focus has moved into the portaled menu, but its focus events
 			// still bubble to the thread's `useFocusOutside` through the
 			// React tree, so the thread stays selected and the trigger mounted.
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 		} );
 
 		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
@@ -1691,14 +1691,8 @@ test.describe( 'Block Notes', () => {
 
 			await secondThread.click();
 
-			await expect( secondThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
-			await expect( firstThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( secondThread ).toHaveClass( /is-selected/ );
+			await expect( firstThread ).not.toHaveClass( /is-selected/ );
 		} );
 
 		test( 'keeps a clicked inline note selected', async ( {
@@ -1725,10 +1719,10 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'listitem' )
 				.filter( { hasText: 'Alpha note' } );
-			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
+			await expect( thread ).not.toHaveClass( /is-selected/ );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
+			await expect( thread ).toHaveClass( /is-selected/ );
 		} );
 	} );
 
@@ -2441,32 +2435,17 @@ test.describe( 'Block Notes', () => {
 				.filter( { hasText: 'charlie' } );
 
 			// Creating a note selects it, so the last-added note starts selected.
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
+			await expect( alphaThread ).toHaveClass( /is-selected/ );
 
 			// Placing the caret inside a marker syncs the open sidebar to that
 			// note; clicking between the two markers flips the selection.
 			await charlieMark.click();
-			await expect( charlieThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( charlieThread ).toHaveClass( /is-selected/ );
+			await expect( alphaThread ).not.toHaveClass( /is-selected/ );
 
 			await alphaMark.click();
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
-			await expect( charlieThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( alphaThread ).toHaveClass( /is-selected/ );
+			await expect( charlieThread ).not.toHaveClass( /is-selected/ );
 		} );
 
 		test( 'selects no note while the caret is outside the inline highlights', async ( {
@@ -2490,31 +2469,19 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'listitem' )
 				.filter( { hasText: 'Alpha note' } );
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
+			await expect( alphaThread ).toHaveClass( /is-selected/ );
 
 			// The block's only note is inline, so a click past the end of its
 			// text selects the block but no note.
 			await paragraph.click();
 			await expect( paragraph ).toBeFocused();
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( alphaThread ).not.toHaveClass( /is-selected/ );
 
 			// Into the marker and out again.
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 18 } );
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
+			await expect( alphaThread ).toHaveClass( /is-selected/ );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( alphaThread ).not.toHaveClass( /is-selected/ );
 		} );
 
 		test( 'selects the block-level note when the caret leaves an inline highlight', async ( {
@@ -2544,10 +2511,7 @@ test.describe( 'Block Notes', () => {
 			const alphaThread = settings
 				.getByRole( 'listitem' )
 				.filter( { hasText: 'Alpha note' } );
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
+			await expect( alphaThread ).toHaveClass( /is-selected/ );
 
 			// Focus leaves the thread for its own block: the caret, inside the
 			// marker, keeps the note selected.
@@ -2555,25 +2519,13 @@ test.describe( 'Block Notes', () => {
 				.locator( 'mark.wp-note' )
 				.filter( { hasText: 'Alpha' } )
 				.click();
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
-			await expect( blockThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( alphaThread ).toHaveClass( /is-selected/ );
+			await expect( blockThread ).not.toHaveClass( /is-selected/ );
 
 			// Past the marker, the block-level note stands for the caret.
 			await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
-			await expect( blockThread ).toHaveAttribute(
-				'aria-current',
-				'true'
-			);
-			await expect( alphaThread ).toHaveAttribute(
-				'aria-current',
-				'false'
-			);
+			await expect( blockThread ).toHaveClass( /is-selected/ );
+			await expect( alphaThread ).not.toHaveClass( /is-selected/ );
 		} );
 	} );
 

@@ -254,12 +254,9 @@ export function NoteThread( {
 			tabIndex={ 0 }
 			// No `aria-label`: screen readers handle one on a list item
 			// inconsistently, so the thread is announced from its content.
+			// No `aria-current` either: VoiceOver repeats it on every element
+			// inside the thread. The expanded replies show the selection.
 			role="listitem"
-			/*
-			 * `aria-current` rather than `aria-expanded`: a list item supports
-			 * the former, and the selected thread is the current one in the set.
-			 */
-			aria-current={ isSelected }
 		>
 			<Button
 				className="editor-collab-sidebar-panel__skip-to-note"
