@@ -3,8 +3,15 @@ import { userEvent } from 'vitest/browser';
 import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
-import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
+import BaseTypographyPanel, {
+	useHasTypographyPanel,
+} from '../typography-panel';
 import type { StyleSettings, TypographyPanelProps } from '../types';
+
+// The per-control indicators default to off now; these tests cover them.
+const TypographyPanel = ( props: TypographyPanelProps ) => (
+	<BaseTypographyPanel showInheritanceLabelIndicators { ...props } />
+);
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these

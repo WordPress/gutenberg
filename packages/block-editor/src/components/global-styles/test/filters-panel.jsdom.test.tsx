@@ -2,7 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
-import FiltersPanel from '../filters-panel';
+import BaseFiltersPanel from '../filters-panel';
+import type { FiltersPanelProps } from '../types';
+
+// The per-control indicators default to off now; these tests cover them.
+const FiltersPanel = ( props: FiltersPanelProps ) => (
+	<BaseFiltersPanel showInheritanceLabelIndicators { ...props } />
+);
 
 globalThis.wpVitest.mockMatchMedia();
 
