@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Add on-demand JPEG XL (JXL) support. `setJxlWasm()` lets the main thread feed the lazily loaded `vips-jxl.wasm` bytes to the worker as a transferable `ArrayBuffer`; the worker wraps them in a Blob URL and re-initializes vips with JXL dynamic library support on the next operation, shutting the previous instance down first. Keeps JXL out of the worker bundle so it is only downloaded when a JXL image is processed ([#77584](https://github.com/WordPress/gutenberg/pull/77584)).
 -   Add `encodePixelsAsJpeg` and its worker counterpart `vipsEncodePixelsAsJpeg`, which encode raw RGBA pixels as a JPEG while copying the EXIF block from the image file they were decoded from ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
 
 ## 5.0.0 (2026-10-20)
