@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `receiveEntityRecords`: clear only the default "Auto Draft" title on auto-draft posts, so custom titles are no longer lost on save.
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).

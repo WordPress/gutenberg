@@ -128,6 +128,19 @@ describe( 'prePersistPostType', () => {
 		).toEqual( {} );
 	} );
 
+	it( 'preserves meaningful titles when saving auto-draft posts', async () => {
+		const record = {
+			status: 'auto-draft',
+			title: 'Failed order',
+		};
+		const edits = {};
+		expect(
+			await prePersistPostType( record, edits, 'post', false )
+		).toEqual( {
+			status: 'draft',
+		} );
+	} );
+
 	it( 'does not set the status to draft and empty the title when saving templates', async () => {
 		const record = {
 			status: 'auto-draft',
