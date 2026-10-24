@@ -684,6 +684,34 @@ describe( 'hasFixedGridCells', () => {
 	} );
 } );
 
+describe( 'capturesToolbars', () => {
+	let originalExperiment: boolean | undefined;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	it( 'captures the toolbars of the blocks in a manual placement grid', () => {
+		expect(
+			grid.capturesToolbars( { type: 'grid', isManualPlacement: true } )
+		).toBe( true );
+	} );
+
+	it( 'leaves the toolbars of the blocks in an auto placement grid alone', () => {
+		expect( grid.capturesToolbars( { type: 'grid' } ) ).toBe( false );
+	} );
+
+	it( 'leaves the toolbars alone with the grid interactivity experiment off', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect(
+			grid.capturesToolbars( { type: 'grid', isManualPlacement: true } )
+		).toBe( false );
+	} );
+} );
+
 describe( 'startChildDrag', () => {
 	let originalExperiment: boolean | undefined;
 	beforeEach( () => {

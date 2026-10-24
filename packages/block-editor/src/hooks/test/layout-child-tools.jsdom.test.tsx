@@ -40,6 +40,7 @@ vi.mock( import( '../../components/grid' ), async ( importOriginal ) => ( {
 	GridVisualizer: memo( () => <></> ),
 	GridItemResizer: () => <div data-testid="grid-item-resizer" />,
 	GridItemMovers: () => <></>,
+	GridItemDragHandle: () => <></>,
 	GridItemRotator: ( {
 		onPreview,
 	}: {
