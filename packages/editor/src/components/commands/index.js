@@ -83,6 +83,7 @@ const getEditorCommandLoader = () =>
 			showBlockBreadcrumbs,
 			isDistractionFree,
 			isFocusMode,
+			showBlockBoundaries,
 			isPreviewMode,
 			isViewable,
 			isPublished,
@@ -112,6 +113,7 @@ const getEditorCommandLoader = () =>
 				showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
+				showBlockBoundaries: get( 'core', 'showBlockBoundaries' ),
 				isPreviewMode: getSettings().isPreviewMode,
 				isViewable: postType?.viewable ?? false,
 				isPublished: isCurrentPostPublished(),
@@ -199,6 +201,18 @@ const getEditorCommandLoader = () =>
 			category: 'command',
 			callback: ( { close } ) => {
 				toggleSpotlightMode();
+				close();
+			},
+		} );
+
+		commands.push( {
+			name: 'core/toggle-block-boundaries',
+			label: showBlockBoundaries
+				? __( 'Hide block boundaries' )
+				: __( 'Show block boundaries' ),
+			category: 'command',
+			callback: ( { close } ) => {
+				toggle( 'core', 'showBlockBoundaries' );
 				close();
 			},
 		} );
