@@ -29,6 +29,7 @@ describe( 'hasReusableBlockSupport', () => {
 			title: 'Default Block',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			save: () => null,
 		} );
 
@@ -36,6 +37,7 @@ describe( 'hasReusableBlockSupport', () => {
 			title: 'No Reusable Block',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			supports: {
 				reusable: false,
 			},
@@ -46,6 +48,7 @@ describe( 'hasReusableBlockSupport', () => {
 			title: 'Explicit Reusable Block',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			supports: {
 				reusable: true,
 			},
@@ -56,6 +59,7 @@ describe( 'hasReusableBlockSupport', () => {
 			title: 'Child Block Default',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			parent: [ 'test/default-block' ],
 			save: () => null,
 		} );
@@ -64,6 +68,7 @@ describe( 'hasReusableBlockSupport', () => {
 			title: 'Child Block Explicit Reusable',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			parent: [ 'test/default-block' ],
 			supports: {
 				reusable: true,
@@ -113,7 +118,11 @@ describe( 'ConvertToTemplatePart', () => {
 	function mockSelectors( {
 		isBlockTheme = true,
 		canInsert = true,
-		blocks = [],
+		blocks = [] as any[],
+	}: {
+		isBlockTheme?: boolean;
+		canInsert?: boolean;
+		blocks?: any[];
 	} ) {
 		// @ts-expect-error Mocking useSelect
 		useSelect.mockImplementation( ( mapSelect ) => {
@@ -139,38 +148,44 @@ describe( 'ConvertToTemplatePart', () => {
 	}
 
 	it( 'does not render when theme is not block-based', () => {
+		const blocks = [
+			{
+				clientId: '1',
+				name: 'core/paragraph',
+				isValid: true,
+			},
+		];
 		mockSelectors( {
 			isBlockTheme: false,
 			canInsert: true,
-			blocks: [
-				{
-					clientId: '1',
-					name: 'core/paragraph',
-					isValid: true,
-				},
-			],
+			blocks,
 		} );
 
-		render( <ConvertToTemplatePart clientIds={ [ '1' ] } /> );
+		render(
+			<ConvertToTemplatePart clientIds={ [ '1' ] } blocks={ blocks } />
+		);
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Create template part' } )
 		).not.toBeInTheDocument();
 	} );
 
 	it( 'does not render when canInsertBlockType is false', () => {
+		const blocks = [
+			{
+				clientId: '1',
+				name: 'core/paragraph',
+				isValid: true,
+			},
+		];
 		mockSelectors( {
 			isBlockTheme: true,
 			canInsert: false,
-			blocks: [
-				{
-					clientId: '1',
-					name: 'core/paragraph',
-					isValid: true,
-				},
-			],
+			blocks,
 		} );
 
-		render( <ConvertToTemplatePart clientIds={ [ '1' ] } /> );
+		render(
+			<ConvertToTemplatePart clientIds={ [ '1' ] } blocks={ blocks } />
+		);
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Create template part' } )
 		).not.toBeInTheDocument();
@@ -183,7 +198,7 @@ describe( 'ConvertToTemplatePart', () => {
 			blocks: [],
 		} );
 
-		render( <ConvertToTemplatePart clientIds={ [] } /> );
+		render( <ConvertToTemplatePart clientIds={ [] } blocks={ [] } /> );
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Create template part' } )
 		).not.toBeInTheDocument();
@@ -194,23 +209,27 @@ describe( 'ConvertToTemplatePart', () => {
 			title: 'Non Reusable',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			supports: { reusable: false },
 			save: () => null,
 		} );
 
+		const blocks = [
+			{
+				clientId: '1',
+				name: 'test/non-reusable',
+				isValid: true,
+			},
+		];
 		mockSelectors( {
 			isBlockTheme: true,
 			canInsert: true,
-			blocks: [
-				{
-					clientId: '1',
-					name: 'test/non-reusable',
-					isValid: true,
-				},
-			],
+			blocks,
 		} );
 
-		render( <ConvertToTemplatePart clientIds={ [ '1' ] } /> );
+		render(
+			<ConvertToTemplatePart clientIds={ [ '1' ] } blocks={ blocks } />
+		);
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Create template part' } )
 		).not.toBeInTheDocument();
@@ -223,6 +242,7 @@ describe( 'ConvertToTemplatePart', () => {
 			title: 'Non Reusable Multi',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			supports: { reusable: false },
 			save: () => null,
 		} );
@@ -230,27 +250,34 @@ describe( 'ConvertToTemplatePart', () => {
 			title: 'Valid Block',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			save: () => null,
 		} );
 
+		const blocks = [
+			{
+				clientId: '1',
+				name: 'test/valid-block',
+				isValid: true,
+			},
+			{
+				clientId: '2',
+				name: 'test/non-reusable-multi',
+				isValid: true,
+			},
+		];
 		mockSelectors( {
 			isBlockTheme: true,
 			canInsert: true,
-			blocks: [
-				{
-					clientId: '1',
-					name: 'test/valid-block',
-					isValid: true,
-				},
-				{
-					clientId: '2',
-					name: 'test/non-reusable-multi',
-					isValid: true,
-				},
-			],
+			blocks,
 		} );
 
-		render( <ConvertToTemplatePart clientIds={ [ '1', '2' ] } /> );
+		render(
+			<ConvertToTemplatePart
+				clientIds={ [ '1', '2' ] }
+				blocks={ blocks }
+			/>
+		);
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Create template part' } )
 		).not.toBeInTheDocument();
@@ -264,22 +291,26 @@ describe( 'ConvertToTemplatePart', () => {
 			title: 'Valid Block Render',
 			apiVersion: 3,
 			category: 'text',
+			attributes: {},
 			save: () => null,
 		} );
 
+		const blocks = [
+			{
+				clientId: '1',
+				name: 'test/valid-block-render',
+				isValid: true,
+			},
+		];
 		mockSelectors( {
 			isBlockTheme: true,
 			canInsert: true,
-			blocks: [
-				{
-					clientId: '1',
-					name: 'test/valid-block-render',
-					isValid: true,
-				},
-			],
+			blocks,
 		} );
 
-		render( <ConvertToTemplatePart clientIds={ [ '1' ] } /> );
+		render(
+			<ConvertToTemplatePart clientIds={ [ '1' ] } blocks={ blocks } />
+		);
 		expect(
 			screen.getByRole( 'menuitem', { name: 'Create template part' } )
 		).toBeInTheDocument();

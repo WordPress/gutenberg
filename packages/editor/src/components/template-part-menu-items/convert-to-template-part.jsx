@@ -26,6 +26,11 @@ export const hasReusableBlockSupport = ( blockName ) => {
 	return hasBlockSupport( blockName, 'reusable', ! hasParent );
 };
 
+/**
+ * @param {Object}   props
+ * @param {string[]} [props.clientIds]
+ * @param {Array}    [props.blocks]
+ */
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
