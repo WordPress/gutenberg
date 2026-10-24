@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import {
+import layoutHook, {
 	getLayoutStateOverrides,
 	getResetLayout,
 	getResponsiveLayoutStyles,
@@ -322,6 +322,43 @@ describe( 'layout', () => {
 			).toBe(
 				'@media (480px < width <= 782px){.wp-container-test { gap: 12px; }}'
 			);
+		} );
+	} );
+
+	describe( 'block props', () => {
+		const manualGrid = {
+			layout: { type: 'grid', columnCount: 12, isManualPlacement: true },
+		};
+		let originalExperiment: boolean | undefined;
+		beforeEach( () => {
+			originalExperiment = window.__experimentalEnableGridInteractivity;
+			window.__experimentalEnableGridInteractivity = true;
+		} );
+		afterEach( () => {
+			window.__experimentalEnableGridInteractivity = originalExperiment;
+		} );
+
+		it( 'should make a manual placement grid not draggable by its body', () => {
+			expect( layoutHook.isMatch( manualGrid ) ).toBe( true );
+			const { result } = renderHook( () => layoutHook.useBlockProps() );
+			expect( result.current ).toEqual( { draggable: false } );
+		} );
+
+		it( 'should leave other layouts draggable', () => {
+			expect(
+				layoutHook.isMatch( {
+					layout: { type: 'grid', columnCount: 3 },
+				} )
+			).toBe( false );
+			expect( layoutHook.isMatch( { layout: { type: 'flex' } } ) ).toBe(
+				false
+			);
+			expect( layoutHook.isMatch( { style: {} } ) ).toBe( false );
+		} );
+
+		it( 'should leave manual placement grids draggable without the experiment', () => {
+			window.__experimentalEnableGridInteractivity = false;
+			expect( layoutHook.isMatch( manualGrid ) ).toBe( false );
 		} );
 	} );
 } );

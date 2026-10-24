@@ -50,7 +50,11 @@ import {
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	isFromInserterKey,
+} from '.././private-keys';
 import type {
 	Action,
 	BlocksState,
@@ -3914,6 +3918,30 @@ describe( 'state', () => {
 			const state = lastBlockInserted( {}, action );
 
 			expect( state.source ).toBe( expectedSource );
+		} );
+
+		it( 'should keep whether the blocks were inserted from an inserter', () => {
+			const action: Action = {
+				blocks: [
+					partial< Block >( {
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					} ),
+				],
+				meta: {
+					[ isFromInserterKey ]: true,
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			expect( lastBlockInserted( {}, action ).isFromInserter ).toBe(
+				true
+			);
+			expect(
+				lastBlockInserted(
+					{ clientIds: [ 'a' ], isFromInserter: true },
+					{ ...action, meta: undefined }
+				).isFromInserter
+			).toBeUndefined();
 		} );
 
 		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {

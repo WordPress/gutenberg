@@ -9,7 +9,11 @@ import {
 import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	isFromInserterKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	Action,
@@ -2099,6 +2103,13 @@ export function lastBlockInserted(
 			} );
 
 			const source = action.meta?.source;
+
+			// Blocks picked in an inserter have no place of their own in
+			// their container, which a container that places its blocks,
+			// such as a manual grid, picks for them.
+			if ( action.meta?.[ isFromInserterKey ] ) {
+				return { clientIds, source, isFromInserter: true };
+			}
 
 			return { clientIds, source };
 		case 'RESET_BLOCKS':

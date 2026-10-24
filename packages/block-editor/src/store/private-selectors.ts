@@ -85,6 +85,22 @@ export function getLastInsertedBlocksClientIds( state: State ) {
 	return state?.lastBlockInserted?.clientIds;
 }
 
+/**
+ * Tells if a block was just inserted from an inserter, which picks the block
+ * but not where it goes, unlike a block added by pressing Enter, for example.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ * @return Whether the block was the last inserted from an inserter.
+ */
+export function wasBlockJustInsertedFromInserter(
+	state: State,
+	clientId: string
+) {
+	const { clientIds, isFromInserter } = state.lastBlockInserted;
+	return !! isFromInserter && !! clientIds?.includes( clientId );
+}
+
 export function getBlockWithoutAttributes( state: State, clientId: string ) {
 	return state.blocks.byClientId.get( clientId );
 }
