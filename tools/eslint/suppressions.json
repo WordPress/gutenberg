@@ -4665,7 +4665,7 @@
 	},
 	"packages/block-library/src/search/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		},
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -4680,11 +4680,6 @@
 		}
 	},
 	"packages/block-library/src/search/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/search/utils.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

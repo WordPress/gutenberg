@@ -19,26 +19,15 @@ import {
 	SelectControl as WCSelectControl,
 	ToggleControl,
 	ResizableBox,
-	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
 import { Icon } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
 import { Path, SVG } from '@wordpress/primitives';
-import {
-	PC_WIDTH_DEFAULT,
-	PX_WIDTH_DEFAULT,
-	MIN_WIDTH,
-	isPercentageUnit,
-} from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // Help text describing each wrapper element option. Kept local to the block
@@ -58,7 +47,6 @@ const TAG_NAME_MESSAGES = {
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
-const PERCENTAGE_WIDTHS = [ 25, 50, 75, 100 ];
 
 // Keep this block-specific icon aligned with the PHP renderer. Unlike the
 // Search icon from @wordpress/icons, it remains fill-based so existing theme
@@ -81,8 +69,6 @@ export default function SearchEdit( {
 		label,
 		showLabel,
 		placeholder,
-		width,
-		widthUnit,
 		align,
 		buttonText,
 		buttonPosition,
@@ -141,7 +127,59 @@ export default function SearchEdit( {
 	const backgroundProps = useBackgroundProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
-	const [ isResizing, setIsResizing ] = useState( false );
+
+	// `dimensionsProps` resolves a preset reference to its CSS variable, the
+	// same value Global Styles emits. Only the two shapes
+	// `styles_for_block_core_search()` refuses are filtered out here, so the
+	// editor and the front end agree: a non-string, and the '0' the Width
+	// control's "None" step writes.
+	const rawWidth = style?.dimensions?.width;
+	const widthStyle =
+		typeof rawWidth === 'string' && rawWidth && '0' !== rawWidth
+			? dimensionsProps.style?.width
+			: undefined;
+
+	// The handles sit in an overlay rather than on the wrapper. re-resizable
+	// always writes a width to its own element, so anything it renders in the
+	// flow would overwrite whatever CSS resolved to. Measuring the wrapper and
+	// sizing the overlay to match keeps the handles in place without the box
+	// owning the width.
+	const [ wrapperBox, setWrapperBox ] = useState( null );
+	const observeWrapper = useResizeObserver(
+		( [ entry ] ) => {
+			const { offsetWidth, offsetHeight, parentElement } = entry.target;
+			// The overlay has to mirror the limits the wrapper will honour, not
+			// just its size, or a drag runs past them and the handle leaves the
+			// block. The resolved `min-width` already covers both the editor's
+			// default floor and a smaller minimum set on the block, and
+			// `max-width: 100%` caps the wrapper to its container.
+			const minWidth = parseFloat(
+				entry.target.ownerDocument.defaultView.getComputedStyle(
+					entry.target
+				).minWidth
+			);
+			setWrapperBox( {
+				width: offsetWidth,
+				height: offsetHeight,
+				minWidth: Number.isNaN( minWidth ) ? undefined : minWidth,
+				maxWidth: parentElement?.clientWidth,
+			} );
+		},
+		{ box: 'border-box' }
+	);
+
+	// Held while dragging so the wrapper follows the handle without writing an
+	// attribute on every pointer move.
+	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
+
+	const setWidth = ( nextWidth ) => {
+		setAttributes( {
+			style: {
+				...style,
+				dimensions: { ...style?.dimensions, width: nextWidth },
+			},
+		} );
+	};
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -154,8 +192,6 @@ export default function SearchEdit( {
 			wideSize: layout?.wideSize,
 		},
 	} );
-	const unitControlInstanceId = useInstanceId( UnitControl );
-	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
@@ -163,11 +199,6 @@ export default function SearchEdit( {
 	const isSearchFieldHidden = hasOnlyButton && ! isSelected;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
-
-	const units = useCustomUnits( {
-		availableUnits: [ '%', 'px' ],
-		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
-	} );
 
 	const getBlockClassNames = () => {
 		return clsx(
@@ -345,8 +376,6 @@ export default function SearchEdit( {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							width: undefined,
-							widthUnit: undefined,
 							showLabel: true,
 							buttonUseIcon: false,
 							buttonPosition: 'button-outside',
@@ -417,87 +446,6 @@ export default function SearchEdit( {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						hasValue={ () => !! width }
-						label={ __( 'Width' ) }
-						onDeselect={ () => {
-							setAttributes( {
-								width: undefined,
-								widthUnit: undefined,
-							} );
-						} }
-						isShownByDefault
-					>
-						<VStack>
-							<UnitControl
-								label={ __( 'Width' ) }
-								id={ unitControlInputId } // Unused, kept for backwards compatibility
-								min={
-									isPercentageUnit( widthUnit )
-										? 0
-										: MIN_WIDTH
-								}
-								max={
-									isPercentageUnit( widthUnit )
-										? 100
-										: undefined
-								}
-								step={ 1 }
-								onChange={ ( newWidth ) => {
-									const parsedNewWidth =
-										newWidth === ''
-											? undefined
-											: parseInt( newWidth, 10 );
-									setAttributes( {
-										width: parsedNewWidth,
-									} );
-								} }
-								onUnitChange={ ( newUnit ) => {
-									setAttributes( {
-										width:
-											'%' === newUnit
-												? PC_WIDTH_DEFAULT
-												: PX_WIDTH_DEFAULT,
-										widthUnit: newUnit,
-									} );
-								} }
-								__unstableInputWidth="80px"
-								value={ `${ width }${ widthUnit }` }
-								units={ units }
-							/>
-							<ToggleGroupControl
-								label={ __( 'Percentage Width' ) }
-								value={
-									PERCENTAGE_WIDTHS.includes( width ) &&
-									widthUnit === '%'
-										? width
-										: undefined
-								}
-								hideLabelFromVision
-								onChange={ ( newWidth ) => {
-									setAttributes( {
-										width: newWidth,
-										widthUnit: '%',
-									} );
-								} }
-								isBlock
-							>
-								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
-									return (
-										<ToggleGroupControlOption
-											key={ widthValue }
-											value={ widthValue }
-											label={ sprintf(
-												/* translators: %d: Percentage value. */
-												__( '%d%%' ),
-												widthValue
-											) }
-										/>
-									);
-								} ) }
-							</ToggleGroupControl>
-						</VStack>
-					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -630,49 +578,47 @@ export default function SearchEdit( {
 					/>
 				) }
 
-				<ResizableBox
-					size={ {
-						width:
-							width === undefined
-								? 'auto'
-								: `${ width }${ widthUnit }`,
-						height: 'auto',
-					} }
+				<div
+					ref={ observeWrapper }
 					className={ clsx(
 						'wp-block-search__inside-wrapper',
 						isButtonPositionInside
 							? borderProps.className
 							: undefined
 					) }
-					style={ getWrapperStyles() }
-					// ResizableBox writes these over `style`, and only reads
-					// them as pixel limits while resizing.
-					minWidth={
-						isResizing ? MIN_WIDTH : dimensionsProps.style?.minWidth
-					}
-					minHeight={
-						isResizing
-							? undefined
-							: dimensionsProps.style?.minHeight
-					}
-					enable={ getResizableSides() }
-					onResizeStart={ ( event, direction, elt ) => {
-						setAttributes( {
-							width: parseInt( elt.offsetWidth, 10 ),
-							widthUnit: 'px',
-						} );
-						setIsResizing( true );
-						toggleSelection( false );
+					style={ {
+						...getWrapperStyles(),
+						...dimensionsProps.style,
+						width: temporaryWidth ?? widthStyle,
 					} }
-					onResizeStop={ ( event, direction, elt, delta ) => {
-						setAttributes( {
-							width: parseInt( width + delta.width, 10 ),
-						} );
-						setIsResizing( false );
-						toggleSelection( true );
-					} }
-					showHandle={ isSelected }
 				>
+					{ isSelected && wrapperBox && (
+						<ResizableBox
+							className="wp-block-search__resizer"
+							size={ {
+								width: wrapperBox.width,
+								height: wrapperBox.height,
+							} }
+							// re-resizable writes `position: relative` inline,
+							// so only an inline style can override it.
+							// Placement lives in the stylesheet, where it gets
+							// flipped for RTL.
+							style={ { position: 'absolute' } }
+							minWidth={ wrapperBox.minWidth }
+							maxWidth={ wrapperBox.maxWidth }
+							enable={ getResizableSides() }
+							onResizeStart={ () => toggleSelection( false ) }
+							onResize={ ( event, direction, elt ) =>
+								setTemporaryWidth( `${ elt.offsetWidth }px` )
+							}
+							onResizeStop={ ( event, direction, elt ) => {
+								setWidth( `${ elt.offsetWidth }px` );
+								setTemporaryWidth( null );
+								toggleSelection( true );
+							} }
+							showHandle
+						/>
+					) }
 					{ ( isButtonPositionInside ||
 						isButtonPositionOutside ||
 						hasOnlyButton ) && (
@@ -683,7 +629,7 @@ export default function SearchEdit( {
 					) }
 
 					{ hasNoButton && renderTextField() }
-				</ResizableBox>
+				</div>
 			</Wrapper>
 		</>
 	);
