@@ -18,6 +18,7 @@
 
 ### Bug Fixes
 
+-   `DropdownMenu`: Keep the height of `MenuItem` consistent regardless of whether it has an icon ([#85503](https://github.com/WordPress/gutenberg/pull/85503)).
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
