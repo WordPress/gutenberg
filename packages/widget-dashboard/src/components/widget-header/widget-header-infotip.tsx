@@ -1,8 +1,14 @@
 import { createInterpolateElement, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, Link, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
+import {
+	Icon,
+	Link,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Popover,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import styles from './widget-header.module.css';
 
 export interface WidgetInfotipProps {
