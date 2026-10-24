@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
-
 // Approximate height of the sticky admin header so that
 // scroll-margin-top keeps focused elements visible at 150 % zoom.
 $sticky-header-clearance: 120px;
@@ -9,28 +7,36 @@ $sticky-header-clearance: 120px;
 	width: 100%;
 	max-width: 680px;
 	margin: 0 auto;
-	padding: 24px;
+	padding: var(--wpds-dimension-padding-2xl);
 
-	.components-item {
-		padding: 20px;
-		border-radius: 8px;
-		border: 1px solid #ddd;
-		background: #fff;
-		overflow: hidden;
+	.connector-item {
 		scroll-margin-top: $sticky-header-clearance;
+	}
+
+	.connector-item__content {
+		flex: 1 1 0%;
+		min-width: 0;
+	}
+
+	.connector-item__description {
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 
 	.connector-settings__error {
-		color: $alert-red;
+		color: var(--wpds-color-foreground-content-error-weak);
 	}
 
-	.connector-settings .components-text-control__input {
-		font-family: monospace;
+	.connector-settings__input input {
+		font-family: var(--wpds-typography-font-family-mono);
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
+	.connector-action-area {
+		align-items: center;
+	}
+
 	&__file-mods-notice {
-		margin-bottom: 16px;
+		margin-bottom: var(--wpds-dimension-gap-lg);
 	}
 
 	&--empty {
@@ -39,40 +45,26 @@ $sticky-header-clearance: 120px;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 32px;
+		gap: var(--wpds-dimension-gap-2xl);
 		text-align: center;
 	}
 
 	.ai-plugin-callout {
-		position: relative;
-		overflow: hidden;
-		border-radius: 8px;
-		padding: 24px;
-		padding-inline-end: 150px;
-		background-color: #e7d4e4;
-		background-image:
-			radial-gradient(ellipse 70% 120% at 18% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
-			radial-gradient(ellipse 55% 110% at 92% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
-			radial-gradient(ellipse 40% 85% at 58% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
-
-		[dir="rtl"] & {
+		&__surface {
+			position: relative;
+			padding: var(--wpds-dimension-padding-2xl);
+			padding-inline-end: 150px;
+			background-color: #e7d4e4;
 			background-image:
-				radial-gradient(ellipse 70% 120% at 82% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
-				radial-gradient(ellipse 55% 110% at 8% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
-				radial-gradient(ellipse 40% 85% at 42% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
-		}
+				radial-gradient(ellipse 70% 120% at 18% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
+				radial-gradient(ellipse 55% 110% at 92% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
+				radial-gradient(ellipse 40% 85% at 58% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
 
-		&__content {
-			display: flex;
-			flex-direction: column;
-			gap: 12px;
-			padding-top: 2px;
-			align-items: flex-start;
-
-			p {
-				margin: 0;
-				font-size: 13px;
-				line-height: 20px;
+			[dir="rtl"] & {
+				background-image:
+					radial-gradient(ellipse 70% 120% at 82% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
+					radial-gradient(ellipse 55% 110% at 8% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
+					radial-gradient(ellipse 40% 85% at 42% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
 			}
 		}
 
@@ -86,13 +78,16 @@ $sticky-header-clearance: 120px;
 	}
 
 	&__help-text {
-		color: $gray-800;
+		margin-block: var(--wpds-dimension-gap-md);
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@media (max-width: 680px) {
 		.ai-plugin-callout {
-			padding: 12px;
-			padding-inline-end: 100px;
+			&__surface {
+				padding: var(--wpds-dimension-padding-md);
+				padding-inline-end: 100px;
+			}
 
 			&__decoration {
 				width: 75px;
@@ -104,27 +99,21 @@ $sticky-header-clearance: 120px;
 	}
 
 	@media (max-width: 480px) {
-		padding: 8px;
+		padding: var(--wpds-dimension-padding-sm);
 
-		.ai-plugin-callout {
+		.ai-plugin-callout__surface {
 			padding-inline-end: 130px;
 		}
 
-		.components-item {
-			padding: 12px;
+		.connector-item__header svg {
+			width: 32px;
+			height: 32px;
+		}
 
-			> .components-v-stack > .components-h-stack:first-child {
-				svg {
-					width: 32px;
-					height: 32px;
-				}
-
-				// Stack badge and action button vertically on small screens.
-				> .components-h-stack:last-child {
-					flex-direction: column;
-					align-items: flex-end;
-				}
-			}
+		// Stack badge and action button vertically on small screens.
+		.connector-action-area {
+			flex-direction: column;
+			align-items: flex-end;
 		}
 	}
 }
