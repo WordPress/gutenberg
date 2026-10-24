@@ -54,11 +54,9 @@ function ListBox( {
 						'components-autocomplete__result',
 						className,
 						{
-							// Unused, for backwards compatibility.
 							'is-selected': index === selectedIndex,
 						}
 					) }
-					variant={ index === selectedIndex ? 'primary' : undefined }
 					onClick={ () => onSelect( option ) }
 				>
 					{ option.label }

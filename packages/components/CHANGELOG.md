@@ -15,6 +15,7 @@
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
+-   Popup menu and option items: Use solid WPDS brand highlights and keep unpadded options square ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 
 ### Bug Fixes
 
