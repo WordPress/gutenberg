@@ -1,6 +1,7 @@
 import { setImmutably } from '../../utils/object';
 import type { Layout } from '../../layouts/types';
 import type { BlockVisibility } from '../block-visibility/use-block-visibility';
+import type { GridItemBox } from './free-placement';
 
 const MOBILE_VIEWPORT = '@mobile';
 
@@ -14,6 +15,8 @@ export interface GridStyleLayout {
 	columnSpan?: number;
 	rowStart?: number;
 	rowSpan?: number;
+	/** Where a block placed freely in a manual grid is inside its cells. */
+	box?: GridItemBox;
 	columnCount?: number | null;
 	rowCount?: number | null;
 	isManualPlacement?: boolean | null;
@@ -178,7 +181,14 @@ export function getUnstackedMobileUpdates( {
 	return updates;
 }
 
-const PLACEMENT_KEYS = [ 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' ];
+// A block placed freely also has a box inside its cells.
+const PLACEMENT_KEYS = [
+	'columnStart',
+	'columnSpan',
+	'rowStart',
+	'rowSpan',
+	'box',
+];
 
 /**
  * Builds the block updates that remove the mobile placement of a grid's

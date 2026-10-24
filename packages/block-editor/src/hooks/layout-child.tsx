@@ -39,6 +39,11 @@ import type {
 	ResponsiveChildLayoutStylesOptions,
 } from './types';
 import type { ChildLayout } from '../components/child-layout-control/types';
+import {
+	GRID_PLACEMENT_KEYS,
+	getGridItemBox,
+} from '../components/grid/free-placement';
+import type { GridItemBox } from '../components/grid/free-placement';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -73,12 +78,57 @@ function serializeRule( { selector, declarations }: ChildLayoutRule ) {
 	}`;
 }
 
+/**
+ * Checks whether a manual grid item has a box in any state.
+ *
+ * @param style The item's style attribute.
+ *
+ * @return Whether the item has a box in its base layout or a viewport's.
+ */
+export function hasGridItemBoxInAnyState( style?: ChildLayoutBlockStyle ) {
+	if ( ! style ) {
+		return false;
+	}
+	return Object.entries( style ).some(
+		( [ key, value ] ) =>
+			( key === 'layout' || key.startsWith( '@' ) ) &&
+			!! (
+				key === 'layout'
+					? ( value as ChildLayout | undefined )
+					: // A viewport's style holds the child layout it overrides.
+						( value as ChildLayoutBlockStyle | undefined )?.layout
+			)?.box
+	);
+}
+
+function toPercent( fraction: number ) {
+	return `${ Math.round( fraction * 1e5 ) / 1e3 }%`;
+}
+
+/**
+ * Gets the custom properties that place a manual grid item inside its cells,
+ * or that make it fill them when it has no box.
+ *
+ * @param box The item's box.
+ *
+ * @return The declarations.
+ */
+function getGridItemBoxDeclarations( box?: GridItemBox ) {
+	return {
+		'--wp--grid-item--box-left': toPercent( box?.left ?? 0 ),
+		'--wp--grid-item--box-top': toPercent( box?.top ?? 0 ),
+		'--wp--grid-item--box-width': toPercent( box?.width ?? 1 ),
+		'--wp--grid-item--box-height': toPercent( box?.height ?? 1 ),
+	};
+}
+
 export function getChildLayoutStyleRules( {
 	selector,
 	layout = {},
 	viewportOverrides,
 	parentLayout = {},
 	includeContainerQuery = true,
+	hasBox = false,
 }: ChildLayoutStyleRulesOptions ): ChildLayoutRule[] {
 	const hasViewportOverrides = viewportOverrides !== undefined;
 	const effectiveLayout = hasViewportOverrides
@@ -179,8 +229,48 @@ export function getChildLayoutStyleRules( {
 		declarations[ '--wp--grid-item--row-span' ] = `${ rowSpan || 1 }`;
 	}
 
+	// A block placed freely in a manual grid sits inside its cells, with
+	// margins and a size that are percentages of them. They are custom
+	// properties, so that a viewport can change them, and they only apply
+	// where the cells have a fixed size: grids whose rows are sized by their
+	// content, and stacked grids, leave blocks to fill their cells.
+	const hasGridItemBox =
+		hasBox &&
+		isManualPlacement &&
+		window.__experimentalEnableGridInteractivity;
+	if (
+		hasGridItemBox &&
+		( ! hasViewportOverrides ||
+			GRID_PLACEMENT_KEYS.some( hasViewportOverride ) )
+	) {
+		Object.assign(
+			declarations,
+			getGridItemBoxDeclarations(
+				getGridItemBox( layout, viewportOverrides )
+			)
+		);
+	}
+
 	if ( Object.keys( declarations ).length ) {
 		rules.push( { selector, declarations } );
+	}
+
+	// The box's margins are `!important` because a block's own margin is an
+	// inline style, which would otherwise move it away from its box.
+	if ( hasGridItemBox && ! hasViewportOverrides ) {
+		rules.push( {
+			rulesGroup: '@container style(--wp--style--grid-cells: fixed)',
+			selector,
+			declarations: {
+				'justify-self': 'start',
+				'align-self': 'start',
+				'box-sizing': 'border-box',
+				'margin-left': 'var(--wp--grid-item--box-left) !important',
+				'margin-top': 'var(--wp--grid-item--box-top) !important',
+				width: 'var(--wp--grid-item--box-width)',
+				height: 'var(--wp--grid-item--box-height)',
+			},
+		} );
 	}
 
 	if ( includeContainerQuery && ! hasViewportOverrides ) {
@@ -264,12 +354,14 @@ export function getChildLayoutStyles( {
 	layout = {},
 	parentLayout = {},
 	includeContainerQuery = true,
+	hasBox = false,
 }: ChildLayoutStyleRulesOptions ) {
 	return getChildLayoutStyleRules( {
 		selector,
 		layout,
 		parentLayout,
 		includeContainerQuery,
+		hasBox,
 	} )
 		.map( ( rule ) => {
 			const serializedRule = serializeRule( rule );
@@ -289,6 +381,7 @@ export function getResponsiveChildLayoutStyles( {
 	viewportSettings,
 }: ResponsiveChildLayoutStylesOptions ) {
 	const baseLayout = style?.layout ?? {};
+	const hasBox = hasGridItemBoxInAnyState( style );
 
 	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
 		.map( ( [ viewport, mediaQuery ] ) => {
@@ -307,6 +400,7 @@ export function getResponsiveChildLayoutStyles( {
 				viewportOverrides: viewportLayout,
 				parentLayout,
 				includeContainerQuery: false,
+				hasBox,
 			} );
 			const css = viewportRules.map( serializeRule ).join( '' );
 
@@ -352,6 +446,14 @@ function useBlockPropsChildLayoutStyles( {
 		if ( rowSpan && typeof rowSpan !== 'number' ) {
 			throw new Error( 'rowSpan must be a number' );
 		}
+		if (
+			layout.box &&
+			( [ 'left', 'top', 'width', 'height' ] as const ).some(
+				( key ) => typeof layout.box?.[ key ] !== 'number'
+			)
+		) {
+			throw new Error( 'box values must be numbers' );
+		}
 	}
 
 	let css = '';
@@ -361,6 +463,7 @@ function useBlockPropsChildLayoutStyles( {
 				selector,
 				layout,
 				parentLayout,
+				hasBox: hasGridItemBoxInAnyState( style ),
 			} ),
 			getResponsiveChildLayoutStyles( {
 				style,
@@ -575,17 +678,20 @@ function GridTools( {
 	const isViewportState = hasViewportBlockStyleState( selectedState );
 	// The layout the canvas shows for this block and its grid in the
 	// selected state.
+	const viewportLayout = isViewportState
+		? // A style state holds the child layout it overrides.
+			(
+				getStyleForState( style, {
+					viewport: selectedState.viewport,
+					pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				} ) as ChildLayoutBlockStyle | undefined
+			 )?.layout
+		: undefined;
 	const effectiveLayout = stackedLayouts?.children[ clientId ] ?? {
 		...style?.layout,
-		...( isViewportState
-			? // A style state holds the child layout it overrides.
-				(
-					getStyleForState( style, {
-						viewport: selectedState.viewport,
-						pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-					} ) as ChildLayoutBlockStyle | undefined
-				 )?.layout
-			: undefined ),
+		...viewportLayout,
+		// A viewport that sets its own place has its own box, or none.
+		box: getGridItemBox( style?.layout, viewportLayout ),
 	};
 	const effectiveParentLayout = {
 		...parentLayout,

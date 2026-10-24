@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { dispatch, select } from '@wordpress/data';
@@ -14,6 +14,16 @@ vi.mock( '../../components/grid/start-grid-item-drag', () => ( {
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
+
+// The grid's element in the canvas, measured when its column count changes.
+const mockGridElement = { current: null as HTMLElement | null };
+vi.mock(
+	import( '../../components/block-list/use-block-props/use-block-refs' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useBlockElement: () => mockGridElement.current,
+	} )
+);
 
 const GridLayoutInspectorControls = grid.inspectorControls;
 const PANEL_ID = 'test-panel';
@@ -526,6 +536,232 @@ describe( 'GridLayoutInspectorControls', () => {
 					setStyleStateViewport( 'default' );
 				} );
 			}
+		} );
+
+		describe( 'changing the column count of a manual grid', () => {
+			const layout = {
+				type: 'grid',
+				isManualPlacement: true,
+				columnCount: 4,
+				rowCount: 4,
+			};
+
+			beforeEach( () => {
+				// A 430px wide grid with 10px gaps and fixed cells.
+				const element = document.createElement( 'div' );
+				element.style.setProperty( '--wp--style--grid-cells', 'fixed' );
+				element.style.columnGap = '10px';
+				element.style.rowGap = '10px';
+				Object.defineProperty( element, 'clientWidth', {
+					value: 430,
+				} );
+				document.body.appendChild( element );
+				mockGridElement.current = element;
+				act( () => {
+					dispatch( blockEditorStore ).resetBlocks( [
+						{
+							clientId: PANEL_ID,
+							name: 'core/group',
+							isValid: true,
+							attributes: { layout },
+							innerBlocks: [
+								{
+									clientId: 'child',
+									name: 'core/paragraph',
+									isValid: true,
+									attributes: {
+										style: {
+											layout: {
+												columnStart: 1,
+												columnSpan: 2,
+												rowStart: 1,
+												rowSpan: 1,
+											},
+										},
+									},
+									innerBlocks: [],
+								},
+							],
+						},
+					] );
+				} );
+			} );
+			afterEach( () => {
+				mockGridElement.current?.remove();
+				mockGridElement.current = null;
+			} );
+
+			it( 'keeps blocks in place and adds rows', async () => {
+				const onChange = vi.fn();
+				renderInspectorControls( { layout, onChange } );
+
+				const columnsInput = await screen.findByRole( 'spinbutton', {
+					name: 'Columns',
+				} );
+				fireEvent.change( columnsInput, { target: { value: '5' } } );
+				fireEvent.blur( columnsInput );
+
+				expect( onChange ).toHaveBeenCalledWith( {
+					...layout,
+					columnCount: 5,
+					rowCount: 5,
+				} );
+				const childLayout = unlock(
+					select( blockEditorStore )
+				).getBlockAttributes( 'child' ).style.layout;
+				// The block was two 100px columns wide, 210px, which is now
+				// inside three 78px columns, 254px.
+				expect( childLayout ).toEqual( {
+					columnStart: 1,
+					columnSpan: 3,
+					rowStart: 1,
+					rowSpan: 2,
+					box: { left: 0, top: 0, width: 0.8268, height: 0.6024 },
+				} );
+			} );
+
+			it( 'keeps blocks in place when the count is reset', async () => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				renderInspectorControls( {
+					layout: { ...layout, columnCount: 5 },
+					onChange,
+				} );
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Layout options' } )
+				);
+				await user.click(
+					screen.getByRole( 'menuitem', {
+						name: 'Columns and rows, reset to default',
+					} )
+				);
+
+				// The default count of a manual grid is 3, and three of the four
+				// rows of five columns keep it about as tall.
+				expect( onChange ).toHaveBeenCalledWith( {
+					...layout,
+					columnCount: 3,
+					rowCount: 3,
+				} );
+				const childLayout = unlock(
+					select( blockEditorStore )
+				).getBlockAttributes( 'child' ).style.layout;
+				expect( childLayout ).toEqual(
+					expect.objectContaining( {
+						columnStart: 1,
+						rowStart: 1,
+						box: expect.any( Object ),
+					} )
+				);
+			} );
+
+			it( 'only changes the count where the cells are not fixed', async () => {
+				mockGridElement.current?.style.setProperty(
+					'--wp--style--grid-cells',
+					'auto'
+				);
+				const onChange = vi.fn();
+				renderInspectorControls( { layout, onChange } );
+
+				const columnsInput = await screen.findByRole( 'spinbutton', {
+					name: 'Columns',
+				} );
+				fireEvent.change( columnsInput, { target: { value: '5' } } );
+				fireEvent.blur( columnsInput );
+
+				expect( onChange ).toHaveBeenCalledWith( {
+					...layout,
+					columnCount: 5,
+				} );
+				expect(
+					unlock( select( blockEditorStore ) ).getBlockAttributes(
+						'child'
+					).style.layout
+				).toEqual( {
+					columnStart: 1,
+					columnSpan: 2,
+					rowStart: 1,
+					rowSpan: 1,
+				} );
+			} );
+
+			it( 'only changes the count once a typed count is committed', async () => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				renderInspectorControls( { layout, onChange } );
+
+				const columnsInput = await screen.findByRole( 'spinbutton', {
+					name: 'Columns',
+				} );
+				await user.clear( columnsInput );
+				await user.type( columnsInput, '12' );
+
+				expect( onChange ).not.toHaveBeenCalled();
+
+				await user.keyboard( '{Enter}' );
+
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange ).toHaveBeenCalledWith(
+					expect.objectContaining( { columnCount: 12 } )
+				);
+			} );
+		} );
+
+		it( 'keeps the column count when the grid type is switched', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const renderLayout = ( layout: Record< string, unknown > ) => (
+				<ToolsPanel
+					label="Layout"
+					resetAll={ vi.fn() }
+					panelId={ PANEL_ID }
+				>
+					<GridLayoutInspectorControls
+						clientId={ PANEL_ID }
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				</ToolsPanel>
+			);
+			const { rerender } = render(
+				renderLayout( {
+					type: 'grid',
+					isManualPlacement: true,
+					columnCount: 6,
+					rowCount: 2,
+				} )
+			);
+			// The count changed after the control was shown.
+			rerender(
+				renderLayout( {
+					type: 'grid',
+					isManualPlacement: true,
+					columnCount: 8,
+					rowCount: 2,
+				} )
+			);
+
+			await user.click(
+				await screen.findByRole( 'radio', { name: 'Auto' } )
+			);
+			expect( onChange ).toHaveBeenLastCalledWith(
+				expect.objectContaining( {
+					columnCount: 8,
+					isManualPlacement: undefined,
+				} )
+			);
+
+			rerender( renderLayout( { type: 'grid', columnCount: 5 } ) );
+			await user.click(
+				await screen.findByRole( 'radio', { name: 'Manual' } )
+			);
+			expect( onChange ).toHaveBeenLastCalledWith(
+				expect.objectContaining( {
+					columnCount: 5,
+					isManualPlacement: true,
+				} )
+			);
 		} );
 
 		it( 'does not offer stacking on mobile for auto placement grids', async () => {

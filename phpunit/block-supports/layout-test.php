@@ -2030,6 +2030,245 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that a block placed freely in a manual grid takes the grid interactivity flag
+	 * from the `gutenberg_layout_has_grid_interactivity` filter, not the experiments option.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_reads_grid_item_box_flag_from_filter() {
+		remove_filter( 'gutenberg_layout_has_grid_interactivity', 'gutenberg_layout_enable_grid_interactivity' );
+		add_filter( 'gutenberg_layout_has_grid_interactivity', '__return_true' );
+
+		$rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'columnStart' => 1,
+				'columnSpan'  => 2,
+				'rowStart'    => 1,
+				'rowSpan'     => 1,
+				'box'         => array(
+					'left'   => 0.25,
+					'top'    => 0,
+					'width'  => 0.5,
+					'height' => 1,
+				),
+			),
+			array(
+				'isManualPlacement' => true,
+				'columnCount'       => 4,
+			),
+			null,
+			true
+		);
+
+		$this->assertSame( '25%', $rules[0]['declarations']['--wp--grid-item--box-left'] );
+	}
+
+	/**
+	 * Check that a block placed freely in a manual grid publishes its box inside its cells,
+	 * and applies it where the cells have a fixed size.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 * @covers ::gutenberg_get_grid_item_box
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_renders_grid_item_box() {
+		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+
+		$manual_grid = array(
+			'isManualPlacement' => true,
+			'columnCount'       => 4,
+			'rowCount'          => 4,
+		);
+		$placement   = array(
+			'columnStart' => 1,
+			'columnSpan'  => 3,
+			'rowStart'    => 1,
+			'rowSpan'     => 1,
+		);
+		$box         = array(
+			'left'   => 0.1563,
+			'top'    => 0.0625,
+			'width'  => 0.6563,
+			'height' => 0.7,
+		);
+		$no_box      = array(
+			'--wp--grid-item--box-left'   => '0%',
+			'--wp--grid-item--box-top'    => '0%',
+			'--wp--grid-item--box-width'  => '100%',
+			'--wp--grid-item--box-height' => '100%',
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'grid-column'                 => '1 / span 3',
+						'grid-row'                    => '1 / span 1',
+						'--wp--grid-item--row-span'   => '1',
+						'--wp--grid-item--box-left'   => '15.63%',
+						'--wp--grid-item--box-top'    => '6.25%',
+						'--wp--grid-item--box-width'  => '65.63%',
+						'--wp--grid-item--box-height' => '70%',
+					),
+				),
+				array(
+					'rules_group'  => '@container style(--wp--style--grid-cells: fixed)',
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'justify-self' => 'start',
+						'align-self'   => 'start',
+						'box-sizing'   => 'border-box',
+						'margin-left'  => 'var(--wp--grid-item--box-left) !important',
+						'margin-top'   => 'var(--wp--grid-item--box-top) !important',
+						'width'        => 'var(--wp--grid-item--box-width)',
+						'height'       => 'var(--wp--grid-item--box-height)',
+					),
+				),
+			),
+			gutenberg_get_child_layout_style_rules( '.wp-container-content-test', array_merge( $placement, array( 'box' => $box ) ), $manual_grid, null, true ),
+			'A block with a box should publish it and apply it in fixed cells.'
+		);
+
+		$base_rules = gutenberg_get_child_layout_style_rules( '.wp-container-content-test', $placement, $manual_grid, null, true );
+		$this->assertSame( $no_box, array_intersect_key( $base_rules[0]['declarations'], $no_box ), 'A block with a box only in a viewport should publish no-box values in its base rule.' );
+
+		$mobile_rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			$placement,
+			$manual_grid,
+			array(
+				'columnStart' => 2,
+				'columnSpan'  => 1,
+				'rowStart'    => 1,
+				'rowSpan'     => 1,
+				'box'         => $box,
+			),
+			true
+		);
+		$this->assertCount( 1, $mobile_rules, 'Viewport rules should not repeat the fixed-cells rule.' );
+		$this->assertSame( '15.63%', $mobile_rules[0]['declarations']['--wp--grid-item--box-left'], 'A viewport placement should publish its own box.' );
+
+		$this->assertNull( gutenberg_get_grid_item_box( array_merge( $placement, array( 'box' => $box ) ), array( 'columnStart' => 2 ) ), 'A viewport override with only columnStart should have no box.' );
+		$start_only_rules = gutenberg_get_child_layout_style_rules( '.wp-container-content-test', array_merge( $placement, array( 'box' => $box ) ), $manual_grid, array( 'columnStart' => 2 ), true );
+		$this->assertSame( array_merge( array( 'grid-column' => '2 / span 3' ), $no_box ), $start_only_rules[0]['declarations'], 'A viewport override with only columnStart should publish no-box values.' );
+
+		$this->assertSame( $box, gutenberg_get_grid_item_box( array_merge( $placement, array( 'box' => $box ) ), array( 'selfStretch' => 'fit' ) ), 'A viewport override without a placement should inherit the base box.' );
+
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'grid-column'               => '1 / span 3',
+						'grid-row'                  => '1 / span 1',
+						'--wp--grid-item--row-span' => '1',
+					),
+				),
+			),
+			gutenberg_get_child_layout_style_rules( '.wp-container-content-test', $placement, $manual_grid ),
+			'A block without a box anywhere should render as before.'
+		);
+
+		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array( 'left' => 'x' ) ) ), 'A box with values that are not numbers should be ignored.' );
+		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'width' => 2 ) ) ) ), 'A box wider than its cells should be ignored.' );
+		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'height' => '0.5' ) ) ) ), 'A box with numeric strings should be ignored, as in the editor.' );
+		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'left' => -0.01 ) ) ) ), 'A box that starts before its cells should be ignored.' );
+		$this->assertNull(
+			gutenberg_get_grid_item_box(
+				array(
+					'box' => array_merge(
+						$box,
+						array(
+							'left'  => 1.5,
+							'width' => 0.1,
+						)
+					),
+				)
+			),
+			'A box that starts after its cells should be ignored.'
+		);
+		$this->assertNull(
+			gutenberg_get_grid_item_box(
+				array(
+					'box' => array_merge(
+						$box,
+						array(
+							'left'  => 0.5,
+							'width' => 0.6,
+						)
+					),
+				)
+			),
+			'A box that ends past its cells should be ignored.'
+		);
+		$this->assertNotNull(
+			gutenberg_get_grid_item_box(
+				array(
+					'box' => array_merge(
+						$box,
+						array(
+							'left'  => 0.1563,
+							'width' => 0.8438,
+						)
+					),
+				)
+			),
+			'A box whose rounded values end a little past its cells should be kept.'
+		);
+	}
+
+	/**
+	 * Tests that the box-sizing property is allowed in inline styles, so that a block's box
+	 * keeps its padding and borders inside its size.
+	 *
+	 * @covers ::gutenberg_add_box_sizing_to_safe_style_css
+	 */
+	public function test_box_sizing_is_a_safe_css_property() {
+		$this->assertSame( 'box-sizing: border-box', safecss_filter_attr( 'box-sizing: border-box' ) );
+	}
+
+	/**
+	 * Check that a block's box isn't rendered when the grid interactivity experiment is off.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_does_not_render_grid_item_box_without_experiment() {
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'grid-column' => '1 / span 3',
+						'grid-row'    => '1 / span 1',
+					),
+				),
+			),
+			gutenberg_get_child_layout_style_rules(
+				'.wp-container-content-test',
+				array(
+					'columnStart' => 1,
+					'columnSpan'  => 3,
+					'rowStart'    => 1,
+					'rowSpan'     => 1,
+					'box'         => array(
+						'left'   => 0.1563,
+						'top'    => 0.0625,
+						'width'  => 0.6563,
+						'height' => 0.7,
+					),
+				),
+				array(
+					'isManualPlacement' => true,
+					'columnCount'       => 4,
+				),
+				null,
+				true
+			)
+		);
+	}
+
+	/**
 	 * Check that children of manual placement grids don't publish their row span when the
 	 * grid interactivity experiment is off.
 	 *

@@ -240,6 +240,12 @@ describe( 'getMobilePlacementResets()', () => {
 									columnSpan: 2,
 									rowStart: 3,
 									rowSpan: 1,
+									box: {
+										left: 0.1,
+										top: 0,
+										width: 0.5,
+										height: 1,
+									},
 									selfStretch: 'fill',
 								},
 								color: { text: 'red' },

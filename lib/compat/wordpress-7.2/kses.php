@@ -70,3 +70,23 @@ function gutenberg_add_rotate_to_safe_style_css( array $attr ): array {
 	return $attr;
 }
 add_filter( 'safe_style_css', 'gutenberg_add_rotate_to_safe_style_css' );
+
+/**
+ * Adds 'box-sizing' to the list of safe CSS properties.
+ *
+ * A block placed freely in a manual grid is sized as a percentage of its cells, and
+ * `box-sizing: border-box` keeps its padding and borders inside that size. The style
+ * engine filters every declaration through {@see safecss_filter_attr()}, so without
+ * this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_box_sizing_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'box-sizing', $attr, true ) ) {
+		$attr[] = 'box-sizing';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_box_sizing_to_safe_style_css' );
