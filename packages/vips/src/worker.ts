@@ -15,6 +15,7 @@ import {
 	hasTransparency,
 	setJxlWasm,
 	getUltraHdrInfo,
+	encodePixelsAsJpeg,
 } from './index.ts';
 
 /**
@@ -29,6 +30,7 @@ const api = {
 	hasTransparency,
 	setJxlWasm,
 	getUltraHdrInfo,
+	encodePixelsAsJpeg,
 };
 
 expose( api );

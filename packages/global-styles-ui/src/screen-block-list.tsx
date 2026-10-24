@@ -2,7 +2,6 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
-	FlexItem,
 	SearchControl,
 	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
@@ -11,6 +10,7 @@ import {
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
+	Stack,
 } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
@@ -22,7 +22,7 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
-import type { BlockType } from '@wordpress/blocks';
+import type { BlockType, BlockTypeIcon } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
@@ -30,7 +30,21 @@ import {
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import { funnel } from '@wordpress/icons';
+import {
+	button,
+	caption,
+	formInput,
+	formSelect,
+	funnel,
+	heading,
+	headingLevel1,
+	headingLevel2,
+	headingLevel3,
+	headingLevel4,
+	headingLevel5,
+	headingLevel6,
+	link,
+} from '@wordpress/icons';
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -50,13 +64,16 @@ const {
 	searchItems,
 } = unlock( blockEditorPrivateApis );
 
+// `text` is the site's base text, styled under Typography rather than listed.
+type ListedElementName = Exclude< ElementName, 'text' >;
+
 /*
  * Elements are listed alongside blocks, grouped under subheadings, so that
  * anything styleable is one list away rather than behind its own drilldown.
  * Their labels are the titles of their screens, singular to match how blocks
  * are listed.
  */
-const ELEMENT_GROUPS: { title: string; elements: ElementName[] }[] = [
+const ELEMENT_GROUPS: { title: string; elements: ListedElementName[] }[] = [
 	{
 		title: __( 'Elements' ),
 		elements: [ 'link', 'caption', 'cite' ],
@@ -72,6 +89,24 @@ const ELEMENT_GROUPS: { title: string; elements: ElementName[] }[] = [
 		elements: [ 'textInput', 'select', 'button' ],
 	},
 ];
+
+// Where an element maps closely to a block, it reuses that block's icon, e.g.
+// the Heading block's icon for all headings and the Button block's for buttons.
+const ELEMENT_ICONS: Record< ListedElementName, React.ReactElement > = {
+	link,
+	caption,
+	cite: caption,
+	heading,
+	h1: headingLevel1,
+	h2: headingLevel2,
+	h3: headingLevel3,
+	h4: headingLevel4,
+	h5: headingLevel5,
+	h6: headingLevel6,
+	textInput: formInput,
+	select: formSelect,
+	button,
+};
 
 /**
  * Whether a value, or anything nested inside it, holds a real user value.
@@ -166,6 +201,27 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	return hasGlobalStyles;
 }
 
+interface ListMenuItemProps {
+	path: string;
+	icon: BlockTypeIcon;
+	title: string;
+}
+
+// Shared by blocks and elements so that every row in the list looks the same.
+function ListMenuItem( { path, icon, title }: ListMenuItemProps ) {
+	return (
+		<NavigationButtonAsItem path={ path }>
+			<Stack direction="row" align="center" gap="sm">
+				<BlockIcon
+					className="global-styles-ui-block-types-item__icon"
+					icon={ icon }
+				/>
+				<span>{ title }</span>
+			</Stack>
+		</NavigationButtonAsItem>
+	);
+}
+
 interface BlockMenuItemProps {
 	block: any;
 }
@@ -177,25 +233,21 @@ function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	}
 
 	return (
-		<NavigationButtonAsItem
+		<ListMenuItem
 			path={ '/blocks/' + encodeURIComponent( block.name ) }
-		>
-			<HStack justify="flex-start" spacing={ 2 }>
-				<BlockIcon
-					className="global-styles-ui-block-types-item__icon"
-					icon={ block.icon }
-				/>
-				<FlexItem>{ block.title }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
+			icon={ block.icon }
+			title={ block.title }
+		/>
 	);
 }
 
-function ElementMenuItem( { element }: { element: ElementName } ) {
+function ElementMenuItem( { element }: { element: ListedElementName } ) {
 	return (
-		<NavigationButtonAsItem path={ '/blocks/elements/' + element }>
-			{ ELEMENTS[ element ].title }
-		</NavigationButtonAsItem>
+		<ListMenuItem
+			path={ '/blocks/elements/' + element }
+			icon={ ELEMENT_ICONS[ element ] }
+			title={ ELEMENTS[ element ].title }
+		/>
 	);
 }
 
@@ -373,7 +425,10 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 		<>
 			{ filteredElementGroups.map( ( group ) => (
 				<ListGroup key={ group.title } title={ group.title }>
-					<ItemGroup>
+					<ItemGroup
+						className="global-styles-ui-block-types-item-list"
+						size="small"
+					>
 						{ group.elements.map( ( element ) => (
 							<ElementMenuItem
 								key={ element }
@@ -385,11 +440,10 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 			) ) }
 			{ hasBlockResults && (
 				<ListGroup title={ __( 'Blocks' ) }>
-					<div
+					<ItemGroup
 						ref={ blockTypesListRef }
 						className="global-styles-ui-block-types-item-list"
-						// By default, BlockMenuItem has a role=listitem so this div must have a list role.
-						role="list"
+						size="small"
 					>
 						{ filteredBlockTypes.map( ( block ) => (
 							<BlockMenuItem
@@ -397,7 +451,7 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 								key={ 'menu-itemblock-' + block.name }
 							/>
 						) ) }
-					</div>
+					</ItemGroup>
 				</ListGroup>
 			) }
 		</>
