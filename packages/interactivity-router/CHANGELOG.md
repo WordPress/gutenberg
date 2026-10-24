@@ -8,6 +8,11 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+
 ## 2.57.0 (2026-10-07)
 
 ### New Features
