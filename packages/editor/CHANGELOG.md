@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PostTitle`: Preserve literal Markdown characters when pasting text into the post title ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 16.0.0 (2026-10-20)
