@@ -5,10 +5,12 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 import type { BlockCategory, BlockCollection } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../../store';
 import { isFiltered } from '../../../store/utils';
+import { filterInserterItemsSelectKey } from '../../../store/private-keys';
+import BlockContext from '../../block-context';
 import type { InserterItem } from '../../../store/types';
 import type { BlockTypesState, InsertBlocks } from '../types';
 
@@ -30,14 +32,19 @@ const useBlockTypesState = (
 	isQuick?: boolean
 ): BlockTypesState => {
 	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
+	const context = useContext( BlockContext );
 	// Not wrapped in a tuple, so `useSelect` can return the previous array when the items match.
 	const items = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getInserterItems(
-				rootClientId,
-				options
-			),
-		[ rootClientId, options ]
+		( select ) => {
+			const { getInserterItems, getSettings } =
+				select( blockEditorStore );
+			const inserterItems = getInserterItems( rootClientId, options );
+			const filterItems = getSettings()[ filterInserterItemsSelectKey ];
+			return filterItems
+				? filterItems( select, inserterItems, rootClientId, context )
+				: inserterItems;
+		},
+		[ rootClientId, options, context ]
 	);
 
 	const [ categories, collections ] = useSelect(

@@ -6,6 +6,9 @@ export const currentUserIdSelectKey = Symbol( 'currentUserIdSelect' );
 export const userPatternCategoriesSelectKey = Symbol(
 	'userPatternCategoriesSelect'
 );
+export const filterInserterItemsSelectKey = Symbol(
+	'filterInserterItemsSelect'
+);
 export const sectionRootClientIdKey = Symbol( 'sectionRootClientIdKey' );
 export const mediaEditKey = Symbol( 'mediaEditKey' );
 export const getMediaSelectKey = Symbol( 'getMediaSelect' );

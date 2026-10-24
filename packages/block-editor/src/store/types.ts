@@ -24,6 +24,7 @@ import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
+	filterInserterItemsSelectKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
@@ -464,6 +465,12 @@ export type Settings = Record< string | symbol, unknown > & {
 	[ userPatternCategoriesSelectKey ]?: (
 		select: typeof globalSelect
 	) => UserPatternCategory[];
+	[ filterInserterItemsSelectKey ]?: (
+		select: typeof globalSelect,
+		items: InserterItem[],
+		rootClientId: string | null | undefined,
+		context: Record< string, unknown >
+	) => InserterItem[];
 };
 
 /**
