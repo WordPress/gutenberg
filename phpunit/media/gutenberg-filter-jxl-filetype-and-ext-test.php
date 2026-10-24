@@ -70,14 +70,17 @@ class Gutenberg_Filter_JXL_Filetype_And_Ext_Test extends WP_UnitTestCase {
 		$this->assertFalse( $result['type'] );
 	}
 
-	public function test_ignores_a_jxl_container_without_a_codestream(): void {
+	/**
+	 * @covers ::gutenberg_is_jxl_file
+	 */
+	public function test_does_not_sniff_a_jxl_container_without_a_codestream_as_jxl(): void {
 		$container = wp_tempnam( 'empty.jxl' );
 		file_put_contents( $container, "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A\x00\x00\x00\x14ftypjxl \x00\x00\x00\x00jxl " );
 
-		$result = wp_check_filetype_and_ext( $container, 'empty.jxl' );
+		$is_jxl = gutenberg_is_jxl_file( $container );
 		unlink( $container );
 
-		$this->assertFalse( $result['type'] );
+		$this->assertFalse( $is_jxl );
 	}
 
 	/**
