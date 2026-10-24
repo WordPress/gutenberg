@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";function isURL(i){try{return new URL(i),!0}catch{return!1}}function init_is_url(){return(init_is_url=i(()=>{}))()}export{isURL as n,init_is_url as t};

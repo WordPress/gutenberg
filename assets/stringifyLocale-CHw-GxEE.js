@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";function stringifyLocale(i){return Array.isArray(i)?i.map(i=>stringifyLocale(i)).join(","):null==i?"":String(i)}function init_stringifyLocale(){return(init_stringifyLocale=i(()=>{}))()}export{stringifyLocale as n,init_stringifyLocale as t};
