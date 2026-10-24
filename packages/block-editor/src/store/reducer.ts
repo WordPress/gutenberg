@@ -1726,6 +1726,29 @@ export function initialPosition(
 	return state;
 }
 
+/**
+ * Tracks explicit requests to focus a selected block, including reselection.
+ *
+ * @param state  Last block selection request.
+ * @param action Dispatched action.
+ * @return Updated request.
+ */
+export function blockSelectionRequest(
+	state: State[ 'blockSelectionRequest' ] = null,
+	action: Action
+) {
+	if (
+		action.type === 'SELECT_BLOCK' &&
+		action.initialPosition !== null &&
+		action.initialPosition !== undefined
+	) {
+		// A repeated request must remain observable even if the block is unchanged.
+		return { clientId: action.clientId };
+	}
+
+	return state;
+}
+
 export function blocksMode(
 	state: State[ 'blocksMode' ] = {},
 	action: Action
@@ -2546,6 +2569,7 @@ const combinedReducers = combineReducers( {
 	isMultiSelecting,
 	isSelectionEnabled,
 	initialPosition,
+	blockSelectionRequest,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
