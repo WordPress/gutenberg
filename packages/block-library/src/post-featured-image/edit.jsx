@@ -41,7 +41,9 @@ import { unlock } from '../lock-unlock';
 import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { ResolutionTool, useIsInFixedGridCell } = unlock(
+	blockEditorPrivateApis
+);
 
 const hasDimensionValue = ( value ) =>
 	value !== undefined && value !== null && value !== '';
@@ -160,6 +162,9 @@ export default function PostFeaturedImageEdit( {
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
+	// In a grid cell with a fixed size, the image fills the cell, cropped as
+	// needed, so only its scale has an effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
@@ -269,6 +274,7 @@ export default function PostFeaturedImageEdit( {
 					media={ media }
 					selectedStyleState={ selectedStyleState }
 					hasSelectedStyleState={ hasSelectedStyleState }
+					isInFixedGridCell={ isInFixedGridCell }
 				/>
 			</InspectorControls>
 			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
@@ -423,7 +429,7 @@ export default function PostFeaturedImageEdit( {
 			? height
 			: hasDimensionValue( width ) && 'auto',
 		width: hasDimensionValue( width ) ? width : !! aspectRatio && '100%',
-		objectFit: !! ( height || aspectRatio ) && scale,
+		objectFit: !! ( height || aspectRatio || isInFixedGridCell ) && scale,
 	};
 
 	/**
