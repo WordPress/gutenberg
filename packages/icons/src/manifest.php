@@ -45,6 +45,12 @@ return array(
 		'filePath'    => 'library/arrow-up-right.svg',
 		'collections' => array( 'core' ),
 	),
+	'asterisk'            => array(
+		'label'       => _x( 'Asterisk', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/asterisk.svg',
+		'collections' => array( 'core', 'core-admin' ),
+		'keywords'    => array( _x( 'generic', 'icon keyword', 'gutenberg' ), _x( 'wildcard', 'icon keyword', 'gutenberg' ), _x( 'placeholder', 'icon keyword', 'gutenberg' ) ),
+	),
 	'at-symbol'           => array(
 		'label'       => _x( 'At Symbol (@)', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/at-symbol.svg',
