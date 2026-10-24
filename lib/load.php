@@ -270,6 +270,26 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/knowledge/index.php';
 }
 
+// Rendering a template inside another template (only load when experiment is
+// enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-template-inheritance' ) ) {
+	require __DIR__ . '/experimental/block-template-parent.php';
+} else {
+	/*
+	 * The `template` field of a template is part of the experiment, but it is
+	 * registered with the `wp_template` collection of `@wordpress/core-fields`,
+	 * which is WordPress core code with no experiment to read. Unregistering it
+	 * here keeps the field out of the Entity fields API until the experiment is
+	 * on, so nothing advertises a field the REST API has no value for.
+	 */
+	add_action(
+		'wp_entity_fields_api_init',
+		static function () {
+			wp_unregister_entity_fields( 'postType', 'wp_template', array( 'template' ) );
+		}
+	);
+}
+
 // Dashboard Widgets (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';

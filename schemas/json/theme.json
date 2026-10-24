@@ -3698,6 +3698,25 @@
 				"additionalProperties": false
 			}
 		},
+		"templates": {
+			"description": "Additional metadata for templates defined in the templates folder.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"description": "Filename, without extension, of the template in the templates folder.",
+						"type": "string"
+					},
+					"template": {
+						"description": "Filename, without extension, of the template this one is rendered inside of. Its post content block is where this template renders. A site can override it, or render the template on its own, from the editor.",
+						"type": "string"
+					}
+				},
+				"required": [ "name" ],
+				"additionalProperties": false
+			}
+		},
 		"templateParts": {
 			"description": "Additional metadata for template parts defined in the parts folder.",
 			"type": "array",

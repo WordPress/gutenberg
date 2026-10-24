@@ -233,6 +233,23 @@ function generateDocs( themeJson ) {
 	md += '\n';
 
 	/* --------------- *
+	 * templates       *
+	 * --------------- */
+	md += '## templates\n\n';
+	md += `${ themeJson.properties.templates.description }\n\n`;
+	md += '| Property | Description | Type |\n';
+	md += '| -------- | ----------- | ---- |\n';
+	const templatesProperties = Object.entries(
+		themeJson.properties.templates.items.properties
+	);
+	for ( const [ property, subschema ] of templatesProperties ) {
+		const { description } = subschema;
+		const types = generateTypes( subschema );
+		md += `| ${ property } | ${ description } | ${ types } |\n`;
+	}
+	md += '\n';
+
+	/* --------------- *
 	 * templateParts   *
 	 * --------------- */
 	md += '## templateParts\n\n';

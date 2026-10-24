@@ -175,8 +175,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		renderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
-		__unstableTemplate: template,
+		__unstableTemplate: _template,
 	} ) => {
+		/*
+		 * A host editing a template names that template as the template too,
+		 * so that the canvas stands for it. There is nothing to render around
+		 * it then, unlike a template that names another one to render inside.
+		 */
+		const template = _template?.id === post.id ? undefined : _template;
 		const hasTemplate = !! template;
 		const {
 			editorSettings,
@@ -252,10 +258,22 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
+		/*
+		 * A template can name the template it is rendered inside, in which case
+		 * the canvas shows that one around it and the template being edited is
+		 * what its post content block renders, the way a page is.
+		 */
+		const isTemplateInsideTemplate =
+			shouldRenderTemplate &&
+			post.type === 'wp_template' &&
+			template.id !== post.id;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
-			// If it is a template, try to inherit the post type from the name.
-			if ( post.type === 'wp_template' ) {
+			if ( isTemplateInsideTemplate ) {
+				postContext.postId = post.id;
+				postContext.postType = post.type;
+				// If it is a template, try to inherit the post type from the name.
+			} else if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
@@ -288,6 +306,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						: undefined,
 			};
 		}, [
+			isTemplateInsideTemplate,
 			shouldRenderTemplate,
 			post.id,
 			post.type,
@@ -402,10 +421,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return () => updateEditorSettings( { renderingMode: undefined } );
 		}, [ settings, renderingMode, updateEditorSettings ] );
 
-		// Synchronizes the active template with the state.
+		// Synchronizes the active template with the state. Named from the prop
+		// rather than the template to render around the post, so a canvas that
+		// stands for a template still reports which one it is editing.
 		useEffect( () => {
-			setCurrentTemplateId( template?.id );
-		}, [ template?.id, setCurrentTemplateId ] );
+			setCurrentTemplateId( _template?.id );
+		}, [ _template?.id, setCurrentTemplateId ] );
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
