@@ -199,4 +199,25 @@ class Render_Block_Button_Test extends WP_UnitTestCase {
 		$this->assertSame( 'background-image:var(--wp--preset--gradient--purple-to-yellow);', $processor->get_attribute( 'style' ) );
 		$this->assertTrue( $processor->has_class( 'has-background' ) );
 	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_button
+	 */
+	public function test_background_ignores_clip() {
+		$attributes = array(
+			'style' => array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(red, blue)',
+					'backgroundClip' => 'text',
+				),
+			),
+		);
+
+		$result    = gutenberg_render_block_core_button( $attributes, self::$button_content );
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$processor->next_tag( 'a' );
+
+		$this->assertSame( 'background-image:linear-gradient(red, blue);', $processor->get_attribute( 'style' ) );
+		$this->assertTrue( $processor->has_class( 'has-background' ) );
+	}
 }
