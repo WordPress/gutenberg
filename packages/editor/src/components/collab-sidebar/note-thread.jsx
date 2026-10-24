@@ -258,20 +258,27 @@ export function NoteThread( {
 			// inside the thread. The expanded replies show the selection.
 			role="listitem"
 		>
-			<Button
-				className="editor-collab-sidebar-panel__skip-to-note"
-				variant="secondary"
-				size="compact"
-				onClick={ () => {
-					focusNoteThread(
-						note.id,
-						sidebarRef.current,
-						'[role="textbox"]'
-					);
-				} }
-			>
-				{ __( 'Add new reply' ) }
-			</Button>
+			{ /*
+			 * Only the selected thread has a reply field to skip to. Rendered
+			 * on every thread, the link would be the first thing a screen
+			 * reader announces for each one.
+			 */ }
+			{ isSelected && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-note"
+					variant="secondary"
+					size="compact"
+					onClick={ () => {
+						focusNoteThread(
+							note.id,
+							sidebarRef.current,
+							'[role="textbox"]'
+						);
+					} }
+				>
+					{ __( 'Add new reply' ) }
+				</Button>
+			) }
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }

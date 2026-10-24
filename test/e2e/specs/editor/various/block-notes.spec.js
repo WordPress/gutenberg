@@ -474,6 +474,19 @@ test.describe( 'Block Notes', () => {
 		// VoiceOver repeats `aria-current` on every element in the thread.
 		await expect( secondThread ).toHaveClass( /is-selected/ );
 		await expect( secondThread ).not.toHaveAttribute( 'aria-current' );
+
+		// Only the selected thread has a reply field for the skip link to
+		// reach; elsewhere it would open every thread's announcement.
+		const skipLinkName = { name: 'Add new reply' };
+		await expect(
+			secondThread.getByRole( 'button', skipLinkName )
+		).toHaveCount( 1 );
+		await expect(
+			list
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'First note' } )
+				.getByRole( 'button', skipLinkName )
+		).toHaveCount( 0 );
 	} );
 
 	test( 'clearing the block selection does not select an orphaned note', async ( {
