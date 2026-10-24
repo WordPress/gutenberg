@@ -23,6 +23,7 @@ import {
 	useNoteSelection,
 	useNoteThreads,
 	usePickNote,
+	useUnseenNotes,
 } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
@@ -60,6 +61,7 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const hasUnseenNotes = useUnseenNotes( { postId, notes } );
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -175,6 +177,8 @@ function NotesSidebar( { postId, drafts } ) {
 						</h2>
 					}
 					icon={ commentIcon }
+					badge={ hasUnseenNotes }
+					badgeLabel={ __( 'All notes, new activity' ) }
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NoteDraftsContext.Provider value={ drafts }>
