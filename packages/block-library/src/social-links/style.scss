@@ -122,15 +122,16 @@
 :where(.wp-block-social-links.is-style-logos-only) {
 	.wp-social-link {
 		background: none;
-
-		// Make these bigger.
-		svg {
-			width: 1.25em;
-			height: 1.25em;
-		}
 	}
 
 	@include socials-without-bg;
+}
+
+// Make these bigger. This needs enough specificity to override the default
+// icon size defined in `.wp-block-social-links .wp-social-link svg`.
+.wp-block-social-links.is-style-logos-only .wp-social-link svg {
+	width: 1.25em;
+	height: 1.25em;
 }
 
 // Treatment for pill shape style.
