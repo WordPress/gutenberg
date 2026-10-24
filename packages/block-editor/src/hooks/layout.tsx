@@ -30,6 +30,7 @@ import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
+import warning from '@wordpress/warning';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
@@ -708,7 +709,17 @@ function LayoutTypeSwitcher( { type, onChange }: LayoutTypeSwitcherProps ) {
  * @return Filtered block settings.
  */
 export function addAttribute( settings: BlockType ): BlockType {
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
+		if ( hasLayoutBlockSupport( settings ) ) {
+			// The block uses `layout` for its own attribute, but `layout`
+			// is a reserved attribute name: block layout support reads and
+			// writes `attributes.layout` as a layout object, so a custom
+			// attribute with this name will not be validated as expected.
+			warning(
+				`The block "${ settings.name }" defines a "layout" attribute, but "layout" is reserved for block layout support. Rename the attribute to avoid unexpected behavior.`
+			);
+		}
 		return settings;
 	}
 	if ( hasLayoutBlockSupport( settings ) ) {
