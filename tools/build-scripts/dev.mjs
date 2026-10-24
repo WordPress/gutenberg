@@ -262,6 +262,13 @@ async function dev() {
 					);
 				}
 
+				// Copy emojibase locale data, as the production build does.
+				await exec(
+					'node',
+					[ path.join( __dirname, 'copy-emojibase-data.mts' ) ],
+					{ silent: true }
+				);
+
 				readyMarkerFile.create();
 			}
 		} );
