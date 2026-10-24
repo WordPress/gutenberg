@@ -168,4 +168,31 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 		remove_all_filters( 'render_block_core/image' );
 	}
+
+	/**
+	 * @dataProvider data_lightbox_trigger_aria_label
+	 *
+	 * @covers ::block_core_image_render_lightbox
+	 */
+	public function test_lightbox_trigger_button_accessible_name( $alt_attr, $expected ) {
+		$content       = '<figure class="wp-block-image"><img src="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2021/04/canola.jpg"' . $alt_attr . '/></figure>';
+		$parsed_blocks = parse_blocks( '<!-- wp:image {"lightbox":{"enabled":true}} -->' . $content . '<!-- /wp:image -->' );
+		$block         = new WP_Block( $parsed_blocks[0] );
+
+		$block->render();
+
+		$state = wp_interactivity_state( 'core/image' );
+		$meta  = array_values( $state['metadata'] );
+		$this->assertSame( $expected, end( $meta )['triggerButtonAriaLabel'] );
+
+		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
+	}
+
+	public function data_lightbox_trigger_aria_label() {
+		return array(
+			'with alt'  => array( ' alt="A red barn"', 'Enlarge image: A red barn' ),
+			'empty alt' => array( ' alt=""', 'Enlarge image' ),
+			'no alt'    => array( '', 'Enlarge image' ),
+		);
+	}
 }
