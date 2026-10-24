@@ -49,6 +49,7 @@ export interface BlockInspectorSingleBlockProps {
 	availableTabs: InspectorTab[];
 	contentClientIds: string[];
 	hasBlockStyles?: boolean;
+	textStyleClientIds?: string[];
 	editedContentOnlySection?: string;
 	blockEditingMode?: BlockEditingMode;
 	selectedBlockStyleState: SelectedStyleState;

@@ -344,7 +344,7 @@ function splitGapValue(
 	};
 }
 
-function DimensionsToolsPanel( {
+export function DimensionsToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
