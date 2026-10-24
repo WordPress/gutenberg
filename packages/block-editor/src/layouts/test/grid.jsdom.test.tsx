@@ -1,7 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import { dispatch, select } from '@wordpress/data';
 import grid, { hasFixedGridCells } from '../grid';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { startGridItemDrag } from '../../components/grid/start-grid-item-drag';
 
 vi.mock( '../../components/grid/start-grid-item-drag', () => ( {
@@ -9,6 +13,7 @@ vi.mock( '../../components/grid/start-grid-item-drag', () => ( {
 } ) );
 
 globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockResizeObserver();
 
 const GridLayoutInspectorControls = grid.inspectorControls;
 const PANEL_ID = 'test-panel';
@@ -326,6 +331,314 @@ describe( 'GridLayoutInspectorControls', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Columns' } )
 		).toHaveDisplayValue( '' );
+	} );
+
+	describe( 'with the grid interactivity experiment', () => {
+		let originalExperiment: boolean | undefined;
+		beforeEach( () => {
+			originalExperiment = window.__experimentalEnableGridInteractivity;
+			window.__experimentalEnableGridInteractivity = true;
+		} );
+		afterEach( () => {
+			window.__experimentalEnableGridInteractivity = originalExperiment;
+		} );
+
+		it( 'turns stacking on mobile on for manual placement grids', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderInspectorControls( {
+				layout: { type: 'grid', isManualPlacement: true },
+				onChange,
+			} );
+
+			const toggle = screen.getByRole( 'checkbox', {
+				name: 'Stack on mobile',
+			} );
+			expect( toggle ).not.toBeChecked();
+
+			await user.click( toggle );
+			expect( onChange ).toHaveBeenCalledWith( {
+				type: 'grid',
+				isManualPlacement: true,
+				stackOnMobile: true,
+			} );
+		} );
+
+		it( 'stores nothing when stacking on mobile is turned back off', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderInspectorControls( {
+				layout: {
+					type: 'grid',
+					isManualPlacement: true,
+					stackOnMobile: true,
+				},
+				onChange,
+			} );
+
+			const toggle = screen.getByRole( 'checkbox', {
+				name: 'Stack on mobile',
+			} );
+			expect( toggle ).toBeChecked();
+
+			await user.click( toggle );
+			expect( onChange ).toHaveBeenCalledWith( {
+				type: 'grid',
+				isManualPlacement: true,
+			} );
+		} );
+
+		it( 'shows and removes the stacking set by the mobile layout', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const layout = {
+				type: 'grid',
+				isManualPlacement: true,
+				stackOnMobile: true,
+			};
+			act( () => {
+				dispatch( blockEditorStore ).resetBlocks( [
+					{
+						clientId: PANEL_ID,
+						name: 'core/group',
+						isValid: true,
+						attributes: {
+							layout,
+							style: {
+								'@mobile': {
+									layout: {
+										stackOnMobile: false,
+										columnCount: 3,
+									},
+								},
+							},
+						},
+						innerBlocks: [],
+					},
+				] );
+			} );
+			renderInspectorControls( { layout, onChange } );
+
+			const toggle = screen.getByRole( 'checkbox', {
+				name: 'Stack on mobile',
+			} );
+			// The grid was unstacked on mobile, by editing it there.
+			expect( toggle ).not.toBeChecked();
+
+			await user.click( toggle );
+			expect( onChange ).not.toHaveBeenCalled();
+			const attributes = unlock(
+				select( blockEditorStore )
+			).getBlockAttributes( PANEL_ID );
+			expect( attributes.layout ).toEqual( layout );
+			expect( attributes.style ).toEqual( {
+				'@mobile': { layout: { columnCount: 3 } },
+			} );
+			expect( toggle ).toBeChecked();
+		} );
+
+		it( 'removes the mobile placements of the blocks when stacking is turned on', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const layout = { type: 'grid', isManualPlacement: true };
+			act( () => {
+				dispatch( blockEditorStore ).resetBlocks( [
+					{
+						clientId: PANEL_ID,
+						name: 'core/group',
+						isValid: true,
+						attributes: { layout },
+						innerBlocks: [
+							{
+								clientId: 'placed-on-mobile',
+								name: 'core/paragraph',
+								isValid: true,
+								attributes: {
+									style: {
+										layout: { columnStart: 2, rowStart: 1 },
+										'@mobile': {
+											layout: {
+												columnStart: 1,
+												columnSpan: 3,
+												rowStart: 2,
+												rowSpan: 1,
+											},
+										},
+									},
+								},
+								innerBlocks: [],
+							},
+						],
+					},
+				] );
+			} );
+			renderInspectorControls( { layout, onChange } );
+
+			await user.click(
+				screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( {
+				...layout,
+				stackOnMobile: true,
+			} );
+			expect(
+				unlock( select( blockEditorStore ) ).getBlockAttributes(
+					'placed-on-mobile'
+				).style
+			).toEqual( { layout: { columnStart: 2, rowStart: 1 } } );
+		} );
+
+		it( 'offers stacking on mobile in the mobile state but not in the tablet state', async () => {
+			const { setStyleStateViewport } = unlock(
+				dispatch( blockEditorStore )
+			);
+			try {
+				act( () => {
+					setStyleStateViewport( '@mobile' );
+				} );
+				const { unmount } = renderInspectorControls( {
+					layout: { type: 'grid', isManualPlacement: true },
+				} );
+				expect(
+					await screen.findByRole( 'radio', { name: 'Manual' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+				).toBeInTheDocument();
+				unmount();
+
+				act( () => {
+					setStyleStateViewport( '@tablet' );
+				} );
+				renderInspectorControls( {
+					layout: { type: 'grid', isManualPlacement: true },
+				} );
+				expect(
+					await screen.findByRole( 'radio', { name: 'Manual' } )
+				).toBeChecked();
+				expect(
+					screen.queryByRole( 'checkbox', {
+						name: 'Stack on mobile',
+					} )
+				).not.toBeInTheDocument();
+			} finally {
+				act( () => {
+					setStyleStateViewport( 'default' );
+				} );
+			}
+		} );
+
+		it( 'does not offer stacking on mobile for auto placement grids', async () => {
+			renderInspectorControls( { layout: { type: 'grid' } } );
+
+			// Wait for the grid item position control to settle.
+			expect(
+				await screen.findByRole( 'radio', { name: 'Auto' } )
+			).toBeChecked();
+			expect(
+				screen.queryByRole( 'checkbox', { name: 'Stack on mobile' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'does not offer stacking on mobile without the grid interactivity experiment', () => {
+		renderInspectorControls( {
+			layout: { type: 'grid', isManualPlacement: true },
+		} );
+
+		expect(
+			screen.queryByRole( 'checkbox', { name: 'Stack on mobile' } )
+		).not.toBeInTheDocument();
+	} );
+} );
+
+describe( 'getLayoutStyle in the mobile viewport', () => {
+	let originalExperiment: boolean | undefined;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	const getMobileStyle = (
+		layout: Record< string, unknown >,
+		{
+			selector = '.my-container',
+			viewportOverrides = {},
+			viewport = '@mobile',
+		} = {}
+	) =>
+		grid.getLayoutStyle( {
+			blockName: 'core/group',
+			selector,
+			layout,
+			viewportOverrides,
+			viewport,
+		} );
+
+	it( 'stacks the children of manual placement grids, keeping their row spans', () => {
+		expect(
+			getMobileStyle( {
+				isManualPlacement: true,
+				columnCount: 3,
+				stackOnMobile: true,
+			} )
+		).toBe(
+			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }'
+		);
+	} );
+
+	it( 'repeats each selector of a selector list', () => {
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true, stackOnMobile: true },
+				{ selector: '.a,.b' }
+			)
+		).toContain( '.a.a > *,.b.b > * {' );
+	} );
+
+	it( 'reads stacking from the mobile layout', () => {
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true, stackOnMobile: true },
+				{ viewportOverrides: { stackOnMobile: false } }
+			)
+		).toBe( '' );
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true },
+				{ viewportOverrides: { stackOnMobile: true } }
+			)
+		).toContain( 'grid-column: 1 / -1' );
+	} );
+
+	it( 'only stacks in the mobile viewport', () => {
+		expect(
+			getMobileStyle(
+				{ isManualPlacement: true, stackOnMobile: true },
+				{ viewport: '@tablet' }
+			)
+		).toBe( '' );
+	} );
+
+	it( 'does not stack grids that have not opted in, or auto placement grids', () => {
+		expect( getMobileStyle( { isManualPlacement: true } ) ).toBe( '' );
+		expect(
+			getMobileStyle( { isManualPlacement: true, stackOnMobile: false } )
+		).toBe( '' );
+		expect(
+			getMobileStyle( { columnCount: 3, stackOnMobile: true } )
+		).toBe( '' );
+	} );
+
+	it( 'does not stack without the grid interactivity experiment', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect(
+			getMobileStyle( { isManualPlacement: true, stackOnMobile: true } )
+		).toBe( '' );
 	} );
 } );
 
