@@ -7,12 +7,12 @@
  * @package gutenberg-test-disallow-jxl-uploads
  */
 
-// Runs after Gutenberg registers JXL, as a network's upload file types would.
+// Runs at the default priority, like core's check_upload_mimes() applying a
+// network's upload file types.
 add_filter(
 	'upload_mimes',
 	static function ( $mimes ) {
 		unset( $mimes['jxl'] );
 		return $mimes;
-	},
-	20
+	}
 );
