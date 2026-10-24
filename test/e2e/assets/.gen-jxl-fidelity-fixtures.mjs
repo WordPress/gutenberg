@@ -5,13 +5,12 @@
  *   cd test/e2e/assets
  *   node .gen-jxl-fidelity-fixtures.mjs
  *
- * Produces two 200x150 JXL fixtures used by the "preserves the original ...
- * JXL" client-side media processing tests:
+ * Produces two 200x150 JXL fixtures used by the "stores a ... JXL
+ * byte-for-byte" client-side media processing tests:
  *
  *   200x150_e2e_test_image_hdr.jxl
  *     A genuine 16-bit (>8-bit, "HDR") JXL. Decodes in wasm-vips as
- *     rgb16/ushort. Proves CSM flattens high-bit-depth JXL to an 8-bit JPEG
- *     for sub-sizes while preserving the 16-bit original byte-for-byte.
+ *     rgb16/ushort. Proves CSM stores the 16-bit upload byte-for-byte.
  *
  *   200x150_e2e_test_image_gainmap.jxl
  *     An 8-bit JXL carrying an ISO-BMFF `jhgm` (ISO 21496-1 gain map) box.
@@ -20,7 +19,7 @@
  *     real (grayscale JPEG) gain map image wrapped in a `jhgm`-typed box after
  *     the primary codestream. wasm-vips decodes the primary and ignores the
  *     trailing box, which is exactly the path under test. Proves the gain map
- *     survives in the preserved original even though sub-sizes drop it.
+ *     survives in the stored upload even though sub-sizes drop it.
  *
  * Run manually (not part of CI); console output is the script's UI.
  */

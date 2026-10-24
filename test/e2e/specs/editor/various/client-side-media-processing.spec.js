@@ -233,12 +233,20 @@ class MediaProcessingUtils {
 	/**
 	 * Insert a core/image block, upload an asset, and return its REST media object.
 	 *
-	 * @param {Object} editor       The editor fixture.
-	 * @param {Object} requestUtils The requestUtils fixture.
-	 * @param {string} fileName     File name in the assets directory, or an absolute path.
+	 * @param {Object}  editor                   The editor fixture.
+	 * @param {Object}  requestUtils             The requestUtils fixture.
+	 * @param {string}  fileName                 File name in the assets directory, or an absolute path.
+	 * @param {Object}  [options]                Options.
+	 * @param {boolean} [options.waitForPreview] Whether to wait for the image to render. Pass false for a
+	 *                                           format the test browser cannot display, such as JXL.
 	 * @return {Promise<Object>} REST media object for the uploaded attachment.
 	 */
-	async uploadImageAndGetMedia( editor, requestUtils, fileName ) {
+	async uploadImageAndGetMedia(
+		editor,
+		requestUtils,
+		fileName,
+		{ waitForPreview = true } = {}
+	) {
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -251,23 +259,22 @@ class MediaProcessingUtils {
 			fileName
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		// For a format the browser cannot decode (JXL), the image block swaps
-		// the <img> for a spinner placeholder as soon as the temporary blob
-		// preview fails to load, so the <img> only reappears once the upload
-		// finishes and the blob URL is replaced by the uploaded one. Allow the
-		// same window as the src assertion below.
-		await expect( image ).toBeVisible( { timeout: 30_000 } );
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
+		if ( waitForPreview ) {
+			const image = imageBlock.getByRole( 'img', {
+				name: 'This image has an empty alt attribute',
+			} );
+			await expect( image ).toBeVisible();
+			await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+				timeout: 30_000,
+			} );
+		}
 
 		await this.waitForUploadQueueEmpty();
 
+		await expect
+			.poll( () => this.getSelectedBlockImageId(), { timeout: 30_000 } )
+			.toBeDefined();
 		const imageId = await this.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
 
 		return await this.getMediaDetails( requestUtils, imageId );
 	}
@@ -371,142 +378,68 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.height ).toBe( 150 );
 	} );
 
-	test( 'converts a JPEG XL (JXL) upload to a web-compatible JPEG', async ( {
+	test( 'keeps a JPEG XL (JXL) upload and its sub-sizes as JXL', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		// JXL is not broadly web-compatible (most browsers can't display it and
-		// the server can't read it), so CSM decodes it to JPEG client-side via
-		// vips and uploads the JPEG. This also regression-guards the original
-		// upload rejection: JXL files used to be refused with "Sorry, you are
-		// not allowed to upload this file type." because image/jxl was not a
-		// registered upload MIME type.
+		// The test browser predates default JXL support (Chrome 155), so it
+		// cannot render the image; the upload itself still runs through vips.
 		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
 			editor,
 			requestUtils,
-			'200x150_e2e_test_image_decode.jxl'
+			'200x150_e2e_test_image_decode.jxl',
+			{ waitForPreview: false }
 		);
 
-		// The stored attachment is a JPEG the browser/front end can render,
-		// with real dimensions the server could only read post-conversion.
-		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.mime_type ).toBe( 'image/jxl' );
+		expect( media.source_url ).toMatch( /\.jxl$/ );
+		// The server records the dimensions it read from the JXL header.
 		expect( media.media_details.width ).toBe( 200 );
 		expect( media.media_details.height ).toBe( 150 );
 
-		// The original .jxl is preserved as a companion file, recorded in
-		// metadata['source_image'] (mirroring how HEIC keeps its original).
-		const fullMedia = await requestUtils.rest( {
-			method: 'GET',
-			path: `/wp/v2/media/${ media.id }?context=edit`,
-		} );
-		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
+		const { thumbnail } = media.media_details.sizes;
+		expect( thumbnail.mime_type ).toBe( 'image/jxl' );
+		expect( thumbnail.width ).toBe( 150 );
+		expect( thumbnail.height ).toBe( 150 );
+		expect( thumbnail.source_url ).toMatch( /-150x150\.jxl$/ );
 	} );
 
-	test( 'flattens a high-bit-depth (HDR) JXL to JPEG sub-sizes but preserves the 16-bit original', async ( {
-		editor,
-		mediaProcessingUtils,
-		requestUtils,
-		page,
-	} ) => {
-		// A genuine 16-bit (>8-bit, "HDR") JXL. CSM decodes it to JPEG with
-		// vips for upload, so the main attachment and every generated sub-size
-		// are 8-bit JPEG: the extra bit depth is NOT carried into sub-sizes
-		// (JPEG is 8-bit by definition). The full 16-bit fidelity survives only
-		// in the original .jxl, which is preserved byte-for-byte as a companion
-		// file (sideloaded like the HEIC original). This test guards both
-		// halves of that contract: the flattening and the lossless preservation.
-		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+	for ( const [ description, fixture ] of [
+		[ 'high-bit-depth (HDR)', '200x150_e2e_test_image_hdr.jxl' ],
+		[ 'gain-map', '200x150_e2e_test_image_gainmap.jxl' ],
+	] ) {
+		test( `stores a ${ description } JXL byte-for-byte`, async ( {
 			editor,
+			mediaProcessingUtils,
 			requestUtils,
-			'200x150_e2e_test_image_hdr.jxl'
-		);
+			page,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				fixture,
+				{ waitForPreview: false }
+			);
 
-		// Main attachment is the 8-bit JPEG derivative.
-		expect( media.mime_type ).toBe( 'image/jpeg' );
-		expect( media.media_details.width ).toBe( 200 );
-		expect( media.media_details.height ).toBe( 150 );
+			expect( media.mime_type ).toBe( 'image/jxl' );
+			expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
+				'image/jxl'
+			);
 
-		// The generated sub-size is JPEG too — the >8-bit depth is dropped.
-		expect( media.media_details.sizes.thumbnail ).toBeDefined();
-		expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
-			'image/jpeg'
-		);
-
-		// The original 16-bit .jxl is preserved as the companion file.
-		const fullMedia = await requestUtils.rest( {
-			method: 'GET',
-			path: `/wp/v2/media/${ media.id }?context=edit`,
+			// The upload is not re-encoded, so the extra bit depth and the
+			// gain map survive in the full-size image.
+			const stored = await (
+				await page.request.get( media.source_url )
+			).body();
+			const uploaded = await fs.readFile(
+				path.join( ASSETS_DIR, fixture )
+			);
+			expect( Buffer.compare( stored, uploaded ) ).toBe( 0 );
 		} );
-		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
+	}
 
-		// Strongest proof of bit-depth preservation: the stored original is
-		// byte-for-byte identical to the uploaded 16-bit fixture, so its full
-		// depth (and any other embedded fidelity) is intact.
-		const originalUrl = media.source_url.replace(
-			/[^/]+$/,
-			fullMedia.media_details.source_image
-		);
-		const storedOriginal = await (
-			await page.request.get( originalUrl )
-		).body();
-		const uploadedFixture = await fs.readFile(
-			path.join( ASSETS_DIR, '200x150_e2e_test_image_hdr.jxl' )
-		);
-		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
-	} );
-
-	test( 'flattens a gain-map JXL to JPEG sub-sizes but preserves the gain map in the original', async ( {
-		editor,
-		mediaProcessingUtils,
-		requestUtils,
-		page,
-	} ) => {
-		// An 8-bit JXL carrying an ISO 21496-1 gain map (a `jhgm` ISO-BMFF box
-		// after the primary codestream — see .gen-jxl-fidelity-fixtures.mjs).
-		// vips decodes the primary image and discards the gain map, so the
-		// JPEG derivative and its sub-sizes have no gain map. The gain map is
-		// preserved only in the original .jxl companion, kept byte-for-byte.
-		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
-			editor,
-			requestUtils,
-			'200x150_e2e_test_image_gainmap.jxl'
-		);
-
-		// Main attachment is the JPEG derivative without the gain map.
-		expect( media.mime_type ).toBe( 'image/jpeg' );
-		expect( media.media_details.width ).toBe( 200 );
-		expect( media.media_details.height ).toBe( 150 );
-
-		// The generated sub-size is JPEG too — no gain map carried through.
-		expect( media.media_details.sizes.thumbnail ).toBeDefined();
-		expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
-			'image/jpeg'
-		);
-
-		// The original gain-map .jxl is preserved as the companion file.
-		const fullMedia = await requestUtils.rest( {
-			method: 'GET',
-			path: `/wp/v2/media/${ media.id }?context=edit`,
-		} );
-		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
-
-		// Byte-for-byte identity proves the embedded gain map (the `jhgm` box)
-		// survives untouched in the stored original.
-		const originalUrl = media.source_url.replace(
-			/[^/]+$/,
-			fullMedia.media_details.source_image
-		);
-		const storedOriginal = await (
-			await page.request.get( originalUrl )
-		).body();
-		const uploadedFixture = await fs.readFile(
-			path.join( ASSETS_DIR, '200x150_e2e_test_image_gainmap.jxl' )
-		);
-		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
-	} );
-
-	test( 'converts a transparent JXL to PNG instead of flattening it to JPEG', async ( {
+	test( 'keeps the transparency of a JXL in its sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
@@ -525,64 +458,16 @@ test.describe( 'Client-side media processing', () => {
 		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
 			editor,
 			requestUtils,
-			transparentJxl
+			transparentJxl,
+			{ waitForPreview: false }
 		);
 
-		// JPEG has no alpha channel, so a JPEG derivative would fill the
-		// transparent areas in.
-		expect( media.mime_type ).toBe( 'image/png' );
-		const probe = await probeImageUrl( media.source_url );
+		expect( media.mime_type ).toBe( 'image/jxl' );
+		const probe = await probeImageUrl(
+			media.media_details.sizes.thumbnail.source_url
+		);
 		expect( probe.hasAlpha ).toBe( true );
 		expect( probe.minAlpha ).toBeLessThan( 255 );
-
-		const fullMedia = await requestUtils.rest( {
-			method: 'GET',
-			path: `/wp/v2/media/${ media.id }?context=edit`,
-		} );
-		expect( fullMedia.media_details.source_image ).toMatch( /\.jxl$/ );
-	} );
-
-	test( 'keeps JXL metadata when the site turns off metadata stripping', async ( {
-		page,
-		editor,
-		mediaProcessingUtils,
-		requestUtils,
-	} ) => {
-		const jxlWithExif = await writeGeneratedJxl(
-			( vips ) => {
-				const image = vips.Image.newFromFile(
-					path.join( ASSETS_DIR, '200x150_e2e_test_image_opaque.png' )
-				).copy();
-				image.setString( 'exif-ifd0-Artist', 'Gutenberg E2E' );
-				return image;
-			},
-			{ keep: 'all' }
-		);
-
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-image-keep-metadata'
-		);
-
-		try {
-			await page.reload();
-			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
-
-			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
-				editor,
-				requestUtils,
-				jxlWithExif
-			);
-
-			// The `image_strip_meta` filter applies to the JPEG made from the
-			// JXL, as it does to every other client-side conversion.
-			expect( media.mime_type ).toBe( 'image/jpeg' );
-			const probe = await probeImageUrl( media.source_url );
-			expect( probe.artist ).toMatch( /^Gutenberg E2E/ );
-		} finally {
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-plugin-image-keep-metadata'
-			);
-		}
 	} );
 
 	test( 'rejects a JXL upload when the site does not allow JXL', async ( {
@@ -823,7 +708,7 @@ test.describe( 'Client-side media processing', () => {
 		await expect( publishButton ).toBeEnabled( { timeout: 60_000 } );
 	} );
 
-	test( 'converts several JXL images uploaded together', async ( {
+	test( 'processes several JXL images uploaded together', async ( {
 		page,
 		editor,
 		mediaProcessingUtils,
@@ -875,12 +760,14 @@ test.describe( 'Client-side media processing', () => {
 			path: '/wp/v2/media',
 			params: { per_page: 20, context: 'edit' },
 		} );
-		const convertedJxl = media.filter( ( item ) =>
-			/\.jxl$/.test( item.media_details?.source_image ?? '' )
+		const jxlMedia = media.filter(
+			( item ) => item.mime_type === 'image/jxl'
 		);
-		expect( convertedJxl ).toHaveLength( 3 );
-		for ( const item of convertedJxl ) {
-			expect( item.mime_type ).toBe( 'image/jpeg' );
+		expect( jxlMedia ).toHaveLength( 3 );
+		for ( const item of jxlMedia ) {
+			expect( item.media_details.sizes.thumbnail.mime_type ).toBe(
+				'image/jxl'
+			);
 		}
 	} );
 
