@@ -38,6 +38,7 @@ import {
 	type YMapRecord,
 	type YMapWrap,
 } from './crdt-utils';
+import isDefaultAutoDraftTitle from './is-default-auto-draft-title';
 
 // A function that derives content from blocks. Two callers produce this:
 // `useEntityBlockEditor` reads blocks from its argument (so the optional arg
@@ -211,7 +212,7 @@ export function applyPostChangesToCRDTDoc(
 				if (
 					key === 'title' &&
 					! currentValue?.toString() &&
-					'Auto Draft' === rawValue
+					isDefaultAutoDraftTitle( rawValue )
 				) {
 					rawValue = '';
 				}
