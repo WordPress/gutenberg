@@ -682,6 +682,33 @@ export function finishOperation(
 	};
 }
 
+/**
+ * Gets the pixel dimensions of an upload's source image.
+ *
+ * Browsers without JPEG XL support cannot decode a JXL, so for one this uses
+ * the dimensions the server read from its header.
+ *
+ * @param file       Source image.
+ * @param attachment Attachment created from the upload.
+ * @return Width and height, 0 when unknown.
+ */
+async function getSourceDimensions(
+	file: File,
+	attachment: Partial< Attachment >
+): Promise< { width: number; height: number } > {
+	if ( 'image/jxl' === file.type ) {
+		return {
+			width: Number( attachment.media_details?.width ) || 0,
+			height: Number( attachment.media_details?.height ) || 0,
+		};
+	}
+
+	const bitmap = await createImageBitmap( file );
+	const { width, height } = bitmap;
+	bitmap.close();
+	return { width, height };
+}
+
 const VALID_IMAGE_FORMATS = [
 	'jpeg',
 	'webp',
@@ -1924,11 +1951,13 @@ export function generateThumbnails( id: QueueItemId ) {
 					// Check if the image actually exceeds the threshold.
 					// Only create a scaled version for images larger than the threshold,
 					// matching WordPress core's wp_create_image_subsizes() behavior.
-					const bitmap = await createImageBitmap( thumbnailSource );
+					const { width, height } = await getSourceDimensions(
+						thumbnailSource,
+						attachment
+					);
 					const needsScaling =
-						bitmap.width > bigImageSizeThreshold ||
-						bitmap.height > bigImageSizeThreshold;
-					bitmap.close();
+						width > bigImageSizeThreshold ||
+						height > bigImageSizeThreshold;
 
 					if ( needsScaling ) {
 						// Rename sourceFile to match the server attachment filename.

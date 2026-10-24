@@ -276,6 +276,11 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
+	media_details?: {
+		width?: number;
+		height?: number;
+		[ k: string ]: unknown;
+	};
 	poster?: string;
 	meta?:
 		| []

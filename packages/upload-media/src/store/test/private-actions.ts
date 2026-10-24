@@ -1281,6 +1281,66 @@ describe( 'private actions', () => {
 				OperationType.ResizeCrop
 			);
 		} );
+
+		it( 'scales a large JXL using the dimensions the server read', async () => {
+			// Chrome before 155 cannot decode JXL, so createImageBitmap rejects.
+			const originalCreateImageBitmap = global.createImageBitmap;
+			global.createImageBitmap = vi.fn( async () => {
+				throw new DOMException(
+					'The source image could not be decoded.',
+					'InvalidStateError'
+				);
+			} );
+
+			const jxl = new File( [ 'x' ], 'photo.jxl', {
+				type: 'image/jxl',
+			} );
+			const item = {
+				id: 'j',
+				sourceFile: jxl,
+				file: jxl,
+				attachment: {
+					id: 21,
+					filename: 'photo.jxl',
+					missing_image_sizes: [ 'thumbnail' ],
+					media_details: { width: 4000, height: 3000 },
+				},
+			};
+			const dispatchFn = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				addSideloadItem: vi.fn(),
+			} );
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+					bigImageSizeThreshold: 2560,
+				} ),
+			};
+
+			try {
+				await generateThumbnails( item.id )( {
+					select,
+					dispatch: dispatchFn,
+				} as unknown as ThunkArgs );
+			} finally {
+				global.createImageBitmap = originalCreateImageBitmap;
+			}
+
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					additionalData: expect.objectContaining( {
+						image_size: 'scaled',
+					} ),
+				} )
+			);
+			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
+				'j',
+				{}
+			);
+		} );
 	} );
 
 	describe( 'generateThumbnails UltraHDR gain-map routing', () => {
