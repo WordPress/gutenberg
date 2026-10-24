@@ -1,10 +1,12 @@
-import type { ReactElement } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import {
 	justifyLeft,
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifySpaceAround,
+	justifySpaceEvenly,
 	justifyStretch,
 	justifyTop,
 	justifyCenterVertical,
@@ -21,6 +23,7 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { Icon, SelectControl, Stack } from '@wordpress/ui';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -49,6 +52,8 @@ const justifyContentMap: Record< string, string > = {
 	right: 'flex-end',
 	center: 'center',
 	'space-between': 'space-between',
+	'space-around': 'space-around',
+	'space-evenly': 'space-evenly',
 };
 
 // Used with the vertical (column) flex orientation.
@@ -197,11 +202,12 @@ export default {
 					<Flex
 						align="flex-start"
 						className="block-editor-hooks__flex-layout-controls"
-						gap={ 4 }
+						gap={ 1 }
 						justify="flex-start"
 					>
 						{ allowJustification && (
 							<ToolsPanelItem
+								className="block-editor-hooks__flex-layout-justification-item"
 								label={ __( 'Justification' ) }
 								hasValue={ hasJustificationValue }
 								onDeselect={ resetJustification }
@@ -216,6 +222,7 @@ export default {
 						) }
 						{ allowOrientation && (
 							<ToolsPanelItem
+								className="block-editor-hooks__flex-layout-orientation-item"
 								label={ __( 'Orientation' ) }
 								hasValue={ hasOrientationValue }
 								onDeselect={ resetOrientation }
@@ -527,7 +534,7 @@ function FlexLayoutJustifyContentControl( {
 		'right',
 	];
 	if ( orientation === 'horizontal' ) {
-		allowedControls.push( 'space-between' );
+		allowedControls.push( 'space-between', 'space-around', 'space-evenly' );
 	} else {
 		allowedControls.push( 'stretch' );
 	}
@@ -545,57 +552,107 @@ function FlexLayoutJustifyContentControl( {
 
 	const justificationOptions: {
 		value: string;
-		icon: ReactElement;
 		label: string;
+		icon: ComponentProps< typeof Icon >[ 'icon' ];
 	}[] = [
 		{
 			value: 'left',
+			label: _x( 'Left', 'Flex layout justification option' ),
 			icon: justifyLeft,
-			label: __( 'Justify items left' ),
 		},
 		{
 			value: 'center',
+			label: _x( 'Center', 'Flex layout justification option' ),
 			icon: justifyCenter,
-			label: __( 'Justify items center' ),
 		},
 		{
 			value: 'right',
+			label: _x( 'Right', 'Flex layout justification option' ),
 			icon: justifyRight,
-			label: __( 'Justify items right' ),
 		},
 	];
 	if ( orientation === 'horizontal' ) {
-		justificationOptions.push( {
-			value: 'space-between',
-			icon: justifySpaceBetween,
-			label: __( 'Space between items' ),
-		} );
+		justificationOptions.push(
+			{
+				value: 'space-between',
+				label: __( 'Space between' ),
+				icon: justifySpaceBetween,
+			},
+			{
+				value: 'space-around',
+				label: __( 'Space around' ),
+				icon: justifySpaceAround,
+			},
+			{
+				value: 'space-evenly',
+				label: __( 'Space evenly' ),
+				icon: justifySpaceEvenly,
+			}
+		);
 	} else {
 		justificationOptions.push( {
 			value: 'stretch',
-			icon: justifyStretch,
 			label: __( 'Stretch items' ),
+			icon: justifyStretch,
 		} );
 	}
 
+	const selectedOption =
+		justificationOptions.find(
+			( option ) => option.value === justifyContent
+		) ?? justificationOptions[ 0 ];
+
 	return (
-		<ToggleGroupControl
-			label={ __( 'Justification' ) }
-			value={ justifyContent }
-			onChange={ onJustificationChange }
+		<SelectControl
 			className="block-editor-hooks__flex-layout-justification-controls"
+			label={ __( 'Justification' ) }
+			items={ justificationOptions }
+			value={ selectedOption }
+			trigger={
+				<SelectControl.Trigger>
+					<Stack
+						render={ <span /> }
+						direction="row"
+						align="center"
+						gap="xs"
+					>
+						<Icon
+							icon={ selectedOption.icon }
+							style={ { flexShrink: 0 } }
+						/>
+						<span
+							style={ {
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+							} }
+						>
+							{ selectedOption.label }
+						</span>
+					</Stack>
+				</SelectControl.Trigger>
+			}
+			isItemEqualToValue={ ( item, value ) => item.value === value.value }
+			onValueChange={ ( selectedItem ) => {
+				if ( selectedItem && selectedItem.value !== null ) {
+					onJustificationChange( selectedItem.value );
+				}
+			} }
 		>
-			{ justificationOptions.map( ( { value, icon, label } ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ value }
-						value={ value }
-						icon={ icon }
-						label={ label }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+			{ justificationOptions.map( ( option ) => (
+				<SelectControl.Item
+					key={ option.value }
+					value={ option }
+					label={ option.label }
+				>
+					<SelectControl.ItemLabel>
+						<Stack direction="row" align="center" gap="xs">
+							<Icon icon={ option.icon } />
+							{ option.label }
+						</Stack>
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ) }
+		</SelectControl>
 	);
 }
 
@@ -641,7 +698,11 @@ function OrientationControl( { layout, onChange }: LayoutControlProps ) {
 					if ( verticalAlignment === 'stretch' ) {
 						newVerticalAlignment = 'top';
 					}
-					if ( justifyContent === 'space-between' ) {
+					if (
+						justifyContent === 'space-between' ||
+						justifyContent === 'space-around' ||
+						justifyContent === 'space-evenly'
+					) {
 						newJustification = 'left';
 					}
 				}

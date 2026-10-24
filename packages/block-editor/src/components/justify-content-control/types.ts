@@ -5,7 +5,13 @@ import type { Dropdown } from '@wordpress/components';
  * A justification of the items in a block.
  */
 export type JustifyContentValue =
-	'left' | 'center' | 'right' | 'space-between' | 'stretch';
+	| 'left'
+	| 'center'
+	| 'right'
+	| 'space-between'
+	| 'space-around'
+	| 'space-evenly'
+	| 'stretch';
 
 /**
  * Props of `JustifyContentControl` and `JustifyToolbar`.

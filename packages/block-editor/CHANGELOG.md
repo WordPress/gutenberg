@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Flex layout: Add Space around and Space evenly justification options, using a select control with icons and labels in the Layout panel ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+-   `JustifyContentControl`: Include Space around and Space evenly in the default controls ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+
 ### Enhancements
 
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
