@@ -39,4 +39,22 @@ describe( 'ViewLinkButton', () => {
 		);
 		expect( viewLink ).toHaveAttribute( 'target', '_blank' );
 	} );
+
+	test.each( [
+		'javascript:alert(1)',
+		'  JavaScript:alert(1)',
+		'data:text/html,<script>alert(1)</script>',
+		'vbscript:msgbox(1)',
+	] )( 'renders nothing for the unsafe link %s', ( url ) => {
+		expect( getViewLink( url ) ).toBeNull();
+	} );
+
+	test.each( [
+		'https://wordpress.org/news',
+		'http://example.org/',
+		'mailto:hello@example.com',
+		'tel:+15555551234',
+	] )( 'renders the safe link %s', ( url ) => {
+		expect( getViewLink( url ) ).toHaveAttribute( 'href', url );
+	} );
 } );
