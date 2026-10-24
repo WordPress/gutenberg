@@ -1034,6 +1034,20 @@ export const restoreRevision =
 	};
 
 /**
+ * Record whether Undo would withdraw a pending suggestion the core-data history
+ * does not hold. Dispatched by the suggestion undo guard.
+ *
+ * @param {boolean} hasSuggestionUndo Whether a suggestion can be undone.
+ * @return {Object} Action object.
+ */
+export function setHasSuggestionUndo( hasSuggestionUndo ) {
+	return {
+		type: 'SET_HAS_SUGGESTION_UNDO',
+		hasSuggestionUndo,
+	};
+}
+
+/**
  * Hold a post field proposal made while suggesting.
  *
  * @param {string} id       Proposal id: the post field, or `meta.<key>`.
