@@ -1,3 +1,4 @@
+/* eslint-disable gutenberg/use-typescript -- The Image block is implemented in JavaScript; converting this test to TypeScript causes TS6307 because utils.js is not part of tsconfig. */
 import { describe, expect, it } from 'vitest';
 import { getDimensionsTools } from '../utils';
 
@@ -56,3 +57,5 @@ describe( 'getDimensionsTools', () => {
 		expect( tools ).toEqual( [ 'aspectRatio', 'widthHeight' ] );
 	} );
 } );
+
+/* eslint-enable gutenberg/use-typescript */
