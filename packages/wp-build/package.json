@@ -61,7 +61,16 @@
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
+		"@wordpress/theme": "file:../theme",
 		"vitest": "^5.0.3"
+	},
+	"peerDependencies": {
+		"@wordpress/theme": "^3.0.0 || ^4.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@wordpress/theme": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
