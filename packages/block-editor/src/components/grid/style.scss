@@ -504,47 +504,48 @@
 	height: 100%;
 }
 
-// Looks like a block toolbar with a single button.
-.block-editor-grid-item-handle {
+// A small block toolbar outside the block, under its lowest corner and clear
+// of the resize handle in the middle of the bottom side. It is placed by
+// `getCornerToolbarStyle()`.
+.block-editor-grid-item-handles__toolbar.components-accessible-toolbar {
 	position: absolute;
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-sizing: border-box;
-	min-width: $button-size-compact;
-	height: $button-size-compact;
 	// The same border as the block toolbar. No stroke token is as dark.
 	border: var(--wpds-border-width-xs) solid $gray-900;
 	border-radius: var(--wpds-border-radius-sm);
 	background: var(--wpds-color-background-surface-neutral-strong);
-	color: var(--wpds-color-foreground-interactive-neutral);
-	cursor: grab;
-	touch-action: none;
-	// A press on a handle drags or turns the block, and never selects text.
-	user-select: none;
-	-webkit-touch-callout: none;
 
-	&:hover {
-		color: var(--wp-admin-theme-color);
+	// Specificity to override the sizes `Toolbar` gives its buttons, which
+	// are those of the block toolbar.
+	.block-editor-grid-item-handle.block-editor-grid-item-handle.block-editor-grid-item-handle {
+		min-width: $button-size-small;
+		height: $button-size-small;
+		padding: 0;
+		color: var(--wpds-color-foreground-interactive-neutral);
+		touch-action: none;
+		// A press on a handle drags or turns the block, and never selects text.
+		user-select: none;
+		-webkit-touch-callout: none;
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+
+		// The focus ring, inside the button.
+		&::before {
+			inset: $border-width-focus-fallback;
+			height: auto;
+		}
 	}
 
-	&:active {
-		cursor: grabbing;
+	.block-editor-grid-item-handles__drag.block-editor-grid-item-handles__drag,
+	.block-editor-grid-item-handles__rotate.block-editor-grid-item-handles__rotate {
+		cursor: grab;
+
+		&:active {
+			cursor: grabbing;
+		}
 	}
-}
-
-// Above the block, where its toolbar would be if the grid didn't show it.
-.block-editor-grid-item-handles__drag {
-	top: -($button-size-compact + $grid-unit-10);
-	left: 50%;
-	margin-left: -$button-size-compact * 0.5;
-}
-
-// Outside the bottom right corner, clear of the resize handles in the middle
-// of each side.
-.block-editor-grid-item-handles__rotate {
-	right: -($button-size-compact + $grid-unit-10);
-	bottom: -($button-size-compact + $grid-unit-10);
 }
 
 .block-editor-grid-item-handles__angle {

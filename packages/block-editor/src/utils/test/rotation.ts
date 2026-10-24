@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
 	fromPickerAngle,
+	getCornerToolbarStyle,
+	getLowestCorner,
 	getRotatedBoundingRect,
 	getRotatedOverlayStyle,
 	getRotationFromPointer,
@@ -260,4 +262,98 @@ describe( 'getRotatedBoundingRect()', () => {
 			expect( other.bottom ).toBeCloseTo( rotated.bottom );
 		}
 	} );
+} );
+
+describe( 'getLowestCorner()', () => {
+	it( 'is the bottom right corner of a level block', () => {
+		expect( getLowestCorner( 0 ) ).toEqual( { x: 1, y: 1 } );
+	} );
+
+	it( 'is the corner with the bottom right of the screen on a level edge', () => {
+		// Upside down, the block's top-left corner is at the bottom right.
+		expect( getLowestCorner( 180 ) ).toEqual( { x: -1, y: -1 } );
+		// A quarter turn clockwise puts the block's right edge at the bottom.
+		expect( getLowestCorner( 90 ) ).toEqual( { x: 1, y: -1 } );
+		expect( getLowestCorner( -90 ) ).toEqual( { x: -1, y: 1 } );
+	} );
+
+	it( 'is the lowest corner of a rotated block', () => {
+		// Turned clockwise, the bottom right corner drops.
+		expect( getLowestCorner( 30 ) ).toEqual( { x: 1, y: 1 } );
+		// Turned counterclockwise, the bottom left corner drops.
+		expect( getLowestCorner( -30 ) ).toEqual( { x: -1, y: 1 } );
+		expect( getLowestCorner( 150 ) ).toEqual( { x: 1, y: -1 } );
+	} );
+} );
+
+describe( 'getCornerToolbarStyle()', () => {
+	// Resolves a `calc()` of a percentage and pixels for a length.
+	function resolve( value: unknown, length: number ) {
+		const [ , percent, px ] = ( value as string ).match(
+			/^calc\((-?[\d.]+)% \+ (-?[\d.]+)px\)$/
+		)!;
+		return ( Number( percent ) * length ) / 100 + Number( px );
+	}
+
+	// Where a point in the overlay, from its top-left corner, is on screen
+	// relative to the overlay's center, once the overlay is turned.
+	function toScreen(
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		angle: number
+	) {
+		const radians = ( angle * Math.PI ) / 180;
+		const localX = x - width / 2;
+		const localY = y - height / 2;
+		return {
+			x: localX * Math.cos( radians ) - localY * Math.sin( radians ),
+			y: localX * Math.sin( radians ) + localY * Math.cos( radians ),
+		};
+	}
+
+	it( 'is under the bottom right corner of a level block', () => {
+		expect( getCornerToolbarStyle( 0, getLowestCorner( 0 ), 8 ) ).toEqual( {
+			left: 'calc(100% + 0px)',
+			top: 'calc(100% + 8px)',
+			transformOrigin: '0 0',
+			transform: 'rotate(0deg) translateX(-100%)',
+		} );
+	} );
+
+	it.each( [
+		[ 30, 30 ],
+		[ -30, -30 ],
+		[ 90, 90 ],
+		[ 135, 135 ],
+		[ -60, -60 ],
+		[ 180, 180 ],
+		// The corner picked at 30°, while the block turns to -30°.
+		[ 30, -30 ],
+	] )(
+		'is under the corner picked at %d° when the block is at %d°',
+		( anchorAngle, angle ) => {
+			const width = 200;
+			const height = 100;
+			const corner = getLowestCorner( anchorAngle );
+			const { left, top } = getCornerToolbarStyle( angle, corner, 8 );
+			const point = toScreen(
+				resolve( left, width ),
+				resolve( top, height ),
+				width,
+				height,
+				angle
+			);
+			const cornerOnScreen = toScreen(
+				( ( corner.x + 1 ) / 2 ) * width,
+				( ( corner.y + 1 ) / 2 ) * height,
+				width,
+				height,
+				angle
+			);
+			expect( point.x ).toBeCloseTo( cornerOnScreen.x, 2 );
+			expect( point.y ).toBeCloseTo( cornerOnScreen.y + 8, 2 );
+		}
+	);
 } );

@@ -373,6 +373,90 @@ export function getRotatedOverlayStyle( {
 }
 
 /**
+ * A corner of a block in its own frame: `x` is -1 for its left edge and 1 for
+ * its right edge, and `y` is -1 for its top edge and 1 for its bottom edge.
+ */
+export interface Corner {
+	x: number;
+	y: number;
+}
+
+// Sines and cosines this close to 0 count as 0, so that the corners of a
+// level edge count as level.
+const EPSILON = 1e-9;
+
+function getSign( value: number ): number {
+	if ( Math.abs( value ) < EPSILON ) {
+		return 0;
+	}
+	return value > 0 ? 1 : -1;
+}
+
+/**
+ * Gets the lowest corner of a block rotated around its center, on screen.
+ * When two corners are equally low, on a level bottom edge, it is the one on
+ * the right. The lowest corner only depends on the angle, not on the block's
+ * size.
+ *
+ * @param angle Rotation in degrees.
+ *
+ * @return The corner in the block's own frame: `x` is -1 for its left edge and
+ *         1 for its right edge, and `y` is -1 for its top edge and 1 for its
+ *         bottom edge.
+ */
+export function getLowestCorner( angle: number ): Corner {
+	const radians = ( angle * Math.PI ) / 180;
+	const sin = getSign( Math.sin( radians ) );
+	const cos = getSign( Math.cos( radians ) );
+	// The lowest corner is on the side of the sine across the block and of the
+	// cosine along it. On a level edge, one of them is 0, and the corner on
+	// the right of the screen is picked instead.
+	if ( sin === 0 ) {
+		return { x: cos, y: cos };
+	}
+	if ( cos === 0 ) {
+		return { x: sin, y: -sin };
+	}
+	return { x: sin, y: cos };
+}
+
+/**
+ * Gets the style that places an element upright under a corner of a rotated
+ * block, from inside an overlay that turns with the block (see
+ * `getRotatedOverlayStyle`).
+ *
+ * The corner is at a fixed place in the overlay, so the element follows it
+ * while the block turns. Its top-left corner is placed a gap below the block's
+ * corner on screen, and it turns back by the block's angle around that point
+ * and moves left by its own width, so that it is upright with its top-right
+ * corner there.
+ *
+ * @param angle  Rotation of the overlay in degrees.
+ * @param corner The corner, as returned by `getLowestCorner`.
+ * @param gap    Space between the corner and the element, in pixels.
+ *
+ * @return Style properties for the element.
+ */
+export function getCornerToolbarStyle(
+	angle: number,
+	corner: Corner,
+	gap: number
+): CSSProperties {
+	const radians = ( angle * Math.PI ) / 180;
+	const round = ( value: number ) => Math.round( value * 10000 ) / 10000;
+	// The gap points down the screen, which is turned back by the block's
+	// angle in the overlay.
+	const gapX = round( Math.sin( radians ) * gap );
+	const gapY = round( Math.cos( radians ) * gap );
+	return {
+		left: `calc(${ ( ( corner.x + 1 ) / 2 ) * 100 }% + ${ gapX }px)`,
+		top: `calc(${ ( ( corner.y + 1 ) / 2 ) * 100 }% + ${ gapY }px)`,
+		transformOrigin: '0 0',
+		transform: `rotate(${ -angle }deg) translateX(-100%)`,
+	};
+}
+
+/**
  * Gets the bounding box of a rectangle rotated around its center.
  *
  * @param rect  The unrotated rectangle.
