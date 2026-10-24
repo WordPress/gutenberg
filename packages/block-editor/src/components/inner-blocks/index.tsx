@@ -12,6 +12,7 @@ import {
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
@@ -21,6 +22,12 @@ import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
+import {
+	useBoundInnerBlocks,
+	useInnerBlocksBindingMode,
+	useInnerBlocksPreview,
+} from './use-bound-inner-blocks';
+import { useBlockPreview } from '../block-preview';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { normalizeLegacyLayout } from '../../layouts/utils';
@@ -184,6 +191,82 @@ function ControlledInnerBlocks( props: InnerBlocksProps ) {
 	return <UncontrolledInnerBlocks { ...props } />;
 }
 
+/**
+ * Inner blocks overridden in a synced pattern instance: they're controlled
+ * inner blocks, synced with the pattern overrides of the instance.
+ *
+ * @param props The component props.
+ */
+function BoundInnerBlocks( props: InnerBlocksProps ) {
+	const syncProps = useBoundInnerBlocks( props.clientId );
+	return <ControlledInnerBlocks { ...props } { ...syncProps } />;
+}
+
+/**
+ * A read-only preview of the inner blocks a source supplies, in place of the
+ * block's own, which stay as they are. The wrapper generates no box, so the
+ * previewed blocks are laid out as the block's inner blocks would be.
+ *
+ * @param props        The component props.
+ * @param props.blocks The supplied inner blocks.
+ * @param props.layout The block's layout.
+ */
+function InnerBlocksPreview( {
+	blocks,
+	layout,
+}: {
+	blocks: Block[];
+	layout: InnerBlocksProps[ 'layout' ];
+} ) {
+	const { children, ref, className } = useBlockPreview( {
+		blocks,
+		layout: layout ?? undefined,
+	} );
+	return (
+		<div
+			ref={ ref }
+			className={ className }
+			style={ { display: 'contents' } }
+		>
+			{ children }
+		</div>
+	);
+}
+
+/**
+ * Inner blocks supplied by a source that only reads them: a preview of them
+ * when it supplies any, or the block's own otherwise.
+ *
+ * @param props The component props.
+ */
+function PreviewBoundInnerBlocks( props: InnerBlocksProps ) {
+	const blocks = useInnerBlocksPreview(
+		props.clientId,
+		props.blockType?.usesContext
+	);
+	return blocks ? (
+		<InnerBlocksPreview blocks={ blocks } layout={ props.layout } />
+	) : (
+		<UncontrolledInnerBlocks { ...props } />
+	);
+}
+
+/**
+ * Inner blocks that may be bound, when the experiment is enabled.
+ *
+ * @param props The component props.
+ */
+function MaybeBoundInnerBlocks( props: InnerBlocksProps ) {
+	const mode = useInnerBlocksBindingMode( props.clientId );
+	if ( mode === 'editable' ) {
+		return <BoundInnerBlocks { ...props } />;
+	}
+	if ( mode === 'preview' ) {
+		return <PreviewBoundInnerBlocks { ...props } />;
+	}
+	return <UncontrolledInnerBlocks { ...props } />;
+}
+
 // The statics are assigned below.
 const ForwardedInnerBlocks = forwardRef< HTMLElement, InnerBlocksOptions >(
 	( props, ref ) => {
@@ -331,10 +414,12 @@ export function useInnerBlocksProps<
 		defaultLayout,
 		...options,
 	};
-	const InnerBlocks =
-		innerBlocksProps.value && innerBlocksProps.onChange
-			? ControlledInnerBlocks
-			: UncontrolledInnerBlocks;
+	let InnerBlocks = UncontrolledInnerBlocks;
+	if ( innerBlocksProps.value && innerBlocksProps.onChange ) {
+		InnerBlocks = ControlledInnerBlocks;
+	} else if ( window.__experimentalInnerBlocksBindings ) {
+		InnerBlocks = MaybeBoundInnerBlocks;
+	}
 
 	return {
 		...props,

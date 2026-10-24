@@ -10,6 +10,7 @@ import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
+import { isBoundInnerBlocks } from './private-selectors';
 import { unlock } from '../lock-unlock';
 import type {
 	Action,
@@ -2713,9 +2714,14 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 	);
 	const templatePartClientIds: string[] = [];
 	const syncedPatternClientIds: string[] = [];
+	const boundInnerBlocksClientIds: string[] = [];
 
 	state.blocks.controlledInnerBlocks.forEach( ( clientId ) => {
 		const block = state.blocks.byClientId?.get( clientId );
+
+		if ( isBoundInnerBlocks( state, clientId ) ) {
+			boundInnerBlocksClientIds.push( clientId );
+		}
 
 		if ( block?.name === 'core/template-part' ) {
 			templatePartClientIds.push( clientId );
@@ -2875,6 +2881,19 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 					)
 				) {
 					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+
+				// Bound inner blocks are overridden as a whole, so their
+				// content is fully editable.
+				if (
+					findParentInClientIdsList(
+						state,
+						clientId,
+						boundInnerBlocksClientIds
+					)
+				) {
+					derivedBlockEditingModes.set( clientId, 'default' );
 					return;
 				}
 

@@ -39,6 +39,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isBoundInnerBlocks,
 	isZoomOut,
 	isContainerInsertableToInContentOnlyMode,
 	getClientIdWithClientIdsTree,
@@ -1841,9 +1842,14 @@ const canInsertBlockTypeUnmemoized = (
 
 	// Compute section context early so the disabled check below can use it.
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId! );
-	const sectionClientId = isParentSectionBlock
-		? rootClientId
-		: getParentSectionBlock( state, rootClientId! );
+	let sectionClientId: string | null | undefined;
+	// Bound inner blocks are fully editable, apart from the sections around
+	// their block.
+	if ( ! isBoundInnerBlocks( state, rootClientId! ) ) {
+		sectionClientId = isParentSectionBlock
+			? rootClientId
+			: getParentSectionBlock( state, rootClientId! );
+	}
 	const isWithinSection = !! sectionClientId;
 
 	// Disabled containers reject all blocks, with one exception: within a
@@ -2108,9 +2114,14 @@ export function canRemoveBlock( state: State, clientId: string ) {
 	// It shouldn't be possible to move in a section block unless in
 	// some cases when the block is a content block.
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId! );
-	const sectionClientId = isParentSectionBlock
-		? rootClientId
-		: getParentSectionBlock( state, rootClientId! );
+	let sectionClientId: string | null | undefined;
+	// Bound inner blocks are fully editable, apart from the sections around
+	// their block.
+	if ( ! isBoundInnerBlocks( state, rootClientId! ) ) {
+		sectionClientId = isParentSectionBlock
+			? rootClientId
+			: getParentSectionBlock( state, rootClientId! );
+	}
 	const isWithinSection = !! sectionClientId;
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
@@ -3581,9 +3592,11 @@ export function __unstableHasActiveBlockOverlayActive(
 		'__experimentalDisableBlockOverlay',
 		false
 	);
+	// Bound inner blocks are edited in place, like regular ones.
 	const shouldEnableIfUnselected = blockSupportDisable
 		? false
-		: areInnerBlocksControlled( state, clientId );
+		: areInnerBlocksControlled( state, clientId ) &&
+			! isBoundInnerBlocks( state, clientId );
 
 	return (
 		shouldEnableIfUnselected &&

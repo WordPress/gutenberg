@@ -837,12 +837,54 @@ export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If sections are nested, return the top level section block.
 	// Don't return early.
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		// Bound inner blocks are fully editable, apart from the sections
+		// around them. The bound block itself stays in its section.
+		if ( isBoundInnerBlocks( state, current ) ) {
+			break;
+		}
 		if ( isSectionBlockCandidate( state, current ) ) {
 			result = current;
 		}
 	}
 	return result;
 };
+
+/**
+ * Returns whether the inner blocks of a block are bound to a source that
+ * controls them, such as the pattern overrides of a synced pattern instance.
+ *
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
+ *
+ * @return Whether the block's inner blocks are bound.
+ */
+export function isBoundInnerBlocks( state: State, clientId: string ) {
+	return (
+		!! state.blocks.controlledInnerBlocks?.has( clientId ) &&
+		!! state.blocks.attributes?.get( clientId )?.metadata?.bindings
+			?.innerBlocks
+	);
+}
+
+/**
+ * Returns whether a block is within bound inner blocks of the synced pattern
+ * it's in.
+ *
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
+ *
+ * @return Whether the block is within bound inner blocks.
+ */
+export function isWithinBoundInnerBlocks( state: State, clientId: string ) {
+	let parent = state.blocks.parents.get( clientId );
+	while ( parent && getBlockName( state, parent ) !== 'core/block' ) {
+		if ( isBoundInnerBlocks( state, parent ) ) {
+			return true;
+		}
+		parent = state.blocks.parents.get( parent );
+	}
+	return false;
+}
 
 /**
  * Returns whether the block is a contentOnly section.

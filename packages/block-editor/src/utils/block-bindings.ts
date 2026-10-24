@@ -7,6 +7,12 @@ const PATTERN_OVERRIDES_SOURCE = 'core/pattern-overrides';
 const EMPTY_CONTEXT: Record< string, unknown > = {};
 
 /**
+ * The binding key that binds the inner blocks of a block, rather than one of
+ * its attributes.
+ */
+export const INNER_BLOCKS_BINDING_KEY = 'innerBlocks';
+
+/**
  * Assembles the context made available to a block's bindings sources: the
  * entries of the surrounding block context declared by the block type's
  * `usesContext`, plus the entries declared by the given sources' `usesContext`.

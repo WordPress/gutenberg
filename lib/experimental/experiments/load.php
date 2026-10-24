@@ -34,6 +34,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-inner-blocks-bindings',
+					'label'       => __( 'Inner blocks bindings', 'gutenberg' ),
+					'description' => __( 'Lets each instance of a synced pattern change the blocks inside a Group or Column block that allows overrides.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

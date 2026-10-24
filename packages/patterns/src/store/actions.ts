@@ -2,7 +2,10 @@ import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { Block } from '@wordpress/blocks';
-import { PATTERN_SYNC_TYPES } from '../constants';
+import {
+	PATTERN_OVERRIDES_BINDING_SOURCE,
+	PATTERN_SYNC_TYPES,
+} from '../constants';
 import type { BlockMetadata } from '../types';
 import type {
 	PatternJSON,
@@ -102,24 +105,43 @@ export const convertSyncedPatternToStatic =
 		const existingOverrides = patternBlock.attributes?.content as
 			PatternOverrides | undefined;
 
+		const { areInnerBlocksControlled, getBlocks } =
+			registry.select( blockEditorStore );
+
+		// The blocks of overridden inner blocks are overridden as a whole, so
+		// they get no overrides of their own.
 		function cloneBlocksAndRemoveBindings(
-			blocks: Array< Block >
+			blocks: Array< Block >,
+			overrides = existingOverrides
 		): Array< Block > {
 			return blocks.map( ( block ) => {
 				// Block attributes are untyped; every block may carry `metadata`.
 				let metadata = block.attributes.metadata as
 					BlockMetadata | undefined;
+				let innerBlocks;
 				if ( metadata ) {
+					// Bound inner blocks hold what the instance shows: their
+					// override, or their own inner blocks without one.
+					if (
+						metadata.bindings?.innerBlocks?.source ===
+							PATTERN_OVERRIDES_BINDING_SOURCE &&
+						areInnerBlocksControlled( block.clientId )
+					) {
+						innerBlocks = cloneBlocksAndRemoveBindings(
+							getBlocks( block.clientId ),
+							{}
+						);
+					}
 					metadata = { ...metadata };
 					delete metadata.id;
 					delete metadata.bindings;
 					// Use overridden values of the pattern block if they exist.
 					// A block without a name reads the `undefined` key.
-					if ( existingOverrides?.[ metadata.name as string ] ) {
+					if ( overrides?.[ metadata.name as string ] ) {
 						// Iterate over each overridden attribute.
 						for ( const [ attributeName, value ] of Object.entries(
 							// Checked above, under the same possibly `undefined` key.
-							existingOverrides[ metadata.name as string ]
+							overrides[ metadata.name as string ]
 						) ) {
 							// Skip if the attribute does not exist in the block type.
 							if (
@@ -142,14 +164,16 @@ export const convertSyncedPatternToStatic =
 								? metadata
 								: undefined,
 					},
-					cloneBlocksAndRemoveBindings( block.innerBlocks )
+					innerBlocks ??
+						cloneBlocksAndRemoveBindings(
+							block.innerBlocks,
+							overrides
+						)
 				);
 			} );
 		}
 
-		const patternInnerBlocks = registry
-			.select( blockEditorStore )
-			.getBlocks( patternBlock.clientId );
+		const patternInnerBlocks = getBlocks( patternBlock.clientId );
 
 		registry
 			.dispatch( blockEditorStore )
