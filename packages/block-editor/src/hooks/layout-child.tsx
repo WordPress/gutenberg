@@ -18,11 +18,9 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	hasViewportBlockStyleState,
-	setStyleForState,
+	getUpdatedChildLayoutStyle,
 } from './block-style-state';
 import type {
-	BlockStyleState,
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
 	ChildLayoutControlsPureProps,
@@ -294,47 +292,6 @@ export function getResponsiveChildLayoutStyles( {
 		.join( '' );
 }
 
-/**
- * Merges child layout changes into the active layout style state.
- *
- * @param style         Block style attributes.
- * @param layout        Child layout changes.
- * @param selectedState Selected block style state.
- * @return Updated block style attributes.
- */
-export function getUpdatedChildLayoutStyle(
-	style: ChildLayoutBlockStyle | undefined,
-	layout: ChildLayout,
-	selectedState: BlockStyleState | undefined
-): ChildLayoutBlockStyle | undefined {
-	if ( ! hasViewportBlockStyleState( selectedState ) ) {
-		return {
-			...style,
-			layout: {
-				...style?.layout,
-				...layout,
-			},
-		};
-	}
-
-	const layoutState = {
-		// A viewport state is selected here.
-		viewport: selectedState!.viewport,
-		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-	};
-	// A style state holds the child layout it overrides.
-	const stateStyle = getStyleForState( style, layoutState ) as
-		ChildLayoutBlockStyle | undefined;
-
-	return setStyleForState( style, layoutState, {
-		...stateStyle,
-		layout: {
-			...stateStyle?.layout,
-			...layout,
-		},
-	} );
-}
-
 function useBlockPropsChildLayoutStyles( {
 	style,
 }: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
@@ -388,6 +345,20 @@ function useBlockPropsChildLayoutStyles( {
 				viewportSettings,
 			} ),
 		].join( '' );
+	}
+
+	// A block in a manual placement grid stays in place while it is dragged,
+	// so the browser's drag image must not show. WebKit ignores the drag
+	// image set for a block when the drag starts on an image, and shows the
+	// image instead, so images leave the drag to the block. Only the block's
+	// own image is covered, such as an Image block's or a Media & Text
+	// block's, not images in blocks nested inside it.
+	if (
+		parentLayout.type === 'grid' &&
+		parentLayout.isManualPlacement &&
+		window.__experimentalEnableGridInteractivity
+	) {
+		css += `${ selector } > img, ${ selector } > figure img { -webkit-user-drag: none; }`;
 	}
 
 	useStyleOverride( { css } );
