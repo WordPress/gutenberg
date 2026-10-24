@@ -1,5 +1,5 @@
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../store';
@@ -11,6 +11,8 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 } from '../components/grid';
+import { getGridGrowthUpdate } from '../components/grid/get-grid-row-updates';
+import type { GridAttributesUpdate } from '../components/grid/get-grid-row-updates';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
@@ -375,7 +377,6 @@ function useBlockPropsChildLayoutStyles( {
 function ChildLayoutControlsPure( {
 	clientId,
 	style,
-	setAttributes,
 }: ChildLayoutControlsPureProps ) {
 	// The layout context merges the parent's layout and its support.
 	const parentLayout =
@@ -394,7 +395,6 @@ function ChildLayoutControlsPure( {
 		<GridTools
 			clientId={ clientId }
 			style={ style }
-			setAttributes={ setAttributes }
 			allowSizingOnChildren={ allowSizingOnChildren }
 			isManualPlacement={ isManualPlacement }
 			parentLayout={ parentLayout }
@@ -405,7 +405,6 @@ function ChildLayoutControlsPure( {
 function GridTools( {
 	clientId,
 	style,
-	setAttributes,
 	allowSizingOnChildren,
 	isManualPlacement,
 	parentLayout,
@@ -508,6 +507,9 @@ function GridTools( {
 			viewportSettings,
 		} );
 
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
 
@@ -520,9 +522,33 @@ function GridTools( {
 	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
 
 	function updateLayout( layout: ChildLayout ) {
-		setAttributes( {
-			style: getUpdatedChildLayoutStyle( style, layout, selectedState ),
-		} );
+		const updates: Record< string, GridAttributesUpdate > = {
+			[ clientId ]: {
+				style: getUpdatedChildLayoutStyle(
+					style,
+					layout,
+					selectedState
+				),
+			},
+		};
+		// A block resized past the last row of a manual grid grows the grid
+		// in the selected state, in the same undo step.
+		const gridUpdate =
+			isManualPlacement &&
+			window.__experimentalEnableGridInteractivity &&
+			getGridGrowthUpdate( {
+				gridAttributes: getBlockAttributes( rootClientId ) ?? undefined,
+				childStyle: updates[ clientId ].style,
+				selectedState,
+			} );
+		if ( gridUpdate ) {
+			updates[ rootClientId ] = gridUpdate;
+		}
+		updateBlockAttributes(
+			Object.keys( updates ),
+			updates,
+			/* uniqueByBlock: */ true
+		);
 	}
 
 	return (
