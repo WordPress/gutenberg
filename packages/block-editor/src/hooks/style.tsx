@@ -59,6 +59,7 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
 import { unlock } from '../lock-unlock';
+import warning from '@wordpress/warning';
 import type {
 	PanelBorderSide,
 	PanelStyle,
@@ -800,6 +801,14 @@ function addAttribute( settings: BlockType ): BlockType {
 				type: 'object',
 			},
 		} );
+	} else {
+		// The block uses `style` for its own attribute, but `style` is a
+		// reserved attribute name: block support styles read and write
+		// `attributes.style` as a style object, so a custom attribute with
+		// this name will not be validated as expected.
+		warning(
+			`The block "${ settings.name }" defines a "style" attribute, but "style" is reserved for block support styles. Rename the attribute to avoid unexpected behavior.`
+		);
 	}
 
 	return settings;
