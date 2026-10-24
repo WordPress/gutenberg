@@ -37,6 +37,7 @@
 
 ### Bug Fixes
 
+-   Open the entity save dialog with the Save keyboard shortcut when a synced pattern has changed, including when the post itself is unchanged ([#85056](https://github.com/WordPress/gutenberg/pull/85056)).
 -   `PostTaxonomiesFlatTermSelector`: Pressing Enter adds the typed terms, and comma-separated names are added as separate terms ([#84601](https://github.com/WordPress/gutenberg/pull/84601)).
 -   Notes: Keep the canvas from scrolling to the top when adding a floating note on a scrolled post ([#84639](https://github.com/WordPress/gutenberg/pull/84639)).
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
