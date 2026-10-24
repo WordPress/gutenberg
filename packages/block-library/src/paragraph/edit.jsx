@@ -54,11 +54,11 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 		[ clientId ]
 	);
 
-	if ( ! isDropCapFeatureEnabled || hasSelectedStyleState ) {
+	const { style, dropCap } = attributes;
+	if ( ( ! isDropCapFeatureEnabled && ! dropCap ) || hasSelectedStyleState ) {
 		return null;
 	}
 
-	const { style, dropCap } = attributes;
 	const textAlign = style?.typography?.textAlign;
 
 	let helpText;
