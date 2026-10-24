@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   Introduce block validation levels. Instead of a binary valid/invalid result, the parser classifies each block as valid, migrated through a deprecation, reconstructed (the `save` output only adds attributes or changes attribute values), regenerated (the markup differed but all of its text, media and links are preserved) or invalid, and records the outcome on the parsed block as `validationLevel`. Blocks which previously showed the invalid block warning are now silently regenerated from their attributes when no content would be lost; `validateBlock` and `isValidBlockContent` return `true` for them ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
+-   `validateBlock`: Return a third tuple element with validation metadata (`validationLevel`, `originalContent`, `generatedContent`) ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
+-   Export the `VALIDATION_LEVEL` constants and the `ValidationLevel` and `ValidationMetadata` types ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
+-   `registerBlockType`: Add the `allowsReconstruction` setting, allowing a block type to opt out of automatic reconstruction so that only an exact match or a matching deprecation is accepted ([#73116](https://github.com/WordPress/gutenberg/pull/73116)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).

@@ -18,7 +18,9 @@ test.describe( 'Invalid blocks', () => {
 		// Change to HTML mode and close the options.
 		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
 
-		// Focus on the textarea and enter an invalid paragraph.
+		// Focus on the textarea and enter an invalid paragraph. Markup typed
+		// by the user is only accepted when it matches exactly; it is not
+		// regenerated behind their back.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.getByRole( 'textbox' )
@@ -46,26 +48,63 @@ test.describe( 'Invalid blocks', () => {
 		).toHaveText( [ '<p>invalid paragraph', '<p>invalid paragraph</p>' ] );
 	} );
 
-	test( 'should strip potentially malicious on* attributes', async ( {
+	test( 'should regenerate stored malformed HTML which preserves content', async ( {
+		editor,
+	} ) => {
+		// The malformed paragraph can be regenerated from the block's
+		// attributes without losing content (validation Level 3), so the
+		// stored content is loaded as a regular block rather than an invalid
+		// one, and its markup is fixed on save.
+		await editor.setContent( `
+			<!-- wp:paragraph -->
+			<p>invalid paragraph
+			<!-- /wp:paragraph -->
+		` );
+
+		const block = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect( block ).toBeVisible();
+		await expect(
+			block.getByRole( 'button', { name: 'Attempt recovery' } )
+		).toBeHidden();
+
+		const content = await editor.getEditedPostContent();
+		expect( content ).toContain( '<p>invalid paragraph</p>' );
+	} );
+
+	test( 'should show an invalid block message when regenerating would lose content', async ( {
+		editor,
+	} ) => {
+		// The heading block sources its content from heading tags, so the
+		// text in the paragraph cannot be regenerated from attributes.
+		await editor.setContent( `
+			<!-- wp:heading -->
+			<p class="wp-block-heading">Some content</p>
+			<!-- /wp:heading -->
+		` );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Heading' } )
+				.getByRole( 'button', { name: 'Attempt recovery' } )
+		).toBeVisible();
+
+		// The original markup is preserved untouched.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toContain(
+			'<p class="wp-block-heading">Some content</p>'
+		);
+	} );
+
+	test( 'should not execute on* attributes when regenerating a block', async ( {
 		editor,
 		page,
 	} ) => {
 		let hasAlert = false;
-		let error = '';
-		let warning = '';
 
 		page.on( 'dialog', () => {
 			hasAlert = true;
-		} );
-
-		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) {
-				error = msg.text();
-			}
-
-			if ( msg.type() === 'warning' ) {
-				warning = msg.text();
-			}
 		} );
 
 		await editor.setContent( `
@@ -74,20 +113,16 @@ test.describe( 'Invalid blocks', () => {
 			<!-- /wp:paragraph -->
 		` );
 
-		// Give the browser time to show the alert.
+		// The block is regenerated from its attributes (Level 3) instead of
+		// being flagged as invalid. Rich text neutralizes `on*` attributes
+		// while the content is rendered in the editor, so the handler must
+		// not run.
 		await expect(
-			editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.getByRole( 'button', { name: 'Attempt recovery' } )
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toBeVisible();
+		await expect( editor.canvas.locator( '[onerror]' ) ).toHaveCount( 0 );
 
 		expect( hasAlert ).toBe( false );
-		expect( error ).toContain(
-			'Block validation: Block validation failed'
-		);
-		expect( warning ).toContain(
-			'Block validation: Malformed HTML detected'
-		);
 	} );
 
 	test( 'should not trigger malicious script tags when using a shortcode block', async ( {

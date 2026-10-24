@@ -6,6 +6,7 @@ import {
 	getBlockType,
 	getSaveContent,
 	validateBlock,
+	VALIDATION_LEVEL,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useNativeUndo } from '../../utils/native-undo';
@@ -46,18 +47,27 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const [ isValid ] = html
+
+		// Only an exact match is accepted for markup typed by the user:
+		// regenerating the block from its attributes would silently rewrite
+		// the edit, and deprecations are only applied when the block is
+		// parsed again (e.g. via "Attempt recovery").
+		const validationLevel = html
 			? validateBlock( {
 					...block,
 					attributes,
 					originalContent: content,
-				} )
-			: [ true ];
+				} )[ 2 ].validationLevel
+			: VALIDATION_LEVEL.VALID_BLOCK;
+		const isValid = validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 
 		updateBlock( clientId, {
 			attributes,
 			originalContent: content,
 			isValid,
+			validationLevel: isValid
+				? VALIDATION_LEVEL.VALID_BLOCK
+				: VALIDATION_LEVEL.INVALID_BLOCK,
 		} );
 
 		// Ensure the state is updated if we reset so it displays the default content.
