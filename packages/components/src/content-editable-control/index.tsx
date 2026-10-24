@@ -39,7 +39,11 @@ function UnforwardedContentEditableControl(
 	return (
 		<BaseControl { ...baseControlProps }>
 			{ hideLabelFromVision ? (
-				<VisuallyHidden id={ labelId }>{ label }</VisuallyHidden>
+				// Hidden so a screen reader doesn't read it as page text before
+				// the field it names; `aria-labelledby` still resolves it.
+				<VisuallyHidden id={ labelId } aria-hidden="true">
+					{ label }
+				</VisuallyHidden>
 			) : (
 				<BaseControl.VisualLabel
 					id={ labelId }
