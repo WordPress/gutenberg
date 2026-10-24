@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Experimental
+### New Features
 
--   With `window.__experimentalOptionalBlockDelimiters`, `parse` reads HTML without block delimiters as blocks, and `serialize` saves untouched blocks exactly as written and leaves out delimiters that new or edited blocks don't need.
+-   Experimental: with `window.__experimentalOptionalBlockDelimiters`, `parse` reads HTML without block delimiters as blocks, and `serialize` saves untouched blocks exactly as written and leaves out delimiters that new or edited blocks don't need ([#85500](https://github.com/WordPress/gutenberg/pull/85500)).
 
 ### Bug Fixes
 
