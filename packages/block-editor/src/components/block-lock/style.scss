@@ -59,6 +59,12 @@
 	padding-top: $grid-unit-20;
 }
 
+.block-editor-block-lock-modal__description {
+	margin: 0;
+	font-size: $font-size-small;
+	color: $gray-700;
+}
+
 .block-editor-block-lock-modal__actions {
 	margin-top: $grid-unit-30;
 }

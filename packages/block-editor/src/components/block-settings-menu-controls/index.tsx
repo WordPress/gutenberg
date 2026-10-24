@@ -11,7 +11,7 @@ import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
 } from '../convert-to-group-buttons';
-import { BlockLockMenuItem, useBlockLock } from '../block-lock';
+import { BlockLockMenuItem, useBlocksLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
@@ -33,6 +33,8 @@ const BlockSettingsMenuControlsSlot = ( {
 		isContentOnly,
 		canToggleSelectedBlocksVisibility,
 		canEdit,
+		canEditSelectedBlocks,
+		hasContentOnlyBlock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -56,15 +58,21 @@ const BlockSettingsMenuControlsSlot = ( {
 					hasBlockSupport( block.name, 'visibility', true )
 				),
 				canEdit: canEditBlock( ids[ 0 ] ),
+				canEditSelectedBlocks: ids.every( ( id ) =>
+					canEditBlock( id )
+				),
+				hasContentOnlyBlock: ids.some(
+					( id ) => getBlockEditingMode( id ) === 'contentOnly'
+				),
 			};
 		},
 		[ clientIds ]
 	);
 
-	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
+	const { canLock } = useBlocksLock( selectedClientIds );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
 	const showLockButton =
-		selectedClientIds.length === 1 && canLock && ! isContentOnly;
+		canLock && canEditSelectedBlocks && ! hasContentOnlyBlock;
 	const showRenameButton =
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 	const showVisibilityButton =
@@ -105,9 +113,9 @@ const BlockSettingsMenuControlsSlot = ( {
 								onClose={ fillProps?.onClose }
 							/>
 						) }
-						{ canEdit && showLockButton && (
+						{ showLockButton && (
 							<BlockLockMenuItem
-								clientId={ selectedClientIds[ 0 ] }
+								clientIds={ selectedClientIds }
 							/>
 						) }
 						{ canEdit && showRenameButton && (
