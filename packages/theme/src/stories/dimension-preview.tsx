@@ -1,14 +1,19 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import { GroupTitle } from './group-title';
-import {
-	descriptionStyle,
-	itemStyle,
-	listStyle,
-	previewStyle,
-	textStyle,
-	tokenNameStyle,
-} from './token-preview-styles';
+import { TokenTable } from './token-table';
+import { previewStyle } from './token-preview-styles';
+
+const surfaceWidth = ( name: string ) =>
+	parseFloat(
+		( tokens as Record< string, { modes: { default: { css: string } } } > )[
+			name
+		].modes.default.css
+	);
+
+const widestSurfaceWidth = Math.max(
+	...groups.dimension.groups[ 'surface-width' ].tokens.map( surfaceWidth )
+);
 
 const boxStyle: CSSProperties = {
 	backgroundColor: 'var(--wpds-color-background-surface-brand)',
@@ -84,12 +89,16 @@ const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 		),
 	},
 	'surface-width': {
+		// A table cell cannot show the widest surface at its true size, so each
+		// bar is drawn in proportion to it.
 		example: ( name ) => (
 			<span
 				style={ {
 					...boxStyle,
 					display: 'block',
-					width: `var(${ name })`,
+					width: `${
+						( surfaceWidth( name ) / widestSurfaceWidth ) * 100
+					}%`,
 					height: 'var(--wpds-dimension-size-md)',
 				} }
 			/>
@@ -111,43 +120,16 @@ export function DimensionTokenPreview() {
 				const { example } = dimensionConfig[ key ];
 				return (
 					<section key={ key }>
-						<GroupTitle name={ key } />
+						<GroupTitle name={ key } id={ `dimension-${ key }` } />
 						<p>{ group.$description }</p>
-						<dl style={ { ...listStyle, marginBlockStart: 8 } }>
-							{ group.tokens.map( ( name ) => (
-								<div
-									key={ name }
-									style={ {
-										...itemStyle,
-										gridTemplateColumns:
-											key === 'surface-width'
-												? '1fr'
-												: 'minmax(96px, 1fr) 2fr',
-									} }
-								>
-									<dt style={ textStyle }>
-										<code style={ tokenNameStyle }>
-											{ name }
-										</code>
-										<span style={ descriptionStyle }>
-											{ tokens[ name ].$description }
-										</span>
-									</dt>
-									<dd
-										style={ {
-											margin: 0,
-											// Let wide examples (surface widths) scroll instead of
-											// shrinking, so their widths stay comparable.
-											minWidth: 0,
-											overflowX: 'auto',
-										} }
-										aria-hidden="true"
-									>
-										{ example( name ) }
-									</dd>
-								</div>
-							) ) }
-						</dl>
+						<TokenTable
+							names={ group.tokens }
+							renderSample={ example }
+							{ ...( key === 'surface-width' && {
+								sampleWidth: '45%',
+								tokenWidth: '35%',
+							} ) }
+						/>
 					</section>
 				);
 			} ) }
