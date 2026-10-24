@@ -107,6 +107,30 @@ describe( 'vipsEnsureJxlSupport', () => {
 		expect( mockSetJxlWasm ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'sends the bytes once to concurrent callers', async () => {
+		const { vipsEnsureJxlSupport } = await loadWorkerModule();
+
+		await Promise.all( [
+			vipsEnsureJxlSupport(),
+			vipsEnsureJxlSupport(),
+			vipsEnsureJxlSupport(),
+		] );
+
+		expect( mockSetJxlWasm ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'retries a failed hand-off to the worker', async () => {
+		const { vipsEnsureJxlSupport } = await loadWorkerModule();
+		mockSetJxlWasm.mockImplementationOnce( () =>
+			Promise.reject( new Error( 'worker gone' ) )
+		);
+
+		await expect( vipsEnsureJxlSupport() ).rejects.toThrow( 'worker gone' );
+		await vipsEnsureJxlSupport();
+
+		expect( mockSetJxlWasm ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 're-sends the bytes after the worker is recycled', async () => {
 		/*
 		 * Regression test: the cached download used to be cleared on terminate

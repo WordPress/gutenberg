@@ -215,14 +215,16 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
 let jxlWasmBytesPromise: Promise< Uint8Array< ArrayBuffer > > | undefined;
 
 /**
- * The worker API the JXL bytes were last handed to.
+ * The worker API the JXL bytes were last handed to, and that hand-off.
  *
  * JXL support is worker-side state established by an RPC, so it does not
  * survive a worker recycle. Tracking the recipient lets `vipsEnsureJxlSupport`
  * detect a replaced worker and re-send, instead of assuming a single
- * successful call covers the rest of the session.
+ * successful call covers the rest of the session. Keeping the pending RPC
+ * lets concurrent callers share one ~3 MB transfer.
  */
-let jxlWasmRecipient: Remote< WorkerAPI > | undefined;
+let jxlWasmDelivery:
+	{ recipient: Remote< WorkerAPI >; sent: Promise< void > } | undefined;
 
 /**
  * Ensures JXL support is available in the vips worker.
@@ -255,22 +257,31 @@ export async function vipsEnsureJxlSupport(): Promise< void > {
 	const bytes = await jxlWasmBytesPromise;
 	const api = getWorkerAPI();
 
-	if ( jxlWasmRecipient === api ) {
-		return;
+	if ( jxlWasmDelivery?.recipient !== api ) {
+		// Hand the RPC layer a bare ArrayBuffer: it only recognises those as
+		// transferable, and walks any other object key by key, which for ~3 MB
+		// of image codec means millions of main-thread allocations per call.
+		// The buffer is transferred away, so send a fresh copy per worker and
+		// keep the module's own bytes intact for the next one.
+		const delivery = {
+			recipient: api,
+			sent: api.setJxlWasm(
+				bytes.buffer.slice(
+					bytes.byteOffset,
+					bytes.byteOffset + bytes.byteLength
+				)
+			),
+		};
+		jxlWasmDelivery = delivery;
+		delivery.sent.catch( () => {
+			// Let the next call retry a failed hand-off.
+			if ( jxlWasmDelivery === delivery ) {
+				jxlWasmDelivery = undefined;
+			}
+		} );
 	}
 
-	// Hand the RPC layer a bare ArrayBuffer: it only recognises those as
-	// transferable, and walks any other object key by key, which for ~3 MB
-	// of image codec means millions of main-thread allocations per call. The
-	// buffer is transferred away, so send a fresh copy each time and keep the
-	// module's own bytes intact for the next worker.
-	await api.setJxlWasm(
-		bytes.buffer.slice(
-			bytes.byteOffset,
-			bytes.byteOffset + bytes.byteLength
-		)
-	);
-	jxlWasmRecipient = api;
+	await jxlWasmDelivery.sent;
 }
 
 /**
@@ -289,5 +300,5 @@ export function terminateVipsWorker(): void {
 	}
 	// The downloaded bytes stay cached - only the worker-side state is gone,
 	// and vipsEnsureJxlSupport re-sends it when it sees a new worker.
-	jxlWasmRecipient = undefined;
+	jxlWasmDelivery = undefined;
 }
