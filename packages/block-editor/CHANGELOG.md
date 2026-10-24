@@ -6,8 +6,11 @@
 
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
+-   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
+
+-   Block supports: Warn block developers (in `SCRIPT_DEBUG` mode) when a block uses `style` or `layout` as a custom attribute name, since both are reserved for block support styles and layout ([#48112](https://github.com/WordPress/gutenberg/issues/48112)).
 
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
