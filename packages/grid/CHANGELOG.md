@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+
 ### Bug Fixes
 
 -   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#84869](https://github.com/WordPress/gutenberg/pull/84869)).

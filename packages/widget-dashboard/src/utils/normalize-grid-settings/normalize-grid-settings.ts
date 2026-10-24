@@ -1,10 +1,9 @@
 import type { WidgetGridLayoutSettings, WidgetGridSettings } from '../../types';
-import { snapRowHeight } from '../row-height-presets';
 
 /**
- * Coerces legacy grid row heights to a dashboard preset. Standard grid
- * rows always use uniform track sizing so tiles align with the masonry
- * model boundary.
+ * Fills in the row height of grid settings. Any finite positive number is
+ * honored as-is; an absent or invalid value takes `defaultRowHeight`.
+ * Masonry settings pass through, since lane heights follow content.
  *
  * @param settings         Grid settings to normalize.
  * @param defaultRowHeight Fallback row height when none is set.
@@ -21,10 +20,12 @@ export function normalizeGridSettings(
 	// optional and the check goes through `??`.
 	const gridSettings = settings as WidgetGridLayoutSettings;
 
-	const rowHeight = gridSettings.rowHeight;
+	const { rowHeight } = gridSettings;
 	const resolved =
-		typeof rowHeight === 'number'
-			? snapRowHeight( rowHeight )
+		typeof rowHeight === 'number' &&
+		Number.isFinite( rowHeight ) &&
+		rowHeight > 0
+			? rowHeight
 			: defaultRowHeight;
 
 	if ( rowHeight === resolved ) {
