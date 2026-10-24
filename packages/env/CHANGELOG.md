@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Point the `bullseye-security` apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org` instead of dropping them, so the images keep receiving Debian security updates ([#85469](https://github.com/WordPress/gutenberg/pull/85469)).
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes
