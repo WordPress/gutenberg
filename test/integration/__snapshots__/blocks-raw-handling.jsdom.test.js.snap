@@ -132,12 +132,10 @@ exports[`rawHandler > should convert HTML post to blocks with minimal content ch
 <!-- /wp:gallery -->
 
 <!-- wp:html -->
-<dl>
-	<dt>Term</dt>
-	<dd>
-		Description.
-	</dd>
-</dl>
+<address>
+	Street<br>
+	City
+</address>
 <!-- /wp:html -->
 
 <!-- wp:list {"ordered":true} -->
