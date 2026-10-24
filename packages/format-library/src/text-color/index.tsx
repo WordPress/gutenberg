@@ -1,15 +1,14 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
+import { ColorIndicator } from '@wordpress/components';
 import {
-	Icon,
 	color as colorIcon,
 	textColor as textColorIcon,
 } from '@wordpress/icons';
-import { removeFormat } from '@wordpress/rich-text';
 import type { FormatEditProps } from '../types';
-import { default as InlineColorUI, getActiveColors } from './inline';
-import type { ColorObject } from './inline';
+import { default as InlineColorUI, getActiveColors, setColors } from './inline';
+import type { ColorObject, ColorProperty } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
@@ -54,11 +53,38 @@ function fillComputedColors(
 	};
 }
 
+const CONTROLS: {
+	property: ColorProperty;
+	title: string;
+	icon: typeof colorIcon;
+}[] = [
+	{
+		property: 'color',
+		title: __( 'Text color' ),
+		icon: textColorIcon,
+	},
+	{
+		property: 'backgroundColor',
+		title: __( 'Highlight color' ),
+		icon: colorIcon,
+	},
+];
+
+// The toolbar `Icon` wrapper sizes its glyph to 24px. `ColorIndicator` is a
+// 20px circle, so box it to the same footprint as the icon it replaces, or
+// the menu item text shifts when a color is active.
+function ColorIndicatorIcon( { colorValue }: { colorValue: string } ) {
+	return (
+		<span className="format-library-text-color-indicator">
+			<ColorIndicator colorValue={ colorValue } />
+		</span>
+	);
+}
+
 function TextColorEdit( {
 	value,
 	onChange,
 	isActive,
-	activeAttributes,
 	contentRef,
 }: FormatEditProps ) {
 	// The settings hold the custom color flag and the palette.
@@ -66,14 +92,15 @@ function TextColorEdit( {
 		'color.custom',
 		'color.palette'
 	) as [ boolean | undefined, ColorObject[] | undefined ];
-	const [ isAddingColor, setIsAddingColor ] = useState( false );
+	const [ editingProperty, setEditingProperty ] =
+		useState< ColorProperty | null >( null );
+	const activeColors = useMemo(
+		() => getActiveColors( value, name, colors ),
+		[ value, colors ]
+	);
 	const colorIndicatorStyle = useMemo(
-		() =>
-			fillComputedColors(
-				contentRef.current,
-				getActiveColors( value, name, colors )
-			),
-		[ contentRef, value, colors ]
+		() => fillComputedColors( contentRef.current, activeColors ),
+		[ contentRef, activeColors ]
 	);
 
 	const hasColorsToChoose = !! colors.length || allowCustomControl;
@@ -83,32 +110,50 @@ function TextColorEdit( {
 
 	return (
 		<>
-			<RichTextToolbarButton
-				className="format-library-text-color-button"
-				isActive={ isActive }
-				icon={
-					<Icon
+			{ CONTROLS.map( ( { property, title: controlTitle, icon } ) => {
+				const isPropertyActive = !! activeColors[ property ];
+				// Show the active color in place of the icon.
+				const indicatorColor = isPropertyActive
+					? ( colorIndicatorStyle?.[ property ] ??
+						activeColors[ property ] )
+					: undefined;
+
+				return (
+					<RichTextToolbarButton
+						key={ property }
+						className="format-library-text-color-button"
+						isActive={ isPropertyActive }
 						icon={
-							Object.keys( activeAttributes ).length
-								? textColorIcon
-								: colorIcon
+							indicatorColor ? (
+								<ColorIndicatorIcon
+									colorValue={ indicatorColor }
+								/>
+							) : (
+								icon
+							)
 						}
-						style={ colorIndicatorStyle }
+						title={ controlTitle }
+						// If has no colors to choose but a color is active
+						// remove that color onClick.
+						onClick={
+							hasColorsToChoose
+								? () => setEditingProperty( property )
+								: () =>
+										onChange(
+											setColors( value, name, colors, {
+												[ property ]: undefined,
+											} )
+										)
+						}
+						role="menuitemcheckbox"
 					/>
-				}
-				title={ title }
-				// If has no colors to choose but a color is active remove the color onClick.
-				onClick={
-					hasColorsToChoose
-						? () => setIsAddingColor( true )
-						: () => onChange( removeFormat( value, name ) )
-				}
-				role="menuitemcheckbox"
-			/>
-			{ isAddingColor && (
+				);
+			} ) }
+			{ editingProperty && (
 				<InlineColorUI
 					name={ name }
-					onClose={ () => setIsAddingColor( false ) }
+					property={ editingProperty }
+					onClose={ () => setEditingProperty( null ) }
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
