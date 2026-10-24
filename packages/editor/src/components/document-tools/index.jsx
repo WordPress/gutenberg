@@ -2,7 +2,10 @@ import clsx from 'clsx';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { NavigableToolbar } from '@wordpress/block-editor';
+import {
+	NavigableToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
@@ -24,6 +27,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		inserterSidebarToggleRef,
 		listViewToggleRef,
 		showIconLabels,
+		isPreviewMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -33,8 +37,13 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getListViewToggleRef,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { getSettings } = select( blockEditorStore );
 
 		return {
+			// A preview canvas can't take a block. The read-only intents use
+			// it, so the control that adds blocks has to read as unavailable
+			// rather than open onto an empty library.
+			isPreviewMode: !! getSettings().isPreviewMode,
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
@@ -106,7 +115,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 						isPressed={ isInserterOpened }
 						onMouseDown={ preventDefault }
 						onClick={ toggleInserter }
-						disabled={ disableBlockTools }
+						disabled={ disableBlockTools || isPreviewMode }
 						icon={ plus }
 						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
