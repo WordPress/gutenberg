@@ -6,9 +6,9 @@
 	},
 	"references": [
 		{ "path": "../blocks" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../style-engine" }
+		{ "path": "../style-engine/tsconfig.build.json" }
 	]
 }

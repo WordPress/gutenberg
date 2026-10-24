@@ -5,18 +5,18 @@
 		{ "path": "../autop/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../dom" },
+		{ "path": "../dom/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../hooks" },
+		{ "path": "../hooks/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../rich-text" },
+		{ "path": "../rich-text/tsconfig.build.json" },
 		{ "path": "../shortcode/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }
