@@ -54,6 +54,9 @@ add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
  * does not include image/jxl in its default MIME list, so without this filter
  * the editor's allowed-types check rejects the .jxl upload.
  *
+ * Runs before core's check_upload_mimes() (priority 10), so on multisite the
+ * network's "Upload file types" setting still decides whether JXL is allowed.
+ *
  * @param array $mimes Allowed MIME types (extension => type).
  * @return array Modified MIME types.
  */
@@ -62,43 +65,28 @@ function gutenberg_add_jxl_upload_mimes( array $mimes ): array {
 	return $mimes;
 }
 
-add_filter( 'upload_mimes', 'gutenberg_add_jxl_upload_mimes' );
+add_filter( 'upload_mimes', 'gutenberg_add_jxl_upload_mimes', 5 );
 
 /**
  * Determines whether a file is a JPEG XL image by inspecting its magic bytes.
  *
  * JXL files come in two flavors: a naked codestream (starts with 0xFF 0x0A)
- * and an ISOBMFF container (starts with the 12-byte JXL box signature).
+ * and an ISOBMFF container (starts with the 12-byte JXL box signature), which
+ * must hold a codestream.
  *
  * @param string $file Full path to the file.
  * @return bool Whether the file is a JPEG XL image.
  */
 function gutenberg_is_jxl_file( string $file ): bool {
-	// Suppress the warning when the file is missing or unreadable; the false
-	// return is handled below, matching the core wp_is_jxl_file() backport.
 	$handle = @fopen( $file, 'rb' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 	if ( ! $handle ) {
 		return false;
 	}
 
-	$bytes = fread( $handle, 12 );
+	$is_jxl = false !== gutenberg_read_jxl_codestream_header( $handle );
 	fclose( $handle );
 
-	if ( ! is_string( $bytes ) || strlen( $bytes ) < 2 ) {
-		return false;
-	}
-
-	// Naked JXL codestream.
-	if ( "\xFF\x0A" === substr( $bytes, 0, 2 ) ) {
-		return true;
-	}
-
-	// JXL ISOBMFF container ("....JXL \r\n\x87\n").
-	if ( "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A" === $bytes ) {
-		return true;
-	}
-
-	return false;
+	return $is_jxl;
 }
 
 /**
@@ -120,9 +108,9 @@ function gutenberg_is_jxl_file( string $file ): bool {
  * @param array|null $mimes    Allowed MIME types keyed by their file extension regex, or null for the defaults.
  * @return array Filtered values for the extension, MIME type, and corrected filename.
  */
-function gutenberg_filter_jxl_filetype_and_ext( array $data, string $file, string $filename, $mimes = null ): array {
-	// Leave already-recognized files untouched.
-	if ( ! empty( $data['type'] ) ) {
+function gutenberg_filter_jxl_filetype_and_ext( $data, $file, $filename, $mimes = null ) {
+	// Leave already-recognized files, and arguments core does not type, untouched.
+	if ( ! is_array( $data ) || ! empty( $data['type'] ) || ! is_string( $file ) || ! is_string( $filename ) ) {
 		return $data;
 	}
 

@@ -69,4 +69,48 @@ class Gutenberg_Filter_JXL_Filetype_And_Ext_Test extends WP_UnitTestCase {
 
 		$this->assertFalse( $result['type'] );
 	}
+
+	public function test_ignores_a_jxl_container_without_a_codestream(): void {
+		$container = wp_tempnam( 'empty.jxl' );
+		file_put_contents( $container, "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A\x00\x00\x00\x14ftypjxl \x00\x00\x00\x00jxl " );
+
+		$result = wp_check_filetype_and_ext( $container, 'empty.jxl' );
+		unlink( $container );
+
+		$this->assertFalse( $result['type'] );
+	}
+
+	/**
+	 * Core does not type the filename, and some callers pass null.
+	 */
+	public function test_passes_through_a_filename_that_is_not_a_string(): void {
+		$data = array(
+			'ext'             => false,
+			'type'            => false,
+			'proper_filename' => false,
+		);
+
+		$this->assertSame( $data, gutenberg_filter_jxl_filetype_and_ext( $data, $this->jxl_file, null ) );
+	}
+
+	/**
+	 * A network's "Upload file types" setting must still decide whether JXL
+	 * is allowed, so JXL has to be registered before check_upload_mimes().
+	 *
+	 * @group ms-required
+	 */
+	public function test_respects_the_network_upload_file_types(): void {
+		$original = get_site_option( 'upload_filetypes' );
+
+		update_site_option( 'upload_filetypes', 'jpg jpeg png' );
+		$without_jxl = get_allowed_mime_types();
+
+		update_site_option( 'upload_filetypes', 'jpg jpeg png jxl' );
+		$with_jxl = get_allowed_mime_types();
+
+		update_site_option( 'upload_filetypes', $original );
+
+		$this->assertArrayNotHasKey( 'jxl', $without_jxl );
+		$this->assertSame( 'image/jxl', $with_jxl['jxl'] ?? null );
+	}
 }
