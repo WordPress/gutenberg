@@ -400,6 +400,20 @@ export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
 }
 
 /**
+ * Whether a block attribute is connected to a binding source, either directly
+ * or through the pattern overrides `__default` binding. A bound attribute
+ * displays its source's value, so selection offsets don't map to the stored one.
+ *
+ * @param {?Object} attributes   Block attributes.
+ * @param {string}  attributeKey Attribute name.
+ * @return {boolean} Whether the attribute is bound.
+ */
+export function isAttributeBound( attributes, attributeKey ) {
+	const bindings = attributes?.metadata?.bindings;
+	return !! ( bindings?.[ attributeKey ] || bindings?.__default );
+}
+
+/**
  * Wrap a rich-text range with a core/note marker. Returns a new
  * RichTextData ready to write back into block attributes, or null when the
  * incoming value isn't a rich-text instance (legacy/string attributes).

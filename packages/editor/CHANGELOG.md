@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Notes: Add a block-level note instead of an inline note when the selected text is bound to a source, such as post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 16.0.0 (2026-10-20)

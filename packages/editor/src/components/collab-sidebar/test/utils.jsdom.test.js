@@ -25,6 +25,7 @@ import {
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 	getNoteAnchorRect,
+	isAttributeBound,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -716,6 +717,50 @@ describe( 'calculateNotePositions', () => {
 		// 1 (downward):   (234 + 80) - 300 + 20 = 34 → 334
 		expect( positions ).toEqual( { 1: 334, new: 234 } );
 		expect( positions[ 1 ] ).toBeGreaterThan( blockRects[ 1 ].top - 50 );
+	} );
+} );
+
+describe( 'isAttributeBound', () => {
+	const binding = { source: 'core/post-meta', args: { key: 'field' } };
+
+	it( 'returns true for an attribute with its own binding', () => {
+		expect(
+			isAttributeBound(
+				{ metadata: { bindings: { content: binding } } },
+				'content'
+			)
+		).toBe( true );
+	} );
+
+	it( 'returns true for every attribute under a pattern overrides binding', () => {
+		expect(
+			isAttributeBound(
+				{
+					metadata: {
+						bindings: {
+							__default: { source: 'core/pattern-overrides' },
+						},
+					},
+				},
+				'content'
+			)
+		).toBe( true );
+	} );
+
+	it( 'returns false when another attribute is bound', () => {
+		expect(
+			isAttributeBound(
+				{ metadata: { bindings: { url: binding } } },
+				'content'
+			)
+		).toBe( false );
+	} );
+
+	it( 'returns false without bindings', () => {
+		expect( isAttributeBound( { content: 'Text' }, 'content' ) ).toBe(
+			false
+		);
+		expect( isAttributeBound( undefined, 'content' ) ).toBe( false );
 	} );
 } );
 

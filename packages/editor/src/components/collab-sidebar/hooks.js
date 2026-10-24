@@ -29,6 +29,7 @@ import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	getNoteAtCaret,
+	isAttributeBound,
 	pickNoteForCaret,
 	readInlineSelection,
 	removeInlineNote,
@@ -242,8 +243,13 @@ export function useNoteActions() {
 			return;
 		}
 		onDiscard( clientId );
+		const attributes = getBlockAttributes( clientId );
+		// Bound text is anchored at the block level.
+		if ( isAttributeBound( attributes, selection.attributeKey ) ) {
+			return;
+		}
 		const wrapped = wrapInlineNote(
-			getBlockAttributes( clientId )?.[ selection.attributeKey ],
+			attributes?.[ selection.attributeKey ],
 			'new',
 			selection.start,
 			selection.end
