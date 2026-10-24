@@ -237,6 +237,7 @@ function MotionDemo() {
 
 const meta: Meta< typeof MotionDemo > = {
 	title: 'Design System/Tokens/Motion',
+	id: 'design-system-tokens-motion',
 	component: MotionDemo,
 	tags: [ 'docs-only' ],
 	parameters: {

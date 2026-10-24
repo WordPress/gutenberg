@@ -6,6 +6,8 @@ import * as icons from '../../';
 
 const meta = {
 	component: Icon,
+	// Shares its `id` and `title` with `storybook/stories/icons/library.story.tsx`
+	// so both files merge into one entry. Change them together.
 	id: 'icons-icon',
 	title: 'Design System/Icons/Icon',
 	parameters: {
