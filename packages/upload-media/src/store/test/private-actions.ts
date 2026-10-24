@@ -1235,32 +1235,8 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'generateThumbnails (source-format original sideload)', () => {
-		function runGenerate(
-			item: { id: string } & Record< string, unknown >
-		) {
-			const dispatchFn = Object.assign( vi.fn(), {
-				finishOperation: vi.fn(),
-				addSideloadItem: vi.fn(),
-			} );
-			const select = {
-				getItem: () => item,
-				getSettings: () => ( {} ),
-			};
-			return generateThumbnails( item.id )( {
-				select,
-				dispatch: dispatchFn,
-			} as unknown as ThunkArgs ).then( () => dispatchFn );
-		}
-
-		/*
-		 * The size name is a contract with the REST sideload endpoint, which
-		 * validates it against a fixed list. A JXL companion previously had its
-		 * own 'original-jxl' token; core settled on the one generic
-		 * 'source_original' shared with the HEIC original, and a client sending
-		 * anything else is rejected with rest_not_in_enum.
-		 */
-		it( 'sideloads the JXL original as source_original', async () => {
+	describe( 'generateThumbnails (JPEG XL)', () => {
+		it( 'generates JXL sub-sizes from the JXL upload without a companion original', async () => {
 			const jxl = new File( [ 'x' ], 'photo.jxl', {
 				type: 'image/jxl',
 			} );
@@ -1268,24 +1244,42 @@ describe( 'private actions', () => {
 				id: 'j',
 				sourceFile: jxl,
 				file: jxl,
-				originalJxlFile: jxl,
-				attachment: { id: 21 },
+				attachment: {
+					id: 21,
+					filename: 'photo.jxl',
+					missing_image_sizes: [ 'thumbnail' ],
+				},
+			};
+			const dispatchFn = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				addSideloadItem: vi.fn(),
+			} );
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+				} ),
 			};
 
-			const dispatchFn = await runGenerate( item );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch: dispatchFn,
+			} as unknown as ThunkArgs );
 
 			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
-			expect( sideload.file ).toBe( jxl );
-			expect( sideload.parentId ).toBe( 'j' );
+			expect( sideload.file.type ).toBe( 'image/jxl' );
 			expect( sideload.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 21,
-					image_size: 'source_original',
-					convert_format: false,
+					image_size: 'thumbnail',
 				} )
 			);
-			expect( sideload.operations ).toEqual( [ OperationType.Upload ] );
+			expect( sideload.operations[ 0 ][ 0 ] ).toBe(
+				OperationType.ResizeCrop
+			);
 		} );
 	} );
 

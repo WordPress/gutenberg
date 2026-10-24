@@ -33,10 +33,8 @@ import {
 	vipsConvertImageFormat,
 	vipsEncodeCanvasAsJpeg,
 	vipsHasTransparency,
-	vipsEnsureJxlSupport,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
-	withVipsWorkerHeld,
 	maybeRecycleVipsWorker,
 } from './utils';
 import {
@@ -858,17 +856,19 @@ export function prepareItem( id: QueueItemId ) {
 		}
 
 		let heicJpeg: File | null = null;
-		let jxlDerivative: File | null = null;
 
 		// `File.type` comes from the OS MIME registry, which has no `.jxl`
 		// mapping on many systems and hands back an empty string there. Fall
-		// back to the extension so those files still take the conversion path
-		// instead of being uploaded as a raw .jxl the server cannot read -
-		// which the `upload_mimes` registration now lets through. Mirrors the
-		// server-side sniffing in gutenberg_filter_jxl_filetype_and_ext().
-		const isJxl =
-			file.type === 'image/jxl' ||
-			( ! file.type && /\.jxl$/i.test( file.name ) );
+		// back to the extension and re-label the file, so vips decodes it as
+		// JXL. Mirrors the server-side sniffing in
+		// gutenberg_filter_jxl_filetype_and_ext().
+		const isUntypedJxl = ! file.type && /\.jxl$/i.test( file.name );
+		const jxlFile = isUntypedJxl
+			? new File( [ file ], file.name, {
+					type: 'image/jxl',
+					lastModified: file.lastModified,
+				} )
+			: file;
 
 		// A HEIC photo can arrive with a .jpg or .png name, which is all the
 		// browser has to go on when it types the file, so this goes by content.
@@ -876,12 +876,14 @@ export function prepareItem( id: QueueItemId ) {
 		const isMisnamedHeic =
 			isHeic && ! HEIC_MIME_TYPES.includes( file.type );
 
-		const isImage = file.type.startsWith( 'image/' ) || isHeic || isJxl;
+		const isImage =
+			file.type.startsWith( 'image/' ) || isHeic || isUntypedJxl;
 
 		// A misnamed HEIC file claims a vips-processable type. vips cannot
 		// decode HEIC, and taking that branch is what strands the upload.
 		const isVipsSupported =
-			! isHeic && CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( file.type );
+			! isHeic &&
+			CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( jxlFile.type );
 
 		/*
 		 * Re-label a misnamed file so the rest of the pipeline sees HEIC: the
@@ -990,60 +992,6 @@ export function prepareItem( id: QueueItemId ) {
 				OperationType.ThumbnailGeneration,
 				OperationType.Finalize
 			);
-		} else if ( isImage && isJxl ) {
-			// JPEG XL is not yet broadly web-compatible: most browsers cannot
-			// display it and the server cannot read it (no GD/Imagick support).
-			// Decode it client-side with vips — lazily loading the ~3 MB JXL
-			// WASM chunk on demand — and upload a JPEG, or a PNG when the image
-			// is transparent, so the editor and front end use a portable
-			// format. The original .jxl is preserved as a companion file
-			// (sideloaded in generateThumbnails), mirroring how HEIC keeps its
-			// original.
-			try {
-				// Held so a recycle cannot replace the worker after it got the
-				// JXL library and before, or while, it decodes.
-				jxlDerivative = await withVipsWorkerHeld( async () => {
-					await vipsEnsureJxlSupport();
-
-					const blobUrl = createBlobURL( file );
-					let hasTransparency: boolean;
-					try {
-						hasTransparency = await vipsHasTransparency( blobUrl );
-					} finally {
-						revokeBlobURL( blobUrl );
-					}
-
-					return vipsConvertImageFormat(
-						item.id,
-						file,
-						hasTransparency ? 'image/png' : 'image/jpeg',
-						{
-							quality:
-								settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
-							stripMeta: settings.imageStripMeta,
-						}
-					);
-				} );
-			} catch ( error ) {
-				dispatch.cancelItem(
-					id,
-					new UploadError( {
-						code: ErrorCode.JXL_DECODE_ERROR,
-						message: __(
-							'This JPEG XL image could not be decoded and converted for upload.'
-						),
-						file,
-						cause: error instanceof Error ? error : undefined,
-					} )
-				);
-				return;
-			}
-
-			operations.push(
-				OperationType.Upload,
-				OperationType.ThumbnailGeneration,
-				OperationType.Finalize
-			);
 		} else {
 			operations.push( OperationType.Upload );
 		}
@@ -1059,30 +1007,7 @@ export function prepareItem( id: QueueItemId ) {
 		// to false so the server skips the image-type support check
 		// (allowing formats like AVIF that the server can't process).
 		let updates: Partial< QueueItem >;
-		if ( isJxl && jxlDerivative ) {
-			// Upload the JPEG or PNG derivative as the main file and keep the
-			// original .jxl so generateThumbnails() can sideload it as a
-			// companion (stored under $metadata['source_image'], like the HEIC
-			// original).
-			//
-			// `generate_sub_sizes` must be turned off explicitly: it defaults
-			// to true server-side, and leaving it on makes create_item build
-			// every sub-size (and the -scaled copy) itself. The response then
-			// reports no missing_image_sizes, generateThumbnails() sideloads
-			// nothing, and the upload silently reverts to server-side
-			// processing. Decoding the JXL at all proves vips is available, so
-			// unlike HEIC there is no canvas-only case to fall back for.
-			updates = {
-				file: jxlDerivative,
-				sourceFile: jxlDerivative,
-				originalJxlFile: item.file,
-				additionalData: {
-					...item.additionalData,
-					generate_sub_sizes: false,
-					convert_format: true,
-				},
-			};
-		} else if ( isHeic && heicJpeg ) {
+		if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG
 			// and let the server handle it normally (threshold scaling,
 			// sub-sizes, format conversion). Keep the original HEIC in
@@ -1113,6 +1038,7 @@ export function prepareItem( id: QueueItemId ) {
 			};
 		} else {
 			updates = {
+				...( isUntypedJxl && { file: jxlFile, sourceFile: jxlFile } ),
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: false,
@@ -1490,13 +1416,6 @@ export function transcodeImageItem(
 		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
 
 		try {
-			// Lazily load the JXL WASM module when transcoding to JXL.
-			// The server determines the output format, so this runs after
-			// the upload response even if the input was not JXL.
-			if ( outputMimeType === 'image/jxl' ) {
-				await vipsEnsureJxlSupport();
-			}
-
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
@@ -1732,25 +1651,6 @@ export function generateThumbnails( id: QueueItemId ) {
 		if ( item.originalHeicFile && attachment.id ) {
 			dispatch.addSideloadItem( {
 				file: item.originalHeicFile,
-				batchId: uuidv4(),
-				parentId: item.id,
-				additionalData: {
-					post: attachment.id,
-					image_size: 'source_original',
-					convert_format: false,
-				},
-				operations: [ OperationType.Upload ],
-			} );
-		}
-
-		// JXL companion original: preserve the user's uploaded .jxl alongside
-		// the JPEG derivative. Sideloaded under the same `source_original` size
-		// as the HEIC original above, which stores the basename in the
-		// source_image metadata key so it never collides with 'original_image'.
-		// Cleanup on attachment delete is handled by a delete_attachment hook.
-		if ( item.originalJxlFile && attachment.id ) {
-			dispatch.addSideloadItem( {
-				file: item.originalJxlFile,
 				batchId: uuidv4(),
 				parentId: item.id,
 				additionalData: {

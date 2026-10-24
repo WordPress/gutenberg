@@ -45,9 +45,6 @@ vi.mock(
 			vipsConvertImageFormat: vi.fn(),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
-			withVipsWorkerHeld: vi.fn( < T >( callback: () => Promise< T > ) =>
-				callback()
-			),
 		} ) as unknown as typeof import( '../utils' )
 );
 

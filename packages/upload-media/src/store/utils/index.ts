@@ -102,6 +102,29 @@ function loadVipsModule(): Promise<
 }
 
 /**
+ * Runs vips work with JPEG XL support loaded when an input or output is JXL.
+ *
+ * The worker is held so a recycle cannot drop the JXL library between
+ * loading it and using it.
+ *
+ * @param types    MIME types the work reads or writes.
+ * @param callback Vips work to run.
+ * @return The callback's result.
+ */
+async function withJxlSupportFor< T >(
+	types: string[],
+	callback: () => Promise< T >
+): Promise< T > {
+	if ( ! types.includes( 'image/jxl' ) ) {
+		return callback();
+	}
+	return withVipsWorkerHeld( async () => {
+		await vipsEnsureJxlSupport();
+		return callback();
+	} );
+}
+
+/**
  * Converts an image to a different format using vips in a web worker.
  *
  * @param id      Queue item ID.
@@ -124,12 +147,14 @@ export async function vipsConvertImageFormat(
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
 		await loadVipsModule();
-	const buffer = await convertImageFormat(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		type,
-		options
+	const buffer = await withJxlSupportFor( [ file.type, type ], async () =>
+		convertImageFormat(
+			id,
+			await file.arrayBuffer(),
+			file.type,
+			type,
+			options
+		)
 	);
 	const ext = type.split( '/' )[ 1 ];
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
@@ -192,11 +217,8 @@ export async function vipsCompressImage(
 	options: VipsConvertOptions = {}
 ) {
 	const { vipsCompressImage: compressImage } = await loadVipsModule();
-	const buffer = await compressImage(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		options
+	const buffer = await withJxlSupportFor( [ file.type ], async () =>
+		compressImage( id, await file.arrayBuffer(), file.type, options )
 	);
 	return new File(
 		[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
@@ -267,13 +289,15 @@ export async function vipsResizeImage(
 
 	const { vipsResizeImage: resizeImage } = await loadVipsModule();
 	const { buffer, width, height, originalWidth, originalHeight } =
-		await resizeImage( id, await file.arrayBuffer(), file.type, resize, {
-			smartCrop,
-			quality,
-			stripMeta,
-			maxBitdepth,
-			preserveAnimation,
-		} );
+		await withJxlSupportFor( [ file.type ], async () =>
+			resizeImage( id, await file.arrayBuffer(), file.type, resize, {
+				smartCrop,
+				quality,
+				stripMeta,
+				maxBitdepth,
+				preserveAnimation,
+			} )
+		);
 
 	let fileName = file.name;
 	const wasResized = originalWidth > width || originalHeight > height;
@@ -339,11 +363,10 @@ export async function vipsRotateImage(
 	}
 
 	const { vipsRotateImage: rotateImage } = await loadVipsModule();
-	const { buffer, width, height } = await rotateImage(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		orientation
+	const { buffer, width, height } = await withJxlSupportFor(
+		[ file.type ],
+		async () =>
+			rotateImage( id, await file.arrayBuffer(), file.type, orientation )
 	);
 
 	// Add '-rotated' suffix to filename, matching WordPress core behavior.
@@ -386,8 +409,8 @@ export async function vipsCancelOperations( id: QueueItemId ) {
  *
  * Lazily loads the vips-jxl.wasm module (a separate bundler chunk) and
  * signals the worker to re-initialize vips with JXL dynamic library
- * support. Call before processing any image whose input or output type
- * is `image/jxl`.
+ * support. The wrappers above call it for any image whose input or output
+ * type is `image/jxl`.
  *
  * Safe to call multiple times — the underlying import and RPC are cached.
  */
@@ -422,10 +445,10 @@ let heldVipsOperations = 0;
 /**
  * Runs vips work that the worker must not be recycled during.
  *
- * Use this for vips calls made outside ResizeCrop and Rotate, such as decoding
- * a JPEG XL upload in Prepare. Recycling mid-call would drop the in-flight
- * request, and drop worker-side state such as JXL support that a later call
- * in the same callback relies on.
+ * Use this for vips calls made outside ResizeCrop and Rotate, such as JPEG XL
+ * work in a transcode. Recycling mid-call would drop the in-flight request,
+ * and drop worker-side state such as JXL support that a later call in the
+ * same callback relies on.
  *
  * @param callback Vips work to run.
  * @return The callback's result.

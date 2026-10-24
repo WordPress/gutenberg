@@ -15,10 +15,7 @@ import { ErrorCode, UploadError } from '../../upload-error';
 import {
 	vipsCancelOperations,
 	vipsConvertImageFormat,
-	vipsEnsureJxlSupport,
-	vipsHasTransparency,
 	vipsResizeImage,
-	withVipsWorkerHeld,
 } from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
@@ -48,12 +45,8 @@ vi.mock(
 			vipsRotateImage: vi.fn(),
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
-			vipsEnsureJxlSupport: vi.fn( () => Promise.resolve() ),
 			terminateVipsWorker: vi.fn(),
 			maybeRecycleVipsWorker: vi.fn(),
-			withVipsWorkerHeld: vi.fn( < T >( callback: () => Promise< T > ) =>
-				callback()
-			),
 		} ) as unknown as typeof import( '../utils' )
 );
 
@@ -249,22 +242,7 @@ describe( 'actions', () => {
 			);
 		} );
 
-		it( 'converts JPEG XL to JPEG and keeps sub-size generation on the client', async () => {
-			/*
-			 * Regression test: the JXL branch used to leave `additionalData`
-			 * untouched, so `generate_sub_sizes` kept its server-side default
-			 * of true. create_item then built every sub-size itself, the
-			 * response reported no missing_image_sizes, and generateThumbnails
-			 * sideloaded nothing - silently reverting JXL uploads to
-			 * server-side processing.
-			 */
-			const jpegDerivative = new File( [ 'jpeg' ], 'example.jpg', {
-				type: 'image/jpeg',
-			} );
-			( vipsConvertImageFormat as Mock ).mockResolvedValue(
-				jpegDerivative
-			);
-
+		it( 'uploads a JPEG XL as-is and keeps sub-size generation on the client', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jxlFile,
 			} );
@@ -281,23 +259,8 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			// The JXL WASM chunk is only fetched when a JXL is processed, and
-			// the worker is held so a recycle cannot drop it mid-decode.
-			expect( vipsEnsureJxlSupport ).toHaveBeenCalled();
-			expect( withVipsWorkerHeld ).toHaveBeenCalledTimes( 1 );
-			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
-				item.id,
-				jxlFile,
-				'image/jpeg',
-				expect.anything()
-			);
-
-			// The JPEG derivative is uploaded, the original .jxl is kept for
-			// the companion sideload.
-			expect( updatedItem.file ).toBe( jpegDerivative );
-			expect( updatedItem.sourceFile ).toBe( jpegDerivative );
-			expect( updatedItem.originalJxlFile ).toBe( jxlFile );
-
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+			expect( updatedItem.file ).toBe( jxlFile );
 			expect( updatedItem.operations ).toEqual(
 				expect.arrayContaining( [
 					OperationType.Upload,
@@ -307,24 +270,13 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				false
 			);
-			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
 
-		it( 'detects JPEG XL by extension when the OS reports no mime type', async () => {
+		it( 'labels a JPEG XL as image/jxl when the OS reports no mime type', async () => {
 			/*
-			 * Regression test: detection used to key off `File.type` alone.
 			 * On systems with no `.jxl` MIME mapping the type is an empty
-			 * string, so the file fell through to a plain upload - and since
-			 * the upload_mimes filter now registers image/jxl, the server
-			 * accepted and stored a raw .jxl it cannot read.
+			 * string, which vips cannot pick a loader for.
 			 */
-			const jpegDerivative = new File( [ 'jpeg' ], 'example.jpg', {
-				type: 'image/jpeg',
-			} );
-			( vipsConvertImageFormat as Mock ).mockResolvedValue(
-				jpegDerivative
-			);
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: untypedJxlFile,
 			} );
@@ -341,106 +293,17 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			expect( vipsEnsureJxlSupport ).toHaveBeenCalled();
-			expect( updatedItem.file ).toBe( jpegDerivative );
-			expect( updatedItem.originalJxlFile ).toBe( untypedJxlFile );
+			expect( updatedItem.file.type ).toBe( 'image/jxl' );
+			expect( updatedItem.file.name ).toBe( untypedJxlFile.name );
+			expect( updatedItem.sourceFile ).toBe( updatedItem.file );
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				false
-			);
-		} );
-
-		it( 'converts a transparent JPEG XL to PNG to keep its transparency', async () => {
-			const pngDerivative = new File( [ 'png' ], 'example.png', {
-				type: 'image/png',
-			} );
-			( vipsHasTransparency as Mock ).mockResolvedValueOnce( true );
-			( vipsConvertImageFormat as Mock ).mockResolvedValue(
-				pngDerivative
-			);
-
-			unlock( registry.dispatch( uploadStore ) ).addItem( {
-				file: jxlFile,
-			} );
-
-			const item = unlock(
-				registry.select( uploadStore )
-			).getAllItems()[ 0 ];
-
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
-			);
-
-			const updatedItem = unlock(
-				registry.select( uploadStore )
-			).getAllItems()[ 0 ];
-
-			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
-				item.id,
-				jxlFile,
-				'image/png',
-				expect.anything()
-			);
-			expect( updatedItem.file ).toBe( pngDerivative );
-			expect( updatedItem.originalJxlFile ).toBe( jxlFile );
-		} );
-
-		it( 'keeps JXL metadata when the site turns off metadata stripping', async () => {
-			( vipsConvertImageFormat as Mock ).mockResolvedValue(
-				new File( [ 'jpeg' ], 'example.jpg', { type: 'image/jpeg' } )
-			);
-			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
-				imageStripMeta: false,
-			} );
-
-			unlock( registry.dispatch( uploadStore ) ).addItem( {
-				file: jxlFile,
-			} );
-
-			const item = unlock(
-				registry.select( uploadStore )
-			).getAllItems()[ 0 ];
-
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
-			);
-
-			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
-				item.id,
-				jxlFile,
-				'image/jpeg',
-				expect.objectContaining( { stripMeta: false } )
-			);
-		} );
-
-		it( 'cancels with a JXL-specific error code when decoding fails', async () => {
-			/*
-			 * The code used to be the bare string 'JXL_DECODE_ERROR', which is
-			 * absent from the ErrorCode enum and from getErrorMessage()'s
-			 * table, so the user saw the generic "Upload failed / Please try
-			 * again" copy for a permanently unrecoverable failure.
-			 */
-			const onError = vi.fn();
-			( vipsConvertImageFormat as Mock ).mockRejectedValue(
-				new Error( 'unsupported JXL feature' )
-			);
-
-			unlock( registry.dispatch( uploadStore ) ).addItem( {
-				file: jxlFile,
-				onError,
-			} );
-
-			const item = unlock(
-				registry.select( uploadStore )
-			).getAllItems()[ 0 ];
-
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
-			);
-
-			expect( onError ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					code: ErrorCode.JXL_DECODE_ERROR,
-				} )
 			);
 		} );
 
