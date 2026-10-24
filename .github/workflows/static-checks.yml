@@ -5,8 +5,10 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -21,8 +23,9 @@ permissions: {}
 
 jobs:
     check:
-        name: All${{ (matrix.node != '24' || matrix.os != 'ubuntu-24.04') && format(' (Node.js {0} on {1})', matrix.node, contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
+        name: All${{ matrix.os != 'ubuntu-24.04' && format(' (on {0})', contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux') || '' }}
         runs-on: ${{ matrix.os }}
+        timeout-minutes: 45
         env:
             NODE_OPTIONS: --max-old-space-size=4096
         permissions:
@@ -30,32 +33,24 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                event: ['${{ github.event_name }}']
-                node: ['24', '26']
-                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                # macOS and Windows runners are more costly than Ubuntu, so they should not run within forks.
+                os: ${{ github.repository == 'WordPress/gutenberg' && fromJSON( '["macos-15", "ubuntu-24.04", "windows-2025"]' ) || fromJSON( '["ubuntu-24.04"]' ) }}
 
                 include:
                     # Only generate annotations once.
-                    - node: '24'
-                      os: 'ubuntu-24.04'
+                    - os: 'ubuntu-24.04'
                       annotations: true
-                exclude:
-                    # Only test Node 24 on Ubuntu and Windows for pull requests.
-                    - event: 'pull_request'
-                      node: '26'
-                    - event: 'pull_request'
-                      os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  node-version: ${{ matrix.node }}
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Pin npm version for consistency

@@ -3,7 +3,12 @@ name: Create Block
 on:
     pull_request:
     push:
-        branches: [trunk, wp/latest]
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -18,36 +23,26 @@ permissions: {}
 
 jobs:
     checks:
-        name: Checks w/Node.js ${{ matrix.node }} on ${{ contains( matrix.os, 'macos-' ) && 'MacOS' || contains( matrix.os, 'windows-' ) && 'Windows' || 'Linux' }}
+        name: Checks on ${{ contains( matrix.os, 'macos-' ) && 'MacOS' || contains( matrix.os, 'windows-' ) && 'Windows' || 'Linux' }}
         runs-on: ${{ matrix.os }}
+        timeout-minutes: 20
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                event: ['${{ github.event_name }}']
-                node: ['24', '26']
-                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
-                exclude:
-                    # Only test Node 24 on Ubuntu for pull requests.
-                    - event: 'pull_request'
-                      node: '26'
-                    - event: 'pull_request'
-                      os: 'macos-15'
-                    - event: 'pull_request'
-                      os: 'windows-2025'
+                # macOS and Windows runners are more costly than Ubuntu, so they should not run within forks.
+                os: ${{ github.repository == 'WordPress/gutenberg' && fromJSON( '["macos-15", "ubuntu-24.04", "windows-2025"]' ) || fromJSON( '["ubuntu-24.04"]' ) }}
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Create block
               run: npm run test:create-block

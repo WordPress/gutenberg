@@ -39,7 +39,7 @@ jobs:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -47,16 +47,9 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Install NVM
-              run: |
-                  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-                  export NVM_DIR="$HOME/.nvm"
-                  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-                  nvm -v
-
             - name: Compare performance with base branch
               if: github.event_name == 'pull_request'
-              run: npm exec --no release-cli -- perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA"
+              run: npm exec --no release-cli -- perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA" --wp-version "7.1"
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
@@ -131,6 +124,7 @@ jobs:
                       ${{ env.WP_ARTIFACTS_PATH }}/traces
                       ${{ env.WP_ARTIFACTS_PATH }}/build
                   if-no-files-found: ignore
+                  retention-days: 14
 
             - name: Publish performance results
               if: github.event_name == 'push'
@@ -147,3 +141,4 @@ jobs:
                   name: failures-artifacts
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore
+                  retention-days: 14

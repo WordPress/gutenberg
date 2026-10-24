@@ -5,8 +5,10 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -19,10 +21,16 @@ concurrency:
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
+# Runs WordPress on PHP 8.5, the highest version WordPress 7.1 supports, instead of
+# whatever version the floating `wordpress` image uses.
+env:
+    WP_ENV_PHP_VERSION: '8.5'
+
 jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 60
         permissions:
             contents: read
             id-token: write
@@ -34,7 +42,7 @@ jobs:
                 totalParts: [8]
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -78,13 +86,14 @@ jobs:
     e2e-playwright-rtc-websocket:
         name: Playwright - RTC WebSocket
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 45
         permissions:
             contents: read
             id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -137,10 +146,11 @@ jobs:
         if: ${{ !cancelled() }}
         needs: [e2e-playwright, e2e-playwright-rtc-websocket]
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 10
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -183,6 +193,7 @@ jobs:
                   name: html-report--attempt-${{ github.run_attempt }}
                   path: playwright-report
                   if-no-files-found: ignore
+                  retention-days: 14
 
             # Flaky tests are only reported as a comment on the pull request. The
             # merge step above only sets `artifact-id` when a report was produced,
@@ -231,7 +242,7 @@ jobs:
             queue: max
 
         steps:
-            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   sparse-checkout: tools/pr-meta
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
