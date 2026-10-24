@@ -68,7 +68,7 @@ export function register( server: McpServer ): void {
 		{
 			title: 'Get Component Details',
 			description:
-				'Get detailed documentation for one or more WordPress Design System components including props, usage examples, and import statements. Pass multiple names to fetch several components in a single call instead of making repeated calls.',
+				'Get detailed documentation for one or more WordPress Design System components including props, usage examples, and import statements. Pass multiple names to fetch several components in a single call instead of making repeated calls. Props and examples show how to use a component, not whether it is the right one; see get_guidance for that.',
 			inputSchema,
 			annotations: {
 				readOnlyHint: true,

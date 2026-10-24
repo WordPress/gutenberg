@@ -1,4 +1,9 @@
-import type { Component, ComponentDetail } from './types.ts';
+import type {
+	Component,
+	ComponentDetail,
+	GuidanceDoc,
+	GuidanceSummary,
+} from './types.ts';
 
 /**
  * Format a component's name, package, and description as markdown.
@@ -88,4 +93,36 @@ export function formatComponentDetail( detail: ComponentDetail ): string {
 	}
 
 	return lines.join( '\n' );
+}
+
+/**
+ * Format the guidance page list as markdown.
+ *
+ * @param pages - The guidance summaries.
+ * @return Formatted markdown.
+ */
+export function formatGuidanceList( pages: GuidanceSummary[] ): string {
+	const lines = [ '# WordPress Design System Guidance' ];
+	for ( const page of pages ) {
+		const attached =
+			page.components.length > 0
+				? ` _(${ page.components.join( ', ' ) })_`
+				: '';
+		const summary = page.summary ? `: ${ page.summary }` : '';
+		lines.push(
+			'',
+			`- \`${ page.id }\` **${ page.title }**${ attached }${ summary }`
+		);
+	}
+	return lines.join( '\n' );
+}
+
+/**
+ * Format guidance pages as markdown, separated by rules.
+ *
+ * @param pages - The guidance pages.
+ * @return Formatted markdown.
+ */
+export function formatGuidance( pages: GuidanceDoc[] ): string {
+	return pages.map( ( page ) => page.content ).join( '\n\n---\n\n' );
 }
