@@ -1,3 +1,4 @@
+import { VisuallyHidden } from '@wordpress/ui';
 import { Fragment } from '@wordpress/element';
 import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 
@@ -14,26 +15,30 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 		: keyCombination.character;
 
 	return (
-		<kbd
-			className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
-			aria-label={ forceAriaLabel || ariaLabel }
-		>
-			{ ( Array.isArray( shortcut ) ? shortcut : [ shortcut ] ).map(
-				( character, index ) => {
-					if ( character === '+' ) {
-						return <Fragment key={ index }>{ character }</Fragment>;
-					}
+		<kbd className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key-combination">
+			<VisuallyHidden render={ <span /> }>
+				{ forceAriaLabel || ariaLabel }
+			</VisuallyHidden>
+			<span aria-hidden="true">
+				{ ( Array.isArray( shortcut ) ? shortcut : [ shortcut ] ).map(
+					( character, index ) => {
+						if ( character === '+' ) {
+							return (
+								<Fragment key={ index }>{ character }</Fragment>
+							);
+						}
 
-					return (
-						<kbd
-							key={ index }
-							className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key"
-						>
-							{ character }
-						</kbd>
-					);
-				}
-			) }
+						return (
+							<kbd
+								key={ index }
+								className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key"
+							>
+								{ character }
+							</kbd>
+						);
+					}
+				) }
+			</span>
 		</kbd>
 	);
 }
