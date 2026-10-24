@@ -578,7 +578,7 @@ describe( 'getLayoutStyle in the mobile viewport', () => {
 			viewport,
 		} );
 
-	it( 'stacks the children of manual placement grids, keeping their row spans', () => {
+	it( 'stacks the children of manual placement grids, unrotated and keeping their row spans', () => {
 		expect(
 			getMobileStyle( {
 				isManualPlacement: true,
@@ -587,7 +587,7 @@ describe( 'getLayoutStyle in the mobile viewport', () => {
 			} )
 		).toBe(
 			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
-				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }'
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }'
 		);
 	} );
 

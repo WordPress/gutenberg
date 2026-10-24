@@ -10,8 +10,10 @@ import {
 	GridVisualizer,
 	GridItemResizer,
 	GridItemMovers,
+	GridItemRotator,
 	useUpdateGridChildLayout,
 } from '../components/grid';
+import type { GridBlockStyle } from '../components/grid/mobile-stacking';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
@@ -19,8 +21,11 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from './block-style-state';
+import { getRotateForState, getUpdatedRotateStyle } from '../utils/rotation';
+import { isRotateEnabled } from './rotate';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -390,6 +395,7 @@ function useBlockPropsChildLayoutStyles( {
 
 function ChildLayoutControlsPure( {
 	clientId,
+	name,
 	style,
 }: ChildLayoutControlsPureProps ) {
 	// The layout context merges the parent's layout and its support.
@@ -408,6 +414,7 @@ function ChildLayoutControlsPure( {
 	return (
 		<GridTools
 			clientId={ clientId }
+			name={ name }
 			style={ style }
 			allowSizingOnChildren={ allowSizingOnChildren }
 			isManualPlacement={ isManualPlacement }
@@ -418,6 +425,7 @@ function ChildLayoutControlsPure( {
 
 function GridTools( {
 	clientId,
+	name,
 	style,
 	allowSizingOnChildren,
 	isManualPlacement,
@@ -433,6 +441,7 @@ function GridTools( {
 		isChildBlockAGrid,
 		selectedState,
 		parentStyle,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -475,6 +484,7 @@ function GridTools( {
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
 				parentStyle: parentAttributes?.style,
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId ]
@@ -525,6 +535,13 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
+	// Whether the angle previewed while the rotate handle is being dragged
+	// rotates the block, or null when nothing is previewed. Only this is kept
+	// here, not the angle, so that rotating doesn't re-render the grid tools,
+	// including the visualizer, for every degree.
+	const [ isPreviewRotated, setIsPreviewRotated ] = useState<
+		boolean | null
+	>( null );
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
@@ -569,9 +586,41 @@ function GridTools( {
 			: undefined ),
 		...stackedLayouts?.grid,
 	};
+	// Stacked blocks are shown unrotated.
+	const rotate = stackedLayouts
+		? 0
+		: getRotateForState( style, selectedState );
+	// Like the Rotation control in the block settings, the handle is only
+	// offered for blocks that can be fully edited, and not in a state such as
+	// `:hover`, since rotation is stored per viewport.
+	// The resizer sizes the block from pointer movement along the screen's
+	// axes, not the block's, so it is hidden while the block is rotated.
+	const isRotated = isPreviewRotated ?? !! rotate;
+	const showRotator =
+		isManualGrid &&
+		! isBlockItselfCurrentlyHidden &&
+		blockEditingMode === 'default' &&
+		! hasPseudoBlockStyleState( selectedState ) &&
+		isRotateEnabled( name );
 
 	function updateLayout( layout: ChildLayout ) {
 		updateGridChildLayout( clientId, layout );
+	}
+
+	function updateRotate( angle: number ) {
+		// Goes through the grid item update, so that rotating a block of a
+		// stacked grid on mobile first gives the grid its own mobile layout.
+		updateGridChildLayout(
+			clientId,
+			( childStyle, state ) =>
+				// The rotate helpers type the style loosely. An undefined
+				// style, when nothing is left in it, clears the attribute.
+				getUpdatedRotateStyle(
+					childStyle,
+					angle,
+					state
+				) as GridBlockStyle
+		);
 	}
 
 	return (
@@ -587,13 +636,23 @@ function GridTools( {
 				parentLayout={ parentLayout }
 				childGridClientId={ childGridClientId }
 			/>
-			{ showResizer && (
+			{ showResizer && ! isRotated && (
 				<GridItemResizer
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.
 					bounds={ resizerBounds }
 					onChange={ updateLayout }
 					parentLayout={ parentLayout }
+				/>
+			) }
+			{ showRotator && (
+				<GridItemRotator
+					clientId={ clientId }
+					angle={ rotate }
+					onPreview={ ( angle ) =>
+						setIsPreviewRotated( angle === null ? null : !! angle )
+					}
+					onChange={ updateRotate }
 				/>
 			) }
 			{ isManualGrid && (

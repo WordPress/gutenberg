@@ -46,7 +46,7 @@ type GridStyle = {
 
 /**
  * Gets the CSS that stacks the children of a grid: each child becomes full
- * width, in block order.
+ * width, in block order, and unrotated.
  *
  * Each child still spans as many rows as it does in the grid, reading the
  * count from `--wp--grid-item--row-span`, which children of manual grids set.
@@ -61,7 +61,8 @@ type GridStyle = {
  */
 function getStackingStyle( selector: string ): string {
 	// The selector is repeated so that the rules beat the grid's and each
-	// child's own rules, whatever order the stylesheets end up in.
+	// child's own rules, such as rotation, whatever order the stylesheets end
+	// up in.
 	const gridSelector = selector
 		.split( ',' )
 		.map( ( subselector ) => `${ subselector }${ subselector }` )
@@ -76,7 +77,7 @@ function getStackingStyle( selector: string ): string {
 	// blocks that fill fixed cells keep their own size.
 	return (
 		`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }` +
-		`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }`
+		`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }`
 	);
 }
 

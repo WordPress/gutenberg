@@ -82,6 +82,8 @@ export interface GridItemResizerProps {
 	onChange: ( layout: GridItemLayout ) => void;
 	/** Layout of the grid block. */
 	parentLayout: Layout;
+	/** Rotation of the grid item in degrees, which the handles follow. */
+	angle?: number;
 }
 
 export interface GridItemResizerInnerProps extends Omit<
@@ -91,6 +93,7 @@ export interface GridItemResizerInnerProps extends Omit<
 	blockElement: HTMLElement;
 	rootBlockElement: HTMLElement;
 	isManualGrid?: boolean;
+	angle: number;
 }
 
 export interface GridItemMoversProps {
@@ -243,8 +246,11 @@ export interface GridItemMeasurements {
 	rowTracks: GridTrack[];
 	/** The blocks in the grid, other than the dragged one. */
 	siblings: GridSibling[];
-	/** The dragged block, or null when it isn't in the grid. */
-	src: { pixelRect: GridPixelRect; rect: GridRect } | null;
+	/**
+	 * The dragged block, unrotated, with its rotation in degrees, or null when
+	 * it isn't in the grid.
+	 */
+	src: { pixelRect: GridPixelRect; rect: GridRect; angle: number } | null;
 }
 
 /**

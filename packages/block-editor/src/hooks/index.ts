@@ -24,6 +24,7 @@ import textShadow from './text-shadow';
 import fitText from './fit-text';
 import border from './border';
 import customCSS from './custom-css';
+import rotate from './rotate';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
@@ -43,6 +44,7 @@ createBlockEditFilter(
 		anchor,
 		customClassName,
 		style,
+		rotate,
 		customCSS,
 		duotone,
 		fitText,
@@ -70,6 +72,7 @@ createBlockListBlockFilter( [
 	fitText,
 	border,
 	customCSS,
+	rotate,
 	position,
 	blockStyleVariation,
 	childLayout,
