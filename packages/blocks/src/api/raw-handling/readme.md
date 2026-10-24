@@ -24,5 +24,5 @@ This folder contains all paste specific logic (filters, converters, normalisers.
 
 ## Other notable capabilities
 
--   Filters out analytics trackers in the form of images.
--   Pasting a single images (if the browser provides image data).
+- Filters out analytics trackers in the form of images.
+- Pasting a single images (if the browser provides image data).

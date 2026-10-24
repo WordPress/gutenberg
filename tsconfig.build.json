@@ -43,6 +43,7 @@
 		{ "path": "packages/global-styles-ui/tsconfig.build.json" },
 		{ "path": "packages/grid/tsconfig.build.json" },
 		{ "path": "packages/hooks/tsconfig.build.json" },
+		{ "path": "packages/html-api/tsconfig.build.json" },
 		{ "path": "packages/html-entities/tsconfig.build.json" },
 		{ "path": "packages/i18n/tsconfig.build.json" },
 		{ "path": "packages/icons/tsconfig.build.json" },

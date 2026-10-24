@@ -5,7 +5,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 } from '../registration';
-import { getSaveContent } from '../serializer';
+import { getSaveContent, serializeBlock } from '../serializer';
 import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
@@ -13,6 +13,12 @@ import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import {
+	addSource,
+	isUndelimitedEnabled,
+	parseUndelimited,
+	splitInnerBlocks,
+} from '../undelimited';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
 
 /**
@@ -150,18 +156,108 @@ function applyBlockValidation(
 	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
 }
 
+interface ParseContext {
+	isTopLevel?: boolean;
+	writtenBlocks?: WeakMap< RawBlock, string >;
+}
+
+// The default block parser's pattern for delimiters.
+const DELIMITER =
+	/<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
+
+/**
+ * Finds the text each block was written as, so it can be saved exactly that
+ * way. The parser doesn't report where blocks start and end, so this walks
+ * the delimiters the same way; blocks appear in the order of their openers.
+ *
+ * @param content   Post content.
+ * @param rawBlocks Blocks the parser read from it.
+ */
+function getWrittenBlocks(
+	content: string,
+	rawBlocks: RawBlock[]
+): WeakMap< RawBlock, string > {
+	const written: Array< { name: string; text?: string } > = [];
+	const open: Array< { index: number; start: number } > = [];
+	for ( const match of content.matchAll( DELIMITER ) ) {
+		const [ token, isCloser, namespace, name, , , isVoid ] = match;
+		const start = match.index as number;
+		if ( isCloser ) {
+			const opener = open.pop();
+			if ( opener ) {
+				written[ opener.index ].text = content.slice(
+					opener.start,
+					start + token.length
+				);
+			}
+			continue;
+		}
+		written.push( {
+			name: ( namespace ?? 'core/' ) + name,
+			text: isVoid ? token : undefined,
+		} );
+		if ( ! isVoid ) {
+			open.push( { index: written.length - 1, start } );
+		}
+	}
+
+	const writtenBlocks = new WeakMap< RawBlock, string >();
+	let index = 0;
+	const visit = ( rawBlock: RawBlock ) => {
+		if ( rawBlock.blockName ) {
+			const { name, text } = written[ index++ ] ?? {};
+			if ( text && name === rawBlock.blockName ) {
+				writtenBlocks.set( rawBlock, text );
+			}
+		}
+		rawBlock.innerBlocks?.forEach( visit );
+	};
+	rawBlocks.forEach( visit );
+	return writtenBlocks;
+}
+
+/**
+ * Whether saving a block and reading it back gives the same block.
+ *
+ * @param block Block.
+ */
+function isStable( block: Block ): boolean {
+	const html = serializeBlock( block );
+	const [ rawBlock ] = grammarParse( html );
+	const blockType = getBlockType( block.name );
+	if ( ! rawBlock || ! blockType ) {
+		return false;
+	}
+	const readBack = createBlock(
+		block.name,
+		getBlockAttributes(
+			blockType,
+			rawBlock.innerHTML,
+			rawBlock.attrs ?? {}
+		)
+	);
+	return (
+		validateBlock( readBack, blockType )[ 0 ] &&
+		serializeBlock( readBack ) === html
+	);
+}
+
 /**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
  * @param rawBlock The raw block object.
  * @param options  Extra options for handling block parsing.
+ * @param context  Whether the block is top level, and the text each block was
+ *                 written as, for optional block delimiters.
  *
  * @return Fully parsed block.
  */
 export function parseRawBlock(
 	rawBlock: RawBlock,
-	options?: ParseOptions
+	options?: ParseOptions,
+	context: ParseContext = {}
 ): Block | undefined {
+	const { isTopLevel = false, writtenBlocks } = context;
 	let normalizedBlock = normalizeRawBlock( rawBlock, options );
 
 	// During the lifecycle of the project, we renamed some old blocks
@@ -192,9 +288,27 @@ export function parseRawBlock(
 
 	// Parse inner blocks recursively.
 	const parsedInnerBlocks = normalizedBlock.innerBlocks
-		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
+		.map( ( innerBlock ) =>
+			parseRawBlock( innerBlock, options, { writtenBlocks } )
+		)
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
+
+	// With optional delimiters, remember the block as written, so it can be
+	// saved that way unless it's edited. `content` is the HTML to apply edits
+	// to; a migrated block uses its new `save` output.
+	const withSource = ( block: Block, content?: string ) =>
+		isUndelimitedEnabled()
+			? addSource(
+					block,
+					writtenBlocks?.get( rawBlock ) ??
+						serializeRawBlock( rawBlock ),
+					content,
+					{
+						isInnerBlocks: ! isTopLevel,
+					}
+				)
+			: block;
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
@@ -216,9 +330,18 @@ export function parseRawBlock(
 		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
 			normalizedBlock.innerHTML,
 		];
+		if ( isUndelimitedEnabled() ) {
+			Object.assign(
+				parsedBlock,
+				splitInnerBlocks(
+					parsedBlock.innerContent,
+					parsedBlock.innerBlocks
+				)
+			);
+		}
 		parsedBlock.isValid = true;
 		parsedBlock.validationIssues = [];
-		return parsedBlock;
+		return withSource( parsedBlock, normalizedBlock.innerHTML );
 	}
 
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
@@ -233,6 +356,22 @@ export function parseRawBlock(
 		normalizedBlock,
 		blockType
 	);
+
+	// With optional delimiters, a block keeps HTML its `save` doesn't
+	// produce, unless an older version of the block reads it into a block
+	// that survives being saved and read again.
+	if (
+		! validatedBlock.isValid &&
+		isTopLevel &&
+		! parsedInnerBlocks.length &&
+		isUndelimitedEnabled() &&
+		! ( updatedBlock.isValid && isStable( updatedBlock ) )
+	) {
+		return withSource(
+			{ ...validatedBlock, isValid: true, validationIssues: [] },
+			normalizedBlock.innerHTML
+		);
+	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block
@@ -264,7 +403,13 @@ export function parseRawBlock(
 		validationIssues!.forEach( ( { log, args } ) => log( ...args ) );
 	}
 
-	return updatedBlock;
+	if ( ! updatedBlock.isValid ) {
+		return updatedBlock;
+	}
+	return withSource(
+		updatedBlock,
+		updatedBlock === validatedBlock ? normalizedBlock.innerHTML : undefined
+	);
 }
 
 /**
@@ -292,17 +437,38 @@ export default function parse(
 	content: string,
 	options?: ParseOptions
 ): Block[] {
-	return grammarParse( content ).reduce(
-		( accumulator: Block[], rawBlock ) => {
-			const block = parseRawBlock(
-				rawBlock as unknown as RawBlock,
-				options
-			);
-			if ( block ) {
-				accumulator.push( block );
+	const blocks: Block[] = [];
+	// With optional delimiters, whitespace between blocks is kept with them.
+	let whitespace = '';
+	const rawBlocks = grammarParse( content ) as unknown as RawBlock[];
+	const writtenBlocks = isUndelimitedEnabled()
+		? getWrittenBlocks( content, rawBlocks )
+		: undefined;
+	for ( const rawBlock of rawBlocks ) {
+		// HTML outside delimiters is read as blocks, not one Classic block.
+		if ( ! rawBlock.blockName && isUndelimitedEnabled() ) {
+			const undelimitedBlocks = parseUndelimited( rawBlock.innerHTML );
+			if ( ! undelimitedBlocks.length ) {
+				whitespace += rawBlock.innerHTML;
 			}
-			return accumulator;
-		},
-		[] as Block[]
-	);
+			blocks.push( ...undelimitedBlocks );
+			continue;
+		}
+		const block = parseRawBlock( rawBlock, options, {
+			isTopLevel: true,
+			writtenBlocks,
+		} );
+		if ( block ) {
+			if ( block.undelimitedSource ) {
+				block.undelimitedSource.before = whitespace;
+				whitespace = '';
+			}
+			blocks.push( block );
+		}
+	}
+	const lastSource = blocks[ blocks.length - 1 ]?.undelimitedSource;
+	if ( lastSource ) {
+		lastSource.after += whitespace;
+	}
+	return blocks;
 }

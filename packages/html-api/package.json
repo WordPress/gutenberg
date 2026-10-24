@@ -1,0 +1,48 @@
+{
+	"name": "@wordpress/html-api",
+	"version": "1.0.0-prerelease",
+	"description": "Reads and edits HTML one token at a time, keeping everything it does not change exactly as written. A port of the WordPress HTML API.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"html",
+		"parser"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/html-api/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/html-api"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "build-types",
+	"sideEffects": false,
+	"devDependencies": {
+		"vitest": "^5.0.3"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

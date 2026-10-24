@@ -34,6 +34,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-optional-block-delimiters',
+					'label'       => __( 'Optional block delimiters', 'gutenberg' ),
+					'description' => __( 'Opens plain HTML, like classic posts, as blocks instead of a Classic block, and saves new and edited blocks without block delimiters when they aren’t needed. Blocks you don’t edit are saved exactly as they were written.', 'gutenberg' ),
+				),
 			),
 		),
 		array(
