@@ -1,5 +1,6 @@
 import { fixCustomClassname } from './fix-custom-classname';
 import { fixGlobalAttribute } from './fix-global-attribute';
+import { fixHtmlAttributes } from './fix-html-attributes';
 import type { Block, BlockAttribute, BlockType } from '../../types';
 
 const ARIA_LABEL_ATTR_SCHEMA: BlockAttribute = {
@@ -57,6 +58,13 @@ export function applyBuiltInValidationFixes(
 		'anchor',
 		'data-anchor',
 		ANCHOR_ATTR_SCHEMA
+	);
+
+	// Keep any other attributes of the root element.
+	updatedBlockAttributes = fixHtmlAttributes(
+		updatedBlockAttributes,
+		blockType,
+		originalContent ?? ''
 	);
 
 	return {
