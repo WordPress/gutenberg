@@ -36,6 +36,12 @@
 		}
 	}
 
+	// Make the icons bigger for the logos only style.
+	&.is-style-logos-only .wp-social-link svg {
+		width: 1.25em;
+		height: 1.25em;
+	}
+
 	// Icon sizes.
 	// Small.
 	&.has-small-icon-size {
@@ -122,12 +128,6 @@
 :where(.wp-block-social-links.is-style-logos-only) {
 	.wp-social-link {
 		background: none;
-
-		// Make these bigger.
-		svg {
-			width: 1.25em;
-			height: 1.25em;
-		}
 	}
 
 	@include socials-without-bg;
