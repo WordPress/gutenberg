@@ -36,6 +36,9 @@
 		}
 	},
 	"supports": {
+		"layout": {
+			"allowEditing": false
+		},
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -84,8 +87,10 @@
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"margin": false,
-				"padding": false
-			}
+				"padding": false,
+				"blockGap": false
+			},
+			"blockGap": true
 		},
 		"shadow": true,
 		"__unstablePasteTextInline": true,
