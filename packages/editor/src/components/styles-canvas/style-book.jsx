@@ -9,12 +9,14 @@ function StyleBookWithNavigation( {
 	onPathChange,
 	userConfig,
 	forwardedRef,
+	headerActions,
 } ) {
 	return (
 		<StyleBook
 			ref={ forwardedRef }
 			path={ path }
 			userConfig={ userConfig }
+			headerActions={ headerActions }
 			isSelected={ ( blockName ) =>
 				// Match '/blocks/core%2Fbutton' and
 				// '/blocks/core%2Fbutton/typography', but not
@@ -47,7 +49,12 @@ function StyleBookWithNavigation( {
 	);
 }
 
-function StylesCanvasRevisionStyleBook( { path, onPathChange, forwardedRef } ) {
+function StylesCanvasRevisionStyleBook( {
+	path,
+	onPathChange,
+	forwardedRef,
+	headerActions,
+} ) {
 	const { user: userConfig } = useGlobalStyles();
 	const { revisions, isLoading } = useGlobalStylesRevisions();
 
@@ -66,7 +73,7 @@ function StylesCanvasRevisionStyleBook( { path, onPathChange, forwardedRef } ) {
 	}, [ revisionId, revisions ] );
 
 	if ( isLoading ) {
-		return null;
+		return headerActions;
 	}
 
 	return (
@@ -75,6 +82,7 @@ function StylesCanvasRevisionStyleBook( { path, onPathChange, forwardedRef } ) {
 			path={ path }
 			onPathChange={ onPathChange }
 			userConfig={ selectedRevision || userConfig }
+			headerActions={ headerActions }
 		/>
 	);
 }
@@ -83,19 +91,21 @@ function StylesCanvasRevisionStyleBook( { path, onPathChange, forwardedRef } ) {
  * Style Book content component for global styles.
  * Provides the business logic for StyleBook behavior in the global styles context.
  *
- * @param {Object}             props              Component props.
- * @param {string}             props.path         Current path in global styles.
- * @param {Function}           props.onPathChange Callback when the path changes.
- * @param {React.ForwardedRef} ref                Ref to the Style Book component.
+ * @param {Object}             props               Component props.
+ * @param {string}             props.path          Current path in global styles.
+ * @param {Function}           props.onPathChange  Callback when the path changes.
+ * @param {React.ReactNode}    props.headerActions Actions following the tabs.
+ * @param {React.ForwardedRef} ref                 Ref to the Style Book component.
  * @return {React.JSX.Element} The Style Book component.
  */
-function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
+function StylesCanvasStyleBook( { path, onPathChange, headerActions }, ref ) {
 	if ( path?.startsWith( '/revisions' ) ) {
 		return (
 			<StylesCanvasRevisionStyleBook
 				forwardedRef={ ref }
 				path={ path }
 				onPathChange={ onPathChange }
+				headerActions={ headerActions }
 			/>
 		);
 	}
@@ -105,6 +115,7 @@ function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
 			forwardedRef={ ref }
 			path={ path }
 			onPathChange={ onPathChange }
+			headerActions={ headerActions }
 		/>
 	);
 }

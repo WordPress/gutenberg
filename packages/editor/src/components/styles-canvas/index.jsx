@@ -4,7 +4,13 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
-import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import {
+	useFocusOnMount,
+	useFocusReturn,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import StylesCanvasStyleBook from './style-book';
@@ -62,6 +68,41 @@ export default function StylesCanvas() {
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
+	const sectionRef = useMergeRefs( [
+		sectionFocusReturnRef,
+		focusOnMountRef,
+	] );
+	const restoreCloseFocusRef = useRef( false );
+	const closeButtonRef = useRefEffect(
+		( /** @type {HTMLButtonElement} */ node ) => {
+			if ( restoreCloseFocusRef.current ) {
+				node.focus( { preventScroll: true } );
+				restoreCloseFocusRef.current = false;
+			}
+			return () => {
+				// Keep focus on Close when a loaded revision replaces the loading view.
+				restoreCloseFocusRef.current =
+					node.ownerDocument.activeElement === node;
+			};
+		},
+		[]
+	);
+
+	const title = getStylesCanvasTitle( stylesPath, showStylebook );
+	const onCloseCanvas = () => {
+		setIsListViewOpened( showListViewByDefault );
+		resetStylesNavigation();
+	};
+	const closeButton = ! isPreviewMode && (
+		<Button
+			ref={ closeButtonRef }
+			size="compact"
+			className="editor-styles-canvas__close-button"
+			icon={ closeSmall }
+			label={ __( 'Close' ) }
+			onClick={ onCloseCanvas }
+		/>
+	);
 
 	// Determine what content to render
 	let content = null;
@@ -71,23 +112,12 @@ export default function StylesCanvas() {
 			<StylesCanvasStyleBook
 				path={ stylesPath }
 				onPathChange={ setStylesPath }
-				ref={ sectionFocusReturnRef }
+				headerActions={ closeButton }
 			/>
 		);
 	} else if ( stylesPath?.startsWith( '/revisions' ) ) {
-		content = (
-			<StylesCanvasRevisions
-				path={ stylesPath }
-				ref={ sectionFocusReturnRef }
-			/>
-		);
+		content = <StylesCanvasRevisions path={ stylesPath } />;
 	}
-
-	const title = getStylesCanvasTitle( stylesPath, showStylebook );
-	const onCloseCanvas = () => {
-		setIsListViewOpened( showListViewByDefault );
-		resetStylesNavigation();
-	};
 
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
@@ -108,19 +138,11 @@ export default function StylesCanvas() {
 			<ResizableEditor enableResizing={ false }>
 				<section
 					className="editor-styles-canvas__section"
-					ref={ isPreviewMode ? undefined : focusOnMountRef }
+					ref={ isPreviewMode ? sectionFocusReturnRef : sectionRef }
 					onKeyDown={ isPreviewMode ? undefined : closeOnEscape }
 					aria-label={ title }
 				>
-					{ ! isPreviewMode && (
-						<Button
-							size="compact"
-							className="editor-styles-canvas__close-button"
-							icon={ closeSmall }
-							label={ __( 'Close' ) }
-							onClick={ onCloseCanvas }
-						/>
-					) }
+					{ ! showStylebook && closeButton }
 					{ content }
 				</section>
 			</ResizableEditor>
