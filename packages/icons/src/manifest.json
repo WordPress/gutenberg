@@ -552,7 +552,7 @@
 		"slug": "error",
 		"label": "Error",
 		"filePath": "library/error.svg",
-		"collections": [ "core" ],
+		"collections": [ "core", "core-admin" ],
 		"keywords": [ "alert", "caution", "exclamation", "warning" ]
 	},
 	{
@@ -818,7 +818,7 @@
 		"slug": "info",
 		"label": "Info",
 		"filePath": "library/info.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "inline-image",
@@ -1244,7 +1244,8 @@
 	{
 		"slug": "post-comments",
 		"label": "Post Comments",
-		"filePath": "library/post-comments.svg"
+		"filePath": "library/post-comments.svg",
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "post-comments-count",
