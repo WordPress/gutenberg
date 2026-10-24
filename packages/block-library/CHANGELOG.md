@@ -42,6 +42,10 @@
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
 -   Navigation Link: Apply the "Open in new tab" setting from the link popover. Clicking Apply dropped the change, so the setting could only be changed from the block settings sidebar. The Submenu block had the same problem ([#83506](https://github.com/WordPress/gutenberg/pull/83506)).
 
+### Bug Fixes
+
+-   Spacer: Hide resize handles when custom spacing sizes are disabled, preserving preset dimensions ([#84518](https://github.com/WordPress/gutenberg/pull/84518)).
+
 ## 11.2.0 (2026-10-07)
 
 ### Enhancements

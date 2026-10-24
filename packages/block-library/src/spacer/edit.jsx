@@ -348,6 +348,7 @@ const SpacerEdit = ( {
 				} ) }
 			>
 				{ blockEditingMode === 'default' &&
+					! disableCustomSpacingSizes &&
 					resizableBoxWithOrientation( inheritedOrientation ) }
 			</div>
 			{ ! isFlexLayout && (
