@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { AiPluginCallout } from '../ai-plugin-callout';
+import { installPluginViaWpUpdates } from '../use-connector-plugin';
 
 vi.mock(
 	import( '@wordpress/a11y' ),
@@ -112,6 +113,11 @@ vi.mock(
 		} ) as unknown as typeof import( '../default-connectors' )
 );
 
+vi.mock( import( '../use-connector-plugin' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	installPluginViaWpUpdates: vi.fn(),
+} ) );
+
 vi.mock(
 	import( '../wp-logo-decoration' ),
 	() =>
@@ -181,6 +187,9 @@ describe( 'AiPluginCallout', () => {
 				mapSelect( () => selectorStore )
 		);
 
+		vi.mocked( installPluginViaWpUpdates ).mockReset();
+		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue( 'installed' );
+
 		mockSaveEntityRecord.mockReset();
 		mockSaveEntityRecord.mockResolvedValue( undefined );
 		mockCreateSuccessNotice.mockReset();
@@ -221,5 +230,92 @@ describe( 'AiPluginCallout', () => {
 				{ throwOnError: true }
 			);
 		} );
+
+		expect( installPluginViaWpUpdates ).not.toHaveBeenCalled();
+	} );
+
+	it( 'falls back to wp.updates then activates when the REST install reports fs_unavailable', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+		// The REST install (using `slug`) is rejected up front; the
+		// subsequent activate (using `plugin`) succeeds.
+		mockSaveEntityRecord.mockImplementation(
+			(
+				_kind: string,
+				_name: string,
+				record: Record< string, unknown >
+			) =>
+				'slug' in record
+					? Promise.reject( { code: 'fs_unavailable' } )
+					: Promise.resolve( undefined )
+		);
+		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue( 'installed' );
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
+		} );
+
+		await waitFor( () => {
+			expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
+				'root',
+				'plugin',
+				{ plugin: 'ai/ai', status: 'active' },
+				{ throwOnError: true }
+			);
+		} );
+
+		expect( mockCreateErrorNotice ).not.toHaveBeenCalled();
+	} );
+
+	it( 'aborts silently when the filesystem credentials modal is canceled', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+		mockSaveEntityRecord.mockRejectedValue( { code: 'fs_unavailable' } );
+		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue( 'canceled' );
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
+		} );
+
+		// Only the initial REST install attempt ran: no activate follow-up
+		// and no error notice.
+		expect( mockSaveEntityRecord ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateErrorNotice ).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows an error notice when the REST install fails for another reason', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+		mockSaveEntityRecord.mockRejectedValue( {
+			code: 'rest_cannot_install',
+		} );
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( mockCreateErrorNotice ).toHaveBeenCalled();
+		} );
+
+		// A non-filesystem error must not trigger the wp.updates fallback.
+		expect( installPluginViaWpUpdates ).not.toHaveBeenCalled();
 	} );
 } );
