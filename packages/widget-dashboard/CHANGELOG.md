@@ -17,6 +17,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Give each widget its type's translated title through the `title` host capability, on the dashboard and in its previews ([#84738](https://github.com/WordPress/gutenberg/pull/84738)).
+
 ### Internal
 
 -   Update `@testing-library/user-event` to 14.6.8 for Widget Dashboard tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).

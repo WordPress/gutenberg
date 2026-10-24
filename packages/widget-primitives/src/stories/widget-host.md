@@ -14,7 +14,7 @@ A widget renders inside a host, and the host inside an application. Some of what
 
 The provider merges its value over the inherited one, so an application can mount a base host once and layer capabilities per subtree. Reading without any provider yields `{}`.
 
-The application mounts the provider, wrapping the dashboard or whatever surface renders widgets, and the rendering engine keeps no dependency on the application's router. A host nests one only to bind a capability to the instance it renders, as `actions` below.
+The application mounts the provider, wrapping the dashboard or whatever surface renders widgets, and the rendering engine keeps no dependency on the application's router. A host nests one only to bind a capability to the instance it renders, as `actions` and `title` below.
 
 ## The `links` capability
 
@@ -45,6 +45,14 @@ actions: {
 `declare` replaces the runtime actions of one instance; an empty list withdraws them. The host binds it to the instance it renders, so the widget never names which instance it is. `WidgetRender` joins what every `useWidgetActions` call under it declares, so `declare` always receives the whole list.
 
 The list carries data, not UI: placement and materialization stay the host's. The widget's side is `useWidgetActions`, and the Actions page covers how the list joins the declared actions.
+
+## The `title` capability
+
+```ts
+title: string;
+```
+
+The translated title of the widget the host renders: the one the host shows in its header, translated on the server from `widget.json`.
 
 ## Providing it
 
@@ -93,6 +101,19 @@ const host = useMemo< WidgetHost >(
 ```
 
 A host that mounts an instance twice, as a drag preview does, keeps each render's list apart, so one unmounting does not withdraw the other's.
+
+### `title`, per instance
+
+The same nested provider carries the title of the widget it wraps:
+
+```tsx
+const host = useMemo< WidgetHost >(
+	() => ( { title: widgetType.title } ),
+	[ widgetType.title ]
+);
+```
+
+A host with no title to give, such as a story that mounts a render component directly, leaves it out.
 
 ## Consuming it
 
