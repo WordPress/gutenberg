@@ -26,8 +26,8 @@ async function isPortAvailable( port ) {
 		server.once( 'listening', () => {
 			server.close( () => {
 				// Listening can succeed while another server answers on the
-				// port: one on 127.0.0.1 or ::1 only, or, on Windows, one
-				// that set SO_REUSEADDR, like PHP's built-in server.
+				// port: one on another address, or, on Windows, one that set
+				// SO_REUSEADDR, like PHP's built-in server.
 				const socket = net.connect( port, 'localhost' );
 				socket.once( 'connect', () => {
 					socket.destroy();
@@ -37,7 +37,8 @@ async function isPortAvailable( port ) {
 			} );
 		} );
 
-		server.listen( port, '0.0.0.0' );
+		// Only this computer, so Windows doesn't ask to open the firewall.
+		server.listen( port, '127.0.0.1' );
 	} );
 }
 
