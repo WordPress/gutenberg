@@ -60,6 +60,21 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.cropper.isDirty ).toBe( true );
 			expect( result.current.hasOutputEdits ).toBe( true );
 		} );
+
+		it( 'counts a named edit as a session edit only', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+
+			expect( result.current.edits ).toEqual( {
+				'test/vignette': { amount: 0.5 },
+			} );
+			expect( result.current.isDirty ).toBe( true );
+			expect( result.current.cropper.isDirty ).toBe( false );
+			expect( result.current.hasOutputEdits ).toBe( false );
+		} );
 	} );
 
 	describe( 'history — undo / redo across slices', () => {

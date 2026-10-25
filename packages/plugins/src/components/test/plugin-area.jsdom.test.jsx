@@ -87,6 +87,30 @@ describe( 'PluginArea', () => {
 		expect( container ).toHaveTextContent( 'plugin: two.' );
 	} );
 
+	test( 'keeps rerendering after another PluginArea unmounts', () => {
+		registerPlugin( 'one', {
+			render: () => <TestComponent content="one" />,
+			icon: 'smiley',
+			scope: 'my-app',
+		} );
+
+		const { container } = render( <PluginArea scope="my-app" /> );
+		const { unmount: unmountOther } = render(
+			<PluginArea scope="other-app" />
+		);
+		unmountOther();
+
+		act( () => {
+			registerPlugin( 'two', {
+				render: () => <TestComponent content="two" />,
+				icon: 'smiley',
+				scope: 'my-app',
+			} );
+		} );
+
+		expect( container ).toHaveTextContent( 'plugin: one.plugin: two.' );
+	} );
+
 	test( 'does not rerender when a plugin is added to a different scope', () => {
 		const ComponentSpy = vi.fn( ( { content } ) => {
 			return `plugin: ${ content }.`;

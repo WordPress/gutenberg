@@ -1,4 +1,5 @@
 import memoize from 'memize';
+import { useInstanceId } from '@wordpress/compose';
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
@@ -59,6 +60,10 @@ function PluginArea( {
 	scope?: string;
 	onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void;
 } ) {
+	// A namespace of this instance's own: `removeAction` removes every
+	// callback registered under a namespace, so instances sharing one would
+	// unsubscribe each other when one of them unmounts.
+	const namespace = useInstanceId( PluginArea, 'core/plugins/plugin-area' );
 	const store = useMemo( () => {
 		let lastValue: WPPlugin[] = [];
 
@@ -69,25 +74,11 @@ function PluginArea( {
 					name: WPPlugin[ 'name' ]
 				) => void
 			) {
-				addAction(
-					'plugins.pluginRegistered',
-					'core/plugins/plugin-area/plugins-registered',
-					listener
-				);
-				addAction(
-					'plugins.pluginUnregistered',
-					'core/plugins/plugin-area/plugins-unregistered',
-					listener
-				);
+				addAction( 'plugins.pluginRegistered', namespace, listener );
+				addAction( 'plugins.pluginUnregistered', namespace, listener );
 				return () => {
-					removeAction(
-						'plugins.pluginRegistered',
-						'core/plugins/plugin-area/plugins-registered'
-					);
-					removeAction(
-						'plugins.pluginUnregistered',
-						'core/plugins/plugin-area/plugins-unregistered'
-					);
+					removeAction( 'plugins.pluginRegistered', namespace );
+					removeAction( 'plugins.pluginUnregistered', namespace );
 				};
 			},
 			getValue() {
@@ -100,7 +91,7 @@ function PluginArea( {
 				return lastValue;
 			},
 		};
-	}, [ scope ] );
+	}, [ scope, namespace ] );
 
 	const plugins = useSyncExternalStore(
 		store.subscribe,
