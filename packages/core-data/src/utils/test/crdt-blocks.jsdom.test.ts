@@ -38,6 +38,16 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 			},
 		},
 		{
+			name: 'core/test-default-array',
+			attributes: {
+				rows: {
+					type: 'array',
+					default: [],
+					query: { value: { type: 'string' } },
+				},
+			},
+		},
+		{
 			name: 'core/image',
 			attributes: {
 				blob: { type: 'string', role: 'local' },
@@ -3308,6 +3318,78 @@ describe( 'crdt-blocks', () => {
 			);
 
 			expect( updates ).toBe( 0 );
+		} );
+
+		it( 'preserves both notes when users add to a block with a single note id', () => {
+			// Older content stores a single note id instead of a list.
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: 5 } ) ],
+				null
+			);
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 5, 101 ] } ) ],
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks2,
+				[ makeNoteBlock( { noteId: [ 5, 102 ] } ) ],
+				null
+			);
+
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+			Y.applyUpdate( doc, Y.encodeStateAsUpdate( doc2 ) );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const metadata = getDeserializedMetadata( checkBlocks );
+				const noteIds = ( metadata?.noteId as number[] ) ?? [];
+				expect( [ ...noteIds ].sort() ).toEqual( [ 101, 102, 5 ] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'keeps a single note id when merging it again', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: 5 } ) ],
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: 5 } ) ],
+				null
+			);
+
+			expect( getDeserializedMetadata( yblocks )?.noteId ).toEqual( [
+				5,
+			] );
+		} );
+
+		it( 'keeps empty arrays that have a schema default', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[
+					{
+						name: 'core/test-default-array',
+						attributes: { rows: [] },
+						innerBlocks: [],
+						clientId: 'block-1',
+					},
+				],
+				null
+			);
+
+			const [ block ] = deserializeBlockAttributes(
+				yblocks.toJSON() as Block[]
+			);
+			expect( block.attributes.rows ).toEqual( [] );
 		} );
 
 		it( 'keeps array attributes not declared in a query as plain values', () => {

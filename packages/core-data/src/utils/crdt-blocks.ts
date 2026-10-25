@@ -20,6 +20,7 @@ interface BlockAttributes {
 }
 
 interface BlockAttributeSchema {
+	default?: unknown;
 	role?: string;
 	type?: string;
 	query?: Record< string, BlockAttributeSchema >;
@@ -274,7 +275,8 @@ function withoutEmptyDeclaredContainers(
 
 /**
  * Recursively strip a value's empty declared containers, returning undefined
- * once nothing is left.
+ * once nothing is left. A value whose schema has a default is a real value
+ * the block expects, not a materialized container, so it is kept as is.
  *
  * @param schema The attribute type definition for this value.
  * @param value  The value, as plain values from toJSON().
@@ -284,6 +286,10 @@ function withoutEmptyDeclaredValues(
 	schema: BlockAttributeSchema,
 	value: unknown
 ): unknown {
+	if ( schema.default !== undefined ) {
+		return value;
+	}
+
 	if ( schema.type === 'array' ) {
 		return Array.isArray( value ) && value.length === 0 ? undefined : value;
 	}
@@ -466,16 +472,13 @@ function createYValueFromSchema(
 	// that concurrent insertions are preserved. Other arrays without a query
 	// schema, such as a block setting, are replaced as a whole, so they stay
 	// plain values.
-	if (
-		inQuery &&
-		schema.type === 'array' &&
-		Array.isArray( value ) &&
-		value.every( ( item ) => item === null || typeof item !== 'object' )
-	) {
+	const list = inQuery ? toPrimitiveList( schema, value ) : undefined;
+
+	if ( list ) {
 		const yArray = new Y.Array< unknown >();
 
-		if ( value.length > 0 ) {
-			yArray.insert( 0, value );
+		if ( list.length > 0 ) {
+			yArray.insert( 0, list );
 		}
 
 		return yArray;
@@ -486,6 +489,37 @@ function createYValueFromSchema(
 	}
 
 	return value;
+}
+
+/**
+ * Read a value as a list of primitives, for an array schema without a query.
+ *
+ * A single primitive counts as a one-item list, so a value stored in an older
+ * scalar format (such as a single note id) shares the same container as the
+ * list format instead of replacing it.
+ *
+ * @param schema The attribute type definition.
+ * @param value  The plain JS value.
+ * @return The list, or undefined when the value is not a list of primitives.
+ */
+function toPrimitiveList(
+	schema: BlockAttributeSchema | undefined,
+	value: unknown
+): unknown[] | undefined {
+	if ( schema?.type !== 'array' || schema.query ) {
+		return undefined;
+	}
+
+	const isPrimitive = ( item: unknown ) =>
+		item === null || typeof item !== 'object';
+
+	if ( Array.isArray( value ) ) {
+		return value.every( isPrimitive ) ? value : undefined;
+	}
+
+	return value !== undefined && value !== null && isPrimitive( value )
+		? [ value ]
+		: undefined;
 }
 
 /**
@@ -1078,6 +1112,7 @@ function mergeYValue(
 	inQuery = false
 ): void {
 	const currentVal = yMap.get( key );
+	const newList = inQuery ? toPrimitiveList( schema, newVal ) : undefined;
 	if (
 		schema?.type === 'rich-text' &&
 		typeof newVal === 'string' &&
@@ -1095,13 +1130,8 @@ function mergeYValue(
 		currentVal instanceof Y.Array
 	) {
 		mergeYArray( currentVal, newVal, schema, cursorPosition, cursorScope );
-	} else if (
-		inQuery &&
-		schema?.type === 'array' &&
-		Array.isArray( newVal ) &&
-		currentVal instanceof Y.Array
-	) {
-		mergeYPlainArray( currentVal, newVal );
+	} else if ( newList && currentVal instanceof Y.Array ) {
+		mergeYPlainArray( currentVal, newList );
 	} else if (
 		schema?.type === 'object' &&
 		schema.query &&
@@ -1374,8 +1404,16 @@ function getBlockAttributeSchemas(
 				new Map< string, BlockAttributeSchema >(
 					Object.entries( blockType.attributes ?? {} ).map(
 						( [ name, definition ] ) => {
-							const { role, type, query } = definition;
-							return [ name, { role, type, query } ];
+							const {
+								default: defaultValue,
+								role,
+								type,
+								query,
+							} = definition;
+							return [
+								name,
+								{ default: defaultValue, role, type, query },
+							];
 						}
 					)
 				)
