@@ -1,7 +1,6 @@
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 import { UnforwardedTooltip } from '.';
-import { positionToPlacement } from '../popover/utils';
 import type { TooltipProps } from './types';
 
 function UnforwardedDeprecatedTooltip(
@@ -14,12 +13,7 @@ function UnforwardedDeprecatedTooltip(
 		alternative: 'Tooltip from @wordpress/ui',
 	} );
 
-	const placement =
-		props.placement === undefined && props.position !== undefined
-			? positionToPlacement( props.position )
-			: props.placement;
-
-	return UnforwardedTooltip( { ...props, placement }, ref );
+	return UnforwardedTooltip( props, ref );
 }
 
 /**
