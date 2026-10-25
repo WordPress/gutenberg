@@ -510,10 +510,12 @@ export const __unstableSerializeAndClean = ( () => {
 		// For compatibility, treat a post consisting of a
 		// single freeform block as legacy content and apply
 		// pre-block-editor removep'd content formatting.
+		// A delimited one isn't legacy content.
 		if (
 			effectiveBlocks.length === 1 &&
 			effectiveBlocks[ 0 ].name === getFreeformContentHandlerName() &&
-			effectiveBlocks[ 0 ].name === 'core/freeform'
+			effectiveBlocks[ 0 ].name === 'core/freeform' &&
+			! content.startsWith( '<!-- wp:' )
 		) {
 			content = removep( content );
 		}

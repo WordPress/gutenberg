@@ -825,6 +825,11 @@ export interface UndelimitedSource {
 	 */
 	after: string;
 	/**
+	 * Whether the block was the first one, so the whitespace before it starts
+	 * the content.
+	 */
+	isFirst: boolean;
+	/**
 	 * Whether the block was text without a wrapping element, such as a
 	 * paragraph in a classic post.
 	 */

@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `parse` reads HTML outside block delimiters as blocks instead of one Classic block, and `serialize` saves blocks that weren't edited as they were read: blocks with delimiters exactly, and HTML outside delimiters as the browser writes it, with nothing added. Blocks read without delimiters are saved without them unless an edit needs one; new blocks get delimiters as before ([#85524](https://github.com/WordPress/gutenberg/pull/85524)).
+-   `parse` reads HTML outside block delimiters as blocks instead of one Classic block, and `serialize` saves blocks that weren't edited as they were read: blocks with delimiters exactly, and HTML outside delimiters as the browser writes it, with nothing added. Blocks read without delimiters are saved without them unless an edit needs one; new blocks get delimiters, Classic blocks too ([#85524](https://github.com/WordPress/gutenberg/pull/85524)).
 
 ### Bug Fixes
 

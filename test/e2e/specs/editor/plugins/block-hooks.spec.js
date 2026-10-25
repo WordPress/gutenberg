@@ -244,6 +244,23 @@ test.describe( 'Block Hooks API', () => {
 				editor,
 				page,
 			} ) => {
+				// Classic content is read as blocks.
+				const expectedClassicBlocks = [
+					{
+						name: 'core/heading',
+						attributes: {
+							className: 'dummy-classic-heading',
+							content: 'This is a dummy heading',
+						},
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							className: 'dummy-classic-paragraph',
+							content: 'This is a dummy paragraph.',
+						},
+					},
+				];
 				const expectedHookedBlockLastChild = {
 					name: 'core/paragraph',
 					attributes: {
@@ -258,7 +275,7 @@ test.describe( 'Block Hooks API', () => {
 				await expect
 					.poll( editor.getBlocks )
 					.toMatchObject( [
-						{ name: 'core/freeform' },
+						...expectedClassicBlocks,
 						expectedHookedBlockLastChild,
 					] );
 
@@ -266,6 +283,8 @@ test.describe( 'Block Hooks API', () => {
 					getHookedBlockContent( 'last_child', blockType )
 				);
 				await editor.selectBlocks( hookedBlock );
+				// Move it above both classic blocks.
+				await editor.clickBlockToolbarButton( 'Move up' );
 				await editor.clickBlockToolbarButton( 'Move up' );
 
 				// Save updated post.
@@ -284,7 +303,7 @@ test.describe( 'Block Hooks API', () => {
 					.poll( editor.getBlocks )
 					.toMatchObject( [
 						expectedHookedBlockLastChild,
-						{ name: 'core/freeform' },
+						...expectedClassicBlocks,
 					] );
 
 				// Verify that the frontend reflects the changes made in the editor.

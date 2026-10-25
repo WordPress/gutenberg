@@ -264,9 +264,8 @@ export function parseRawBlock(
 		.filter( ( innerBlock ) => !! innerBlock );
 
 	// Remember the block as written, so it can be saved that way unless it's
-	// edited. `content` is the HTML to apply edits to; a migrated block uses
-	// its new `save` output.
-	const withSource = ( block: Block, content?: string ) =>
+	// edited. `content` is the HTML to apply edits to.
+	const withSource = ( block: Block, content: string ) =>
 		addSource(
 			block,
 			writtenBlocks?.get( rawBlock ) ?? serializeRawBlock( rawBlock ),
@@ -342,10 +341,14 @@ export function parseRawBlock(
 		validationIssues!.forEach( ( { log, args } ) => log( ...args ) );
 	}
 
-	return withSource(
-		updatedBlock,
-		updatedBlock === validatedBlock ? normalizedBlock.innerHTML : undefined
-	);
+	// A block read from an old format, or holding one, is saved in the new
+	// format.
+	return updatedBlock === validatedBlock &&
+		updatedBlock.innerBlocks.every( ( { undelimitedSource } ) =>
+			Boolean( undelimitedSource )
+		)
+		? withSource( updatedBlock, normalizedBlock.innerHTML )
+		: updatedBlock;
 }
 
 /**

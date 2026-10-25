@@ -5,7 +5,7 @@ import parse from './parser';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 import { htmlToBlocks } from './raw-handling/html-to-blocks';
 import { rawHandler } from './raw-handling';
-import { getBlockType, getFreeformContentHandlerName } from './registration';
+import { getBlockType } from './registration';
 import {
 	getCommentAttributes,
 	getCommentDelimitedContent,
@@ -313,6 +313,7 @@ export function parseUndelimited( parts: Array< string | Block > ): Block[] {
 		const whitespace = {
 			before: piece.before,
 			after: index === pieces.length - 1 ? after : '',
+			isFirst: index === 0,
 		};
 		if ( piece.html === SLOT ) {
 			Object.assign( block.undelimitedSource ?? {}, whitespace );
@@ -502,6 +503,7 @@ export function addSource(
 		content: content ?? savedHTML,
 		before: '',
 		after: '',
+		isFirst: false,
 		bare: false,
 		savedHTML,
 		fingerprint: serializeBlockWithoutSource( block, options ),
@@ -547,17 +549,13 @@ function getBlockHTML(
 		return { html: serializeBlock( block ), delimited: true };
 	}
 
-	// Classic blocks have delimiters only inside other blocks.
-	if ( block.name === getFreeformContentHandlerName() ) {
-		return {
-			html: serializeBlock( block, { isInnerBlocks: isInside } ),
-			delimited: isInside,
-		};
-	}
-
-	// New blocks get delimiters. Blocks inside another block follow it.
+	// New blocks get delimiters, classic blocks too. Blocks inside another
+	// block follow it.
 	if ( ! source && ! isInside ) {
-		return { html: serializeBlock( block ), delimited: true };
+		return {
+			html: serializeBlock( block, { isInnerBlocks: true } ),
+			delimited: true,
+		};
 	}
 
 	const blockType = getBlockType( block.name );
@@ -644,7 +642,7 @@ export function serializeUndelimited( blocks: Block[] ): string {
 		// get a blank line.
 		let before =
 			( previous?.undelimitedSource?.after ?? '' ) +
-			( source?.before ?? '' );
+			( previous || source?.isFirst ? ( source?.before ?? '' ) : '' );
 		if (
 			previous &&
 			( ! source || ! previous.undelimitedSource ) &&

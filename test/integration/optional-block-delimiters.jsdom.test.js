@@ -7,6 +7,7 @@ import {
 	getBlockTypes,
 	parse,
 	serialize,
+	setFreeformContentHandlerName,
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -78,7 +79,7 @@ describe( 'optional block delimiters', () => {
 		expect( serialize( parse( content ) ) ).toBe( content );
 	} );
 
-	it( 'saves every untouched block fixture exactly as written', () => {
+	it( 'saves every untouched block fixture in the current format exactly as written', () => {
 		const fixtures = fs
 			.readdirSync( fixturesDirectory )
 			.filter(
@@ -91,10 +92,14 @@ describe( 'optional block delimiters', () => {
 				path.join( fixturesDirectory, file ),
 				'utf8'
 			);
+			const blocks = parse( content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+			// Blocks read from an old format are saved in the new one.
 			return (
-				serialize(
-					parse( content, { __unstableSkipMigrationLogs: true } )
-				) !== content
+				blocks.every(
+					( { undelimitedSource } ) => undelimitedSource
+				) && serialize( blocks ) !== content
 			);
 		} );
 		expect( changed ).toEqual( [] );
@@ -104,6 +109,14 @@ describe( 'optional block delimiters', () => {
 				'wp.blocks.children.matcher is deprecated'
 			)
 		);
+	} );
+
+	it( 'saves a block read from an old format in the new format', () => {
+		expect(
+			serialize(
+				parse( '<!-- wp:navigation {"openSubmenusOnClick":true} /-->' )
+			)
+		).toBe( '<!-- wp:navigation {"submenuVisibility":"click"} /-->' );
 	} );
 
 	it( 'keeps the delimiter and unknown attributes of an edited block', () => {
@@ -206,6 +219,20 @@ describe( 'optional block delimiters', () => {
 			`<!-- wp:paragraph {"style":{"color":{"text":"#000000"}}} -->\n<p class="has-text-color" style="color:#000000;border-left:4px solid" data-note="tip">New</p>\n<!-- /wp:paragraph -->`
 		);
 		expect( serialize( parse( content ) ) ).toBe( content );
+	} );
+
+	it( 'gives a new HTML block a delimiter when it handles classic content', () => {
+		setFreeformContentHandlerName( 'core/html' );
+		const content = serialize( [
+			createBlock( 'core/html', {}, [], [ 'hello' ] ),
+		] );
+		setFreeformContentHandlerName( 'core/freeform' );
+		expect( content ).toBe( '<!-- wp:html -->\nhello\n<!-- /wp:html -->' );
+	} );
+
+	it( 'drops the whitespace before a removed first block', () => {
+		const [ , ...blocks ] = parse( '\n<p>a</p>\n\n<p>b</p>\n' );
+		expect( serialize( blocks ) ).toBe( '<p>b</p>\n' );
 	} );
 
 	it( 'gives new blocks delimiters', () => {
