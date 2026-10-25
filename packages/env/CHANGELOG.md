@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Check whether WordPress.org is reachable with the operating system's resolver (`dns.lookup`) instead of querying DNS servers directly (`dns.resolve`), so `wp-env` no longer wrongly decides it is offline, and fails to find the latest WordPress version, when Node.js reports an unusable DNS server such as `127.0.0.1` ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes
