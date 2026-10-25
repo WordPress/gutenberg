@@ -124,6 +124,16 @@ describe( 'optional block delimiters', () => {
 		);
 	} );
 
+	it( 'saves an edited list item without delimiters', () => {
+		const [ list ] = parse( '<ul>\n\t<li>One</li>\n\t<li>Two</li>\n</ul>' );
+		list.innerBlocks[ 0 ] = update( list.innerBlocks[ 0 ], {
+			content: 'Uno',
+		} );
+		const content = serialize( [ list ] );
+		expect( content ).toBe( '<ul><li>Uno</li><li>Two</li></ul>' );
+		expect( serialize( parse( content ) ) ).toBe( content );
+	} );
+
 	it( 'keeps unknown attributes when a setting changes', () => {
 		const blocks = parse( classicPost );
 		blocks[ 1 ] = update( blocks[ 1 ], { level: 3 } );
