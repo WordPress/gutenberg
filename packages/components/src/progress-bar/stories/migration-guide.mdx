@@ -9,13 +9,13 @@ import * as ProgressBarStories from './index.story';
 
 ## Basic migration
 
-Replace `ProgressBar` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator`. Pass the progress value to `Progress.Root`. Use `null` for indeterminate progress instead of omitting `value`.
+Replace `ProgressBar` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator`. Pass the progress value to `Progress.Root`. Use `null` for indeterminate progress instead of omitting `value`. If an existing value can be `undefined`, convert it to `null` with `value={ value ?? null }`.
 
 ```jsx
 import { Progress } from '@wordpress/ui';
 
 const MyLoadingComponent = ( { progress = null } ) => (
-	<Progress.Root value={ progress } aria-label="Loading">
+	<Progress.Root value={ progress } aria-label="Uploading files">
 		<Progress.Track>
 			<Progress.Indicator />
 		</Progress.Track>
