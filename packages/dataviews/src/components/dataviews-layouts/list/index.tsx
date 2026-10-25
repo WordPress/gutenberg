@@ -13,8 +13,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { inertValue } from '@wordpress/react-inert-value';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack, VisuallyHidden } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
