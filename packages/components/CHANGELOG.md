@@ -16,6 +16,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Deprecations
+
+-   `FormToggle`: Deprecate in favor of `Switch` from `@wordpress/ui`, with removal planned for WordPress 7.4.
+
 ### Bug Fixes
 
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
