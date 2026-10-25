@@ -126,8 +126,8 @@ const test = base.extend<
 		lighthousePort: number;
 	}
 >( {
-	admin: async ( { page, pageUtils, editor }, use ) => {
-		await use( new Admin( { page, pageUtils, editor } ) );
+	admin: async ( { page, pageUtils, editor, baseURL }, use ) => {
+		await use( new Admin( { page, pageUtils, editor, baseURL } ) );
 	},
 	editor: async ( { page }, use ) => {
 		await use( new Editor( { page } ) );

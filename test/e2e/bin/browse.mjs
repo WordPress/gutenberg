@@ -2,24 +2,30 @@
 
 /**
  * Drives a browser on this checkout's WordPress site, to check a change by
- * hand. `open`, `new-post` and `blocks` are ours and use the e2e test utils;
- * any other command goes to playwright-cli, in the same browser.
+ * hand. `open` starts it; `<helper>.<method> [args]` calls an e2e test util
+ * (admin, editor, pageUtils or requestUtils), with each argument read as JSON
+ * when it is JSON; any other command goes to playwright-cli, in the same
+ * browser.
  *
  *   npm run browse -- open
- *   npm run browse -- new-post --content '<!-- wp:paragraph --><p>Hi</p><!-- /wp:paragraph -->'
+ *   npm run browse -- admin.createNewPost
+ *   npm run browse -- editor.insertBlock '{"name":"core/paragraph"}'
  *   npm run browse -- press Enter
- *   npm run browse -- blocks
+ *   npm run browse -- editor.getBlocks
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseArgs } from 'node:util';
 import { chromium } from '@playwright/test';
-import { Editor, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import {
+	Admin,
+	Editor,
+	PageUtils,
+	RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
-const baseURL = process.env.WP_BASE_URL || 'http://localhost:8889';
 const workDir = fileURLToPath(
 	new URL( '../artifacts/browse', import.meta.url )
 );
@@ -36,9 +42,15 @@ function playwrightCli( args ) {
 	} ).status;
 }
 
+async function loggedInRequestUtils() {
+	const requestUtils = await RequestUtils.setup( {} );
+	await requestUtils.setupRest();
+	return requestUtils;
+}
+
 // Connects to the browser playwright-cli keeps open, through the port Chrome
 // picked itself and wrote to its profile.
-async function withPage( callback ) {
+async function withHelpers( callback ) {
 	let browser;
 	try {
 		const port = readFileSync(
@@ -51,67 +63,78 @@ async function withPage( callback ) {
 	}
 	const page = browser.contexts()[ 0 ].pages()[ 0 ];
 	try {
-		await callback( { page, editor: new Editor( { page } ) } );
+		const pageUtils = new PageUtils( { page, browserName: 'chromium' } );
+		const editor = new Editor( { page } );
+		return await callback( {
+			page,
+			pageUtils,
+			editor,
+			admin: new Admin( { page, pageUtils, editor } ),
+		} );
 	} finally {
 		// Only disconnects: the browser stays open for the next command.
 		await browser.close();
 	}
 }
 
-const commands = {
-	async open() {
-		mkdirSync( workDir, { recursive: true } );
-		const config = path.join( workDir, 'cli.config.json' );
-		writeFileSync(
-			config,
-			JSON.stringify( {
-				outputDir: workDir,
-				browser: {
-					userDataDir: profileDir,
-					launchOptions: { args: [ '--remote-debugging-port=0' ] },
-				},
+async function open() {
+	mkdirSync( workDir, { recursive: true } );
+	const config = path.join( workDir, 'cli.config.json' );
+	writeFileSync(
+		config,
+		JSON.stringify( {
+			outputDir: workDir,
+			browser: {
+				userDataDir: profileDir,
+				launchOptions: { args: [ '--remote-debugging-port=0' ] },
+			},
+		} )
+	);
+	if ( playwrightCli( [ 'open', `--config=${ config }` ] ) !== 0 ) {
+		throw new Error( 'playwright-cli could not open the browser.' );
+	}
+	const { cookies } = await (
+		await loggedInRequestUtils()
+	).request.storageState();
+	await withHelpers( async ( { page, admin } ) => {
+		await page.context().addCookies( cookies );
+		await admin.visitAdminPage( '' );
+	} );
+}
+
+async function callHelper( helperName, methodName, args ) {
+	const result = await withHelpers( async ( helpers ) => {
+		const helper =
+			helperName === 'requestUtils'
+				? await loggedInRequestUtils()
+				: helpers[ helperName ];
+		if ( typeof helper?.[ methodName ] !== 'function' ) {
+			throw new Error(
+				`No helper ${ helperName }.${ methodName }. See packages/e2e-test-utils-playwright/src.`
+			);
+		}
+		return helper[ methodName ](
+			...args.map( ( arg ) => {
+				try {
+					return JSON.parse( arg );
+				} catch {
+					return arg;
+				}
 			} )
 		);
-		if ( playwrightCli( [ 'open', `--config=${ config }` ] ) !== 0 ) {
-			throw new Error( 'playwright-cli could not open the browser.' );
-		}
-		const requestUtils = await RequestUtils.setup( { baseURL } );
-		const { cookies } = await requestUtils.setupRest();
-		await withPage( async ( { page } ) => {
-			await page.context().addCookies( cookies );
-			await page.goto( new URL( 'wp-admin/', baseURL ).href );
-		} );
-	},
-	async 'new-post'( args ) {
-		const { values } = parseArgs( {
-			args,
-			options: { content: { type: 'string' } },
-		} );
-		// Full URLs only: the e2e utils that navigate need the base URL that
-		// Playwright takes when it opens a browser, not when it connects.
-		await withPage( async ( { page, editor } ) => {
-			await page.goto( new URL( 'wp-admin/post-new.php', baseURL ).href );
-			await editor.setPreferences( 'core/edit-post', {
-				welcomeGuide: false,
-				fullscreenMode: false,
-			} );
-			if ( values.content ) {
-				await editor.setContent( values.content );
-			}
-		} );
-	},
-	async blocks() {
-		await withPage( async ( { editor } ) => {
-			console.log(
-				JSON.stringify( await editor.getBlocks(), null, '\t' )
-			);
-		} );
-	},
-};
+	} );
+	if ( result !== undefined ) {
+		console.log( JSON.stringify( result, null, '\t' ) );
+	}
+}
 
-const [ name, ...args ] = process.argv.slice( 2 );
-if ( commands[ name ] ) {
-	commands[ name ]( args ).catch( ( error ) => {
+const [ command, ...args ] = process.argv.slice( 2 );
+const [ helperName, methodName ] = command?.split( '.' ) ?? [];
+if ( command === 'open' || methodName ) {
+	( command === 'open'
+		? open()
+		: callHelper( helperName, methodName, args )
+	).catch( ( error ) => {
 		console.error( error.message );
 		process.exitCode = 1;
 	} );

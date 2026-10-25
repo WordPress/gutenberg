@@ -7,11 +7,13 @@ import { visitSiteEditor } from './visit-site-editor';
 import { waitForSiteEditor } from './wait-for-site-editor';
 import type { PageUtils } from '../page-utils';
 import type { Editor } from '../editor';
+import { WP_BASE_URL } from '../config';
 
 type AdminConstructorProps = {
 	page: Page;
 	pageUtils: PageUtils;
 	editor: Editor;
+	baseURL?: string;
 };
 
 export class Admin {
@@ -20,13 +22,20 @@ export class Admin {
 	browser: Browser;
 	pageUtils: PageUtils;
 	editor: Editor;
+	baseURL: string;
 
-	constructor( { page, pageUtils, editor }: AdminConstructorProps ) {
+	constructor( {
+		page,
+		pageUtils,
+		editor,
+		baseURL = WP_BASE_URL,
+	}: AdminConstructorProps ) {
 		this.page = page;
 		this.context = page.context();
 		this.browser = this.context.browser()!;
 		this.pageUtils = pageUtils;
 		this.editor = editor;
+		this.baseURL = baseURL;
 	}
 
 	/** @borrows createNewPost as this.createNewPost */

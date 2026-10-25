@@ -14,7 +14,10 @@ export async function visitAdminPage(
 	query?: string
 ) {
 	await this.page.goto(
-		join( 'wp-admin', adminPath ) + ( query ? `?${ query }` : '' )
+		new URL(
+			join( 'wp-admin', adminPath ) + ( query ? `?${ query }` : '' ),
+			this.baseURL
+		).href
 	);
 
 	// Handle upgrade required screen
