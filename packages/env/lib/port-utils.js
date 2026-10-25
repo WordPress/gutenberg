@@ -25,7 +25,15 @@ async function isPortAvailable( port ) {
 
 		server.once( 'listening', () => {
 			server.close( () => {
-				resolve( true );
+				// Listening can succeed while another server answers on the
+				// port: one on 127.0.0.1 or ::1 only, or, on Windows, one
+				// that set SO_REUSEADDR, like PHP's built-in server.
+				const socket = net.connect( port, 'localhost' );
+				socket.once( 'connect', () => {
+					socket.destroy();
+					resolve( false );
+				} );
+				socket.once( 'error', () => resolve( true ) );
 			} );
 		} );
 

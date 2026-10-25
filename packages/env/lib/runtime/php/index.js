@@ -7,6 +7,7 @@ const { rimraf } = require( 'rimraf' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
 const { parseSourceString } = require( '../../config/parse-source-string' );
+const { isPortAvailable } = require( '../../port-utils' );
 
 const SQLITE_PLUGIN_URL =
 	'https://downloads.wordpress.org/plugin/sqlite-database-integration.zip';
@@ -77,6 +78,21 @@ class PhpRuntime {
 			spinner.start();
 		}
 
+		const check = spawn.sync( 'php', [
+			'-r',
+			"exit( extension_loaded( 'pdo_sqlite' ) ? 0 : 1 );",
+		] );
+		if ( check.error?.code === 'ENOENT' ) {
+			throw new Error(
+				'PHP was not found. Install PHP or use --runtime=playground.'
+			);
+		}
+		if ( check.status !== 0 ) {
+			throw new Error(
+				"PHP's pdo_sqlite extension is missing. Turn it on in php.ini or install it."
+			);
+		}
+
 		await this.stop( config, { spinner } );
 
 		const mappings = getMappings( config );
@@ -110,6 +126,12 @@ class PhpRuntime {
 
 		const port = envConfig.port;
 		const siteUrl = envConfig.config.WP_SITEURL;
+		// PHP doesn't always fail on a busy port.
+		if ( ! ( await isPortAvailable( port ) ) ) {
+			throw new Error(
+				`Port ${ port } is busy. Free the port, set a different one, or enable automatic port selection with --auto-port or "autoPort": true.`
+			);
+		}
 		spinner.text = `Starting PHP on port ${ port }.`;
 
 		const logFile = path.join( siteDir, 'server.log' );
@@ -130,6 +152,8 @@ class PhpRuntime {
 			],
 			{
 				detached: true,
+				// Otherwise Windows opens a console that stops the server when closed.
+				windowsHide: true,
 				stdio: [ 'ignore', log.fd, log.fd ],
 				// Without workers the server handles one request at a time.
 				env: { ...process.env, PHP_CLI_SERVER_WORKERS: '8' },
@@ -162,8 +186,21 @@ class PhpRuntime {
 		const pidFile = path.join( config.workDirectoryPath, 'php/server.pid' );
 		try {
 			const pid = parseInt( await fs.readFile( pidFile, 'utf8' ), 10 );
-			// The negative PID stops the server and its workers.
-			process.kill( -pid, 'SIGTERM' );
+			if ( process.platform === 'win32' ) {
+				// Windows has no process groups, so stop the process tree.
+				spawn.sync( 'taskkill', [ '/pid', String( pid ), '/t', '/f' ] );
+			} else {
+				// The negative PID stops the server and its workers.
+				process.kill( -pid, 'SIGTERM' );
+				// Wait until they are gone, so the port is free again. Signal 0
+				// only checks, and throws once no process is left.
+				for ( let i = 0; i < 50; i++ ) {
+					await new Promise( ( resolve ) =>
+						setTimeout( resolve, 100 )
+					);
+					process.kill( -pid, 0 );
+				}
+			}
 		} catch {
 			// Not running.
 		}
@@ -322,7 +359,7 @@ class PhpRuntime {
 			await unlinkParents( siteDir, target );
 			await rimraf( target );
 			await fs.mkdir( path.dirname( target ), { recursive: true } );
-			await fs.symlink( mappings[ wpPath ].path, target, 'junction' );
+			await link( mappings[ wpPath ].path, target );
 		}
 
 		await writeWpConfig( config, siteDir );
@@ -336,11 +373,6 @@ class PhpRuntime {
 			],
 			{ encoding: 'utf8' }
 		);
-		if ( install.error?.code === 'ENOENT' ) {
-			throw new Error(
-				'PHP was not found. Install PHP or use --runtime=playground.'
-			);
-		}
 		// WordPress errors exit with 0, but leave no database.
 		const { database, clean } = getDatabasePaths( config );
 		if ( install.status !== 0 || ! existsSync( database ) ) {
@@ -440,12 +472,34 @@ async function unlinkParents( siteDir, target ) {
 		await fs.unlink( dir );
 		await fs.mkdir( dir );
 		for ( const entry of await fs.readdir( linked ) ) {
-			await fs.symlink(
-				path.join( linked, entry ),
-				path.join( dir, entry ),
-				'junction'
+			await link( path.join( linked, entry ), path.join( dir, entry ) );
+		}
+	}
+}
+
+/**
+ * Link a folder or file. Folders become junctions, which Windows creates
+ * without special rights; other systems create a symlink either way.
+ *
+ * @param {string} source The folder or file to link to.
+ * @param {string} target The link to create.
+ */
+async function link( source, target ) {
+	const stats = await fs.stat( source ).catch( () => null );
+	if ( ! stats?.isFile() ) {
+		await fs.symlink( source, target, 'junction' );
+		return;
+	}
+	try {
+		// Junctions can't point to files.
+		await fs.symlink( source, target, 'file' );
+	} catch ( error ) {
+		if ( error.code === 'EPERM' && process.platform === 'win32' ) {
+			throw new Error(
+				`Linking ${ source } needs Developer Mode on Windows. Turn it on in Settings, or map the folder that holds the file.`
 			);
 		}
+		throw error;
 	}
 }
 
