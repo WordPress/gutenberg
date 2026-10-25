@@ -1,19 +1,17 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
+
 	test( 'Create a custom template', async ( { admin, page } ) => {
 		const templateName = 'demo';
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
@@ -45,8 +43,7 @@ test.describe( 'Templates', () => {
 		page,
 		admin,
 	} ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		// Search templates
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'Index' );

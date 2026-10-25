@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { PlaywrightTestConfig } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {

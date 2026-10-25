@@ -43,7 +43,17 @@
 	},
 	"usesContext": [ "enhancedPagination" ],
 	"supports": {
+		"anchor": true,
 		"align": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -56,6 +66,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textColumns": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -89,7 +100,8 @@
 				"width": true,
 				"style": true
 			}
-		}
+		},
+		"shadow": true
 	},
 	"editorStyle": "wp-block-categories-editor",
 	"style": "wp-block-categories"

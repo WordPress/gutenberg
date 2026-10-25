@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Style, StyleOptions } from '../../types';
 import { generateBoxRules } from '../utils';
 

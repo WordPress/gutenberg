@@ -1,31 +1,21 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useMemo,
 	forwardRef,
 	useCallback,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import { Context } from './context';
 
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover(
-	{ gutter, children, shift, modal = true, ...otherProps },
+>( function UnforwardedPopover(
+	{ gutter, shift, modal = true, ...otherProps },
 	ref
 ) {
 	const menuContext = useContext( Context );
@@ -70,9 +60,29 @@ export const Popover = forwardRef<
 		);
 	}
 
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<div className={ styles[ 'menu-motion-root' ] }>
+				<div
+					{ ...htmlProps }
+					className={ clsx(
+						styles[ 'menu-surface' ],
+						htmlProps.className,
+						{
+							[ styles[ 'is-toolbar' ] ]:
+								menuContext.variant === 'toolbar',
+						}
+					) }
+				/>
+			</div>
+		),
+		[ menuContext.variant ]
+	);
+
 	return (
 		<Ariakit.Menu
 			{ ...otherProps }
+			className={ clsx( styles.menu, otherProps.className ) }
 			ref={ ref }
 			modal={ modal }
 			store={ menuContext.store }
@@ -84,20 +94,11 @@ export const Popover = forwardRef<
 			shift={ shift ?? ( menuContext.store.parent ? -4 : 0 ) }
 			hideOnHoverOutside={ false }
 			data-side={ appliedPlacementSide }
+			data-submenu={ !! menuContext.store.parent || undefined }
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			render={ ( renderProps ) => (
-				// Two wrappers are needed for the entry animation, where the menu
-				// container scales with a different factor than its contents.
-				// The {...renderProps} are passed to the inner wrapper, so that the
-				// menu element is the direct parent of the menu item elements.
-				<Styled.PopoverOuterWrapper variant={ menuContext.variant }>
-					<Styled.PopoverInnerWrapper { ...renderProps } />
-				</Styled.PopoverOuterWrapper>
-			) }
-		>
-			{ children }
-		</Ariakit.Menu>
+			render={ renderMenu }
+		/>
 	);
 } );

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const remark = require( 'remark' );
-
-/**
- * Internal dependencies
- */
 const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
 
 const cleanSpaces = ( paragraph ) =>
