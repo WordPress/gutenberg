@@ -182,4 +182,66 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 			'Failed to assert that $rendered contain the link relation attribute.'
 		);
 	}
+
+	/**
+	 * The title and its link must refer to the post provided by block context.
+	 *
+	 * @dataProvider data_render_with_post_context
+	 *
+	 * @param bool $has_global_post Whether a different global post is available.
+	 * @param bool $is_link         Whether the title is linked.
+	 */
+	public function test_render_with_post_context( $has_global_post, $is_link ) {
+		$previous_post   = $GLOBALS['post'] ?? null;
+		$GLOBALS['post'] = $has_global_post
+			? self::factory()->post->create_and_get( array( 'post_title' => 'Different global post' ) )
+			: null;
+
+		$block = new WP_Block(
+			array(
+				'blockName' => 'core/post-title',
+				'attrs'     => array( 'isLink' => $is_link ),
+			),
+			array( 'postId' => self::$post->ID )
+		);
+
+		try {
+			$rendered = $block->render();
+		} finally {
+			$GLOBALS['post'] = $previous_post;
+		}
+		$this->assertSame( self::$post->post_title, wp_strip_all_tags( $rendered ) );
+		if ( $is_link ) {
+			$this->assertStringContainsString( 'href="' . esc_url( get_permalink( self::$post ) ) . '"', $rendered );
+		}
+	}
+
+	/**
+	 * @return array[] Context and link combinations.
+	 */
+	public static function data_render_with_post_context() {
+		return array(
+			'different global post'       => array( true, false ),
+			'different global post, link' => array( true, true ),
+			'no global post'              => array( false, false ),
+			'no global post, link'        => array( false, true ),
+		);
+	}
+
+	/**
+	 * An unsaved title in the global post must still appear in a preview.
+	 */
+	public function test_render_preserves_preview_title() {
+		$previous_post               = $GLOBALS['post'] ?? null;
+		$GLOBALS['post']             = clone self::$post;
+		$GLOBALS['post']->post_title = 'Unsaved preview title';
+
+		try {
+			$rendered = do_blocks( '<!-- wp:post-title /-->' );
+		} finally {
+			$GLOBALS['post'] = $previous_post;
+		}
+
+		$this->assertSame( 'Unsaved preview title', wp_strip_all_tags( $rendered ) );
+	}
 }
