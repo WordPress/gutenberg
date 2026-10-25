@@ -98,6 +98,20 @@ class PhpRuntime {
 			);
 		}
 
+		const mappings = getMappings( config );
+		for ( const wpPath of Object.keys( mappings ) ) {
+			// Setup replaces what is at the path, so it must stay in the site.
+			const relative = path.relative(
+				siteDir,
+				path.join( siteDir, wpPath )
+			);
+			if ( ! relative || relative.startsWith( '..' ) ) {
+				throw new Error(
+					`The mapping "${ wpPath }" must point to a path inside WordPress.`
+				);
+			}
+		}
+
 		await this.stop( config, { spinner } );
 
 		const port = envConfig.port;
@@ -111,7 +125,6 @@ class PhpRuntime {
 
 		// Set up again when the sources change, keeping the database.
 		const { workDirectoryPath } = config;
-		const mappings = getMappings( config );
 		const sourcesHash = md5( { core: envConfig.coreSource, mappings } );
 		if (
 			update ||
@@ -167,7 +180,7 @@ class PhpRuntime {
 		);
 		child.unref();
 		await log.close();
-		await fs.writeFile( pidFile, String( child.pid ) );
+		await fs.writeFile( pidFile, `${ child.pid } ${ port }` );
 
 		await this._waitForServer( child, logFile );
 
@@ -257,6 +270,9 @@ class PhpRuntime {
 	async clean( config, { spinner } ) {
 		spinner.text = 'Resetting the database.';
 		const { database, clean } = getDatabasePaths( config );
+		if ( ! existsSync( clean ) ) {
+			throw new Error( 'The site is not set up yet. Start it first.' );
+		}
 		await fs.copyFile( clean, database );
 		// Plugins added to the config since installation.
 		install( config, path.join( config.workDirectoryPath, 'php' ) );
@@ -354,6 +370,11 @@ class PhpRuntime {
 			( await getCache( LINKS_CACHE_KEY, { workDirectoryPath } ) ) ?? [];
 		for ( const wpPath of links ) {
 			await rimraf( path.join( siteDir, wpPath ) );
+			// Bring back the WordPress files a removed mapping replaced.
+			const original = path.join( envConfig.coreSource.path, wpPath );
+			if ( ! mappings[ wpPath ] && existsSync( original ) ) {
+				await copyCore( original, path.join( siteDir, wpPath ), [] );
+			}
 		}
 
 		const isInstalled = existsSync( clean );
@@ -368,10 +389,6 @@ class PhpRuntime {
 			await rimraf( path.dirname( database ) );
 			await fs.mkdir( path.dirname( database ), { recursive: true } );
 			await copyCore( envConfig.coreSource.path, siteDir, [ '.git' ] );
-			await fs.copyFile(
-				path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
-				path.join( siteDir, 'wp-content/db.php' )
-			);
 		} else if ( coreChanged ) {
 			// The plugins, themes and uploads stay as they are.
 			await copyCore( envConfig.coreSource.path, siteDir, [
@@ -379,6 +396,11 @@ class PhpRuntime {
 				'wp-content',
 			] );
 		}
+		// The SQLite plugin may have been updated.
+		await fs.copyFile(
+			path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
+			path.join( siteDir, 'wp-content/db.php' )
+		);
 		await setCache( CORE_CACHE_KEY, coreHash, { workDirectoryPath } );
 
 		// Shorter paths first, so a mapping inside another one replaces an
@@ -572,31 +594,37 @@ function getServerPaths( config ) {
  * @return {Promise<number|null>} The PID, or null.
  */
 async function getServerPid( config ) {
-	const pid = parseInt(
+	// The PID, then the port.
+	const saved = (
 		await fs
 			.readFile( getServerPaths( config ).pidFile, 'utf8' )
-			.catch( () => '' ),
-		10
-	);
+			.catch( () => '' )
+	)
+		.split( ' ' )
+		.map( Number );
+	const pid = saved[ 0 ];
 	if ( ! pid ) {
 		return null;
 	}
 	// After a restart, the saved PID can belong to another program, so check
 	// that the process serves this site.
-	const { stdout } =
-		process.platform === 'win32'
-			? spawn.sync(
-					'powershell',
-					[
-						'-NoProfile',
-						'-Command',
-						`(Get-CimInstance Win32_Process -Filter 'ProcessId = ${ pid }').CommandLine`,
-					],
-					{ encoding: 'utf8' }
-				)
-			: spawn.sync( 'ps', [ '-ww', '-o', 'args=', '-p', String( pid ) ], {
-					encoding: 'utf8',
-				} );
+	if ( process.platform === 'win32' ) {
+		// Reading a process's command line takes PowerShell, which is slow.
+		const { stdout } = spawn.sync(
+			'tasklist',
+			[ '/fi', `PID eq ${ pid }`, '/fo', 'csv', '/nh' ],
+			{ encoding: 'utf8' }
+		);
+		return /^"php/i.test( stdout ) &&
+			( await isPortAnswering( saved[ 1 ] ) )
+			? pid
+			: null;
+	}
+	const { stdout } = spawn.sync(
+		'ps',
+		[ '-ww', '-o', 'args=', '-p', String( pid ) ],
+		{ encoding: 'utf8' }
+	);
 	const siteDir = path.join( config.workDirectoryPath, 'php' );
 	return stdout?.includes( siteDir ) ? pid : null;
 }

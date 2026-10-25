@@ -8,6 +8,12 @@ $root = $_SERVER['DOCUMENT_ROOT'];
 $url  = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
 $path = rawurldecode( $url );
 
+// Never leave the site folder.
+if ( preg_match( '#(^|[/\\\\])\.\.([/\\\\]|$)#', $path ) ) {
+	http_response_code( 400 );
+	exit;
+}
+
 if ( is_file( $root . $path ) ) {
 	return false;
 }
