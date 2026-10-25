@@ -18,7 +18,7 @@
 
 ### Deprecations
 
--   `FormToggle`: Deprecate in favor of `Switch` from `@wordpress/ui`, with removal planned for WordPress 7.4.
+-   `FormToggle`: Deprecate in favor of `Switch` from `@wordpress/ui`, with removal planned for WordPress 7.4 ([#85517](https://github.com/WordPress/gutenberg/pull/85517)).
 
 ### Bug Fixes
 
