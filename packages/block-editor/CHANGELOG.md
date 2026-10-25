@@ -13,6 +13,7 @@
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
+-   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#84578](https://github.com/WordPress/gutenberg/pull/84578)).
 
 ### Internal
 
