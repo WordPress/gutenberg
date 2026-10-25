@@ -2,15 +2,15 @@
 
 /**
  * Drives a browser on this checkout's WordPress site, to check a change by
- * hand. The commands below call the e2e test utils, with each argument read
- * as JSON when it is JSON; any other command goes to playwright-cli, in the
- * same browser.
+ * hand. `gb <command>` calls the e2e test utils below, with each argument
+ * read as JSON when it is JSON; any other command goes to playwright-cli, in
+ * the same browser.
  *
- *   npm run gb -- open
- *   npm run gb -- new-post
- *   npm run gb -- insert '{"name":"core/heading"}'
- *   npm run gb -- press Enter
- *   npm run gb -- blocks
+ *   npm run browse -- open
+ *   npm run browse -- gb new-post
+ *   npm run browse -- gb insert '{"name":"core/heading"}'
+ *   npm run browse -- press Enter
+ *   npm run browse -- gb blocks
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -52,7 +52,7 @@ async function withHelpers( callback ) {
 		).split( '\n' )[ 0 ];
 		browser = await chromium.connectOverCDP( `http://127.0.0.1:${ port }` );
 	} catch {
-		throw new Error( 'No browser open. Run `npm run gb -- open`.' );
+		throw new Error( 'No browser open. Run `npm run browse -- open`.' );
 	}
 	const page = browser.contexts()[ 0 ].pages()[ 0 ];
 	try {
@@ -132,12 +132,16 @@ async function api( method, restPath, data ) {
 	return requestUtils.rest( { method, path: restPath, data } );
 }
 
-async function run( command, args ) {
-	if ( command === 'open' ) {
-		return open();
-	}
+async function gb( command, ...args ) {
 	if ( command === 'api' ) {
 		return api( ...args );
+	}
+	if ( ! commands[ command ] ) {
+		throw new Error(
+			`No gb command "${ command }". Use one of: api, ${ Object.keys(
+				commands
+			).join( ', ' ) }.`
+		);
 	}
 	return withHelpers( ( helpers ) =>
 		commands[ command ]( helpers, ...args )
@@ -145,16 +149,18 @@ async function run( command, args ) {
 }
 
 const [ command, ...args ] = process.argv.slice( 2 );
-if ( [ 'open', 'api', ...Object.keys( commands ) ].includes( command ) ) {
-	run(
-		command,
-		args.map( ( arg ) => {
-			try {
-				return JSON.parse( arg );
-			} catch {
-				return arg;
-			}
-		} )
+if ( command === 'open' || command === 'gb' ) {
+	( command === 'open'
+		? open()
+		: gb(
+				...args.map( ( arg ) => {
+					try {
+						return JSON.parse( arg );
+					} catch {
+						return arg;
+					}
+				} )
+			)
 	)
 		.then( ( result ) => {
 			if ( typeof result === 'string' ) {

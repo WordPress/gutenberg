@@ -40,7 +40,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"gb": "node bin/gb.mjs",
+		"browse": "node bin/browse.mjs",
 		"test:e2e:update-timings": "flakiness-playwright-timings fetch -c ./playwright.config.ts -o timings.json",
 		"test:e2e": "wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json",
 		"test:e2e:debug": "wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json --ui",

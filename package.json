@@ -118,6 +118,7 @@
 	},
 	"scripts": {
 		"agents:setup": "npm run --workspace @wordpress/agent-tools setup --",
+		"browse": "npm run browse --workspace @wordpress/e2e-tests-playwright --",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "npm run --workspace @wordpress/release-tools build-plugin-zip --",
 		"check:type-declarations": "npm run --workspace @wordpress/build-scripts check-type-declarations --",
@@ -138,7 +139,6 @@
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit -- test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"format": "wp-scripts format",
-		"gb": "npm run gb --workspace @wordpress/e2e-tests-playwright --",
 		"preformat:php": "npm run other:update-packages:php",
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script format",
 		"prelint:js": "npm run --if-present --workspaces prelint:js",
