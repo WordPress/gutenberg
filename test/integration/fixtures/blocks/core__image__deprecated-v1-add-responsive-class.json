@@ -5,8 +5,12 @@
 		"attributes": {
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
-			"caption": [],
-			"align": "left"
+			"caption": "",
+			"isDecorative": false,
+			"align": "left",
+			"htmlAttributes": {
+				"style": "max-width:50%"
+			}
 		},
 		"innerBlocks": []
 	}

@@ -43,6 +43,19 @@ const normalizeParsedBlocks = ( blocks ) =>
 		...( block.innerContent ? { innerContent: block.innerContent } : {} ),
 	} ) );
 
+/**
+ * Returns blocks without the HTML they were read from, so they're saved from
+ * their attributes, as new blocks.
+ *
+ * @param {WPBlock[]} blocks Blocks.
+ */
+const withoutSources = ( blocks ) =>
+	blocks.map( ( block ) => ( {
+		...block,
+		undelimitedSource: undefined,
+		innerBlocks: withoutSources( block.innerBlocks ),
+	} ) );
+
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
 		const blockMetadataFiles = glob.sync(
@@ -185,8 +198,10 @@ describe( 'full post content fixture', () => {
 			}
 
 			// `serialize` doesn't have a trailing newline, but the fixture
-			// files should.
-			const serializedActual = serialize( blocksActual ) + '\n';
+			// files should. Untouched blocks are saved as they were written,
+			// so this checks what the blocks themselves save.
+			const serializedActual =
+				serialize( withoutSources( blocksActual ) ) + '\n';
 			const {
 				filename: serializedHTMLFileName,
 				file: serializedHTMLFixtureContent,

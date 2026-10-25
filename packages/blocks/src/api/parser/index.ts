@@ -5,7 +5,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 } from '../registration';
-import { getSaveContent, serializeBlock } from '../serializer';
+import { getSaveContent } from '../serializer';
 import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
@@ -15,7 +15,7 @@ import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions'
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import {
 	addSource,
-	isUndelimitedEnabled,
+	canReadHTML,
 	parseUndelimited,
 	splitInnerBlocks,
 } from '../undelimited';
@@ -217,32 +217,6 @@ function getWrittenBlocks(
 }
 
 /**
- * Whether saving a block and reading it back gives the same block.
- *
- * @param block Block.
- */
-function isStable( block: Block ): boolean {
-	const html = serializeBlock( block );
-	const [ rawBlock ] = grammarParse( html );
-	const blockType = getBlockType( block.name );
-	if ( ! rawBlock || ! blockType ) {
-		return false;
-	}
-	const readBack = createBlock(
-		block.name,
-		getBlockAttributes(
-			blockType,
-			rawBlock.innerHTML,
-			rawBlock.attrs ?? {}
-		)
-	);
-	return (
-		validateBlock( readBack, blockType )[ 0 ] &&
-		serializeBlock( readBack ) === html
-	);
-}
-
-/**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
  * @param rawBlock The raw block object.
@@ -294,21 +268,16 @@ export function parseRawBlock(
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
 
-	// With optional delimiters, remember the block as written, so it can be
-	// saved that way unless it's edited. `content` is the HTML to apply edits
-	// to; a migrated block uses its new `save` output.
+	// Remember the block as written, so it can be saved that way unless it's
+	// edited. `content` is the HTML to apply edits to; a migrated block uses
+	// its new `save` output.
 	const withSource = ( block: Block, content?: string ) =>
-		isUndelimitedEnabled()
-			? addSource(
-					block,
-					writtenBlocks?.get( rawBlock ) ??
-						serializeRawBlock( rawBlock ),
-					content,
-					{
-						isInnerBlocks: ! isTopLevel,
-					}
-				)
-			: block;
+		addSource(
+			block,
+			writtenBlocks?.get( rawBlock ) ?? serializeRawBlock( rawBlock ),
+			content,
+			{ isInnerBlocks: ! isTopLevel }
+		);
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
@@ -330,15 +299,13 @@ export function parseRawBlock(
 		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
 			normalizedBlock.innerHTML,
 		];
-		if ( isUndelimitedEnabled() ) {
-			Object.assign(
-				parsedBlock,
-				splitInnerBlocks(
-					parsedBlock.innerContent,
-					parsedBlock.innerBlocks
-				)
-			);
-		}
+		Object.assign(
+			parsedBlock,
+			splitInnerBlocks(
+				parsedBlock.innerContent,
+				parsedBlock.innerBlocks
+			)
+		);
 		parsedBlock.isValid = true;
 		parsedBlock.validationIssues = [];
 		return withSource( parsedBlock, normalizedBlock.innerHTML );
@@ -356,22 +323,6 @@ export function parseRawBlock(
 		normalizedBlock,
 		blockType
 	);
-
-	// With optional delimiters, a block keeps HTML its `save` doesn't
-	// produce, unless an older version of the block reads it into a block
-	// that survives being saved and read again.
-	if (
-		! validatedBlock.isValid &&
-		isTopLevel &&
-		! parsedInnerBlocks.length &&
-		isUndelimitedEnabled() &&
-		! ( updatedBlock.isValid && isStable( updatedBlock ) )
-	) {
-		return withSource(
-			{ ...validatedBlock, isValid: true, validationIssues: [] },
-			normalizedBlock.innerHTML
-		);
-	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block
@@ -403,9 +354,6 @@ export function parseRawBlock(
 		validationIssues!.forEach( ( { log, args } ) => log( ...args ) );
 	}
 
-	if ( ! updatedBlock.isValid ) {
-		return updatedBlock;
-	}
 	return withSource(
 		updatedBlock,
 		updatedBlock === validatedBlock ? normalizedBlock.innerHTML : undefined
@@ -438,15 +386,13 @@ export default function parse(
 	options?: ParseOptions
 ): Block[] {
 	const blocks: Block[] = [];
-	// With optional delimiters, whitespace between blocks is kept with them.
+	// Whitespace between blocks is kept with them.
 	let whitespace = '';
 	const rawBlocks = grammarParse( content ) as unknown as RawBlock[];
-	const writtenBlocks = isUndelimitedEnabled()
-		? getWrittenBlocks( content, rawBlocks )
-		: undefined;
+	const writtenBlocks = getWrittenBlocks( content, rawBlocks );
 	for ( const rawBlock of rawBlocks ) {
 		// HTML outside delimiters is read as blocks, not one Classic block.
-		if ( ! rawBlock.blockName && isUndelimitedEnabled() ) {
+		if ( ! rawBlock.blockName && canReadHTML() ) {
 			const undelimitedBlocks = parseUndelimited( rawBlock.innerHTML );
 			if ( ! undelimitedBlocks.length ) {
 				whitespace += rawBlock.innerHTML;

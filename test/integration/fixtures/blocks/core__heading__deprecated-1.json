@@ -9,6 +9,9 @@
 				"typography": {
 					"textAlign": "right"
 				}
+			},
+			"htmlAttributes": {
+				"style": "text-align:right"
 			}
 		},
 		"innerBlocks": []

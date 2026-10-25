@@ -6,7 +6,7 @@ import { createBlock } from './factory';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 import { htmlToBlocks } from './raw-handling/html-to-blocks';
 import { rawHandler } from './raw-handling';
-import { getBlockType } from './registration';
+import { getBlockType, getFreeformContentHandlerName } from './registration';
 import {
 	getCommentAttributes,
 	getCommentDelimitedContent,
@@ -17,26 +17,19 @@ import {
 import type { Block } from '../types';
 
 /*
- * Experimental: reads HTML without block delimiters as blocks, and saves
+ * Reads HTML without block delimiters as blocks, and saves
  * blocks without delimiters when reading the result back gives the same
  * block. Untouched blocks keep their HTML exactly as written; edited blocks
  * change only what the edit changed.
  */
 
-declare global {
-	interface Window {
-		__experimentalOptionalBlockDelimiters?: boolean;
-	}
-}
-
 /**
- * Whether block delimiters are optional.
+ * Whether HTML can be read as blocks: that needs the browser's parser, for
+ * the blocks' raw transforms, and the HTML block, for HTML no other block
+ * reads. Without them, HTML is read and saved as before.
  */
-export function isUndelimitedEnabled(): boolean {
-	return (
-		typeof window !== 'undefined' &&
-		!! window.__experimentalOptionalBlockDelimiters
-	);
+export function canReadHTML(): boolean {
+	return typeof document !== 'undefined' && !! getBlockType( 'core/html' );
 }
 
 // Elements WordPress treats as blocks when adding paragraphs (`wpautop`).
@@ -331,6 +324,9 @@ export function splitInnerBlocks(
 	innerContent: Array< string | null >,
 	innerBlocks: Block[]
 ): { innerContent: Array< string | null >; innerBlocks: Block[] } {
+	if ( ! canReadHTML() ) {
+		return { innerContent, innerBlocks };
+	}
 	const split: {
 		innerContent: Array< string | null >;
 		innerBlocks: Block[];
@@ -672,9 +668,9 @@ function withoutSources( block: Block ): Block {
 }
 
 /**
- * Returns the HTML to save for a block. A block that had delimiters keeps
- * them; any other block gets them only if reading it back without them
- * wouldn't give the same block.
+ * Returns the HTML to save for a block. New blocks, and blocks that had
+ * delimiters, get them; blocks written without get them only if reading them
+ * back without would give a different block.
  *
  * @param block    Block.
  * @param isInside Whether the block is inside another block's `save`, which
@@ -688,6 +684,25 @@ function getBlockHTML(
 	const serialized = serializeBlockWithoutSource( block );
 	if ( source && serialized === source.fingerprint ) {
 		return { html: source.html, delimited: source.html !== source.content };
+	}
+
+	// Invalid blocks keep the HTML they were read from, and without a way to
+	// read HTML back there's no telling whether a delimiter is needed.
+	if ( ! block.isValid || ! canReadHTML() ) {
+		return { html: serializeBlock( block ), delimited: true };
+	}
+
+	// Classic blocks have delimiters only inside other blocks.
+	if ( block.name === getFreeformContentHandlerName() ) {
+		return {
+			html: serializeBlock( block, { isInnerBlocks: isInside } ),
+			delimited: isInside,
+		};
+	}
+
+	// New blocks get delimiters. Blocks inside another block follow it.
+	if ( ! source && ! isInside ) {
+		return { html: serializeBlock( block ), delimited: true };
 	}
 
 	const blockType = getBlockType( block.name );

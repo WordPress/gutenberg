@@ -5,10 +5,9 @@
 		"attributes": {
 			"content": "... like this one, which is separate from the above and right aligned.",
 			"dropCap": false,
-			"style": {
-				"typography": {
-					"textAlign": "right"
-				}
+			"align": "right",
+			"htmlAttributes": {
+				"style": "text-align:right"
 			}
 		},
 		"innerBlocks": []
