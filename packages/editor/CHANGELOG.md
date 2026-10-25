@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Match the Style Book's keyboard focus order to the visible tabs and Close button ([#85497](https://github.com/WordPress/gutenberg/pull/85497)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 16.0.0 (2026-10-20)
