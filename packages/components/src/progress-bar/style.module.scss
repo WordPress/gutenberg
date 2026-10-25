@@ -1,0 +1,66 @@
+$indeterminate-indicator-width: 50%;
+
+.track {
+	position: relative;
+	overflow: hidden;
+	height: 1.5px;
+	background-color: var(--wpds-color-background-track-neutral);
+	border-radius: 9999px;
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+
+	:where(&) {
+		width: 160px;
+	}
+}
+
+.indicator {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	border-radius: 9999px;
+	background-color: var(--wpds-color-background-thumb-neutral);
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+
+	width: var(--indicator-width);
+
+	@media not (prefers-reduced-motion) {
+		transition: width 0.4s ease-in-out;
+	}
+
+	&.is-indeterminate {
+		--indicator-width: #{$indeterminate-indicator-width};
+		animation: indeterminate-slide 1.5s ease-in-out infinite;
+		transition: none;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 3s;
+			animation-timing-function: steps(4, end);
+		}
+	}
+}
+
+@keyframes indeterminate-slide {
+	0% {
+		inset-inline-start: -$indeterminate-indicator-width;
+	}
+
+	100% {
+		inset-inline-start: 100%;
+	}
+}
+
+.progress-element {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+}

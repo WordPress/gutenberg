@@ -10,9 +10,7 @@
  *
  * @param array $types Types of styles to load. Optional.
  *                     See {@see 'WP_Theme_JSON::get_stylesheet'} for all valid types.
- *                     If empty, it'll load the following:
- *                     - for themes without theme.json: 'variables', 'presets', 'base-layout-styles'.
- *                     - for themes with theme.json: 'variables', 'presets', 'styles'.
+ *                     If empty, will load: 'variables', 'presets', 'styles'.
  *
  * @return string Stylesheet.
  */
@@ -30,11 +28,17 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
 
-	$supports_theme_json = wp_theme_has_theme_json();
-	if ( empty( $types ) && ! $supports_theme_json ) {
-		$types = array( 'variables', 'presets', 'base-layout-styles' );
-	} elseif ( empty( $types ) ) {
+	if ( empty( $types ) ) {
 		$types = array( 'variables', 'presets', 'styles' );
+	}
+
+	/*
+	 * Enable base layout styles only mode for classic themes without theme.json.
+	 * This skips alignment styles that target .wp-site-blocks which is only used by block themes.
+	 */
+	$options = array();
+	if ( ! wp_is_block_theme() && ! wp_theme_has_theme_json() ) {
+		$options['base_layout_styles'] = true;
 	}
 
 	/*
@@ -54,7 +58,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * @see wp_add_global_styles_for_blocks
 		 */
 		$origins          = array( 'default', 'theme', 'custom' );
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
+		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins, $options );
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
 
@@ -72,18 +76,8 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * at a later phase (render cycle) so we only render the ones in use.
 		 * @see wp_add_global_styles_for_blocks
 		 */
-		$origins = array( 'default', 'theme', 'custom' );
-
-		/*
-		* If the theme doesn't have theme.json but supports both appearance tools and color palette,
-		* the 'theme' origin should be included so color palette presets are also output.
-		*/
-		if ( ! $supports_theme_json && ( current_theme_supports( 'appearance-tools' ) || current_theme_supports( 'border' ) ) && current_theme_supports( 'editor-color-palette' ) ) {
-			$origins = array( 'default', 'theme' );
-		} elseif ( ! $supports_theme_json ) {
-			$origins = array( 'default' );
-		}
-		$styles_rest = $tree->get_stylesheet( $types, $origins );
+		$origins     = array( 'default', 'theme', 'custom' );
+		$styles_rest = $tree->get_stylesheet( $types, $origins, $options );
 	}
 	$stylesheet = $styles_variables . $styles_rest;
 	if ( $can_use_cached ) {
@@ -120,23 +114,27 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 
 	// This is the default value when no origin is provided or when it is 'all'.
 	$origin = 'custom';
-	if (
-		! wp_theme_has_theme_json() ||
-		( isset( $context['origin'] ) && 'base' === $context['origin'] )
-	) {
+	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
 	}
 
-	$cache_group = 'theme_json';
-	$cache_key   = 'gutenberg_get_global_settings_' . $origin;
-	$settings    = wp_cache_get( $cache_key, $cache_group );
-
-	if ( false === $settings || WP_DEBUG ) {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
-		wp_cache_set( $cache_key, $settings, $cache_group );
-	}
+	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 
 	return _wp_array_get( $settings, $path, $settings );
+}
+
+/**
+ * Returns CSS media queries for responsive viewport style states.
+ *
+ * @param mixed $viewport_settings Viewport settings from theme.json.
+ * @param array $options           Options for generating media queries.
+ * @return array Responsive media queries.
+ */
+function gutenberg_get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
+	return WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+		$viewport_settings,
+		$options
+	);
 }
 
 /**
@@ -159,10 +157,6 @@ function gutenberg_get_global_styles_custom_css() {
 		}
 	}
 
-	if ( ! wp_theme_has_theme_json() ) {
-		return '';
-	}
-
 	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$stylesheet = $tree->get_custom_css();
 
@@ -182,9 +176,6 @@ function gutenberg_get_global_styles_custom_css() {
  */
 function gutenberg_get_global_styles_base_custom_css() {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_get_global_stylesheet' );
-	if ( ! wp_theme_has_theme_json() ) {
-		return '';
-	}
 
 	$can_use_cached = ! WP_DEBUG;
 
@@ -219,7 +210,7 @@ function gutenberg_add_global_styles_block_custom_css() {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_add_global_styles_for_blocks' );
 	global $wp_styles;
 
-	if ( ! wp_theme_has_theme_json() || ! wp_should_load_separate_core_block_assets() ) {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
 
@@ -287,8 +278,8 @@ function gutenberg_add_global_styles_for_blocks() {
 
 	foreach ( $block_nodes as $metadata ) {
 		if ( $can_use_cached ) {
-			// Use the block name as the key for cached CSS data. Otherwise, use a hash of the metadata.
-			$cache_node_key = isset( $metadata['name'] ) ? $metadata['name'] : md5( wp_json_encode( $metadata ) );
+			// Generate a unique cache key based on the full metadata to ensure pseudo-selectors and other variations get unique keys.
+			$cache_node_key = md5( wp_json_encode( $metadata ) );
 
 			if ( isset( $cached['blocks'][ $cache_node_key ] ) ) {
 				$block_css = $cached['blocks'][ $cache_node_key ];
@@ -354,15 +345,13 @@ function gutenberg_add_global_styles_for_blocks() {
 }
 
 /**
- * Private function to clean the caches used by gutenberg_get_global_settings method.
+ * Private function to clean the caches used by the theme JSON APIs.
  *
  * @access private
  */
 function _gutenberg_clean_theme_json_caches() {
 	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
-	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_custom_css', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_styles_base_custom_css', 'theme_json' );
 	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
@@ -414,6 +403,7 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 		$merged_data = WP_Theme_JSON_Gutenberg::resolve_variables( $merged_data );
 	}
 	$styles = $merged_data->get_raw_data()['styles'];
+
 	return _wp_array_get( $styles, $path, $styles );
 }
 
