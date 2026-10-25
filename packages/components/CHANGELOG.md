@@ -8,7 +8,7 @@
 
 ### Deprecations
 
--   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5 ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+-   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5 ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
 
 ### Enhancements
 

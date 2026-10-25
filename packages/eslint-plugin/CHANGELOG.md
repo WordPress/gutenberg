@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Update the deprecation message for `TabbableContainer` to mention the `useConstrainedTabbing` hook from `@wordpress/compose` ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+-   `use-recommended-components`: Update the deprecation message for `TabbableContainer` to mention the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
 
 ## 28.0.0 (2026-10-20)
 
