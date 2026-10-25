@@ -322,7 +322,8 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
  *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
  * }
- * @return ?array An array consisting of `'value'` and `'unit'` properties.
+ * @return array|null An array consisting of `'value'` and `'unit'` properties on success.
+ *                    `null` on failure.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
 	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) && ! is_float( $raw_value ) ) {
