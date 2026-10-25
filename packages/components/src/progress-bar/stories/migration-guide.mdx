@@ -1,0 +1,36 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import * as ProgressBarStories from './index.story';
+
+<Meta of={ ProgressBarStories } name="Migration Guide" />
+
+# ProgressBar migration guide
+
+`ProgressBar` is deprecated since WordPress 7.2 and scheduled for removal in WordPress 7.4. Use [`Progress`](?path=/docs/design-system-components-progress--docs) from `@wordpress/ui` instead.
+
+## Basic migration
+
+Replace `ProgressBar` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator`. Pass the progress value to `Progress.Root`. Use `null` for indeterminate progress instead of omitting `value`.
+
+```jsx
+import { Progress } from '@wordpress/ui';
+
+const MyLoadingComponent = ( { progress = null } ) => (
+	<Progress.Root value={ progress } aria-label="Loading">
+		<Progress.Track>
+			<Progress.Indicator />
+		</Progress.Track>
+	</Progress.Root>
+);
+```
+
+Provide a task-specific accessible name with `aria-label`, `aria-labelledby`, or `Progress.Label`. Unlike `ProgressBar`, `Progress.Root` does not provide a default accessible name. Add `Progress.Value` when a visible progress value is useful.
+
+## Props and styling
+
+Both components support progress values from 0 to 100 by default. `Progress.Root` also supports `min` and `max` for other ranges.
+
+Move custom width styles to `Progress.Root`, which sets the overall width. Style the track with `Progress.Track` and the filled indicator with `Progress.Indicator`. For example, pass `style={ { width: '100%' } }` to `Progress.Root` to fill its container. Update CSS selectors that depend on the legacy markup.
+
+`ProgressBar` forwards its ref and additional HTML props to a native `progress` element. `Progress.Root` renders a `div` with the `progressbar` role by default, so update refs typed as `HTMLProgressElement` and any code that relies on native `progress` properties.
+
+`@wordpress/ui` is distributed as an npm package and is not available as `wp.ui`. Follow the package's [installation and setup guidance](https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui#installation) when migrating plugin or standalone application code.
