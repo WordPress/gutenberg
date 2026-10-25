@@ -48,7 +48,7 @@ The PHP runtime serves WordPress with the PHP installed on your computer, using 
 $ wp-env start --runtime=php
 ```
 
-WordPress is copied from the configured `core` source into the work directory, and plugins, themes and mappings are linked into it, so changes to your files show up straight away. Changes to the plugins, themes and mappings in the config apply at the next start, and the database stays. `wp-env reset` restores the database to how it was right after installation. Run it again with another `WP_ENV_PORT` to change the port. On Windows, PHP's built-in server handles one request at a time, so pages with many requests load slower.
+WordPress is copied from the configured `core` source into the work directory, and plugins, themes and mappings are linked into it, so changes to your files show up straight away. When the plugins, themes, mappings or core in the config change, the next start builds the site again, keeping the database and uploads. After changing the files of a local `core` folder, run `wp-env start --update`. `wp-env reset` restores the database to how it was right after installation. Run it again with another `WP_ENV_PORT` to change the port. On Windows, PHP's built-in server handles one request at a time, so pages with many requests load slower.
 
 ### Runtime comparison
 
@@ -64,7 +64,7 @@ WordPress is copied from the configured `core` source into the work directory, a
 | Custom MariaDB version | Yes | No (SQLite) | No (SQLite) |
 | Plugin/theme mounting | Yes | Yes | Yes |
 | `wp-env run` command | Yes | No | No |
-| `wp-env logs` command | Yes | No | Yes |
+| `wp-env logs` command | Yes | No | Yes, without `--watch` |
 
 ## Installation
 

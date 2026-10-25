@@ -8,15 +8,13 @@ const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
 const { parseSourceString } = require( '../../config/parse-source-string' );
 const { isPortAnswering } = require( '../../port-utils' );
-const { didCacheChange, getCache, setCache } = require( '../../cache' );
+const { didCacheChange, setCache } = require( '../../cache' );
 const md5 = require( '../../md5' );
 
 const SQLITE_PLUGIN_URL =
 	'https://downloads.wordpress.org/plugin/sqlite-database-integration.zip';
 const SQLITE_PLUGIN_PATH = 'wp-content/plugins/sqlite-database-integration';
-const SOURCES_CACHE_KEY = 'php_sources_checksum';
-const LINKS_CACHE_KEY = 'php_links';
-const CORE_CACHE_KEY = 'php_core_checksum';
+const SETUP_CACHE_KEY = 'php_setup_checksum';
 
 /**
  * PHP runtime implementation for wp-env: the PHP installed on the computer
@@ -123,12 +121,12 @@ class PhpRuntime {
 			);
 		}
 
-		// Set up again when the sources change, keeping the database.
+		// Set up again when the sources change, like the Docker runtime.
 		const { workDirectoryPath } = config;
-		const sourcesHash = md5( { core: envConfig.coreSource, mappings } );
+		const setupHash = md5( { core: envConfig.coreSource, mappings } );
 		if (
 			update ||
-			( await didCacheChange( SOURCES_CACHE_KEY, sourcesHash, {
+			( await didCacheChange( SETUP_CACHE_KEY, setupHash, {
 				workDirectoryPath,
 			} ) )
 		) {
@@ -143,46 +141,18 @@ class PhpRuntime {
 						} )
 				)
 			);
-			await this._setUp( config, siteDir, mappings, { spinner, update } );
-			await setCache( SOURCES_CACHE_KEY, sourcesHash, {
+			spinner.text = 'Setting up WordPress.';
+			await setUp( config, siteDir, mappings );
+			await setCache( SETUP_CACHE_KEY, setupHash, {
 				workDirectoryPath,
 			} );
 		} else {
 			// The port can change between starts.
 			await writeWpConfig( config, siteDir );
 		}
+
 		spinner.text = `Starting PHP on port ${ port }.`;
-
-		const { logFile, pidFile } = getServerPaths( config );
-		const log = await fs.open( logFile, 'w' );
-		const child = spawn(
-			'php',
-			[
-				// The same limits as the Docker runtime.
-				'-d',
-				'upload_max_filesize=1G',
-				'-d',
-				'post_max_size=1G',
-				'-S',
-				`localhost:${ port }`,
-				'-t',
-				siteDir,
-				path.join( __dirname, 'router.php' ),
-			],
-			{
-				detached: true,
-				// Otherwise Windows opens a console that stops the server when closed.
-				windowsHide: true,
-				stdio: [ 'ignore', log.fd, log.fd ],
-				// Without workers the server handles one request at a time.
-				env: { ...process.env, PHP_CLI_SERVER_WORKERS: '8' },
-			}
-		);
-		child.unref();
-		await log.close();
-		await fs.writeFile( pidFile, `${ child.pid } ${ port }` );
-
-		await this._waitForServer( child, logFile );
+		await this._startServer( config );
 
 		return {
 			message: `WordPress development site started at ${ siteUrl }`,
@@ -204,25 +174,20 @@ class PhpRuntime {
 			// Windows has no process groups, so stop the process tree.
 			spawn.sync( 'taskkill', [ '/pid', String( pid ), '/t', '/f' ] );
 		} else if ( pid ) {
-			// The negative PID reaches the server and its workers. Returns
-			// false once none of them is left.
-			const send = ( signal ) => {
-				try {
-					process.kill( -pid, signal );
-					return true;
-				} catch {
-					return false;
-				}
-			};
-			// Wait until they are gone, so the port is free again, and force
-			// it after 5 seconds.
-			for ( const signal of [ 'SIGTERM', 'SIGKILL' ] ) {
-				send( signal );
-				for ( let i = 0; i < 50 && send( 0 ); i++ ) {
+			try {
+				// The negative PID stops the server and its workers. It keeps
+				// nothing in memory, so there is no need to let it finish.
+				process.kill( -pid, 'SIGKILL' );
+				// Wait until they are gone, so the port is free again. Signal 0
+				// only checks, and throws once no process is left.
+				for ( let i = 0; i < 50; i++ ) {
 					await new Promise( ( resolve ) =>
 						setTimeout( resolve, 100 )
 					);
+					process.kill( -pid, 0 );
 				}
+			} catch {
+				// Gone.
 			}
 		}
 		await rimraf( getServerPaths( config ).pidFile );
@@ -273,9 +238,16 @@ class PhpRuntime {
 		if ( ! existsSync( clean ) ) {
 			throw new Error( 'The site is not set up yet. Start it first.' );
 		}
+		// Replacing the database while the server writes to it can corrupt it.
+		const isRunning = !! ( await getServerPid( config ) );
+		await this.stop( config, { spinner } );
+		await rimraf( [ `${ database }-wal`, `${ database }-shm` ] );
 		await fs.copyFile( clean, database );
 		// Plugins added to the config since installation.
 		install( config, path.join( config.workDirectoryPath, 'php' ) );
+		if ( isRunning ) {
+			await this._startServer( config );
+		}
 		spinner.text = 'Reset the database.';
 	}
 
@@ -308,14 +280,13 @@ class PhpRuntime {
 	}
 
 	/**
-	 * Show the server log.
+	 * Show the server log. Following it is not supported yet.
 	 *
-	 * @param {Object}  config          The wp-env config object.
-	 * @param {Object}  options         Logs options.
-	 * @param {boolean} options.watch   If true, follow along with log output.
-	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Logs options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
 	 */
-	async logs( config, { watch, spinner } ) {
+	async logs( config, { spinner } ) {
 		spinner.stop();
 		const { logFile } = getServerPaths( config );
 		if ( ! existsSync( logFile ) ) {
@@ -323,105 +294,46 @@ class PhpRuntime {
 				'There is no PHP server log yet. Start the site first.'
 			);
 		}
-		const file = await fs.open( logFile );
-		let position = 0;
-		do {
-			const { size } = await file.stat();
-			// The log starts over when the server restarts.
-			if ( size < position ) {
-				position = 0;
-			}
-			if ( size > position ) {
-				const { buffer } = await file.read( {
-					buffer: Buffer.alloc( size - position ),
-					position,
-				} );
-				process.stdout.write( buffer );
-				position = size;
-			}
-			if ( watch ) {
-				await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
-			}
-		} while ( watch );
-		await file.close();
+		process.stdout.write( await fs.readFile( logFile ) );
 	}
 
 	/**
-	 * Copy WordPress into the site folder and link the plugins, themes and
-	 * mappings. Install WordPress with a SQLite database the first time, and
-	 * keep a clean copy of the database for `wp-env clean`.
+	 * Start the PHP built-in server in the background.
 	 *
-	 * @param {Object}  config          The wp-env config object.
-	 * @param {string}  siteDir         The site folder.
-	 * @param {Object}  mappings        The sources to link, by path in the site.
-	 * @param {Object}  options         Setup options.
-	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
-	 * @param {boolean} options.update  If true, copy WordPress again.
+	 * @param {Object} config The wp-env config object.
 	 */
-	async _setUp( config, siteDir, mappings, { spinner, update } ) {
-		const envConfig = config.env.development;
-		const { workDirectoryPath } = config;
-		const { database, clean } = getDatabasePaths( config );
-		spinner.text = 'Setting up WordPress.';
-
-		// Remove the last setup's links first, so that a removed mapping goes
-		// away and copying WordPress never writes through a link.
-		const links =
-			( await getCache( LINKS_CACHE_KEY, { workDirectoryPath } ) ) ?? [];
-		for ( const wpPath of links ) {
-			await rimraf( path.join( siteDir, wpPath ) );
-			// Bring back the WordPress files a removed mapping replaced.
-			const original = path.join( envConfig.coreSource.path, wpPath );
-			if ( ! mappings[ wpPath ] && existsSync( original ) ) {
-				await copyCore( original, path.join( siteDir, wpPath ), [] );
+	async _startServer( config ) {
+		const { port } = config.env.development;
+		const { logFile, pidFile } = getServerPaths( config );
+		const log = await fs.open( logFile, 'w' );
+		const child = spawn(
+			'php',
+			[
+				// The same limits as the Docker runtime.
+				'-d',
+				'upload_max_filesize=1G',
+				'-d',
+				'post_max_size=1G',
+				'-S',
+				`localhost:${ port }`,
+				'-t',
+				path.join( config.workDirectoryPath, 'php' ),
+				path.join( __dirname, 'router.php' ),
+			],
+			{
+				detached: true,
+				// Otherwise Windows opens a console that stops the server when closed.
+				windowsHide: true,
+				stdio: [ 'ignore', log.fd, log.fd ],
+				// Without workers the server handles one request at a time.
+				env: { ...process.env, PHP_CLI_SERVER_WORKERS: '8' },
 			}
-		}
-
-		const isInstalled = existsSync( clean );
-		const coreHash = md5( envConfig.coreSource );
-		const coreChanged =
-			update ||
-			( await didCacheChange( CORE_CACHE_KEY, coreHash, {
-				workDirectoryPath,
-			} ) );
-		if ( ! isInstalled ) {
-			await rimraf( siteDir );
-			await rimraf( path.dirname( database ) );
-			await fs.mkdir( path.dirname( database ), { recursive: true } );
-			await copyCore( envConfig.coreSource.path, siteDir, [ '.git' ] );
-		} else if ( coreChanged ) {
-			// The plugins, themes and uploads stay as they are.
-			await copyCore( envConfig.coreSource.path, siteDir, [
-				'.git',
-				'wp-content',
-			] );
-		}
-		// The SQLite plugin may have been updated.
-		await fs.copyFile(
-			path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
-			path.join( siteDir, 'wp-content/db.php' )
 		);
-		await setCache( CORE_CACHE_KEY, coreHash, { workDirectoryPath } );
+		child.unref();
+		await log.close();
+		await fs.writeFile( pidFile, `${ child.pid } ${ port }` );
 
-		// Shorter paths first, so a mapping inside another one replaces an
-		// entry of it.
-		const sorted = Object.keys( mappings ).sort(
-			( a, b ) => a.length - b.length
-		);
-		for ( const wpPath of sorted ) {
-			const target = path.join( siteDir, wpPath );
-			await unlinkParents( siteDir, target );
-			await rimraf( target );
-			await fs.mkdir( path.dirname( target ), { recursive: true } );
-			await link( mappings[ wpPath ].path, target );
-		}
-		await setCache( LINKS_CACHE_KEY, sorted, { workDirectoryPath } );
-
-		await writeWpConfig( config, siteDir );
-		install( config, siteDir );
-		if ( ! isInstalled ) {
-			await fs.copyFile( database, clean );
-		}
+		await this._waitForServer( child, logFile );
 	}
 
 	/**
@@ -450,6 +362,64 @@ class PhpRuntime {
 }
 
 /**
+ * Build the site folder: a copy of WordPress with links to the plugins, themes
+ * and mappings. The database and uploads live outside it, so building it again
+ * keeps them. Install WordPress the first time, and keep a clean copy of the
+ * database for `wp-env clean`.
+ *
+ * @param {Object} config   The wp-env config object.
+ * @param {string} siteDir  The site folder.
+ * @param {Object} mappings The sources to link, by path in the site.
+ */
+async function setUp( config, siteDir, mappings ) {
+	const { database, clean } = getDatabasePaths( config );
+	await fs.mkdir( path.dirname( database ), { recursive: true } );
+	const uploadsDir = path.join( config.workDirectoryPath, 'php-uploads' );
+	await fs.mkdir( uploadsDir, { recursive: true } );
+
+	// Removing the folder removes the links, not what they point to.
+	await rimraf( siteDir );
+	// A copy-on-write clone where the file system supports it.
+	const coreDir = config.env.development.coreSource.path;
+	await fs.cp( coreDir, siteDir, {
+		recursive: true,
+		mode: constants.COPYFILE_FICLONE,
+		filter: ( source ) => path.relative( coreDir, source ) !== '.git',
+	} );
+	// Before the mappings, so a mapping can replace it.
+	await link( uploadsDir, path.join( siteDir, 'wp-content/uploads' ) );
+
+	// Shorter paths first, so a mapping inside another one replaces an
+	// entry of it.
+	const sorted = Object.keys( mappings ).sort(
+		( a, b ) => a.length - b.length
+	);
+	for ( const wpPath of sorted ) {
+		const target = path.join( siteDir, wpPath );
+		await unlinkParents( siteDir, target );
+		await rimraf( target );
+		await fs.mkdir( path.dirname( target ), { recursive: true } );
+		await link( mappings[ wpPath ].path, target );
+	}
+
+	// After the mappings, so a mapped wp-content gets it too, without writing
+	// into the mapped folder.
+	const dropIn = path.join( siteDir, 'wp-content/db.php' );
+	await unlinkParents( siteDir, dropIn );
+	await rimraf( dropIn );
+	await fs.copyFile(
+		path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
+		dropIn
+	);
+
+	await writeWpConfig( config, siteDir );
+	install( config, siteDir );
+	if ( ! existsSync( clean ) ) {
+		await fs.copyFile( database, clean );
+	}
+}
+
+/**
  * The sources to link into the site, by path in the site: the SQLite plugin,
  * then the plugins, themes and mappings from the config.
  *
@@ -470,23 +440,6 @@ function getMappings( config ) {
 		mappings[ `wp-content/themes/${ source.basename }` ] = source;
 	}
 	return Object.assign( mappings, envConfig.mappings );
-}
-
-/**
- * Copy WordPress core into the site folder, as a copy-on-write clone where
- * the file system supports it.
- *
- * @param {string}   coreDir The WordPress core folder.
- * @param {string}   siteDir The site folder.
- * @param {string[]} exclude Paths in the core folder not to copy.
- */
-function copyCore( coreDir, siteDir, exclude ) {
-	return fs.cp( coreDir, siteDir, {
-		recursive: true,
-		mode: constants.COPYFILE_FICLONE,
-		filter: ( source ) =>
-			! exclude.includes( path.relative( coreDir, source ) ),
-	} );
 }
 
 /**
