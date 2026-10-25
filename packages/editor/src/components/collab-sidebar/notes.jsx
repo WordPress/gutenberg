@@ -125,10 +125,11 @@ export function Notes( {
 	/*
 	 * Focuses the thread, or its neighbor when the thread is leaving the list,
 	 * so focus doesn't fall to the document body. `nextThread` is the thread
-	 * as it will be after the change, or `null` when it's being removed.
+	 * as it will be after the change, or `null` when it's being removed. A
+	 * thread the filters would hide is leaving too.
 	 */
 	function focusThreadOrAdjacent( thread, nextThread ) {
-		if ( nextThread ) {
+		if ( nextThread && filterNotes( [ nextThread ], filters ).length ) {
 			focusNoteThread( thread.id, sidebarRef.current );
 			return;
 		}

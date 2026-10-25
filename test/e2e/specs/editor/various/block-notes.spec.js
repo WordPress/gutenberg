@@ -489,6 +489,42 @@ test.describe( 'Block Notes', () => {
 		await expect( headingThread ).toBeHidden();
 	} );
 
+	test( 'moves focus to the next note when resolving one hides it', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await headingThread.click();
+		await sidebar.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( headingThread ).toBeHidden();
+		await expect( imageThread ).toBeFocused();
+	} );
+
 	test( 'expands collapsed replies while searching notes', async ( {
 		editor,
 		page,
