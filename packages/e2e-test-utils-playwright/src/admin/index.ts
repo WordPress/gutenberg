@@ -12,7 +12,6 @@ type AdminConstructorProps = {
 	page: Page;
 	pageUtils: PageUtils;
 	editor: Editor;
-	baseURL?: string;
 };
 
 export class Admin {
@@ -21,15 +20,13 @@ export class Admin {
 	browser: Browser;
 	pageUtils: PageUtils;
 	editor: Editor;
-	baseURL?: string;
 
-	constructor( { page, pageUtils, editor, baseURL }: AdminConstructorProps ) {
+	constructor( { page, pageUtils, editor }: AdminConstructorProps ) {
 		this.page = page;
 		this.context = page.context();
 		this.browser = this.context.browser()!;
 		this.pageUtils = pageUtils;
 		this.editor = editor;
-		this.baseURL = baseURL;
 	}
 
 	/** @borrows createNewPost as this.createNewPost */

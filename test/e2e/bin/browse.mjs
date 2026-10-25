@@ -55,6 +55,12 @@ async function withHelpers( callback ) {
 		throw new Error( 'No browser open. Run `npm run browse -- open`.' );
 	}
 	const page = browser.contexts()[ 0 ].pages()[ 0 ];
+	// A browser we connect to has no base URL, so resolve paths like
+	// `wp-admin/post-new.php` against the site, as the test fixture does.
+	const baseURL = process.env.WP_BASE_URL || 'http://localhost:8889';
+	const goto = page.goto.bind( page );
+	page.goto = ( url, options ) =>
+		goto( new URL( url, baseURL ).href, options );
 	try {
 		const pageUtils = new PageUtils( { page, browserName: 'chromium' } );
 		const editor = new Editor( { page } );
@@ -62,13 +68,7 @@ async function withHelpers( callback ) {
 			page,
 			pageUtils,
 			editor,
-			// A browser we connect to has no base URL; same default as the e2e utils.
-			admin: new Admin( {
-				page,
-				pageUtils,
-				editor,
-				baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
-			} ),
+			admin: new Admin( { page, pageUtils, editor } ),
 		} );
 	} finally {
 		// Only disconnects: the browser stays open for the next command.
