@@ -4352,7 +4352,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * element then compute the style properties for it.
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
-		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings ?? array() );
+		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings );
 
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
 			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
