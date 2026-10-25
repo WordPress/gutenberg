@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type {
 	DropdownMenuProps,
 	DropdownOption,
 } from '../../dropdown-menu/types';
-
-/**
- * WordPress dependencies
- */
 import type { Props as IconProps } from '../../icon';
 
 export type ToolbarGroupControls = DropdownOption & {

@@ -1,7 +1,5 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 test.describe( 'new editor filtered state', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -22,7 +20,7 @@ test.describe( 'new editor filtered state', () => {
 	} );
 
 	test( 'should respect default content', async ( { editor, page } ) => {
-		await editor.openDocumentSettingsSidebar();
+		const summary = await openPostSummary( { editor, page } );
 		// Assert they match what the plugin set.
 		await expect(
 			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
@@ -30,9 +28,9 @@ test.describe( 'new editor filtered state', () => {
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toBe( 'My default content' );
-		await page.getByRole( 'button', { name: 'Edit excerpt' } ).click();
+		await summary.getByRole( 'button', { name: 'Edit Excerpt' } ).click();
 		await expect(
-			page.getByRole( 'textbox', { name: 'Write an excerpt (optional)' } )
+			page.getByRole( 'textbox', { name: 'Excerpt' } )
 		).toHaveValue( 'My default excerpt' );
 	} );
 } );

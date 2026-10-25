@@ -1,5 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 .editor-post-featured-image {
 	padding: 0;
+
+	.hidden {
+		display: none;
+	}
 
 	.components-spinner {
 		position: absolute;
@@ -46,7 +54,7 @@
 .editor-post-featured-image__preview {
 	width: 100%;
 	padding: 0;
-	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+	border-color: $gray-400;
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
 	outline-offset: -#{$border-width};
 	min-height: $grid-unit-50;
@@ -58,21 +66,13 @@
 .editor-post-featured-image__preview {
 	height: auto !important;
 	outline: $border-width solid rgba($black, 0.1);
+	@include checkerboard-background( 12px );
 
 	.editor-post-featured-image__preview-image {
 		object-fit: cover;
 		width: 100%;
 		object-position: 50% 50%;
 		aspect-ratio: 2/1;
-	}
-}
-
-.editor-post-featured-image__toggle {
-	box-shadow: inset 0 0 0 $border-width $gray-400;
-
-	&:focus:not(:disabled) {
-		// Allow smooth transition between focused and unfocused box-shadow states.
-		box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 }
 

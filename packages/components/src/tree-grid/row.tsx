@@ -1,13 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import type { TreeGridRowProps } from './types';
+import { useValidateTreeGridStructure } from './use-validate-tree-grid-structure';
 
 function UnforwardedTreeGridRow(
 	{
@@ -20,10 +15,14 @@ function UnforwardedTreeGridRow(
 	}: WordPressComponentProps< TreeGridRowProps, 'tr', false >,
 	ref: React.ForwardedRef< HTMLTableRowElement >
 ) {
+	const rowRef = useRef< HTMLTableRowElement >( null );
+	const refs = useMergeRefs( [ rowRef, ref ] );
+	useValidateTreeGridStructure( 'TreeGridRow', rowRef );
+
 	return (
 		<tr
 			{ ...props }
-			ref={ ref }
+			ref={ refs }
 			role="row"
 			aria-level={ level }
 			aria-posinset={ positionInSet }
@@ -43,5 +42,6 @@ function UnforwardedTreeGridRow(
  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
  */
 export const TreeGridRow = forwardRef( UnforwardedTreeGridRow );
+TreeGridRow.displayName = 'TreeGridRow';
 
 export default TreeGridRow;

@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,
-	title: 'Components/FormToggle',
+	id: 'components-formtoggle',
+	title: 'Components/@wordpress-components/FormToggle',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
@@ -26,6 +16,14 @@ const meta: Meta< typeof FormToggle > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Switch`](?path=/docs/design-system-components-form-primitives-switch--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-togglecontrol--migration-guide).',
+		},
+		// FIXME: Story shows FormToggle without a visible label (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 	},
 };
 export default meta;
