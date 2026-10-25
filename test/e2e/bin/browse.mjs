@@ -62,7 +62,13 @@ async function withHelpers( callback ) {
 			page,
 			pageUtils,
 			editor,
-			admin: new Admin( { page, pageUtils, editor } ),
+			// A browser we connect to has no base URL; same default as the e2e utils.
+			admin: new Admin( {
+				page,
+				pageUtils,
+				editor,
+				baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
+			} ),
 		} );
 	} finally {
 		// Only disconnects: the browser stays open for the next command.

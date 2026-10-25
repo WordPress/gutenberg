@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Admin`: accepts a `baseURL`, like `RequestUtils`. The `admin` fixture passes the project's `baseURL`; otherwise it defaults to the `WP_BASE_URL` environment variable, so `Admin` also works outside the test runner ([#85525](https://github.com/WordPress/gutenberg/pull/85525)).
+-   `Admin`: accepts an optional `baseURL` to navigate against, for use outside the test runner, where the browser has none of its own ([#85525](https://github.com/WordPress/gutenberg/pull/85525)).
 
 ### Bug Fixes
 

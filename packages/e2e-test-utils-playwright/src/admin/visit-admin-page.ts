@@ -13,11 +13,10 @@ export async function visitAdminPage(
 	adminPath: string,
 	query?: string
 ) {
+	const url = join( 'wp-admin', adminPath ) + ( query ? `?${ query }` : '' );
+	// Without a base URL, Playwright resolves the path against the context's.
 	await this.page.goto(
-		new URL(
-			join( 'wp-admin', adminPath ) + ( query ? `?${ query }` : '' ),
-			this.baseURL
-		).href
+		this.baseURL ? new URL( url, this.baseURL ).href : url
 	);
 
 	// Handle upgrade required screen
