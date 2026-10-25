@@ -29,7 +29,6 @@ const MyFontSizePicker = () => {
 
 	return (
 		<FontSizePicker
-			__next40pxDefaultSize
 			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
@@ -81,13 +80,6 @@ If onChange is called without any parameter, it should reset the value, attendin
 
 -   Required: Yes
 
-### `size`: `'default' | '__unstable-large'`
-
-Size of the control.
-
--   Required: No
--   Default: `'default'`
-
 ### `units`: `string[]`
 
 Available units for custom font size selection.
@@ -103,6 +95,16 @@ The current font size value.
 
 -   Required: No
 
+### `valueMode`: `'literal' | 'slug'`
+
+Determines how the `value` prop should be interpreted.
+
+- `'literal'`: The `value` prop contains the actual font size value (number or string).
+- `'slug'`: The `value` prop contains the slug of the selected font size.
+
+-   Required: No
+-   Default: `'literal'`
+
 ### `withReset`: `boolean`
 
 If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
@@ -116,10 +118,3 @@ If `true`, a slider will be displayed alongside the input field when a custom fo
 
 -   Required: no
 -   Default: `false`
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
-- Required: No
-- Default: `false`

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { get } = require( 'https' );
 const path = require( 'path' );
 const fs = require( 'fs' );
