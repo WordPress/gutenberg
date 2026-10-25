@@ -41,12 +41,10 @@ function update( block, attributes ) {
 
 describe( 'optional block delimiters', () => {
 	beforeAll( () => {
-		window.__experimentalOptionalBlockDelimiters = true;
 		registerCoreBlocks();
 	} );
 
 	afterAll( () => {
-		delete window.__experimentalOptionalBlockDelimiters;
 		getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
 	} );
 
@@ -204,21 +202,20 @@ describe( 'optional block delimiters', () => {
 				style: { color: { text: '#000000' } },
 			} ),
 		] );
-		// The text color can't be read from the HTML yet, so it needs a
-		// delimiter; the unknown attributes stay in the HTML.
 		expect( content ).toBe(
 			`<!-- wp:paragraph {"style":{"color":{"text":"#000000"}}} -->\n<p class="has-text-color" style="color:#000000;border-left:4px solid" data-note="tip">New</p>\n<!-- /wp:paragraph -->`
 		);
 		expect( serialize( parse( content ) ) ).toBe( content );
 	} );
 
-	it( 'adds a delimiter only when a block needs one', () => {
+	it( 'gives new blocks delimiters', () => {
+		const [ old ] = parse( '<p>Old</p>' );
 		const content = serialize( [
-			createBlock( 'core/paragraph', { content: 'Plain' } ),
-			createBlock( 'core/paragraph', { content: 'Big', dropCap: true } ),
+			old,
+			createBlock( 'core/paragraph', { content: 'New' } ),
 		] );
 		expect( content ).toBe(
-			`<p>Plain</p>\n\n<!-- wp:paragraph {"dropCap":true} -->\n<p class="has-drop-cap">Big</p>\n<!-- /wp:paragraph -->`
+			`<p>Old</p>\n\n<!-- wp:paragraph -->\n<p>New</p>\n<!-- /wp:paragraph -->`
 		);
 		expect( serialize( parse( content ) ) ).toBe( content );
 	} );

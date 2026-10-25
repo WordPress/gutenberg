@@ -3,15 +3,6 @@ import { getBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import type { BlockListBlockFeatureProps, BlockWrapperProps } from './types';
 
-declare global {
-	interface Window {
-		/**
-		 * Whether the optional block delimiters experiment is enabled.
-		 */
-		__experimentalOptionalBlockDelimiters?: boolean;
-	}
-}
-
 type HtmlAttributes = Record< string, string >;
 
 /**
@@ -23,15 +14,10 @@ type HtmlAttributes = Record< string, string >;
  * @return Block settings.
  */
 export function addAttribute( settings: BlockType ): BlockType {
-	if (
-		typeof window !== 'undefined' &&
-		window.__experimentalOptionalBlockDelimiters
-	) {
-		settings.attributes = {
-			...settings.attributes,
-			htmlAttributes: { type: 'object', role: 'local' },
-		};
-	}
+	settings.attributes = {
+		...settings.attributes,
+		htmlAttributes: { type: 'object', role: 'local' },
+	};
 	return settings;
 }
 

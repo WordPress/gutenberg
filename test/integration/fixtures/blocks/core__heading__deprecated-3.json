@@ -5,10 +5,8 @@
 		"attributes": {
 			"content": "Text",
 			"level": 2,
-			"style": {
-				"color": {
-					"text": "#268ebb"
-				}
+			"htmlAttributes": {
+				"style": "color:#268ebb"
 			}
 		},
 		"innerBlocks": []
