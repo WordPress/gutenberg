@@ -4103,7 +4103,7 @@ class WP_Theme_JSON_Gutenberg {
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$use_root_padding         = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector                 = $block_metadata['selector'];
-		$settings                 = $this->theme_json['settings'] ?? null;
+		$settings                 = $this->theme_json['settings'] ?? array();
 		$is_root_selector         = static::ROOT_BLOCK_SELECTOR === $selector;
 		$media_query              = $block_metadata['media_query'] ?? null;
 		$responsive_media_queries = static::get_viewport_media_queries( $settings['viewport'] ?? null );
@@ -5948,7 +5948,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$settings = $this->theme_json['settings'] ?? null;
+		$settings = $this->theme_json['settings'] ?? array();
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
 			// Skip if this is the block's root selector, the custom CSS
