@@ -5930,14 +5930,15 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Generates style declarations for a node's features e.g. color, border,
-	 * typography etc, that have custom selectors in their related block's
+	 * Generates style declarations for a node's features e.g., color, border,
+	 * typography etc. that have custom selectors in their related block's
 	 * metadata.
+	 *
+	 * @since 6.3.0
 	 *
 	 * @param array<string, mixed> $metadata The related block metadata containing selectors.
 	 * @param array<string, mixed> $node     A merged theme.json node for block or variation. Features
 	 *                                       promoted to their own selector are removed from it.
-	 *
 	 * @return array<string, array[]> The style declarations for the node's features with custom
 	 *                                selectors, keyed by selector.
 	 *
@@ -5954,8 +5955,10 @@ class WP_Theme_JSON_Gutenberg {
 		$settings = $this->theme_json['settings'] ?? array();
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
-			// Skip if this is the block's root selector, the custom CSS
-			// selector, or the block doesn't have any styles for the feature.
+			/*
+			 * Skip if this is the block's root selector, the custom CSS
+			 * selector, or the block doesn't have any styles for the feature.
+			 */
 			if ( 'root' === $feature || 'css' === $feature || empty( $node[ $feature ] ) ) {
 				continue;
 			}
@@ -5967,8 +5970,10 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					// Create temporary node containing only the subfeature data
-					// to leverage existing `compute_style_properties` function.
+					/*
+					 * Create temporary node containing only the subfeature data
+					 * to leverage existing `compute_style_properties` function.
+					 */
 					$subfeature_node = array(
 						$feature => array(
 							$subfeature => $feature_styles[ $subfeature ],
@@ -5987,32 +5992,40 @@ class WP_Theme_JSON_Gutenberg {
 						$declarations[ $subfeature_selector ] = $new_declarations;
 					}
 
-					// Remove the subfeature from the block's node now its
-					// styles will be included under its own selector not the
-					// block's.
+					/*
+					 * Remove the subfeature from the block's node now its
+					 * styles will be included under its own selector not the
+					 * block's.
+					 */
 					unset( $feature_styles[ $subfeature ] );
 				}
 				$node[ $feature ] = $feature_styles;
 			}
 
-			// Now subfeatures have been processed and removed we can process
-			// feature root selector or simple string selector.
+			/*
+			 * Now subfeatures have been processed and removed we can process
+			 * feature root selector or simple string selector.
+			 */
 			if (
 				is_string( $feature_selectors ) ||
 				( isset( $feature_selectors['root'] ) && $feature_selectors['root'] )
 			) {
 				$feature_selector = is_string( $feature_selectors ) ? $feature_selectors : $feature_selectors['root'];
 
-				// Create temporary node containing only the feature data
-				// to leverage existing `compute_style_properties` function.
+				/*
+				 * Create temporary node containing only the feature data
+				 * to leverage existing `compute_style_properties` function.
+				 */
 				$feature_node = array( $feature => $node[ $feature ] );
 
 				// Generate the style declarations.
 				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $this->theme_json );
 
-				// Merge new declarations with any that already exist for
-				// the feature selector. This may occur when multiple block
-				// support features use the same custom selector.
+				/*
+				 * Merge new declarations with any that already exist for
+				 * the feature selector. This may occur when multiple block
+				 * support features use the same custom selector.
+				 */
 				if ( isset( $declarations[ $feature_selector ] ) ) {
 					foreach ( $new_declarations as $new_declaration ) {
 						$declarations[ $feature_selector ][] = $new_declaration;
@@ -6021,8 +6034,10 @@ class WP_Theme_JSON_Gutenberg {
 					$declarations[ $feature_selector ] = $new_declarations;
 				}
 
-				// Remove the feature from the block's node now its styles
-				// will be included under its own selector not the block's.
+				/*
+				 * Remove the feature from the block's node now its styles
+				 * will be included under its own selector not the block's.
+				 */
 				unset( $node[ $feature ] );
 			}
 		}
