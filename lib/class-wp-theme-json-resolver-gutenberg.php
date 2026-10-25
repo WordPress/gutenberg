@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.8.0
  */
 
@@ -24,6 +24,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for keep track of registered blocks.
 	 *
 	 * @since 6.1.0
+	 * @since 7.2.0 Added the `merged` entry.
 	 * @var array
 	 */
 	protected static $blocks_cache = array(
@@ -31,7 +32,16 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		'blocks' => array(),
 		'theme'  => array(),
 		'user'   => array(),
+		'merged' => array(),
 	);
+
+	/**
+	 * Merged data keyed by origin.
+	 *
+	 * @since 7.2.0
+	 * @var array
+	 */
+	protected static $merged = array();
 
 	/**
 	 * Container for data coming from core.
@@ -144,7 +154,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	protected static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === static::$i18n_schema ) {
 			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
-			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
+			static::$i18n_schema = $i18n_schema ?? array();
 		}
 
 		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
@@ -182,9 +192,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Checks whether the registered blocks were already processed for this origin.
 	 *
 	 * @since 6.1.0
+	 * @since 7.2.0 Added the 'merged' origin.
 	 *
 	 * @param string $origin Data source for which to cache the blocks.
-	 *                       Valid values are 'core', 'blocks', 'theme', and 'user'.
+	 *                       Valid values are 'core', 'blocks', 'theme', 'user',
+	 *                       and 'merged'.
 	 * @return bool True on success, false otherwise.
 	 */
 	protected static function has_same_registered_blocks( $origin ) {
@@ -224,7 +236,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              Added registration and merging of block style variations from partial theme.json files and the block styles registry.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
-	 * @param array $options {
+	 * @param array $options    {
 	 *     Options arguments.
 	 *
 	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
@@ -297,13 +309,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					static::$theme = $parent_theme;
 				}
 			}
-
-			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			if ( ! class_exists( 'WP_Font_Face' ) && class_exists( 'WP_Fonts_Resolver' ) ) {
-				static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
-			}
-			// END OF EXPERIMENTAL CODE.
-
 		}
 
 		if ( ! $options['with_supports'] ) {
@@ -459,17 +464,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$theme = wp_get_theme();
 		}
 
-		/*
-		 * Bail early if the theme does not support a theme.json.
-		 *
-		 * Since wp_theme_has_theme_json only supports the active
-		 * theme, the extra condition for whether $theme is the active theme is
-		 * present here.
-		 */
-		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
-			return array();
-		}
-
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
@@ -494,7 +488,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
-		if ( count( $recent_posts ) === 1 ) {
+		if ( count( $recent_posts ) === 1 && $recent_posts[0] instanceof WP_Post ) {
 			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
@@ -511,7 +505,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
+				$post = get_post( $cpt_post_id );
+				if ( $post instanceof WP_Post ) {
+					$user_cpt = get_object_vars( $post );
+				}
 			}
 		}
 
@@ -599,6 +596,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 5.9.0 Added user data, removed the `$settings` parameter,
 	 *              added the `$origin` parameter.
 	 * @since 6.1.0 Added block data and generation of spacingSizes array.
+	 * @since 7.2.0 Caches the merged data per origin for the request and returns a copy of it.
 	 *
 	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
 	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
@@ -610,24 +608,39 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
+		if ( ! in_array( $origin, array( 'default', 'blocks', 'theme', 'custom' ), true ) ) {
+			$origin = 'custom';
+		}
+
+		/*
+		 * Discard the merged data when blocks were registered after the last merge.
+		 *
+		 * This check detects new blocks, not theme support changes. Call
+		 * clean_cached_data() after changing theme supports to refresh the merged data.
+		 */
+		if ( ! static::has_same_registered_blocks( 'merged' ) ) {
+			static::$merged = array();
+		}
+		if ( isset( static::$merged[ $origin ] ) ) {
+			return clone static::$merged[ $origin ];
+		}
+
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( static::get_core_data() );
-		if ( 'default' === $origin ) {
-			return $result;
+		if ( 'default' !== $origin ) {
+			$result->merge( static::get_block_data() );
+		}
+		if ( 'theme' === $origin || 'custom' === $origin ) {
+			$result->merge( static::get_theme_data() );
+		}
+		if ( 'custom' === $origin ) {
+			$result->merge( static::get_user_data() );
 		}
 
-		$result->merge( static::get_block_data() );
-		if ( 'blocks' === $origin ) {
-			return $result;
-		}
+		static::$merged[ $origin ] = $result;
 
-		$result->merge( static::get_theme_data() );
-		if ( 'theme' === $origin ) {
-			return $result;
-		}
-
-		$result->merge( static::get_user_data() );
-		return $result;
+		// Return a clone so callers can modify the result without changing the cache.
+		return clone $result;
 	}
 
 	/**
@@ -696,16 +709,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              and `$i18n_schema` variables to reset.
 	 * @since 6.1.0 Added the `$blocks` and `$blocks_cache` variables
 	 *              to reset.
+	 * @since 7.2.0 Added the `$merged` variable to reset.
 	 */
 	public static function clean_cached_data() {
 		static::$core                     = null;
 		static::$blocks                   = null;
-		static::$blocks_cache             = array(
-			'core'   => array(),
-			'blocks' => array(),
-			'theme'  => array(),
-			'user'   => array(),
-		);
+		static::$blocks_cache             = array_fill_keys( array_keys( static::$blocks_cache ), array() );
+		static::$merged                   = array();
 		static::$theme                    = null;
 		static::$user                     = null;
 		static::$user_custom_post_type_id = null;
@@ -935,7 +945,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $data   Array following the theme.json specification.
+	 * @param array $data       Array following the theme.json specification.
 	 * @param array $variations Shared block style variations.
 	 * @return array Theme json data including shared block style variation definitions.
 	 */
@@ -977,7 +987,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $data   Array following the theme.json specification.
+	 * @param array $data Array following the theme.json specification.
 	 * @return array Theme json data including variations from the block styles registry.
 	 */
 	private static function inject_variations_from_block_styles_registry( $data ) {
