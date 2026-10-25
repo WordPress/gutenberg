@@ -18,7 +18,7 @@
 
 ### Deprecations
 
--   `Tooltip`: Deprecate the component in favor of `Tooltip` from `@wordpress/ui`, planned for removal in WordPress 7.4.
+-   `Tooltip`: Deprecate the component in favor of `Tooltip` from `@wordpress/ui`, planned for removal in WordPress 7.4 ([#85518](https://github.com/WordPress/gutenberg/pull/85518)).
 
 ### Bug Fixes
 
