@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Experimental: with `window.__experimentalOptionalBlockDelimiters`, `parse` reads HTML without block delimiters as blocks, and `serialize` saves untouched blocks exactly as written and leaves out delimiters that new or edited blocks don't need ([#85500](https://github.com/WordPress/gutenberg/pull/85500)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).

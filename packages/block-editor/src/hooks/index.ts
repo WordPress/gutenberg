@@ -11,6 +11,7 @@ import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';
+import htmlAttributes from './html-attributes';
 import './generated-class-name';
 import style from './style';
 import './settings';
@@ -57,6 +58,7 @@ createBlockEditFilter(
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
+	htmlAttributes,
 	align,
 	textAlign,
 	background,
@@ -88,6 +90,8 @@ createBlockSaveFilter( [
 	fontFamily,
 	fontSize,
 	textShadow,
+	// Last, so the block's own styles win over these.
+	htmlAttributes,
 ] );
 
 export { useCustomSides } from './dimensions';

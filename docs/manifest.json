@@ -2526,6 +2526,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/html-api",
+		"slug": "packages-html-api",
+		"markdown_source": "../packages/html-api/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/html-entities",
 		"slug": "packages-html-entities",
 		"markdown_source": "../packages/html-entities/README.md",
