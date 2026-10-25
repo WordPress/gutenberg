@@ -23,6 +23,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @var array
+	 * @phpstan-var array{ version?: int, settings?: array<string, mixed>, styles?: array<string, mixed>, ...<string, mixed> }
 	 */
 	protected $theme_json = null;
 
