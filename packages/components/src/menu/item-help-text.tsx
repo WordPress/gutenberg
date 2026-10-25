@@ -1,20 +1,15 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import * as Styled from './styles';
+import { Context } from './context';
+import { Truncate } from '../truncate';
+import styles from './style.module.scss';
 
-export const MenuItemHelpText = forwardRef<
+export const ItemHelpText = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function MenuItemHelpText( props, ref ) {
-	const menuContext = useContext( MenuContext );
+>( function UnforwardedItemHelpText( { className, ...props }, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -23,6 +18,11 @@ export const MenuItemHelpText = forwardRef<
 	}
 
 	return (
-		<Styled.MenuItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />
+		<Truncate
+			numberOfLines={ 2 }
+			ref={ ref }
+			{ ...props }
+			className={ clsx( styles[ 'item-help-text' ], className ) }
+		/>
 	);
 } );

@@ -15,7 +15,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Components
 
-This package doesn't currently have any publically exported components.
+This package doesn't currently have any publicly exported components.
 
 ## Contributing to this package
 

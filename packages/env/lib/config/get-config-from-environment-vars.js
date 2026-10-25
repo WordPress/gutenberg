@@ -1,12 +1,14 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const {
 	parseSourceString,
 	includeTestsPath,
 } = require( './parse-source-string' );
-const { checkPort, checkVersion, checkString } = require( './validate-config' );
+const {
+	checkPort,
+	checkVersion,
+	checkMariaDBVersion,
+	checkString,
+} = require( './validate-config' );
 
 /**
  * @typedef {import('./parse-source-string').WPSource} WPSource
@@ -23,6 +25,7 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  * @property {?number}                  phpmyadminPort   An override for the development environment's phpMyAdmin port.
  * @property {?WPSource}                coreSource       An override for all environment's coreSource.
  * @property {?string}                  phpVersion       An override for all environment's PHP version.
+ * @property {?string}                  mariadbVersion   An override for all environment's MariaDB version.
  * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
  */
 
@@ -68,6 +71,15 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 		environmentConfig.phpVersion = process.env.WP_ENV_PHP_VERSION;
 	}
 
+	if ( process.env.WP_ENV_MARIADB_VERSION ) {
+		checkMariaDBVersion(
+			'environment variable',
+			'WP_ENV_MARIADB_VERSION',
+			process.env.WP_ENV_MARIADB_VERSION
+		);
+		environmentConfig.mariadbVersion = process.env.WP_ENV_MARIADB_VERSION;
+	}
+
 	return environmentConfig;
 };
 
@@ -103,6 +115,8 @@ function getLifecycleScriptOverrides() {
 	const lifecycleEnvironmentVars = {
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_START: 'afterStart',
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEAN: 'afterClean',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_RESET: 'afterReset',
+		WP_ENV_LIFECYCLE_SCRIPT_AFTER_CLEANUP: 'afterCleanup',
 		WP_ENV_LIFECYCLE_SCRIPT_AFTER_DESTROY: 'afterDestroy',
 	};
 	for ( const envVar in lifecycleEnvironmentVars ) {

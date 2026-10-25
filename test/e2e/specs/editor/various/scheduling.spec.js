@@ -1,7 +1,5 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 // The `timezone` setting exposed via REST API only accepts `UTC`
 // and timezone strings by location.
@@ -10,9 +8,10 @@ const TIMEZONES = [ 'Pacific/Honolulu', 'UTC', 'Australia/Sydney' ];
 test.describe( 'Scheduling', () => {
 	TIMEZONES.forEach( ( timezone ) => {
 		test.describe( `Timezone ${ timezone }`, () => {
-			let orignalTimezone;
+			let originalTimezone;
+
 			test.beforeAll( async ( { requestUtils } ) => {
-				orignalTimezone = ( await requestUtils.getSiteSettings() )
+				originalTimezone = ( await requestUtils.getSiteSettings() )
 					.timezone;
 
 				await requestUtils.updateSiteSettings( { timezone } );
@@ -20,7 +19,7 @@ test.describe( 'Scheduling', () => {
 
 			test.afterAll( async ( { requestUtils } ) => {
 				await requestUtils.updateSiteSettings( {
-					timezone: orignalTimezone,
+					timezone: originalTimezone,
 				} );
 			} );
 
@@ -30,7 +29,7 @@ test.describe( 'Scheduling', () => {
 				page,
 			} ) => {
 				await admin.createNewPost();
-				await editor.openDocumentSettingsSidebar();
+				const summary = await openPostSummary( { editor, page } );
 
 				const topBar = page.getByRole( 'region', {
 					name: 'Editor top bar',
@@ -40,17 +39,14 @@ test.describe( 'Scheduling', () => {
 					topBar.getByRole( 'button', { name: 'Publish' } )
 				).toBeVisible();
 
-				// Open the datepicker.
-				await page
-					.getByRole( 'button', { name: 'Change date' } )
-					.click();
-
 				// Change the publishing date to a year in the future.
-				await page
-					.getByRole( 'group', { name: 'Date' } )
-					.getByRole( 'spinbutton', { name: 'Year' } )
+				await summary
+					.getByRole( 'button', { name: 'Edit Date' } )
 					.click();
-				await page.keyboard.press( 'ArrowUp' );
+				const nextYear = new Date().getFullYear() + 1;
+				await page
+					.getByLabel( 'Date time' )
+					.fill( `${ nextYear }-03-15T10:00` );
 
 				// Close the datepicker.
 				await page.keyboard.press( 'Escape' );
@@ -68,15 +64,17 @@ test.describe( 'Scheduling', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Change date' } ).click();
+		const summary = await openPostSummary( { editor, page } );
+		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 
-		const calendar = page.getByRole( 'application', { name: 'Calendar' } );
+		const calendar = page.getByRole( 'application', {
+			name: /Date calendar/,
+		} );
 		const prevMonth = calendar.getByRole( 'button', {
-			name: 'View previous month',
+			name: 'Previous month',
 		} );
 		const nextMonth = calendar.getByRole( 'button', {
-			name: 'View next month',
+			name: 'Next month',
 		} );
 
 		await prevMonth.click();

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-class', () => {
@@ -106,7 +103,9 @@ test.describe( 'data-wp-class', () => {
 
 	test( 'can use classes with several dashes', async ( { page } ) => {
 		const el = page.getByTestId( 'can use classes with several dashes' );
-		await expect( el ).toHaveClass( 'main-bg----color' );
+		await expect( el ).toContainClass( 'main-bg--color' );
+		await expect( el ).toContainClass( 'main-bg---color' );
+		await expect( el ).toContainClass( 'main-bg----color' );
 	} );
 
 	test( 'can use "default" as a class name', async ( { page } ) => {

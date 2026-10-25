@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-
 // TODO: this util should perhaps be refactored somewhere like core-data.
 import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
 import { getTemplatePartIcon } from '../template-part/edit/utils/get-template-part-icon';
@@ -36,24 +28,24 @@ export default function useTemplatePartAreaLabel( clientId ) {
 				return;
 			}
 
+			const { getCurrentTheme, getEditedEntityRecord } =
+				select( coreStore );
+
+			const currentTheme = getCurrentTheme();
 			const defaultTemplatePartAreas =
-				select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-					?.default_template_part_areas || [];
+				currentTheme?.default_template_part_areas || [];
 
 			const definedAreas = defaultTemplatePartAreas.map( ( item ) => ( {
 				...item,
 				icon: getTemplatePartIcon( item.icon ),
 			} ) );
 
-			const { getCurrentTheme, getEditedEntityRecord } =
-				select( coreStore );
-
 			for ( const templatePartClientId of parentTemplatePartClientIds ) {
 				const templatePartBlock = getBlock( templatePartClientId );
 
 				// The 'area' usually isn't stored on the block, but instead
 				// on the entity.
-				const { theme = getCurrentTheme()?.stylesheet, slug } =
+				const { theme = currentTheme?.stylesheet, slug } =
 					templatePartBlock.attributes;
 				const templatePartEntityId = createTemplatePartId(
 					theme,

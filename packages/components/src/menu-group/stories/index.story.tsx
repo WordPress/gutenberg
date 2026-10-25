@@ -1,22 +1,13 @@
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import MenuGroup from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
-
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
+import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuGroup > = {
-	title: 'Components/Actions/MenuGroup',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Actions/MenuGroup',
 	component: MenuGroup,
 	id: 'components-menugroup',
 	argTypes: {
@@ -25,16 +16,23 @@ const meta: Meta< typeof MenuGroup > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Subcomponent of `DropdownMenu`.',
+		},
 	},
 };
 export default meta;
 
 const Template: StoryFn< typeof MenuGroup > = ( args ) => {
 	return (
-		<MenuGroup { ...args }>
-			<MenuItem>Menu Item 1</MenuItem>
-			<MenuItem>Menu Item 2</MenuItem>
-		</MenuGroup>
+		<NavigableMenu>
+			<MenuGroup { ...args }>
+				<MenuItem>Menu Item 1</MenuItem>
+				<MenuItem>Menu Item 2</MenuItem>
+			</MenuGroup>
+		</NavigableMenu>
 	);
 };
 
@@ -54,7 +52,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 	];
 
 	return (
-		<>
+		<NavigableMenu>
 			<MenuGroup label="View">
 				<MenuItem>Top Toolbar</MenuItem>
 				<MenuItem>Spotlight Mode</MenuItem>
@@ -68,7 +66,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 					onHover={ () => {} }
 				/>
 			</MenuGroup>
-		</>
+		</NavigableMenu>
 	);
 };
 
@@ -76,8 +74,8 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
  * When other menu items exist above or below a MenuGroup, the group
  * should have a divider line between it and the adjacent item.
  */
-export const WithSeperator = MultiGroupsTemplate.bind( {} );
-WithSeperator.args = {
+export const WithSeparator = MultiGroupsTemplate.bind( {} );
+WithSeparator.args = {
 	...Default.args,
 	hideSeparator: false,
 	label: 'Editor',

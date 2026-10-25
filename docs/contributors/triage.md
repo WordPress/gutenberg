@@ -9,7 +9,7 @@ To keep the repository healthy, it needs to be triaged regularly. **Triage is th
 The triage team is an open group of people with a particular role of making sure triage is done consistently across the Gutenberg repo. There are various types of triage which happen:
 
 -   Regular self triage sessions done by members on their own time.
--   Organised triage sessions done as a group at a set time. You can [review the meetings page](https://make.wordpress.org/meetings/) to find these triage sessions and appropriate slack channels.
+-   Organized triage sessions done as a group at a set time. You can [review the meetings page](https://make.wordpress.org/meetings/) to find these triage sessions and appropriate slack channels.
 -   Focused triage sessions on a specific board, label or feature.
 
 These are the expectations of being a triage team member:

@@ -1,22 +1,13 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuRadioItemProps } from './types';
-import * as Styled from './styles';
 import { SVG, Circle } from '@wordpress/primitives';
+import type { WordPressComponentProps } from '../context';
+import { Context } from './context';
+import type { RadioItemProps } from './types';
+import styles from './style.module.scss';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -24,50 +15,61 @@ const radioCheck = (
 	</SVG>
 );
 
-export const MenuRadioItem = forwardRef<
+export const RadioItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuRadioItemProps, 'div', false >
->( function MenuRadioItem(
-	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+	WordPressComponentProps< RadioItemProps, 'div', false >
+>( function UnforwardedRadioItem(
+	{
+		className,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = false,
+		...props
+	},
 	ref
 ) {
-	const menuContext = useContext( MenuContext );
+	const menuContext = useContext( Context );
+	const store = menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
-	if ( ! menuContext?.store ) {
+	if ( ! store ) {
 		throw new Error(
 			'Menu.RadioItem can only be rendered inside a Menu component'
 		);
 	}
-
 	return (
-		<Styled.MenuRadioItem
+		<Ariakit.MenuItemRadio
 			ref={ ref }
 			{ ...props }
+			className={ clsx( styles.item, styles[ 'radio-item' ], className ) }
 			accessibleWhenDisabled
 			disabled={ disabled }
-			hideOnClick={ hideOnClick }
-			store={ menuContext.store }
+			store={ store }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
-				store={ menuContext.store }
-				render={ <Styled.ItemPrefixWrapper /> }
+				store={ store }
+				render={
+					<span className={ styles[ 'item-prefix-wrapper' ] } />
+				}
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.MenuItemContentWrapper>
-				<Styled.MenuItemChildrenWrapper>
+			<div className={ styles[ 'item-content-wrapper' ] }>
+				<div className={ styles[ 'item-children-wrapper' ] }>
 					{ children }
-				</Styled.MenuItemChildrenWrapper>
+				</div>
 
 				{ suffix && (
-					<Styled.ItemSuffixWrapper>
+					<span className={ styles[ 'item-suffix-wrapper' ] }>
 						{ suffix }
-					</Styled.ItemSuffixWrapper>
+					</span>
 				) }
-			</Styled.MenuItemContentWrapper>
-		</Styled.MenuRadioItem>
+			</div>
+		</Ariakit.MenuItemRadio>
 	);
 } );

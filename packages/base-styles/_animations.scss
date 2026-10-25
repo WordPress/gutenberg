@@ -14,10 +14,10 @@
 		}
 	}
 
-
-	animation: __wp-base-styles-fade-in $speed $easing $delay;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: __wp-base-styles-fade-in $speed $easing $delay;
+		animation-fill-mode: forwards;
+	}
 }
 
 @mixin animation__fade-out($speed: 0.08s, $delay: 0s, $easing: linear) {
@@ -30,10 +30,10 @@
 		}
 	}
 
-
-	animation: __wp-base-styles-fade-out $speed $easing $delay;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: __wp-base-styles-fade-out $speed $easing $delay;
+		animation-fill-mode: forwards;
+	}
 }
 
 // Deprecated

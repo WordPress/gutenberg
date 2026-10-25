@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent, useFocusReturn } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
@@ -32,7 +29,7 @@ type Props = {
  *                describing the component and the
  *                focus return characteristics.
  *
- * @return Higher Order Component with the focus restauration behaviour.
+ * @return Higher Order Component with the focus restoration behaviour.
  */
 export default createHigherOrderComponent(
 	// @ts-expect-error TODO: Reconcile with intended `createHigherOrderComponent` types

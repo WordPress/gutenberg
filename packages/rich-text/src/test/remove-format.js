@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { removeFormat } from '../remove-format';
 import { getSparseArrayLength } from './helpers';
 
@@ -45,7 +38,7 @@ describe( 'removeFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
 
-	it( 'should remove format for collased selection', () => {
+	it( 'should remove format for collapsed selection', () => {
 		const record = {
 			formats: [
 				,

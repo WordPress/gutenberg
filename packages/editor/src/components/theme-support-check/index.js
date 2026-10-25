@@ -1,22 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**
  * Checks if the current theme supports specific features and renders the children if supported.
  *
- * @param {Object}             props             The component props.
- * @param {React.ReactElement} props.children    The children to render if the theme supports the specified features.
- * @param {string|string[]}    props.supportKeys The key(s) of the theme support(s) to check.
+ * @param {Object}          props             The component props.
+ * @param {React.ReactNode} props.children    The children to render if the theme supports the specified features.
+ * @param {string|string[]} props.supportKeys The key(s) of the theme support(s) to check.
  *
- * @return {React.ReactElement} The rendered children if the theme supports the specified features, otherwise null.
+ * @return {React.ReactNode} The rendered children if the theme supports the specified features, otherwise null.
  */
 export default function ThemeSupportCheck( { children, supportKeys } ) {
 	const { postType, themeSupports } = useSelect( ( select ) => {

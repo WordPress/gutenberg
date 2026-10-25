@@ -1,0 +1,37 @@
+# Generated into an Xcode project by xcodegen (see run.sh). The tests drive
+# the editor in the host app's web view.
+name: GutenbergIOS
+options:
+    bundleIdPrefix: org.wordpress.gutenberg.tests
+    deploymentTarget:
+        iOS: '17.0'
+settings:
+    GENERATE_INFOPLIST_FILE: YES
+targets:
+    Host:
+        type: application
+        platform: iOS
+        sources: [Host]
+        info:
+            path: build/Host-Info.plist
+            properties:
+                UILaunchScreen: {}
+                # WordPress is served over plain HTTP.
+                NSAppTransportSecurity:
+                    NSAllowsArbitraryLoads: true
+        settings:
+            INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    SafariTests:
+        type: bundle.ui-testing
+        platform: iOS
+        sources: [SafariTests]
+        dependencies:
+            - target: Host
+schemes:
+    SafariTests:
+        build:
+            targets:
+                Host: all
+                SafariTests: [test]
+        test:
+            targets: [SafariTests]

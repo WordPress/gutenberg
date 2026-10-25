@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const { command } = require( 'execa' );
-
-/**
- * Internal dependencies
- */
 const { info } = require( './log' );
 
 module.exports = async ( { rootDirectory } ) => {
@@ -24,7 +17,7 @@ module.exports = async ( { rootDirectory } ) => {
 	} );
 
 	info( '' );
-	info( 'Compiling block.' );
+	info( 'Compiling block and generating blocks manifest.' );
 	await command( 'npm run build', {
 		cwd: rootDirectory,
 	} );

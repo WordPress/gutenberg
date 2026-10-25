@@ -1,9 +1,6 @@
-/**
- * External dependencies
- */
 import type * as Ariakit from '@ariakit/react';
 
-export interface MenuContext {
+export interface ContextProps {
 	/**
 	 * The ariakit store shared across all Menu subcomponents.
 	 */
@@ -14,7 +11,7 @@ export interface MenuContext {
 	variant?: 'toolbar';
 }
 
-export interface MenuProps {
+export interface Props {
 	/**
 	 * The elements, which should include one instance of the `Menu.TriggerButton`
 	 * component and one instance of the `Menu.Popover` component.
@@ -50,7 +47,7 @@ export interface MenuProps {
 	placement?: Ariakit.MenuProviderProps[ 'placement' ];
 }
 
-export interface MenuPopoverProps {
+export interface PopoverProps {
 	/**
 	 * The contents of the menu popover, which should include instances of the
 	 * `Menu.Item`, `Menu.CheckboxItem`, `Menu.RadioItem`, `Menu.Group`, and
@@ -98,7 +95,7 @@ export interface MenuPopoverProps {
 	hideOnEscape?: Ariakit.MenuProps[ 'hideOnEscape' ];
 }
 
-export interface MenuTriggerButtonProps {
+export interface TriggerButtonProps {
 	/**
 	 * The contents of the menu trigger button.
 	 */
@@ -139,7 +136,7 @@ export interface MenuTriggerButtonProps {
 	accessibleWhenDisabled?: Ariakit.MenuButtonProps[ 'accessibleWhenDisabled' ];
 }
 
-export interface MenuGroupProps {
+export interface GroupProps {
 	/**
 	 * The contents of the menu group, which should include one instance of the
 	 * `Menu.GroupLabel` component and one or more instances of `Menu.Item`,
@@ -148,7 +145,7 @@ export interface MenuGroupProps {
 	children: Ariakit.MenuGroupProps[ 'children' ];
 }
 
-export interface MenuGroupLabelProps {
+export interface GroupLabelProps {
 	/**
 	 * The contents of the menu group label, which should provide an accessible
 	 * label for the menu group.
@@ -156,7 +153,7 @@ export interface MenuGroupLabelProps {
 	children: Ariakit.MenuGroupLabelProps[ 'children' ];
 }
 
-export interface MenuItemProps {
+export interface ItemProps {
 	/**
 	 * The contents of the menu item, which could include one instance of the
 	 * `Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
@@ -203,7 +200,7 @@ export interface MenuItemProps {
 	store?: Ariakit.MenuItemProps[ 'store' ];
 }
 
-export interface MenuCheckboxItemProps {
+export interface CheckboxItemProps {
 	/**
 	 * The contents of the menu item, which could include one instance of the
 	 * `Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
@@ -258,7 +255,7 @@ export interface MenuCheckboxItemProps {
 	 * The checked state of the checkbox menu item when it is initially rendered.
 	 * Use when not wanting to control its checked state.
 	 *
-	 * Note: this prop will be overriden by the `checked` prop, if it is defined.
+	 * Note: this prop will be overridden by the `checked` prop, if it is defined.
 	 */
 	defaultChecked?: Ariakit.MenuItemCheckboxProps[ 'defaultChecked' ];
 	/**
@@ -267,7 +264,7 @@ export interface MenuCheckboxItemProps {
 	onChange?: Ariakit.MenuItemCheckboxProps[ 'onChange' ];
 }
 
-export interface MenuRadioItemProps {
+export interface RadioItemProps {
 	/**
 	 * The contents of the menu item, which could include one instance of the
 	 * `Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
@@ -321,7 +318,7 @@ export interface MenuRadioItemProps {
 	 * The checked state of the radio menu item when it is initially rendered.
 	 * Use when not wanting to control its checked state.
 	 *
-	 * Note: this prop will be overriden by the `checked` prop, if it is defined.
+	 * Note: this prop will be overridden by the `checked` prop, if it is defined.
 	 */
 	defaultChecked?: Ariakit.MenuItemRadioProps[ 'defaultChecked' ];
 	/**
@@ -330,4 +327,4 @@ export interface MenuRadioItemProps {
 	onChange?: Ariakit.MenuItemRadioProps[ 'onChange' ];
 }
 
-export interface MenuSeparatorProps {}
+export interface SeparatorProps {}

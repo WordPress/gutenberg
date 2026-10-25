@@ -1,21 +1,16 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
+import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuSeparatorProps } from './types';
-import * as Styled from './styles';
+import { Context } from './context';
+import type { SeparatorProps } from './types';
+import styles from './style.module.scss';
 
-export const MenuSeparator = forwardRef<
+export const Separator = forwardRef<
 	HTMLHRElement,
-	WordPressComponentProps< MenuSeparatorProps, 'hr', false >
->( function MenuSeparator( props, ref ) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< SeparatorProps, 'hr', false >
+>( function UnforwardedSeparator( { className, ...props }, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -24,11 +19,13 @@ export const MenuSeparator = forwardRef<
 	}
 
 	return (
-		<Styled.MenuSeparator
+		<Ariakit.MenuSeparator
 			ref={ ref }
 			{ ...props }
+			className={ clsx( styles.separator, className, {
+				[ styles[ 'is-toolbar' ] ]: menuContext.variant === 'toolbar',
+			} ) }
 			store={ menuContext.store }
-			variant={ menuContext.variant }
 		/>
 	);
 } );

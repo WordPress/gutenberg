@@ -1,14 +1,8 @@
-/**
- * External dependencies
- */
 const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * Internal dependencies
- */
 const {
+	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
 	hasArgInCLI,
@@ -42,41 +36,6 @@ const hasCssnanoConfig = () =>
 	hasProjectFile( 'cssnano.config.js' ) ||
 	hasPackageProp( 'cssnano' );
 
-/**
- * Returns path to a Jest configuration which should be provided as the explicit
- * configuration when there is none available for discovery by Jest in the
- * project environment. Returns undefined if Jest should be allowed to discover
- * an available configuration.
- *
- * This can be used in cases where multiple possible configurations are
- * supported. Since Jest will only discover `jest.config.js`, or `jest` package
- * directive, such custom configurations must be specified explicitly.
- *
- * @param {"e2e"|"unit"} suffix Suffix of configuration file to accept.
- *
- * @return {string= | undefined} Override or fallback configuration file path.
- */
-function getJestOverrideConfigFile( suffix ) {
-	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
-		return;
-	}
-
-	if ( hasProjectFile( `jest-${ suffix }.config.js` ) ) {
-		return fromProjectRoot( `jest-${ suffix }.config.js` );
-	}
-
-	if ( ! hasJestConfig() ) {
-		return fromConfigRoot( `jest-${ suffix }.config.js` );
-	}
-}
-
-// See https://jestjs.io/docs/configuration.
-const hasJestConfig = () =>
-	hasProjectFile( 'jest.config.js' ) ||
-	hasProjectFile( 'jest.config.json' ) ||
-	hasProjectFile( 'jest.config.ts' ) ||
-	hasPackageProp( 'jest' );
-
 // See https://prettier.io/docs/en/configuration.html.
 const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.js' ) ||
@@ -85,6 +44,7 @@ const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.yaml' ) ||
 	hasProjectFile( '.prettierrc.yml' ) ||
 	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( 'prettier.config.mjs' ) ||
 	hasProjectFile( '.prettierrc' ) ||
 	hasPackageProp( 'prettier' );
 
@@ -113,9 +73,42 @@ const hasPostCSSConfig = () =>
 const getWebpackArgs = () => {
 	// Gets all args from CLI without those prefixed with `--webpack`.
 	let webpackArgs = getArgsFromCLI( [
+		'--blocks-manifest',
 		'--experimental-modules',
+		'--source-path',
 		'--webpack',
 	] );
+
+	if ( hasArgInCLI( '--experimental-modules' ) ) {
+		process.env.WP_EXPERIMENTAL_MODULES = true;
+	}
+
+	if ( hasArgInCLI( '--source-path' ) ) {
+		process.env.WP_SOURCE_PATH = getArgFromCLI( '--source-path' );
+	} else if ( hasArgInCLI( '--webpack-src-dir' ) ) {
+		// Backwards compatibility.
+		process.env.WP_SOURCE_PATH = getArgFromCLI( '--webpack-src-dir' );
+	}
+
+	if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
+		process.env.WP_BUNDLE_ANALYZER = true;
+	}
+
+	if ( hasArgInCLI( '--webpack-copy-php' ) ) {
+		process.env.WP_COPY_PHP_FILES_TO_DIST = true;
+	}
+
+	if ( hasArgInCLI( '--webpack--devtool' ) ) {
+		process.env.WP_DEVTOOL = getArgFromCLI( '--webpack--devtool' );
+	}
+
+	if ( hasArgInCLI( '--webpack-no-externals' ) ) {
+		process.env.WP_NO_EXTERNALS = true;
+	}
+
+	if ( hasArgInCLI( '--blocks-manifest' ) ) {
+		process.env.WP_BLOCKS_MANIFEST = true;
+	}
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
@@ -126,19 +119,15 @@ const getWebpackArgs = () => {
 	) {
 		/**
 		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
-		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
-		 * `entry-two.js` -> `[ 'entry-two', './entry-two.js' ]`
+		 * `./entry-one.jsx` -> `[ 'entry-one', './entry-one.jsx' ]`
+		 * `entry-two.tsx` -> `[ 'entry-two', './entry-two.tsx' ]`
 		 *
 		 * @param {string} path The path provided.
 		 *
 		 * @return {string[]} The entry pair of its name and the file path.
 		 */
 		const pathToEntry = ( path ) => {
-			const entryName = basename( path, '.js' );
-
-			if ( ! path.startsWith( './' ) ) {
-				path = './' + path;
-			}
+			const entryName = basename( path, extname( path ) );
 
 			return [ entryName, path ];
 		};
@@ -162,7 +151,11 @@ const getWebpackArgs = () => {
 				const [ entryName, path ] = fileArg.includes( '=' )
 					? fileArg.split( '=' )
 					: pathToEntry( fileArg );
-				entry[ entryName ] = path;
+				entry[ entryName ] = fromProjectRoot(
+					process.env.WP_SOURCE_PATH
+						? join( process.env.WP_SOURCE_PATH, path )
+						: path
+				);
 			} );
 			process.env.WP_ENTRY = JSON.stringify( entry );
 		}
@@ -176,20 +169,20 @@ const getWebpackArgs = () => {
 };
 
 /**
- * Returns the WordPress source directory. It defaults to 'src' if the
- * `process.env.WP_SRC_DIRECTORY` variable is not set.
+ * Returns the project source path. It defaults to 'src' if the
+ * `process.env.WP_SOURCE_PATH` variable is not set.
  *
  * @return {string} The WordPress source directory.
  */
-function getWordPressSrcDirectory() {
-	return process.env.WP_SRC_DIRECTORY || 'src';
+function getProjectSourcePath() {
+	return process.env.WP_SOURCE_PATH || 'src';
 }
 
 /**
- * Detects the list of entry points to use with webpack. There are three ways to do this:
- *  1. Use the legacy webpack 4 format passed as CLI arguments.
- *  2. Scan `block.json` files for scripts.
- *  3. Fallback to `src/index.*` file.
+ * Detects the list of entry points to use with webpack. There are three alternative ways to do this:
+ *  1. Use the recommended command format that lists the paths to JavaScript files.
+ *  2. Scan `block.json` files to detect referenced JavaScript and PHP files automatically.
+ *  3. Fallback to the `src/index.*` file.
  *
  * @see https://webpack.js.org/concepts/entry-points/
  *
@@ -200,31 +193,32 @@ function getWebpackEntryPoints( buildType ) {
 	 * @return {Object<string,string>} The list of entry points.
 	 */
 	return () => {
-		// 1. Handles the legacy format for entry points when explicitly provided with the `process.env.WP_ENTRY`.
+		// 1. Uses the recommended command format that lists entry points as paths to JavaScript files.
+		//    Example: `wp-scripts build one.js two.js`.
 		if ( process.env.WP_ENTRY ) {
 			return buildType === 'script'
 				? JSON.parse( process.env.WP_ENTRY )
 				: {};
 		}
 
-		// Continue only if the source directory exists.
-		if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
+		// Continues only if the source directory exists. Defaults to "src" if not explicitly set in the command.
+		if ( ! hasProjectFile( getProjectSourcePath() ) ) {
 			warn(
-				`Source directory "${ getWordPressSrcDirectory() }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+				`Source directory "${ getProjectSourcePath() }" was not found. Please confirm there is a "src" directory in the root or the value passed with "--output-path" is correct.`
 			);
 			return {};
 		}
 
 		// 2. Checks whether any block metadata files can be detected in the defined source directory.
-		//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
+		//    It scans all discovered files, looks for JavaScript assets, and converts them to entry points.
 		const blockMetadataFiles = glob( '**/block.json', {
 			absolute: true,
-			cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+			cwd: fromProjectRoot( getProjectSourcePath() ),
 		} );
 
 		if ( blockMetadataFiles.length > 0 ) {
 			const srcDirectory = fromProjectRoot(
-				getWordPressSrcDirectory() + sep
+				getProjectSourcePath() + sep
 			);
 
 			const entryPoints = {};
@@ -237,7 +231,7 @@ function getWebpackEntryPoints( buildType ) {
 				// at which point they are completely empty and therefore not valid JSON
 				try {
 					parsedBlockJson = JSON.parse( fileContents );
-				} catch ( error ) {
+				} catch {
 					warn(
 						`Not scanning "${ blockMetadataFile.replace(
 							fromProjectRoot( sep ),
@@ -276,7 +270,7 @@ function getWebpackEntryPoints( buildType ) {
 							) }" listed in "${ blockMetadataFile.replace(
 								fromProjectRoot( sep ),
 								''
-							) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
+							) }". File is located outside of the "${ getProjectSourcePath() }" directory.`
 						);
 						continue;
 					}
@@ -287,10 +281,10 @@ function getWebpackEntryPoints( buildType ) {
 
 					// Detects the proper file extension used in the defined source directory.
 					const [ entryFilepath ] = glob(
-						`${ entryName }.?(m)[jt]s?(x)`,
+						`${ entryName }.?([cm])[jt]s?(x)`,
 						{
 							absolute: true,
-							cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+							cwd: fromProjectRoot( getProjectSourcePath() ),
 						}
 					);
 
@@ -302,7 +296,7 @@ function getWebpackEntryPoints( buildType ) {
 							) }" listed in "${ blockMetadataFile.replace(
 								fromProjectRoot( sep ),
 								''
-							) }". File does not exist in the "${ getWordPressSrcDirectory() }" directory.`
+							) }". File does not exist in the "${ getProjectSourcePath() }" directory.`
 						);
 						continue;
 					}
@@ -322,15 +316,15 @@ function getWebpackEntryPoints( buildType ) {
 		}
 
 		// 3. Checks whether a standard file name can be detected in the defined source directory,
-		//  and converts the discovered file to entry point.
-		const [ entryFile ] = glob( 'index.[jt]s?(x)', {
+		//    and converts the discovered file to entry point.
+		const [ entryFile ] = glob( 'index.@([cm]ts|js|jsx|ts|tsx)', {
 			absolute: true,
-			cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+			cwd: fromProjectRoot( getProjectSourcePath() ),
 		} );
 
 		if ( ! entryFile ) {
 			warn(
-				`No entry file discovered in the "${ getWordPressSrcDirectory() }" directory.`
+				`No entry file discovered in the "${ getProjectSourcePath() }" directory.`
 			);
 			return {};
 		}
@@ -367,7 +361,7 @@ function getPhpFilePaths( context, props ) {
 		let parsedBlockJson;
 		try {
 			parsedBlockJson = JSON.parse( readFileSync( blockMetadataFile ) );
-		} catch ( error ) {
+		} catch {
 			warn(
 				`Not scanning "${ blockMetadataFile.replace(
 					fromProjectRoot( sep ),
@@ -411,14 +405,12 @@ function getPhpFilePaths( context, props ) {
 }
 
 module.exports = {
-	getJestOverrideConfigFile,
-	getWebpackArgs,
-	getWordPressSrcDirectory,
-	getWebpackEntryPoints,
 	getPhpFilePaths,
+	getProjectSourcePath,
+	getWebpackArgs,
+	getWebpackEntryPoints,
 	hasBabelConfig,
 	hasCssnanoConfig,
-	hasJestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
 };

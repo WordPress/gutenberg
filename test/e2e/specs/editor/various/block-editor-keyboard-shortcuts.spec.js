@@ -1,12 +1,9 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function addTestParagraphBlocks( { editor, page } ) {
 	await test.step( 'add test paragraph blocks', async () => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );
@@ -192,7 +189,7 @@ test.describe( 'Block editor keyboard shortcuts', () => {
 				.getByRole( 'menuitem', { name: 'Create pattern' } )
 				.click();
 			await page
-				.getByRole( 'dialog', { name: 'add new pattern' } )
+				.getByRole( 'dialog', { name: 'add pattern' } )
 				.getByRole( 'textbox', { name: 'Name' } )
 				.fill( 'hi' );
 

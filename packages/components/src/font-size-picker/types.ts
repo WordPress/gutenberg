@@ -1,4 +1,9 @@
-export type FontSizePickerProps = {
+import type { ToggleGroupControlProps } from '../toggle-group-control/types';
+
+export type FontSizePickerProps = Pick<
+	ToggleGroupControlProps,
+	'__next40pxDefaultSize' | 'size'
+> & {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
 	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
@@ -34,8 +39,20 @@ export type FontSizePickerProps = {
 	units?: string[];
 	/**
 	 * The current font size value.
+	 *
+	 * Note: For the `units` property to work, the current font size value must be specified
+	 * as strings with units (e.g., '12px' instead of 12). When the font size is provided
+	 * as a number, the component operates in "unitless mode" where the `units` property has no effect.
 	 */
 	value?: number | string;
+	/**
+	 * Determines how the `value` prop should be interpreted.
+	 * - `'literal'`: The `value` prop contains the actual font size value (number or string)
+	 * - `'slug'`: The `value` prop contains the slug of the selected font size
+	 *
+	 * @default 'literal'
+	 */
+	valueMode?: 'literal' | 'slug';
 	/**
 	 * If `true`, a slider will be displayed alongside the input field when a
 	 * custom font size is active. Has no effect when `disableCustomFontSizes`
@@ -62,18 +79,6 @@ export type FontSizePickerProps = {
 	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'default' | '__unstable-large';
 };
 
 export type FontSize = {
@@ -92,19 +97,27 @@ export type FontSize = {
 	 * size. Used for the class generation process.
 	 */
 	slug: string;
+	/**
+	 * The `hint` property is an optional string that provides additional information
+	 * about the font size, such as fluid typography ranges or custom descriptions.
+	 * Consumers can use this to provide their own preferred hints.
+	 */
+	hint?: string;
 };
 
 export type FontSizePickerSelectProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size'
+	'value' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
 		FontSizePickerProps[ 'disableCustomFontSizes' ]
 	>;
-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onChange: (
+		value: number | string | undefined,
+		selectedItem?: FontSize
+	) => void;
 	onSelectCustom: () => void;
-	__next40pxDefaultSize: boolean;
 };
 
 export type FontSizePickerSelectOption = {
@@ -116,8 +129,11 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__next40pxDefaultSize'
+	'value' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onChange: (
+		value: number | string | undefined,
+		selectedItem?: FontSize
+	) => void;
 };

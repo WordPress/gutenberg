@@ -15,7 +15,7 @@ This component should be used as a child of a `<BlockControls>` component.
 The URL of the media.
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
 ### mediaId
 
@@ -29,14 +29,14 @@ The Id of the attachment post type for the current media.
 A list of media types allowed to replace the current media.
 
 -   Type: `Array`
--   Required: Yes
+-   Required: No
 
 ### accept
 
 Comma delimited list of MIME types accepted for upload.
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
 ### onFilesUpload
 
@@ -98,3 +98,10 @@ If passed, children are rendered inside the dropdown.
 -   Required: No
 
 If passed, children are rendered inside the dropdown. If a function is provided for this prop, it will receive an object with the `onClose` prop as an argument.
+
+### renderToggle
+
+-   Type: `func`
+-   Required: No
+
+If passed, it will be used to render the provided button instead of the default one. It should accept and pass through `button` props to a `button` element.

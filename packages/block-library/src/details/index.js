@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { details as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -16,11 +9,21 @@ import transforms from './transforms';
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[
+		'core/paragraph',
+		{
+			placeholder: __( 'Type / to add a hidden block' ),
+		},
+	],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	example: {
 		attributes: {
-			summary: 'La Mancha',
+			summary: __( 'La Mancha' ),
 			showContent: true,
 		},
 		innerBlocks: [
@@ -46,14 +49,18 @@ export const settings = {
 			return customName || summary;
 		}
 
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return ! hasSummary
 				? __( 'Details. Empty.' )
 				: sprintf(
-						/* translators: accessibility text; summary title. */
+						/* translators: %s: accessibility text; summary title. */
 						__( 'Details. %s' ),
 						summary
-				  );
+					);
 		}
 	},
 	save,

@@ -15,7 +15,7 @@ In addition to presenting the structure of the blocks in the editor, the ListVie
 
 ### Usage
 
-Renders a list view with default syles.
+Renders a list view with default styles.
 
 ```jsx
 import { ListView } from '@wordpress/block-editor';

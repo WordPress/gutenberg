@@ -1,66 +1,72 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuCheckboxItemProps } from './types';
-import * as Styled from './styles';
+import { Context } from './context';
+import type { CheckboxItemProps } from './types';
+import styles from './style.module.scss';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
-export const MenuCheckboxItem = forwardRef<
+export const CheckboxItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
->( function MenuCheckboxItem(
-	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+	WordPressComponentProps< CheckboxItemProps, 'div', false >
+>( function UnforwardedCheckboxItem(
+	{
+		className,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = false,
+		...props
+	},
 	ref
 ) {
-	const menuContext = useContext( MenuContext );
+	const menuContext = useContext( Context );
+	const store = menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
-	if ( ! menuContext?.store ) {
+	if ( ! store ) {
 		throw new Error(
 			'Menu.CheckboxItem can only be rendered inside a Menu component'
 		);
 	}
-
 	return (
-		<Styled.MenuCheckboxItem
+		<Ariakit.MenuItemCheckbox
 			ref={ ref }
 			{ ...props }
+			className={ clsx(
+				styles.item,
+				styles[ 'checkbox-item' ],
+				className
+			) }
 			accessibleWhenDisabled
 			disabled={ disabled }
-			hideOnClick={ hideOnClick }
-			store={ menuContext.store }
+			store={ store }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
-				store={ menuContext.store }
-				render={ <Styled.ItemPrefixWrapper /> }
+				store={ store }
+				render={
+					<span className={ styles[ 'item-prefix-wrapper' ] } />
+				}
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.MenuItemContentWrapper>
-				<Styled.MenuItemChildrenWrapper>
+			<div className={ styles[ 'item-content-wrapper' ] }>
+				<div className={ styles[ 'item-children-wrapper' ] }>
 					{ children }
-				</Styled.MenuItemChildrenWrapper>
+				</div>
 
 				{ suffix && (
-					<Styled.ItemSuffixWrapper>
+					<span className={ styles[ 'item-suffix-wrapper' ] }>
 						{ suffix }
-					</Styled.ItemSuffixWrapper>
+					</span>
 				) }
-			</Styled.MenuItemContentWrapper>
-		</Styled.MenuCheckboxItem>
+			</div>
+		</Ariakit.MenuItemCheckbox>
 	);
 } );

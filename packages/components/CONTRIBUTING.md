@@ -17,7 +17,7 @@ This set of guidelines should apply especially to newly introduced components. I
 -   [Unit tests](#unit-tests)
 -   [Storybook](#storybook)
 -   [Documentation](#documentation)
--   [README example](#README-example)
+-   [README example](#readme-example)
 -   [Folder structure](#folder-structure)
 -   [Component versioning](#component-versioning)
 
@@ -191,10 +191,10 @@ function useExampleComponent(
 	);
 
 	// Any other reusable rendering logic (e.g. computing className, state, event listeners...)
-	const cx = useCx();
-	const classes = useMemo(
-		() => cx( styles.example, isVisible && styles.visible, className ),
-		[ className, isVisible ]
+	const classes = clsx(
+		styles.example,
+		isVisible && styles.visible,
+		className
 	);
 
 	return {
@@ -346,7 +346,7 @@ function HookExample() {
 
 ## TypeScript
 
-We strongly encourage using TypeScript for all new components.
+All new components should be written in TypeScript.
 
 Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package:
 
@@ -411,14 +411,20 @@ export default MyComponent;
 
 On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
 
-<!-- TODO: add to the previous paragraph once the composision section gets added to this document.
+<!-- TODO: add to the previous paragraph once the compositions section gets added to this document.
 (more details about polymorphism can be found above in the "Components composition" section). -->
 
 ## Styling
 
-All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
+All new components should be styled using SCSS Modules.
 
-Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
+Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx` object syntax, e.g. `{ [ styles.className ]: condition }`.
+
+Use `--_wp-components-*` for new private custom properties. These are implementation details, not public theming APIs. Keep supported customization in component props and existing public styles.
+
+Components no longer use Emotion. Do not add new Emotion imports.
+
+For styling compatibility and verification, follow [Change a package safely](/docs/contributors/design/design-system-packages.md#change-a-package-safely) and the [cross-document setup guidance](/packages/theme/README.md#across-documents-iframes-and-other-portals).
 
 ### Deprecating styles
 
@@ -426,10 +432,11 @@ Changing the styles of a non-experimental component must be done with care. To p
 
 ```jsx
 // component.tsx
+import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
-import { Wrapper } from './styles.ts';
+import styles from './style.module.scss';
 
-function MyComponent( { __nextHasNoOuterMargins = false } ) {
+function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
 	if ( ! __nextHasNoOuterMargins ) {
 		deprecated( 'Outer margin styles for wp.components.MyComponent', {
 			since: '6.0',
@@ -437,27 +444,33 @@ function MyComponent( { __nextHasNoOuterMargins = false } ) {
 			hint: 'Set the `__nextHasNoOuterMargins` prop to true to start opting into the new styles, which will become the default in a future version.',
 		} );
 	}
-	return <Wrapper __nextHasNoOuterMargins={ __nextHasNoOuterMargins } />;
+	return (
+		<div
+			className={ clsx(
+				'components-my-component',
+				styles.root,
+				className,
+				{
+					[ styles.deprecatedOuterMargins ]:
+						! __nextHasNoOuterMargins,
+				}
+			) }
+		/>
+	);
 }
 ```
 
 Styles should be structured so the deprecated styles are cleanly encapsulated, and can be easily removed when the deprecation version arrives.
 
-```js
-// styles.ts
-const deprecatedMargins = ( { __nextHasNoOuterMargins } ) => {
-	if ( ! __nextHasNoOuterMargins ) {
-		return css`
-			margin: 8px;
-		`;
-	}
-};
-
-export const Wrapper = styled.div`
+```scss
+// style.module.scss
+.root {
 	margin: 0;
+}
 
-	${ deprecatedMargins }
-`;
+.deprecatedOuterMargins {
+	margin: 8px;
+}
 ```
 
 Once deprecated, code examples in docs/stories should include the opt-in prop set to `true` so that new consumers are encouraged to adopt it from the start.
@@ -550,7 +563,7 @@ export function useCardBody( props ) {
 	// Read any derived registered prop from the Context System in the `CardBody` namespace.
 	// If a `CardBody` component is rendered as a child of a `Card` component, the value of
 	// the `size` prop will be the one set by the parent `Card` component via the Context
-	// System (unless the prop gets explicitely set on the `CardBody` component).
+	// System (unless the prop gets explicitly set on the `CardBody` component).
 	const { size = 'medium', ...otherDerivedProps } = useContextSystem(
 		props,
 		'CardBody'
@@ -570,12 +583,22 @@ Please refer to the [JavaScript Testing Overview docs](https://developer.wordpre
 
 All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
 
+### Source code display
+
+Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the build uses [terser](https://terser.org/) with `keep_fnames: true` (configured in `storybook/main.ts`).
+
+For function declaration components, no additional configuration is needed — the function name is preserved automatically. For `forwardRef` components, ensure the unforwarded function is named (not an arrow function), and set `displayName` on the forwarded component.
+
 A component's story should be showcasing its different states — for example, the different variants of a `Button`:
 
 ```jsx
 import Button from '../';
 
-export default { title: 'Components/Button', component: Button };
+export default {
+	id: 'components-button',
+	title: 'Components/@wordpress-components/Actions/Button',
+	component: Button,
+};
 
 const Template = ( args ) => <Button { ...args } />;
 
@@ -596,7 +619,7 @@ Primary.args = {
 
 A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) ([source code](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
@@ -612,14 +635,10 @@ Each component that is exported from the `@wordpress/components` package should 
 # `ComponentName`
 
 <!-- If component is experimental, add the following section: -->
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 <!-- If component is deprecated, add the following section: -->
-<div class="callout callout-alert">
-This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Please use `{other component}` from the `{other package}` package instead.</p>
 
 Description of the component.
 
@@ -669,15 +688,15 @@ As a result of the above guidelines, all new components (except for shared utili
 ```text
 component-name/
 ├── stories
-│   └── index.js
+│   └── index.ts
 ├── test
-│   └── index.js
+│   └── index.ts
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
 ├── index.ts
 ├── README.md
-├── styles.ts
+├── style.module.scss
 └── types.ts
 ```
 
@@ -690,17 +709,17 @@ component-family-name/
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   └── styles.ts
+│   └── style.module.scss
 ├── sub-component-name/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
 │   ├── README.md
-│   └── styles.ts
+│   └── style.module.scss
 ├── stories
-│   └── index.js
+│   └── index.ts
 ├── test
-│   └── index.js
+│   └── index.ts
 ├── context.ts
 ├── index.ts
 ├── types.ts
@@ -736,36 +755,35 @@ This second approach involves creating a new, separate version (ie. export) of t
 
 If possible, the legacy version of the component should be rewritten so that it uses the same underlying implementation of the new version, with an extra API "translation" layer to adapt the legacy API surface to the new API surface, e.g:
 
-```
+```tsx
 // legacy-component/index.tsx
 
 function LegacyComponent( props ) {
 	const newProps = useTranslateLegacyPropsToNewProps( props );
 
-	return ( <NewComponentImplementation { ...newProps } /> );
+	return <NewComponentImplementation { ...newProps } />;
 }
 
 // new-component/index.tsx
 function NewComponent( props ) {
-	return ( <NewComponentImplementation { ...props } /> );
+	return <NewComponentImplementation { ...props } />;
 }
 
 // new-component/implementation.tsx
 function NewComponentImplementation( props ) {
 	// implementation
 }
-
 ```
 
 In case that is not possible (eg. too difficult to reconciliate new and legacy implementations, or impossible to preserve backward compatibility), then the legacy implementation can stay as-is.
 
-In any case, extra attention should be payed to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning when the above scenario happens — or even better, aliasing to the correct version of the component.
+In any case, extra attention should be paid to legacy component families made of two or more subcomponents. It is possible, in fact, that the a legacy subcomponent is used as a parent / child of a subcomponent from the new version (this can happen, for example, when Gutenberg allows third party developers to inject React components via Slot/Fill). To avoid incompatibility issues and unexpected behavior, there should be some code in the components warning when the above scenario happens — or even better, aliasing to the correct version of the component.
 
 ##### Naming
 
 When it comes to naming the newly added component, there are two options.
 
-If there is a good reason for it, pick a new name for the component. For example, some legacy components have names that don't correspond to the corrent name of UI widget that they implement (for example, `TabPanel` should be called `Tabs`, and `Modal` should be called `Dialog`).
+If there is a good reason for it, pick a new name for the component. For example, some legacy components have names that don't correspond to the current name of UI widget that they implement (for example, `TabPanel` should be called `Tabs`, and `Modal` should be called `Dialog`).
 
 Alternatively, version the component name. For example, the new version of `Component` could be called `ComponentV2`. This also applies for namespaced subcomponents (ie. `ComponentV2.SubComponent`).
 

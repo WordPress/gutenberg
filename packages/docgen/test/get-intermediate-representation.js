@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
-const engine = require( '../lib/engine' );
-const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
+import { describe, expect, it } from 'vitest';
+import engine from '../lib/engine';
+import getIntermediateRepresentation from '../lib/get-intermediate-representation';
 
 /**
  * Parses sample code into testable structure.
@@ -662,15 +660,70 @@ describe( 'Intermediate Representation', () => {
 		} );
 	} );
 
+	describe( 'TypeScript function overloads', () => {
+		it( 'extracts description from first overload signature and infers types from the implementation', () =>
+			expect(
+				parse( `
+					/**
+					 * Registers a new block.
+					 * @param blockNameOrMetadata Block type name or its metadata.
+					 * @param settings Block settings.
+					 * @return The block, if registered; otherwise undefined.
+					 */
+					export function registerBlockType( blockNameOrMetadata: object, settings?: object ): object | undefined;
+					export function registerBlockType( blockNameOrMetadata: string, settings: object ): object | undefined;
+					export function registerBlockType( blockNameOrMetadata: string | object, settings?: object ): object | undefined {
+						return undefined;
+					}
+				` )
+			).toEqual( [
+				expect.objectContaining( {
+					description: 'Registers a new block.',
+					name: 'registerBlockType',
+					tags: expect.arrayContaining( [
+						expect.objectContaining( {
+							tag: 'param',
+							name: 'blockNameOrMetadata',
+							type: 'string | object',
+						} ),
+						expect.objectContaining( {
+							tag: 'return',
+							type: 'object | undefined',
+						} ),
+					] ),
+				} ),
+			] ) );
+
+		it( 'extracts JSDoc from non-exported overload signatures exported via export { }', () =>
+			expect(
+				parse( `
+					/**
+					 * My overloaded function.
+					 * @param a The argument.
+					 * @return The result.
+					 */
+					function myDeclaration( a: string ): string;
+					function myDeclaration( a: number ): number;
+					function myDeclaration( a: string | number ): string | number {
+						return a;
+					}
+
+					export { myDeclaration };
+				` )
+			).toEqual( [
+				expect.objectContaining( {
+					description: 'My overloaded function.',
+					name: 'myDeclaration',
+				} ),
+			] ) );
+	} );
+
 	describe( 'JSDoc in module dependency through import', () => {
 		describe( 'default export', () => {
 			it( 'default import', () =>
 				expect(
 					parse(
 						`
-						/**
-						 * Internal dependencies
-						 */
 						import fnDeclaration from './module-code';
 
 						export default fnDeclaration;
@@ -696,9 +749,6 @@ describe( 'Intermediate Representation', () => {
 				expect(
 					parse(
 						`
-						/**
-						 * Internal dependencies
-						 */
 						import { functionDeclaration as fnDeclaration } from './module-code';
 
 						export default fnDeclaration;
@@ -739,9 +789,6 @@ describe( 'Intermediate Representation', () => {
 					engine(
 						'test-code.ts',
 						`
-						/**
-						 * Internal dependencies
-						 */
 						import * as variables from './named-import-namespace-module';
 
 						export { variables };
