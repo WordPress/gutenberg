@@ -2,15 +2,15 @@
 
 /**
  * Drives a browser on this checkout's WordPress site, to check a change by
- * hand. `gb <command>` calls the e2e test utils below, with each argument
- * read as JSON when it is JSON; any other command goes to playwright-cli, in
- * the same browser.
+ * hand. The commands below call the e2e test utils, with each argument read
+ * as JSON when it is JSON; any other command goes to playwright-cli, in the
+ * same browser.
  *
  *   npm run browse -- open
- *   npm run browse -- gb new-post
- *   npm run browse -- gb insert '{"name":"core/heading"}'
+ *   npm run browse -- new-post
+ *   npm run browse -- insert '{"name":"core/heading"}'
  *   npm run browse -- press Enter
- *   npm run browse -- gb blocks
+ *   npm run browse -- blocks
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -132,16 +132,12 @@ async function api( method, restPath, data ) {
 	return requestUtils.rest( { method, path: restPath, data } );
 }
 
-async function gb( command, ...args ) {
+async function run( command, args ) {
+	if ( command === 'open' ) {
+		return open();
+	}
 	if ( command === 'api' ) {
 		return api( ...args );
-	}
-	if ( ! commands[ command ] ) {
-		throw new Error(
-			`No gb command "${ command }". Use one of: api, ${ Object.keys(
-				commands
-			).join( ', ' ) }.`
-		);
 	}
 	return withHelpers( ( helpers ) =>
 		commands[ command ]( helpers, ...args )
@@ -149,18 +145,16 @@ async function gb( command, ...args ) {
 }
 
 const [ command, ...args ] = process.argv.slice( 2 );
-if ( command === 'open' || command === 'gb' ) {
-	( command === 'open'
-		? open()
-		: gb(
-				...args.map( ( arg ) => {
-					try {
-						return JSON.parse( arg );
-					} catch {
-						return arg;
-					}
-				} )
-			)
+if ( [ 'open', 'api', ...Object.keys( commands ) ].includes( command ) ) {
+	run(
+		command,
+		args.map( ( arg ) => {
+			try {
+				return JSON.parse( arg );
+			} catch {
+				return arg;
+			}
+		} )
 	)
 		.then( ( result ) => {
 			if ( typeof result === 'string' ) {
