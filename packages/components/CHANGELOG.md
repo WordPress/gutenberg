@@ -18,7 +18,7 @@
 
 ### Deprecations
 
--   `ProgressBar`: Deprecate in favor of `Progress` from `@wordpress/ui`.
+-   `ProgressBar`: Deprecate in favor of `Progress` from `@wordpress/ui` ([#85520](https://github.com/WordPress/gutenberg/pull/85520)).
 
 ### Bug Fixes
 
