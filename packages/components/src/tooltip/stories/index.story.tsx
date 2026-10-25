@@ -1,10 +1,10 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-import Tooltip from '..';
+import Tooltip from '../deprecated';
 import Button from '../../button';
 
 const meta: Meta< typeof Tooltip > = {
-	title: 'Components/@wordpress-components/Overlays/Tooltip',
+	title: 'Components/@wordpress-components/Deprecated/Tooltip',
 	id: 'components-tooltip',
 	component: Tooltip,
 	argTypes: {
@@ -28,7 +28,7 @@ const meta: Meta< typeof Tooltip > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`Tooltip`](?path=/docs/design-system-components-tooltip--docs) from `@wordpress/ui` instead.',
+			notes: 'Deprecated. Use [`Tooltip`](?path=/docs/design-system-components-tooltip--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };
