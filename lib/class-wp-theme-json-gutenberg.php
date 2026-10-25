@@ -5958,8 +5958,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( is_array( $feature_selectors ) && is_array( $node[ $feature ] ) ) {
+				$feature_styles = $node[ $feature ];
 				foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
-					if ( 'root' === $subfeature || empty( $node[ $feature ][ $subfeature ] ) ) {
+					if ( 'root' === $subfeature || empty( $feature_styles[ $subfeature ] ) ) {
 						continue;
 					}
 
@@ -5967,7 +5968,7 @@ class WP_Theme_JSON_Gutenberg {
 					// to leverage existing `compute_style_properties` function.
 					$subfeature_node = array(
 						$feature => array(
-							$subfeature => $node[ $feature ][ $subfeature ],
+							$subfeature => $feature_styles[ $subfeature ],
 						),
 					);
 
@@ -5986,8 +5987,9 @@ class WP_Theme_JSON_Gutenberg {
 					// Remove the subfeature from the block's node now its
 					// styles will be included under its own selector not the
 					// block's.
-					unset( $node[ $feature ][ $subfeature ] );
+					unset( $feature_styles[ $subfeature ] );
 				}
+				$node[ $feature ] = $feature_styles;
 			}
 
 			// Now subfeatures have been processed and removed we can process
