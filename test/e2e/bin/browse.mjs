@@ -118,7 +118,12 @@ const commands = {
 			await editor.insertBlock( block );
 		}
 	},
-	insert: ( { editor }, block ) => editor.insertBlock( block ),
+	// `insert heading` is short for `insert core/heading`.
+	insert: ( { editor }, name, attributes ) =>
+		editor.insertBlock( {
+			name: name.includes( '/' ) ? name : `core/${ name }`,
+			attributes,
+		} ),
 	transform: ( { editor }, name ) => editor.transformBlockTo( name ),
 	keys: ( { pageUtils }, keys ) => pageUtils.pressKeys( keys ),
 	focus: ( { editor } ) => editor.getFocusOwnerLabel(),

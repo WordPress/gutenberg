@@ -20,7 +20,7 @@ Each one calls an e2e test util from `packages/e2e-test-utils-playwright/src`, w
 | `site-editor [options]` | Opens the site editor. | `admin.visitSiteEditor` |
 | `content [markup]` | Prints the post's block markup, or sets it. | `editor.getEditedPostContent`, `editor.setContent` |
 | `blocks [blocks]` | Prints the blocks with all their attributes, as JSON, or sets them from the same shape, e.g. `blocks '[{"name":"core/heading","attributes":{"content":"Hi"}}]'`. | `editor.getBlocks`, `editor.insertBlock` |
-| `insert <block>` | Inserts a block, e.g. `insert '{"name":"core/heading"}'`. | `editor.insertBlock` |
+| `insert <name> [attributes]` | Inserts a block, e.g. `insert heading` or `insert heading '{"level":3}'`. Names without a namespace are `core/` blocks. | `editor.insertBlock` |
 | `transform <name>` | Transforms the selected block, e.g. `transform core/paragraph`. | `editor.transformBlockTo` |
 | `keys <keys>` | Presses keys, with `primary` for Cmd or Ctrl, e.g. `keys primary+z`. | `pageUtils.pressKeys` |
 | `focus` | Prints what has keyboard focus. | `editor.getFocusOwnerLabel` |
