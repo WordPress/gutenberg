@@ -1,26 +1,21 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { SVG, Path } from '@wordpress/primitives';
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
-	title: 'Components/Icon',
+	id: 'components-icon',
+	title: 'Components/@wordpress-components/Icon',
 	component: Icon,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When rendering SVGs, use [`Icon`](?path=/docs/design-system-components-icon--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;
@@ -30,21 +25,6 @@ const Template: StoryFn< typeof Icon > = ( args ) => <Icon { ...args } />;
 export const Default = Template.bind( {} );
 Default.args = {
 	icon: wordpress,
-};
-
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
-	return (
-		<div
-			style={ {
-				fill: 'blue',
-			} }
-		>
-			<Icon { ...args } />
-		</div>
-	);
-};
-FillColor.args = {
-	...Default.args,
 };
 
 /**
