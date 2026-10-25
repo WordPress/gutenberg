@@ -5,7 +5,7 @@ import FormToggle from '../deprecated';
 const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,
 	id: 'components-formtoggle',
-	title: 'Components/Deprecated/FormToggle',
+	title: 'Components/@wordpress-components/Deprecated/FormToggle',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
