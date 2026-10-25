@@ -3,17 +3,9 @@
 		"name": "core/html",
 		"isValid": true,
 		"attributes": {},
-		"innerBlocks": [
-			{
-				"name": "core/heading",
-				"isValid": true,
-				"attributes": {
-					"content": "Some HTML code",
-					"level": 1
-				},
-				"innerBlocks": []
-			}
-		],
-		"innerContent": [ "\n", null, "\n<div>This is a div</div>\n" ]
+		"innerBlocks": [],
+		"innerContent": [
+			"\n<h1>Some HTML code</h1>\n<div>This is a div</div>\n"
+		]
 	}
 ]

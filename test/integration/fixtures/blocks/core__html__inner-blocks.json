@@ -5,15 +5,6 @@
 		"attributes": {},
 		"innerBlocks": [
 			{
-				"name": "core/heading",
-				"isValid": true,
-				"attributes": {
-					"content": "Static heading",
-					"level": 1
-				},
-				"innerBlocks": []
-			},
-			{
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
@@ -24,9 +15,7 @@
 			}
 		],
 		"innerContent": [
-			"\n<div class=\"banner\">",
-			null,
-			"",
+			"\n<div class=\"banner\"><h1>Static heading</h1>",
 			null,
 			"<footer>Static footer</footer></div>\n"
 		]

@@ -13,12 +13,7 @@ import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
-import {
-	addSource,
-	canReadHTML,
-	parseUndelimited,
-	splitInnerBlocks,
-} from '../undelimited';
+import { addSource, canReadHTML, parseUndelimited } from '../undelimited';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
 
 /**
@@ -299,13 +294,6 @@ export function parseRawBlock(
 		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
 			normalizedBlock.innerHTML,
 		];
-		Object.assign(
-			parsedBlock,
-			splitInnerBlocks(
-				parsedBlock.innerContent,
-				parsedBlock.innerBlocks
-			)
-		);
 		parsedBlock.isValid = true;
 		parsedBlock.validationIssues = [];
 		return withSource( parsedBlock, normalizedBlock.innerHTML );

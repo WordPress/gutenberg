@@ -197,69 +197,9 @@ function readBlock( html: string ): Block | null {
 const SLOT = 'wp-inner-block';
 
 /**
- * Turns the elements in an HTML block's static HTML that blocks read into
- * inner blocks, kept without delimiters.
- *
- * @param innerContent Static HTML, with `null` where inner blocks are.
- * @param innerBlocks  Inner blocks.
- */
-export function splitInnerBlocks(
-	innerContent: Array< string | null >,
-	innerBlocks: Block[]
-): { innerContent: Array< string | null >; innerBlocks: Block[] } {
-	if ( ! canReadHTML() ) {
-		return { innerContent, innerBlocks };
-	}
-	// Read the static HTML as one document, marking existing inner blocks.
-	const body = getBody(
-		innerContent.map( ( part ) => part ?? `<!--${ SLOT }-->` ).join( '' )
-	);
-	const found = new Map< Comment, Block >();
-	const visit = ( parent: Element ) => {
-		for ( const element of Array.from( parent.children ) ) {
-			const block = BLOCK_ELEMENTS.has( element.tagName )
-				? readBlock( element.outerHTML )
-				: null;
-			if ( block ) {
-				const slot = document.createComment( SLOT );
-				found.set(
-					slot,
-					addSource( block, element.outerHTML, element.outerHTML, {
-						isInnerBlocks: true,
-					} )
-				);
-				element.replaceWith( slot );
-			} else {
-				visit( element );
-			}
-		}
-	};
-	visit( body );
-	if ( ! found.size ) {
-		return { innerContent, innerBlocks };
-	}
-
-	// Inner blocks, old and found, in the order they appear.
-	const blocks: Block[] = [];
-	let index = 0;
-	const walker = document.createTreeWalker( body, NodeFilter.SHOW_COMMENT );
-	while ( walker.nextNode() ) {
-		const comment = walker.currentNode as Comment;
-		if ( comment.data === SLOT ) {
-			blocks.push( found.get( comment ) ?? innerBlocks[ index++ ] );
-		}
-	}
-	return {
-		innerContent: body.innerHTML
-			.split( `<!--${ SLOT }-->` )
-			.flatMap( ( part, at ) => ( at ? [ null, part ] : [ part ] ) ),
-		innerBlocks: blocks,
-	};
-}
-
-/**
- * Returns the block for a piece of HTML, or an HTML block holding it as is,
- * with the blocks inside it editable.
+ * Returns the block for a piece of HTML, or an HTML block holding it, with
+ * the elements in it that blocks read as inner blocks, kept without
+ * delimiters.
  *
  * @param piece Piece of HTML.
  */
@@ -269,11 +209,38 @@ function pieceToBlock( piece: Piece ): Block {
 	if ( block ) {
 		return block;
 	}
-	const { innerContent, innerBlocks } = splitInnerBlocks(
-		[ piece.html ],
-		[]
+
+	const body = getBody( piece.html );
+	const innerBlocks: Block[] = [];
+	const visit = ( parent: Element ) => {
+		for ( const element of Array.from( parent.children ) ) {
+			const innerBlock = BLOCK_ELEMENTS.has( element.tagName )
+				? readBlock( element.outerHTML )
+				: null;
+			if ( innerBlock ) {
+				innerBlocks.push(
+					addSource(
+						innerBlock,
+						element.outerHTML,
+						element.outerHTML,
+						{ isInnerBlocks: true }
+					)
+				);
+				element.replaceWith( document.createComment( SLOT ) );
+			} else {
+				visit( element );
+			}
+		}
+	};
+	visit( body );
+	return createBlock(
+		'core/html',
+		{},
+		innerBlocks,
+		body.innerHTML
+			.split( `<!--${ SLOT }-->` )
+			.flatMap( ( part, at ) => ( at ? [ null, part ] : [ part ] ) )
 	);
-	return createBlock( 'core/html', {}, innerBlocks, innerContent );
 }
 
 /**
