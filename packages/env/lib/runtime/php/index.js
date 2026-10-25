@@ -10,6 +10,7 @@ const { parseSourceString } = require( '../../config/parse-source-string' );
 
 const SQLITE_PLUGIN_URL =
 	'https://downloads.wordpress.org/plugin/sqlite-database-integration.zip';
+const SQLITE_PLUGIN_PATH = 'wp-content/plugins/sqlite-database-integration';
 
 /**
  * PHP runtime implementation for wp-env: the PHP installed on the computer
@@ -46,37 +47,73 @@ class PhpRuntime {
 	/**
 	 * Start the PHP built-in server, setting up the site first if needed.
 	 *
-	 * @param {Object} config          The wp-env config object.
-	 * @param {Object} options         Start options.
-	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @param {Object}  config          The wp-env config object.
+	 * @param {Object}  options         Start options.
+	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean} options.update  If true, update sources.
 	 * @return {Promise<Object>} The start message and site URL.
 	 */
-	async start( config, { spinner } ) {
+	async start( config, { spinner, update } ) {
 		const envConfig = config.env.development;
 		const siteDir = path.join( config.workDirectoryPath, 'php' );
-		const { clean } = getDatabasePaths( config );
 
 		if ( envConfig.multisite ) {
 			throw new Error(
 				'Multisite is not supported with the PHP runtime yet.'
 			);
 		}
+		const ignored = [
+			config.xdebug && config.xdebug !== 'off' && 'Xdebug',
+			config.spx && config.spx !== 'off' && 'SPX',
+			envConfig.phpmyadmin && 'phpMyAdmin',
+			envConfig.phpVersion && '"phpVersion"',
+		].filter( Boolean );
+		if ( ignored.length ) {
+			spinner.warn(
+				`The PHP runtime does not support ${ ignored.join(
+					', '
+				) } yet; it uses the installed PHP as it is.`
+			);
+			spinner.start();
+		}
 
 		await this.stop( config, { spinner } );
 
-		try {
-			await fs.access( clean );
+		const mappings = getMappings( config );
+		const isSetUp = existsSync( getDatabasePaths( config ).clean );
+		if ( ! isSetUp || update ) {
+			spinner.text = 'Downloading sources.';
+			await Promise.all(
+				[ envConfig.coreSource, ...Object.values( mappings ) ].map(
+					( source ) =>
+						downloadSource( source, {
+							onProgress: () => {},
+							spinner,
+							debug: config.debug,
+						} )
+				)
+			);
+		}
+		if ( ! isSetUp ) {
+			await this._setUp( config, siteDir, mappings, spinner );
+		} else {
+			if ( update ) {
+				// The plugins, themes and database stay as they are.
+				await copyCore( envConfig.coreSource.path, siteDir, [
+					'.git',
+					'wp-content',
+				] );
+			}
 			// The port can change between starts.
 			await writeWpConfig( config, siteDir );
-		} catch {
-			await this._setUp( config, siteDir, spinner );
 		}
 
 		const port = envConfig.port;
 		const siteUrl = envConfig.config.WP_SITEURL;
 		spinner.text = `Starting PHP on port ${ port }.`;
 
-		const log = await fs.open( path.join( siteDir, 'server.log' ), 'w' );
+		const logFile = path.join( siteDir, 'server.log' );
+		const log = await fs.open( logFile, 'w' );
 		const child = spawn(
 			'php',
 			[
@@ -105,7 +142,7 @@ class PhpRuntime {
 			String( child.pid )
 		);
 
-		await this._waitForServer( siteUrl );
+		await this._waitForServer( child, logFile );
 
 		return {
 			message: `WordPress development site started at ${ siteUrl }`,
@@ -230,79 +267,35 @@ class PhpRuntime {
 	 * mappings, install it with a SQLite database and keep a clean copy of
 	 * the database for `wp-env clean`.
 	 *
-	 * @param {Object} config  The wp-env config object.
-	 * @param {string} siteDir The site folder.
-	 * @param {Object} spinner A CLI spinner which indicates progress.
+	 * @param {Object} config   The wp-env config object.
+	 * @param {string} siteDir  The site folder.
+	 * @param {Object} mappings The sources to link, by path in the site.
+	 * @param {Object} spinner  A CLI spinner which indicates progress.
 	 */
-	async _setUp( config, siteDir, spinner ) {
+	async _setUp( config, siteDir, mappings, spinner ) {
 		const envConfig = config.env.development;
-		const sqlite = parseSourceString( SQLITE_PLUGIN_URL, {
-			cacheDirectoryPath: config.workDirectoryPath,
-		} );
-		const mappings = {
-			'wp-content/plugins/sqlite-database-integration': sqlite,
-		};
-		for ( const source of envConfig.pluginSources ) {
-			mappings[ `wp-content/plugins/${ source.basename }` ] = source;
-		}
-		for ( const source of envConfig.themeSources ) {
-			mappings[ `wp-content/themes/${ source.basename }` ] = source;
-		}
-		Object.assign( mappings, envConfig.mappings );
-
-		spinner.text = 'Downloading sources.';
-		await Promise.all(
-			[ envConfig.coreSource, ...Object.values( mappings ) ].map(
-				( source ) =>
-					downloadSource( source, {
-						onProgress: () => {},
-						spinner,
-						debug: config.debug,
-					} )
-			)
-		);
-
 		spinner.text = 'Setting up WordPress.';
 		await rimraf( siteDir );
 		const databaseDir = path.dirname( getDatabasePaths( config ).database );
 		await rimraf( databaseDir );
 		await fs.mkdir( databaseDir, { recursive: true } );
-		// A copy-on-write clone where the file system supports it.
-		await fs.cp( envConfig.coreSource.path, siteDir, {
-			recursive: true,
-			mode: constants.COPYFILE_FICLONE,
-			filter: ( source ) => path.basename( source ) !== '.git',
-		} );
+		await copyCore( envConfig.coreSource.path, siteDir, [ '.git' ] );
 		await fs.copyFile(
-			path.join( sqlite.path, 'db.copy' ),
+			path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
 			path.join( siteDir, 'wp-content/db.php' )
 		);
 
-		// Shorter paths first, so a mapping inside another one is linked
-		// within it rather than in the folder it points to.
+		// Shorter paths first, so a mapping inside another one replaces an
+		// entry of it.
 		const sorted = Object.keys( mappings ).sort(
 			( a, b ) => a.length - b.length
 		);
 		for ( const wpPath of sorted ) {
 			const target = path.join( siteDir, wpPath );
+			await unlinkParents( siteDir, target );
 			await rimraf( target );
 			await fs.mkdir( path.dirname( target ), { recursive: true } );
-			if (
-				sorted.some( ( other ) => other.startsWith( wpPath + '/' ) )
-			) {
-				await fs.mkdir( target );
-				for ( const entry of await fs.readdir(
-					mappings[ wpPath ].path
-				) ) {
-					await fs.symlink(
-						path.join( mappings[ wpPath ].path, entry ),
-						path.join( target, entry ),
-						'junction'
-					);
-				}
-			} else {
-				await fs.symlink( mappings[ wpPath ].path, target, 'junction' );
-			}
+			await fs.symlink( mappings[ wpPath ].path, target, 'junction' );
 		}
 
 		await writeWpConfig( config, siteDir );
@@ -333,20 +326,99 @@ class PhpRuntime {
 	}
 
 	/**
-	 * Wait until the server answers.
+	 * Wait until the server listens, or fail with its log.
 	 *
-	 * @param {string} url The site URL.
+	 * @param {Object} child   The server process.
+	 * @param {string} logFile The server log.
 	 */
-	async _waitForServer( url ) {
+	async _waitForServer( child, logFile ) {
+		let exited = false;
+		child.on( 'exit', () => ( exited = true ) );
+		let log = '';
 		for ( let i = 0; i < 100; i++ ) {
-			try {
-				await fetch( url, { redirect: 'manual' } );
+			log = await fs.readFile( logFile, 'utf8' );
+			// PHP logs this once it listens, and exits if the port is busy.
+			if ( log.includes( 'Development Server' ) ) {
 				return;
-			} catch {
-				await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 			}
+			if ( exited ) {
+				break;
+			}
+			await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 		}
-		throw new Error( `PHP did not start at ${ url } within 10 seconds.` );
+		throw new Error( `PHP did not start:\n${ log }` );
+	}
+}
+
+/**
+ * The sources to link into the site, by path in the site: the SQLite plugin,
+ * then the plugins, themes and mappings from the config.
+ *
+ * @param {Object} config The wp-env config object.
+ * @return {Object} The sources by path.
+ */
+function getMappings( config ) {
+	const envConfig = config.env.development;
+	const mappings = {
+		[ SQLITE_PLUGIN_PATH ]: parseSourceString( SQLITE_PLUGIN_URL, {
+			cacheDirectoryPath: config.workDirectoryPath,
+		} ),
+	};
+	for ( const source of envConfig.pluginSources ) {
+		mappings[ `wp-content/plugins/${ source.basename }` ] = source;
+	}
+	for ( const source of envConfig.themeSources ) {
+		mappings[ `wp-content/themes/${ source.basename }` ] = source;
+	}
+	return Object.assign( mappings, envConfig.mappings );
+}
+
+/**
+ * Copy WordPress core into the site folder, as a copy-on-write clone where
+ * the file system supports it.
+ *
+ * @param {string}   coreDir The WordPress core folder.
+ * @param {string}   siteDir The site folder.
+ * @param {string[]} exclude Paths in the core folder not to copy.
+ */
+function copyCore( coreDir, siteDir, exclude ) {
+	return fs.cp( coreDir, siteDir, {
+		recursive: true,
+		mode: constants.COPYFILE_FICLONE,
+		filter: ( source ) =>
+			! exclude.includes( path.relative( coreDir, source ) ),
+	} );
+}
+
+/**
+ * Turn linked folders on the way to a path into real folders that hold links
+ * to their entries, so writing the path never changes a linked folder.
+ *
+ * @param {string} siteDir The site folder.
+ * @param {string} target  A path in the site folder.
+ */
+async function unlinkParents( siteDir, target ) {
+	let dir = siteDir;
+	for ( const part of path
+		.relative( siteDir, path.dirname( target ) )
+		.split( path.sep ) ) {
+		dir = path.join( dir, part );
+		let linked;
+		try {
+			linked = await fs.readlink( dir );
+		} catch {
+			// Not a link.
+			continue;
+		}
+		await fs.unlink( dir );
+		await fs.mkdir( dir );
+		for ( const entry of await fs.readdir( linked ) ) {
+			await fs.symlink(
+				path.join( linked, entry ),
+				path.join( dir, entry ),
+				'junction'
+			);
+		}
 	}
 }
 
