@@ -1093,7 +1093,7 @@ describe( 'prependHTTP', () => {
 		'chrome-extension://abcdef/options.html',
 		'web+demo2://wordpress.org',
 		'localhost:8888',
-	] )( 'shouldn’t prepend http to a URL with a scheme: %s', ( url ) => {
+	] )( 'should not prepend http to a URL with a scheme: %s', ( url ) => {
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
