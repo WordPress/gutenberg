@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Check whether WordPress.org is reachable with the operating system's resolver (`dns.lookup`) instead of querying DNS servers directly (`dns.resolve`), so `wp-env` no longer wrongly decides it is offline, and fails to find the latest WordPress version, when Node.js cannot read the system DNS servers and falls back to `127.0.0.1`, as can happen on Windows ([#85522](https://github.com/WordPress/gutenberg/pull/85522)).
+-   Fix `wp-env` wrongly detecting that it is offline on some Windows machines, by checking access to WordPress.org with `dns.lookup` instead of `dns.resolve` ([#85522](https://github.com/WordPress/gutenberg/pull/85522)).
 
 ## 12.0.0 (2026-10-20)
 
