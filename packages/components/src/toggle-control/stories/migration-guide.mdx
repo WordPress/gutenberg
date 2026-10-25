@@ -1,0 +1,129 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as ToggleControlStories from './index.story';
+
+<Meta of={ ToggleControlStories } name="Migration Guide" />
+
+# Toggle family migration guide
+
+Migrate from [`ToggleControl`](?path=/docs/components-togglecontrol--docs) in `@wordpress/components` to [`SwitchControl`](?path=/docs/design-system-components-form-switchcontrol--docs) in `@wordpress/ui`. For custom compositions, replace [`FormToggle`](?path=/docs/components-formtoggle--docs) with [`Switch`](?path=/docs/design-system-components-form-primitives-switch--docs).
+
+## Basic migration
+
+Rename the component, callback, and help props:
+
+Before:
+
+```jsx
+import { ToggleControl } from '@wordpress/components';
+
+<ToggleControl
+	label="Fixed background"
+	checked={ hasFixedBackground }
+	onChange={ setHasFixedBackground }
+	help="Keep the background fixed while scrolling."
+/>;
+```
+
+After:
+
+```jsx
+import { SwitchControl } from '@wordpress/ui';
+
+<SwitchControl
+	label="Fixed background"
+	checked={ hasFixedBackground }
+	onCheckedChange={ setHasFixedBackground }
+	description="Keep the background fixed while scrolling."
+/>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`ToggleControl\` | \`SwitchControl\` | Notes |
+| --- | --- | --- |
+| \`checked\` | \`checked\` | Continue passing the state for a controlled switch. |
+| \`onChange\` | \`onCheckedChange\` | Receives the next checked state as a boolean. |
+| \`help\` | \`description\` | Use plain text only. |
+| \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
+| \`label\` | \`label\` | The new control requires a plain string. See [Labels](#labels). |
+` }</Markdown>
+
+If `help` is a function, evaluate it with the current checked state and pass the result to `description` or `details`:
+
+```jsx
+<SwitchControl
+	label="Fixed background"
+	checked={ hasFixedBackground }
+	onCheckedChange={ setHasFixedBackground }
+	description={ getHelpText( hasFixedBackground ) }
+/>
+```
+
+## Labels
+
+`SwitchControl` requires a `label` prop with a plain `string` value. The legacy `ToggleControl` accepts a `ReactNode`.
+
+When the label text is already visible elsewhere, pass a descriptive string and hide it visually:
+
+```jsx
+<SwitchControl
+	label="Fixed background"
+	hideLabelFromVision
+	checked={ hasFixedBackground }
+	onCheckedChange={ setHasFixedBackground }
+/>
+```
+
+To customize the label typography, compose `Switch` with [`Field`](?path=/docs/design-system-components-form-primitives-field--docs):
+
+```jsx
+import { Field, Stack, Switch } from '@wordpress/ui';
+
+<Field.Root render={ <Stack gap="sm" align="start" /> }>
+	<Switch
+		checked={ hasFixedBackground }
+		onCheckedChange={ setHasFixedBackground }
+	/>
+	<Field.Label
+		variant="plain"
+		style={ { fontFamily: 'var(--wpds-typography-font-family-mono)' } }
+	>
+		Fixed background
+	</Field.Label>
+</Field.Root>;
+```
+
+## FormToggle
+
+`FormToggle.onChange` receives an input change event. `Switch.onCheckedChange` receives the next checked state as a boolean, so remove any `event.target.checked` access:
+
+Before:
+
+```jsx
+import { FormToggle } from '@wordpress/components';
+
+<FormToggle
+	aria-label="Fixed background"
+	checked={ hasFixedBackground }
+	onChange={ ( event ) => setHasFixedBackground( event.target.checked ) }
+/>;
+```
+
+After:
+
+```jsx
+import { Switch } from '@wordpress/ui';
+
+<Switch
+	aria-label="Fixed background"
+	checked={ hasFixedBackground }
+	onCheckedChange={ setHasFixedBackground }
+/>;
+```
+
+Prefer `SwitchControl` for a standard labeled switch. Use `Field.Label` for a visible label in custom compositions.
+
+## Refs and semantics
+
+The legacy components forward refs to an `HTMLInputElement`. The new components forward refs to an `HTMLSpanElement` with switch semantics. Update ref types and any code that reads input properties such as `ref.current.checked` to use the controlled state instead.

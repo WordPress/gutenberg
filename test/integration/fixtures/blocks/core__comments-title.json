@@ -6,10 +6,10 @@
 			"showPostTitle": true,
 			"showCommentsCount": true,
 			"level": 4,
-			"borderColor": "vivid-red",
 			"backgroundColor": "primary",
 			"textColor": "background",
 			"fontSize": "large",
+			"borderColor": "vivid-red",
 			"style": {
 				"spacing": {
 					"padding": {

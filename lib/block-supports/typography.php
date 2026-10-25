@@ -30,6 +30,8 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
+	$has_text_shadow_support     = $typography_supports['textShadow'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	$has_typography_support = $has_font_family_support
@@ -42,6 +44,8 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_text_columns_support
 		|| $has_text_decoration_support
 		|| $has_text_transform_support
+		|| $has_text_indent_support
+		|| $has_text_shadow_support
 		|| $has_writing_mode_support;
 
 	if ( ! $block_type->attributes ) {
@@ -65,6 +69,12 @@ function gutenberg_register_typography_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
+
+	if ( $has_text_shadow_support && ! array_key_exists( 'textShadow', $block_type->attributes ) ) {
+		$block_type->attributes['textShadow'] = array(
+			'type' => 'string',
+		);
+	}
 }
 
 /**
@@ -72,8 +82,8 @@ function gutenberg_register_typography_support( $block_type ) {
  * to the incoming attributes array. This will be applied to the block markup in
  * the front-end.
  *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
+ * @param WP_Block_Type $block_type       Block type.
+ * @param array         $block_attributes Block attributes.
  *
  * @return array Typography CSS classes and inline styles.
  */
@@ -101,6 +111,8 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_text_indent_support     = $typography_supports['textIndent'] ?? false;
+	$has_text_shadow_support     = $typography_supports['textShadow'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	// Whether to skip individual block support features.
@@ -114,12 +126,14 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
+	$should_skip_text_indent     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textIndent' );
+	$should_skip_text_shadow     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textShadow' );
 	$should_skip_writing_mode    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
 
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
 		$preset_font_size                    = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
-		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
+		$custom_font_size                    = $block_attributes['style']['typography']['fontSize'] ?? null;
 		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : gutenberg_get_typography_font_size_value(
 			array(
 				'size' => $custom_font_size,
@@ -172,6 +186,16 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_writing_mode_support && ! $should_skip_writing_mode && isset( $block_attributes['style']['typography']['writingMode'] ) ) {
 		$typography_block_styles['writingMode'] = $block_attributes['style']['typography']['writingMode'] ?? null;
+	}
+
+	if ( $has_text_indent_support && ! $should_skip_text_indent && isset( $block_attributes['style']['typography']['textIndent'] ) ) {
+		$typography_block_styles['textIndent'] = $block_attributes['style']['typography']['textIndent'] ?? null;
+	}
+
+	if ( $has_text_shadow_support && ! $should_skip_text_shadow ) {
+		$preset_text_shadow                    = array_key_exists( 'textShadow', $block_attributes ) ? "var:preset|text-shadow|{$block_attributes['textShadow']}" : null;
+		$custom_text_shadow                    = $block_attributes['style']['typography']['textShadow'] ?? null;
+		$typography_block_styles['textShadow'] = $preset_text_shadow ? $preset_text_shadow : $custom_text_shadow;
 	}
 
 	$attributes = array();
@@ -239,11 +263,32 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 /**
  * Renders typography styles/content to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_typography_support( $block_content, $block ) {
+	if ( ! empty( $block['attrs']['fitText'] ) && $block['attrs']['fitText'] && ! is_admin() ) {
+		wp_enqueue_script_module( '@wordpress/block-editor/utils/fit-text-frontend' );
+
+		// Add Interactivity API directives for fit text to work with client-side navigation.
+		if ( ! empty( $block_content ) ) {
+			$processor = new WP_HTML_Tag_Processor( $block_content );
+			if ( $processor->next_tag() ) {
+				$processor->add_class( 'has-fit-text' );
+				if ( ! $processor->get_attribute( 'data-wp-interactive' ) ) {
+					$processor->set_attribute( 'data-wp-interactive', true );
+				}
+				$processor->set_attribute( 'data-wp-context---core-fit-text', 'core/fit-text::{"fontSize":""}' );
+				$processor->set_attribute( 'data-wp-init---core-fit-text', 'core/fit-text::callbacks.init' );
+				$processor->set_attribute( 'data-wp-style--font-size', 'core/fit-text::context.fontSize' );
+				$block_content = $processor->get_updated_html();
+			}
+		}
+		// fitText supersedes any other typography features
+		return $block_content;
+	}
+
 	if ( ! isset( $block['attrs']['style']['typography']['fontSize'] ) ) {
 		return $block_content;
 	}
@@ -264,26 +309,33 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 }
 
 /**
- * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
- * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
+ * Checks a string for a unit and value and returns an array
+ * consisting of `'value'` and `'unit'`, e.g. array( '42', 'rem' ).
  *
- * @access private
+ * @since 6.1.0
  *
  * @param string|int|float $raw_value Raw size value from theme.json.
  * @param array            $options   {
  *     Optional. An associative array of options. Default is empty array.
  *
- *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
- *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
- *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
+ *     @type string   $coerce_to        Coerce the value to rem or px. Default `'rem'`.
+ *     @type int      $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
+ *     @type string[] $acceptable_units An array of font size units. Default `array( 'rem', 'px', 'em' )`;
  * }
- * @return array An array consisting of `'value'` and `'unit'` properties.
+ * @return array|null An array consisting of `'value'` and `'unit'` properties on success.
+ *                    `null` on failure.
+ * @phpstan-param array{
+ *     coerce_to?: string,
+ *     root_size_value?: positive-int,
+ *     acceptable_units?: non-empty-array<non-empty-string>,
+ * } $options
+ * @phpstan-return array{ value: float, unit: non-empty-string }|null
  */
-function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
+function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ): ?array {
 	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) && ! is_float( $raw_value ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
-			__( 'Raw size value must be a string, integer or a float.', 'gutenberg' ),
+			__( 'Raw size value must be a string, integer, or float.', 'gutenberg' ),
 			'6.1.0'
 		);
 		return null;
@@ -293,7 +345,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
-	// Converts numeric values to pixel values by default.
+	// Converts numbers to pixel values by default.
 	if ( is_numeric( $raw_value ) ) {
 		$raw_value = $raw_value . 'px';
 	}
@@ -304,22 +356,31 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		'acceptable_units' => array( 'rem', 'px', 'em' ),
 	);
 
+	/**
+	 * @var array{
+	 *     coerce_to: string,
+	 *     root_size_value: positive-int,
+	 *     acceptable_units: non-empty-array<non-empty-string>,
+	 * } $options
+	 */
 	$options = wp_parse_args( $options, $defaults );
 
-	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
-	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
-
-	preg_match( $pattern, $raw_value, $matches );
-
-	// We need a number value and a px or rem unit.
-	if ( ! isset( $matches[1] ) || ! isset( $matches[2] ) ) {
+	// Bails out if the raw value can't be parsed.
+	if ( ! preg_match( '/^(\d*\.?\d+)([a-zA-Z]+|%)$/', $raw_value, $matches ) ) {
 		return null;
 	}
 
-	$value = $matches[1];
+	$value = (float) $matches[1];
 	$unit  = $matches[2];
 
-	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
+	if ( ! in_array( $unit, $options['acceptable_units'], true ) ) {
+		return null;
+	}
+
+	/*
+	 * Default browser font size. Later, possibly could inject some JS to
+	 * compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
+	 */
 	if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
 		$value = $value * $options['root_size_value'];
 		$unit  = $options['coerce_to'];
@@ -362,11 +423,11 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
  * @return string|null A font-size value using clamp().
  */
 function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
-	$maximum_viewport_width_raw = isset( $args['maximum_viewport_width'] ) ? $args['maximum_viewport_width'] : null;
-	$minimum_viewport_width_raw = isset( $args['minimum_viewport_width'] ) ? $args['minimum_viewport_width'] : null;
-	$maximum_font_size_raw      = isset( $args['maximum_font_size'] ) ? $args['maximum_font_size'] : null;
-	$minimum_font_size_raw      = isset( $args['minimum_font_size'] ) ? $args['minimum_font_size'] : null;
-	$scale_factor               = isset( $args['scale_factor'] ) ? $args['scale_factor'] : null;
+	$maximum_viewport_width_raw = $args['maximum_viewport_width'] ?? null;
+	$minimum_viewport_width_raw = $args['minimum_viewport_width'] ?? null;
+	$maximum_font_size_raw      = $args['maximum_font_size'] ?? null;
+	$minimum_font_size_raw      = $args['minimum_font_size'] ?? null;
+	$scale_factor               = $args['scale_factor'] ?? null;
 
 	// Normalizes the minimum font size in order to use the value for calculations.
 	$minimum_font_size = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
@@ -375,7 +436,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	 * We get a 'preferred' unit to keep units consistent when calculating,
 	 * otherwise the result will not be accurate.
 	 */
-	$font_size_unit = isset( $minimum_font_size['unit'] ) ? $minimum_font_size['unit'] : 'rem';
+	$font_size_unit = $minimum_font_size['unit'] ?? 'rem';
 
 	// Grabs the maximum font size and normalize it in order to use the value for calculations.
 	$maximum_font_size = gutenberg_get_typography_value_and_unit(
@@ -451,7 +512,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
  * @since 6.7.0 Font size presets can enable fluid typography individually, even if it’s disabled globally.
  *
- * @param array $preset       {
+ * @param array      $preset   {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.
@@ -509,8 +570,8 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 		return $preset['size'];
 	}
 
-	$fluid_settings  = isset( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
-	$layout_settings = isset( $settings['layout'] ) ? $settings['layout'] : array();
+	$fluid_settings  = $typography_settings['fluid'] ?? array();
+	$layout_settings = $settings['layout'] ?? array();
 
 	// Defaults.
 	$default_maximum_viewport_width       = '1600px';
@@ -521,7 +582,7 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	$default_minimum_font_size_limit      = '14px';
 
 	// Defaults overrides.
-	$minimum_viewport_width = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : $default_minimum_viewport_width;
+	$minimum_viewport_width = $fluid_settings['minViewportWidth'] ?? $default_minimum_viewport_width;
 	$maximum_viewport_width = isset( $layout_settings['wideSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $layout_settings['wideSize'] ) ) ? $layout_settings['wideSize'] : $default_maximum_viewport_width;
 	if ( isset( $fluid_settings['maxViewportWidth'] ) ) {
 		$maximum_viewport_width = $fluid_settings['maxViewportWidth'];
@@ -530,8 +591,8 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	$minimum_font_size_limit = $has_min_font_size ? $fluid_settings['minFontSize'] : $default_minimum_font_size_limit;
 
 	// Try to grab explicit min and max fluid font sizes.
-	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;
-	$maximum_font_size_raw = isset( $fluid_font_size_settings['max'] ) ? $fluid_font_size_settings['max'] : null;
+	$minimum_font_size_raw = $fluid_font_size_settings['min'] ?? null;
+	$maximum_font_size_raw = $fluid_font_size_settings['max'] ?? null;
 
 	// Font sizes.
 	$preferred_size = gutenberg_get_typography_value_and_unit( $preset['size'] );

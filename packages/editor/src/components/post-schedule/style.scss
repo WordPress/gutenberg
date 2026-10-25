@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-schedule__panel-dropdown {
 	width: 100%;
 }
@@ -7,4 +9,10 @@
 		min-width: 320px;
 		padding: $grid-unit-20;
 	}
+}
+
+.editor-post-schedule__reset {
+	justify-content: center;
+	margin-top: $grid-unit-20;
+	width: 100%;
 }

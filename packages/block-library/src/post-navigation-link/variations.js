@@ -1,10 +1,23 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 
 const variations = [
+	{
+		name: 'post-previous',
+		title: __( 'Previous Post' ),
+		description: __(
+			'Displays the post link that precedes the current post.'
+		),
+		icon: previous,
+		attributes: { type: 'previous' },
+		scope: [ 'inserter', 'transform' ],
+		example: {
+			attributes: {
+				label: __( 'Previous post' ),
+				arrow: 'arrow',
+			},
+		},
+	},
 	{
 		isDefault: true,
 		name: 'post-next',
@@ -18,22 +31,6 @@ const variations = [
 		example: {
 			attributes: {
 				label: __( 'Next post' ),
-				arrow: 'arrow',
-			},
-		},
-	},
-	{
-		name: 'post-previous',
-		title: __( 'Previous Post' ),
-		description: __(
-			'Displays the post link that precedes the current post.'
-		),
-		icon: previous,
-		attributes: { type: 'previous' },
-		scope: [ 'inserter', 'transform' ],
-		example: {
-			attributes: {
-				label: __( 'Previous post' ),
 				arrow: 'arrow',
 			},
 		},

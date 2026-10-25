@@ -28,8 +28,6 @@ const MyFontFamilyControl = () => {
 			onChange={ ( newFontFamily ) => {
 				setFontFamily( newFontFamily );
 			} }
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 		/>
 	);
 };
@@ -46,7 +44,7 @@ The component accepts the following props:
 ### onChange
 
 A function that receives the new font family value.
-If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font family to undefined or set the font family a starting value.
+Selecting Default calls `onChange` with an empty string to reset the font family.
 
 - Type: `function`
 - Required: Yes
@@ -73,21 +71,3 @@ The current font family value.
 - Type: `String`
 - Required: No
 - Default: ''
-
-The rest of the props are passed down to the underlying `<SelectControl />` instance.
-
-#### `__next40pxDefaultSize`
-
-- Type: `boolean`
-- Required: No
-- Default: `false`
-
-Start opting into the larger default height that will become the default size in a future version.
-
-#### `__nextHasNoMarginBottom`
-
-- Type: `boolean`
-- Required: No
-- Default: `false`
-
-Start opting into the new margin-free styles that will become the default in a future version.

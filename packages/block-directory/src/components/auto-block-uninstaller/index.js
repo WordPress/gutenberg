@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { unregisterBlockType } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { store as blockDirectoryStore } from '../../store';
 
 export default function AutoBlockUninstaller() {
