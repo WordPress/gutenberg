@@ -262,9 +262,10 @@ describe( 'optional block delimiters', () => {
 					'<!-- wp:paragraph {"dropCap":true} -->\n<p class="has-drop-cap">Six nests this year.</p>\n<!-- /wp:paragraph -->'
 				) }\n<!-- /wp:html -->`
 			);
+			// It's now an HTML block, whose static HTML is left as it is.
 			const [ readBack ] = parse( content );
 			expect( readBack.innerBlocks.map( ( { name } ) => name ) ).toEqual(
-				[ 'core/heading', 'core/paragraph', 'core/paragraph' ]
+				[ 'core/paragraph' ]
 			);
 			expect( serialize( [ readBack ] ) ).toBe( content );
 		} );

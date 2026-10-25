@@ -256,7 +256,7 @@ interface Element {
  * Finds the outermost elements in HTML that a block reads, keeping each
  * block's HTML as written.
  *
- * @param html HTML, possibly with elements opened or closed outside it.
+ * @param html HTML of an element no block reads.
  */
 function findBlocks(
 	html: string
@@ -314,47 +314,9 @@ function findBlocks(
 }
 
 /**
- * Turns the elements in an HTML block's static HTML that blocks read into
- * inner blocks, kept without delimiters.
- *
- * @param innerContent Static HTML, with `null` where inner blocks are.
- * @param innerBlocks  Inner blocks.
- */
-export function splitInnerBlocks(
-	innerContent: Array< string | null >,
-	innerBlocks: Block[]
-): { innerContent: Array< string | null >; innerBlocks: Block[] } {
-	if ( ! canReadHTML() ) {
-		return { innerContent, innerBlocks };
-	}
-	const split: {
-		innerContent: Array< string | null >;
-		innerBlocks: Block[];
-	} = { innerContent: [], innerBlocks: [] };
-	let index = 0;
-	for ( const part of innerContent ) {
-		if ( part === null ) {
-			split.innerContent.push( null );
-			split.innerBlocks.push( innerBlocks[ index++ ] );
-			continue;
-		}
-		let wasAt = 0;
-		for ( const { start, end, block } of findBlocks( part ) ) {
-			const html = part.slice( start, end );
-			split.innerContent.push( part.slice( wasAt, start ), null );
-			split.innerBlocks.push(
-				addSource( block, html, html, { isInnerBlocks: true } )
-			);
-			wasAt = end;
-		}
-		split.innerContent.push( part.slice( wasAt ) );
-	}
-	return split;
-}
-
-/**
- * Returns the block for a piece of HTML, or an HTML block holding it as is,
- * with the blocks inside it editable.
+ * Returns the block for a piece of HTML, or an HTML block holding it, with
+ * the elements in it that blocks read as inner blocks, kept without
+ * delimiters.
  *
  * @param piece Piece of HTML.
  */
@@ -364,10 +326,21 @@ function pieceToBlock( piece: Piece ): Block {
 	if ( block ) {
 		return block;
 	}
-	const { innerContent, innerBlocks } = splitInnerBlocks(
-		[ piece.html ],
-		[]
-	);
+
+	const innerContent: Array< string | null > = [];
+	const innerBlocks: Block[] = [];
+	let wasAt = 0;
+	for ( const { start, end, block: innerBlock } of findBlocks(
+		piece.html
+	) ) {
+		const html = piece.html.slice( start, end );
+		innerContent.push( piece.html.slice( wasAt, start ), null );
+		innerBlocks.push(
+			addSource( innerBlock, html, html, { isInnerBlocks: true } )
+		);
+		wasAt = end;
+	}
+	innerContent.push( piece.html.slice( wasAt ) );
 	return createBlock( 'core/html', {}, innerBlocks, innerContent );
 }
 
