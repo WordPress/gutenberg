@@ -5936,7 +5936,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                                       promoted to their own selector are removed from it.
 	 *
 	 * @return array<string, array[]> The style declarations for the node's features with custom
-	 * selectors, keyed by selector.
+	 *                                selectors, keyed by selector.
 	 *
 	 * @phpstan-param array{ selectors?: array<string, string|array<string, string>> } $metadata
 	 * @phpstan-return array<string, list<array{ name: non-falsy-string, value: scalar }>>
