@@ -1,30 +1,22 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import { useDrag } from '@use-gesture/react';
 import type {
+	CSSProperties,
 	SyntheticEvent,
 	ChangeEvent,
 	KeyboardEvent,
 	PointerEvent,
 	FocusEvent,
 	ForwardedRef,
-	MouseEvent,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
-import { Input } from './styles/input-control-styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
@@ -47,6 +39,9 @@ function InputField(
 		stateReducer = ( state: any ) => state,
 		value: valueProp,
 		type,
+		paddingInlineStart,
+		paddingInlineEnd,
+		style,
 		...props
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
@@ -144,6 +139,16 @@ function InputField(
 		( dragProps ) => {
 			const { distance, dragging, event, target } = dragProps;
 
+			// The drag gesture is not offered for touch input, where there is
+			// no cursor affordance for it, and where it's easy to accidentally
+			// change the value when only meaning to tap or move the caret.
+			if (
+				event.pointerType === 'touch' ||
+				event.type.startsWith( 'touch' )
+			) {
+				return;
+			}
+
 			// The `target` prop always references the `input` element while, by
 			// default, the `dragProps.event.target` property would reference the real
 			// event target (i.e. any DOM element that the pointer is hovering while
@@ -187,38 +192,41 @@ function InputField(
 	);
 
 	const dragProps = isDragEnabled ? dragGestureProps() : {};
-	/*
-	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
-	 * type=number when their spinner arrows are pressed.
-	 */
-	let handleOnMouseDown;
-	if ( type === 'number' ) {
-		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
-			props.onMouseDown?.( event );
-			if (
-				event.currentTarget !==
-				event.currentTarget.ownerDocument.activeElement
-			) {
-				event.currentTarget.focus();
-			}
-		};
-	}
 
 	return (
-		<Input
+		<PolymorphicElement
+			as="input"
 			{ ...props }
 			{ ...dragProps }
-			className="components-input-control__input"
+			className={ clsx( 'components-input-control__input', styles.input, {
+				[ styles[ 'is-small' ] ]: size === 'small',
+				[ styles[ 'is-compact' ] ]: size === 'compact',
+				[ styles[ 'is-dragging' ] ]: isDragging,
+				[ styles[ 'has-drag-cursor' ] ]: isDragging && !! dragCursor,
+			} ) }
+			style={
+				{
+					'--_wp-components-input-control-padding-start':
+						typeof paddingInlineStart === 'number'
+							? `${ paddingInlineStart }px`
+							: paddingInlineStart,
+					'--_wp-components-input-control-padding-end':
+						typeof paddingInlineEnd === 'number'
+							? `${ paddingInlineEnd }px`
+							: paddingInlineEnd,
+					'--_wp-components-input-control-drag-cursor': isDragging
+						? dragCursor
+						: undefined,
+					...style,
+				} as CSSProperties
+			}
+			data-empty-value={ value ? undefined : '' }
 			disabled={ disabled }
-			dragCursor={ dragCursor }
-			isDragging={ isDragging }
 			id={ id }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
-			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
-			inputSize={ size }
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.
 			// See https://github.com/WordPress/gutenberg/pull/47250 for details.
 			value={ value ?? '' }

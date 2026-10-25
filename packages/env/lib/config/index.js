@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const loadConfig = require( './load-config' );
 const { ValidationError } = require( './validate-config' );
 const dbEnv = require( './db-env' );

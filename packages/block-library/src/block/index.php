@@ -16,7 +16,7 @@
  *
  * @return string Rendered HTML of the referenced block.
  */
-function render_block_core_block( $attributes ) {
+function render_block_core_block( $attributes, $content, $block_instance ) {
 	static $seen_refs = array();
 
 	if ( empty( $attributes['ref'] ) ) {
@@ -73,29 +73,20 @@ function render_block_core_block( $attributes ) {
 		$attributes['content'] = $attributes['overrides'];
 	}
 
-	/**
-	 * We set the `pattern/overrides` context through the `render_block_context`
-	 * filter so that it is available when a pattern's inner blocks are
-	 * rendering via do_blocks given it only receives the inner content.
-	 */
-	$has_pattern_overrides = isset( $attributes['content'] ) && null !== get_block_bindings_source( 'core/pattern-overrides' );
-	if ( $has_pattern_overrides ) {
-		$filter_block_context = static function ( $context ) use ( $attributes ) {
-			$context['pattern/overrides'] = $attributes['content'];
-			return $context;
-		};
-		add_filter( 'render_block_context', $filter_block_context, 1 );
-	}
-
 	// Apply Block Hooks.
 	$content = apply_block_hooks_to_content_from_post_object( $content, $reusable_block );
 
-	$content = do_blocks( $content );
-	unset( $seen_refs[ $attributes['ref'] ] );
+	/**
+	 * We attach the blocks from $content as inner blocks to the Synced Pattern block instance.
+	 * This ensures that block context available to the Synced Pattern block instance is provided to
+	 * those blocks.
+	 */
+	$block_instance->parsed_block['innerBlocks']  = parse_blocks( $content );
+	$block_instance->parsed_block['innerContent'] = array_fill( 0, count( $block_instance->parsed_block['innerBlocks'] ), null );
+	$block_instance->refresh_context_dependents();
 
-	if ( $has_pattern_overrides ) {
-		remove_filter( 'render_block_context', $filter_block_context, 1 );
-	}
+	$content = $block_instance->render( array( 'dynamic' => false ) );
+	unset( $seen_refs[ $attributes['ref'] ] );
 
 	return $content;
 }

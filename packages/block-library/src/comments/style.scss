@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 /* Styles for backwards compatibility with the legacy `post-comments` block */
 .wp-block-post-comments {
 	// This block has customizable padding, border-box makes that more predictable.
@@ -68,7 +70,7 @@
 		line-height: 1.5;
 
 		b {
-			font-weight: normal;
+			font-weight: 400;
 		}
 
 		.comment-awaiting-moderation {
@@ -80,16 +82,6 @@
 
 	.comment-body .commentmetadata {
 		font-size: 0.875em;
-	}
-
-	.comment-form-comment,
-	.comment-form-author,
-	.comment-form-email,
-	.comment-form-url {
-		label {
-			display: block;
-			margin-bottom: 0.25em;
-		}
 	}
 
 	.comment-form {
@@ -138,6 +130,13 @@
 	}
 }
 
+:where(.wp-block-post-comments .comment-form-comment label),
+:where(.wp-block-post-comments .comment-form-author label),
+:where(.wp-block-post-comments .comment-form-email label),
+:where(.wp-block-post-comments .comment-form-url label) {
+	display: block;
+	margin-bottom: 0.25em;
+}
 
 // Using :where to give this a low specificity so that element styles take precedence.
 // Needed for backwards compatibility.
