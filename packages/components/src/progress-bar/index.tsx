@@ -12,8 +12,8 @@ function UnforwardedProgressBar(
 	ref: ForwardedRef< HTMLProgressElement >
 ) {
 	deprecated( 'wp.components.ProgressBar', {
-		since: '7.2',
-		version: '7.4',
+		since: '7.3',
+		version: '7.5',
 		alternative: 'Progress from @wordpress/ui',
 	} );
 

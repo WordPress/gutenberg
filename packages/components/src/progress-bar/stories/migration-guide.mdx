@@ -5,7 +5,7 @@ import * as ProgressBarStories from './index.story';
 
 # ProgressBar migration guide
 
-`ProgressBar` is deprecated since WordPress 7.2 and scheduled for removal in WordPress 7.4. Use [`Progress`](?path=/docs/design-system-components-progress--docs) from `@wordpress/ui` instead.
+Migrate from [`ProgressBar`](?path=/docs/components-progressbar--docs) in `@wordpress/components` to [`Progress`](?path=/docs/design-system-components-progress--docs) in `@wordpress/ui`.
 
 ## Basic migration
 
@@ -32,5 +32,3 @@ Both components support progress values from 0 to 100 by default. `Progress.Root
 Move custom width styles to `Progress.Root`, which sets the overall width. Style the track with `Progress.Track` and the filled indicator with `Progress.Indicator`. For example, pass `style={ { width: '100%' } }` to `Progress.Root` to fill its container. Update CSS selectors that depend on the legacy markup.
 
 `ProgressBar` forwards its ref and additional HTML props to a native `progress` element. `Progress.Root` renders a `div` with the `progressbar` role by default, so update refs typed as `HTMLProgressElement` and any code that relies on native `progress` properties.
-
-`@wordpress/ui` is distributed as an npm package and is not available as `wp.ui`. Follow the package's [installation and setup guidance](https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui#installation) when migrating plugin or standalone application code.

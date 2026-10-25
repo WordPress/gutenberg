@@ -5,7 +5,7 @@ import { ProgressBar } from '..';
 
 describe( 'ProgressBar', () => {
 	const deprecationWarning =
-		'wp.components.ProgressBar is deprecated since version 7.2 and will be removed in version 7.4. Please use Progress from @wordpress/ui instead.';
+		'wp.components.ProgressBar is deprecated since version 7.3 and will be removed in version 7.5. Please use Progress from @wordpress/ui instead.';
 
 	it( 'should render an indeterminate semantic progress bar element', async () => {
 		await render( <ProgressBar /> );

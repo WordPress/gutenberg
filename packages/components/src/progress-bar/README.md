@@ -1,6 +1,6 @@
 # ProgressBar
 
-<p class="callout callout-alert">This component is deprecated since WordPress 7.2 and scheduled for removal in WordPress 7.4. Use `Progress` from `@wordpress/ui` instead. See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide">migration guide</a>.</p>
+<p class="callout callout-alert">This component is deprecated since WordPress 7.3 and scheduled for removal in WordPress 7.5. Use `Progress` from `@wordpress/ui` instead. See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide">migration guide</a>.</p>
 
 A simple horizontal progress bar component.
 
