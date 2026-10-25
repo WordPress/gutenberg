@@ -1,4 +1,5 @@
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
+import { autop } from '@wordpress/autop';
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
@@ -74,13 +75,14 @@ function filterInlineHTML( HTML: string ): string {
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param options
- * @param options.HTML      The HTML to convert.
- * @param options.plainText Plain text version.
- * @param options.mode      Handle content as blocks or inline content.
- *                          * 'AUTO': Decide based on the content passed.
- *                          * 'INLINE': Always handle as inline content, and return string.
- *                          * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param options.tagName   The tag into which content will be inserted.
+ * @param options.HTML            The HTML to convert.
+ * @param options.plainText       Plain text version.
+ * @param options.mode            Handle content as blocks or inline content.
+ *                                * 'AUTO': Decide based on the content passed.
+ *                                * 'INLINE': Always handle as inline content, and return string.
+ *                                * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param options.tagName         The tag into which content will be inserted.
+ * @param options.convertMarkdown Whether to convert Markdown in plain text. Default true.
  *
  * @return A list of blocks or a string, depending on `handlerMode`.
  */
@@ -89,6 +91,7 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
+	convertMarkdown = true,
 }: RawHandlerOptions ): Block[] | string {
 	// Allows us to ask for this information when we get a report.
 	log( 'Received HTML (pasteHandler):\n\n', HTML );
@@ -148,7 +151,7 @@ export function pasteHandler( {
 
 		// The markdown converter (Showdown) trims whitespace.
 		if ( ! /^\s+$/.test( plainText ) ) {
-			HTML = markdownConverter( HTML );
+			HTML = convertMarkdown ? markdownConverter( HTML ) : autop( HTML );
 		}
 	}
 
