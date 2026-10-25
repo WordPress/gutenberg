@@ -1,9 +1,11 @@
 import { useState, useId } from '@wordpress/element';
 import {
 	InspectorControls,
+	store as blockEditorStore,
 	useBlockBindingsUtils,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { PATTERN_OVERRIDES_BINDING_SOURCE } from '../constants';
 import {
@@ -23,8 +25,21 @@ function PatternOverridesControls( {
 	const [ showDisallowOverridesModal, setShowDisallowOverridesModal ] =
 		useState( false );
 
+	// Blocks whose inner blocks can be bound are overridden as a whole, so
+	// they bind their inner blocks rather than their attributes.
+	const bindingKey = useSelect(
+		( select ) =>
+			(
+				select( blockEditorStore ).getSettings()
+					.__experimentalBlockBindingsSupportedAttributes as
+					Record< string, string[] > | undefined
+			 )?.[ blockName ]?.includes( 'innerBlocks' )
+				? 'innerBlocks'
+				: '__default',
+		[ blockName ]
+	);
 	const hasName = !! attributes.metadata?.name;
-	const defaultBindings = attributes.metadata?.bindings?.__default;
+	const defaultBindings = attributes.metadata?.bindings?.[ bindingKey ];
 	const hasOverrides =
 		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
 	const isConnectedToOtherSources =
@@ -43,7 +58,7 @@ function PatternOverridesControls( {
 		}
 
 		updateBlockBindings( {
-			__default: isChecked
+			[ bindingKey ]: isChecked
 				? { source: PATTERN_OVERRIDES_BINDING_SOURCE }
 				: undefined,
 		} );

@@ -6,7 +6,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockBindingsAttributeControl,
@@ -16,6 +16,7 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
+import { INNER_BLOCKS_BINDING_KEY } from '../utils/block-bindings';
 import type { BlockBindingsPanelProps } from './types';
 
 const useToolsPanelDropdownMenuProps = () => {
@@ -39,7 +40,7 @@ export const BlockBindingsPanel = ( {
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { bindableAttributes, hasCompatibleFields } = useSelect(
+	const { supportedAttributes, hasCompatibleFields } = useSelect(
 		( select ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
@@ -50,7 +51,7 @@ export const BlockBindingsPanel = ( {
 
 			return {
 				// The setting maps block names to their bindable attributes.
-				bindableAttributes: (
+				supportedAttributes: (
 					__experimentalBlockBindingsSupportedAttributes as
 						Record< string, string[] > | undefined
 				 )?.[ blockName ],
@@ -64,6 +65,15 @@ export const BlockBindingsPanel = ( {
 			};
 		},
 		[ blockName, blockContext ]
+	);
+
+	// The supported attributes can list inner blocks, which aren't one.
+	const bindableAttributes = useMemo(
+		() =>
+			supportedAttributes?.filter(
+				( attribute ) => attribute !== INNER_BLOCKS_BINDING_KEY
+			),
+		[ supportedAttributes ]
 	);
 
 	// Return early if there are no bindable attributes.

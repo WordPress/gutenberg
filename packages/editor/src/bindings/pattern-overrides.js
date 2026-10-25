@@ -19,6 +19,13 @@ export default {
 					currentBlockAttributes?.metadata?.name
 				]?.[ attributeName ];
 
+			// Overridden inner blocks are serialized blocks, where an empty
+			// string means no inner blocks.
+			if ( attributeName === 'innerBlocks' ) {
+				overridesValues[ attributeName ] = overridableValue;
+				continue;
+			}
+
 			// If it has not been overridden, return the original value.
 			// Check undefined because empty string is a valid value.
 			if ( overridableValue === undefined ) {

@@ -13,6 +13,7 @@ import type { BlockBindingsSource } from '@wordpress/blocks';
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {
+	INNER_BLOCKS_BINDING_KEY,
 	getBlockBindingsContext,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
@@ -56,7 +57,16 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
 	);
-	const { bindableAttributes } = useContext( PrivateBlockContext );
+	const { bindableAttributes: supportedAttributes } =
+		useContext( PrivateBlockContext );
+	// Inner blocks aren't an attribute: the inner blocks resolve their binding.
+	const bindableAttributes = useMemo(
+		() =>
+			( supportedAttributes as string[] | undefined )?.filter(
+				( attributeName ) => attributeName !== INNER_BLOCKS_BINDING_KEY
+			),
+		[ supportedAttributes ]
+	);
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		return {

@@ -70,6 +70,29 @@ const {
 	RichTextInputEvent: UntypedRichTextInputEvent,
 } = unlock( richTextPrivateApis );
 
+function useIsWithinBoundInnerBlocksSelect(
+	clientId: string,
+	isNeeded: boolean
+) {
+	return useSelect(
+		( select ) =>
+			isNeeded &&
+			unlock( select( blockEditorStore ) ).isWithinBoundInnerBlocks(
+				clientId
+			),
+		[ clientId, isNeeded ]
+	);
+}
+
+/**
+ * Whether the block is within bound inner blocks, whose content can be edited
+ * inside a synced pattern. Without the experiment that binds inner blocks, it
+ * never is, and the store isn't subscribed to.
+ */
+const useIsWithinBoundInnerBlocks = window.__experimentalInnerBlocksBindings
+	? useIsWithinBoundInnerBlocksSelect
+	: () => false;
+
 // The private APIs are untyped, so type the components this re-exports.
 const RichTextShortcut =
 	UntypedRichTextShortcut as ComponentType< RichTextShortcutProps >;
@@ -293,8 +316,15 @@ function RichTextWrapper(
 	const hasOverrideEnabled =
 		blockBindings?.__default?.source === 'core/pattern-overrides';
 
+	const isWithinBoundInnerBlocks = useIsWithinBoundInnerBlocks(
+		clientId,
+		isInsidePatternOverrides && ! hasOverrideEnabled
+	);
+
 	const shouldDisableForPattern =
-		isInsidePatternOverrides && ! hasOverrideEnabled;
+		isInsidePatternOverrides &&
+		! hasOverrideEnabled &&
+		! isWithinBoundInnerBlocks;
 
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
