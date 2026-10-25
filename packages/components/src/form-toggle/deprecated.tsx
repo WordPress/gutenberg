@@ -10,8 +10,8 @@ function UnforwardedDeprecatedFormToggle(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	deprecated( 'wp.components.FormToggle', {
-		since: '7.2',
-		version: '7.4',
+		since: '7.3',
+		version: '7.5',
 		alternative: 'Switch from @wordpress/ui',
 	} );
 

@@ -9,7 +9,7 @@ import ToggleControl from '../../toggle-control';
 import type { FormToggleProps } from '../types';
 
 const DEPRECATION_MESSAGE =
-	'wp.components.FormToggle is deprecated since version 7.2 and will be removed in version 7.4. Please use Switch from @wordpress/ui instead.';
+	'wp.components.FormToggle is deprecated since version 7.3 and will be removed in version 7.5. Please use Switch from @wordpress/ui instead.';
 
 globalThis.wpVitest.mockMatchMedia();
 
