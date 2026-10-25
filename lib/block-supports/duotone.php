@@ -432,6 +432,6 @@ function gutenberg_register_duotone_support( $block_type ) {
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );
-	// @phpstan-ignore arguments.count (The required $wp_block argument is missing, so this throws an ArgumentCountError. Not fixed since the function is deprecated.)
-	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block );
+	$wp_block = new WP_Block( $block );
+	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block );
 }
