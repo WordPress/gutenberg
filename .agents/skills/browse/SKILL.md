@@ -31,6 +31,8 @@ Each one calls an e2e test util from `packages/e2e-test-utils-playwright/src`, w
 
 Any other command goes to [playwright-cli](https://playwright.dev/docs/getting-started-cli) in the same browser: `snapshot` (the page as text, with refs), `click <ref>`, `type <text>`, `press <key>`, `goto <full URL>`, `screenshot`, `close`. Run `npm run browse -- --help` for the full list; its first lines point to playwright-cli's own skill.
 
+To record a video of a check, wrap the steps in `video-start` and `video-stop`, which prints the file's path. It records everything on the page, including the commands above. `video-chapter <title>` marks a step, and `video-show-actions` labels each action on screen.
+
 ## Check a change
 
 1. Run `open`, then set the page up, for example with `new-post`.
