@@ -255,11 +255,38 @@ class PhpRuntime {
 	}
 
 	/**
-	 * Show logs. Not supported yet; the server log is php/server.log in the
-	 * work directory.
+	 * Show the server log.
+	 *
+	 * @param {Object}  config          The wp-env config object.
+	 * @param {Object}  options         Logs options.
+	 * @param {boolean} options.watch   If true, follow along with log output.
+	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
 	 */
-	async logs() {
-		throw new UnsupportedCommandError( 'logs' );
+	async logs( config, { watch, spinner } ) {
+		spinner.stop();
+		const file = await fs.open(
+			path.join( config.workDirectoryPath, 'php/server.log' )
+		);
+		let position = 0;
+		do {
+			const { size } = await file.stat();
+			// The log starts over when the server restarts.
+			if ( size < position ) {
+				position = 0;
+			}
+			if ( size > position ) {
+				const { buffer } = await file.read( {
+					buffer: Buffer.alloc( size - position ),
+					position,
+				} );
+				process.stdout.write( buffer );
+				position = size;
+			}
+			if ( watch ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
+			}
+		} while ( watch );
+		await file.close();
 	}
 
 	/**
