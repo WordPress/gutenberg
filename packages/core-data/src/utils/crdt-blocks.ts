@@ -428,16 +428,19 @@ function createNewYAttributeValue(
  *
  * - `rich-text`          -> Y.Text
  * - `array`  with query  -> Y.Array of Y.Maps
+ * - `array`  in a query  -> Y.Array of primitives
  * - `object` with query  -> Y.Map
  * - anything else        -> plain value (unchanged)
  *
- * @param schema The attribute type definition.
- * @param value  The plain JS value to convert.
+ * @param schema  The attribute type definition.
+ * @param value   The plain JS value to convert.
+ * @param inQuery Whether the schema was declared in a parent's query.
  * @return A Y.js type or the original value.
  */
 function createYValueFromSchema(
 	schema: BlockAttributeSchema | undefined,
-	value: unknown
+	value: unknown,
+	inQuery = false
 ): Y.Text | Y.Array< unknown > | Y.Map< unknown > | unknown {
 	if ( ! schema ) {
 		return value;
@@ -459,10 +462,12 @@ function createYValueFromSchema(
 		return yArray;
 	}
 
-	// Arrays of primitives are stored as Y.Array too, so that concurrent
-	// insertions are preserved. Arrays of objects without a query schema have
-	// no described structure to merge, so they stay plain values.
+	// Arrays of primitives declared in a query are stored as Y.Array too, so
+	// that concurrent insertions are preserved. Other arrays without a query
+	// schema, such as a block setting, are replaced as a whole, so they stay
+	// plain values.
 	if (
+		inQuery &&
 		schema.type === 'array' &&
 		Array.isArray( value ) &&
 		value.every( ( item ) => item === null || typeof item !== 'object' )
@@ -568,7 +573,7 @@ function createYMapFromQuery(
 	const entries: [ string, unknown ][] = Object.entries( record ).map(
 		( [ key, val ] ): [ string, unknown ] => {
 			const subSchema = query[ key ];
-			return [ key, createYValueFromSchema( subSchema, val ) ];
+			return [ key, createYValueFromSchema( subSchema, val, true ) ];
 		}
 	);
 
@@ -1061,6 +1066,7 @@ function mergeYArray(
  * @param cursorPosition The cursor position for rich-text delta merges from the updated value.
  * @param cursorScope    Indicates a specific block and attribute associated with the editor;
  *                       determines whether the cursor should be updated based on the change.
+ * @param inQuery        Whether the schema was declared in a parent's query.
  */
 function mergeYValue(
 	schema: BlockAttributeSchema | undefined,
@@ -1068,7 +1074,8 @@ function mergeYValue(
 	yMap: Y.Map< unknown >,
 	key: string,
 	cursorPosition: MergeCursorPosition,
-	cursorScope: RichTextCursorScope
+	cursorScope: RichTextCursorScope,
+	inQuery = false
 ): void {
 	const currentVal = yMap.get( key );
 	if (
@@ -1089,6 +1096,7 @@ function mergeYValue(
 	) {
 		mergeYArray( currentVal, newVal, schema, cursorPosition, cursorScope );
 	} else if (
+		inQuery &&
 		schema?.type === 'array' &&
 		Array.isArray( newVal ) &&
 		currentVal instanceof Y.Array
@@ -1115,7 +1123,7 @@ function mergeYValue(
 		// or no longer the declared shape. Empty it rather than replace it.
 		clearYContainer( currentVal, schema, cursorPosition, cursorScope );
 	} else {
-		const newYValue = createYValueFromSchema( schema, newVal );
+		const newYValue = createYValueFromSchema( schema, newVal, inQuery );
 
 		// If createYValueFromSchema wrapped the value into a Y type, the
 		// current value is the wrong type and needs upgrading. Otherwise,
@@ -1205,7 +1213,8 @@ function mergeYMapValues(
 			yMap,
 			key,
 			cursorPosition,
-			cursorScope
+			cursorScope,
+			true
 		);
 	}
 
@@ -1400,7 +1409,7 @@ function isExpectedAttributeType(
 		return typeof attributeValue === 'string';
 	}
 
-	if ( schema?.type === 'array' ) {
+	if ( schema?.type === 'array' && schema.query ) {
 		return attributeValue instanceof Y.Array;
 	}
 

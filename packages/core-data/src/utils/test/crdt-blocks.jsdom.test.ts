@@ -30,6 +30,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 			name: 'core/paragraph',
 			attributes: {
 				content: { type: 'rich-text' },
+				levelOptions: { type: 'array' },
 				metadata: {
 					type: 'object',
 					query: { noteId: { type: 'array' } },
@@ -3307,6 +3308,64 @@ describe( 'crdt-blocks', () => {
 			);
 
 			expect( updates ).toBe( 0 );
+		} );
+
+		it( 'keeps array attributes not declared in a query as plain values', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[
+					{
+						...makeNoteBlock(),
+						attributes: {
+							content: 'Note target block',
+							levelOptions: [ 1, 2, 3 ],
+						},
+					},
+				],
+				null
+			);
+
+			const attributes = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			expect( attributes.get( 'levelOptions' ) ).toEqual( [ 1, 2, 3 ] );
+			expect( attributes.get( 'levelOptions' ) ).not.toBeInstanceOf(
+				Y.Array
+			);
+		} );
+
+		it( 'keeps one whole value when two users change an undeclared array concurrently', () => {
+			const makeBlock = ( levelOptions: number[] ): Block => ( {
+				...makeNoteBlock(),
+				attributes: { content: 'Note target block', levelOptions },
+			} );
+
+			mergeCrdtBlocks( yblocks, [ makeBlock( [ 1, 2, 3 ] ) ], null );
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// Each user removes a different option.
+			mergeCrdtBlocks( yblocks, [ makeBlock( [ 2, 3 ] ) ], null );
+			mergeCrdtBlocks( yblocks2, [ makeBlock( [ 1, 2 ] ) ], null );
+
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+			Y.applyUpdate( doc, Y.encodeStateAsUpdate( doc2 ) );
+
+			// One user's choice wins as a whole instead of being mixed into
+			// a value neither of them chose.
+			const [ block1 ] = yblocks.toJSON() as Block[];
+			const [ block2 ] = yblocks2.toJSON() as Block[];
+			expect( block1.attributes.levelOptions ).toEqual(
+				block2.attributes.levelOptions
+			);
+			expect( [
+				[ 2, 3 ],
+				[ 1, 2 ],
+			] ).toContainEqual( block1.attributes.levelOptions );
+
+			doc2.destroy();
 		} );
 	} );
 } );
