@@ -16,11 +16,11 @@ Each one calls an e2e test util from `packages/e2e-test-utils-playwright/src`, w
 | Command | Does | Test util |
 | --- | --- | --- |
 | `open` | Opens the browser on the dashboard, logged in as admin. Run it first. | |
-| `new-post [options]` | Opens a new post, e.g. `new-post '{"postType":"page"}'`. | `admin.createNewPost` |
+| `new-post [options]` | Opens a new post, e.g. `new-post '{"postType":"page","content":"<block markup>"}'`. | `admin.createNewPost`, `editor.setContent` |
 | `edit-post <id>` | Opens a post in the editor. | `admin.editPost` |
 | `site-editor [options]` | Opens the site editor. | `admin.visitSiteEditor` |
 | `content [markup]` | Prints the post's block markup, or sets it. | `editor.getEditedPostContent`, `editor.setContent` |
-| `blocks` | Prints the blocks with all their attributes, as JSON. | `editor.getBlocks` |
+| `blocks [blocks]` | Prints the blocks with all their attributes, as JSON, or sets them from the same shape, e.g. `blocks '[{"name":"core/heading","attributes":{"content":"Hi"}}]'`. | `editor.getBlocks`, `editor.insertBlock` |
 | `insert <block>` | Inserts a block, e.g. `insert '{"name":"core/heading"}'`. | `editor.insertBlock` |
 | `transform <name>` | Transforms the selected block, e.g. `transform core/paragraph`. | `editor.transformBlockTo` |
 | `keys <keys>` | Presses keys, with `primary` for Cmd or Ctrl, e.g. `keys primary+z`. | `pageUtils.pressKeys` |

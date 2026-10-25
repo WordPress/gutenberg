@@ -95,14 +95,29 @@ async function open() {
 
 // The e2e test utils worth calling by hand, by command name.
 const commands = {
-	'new-post': ( { admin }, options ) => admin.createNewPost( options ),
+	// WordPress escapes block markup passed to createNewPost as `content`.
+	'new-post': async ( { admin, editor }, { content, ...options } = {} ) => {
+		await admin.createNewPost( options );
+		if ( content ) {
+			await editor.setContent( content );
+		}
+	},
 	'edit-post': ( { admin }, postId ) => admin.editPost( postId ),
 	'site-editor': ( { admin }, options ) => admin.visitSiteEditor( options ),
 	content: ( { editor }, markup ) =>
 		markup === undefined
 			? editor.getEditedPostContent()
 			: editor.setContent( markup ),
-	blocks: ( { editor } ) => editor.getBlocks(),
+	blocks: async ( { editor }, blocks ) => {
+		if ( blocks === undefined ) {
+			return editor.getBlocks();
+		}
+		await editor.setContent( '' );
+		// Each block goes in after the one inserted before it.
+		for ( const block of blocks ) {
+			await editor.insertBlock( block );
+		}
+	},
 	insert: ( { editor }, block ) => editor.insertBlock( block ),
 	transform: ( { editor }, name ) => editor.transformBlockTo( name ),
 	keys: ( { pageUtils }, keys ) => pageUtils.pressKeys( keys ),
