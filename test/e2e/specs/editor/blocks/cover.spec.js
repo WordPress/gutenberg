@@ -402,6 +402,7 @@ test.describe( 'Cover', () => {
 		).toBeVisible();
 
 		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
 
 		// The focal point picker is in the Settings tab of the block inspector.
 		await page.getByRole( 'tab', { name: 'Settings' } ).click();
