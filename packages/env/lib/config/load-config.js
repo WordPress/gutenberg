@@ -23,6 +23,7 @@ const { createPortResolver } = require( '../resolve-available-ports' );
  * @property {string}                               dockerComposeConfigPath Path to the docker-compose.yml file.
  * @property {boolean}                              detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, string>}              lifecycleScripts        Any lifecycle scripts that we might need to execute.
+ * @property {string}                               [runtime]               The runtime set in .wp-env.json ("docker" or "playground"), if any.
  * @property {Object.<string, WPEnvironmentConfig>} env                     Specific config for different environments.
  * @property {boolean}                              debug                   True if debug mode is enabled.
  */
@@ -125,6 +126,7 @@ module.exports = async function loadConfig(
 			),
 		] ),
 		lifecycleScripts: config.lifecycleScripts,
+		...( config.runtime !== undefined && { runtime: config.runtime } ),
 		env: config.env,
 	};
 };
