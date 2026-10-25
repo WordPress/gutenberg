@@ -1,12 +1,14 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
+const INNER_BLOCKS = 'innerBlocks';
 
 /**
  * @type {WPBlockBindingsSource}
  */
 export default {
 	name: 'core/pattern-overrides',
+	usesContext: [ 'pattern/overrides' ],
 	getValues( { select, clientId, context, bindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = select( blockEditorStore );
@@ -18,6 +20,17 @@ export default {
 				patternOverridesContent?.[
 					currentBlockAttributes?.metadata?.name
 				]?.[ attributeName ];
+
+			// The inner blocks are overridden with serialized block markup,
+			// where an empty string means no inner blocks. Without an
+			// override, the block keeps its own inner blocks.
+			if ( attributeName === INNER_BLOCKS ) {
+				overridesValues[ attributeName ] =
+					typeof overridableValue === 'string'
+						? overridableValue
+						: undefined;
+				continue;
+			}
 
 			// If it has not been overridden, return the original value.
 			// Check undefined because empty string is a valid value.
@@ -50,11 +63,25 @@ export default {
 		// Extract the updated attributes from the source bindings.
 		const attributes = Object.entries( bindings ).reduce(
 			( attrs, [ key, { newValue } ] ) => {
+				// The inner blocks are only overridden in a pattern instance,
+				// with serialized block markup, stored as written: the
+				// overridable blocks inside keep reading their values from
+				// the instance. In the pattern itself, they are edited
+				// directly.
+				if (
+					key === INNER_BLOCKS &&
+					( ! patternClientId || typeof newValue !== 'string' )
+				) {
+					return attrs;
+				}
 				attrs[ key ] = newValue;
 				return attrs;
 			},
 			{}
 		);
+		if ( INNER_BLOCKS in bindings && ! Object.keys( attributes ).length ) {
+			return;
+		}
 
 		// If there is no pattern client ID, sync blocks with the same name and same attributes.
 		if ( ! patternClientId ) {
@@ -96,5 +123,11 @@ export default {
 			},
 		} );
 	},
-	canUserEditValue: () => true,
+	// Bound inner blocks are checked with their block's client ID. As
+	// overrides are stored by block name, a block without one can't override
+	// its inner blocks.
+	canUserEditValue: ( { select, clientId } ) =>
+		! clientId ||
+		!! select( blockEditorStore ).getBlockAttributes( clientId )?.metadata
+			?.name,
 };

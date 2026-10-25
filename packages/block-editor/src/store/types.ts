@@ -516,17 +516,35 @@ export interface InsertionPoint {
 	index?: number;
 }
 
+/**
+ * A block whose inner blocks are bound to a block bindings source.
+ */
+export interface BoundInnerBlocks {
+	editable: boolean;
+}
+
 export interface BlocksState {
 	byClientId: Map< string, BlockWithoutAttributes >;
 	attributes: Map< string, BlockAttributes >;
 	order: Map< string, string[] >;
 	parents: Map< string, string >;
 	controlledInnerBlocks: Set< string >;
+	/**
+	 * Controlled blocks whose inner blocks are bound to a source. Their tree
+	 * entry keeps their own inner blocks, which their parent serializes as the
+	 * binding's fallback, while the controlled inner blocks are the source's.
+	 */
+	boundInnerBlocks: Map< string, BoundInnerBlocks >;
 	blockEditingModes: Map< string, BlockEditingMode >;
 	tree: Map< string, BlockTreeNode >;
 	isPersistentChange?: boolean;
 	isIgnoredChange?: boolean;
 	lastBlockChangeHistoryMode?: HistoryMode;
+	/**
+	 * For a change derived from another one, like writing bound inner blocks
+	 * back to their source, the state that change resulted in.
+	 */
+	derivedFrom?: BlocksState;
 }
 
 export interface SelectionState {
@@ -648,6 +666,7 @@ export type Action =
 	| { type: 'MARK_AUTOMATIC_CHANGE' }
 	| { type: 'MARK_AUTOMATIC_CHANGE_FINAL' }
 	| { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' }
+	| { type: 'MARK_NEXT_CHANGE_AS_DERIVED' }
 	| { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'; history?: HistoryMode }
 	| {
 			type: 'MOVE_BLOCKS_TO_POSITION';
@@ -754,6 +773,7 @@ export type Action =
 			type: 'SET_HAS_CONTROLLED_INNER_BLOCKS';
 			clientId: string;
 			hasControlledInnerBlocks: boolean;
+			boundInnerBlocks?: BoundInnerBlocks;
 	  }
 	| { type: 'SET_INSERTION_POINT'; value: InsertionPoint | null }
 	| { type: 'SET_OPEN_LIST_VIEW_PANEL'; clientId: string | null }
@@ -794,6 +814,11 @@ export type Action =
 	| { type: 'TOGGLE_SELECTION'; isSelectionEnabled: boolean }
 	| { type: 'UNSET_BLOCK_EDITING_MODE'; clientId: string }
 	| { type: 'UPDATE_BLOCK'; clientId: string; updates: Partial< Block > }
+	| {
+			type: 'UPDATE_BOUND_INNER_BLOCKS';
+			clientId: string;
+			boundInnerBlocks: BoundInnerBlocks;
+	  }
 	| {
 			type: 'UPDATE_BLOCK_ATTRIBUTES';
 			clientIds: string[];

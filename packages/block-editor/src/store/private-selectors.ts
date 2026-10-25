@@ -837,12 +837,91 @@ export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If sections are nested, return the top level section block.
 	// Don't return early.
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		// Editable bound inner blocks aren't part of the sections around them.
+		if (
+			state.blocks.boundInnerBlocks?.size &&
+			isEditableBoundInnerBlocks( state, current )
+		) {
+			break;
+		}
 		if ( isSectionBlockCandidate( state, current ) ) {
 			result = current;
 		}
 	}
 	return result;
 };
+
+/**
+ * Returns what identifies the most recent block change, or the change it
+ * derives from, like the edit that writing bound inner blocks back to their
+ * source follows. A controller of blocks that reported a change reports the
+ * changes derived from it as part of it.
+ *
+ * @param state Global application state.
+ *
+ * @return The change, as an object to compare by identity.
+ */
+export function getLastBlockChangeOrigin( state: State ): object {
+	return state.blocks.derivedFrom ?? state.blocks;
+}
+
+/**
+ * Returns the binding of a block whose inner blocks are bound to a source.
+ *
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
+ *
+ * @return The binding, if the block's inner blocks are bound.
+ */
+export function getBoundInnerBlocks( state: State, clientId: string ) {
+	return state.blocks.boundInnerBlocks?.get( clientId );
+}
+
+/**
+ * Returns whether the inner blocks of a block are bound to a source and can be
+ * edited: the source allows it, and the block itself isn't disabled.
+ *
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
+ *
+ * @return Whether the block's bound inner blocks can be edited.
+ */
+export function isEditableBoundInnerBlocks( state: State, clientId: string ) {
+	return (
+		!! state.blocks.boundInnerBlocks?.get( clientId )?.editable &&
+		getBlockEditingMode( state, clientId ) !== 'disabled'
+	);
+}
+
+/**
+ * Returns whether a block is within editable bound inner blocks: of its synced
+ * pattern and bound block ancestors, the closest one is a bound block whose
+ * inner blocks can be edited.
+ *
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
+ *
+ * @return Whether the block is within editable bound inner blocks.
+ */
+export function isWithinEditableBoundInnerBlocks(
+	state: State,
+	clientId: string
+) {
+	if ( ! state.blocks.boundInnerBlocks?.size ) {
+		return false;
+	}
+	let parent = state.blocks.parents.get( clientId );
+	while ( parent ) {
+		if ( state.blocks.boundInnerBlocks.has( parent ) ) {
+			return isEditableBoundInnerBlocks( state, parent );
+		}
+		if ( getBlockName( state, parent ) === 'core/block' ) {
+			return false;
+		}
+		parent = state.blocks.parents.get( parent );
+	}
+	return false;
+}
 
 /**
  * Returns whether the block is a contentOnly section.

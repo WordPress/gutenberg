@@ -13,6 +13,7 @@ import type { BlockBindingsSource } from '@wordpress/blocks';
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {
+	INNER_BLOCKS_BINDING_KEY,
 	getBlockBindingsContext,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
@@ -111,6 +112,8 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				const source = registeredSources[ sourceName as string ];
 				if (
 					! source ||
+					// Inner blocks aren't an attribute.
+					attributeName === INNER_BLOCKS_BINDING_KEY ||
 					! bindableAttributes?.includes( attributeName )
 				) {
 					continue;
@@ -197,6 +200,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
+						attributeName === INNER_BLOCKS_BINDING_KEY ||
 						! bindableAttributes?.includes( attributeName )
 					) {
 						continue;

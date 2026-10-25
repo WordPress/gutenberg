@@ -215,6 +215,27 @@ function updateBlockTreeForBlocks( state: BlocksState, blocks: Block[] ) {
 	}
 }
 
+/**
+ * Removes the given blocks and their descendants from the maps of a state that
+ * is being built, without touching the tree entries that reference them.
+ *
+ * @param state  The state being built, which owns its maps.
+ * @param blocks The blocks to remove.
+ */
+function removeBlocksFromState( state: BlocksState, blocks: Block[] ) {
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		const { clientId, innerBlocks } = stack.shift()!;
+		state.byClientId.delete( clientId );
+		state.attributes.delete( clientId );
+		state.parents.delete( clientId );
+		state.order.delete( clientId );
+		state.tree.delete( clientId );
+		state.tree.delete( 'controlled||' + clientId );
+		stack.push( ...innerBlocks );
+	}
+}
+
 function updateParentInnerBlocksInTree(
 	state: BlocksState,
 	updatedClientIds: Iterable< string >,
@@ -399,6 +420,11 @@ const withBlockTree =
 				}
 				if ( action.toRootClientId ) {
 					updatedBlockUids.push( action.toRootClientId );
+				} else if ( newState.boundInnerBlocks?.size ) {
+					// Updating a controlled block stops at it, so the root
+					// needs its own update when receiving a block from bound
+					// inner blocks, or from blocks nested in them.
+					updatedBlockUids.push( '' );
 				}
 				newState.tree = new Map( newState.tree );
 				updateParentInnerBlocksInTree(
@@ -439,15 +465,48 @@ const withBlockTree =
 function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 	let lastAction: Action | undefined;
 	let nextHistoryMode: HistoryMode | undefined;
+	let isNextChangeDerived = false;
 
 	return ( state: BlocksState | undefined, action: Action ) => {
 		const nextState = reducer( state, action );
+
+		if ( action.type === 'MARK_NEXT_CHANGE_AS_DERIVED' ) {
+			isNextChangeDerived = true;
+			return nextState;
+		}
+		const isDerivedChange =
+			isNextChangeDerived && !! state && state !== nextState;
+		isNextChangeDerived = false;
 
 		const pendingHistoryMode = nextHistoryMode;
 		nextHistoryMode =
 			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
 				? ( action.history ?? 'merge' )
 				: undefined;
+
+		// A change derived from another one, like writing the inner blocks of
+		// a bound block back to their source, keeps the persistence of that
+		// change, unless it's marked otherwise, and doesn't interrupt its
+		// coalescing. Controllers that reported that change report this one
+		// as part of it.
+		if ( isDerivedChange ) {
+			const derivedFrom = state!.derivedFrom ?? state!;
+			const {
+				lastBlockChangeHistoryMode,
+				derivedFrom: previousDerivedFrom,
+				...blockChange
+			} = nextState;
+			const isIgnored =
+				pendingHistoryMode === 'ignore' ||
+				derivedFrom.lastBlockChangeHistoryMode === 'ignore';
+			return {
+				...blockChange,
+				isPersistentChange:
+					! pendingHistoryMode && derivedFrom.isPersistentChange,
+				...( isIgnored && { lastBlockChangeHistoryMode: 'ignore' } ),
+				derivedFrom,
+			};
+		}
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
@@ -471,15 +530,16 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
+		const { lastBlockChangeHistoryMode, derivedFrom, ...blockChange } =
+			nextState;
+
 		if ( pendingHistoryMode === 'ignore' ) {
 			return {
-				...nextState,
+				...blockChange,
 				isPersistentChange,
 				lastBlockChangeHistoryMode: 'ignore',
 			};
 		}
-
-		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
 
 		return { ...blockChange, isPersistentChange };
 	};
@@ -600,6 +660,28 @@ const withBlockReset =
 
 			const preservedControlledInnerBlocks =
 				state?.controlledInnerBlocks ?? new Set();
+			const preservedBoundInnerBlocks =
+				state?.boundInnerBlocks ?? new Map();
+
+			// The inner blocks that `action.blocks` gives a bound block are
+			// its own ones: they stay in its tree entry, but the store holds
+			// the bound inner blocks. They're removed before the controlled
+			// inner blocks are preserved, so that the controlled blocks they
+			// contain aren't.
+			const incomingBoundBlocks = new Map< string, Block >();
+			if ( preservedBoundInnerBlocks.size ) {
+				const stack = [ ...action.blocks ];
+				while ( stack.length ) {
+					const block = stack.shift()!;
+					if ( preservedBoundInnerBlocks.has( block.clientId ) ) {
+						incomingBoundBlocks.set( block.clientId, block );
+					}
+					stack.push( ...block.innerBlocks );
+				}
+				for ( const block of incomingBoundBlocks.values() ) {
+					removeBlocksFromState( newState, block.innerBlocks );
+				}
+			}
 
 			// Preserve controlled inner blocks data from the old state.
 			// The maps above are rebuilt solely from action.blocks, but
@@ -613,6 +695,24 @@ const withBlockReset =
 						continue;
 					}
 					newState.controlledInnerBlocks.add( clientId );
+					const boundInnerBlocks =
+						preservedBoundInnerBlocks.get( clientId );
+					if ( boundInnerBlocks ) {
+						newState.boundInnerBlocks.set(
+							clientId,
+							boundInnerBlocks
+						);
+						const incomingBlock =
+							incomingBoundBlocks.get( clientId );
+						if ( incomingBlock ) {
+							// The incoming own inner blocks are usually the
+							// ones the block had: keeping them as they are
+							// keeps them unchanged for its subscribers.
+							newState.tree.get( clientId )!.innerBlocks =
+								incomingBlock.innerBlocks as TreeBlock[];
+						}
+						newState.order.set( clientId, [] );
+					}
 					const oldOrder = state.order.get( clientId );
 					if ( ! oldOrder?.length ) {
 						continue;
@@ -642,6 +742,16 @@ const withBlockReset =
 				}
 			}
 
+			const preserveTreeEntry = ( blockId: string ) => {
+				const treeEntry = state!.tree.get( blockId );
+				if ( ! treeEntry ) {
+					return;
+				}
+				newState.tree.set( blockId, treeEntry );
+				const childOrder = newState.order.get( blockId ) || [];
+				childOrder.forEach( preserveTreeEntry );
+			};
+
 			// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
 			// built tree entries using action.blocks' inner block structure
 			// (entity-level IDs), but we need them to reference the preserved
@@ -649,6 +759,19 @@ const withBlockReset =
 			// preserves references held by ancestor tree entries.
 			for ( const clientId of newState.controlledInnerBlocks ) {
 				const controlledOrder = newState.order.get( clientId );
+				if ( newState.boundInnerBlocks.has( clientId ) ) {
+					// A bound block's tree entry keeps its own inner blocks,
+					// and its bound inner blocks keep their identity, so that
+					// their subscribers don't see the reset as a change.
+					newState.tree.set(
+						'controlled||' + clientId,
+						state!.tree.get( 'controlled||' + clientId ) ?? {
+							innerBlocks: [],
+						}
+					);
+					controlledOrder?.forEach( preserveTreeEntry );
+					continue;
+				}
 				if ( ! controlledOrder?.length ) {
 					continue;
 				}
@@ -660,15 +783,6 @@ const withBlockReset =
 					existingEntry.innerBlocks = innerBlocks;
 				}
 				newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
-				const preserveTreeEntry = ( blockId: string ) => {
-					const treeEntry = state!.tree.get( blockId );
-					if ( ! treeEntry ) {
-						return;
-					}
-					newState.tree.set( blockId, treeEntry );
-					const childOrder = newState.order.get( blockId ) || [];
-					childOrder.forEach( preserveTreeEntry );
-				};
 				controlledOrder.forEach( preserveTreeEntry );
 			}
 
@@ -713,13 +827,19 @@ const withReplaceInnerBlocks =
 		// inner blocks from the block state because its inner blocks will not be
 		// attached to the block in the action.
 		const nestedControllers: Record< string, boolean > = {};
+		// The inner blocks given to a bound nested controller are its own.
+		const nestedBoundBlocks: Block[] = [];
 		if ( state.controlledInnerBlocks.size ) {
 			const stack = [ ...action.blocks ];
 			while ( stack.length ) {
-				const { innerBlocks, ...block } = stack.shift()!;
+				const nextBlock = stack.shift()!;
+				const { innerBlocks, ...block } = nextBlock;
 				stack.push( ...innerBlocks );
 				if ( state.controlledInnerBlocks.has( block.clientId ) ) {
 					nestedControllers[ block.clientId ] = true;
+					if ( state.boundInnerBlocks?.has( block.clientId ) ) {
+						nestedBoundBlocks.push( nextBlock );
+					}
 				}
 			}
 		}
@@ -760,8 +880,133 @@ const withReplaceInnerBlocks =
 					stateAfterInsert.tree.set( key, state.tree.get( key )! );
 				}
 			} );
+			for ( const block of nestedBoundBlocks ) {
+				removeBlocksFromState( stateAfterInsert, block.innerBlocks );
+				stateAfterInsert.order.set(
+					block.clientId,
+					state.order.get( block.clientId ) ?? []
+				);
+			}
 		}
 		return stateAfterInsert;
+	};
+
+/**
+ * Returns whether the action switches the controlled state of a block whose
+ * inner blocks are bound to a source.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Whether the action concerns a bound block.
+ */
+function isBoundInnerBlocksAction(
+	state: BlocksState | undefined,
+	action: Extract< Action, { type: 'SET_HAS_CONTROLLED_INNER_BLOCKS' } >
+) {
+	return (
+		!! action.boundInnerBlocks ||
+		!! state?.boundInnerBlocks?.has( action.clientId )
+	);
+}
+
+/**
+ * Makes the given own inner blocks of a block its inner blocks again, reusing
+ * the block objects that its tree entry holds, so that the tree, as seen from
+ * the block's parents, doesn't change.
+ *
+ * @param state       Current state.
+ * @param clientId    The block whose inner blocks to restore.
+ * @param innerBlocks The own inner blocks, from the block's tree entry.
+ *
+ * @return Updated state.
+ */
+function restoreOwnInnerBlocks(
+	state: BlocksState,
+	clientId: string,
+	innerBlocks: TreeBlock[]
+) {
+	const byClientId = new Map( state.byClientId );
+	const attributes = new Map( state.attributes );
+	const order = new Map( state.order );
+	const parents = new Map( state.parents );
+	const tree = new Map( state.tree );
+	const restore = ( blocks: TreeBlock[], parentClientId: string ) => {
+		order.set(
+			parentClientId,
+			blocks.map( ( block ) => block.clientId )
+		);
+		for ( const block of blocks ) {
+			const {
+				innerBlocks: blockInnerBlocks,
+				attributes: blockAttributes,
+				...blockWithoutAttributes
+			} = block;
+			byClientId.set( block.clientId, blockWithoutAttributes );
+			attributes.set( block.clientId, blockAttributes );
+			parents.set( block.clientId, parentClientId );
+			tree.set( block.clientId, block );
+			restore( blockInnerBlocks as TreeBlock[], block.clientId );
+		}
+	};
+	restore( innerBlocks, clientId );
+	tree.delete( 'controlled||' + clientId );
+	return { ...state, byClientId, attributes, order, parents, tree };
+}
+
+/**
+ * Higher-order reducer which switches the controlled state of blocks whose
+ * inner blocks are bound to a source. While bound, the block's tree entry, as
+ * seen and serialized by its parents, keeps its own inner blocks (the binding's
+ * fallback), and the controlled inner blocks are the source's. It runs inside
+ * the persistence tracking, so that each switch is a single change.
+ *
+ * @param reducer Original reducer function.
+ *
+ * @return Enhanced reducer function.
+ */
+const withBoundInnerBlocks =
+	( reducer: Reducer< BlocksState > ) =>
+	( state: BlocksState, action: Action ) => {
+		if (
+			action.type !== 'SET_HAS_CONTROLLED_INNER_BLOCKS' ||
+			! isBoundInnerBlocksAction( state, action )
+		) {
+			return reducer( state, action );
+		}
+
+		const { clientId } = action;
+		const hasInnerBlocks = !! state.order.get( clientId )?.length;
+		if ( action.hasControlledInnerBlocks ) {
+			// Flag the block first, so that removing its own inner blocks stops
+			// at it, and its parents keep seeing them.
+			const nextState = reducer( state, action );
+			return hasInnerBlocks
+				? reducer( nextState, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: clientId,
+						blocks: [],
+					} )
+				: nextState;
+		}
+
+		let nextState = hasInnerBlocks
+			? reducer( state, {
+					type: 'REPLACE_INNER_BLOCKS',
+					rootClientId: clientId,
+					blocks: [],
+				} )
+			: state;
+		nextState = reducer( nextState, action );
+		const ownInnerBlocks = nextState.tree.get( clientId )?.innerBlocks;
+		if ( ! nextState.byClientId.has( clientId ) || ! ownInnerBlocks ) {
+			return nextState;
+		}
+		return restoreOwnInnerBlocks(
+			nextState,
+			clientId,
+			ownInnerBlocks as TreeBlock[]
+		);
 	};
 
 /**
@@ -774,7 +1019,10 @@ const withReplaceInnerBlocks =
 const withResetControlledBlocks =
 	( reducer: Reducer< BlocksState > ) =>
 	( state: BlocksState, action: Action ) => {
-		if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+		if (
+			action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' &&
+			! isBoundInnerBlocksAction( state, action )
+		) {
 			// When switching a block from controlled to uncontrolled or inverse,
 			// we need to remove its content first — but only if there are inner
 			// blocks to remove. Skipping the no-op dispatch is important because
@@ -810,6 +1058,7 @@ export const blocks = pipe(
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
+	withBoundInnerBlocks, // Needs to be before withPersistentBlockChange.
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
 	withResetControlledBlocks
@@ -1259,6 +1508,42 @@ export const blocks = pipe(
 			const newState = new Set( state );
 			newState.delete( clientId );
 			return newState;
+		}
+		return state;
+	},
+
+	boundInnerBlocks(
+		state: BlocksState[ 'boundInnerBlocks' ] = new Map(),
+		action: Action
+	) {
+		switch ( action.type ) {
+			case 'SET_HAS_CONTROLLED_INNER_BLOCKS':
+				if (
+					action.hasControlledInnerBlocks &&
+					action.boundInnerBlocks
+				) {
+					return new Map( state ).set(
+						action.clientId,
+						action.boundInnerBlocks
+					);
+				}
+				if (
+					! action.hasControlledInnerBlocks &&
+					state.has( action.clientId )
+				) {
+					const newState = new Map( state );
+					newState.delete( action.clientId );
+					return newState;
+				}
+				return state;
+			case 'UPDATE_BOUND_INNER_BLOCKS':
+				if ( ! state.has( action.clientId ) ) {
+					return state;
+				}
+				return new Map( state ).set(
+					action.clientId,
+					action.boundInnerBlocks
+				);
 		}
 		return state;
 	},
@@ -2649,28 +2934,79 @@ function traverseBlockTree(
 /**
  * Checks if a block has a parent in a list of client IDs, and if so returns the client ID of the parent.
  *
- * @param state     The current state object.
- * @param clientId  The client ID of the block to search the parents of.
- * @param clientIds The client IDs of the blocks to check.
+ * @param state            The current state object.
+ * @param clientId         The client ID of the block to search the parents of.
+ * @param clientIds        The client IDs of the blocks to check.
+ * @param boundaryClientId The client ID of a parent to stop the search at, if any.
  *
  * @return The client ID of the parent block if found, undefined otherwise.
  */
 function findParentInClientIdsList(
 	state: State,
 	clientId: string,
-	clientIds: string[]
+	clientIds: string[],
+	boundaryClientId?: string
 ): string | void {
 	if ( ! clientIds.length ) {
 		return;
 	}
 
 	let parent = state.blocks.parents.get( clientId );
-	while ( parent !== undefined ) {
+	while ( parent !== undefined && parent !== boundaryClientId ) {
 		if ( clientIds.includes( parent ) ) {
 			return parent;
 		}
 		parent = state.blocks.parents.get( parent );
 	}
+}
+
+/**
+ * Returns the closest parent of a block that is either a synced pattern or a
+ * block whose inner blocks are bound to a source.
+ *
+ * @param state                  The current state object.
+ * @param clientId               The client ID of the block.
+ * @param syncedPatternClientIds The client IDs of the synced patterns.
+ *
+ * @return The client ID of the parent, if any.
+ */
+function findSyncedPatternOrBoundBlockParent(
+	state: State,
+	clientId: string,
+	syncedPatternClientIds: string[]
+): string | undefined {
+	let parent = state.blocks.parents.get( clientId );
+	while ( parent !== undefined ) {
+		if (
+			state.blocks.boundInnerBlocks?.has( parent ) ||
+			syncedPatternClientIds.includes( parent )
+		) {
+			return parent;
+		}
+		parent = state.blocks.parents.get( parent );
+	}
+	return undefined;
+}
+
+/**
+ * Returns whether the bound inner blocks of a block can be edited: the source
+ * allows it, and the block itself isn't disabled.
+ *
+ * @param state               The current state object.
+ * @param clientId            The client ID of the bound block.
+ * @param getBlockEditingMode Returns the editing mode of a block.
+ *
+ * @return Whether the bound inner blocks can be edited.
+ */
+function isBoundBlockEditable(
+	state: State,
+	clientId: string,
+	getBlockEditingMode: ( clientId: string ) => BlockEditingMode | undefined
+) {
+	return (
+		!! state.blocks.boundInnerBlocks?.get( clientId )?.editable &&
+		getBlockEditingMode( clientId ) !== 'disabled'
+	);
 }
 
 /**
@@ -2692,11 +3028,16 @@ function hasBindings( block: TraversedBlock ) {
  * This function calculates the editing modes for each block in the tree, taking into account
  * various factors such as zoom level, sections, and synced patterns.
  *
- * @param state        The current state object.
- * @param treeClientId The client ID of the root block for the tree. Defaults to an empty string.
+ * @param state                        The current state object.
+ * @param treeClientId                 The client ID of the root block for the tree. Defaults to an empty string.
+ * @param prevDerivedBlockEditingModes The derived block editing modes before the update, if any.
  * @return A Map containing the derived block editing modes, keyed by block client ID.
  */
-function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
+function getDerivedBlockEditingModesForTree(
+	state: State,
+	treeClientId = '',
+	prevDerivedBlockEditingModes?: Map< string, BlockEditingMode >
+) {
 	const isZoomedOut =
 		( state?.zoomLevel as number ) < 100 ||
 		state?.zoomLevel === 'auto-scaled';
@@ -2759,8 +3100,49 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 			: templatePartClientIds ),
 	];
 
+	// The editing mode of a block, as derived by this traversal when it visited
+	// the block, or before it otherwise.
+	const visitedClientIds = new Set< string >();
+	const getBlockEditingModeSoFar = ( clientId: string ) =>
+		( visitedClientIds.has( clientId )
+			? derivedBlockEditingModes.get( clientId )
+			: prevDerivedBlockEditingModes?.get( clientId ) ) ??
+		state.blocks.blockEditingModes.get( clientId );
+
+	const isNestedSyncedPattern = ( patternClientId: string ) => {
+		if ( ! state.blocks.boundInnerBlocks?.size ) {
+			return !! findParentInClientIdsList(
+				state,
+				patternClientId,
+				syncedPatternClientIds
+			);
+		}
+		const boundaryClientId = findSyncedPatternOrBoundBlockParent(
+			state,
+			patternClientId,
+			syncedPatternClientIds
+		);
+		if ( boundaryClientId === undefined ) {
+			return false;
+		}
+		// A synced pattern within editable bound inner blocks is like a
+		// top-level one.
+		return (
+			! state.blocks.boundInnerBlocks?.has( boundaryClientId ) ||
+			! isBoundBlockEditable(
+				state,
+				boundaryClientId,
+				getBlockEditingModeSoFar
+			)
+		);
+	};
+
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
+
+		if ( state.blocks.boundInnerBlocks?.size ) {
+			visitedClientIds.add( clientId );
+		}
 
 		const hasEditedContentOnlySection = !! state.editedContentOnlySection;
 		let isWithinEditedContentOnlySection = false;
@@ -2838,18 +3220,44 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 			return;
 		}
 
-		if ( syncedPatternClientIds.length ) {
+		// Blocks within bound inner blocks follow the binding when a bound
+		// block is the closest of their synced pattern and bound block
+		// ancestors: they are disabled if it can't be edited, and are free from
+		// the synced pattern and the sections it may be in otherwise.
+		let editableBoundBlockClientId: string | undefined;
+		if ( state.blocks.boundInnerBlocks?.size ) {
+			const boundaryClientId = findSyncedPatternOrBoundBlockParent(
+				state,
+				clientId,
+				syncedPatternClientIds
+			);
+			if (
+				boundaryClientId !== undefined &&
+				state.blocks.boundInnerBlocks?.has( boundaryClientId )
+			) {
+				if (
+					! isBoundBlockEditable(
+						state,
+						boundaryClientId,
+						getBlockEditingModeSoFar
+					)
+				) {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+				editableBoundBlockClientId = boundaryClientId;
+			}
+		}
+
+		if (
+			syncedPatternClientIds.length &&
+			editableBoundBlockClientId === undefined
+		) {
 			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
 				// This is a synced pattern nested in another synced pattern,
 				// disable the core/block itself.
-				if (
-					findParentInClientIdsList(
-						state,
-						clientId,
-						syncedPatternClientIds
-					)
-				) {
+				if ( isNestedSyncedPattern( clientId ) ) {
 					derivedBlockEditingModes.set( clientId, 'disabled' );
 					return;
 				}
@@ -2867,13 +3275,7 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 			if ( parentSyncedPatternClientId ) {
 				// This is an inner block of a synced pattern that's nested in another synced pattern,
 				// disable its contents.
-				if (
-					findParentInClientIdsList(
-						state,
-						parentSyncedPatternClientId,
-						syncedPatternClientIds
-					)
-				) {
+				if ( isNestedSyncedPattern( parentSyncedPatternClientId ) ) {
 					derivedBlockEditingModes.set( clientId, 'disabled' );
 					return;
 				}
@@ -2904,7 +3306,10 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 			const hasContentOnlyParent = !! findParentInClientIdsList(
 				state,
 				clientId,
-				contentOnlyParents
+				contentOnlyParents,
+				// Editable bound inner blocks aren't part of the sections
+				// around them.
+				editableBoundBlockClientId
 			);
 			if ( hasContentOnlyParent ) {
 				if ( isContentBlock( blockName ) ) {
@@ -2972,7 +3377,8 @@ function getDerivedBlockEditingModesUpdates( {
 		const updates = getDerivedBlockEditingModesForTree(
 			nextState,
 			// A stale client ID leaves `undefined` here, which throws as before.
-			addedBlock!.clientId
+			addedBlock!.clientId,
+			prevDerivedBlockEditingModes
 		);
 
 		if ( updates.size ) {
@@ -3189,7 +3595,8 @@ export function withDerivedBlockEditingModes( reducer: Reducer< State > ) {
 			}
 			case 'SET_BLOCK_EDITING_MODE':
 			case 'UNSET_BLOCK_EDITING_MODE':
-			case 'SET_HAS_CONTROLLED_INNER_BLOCKS': {
+			case 'SET_HAS_CONTROLLED_INNER_BLOCKS':
+			case 'UPDATE_BOUND_INNER_BLOCKS': {
 				const updatedBlock = getBlockTreeBlock(
 					nextState,
 					action.clientId
