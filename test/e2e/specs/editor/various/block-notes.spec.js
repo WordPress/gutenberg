@@ -487,6 +487,17 @@ test.describe( 'Block Notes', () => {
 		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
 		await expect( imageThread ).toBeVisible();
 		await expect( headingThread ).toBeHidden();
+
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter: Open' } )
+		).toBeVisible();
+		await sidebar.getByRole( 'button', { name: 'Filter: Open' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'All' } ).click();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter', exact: true } )
+		).toBeVisible();
 	} );
 
 	test( 'moves focus to the next note when resolving one hides it', async ( {

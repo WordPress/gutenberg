@@ -1,6 +1,7 @@
+import clsx from 'clsx';
 import { Button, SearchControl } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
@@ -67,6 +68,13 @@ type NotesFiltersProps = {
 };
 
 export function NotesFilters( { filters, onChange }: NotesFiltersProps ) {
+	const statusLabels: Record< NoteStatusFilter, string > = {
+		all: __( 'All' ),
+		hold: __( 'Open' ),
+		approved: __( 'Resolved' ),
+	};
+	const isStatusFiltered = filters.status !== 'all';
+
 	return (
 		<Stack
 			className="editor-collab-sidebar-filters"
@@ -85,8 +93,20 @@ export function NotesFilters( { filters, onChange }: NotesFiltersProps ) {
 					render={
 						<Button
 							__next40pxDefaultSize
+							className={ clsx(
+								'editor-collab-sidebar-filters__toggle',
+								{ 'is-active': isStatusFiltered }
+							) }
 							icon={ settings }
-							label={ _x( 'Filter', 'verb' ) }
+							label={
+								isStatusFiltered
+									? sprintf(
+											/* translators: %s: Note status shown, e.g. "Open". */
+											__( 'Filter: %s' ),
+											statusLabels[ filters.status ]
+										)
+									: _x( 'Filter', 'verb' )
+							}
 						/>
 					}
 				/>
@@ -99,14 +119,18 @@ export function NotesFilters( { filters, onChange }: NotesFiltersProps ) {
 					>
 						<Menu.GroupLabel>{ __( 'Status' ) }</Menu.GroupLabel>
 						<Menu.RadioItem value="all">
-							<Menu.ItemLabel>{ __( 'All' ) }</Menu.ItemLabel>
+							<Menu.ItemLabel>
+								{ statusLabels.all }
+							</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem value="hold">
-							<Menu.ItemLabel>{ __( 'Open' ) }</Menu.ItemLabel>
+							<Menu.ItemLabel>
+								{ statusLabels.hold }
+							</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem value="approved">
 							<Menu.ItemLabel>
-								{ __( 'Resolved' ) }
+								{ statusLabels.approved }
 							</Menu.ItemLabel>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>

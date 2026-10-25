@@ -380,6 +380,21 @@ mark.wp-note {
 	min-width: 0;
 }
 
+.editor-collab-sidebar-filters__toggle.is-active {
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: $grid-unit-05;
+		right: $grid-unit-05;
+		width: $grid-unit-10;
+		height: $grid-unit-10;
+		border-radius: 50%;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
 .editor-collab-sidebar-panel__no-results {
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-20 0;
