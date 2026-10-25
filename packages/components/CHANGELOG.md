@@ -6,6 +6,10 @@
 
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 
+### Deprecations
+
+-   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5 ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+
 ### Enhancements
 
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
