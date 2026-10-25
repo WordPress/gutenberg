@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Style Book: Use the design system outline for focused preview cards ([#85370](https://github.com/WordPress/gutenberg/pull/85370)).
+
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
