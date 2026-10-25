@@ -1,6 +1,6 @@
 # Block Lock
 
-The `BlockLock` components render the UI for locking a block's movement, editing and removal, and the `useBlockLock` hook exposes a block's current lock state. Movement and removal can be locked on any block; the editing option is only offered for an allowlist of block types, currently `core/navigation`.
+The `BlockLock` components render the UI for locking a block's movement, editing and removal, and the `useBlockLock` hook exposes the current lock state of one or more blocks. Movement and removal can be locked on any block; the editing option is only offered for an allowlist of block types, currently `core/navigation`.
 
 These are private components of the `@wordpress/block-editor` package. They are not exported publicly and are meant to be consumed from within the package only.
 
@@ -60,18 +60,11 @@ A callback invoked when the modal is dismissed. Accepted by `BlockLockModal` onl
 
 ### `useBlockLock`
 
-A hook that returns the lock state of a block. It accepts the block's client ID and returns an object with the following properties.
+A hook that returns the lock state of one or more blocks. It accepts a block's client ID or an array of client IDs and returns an object with the following properties.
 
--   `isEditLocked` (`Boolean`): Whether editing the block is locked.
--   `isMoveLocked` (`Boolean`): Whether moving the block is locked.
--   `isRemoveLocked` (`Boolean`): Whether removing the block is locked.
--   `canLock` (`Boolean`): Whether the block type allows locking.
--   `isLocked` (`Boolean`): Whether any of the block's lock features are applied.
-
-### `useBlocksLock`
-
-A hook that returns the lock state shared by a group of blocks. It accepts an array of client IDs and returns an object with the following properties.
-
+-   `isEditLocked` (`Boolean|null`): Whether editing the blocks is locked, or `null` when only some of them are.
+-   `isMoveLocked` (`Boolean|null`): Whether moving the blocks is locked, or `null` when only some of them are.
+-   `isRemoveLocked` (`Boolean|null`): Whether removing the blocks is locked, or `null` when only some of them are.
 -   `canLock` (`Boolean`): Whether every block type allows locking.
 -   `isLocked` (`Boolean`): Whether every block has at least one lock feature applied.
 

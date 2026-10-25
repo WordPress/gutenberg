@@ -2,14 +2,14 @@ import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { lockOutline, unlock } from '@wordpress/icons';
-import useBlocksLock from './use-blocks-lock';
+import useBlockLock from './use-block-lock';
 import type { BlocksLockControlProps } from './types';
 import BlockLockModal from './modal';
 
 export default function BlockLockMenuItem( {
 	clientIds,
 }: BlocksLockControlProps ) {
-	const { canLock, isLocked } = useBlocksLock( clientIds );
+	const { canLock, isLocked } = useBlockLock( clientIds );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive: boolean ) => ! isActive,

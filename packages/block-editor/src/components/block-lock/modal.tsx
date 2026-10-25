@@ -1,5 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl as WCCheckboxControl,
@@ -11,154 +11,118 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import type { SelectFunction } from '@wordpress/data';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { getBlockType } from '@wordpress/blocks';
+import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-import { getLockAttributes, getSharedLockValue } from './utils';
+import type { BlockAttributes } from '../../store/types';
+import { getSharedLockValue, getTemplateLockValue } from './utils';
 import type {
 	BlockLock,
 	BlockLockModalProps,
 	BlockLockSelection,
-	BlockLockState,
 	SharedLockValue,
-	TemplateLock,
 } from './types';
 
 // Entity based blocks which allow edit locking
 const ALLOWS_EDIT_LOCKING = [ 'core/navigation' ];
 
 /**
- * Returns the saved lock attributes of each block.
+ * Returns whether a block type can apply its lock to its inner blocks.
  *
- * @param select    The data registry's `select` function.
- * @param clientIds The block client IDs.
+ * @param blockName The block name.
  *
- * @return The saved lock attributes of each block.
+ * @return Whether the block type supports a template lock.
  */
-function getBlockLockStates(
-	select: SelectFunction,
-	clientIds: string[]
-): BlockLockState[] {
-	const { getBlockName, getBlockAttributes } = select( blockEditorStore );
-
-	return clientIds.map( ( clientId ) => {
-		const attributes = getBlockAttributes( clientId );
-		// The modal is opened for existing blocks.
-		const blockType = getBlockType( getBlockName( clientId ) as string );
-
-		return {
-			lock: attributes?.lock,
-			templateLock: attributes?.templateLock as TemplateLock | undefined,
-			supportsTemplateLock: !! blockType?.attributes?.templateLock,
-		};
-	} );
+function hasTemplateLockSupport( blockName: string ) {
+	return !! getBlockType( blockName )?.attributes?.templateLock;
 }
 
 /**
- * Returns the lock features chosen in the modal, starting from the blocks'
- * shared lock state, including locks inherited from a parent's template lock.
+ * Returns the attributes that apply the chosen lock options to a block. Options
+ * left mixed keep the block's saved values.
  *
- * @param clientIds The block client IDs.
+ * @param blockName         The block name.
+ * @param attributes        The block's saved attributes.
+ * @param chosenLock        The lock options that aren't mixed.
+ * @param applyTemplateLock Whether to apply the lock to the inner blocks, or
+ *                          `null` when the blocks differ.
  *
- * @return The shared lock state and the chosen lock features.
+ * @return The block's new lock attributes.
  */
-function useLockSelection( clientIds: string[] ) {
-	// Every value is a primitive so that `useSelect` only re-renders when one
-	// of them changes.
-	const sharedState = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				isEditLockedBlock,
-				isMoveLockedBlock,
-				isRemoveLockedBlock,
-			} = unlock( select( blockEditorStore ) );
-			const templateLockBlocks = getBlockLockStates(
-				select,
-				clientIds
-			).filter( ( block ) => block.supportsTemplateLock );
-
-			return {
-				isEditLocked: getSharedLockValue(
-					clientIds.map( ( clientId ) =>
-						isEditLockedBlock( clientId )
-					)
-				),
-				isMoveLocked: getSharedLockValue(
-					clientIds.map( ( clientId ) =>
-						isMoveLockedBlock( clientId )
-					)
-				),
-				isRemoveLocked: getSharedLockValue(
-					clientIds.map( ( clientId ) =>
-						isRemoveLockedBlock( clientId )
-					)
-				),
-				allowsEditLocking: clientIds.every( ( clientId ) =>
-					ALLOWS_EDIT_LOCKING.includes( getBlockName( clientId ) )
-				),
-				// Offered when at least one block can hold inner blocks, and
-				// applied only to those that can.
-				hasTemplateLock: templateLockBlocks.length > 0,
-				appliesTemplateLock: getSharedLockValue(
-					templateLockBlocks.map( ( block ) => !! block.templateLock )
-				),
-			};
-		},
-		[ clientIds ]
-	);
-	const { isEditLocked, isMoveLocked, isRemoveLocked, allowsEditLocking } =
-		sharedState;
-	const initialLock = useMemo< BlockLockSelection >(
-		() => ( {
-			move: isMoveLocked,
-			remove: isRemoveLocked,
-			...( allowsEditLocking ? { edit: isEditLocked } : {} ),
-		} ),
-		[ isEditLocked, isMoveLocked, isRemoveLocked, allowsEditLocking ]
-	);
-	const [ lock, setLock ] = useState< BlockLockSelection >( initialLock );
-
-	useEffect( () => {
-		setLock( initialLock );
-	}, [ initialLock ] );
-
-	return { ...sharedState, initialLock, lock, setLock };
-}
-
-/**
- * Returns whether any chosen lock feature differs from the initial one.
- *
- * @param lock        The chosen lock features.
- * @param initialLock The initial lock features.
- *
- * @return Whether the lock features changed.
- */
-function hasLockChanged(
-	lock: BlockLockSelection,
-	initialLock: BlockLockSelection
+function getLockAttributes(
+	blockName: string,
+	attributes: BlockAttributes | null,
+	chosenLock: BlockLock,
+	applyTemplateLock: SharedLockValue
 ) {
-	return ( Object.keys( initialLock ) as Array< keyof BlockLock > ).some(
-		( feature ) => lock[ feature ] !== initialLock[ feature ]
-	);
+	const newLock = { ...attributes?.lock, ...chosenLock };
+	// Leaves a block without a lock as it is when every option is mixed.
+	const lock = Object.keys( newLock ).length > 0 ? newLock : undefined;
+	const keepsTemplateLock =
+		applyTemplateLock === null ||
+		! hasTemplateLockSupport( blockName ) ||
+		// A `contentOnly` lock already applies to the inner blocks, in a way
+		// the modal can't express.
+		( applyTemplateLock && attributes?.templateLock === 'contentOnly' );
+
+	if ( keepsTemplateLock ) {
+		return { lock };
+	}
+
+	return {
+		lock,
+		templateLock: applyTemplateLock
+			? getTemplateLockValue( newLock )
+			: undefined,
+	};
 }
 
 export default function BlockLockModal( {
 	clientIds,
 	onClose,
 }: BlockLockModalProps ) {
-	const {
-		allowsEditLocking,
-		hasTemplateLock,
-		appliesTemplateLock,
-		initialLock,
-		lock,
-		setLock,
-	} = useLockSelection( clientIds );
+	const { isEditLocked, isMoveLocked, isRemoveLocked } =
+		useBlockLock( clientIds );
+	const { allowsEditLocking, hasTemplateLock, appliesTemplateLock } =
+		useSelect(
+			( select ) => {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				// The modal is opened for existing blocks.
+				const blockNames = clientIds.map(
+					( clientId ) => getBlockName( clientId ) as string
+				);
+				const templateLocks = clientIds
+					.filter( ( _clientId, index ) =>
+						hasTemplateLockSupport( blockNames[ index ] )
+					)
+					.map(
+						( clientId ) =>
+							!! getBlockAttributes( clientId )?.templateLock
+					);
+
+				return {
+					allowsEditLocking: blockNames.every( ( blockName ) =>
+						ALLOWS_EDIT_LOCKING.includes( blockName )
+					),
+					// Offered when at least one block can hold inner blocks,
+					// and applied only to those that can.
+					hasTemplateLock: templateLocks.length > 0,
+					appliesTemplateLock: getSharedLockValue( templateLocks ),
+				};
+			},
+			[ clientIds ]
+		);
+	const initialLock: BlockLockSelection = {
+		move: isMoveLocked,
+		remove: isRemoveLocked,
+		...( allowsEditLocking ? { edit: isEditLocked } : {} ),
+	};
+	const [ lock, setLock ] = useState( initialLock );
 	const [ applyTemplateLock, setApplyTemplateLock ] =
-		useState< SharedLockValue >( appliesTemplateLock );
+		useState( appliesTemplateLock );
 	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientIds[ 0 ] );
@@ -177,10 +141,9 @@ export default function BlockLockModal( {
 		( hasTemplateLock && applyTemplateLock === null );
 	const showDescription = hasMultipleBlocks && hasMixedSettings;
 
-	const hasTemplateLockChanged =
-		hasTemplateLock && applyTemplateLock !== appliesTemplateLock;
 	const isDirty =
-		hasLockChanged( lock, initialLock ) || hasTemplateLockChanged;
+		! isShallowEqual( lock, initialLock ) ||
+		( hasTemplateLock && applyTemplateLock !== appliesTemplateLock );
 
 	const title = hasMultipleBlocks
 		? __( 'Lock blocks' )
@@ -204,23 +167,23 @@ export default function BlockLockModal( {
 					if ( ! isDirty ) {
 						return;
 					}
-					const blocks = getBlockLockStates(
-						registry.select,
-						clientIds
+					const { getBlockName, getBlockAttributes } =
+						registry.select( blockEditorStore );
+					const chosenLock = Object.fromEntries(
+						Object.entries( lock ).filter(
+							( [ , value ] ) => value !== null
+						)
 					);
 					updateBlockAttributes(
 						clientIds,
 						Object.fromEntries(
-							clientIds.map( ( clientId, index ) => [
+							clientIds.map( ( clientId ) => [
 								clientId,
 								getLockAttributes(
-									blocks[ index ],
-									lock,
-									// An untouched choice keeps each block's
-									// current one.
-									hasTemplateLockChanged
-										? applyTemplateLock
-										: null
+									getBlockName( clientId ) as string,
+									getBlockAttributes( clientId ),
+									chosenLock,
+									applyTemplateLock
 								),
 							] )
 						),

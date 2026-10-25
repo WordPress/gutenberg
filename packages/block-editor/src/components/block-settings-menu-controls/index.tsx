@@ -11,7 +11,7 @@ import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
 } from '../convert-to-group-buttons';
-import { BlockLockMenuItem, useBlocksLock } from '../block-lock';
+import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
@@ -69,7 +69,7 @@ const BlockSettingsMenuControlsSlot = ( {
 		[ clientIds ]
 	);
 
-	const { canLock } = useBlocksLock( selectedClientIds );
+	const { canLock } = useBlockLock( selectedClientIds );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
 	const showLockButton =
 		canLock && canEditSelectedBlocks && ! hasContentOnlyBlock;

@@ -1,20 +1,12 @@
 import type { BlockAttributes } from '../../store/types';
 
 /**
- * The lock status of a block.
+ * The lock status of one or more blocks.
  */
 export interface BlockLockStatus {
-	isEditLocked: boolean;
-	isMoveLocked: boolean;
-	isRemoveLocked: boolean;
-	canLock: boolean;
-	isLocked: boolean;
-}
-
-/**
- * The lock status shared by a group of blocks.
- */
-export interface BlocksLockStatus {
+	isEditLocked: SharedLockValue;
+	isMoveLocked: SharedLockValue;
+	isRemoveLocked: SharedLockValue;
 	/**
 	 * Whether every block's type allows locking.
 	 */
@@ -31,7 +23,7 @@ export interface BlocksLockStatus {
 export type BlockLock = NonNullable< BlockAttributes[ 'lock' ] >;
 
 /**
- * A lock feature's value across a group of blocks: `true` when it is applied
+ * A lock feature's value across one or more blocks: `true` when it is applied
  * to every block, `false` when it is applied to none, and `null` when it is
  * applied to some of them.
  */
@@ -45,29 +37,6 @@ export interface BlockLockSelection {
 	move: SharedLockValue;
 	remove: SharedLockValue;
 	edit?: SharedLockValue;
-}
-
-/**
- * A `templateLock` attribute value.
- */
-export type TemplateLock = 'all' | 'insert' | 'contentOnly' | false;
-
-/**
- * The saved lock attributes of a block.
- */
-export interface BlockLockState {
-	/**
-	 * The block's `lock` attribute, without locks inherited from a parent.
-	 */
-	lock?: BlockLock;
-	/**
-	 * The block's `templateLock` attribute.
-	 */
-	templateLock?: TemplateLock;
-	/**
-	 * Whether the block's type supports a template lock.
-	 */
-	supportsTemplateLock: boolean;
 }
 
 /**
