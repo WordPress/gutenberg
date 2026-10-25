@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `build` and `start`: Run webpack with Node.js so its entry point can be loaded from Yarn Plug'n'Play archives.
+-   `build` and `start`: Run webpack with Node.js so its entry point can be loaded from Yarn Plug'n'Play archives ([#85511](https://github.com/WordPress/gutenberg/pull/85511)).
 
 ## 37.0.0 (2026-10-20)
 
