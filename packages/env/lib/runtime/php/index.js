@@ -7,11 +7,16 @@ const { rimraf } = require( 'rimraf' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
 const { parseSourceString } = require( '../../config/parse-source-string' );
-const { isPortAvailable } = require( '../../port-utils' );
+const { isPortAnswering } = require( '../../port-utils' );
+const { didCacheChange, getCache, setCache } = require( '../../cache' );
+const md5 = require( '../../md5' );
 
 const SQLITE_PLUGIN_URL =
 	'https://downloads.wordpress.org/plugin/sqlite-database-integration.zip';
 const SQLITE_PLUGIN_PATH = 'wp-content/plugins/sqlite-database-integration';
+const SOURCES_CACHE_KEY = 'php_sources_checksum';
+const LINKS_CACHE_KEY = 'php_links';
+const CORE_CACHE_KEY = 'php_core_checksum';
 
 /**
  * PHP runtime implementation for wp-env: the PHP installed on the computer
@@ -95,9 +100,25 @@ class PhpRuntime {
 
 		await this.stop( config, { spinner } );
 
+		const port = envConfig.port;
+		const siteUrl = envConfig.config.WP_SITEURL;
+		// PHP doesn't always fail on a busy port.
+		if ( await isPortAnswering( port ) ) {
+			throw new Error(
+				`Port ${ port } is busy. Free the port, set a different one, or enable automatic port selection with --auto-port or "autoPort": true.`
+			);
+		}
+
+		// Set up again when the sources change, keeping the database.
+		const { workDirectoryPath } = config;
 		const mappings = getMappings( config );
-		const isSetUp = existsSync( getDatabasePaths( config ).clean );
-		if ( ! isSetUp || update ) {
+		const sourcesHash = md5( { core: envConfig.coreSource, mappings } );
+		if (
+			update ||
+			( await didCacheChange( SOURCES_CACHE_KEY, sourcesHash, {
+				workDirectoryPath,
+			} ) )
+		) {
 			spinner.text = 'Downloading sources.';
 			await Promise.all(
 				[ envConfig.coreSource, ...Object.values( mappings ) ].map(
@@ -109,32 +130,17 @@ class PhpRuntime {
 						} )
 				)
 			);
-		}
-		if ( ! isSetUp ) {
-			await this._setUp( config, siteDir, mappings, spinner );
+			await this._setUp( config, siteDir, mappings, { spinner, update } );
+			await setCache( SOURCES_CACHE_KEY, sourcesHash, {
+				workDirectoryPath,
+			} );
 		} else {
-			if ( update ) {
-				// The plugins, themes and database stay as they are.
-				await copyCore( envConfig.coreSource.path, siteDir, [
-					'.git',
-					'wp-content',
-				] );
-			}
 			// The port can change between starts.
 			await writeWpConfig( config, siteDir );
 		}
-
-		const port = envConfig.port;
-		const siteUrl = envConfig.config.WP_SITEURL;
-		// PHP doesn't always fail on a busy port.
-		if ( ! ( await isPortAvailable( port ) ) ) {
-			throw new Error(
-				`Port ${ port } is busy. Free the port, set a different one, or enable automatic port selection with --auto-port or "autoPort": true.`
-			);
-		}
 		spinner.text = `Starting PHP on port ${ port }.`;
 
-		const logFile = path.join( siteDir, 'server.log' );
+		const { logFile, pidFile } = getServerPaths( config );
 		const log = await fs.open( logFile, 'w' );
 		const child = spawn(
 			'php',
@@ -161,10 +167,7 @@ class PhpRuntime {
 		);
 		child.unref();
 		await log.close();
-		await fs.writeFile(
-			path.join( siteDir, 'server.pid' ),
-			String( child.pid )
-		);
+		await fs.writeFile( pidFile, String( child.pid ) );
 
 		await this._waitForServer( child, logFile );
 
@@ -183,28 +186,33 @@ class PhpRuntime {
 	 */
 	async stop( config, { spinner } ) {
 		spinner.text = 'Stopping PHP.';
-		const pidFile = path.join( config.workDirectoryPath, 'php/server.pid' );
-		try {
-			const pid = parseInt( await fs.readFile( pidFile, 'utf8' ), 10 );
-			if ( process.platform === 'win32' ) {
-				// Windows has no process groups, so stop the process tree.
-				spawn.sync( 'taskkill', [ '/pid', String( pid ), '/t', '/f' ] );
-			} else {
-				// The negative PID stops the server and its workers.
-				process.kill( -pid, 'SIGTERM' );
-				// Wait until they are gone, so the port is free again. Signal 0
-				// only checks, and throws once no process is left.
-				for ( let i = 0; i < 50; i++ ) {
+		const pid = await getServerPid( config );
+		if ( pid && process.platform === 'win32' ) {
+			// Windows has no process groups, so stop the process tree.
+			spawn.sync( 'taskkill', [ '/pid', String( pid ), '/t', '/f' ] );
+		} else if ( pid ) {
+			// The negative PID reaches the server and its workers. Returns
+			// false once none of them is left.
+			const send = ( signal ) => {
+				try {
+					process.kill( -pid, signal );
+					return true;
+				} catch {
+					return false;
+				}
+			};
+			// Wait until they are gone, so the port is free again, and force
+			// it after 5 seconds.
+			for ( const signal of [ 'SIGTERM', 'SIGKILL' ] ) {
+				send( signal );
+				for ( let i = 0; i < 50 && send( 0 ); i++ ) {
 					await new Promise( ( resolve ) =>
 						setTimeout( resolve, 100 )
 					);
-					process.kill( -pid, 0 );
 				}
 			}
-		} catch {
-			// Not running.
 		}
-		await rimraf( pidFile );
+		await rimraf( getServerPaths( config ).pidFile );
 	}
 
 	/**
@@ -250,6 +258,8 @@ class PhpRuntime {
 		spinner.text = 'Resetting the database.';
 		const { database, clean } = getDatabasePaths( config );
 		await fs.copyFile( clean, database );
+		// Plugins added to the config since installation.
+		install( config, path.join( config.workDirectoryPath, 'php' ) );
 		spinner.text = 'Reset the database.';
 	}
 
@@ -261,17 +271,7 @@ class PhpRuntime {
 	 */
 	async getStatus( config ) {
 		const envConfig = config.env.development;
-		let isRunning = false;
-		try {
-			const pid = await fs.readFile(
-				path.join( config.workDirectoryPath, 'php/server.pid' ),
-				'utf8'
-			);
-			process.kill( parseInt( pid, 10 ), 0 );
-			isRunning = true;
-		} catch {
-			// Not running.
-		}
+		const isRunning = !! ( await getServerPid( config ) );
 
 		return {
 			status: isRunning ? 'running' : 'stopped',
@@ -301,9 +301,13 @@ class PhpRuntime {
 	 */
 	async logs( config, { watch, spinner } ) {
 		spinner.stop();
-		const file = await fs.open(
-			path.join( config.workDirectoryPath, 'php/server.log' )
-		);
+		const { logFile } = getServerPaths( config );
+		if ( ! existsSync( logFile ) ) {
+			throw new Error(
+				'There is no PHP server log yet. Start the site first.'
+			);
+		}
+		const file = await fs.open( logFile );
 		let position = 0;
 		do {
 			const { size } = await file.stat();
@@ -327,27 +331,55 @@ class PhpRuntime {
 	}
 
 	/**
-	 * Copy WordPress into the site folder, link the plugins, themes and
-	 * mappings, install it with a SQLite database and keep a clean copy of
-	 * the database for `wp-env clean`.
+	 * Copy WordPress into the site folder and link the plugins, themes and
+	 * mappings. Install WordPress with a SQLite database the first time, and
+	 * keep a clean copy of the database for `wp-env clean`.
 	 *
-	 * @param {Object} config   The wp-env config object.
-	 * @param {string} siteDir  The site folder.
-	 * @param {Object} mappings The sources to link, by path in the site.
-	 * @param {Object} spinner  A CLI spinner which indicates progress.
+	 * @param {Object}  config          The wp-env config object.
+	 * @param {string}  siteDir         The site folder.
+	 * @param {Object}  mappings        The sources to link, by path in the site.
+	 * @param {Object}  options         Setup options.
+	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean} options.update  If true, copy WordPress again.
 	 */
-	async _setUp( config, siteDir, mappings, spinner ) {
+	async _setUp( config, siteDir, mappings, { spinner, update } ) {
 		const envConfig = config.env.development;
+		const { workDirectoryPath } = config;
+		const { database, clean } = getDatabasePaths( config );
 		spinner.text = 'Setting up WordPress.';
-		await rimraf( siteDir );
-		const databaseDir = path.dirname( getDatabasePaths( config ).database );
-		await rimraf( databaseDir );
-		await fs.mkdir( databaseDir, { recursive: true } );
-		await copyCore( envConfig.coreSource.path, siteDir, [ '.git' ] );
-		await fs.copyFile(
-			path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
-			path.join( siteDir, 'wp-content/db.php' )
-		);
+
+		// Remove the last setup's links first, so that a removed mapping goes
+		// away and copying WordPress never writes through a link.
+		const links =
+			( await getCache( LINKS_CACHE_KEY, { workDirectoryPath } ) ) ?? [];
+		for ( const wpPath of links ) {
+			await rimraf( path.join( siteDir, wpPath ) );
+		}
+
+		const isInstalled = existsSync( clean );
+		const coreHash = md5( envConfig.coreSource );
+		const coreChanged =
+			update ||
+			( await didCacheChange( CORE_CACHE_KEY, coreHash, {
+				workDirectoryPath,
+			} ) );
+		if ( ! isInstalled ) {
+			await rimraf( siteDir );
+			await rimraf( path.dirname( database ) );
+			await fs.mkdir( path.dirname( database ), { recursive: true } );
+			await copyCore( envConfig.coreSource.path, siteDir, [ '.git' ] );
+			await fs.copyFile(
+				path.join( mappings[ SQLITE_PLUGIN_PATH ].path, 'db.copy' ),
+				path.join( siteDir, 'wp-content/db.php' )
+			);
+		} else if ( coreChanged ) {
+			// The plugins, themes and uploads stay as they are.
+			await copyCore( envConfig.coreSource.path, siteDir, [
+				'.git',
+				'wp-content',
+			] );
+		}
+		await setCache( CORE_CACHE_KEY, coreHash, { workDirectoryPath } );
 
 		// Shorter paths first, so a mapping inside another one replaces an
 		// entry of it.
@@ -361,27 +393,13 @@ class PhpRuntime {
 			await fs.mkdir( path.dirname( target ), { recursive: true } );
 			await link( mappings[ wpPath ].path, target );
 		}
+		await setCache( LINKS_CACHE_KEY, sorted, { workDirectoryPath } );
 
 		await writeWpConfig( config, siteDir );
-		const install = spawn.sync(
-			'php',
-			[
-				path.join( __dirname, 'install.php' ),
-				siteDir,
-				config.name,
-				...envConfig.pluginSources.map( ( source ) => source.basename ),
-			],
-			{ encoding: 'utf8' }
-		);
-		// WordPress errors exit with 0, but leave no database.
-		const { database, clean } = getDatabasePaths( config );
-		if ( install.status !== 0 || ! existsSync( database ) ) {
-			throw new Error(
-				`Installing WordPress failed:\n${ install.stdout }${ install.stderr }`
-			);
+		install( config, siteDir );
+		if ( ! isInstalled ) {
+			await fs.copyFile( database, clean );
 		}
-
-		await fs.copyFile( database, clean );
 	}
 
 	/**
@@ -501,6 +519,86 @@ async function link( source, target ) {
 		}
 		throw error;
 	}
+}
+
+/**
+ * Install WordPress if the database is empty, and activate the plugins from
+ * the config.
+ *
+ * @param {Object} config  The wp-env config object.
+ * @param {string} siteDir The site folder.
+ */
+function install( config, siteDir ) {
+	const result = spawn.sync(
+		'php',
+		[
+			path.join( __dirname, 'install.php' ),
+			siteDir,
+			config.name,
+			...config.env.development.pluginSources.map(
+				( source ) => source.basename
+			),
+		],
+		{ encoding: 'utf8' }
+	);
+	// WordPress errors exit with 0, but leave no database.
+	if (
+		result.status !== 0 ||
+		! existsSync( getDatabasePaths( config ).database )
+	) {
+		throw new Error(
+			`Installing WordPress failed:\n${ result.stdout }${ result.stderr }`
+		);
+	}
+}
+
+/**
+ * The server's PID and log files, outside the folder the server serves.
+ *
+ * @param {Object} config The wp-env config object.
+ * @return {Object} The PID and log file paths.
+ */
+function getServerPaths( config ) {
+	return {
+		pidFile: path.join( config.workDirectoryPath, 'php-server.pid' ),
+		logFile: path.join( config.workDirectoryPath, 'php-server.log' ),
+	};
+}
+
+/**
+ * The PID of this site's running server, if any.
+ *
+ * @param {Object} config The wp-env config object.
+ * @return {Promise<number|null>} The PID, or null.
+ */
+async function getServerPid( config ) {
+	const pid = parseInt(
+		await fs
+			.readFile( getServerPaths( config ).pidFile, 'utf8' )
+			.catch( () => '' ),
+		10
+	);
+	if ( ! pid ) {
+		return null;
+	}
+	// After a restart, the saved PID can belong to another program, so check
+	// that the process serves this site.
+	const { stdout } =
+		process.platform === 'win32'
+			? spawn.sync(
+					'powershell',
+					[
+						'-NoProfile',
+						'-Command',
+						`(Get-CimInstance Win32_Process -Filter 'ProcessId = ${ pid }').CommandLine`,
+					],
+					{ encoding: 'utf8' }
+				)
+			: spawn.sync( 'ps', [ '-ww', '-o', 'args=', '-p', String( pid ) ], {
+					encoding: 'utf8',
+				} );
+	const siteDir = path.join( config.workDirectoryPath, 'php' );
+	return stdout?.includes( siteDir ) ? pid : null;
 }
 
 /**

@@ -5,10 +5,18 @@
  */
 
 $root = $_SERVER['DOCUMENT_ROOT'];
-$path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+$url  = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+$path = rawurldecode( $url );
 
 if ( is_file( $root . $path ) ) {
 	return false;
+}
+
+// Like Apache, add the slash to a folder, so relative links work.
+if ( is_dir( $root . $path ) && '/' !== substr( $path, -1 ) ) {
+	$query = isset( $_SERVER['QUERY_STRING'] ) && '' !== $_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : '';
+	header( 'Location: ' . $url . '/' . $query, true, 301 );
+	exit;
 }
 
 $index = rtrim( $path, '/' ) . '/index.php';
