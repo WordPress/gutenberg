@@ -114,6 +114,13 @@
 		"filePath": "library/aspect-ratio.svg"
 	},
 	{
+		"slug": "asterisk",
+		"label": "Asterisk",
+		"filePath": "library/asterisk.svg",
+		"collections": [ "core", "core-admin" ],
+		"keywords": [ "generic", "wildcard", "placeholder" ]
+	},
+	{
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
 		"filePath": "library/at-symbol.svg",
