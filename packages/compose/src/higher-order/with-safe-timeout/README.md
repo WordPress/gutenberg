@@ -5,9 +5,6 @@
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { withSafeTimeout } from '@wordpress/compose';
 
 function MyEffectfulComponent( { setTimeout } ) {

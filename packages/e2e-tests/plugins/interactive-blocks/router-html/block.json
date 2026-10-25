@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/router-html",
+	"title": "E2E Interactivity tests - router HTML",
+	"category": "text",
+	"icon": "heart",
+	"attributes": {
+		"page": { "type": "string" },
+		"value": { "type": "string", "default": "null" },
+		"next": { "type": "string" }
+	},
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 
 type SelectControlBaseProps< V extends string > = Pick<
 	InputBaseProps,
-	| '__next36pxDefaultSize'
-	| '__next40pxDefaultSize'
-	| '__shouldNotWarnDeprecated36pxSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
 	| 'label'
@@ -22,7 +12,22 @@ type SelectControlBaseProps< V extends string > = Pick<
 	| 'size'
 	| 'suffix'
 > &
-	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
+	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'help' > & {
+		/**
+		 * Deprecated. Use `__next40pxDefaultSize` instead.
+		 *
+		 * @default false
+		 * @deprecated
+		 * @ignore
+		 */
+		__next36pxDefaultSize?: boolean;
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 * @ignore
+		 */
+		__next40pxDefaultSize?: boolean;
 		/**
 		 * An array of option property objects to be rendered,
 		 * each with a `label` and `value` property, as well as any other

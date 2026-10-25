@@ -2,8 +2,8 @@
 
 This webpack plugin serves two purposes:
 
--   Externalize dependencies that are available as shared scripts or modules on WordPress sites.
--   Add an asset file for each entry point that declares an object with the list of WordPress script or module dependencies for the entry point. The asset file also contains the current version calculated for the current source code.
+- Externalize dependencies that are available as shared scripts or modules on WordPress sites.
+- Add an asset file for each entry point that declares an object with the list of WordPress script or module dependencies for the entry point. The asset file also contains the current version calculated for the current source code.
 
 This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing without an error-prone process of manually maintaining a dependency list.
 
@@ -62,20 +62,25 @@ const webpackConfig = {
 
 ### Behavior with scripts
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the content of the entry point's files, including any extracted styles.
 
-For example:
+The asset file name mirrors the emitted JavaScript file name, replacing the file extension with `.asset.php` or `.asset.json` depending on the configured `outputFormat`. Because it follows the webpack `output.filename` setting, a single unnamed entry produces `main.asset.php` by default, and an output such as `index.min.js` produces `index.min.asset.php`.
+
+For example, for an entry named `entrypoint`:
 
 ```
-// Source file entrypoint.js
+// Entry `entrypoint`
 import { Component } from 'react';
 
-// Webpack will produce the output output/entrypoint.js
+// Webpack will produce a JavaScript output file, for example output/entrypoint.js
 /* bundled JavaScript output */
 
-// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+// Webpack will also produce a matching asset file, for example
+// output/entrypoint.asset.php, declaring script dependencies
 <?php return array('dependencies' => array('react'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
+
+The generated asset file name is based on the emitted JavaScript output file name. For example, if webpack is configured with `output.filename: 'bunny-plugin-[name].min.js'`, an `entrypoint` entry creates `output/bunny-plugin-entrypoint.min.asset.php`.
 
 By default, the following module requests are handled:
 
@@ -129,18 +134,19 @@ const webpackConfig = {
 };
 ```
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the content of the entry point's files, including any extracted styles.
 
-For example:
+For example, for an entry named `entrypoint`:
 
 ```
-// Source file entrypoint.js
+// Entry `entrypoint`
 import { store, getContext } from '@wordpress/interactivity';
 
-// Webpack will produce the output output/entrypoint.js
+// Webpack will produce a JavaScript output file, for example output/entrypoint.js
 /* bundled JavaScript output */
 
-// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+// Webpack will also produce a matching asset file, for example
+// output/entrypoint.asset.php, declaring script module dependencies
 <?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
@@ -170,43 +176,43 @@ module.exports = {
 
 ##### `outputFormat`
 
--   Type: string
--   Default: `php`
+- Type: string
+- Default: `php`
 
 The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
 ##### `outputFilename`
 
--   Type: string | function
--   Default: null
+- Type: string | function
+- Default: null
 
 The filename for the generated asset file. Accepts the same values as the Webpack `output.filename` option.
 
 ##### `combineAssets`
 
--   Type: boolean
--   Default: `false`
+- Type: boolean
+- Default: `false`
 
 By default, one asset file is created for each entry point. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory.
 
 ##### `combinedOutputFile`
 
--   Type: string
--   Default: `null`
+- Type: string
+- Default: `null`
 
 This option is useful only when the `combineAssets` option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
 
 ##### `useDefaults`
 
--   Type: boolean
--   Default: `true`
+- Type: boolean
+- Default: `true`
 
 Pass `useDefaults: false` to disable the default request handling.
 
 ##### `injectPolyfill`
 
--   Type: boolean
--   Default: `false`
+- Type: boolean
+- Default: `false`
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
 
@@ -214,8 +220,8 @@ Force `wp-polyfill` to be included in each entry point's dependency list. This w
 
 ##### `externalizedReport`
 
--   Type: boolean | string
--   Default: `false`
+- Type: boolean | string
+- Default: `false`
 
 Report all externalized dependencies as an array in JSON format. It could be used for further manual or automated inspection.
 You can provide a filename, or set it to `true` to report to a default `externalized-dependencies.json`.
@@ -224,7 +230,7 @@ You can provide a filename, or set it to `true` to report to a default `external
 
 **Note**: This option is not available with script modules. See [`requestToExternalModule`](#requestToExternalModule) for module usage.
 
--   Type: function
+- Type: function
 
 `requestToExternal` allows the module handling to be customized. The function should accept a module request string and may return a string representing the global variable to use. An array of strings may be used to access globals via an object path, e.g. `wp.i18n` may be represented as `[ 'wp', 'i18n' ]`.
 
@@ -255,7 +261,7 @@ module.exports = {
 
 **Note**: This option is only available with script modules. See [`requestToExternal`](#requestToExternal) for script usage.
 
--   Type: function
+- Type: function
 
 `requestToExternalModule` allows the script module handling to be customized. The function should accept a script module request string and may return a string representing the script module to use. Often, the script module will have the same name.
 
@@ -291,7 +297,7 @@ module.exports = {
 
 **Note**: This option is not available with script modules. It has no corresponding module configuration.
 
--   Type: function
+- Type: function
 
 All of the external modules handled by the plugin are expected to be WordPress script dependencies
 and will be added to the dependency list. `requestToHandle` allows the script handle included in the dependency list to be customized.
