@@ -6,10 +6,6 @@
 
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 
-### Deprecations
-
--   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5 ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
-
 ### Enhancements
 
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
@@ -19,6 +15,10 @@
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
+
+### Deprecations
+
+-   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5 ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
 
 ### Bug Fixes
 
