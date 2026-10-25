@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an experimental `php` runtime that serves WordPress with the installed PHP's built-in web server and a SQLite database, without Docker.
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes

@@ -144,7 +144,7 @@ module.exports = function cli() {
 			args.option( 'runtime', {
 				type: 'string',
 				describe:
-					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental).',
+					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental), "php" uses the PHP installed on this computer (experimental).',
 				choices: getAvailableRuntimes(),
 				default: 'docker',
 			} );
