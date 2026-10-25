@@ -1,6 +1,7 @@
 import { autop } from '@wordpress/autop';
 import { createElement, RawHTML } from '@wordpress/element';
 import { createBlock } from './factory';
+import parse from './parser';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 import { htmlToBlocks } from './raw-handling/html-to-blocks';
 import { rawHandler } from './raw-handling';
@@ -46,6 +47,9 @@ const BLOCK_ELEMENTS = new Set(
 const RAW_TEXT_ELEMENTS = new Set(
 	'SCRIPT STYLE TEXTAREA TITLE IFRAME NOEMBED NOFRAMES XMP'.split( ' ' )
 );
+
+// Marks where a delimited block sits in HTML without delimiters.
+const SLOT = '<!--wp-delimited-block-->';
 
 // A blank line ends a paragraph of text.
 const BLANK_LINE = /\n[ \t]*\n/;
@@ -145,7 +149,8 @@ function splitPieces( html: string ): { pieces: Piece[]; after: string } {
 		if (
 			BLOCK_ELEMENTS.has( tag ) ||
 			RAW_TEXT_ELEMENTS.has( tag ) ||
-			( node.nodeType === node.COMMENT_NODE && ! paragraph )
+			( node.nodeType === node.COMMENT_NODE &&
+				( ! paragraph || getHTML( [ node.cloneNode() ] ) === SLOT ) )
 		) {
 			endParagraph();
 			pieces.push( {
@@ -193,54 +198,67 @@ function readBlock( html: string ): Block | null {
 	);
 }
 
-// Marks where inner blocks are in an HTML block's static HTML.
-const SLOT = 'wp-inner-block';
+// Marks where found inner blocks are in an HTML block's static HTML.
+const FOUND = '<!--wp-inner-block-->';
 
 /**
  * Returns the block for a piece of HTML, or an HTML block holding it, with
- * the elements in it that blocks read as inner blocks, kept without
- * delimiters.
+ * the elements in it that blocks read, and the delimited blocks in it, as
+ * inner blocks.
  *
- * @param piece Piece of HTML.
+ * @param piece     Piece of HTML.
+ * @param delimited Delimited blocks still to place, in order.
  */
-function pieceToBlock( piece: Piece ): Block {
+function pieceToBlock( piece: Piece, delimited: Block[] ): Block {
+	if ( piece.html === SLOT ) {
+		return delimited.shift() as Block;
+	}
+
 	// Paragraphs of text get their `<p>` the way WordPress adds it.
-	const block = readBlock( piece.bare ? autop( piece.html ) : piece.html );
+	const block = piece.html.includes( SLOT )
+		? null
+		: readBlock( piece.bare ? autop( piece.html ) : piece.html );
 	if ( block ) {
 		return block;
 	}
 
 	const body = getBody( piece.html );
-	const innerBlocks: Block[] = [];
+	const found: Block[] = [];
 	const visit = ( parent: Element ) => {
 		for ( const element of Array.from( parent.children ) ) {
-			const innerBlock = BLOCK_ELEMENTS.has( element.tagName )
-				? readBlock( element.outerHTML )
-				: null;
+			const html = element.outerHTML;
+			const innerBlock =
+				BLOCK_ELEMENTS.has( element.tagName ) && ! html.includes( SLOT )
+					? readBlock( html )
+					: null;
 			if ( innerBlock ) {
-				innerBlocks.push(
-					addSource(
-						innerBlock,
-						element.outerHTML,
-						element.outerHTML,
-						{ isInnerBlocks: true }
-					)
+				found.push(
+					addSource( innerBlock, html, html, { isInnerBlocks: true } )
 				);
-				element.replaceWith( document.createComment( SLOT ) );
+				element.replaceWith( getBody( FOUND ).firstChild as Comment );
 			} else {
 				visit( element );
 			}
 		}
 	};
 	visit( body );
-	return createBlock(
-		'core/html',
-		{},
-		innerBlocks,
-		body.innerHTML
-			.split( `<!--${ SLOT }-->` )
-			.flatMap( ( part, at ) => ( at ? [ null, part ] : [ part ] ) )
-	);
+
+	// Inner blocks, found and delimited, in the order they appear.
+	const innerContent: Array< string | null > = [];
+	const innerBlocks: Block[] = [];
+	body.innerHTML
+		.split( new RegExp( `(${ FOUND }|${ SLOT })` ) )
+		.forEach( ( part, index ) => {
+			if ( index % 2 ) {
+				innerContent.push( null );
+				innerBlocks.push(
+					( part === FOUND ? found : delimited ).shift() as Block
+				);
+			} else {
+				innerContent.push( part );
+			}
+		} );
+	return createBlock( 'core/html', {}, innerBlocks, innerContent );
 }
 
 /**
@@ -276,19 +294,44 @@ function getPlainSavedHTML( block: Block ): string {
 }
 
 /**
- * Reads HTML without delimiters as blocks.
+ * Reads HTML outside delimiters as blocks. Delimited blocks inside an element
+ * of it become inner blocks of an HTML block.
  *
- * @param html HTML without delimiters.
+ * @param parts HTML outside delimiters, and the delimited blocks between it.
  */
-export function parseUndelimited( html: string ): Block[] {
-	const { pieces, after } = splitPieces( html );
+export function parseUndelimited( parts: Array< string | Block > ): Block[] {
+	const delimited = parts.filter(
+		( part ): part is Block => typeof part !== 'string'
+	);
+	const { pieces, after } = splitPieces(
+		parts
+			.map( ( part ) => ( typeof part === 'string' ? part : SLOT ) )
+			.join( '' )
+	);
 	return pieces.map( ( piece, index ) => {
-		const block = pieceToBlock( piece );
-		block.undelimitedSource = {
-			html: piece.html,
-			content: piece.html,
+		const block = pieceToBlock( piece, delimited );
+		const whitespace = {
 			before: piece.before,
 			after: index === pieces.length - 1 ? after : '',
+		};
+		if ( piece.html === SLOT ) {
+			Object.assign( block.undelimitedSource ?? {}, whitespace );
+			return block;
+		}
+		// The HTML as written, with any delimited blocks in it as written.
+		const html = piece.html.includes( SLOT )
+			? getSavedHTML(
+					block,
+					block.innerBlocks.map(
+						( innerBlock ) =>
+							innerBlock.undelimitedSource?.html ?? ''
+					)
+				)
+			: piece.html;
+		block.undelimitedSource = {
+			html,
+			content: html,
+			...whitespace,
 			bare: piece.bare,
 			savedHTML: getPlainSavedHTML( block ),
 			fingerprint: serializeBlockWithoutSource( block ),
@@ -550,11 +593,12 @@ function getBlockHTML(
 			? patch( source.content, source.savedHTML, saved, source.bare )
 			: saved;
 
-	if ( ! hadDelimiters && ! hasDelimitedInner ) {
+	// The HTML block can hold delimited inner blocks without a delimiter.
+	if ( ! hadDelimiters && ( isHTMLBlock || ! hasDelimitedInner ) ) {
 		if ( isInside ) {
 			return { html, delimited: false };
 		}
-		const [ readBack, ...rest ] = parseUndelimited( html );
+		const [ readBack, ...rest ] = parse( html );
 		if (
 			! rest.length &&
 			readBack &&

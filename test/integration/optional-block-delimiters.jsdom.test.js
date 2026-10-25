@@ -258,23 +258,23 @@ describe( 'optional block delimiters', () => {
 			expect( serialize( parse( content ) ) ).toBe( content );
 		} );
 
-		it( 'adds delimiters only around the HTML and the inner block that needs one', () => {
+		it( 'adds a delimiter only to the inner block that needs one', () => {
 			const [ block ] = parse( cards );
 			block.innerBlocks[ 1 ] = update( block.innerBlocks[ 1 ], {
 				dropCap: true,
 			} );
 			const content = serialize( [ block ] );
 			expect( content ).toBe(
-				`<!-- wp:html -->\n${ cards.replace(
+				cards.replace(
 					'<p>Six nests this year.</p>',
 					'<!-- wp:paragraph {"dropCap":true} -->\n<p class="has-drop-cap">Six nests this year.</p>\n<!-- /wp:paragraph -->'
-				) }\n<!-- /wp:html -->`
+				)
 			);
-			// It's now an HTML block, whose static HTML is left as it is.
 			const [ readBack ] = parse( content );
 			expect( readBack.innerBlocks.map( ( { name } ) => name ) ).toEqual(
-				[ 'core/paragraph' ]
+				[ 'core/heading', 'core/paragraph', 'core/paragraph' ]
 			);
+			expect( readBack.innerBlocks[ 1 ].attributes.dropCap ).toBe( true );
 			expect( serialize( [ readBack ] ) ).toBe( content );
 		} );
 	} );

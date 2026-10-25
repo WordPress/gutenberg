@@ -373,36 +373,23 @@ export default function parse(
 	content: string,
 	options?: ParseOptions
 ): Block[] {
-	const blocks: Block[] = [];
-	// Whitespace between blocks is kept with them.
-	let whitespace = '';
 	const rawBlocks = grammarParse( content ) as unknown as RawBlock[];
 	const writtenBlocks = getWrittenBlocks( content, rawBlocks );
-	for ( const rawBlock of rawBlocks ) {
-		// HTML outside delimiters is read as blocks, not one Classic block.
-		if ( ! rawBlock.blockName && canReadHTML() ) {
-			const undelimitedBlocks = parseUndelimited( rawBlock.innerHTML );
-			if ( ! undelimitedBlocks.length ) {
-				whitespace += rawBlock.innerHTML;
-			}
-			blocks.push( ...undelimitedBlocks );
-			continue;
-		}
-		const block = parseRawBlock( rawBlock, options, {
-			isTopLevel: true,
-			writtenBlocks,
-		} );
-		if ( block ) {
-			if ( block.undelimitedSource ) {
-				block.undelimitedSource.before = whitespace;
-				whitespace = '';
-			}
-			blocks.push( block );
-		}
+	const parseTopLevel = ( rawBlock: RawBlock ) =>
+		parseRawBlock( rawBlock, options, { isTopLevel: true, writtenBlocks } );
+	if ( ! canReadHTML() ) {
+		return rawBlocks
+			.map( parseTopLevel )
+			.filter( ( block ): block is Block => !! block );
 	}
-	const lastSource = blocks[ blocks.length - 1 ]?.undelimitedSource;
-	if ( lastSource ) {
-		lastSource.after += whitespace;
-	}
-	return blocks;
+	// HTML outside delimiters is read as blocks, not Classic blocks.
+	return parseUndelimited(
+		rawBlocks
+			.map( ( rawBlock ) =>
+				rawBlock.blockName
+					? parseTopLevel( rawBlock )
+					: rawBlock.innerHTML
+			)
+			.filter( ( part ): part is string | Block => !! part )
+	);
 }

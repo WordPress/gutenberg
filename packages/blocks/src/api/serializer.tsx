@@ -16,7 +16,7 @@ import {
 } from './registration';
 import { serializeRawBlock } from './parser/serialize-raw-block';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
-import { serializeUndelimited } from './undelimited';
+import { canReadHTML, serializeUndelimited } from './undelimited';
 import type { Block, BlockType, BlockSerializationOptions } from '../types';
 
 /**
@@ -536,7 +536,7 @@ export default function serialize(
 	options?: BlockSerializationOptions
 ): string {
 	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
-	if ( ! options?.isInnerBlocks ) {
+	if ( ! options?.isInnerBlocks && canReadHTML() ) {
 		return serializeUndelimited( blocksArray );
 	}
 	return blocksArray
