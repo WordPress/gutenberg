@@ -1,25 +1,25 @@
-import { TagProcessor } from '@wordpress/html-api';
 import { getSaveContent } from '../serializer';
-import { readStyle } from '../undelimited';
+import { getRootElement, readStyle } from '../undelimited';
 import type { BlockType } from '../../types';
 
 /**
- * Returns the attributes of the first element in a piece of HTML. Attributes
+ * Returns the attributes of the element a piece of HTML is. Attributes
  * without a value are read as empty strings.
  *
  * @param html HTML.
  */
 function getRootAttributes( html: string ): Map< string, string > | null {
-	const processor = new TagProcessor( html );
-	if ( ! processor.nextTag() ) {
-		return null;
-	}
-	const attributes = new Map< string, string >();
-	for ( const name of processor.getAttributeNamesWithPrefix( '' ) ?? [] ) {
-		const value = processor.getAttribute( name );
-		attributes.set( name, typeof value === 'string' ? value : '' );
-	}
-	return attributes;
+	const root = getRootElement( html );
+	return root
+		? new Map(
+				root
+					.getAttributeNames()
+					.map( ( name ) => [
+						name,
+						root.getAttribute( name ) ?? '',
+					] )
+			)
+		: null;
 }
 
 /**

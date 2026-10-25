@@ -21,7 +21,7 @@ const fixturesDirectory = path.join(
 const classicPost = `Hello <strong>world</strong>, this is a classic post.
 It has a line break.
 
-<h2 id="intro" data-x>A heading</h2>
+<h2 id="intro" data-x="">A heading</h2>
 A second paragraph &amp; <em>more</em>.
 
 <!--more-->
@@ -67,6 +67,14 @@ describe( 'optional block delimiters', () => {
 		expect( serialize( parse( classicPost ) ) ).toBe( classicPost );
 	} );
 
+	it( 'saves untouched HTML as the browser writes it, adding nothing', () => {
+		expect(
+			serialize(
+				parse( '<P CLASS=tip>Hi<br />there</P>\n\n<h2 data-x>A</h2>' )
+			)
+		).toBe( '<p class="tip">Hi<br>there</p>\n\n<h2 data-x="">A</h2>' );
+	} );
+
 	it( 'keeps HTML with delimiters as it is', () => {
 		const content = `<!-- wp:paragraph {"dropCap":true} -->\n<p class="has-drop-cap">a</p>\n<!-- /wp:paragraph -->\n\n<p>b</p>`;
 		expect( serialize( parse( content ) ) ).toBe( content );
@@ -104,7 +112,7 @@ describe( 'optional block delimiters', () => {
 		const content = `<!-- wp:heading {"level":3} -->\n<h3 class="wp-block-heading" data-x>Old</h3>\n<!-- /wp:heading -->`;
 		const [ block ] = parse( content );
 		expect( serialize( [ update( block, { content: 'New' } ) ] ) ).toBe(
-			content.replace( 'Old', 'New' )
+			content.replace( 'data-x>Old', 'data-x="">New' )
 		);
 	} );
 
@@ -131,10 +139,10 @@ describe( 'optional block delimiters', () => {
 		expect( serialize( blocks ) ).toBe(
 			classicPost
 				.replace(
-					'<h2 id="intro" data-x>A heading</h2>',
-					'<h3 id="intro" data-x>A heading</h3>'
+					'<h2 id="intro" data-x="">A heading</h2>',
+					'<h3 id="intro" data-x="">A heading</h3>'
 				)
-				.replace( '<p class="intro"', '<p id="styled" class="intro"' )
+				.replace( 'data-x="1">Styled', 'data-x="1" id="styled">Styled' )
 		);
 	} );
 
@@ -162,7 +170,7 @@ describe( 'optional block delimiters', () => {
 			hidden: '',
 		} );
 		expect( serialize( [ update( block, { content: 'Tip!' } ) ] ) ).toBe(
-			content.replace( 'Tip<', 'Tip!<' )
+			content.replace( 'hidden>Tip<', 'hidden="">Tip!<' )
 		);
 	} );
 

@@ -41,7 +41,6 @@
 		{ "path": "packages/global-styles-ui" },
 		{ "path": "packages/grid" },
 		{ "path": "packages/grid/tsconfig.test.json" },
-		{ "path": "packages/html-api" },
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/hooks" },
 		{ "path": "packages/i18n" },

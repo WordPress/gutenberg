@@ -1,7 +1,5 @@
 import { autop } from '@wordpress/autop';
 import { createElement, RawHTML } from '@wordpress/element';
-import { TagProcessor } from '@wordpress/html-api';
-import type { Span } from '@wordpress/html-api';
 import { createBlock } from './factory';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 import { htmlToBlocks } from './raw-handling/html-to-blocks';
@@ -19,8 +17,9 @@ import type { Block } from '../types';
 /*
  * Experimental: reads HTML without block delimiters as blocks, and saves
  * blocks without delimiters when reading the result back gives the same
- * block. Untouched blocks keep their HTML exactly as written; edited blocks
- * change only what the edit changed.
+ * block. HTML outside delimiters is read and written by the browser, so it
+ * comes back tidied, but blocks add nothing to it unless they're edited, and
+ * then change only what the edit changed.
  */
 
 declare global {
@@ -50,13 +49,7 @@ const BLOCK_ELEMENTS = new Set(
 	).split( ' ' )
 );
 
-const VOID_ELEMENTS = new Set(
-	'AREA BASE BR COL EMBED HR IMG INPUT LINK META SOURCE TRACK WBR'.split(
-		' '
-	)
-);
-
-// Elements whose contents the tokenizer reads as part of the opening tag.
+// Elements that are pieces of their own, like block elements.
 const RAW_TEXT_ELEMENTS = new Set(
 	'SCRIPT STYLE TEXTAREA TITLE IFRAME NOEMBED NOFRAMES XMP'.split( ' ' )
 );
@@ -64,11 +57,36 @@ const RAW_TEXT_ELEMENTS = new Set(
 // A blank line ends a paragraph of text.
 const BLANK_LINE = /\n[ \t]*\n/;
 
-class SpanProcessor extends TagProcessor {
-	getSpan(): Span {
-		this.setBookmark( 'here' );
-		return { ...( this.bookmarks.get( 'here' ) as Span ) };
-	}
+/**
+ * Returns the body of a new document holding some HTML.
+ *
+ * @param html HTML.
+ */
+function getBody( html: string ): HTMLElement {
+	const { body } = document.implementation.createHTMLDocument( '' );
+	body.innerHTML = html;
+	return body;
+}
+
+/**
+ * Returns the HTML of some nodes, as the browser writes it.
+ *
+ * @param nodes Nodes.
+ */
+function getHTML( nodes: Node[] ): string {
+	const container = document.createElement( 'div' );
+	container.append( ...nodes );
+	return container.innerHTML;
+}
+
+/**
+ * Returns the element a piece of HTML is, if it's exactly one element.
+ *
+ * @param html HTML.
+ */
+export function getRootElement( html: string ): Element | null {
+	const body = getBody( html.trim() );
+	return body.childNodes.length === 1 ? body.firstElementChild : null;
 }
 
 interface Piece {
@@ -84,139 +102,74 @@ interface Piece {
  * @param html HTML without delimiters.
  */
 function splitPieces( html: string ): { pieces: Piece[]; after: string } {
-	const processor = new SpanProcessor( html );
 	const pieces: Piece[] = [];
-	const openElements: string[] = [];
-	// Where the piece being read starts, and whether it is inline content.
-	let pieceStart: number | null = null;
-	let isBare = false;
-	let wasAt = 0;
-	let lastEnd = 0;
+	// Whitespace since the last piece, and the inline nodes of a paragraph.
+	let whitespace = '';
+	let paragraph: { before: string; nodes: Node[] } | null = null;
 
-	// Ends the piece at `end`, leaving out whitespace before it.
-	const endPiece = ( end: number ) => {
-		if ( pieceStart === null ) {
+	const endParagraph = () => {
+		if ( ! paragraph ) {
 			return;
 		}
-		const trimmedEnd = Math.max(
-			pieceStart,
-			end -
-				( /\s*$/.exec( html.slice( pieceStart, end ) )?.[ 0 ].length ??
-					0 )
-		);
-		pieces.push( {
-			before: html.slice( wasAt, pieceStart ),
-			html: html.slice( pieceStart, trimmedEnd ),
-			bare: isBare,
-		} );
-		wasAt = trimmedEnd;
-		pieceStart = null;
+		const paragraphHTML = getHTML( paragraph.nodes );
+		const trimmed = paragraphHTML.trimEnd();
+		pieces.push( { before: paragraph.before, html: trimmed, bare: true } );
+		whitespace = paragraphHTML.slice( trimmed.length );
+		paragraph = null;
 	};
 
-	const startPiece = ( start: number, bare: boolean ) => {
-		if ( pieceStart === null ) {
-			pieceStart = start;
-			isBare = bare;
-		}
+	const addInline = ( node: Node ) => {
+		paragraph ??= { before: whitespace, nodes: [] };
+		whitespace = '';
+		paragraph.nodes.push( node );
 	};
 
-	while ( processor.nextToken() ) {
-		const { start, length } = processor.getSpan();
-		const end = start + length;
-		lastEnd = end;
-		const type = processor.getTokenType();
-		const tag = processor.getTag() ?? '';
-		const isOpener = type === '#tag' && ! processor.isTagCloser();
-		// Void elements, and elements like SCRIPT whose contents are part of
-		// the same token, don't stay open.
-		const staysOpen =
-			isOpener &&
-			! VOID_ELEMENTS.has( tag ) &&
-			! RAW_TEXT_ELEMENTS.has( tag );
-
-		if ( openElements.length ) {
-			// A block element closes an open paragraph, as in `<p>a<div>`.
-			if (
-				isOpener &&
-				BLOCK_ELEMENTS.has( tag ) &&
-				openElements[ openElements.length - 1 ] === 'P'
-			) {
-				openElements.pop();
-			}
-			if ( ! openElements.length ) {
-				endPiece( start );
-			} else {
-				if ( type === '#tag' && processor.isTagCloser() ) {
-					const at = openElements.lastIndexOf( tag );
-					if ( at !== -1 ) {
-						openElements.length = at;
-					}
-				} else if ( staysOpen ) {
-					openElements.push( tag );
-				}
-				if ( ! openElements.length && ! isBare ) {
-					endPiece( end );
-				}
-				continue;
-			}
-		}
-
-		if ( type === '#text' ) {
+	for ( const node of Array.from( getBody( html ).childNodes ) ) {
+		if ( node.nodeType === node.TEXT_NODE ) {
 			// Text ends a paragraph at each blank line.
-			let at = start;
-			for ( const part of html
-				.slice( start, end )
-				.split( /(\n[ \t]*\n\s*)/ ) ) {
+			for ( const part of ( node.textContent ?? '' ).split(
+				/(\n[ \t]*\n\s*)/
+			) ) {
 				if ( BLANK_LINE.test( part ) ) {
-					endPiece( at );
-				} else if ( part.trim() ) {
-					startPiece(
-						at + ( /^\s*/.exec( part )?.[ 0 ].length ?? 0 ),
-						true
+					endParagraph();
+					whitespace += part;
+				} else if ( part.trim() || paragraph ) {
+					const leading = paragraph ? '' : /^\s*/.exec( part )![ 0 ];
+					whitespace += leading;
+					addInline(
+						document.createTextNode( part.slice( leading.length ) )
 					);
+				} else {
+					whitespace += part;
 				}
-				at += part.length;
 			}
 			continue;
 		}
 
 		// Block elements, and comments outside a paragraph, are pieces of
-		// their own and end the paragraph before them. Stray closers are
-		// inline content.
+		// their own and end the paragraph before them.
+		const tag = ( node as Element ).tagName;
 		if (
-			( isOpener &&
-				( BLOCK_ELEMENTS.has( tag ) ||
-					RAW_TEXT_ELEMENTS.has( tag ) ) ) ||
-			( type === '#comment' && pieceStart === null )
+			BLOCK_ELEMENTS.has( tag ) ||
+			RAW_TEXT_ELEMENTS.has( tag ) ||
+			( node.nodeType === node.COMMENT_NODE && ! paragraph )
 		) {
-			endPiece( start );
-			startPiece( start, false );
-			if ( staysOpen ) {
-				openElements.push( tag );
-			} else {
-				endPiece( end );
-			}
+			endParagraph();
+			pieces.push( {
+				before: whitespace,
+				html: getHTML( [ node ] ),
+				bare: false,
+			} );
+			whitespace = '';
 			continue;
 		}
 
 		// Anything else is inline content of a paragraph.
-		startPiece( start, true );
-		if ( staysOpen ) {
-			openElements.push( tag );
-		}
+		addInline( node );
 	}
+	endParagraph();
 
-	// Keep whatever the tokenizer couldn't finish reading.
-	if ( processor.pausedAtIncompleteToken() ) {
-		startPiece(
-			lastEnd +
-				( /^\s*/.exec( html.slice( lastEnd ) )?.[ 0 ].length ?? 0 ),
-			false
-		);
-	}
-	endPiece( html.length );
-
-	return { pieces, after: html.slice( wasAt ) };
+	return { pieces, after: whitespace };
 }
 
 /**
@@ -226,12 +179,7 @@ function splitPieces( html: string ): { pieces: Piece[]; after: string } {
  */
 function readBlock( html: string ): Block | null {
 	// Only read the piece as a block if the browser also sees one element.
-	const doc = document.implementation.createHTMLDocument( '' );
-	doc.body.innerHTML = html.trim();
-	if (
-		doc.body.childNodes.length !== 1 ||
-		doc.body.firstChild?.nodeType !== doc.ELEMENT_NODE
-	) {
+	if ( ! getRootElement( html ) ) {
 		return null;
 	}
 
@@ -252,73 +200,8 @@ function readBlock( html: string ): Block | null {
 	);
 }
 
-interface Element {
-	tag: string;
-	start: number;
-	end?: number;
-	children: Element[];
-}
-
-/**
- * Finds the outermost elements in HTML that a block reads, keeping each
- * block's HTML as written.
- *
- * @param html HTML, possibly with elements opened or closed outside it.
- */
-function findBlocks(
-	html: string
-): Array< { start: number; end: number; block: Block } > {
-	const processor = new SpanProcessor( html );
-	const root: Element = { tag: '', start: 0, children: [] };
-	const open = [ root ];
-	while ( processor.nextToken() ) {
-		if ( processor.getTokenType() !== '#tag' ) {
-			continue;
-		}
-		const tag = processor.getTag() as string;
-		const { start, length } = processor.getSpan();
-		if ( processor.isTagCloser() ) {
-			const at = open
-				.map( ( element ) => element.tag )
-				.lastIndexOf( tag );
-			if ( at > 0 ) {
-				open[ at ].end = start + length;
-				open.length = at;
-			}
-			continue;
-		}
-		// A block element closes an open paragraph, as in `<p>a<div>`.
-		if (
-			BLOCK_ELEMENTS.has( tag ) &&
-			open[ open.length - 1 ].tag === 'P'
-		) {
-			open.pop();
-		}
-		const element: Element = { tag, start, children: [] };
-		open[ open.length - 1 ].children.push( element );
-		if ( ! VOID_ELEMENTS.has( tag ) && ! RAW_TEXT_ELEMENTS.has( tag ) ) {
-			open.push( element );
-		}
-	}
-
-	const found: Array< { start: number; end: number; block: Block } > = [];
-	const visit = ( { children }: Element ) => {
-		for ( const element of children ) {
-			const { start, end } = element;
-			const block =
-				end !== undefined && BLOCK_ELEMENTS.has( element.tag )
-					? readBlock( html.slice( start, end ) )
-					: null;
-			if ( block ) {
-				found.push( { start, end: end as number, block } );
-			} else {
-				visit( element );
-			}
-		}
-	};
-	visit( root );
-	return found;
-}
+// Marks where inner blocks are in an HTML block's static HTML.
+const SLOT = 'wp-inner-block';
 
 /**
  * Turns the elements in an HTML block's static HTML that blocks read into
@@ -331,29 +214,51 @@ export function splitInnerBlocks(
 	innerContent: Array< string | null >,
 	innerBlocks: Block[]
 ): { innerContent: Array< string | null >; innerBlocks: Block[] } {
-	const split: {
-		innerContent: Array< string | null >;
-		innerBlocks: Block[];
-	} = { innerContent: [], innerBlocks: [] };
-	let index = 0;
-	for ( const part of innerContent ) {
-		if ( part === null ) {
-			split.innerContent.push( null );
-			split.innerBlocks.push( innerBlocks[ index++ ] );
-			continue;
+	// Read the static HTML as one document, marking existing inner blocks.
+	const body = getBody(
+		innerContent.map( ( part ) => part ?? `<!--${ SLOT }-->` ).join( '' )
+	);
+	const found = new Map< Comment, Block >();
+	const visit = ( parent: Element ) => {
+		for ( const element of Array.from( parent.children ) ) {
+			const block = BLOCK_ELEMENTS.has( element.tagName )
+				? readBlock( element.outerHTML )
+				: null;
+			if ( block ) {
+				const slot = document.createComment( SLOT );
+				found.set(
+					slot,
+					addSource( block, element.outerHTML, element.outerHTML, {
+						isInnerBlocks: true,
+					} )
+				);
+				element.replaceWith( slot );
+			} else {
+				visit( element );
+			}
 		}
-		let wasAt = 0;
-		for ( const { start, end, block } of findBlocks( part ) ) {
-			const html = part.slice( start, end );
-			split.innerContent.push( part.slice( wasAt, start ), null );
-			split.innerBlocks.push(
-				addSource( block, html, html, { isInnerBlocks: true } )
-			);
-			wasAt = end;
-		}
-		split.innerContent.push( part.slice( wasAt ) );
+	};
+	visit( body );
+	if ( ! found.size ) {
+		return { innerContent, innerBlocks };
 	}
-	return split;
+
+	// Inner blocks, old and found, in the order they appear.
+	const blocks: Block[] = [];
+	let index = 0;
+	const walker = document.createTreeWalker( body, NodeFilter.SHOW_COMMENT );
+	while ( walker.nextNode() ) {
+		const comment = walker.currentNode as Comment;
+		if ( comment.data === SLOT ) {
+			blocks.push( found.get( comment ) ?? innerBlocks[ index++ ] );
+		}
+	}
+	return {
+		innerContent: body.innerHTML
+			.split( `<!--${ SLOT }-->` )
+			.flatMap( ( part, at ) => ( at ? [ null, part ] : [ part ] ) ),
+		innerBlocks: blocks,
+	};
 }
 
 /**
@@ -429,50 +334,6 @@ export function parseUndelimited( html: string ): Block[] {
 	} );
 }
 
-interface Root {
-	tag: string;
-	attributes: Map< string, string | true >;
-	classes: string[];
-	openerEnd: number;
-	closerStart: number;
-	closerEnd: number;
-}
-
-/**
- * Reads the root element of a piece of HTML.
- *
- * @param html HTML of one element.
- */
-function readRoot( html: string ): Root | null {
-	const processor = new SpanProcessor( html );
-	if ( ! processor.nextToken() || processor.getTokenType() !== '#tag' ) {
-		return null;
-	}
-
-	const tag = processor.getTag() as string;
-	const attributes = new Map< string, string | true >();
-	for ( const name of processor.getAttributeNamesWithPrefix( '' ) ?? [] ) {
-		attributes.set( name, processor.getAttribute( name ) as string | true );
-	}
-	const classes = [ ...processor.classList() ];
-	const opener = processor.getSpan();
-	const openerEnd = opener.start + opener.length;
-
-	let closerStart = html.length;
-	let closerEnd = html.length;
-	while ( processor.nextToken() ) {
-		const span = processor.getSpan();
-		closerStart = html.length;
-		closerEnd = html.length;
-		if ( processor.isTagCloser() && processor.getTag() === tag ) {
-			closerStart = span.start;
-			closerEnd = span.start + span.length;
-		}
-	}
-
-	return { tag, attributes, classes, openerEnd, closerStart, closerEnd };
-}
-
 /**
  * Splits an inline style into declarations, keyed by property name.
  *
@@ -541,88 +402,72 @@ function patch(
 	after: string,
 	bare: boolean
 ): string {
-	const beforeRoot = readRoot( before );
-	const afterRoot = readRoot( after );
-	if ( ! beforeRoot || ! afterRoot || ( ! bare && ! readRoot( source ) ) ) {
+	const beforeRoot = getRootElement( before );
+	const afterRoot = getRootElement( after );
+	const root = bare ? null : getRootElement( source );
+	if ( ! beforeRoot || ! afterRoot || ( ! bare && ! root ) ) {
 		return after;
 	}
 
-	const innerAfter = after.slice(
-		afterRoot.openerEnd,
-		afterRoot.closerStart
-	);
-
 	// Text without a wrapping element stays that way if only the text changed.
-	if ( bare ) {
-		return before.slice( 0, beforeRoot.openerEnd ) ===
-			after.slice( 0, afterRoot.openerEnd )
-			? innerAfter
+	if ( ! root ) {
+		return getHTML( [ beforeRoot.cloneNode() ] ) ===
+			getHTML( [ afterRoot.cloneNode() ] )
+			? afterRoot.innerHTML
 			: after;
 	}
 
-	const innerBefore = before.slice(
-		beforeRoot.openerEnd,
-		beforeRoot.closerStart
-	);
-
-	const processor = new TagProcessor( source );
-	processor.nextToken();
 	for ( const name of new Set( [
-		...beforeRoot.attributes.keys(),
-		...afterRoot.attributes.keys(),
+		...beforeRoot.getAttributeNames(),
+		...afterRoot.getAttributeNames(),
 	] ) ) {
-		const beforeValue = beforeRoot.attributes.get( name );
-		const afterValue = afterRoot.attributes.get( name );
+		const beforeValue = beforeRoot.getAttribute( name );
+		const afterValue = afterRoot.getAttribute( name );
 		if ( name === 'class' || beforeValue === afterValue ) {
 			continue;
 		}
 		if ( name === 'style' ) {
-			const style = processor.getAttribute( 'style' );
 			const patched = patchStyle(
-				typeof style === 'string' ? style : '',
-				typeof beforeValue === 'string' ? beforeValue : '',
-				typeof afterValue === 'string' ? afterValue : ''
+				root.getAttribute( 'style' ) ?? '',
+				beforeValue ?? '',
+				afterValue ?? ''
 			);
 			if ( patched ) {
-				processor.setAttribute( 'style', patched );
+				root.setAttribute( 'style', patched );
 			} else {
-				processor.removeAttribute( 'style' );
+				root.removeAttribute( 'style' );
 			}
-		} else if ( afterValue === undefined ) {
-			processor.removeAttribute( name );
+		} else if ( afterValue === null ) {
+			root.removeAttribute( name );
 		} else {
-			processor.setAttribute( name, afterValue );
+			root.setAttribute( name, afterValue );
 		}
 	}
-	for ( const className of beforeRoot.classes ) {
-		if ( ! afterRoot.classes.includes( className ) ) {
-			processor.removeClass( className );
+	for ( const className of beforeRoot.classList ) {
+		if ( ! afterRoot.classList.contains( className ) ) {
+			root.classList.remove( className );
 		}
 	}
-	for ( const className of afterRoot.classes ) {
-		if ( ! beforeRoot.classes.includes( className ) ) {
-			processor.addClass( className );
+	for ( const className of afterRoot.classList ) {
+		if ( ! beforeRoot.classList.contains( className ) ) {
+			root.classList.add( className );
 		}
 	}
-
-	let html = processor.getUpdatedHtml();
-	const root = readRoot( html ) as Root;
-	const inner =
-		innerBefore === innerAfter
-			? html.slice( root.openerEnd, root.closerStart )
-			: innerAfter;
-	const tagName = afterRoot.tag.toLowerCase();
-	const opener =
-		beforeRoot.tag === afterRoot.tag
-			? html.slice( 0, root.openerEnd )
-			: `<${ tagName }` +
-				html.slice( 1 + root.tag.length, root.openerEnd );
-	const closer =
-		beforeRoot.tag === afterRoot.tag || root.closerStart === root.closerEnd
-			? html.slice( root.closerStart )
-			: `</${ tagName }>` + html.slice( root.closerEnd );
-	html = opener + inner + closer;
-	return html;
+	if ( ! root.classList.length ) {
+		root.removeAttribute( 'class' );
+	}
+	if ( beforeRoot.innerHTML !== afterRoot.innerHTML ) {
+		root.innerHTML = afterRoot.innerHTML;
+	}
+	if ( beforeRoot.tagName === afterRoot.tagName ) {
+		return root.outerHTML;
+	}
+	const renamed = document.createElement( afterRoot.localName );
+	for ( const { name, value } of Array.from( root.attributes ) ) {
+		renamed.setAttribute( name, value );
+	}
+	renamed.append( ...root.childNodes );
+	return renamed.outerHTML;
 }
 
 /**
