@@ -3,6 +3,9 @@ import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -53,12 +56,37 @@ export function useEventHandlers( {
 		startDraggingBlocks,
 		stopDraggingBlocks,
 		editContentOnlySection,
+		setBlockToolbarView,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const { getShortcutRepresentation } = useSelect( keyboardShortcutsStore );
 
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isSelected && ! isMultiSelected ) {
 				return;
+			}
+
+			/**
+			 * Part of the block toolbar views experiment: shows the editing tools of
+			 * the block in its toolbar, as the toolbar's "Edit" toggle does.
+			 *
+			 * @param announce Whether to tell screen reader users where to find the tools.
+			 */
+			function showEditingTools( announce: boolean ) {
+				setBlockToolbarView( clientId, 'content' );
+				if ( announce ) {
+					speak(
+						sprintf(
+							/* translators: %s: keyboard shortcut to focus the block toolbar, e.g. "Alt+F10". */
+							__(
+								'Editing tools shown in the block toolbar. Press %s to reach them.'
+							),
+							getShortcutRepresentation(
+								'core/block-editor/focus-toolbar'
+							) ?? ''
+						)
+					);
+				}
 			}
 
 			/**
@@ -90,6 +118,28 @@ export function useEventHandlers( {
 					if ( isZoomOut() ) {
 						event.preventDefault();
 						resetZoomLevel();
+					} else if ( window.__experimentalBlockToolbarViews ) {
+						const block = getBlock( clientId );
+						if (
+							isReusableBlock( block ) ||
+							isTemplatePart( block )
+						) {
+							return;
+						}
+						if ( editedContentOnlySection === clientId ) {
+							return;
+						}
+						event.preventDefault();
+						if ( isSectionBlock( clientId ) ) {
+							editContentOnlySection( clientId );
+							speak(
+								__(
+									'Editing pattern. Its blocks are unlocked.'
+								)
+							);
+						} else {
+							showEditingTools( true );
+						}
 					}
 				} else {
 					event.preventDefault();
@@ -556,23 +606,32 @@ export function useEventHandlers( {
 			node.addEventListener( 'keydown', onKeyDown );
 
 			/**
-			 * Handles double-click events on section blocks to edit content only section.
+			 * Handles double-click events on section blocks to edit content only
+			 * section. With the block toolbar views experiment, double-clicking
+			 * any other block shows its editing tools.
 			 *
 			 * @param event Double-click event.
 			 */
 			function onDoubleClick( event: MouseEvent ) {
-				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
-				const isSyncedPattern = isReusableBlock( block );
-				const isTemplatePartBlock = isTemplatePart( block );
-				const isAlreadyEditing = editedContentOnlySection === clientId;
+				if ( isReusableBlock( block ) || isTemplatePart( block ) ) {
+					return;
+				}
 
+				const isSection = isSectionBlock( clientId );
+
+				// Skip double-clicks that belong to a nested block.
 				if (
-					! isSection ||
-					isAlreadyEditing ||
-					isSyncedPattern ||
-					isTemplatePartBlock
+					! isSection &&
+					window.__experimentalBlockToolbarViews &&
+					( event.target as Element ).closest( '[data-block]' ) ===
+						node
 				) {
+					showEditingTools( false );
+					return;
+				}
+
+				if ( ! isSection || editedContentOnlySection === clientId ) {
 					return;
 				}
 
@@ -608,6 +667,8 @@ export function useEventHandlers( {
 			isSectionBlock,
 			editedContentOnlySection,
 			editContentOnlySection,
+			setBlockToolbarView,
+			getShortcutRepresentation,
 		]
 	);
 }

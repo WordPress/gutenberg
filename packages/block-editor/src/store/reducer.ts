@@ -2108,6 +2108,61 @@ export function lastBlockInserted(
 }
 
 /**
+ * Reducer returning which view of the block toolbar is shown for the selected
+ * block: `block` for block-level actions or `content` for the block's editing
+ * tools. Only an explicit choice is stored; it is dropped as soon as another
+ * block is selected, so every newly selected block starts in the block view.
+ *
+ * @param state  Current state, `{ clientId, view }` or null.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function blockToolbarView(
+	state: State[ 'blockToolbarView' ] = null,
+	action: Action
+): State[ 'blockToolbarView' ] {
+	if ( action.type === 'SET_BLOCK_TOOLBAR_VIEW' ) {
+		return { clientId: action.clientId, view: action.view };
+	}
+
+	if ( ! state ) {
+		return state;
+	}
+
+	switch ( action.type ) {
+		case 'SELECT_BLOCK':
+			return action.clientId === state.clientId ? state : null;
+		case 'SELECTION_CHANGE': {
+			// Rich text dispatches either a client id or `start` and `end`
+			// objects, either of which may be left out to keep its value.
+			const startClientId = action.clientId ?? action.start?.clientId;
+			const endClientId = action.clientId ?? action.end?.clientId;
+			return [ startClientId, endClientId ].every(
+				( clientId ) =>
+					clientId === undefined || clientId === state.clientId
+			)
+				? state
+				: null;
+		}
+		case 'RESET_SELECTION':
+			return action.selectionStart?.clientId === state.clientId &&
+				action.selectionEnd?.clientId === state.clientId
+				? state
+				: null;
+		case 'MULTI_SELECT':
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'RESET_BLOCKS':
+			return null;
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+			return action.clientIds.includes( state.clientId ) ? null : state;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the contentOnly block that is being edited.
  *
  * @param state  Current state.
@@ -2559,6 +2614,7 @@ const combinedReducers = combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	editedContentOnlySection,
+	blockToolbarView,
 	blockVisibility,
 	viewportModalClientIds,
 	styleOverrides,

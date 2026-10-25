@@ -570,6 +570,12 @@ export interface SelectedBlockStyleState {
 	value: Record< string, unknown > & { pseudo: string };
 }
 
+/**
+ * Which view of the block toolbar is shown: `block` for block-level actions or
+ * `content` for the block's editing tools.
+ */
+export type BlockToolbarView = 'block' | 'content';
+
 export interface State {
 	blocks: BlocksState;
 	isDragging: boolean;
@@ -595,6 +601,7 @@ export interface State {
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
 	editedContentOnlySection: string | undefined;
+	blockToolbarView: { clientId: string; view: BlockToolbarView } | null;
 	blockVisibility: Record< string, boolean >;
 	viewportModalClientIds: string[] | null;
 	styleOverrides: Map< unknown, StyleOverride >;
@@ -744,6 +751,11 @@ export type Action =
 			mode: BlockEditingMode;
 	  }
 	| { type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW'; clientId: string | null }
+	| {
+			type: 'SET_BLOCK_TOOLBAR_VIEW';
+			clientId: string;
+			view: BlockToolbarView;
+	  }
 	| {
 			type: 'SET_BLOCK_REMOVAL_RULES';
 			rules: BlockRemovalRule[] | false;

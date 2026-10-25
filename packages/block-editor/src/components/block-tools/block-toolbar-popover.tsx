@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { PrivateBlockPopover } from '../block-popover';
@@ -7,6 +7,8 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { store as blockEditorStore } from '../../store';
 import { PrivateBlockToolbar } from '../block-toolbar';
+import { unlock } from '../../lock-unlock';
+import type { BlockToolbarView } from '../../store/types';
 import type { BlockToolbarPopoverProps } from './types';
 
 export default function BlockToolbarPopover( {
@@ -18,15 +20,31 @@ export default function BlockToolbarPopover( {
 		useSelectedBlockToolProps( clientId );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
-	// to it when re-mounting.
-	const initialToolbarItemIndexRef = useRef< number | undefined >(
-		undefined
+	// to it when re-mounting. The index is kept per toolbar view, since the
+	// block view and the editing tools view hold different items.
+	const initialToolbarItemIndexRef = useRef<
+		Partial< Record< BlockToolbarView, number > >
+	>( {} );
+	const toolbarView: BlockToolbarView = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getBlockToolbarView(
+				clientId
+			),
+		[ clientId ]
 	);
+	// The toolbar reports its index as it unmounts, which can be after the
+	// view changed, so remember the view it was rendered with.
+	const renderedToolbarViewRef = useRef( toolbarView );
+	useEffect( () => {
+		if ( ! isTyping ) {
+			renderedToolbarViewRef.current = toolbarView;
+		}
+	} );
 
 	useEffect( () => {
 		// Resets the index whenever the active block changes so this is not
 		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-		initialToolbarItemIndexRef.current = undefined;
+		initialToolbarItemIndexRef.current = {};
 	}, [ clientId ] );
 
 	const { stopTyping } = useDispatch( blockEditorStore );
@@ -68,10 +86,12 @@ export default function BlockToolbarPopover( {
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForcedRef.current }
 					__experimentalInitialIndex={
-						initialToolbarItemIndexRef.current
+						initialToolbarItemIndexRef.current[ toolbarView ]
 					}
 					__experimentalOnIndexChange={ ( index ) => {
-						initialToolbarItemIndexRef.current = index;
+						initialToolbarItemIndexRef.current[
+							renderedToolbarViewRef.current
+						] = index;
 					} }
 					variant="toolbar"
 				/>
