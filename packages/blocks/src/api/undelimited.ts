@@ -521,9 +521,14 @@ function withoutSources( block: Block ): Block {
  * them; any other block gets them only if reading it back without them
  * wouldn't give the same block.
  *
- * @param block Block.
+ * @param block    Block.
+ * @param isInside Whether the block is inside another block's `save`, which
+ *                 is read back as a whole.
  */
-function getBlockHTML( block: Block ): { html: string; delimited: boolean } {
+function getBlockHTML(
+	block: Block,
+	isInside = false
+): { html: string; delimited: boolean } {
 	const source = block.undelimitedSource;
 	const serialized = serializeBlockWithoutSource( block );
 	if ( source && serialized === source.fingerprint ) {
@@ -532,11 +537,13 @@ function getBlockHTML( block: Block ): { html: string; delimited: boolean } {
 
 	const blockType = getBlockType( block.name );
 	const hadDelimiters = !! source && source.html !== source.content;
-	const inner = block.innerBlocks.map( getBlockHTML );
-	const hasDelimitedInner = inner.some( ( { delimited } ) => delimited );
 	// The HTML block's static HTML can hold inner blocks with or without
 	// delimiters.
 	const isHTMLBlock = block.name === 'core/html';
+	const inner = block.innerBlocks.map( ( innerBlock ) =>
+		getBlockHTML( innerBlock, ! isHTMLBlock )
+	);
+	const hasDelimitedInner = inner.some( ( { delimited } ) => delimited );
 	if (
 		! blockType ||
 		( ! isHTMLBlock &&
@@ -562,6 +569,9 @@ function getBlockHTML( block: Block ): { html: string; delimited: boolean } {
 			: saved;
 
 	if ( ! hadDelimiters && ! hasDelimitedInner ) {
+		if ( isInside ) {
+			return { html, delimited: false };
+		}
 		const [ readBack, ...rest ] = parseUndelimited( html );
 		if (
 			! rest.length &&
@@ -571,6 +581,11 @@ function getBlockHTML( block: Block ): { html: string; delimited: boolean } {
 		) {
 			return { html, delimited: false };
 		}
+	}
+
+	// Inner blocks without delimiters can't go inside one.
+	if ( ! isHTMLBlock && block.innerBlocks.length ) {
+		return { html: serializeBlock( block ), delimited: true };
 	}
 
 	// Keep the edited HTML, with a delimiter for what it can't hold. Text
