@@ -32,4 +32,4 @@ Extra classes for the used `<span>` element. By default only `component-color-in
 
 The color of the indicator. Any value from the CSS [`background`](https://developer.mozilla.org/en-US/docs/Web/CSS/background) property is supported.
 
--   Required: Yes
+-   Required: No

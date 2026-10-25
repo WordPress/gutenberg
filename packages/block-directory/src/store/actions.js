@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store as blocksStore,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -9,10 +6,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { loadAssets } from './load-assets';
 import getPluginUrl from './utils/get-plugin-url';
 

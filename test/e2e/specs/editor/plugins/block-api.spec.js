@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Using Block API', () => {
@@ -17,12 +14,12 @@ test.describe( 'Using Block API', () => {
 		editor,
 	} ) => {
 		await admin.createNewPost();
-
 		await editor.insertBlock( { name: 'e2e-tests/hello-world' } );
 
-		const block = editor.canvas.locator(
-			'[data-type="e2e-tests/hello-world"]'
-		);
-		await expect( block ).toHaveText( 'Hello Editor!' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Filtered Hello World',
+			} )
+		).toBeVisible();
 	} );
 } );

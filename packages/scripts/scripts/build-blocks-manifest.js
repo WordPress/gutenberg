@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 const json2php = require( 'json2php' );
 const chalk = require( 'chalk' );
-
-/**
- * Internal dependencies
- */
 const { getArgFromCLI } = require( '../utils' );
 
 // Parses command line arguments.
