@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix `wp-env` wrongly detecting that it is offline on some Windows machines, by checking access to WordPress.org with `dns.lookup` instead of `dns.resolve` ([#85522](https://github.com/WordPress/gutenberg/pull/85522)).
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes

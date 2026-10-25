@@ -6,7 +6,7 @@ const stat = vi.fn();
 const mkdir = vi.fn();
 const writeFile = vi.fn();
 const existsSync = vi.fn();
-const resolveDns = vi.fn();
+const lookupDns = vi.fn();
 const gotPath = require.resolve( 'got' );
 const originalGot = require( gotPath );
 const got = vi.fn( ( url ) => ( {
@@ -58,7 +58,7 @@ try {
 		},
 	};
 	require.cache.dns = {
-		exports: { promises: { resolve: resolveDns } },
+		exports: { promises: { lookup: lookupDns } },
 	};
 	require.cache[ gotPath ].exports = got;
 	require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
@@ -84,7 +84,10 @@ describe( 'Config Integration', () => {
 		mkdir.mockReset().mockResolvedValue();
 		writeFile.mockReset().mockResolvedValue();
 		existsSync.mockReset().mockReturnValue( false );
-		resolveDns.mockReset().mockResolvedValue( [ '198.143.164.252' ] );
+		lookupDns.mockReset().mockResolvedValue( {
+			address: '198.143.164.252',
+			family: 4,
+		} );
 		process.env.WP_ENV_HOME = '/cache';
 		detectDirectoryType.mockResolvedValue( null );
 	} );

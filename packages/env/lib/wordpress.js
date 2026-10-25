@@ -47,14 +47,16 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
  *
  * @return {boolean} True if we can connect to WordPress.org, false otherwise.
  */
-let IS_OFFLINE;
+let CAN_ACCESS_WPORG;
 async function canAccessWPORG() {
 	// Avoid situations where some parts of the code think we're offline and others don't.
-	if ( IS_OFFLINE !== undefined ) {
-		return IS_OFFLINE;
+	if ( CAN_ACCESS_WPORG !== undefined ) {
+		return CAN_ACCESS_WPORG;
 	}
-	IS_OFFLINE = !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
-	return IS_OFFLINE;
+	CAN_ACCESS_WPORG = !! ( await dns
+		.lookup( 'WordPress.org' )
+		.catch( () => {} ) );
+	return CAN_ACCESS_WPORG;
 }
 
 /**
