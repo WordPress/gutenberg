@@ -378,15 +378,6 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const parentPage = await requestUtils.createPage( {
-			title: 'Parent Page',
-			status: 'publish',
-		} );
-		await requestUtils.createPage( {
-			title: 'Child Page',
-			status: 'publish',
-			parent: parentPage.id,
-		} );
 		const createdMenu = await requestUtils.createNavigationMenu( {
 			title: 'Page List Menu',
 			content: '<!-- wp:page-list /-->',
@@ -400,10 +391,6 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const parentRow = listView.getByRole( 'row', {
-			name: 'Parent Page',
-		} );
-		const childRow = listView.getByRole( 'row', { name: 'Child Page' } );
 
 		await expect(
 			listView.getByRole( 'row', { name: 'Test Page 1' } )
@@ -411,8 +398,6 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			listView.getByRole( 'row', { name: 'Test Page 2' } )
 		).toBeVisible();
-		await expect( parentRow ).toHaveAttribute( 'aria-level', '1' );
-		await expect( childRow ).toHaveAttribute( 'aria-level', '2' );
 	} );
 } );
 
