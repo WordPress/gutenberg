@@ -33,8 +33,8 @@
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev",
 		"phpstan/extension-installer": "^1.4",
-		"phpstan/phpstan": "^1.12",
-		"szepeviktor/phpstan-wordpress": "^1.3"
+		"phpstan/phpstan": "^2.1",
+		"szepeviktor/phpstan-wordpress": "^2.0"
 	},
 	"repositories": [
 		{
@@ -50,9 +50,9 @@
 		"composer/installers": "^1.0 || ^2.0"
 	},
 	"scripts": {
-		"analyse": "phpstan analyse -v",
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
+		"phpstan": "phpstan analyse --memory-limit=2G",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}
