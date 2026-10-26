@@ -32,7 +32,7 @@
 		"spatie/phpunit-watcher": "^1.23",
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev",
-		"phpstan/extension-installer": "^1.4",
+		"phpstan/extension-installer": "1.4.3",
 		"phpstan/phpstan": "2.3.2",
 		"phpstan/phpstan-phpunit": "2.1.1",
 		"php-stubs/wordpress-stubs": "7.1.2",
