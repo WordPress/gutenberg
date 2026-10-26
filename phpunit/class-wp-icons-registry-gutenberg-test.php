@@ -705,4 +705,85 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$names = array_column( $upgraded->get_registered_icons( 'peace' ), 'name' );
 		$this->assertContains( 'test-collection/dove', $names );
 	}
+
+	/**
+	 * Should return the registered core-admin icon that replaces a Dashicon,
+	 * including for Dashicons other than the first one listed for the icon.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 */
+	public function test_get_admin_icon_name_for_dashicon_returns_registered_icon() {
+		$this->register(
+			'core-admin/pin',
+			array(
+				'label'   => 'Pin',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertSame( 'core-admin/pin', $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-admin-post' ) );
+		$this->assertSame( 'core-admin/pin', $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-format-standard' ) );
+	}
+
+	/**
+	 * Should return null when the replacement icon is not registered, so the
+	 * Dashicon can still be rendered.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 */
+	public function test_get_admin_icon_name_for_dashicon_returns_null_for_unregistered_icon() {
+		$this->assertNull( $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-admin-post' ) );
+	}
+
+	/**
+	 * Should only replace Dashicons with icons from the core-admin collection.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 */
+	public function test_get_admin_icon_name_for_dashicon_ignores_icons_outside_core_admin() {
+		$this->register(
+			'core/envelope',
+			array(
+				'label'   => 'Envelope',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertNull( $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-email' ) );
+	}
+
+	/**
+	 * Should return null for values without a replacement.
+	 *
+	 * @dataProvider data_get_admin_icon_name_for_dashicon_without_replacement
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 *
+	 * @param mixed $dashicon Value to look up.
+	 */
+	public function test_get_admin_icon_name_for_dashicon_returns_null_without_replacement( $dashicon ) {
+		$this->register(
+			'core-admin/pin',
+			array(
+				'label'   => 'Pin',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertNull( $this->registry->get_admin_icon_name_for_dashicon( $dashicon ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_admin_icon_name_for_dashicon_without_replacement() {
+		return array(
+			'unknown Dashicon'   => array( 'dashicons-not-a-real-icon' ),
+			'icon name'          => array( 'core-admin/pin' ),
+			'name without class' => array( 'admin-post' ),
+			'null'               => array( null ),
+			'array'              => array( array( 'dashicons-admin-post' ) ),
+		);
+	}
 }
