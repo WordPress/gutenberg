@@ -16,6 +16,7 @@ import {
 	getBlockClientId,
 	getSelectionEditableElement,
 	isInSameBlock,
+	isInsideRootBlock,
 } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
@@ -88,6 +89,11 @@ export function isNavigationCandidate(
  * @param onlyVertical     Whether to only consider tabbable elements
  *                         that are visually above or under the
  *                         target.
+ * @param x                Horizontal position of the caret, to pick
+ *                         the field under it when a block has several
+ *                         side by side in the row reached. Only used
+ *                         with `onlyVertical`; DOM order decides
+ *                         without it.
  *
  * @return Optimal tab target, if one exists.
  */
@@ -95,7 +101,8 @@ export function getClosestTabbable(
 	target: Element,
 	isReverse: boolean,
 	containerElement: Element,
-	onlyVertical?: boolean
+	onlyVertical?: boolean,
+	x?: number
 ): HTMLElement | undefined {
 	// Since the current focus target is not guaranteed to be a text field, find
 	// all focusables. Tabbability is considered later.
@@ -185,7 +192,93 @@ export function getClosestTabbable(
 		return true;
 	}
 
-	return focusableNodes.find( isTabCandidate );
+	const firstIndex = focusableNodes.findIndex( isTabCandidate );
+
+	if ( firstIndex === -1 ) {
+		return;
+	}
+
+	const first = focusableNodes[ firstIndex ];
+	const firstBlockClientId = getBlockClientId( first );
+
+	if ( ! onlyVertical || x === undefined || ! firstBlockClientId ) {
+		return first;
+	}
+
+	// Fields side by side within a block (e.g. the input and the button of
+	// the Search block) all overlap a target wider than them. DOM order would
+	// then land on the first of them going down and on the last going up, so
+	// the field reached would depend on the direction. Prefer the field under
+	// the caret instead, as the caret keeps its horizontal position when
+	// moving vertically; DOM order only breaks ties.
+	//
+	// Only the content of the block the first candidate belongs to is
+	// considered, not its inner blocks or appenders: rows of blocks
+	// (columns, buttons) keep entering at the DOM-first block.
+	// A rendered block has an element.
+	const firstBlock = first.ownerDocument.getElementById(
+		'block-' + firstBlockClientId
+	)!;
+	const firstRect = first.getBoundingClientRect();
+	let closest = first;
+	let closestDistance = getHorizontalDistance( firstRect, x );
+
+	for ( const node of focusableNodes.slice( firstIndex + 1 ) ) {
+		// A block's descendants are contiguous in DOM order: past the block,
+		// nothing qualifies.
+		if ( ! firstBlock.contains( node ) ) {
+			break;
+		}
+
+		// A block wrapper is not next to its own content.
+		if (
+			! isInsideRootBlock( firstBlock, node ) ||
+			node.contains( first ) ||
+			first.contains( node )
+		) {
+			continue;
+		}
+
+		const nodeRect = node.getBoundingClientRect();
+
+		// Only elements in the same row qualify.
+		if (
+			nodeRect.bottom <= firstRect.top ||
+			nodeRect.top >= firstRect.bottom
+		) {
+			continue;
+		}
+
+		const distance = getHorizontalDistance( nodeRect, x );
+
+		if ( distance < closestDistance && isTabCandidate( node ) ) {
+			closest = node;
+			closestDistance = distance;
+		}
+	}
+
+	return closest;
+}
+
+/**
+ * Returns how far a horizontal position is from a rectangle: zero when it is
+ * within the rectangle's horizontal span.
+ *
+ * @param rect The rectangle.
+ * @param x    The horizontal position.
+ *
+ * @return The distance.
+ */
+function getHorizontalDistance( rect: DOMRect, x: number ): number {
+	if ( x < rect.left ) {
+		return rect.left - x;
+	}
+
+	if ( x > rect.right ) {
+		return x - rect.right;
+	}
+
+	return 0;
 }
 
 export default function useArrowNav() {
@@ -389,11 +482,17 @@ export default function useArrowNav() {
 				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
 				! keepCaretInsideBlock
 			) {
+				// The rect is set on the first vertical key press (when the
+				// caret has one). When Alt is pressed, the caret goes to the
+				// furthest horizontal edge instead of keeping its position.
+				const rect =
+					altKey || ! verticalRect ? undefined : verticalRect;
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverse,
 					node,
-					true
+					true,
+					rect?.left
 				);
 
 				if ( closestTabbable ) {
@@ -402,8 +501,7 @@ export default function useArrowNav() {
 						// When Alt is pressed, place the caret at the furthest
 						// horizontal edge and the furthest vertical edge.
 						altKey ? ! isReverse : isReverse,
-						// The rect is set on the first vertical key press.
-						altKey ? undefined : verticalRect!
+						rect
 					);
 					event.preventDefault();
 				}

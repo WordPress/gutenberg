@@ -466,6 +466,59 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveClass( /is-selected/ );
 	} );
 
+	// See https://github.com/WordPress/gutenberg/issues/38261.
+	test( 'should navigate side by side fields in the same order up and down', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/search' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		const label = editor.canvas.getByRole( 'textbox', {
+			name: 'Label text',
+		} );
+		const input = editor.canvas.getByRole( 'searchbox', {
+			name: 'Optional placeholder text',
+		} );
+		// Empty, the paragraph is labelled as such rather than as a block.
+		const paragraph = editor.canvas.locator(
+			'[data-type="core/paragraph"]'
+		);
+
+		// The caret is at the start of the paragraph: above it is the input,
+		// not the button next to it.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( input ).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( label ).toBeFocused();
+
+		// The same fields on the way down.
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( input ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( paragraph ).toHaveClass( /is-selected/ );
+
+		// With the caret under the button, the button is the field above.
+		await page.keyboard.type( 'a '.repeat( 150 ) );
+		const button = editor.canvas.getByRole( 'textbox', {
+			name: 'Button text',
+		} );
+		const buttonBox = await button.boundingBox();
+		const paragraphBox = await paragraph.boundingBox();
+		await page.mouse.click(
+			buttonBox.x + buttonBox.width / 2,
+			paragraphBox.y + 8
+		);
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( button ).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( label ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( button ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( paragraph ).toHaveClass( /is-selected/ );
+	} );
+
 	test( 'should not delete surrounding space when deleting a word with Backspace', async ( {
 		editor,
 		page,
