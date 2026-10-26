@@ -63,9 +63,6 @@ export const LargePageCountComponent = ( {
 			view={ view }
 			fields={ fields }
 			onChangeView={ setView }
-			defaultLayouts={ {
-				[ LAYOUT_TABLE ]: true,
-			} }
 		/>
 	);
 };
