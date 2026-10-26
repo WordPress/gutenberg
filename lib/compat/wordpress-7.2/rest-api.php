@@ -464,7 +464,7 @@ add_filter( 'rest_prepare_page', 'gutenberg_add_page_homepage_action_links', 10,
  * @return WP_REST_Response The response object.
  */
 function gutenberg_rest_only_include_revisioned_meta( $response, $post ) {
-	if ( ! $post instanceof WP_Post || 'revision' !== $post->post_type ) {
+	if ( ! $response instanceof WP_REST_Response || ! $post instanceof WP_Post || 'revision' !== $post->post_type ) {
 		return $response;
 	}
 
@@ -475,14 +475,16 @@ function gutenberg_rest_only_include_revisioned_meta( $response, $post ) {
 
 	$post_type = get_post_type( $post->post_parent );
 
-	// The keys are filterable, so ignore anything that isn't a meta key.
-	$revisioned_keys = array_filter( (array) wp_post_revision_meta_keys( $post_type ), 'is_string' );
-
 	// Map the revisioned keys to their REST names, like `WP_REST_Meta_Fields::get_registered_fields()` does.
-	$meta_keys  = array_merge( get_registered_meta_keys( 'post' ), get_registered_meta_keys( 'post', $post_type ) );
+	$meta_args  = array_merge( get_registered_meta_keys( 'post' ), get_registered_meta_keys( 'post', $post_type ) );
 	$rest_names = array();
-	foreach ( $revisioned_keys as $meta_key ) {
-		$show_in_rest = $meta_keys[ $meta_key ]['show_in_rest'] ?? false;
+	foreach ( (array) wp_post_revision_meta_keys( $post_type ) as $meta_key ) {
+		// The keys are filterable, so ignore anything that isn't a meta key.
+		if ( ! is_string( $meta_key ) ) {
+			continue;
+		}
+
+		$show_in_rest = $meta_args[ $meta_key ]['show_in_rest'] ?? false;
 		if ( $show_in_rest ) {
 			$rest_names[] = empty( $show_in_rest['name'] ) ? $meta_key : $show_in_rest['name'];
 		}
