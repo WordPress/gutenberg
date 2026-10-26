@@ -7,7 +7,7 @@ The image editor is the cropper engine used by the media editor:
 -   **Core:** state, camera math, containment, source-region, transforms, and canvas export.
 -   **React:** `<Cropper>`, `useCropperController`, and the optional `CropperProvider` / `useCropper` context wrapper.
 
-`useCropperController` does not provide undo/redo. The media editor's composite state layer adds history and sidebar crop options on top of the cropper reducer, through `image-editor/internals`, which is not part of the contract.
+`useCropperController` does not provide undo/redo. The media editor's composite state layer adds history and sidebar crop options on top of the cropper reducer, through `image-editor/internals`, which only the media editor's own state code imports.
 
 ## Quick Start
 
@@ -49,7 +49,7 @@ Convenience context wrapper around `useCropperController` for component trees th
 
 ## Core Helpers
 
-The local barrel also exposes helpers for reducer composition, source-region calculation, pipeline replay, and canvas export. Use named setters or `TransformOperation` values for normal state changes. Use reducer actions only when composing a controller such as `useMediaEditorState()`.
+`index.ts` also exports helpers for source-region calculation, pipeline replay, and canvas export. Use the named setters or `TransformOperation` values for state changes. The reducer-level helpers that `useMediaEditorState()` composes the cropper with live in `internals.ts`, which only the media editor's own state code imports.
 
 ## Styles
 

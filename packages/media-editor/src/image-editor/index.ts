@@ -3,9 +3,8 @@
  *
  * Keep this barrel explicit so implementation details from `core/`,
  * `react/hooks/`, or `react/components/` do not become supported API by
- * accident. What a composite store needs to delegate cropper actions
- * through the pure reducer is in `./internals`; a consumer drives the
- * cropper through the controller and the helpers here.
+ * accident. The media editor's own state code imports the reducer-level
+ * helpers from `./internals`; everyone else uses what is here.
  */
 
 // React surface.

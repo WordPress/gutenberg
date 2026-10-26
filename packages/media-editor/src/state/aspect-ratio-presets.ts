@@ -2,10 +2,8 @@ import { __ } from '@wordpress/i18n';
 import { ORIGINAL_ASPECT_RATIO, type AspectRatioPreset } from '../image-editor';
 
 /**
- * The presets the editor offers by default. Free and Original lead; the
- * rest are the fixed ratios a host can replace with its own. The labels
- * live here rather than in the engine, which carries no user-facing
- * strings.
+ * The presets the editor offers by default. The labels live here rather
+ * than in the cropper core, which has no user-facing strings.
  */
 export const DEFAULT_ASPECT_RATIOS: AspectRatioPreset[] = [
 	{ label: __( 'Free' ), value: 0 },

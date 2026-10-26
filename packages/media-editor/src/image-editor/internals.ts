@@ -1,15 +1,12 @@
 /**
- * The cropper's internals, for a composite store that delegates cropper
- * actions through the pure reducer, the way the media editor's session
- * does. Not part of the consumer contract: a consumer drives the cropper
- * through the controller and the helpers in `./index`.
+ * For the media editor's own state code, which drives the cropper through
+ * its reducer. Everything else imports from `./index`.
  */
 export {
 	DEFAULT_STATE,
 	cropperReducer,
 	enforceContainment,
 	areCropperStatesEqual,
-	isStateDirty,
 	applyOperationToState,
 	computeInscribedRect,
 } from './core';
