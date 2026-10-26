@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
@@ -71,8 +72,7 @@
 
 	/* Show an outline only when interacting with keyboard */
 	.cell[data-focus-visible] & {
-		outline: 1px solid $components-color-accent;
-		outline-offset: 1px;
+		@include outset-ring__focus();
 	}
 
 	@media not (prefers-reduced-motion) {
