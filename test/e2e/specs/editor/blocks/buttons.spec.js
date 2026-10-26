@@ -814,4 +814,30 @@ test.describe( 'Buttons', () => {
 			).toBeHidden();
 		} );
 	} );
+
+	test( 'keeps the usual inspector outside a Navigation block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'Testing' } },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button', exact: true } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			settings.getByRole( 'heading', { name: 'Settings' } )
+		).toBeHidden();
+		await expect(
+			settings.getByRole( 'textbox', { name: 'Text' } )
+		).toBeHidden();
+	} );
 } );
