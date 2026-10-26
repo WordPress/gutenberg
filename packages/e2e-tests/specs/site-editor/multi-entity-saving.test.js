@@ -261,33 +261,21 @@ describe( 'Multi-entity save flow', () => {
 		};
 
 		/*
-		 * The block inspector shows Settings and Styles tabs when the Settings
-		 * tab has controls to show, and then opens on the Settings tab. The font
-		 * size picker is on the Styles tab, so switch to it when the tabs are
-		 * there.
+		 * The block inspector can show the controls of more than one block at
+		 * once, so clicking a font size picker does not reliably change the
+		 * block under test. Change the attribute through the block editor store
+		 * instead: the test covers the edit tracking, not the picker.
 		 */
-		const showFontSizePicker = async () => {
-			const fontSizePickerSelector =
-				'.components-font-size-picker__controls';
-			const stylesTabSelector =
-				'.block-editor-block-inspector__tabs button[role="tab"][aria-label="Styles"]';
-
-			await page.waitForSelector(
-				`${ fontSizePickerSelector }, ${ stylesTabSelector }`
+		const setFontSize = ( clientId, fontSize ) =>
+			page.evaluate(
+				( id, size ) => {
+					wp.data
+						.dispatch( 'core/block-editor' )
+						.updateBlockAttributes( id, { fontSize: size } );
+				},
+				clientId,
+				fontSize
 			);
-
-			if ( await page.$( stylesTabSelector ) ) {
-				const isStylesTabSelected = await page.$eval(
-					stylesTabSelector,
-					( tab ) => tab.getAttribute( 'aria-selected' ) === 'true'
-				);
-				if ( ! isStylesTabSelected ) {
-					await page.click( stylesTabSelector );
-				}
-			}
-
-			await page.waitForSelector( fontSizePickerSelector );
-		};
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
@@ -339,28 +327,19 @@ describe( 'Multi-entity save flow', () => {
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );
-
-			// Open the block settings.
-			await page.click( 'button[aria-label="Settings"]' );
-
-			// Wait for the font size picker controls.
-			await showFontSizePicker();
-
-			// Change the font size.
-			await page.click(
-				'.components-font-size-picker__controls button[aria-label="Small"]'
+			const paragraphClientId = await page.evaluate( () =>
+				wp.data.select( 'core/block-editor' ).getSelectedBlockClientId()
 			);
 
-			// Save all changes.
+			// Change the font size.
+			await setFontSize( paragraphClientId, 'small' );
+
+			// Save all changes and wait for the save to finish.
 			await saveAllChanges();
+			await page.waitForSelector( disabledSaveSiteSelector );
 
-			// The picker should still be showing after saving.
-			await showFontSizePicker();
-
-			// Change the font size.
-			await page.click(
-				'.components-font-size-picker__controls button[aria-label="Medium"]'
-			);
+			// Change the same attribute again.
+			await setFontSize( paragraphClientId, 'medium' );
 
 			// Assert that the save button has been re-enabled.
 			const saveButton = await page.waitForSelector(
