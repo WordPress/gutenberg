@@ -105,6 +105,7 @@ function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
+		__unstableDisableFormatInputRules,
 		readOnly,
 		...props
 	}: RichTextProps,
@@ -686,6 +687,7 @@ function RichTextWrapper(
 						getValue,
 						onChange,
 						__unstableAllowPrefixTransformations,
+						__unstableDisableFormatInputRules,
 						formatTypes,
 						onReplace,
 						// The action also takes no arguments.
@@ -783,6 +785,7 @@ const PublicForwardedRichTextContainer = forwardRef<
 			__unstableDisableFormats,
 			disableLineBreaks,
 			__unstableAllowPrefixTransformations,
+			__unstableDisableFormatInputRules,
 			readOnly,
 			...contentProps
 		} = props;
