@@ -119,15 +119,21 @@ export function addAttribute( settings: BlockType ): BlockType {
  * comes from outside the post — the template wrapped around the content — there
  * is no block on the page to send anyone to.
  *
- * @param clientId The block whose alignments are withheld.
+ * @param clientId   The block whose alignments are withheld.
+ * @param isRequired Whether any alignments are withheld. When false, the parent is not looked up.
  *
  * @return What is limiting the width, or `undefined` when nothing reachable is.
  */
 function useAlignmentConstraint(
-	clientId: string
+	clientId: string,
+	isRequired: boolean
 ): BlockAlignmentConstraint | undefined {
 	const parentClientId = useSelect(
 		( select ) => {
+			if ( ! isRequired ) {
+				return null;
+			}
+
 			const { getBlockRootClientId, getBlockEditingMode } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
@@ -141,7 +147,7 @@ function useAlignmentConstraint(
 
 			return rootClientId;
 		},
-		[ clientId ]
+		[ clientId, isRequired ]
 	);
 
 	const parentInfo = useBlockDisplayInformation( parentClientId ?? '' );
@@ -193,7 +199,6 @@ function BlockEditAlignmentToolbarControlsPure( {
 	);
 
 	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
-	const constraint = useAlignmentConstraint( clientId );
 	const blockEditingMode = useBlockEditingMode();
 	/*
 	 * Only render when some alignment actually works. Many blocks — Paragraph,
@@ -201,7 +206,13 @@ function BlockEditAlignmentToolbarControlsPure( {
 	 * in a layout offering neither, a control made only of unavailable options
 	 * would sit on the toolbar unable to change anything.
 	 */
-	if ( ! enabled.length || blockEditingMode !== 'default' ) {
+	const isRendered = enabled.length > 0 && blockEditingMode === 'default';
+	const constraint = useAlignmentConstraint(
+		clientId,
+		isRendered && unavailable.length > 0
+	);
+
+	if ( ! isRendered ) {
 		return null;
 	}
 
@@ -229,7 +240,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 				 * parent layout has taken away.
 				 */
 				controls={ blockAllowedAlignments }
-				constraint={ unavailable.length ? constraint : undefined }
+				constraint={ constraint }
 			/>
 		</BlockControls>
 	);
