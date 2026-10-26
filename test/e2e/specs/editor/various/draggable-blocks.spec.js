@@ -70,9 +70,13 @@ test.describe( 'Draggable block', () => {
 			'data-testid=block-list-insertion-point-indicator'
 		);
 		await expect( indicator ).toBeVisible();
-		// Expect the indicator to be above the first paragraph.
+		// Expect the indicator to be above the first paragraph. The
+		// indicator is remounted every time the drop target changes, so a
+		// measurement can land on a detached element and come back empty.
 		await expect
-			.poll( () => indicator.boundingBox().then( ( { y } ) => y ) )
+			.poll( () =>
+				indicator.boundingBox().then( ( box ) => box?.y ?? Infinity )
+			)
 			.toBeLessThan( firstParagraphBound.y );
 
 		// Drop the paragraph block.
@@ -146,7 +150,9 @@ test.describe( 'Draggable block', () => {
 		// Expect the indicator to be below the second paragraph.
 		await expect
 			.poll( () =>
-				indicator.boundingBox().then( ( { y, height } ) => y + height )
+				indicator
+					.boundingBox()
+					.then( ( box ) => ( box ? box.y + box.height : -Infinity ) )
 			)
 			.toBeGreaterThan(
 				secondParagraphBound.y + secondParagraphBound.height
@@ -225,7 +231,9 @@ test.describe( 'Draggable block', () => {
 		await expect( indicator ).toBeVisible();
 		// Expect the indicator to be to the left of the first paragraph.
 		await expect
-			.poll( () => indicator.boundingBox().then( ( { x } ) => x ) )
+			.poll( () =>
+				indicator.boundingBox().then( ( box ) => box?.x ?? Infinity )
+			)
 			.toBeLessThan( firstParagraphBound.x );
 
 		// Drop the paragraph block.
@@ -304,7 +312,9 @@ test.describe( 'Draggable block', () => {
 		// Expect the indicator to be to the right of the second paragraph.
 		await expect
 			.poll( () =>
-				indicator.boundingBox().then( ( { x, width } ) => x + width )
+				indicator
+					.boundingBox()
+					.then( ( box ) => ( box ? box.x + box.width : -Infinity ) )
 			)
 			.toBeGreaterThan(
 				secondParagraphBound.x + secondParagraphBound.width
@@ -618,7 +628,9 @@ test.describe( 'Draggable block', () => {
 		// Expect the indicator to be below the paragraph.
 		await expect
 			.poll( () =>
-				indicator.boundingBox().then( ( { y, height } ) => y + height )
+				indicator
+					.boundingBox()
+					.then( ( box ) => ( box ? box.y + box.height : -Infinity ) )
 			)
 			.toBeGreaterThan( paragraphBound.y + paragraphBound.height );
 
@@ -821,7 +833,9 @@ test.describe( 'Draggable block', () => {
 		);
 		await expect( indicator ).toBeVisible();
 		await expect
-			.poll( async () => ( await indicator.boundingBox() ).y )
+			.poll(
+				async () => ( await indicator.boundingBox() )?.y ?? -Infinity
+			)
 			.toBeGreaterThan( landingBox.y );
 	}
 
@@ -986,7 +1000,9 @@ test.describe( 'Draggable block', () => {
 		);
 		await expect( indicator ).toBeVisible();
 		await expect
-			.poll( async () => ( await indicator.boundingBox() ).y )
+			.poll(
+				async () => ( await indicator.boundingBox() )?.y ?? -Infinity
+			)
 			.toBeGreaterThan( landingBox.y );
 		await page.mouse.up();
 
