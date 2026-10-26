@@ -5,6 +5,8 @@
 
 namespace Gutenberg\PHPStan;
 
+use LogicException;
+use PhpParser\Node\Stmt;
 use PHPStan\Parser\Parser;
 use PHPStan\Parser\ParserErrorsException;
 
@@ -64,7 +66,7 @@ final class WpBuildTemplateParser implements Parser {
 	 * Parses a file, rendering it first if it is a wp-build template.
 	 *
 	 * @param string $file Path to the file to parse.
-	 * @return \PhpParser\Node\Stmt[]
+	 * @return Stmt[]
 	 * @throws ParserErrorsException When the code cannot be parsed.
 	 */
 	public function parseFile( string $file ): array {
@@ -84,12 +86,12 @@ final class WpBuildTemplateParser implements Parser {
 	/**
 	 * Parses a string of PHP code.
 	 *
-	 * @param string $source_code The code to parse.
-	 * @return \PhpParser\Node\Stmt[]
+	 * @param string $sourceCode The code to parse.
+	 * @return Stmt[]
 	 * @throws ParserErrorsException When the code cannot be parsed.
 	 */
-	public function parseString( string $source_code ): array {
-		return $this->parser->parseString( $source_code );
+	public function parseString( string $sourceCode ): array {
+		return $this->parser->parseString( $sourceCode );
 	}
 
 	/**
@@ -107,7 +109,7 @@ final class WpBuildTemplateParser implements Parser {
 	 * @param string $template The template.
 	 * @param string $file     Path to the template, for the error message.
 	 * @return string The rendered code.
-	 * @throws \LogicException When the template has a placeholder without a substitute.
+	 * @throws LogicException When the template has a placeholder without a substitute.
 	 */
 	private static function render( string $template, string $file ): string {
 		$code = strtr( $template, self::REPLACEMENTS );
@@ -118,8 +120,8 @@ final class WpBuildTemplateParser implements Parser {
 		}
 
 		// Fail on any placeholder that this parser does not know, rather than report a syntax error in the template.
-		if ( preg_match( '/\{\{[A-Z_]+\}\}/', $code, $matches, PREG_OFFSET_CAPTURE ) ) {
-			throw new \LogicException(
+		if ( preg_match( '/\{\{[A-Z_]+}}/', $code, $matches, PREG_OFFSET_CAPTURE ) ) {
+			throw new LogicException(
 				sprintf(
 					'The wp-build template placeholder %1$s on line %2$d of %3$s has no substitute in %4$s.',
 					$matches[0][0],

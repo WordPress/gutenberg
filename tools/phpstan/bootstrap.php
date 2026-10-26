@@ -3,5 +3,5 @@
  * Defines WordPress constants which are not available in the stubs, for discovery.
  */
 
-define( 'WPINC', 'wp-includes' );
-define( 'MEDIA_TRASH', false );
+const WPINC = 'wp-includes';
+const MEDIA_TRASH = false;
