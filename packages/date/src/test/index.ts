@@ -810,7 +810,7 @@ describe( 'WP timezone zone recovery', () => {
 
 describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	const original = getSettings();
-	const useSite = ( string: string, offset: number ) =>
+	const setSiteTimezone = ( string: string, offset: number ) =>
 		setSettings( {
 			...original,
 			timezone: {
@@ -823,7 +823,7 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	afterEach( () => setSettings( original ) );
 
 	it( 'reads a zoneless datetime in site time before converting', () => {
-		useSite( 'America/New_York', -5 );
+		setSiteTimezone( 'America/New_York', -5 );
 		expect( dateI18n( 'c', '2026-10-26T12:00:00', 'UTC' ) ).toBe(
 			'2026-10-26T16:00:00+00:00'
 		);
@@ -833,25 +833,25 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	} );
 
 	it( 'reads a date-only string as midnight in site time', () => {
-		useSite( 'Europe/Paris', 1 );
+		setSiteTimezone( 'Europe/Paris', 1 );
 		expect( dateI18n( 'c', '2026-10-26', 'UTC' ) ).toBe(
 			'2026-10-25T23:00:00+00:00'
 		);
 	} );
 
 	it( 'supports sites configured with a UTC offset only', () => {
-		useSite( '', -5 );
+		setSiteTimezone( '', -5 );
 		expect( dateI18n( 'c', '2026-10-26T12:00:00', 'UTC' ) ).toBe(
 			'2026-10-26T17:00:00+00:00'
 		);
-		useSite( '', 5.5 );
+		setSiteTimezone( '', 5.5 );
 		expect( dateI18n( 'c', '2026-10-26T12:00:00' ) ).toBe(
 			'2026-10-26T12:00:00+05:30'
 		);
 	} );
 
 	it( 'leaves strings with an explicit zone designator unchanged', () => {
-		useSite( 'America/New_York', -5 );
+		setSiteTimezone( 'America/New_York', -5 );
 		expect( dateI18n( 'c', '2026-10-26T12:00:00Z', 'UTC' ) ).toBe(
 			'2026-10-26T12:00:00+00:00'
 		);
@@ -861,7 +861,7 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	} );
 
 	it( 'leaves Date objects and timestamps unchanged', () => {
-		useSite( 'America/New_York', -5 );
+		setSiteTimezone( 'America/New_York', -5 );
 		const ms = Date.UTC( 2026, 9, 26, 12 );
 		expect( dateI18n( 'c', new Date( ms ), 'UTC' ) ).toBe(
 			'2026-10-26T12:00:00+00:00'
@@ -885,7 +885,7 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 			[ '', -5 ],
 		];
 		for ( const [ string, offset ] of sites ) {
-			useSite( string, offset );
+			setSiteTimezone( string, offset );
 			for ( const input of inputs ) {
 				expect( dateI18n( 'c', input, 'UTC' ) ).toBe(
 					gmdate( 'c', getDate( input ) )
@@ -895,7 +895,7 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	} );
 
 	it( 'resolves DST gaps and overlaps the way getDate() does', () => {
-		useSite( 'America/New_York', -5 );
+		setSiteTimezone( 'America/New_York', -5 );
 		// Spring forward gap: 02:30 does not exist on 2026-03-08.
 		// Fall back overlap: 01:30 occurs twice on 2026-11-01.
 		for ( const input of [
@@ -909,7 +909,7 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	} );
 
 	it( 'leaves other string shapes on the previous parsing path', () => {
-		useSite( 'America/New_York', -5 );
+		setSiteTimezone( 'America/New_York', -5 );
 		// Compact, week, ordinal and padded shapes are not zoneless ISO
 		// calendar strings in the sense above, so they are not rerouted.
 		// Moment falls back to the Date constructor, and warns, for some of
@@ -934,7 +934,7 @@ describe( 'zoneless ISO strings with an explicit output timezone', () => {
 	} );
 
 	it( 'still returns an invalid date for impossible calendar dates', () => {
-		useSite( 'America/New_York', -5 );
+		setSiteTimezone( 'America/New_York', -5 );
 		expect( dateI18n( 'c', '2026-02-30', 'UTC' ) ).toBe( 'Invalid date' );
 		expect( dateI18n( 'c', '2026-13-01T10:00', 'UTC' ) ).toBe(
 			'Invalid date'
