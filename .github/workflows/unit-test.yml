@@ -100,7 +100,7 @@ jobs:
                       ./build-module/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
         needs: [build-assets]
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 20
