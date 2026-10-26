@@ -31,12 +31,35 @@ const {
 	GITHUB_WORKSPACE,
 } = process.env;
 
-/*
- * The identifiers of the errors that mean the baseline is out of date: an entry
- * that matches no error, or that matches a different number of them than it
- * records. Both are fixed by regenerating the baseline.
+/**
+ * Whether an error means a baseline entry records more occurrences of an error
+ * than there are now, because some were fixed. Regenerating the baseline fixes
+ * it.
+ *
+ * @param {PhpstanError} error The error.
+ * @return {boolean} Whether the baseline entry is stale.
  */
-const BASELINE_IDENTIFIERS = [ 'ignore.unmatched', 'ignore.count' ];
+function isStaleBaselineEntry( error ) {
+	return (
+		error.identifier === 'ignore.unmatched' ||
+		( error.identifier === 'ignore.count' &&
+			error.message.includes( ', but occurred only ' ) )
+	);
+}
+
+/**
+ * Whether an error means a baseline entry records fewer occurrences of an error
+ * than there are now, because more were added. Regenerating the baseline would
+ * record the new ones too, so they should be fixed instead.
+ *
+ * @param {PhpstanError} error The error.
+ * @return {boolean} Whether the baseline entry is exceeded.
+ */
+function isExceededBaselineEntry( error ) {
+	return (
+		error.identifier === 'ignore.count' && ! isStaleBaselineEntry( error )
+	);
+}
 
 // GitHub shows at most this many error annotations per step.
 const ANNOTATION_LIMIT = 10;
@@ -196,16 +219,20 @@ function buildSummary( errors ) {
 		}`,
 	];
 
-	const baselineErrors = errors.filter( ( error ) =>
-		BASELINE_IDENTIFIERS.includes( error.identifier )
-	);
-	if ( baselineErrors.length > 0 ) {
+	if ( errors.some( isStaleBaselineEntry ) ) {
 		sections.push(
 			'### The baseline is out of date',
-			'An entry in `tools/phpstan/baseline.neon` no longer matches the errors it records. **If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: regenerate the baseline and commit the result.',
+			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs fewer times, or not at all. **If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: regenerate the baseline and commit the result.',
 			'```bash\ncomposer phpstan:baselines\n```',
 			'or, in the local environment:',
 			'```bash\nnpm run typecheck:php:baselines\n```'
+		);
+	}
+
+	if ( errors.some( isExceededBaselineEntry ) ) {
+		sections.push(
+			'### A baselined error occurs more often',
+			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.'
 		);
 	}
 
