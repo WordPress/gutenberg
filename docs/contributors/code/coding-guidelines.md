@@ -816,6 +816,8 @@ The easiest way to use PHPCS is [local environment](/docs/contributors/code/gett
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
 
+PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). After running `composer install` and `npm run build`, which generates the PHP files that the code in `lib/` calls, run `composer phpstan`. Errors that predate the analysis are recorded in `tools/phpstan/baseline.neon`. When a change fixes one of them, PHPStan reports the baseline entry as unmatched; regenerate the baseline with `composer phpstan -- --generate-baseline=tools/phpstan/baseline.neon` and commit the result. To adjust the configuration locally, such as to try a higher rule level, copy `phpstan.neon.dist` to `phpstan.neon`, which is ignored by Git.
+
 ## GitHub Actions workflow files
 
 GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
