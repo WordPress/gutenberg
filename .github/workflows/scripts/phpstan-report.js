@@ -64,6 +64,13 @@ function isExceededBaselineEntry( error ) {
 // GitHub shows at most this many error annotations per step.
 const ANNOTATION_LIMIT = 10;
 
+/*
+ * The job summary lists at most this many errors. GitHub drops a summary larger
+ * than 1 MiB entirely, which thousands of errors, such as after a PHPStan
+ * upgrade, could otherwise exceed.
+ */
+const SUMMARY_LIMIT = 500;
+
 /**
  * @typedef {Object} PhpstanError
  * @property {string|null} file       Path relative to the workspace, if any.
@@ -242,22 +249,31 @@ function buildSummary( errors ) {
 		);
 	}
 
-	const rows = errors.map(
-		( error ) =>
-			`<tr><td>${ formatLocation( error ) }</td><td>${
-				error.identifier
-					? `<code>${ escapeHtml( error.identifier ) }</code>`
-					: ''
-			}</td><td>${ escapeHtml( error.message ) }${
-				error.tip ? `<br><em>${ escapeHtml( error.tip ) }</em>` : ''
-			}</td></tr>`
-	);
+	const rows = errors
+		.slice( 0, SUMMARY_LIMIT )
+		.map(
+			( error ) =>
+				`<tr><td>${ formatLocation( error ) }</td><td>${
+					error.identifier
+						? `<code>${ escapeHtml( error.identifier ) }</code>`
+						: ''
+				}</td><td>${ escapeHtml( error.message ) }${
+					error.tip ? `<br><em>${ escapeHtml( error.tip ) }</em>` : ''
+				}</td></tr>`
+		);
 	sections.push(
 		'### Errors',
 		`<table><thead><tr><th>Location</th><th>Identifier</th><th>Message</th></tr></thead><tbody>${ rows.join(
 			''
 		) }</tbody></table>`
 	);
+	if ( errors.length > SUMMARY_LIMIT ) {
+		sections.push(
+			`…and ${
+				errors.length - SUMMARY_LIMIT
+			} more, which are listed in the output of this step.`
+		);
+	}
 
 	if ( errors.length > ANNOTATION_LIMIT ) {
 		sections.push(
