@@ -3,25 +3,23 @@ import type { BlockCrashBoundaryProps } from './types';
 
 class BlockCrashBoundary extends Component<
 	BlockCrashBoundaryProps,
-	{ hasError: boolean }
+	{ error: Error | null }
 > {
 	constructor( props: BlockCrashBoundaryProps ) {
 		super( props );
 
 		this.state = {
-			hasError: false,
+			error: null,
 		};
 	}
 
-	componentDidCatch() {
-		this.setState( {
-			hasError: true,
-		} );
+	componentDidCatch( error: Error ) {
+		this.setState( { error } );
 	}
 
 	render() {
-		if ( this.state.hasError ) {
-			return this.props.fallback;
+		if ( this.state.error ) {
+			return this.props.fallback( this.state.error );
 		}
 
 		return this.props.children;
