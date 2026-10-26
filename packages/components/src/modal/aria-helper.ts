@@ -6,7 +6,7 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 	'timer',
 ] );
 
-const hiddenElementsByDepth: Element[][] = [];
+const hiddenElementsByModal = new Map< Element, Element[] >();
 
 /**
  * Hides all elements in the body element from screen-readers except
@@ -20,10 +20,10 @@ const hiddenElementsByDepth: Element[][] = [];
  *
  * @param modalElement The element that should not be hidden.
  */
-export function modalize( modalElement?: HTMLDivElement ) {
+export function modalize( modalElement: HTMLDivElement ) {
 	const elements = Array.from( document.body.children );
 	const hiddenElements: Element[] = [];
-	hiddenElementsByDepth.push( hiddenElements );
+	hiddenElementsByModal.set( modalElement, hiddenElements );
 	for ( const element of elements ) {
 		if ( element === modalElement ) {
 			continue;
@@ -55,15 +55,27 @@ export function elementShouldBeHidden( element: Element ) {
 }
 
 /**
- * Accessibly reveals the elements hidden by the latest modal.
+ * Accessibly reveals the elements hidden by the provided modal.
+ *
+ * Modals can close in any order, so elements the closing modal hid stay hidden
+ * while another modal is open, and are revealed once that modal closes.
+ *
+ * @param modalElement The element of the closing modal.
  */
-export function unmodalize() {
-	const hiddenElements = hiddenElementsByDepth.pop();
+export function unmodalize( modalElement: HTMLDivElement ) {
+	const hiddenElements = hiddenElementsByModal.get( modalElement );
 	if ( ! hiddenElements ) {
 		return;
 	}
+	hiddenElementsByModal.delete( modalElement );
 
+	const [ topModalElement, topModalHiddenElements ] =
+		Array.from( hiddenElementsByModal ).pop() ?? [];
 	for ( const element of hiddenElements ) {
-		element.removeAttribute( 'aria-hidden' );
+		if ( topModalHiddenElements && element !== topModalElement ) {
+			topModalHiddenElements.push( element );
+		} else {
+			element.removeAttribute( 'aria-hidden' );
+		}
 	}
 }

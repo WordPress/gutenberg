@@ -280,6 +280,49 @@ describe( 'Modal', () => {
 		expect( container ).not.toHaveAttribute( 'aria-hidden' );
 	} );
 
+	it( 'should keep the open modal accessible when a modal opened before it closes', async () => {
+		const user = userEvent.setup();
+
+		const OpenTogether = () => {
+			const [ isFirstShown, setIsFirstShown ] = useState( true );
+			const [ isSecondShown, setIsSecondShown ] = useState( true );
+			return (
+				<>
+					{ isFirstShown && (
+						<Modal
+							title="First"
+							onRequestClose={ () => setIsFirstShown( false ) }
+						>
+							<p>First modal content</p>
+						</Modal>
+					) }
+					{ isSecondShown && (
+						<Modal
+							title="Second"
+							onRequestClose={ () => setIsSecondShown( false ) }
+						>
+							<p>Second modal content</p>
+						</Modal>
+					) }
+				</>
+			);
+		};
+		const { container } = render( <OpenTogether /> );
+
+		// Second modal opens > closes first modal and stays accessible.
+		expect(
+			screen.queryByRole( 'dialog', { name: 'First' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'dialog', { name: 'Second' } )
+		).toBeVisible();
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+
+		// Closes second modal > Unhides container.
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+		expect( container ).not.toHaveAttribute( 'aria-hidden' );
+	} );
+
 	it( 'keeps the @wordpress/ui compat overlay slot exposed while open', async () => {
 		const user = userEvent.setup();
 
