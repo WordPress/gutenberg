@@ -1,4 +1,9 @@
-import { registerAbility, registerAbilityCategory } from '@wordpress/abilities';
+import {
+	getAbility,
+	getAbilityCategory,
+	registerAbility,
+	registerAbilityCategory,
+} from '@wordpress/abilities';
 import type {
 	Ability,
 	AbilityCategory,
@@ -81,6 +86,11 @@ async function initializeCategories(): Promise< void > {
 
 		if ( categories && Array.isArray( categories ) ) {
 			for ( const category of categories ) {
+				// A script module may have registered it already, such as the
+				// `content` category of the post abilities in core-actions.
+				if ( getAbilityCategory( category.slug ) ) {
+					continue;
+				}
 				registerAbilityCategory( category.slug, {
 					label: category.label,
 					description: category.description,
@@ -110,6 +120,12 @@ async function initializeAbilities(): Promise< void > {
 
 		if ( abilities && Array.isArray( abilities ) ) {
 			for ( const ability of abilities ) {
+				// A client-side ability with the same name runs in the
+				// browser, so it is kept: one duplicate must not stop the
+				// rest from registering.
+				if ( getAbility( ability.name ) ) {
+					continue;
+				}
 				// Register the ability with a callback
 				// The abilities package filters annotations to allowed keys
 				registerAbility( {
