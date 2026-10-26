@@ -21,7 +21,7 @@ const meta: Meta< typeof TabbableContainer > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Deprecated.',
+			notes: 'Deprecated. For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',
 		},
 	},
 };

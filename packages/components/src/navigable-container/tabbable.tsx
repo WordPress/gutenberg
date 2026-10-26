@@ -11,6 +11,7 @@ export function UnforwardedTabbableContainer(
 	deprecated( 'wp.components.TabbableContainer', {
 		since: '7.3',
 		version: '7.5',
+		hint: 'For focus trapping, consider the useConstrainedTabbing hook from @wordpress/compose.',
 	} );
 
 	const innerEventToOffset = ( evt: KeyboardEvent ) => {

@@ -31,7 +31,7 @@ const getTabbableContainerTabbables = () => [
 ];
 
 const DEPRECATION_MESSAGE =
-	'wp.components.TabbableContainer is deprecated since version 7.3 and will be removed in version 7.5.';
+	'wp.components.TabbableContainer is deprecated since version 7.3 and will be removed in version 7.5. Note: For focus trapping, consider the useConstrainedTabbing hook from @wordpress/compose.';
 
 beforeEach( () => {
 	logged[ DEPRECATION_MESSAGE ] = true;
