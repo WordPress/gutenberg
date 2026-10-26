@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockSupport,
 	getBlockType,
@@ -11,6 +13,9 @@ import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import useBlockDisplayInformation from '../components/use-block-display-information';
+import type { BlockAlignmentConstraint } from '../components/block-alignment-control/types';
 import type {
 	AlignAttributes,
 	AlignEditProps,
@@ -106,9 +111,81 @@ export function addAttribute( settings: BlockType ): BlockType {
 	return settings;
 }
 
+/**
+ * Describes the block whose layout is withholding alignments, so the menu can
+ * name it and offer to select it.
+ *
+ * Only a block the user can reach from here is described. When the constraint
+ * comes from outside the post — the template wrapped around the content — there
+ * is no block on the page to send anyone to.
+ *
+ * @param clientId   The block whose alignments are withheld.
+ * @param isRequired Whether any alignments are withheld. When false, the parent is not looked up.
+ *
+ * @return What is limiting the width, or `undefined` when nothing reachable is.
+ */
+function useAlignmentConstraint(
+	clientId: string,
+	isRequired: boolean
+): BlockAlignmentConstraint | undefined {
+	const parentClientId = useSelect(
+		( select ) => {
+			if ( ! isRequired ) {
+				return null;
+			}
+
+			const { getBlockRootClientId, getBlockEditingMode } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+
+			if (
+				! rootClientId ||
+				getBlockEditingMode( rootClientId ) !== 'default'
+			) {
+				return null;
+			}
+
+			return rootClientId;
+		},
+		[ clientId, isRequired ]
+	);
+
+	const parentInfo = useBlockDisplayInformation( parentClientId ?? '' );
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	if ( ! parentClientId || ! parentInfo ) {
+		return undefined;
+	}
+
+	return {
+		/*
+		 * The label beside this already names the block, so the description only
+		 * has to say what about it is doing the limiting. "Layout" is also where
+		 * the setting lives once they get there.
+		 */
+		description: __( 'Its layout limits widths' ),
+		action: {
+			/*
+			 * The block type rather than any name it has been given, matching how
+			 * `BlockParentSelector` labels the same action. The icon comes from
+			 * the type too, so the two can never describe different blocks — a
+			 * custom name can sit beside an icon that does not look like it.
+			 */
+			label: sprintf(
+				// translators: %s: title of the containing block, e.g. "Group".
+				__( 'Select %s' ),
+				parentInfo.title
+			),
+			icon: parentInfo.icon,
+			onClick: () => selectBlock( parentClientId ),
+		},
+	};
+}
+
 function BlockEditAlignmentToolbarControlsPure( {
 	name: blockName,
 	align,
+	clientId,
 	setAttributes,
 }: AlignEditProps ) {
 	// Compute the block valid alignments by taking into account,
@@ -121,7 +198,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 		hasBlockSupport( blockName, 'alignWide', true )
 	);
 
-	const { enabled } = useAlignmentMenu( blockAllowedAlignments );
+	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
 	/*
 	 * Only render when some alignment actually works. Many blocks — Paragraph,
@@ -129,7 +206,13 @@ function BlockEditAlignmentToolbarControlsPure( {
 	 * in a layout offering neither, a control made only of unavailable options
 	 * would sit on the toolbar unable to change anything.
 	 */
-	if ( ! enabled.length || blockEditingMode !== 'default' ) {
+	const isRendered = enabled.length > 0 && blockEditingMode === 'default';
+	const constraint = useAlignmentConstraint(
+		clientId,
+		isRendered && unavailable.length > 0
+	);
+
+	if ( ! isRendered ) {
 		return null;
 	}
 
@@ -157,6 +240,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 				 * parent layout has taken away.
 				 */
 				controls={ blockAllowedAlignments }
+				constraint={ constraint }
 			/>
 		</BlockControls>
 	);

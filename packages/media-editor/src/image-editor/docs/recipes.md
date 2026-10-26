@@ -5,10 +5,10 @@
 ## Mount a Cropper
 
 ```tsx
-import { Cropper, useCropperReducer } from '../image-editor';
+import { Cropper, useCropperController } from '../image-editor';
 
 function ImageCropper( { src }: { src: string } ) {
-	const controller = useCropperReducer();
+	const controller = useCropperController();
 
 	return (
 		<div style={ { width: 600, height: 400 } }>
@@ -30,7 +30,7 @@ The cropper fills its parent. Always render it inside a sized container.
 
 ```tsx
 function ImageCropperWithControls( { src }: { src: string } ) {
-	const controller = useCropperReducer();
+	const controller = useCropperController();
 	const { state, setZoom, snapRotate90, toggleFlip, reset } = controller;
 
 	return (
