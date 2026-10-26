@@ -11,8 +11,9 @@ const { isPortAnswering } = require( '../../port-utils' );
 const { didCacheChange, setCache } = require( '../../cache' );
 const md5 = require( '../../md5' );
 
+// 3.1.0 or later, for DB_PATH.
 const SQLITE_PLUGIN_URL =
-	'https://downloads.wordpress.org/plugin/sqlite-database-integration.zip';
+	'https://downloads.wordpress.org/plugin/sqlite-database-integration.3.1.1.zip';
 const SQLITE_PLUGIN_PATH = 'wp-content/plugins/sqlite-database-integration';
 const SETUP_CACHE_KEY = 'php_setup_checksum';
 
@@ -326,7 +327,7 @@ class PhpRuntime {
 				windowsHide: true,
 				stdio: [ 'ignore', log.fd, log.fd ],
 				// Without workers the server handles one request at a time.
-				env: { ...process.env, PHP_CLI_SERVER_WORKERS: '8' },
+				env: { PHP_CLI_SERVER_WORKERS: '8', ...process.env },
 			}
 		);
 		child.unref();
@@ -386,8 +387,11 @@ async function setUp( config, siteDir, mappings ) {
 		mode: constants.COPYFILE_FICLONE,
 		filter: ( source ) => path.relative( coreDir, source ) !== '.git',
 	} );
-	// Before the mappings, so a mapping can replace it.
-	await link( uploadsDir, path.join( siteDir, 'wp-content/uploads' ) );
+	// Before the mappings, so a mapping can replace it. A used core folder
+	// can have its own.
+	const uploads = path.join( siteDir, 'wp-content/uploads' );
+	await rimraf( uploads );
+	await link( uploadsDir, uploads );
 
 	// Shorter paths first, so a mapping inside another one replaces an
 	// entry of it.
@@ -604,7 +608,12 @@ function getDatabasePaths( config ) {
  * @param {string} siteDir The site folder.
  */
 async function writeWpConfig( config, siteDir ) {
-	const defines = Object.entries( config.env.development.config )
+	const defines = Object.entries( {
+		// WordPress only skips updating itself when it finds .git, which the
+		// copy leaves out.
+		WP_AUTO_UPDATE_CORE: false,
+		...config.env.development.config,
+	} )
 		.filter( ( [ , value ] ) => value !== null )
 		.map(
 			( [ key, value ] ) =>
