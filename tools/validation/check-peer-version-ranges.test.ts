@@ -1,28 +1,26 @@
 import { describe, expect, test } from 'vitest';
 import {
 	findRangeMismatches,
-	hasUnreleasedBreakingChanges,
-	nextBreakingVersion,
+	nextReleaseVersion,
 } from './check-peer-version-ranges.ts';
 
 const changelog = ( body: string ) =>
 	`## Unreleased\n\n${ body }\n## 1.0.0 (2026-01-01)\n\n### Breaking Changes\n\n-   Old.\n`;
 
-describe( 'hasUnreleasedBreakingChanges', () => {
-	test( 'only looks at the Unreleased section', () => {
-		expect( hasUnreleasedBreakingChanges( changelog( '' ) ) ).toBe( false );
+describe( 'nextReleaseVersion', () => {
+	test( 'follows the release tool bump rules', () => {
+		const breaking = changelog( '### Breaking Changes\n\n-   New.\n' );
+		expect( nextReleaseVersion( '3.1.0', breaking ) ).toBe( '4.0.0' );
+		expect( nextReleaseVersion( '0.8.2', breaking ) ).toBe( '0.9.0' );
 		expect(
-			hasUnreleasedBreakingChanges(
-				changelog( '### Breaking Changes\n\n-   New.\n' )
+			nextReleaseVersion(
+				'0.8.2',
+				changelog(
+					'### Stable Release\n\n-   Go.\n\n### Breaking Changes\n\n-   New.\n'
+				)
 			)
-		).toBe( true );
-	} );
-} );
-
-describe( 'nextBreakingVersion', () => {
-	test( 'bumps the major, or the minor on 0.x', () => {
-		expect( nextBreakingVersion( '3.1.0' ) ).toBe( '4.0.0' );
-		expect( nextBreakingVersion( '0.8.2' ) ).toBe( '0.9.0' );
+		).toBe( '1.0.0' );
+		expect( nextReleaseVersion( '3.1.0', changelog( '' ) ) ).toBeNull();
 	} );
 } );
 

@@ -2,15 +2,27 @@
 /*
  * Verifies that the `peerDependencies` ranges a published workspace declares
  * on other workspace packages admit the version those packages are at, and the
- * next breaking version when their changelog already announces a breaking change.
+ * version their unreleased changelog entries will release as.
  *
  * Catching the second case in the pull request that adds the "Breaking Changes"
  * entry avoids a follow-up range bump after the release.
  */
+import { createRequire } from 'node:module';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import semver from 'semver';
+
+// Loaded untyped so this project does not pull the release tool into its sources.
+const { calculateVersionBumpFromChangelog } = createRequire( import.meta.url )(
+	'../release/commands/common.js'
+) as {
+	calculateVersionBumpFromChangelog: (
+		lines: string[],
+		minimumVersionBump: 'patch' | 'minor' | 'major',
+		currentVersion: string
+	) => 'patch' | 'minor' | 'major' | null;
+};
 
 type Manifest = {
 	name?: string;
@@ -31,31 +43,22 @@ const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const REPO_ROOT = resolve( __dirname, '../..' );
 
 /**
- * Whether the `## Unreleased` section of a changelog has a `### Breaking Changes` heading.
+ * The version the package releases as, by the release tool's own rules, or
+ * `null` when its changelog has no unreleased changes.
  *
+ * @param version   Current version.
  * @param changelog Changelog contents.
  */
-export function hasUnreleasedBreakingChanges( changelog: string ): boolean {
-	const match = changelog.match(
-		/^## Unreleased\s*$([\s\S]*?)(?=^## |$(?![\s\S]))/m
+export function nextReleaseVersion(
+	version: string,
+	changelog: string
+): string | null {
+	const bump = calculateVersionBumpFromChangelog(
+		changelog.split( '\n' ),
+		'patch',
+		version
 	);
-	return !! match && /^### Breaking Changes\s*$/m.test( match[ 1 ] );
-}
-
-/**
- * The first version a breaking change would release as: the next major, or the
- * next minor while the package is still on 0.x.
- *
- * @param version Current version.
- */
-export function nextBreakingVersion( version: string ): string | null {
-	const parsed = semver.parse( version );
-	if ( ! parsed ) {
-		return null;
-	}
-	return parsed.major === 0
-		? `0.${ parsed.minor + 1 }.0`
-		: `${ parsed.major + 1 }.0.0`;
+	return bump ? semver.inc( version, bump ) : null;
 }
 
 /**
@@ -93,15 +96,13 @@ export function findRangeMismatches(
 			const expected: [ string, string ][] = [
 				[ current, 'the current version' ],
 			];
-			const next = nextBreakingVersion( current );
-			if (
-				next &&
+			const next =
 				target.changelog &&
-				hasUnreleasedBreakingChanges( target.changelog )
-			) {
+				nextReleaseVersion( current, target.changelog );
+			if ( next ) {
 				expected.push( [
 					next,
-					'the next breaking version, announced by "Breaking Changes" in its changelog',
+					'the version its unreleased changelog entries will release as',
 				] );
 			}
 
