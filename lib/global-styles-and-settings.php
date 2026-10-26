@@ -431,9 +431,9 @@ function gutenberg_get_theme_directory_pattern_slugs() {
  * its migrated key names. The result depends on the blocks and block styles registered at the
  * time of the call.
  *
- * The shape of each diagnostic is not final. `code` and `path` are the keys to rely on; `data`
- * is documented per code and may gain keys; `message` is display text. This function stays in
- * the plugin until the shape has been exercised by real callers.
+ * The shape of each diagnostic is not final. `code` and `path` are the keys to rely on, and
+ * `message` is display text. This function stays in the plugin until the shape has been
+ * exercised by real callers.
  *
  * @since 7.2.0
  *
@@ -444,7 +444,7 @@ function gutenberg_get_theme_directory_pattern_slugs() {
  *     @type string $origin What source of data the structure represents. One of 'blocks',
  *                          'default', 'theme', or 'custom'. Default 'theme'.
  * }
- * @return array[] Diagnostics, each with `code`, `path`, `data` and `message` keys. See
+ * @return array[] Diagnostics, each with `code`, `path` and `message` keys. See
  *                 {@see WP_Theme_JSON_Sanitizer_Gutenberg::collect()} for each key.
  */
 function gutenberg_validate_theme_json( $theme_json, $args = array() ) {

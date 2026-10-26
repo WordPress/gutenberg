@@ -54,14 +54,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 		$output = array();
 
 		if ( ! is_array( $input ) ) {
-			static::add_diagnostic(
-				'theme_json_invalid_type',
-				array(),
-				array(
-					'expected' => 'object',
-					'value'    => $input,
-				)
-			);
+			static::add_diagnostic( 'theme_json_expected_object', array() );
 			return $output;
 		}
 
@@ -298,14 +291,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			}
 
 			if ( ! is_array( $input[ $subtree ] ) ) {
-				static::add_diagnostic(
-					'theme_json_invalid_type',
-					array( $subtree ),
-					array(
-						'expected' => 'object',
-						'value'    => $input[ $subtree ],
-					)
-				);
+				static::add_diagnostic( 'theme_json_expected_object', array( $subtree ) );
 				unset( $output[ $subtree ] );
 				continue;
 			}
@@ -345,14 +331,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 				$result['viewport'] = static::sanitize_viewport_settings( $input[ $subtree ]['viewport'] );
 
 				if ( null !== self::$diagnostics && $result['viewport'] !== $input[ $subtree ]['viewport'] ) {
-					static::add_diagnostic(
-						'theme_json_invalid_viewport',
-						array( 'settings', 'viewport' ),
-						array(
-							'actual'    => $input[ $subtree ]['viewport'],
-							'sanitized' => $result['viewport'],
-						)
-					);
+					static::add_diagnostic( 'theme_json_invalid_viewport', array( 'settings', 'viewport' ) );
 				}
 			}
 
@@ -382,25 +361,11 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 
 		foreach ( $items as $index => $item ) {
 			if ( ! is_array( $item ) ) {
-				static::add_diagnostic(
-					'theme_json_invalid_type',
-					array_merge( $path, array( $index ) ),
-					array(
-						'expected' => 'object',
-						'value'    => $item,
-					)
-				);
+				static::add_diagnostic( 'theme_json_expected_object', array_merge( $path, array( $index ) ) );
 				continue;
 			}
 			if ( isset( $item['slug'] ) && ! is_scalar( $item['slug'] ) ) {
-				static::add_diagnostic(
-					'theme_json_invalid_type',
-					array_merge( $path, array( $index, 'slug' ) ),
-					array(
-						'expected' => 'scalar',
-						'value'    => $item['slug'],
-					)
-				);
+				static::add_diagnostic( 'theme_json_expected_scalar', array_merge( $path, array( $index, 'slug' ) ) );
 				continue;
 			}
 			$valid[] = $item;
@@ -442,14 +407,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			if ( is_bool( $schema[ $key ] ) ) {
 				// Schema expects a boolean value - validate the input matches.
 				if ( ! is_bool( $value ) ) {
-					static::add_diagnostic(
-						'theme_json_invalid_type',
-						$key_path,
-						array(
-							'expected' => 'boolean',
-							'value'    => $value,
-						)
-					);
+					static::add_diagnostic( 'theme_json_expected_boolean', $key_path );
 					unset( $tree[ $key ] );
 					continue;
 				}
@@ -459,14 +417,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 
 			if ( is_array( $schema[ $key ] ) ) {
 				if ( ! is_array( $value ) ) {
-					static::add_diagnostic(
-						'theme_json_invalid_type',
-						$key_path,
-						array(
-							'expected' => 'object',
-							'value'    => $value,
-						)
-					);
+					static::add_diagnostic( 'theme_json_expected_object', $key_path );
 					unset( $tree[ $key ] );
 				} elseif ( wp_is_numeric_array( $value ) ) {
 					// If indexed, process each item in the array.
@@ -550,7 +501,6 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 * @return array[] Diagnostics recorded while the callback ran, in no particular order. Each has:
 	 *                 - `code`    string  Stable identifier, one of the codes `get_diagnostic_message()` knows.
 	 *                 - `path`    array   Keys from the root of the structure to the value.
-	 *                 - `data`    array   Extra keys documented per code, such as `expected` and `actual`. May grow.
 	 *                 - `message` string  Translated text for display. Not part of the contract; never branch on it.
 	 */
 	public static function collect( callable $callback ) {
@@ -577,24 +527,16 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * @param string $code Diagnostic code, one of the codes `get_diagnostic_message()` knows.
 	 * @param array  $path Path to the value in the theme.json structure. Empty for the whole structure.
-	 * @param array  $data Optional. Additional data. A `value` entry is replaced by its JSON type name
-	 *                     under `actual`, so the diagnostic describes the type rather than carrying the value.
 	 */
-	public static function add_diagnostic( $code, $path, $data = array() ) {
+	public static function add_diagnostic( $code, $path ) {
 		if ( null === self::$diagnostics ) {
 			return;
-		}
-
-		if ( array_key_exists( 'value', $data ) ) {
-			$data['actual'] = static::get_type_name( $data['value'] );
-			unset( $data['value'] );
 		}
 
 		self::$diagnostics[] = array(
 			'code'    => $code,
 			'path'    => $path,
-			'data'    => $data,
-			'message' => static::get_diagnostic_message( $code, $path, $data ),
+			'message' => static::get_diagnostic_message( $code, $path ),
 		);
 	}
 
@@ -605,10 +547,9 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * @param string $code Diagnostic code.
 	 * @param array  $path Path to the value.
-	 * @param array  $data Additional data.
 	 * @return string The message.
 	 */
-	private static function get_diagnostic_message( $code, $path, $data ) {
+	private static function get_diagnostic_message( $code, $path ) {
 		$dotted = implode( '.', $path );
 
 		switch ( $code ) {
@@ -635,51 +576,26 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 				/* translators: 1: block style variation name, 2: block name. */
 				return sprintf( __( 'Block style variation "%1$s" is not registered for block "%2$s".', 'gutenberg' ), $path[4], $path[2] );
 
-			case 'theme_json_invalid_type':
+			case 'theme_json_expected_object':
 				if ( empty( $path ) ) {
 					return __( 'The theme.json structure must be an object.', 'gutenberg' );
 				}
-				if ( 'boolean' === $data['expected'] ) {
-					/* translators: %s: dot-separated theme.json path. */
-					return sprintf( __( '"%s" must be a boolean.', 'gutenberg' ), $dotted );
-				}
-				if ( 'scalar' === $data['expected'] ) {
-					/* translators: %s: dot-separated theme.json path. */
-					return sprintf( __( '"%s" must be a string or a number.', 'gutenberg' ), $dotted );
-				}
 				/* translators: %s: dot-separated theme.json path. */
 				return sprintf( __( '"%s" must be an object.', 'gutenberg' ), $dotted );
+
+			case 'theme_json_expected_boolean':
+				/* translators: %s: dot-separated theme.json path. */
+				return sprintf( __( '"%s" must be a boolean.', 'gutenberg' ), $dotted );
+
+			case 'theme_json_expected_scalar':
+				/* translators: %s: dot-separated theme.json path. */
+				return sprintf( __( '"%s" must be a string or a number.', 'gutenberg' ), $dotted );
 
 			case 'theme_json_invalid_viewport':
 				return __( 'Viewport breakpoints were normalized, or replaced by the defaults because no valid breakpoint was found.', 'gutenberg' );
 		}
 
 		return '';
-	}
-
-	/**
-	 * Returns the JSON type name of a value, for diagnostics.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param mixed $value Value to describe.
-	 * @return string One of `object`, `array`, `string`, `number`, `boolean` or `null`.
-	 */
-	private static function get_type_name( $value ) {
-		if ( is_array( $value ) ) {
-			return wp_is_numeric_array( $value ) ? 'array' : 'object';
-		}
-		if ( is_int( $value ) || is_float( $value ) ) {
-			return 'number';
-		}
-		if ( is_bool( $value ) ) {
-			return 'boolean';
-		}
-		if ( null === $value ) {
-			return 'null';
-		}
-
-		return 'string';
 	}
 
 	/**

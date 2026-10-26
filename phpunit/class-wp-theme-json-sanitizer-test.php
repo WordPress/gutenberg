@@ -102,28 +102,28 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'styles'  => array( 'color' => 'red' ),
 				),
-				array( 'theme_json_invalid_type', array( 'styles', 'color' ) ),
+				array( 'theme_json_expected_object', array( 'styles', 'color' ) ),
 			),
 			'non-boolean for a boolean setting'        => array(
 				array(
 					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'settings' => array( 'lightbox' => array( 'enabled' => 'yes' ) ),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'lightbox', 'enabled' ) ),
+				array( 'theme_json_expected_boolean', array( 'settings', 'lightbox', 'enabled' ) ),
 			),
 			'styles subtree that is not an object'     => array(
 				array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'styles'  => 'none',
 				),
-				array( 'theme_json_invalid_type', array( 'styles' ) ),
+				array( 'theme_json_expected_object', array( 'styles' ) ),
 			),
 			'preset item that is not an object'        => array(
 				array(
 					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'settings' => array( 'color' => array( 'palette' => array( 'red' ) ) ),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'color', 'palette', 0 ) ),
+				array( 'theme_json_expected_object', array( 'settings', 'color', 'palette', 0 ) ),
 			),
 			'preset slug that is not scalar'           => array(
 				array(
@@ -140,7 +140,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'typography', 'fontSizes', 0, 'slug' ) ),
+				array( 'theme_json_expected_scalar', array( 'settings', 'typography', 'fontSizes', 0, 'slug' ) ),
 			),
 			'origin-keyed preset item that is not an object' => array(
 				array(
@@ -151,7 +151,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'blocks', 'core/paragraph', 'color', 'palette', 'custom', 0 ) ),
+				array( 'theme_json_expected_object', array( 'settings', 'blocks', 'core/paragraph', 'color', 'palette', 'custom', 0 ) ),
 			),
 			'viewport breakpoint replaced by defaults' => array(
 				array(
@@ -174,7 +174,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $diagnostics, 'Exactly one diagnostic is expected: ' . wp_json_encode( $diagnostics ) );
 		$this->assertSame( $expected, array( $diagnostics[0]['code'], $diagnostics[0]['path'] ) );
-		$this->assertSame( array( 'code', 'path', 'data', 'message' ), array_keys( $diagnostics[0] ) );
+		$this->assertSame( array( 'code', 'path', 'message' ), array_keys( $diagnostics[0] ) );
 		$this->assertNotSame( '', $diagnostics[0]['message'] );
 	}
 
@@ -226,9 +226,8 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 		$diagnostics = gutenberg_validate_theme_json( 'not a structure' );
 
 		$this->assertCount( 1, $diagnostics );
-		$this->assertSame( 'theme_json_invalid_type', $diagnostics[0]['code'] );
+		$this->assertSame( 'theme_json_expected_object', $diagnostics[0]['code'] );
 		$this->assertSame( array(), $diagnostics[0]['path'] );
-		$this->assertSame( 'string', $diagnostics[0]['data']['actual'] );
 	}
 
 	public function test_missing_version_is_reported_and_nothing_else() {
