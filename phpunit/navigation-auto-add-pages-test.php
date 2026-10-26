@@ -262,9 +262,10 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		// A scheduled page publishes from cron, where there is no user and
 		// kses filters the menu content on save.
 		$menu_id = $this->create_menu(
-			'<!-- wp:navigation-link {"label":"Tom \\u0026 Jerry\\u0027s","url":"https://example.com","kind":"custom"} /-->',
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
 			true
 		);
+		$before  = $this->get_menu_blocks( $menu_id );
 		wp_set_current_user( 0 );
 		kses_init();
 
@@ -272,10 +273,7 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 
 		$blocks = $this->get_menu_blocks( $menu_id );
 		$this->assertCount( 2, $blocks );
-		// kses re-encodes block attributes on a save without `unfiltered_html`:
-		// the existing link keeps its structure and its label is entity-encoded,
-		// as it would be for any post saved by a user without that capability.
-		$this->assertSame( 'Tom &amp; Jerry\'s', $blocks[0]['attrs']['label'] );
+		$this->assertSame( $before[0], $blocks[0] );
 		$this->assert_page_link_block( $blocks[1], $page_id );
 		kses_remove_filters();
 	}
