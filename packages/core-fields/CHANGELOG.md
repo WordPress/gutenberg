@@ -8,4 +8,4 @@
 
 ### Bug Fixes
 
-- Only register the parent field for hierarchical post types supporting page attributes ([#85595](https://github.com/WordPress/gutenberg/issues/85595)).
+- Only register the parent field for hierarchical post types supporting page attributes ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
