@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85595](https://github.com/WordPress/gutenberg/issues/85595)).
+
 ### Documentation
 
 -   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
