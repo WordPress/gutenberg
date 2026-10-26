@@ -6,7 +6,10 @@ import {
 	serialize,
 	getBlockType,
 } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
@@ -25,10 +28,15 @@ import type { CreatePatternResult, PatternConvertButtonProps } from './types';
  *
  * @return The menu control or null.
  */
+const { BlockOptionsMenuItem, BlockOptionsMenuItemFill } = unlock(
+	blockEditorPrivateApis
+);
+
 export default function PatternConvertButton( {
 	clientIds,
 	rootClientId,
 	closeBlockSettingsMenu,
+	isOptionsMenuItem = false,
 }: PatternConvertButtonProps ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { replaceBlocks, updateBlockAttributes } =
@@ -161,14 +169,28 @@ export default function PatternConvertButton( {
 	};
 	return (
 		<>
-			<MenuItem
-				icon={ symbol }
-				onClick={ () => setIsModalOpen( true ) }
-				aria-expanded={ isModalOpen }
-				aria-haspopup="dialog"
-			>
-				{ __( 'Create pattern' ) }
-			</MenuItem>
+			{ isOptionsMenuItem ? (
+				// The modal stays outside the fill, as the menu unmounts its
+				// items when it closes.
+				<BlockOptionsMenuItemFill>
+					<BlockOptionsMenuItem
+						group="actions"
+						name="core/patterns/create-pattern"
+						label={ __( 'Create pattern' ) }
+						icon={ symbol }
+						onClick={ () => setIsModalOpen( true ) }
+					/>
+				</BlockOptionsMenuItemFill>
+			) : (
+				<MenuItem
+					icon={ symbol }
+					onClick={ () => setIsModalOpen( true ) }
+					aria-expanded={ isModalOpen }
+					aria-haspopup="dialog"
+				>
+					{ __( 'Create pattern' ) }
+				</MenuItem>
+			) }
 			{ isModalOpen && (
 				<CreatePatternModal
 					content={ getContent }

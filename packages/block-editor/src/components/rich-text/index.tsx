@@ -656,6 +656,7 @@ function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					editableContentElement={ anchorElement }
+					isCollapsed={ selectionStart === selectionEnd }
 				/>
 			) }
 			<TagName

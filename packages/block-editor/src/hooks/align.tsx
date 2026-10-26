@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -15,6 +15,15 @@ import useAvailableAlignments, {
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
 import useBlockDisplayInformation from '../components/use-block-display-information';
+import { isBlockToolbarRedesignEnabled } from '../utils/block-toolbar-redesign';
+import {
+	BlockOptionsMenuControls,
+	BlockOptionsMenuItem,
+} from '../components/block-toolbar/redesign/options-menu-item';
+import { BLOCK_ALIGNMENTS_CONTROLS } from '../components/block-alignment-control/constants';
+import { useLayout } from '../components/block-list/layout';
+import { hasLayoutBlockSupport } from './layout';
+import type { Layout } from '../layouts/types';
 import type { BlockAlignmentConstraint } from '../components/block-alignment-control/types';
 import type {
 	AlignAttributes,
@@ -182,6 +191,93 @@ function useAlignmentConstraint(
 	};
 }
 
+/**
+ * The labels of block alignments in the menus of the redesigned toolbar.
+ *
+ * @param isInLayoutMenu Whether the labels are for the Layout menu, where the
+ *                       group label does not say what is wide.
+ * @return The labels, by alignment.
+ */
+function getAlignmentMenuLabels(
+	isInLayoutMenu: boolean
+): Record< string, string > {
+	return {
+		none: _x( 'None', 'Alignment option' ),
+		left: _x( 'Left', 'Block alignment option' ),
+		center: _x( 'Center', 'Block alignment option' ),
+		right: _x( 'Right', 'Block alignment option' ),
+		wide: isInLayoutMenu
+			? __( 'Wide width' )
+			: _x( 'Wide', 'Block alignment option' ),
+		full: __( 'Full width' ),
+	};
+}
+
+/**
+ * Returns the maximum width of an alignment in a layout, as shown next to the
+ * alignment in the menus of the redesigned toolbar.
+ *
+ * @param layout    The layout the block is in.
+ * @param alignment The alignment.
+ * @return The maximum width, or nothing when it is not limited.
+ */
+function getAlignmentMaxWidth(
+	layout: Layout,
+	alignment: string
+): string | undefined {
+	const { contentSize, wideSize, inherit, type } = layout;
+	const isConstrained = type === 'constrained' || ( ! type && inherit );
+	let size: string | null | undefined;
+	if ( alignment === 'none' && isConstrained ) {
+		size = contentSize;
+	} else if ( alignment === 'wide' ) {
+		size = wideSize;
+	}
+	if ( ! size ) {
+		return undefined;
+	}
+	// translators: %s: maximum width of a block, e.g. "645px".
+	return sprintf( __( 'Max. %s' ), size );
+}
+
+function BlockAlignmentMenuItem( {
+	blockName,
+	value,
+	alignments,
+	onChange,
+}: {
+	blockName: string;
+	value?: string;
+	alignments: { name: string }[];
+	onChange: ( value: string | undefined ) => void;
+} ) {
+	const layout = useLayout();
+	// Containers group their width with their layout in the Layout menu.
+	const isInLayoutMenu = hasLayoutBlockSupport( blockName );
+	const labels = getAlignmentMenuLabels( isInLayoutMenu );
+	const currentValue = value || 'none';
+	return (
+		<BlockOptionsMenuControls>
+			<BlockOptionsMenuItem
+				group={ isInLayoutMenu ? 'layout' : 'align' }
+				name="block-align"
+				label={ isInLayoutMenu ? __( 'Block width' ) : __( 'Block' ) }
+				icon={ BLOCK_ALIGNMENTS_CONTROLS[ currentValue ]?.icon }
+				choices={ alignments.map( ( { name } ) => ( {
+					value: name,
+					label: labels[ name ] ?? name,
+					icon: BLOCK_ALIGNMENTS_CONTROLS[ name ]?.icon,
+					info: getAlignmentMaxWidth( layout, name ),
+				} ) ) }
+				value={ currentValue }
+				onChange={ ( nextValue ) =>
+					onChange( nextValue === 'none' ? undefined : nextValue )
+				}
+			/>
+		</BlockOptionsMenuControls>
+	);
+}
+
 function BlockEditAlignmentToolbarControlsPure( {
 	name: blockName,
 	align,
@@ -226,6 +322,19 @@ function BlockEditAlignmentToolbarControlsPure( {
 		}
 		setAttributes( { align: nextAlign } );
 	};
+
+	// The redesigned toolbar offers block alignment in the options menu, or
+	// in the Layout menu of container blocks.
+	if ( isBlockToolbarRedesignEnabled() ) {
+		return (
+			<BlockAlignmentMenuItem
+				blockName={ blockName }
+				value={ align }
+				alignments={ enabled }
+				onChange={ updateAlignment }
+			/>
+		);
+	}
 
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
