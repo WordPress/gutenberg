@@ -436,6 +436,7 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ loading && (
 				<Stack
+					align="center"
 					justify="center"
 					style={ {
 						// Match SearchControl height to prevent layout shift.
