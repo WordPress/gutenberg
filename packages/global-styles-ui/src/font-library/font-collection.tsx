@@ -19,8 +19,12 @@ import {
 	SearchControl,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Progress, Select } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Progress,
+	Select,
+} from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import {

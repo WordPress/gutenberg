@@ -18,6 +18,9 @@ test.use( {
 } );
 
 test.describe( 'Style Revisions', () => {
+	// Later tests use the revisions that earlier tests save.
+	test.describe.configure( { mode: 'serial' } );
+
 	let stylesPostId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -565,8 +568,15 @@ test.describe( 'Style Revisions', () => {
 		} );
 		await expect( currentPageSelect ).toHaveText( '1' );
 		await currentPageSelect.click();
-		await page.getByRole( 'option', { name: '2', exact: true } ).click();
-		await expect( currentPageSelect ).toHaveText( '2' );
+		// Specs that ran earlier can leave revisions behind, so go to the last
+		// page rather than assuming there are exactly two. Every page but the
+		// current one is named by its number alone.
+		const lastPageOption = page
+			.getByRole( 'option', { name: /^\d+$/ } )
+			.last();
+		const lastPageNumber = ( await lastPageOption.textContent() ).trim();
+		await lastPageOption.click();
+		await expect( currentPageSelect ).toHaveText( lastPageNumber );
 		// The theme defaults entry closes the last page.
 		await expect(
 			page.getByRole( 'option', {

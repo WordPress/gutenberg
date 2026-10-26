@@ -187,6 +187,8 @@ export const SETTINGS_DEFAULTS = {
 		'core/navigation-submenu': { enterDirection: 'rightToLeft' },
 		'core/navigation-link': { enterDirection: 'rightToLeft' },
 		'core/search': { enterDirection: 'rightToLeft' },
+		'core/buttons': { enterDirection: 'rightToLeft' },
+		'core/button': { enterDirection: 'rightToLeft' },
 		'core/social-links': { enterDirection: 'rightToLeft' },
 		'core/page-list': { enterDirection: 'rightToLeft' },
 		'core/spacer': { enterDirection: 'rightToLeft' },

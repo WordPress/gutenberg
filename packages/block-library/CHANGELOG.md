@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+
+### Bug Fixes
+
+-   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
+-   Page List: Keep page items visible in the Navigation sidebar during content-only editing ([#85357](https://github.com/WordPress/gutenberg/pull/85357)).
+-   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
+-   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
+-   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
+
+## 12.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

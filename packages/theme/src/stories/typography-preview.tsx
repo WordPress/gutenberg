@@ -1,21 +1,24 @@
 import type { CSSProperties } from 'react';
-import { tokens as wpdsTokens } from '../../prebuilt/js/design-tokens.mjs';
-
-const typographyTokens = Object.keys( wpdsTokens ).filter( ( tokenName ) =>
-	tokenName.startsWith( '--wpds-typography-' )
-);
+import { GroupTitle } from './group-title';
+import {
+	descriptionStyle,
+	itemStyle as sharedItemStyle,
+	listStyle,
+	previewStyle,
+	textStyle,
+	tokenNameStyle,
+} from './token-preview-styles';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 
 type TypographyTokenGroup = {
-	title: string;
-	tokenPrefix: string;
 	sampleLines: string[];
 	getSampleStyle: ( tokenValue: string, tokenName: string ) => CSSProperties;
 };
 
-const tokenGroups: TypographyTokenGroup[] = [
-	{
-		title: 'Font families',
-		tokenPrefix: '--wpds-typography-font-family-',
+type TypographyGroupKey = keyof typeof groups.typography.groups;
+
+const typographyConfig: Record< TypographyGroupKey, TypographyTokenGroup > = {
+	'font-family': {
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
 			fontFamily: tokenValue,
@@ -23,9 +26,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 			lineHeight: 'var(--wpds-typography-line-height-xl)',
 		} ),
 	},
-	{
-		title: 'Font sizes',
-		tokenPrefix: '--wpds-typography-font-size-',
+	'font-size': {
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue, tokenName ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-heading)',
@@ -36,9 +37,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 			),
 		} ),
 	},
-	{
-		title: 'Line heights',
-		tokenPrefix: '--wpds-typography-line-height-',
+	'line-height': {
 		sampleLines: [
 			'WordPress grows when people like you tell their friends about it.',
 			'Code is Poetry.',
@@ -49,9 +48,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 			lineHeight: tokenValue,
 		} ),
 	},
-	{
-		title: 'Font weights',
-		tokenPrefix: '--wpds-typography-font-weight-',
+	'font-weight': {
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-body)',
@@ -60,48 +57,15 @@ const tokenGroups: TypographyTokenGroup[] = [
 			lineHeight: 'var(--wpds-typography-line-height-lg)',
 		} ),
 	},
-];
-
-const previewStyle: CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	gap: 'var(--wpds-dimension-gap-3xl)',
-	color: 'var(--wpds-color-foreground-content-neutral)',
 };
 
-const headingStyle: CSSProperties = {
-	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
-};
-
-const listStyle: CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	gap: 'var(--wpds-dimension-gap-md)',
-	margin: 0,
-	padding: 0,
-};
-
+// Stack the token name and description above the sample.
 const itemStyle: CSSProperties = {
+	...sharedItemStyle,
 	display: 'flex',
 	flexDirection: 'column',
+	alignItems: 'stretch',
 	gap: 'var(--wpds-dimension-gap-md)',
-	padding: 'var(--wpds-dimension-padding-lg)',
-	backgroundColor: 'var(--wpds-color-background-surface-neutral-weak)',
-	border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
-	borderRadius: 'var(--wpds-border-radius-sm)',
-};
-
-const tokenNameStyle: CSSProperties = {
-	fontFamily: 'var(--wpds-typography-font-family-mono)',
-	fontSize: 'var(--wpds-typography-font-size-sm)',
-	fontStyle: 'normal',
-	fontWeight: 'var(--wpds-typography-font-weight-default)',
-	lineHeight: 'var(--wpds-typography-line-height-sm)',
-	overflowWrap: 'anywhere',
-};
-
-const tokenNameContainerStyle: CSSProperties = {
-	margin: 0,
 };
 
 const sampleStyle: CSSProperties = {
@@ -118,29 +82,33 @@ function getTokenValue( tokenName: string ) {
 }
 
 function TypographyTokenSection( {
-	title,
-	tokenPrefix,
+	groupKey,
+	tokenNames,
 	sampleLines,
 	getSampleStyle,
-}: TypographyTokenGroup ) {
-	const tokens = typographyTokens.filter( ( tokenName ) =>
-		tokenName.startsWith( tokenPrefix )
-	);
+}: TypographyTokenGroup & {
+	groupKey: string;
+	tokenNames: readonly ( keyof typeof tokens )[];
+} ) {
+	const sectionTokens = tokenNames;
 
 	return (
 		<section>
-			<h2 style={ headingStyle }>{ title }</h2>
+			<GroupTitle name={ groupKey } />
 			<dl style={ listStyle }>
-				{ tokens.map( ( tokenName ) => {
+				{ sectionTokens.map( ( tokenName ) => {
 					const tokenValue = getTokenValue( tokenName );
 					const tokenStyle = getSampleStyle( tokenValue, tokenName );
 
 					return (
 						<div key={ tokenName } style={ itemStyle }>
-							<dt style={ tokenNameContainerStyle }>
+							<dt style={ textStyle }>
 								<code style={ tokenNameStyle }>
 									{ tokenName }
 								</code>
+								<span style={ descriptionStyle }>
+									{ tokens[ tokenName ].$description }
+								</span>
 							</dt>
 							<dd style={ { margin: 0 } }>
 								<p style={ sampleStyle }>
@@ -172,10 +140,14 @@ function TypographyTokenSection( {
 export function TypographyTokenPreview() {
 	return (
 		<div style={ previewStyle }>
-			{ tokenGroups.map( ( tokenGroup ) => (
+			{ (
+				Object.keys( groups.typography.groups ) as TypographyGroupKey[]
+			 ).map( ( key ) => (
 				<TypographyTokenSection
-					key={ tokenGroup.tokenPrefix }
-					{ ...tokenGroup }
+					key={ key }
+					groupKey={ key }
+					tokenNames={ groups.typography.groups[ key ].tokens }
+					{ ...typographyConfig[ key ] }
 				/>
 			) ) }
 		</div>

@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Description', 'gutenberg' ),
+	'label'         => __( 'Description' ),
 	'readOnly'      => true,
 	'enableSorting' => false,
 	'enableHiding'  => false,

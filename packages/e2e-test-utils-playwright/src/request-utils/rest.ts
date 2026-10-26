@@ -2,7 +2,6 @@ import * as fs from 'fs/promises';
 import { dirname } from 'path';
 import { expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
-import { WP_BASE_URL } from '../config';
 import type { RequestUtils, StorageState } from './index';
 
 function splitRequestsToChunks( requests: BatchRequest[], chunkSize: number ) {
@@ -15,10 +14,10 @@ function splitRequestsToChunks( requests: BatchRequest[], chunkSize: number ) {
 	return cache;
 }
 
-async function getAPIRootURL( request: APIRequestContext ) {
+async function getAPIRootURL( request: APIRequestContext, baseURL?: string ) {
 	// Discover the API root url using link header.
 	// See https://developer.wordpress.org/rest-api/using-the-rest-api/discovery/#link-header
-	const response = await request.head( WP_BASE_URL );
+	const response = await request.head( baseURL! );
 	const links = response.headers().link;
 	const restLink = links?.match( /<([^>]+)>; rel="https:\/\/api\.w\.org\/"/ );
 
@@ -44,7 +43,7 @@ async function setupRest( this: RequestUtils ): Promise< StorageState > {
 				try {
 					[ nonce, rootURL ] = await Promise.all( [
 						this.login(),
-						getAPIRootURL( this.request ),
+						getAPIRootURL( this.request, this.baseURL ),
 					] );
 				} catch ( error ) {
 					// Prints the error if the timeout is reached.

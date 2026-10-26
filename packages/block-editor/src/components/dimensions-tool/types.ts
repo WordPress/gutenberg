@@ -57,7 +57,7 @@ export interface DimensionsToolProps {
 	/**
 	 * ID of the panel that contains the controls.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current dimensions values.
 	 */
@@ -99,7 +99,7 @@ export interface AspectRatioToolProps {
 	/**
 	 * ID of the panel this tool is associated with.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current aspect ratio value.
 	 */
@@ -145,7 +145,7 @@ export interface ScaleToolProps {
 	/**
 	 * ID of the panel that contains the controls.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current scale value.
 	 */
@@ -189,7 +189,7 @@ export interface WidthHeightToolProps {
 	/**
 	 * ID of the panel that contains the controls.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current dimensions values.
 	 */

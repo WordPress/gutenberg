@@ -18,7 +18,12 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { NoteDraftsContext, useNoteDraft, usePickNote } from './hooks';
+import {
+	NoteDraftsContext,
+	useNoteActions,
+	useNoteDraft,
+	usePickNote,
+} from './hooks';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
@@ -75,19 +80,15 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 
 export function NoteThread( {
 	note,
-	onEditNote,
-	onAddReply,
-	onDiscard,
-	onDeleteNote,
+	focusThreadOrAdjacent,
 	isSelected,
 	sidebarRef,
 	floating,
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -192,17 +193,34 @@ export function NoteThread( {
 
 	function onDeselectNote() {
 		selectNote( undefined );
-		toggleBlockSpotlight( note.blockClientId, false );
+		toggleBlockHighlight( note.blockClientId, false );
 	}
 
 	function handleResolve() {
-		onEditNote( note, { status: 'approved' } );
+		onEdit( note, { status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
-			focusNoteThread( note.id, sidebarRef.current );
+			focusThreadOrAdjacent( note, { ...note, status: 'approved' } );
 		}
+	}
+
+	async function handleDelete( noteToDelete ) {
+		const deleted = await onDelete( noteToDelete );
+		// Leave the selection alone when the delete failed; the note is still there.
+		if ( ! deleted ) {
+			return;
+		}
+
+		if ( noteToDelete.parent !== 0 ) {
+			// Move focus to the parent thread when a reply was deleted.
+			selectNote( noteToDelete.parent );
+			focusNoteThread( noteToDelete.parent, sidebarRef.current );
+			return;
+		}
+
+		focusThreadOrAdjacent( note, null );
 	}
 
 	const allReplies = note?.reply || [];
@@ -235,8 +253,6 @@ export function NoteThread( {
 			<AddNote
 				key={ note.blockClientId }
 				clientId={ note.blockClientId }
-				onSubmit={ onAddReply }
-				onDiscard={ onDiscard }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
@@ -298,8 +314,8 @@ export function NoteThread( {
 			<Note
 				note={ note }
 				isSelected={ isSelected }
-				onEditNote={ onEditNote }
-				onDeleteNote={ onDeleteNote }
+				onEditNote={ onEdit }
+				onDeleteNote={ handleDelete }
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
 			/>
@@ -310,8 +326,8 @@ export function NoteThread( {
 						note={ reply }
 						parentNote={ note }
 						isSelected={ isSelected }
-						onEditNote={ onEditNote }
-						onDeleteNote={ onDeleteNote }
+						onEditNote={ onEdit }
+						onDeleteNote={ handleDelete }
 						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
@@ -348,21 +364,21 @@ export function NoteThread( {
 					note={ lastReply }
 					parentNote={ note }
 					isSelected={ false }
-					onEditNote={ onEditNote }
-					onDeleteNote={ onDeleteNote }
+					onEditNote={ onEdit }
+					onDeleteNote={ handleDelete }
 					isThreadResolved={ isThreadResolved }
 				/>
 			) }
 			{ isSelected && (
 				<NoteReply
 					note={ note }
-					onEditNote={ onEditNote }
-					onAddReply={ onAddReply }
+					onEditNote={ onEdit }
+					onAddReply={ onCreate }
 					onCancel={ ( event ) => {
 						// Prevent the parent onClick from being triggered.
 						event.stopPropagation();
 						onDeselectNote();
-						focusNoteThread( note.id, sidebarRef.current );
+						focusThreadOrAdjacent( note, note );
 					} }
 				/>
 			) }

@@ -18,6 +18,17 @@
 	margin: 0;
 }
 
+// Keep the legacy control heights; the current control-size tokens use a different scale.
+.control-line-height {
+	--wp-components-text-line-height: 44px;
+}
+
+@each $size, $height in (large: 51.2px, small: 36.8px, xSmall: 29.6px) {
+	.control-line-height-#{$size} {
+		--wp-components-text-line-height: #{$height};
+	}
+}
+
 // Truncate's white-space declaration must win in either stylesheet order.
 :where(.text) {
 	text-wrap: pretty;
