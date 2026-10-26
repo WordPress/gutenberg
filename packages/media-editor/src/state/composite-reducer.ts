@@ -4,7 +4,7 @@ import {
 	cropperReducer,
 	areCropperStatesEqual,
 	computeInscribedRect,
-} from '../image-editor/internals';
+} from '../image-editor/core';
 import {
 	DEFAULT_CROP_OPTIONS,
 	type CropOptionsSlice,

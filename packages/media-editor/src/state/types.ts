@@ -1,5 +1,5 @@
 import type { CropperState, NormalizedRect, Size } from '../image-editor';
-import type { CropperAction } from '../image-editor/internals';
+import type { CropperAction } from '../image-editor/core';
 
 /**
  * Sidebar control state for the cropper. Lives in the composite store

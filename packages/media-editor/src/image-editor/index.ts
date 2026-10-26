@@ -4,7 +4,8 @@
  * Keep this barrel explicit so implementation details from `core/`,
  * `react/hooks/`, or `react/components/` do not become supported API by
  * accident. The media editor's own state code imports the reducer-level
- * helpers from `./internals`; everyone else uses what is here.
+ * helpers from `./core` and `./react/hooks` directly, as the package's
+ * components already do; everyone else uses what is here.
  */
 
 // React surface.

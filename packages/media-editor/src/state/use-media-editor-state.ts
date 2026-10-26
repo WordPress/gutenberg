@@ -16,10 +16,10 @@ import {
 import {
 	DEFAULT_STATE,
 	areCropperStatesEqual,
-	buildCropperSetters,
 	enforceContainment,
 	type CropperAction,
-} from '../image-editor/internals';
+} from '../image-editor/core';
+import { buildCropperSetters } from '../image-editor/react/hooks';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
