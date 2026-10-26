@@ -22,6 +22,9 @@ parameters:
 		- ../../lib
 	bootstrapFiles:
 		- bootstrap.php
+	# The polyfills that WordPress provides for newer PHP functions.
+	scanFiles:
+		- polyfills.php
 	# Constants defined in the bootstrap whose values depend on the site's configuration.
 	dynamicConstantNames:
 		- MEDIA_TRASH

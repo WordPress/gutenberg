@@ -1,70 +1,10 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Function str_ends_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/background.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/custom-css.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 3
-			path: ../../lib/block-supports/custom-css.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/dimensions.php
-
-		-
-			message: '#^Function str_ends_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/dimensions.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/block-supports/duotone.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/elements.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/elements.php
-
-		-
 			message: '#^Function wp_get_elements_class_name invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 1
 			path: ../../lib/block-supports/elements.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 7
-			path: ../../lib/block-supports/layout.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/layout.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''FIGURE'' given\.$#'
@@ -73,34 +13,10 @@ parameters:
 			path: ../../lib/block-supports/layout.php
 
 		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/position.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 4
-			path: ../../lib/block-supports/states.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/states.php
-
-		-
 			message: '#^Property WP_Block_Type\:\:\$selectors \(array\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
 			path: ../../lib/block-supports/states.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/block-supports/typography.php
 
 		-
 			message: '#^Right side of && is always true\.$#'
@@ -109,64 +25,16 @@ parameters:
 			path: ../../lib/block-supports/typography.php
 
 		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/blocks.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/class-wp-duotone-gutenberg.php
-
-		-
 			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
 			path: ../../lib/class-wp-duotone-gutenberg.php
 
 		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/class-wp-icons-registry-gutenberg.php
-
-		-
-			message: '#^Function str_ends_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/class-wp-icons-registry-gutenberg.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/class-wp-icons-registry-gutenberg.php
-
-		-
 			message: '#^Parameter \#1 \$id \(int\) of method WP_REST_Global_Styles_Controller_Gutenberg\:\:prepare_links\(\) should be compatible with parameter \$post \(WP_Post\) of method WP_REST_Posts_Controller\:\:prepare_links\(\)$#'
 			identifier: method.childParameterType
 			count: 1
 			path: ../../lib/class-wp-rest-global-styles-controller-gutenberg.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 7
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Function str_ends_with not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 7
-			path: ../../lib/class-wp-theme-json-gutenberg.php
 
 		-
 			message: '#^Method WP_Theme_JSON_Gutenberg\:\:get_block_name_from_metadata_path\(\) should return string\|null but return statement is missing\.$#'
@@ -271,12 +139,6 @@ parameters:
 			path: ../../lib/class-wp-theme-json-gutenberg.php
 
 		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
 			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$blocks \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -349,34 +211,16 @@ parameters:
 			path: ../../lib/client-assets.php
 
 		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/client-assets.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
 			path: ../../lib/client-assets.php
 
 		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/block-bindings.php
-
-		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
 			path: ../../lib/compat/wordpress-7.1/block-bindings.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/block-comments.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SPAN'' given\.$#'
@@ -403,9 +247,9 @@ parameters:
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
 
 		-
-			message: '#^Function array_is_list not found\.$#'
-			identifier: function.notFound
-			count: 10
+			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
 
 		-
@@ -421,22 +265,10 @@ parameters:
 			path: ../../lib/compat/wordpress-7.1/icons.php
 
 		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/notes-mentions.php
-
-		-
 			message: '#^Property WP_Post\:\:\$post_date \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
 			path: ../../lib/compat/wordpress-7.1/rest-api.php
-
-		-
-			message: '#^Function array_any not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php
 
 		-
 			message: '#^Parameter \#1 \$args of function get_comments expects array\{author_email\?\: string, author_url\?\: string, author__in\?\: array\<int\>, author__not_in\?\: array\<int\>, comment__in\?\: array\<int\>, comment__not_in\?\: array\<int\>, count\?\: bool, date_query\?\: array, \.\.\.\}, array\{parent\: numeric\-string, count\: true, orderby\: ''none'', type\: ''all'', type__not_in\: array\{''reaction''\}\} given\.$#'
@@ -445,39 +277,9 @@ parameters:
 			path: ../../lib/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php
 
 		-
-			message: '#^Function array_is_list not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/class-wp-entity-actions-registry.php
-
-		-
-			message: '#^Function array_is_list not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/class-wp-entity-fields-registry.php
-
-		-
 			message: '#^Function gutenberg_exclude_notes_from_comment_count_7_2\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
-			path: ../../lib/compat/wordpress-7.2/note-reactions.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/compat/wordpress-7.2/note-reactions.php
-
-		-
-			message: '#^Function str_ends_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/note-reactions.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 2
 			path: ../../lib/compat/wordpress-7.2/note-reactions.php
 
 		-
@@ -505,58 +307,10 @@ parameters:
 			path: ../../lib/compat/wordpress-7.2/notes.php
 
 		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/preload.php
-
-		-
-			message: '#^Function array_is_list not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: ../../lib/compat/wordpress-7.2/rest-api.php
-
-		-
-			message: '#^Function array_any not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/experimental/collaboration/class-wp-http-polling-sync-server.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/experimental/collaboration/class-wp-sync-config.php
-
-		-
 			message: '#^Method WP_Sync_Save_Server\:\:handle_request\(\) should return WP_Error\|WP_REST_Response but returns array\.$#'
 			identifier: return.type
 			count: 1
 			path: ../../lib/experimental/collaboration/class-wp-sync-save-server.php
-
-		-
-			message: '#^Function str_contains not found\.$#'
-			identifier: function.notFound
-			count: 3
-			path: ../../lib/experimental/dashboard-widgets/widget-types.php
-
-		-
-			message: '#^Function str_ends_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/experimental/dashboard-widgets/widget-types.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/experimental/dashboard-widgets/widget-types.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 3
-			path: ../../lib/experimental/knowledge/knowledge.php
 
 		-
 			message: '#^Access to an undefined property WP_Post\:\:\$content\.$#'
@@ -595,24 +349,6 @@ parameters:
 			path: ../../lib/experimental/navigation-theme-opt-in.php
 
 		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../lib/experimental/rest-api-overrides.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 3
-			path: ../../lib/experimental/script-modules.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 3
-			path: ../../lib/global-styles-and-settings.php
-
-		-
 			message: '#^Cannot assign offset ''_fields'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
 			identifier: offsetAssign.dimType
 			count: 1
@@ -622,12 +358,6 @@ parameters:
 			message: '#^Cannot assign offset ''context'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
 			identifier: offsetAssign.dimType
 			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-		-
-			message: '#^Function str_starts_with not found\.$#'
-			identifier: function.notFound
-			count: 2
 			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
 
 		-
