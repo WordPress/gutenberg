@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. Spinners at the default size are now thinner, and large spinners are thicker ([#85378](https://github.com/WordPress/gutenberg/pull/85378)).
 -   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items and their supporting content ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
