@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `formatNumber`, `getSettings` and `setSettings` to format displayed numbers with the separators of the user's locale.
+
 ## 7.0.0 (2026-10-20)
 
 ### Breaking Changes

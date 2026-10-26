@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useCallback, useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, formatNumber } from '@wordpress/i18n';
 import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
 import { Spinner as WCSpinner } from '@wordpress/components';
@@ -9,7 +9,6 @@ import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import type { MediaItem, MediaType } from './types';
-import formatNumber from '../../../utils/format-number';
 
 type MediaGridProps = {
 	// Results.

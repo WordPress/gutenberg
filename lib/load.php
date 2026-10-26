@@ -152,6 +152,7 @@ require __DIR__ . '/compat/wordpress-7.1/icons.php';
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
 require __DIR__ . '/compat/wordpress-7.2/media.php';
 require __DIR__ . '/compat/wordpress-7.2/post.php';
+require __DIR__ . '/compat/wordpress-7.2/i18n.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

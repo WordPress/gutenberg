@@ -1,5 +1,11 @@
 export { sprintf } from './sprintf';
 export * from './create-i18n';
+export {
+	formatNumber,
+	getSettings,
+	setSettings,
+	type NumberFormatSettings,
+} from './number-format';
 export type * from './types';
 export {
 	default as defaultI18n,

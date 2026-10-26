@@ -1,7 +1,6 @@
 import { addQueryArgs } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, formatNumber } from '@wordpress/i18n';
 import type { Post, ActionScriptParts } from '../../shared/types';
-import formatNumber from '../../shared/format-number';
 
 const viewPostRevisions: ActionScriptParts< Post > = {
 	label( items ) {

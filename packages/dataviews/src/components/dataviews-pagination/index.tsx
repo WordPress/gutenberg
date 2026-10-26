@@ -7,12 +7,11 @@ import {
 	useContext,
 	useState,
 } from '@wordpress/element';
-import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
+import { sprintf, __, _x, isRTL, formatNumber } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { Input, Select, Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import type { View } from '../../types';
-import formatNumber from '../../utils/format-number';
 
 /**
  * Above this many pages the page select gives way to a number input. A list

@@ -11,9 +11,8 @@ import { useState, useEffect, useMemo, Fragment } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
-import { sprintf, _n, _x, __ } from '@wordpress/i18n';
+import { sprintf, _n, _x, __, formatNumber } from '@wordpress/i18n';
 import { useTaxonomies } from '../../utils';
-import formatNumber from '../../../utils/format-number';
 
 const EMPTY_ARRAY = [];
 const EMPTY_MAP = new Map();
