@@ -8,6 +8,7 @@ const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
 const { parseSourceString } = require( '../../config/parse-source-string' );
 const { isPortAnswering } = require( '../../port-utils' );
+const addOrReplacePort = require( '../../config/add-or-replace-port' );
 const { didCacheChange, setCache } = require( '../../cache' );
 const md5 = require( '../../md5' );
 
@@ -170,7 +171,7 @@ class PhpRuntime {
 	 */
 	async stop( config, { spinner } ) {
 		spinner.text = 'Stopping PHP.';
-		const pid = await getServerPid( config );
+		const pid = ( await getServer( config ) )?.pid;
 		if ( pid && process.platform === 'win32' ) {
 			// Windows has no process groups, so stop the process tree.
 			spawn.sync( 'taskkill', [ '/pid', String( pid ), '/t', '/f' ] );
@@ -240,7 +241,7 @@ class PhpRuntime {
 			throw new Error( 'The site is not set up yet. Start it first.' );
 		}
 		// Replacing the database while the server writes to it can corrupt it.
-		const isRunning = !! ( await getServerPid( config ) );
+		const isRunning = !! ( await getServer( config ) );
 		await this.stop( config, { spinner } );
 		await rimraf( [ `${ database }-wal`, `${ database }-shm` ] );
 		await fs.copyFile( clean, database );
@@ -260,16 +261,22 @@ class PhpRuntime {
 	 */
 	async getStatus( config ) {
 		const envConfig = config.env.development;
-		const isRunning = !! ( await getServerPid( config ) );
+		// `--auto-port` can start the server on another port than the config's.
+		const server = await getServer( config );
 
 		return {
-			status: isRunning ? 'running' : 'stopped',
+			status: server ? 'running' : 'stopped',
 			runtime: 'php',
 			urls: {
-				development: isRunning ? envConfig.config.WP_SITEURL : null,
+				development: server
+					? addOrReplacePort(
+							envConfig.config.WP_SITEURL,
+							server.port
+						)
+					: null,
 			},
 			ports: {
-				development: envConfig.port,
+				development: server?.port ?? envConfig.port,
 			},
 			config: {
 				multisite: false,
@@ -545,12 +552,12 @@ function getServerPaths( config ) {
 }
 
 /**
- * The PID of this site's running server, if any.
+ * The PID and port of this site's running server, if any.
  *
  * @param {Object} config The wp-env config object.
- * @return {Promise<number|null>} The PID, or null.
+ * @return {Promise<{pid: number, port: number}|null>} The server, or null.
  */
-async function getServerPid( config ) {
+async function getServer( config ) {
 	// The PID, then the port.
 	const saved = (
 		await fs
@@ -574,7 +581,7 @@ async function getServerPid( config ) {
 		);
 		return /^"php/i.test( stdout ) &&
 			( await isPortAnswering( saved[ 1 ] ) )
-			? pid
+			? { pid, port: saved[ 1 ] }
 			: null;
 	}
 	const { stdout } = spawn.sync(
@@ -583,7 +590,7 @@ async function getServerPid( config ) {
 		{ encoding: 'utf8' }
 	);
 	const siteDir = path.join( config.workDirectoryPath, 'php' );
-	return stdout?.includes( siteDir ) ? pid : null;
+	return stdout?.includes( siteDir ) ? { pid, port: saved[ 1 ] } : null;
 }
 
 /**
