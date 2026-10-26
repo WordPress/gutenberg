@@ -20,6 +20,28 @@ parameters:
 	paths:
 		- ../../gutenberg.php
 		- ../../lib
+		# Package PHP that WordPress core ships, copied or synced from here, so this is the only
+		# place it can be analyzed.
+		- ../../packages/block-library/src
+		- ../../packages/block-serialization-default-parser
+		- ../../packages/core-actions/src
+		- ../../packages/core-fields/src
+		- ../../packages/icons/src
+		- ../../packages/style-engine/src
+		- ../../packages/widgets/src
+		# The PHP generated from the wp-build templates, which core also ships. The templates are
+		# not valid PHP themselves, so only the generated files can be analyzed.
+		- ../../build/constants.php
+		- ../../build/pages.php
+		- ../../build/pages
+		- ../../build/routes.php
+		- ../../build/routes
+	excludePaths:
+		analyseAndScan:
+			# Locally installed npm dependencies, which may include PHP files.
+			- */node_modules/*
+		analyse:
+			- ../../packages/block-serialization-default-parser/test
 	bootstrapFiles:
 		- bootstrap.php
 	# The polyfills that WordPress provides for newer PHP functions.
