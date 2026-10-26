@@ -64,7 +64,7 @@ export function NoteByline( { avatar, name, date, userId } ) {
 	const tooltipText = dateI18n(
 		// translators: Use a non-breaking space between 'g:i' and 'a' if appropriate.
 		_x( 'F j, Y g:i\xa0a', 'Note date full date format' ),
-		date
+		commentDate
 	);
 
 	return (

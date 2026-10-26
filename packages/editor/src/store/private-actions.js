@@ -7,7 +7,11 @@ import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	getDate,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
 import {
@@ -1008,7 +1012,13 @@ export const restoreRevision =
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
 				__( 'Restored to revision from %s.' ),
-				dateI18n( getDateSettings().formats.datetime, revision.date )
+				// The REST API gives the date in site time without an offset;
+				// getDate() reads it in the site timezone rather than the
+				// browser's.
+				dateI18n(
+					getDateSettings().formats.datetime,
+					getDate( revision.date )
+				)
 			),
 			{
 				type: 'snackbar',
