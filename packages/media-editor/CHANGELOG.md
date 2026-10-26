@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the design system focus ring for the crop area and crop handles in the image cropper.
+
 ## 0.21.0 (2026-10-20)
 
 ### Breaking Changes
