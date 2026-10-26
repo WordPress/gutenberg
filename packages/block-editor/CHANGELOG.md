@@ -11,7 +11,7 @@
 
 ### Experimental
 
--   Block toolbar: Add a redesign of the block toolbar behind the "Block toolbar redesign" experiment. It shows the block name as the entry point for transforms and style presets, groups block tools in one searchable options menu, moves text formatting to a toolbar that appears with a text selection, adds full-size movers, a Delete button, a Layout menu and inserter for container blocks, and moves the parent selector outside the block with a menu of every ancestor.
+-   Block toolbar: Add a redesign of the block toolbar behind the "Block toolbar redesign" experiment. It shows the block name as the entry point for transforms and style presets, groups block tools in one searchable options menu, moves text formatting to a toolbar that appears with a text selection, adds full-size movers, a Delete button, a Layout menu and inserter for container blocks, and moves the parent selector outside the block with a menu of every ancestor ([#85567](https://github.com/WordPress/gutenberg/pull/85567)).
 
 ### Bug Fixes
 
