@@ -246,7 +246,7 @@ export function AiPluginCallout() {
 			<Card.Content>
 				<Card.FullBleed className="ai-plugin-callout__surface">
 					<Stack direction="column" align="flex-start" gap="md">
-						<Text variant="body-md" render={ <p /> }>
+						<Text variant="body-md">
 							{ createInterpolateElement( getMessage(), {
 								strong: <strong />,
 								a: <Link href={ AI_PLUGIN_URL } openInNewTab />,
