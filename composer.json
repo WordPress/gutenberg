@@ -58,6 +58,7 @@
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
 		"phpstan": "phpstan analyse --memory-limit=2G",
+		"phpstan:baselines": "@phpstan --generate-baseline=tools/phpstan/baseline.neon --allow-empty-baseline",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}
