@@ -118,15 +118,44 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 	},
 };
 
-export const MultiSelection: StoryObj< typeof DropdownMenu > = {
-	parameters: {
-		docs: {
-			source: { type: 'code' },
-			description: {
-				story: 'Use `MenuItem` with `role="menuitemcheckbox"` for independent selections. Set `isSelected` and a check icon for each selected item. Keep the popup open by updating the selection without calling `onClose`.',
-			},
-		},
+/**
+ * Use `MenuItemsChoice` for mutually exclusive selections. It renders radio menu
+ * items and a check icon for the selected choice. This example keeps the popup
+ * open when the selection changes.
+ */
+export const SingleSelection: StoryObj< typeof DropdownMenu > = {
+	args: {
+		label: 'Editor options',
+		icon: more,
 	},
+	render: function Render( args ) {
+		const [ mode, setMode ] = useState( 'visual' );
+
+		return (
+			<DropdownMenu { ...args }>
+				{ () => (
+					<MenuGroup label="Editor">
+						<MenuItemsChoice
+							choices={ [
+								{ value: 'visual', label: 'Visual editor' },
+								{ value: 'code', label: 'Code editor' },
+							] }
+							value={ mode }
+							onSelect={ setMode }
+						/>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+		);
+	},
+};
+
+/**
+ * Use `MenuItem` with `role="menuitemcheckbox"` for independent selections.
+ * Set `isSelected` and a check icon for each selected item. Keep the popup open
+ * by updating the selection without calling `onClose`.
+ */
+export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 	args: {
 		label: 'Typography options',
 		icon: more,
@@ -163,41 +192,6 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 								);
 							}
 						) }
-					</MenuGroup>
-				) }
-			</DropdownMenu>
-		);
-	},
-};
-
-export const SingleSelection: StoryObj< typeof DropdownMenu > = {
-	parameters: {
-		docs: {
-			source: { type: 'code' },
-			description: {
-				story: 'Use `MenuItemsChoice` for mutually exclusive selections. It renders radio menu items and a check icon for the selected choice. This example keeps the popup open when the selection changes.',
-			},
-		},
-	},
-	args: {
-		label: 'Editor options',
-		icon: more,
-	},
-	render: function Render( args ) {
-		const [ mode, setMode ] = useState( 'visual' );
-
-		return (
-			<DropdownMenu { ...args }>
-				{ () => (
-					<MenuGroup label="Editor">
-						<MenuItemsChoice
-							choices={ [
-								{ value: 'visual', label: 'Visual editor' },
-								{ value: 'code', label: 'Code editor' },
-							] }
-							value={ mode }
-							onSelect={ setMode }
-						/>
 					</MenuGroup>
 				) }
 			</DropdownMenu>
