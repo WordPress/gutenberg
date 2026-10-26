@@ -1,12 +1,7 @@
 import { useEffect, useRef } from '@wordpress/element';
-import {
-	focus,
-	isFormElement,
-	isTextField,
-	placeCaretAtHorizontalEdge,
-} from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 import { isInsideRootBlock } from '../../../utils/dom';
+import { focusBlock } from '../../../utils/focus-block';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -30,15 +25,6 @@ export function useFocusFirstElement( {
 	const ref = useRef< HTMLElement >( null );
 	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
 		unlock( useSelect( blockEditorStore ) );
-	// Reselecting a block can request focus without changing its initial position.
-	const { selectionRequest } = useSelect(
-		( select ) => ( {
-			selectionRequest: unlock(
-				select( blockEditorStore )
-			).getBlockSelectionRequest( clientId ),
-		} ),
-		[ clientId ]
-	);
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -60,77 +46,32 @@ export function useFocusFirstElement( {
 
 		const { ownerDocument } = ref.current;
 
-		// An iframe can retain its active element after focus leaves the canvas.
-		// Only skip focusing if the block actually has focus.
-		if (
-			ownerDocument.hasFocus() &&
-			isInsideRootBlock( ref.current, ownerDocument.activeElement! )
-		) {
+		// Preserve the active element and caret while interacting with editor UI.
+		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement! ) ) {
 			return;
 		}
 
-		if ( initialPosition === true ) {
-			ref.current.focus();
-			return;
-		}
-
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable
-			.find( ref.current )
-			.filter( ( node ) => isTextField( node ) );
-
-		// If reversed (e.g. merge via backspace), use the last in the set of
-		// tabbables.
-		const isReverse = -1 === initialPosition;
-		const target =
-			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
-
-		if ( ! isInsideRootBlock( ref.current, target ) ) {
-			ref.current.focus();
-			return;
-		}
-
-		// Check to see if element is focussable before a generic caret insert.
-		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
-			const focusElement = focus.tabbable.findNext( ref.current );
-			// Make sure focusElement is valid, contained in the same block, and a form field.
-			if (
-				focusElement &&
-				isInsideRootBlock( ref.current, focusElement ) &&
-				isFormElement( focusElement )
-			) {
-				focusElement.focus();
-				return;
-			}
-		}
-		// Do not place a caret when the target already contains one:
-		// while a focused editing host contains the target (the block
-		// supports `editableRoot`), the caret can be inside it without the
-		// target holding focus. Only a caret the rich text synchronized to
-		// the store (offsets present) is deliberate; a leftover one yields
-		// to an explicitly requested edge position (initialPosition -1).
-		// Only HTML elements are focused in the editor.
-		const activeElement = ownerDocument.activeElement as HTMLElement | null;
-		// A rendered block's document has a window with a selection.
-		const selection = ownerDocument.defaultView!.getSelection()!;
-		const { clientId: selectionClientId, offset } = getSelectionStart();
-		const hasCaret =
-			ownerDocument.hasFocus() &&
-			activeElement?.isContentEditable &&
-			activeElement.contains( target ) &&
-			!! selection.anchorNode &&
-			target.contains( selection.anchorNode );
-		const isDeliberate =
-			initialPosition === 0 ||
-			( offset !== undefined && selectionClientId === clientId );
-
-		if ( ! ( hasCaret && isDeliberate ) ) {
-			placeCaretAtHorizontalEdge( target, isReverse );
-		}
+		focusBlock( ref.current, initialPosition, ( target ) => {
+			// An editable canvas can own the caret without focusing the block.
+			// Keep a deliberate caret, but let a leftover one yield to a requested
+			// reverse position (for example, when merging with Backspace).
+			const activeElement =
+				ownerDocument.activeElement as HTMLElement | null;
+			const selection = ownerDocument.defaultView!.getSelection()!;
+			const { clientId: selectionClientId, offset } = getSelectionStart();
+			const hasCaret =
+				activeElement?.isContentEditable &&
+				activeElement.contains( target ) &&
+				!! selection.anchorNode &&
+				target.contains( selection.anchorNode );
+			const isDeliberate =
+				initialPosition === 0 ||
+				( offset !== undefined && selectionClientId === clientId );
+			return !! ( hasCaret && isDeliberate );
+		} );
 	}, [
 		initialPosition,
 		clientId,
-		selectionRequest,
 		getSelectionStart,
 		isBlockSelected,
 		isMultiSelecting,

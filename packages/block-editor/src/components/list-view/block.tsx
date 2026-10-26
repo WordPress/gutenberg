@@ -35,6 +35,8 @@ import {
 } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
+import { focusBlock } from '../../utils/focus-block';
+import { useBlockElementRef } from '../block-list/use-block-props/use-block-refs';
 import { getPositionTypeLabel } from '../use-block-display-information';
 import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
@@ -66,6 +68,8 @@ function ListViewBlock( {
 	const cellRef = useRef< HTMLTableCellElement >( null );
 	const rowRef = useRef< HTMLTableRowElement >( null );
 	const settingsRef = useRef< HTMLTableCellElement >( null );
+	const blockRef = useRef< HTMLElement | null | undefined >( null );
+	useBlockElementRef( clientId, blockRef );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState< DOMRect >();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
@@ -107,6 +111,7 @@ function ListViewBlock( {
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
+	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const pasteStyles = usePasteStyles();
@@ -446,10 +451,31 @@ function ListViewBlock( {
 			// subsequent keyboard operations (arrow navigation, copy/paste)
 			// still work.
 			const isKeyboardActivation = event?.detail === 0;
+			const selectedBlocks = getSelectedBlockClientIds();
+			const isAlreadySelected =
+				selectedBlocks.length === 1 && selectedBlocks[ 0 ] === clientId;
 			selectBlock( event, clientId, isKeyboardActivation ? 0 : null );
 			event.preventDefault();
+
+			// Reselection does not trigger the canvas selection effect.
+			if (
+				isKeyboardActivation &&
+				! event.shiftKey &&
+				isAlreadySelected &&
+				! isDisabled &&
+				! isZoomOut() &&
+				blockRef.current
+			) {
+				focusBlock( blockRef.current );
+			}
 		},
-		[ clientId, selectBlock ]
+		[
+			clientId,
+			selectBlock,
+			getSelectedBlockClientIds,
+			isDisabled,
+			isZoomOut,
+		]
 	);
 
 	const updateFocusAndSelection = useCallback(
