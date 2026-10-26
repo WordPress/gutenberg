@@ -322,22 +322,26 @@ class Gutenberg_Navigation_Remove_Deleted_Links_Test extends WP_UnitTestCase {
 		$this->assertSame( array(), $this->get_menu_blocks( $menu_id ) );
 	}
 
-	public function test_a_deletion_with_no_current_user_keeps_the_other_labels_intact() {
+	public function test_a_deletion_with_no_current_user_keeps_the_other_links_intact() {
 		// Emptying the trash runs from cron, where there is no user and kses
 		// filters the menu content on save.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$menu_id = $this->create_menu( $this->custom_link( 'Tom & Jerry\'s "Day"' ) . $this->page_link( $page_id ) );
+		$other   = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$menu_id = $this->create_menu(
+			$this->custom_link() .
+			$this->submenu( $this->page_attrs( $other, 'Other' ), $this->page_link( $page_id, 'Deleted' ) . $this->custom_link( 'Child' ) )
+		);
+		$before  = $this->get_menu_blocks( $menu_id );
 		wp_set_current_user( 0 );
 		kses_init();
 
 		wp_delete_post( $page_id, true );
 
 		$blocks = $this->get_menu_blocks( $menu_id );
-		$this->assertCount( 1, $blocks );
-		// kses re-encodes block attributes on a save without `unfiltered_html`:
-		// the structure survives and the label is entity-encoded, as it would
-		// be for any post saved by a user without that capability.
-		$this->assertSame( 'Tom &amp; Jerry\'s "Day"', $blocks[0]['attrs']['label'] );
+		$this->assertSame( $before[0], $blocks[0] );
+		$this->assertSame( $before[1]['attrs'], $blocks[1]['attrs'] );
+		$this->assertCount( 1, $blocks[1]['innerBlocks'] );
+		$this->assertSame( $before[1]['innerBlocks'][1], $blocks[1]['innerBlocks'][0] );
 		kses_remove_filters();
 	}
 
