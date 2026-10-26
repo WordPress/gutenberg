@@ -160,11 +160,7 @@ export function getSliderValueFromPreset(
 		return 0;
 	}
 	const slug =
-		parseFloat(
-			presetValue,
-			// @ts-expect-error `parseFloat` takes no radix, so this is ignored.
-			10
-		) === 0
+		parseFloat( presetValue ) === 0
 			? '0'
 			: getPresetSlug( presetValue, SPACING_PRESET_TYPE );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {

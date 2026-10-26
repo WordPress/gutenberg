@@ -1,6 +1,5 @@
 import { useSelect } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { AbsoluteBlockIndexPath } from '../types';
 import { unlock } from '../lock-unlock';

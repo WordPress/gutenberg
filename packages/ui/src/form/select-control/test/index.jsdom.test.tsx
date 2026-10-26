@@ -2,13 +2,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import warning from '@wordpress/warning';
 import type { ReactNode } from 'react';
 import { SelectControl } from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../../utils/use-enable-wp-compat-overlay-slot';
 
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
+
+const mockedWarning = vi.mocked( warning );
+
 describe( 'SelectControl', () => {
 	const mockItems = [
-		{ value: '', label: 'Select' },
+		{ value: null, label: 'None' },
 		{ value: 'option1', label: 'Option 1' },
 		{ value: 'option2', label: 'Option 2' },
 		{ value: 'option3', label: 'Option 3' },
@@ -111,7 +116,7 @@ describe( 'SelectControl', () => {
 		render(
 			<SelectControl
 				label="Country"
-				items={ mockItems }
+				items={ mockItems.slice( 1 ) }
 				placeholder="Choose a country"
 			/>
 		);
@@ -299,6 +304,65 @@ describe( 'SelectControl', () => {
 
 	// Slot is identified by a data attribute, not a user-facing role/text.
 	/* eslint-disable testing-library/no-node-access */
+	describe( 'empty values', () => {
+		afterEach( () => {
+			mockedWarning.mockClear();
+		} );
+
+		it( 'shows the label of a selected null item', () => {
+			render(
+				<SelectControl
+					label="Country"
+					items={ mockItems }
+					defaultValue={ mockItems[ 0 ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Country' } )
+			).toHaveTextContent( 'None' );
+		} );
+
+		it( 'warns when an item has an empty string value', () => {
+			render(
+				<SelectControl
+					label="Country"
+					items={ [
+						{ value: '', label: 'Default' },
+						{ value: 'option1', label: 'Option 1' },
+					] }
+				/>
+			);
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				expect.stringContaining(
+					'SelectControl: empty string item values'
+				)
+			);
+		} );
+
+		it( 'does not warn when a custom serializer gives an empty value a name', () => {
+			render(
+				<SelectControl
+					label="Country"
+					items={ [
+						{ value: '', label: 'Default' },
+						{ value: 'option1', label: 'Option 1' },
+					] }
+					itemToStringValue={ ( item ) => item.value || 'default' }
+				/>
+			);
+
+			expect( mockedWarning ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not warn for null and non-empty values', () => {
+			render( <SelectControl label="Country" items={ mockItems } /> );
+
+			expect( mockedWarning ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'wp compat overlay slot', () => {
 		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
 

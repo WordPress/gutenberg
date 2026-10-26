@@ -11,7 +11,11 @@ import {
 	isHeicFile,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
+import {
+	canvasConvertToJpeg,
+	HeicUnsupportedError,
+	type JpegEncoder,
+} from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
@@ -27,6 +31,7 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
+	vipsEncodeCanvasAsJpeg,
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
@@ -870,8 +875,8 @@ export function prepareItem( id: QueueItemId ) {
 				} )
 			: file;
 
-		// Gate very large images out of client-side processing. wasm-vips is
-		// capped at 1 GiB of memory, so high-megapixel images, especially
+		// Gate very large images out of client-side processing. wasm-vips's
+		// memory can grow to at most 2 GiB, so high-megapixel images, especially
 		// interlaced/progressive ones, which can't be decoded with
 		// shrink-on-load, can exhaust it and fail. These are routed to the
 		// server, which has no comparable per-image ceiling. If dimensions
@@ -919,10 +924,19 @@ export function prepareItem( id: QueueItemId ) {
 			// and upload the resulting JPEG. The server then handles it like
 			// any normal JPEG (threshold scaling, sub-sizes, etc.).
 			// This matches iOS behavior where HEIC is converted on the fly.
+			//
+			// When vips is available it encodes the decoded pixels so the
+			// source EXIF block carries over into the JPEG; the canvas
+			// encoder used otherwise produces a JPEG without metadata.
+			const encode: JpegEncoder | undefined = isClientSideMediaSupported()
+				? ( canvas, quality ) =>
+						vipsEncodeCanvasAsJpeg( id, canvas, heicFile, quality )
+				: undefined;
 			try {
 				heicJpeg = await canvasConvertToJpeg(
 					heicFile,
-					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+					encode
 				);
 			} catch ( error ) {
 				/*
