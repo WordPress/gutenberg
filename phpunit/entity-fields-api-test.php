@@ -545,7 +545,6 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		return array(
 			'discussion'        => array( 'discussion', array( 'comments', 'trackbacks' ) ),
 			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
-			'parent'            => array( 'parent', array( 'page-attributes' ) ),
 			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
 			'title'             => array( 'title', array( 'title' ) ),
 			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
@@ -791,6 +790,47 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertNotContains( 'slug', array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_note' ), 'id' ), 'A post type that is not viewable has no permalink.' );
 		$this->assertContains( 'slug', array_column( wp_get_registered_entity_fields( 'postType', 'page' ), 'id' ) );
 		$this->assertNotContains( 'slug', array_column( wp_get_registered_entity_fields( 'postType', 'wp_template' ), 'id' ) );
+	}
+
+	/**
+	 * The parent field is registered on the hierarchical post types supporting
+	 * `page-attributes`: the posts of a flat post type have no parent to choose.
+	 */
+	public function test_the_hierarchical_post_types_supporting_page_attributes_get_the_parent_field() {
+		register_post_type(
+			'gutenberg_chapter',
+			array(
+				'hierarchical' => true,
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'page-attributes' ),
+			)
+		);
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'hierarchical' => false,
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'page-attributes' ),
+			)
+		);
+		register_post_type(
+			'gutenberg_section',
+			array(
+				'hierarchical' => true,
+				'show_in_rest' => true,
+				'supports'     => array( 'title' ),
+			)
+		);
+		$this->post_types[] = 'gutenberg_chapter';
+		$this->post_types[] = 'gutenberg_book';
+		$this->post_types[] = 'gutenberg_section';
+		self::reset_registry();
+
+		$this->assertContains( 'parent', array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_chapter' ), 'id' ) );
+		$this->assertNotContains( 'parent', array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_book' ), 'id' ), 'A post type that is not hierarchical has no parent to choose.' );
+		$this->assertNotContains( 'parent', array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_section' ), 'id' ), 'A hierarchical post type still needs the page-attributes support.' );
+		$this->assertContains( 'parent', array_column( wp_get_registered_entity_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'parent', array_column( wp_get_registered_entity_fields( 'postType', 'post' ), 'id' ) );
 	}
 
 	/**
