@@ -10,6 +10,7 @@
  *
  * @since 5.0.0
  * @since 6.7.0 Enable client-side rendering if enhancedPagination context is true.
+ * @since 7.2.0 Apply the Categories widget filters to the category taxonomy.
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    Block default content.
@@ -54,6 +55,13 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		// Pre-select the current term using query var.
 		$args['selected'] = get_query_var( $taxonomy->query_var );
 
+		// The legacy widget filters only ever applied to categories.
+		if ( 'category' === $attributes['taxonomy'] ) {
+			/** This filter is documented in wp-includes/widgets/class-wp-widget-categories.php */
+			$args         = apply_filters( 'widget_categories_dropdown_args', $args, array() );
+			$args['echo'] = false;
+		}
+
 		$show_label     = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 		$default_label  = $taxonomy->label;
 		$label_text     = ! empty( $attributes['label'] ) ? wp_kses_post( $attributes['label'] ) : $default_label;
@@ -72,6 +80,12 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		}
 	} else {
 		$args['show_option_none'] = $taxonomy->labels->no_terms;
+
+		if ( 'category' === $attributes['taxonomy'] ) {
+			/** This filter is documented in wp-includes/widgets/class-wp-widget-categories.php */
+			$args         = apply_filters( 'widget_categories_args', $args, array() );
+			$args['echo'] = false;
+		}
 
 		$wrapper_markup = '<ul %1$s>%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
