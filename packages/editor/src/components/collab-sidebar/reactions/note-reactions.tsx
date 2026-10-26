@@ -183,6 +183,7 @@ export function NoteReactions( {
 	disabled,
 }: NoteReactionsProps ) {
 	const [ reactions, toggleReaction ] = useNoteReactions( noteId );
+	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
 	const entries = Object.entries( reactions ?? {} );
 
 	if ( ! entries.length && ! canReact ) {
@@ -220,7 +221,10 @@ export function NoteReactions( {
 				 * first reaction lands would remount the open picker's trigger.
 				 */ }
 				{ canReact && (
-					<Menu.Root>
+					<Menu.Root
+						open={ isPickerOpen }
+						onOpenChange={ setIsPickerOpen }
+					>
 						<Menu.Trigger
 							render={
 								<IconButton
@@ -235,32 +239,54 @@ export function NoteReactions( {
 						/>
 						<Menu.Popup
 							aria-label={ __( 'Add reaction' ) }
+							className="editor-collab-sidebar-panel__reaction-picker"
+							onKeyDownCapture={ ( event ) => {
+								// Escape would otherwise close only the focused
+								// item's tooltip.
+								if ( event.key === 'Escape' ) {
+									event.stopPropagation();
+									setIsPickerOpen( false );
+								}
+							} }
 							positioner={
 								<Menu.Positioner side="bottom" align="end" />
 							}
 						>
 							{ REACTION_EMOJIS.map(
 								( { emoji, hexKey, label } ) => (
-									<Menu.CheckboxItem
-										key={ hexKey }
-										checked={
-											!! reactions?.[ hexKey ]
-												?.current_user_reaction
-										}
-										onCheckedChange={ () =>
-											toggleReaction( hexKey )
-										}
-										closeOnClick
-										prefix={
-											<span className="editor-collab-sidebar-panel__reaction-option-emoji">
-												{ emoji }
-											</span>
-										}
-									>
-										<Menu.ItemLabel>
+									<Tooltip.Root key={ hexKey }>
+										<Tooltip.Trigger
+											render={
+												<Menu.CheckboxItem
+													checked={
+														!! reactions?.[ hexKey ]
+															?.current_user_reaction
+													}
+													onCheckedChange={ () =>
+														toggleReaction( hexKey )
+													}
+													closeOnClick
+													aria-label={ label }
+												>
+													<Menu.ItemLabel>
+														<span
+															aria-hidden="true"
+															className="editor-collab-sidebar-panel__reaction-option-emoji"
+														>
+															{ emoji }
+														</span>
+													</Menu.ItemLabel>
+												</Menu.CheckboxItem>
+											}
+										/>
+										<Tooltip.Popup
+											positioner={
+												<Tooltip.Positioner side="inline-start" />
+											}
+										>
 											{ label }
-										</Menu.ItemLabel>
-									</Menu.CheckboxItem>
+										</Tooltip.Popup>
+									</Tooltip.Root>
 								)
 							) }
 						</Menu.Popup>

@@ -342,6 +342,11 @@ mark.wp-note {
 	outline: none;
 }
 
+// Emoji-only items; the Menu's 160px minimum is sized for text labels.
+.editor-collab-sidebar-panel__reaction-picker {
+	--wp-ui-menu-min-width: 0;
+}
+
 .editor-collab-sidebar-panel__reaction-button-emoji,
 .editor-collab-sidebar-panel__reaction-option-emoji {
 	font-size: var(--wpds-typography-font-size-lg);
