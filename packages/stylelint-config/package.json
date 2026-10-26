@@ -48,13 +48,20 @@
 	},
 	"devDependencies": {
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
+		"@wordpress/theme": "file:../theme",
 		"stylelint": "^17.14.1",
 		"stylelint-scss": "^7.2.0",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
+		"@wordpress/theme": "^3.0.0 || ^4.0.0",
 		"stylelint": "^17.14.1",
 		"stylelint-scss": "^7.2.0"
+	},
+	"peerDependenciesMeta": {
+		"@wordpress/theme": {
+			"optional": true
+		}
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",
