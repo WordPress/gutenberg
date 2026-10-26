@@ -44,7 +44,8 @@ $sticky-header-clearance: 120px;
 	}
 
 	.mcp-access-panel code {
-		font-size: 12px;
+		font-family: var(--wpds-typography-font-family-mono);
+		font-size: var(--wpds-typography-font-size-sm);
 	}
 
 	.ai-plugin-callout {
