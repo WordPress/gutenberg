@@ -26,6 +26,7 @@
 	"devDependencies": {
 		"@mawesome/dependency-audit": "^0.4.6",
 		"@types/node": "^24.13.3",
+		"@types/semver": "^7.8.0",
 		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/monorepo-tools": "file:../monorepo",
