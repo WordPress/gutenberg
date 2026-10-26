@@ -87,7 +87,7 @@ const getGlobalEventDirective = (
 				}
 				useInit( () => {
 					const cb = ( event: Event ) => {
-						const result = evaluate( entry );
+						const result = evaluate( entry, event );
 						if ( typeof result === 'function' ) {
 							if ( ! result?.sync ) {
 								event = wrapEventAsync( event );
@@ -127,7 +127,7 @@ const getGlobalAsyncEventDirective = (
 				useInit( () => {
 					const cb = async ( event: Event ) => {
 						await splitTask();
-						const result = evaluate( entry );
+						const result = evaluate( entry, event );
 						if ( typeof result === 'function' ) {
 							result( event );
 						}
@@ -171,7 +171,7 @@ directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 						start = performance.now();
 					}
 				}
-				const result = evaluate( entry );
+				const result = evaluate( entry, event );
 				if ( typeof result === 'function' ) {
 					if ( ! result?.sync ) {
 						event = wrapEventAsync( event );
@@ -224,7 +224,7 @@ directive(
 				}
 				entries.forEach( async ( entry ) => {
 					await splitTask();
-					const result = evaluate( entry );
+					const result = evaluate( entry, event );
 					if ( typeof result === 'function' ) {
 						result( event );
 					}
