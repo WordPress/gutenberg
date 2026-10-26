@@ -1,8 +1,4 @@
-import {
-	packageNameFromPath,
-	parseComponents,
-	parseComponentDetail,
-} from './parse-components.ts';
+import { parseComponents, parseComponentDetail } from './parse-components.ts';
 import { parsePatterns } from './parse-patterns.ts';
 import type {
 	Component,
@@ -38,10 +34,11 @@ export function resetCache(): void {
 }
 
 /**
- * Fetch and cache the components from the Storybook manifest, filtered to only
- * components from allowed packages.
+ * Fetch and cache the components from the Storybook manifest. The parsers skip
+ * entries outside the allowed packages, such as the example stories of
+ * pattern documents.
  *
- * @return The filtered components record.
+ * @return The components record.
  */
 async function fetchComponents(): Promise<
 	Record< string, ManifestComponent >
@@ -62,14 +59,7 @@ async function fetchComponents(): Promise<
 		components: Record< string, ManifestComponent >;
 	} = await response.json();
 
-	const filtered: Record< string, ManifestComponent > = {};
-	for ( const [ key, component ] of Object.entries( manifest.components ) ) {
-		if ( packageNameFromPath( component.path ) ) {
-			filtered[ key ] = component;
-		}
-	}
-
-	cachedComponents = filtered;
+	cachedComponents = manifest.components;
 	return cachedComponents;
 }
 
@@ -133,12 +123,16 @@ export async function getPatterns(): Promise< Pattern[] > {
 		);
 	}
 
-	const manifest: {
-		v: number;
-		docs: Record< string, ManifestDoc >;
-	} = await response.json();
+	const [ manifest, components ] = await Promise.all( [
+		response.json() as Promise< {
+			v: number;
+			docs: Record< string, ManifestDoc >;
+		} >,
+		// Examples are optional: without them, patterns keep their `<Canvas />`.
+		fetchComponents().catch( () => ( {} ) ),
+	] );
 
-	cachedPatterns = parsePatterns( manifest.docs );
+	cachedPatterns = parsePatterns( manifest.docs, components );
 	return cachedPatterns;
 }
 
