@@ -16,6 +16,10 @@
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
 
+### Bug Fixes
+
+-   Inserter: Keep keyboard-focused search results below the sticky search field.
+
 ### Internal
 
 -   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
