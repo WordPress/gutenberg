@@ -59,6 +59,10 @@ function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
 	// hardcoded ID to check whether the WP AI plugin is installed/active.
 	$preload_paths[] = '/wp/v2/plugins/ai/ai?context=edit';
 
+	// McpAccessPanel in routes/connectors-home/mcp-access-panel.tsx queries this
+	// hardcoded ID to check whether the MCP Adapter is installed/active.
+	$preload_paths[] = '/wp/v2/plugins/mcp-adapter/mcp-adapter?context=edit';
+
 	// getEntityRecord( 'root', 'plugin', <basename> ) per connector in use-connector-plugin.ts.
 	foreach ( wp_get_connectors() as $connector_data ) {
 		if ( empty( $connector_data['plugin']['file'] ) ) {
@@ -73,3 +77,42 @@ function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
 	return $preload_paths;
 }
 add_filter( 'gutenberg_options_connectors_wp_admin_preload_paths', '_gutenberg_connectors_preload_paths' );
+
+/**
+ * Adds the MCP Adapter's state to the Connectors page data.
+ *
+ * Reading the plugin record over REST needs `activate_plugins`, so users without
+ * it rely on this state, and the endpoint has to follow the site's REST URL
+ * settings, which only the server knows.
+ *
+ * @access private
+ *
+ * @param array<string, mixed> $data Connectors page data.
+ * @return array<string, mixed> Data with the MCP Adapter state added.
+ */
+function _gutenberg_connectors_mcp_adapter_data( array $data ): array {
+	if ( ! function_exists( 'validate_plugin' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	$file   = 'mcp-adapter/mcp-adapter.php';
+	$status = 'not-installed';
+
+	if ( is_multisite() && is_plugin_active_for_network( $file ) ) {
+		$status = 'network-active';
+	} elseif ( is_plugin_active( $file ) ) {
+		$status = 'active';
+	} elseif ( 0 === validate_plugin( $file ) ) {
+		$status = 'inactive';
+	}
+
+	$data['mcpAdapter'] = array(
+		'status'      => $status,
+		'endpoint'    => rest_url( 'mcp/mcp-adapter-default-server' ),
+		'canInstall'  => current_user_can( 'install_plugins' ),
+		'canActivate' => current_user_can( 'activate_plugins' ),
+	);
+
+	return $data;
+}
+add_filter( 'script_module_data_options-connectors-wp-admin', '_gutenberg_connectors_mcp_adapter_data' );
