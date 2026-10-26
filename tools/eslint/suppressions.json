@@ -6344,11 +6344,6 @@
 			"count": 1
 		}
 	},
-	"packages/blocks/src/api/raw-handling/test/is-inline-content.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/blocks/src/api/raw-handling/test/latex-to-math.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
