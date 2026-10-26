@@ -2,11 +2,16 @@
  * Reports the errors in a PHPStan JSON report as annotations and in the job
  * summary, and fails when there are any.
  *
+ * PHPStan writes the report as JSON rather than in its `github` format, since it
+ * can only produce one format per run, so this script prints the annotations
+ * that format would have, and additionally lists every error in the job summary.
+ *
  * An annotation is only shown alongside the changes in a pull request when its
  * line is part of the diff, and GitHub shows at most ten error annotations per
  * step. An error on a line the pull request did not change, or one with no line
- * at all, would otherwise only be found in the log. The job summary lists every
- * error, and explains the most common of those: a baseline entry that no longer
+ * at all, is otherwise easy to miss: it is only listed with the run's
+ * annotations, or not at all past the tenth. The job summary lists every error,
+ * and explains the most common of those: a baseline entry that no longer
  * matches, because the error it recorded was fixed.
  *
  * Usage:
