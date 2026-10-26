@@ -474,6 +474,9 @@ function gutenberg_rest_only_include_revisioned_meta( $response, $post ) {
 	}
 
 	$post_type = get_post_type( $post->post_parent );
+	if ( ! $post_type ) {
+		return $response;
+	}
 
 	// Map the revisioned keys to their REST names, like `WP_REST_Meta_Fields::get_registered_fields()` does.
 	$meta_args  = array_merge( get_registered_meta_keys( 'post' ), get_registered_meta_keys( 'post', $post_type ) );
