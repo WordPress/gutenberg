@@ -50,6 +50,8 @@ import type {
 	ResponsiveLayoutStylesOptions,
 } from './types';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
+import { isBlockToolbarRedesignEnabled } from '../utils/block-toolbar-redesign';
+import LayoutMenuItems from './layout-menu-items';
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -168,7 +170,7 @@ function getLayoutContainerValues( layout: Layout | undefined = {} ): Layout {
 	);
 }
 
-function hasLayoutBlockSupport( blockName: string | BlockType ) {
+export function hasLayoutBlockSupport( blockName: string | BlockType ) {
 	return (
 		hasBlockSupport( blockName, 'layout' ) ||
 		hasBlockSupport( blockName, '__experimentalLayout' )
@@ -645,22 +647,38 @@ function LayoutPanelPure( {
 					) }
 				</InspectorControls>
 			) }
-			{ ! inherit && layoutType && (
-				<layoutType.toolBarControls
-					layout={ usedLayout }
-					onChange={ onChangeLayout }
-					layoutBlockSupport={ layoutBlockSupport }
-					controlsGroup={
-						isResponsiveEditing &&
-						hasViewportBlockStyleState( selectedState ) &&
-						! hasPseudoBlockStyleState( selectedState )
-							? 'style-state'
-							: 'block'
-					}
-					name={ blockName }
-					clientId={ clientId }
-				/>
-			) }
+			{ ! inherit &&
+				layoutType &&
+				isBlockToolbarRedesignEnabled() &&
+				! isViewportLayoutState && (
+					// The redesigned toolbar offers these in the Layout menu.
+					<LayoutMenuItems
+						layoutType={ layoutType.name }
+						layout={ usedLayout }
+						layoutBlockSupport={ blockSupportAndThemeSettings }
+						onChange={ onChangeLayout }
+					/>
+				) }
+			{ ! inherit &&
+				layoutType &&
+				! (
+					isBlockToolbarRedesignEnabled() && ! isViewportLayoutState
+				) && (
+					<layoutType.toolBarControls
+						layout={ usedLayout }
+						onChange={ onChangeLayout }
+						layoutBlockSupport={ layoutBlockSupport }
+						controlsGroup={
+							isResponsiveEditing &&
+							hasViewportBlockStyleState( selectedState ) &&
+							! hasPseudoBlockStyleState( selectedState )
+								? 'style-state'
+								: 'block'
+						}
+						name={ blockName }
+						clientId={ clientId }
+					/>
+				) }
 		</>
 	);
 }

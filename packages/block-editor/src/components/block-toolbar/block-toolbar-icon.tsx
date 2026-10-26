@@ -19,7 +19,7 @@ import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 import type { BlockToolbarIconProps, BlockToolbarIconVariant } from './types';
 
-function getBlockIconVariant( {
+export function getBlockIconVariant( {
 	select,
 	clientIds,
 }: {
@@ -99,7 +99,7 @@ function getBlockIconVariant( {
 	return 'default';
 }
 
-function getBlockIcon( {
+export function getBlockIcon( {
 	select,
 	clientIds,
 }: {

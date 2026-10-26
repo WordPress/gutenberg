@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, MouseEvent } from 'react';
+import type { IconType } from '@wordpress/components';
 
 /**
  * Direction the mover buttons move the blocks in.
@@ -27,4 +28,6 @@ export interface BlockMoverButtonProps extends Omit<
 	orientation?: BlockMoverOrientation;
 	/** Called after the blocks move. */
 	onClick?: ( event: MouseEvent< HTMLButtonElement > ) => void;
+	/** Replaces the arrow icon of the direction and orientation. */
+	icon?: IconType;
 }
