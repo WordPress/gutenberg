@@ -570,6 +570,12 @@ test.describe( 'Connectors', () => {
 						name: 'search the plugin directory',
 					} )
 				).toBeHidden();
+
+				await expect(
+					page
+						.locator( '.mcp-access-panel' )
+						.getByLabel( 'Allow AI agents to connect' )
+				).toBeDisabled();
 			} );
 		} );
 	} );

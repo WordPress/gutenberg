@@ -1,8 +1,18 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { McpAccessPanel } from '../mcp-access-panel';
+
+const mocks = vi.hoisted( () => ( {
+	mcpAdapterData: {
+		status: 'not-installed',
+		endpoint: 'https://example.org/wp-json/mcp/mcp-adapter-default-server',
+		canInstall: true,
+		canActivate: true,
+	},
+	isFileModDisabled: false,
+} ) );
 
 vi.mock(
 	import( '@wordpress/a11y' ),
@@ -57,15 +67,34 @@ vi.mock(
 		} ) as unknown as typeof import( '@wordpress/data' )
 );
 
+vi.mock(
+	import( '../default-connectors' ),
+	() =>
+		( {
+			getMcpAdapterData: vi.fn( () => mocks.mcpAdapterData ),
+			getIsFileModDisabled: vi.fn( () => mocks.isFileModDisabled ),
+		} ) as unknown as typeof import( '../default-connectors' )
+);
+
 type StoreState = {
-	canCreate: boolean;
-	hasFinishedResolution: boolean;
 	plugin?: { plugin: string; status: string };
 };
 
 const TOGGLE_LABEL = 'Allow AI agents to connect';
+const ENDPOINT = 'https://example.org/wp-json/mcp/mcp-adapter-default-server';
+const PLUGIN_ID = 'mcp-adapter/mcp-adapter';
+
+// Browsers move focus to the page body when the focused toggle gets disabled.
+// jsdom keeps it on the toggle, so drop it the same way by hand.
+function dropFocusToBody() {
+	const placeholder = document.createElement( 'button' );
+	document.body.append( placeholder );
+	act( () => placeholder.focus() );
+	act( () => placeholder.remove() );
+}
 
 const mockSaveEntityRecord = vi.fn();
+const mockInvalidateResolution = vi.fn();
 const mockCreateSuccessNotice = vi.fn();
 const mockCreateErrorNotice = vi.fn();
 const mockedUseSelect = vi.mocked( useSelect ) as Mock;
@@ -73,35 +102,36 @@ const mockedUseDispatch = vi.mocked( useDispatch ) as Mock;
 
 describe( 'McpAccessPanel', () => {
 	let storeState: StoreState;
+	let selectorStore: {
+		getEntityRecord: Mock;
+	};
 
 	beforeEach( () => {
+		mocks.mcpAdapterData = {
+			status: 'not-installed',
+			endpoint: ENDPOINT,
+			canInstall: true,
+			canActivate: true,
+		};
+		mocks.isFileModDisabled = false;
+
 		storeState = {
-			canCreate: true,
-			hasFinishedResolution: true,
 			plugin: undefined,
 		};
 
-		const selectorStore = {
-			canUser: vi.fn( () => storeState.canCreate ),
+		selectorStore = {
 			getEntityRecord: vi.fn(
 				( kind: string, name: string, id?: string ) => {
-					if ( kind === 'root' && name === '__unstableBase' ) {
-						return { url: 'https://example.org' };
-					}
-
 					if (
 						kind === 'root' &&
 						name === 'plugin' &&
-						id === 'mcp-adapter/mcp-adapter'
+						id === PLUGIN_ID
 					) {
 						return storeState.plugin;
 					}
 
 					return undefined;
 				}
-			),
-			hasFinishedResolution: vi.fn(
-				() => storeState.hasFinishedResolution
 			),
 		};
 
@@ -112,10 +142,12 @@ describe( 'McpAccessPanel', () => {
 
 		mockSaveEntityRecord.mockReset();
 		mockSaveEntityRecord.mockResolvedValue( undefined );
+		mockInvalidateResolution.mockReset();
 		mockCreateSuccessNotice.mockReset();
 		mockCreateErrorNotice.mockReset();
 		mockedUseDispatch.mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
+			invalidateResolution: mockInvalidateResolution,
 			createSuccessNotice: mockCreateSuccessNotice,
 			createErrorNotice: mockCreateErrorNotice,
 		} );
@@ -136,11 +168,7 @@ describe( 'McpAccessPanel', () => {
 			'href',
 			'https://wordpress.org/plugins/mcp-adapter/'
 		);
-		expect(
-			screen.queryByText(
-				'https://example.org/wp-json/mcp/mcp-adapter-default-server'
-			)
-		).not.toBeInTheDocument();
+		expect( screen.queryByText( ENDPOINT ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'installs and activates the plugin by slug when turned on while missing', async () => {
@@ -166,10 +194,7 @@ describe( 'McpAccessPanel', () => {
 
 	it( 'activates the installed plugin when turned on', async () => {
 		const user = userEvent.setup();
-		storeState.plugin = {
-			plugin: 'mcp-adapter/mcp-adapter',
-			status: 'inactive',
-		};
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'inactive' };
 
 		render( <McpAccessPanel /> );
 
@@ -183,7 +208,7 @@ describe( 'McpAccessPanel', () => {
 			expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 				'root',
 				'plugin',
-				{ plugin: 'mcp-adapter/mcp-adapter', status: 'active' },
+				{ plugin: PLUGIN_ID, status: 'active' },
 				{ throwOnError: true }
 			);
 		} );
@@ -191,19 +216,12 @@ describe( 'McpAccessPanel', () => {
 
 	it( 'shows the endpoint and sign-in details while on, and deactivates the plugin when turned off', async () => {
 		const user = userEvent.setup();
-		storeState.plugin = {
-			plugin: 'mcp-adapter/mcp-adapter',
-			status: 'active',
-		};
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'active' };
 
 		render( <McpAccessPanel /> );
 
 		expect( screen.getByLabelText( TOGGLE_LABEL ) ).toBeChecked();
-		expect(
-			screen.getByText(
-				'https://example.org/wp-json/mcp/mcp-adapter-default-server'
-			)
-		).toBeVisible();
+		expect( screen.getByText( ENDPOINT ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'link', { name: 'Application Password' } )
 		).toHaveAttribute(
@@ -217,7 +235,7 @@ describe( 'McpAccessPanel', () => {
 			expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 				'root',
 				'plugin',
-				{ plugin: 'mcp-adapter/mcp-adapter', status: 'inactive' },
+				{ plugin: PLUGIN_ID, status: 'inactive' },
 				{ throwOnError: true }
 			);
 		} );
@@ -235,10 +253,7 @@ describe( 'McpAccessPanel', () => {
 				finish = resolve;
 			} )
 		);
-		storeState.plugin = {
-			plugin: 'mcp-adapter/mcp-adapter',
-			status: 'inactive',
-		};
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'inactive' };
 
 		render( <McpAccessPanel /> );
 
@@ -254,16 +269,133 @@ describe( 'McpAccessPanel', () => {
 		} );
 	} );
 
-	it( 'disables the toggle while the plugin status is loading', () => {
-		storeState.hasFinishedResolution = false;
+	it( 'returns focus to the toggle when the request finishes', async () => {
+		const user = userEvent.setup();
+		let finish: () => void = () => {};
+		mockSaveEntityRecord.mockReturnValue(
+			new Promise< void >( ( resolve ) => {
+				finish = resolve;
+			} )
+		);
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'inactive' };
+
+		render( <McpAccessPanel /> );
+
+		await user.click( screen.getByLabelText( TOGGLE_LABEL ) );
+		dropFocusToBody();
+
+		finish();
+
+		await waitFor( () => {
+			expect( screen.getByLabelText( TOGGLE_LABEL ) ).toHaveFocus();
+		} );
+	} );
+
+	it( 'leaves focus alone when the user moved it during the request', async () => {
+		const user = userEvent.setup();
+		let finish: () => void = () => {};
+		mockSaveEntityRecord.mockReturnValue(
+			new Promise< void >( ( resolve ) => {
+				finish = resolve;
+			} )
+		);
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'inactive' };
+
+		render(
+			<>
+				<McpAccessPanel />
+				<button type="button">Elsewhere</button>
+			</>
+		);
+
+		await user.click( screen.getByLabelText( TOGGLE_LABEL ) );
+		await user.click( screen.getByRole( 'button', { name: 'Elsewhere' } ) );
+
+		finish();
+
+		await waitFor( () => {
+			expect( screen.getByLabelText( TOGGLE_LABEL ) ).toBeEnabled();
+		} );
+		expect(
+			screen.getByRole( 'button', { name: 'Elsewhere' } )
+		).toHaveFocus();
+	} );
+
+	it( 'shows the server state while the plugin record loads', () => {
+		mocks.mcpAdapterData.status = 'active';
+
+		render( <McpAccessPanel /> );
+
+		expect( screen.getByLabelText( TOGGLE_LABEL ) ).toBeChecked();
+		expect( screen.getByText( ENDPOINT ) ).toBeVisible();
+	} );
+
+	it( 'uses the server state when the user cannot manage plugins', () => {
+		mocks.mcpAdapterData.status = 'active';
+		mocks.mcpAdapterData.canActivate = false;
+
+		render( <McpAccessPanel /> );
+
+		const toggle = screen.getByLabelText( TOGGLE_LABEL );
+		expect( toggle ).toBeChecked();
+		expect( toggle ).toBeDisabled();
+		expect(
+			screen.getByText(
+				/Only users who can manage plugins can turn it off/
+			)
+		).toBeVisible();
+	} );
+
+	it( 'does not request the plugin record when the user cannot manage plugins', () => {
+		mocks.mcpAdapterData.status = 'active';
+		mocks.mcpAdapterData.canActivate = false;
+
+		render( <McpAccessPanel /> );
+
+		expect( selectorStore.getEntityRecord ).not.toHaveBeenCalledWith(
+			'root',
+			'plugin',
+			PLUGIN_ID
+		);
+	} );
+
+	it( 'explains that only plugin managers can turn it on', () => {
+		mocks.mcpAdapterData.status = 'inactive';
+		mocks.mcpAdapterData.canActivate = false;
 
 		render( <McpAccessPanel /> );
 
 		expect( screen.getByLabelText( TOGGLE_LABEL ) ).toBeDisabled();
+		expect(
+			screen.getByText( /Only users who can manage plugins can turn on/ )
+		).toBeVisible();
+	} );
+
+	it( 'shows network activation as on and locked', () => {
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'network-active' };
+
+		render( <McpAccessPanel /> );
+
+		const toggle = screen.getByLabelText( TOGGLE_LABEL );
+		expect( toggle ).toBeChecked();
+		expect( toggle ).toBeDisabled();
+		expect( screen.getByText( /active across the network/ ) ).toBeVisible();
+	} );
+
+	it( 'explains when plugins cannot be installed on this site', () => {
+		mocks.isFileModDisabled = true;
+		mocks.mcpAdapterData.canInstall = false;
+
+		render( <McpAccessPanel /> );
+
+		expect( screen.getByLabelText( TOGGLE_LABEL ) ).toBeDisabled();
+		expect(
+			screen.getByText( /using your normal deployment workflow/ )
+		).toBeVisible();
 	} );
 
 	it( 'disables the toggle when the user cannot install the missing plugin', () => {
-		storeState.canCreate = false;
+		mocks.mcpAdapterData.canInstall = false;
 
 		render( <McpAccessPanel /> );
 
@@ -273,7 +405,7 @@ describe( 'McpAccessPanel', () => {
 		).toBeVisible();
 	} );
 
-	it( 'shows an error notice when turning it on fails', async () => {
+	it( 'shows an error notice and refetches the plugin status when a request fails', async () => {
 		const user = userEvent.setup();
 		mockSaveEntityRecord.mockRejectedValue( new Error( 'Install failed' ) );
 
@@ -287,7 +419,22 @@ describe( 'McpAccessPanel', () => {
 				expect.objectContaining( { type: 'snackbar' } )
 			);
 		} );
+		expect( mockInvalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecord',
+			[ 'root', 'plugin', PLUGIN_ID ]
+		);
 		expect( mockCreateSuccessNotice ).not.toHaveBeenCalled();
 		expect( screen.getByLabelText( TOGGLE_LABEL ) ).toBeEnabled();
+	} );
+
+	it( 'keeps the endpoint row mounted when the panel re-renders', () => {
+		storeState.plugin = { plugin: PLUGIN_ID, status: 'active' };
+
+		const { rerender } = render( <McpAccessPanel /> );
+		const before = screen.getByText( ENDPOINT );
+
+		rerender( <McpAccessPanel /> );
+
+		expect( screen.getByText( ENDPOINT ) ).toBe( before );
 	} );
 } );
