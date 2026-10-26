@@ -48,6 +48,9 @@ parameters:
 	# The polyfills that WordPress provides for newer PHP functions.
 	scanFiles:
 		- polyfills.stub
+		# The WordPress test library, which wp-env provides at runtime, for a local configuration that
+		# adds phpunit to the paths.
+		- ../../vendor/php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php
 	# Constants defined in the bootstrap whose values depend on the site's configuration.
 	dynamicConstantNames:
 		- MEDIA_TRASH

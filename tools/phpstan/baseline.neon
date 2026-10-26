@@ -967,12 +967,6 @@ parameters:
 			path: ../../packages/block-library/src/tag-cloud/index.php
 
 		-
-			message: '#^Constant WP_TEMPLATE_PART_AREA_UNCATEGORIZED not found\.$#'
-			identifier: constant.notFound
-			count: 2
-			path: ../../packages/block-library/src/template-part/index.php
-
-		-
 			message: '#^Right side of \|\| is always true\.$#'
 			identifier: booleanOr.rightAlwaysTrue
 			count: 1

@@ -34,6 +34,8 @@
 		"gutenberg/gutenberg-coding-standards": "@dev",
 		"phpstan/extension-installer": "^1.4",
 		"phpstan/phpstan": "^2.1",
+		"phpstan/phpstan-phpunit": "^2.0",
+		"php-stubs/wordpress-tests-stubs": "^7.0",
 		"szepeviktor/phpstan-wordpress": "^2.0"
 	},
 	"autoload-dev": {
