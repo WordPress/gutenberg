@@ -2,7 +2,13 @@ name: Unit Tests
 
 on:
     pull_request:
-    push:
+    # Running on pushes to the release branches leads Zizmor to treat this as a release workflow, and so
+    # to report every cache that its jobs restore as open to cache poisoning: an attacker who can write
+    # a cache entry on trunk could have it restored here. That only matters for a workflow that publishes
+    # what it builds, and nothing built here is published; the jobs only report test and lint results,
+    # and the build-assets artifact is only used by this workflow's own jobs. If that changes, remove
+    # this ignore and avoid restoring caches in the jobs that publish.
+    push: # zizmor: ignore[cache-poisoning] Nothing built in this workflow is published; see above.
         branches:
             - trunk
             - 'release/[0-9]+.[0-9]'
