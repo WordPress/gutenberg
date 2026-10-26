@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `receiveEntityRecords`: clear only the default "Auto Draft" title on auto-draft posts, so custom titles are no longer lost on save.
+-   `receiveEntityRecords`: clear only the default "Auto Draft" title on auto-draft posts, so custom titles are no longer lost on save ([#85544](https://github.com/WordPress/gutenberg/pull/85544)).
 
 ### Internal
 
