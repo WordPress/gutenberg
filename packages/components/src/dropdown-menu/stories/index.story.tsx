@@ -121,6 +121,7 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 	parameters: {
 		docs: {
+			source: { type: 'code' },
 			description: {
 				story: 'Use `MenuItem` with `role="menuitemcheckbox"` for independent selections. Set `isSelected` and a check icon for each selected item. Keep the popup open by updating the selection without calling `onClose`.',
 			},
@@ -172,6 +173,7 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 export const SingleSelection: StoryObj< typeof DropdownMenu > = {
 	parameters: {
 		docs: {
+			source: { type: 'code' },
 			description: {
 				story: 'Use `MenuItemsChoice` for mutually exclusive selections. It renders radio menu items and a check icon for the selected choice. This example keeps the popup open when the selection changes.',
 			},
