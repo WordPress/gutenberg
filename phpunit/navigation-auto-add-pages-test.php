@@ -258,6 +258,21 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		kses_remove_filters();
 	}
 
+	public function test_a_page_published_with_no_current_user_is_added_with_its_title_intact() {
+		// A scheduled page publishes from cron, where there is no user and
+		// kses filters the menu content on save.
+		$menu_id = $this->create_menu( '', true );
+		wp_set_current_user( 0 );
+		kses_init();
+
+		$page_id = $this->publish_new_page( array( 'post_title' => 'Tom & Jerry\'s <Big> "Day"' ) );
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assert_page_link_block( $blocks[0], $page_id );
+		kses_remove_filters();
+	}
+
 	/*
 	 * Child pages.
 	 */
