@@ -4,7 +4,10 @@ import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { pasteHandler } from '@wordpress/blocks';
+import {
+	pasteHandler,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import {
 	privateApis as richTextPrivateApis,
 	create,
@@ -15,10 +18,23 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
+import splitFirstLine from './split-first-line';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
+const { isPlainTextPaste } = unlock( blocksPrivateApis );
+
+/**
+ * Whether a pasted block holds text that can be the title.
+ *
+ * @param {Object} block The block.
+ *
+ * @return {boolean} Whether its content can be the title.
+ */
+function isTextBlock( block ) {
+	return block?.name === 'core/heading' || block?.name === 'core/paragraph';
+}
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
@@ -82,6 +98,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertBlocks( blocks, 0 );
 	}
 
+	// Inserts text at the caret, which stays after it. The text is escaped on
+	// the way into the title, so it is never rendered as HTML.
+	function insertText( text ) {
+		onChange( insert( value, create( { text } ) ) );
+	}
+
 	function onSelect() {
 		setIsSelected( true );
 		clearSelectedBlock();
@@ -132,12 +154,39 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			return;
 		}
 
+		event.preventDefault();
+
+		// The title is plain text, so plain text is pasted verbatim: the paste
+		// handler would parse it as Markdown and consume characters like `#`
+		// or `**` that the title has no formatting to carry. Only the lines
+		// that do not fit in the title go through the handler, as blocks.
+		if ( isPlainTextPaste( { HTML: html, plainText } ) ) {
+			const [ firstLine, remainder ] = splitFirstLine( plainText );
+
+			if ( ! remainder ) {
+				insertText( firstLine );
+				return;
+			}
+
+			const blocks = pasteHandler( { plainText, mode: 'BLOCKS' } );
+
+			// As with HTML, the first line is only the title when it is text;
+			// a list or a code block pasted into an empty title stays whole.
+			if ( ! title && isTextBlock( blocks[ 0 ] ) ) {
+				insertText( firstLine );
+				onInsertBlockAfter(
+					pasteHandler( { plainText: remainder, mode: 'BLOCKS' } )
+				);
+			} else {
+				onInsertBlockAfter( blocks );
+			}
+			return;
+		}
+
 		const content = pasteHandler( {
 			HTML: html,
 			plainText,
 		} );
-
-		event.preventDefault();
 
 		if ( ! content.length ) {
 			return;
@@ -146,11 +195,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		if ( typeof content !== 'string' ) {
 			const [ firstBlock ] = content;
 
-			if (
-				! title &&
-				( firstBlock.name === 'core/heading' ||
-					firstBlock.name === 'core/paragraph' )
-			) {
+			if ( ! title && isTextBlock( firstBlock ) ) {
 				// Strip HTML to avoid unwanted HTML being added to the title.
 				// In the majority of cases it is assumed that HTML in the title
 				// is undesirable.
