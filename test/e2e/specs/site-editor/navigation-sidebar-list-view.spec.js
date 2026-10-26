@@ -372,6 +372,48 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeHidden();
 	} );
+
+	test( 'lists the pages of a Page List block', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const parentPage = await requestUtils.createPage( {
+			title: 'Parent Page',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Child Page',
+			status: 'publish',
+			parent: parentPage.id,
+		} );
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Page List Menu',
+			content: '<!-- wp:page-list /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const parentRow = listView.getByRole( 'row', {
+			name: 'Parent Page',
+		} );
+		const childRow = listView.getByRole( 'row', { name: 'Child Page' } );
+
+		await expect(
+			listView.getByRole( 'row', { name: 'Test Page 1' } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'row', { name: 'Test Page 2' } )
+		).toBeVisible();
+		await expect( parentRow ).toHaveAttribute( 'aria-level', '1' );
+		await expect( childRow ).toHaveAttribute( 'aria-level', '2' );
+	} );
 } );
 
 class LinkControl {
