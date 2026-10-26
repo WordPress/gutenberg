@@ -254,11 +254,11 @@ function BlockListBlock( {
 			} }
 		>
 			<BlockCrashBoundary
-				fallback={
+				fallback={ ( error ) => (
 					<Block className="has-warning">
-						<BlockCrashWarning />
+						<BlockCrashWarning error={ error } />
 					</Block>
-				}
+				) }
 			>
 				{ block }
 			</BlockCrashBoundary>

@@ -88,8 +88,8 @@ export interface PrivateBlockContextValue {
 }
 
 export interface BlockCrashBoundaryProps {
-	/** Rendered in place of the children once they throw. */
-	fallback: ReactNode;
+	/** Rendered in place of the children once they throw, given the error. */
+	fallback: ( error: Error ) => ReactNode;
 	children?: ReactNode;
 }
 
