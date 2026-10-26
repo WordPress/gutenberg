@@ -290,6 +290,37 @@ export default function useClipboardHandler() {
 					return;
 				}
 
+				const [ firstSelectedClientId ] = selectedBlockClientIds;
+				const rootClientId = getBlockRootClientId(
+					firstSelectedClientId
+				);
+				const canSplitSelection =
+					hasMultiSelection() ||
+					hasBlockSupport(
+						// The selected block has a name.
+						getBlockName( firstSelectedClientId )!,
+						'splitting',
+						false
+					) ||
+					event.__deprecatedOnSplit;
+
+				// Keep allowed top-level blocks instead of falling back to
+				// inline content when part of the clipboard cannot be inserted.
+				// Nested blocks may need the parent-specific transforms below.
+				if (
+					! rootClientId &&
+					( isFullySelected || canSplitSelection )
+				) {
+					const allowedBlocks = blocks.filter( ( block ) =>
+						canInsertBlockType( block.name, rootClientId )
+					);
+					// If none can be inserted, keep the existing inline fallback,
+					// including when a template lock prevents structural changes.
+					if ( allowedBlocks.length ) {
+						blocks = allowedBlocks;
+					}
+				}
+
 				if ( isFullySelected ) {
 					replaceBlocks(
 						selectedBlockClientIds,
@@ -303,16 +334,7 @@ export default function useClipboardHandler() {
 
 				// If a block doesn't support splitting, let rich text paste
 				// inline.
-				if (
-					! hasMultiSelection() &&
-					! hasBlockSupport(
-						// The selected block has a name.
-						getBlockName( selectedBlockClientIds[ 0 ] )!,
-						'splitting',
-						false
-					) &&
-					! event.__deprecatedOnSplit
-				) {
+				if ( ! canSplitSelection ) {
 					return;
 				}
 
@@ -334,11 +356,6 @@ export default function useClipboardHandler() {
 					event.preventDefault();
 					return;
 				}
-
-				const [ firstSelectedClientId ] = selectedBlockClientIds;
-				const rootClientId = getBlockRootClientId(
-					firstSelectedClientId
-				);
 
 				const newBlocks: Block[] = [];
 
