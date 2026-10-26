@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `AlignmentMatrixControl`: Use the design system outline for the keyboard focus ring ([#85528](https://github.com/WordPress/gutenberg/pull/85528)).
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
 -   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
 -   `Modal`: Use the design system outline for scrollable content focus ([#85251](https://github.com/WordPress/gutenberg/pull/85251)).
