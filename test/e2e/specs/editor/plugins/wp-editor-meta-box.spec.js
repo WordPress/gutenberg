@@ -24,11 +24,33 @@ test.describe( 'WP Editor Meta Boxes', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello Meta' );
 
-		// Open the meta box pane. The click isn’t in the center because that
-		// would hit the resize handle instead of the located element.
-		await page
-			.getByRole( 'button', { name: 'Meta Boxes' } )
-			.click( { position: { x: 0, y: 0 } } );
+		/*
+		 * Open the meta box pane, unless it's already open: its state is a
+		 * persisted preference, so a retry would otherwise close it. The click
+		 * isn’t in the center because that would hit the resize handle instead
+		 * of the located element.
+		 */
+		const metaBoxesToggle = page.getByRole( 'button', {
+			name: 'Meta Boxes',
+		} );
+		if (
+			( await metaBoxesToggle.getAttribute( 'aria-expanded' ) ) !== 'true'
+		) {
+			await metaBoxesToggle.click( { position: { x: 0, y: 0 } } );
+		}
+
+		/*
+		 * The editor moves the meta box form with `appendChild`, which reloads
+		 * TinyMCE's iframe and can leave the editor uninitialized when it
+		 * happens while TinyMCE is still starting. Re-create the editor with
+		 * its original settings now that the form is in place.
+		 */
+		await page.evaluate( () => {
+			window.tinymce.get( 'test_tinymce_id' )?.remove();
+			window.tinymce.init(
+				window.tinyMCEPreInit.mceInit.test_tinymce_id
+			);
+		} );
 
 		// Switch to Visual mode and wait for TinyMCE to fully initialize.
 		// This ensures getSelection() won't return null when TinyMCE tries
