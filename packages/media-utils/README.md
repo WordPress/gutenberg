@@ -49,6 +49,10 @@ _Parameters_
 - _$0.onSuccess_ `SideloadMediaArgs[ 'onSuccess' ]`: Function called when the sideload completes with sub-size data.
 - _$0.onError_ `SideloadMediaArgs[ 'onError' ]`: Function called when an error happens.
 
+### SideloadMediaArgs
+
+Undocumented declaration.
+
 ### SubSizeData
 
 Undocumented declaration.

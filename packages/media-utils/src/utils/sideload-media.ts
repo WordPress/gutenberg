@@ -12,7 +12,10 @@ const noop = () => {};
 
 type OnSubSizeHandler = ( subSize: SubSizeData ) => void;
 
-interface SideloadMediaArgs {
+/**
+ * Arguments for `sideloadMedia()`.
+ */
+export interface SideloadMediaArgs {
 	// Additional data to include in the request.
 	additionalData?: CreateSideloadFile;
 	// File to sideload.
