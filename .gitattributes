@@ -24,5 +24,8 @@ docs/** linguist-documentation
 # TSConfig files use jsonc.
 tsconfig*.json linguist-language=jsonc
 
+# PHPStan stub files are PHP.
+*.stub linguist-language=PHP diff=php
+
 # The WordPress stubs generated for PHPStan by tools/phpstan/generate-wordpress-stubs.sh.
 tools/phpstan/wordpress-stubs/wordpress-stubs.stub linguist-generated
