@@ -114,10 +114,16 @@ function escapeHtml( value ) {
  * Reads the errors from a PHPStan JSON report.
  *
  * @param {string} reportPath Path to the report.
- * @return {PhpstanError[]} The errors.
+ * @return {PhpstanError[]|null} The errors, or null if the report could not be read.
  */
 function readErrors( reportPath ) {
-	const report = JSON.parse( fs.readFileSync( reportPath, 'utf8' ) );
+	let report;
+	try {
+		report = JSON.parse( fs.readFileSync( reportPath, 'utf8' ) );
+	} catch {
+		// PHPStan also exits with 1 when it cannot load the configuration, writing to stderr only.
+		return null;
+	}
 	const workspace = `${ GITHUB_WORKSPACE || process.cwd() }/`;
 
 	/** @type {PhpstanError[]} */
@@ -273,6 +279,18 @@ if ( ! reportPath ) {
 }
 
 const errors = readErrors( reportPath );
+if ( errors === null ) {
+	process.stdout.write(
+		'::error title=PHPStan did not complete::The report is missing or is not valid JSON, so the code was not checked. See the output of the previous step for the reason.\n'
+	);
+	if ( GITHUB_STEP_SUMMARY ) {
+		fs.appendFileSync(
+			GITHUB_STEP_SUMMARY,
+			'## PHPStan did not complete\n\nThe report is missing or is not valid JSON, so the code was not checked. See the output of the “Run PHPStan” step for the reason, such as an error in the configuration.\n'
+		);
+	}
+	process.exit( 1 );
+}
 annotate( errors );
 if ( GITHUB_STEP_SUMMARY ) {
 	fs.appendFileSync( GITHUB_STEP_SUMMARY, buildSummary( errors ) );
