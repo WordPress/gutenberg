@@ -4,7 +4,7 @@ module.exports = [
 		rules: {
 			// Console should be allowed in a build tool.
 			'no-console': 'off',
-			// These rules are designed for source files processed by esbuild,
+			// These rules are designed for source files processed by the build,
 			// not for the build script itself, which runs directly in Node.js.
 			'@wordpress/no-wp-process-env': 'off',
 			'@wordpress/wp-global-usage': 'off',
