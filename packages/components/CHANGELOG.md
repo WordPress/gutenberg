@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
 -   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
 -   `Modal`: Use the design system outline for scrollable content focus ([#85251](https://github.com/WordPress/gutenberg/pull/85251)).
 -   `FormToggle`: Use the design system outline for the focus ring ([#85285](https://github.com/WordPress/gutenberg/pull/85285)).
@@ -15,9 +16,16 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Deprecations
+
+-   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5. For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
+
 ### Bug Fixes
 
+-   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
+-   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
+-   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
 -   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 
 ### Internal
