@@ -6614,22 +6614,12 @@
 			"count": 3
 		}
 	},
-	"packages/core-actions/src/post_type_supports/move-to-trash/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/core-actions/src/post_type_supports/order-pages/action.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
 	},
 	"packages/core-actions/src/post_type_supports/permanently-delete/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/rename-post/action.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}

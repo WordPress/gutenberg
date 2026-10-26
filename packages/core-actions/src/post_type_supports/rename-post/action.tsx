@@ -1,15 +1,5 @@
-import { useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import {
-	Button,
-	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
-import { store as noticesStore } from '@wordpress/notices';
 import { unlock } from '../../lock-unlock';
 import {
 	getItemTitle,
@@ -17,8 +7,9 @@ import {
 	isTemplate,
 	isTemplatePart,
 } from '../../shared/utils';
+import { createAbilityAction } from '../../shared/ability-action';
+import { RENAME_POST_ABILITY } from '../../shared/abilities';
 import type {
-	CoreDataError,
 	PostWithPermissions,
 	ActionScriptParts,
 } from '../../shared/types';
@@ -56,72 +47,17 @@ const renamePost: ActionScriptParts< PostWithPermissions > = {
 
 		return post.type === PATTERN_TYPES.user && post.permissions?.update;
 	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-
-		async function onRename( event: React.FormEvent ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord( 'postType', item.type, item.id, {
-					title,
-				} );
-				// Update state before saving rerenders the list.
-				setTitle( '' );
-				closeModal?.();
-				// Persist edited entity.
-				await saveEditedEntityRecord( 'postType', item.type, item.id, {
-					throwOnError: true,
-				} );
-				createSuccessNotice( __( 'Name updated' ), {
-					type: 'snackbar',
-				} );
-				onActionPerformed?.( items );
-			} catch ( error ) {
-				const typedError = error as CoreDataError;
-				const errorMessage =
-					typedError.message && typedError.code !== 'unknown_error'
-						? typedError.message
-						: __( 'An error occurred while updating the name' );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		return (
-			<form onSubmit={ onRename }>
-				<VStack spacing="5">
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								closeModal?.();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
+	...createAbilityAction< PostWithPermissions >( {
+		ability: RENAME_POST_ABILITY,
+		// The title is not provided, so the modal asks for it.
+		getInput: ( [ item ] ) => ( { post_type: item.type, id: item.id } ),
+		getInitialValues: ( [ item ] ) => ( {
+			title: getItemTitle( item, '' ),
+		} ),
+		submitLabel: __( 'Save' ),
+		getSuccessMessage: () => __( 'Name updated' ),
+		fallbackErrorMessage: __( 'An error occurred while updating the name' ),
+	} ),
 };
 
 /**
