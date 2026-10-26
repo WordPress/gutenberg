@@ -1013,7 +1013,11 @@ _Parameters_
 
 ### validateBlock
 
-Returns an object with `isValid` property set to `true` if the parsed block is valid given the input content. A block is considered valid if, when serialized with assumed attributes, the content matches the original value. If block is invalid, this function returns all validations issues as well.
+Returns validation results for a parsed block. Validation classifies the block's content integrity into one of the `VALIDATION_LEVEL` levels, from a perfect match (`VALID_BLOCK`) to requiring user intervention (`INVALID_BLOCK`).
+
+A block is considered valid when its content can be regenerated from its attributes without losing anything meaningful: the `save` output either matches the stored content, only adds attributes to it, or differs structurally while preserving all of its text, media and links. Block types can opt out of the latter two with `allowsReconstruction: false`.
+
+Note: `MIGRATED_BLOCK` (Level 1) is assigned by the parser when a block deprecation matches, not by this function.
 
 _Parameters_
 
@@ -1022,7 +1026,13 @@ _Parameters_
 
 _Returns_
 
-- `[ boolean, LoggerItem[] ]`: Validation results.
+- `[ boolean, LoggerItem[], ValidationMetadata ]`: Validation results tuple: whether the block is valid, the validation issues found by the strict comparison (empty for an exact match), and metadata with the validation level and the original and generated content.
+
+### VALIDATION_LEVEL
+
+Validation level constants ordered by decreasing certainty over content integrity. Lower numbers indicate higher confidence in content preservation.
+
+The levels describe what serializing the parsed block again does to its serialization footprint, delimiter attributes and markup alike, as read through the block type: the parser builds the attributes from the block type's schema before any evaluation, so delimiter attributes the block type does not declare are not part of the block and are dropped at every level.
 
 ### withBlockContentContext
 
