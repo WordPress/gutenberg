@@ -238,7 +238,25 @@ function buildSummary( errors ) {
 	if ( errors.some( isStaleBaselineEntry ) ) {
 		sections.push(
 			'### The baseline is out of date',
-			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs fewer times, or not at all. **If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: regenerate the baseline and commit the result.',
+			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs fewer times, or not at all.'
+		);
+		if (
+			errors.some(
+				( error ) =>
+					! isStaleBaselineEntry( error ) &&
+					! isExceededBaselineEntry( error )
+			)
+		) {
+			// Regenerating now would record those errors in the baseline.
+			sections.push(
+				'This run also reports other errors, which are listed below. **Fix those first**, since regenerating the baseline would record them as accepted errors. When a pull request changes a line with a baselined error, the error can also come back as a new one with a different message, so that its baseline entry no longer matches: fix it rather than regenerating the baseline. Once only out-of-date entries are left, regenerate the baseline and commit the result.'
+			);
+		} else {
+			sections.push(
+				'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: regenerate the baseline and commit the result.'
+			);
+		}
+		sections.push(
 			'```bash\ncomposer phpstan:baselines\n```',
 			'or, in the local environment:',
 			'```bash\nnpm run typecheck:php:baselines\n```'
