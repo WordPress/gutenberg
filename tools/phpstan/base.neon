@@ -5,6 +5,17 @@
 # https://phpstan.org/config-reference
 
 parameters:
+	# Cache is stored locally, so it's available for CI.
+	tmpDir: ../../.cache/phpstan
+
+	# The supported PHP versions, so the results do not depend on the version PHPStan runs on.
+	phpVersion:
+		min: 70400
+		max: 80500
+
+	# If it's not enforced by PHP we can't assume users are passing valid values.
+	treatPhpDocTypesAsCertain: false
+
 	# What directories and files should be analyzed.
 	paths:
 		- ../../gutenberg.php
