@@ -35,39 +35,18 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	private static $diagnostics = null;
 
 	/**
-	 * Category and severity of each diagnostic code.
-	 *
-	 * The category says what kind of rule was applied: `structure` or `type`. The severity says
-	 * what happened to the value: `dropped` or `coerced`.
+	 * Severity of each diagnostic code: what happened to the value, `dropped` or `coerced`.
 	 *
 	 * @since 7.2.0
-	 * @var array<string, array{category: string, severity: string}>
+	 * @var array<string, string>
 	 */
 	const DIAGNOSTIC_CODES = array(
-		'theme_json_missing_version'        => array(
-			'category' => 'structure',
-			'severity' => 'dropped',
-		),
-		'theme_json_unknown_key'            => array(
-			'category' => 'structure',
-			'severity' => 'dropped',
-		),
-		'theme_json_unregistered_block'     => array(
-			'category' => 'structure',
-			'severity' => 'dropped',
-		),
-		'theme_json_unregistered_variation' => array(
-			'category' => 'structure',
-			'severity' => 'dropped',
-		),
-		'theme_json_invalid_type'           => array(
-			'category' => 'type',
-			'severity' => 'dropped',
-		),
-		'theme_json_invalid_viewport'       => array(
-			'category' => 'type',
-			'severity' => 'coerced',
-		),
+		'theme_json_missing_version'        => 'dropped',
+		'theme_json_unknown_key'            => 'dropped',
+		'theme_json_unregistered_block'     => 'dropped',
+		'theme_json_unregistered_variation' => 'dropped',
+		'theme_json_invalid_type'           => 'dropped',
+		'theme_json_invalid_viewport'       => 'coerced',
 	);
 
 	/**
@@ -583,8 +562,12 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 * @since 7.2.0
 	 *
 	 * @param callable $callback Code to run, typically a `sanitize()` call.
-	 * @return array[] Diagnostics recorded while the callback ran. Each has `code`, `category`,
-	 *                 `severity`, `path`, `message` and `data` keys.
+	 * @return array[] Diagnostics recorded while the callback ran, in no particular order. Each has:
+	 *                 - `code`     string  Stable identifier, one of the `DIAGNOSTIC_CODES` keys.
+	 *                 - `path`     array   Keys from the root of the structure to the value.
+	 *                 - `severity` string  `dropped` or `coerced`.
+	 *                 - `data`     array   Extra keys documented per code, such as `expected` and `actual`. May grow.
+	 *                 - `message`  string  Translated text for display. Not part of the contract; never branch on it.
 	 */
 	public static function collect( callable $callback ) {
 		$previous          = self::$diagnostics;
@@ -625,11 +608,10 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 
 		self::$diagnostics[] = array(
 			'code'     => $code,
-			'category' => self::DIAGNOSTIC_CODES[ $code ]['category'],
-			'severity' => self::DIAGNOSTIC_CODES[ $code ]['severity'],
 			'path'     => $path,
-			'message'  => static::get_diagnostic_message( $code, $path, $data ),
+			'severity' => self::DIAGNOSTIC_CODES[ $code ],
 			'data'     => $data,
+			'message'  => static::get_diagnostic_message( $code, $path, $data ),
 		);
 	}
 

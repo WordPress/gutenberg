@@ -174,7 +174,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $diagnostics, 'Exactly one diagnostic is expected: ' . wp_json_encode( $diagnostics ) );
 		$this->assertSame( $expected, array( $diagnostics[0]['code'], $diagnostics[0]['path'], $diagnostics[0]['severity'] ) );
-		$this->assertSame( array( 'code', 'category', 'severity', 'path', 'message', 'data' ), array_keys( $diagnostics[0] ) );
+		$this->assertSame( array( 'code', 'path', 'severity', 'data', 'message' ), array_keys( $diagnostics[0] ) );
 		$this->assertNotSame( '', $diagnostics[0]['message'] );
 	}
 
