@@ -74,10 +74,13 @@ class Gutenberg_REST_Only_Include_Revisioned_Meta_Test extends WP_Test_REST_Test
 
 	public function test_autosave_only_includes_revisioned_meta() {
 		$post_id = self::factory()->post->create();
+		update_post_meta( $post_id, 'revisioned_meta', 'revisioned value' );
+		update_post_meta( $post_id, 'non_revisioned_meta', 'non-revisioned value' );
 
 		$data = $this->autosave( $post_id );
 
 		$this->assertNotSame( $post_id, $data['id'], 'Autosaving a published post should create an autosave.' );
+		$this->assertSame( 'revisioned value', $data['meta']['revisioned_meta'], 'Revisioned meta should be read from the autosave.' );
 		$this->assertArrayNotHasKey( 'non_revisioned_meta', $data['meta'] );
 	}
 
@@ -96,6 +99,57 @@ class Gutenberg_REST_Only_Include_Revisioned_Meta_Test extends WP_Test_REST_Test
 
 		$this->assertSame( $draft_id, $data['id'], 'Autosaving your own draft should update the post itself.' );
 		$this->assertSame( 'non-revisioned value', $data['meta']['non_revisioned_meta'], 'The post itself should include meta that is not revisioned.' );
+	}
+
+	public function test_own_draft_autosave_with_collaboration_only_includes_revisioned_meta() {
+		// The test bootstrap enables real-time collaboration, whose autosaves controller
+		// stores an author's own draft autosave as a revision instead of updating the post.
+		$draft_id = self::factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => self::$editor_id,
+			)
+		);
+		update_post_meta( $draft_id, 'revisioned_meta', 'revisioned value' );
+		update_post_meta( $draft_id, 'non_revisioned_meta', 'non-revisioned value' );
+
+		$data = $this->autosave( $draft_id );
+
+		$this->assertNotSame( $draft_id, $data['id'], 'Autosaving your own draft with collaboration enabled should create an autosave.' );
+		$this->assertSame( 'revisioned value', $data['meta']['revisioned_meta'], 'Revisioned meta should be read from the autosave.' );
+		$this->assertArrayNotHasKey( 'non_revisioned_meta', $data['meta'] );
+	}
+
+	public function test_autosave_of_another_users_draft_only_includes_revisioned_meta() {
+		$draft_id = self::factory()->post->create(
+			array(
+				'post_status' => 'draft',
+				'post_author' => self::factory()->user->create( array( 'role' => 'author' ) ),
+			)
+		);
+		update_post_meta( $draft_id, 'revisioned_meta', 'revisioned value' );
+		update_post_meta( $draft_id, 'non_revisioned_meta', 'non-revisioned value' );
+
+		$data = $this->autosave( $draft_id );
+
+		$this->assertNotSame( $draft_id, $data['id'], "Autosaving another user's draft should create an autosave." );
+		$this->assertSame( 'revisioned value', $data['meta']['revisioned_meta'], 'Revisioned meta should be read from the autosave.' );
+		$this->assertArrayNotHasKey( 'non_revisioned_meta', $data['meta'] );
+	}
+
+	public function test_revision_without_a_parent_post_is_unchanged() {
+		$revision = new WP_Post(
+			(object) array(
+				'ID'          => PHP_INT_MAX,
+				'post_type'   => 'revision',
+				'post_parent' => PHP_INT_MAX - 1,
+			)
+		);
+		$response = new WP_REST_Response( array( 'meta' => array( 'revisioned_meta' => 'revisioned value' ) ) );
+
+		$response = gutenberg_rest_only_include_revisioned_meta( $response, $revision );
+
+		$this->assertSame( array( 'revisioned_meta' => 'revisioned value' ), $response->get_data()['meta'] );
 	}
 
 	public function test_meta_keys_from_revision_meta_keys_filter_are_included() {
