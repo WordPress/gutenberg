@@ -970,6 +970,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		 */
 		$prefetch = null;
 		if (
+			// @phpstan-ignore function.alreadyNarrowedType (The stubs are generated from trunk, but the method does not exist before WordPress 7.2.)
 			! method_exists( 'WP_REST_Comments_Controller', 'prefetch_reaction_summaries' ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )

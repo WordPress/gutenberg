@@ -265,12 +265,6 @@ parameters:
 			path: ../../lib/compat/wordpress-7.1/rest-api.php
 
 		-
-			message: '#^Call to function method_exists\(\) with ''WP_REST_Comments…'' and ''prefetch_reaction…'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php
-
-		-
 			message: '#^Function gutenberg_exclude_notes_from_comment_count_7_2\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
