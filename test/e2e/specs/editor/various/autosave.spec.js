@@ -152,6 +152,12 @@ test.describe( 'Autosave', () => {
 			backup
 		);
 		await page.reload();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save backup newer' },
+			},
+		] );
 
 		await page.getByRole( 'button', { name: 'View the backup' } ).click();
 		await page.getByRole( 'button', { name: 'Restore' } ).click();
@@ -166,8 +172,8 @@ test.describe( 'Autosave', () => {
 			path: `/wp/v2/posts/${ postId }/revisions`,
 			params: { context: 'edit' },
 		} );
-		expect( revisions[ 0 ].content.raw ).toContain(
-			'before save backup newer'
+		expect( revisions[ 0 ].content.raw ).toBe(
+			'<!-- wp:paragraph -->\n<p>before save backup newer</p>\n<!-- /wp:paragraph -->'
 		);
 	} );
 
