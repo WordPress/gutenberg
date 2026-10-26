@@ -120,7 +120,7 @@ test.describe( 'Global Styles - Button States', () => {
 			.click();
 
 		await page
-			.getByRole( 'button', { name: 'Button (element)', exact: true } )
+			.getByRole( 'button', { name: 'Form button', exact: true } )
 			.click();
 
 		await page

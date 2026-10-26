@@ -25,57 +25,8 @@ import {
 	isBlockSuggestion,
 	useBlockSuggestions,
 	useEntityBinding,
-	useLinkPreview,
 } from '../shared';
-
-/**
- * Given the Link block's type attribute, return the query params for that one
- * entity type.
- *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type: string, subtype?: string }} Search query params.
- */
-function getOwnTypeSearchOptions( type, kind ) {
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type };
-		case 'category':
-			return { type: 'term', subtype: 'category' };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
-		case 'post_format':
-			return { type: 'post-format' };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
-			}
-			// for custom link which has no type
-			// always show pages as initial suggestions
-			return { type: 'post', subtype: 'page' };
-	}
-}
-
-/**
- * Given the Link block's type attribute, return the query params to give to
- * /wp/v2/search.
- *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {Object} Search query params.
- */
-export function getSuggestionsQuery( type, kind ) {
-	const ownType = getOwnTypeSearchOptions( type, kind );
-
-	return {
-		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
-		initialSuggestionsSearchOptions: { ...ownType, perPage: 20 },
-	};
-}
+import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
