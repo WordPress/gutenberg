@@ -17,6 +17,7 @@
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 -   Show bulk actions in table and grid headers, with a labeled action menu on mobile ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 -   Use the design system outline for keyboard focus on list items ([#85358](https://github.com/WordPress/gutenberg/pull/85358)).
+-   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
 
 ### Bug Fixes
 
