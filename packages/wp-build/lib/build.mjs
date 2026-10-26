@@ -2003,10 +2003,13 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
+ * @param {string[]} [widgetDirNames] Widget directories to collect. Defaults to all.
  * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
-function collectWidgets() {
-	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
+function collectWidgets( widgetDirNames ) {
+	const widgetNames = widgetDirNames ?? getAllWidgets( ROOT_DIR );
+
+	return widgetNames.flatMap( ( widgetName ) => {
 		const metadata = getWidgetMetadata( ROOT_DIR, widgetName );
 
 		// Skip widgets without a valid widget.json.
@@ -2519,8 +2522,10 @@ async function buildAll( baseUrlExpression ) {
 
 /**
  * Watch mode for development.
+ *
+ * @param {string?} baseUrlExpression PHP expression for the base URL.
  */
-async function watchMode() {
+async function watchMode( baseUrlExpression ) {
 	let isRebuilding = false;
 	const needsRebuild = new Set();
 
@@ -2541,6 +2546,23 @@ async function watchMode() {
 	const allRoutes = getAllRoutes( ROOT_DIR );
 	const allWidgetDirs = getAllWidgets( ROOT_DIR );
 
+	const phpReplacements = await getPhpReplacements(
+		ROOT_DIR,
+		baseUrlExpression
+	);
+
+	async function regenerateWidgetPhp() {
+		// Calling it with no argument rescans widgets/,
+		// so a directory created during watch would show up
+		// in the registry before this watcher has compiled it.
+		const widgets = collectWidgets( allWidgetDirs );
+
+		await Promise.all( [
+			generateWidgetRegistry( widgets, phpReplacements ),
+			generateWidgetsPhp( widgets, phpReplacements ),
+		] );
+	}
+
 	/**
 	 * Rebuild a widget.
 	 *
@@ -2550,6 +2572,7 @@ async function watchMode() {
 		try {
 			const startTime = Date.now();
 			await buildWidget( widgetName );
+			await regenerateWidgetPhp();
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ widgets/${ widgetName } (${ buildTime }ms)` );
 		} catch ( error ) {
@@ -2875,7 +2898,7 @@ async function main() {
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
-		await watchMode();
+		await watchMode( baseUrlExpression );
 	}
 }
 
