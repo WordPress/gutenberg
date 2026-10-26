@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import reducer from '../reducer';
 import {
 	ItemStatus,
+	type Operation,
 	OperationType,
 	type QueueItem,
 	type State,
@@ -983,7 +984,7 @@ describe( 'reducer', () => {
 							id: '2',
 							parentId: '1',
 							status: ItemStatus.Processing,
-							operations: [],
+							operations: [] as Operation[],
 						} as QueueItem,
 					],
 				},
@@ -1007,7 +1008,7 @@ describe( 'reducer', () => {
 							id: '2',
 							parentId: '1',
 							status: ItemStatus.Processing,
-							operations: [],
+							operations: [] as Operation[],
 						} as QueueItem,
 						{
 							id: '3',
