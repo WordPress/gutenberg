@@ -3,6 +3,8 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
 		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ],
+		// `paths` replaces the base map. This branch lacks the block-editor
+		// declarations published in #85036, so map it to its source project.
 		"paths": {
 			"@wordpress/block-editor": [ "../block-editor/src" ]
 		}
