@@ -86,10 +86,26 @@ describe( 'TypeWriter', () => {
 			wp.dom.getScrollContainer( document.activeElement ).scrollTop = 1
 		);
 
+		/*
+		 * The scroll event fires on the next animation frame, and the
+		 * Typewriter recalculates the caret rectangle in an animation frame
+		 * of its own after that, so wait two frames before reading it.
+		 */
+		await page.evaluate( () => new Promise( ( resolve ) =>
+			window.requestAnimationFrame( () =>
+				window.requestAnimationFrame( resolve )
+			)
+		) );
+
 		const initialPosition = await getCaretPosition();
 
 		// Should maintain scroll position.
 		await page.keyboard.press( 'Enter' );
+
+		// Wait for the Typewriter to scroll down past the initial position.
+		await page.waitForFunction( () =>
+			wp.dom.getScrollContainer( document.activeElement ).scrollTop > 1
+		);
 
 		expect( await getDiff( initialPosition ) ).toBeLessThanOrEqual( BUFFER );
 	} );
