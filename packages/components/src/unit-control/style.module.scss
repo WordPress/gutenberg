@@ -28,10 +28,6 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	field-sizing: content;
-
-	&:not(:disabled) {
-		color: $components-color-accent;
-	}
 }
 
 @mixin small-unit-label {
@@ -107,5 +103,9 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+		&:not(:disabled) {
+			color: $components-color-accent;
+		}
 	}
 }
