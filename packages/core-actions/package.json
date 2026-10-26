@@ -68,6 +68,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@wordpress/abilities": "file:../abilities",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",

@@ -11,6 +11,7 @@
  */
 
 import type { ActionScriptParts } from '../shared/types';
+import { registerPostAbilities } from '../shared/abilities';
 import deletePost from './delete-post/action';
 import duplicatePost from './duplicate-post/action';
 import moveToTrash from './move-to-trash/action';
@@ -21,6 +22,10 @@ import resetPost from './reset-post/action';
 import restore from './restore/action';
 import viewPost from './view-post/action';
 import viewPostRevisions from './view-post-revisions/action';
+
+// The trash and rename actions run abilities, which must be registered before
+// the actions render.
+registerPostAbilities();
 
 const actions = {
 	'delete-post': deletePost,
