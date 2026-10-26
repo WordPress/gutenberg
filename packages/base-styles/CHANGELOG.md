@@ -6,6 +6,10 @@
 
 -   Remove the `checkbox-control` and `radio-control` Sass mixins. Use the `Checkbox` and `Radio` primitives from `@wordpress/ui` instead, with `Radio` inside a `RadioGroup` ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).
 
+### New Features
+
+-   Add the `--wp-block-selection-color` custom property for the block selection outline on the canvas, and an optional color parameter to the `selected-block-outline` and `selected-block-focus` mixins ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ## 14.0.0 (2026-10-20)
 
 ### Breaking Changes

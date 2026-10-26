@@ -60,7 +60,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 			right: 0;
 			bottom: 0;
 			left: 0;
-			background: var(--wp-admin-theme-color);
+			background: var(--wp-block-selection-color);
 			opacity: 0.4;
 
 			@media not ( prefers-reduced-motion ) {
@@ -96,7 +96,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		// We're using a pseudo element to overflow placeholder borders
 		// and any border inside the block itself.
 		&::after {
-			@include selected-block-focus();
+			@include selected-block-focus(1, var(--wp-block-selection-color));
 			z-index: 1;
 		}
 	}
@@ -215,7 +215,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 
 		&::after {
-			@include selected-block-focus();
+			@include selected-block-focus(1, var(--wp-block-selection-color));
 		}
 	}
 }
@@ -240,22 +240,22 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 // Add fade in/out background for editable blocks in synced patterns.
 @keyframes block-editor-is-editable__animation {
 	from {
-		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+		background-color: rgba(var(--wp-block-selection-color--rgb), 0.1);
 	}
 	to {
-		background-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+		background-color: rgba(var(--wp-block-selection-color--rgb), 0);
 	}
 }
 
 @keyframes block-editor-is-editable__animation_reduce-motion {
 	0% {
-		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+		background-color: rgba(var(--wp-block-selection-color--rgb), 0.1);
 	}
 	99% {
-		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+		background-color: rgba(var(--wp-block-selection-color--rgb), 0.1);
 	}
 	100% {
-		background-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+		background-color: rgba(var(--wp-block-selection-color--rgb), 0);
 	}
 }
 

@@ -11,6 +11,9 @@
 	// This CSS variable is not used in Gutenberg project,
 	// but is maintained for backwards compatibility.
 	--wp-bound-block-color: var(--wp-block-synced-color);
+	// Block selection, hover and highlight outlines on the canvas. Deliberately not derived from the admin color scheme so the outline stays the same for every user and never matches a scheme that clashes with the content.
+	--wp-block-selection-color: #3858e9;
+	--wp-block-selection-color--rgb: #{functions.hex-to-rgb(#3858e9)};
 	--wp-editor-canvas-background: #{colors.$gray-300};
 	@include mixins.admin-scheme(#3858e9);
 }
