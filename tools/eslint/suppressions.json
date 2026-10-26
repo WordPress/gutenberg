@@ -7057,16 +7057,6 @@
 			"count": 1
 		}
 	},
-	"packages/e2e-test-utils-playwright/src/page-utils/set-browser-viewport.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/e2e-test-utils-playwright/src/request-utils/widgets.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/edit-post/src/components/back-button/fullscreen-mode-close.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
