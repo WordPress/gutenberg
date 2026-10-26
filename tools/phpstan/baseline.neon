@@ -1,102 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/dashboard/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/dashboard/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/experiments/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/experiments/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/font-library/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/font-library/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/guidelines/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/guidelines/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/media-editor/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/media-editor/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/options-connectors/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/options-connectors/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/site-editor-v2/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/site-editor-v2/page.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/theme-preview/page-wp-admin.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../build/pages/theme-preview/page.php
-
-		-
 			message: '#^Function wp_get_elements_class_name invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -1109,3 +1013,15 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/style-engine/src/class-wp-style-engine.php
+
+		-
+			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/wp-build/templates/page-wp-admin.php.template
+
+		-
+			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/wp-build/templates/page.php.template

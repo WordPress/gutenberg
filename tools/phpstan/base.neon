@@ -4,6 +4,11 @@
 #
 # https://phpstan.org/config-reference
 
+includes:
+	# The templates from which the build generates PHP that core also ships. They are rendered
+	# into valid PHP before parsing, by WpBuildTemplateParser, so errors point at their lines.
+	- wp-build-templates.php
+
 parameters:
 	# Cache is stored locally, so it's available for CI.
 	tmpDir: ../../.cache/phpstan
@@ -29,13 +34,9 @@ parameters:
 		- ../../packages/icons/src
 		- ../../packages/style-engine/src
 		- ../../packages/widgets/src
-		# The PHP generated from the wp-build templates, which core also ships. The templates are
-		# not valid PHP themselves, so only the generated files can be analyzed.
-		- ../../build/constants.php
-		- ../../build/pages.php
-		- ../../build/pages
-		- ../../build/routes.php
-		- ../../build/routes
+	fileExtensions:
+		- php
+		- template
 	excludePaths:
 		analyseAndScan:
 			# Locally installed npm dependencies, which may include PHP files.
@@ -54,3 +55,18 @@ parameters:
 	# that lib/ calls. Run `npm run build` before analyzing.
 	scanDirectories:
 		- ../../build
+
+services:
+	# Renders the wp-build templates into valid PHP before they are parsed, in place of the parser
+	# that PHPStan uses for analyzed files. If a PHPStan update renames this service, the templates
+	# fail to parse and are reported as syntax errors, so the analysis does not silently skip them.
+	wpBuildTemplateWrappedRichParser:
+		class: PHPStan\Parser\RichParser
+		arguments:
+			parser: @currentPhpVersionPhpParser
+		autowired: false
+	currentPhpVersionRichParser:
+		class: Gutenberg\PHPStan\WpBuildTemplateParser
+		arguments:
+			parser: @wpBuildTemplateWrappedRichParser
+		autowired: false

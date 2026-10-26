@@ -36,6 +36,11 @@
 		"phpstan/phpstan": "^2.1",
 		"szepeviktor/phpstan-wordpress": "^2.0"
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"Gutenberg\\PHPStan\\": "tools/phpstan/src/"
+		}
+	},
 	"repositories": [
 		{
 			"type": "path",
