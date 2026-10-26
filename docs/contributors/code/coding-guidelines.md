@@ -531,7 +531,7 @@ Format displayed counts and quantities with [`Intl.NumberFormat`](https://develo
 
 -   Pass the locale from `getSettings().l10n.locale` in `@wordpress/date`. WordPress locales use underscores (`de_DE`), while `Intl` expects BCP 47 tags (`de-DE`), so replace `_` with `-`.
 -   Prefer full counts. Use `notation: 'compact'` only when the available space needs an abbreviation and an approximate value is sufficient.
--   `Intl.NumberFormat` rounds to three fraction digits by default. Set `minimumFractionDigits` or `maximumFractionDigits` explicitly when displaying fractional measurements or rates, and use `style: 'currency'` for monetary amounts.
+-   `Intl.NumberFormat` rounds to three fraction digits by default. Set `minimumFractionDigits` or `maximumFractionDigits` explicitly when displaying fractional measurements or rates.
 -   Keep the underlying values numeric for calculations, sorting, filtering, and plural selection: pass the original count to `_n()` and format only the displayed value. In `sprintf()`, use `%s` placeholders for formatted numbers, since `%d` would discard their separators.
 -   Format quantities, but leave identifiers, version numbers, years, HTTP status codes, and port numbers in their expected formats.
 -   Verify large counts (for example, `1234567`), zero and singular values, fractional values where relevant, and a locale with different separators such as German.
