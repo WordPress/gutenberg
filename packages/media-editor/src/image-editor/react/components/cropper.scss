@@ -150,6 +150,12 @@ $handle-touch-target-size: 44px;
 	// itself is focused, not when focus is on a child handle.
 	&__canvas--focus-visible:focus &__stencil-rect {
 		@include outset-ring__focus();
+
+		// The ring sits on a child of the focused canvas, so forced colors
+		// would paint it as CanvasText rather than the focus Highlight.
+		@media (forced-colors: active) {
+			outline-color: Highlight;
+		}
 	}
 
 	&__handle {
