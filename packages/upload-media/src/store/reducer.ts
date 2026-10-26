@@ -32,48 +32,61 @@ import {
 const noop = () => {};
 
 /**
- * Recomputes the progress of a top-level item.
+ * Advances the progress of the top-level item that an item counts towards.
  *
- * Progress is the share of operations finished out of all operations seen so
- * far, the item's own and those of its sub-size items. Sub-sizes are only
- * queued once the original has uploaded, which grows the total, so progress
- * never moves backwards.
+ * Moves progress by the share of remaining operations, the item's own and
+ * those of its sub-size items, that just finished or were dropped. Sub-sizes
+ * are only queued once the original has uploaded, so the total grows over
+ * time. Spreading what is left of the bar over what is left of the work keeps
+ * progress moving with every operation.
  *
- * @param queue Upload queue.
- * @param id    ID of the item, or of a sub-size item whose parent to update.
+ * @param queue Upload queue, before the operations are taken off.
+ * @param id    ID of the item whose operations finished or were dropped.
+ * @param count Number of operations that finished or were dropped.
  *
  * @return Updated queue.
  */
-function withProgress( queue: QueueItem[], id?: QueueItemId ): QueueItem[] {
-	let item = queue.find( ( { id: itemId } ) => itemId === id );
-	if ( item?.parentId ) {
-		const parentId = item.parentId;
-		item = queue.find( ( { id: itemId } ) => itemId === parentId );
+function advanceProgress(
+	queue: QueueItem[],
+	id: QueueItemId,
+	count: number
+): QueueItem[] {
+	let root = queue.find( ( item ) => item.id === id );
+	while ( root?.parentId ) {
+		const { parentId } = root;
+		root = queue.find( ( item ) => item.id === parentId );
 	}
-	if ( ! item || item.parentId ) {
+	if ( ! root || ! count ) {
 		return queue;
 	}
 
-	const completed = item.completedOperations ?? 0;
-	let remaining = item.operations?.length ?? 0;
-	for ( const child of queue ) {
-		if ( child.parentId === item.id ) {
-			remaining += child.operations?.length ?? 0;
+	// Sub-size items are always queued after their parent.
+	const ids = new Set( [ root.id ] );
+	let remaining = 0;
+	for ( const item of queue ) {
+		if ( item.parentId && ids.has( item.parentId ) ) {
+			ids.add( item.id );
+		}
+		if ( ids.has( item.id ) ) {
+			remaining += item.operations?.length ?? 0;
 		}
 	}
-
-	const total = completed + remaining;
-	const progress = Math.max(
-		item.progress ?? 0,
-		total ? Math.round( ( completed / total ) * 100 ) : 0
-	);
-	if ( progress === item.progress ) {
+	if ( ! remaining ) {
 		return queue;
 	}
 
-	const target = item;
-	return queue.map( ( queueItem ) =>
-		queueItem === target ? { ...queueItem, progress } : queueItem
+	const current = root.progress ?? 0;
+	const progress = Math.round(
+		current +
+			( ( 100 - current ) * Math.min( count, remaining ) ) / remaining
+	);
+	if ( progress === root.progress ) {
+		return queue;
+	}
+
+	const target = root;
+	return queue.map( ( item ) =>
+		item === target ? { ...item, progress } : item
 	);
 }
 
@@ -158,10 +171,12 @@ function reducer(
 		case Type.Add:
 			return {
 				...state,
-				queue: withProgress(
-					[ ...state.queue, action.item ],
-					action.item.id
-				),
+				queue: [
+					...state.queue,
+					action.item.parentId || action.item.progress !== undefined
+						? action.item
+						: { ...action.item, progress: 0 },
+				],
 			};
 
 		case Type.Cancel: {
@@ -235,15 +250,20 @@ function reducer(
 			};
 
 		case Type.Remove: {
-			const parentId = state.queue.find(
+			// A dropped sub-size's operations no longer hold its parent back.
+			const removed = state.queue.find(
 				( item ) => item.id === action.id
-			)?.parentId;
+			);
+			const queue = removed?.parentId
+				? advanceProgress(
+						state.queue,
+						action.id,
+						removed.operations?.length ?? 0
+					)
+				: state.queue;
 			return {
 				...state,
-				queue: withProgress(
-					state.queue.filter( ( item ) => item.id !== action.id ),
-					parentId
-				),
+				queue: queue.filter( ( item ) => item.id !== action.id ),
 			};
 		}
 
@@ -264,22 +284,19 @@ function reducer(
 		case Type.AddOperations:
 			return {
 				...state,
-				queue: withProgress(
-					state.queue.map( ( item ): QueueItem => {
-						if ( item.id !== action.id ) {
-							return item;
-						}
+				queue: state.queue.map( ( item ): QueueItem => {
+					if ( item.id !== action.id ) {
+						return item;
+					}
 
-						return {
-							...item,
-							operations: [
-								...( item.operations || [] ),
-								...action.operations,
-							],
-						};
-					} ),
-					action.id
-				),
+					return {
+						...item,
+						operations: [
+							...( item.operations || [] ),
+							...action.operations,
+						],
+					};
+				} ),
 			};
 
 		case Type.OperationFinish: {
@@ -287,52 +304,44 @@ function reducer(
 			const finished = state.queue.find(
 				( item ) => item.id === action.id
 			);
-			const progressId = finished?.parentId ?? action.id;
-
-			const queue = state.queue.map( ( item ): QueueItem => {
-				let updated = item;
-
-				if ( item.id === progressId ) {
-					updated = {
-						...updated,
-						completedOperations:
-							( item.completedOperations ?? 0 ) + 1,
-					};
-				}
-
-				if ( item.id !== action.id ) {
-					return updated;
-				}
-
-				const operations = item.operations
-					? item.operations.slice( 1 )
-					: [];
-
-				// Prevent an empty object if there's no attachment data.
-				const attachment =
-					item.attachment || action.item.attachment
-						? {
-								...item.attachment,
-								...action.item.attachment,
-							}
-						: undefined;
-
-				return {
-					...updated,
-					currentOperation: undefined,
-					operations,
-					...action.item,
-					attachment,
-					additionalData: {
-						...item.additionalData,
-						...action.item.additionalData,
-					},
-				};
-			} );
+			const queue = advanceProgress(
+				state.queue,
+				action.id,
+				finished?.operations?.length ? 1 : 0
+			);
 
 			return {
 				...state,
-				queue: withProgress( queue, progressId ),
+				queue: queue.map( ( item ): QueueItem => {
+					if ( item.id !== action.id ) {
+						return item;
+					}
+
+					const operations = item.operations
+						? item.operations.slice( 1 )
+						: [];
+
+					// Prevent an empty object if there's no attachment data.
+					const attachment =
+						item.attachment || action.item.attachment
+							? {
+									...item.attachment,
+									...action.item.attachment,
+								}
+							: undefined;
+
+					return {
+						...item,
+						currentOperation: undefined,
+						operations,
+						...action.item,
+						attachment,
+						additionalData: {
+							...item.additionalData,
+							...action.item.additionalData,
+						},
+					};
+				} ),
 			};
 		}
 
