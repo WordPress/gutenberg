@@ -5,30 +5,14 @@
 # https://phpstan.org/config-reference
 
 includes:
-  # The WordPress Core configuration file includes the base configuration for the WordPress codebase.
-  - tools/phpstan/base.neon
-  # The baseline file includes preexisting errors in the codebase that should be ignored.
-  # https://phpstan.org/user-guide/baseline
-  - tools/phpstan/baseline/level-0.php
-  - tools/phpstan/baseline/level-1.php
-  - tools/phpstan/baseline/level-2.php
-  - tools/phpstan/baseline/level-3.php
-  - tools/phpstan/baseline/level-4.php
-  - tools/phpstan/baseline/level-5.php
-  - tools/phpstan/baseline/level-6.php
-  - tools/phpstan/baseline/level-7.php
+	# The base configuration file for using PHPStan with the Gutenberg codebase.
+	- tools/phpstan/base.neon
+
+	# Preexisting errors that should be ignored. Regenerate with `composer phpstan -- --generate-baseline=tools/phpstan/baseline.neon`.
+	# https://phpstan.org/user-guide/baseline
+	- tools/phpstan/baseline.neon
 
 parameters:
-  level: 7
-
-  treatPhpDocTypesAsCertain: false
-
-  ignoreErrors:
-    # @TODO: need to discover these symbols.
-    - '#Function gutenberg_.* not found.#'
-
-    # Level 6:
-
-    # WPCS syntax for iterable types is not supported:
-    -
-      identifier: missingType.iterableValue
+	# https://phpstan.org/user-guide/rule-levels
+	level: 5
+	reportUnmatchedIgnoredErrors: true
