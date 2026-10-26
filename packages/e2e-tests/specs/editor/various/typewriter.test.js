@@ -90,7 +90,8 @@ describe( 'TypeWriter', () => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
-		// Create blocks until there is a scrollable container.
+		// Create zero or more blocks until there is a scrollable container.
+		// No blocks should be created if there's already a scrollbar.
 		while (
 			await page.evaluate(
 				() => ! wp.dom.getScrollContainer( document.activeElement )
@@ -99,21 +100,37 @@ describe( 'TypeWriter', () => {
 			await page.keyboard.press( 'Enter' );
 		}
 
-		await page.evaluate(
+		const scrollPosition = await page.evaluate(
+			() => wp.dom.getScrollContainer( document.activeElement ).scrollTop
+		);
+		// Expect scrollbar to be at the top.
+		expect( scrollPosition ).toBe( 0 );
+
+		// Move the mouse to the scroll container, and scroll down
+		// a small amount to trigger the typewriter mode.
+		const mouseMovePosition = await page.evaluate( () => {
+			const caretRect = wp.dom.computeCaretRect( window );
+			return [ Math.floor( caretRect.x ), Math.floor( caretRect.y ) ];
+		} );
+		await page.mouse.move( ...mouseMovePosition );
+		await page.mouse.wheel( { deltaY: 2 } );
+		await page.waitForFunction(
 			() =>
-				( wp.dom.getScrollContainer(
-					document.activeElement
-				).scrollTop = 1 )
+				wp.dom.getScrollContainer( document.activeElement )
+					.scrollTop === 2
 		);
 
+		// After hitting Enter to create a new block, the caret screen
+		// coordinates should be the same.
 		const initialPosition = await getCaretPosition();
-
-		// Should maintain scroll position.
 		await page.keyboard.press( 'Enter' );
-
-		expect( await getDiff( initialPosition ) ).toBeLessThanOrEqual(
-			BUFFER
+		await page.waitForFunction(
+			() =>
+				// Wait for the Typewriter to scroll down past the initial position.
+				wp.dom.getScrollContainer( document.activeElement ).scrollTop >
+				2
 		);
+		expect( await getDiff( initialPosition ) ).toBe( 0 );
 	} );
 
 	it( 'should maintain caret position after leaving last editable', async () => {
