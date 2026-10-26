@@ -194,22 +194,11 @@ function TemplateListView( {
 		[ cleanupDeletedPostIdsFromUrl ]
 	);
 
-	const postTypeActions: Action< Template >[] = usePostActions( {
+	const actions: Action< Template >[] = usePostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
 		onActionPerformed,
 	} );
-
-	const actions = useMemo( () => {
-		return postTypeActions?.flatMap< Action< Template > >( ( action ) => {
-			// Skip revisions as the admin does not support it
-			if ( action.id === 'view-post-revisions' ) {
-				return [];
-			}
-
-			return [ action ];
-		} );
-	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
 		( viewSlug: string ) => {

@@ -1873,6 +1873,65 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				.toMatch( /text s/ );
 		} );
 
+		test( 'should preserve text selection on shift+click within the same paragraph', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'sample paragraph text' },
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			const paragraph = editor.canvas.getByText(
+				'sample paragraph text',
+				{ exact: true }
+			);
+
+			// Click to place caret at the beginning.
+			await paragraph.click( { position: { x: 10, y: 8 } } );
+
+			// Shift+click towards the end of the same paragraph.
+			await paragraph.click( {
+				modifiers: [ 'Shift' ],
+				position: { x: 80, y: 8 },
+			} );
+
+			// Extending selection within the same block keeps text selection active.
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const sel =
+							window.wp.data.select( 'core/block-editor' );
+						return {
+							blocks: sel.getSelectedBlockClientIds().length,
+							startKey: sel.getSelectionStart()?.attributeKey,
+							endKey: sel.getSelectionEnd()?.attributeKey,
+							isFullySelected: sel.__unstableIsFullySelected(),
+						};
+					} )
+				)
+				.toEqual( {
+					blocks: 1,
+					startKey: 'content',
+					endKey: 'content',
+					isFullySelected: false,
+				} );
+
+			await expect
+				.poll( () =>
+					page
+						.frame( { name: 'editor-canvas' } )
+						.evaluate( () =>
+							document
+								.getSelection()
+								.toString()
+								.replace( /\s+/g, ' ' )
+						)
+				)
+				.not.toBe( '' );
+		} );
+
 		test( 'should multi-select blocks without text selection', async ( {
 			editor,
 			multiBlockSelectionUtils,

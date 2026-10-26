@@ -261,9 +261,9 @@ function Fields( {
 			const fields = clientIds.map( ( clientId, i ) =>
 				getFieldFormatSettings( clientId, keys[ i ] )
 			);
-			const lists: string[][] = fields
+			const lists = fields
 				.map( ( field ) => field?.allowedFormats )
-				.filter( Boolean );
+				.filter( ( list ): list is readonly string[] => !! list );
 			return {
 				allowedFormats: lists.length
 					? lists.reduce( ( a, b ) =>
@@ -340,20 +340,14 @@ function Fields( {
 		// non-breaking space. It ran from the first block to the last, so
 		// they are now one block, with the caret after the new text: the
 		// same as typing over the selection.
-		if ( parts.length !== 1 ) {
+		const { start, end } = newValue;
+		if ( parts.length !== 1 || start === undefined || end === undefined ) {
 			return;
 		}
 		const [ clientId ] = clientIds;
-		const block = registry
-			.select( blockEditorStore )
-			.getBlock( clientId ) as { attributes: Record< string, unknown > };
+		const block = registry.select( blockEditorStore ).getBlock( clientId )!;
 		registry.batch( () => {
-			selectionChange(
-				clientId,
-				keys[ 0 ],
-				newValue.start,
-				newValue.end
-			);
+			selectionChange( clientId, keys[ 0 ], start, end );
 			replaceBlocks(
 				clientIds,
 				{

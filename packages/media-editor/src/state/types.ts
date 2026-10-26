@@ -1,9 +1,5 @@
-import type {
-	CropperAction,
-	CropperState,
-	NormalizedRect,
-	Size,
-} from '../image-editor';
+import type { CropperState, NormalizedRect, Size } from '../image-editor';
+import type { CropperAction } from '../image-editor/core';
 
 /**
  * Sidebar control state for the cropper. Lives in the composite store
@@ -102,8 +98,12 @@ export type MediaEditorAction =
 				visualSize: Size;
 			};
 	  }
-	/** Reset cropOptions to defaults. */
-	| { type: 'RESET_CROP_OPTIONS' }
+	/**
+	 * Put every slice back to its starting state, keeping the image:
+	 * default geometry, default crop options, no edits. One action,
+	 * so one undo entry.
+	 */
+	| { type: 'RESET' }
 	/** Set a named edit, or remove it when `value` is `undefined`. */
 	| {
 			type: 'SET_EDIT';
