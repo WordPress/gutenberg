@@ -6,10 +6,10 @@
 	},
 	"references": [
 		{ "path": "../api-fetch/tsconfig.build.json" },
-		{ "path": "../blocks" },
+		{ "path": "../blocks/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../url/tsconfig.build.json" }
