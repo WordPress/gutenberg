@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors ([#82478](https://github.com/WordPress/gutenberg/pull/82478)).
+-   Point the `bullseye-security` apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org` instead of dropping them, so the images keep receiving Debian security updates ([#85469](https://github.com/WordPress/gutenberg/pull/85469)).
 
 ## 11.11.0 (2026-07-14)
 
