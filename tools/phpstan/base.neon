@@ -43,6 +43,8 @@ parameters:
 			- */node_modules/*
 		analyse:
 			- ../../packages/block-serialization-default-parser/test
+	# WordPress itself is declared by the stubs that szepeviktor/phpstan-wordpress loads, which are
+	# generated from core trunk by generate-wordpress-stubs.sh and installed from wordpress-stubs/.
 	bootstrapFiles:
 		- bootstrap.php
 	# The polyfills that WordPress provides for newer PHP functions.

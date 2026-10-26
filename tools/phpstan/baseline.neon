@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Function wp_get_elements_class_name invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../../lib/block-supports/elements.php
+
+		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''FIGURE'' given\.$#'
 			identifier: argument.type
 			count: 1
@@ -247,28 +253,10 @@ parameters:
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
 
 		-
-			message: '#^Call to an undefined method WP_Icons_Registry\:\:unregister\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-wp-icon-collections-registry.php
-
-		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$_request$#'
 			identifier: parameter.notFound
 			count: 1
 			path: ../../lib/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php
-
-		-
-			message: '#^Call to an undefined method WP_Icons_Registry\:\:unregister\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/icons.php
-
-		-
-			message: '#^Call to protected method register\(\) of class WP_Icons_Registry\.$#'
-			identifier: method.protected
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/icons.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
@@ -283,15 +271,9 @@ parameters:
 			path: ../../lib/compat/wordpress-7.1/rest-api.php
 
 		-
-			message: '#^Parameter \#1 \$args of function get_comments expects array\{author_email\?\: string, author_url\?\: string, author__in\?\: array\<int\>, author__not_in\?\: array\<int\>, comment__in\?\: array\<int\>, comment__not_in\?\: array\<int\>, count\?\: bool, date_query\?\: array, \.\.\.\}, array\{parent\: string, count\: true, orderby\: ''none'', type\: ''all'', type__not_in\: array\{''reaction''\}\} given\.$#'
-			identifier: argument.type
+			message: '#^Call to function method_exists\(\) with ''WP_REST_Comments…'' and ''prefetch_reaction…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
-			path: ../../lib/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php
-
-		-
-			message: '#^Parameter \#1 \$post of function get_post expects int\|object\|null, string given\.$#'
-			identifier: argument.type
-			count: 2
 			path: ../../lib/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php
 
 		-
@@ -299,42 +281,6 @@ parameters:
 			identifier: return.unusedType
 			count: 1
 			path: ../../lib/compat/wordpress-7.2/note-reactions.php
-
-		-
-			message: '#^Parameter \#1 \$args of function get_comments expects array\{author_email\?\: string, author_url\?\: string, author__in\?\: array\<int\>, author__not_in\?\: array\<int\>, comment__in\?\: array\<int\>, comment__not_in\?\: array\<int\>, count\?\: bool, date_query\?\: array, \.\.\.\}, array\{parent\: string, type\: ''reaction'', status\: string, fields\: ''ids'', orderby\: ''comment_ID'', order\: ''ASC''\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/note-reactions.php
-
-		-
-			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(WP_Comment\)\: mixed\)\|null, ''intval'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/notes.php
-
-		-
-			message: '#^Parameter \#1 \$comment_id of function add_comment_meta expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/notes.php
-
-		-
-			message: '#^Parameter \#1 \$comment_id of function delete_comment_meta expects int, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../lib/compat/wordpress-7.2/notes.php
-
-		-
-			message: '#^Parameter \#1 \$comment_id of function get_comment_meta expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/notes.php
-
-		-
-			message: '#^Parameter \#1 \$comment_id of function wp_untrash_comment expects int\|WP_Comment, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/notes.php
 
 		-
 			message: '#^Method WP_Sync_Save_Server\:\:handle_request\(\) should return WP_Error\|WP_REST_Response but returns array\.$#'
@@ -463,18 +409,6 @@ parameters:
 			path: ../../packages/block-library/src/comment-template/index.php
 
 		-
-			message: '#^Parameter \#2 \$comment of function comment_class expects int\|WP_Comment\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-template/index.php
-
-		-
-			message: '#^Parameter \#3 \$post of function comment_class expects int\|WP_Post\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-template/index.php
-
-		-
 			message: '#^Function render_block_core_comments_pagination\(\) should return string but empty return statement found\.$#'
 			identifier: return.empty
 			count: 1
@@ -571,18 +505,6 @@ parameters:
 			path: ../../packages/block-library/src/latest-comments/index.php
 
 		-
-			message: '#^Parameter \#1 \$post of function post_password_required expects int\|WP_Post\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/latest-comments/index.php
-
-		-
-			message: '#^Parameter \#1 \$post of function wp_latest_comments_draft_or_post_title expects int\|WP_Post, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/latest-comments/index.php
-
-		-
 			message: '#^Parameter \#2 \$timestamp_with_offset of function date_i18n expects bool\|int, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -617,12 +539,6 @@ parameters:
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 3
 			path: ../../packages/block-library/src/navigation-submenu/index.php
-
-		-
-			message: '#^Call to an undefined static method WP_Theme_JSON\:\:get_viewport_media_queries\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
 
 		-
 			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'

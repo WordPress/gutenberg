@@ -1,0 +1,6 @@
+{
+	"name": "php-stubs/wordpress-stubs",
+	"version": "7.2.0-beta1.64757",
+	"description": "WordPress stubs generated from core trunk r64757 by tools/phpstan/generate-wordpress-stubs.sh, in place of the released package.",
+	"license": "GPL-2.0-or-later"
+}

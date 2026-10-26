@@ -35,7 +35,7 @@
 		"phpstan/extension-installer": "1.4.3",
 		"phpstan/phpstan": "2.3.2",
 		"phpstan/phpstan-phpunit": "2.1.1",
-		"php-stubs/wordpress-stubs": "7.0.1",
+		"php-stubs/wordpress-stubs": "@dev",
 		"php-stubs/wordpress-tests-stubs": "7.1.0",
 		"szepeviktor/phpstan-wordpress": "2.0.4"
 	},
@@ -51,6 +51,10 @@
 			"options": {
 				"symlink": false
 			}
+		},
+		{
+			"type": "path",
+			"url": "./tools/phpstan/wordpress-stubs"
 		}
 	],
 	"require": {
