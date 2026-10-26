@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `formatNumber`, `getSettings` and `setSettings` to format displayed numbers with the separators of the user's locale.
+-   Add `formatNumber` to format displayed numbers with the separators of the locale (`lang`) of the default text domain's locale data.
 
 ## 7.0.0 (2026-10-20)
 

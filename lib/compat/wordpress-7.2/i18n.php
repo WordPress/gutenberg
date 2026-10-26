@@ -1,21 +1,22 @@
 <?php
 /**
- * WordPress 7.2 compatibility functions for the number formatting settings
- * of the `wp-i18n` script.
+ * WordPress 7.2 compatibility functions for the locale used by `wp.i18n` to
+ * format numbers.
  *
  * @package gutenberg
  */
 
 /**
- * Passes the locale of the current user to `wp.i18n`, which formats numbers
- * with it.
+ * Passes the locale of the current user to `wp.i18n`, as the `lang` of the
+ * locale data of the default text domain. `wp.i18n.formatNumber()` formats
+ * numbers with it.
  *
- * Only the settings `wp.i18n.formatNumber()` needs are passed, unlike the date
- * settings, which also carry month names, formats and more.
+ * Translation files carry the same `lang` in their locale data, but English
+ * sites have none, so the locale is always set.
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_add_i18n_number_format_settings( $scripts ) {
+function gutenberg_add_i18n_locale( $scripts ) {
 	if ( ! $scripts->query( 'wp-i18n', 'registered' ) ) {
 		return;
 	}
@@ -23,13 +24,10 @@ function gutenberg_add_i18n_number_format_settings( $scripts ) {
 	$scripts->add_inline_script(
 		'wp-i18n',
 		sprintf(
-			'wp.i18n.setSettings( %s );',
-			wp_json_encode(
-				array( 'locale' => get_user_locale() ),
-				JSON_HEX_TAG | JSON_UNESCAPED_SLASHES
-			)
+			'wp.i18n.setLocaleData( { "": { "lang": %s } } );',
+			wp_json_encode( get_user_locale(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		),
 		'after'
 	);
 }
-add_action( 'wp_default_scripts', 'gutenberg_add_i18n_number_format_settings', 20 );
+add_action( 'wp_default_scripts', 'gutenberg_add_i18n_locale', 20 );

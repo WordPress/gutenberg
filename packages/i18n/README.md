@@ -49,7 +49,7 @@ Default, singleton instance of `I18n`.
 
 Formats a number for display with the separators and decimal mark of the user's locale, for example `1,234,567.5` in English or `1.234.567,5` in German.
 
-Use it for displayed counts and quantities, and pass the formatted value to `sprintf` with a `%s` placeholder. Keep the numeric value for plural selection with `_n`.
+The locale is the `lang` of the locale data of the default text domain, as set by `setLocaleData`. Use the function for displayed counts and quantities, and pass the formatted value to `sprintf` with a `%s` placeholder. Keep the numeric value for plural selection with `_n`.
 
 _Parameters_
 
@@ -76,14 +76,6 @@ _Returns_
 
 - `LocaleData`: Locale data.
 
-### getSettings
-
-Returns the settings used to format numbers.
-
-_Returns_
-
-- `NumberFormatSettings`: Number format settings.
-
 ### hasTranslation
 
 Check if there is a translation for a given string (in singular form).
@@ -107,10 +99,6 @@ Check if current locale is RTL.
 _Returns_
 
 - `boolean`: Whether locale is RTL.
-
-### NumberFormatSettings
-
-Undocumented declaration.
 
 ### resetLocaleData
 
@@ -137,14 +125,6 @@ _Parameters_
 
 - _data_ `[LocaleData ]`: Locale data configuration.
 - _domain_ `[string | undefined]`: Domain for which configuration applies.
-
-### setSettings
-
-Sets the settings used to format numbers. In WordPress, this is called from an inline script with the locale of the current user.
-
-_Parameters_
-
-- _newSettings_ `NumberFormatSettings`: Number format settings.
 
 ### sprintf
 

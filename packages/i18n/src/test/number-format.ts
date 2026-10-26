@@ -1,29 +1,37 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { formatNumber, getSettings, setSettings } from '../number-format';
+import { resetLocaleData, setLocaleData } from '../default-i18n';
+import { formatNumber } from '../number-format';
 
-describe( 'number format', () => {
+describe( 'formatNumber', () => {
 	afterEach( () => {
-		setSettings( { locale: 'en' } );
+		resetLocaleData();
 	} );
 
 	it( 'defaults to the English locale', () => {
-		expect( getSettings() ).toEqual( { locale: 'en' } );
 		expect( formatNumber( 1234567.5 ) ).toBe( '1,234,567.5' );
 	} );
 
-	it( 'returns the settings that were set', () => {
-		setSettings( { locale: 'de_DE' } );
-		expect( getSettings() ).toEqual( { locale: 'de_DE' } );
-	} );
-
-	it( 'formats with the separators of the locale', () => {
-		setSettings( { locale: 'de-DE' } );
+	it( 'formats with the lang of the locale data', () => {
+		setLocaleData( { '': { lang: 'de-DE' } } );
 		expect( formatNumber( 1234567.5 ) ).toBe( '1.234.567,5' );
 	} );
 
 	it( 'accepts WordPress locales with underscores', () => {
-		setSettings( { locale: 'de_DE' } );
+		setLocaleData( { '': { lang: 'de_DE' } } );
 		expect( formatNumber( 1234567.5 ) ).toBe( '1.234.567,5' );
+	} );
+
+	it( 'follows changes of the locale data', () => {
+		setLocaleData( { '': { lang: 'de_DE' } } );
+		setLocaleData( { '': { lang: 'fr_FR' } } );
+		expect( formatNumber( 1234567 ) ).not.toBe( '1.234.567' );
+		resetLocaleData();
+		expect( formatNumber( 1234567 ) ).toBe( '1,234,567' );
+	} );
+
+	it( 'ignores locale data of other domains', () => {
+		setLocaleData( { '': { lang: 'de_DE' } }, 'other' );
+		expect( formatNumber( 1234567 ) ).toBe( '1,234,567' );
 	} );
 
 	it( 'formats zero and negative numbers', () => {
@@ -41,7 +49,7 @@ describe( 'number format', () => {
 	} );
 
 	it( 'falls back to English for an invalid locale', () => {
-		setSettings( { locale: 'not a locale' } );
+		setLocaleData( { '': { lang: 'not a locale' } } );
 		expect( formatNumber( 1234567 ) ).toBe( '1,234,567' );
 	} );
 } );

@@ -1,36 +1,18 @@
-/**
- * Settings used to format numbers.
- */
-export interface NumberFormatSettings {
-	/**
-	 * Locale of the user, such as `en`, `de_DE`, or `de-DE`. Underscores are
-	 * converted to hyphens when formatting, so both WordPress locales and BCP
-	 * 47 language tags are accepted.
-	 */
-	locale: string;
-}
+import { getLocaleData } from './default-i18n';
 
 const DEFAULT_LOCALE = 'en';
 
-let settings: NumberFormatSettings = { locale: DEFAULT_LOCALE };
-
 /**
- * Sets the settings used to format numbers. In WordPress, this is called from
- * an inline script with the locale of the current user.
+ * Returns the locale of the default text domain, such as `de_DE`. It is the
+ * `lang` of the locale data, which translation files include, and which
+ * WordPress also sets for the default domain.
  *
- * @param newSettings Number format settings.
+ * @return The locale, or the default locale if the locale data has none.
  */
-export function setSettings( newSettings: NumberFormatSettings ) {
-	settings = { ...newSettings };
-}
-
-/**
- * Returns the settings used to format numbers.
- *
- * @return Number format settings.
- */
-export function getSettings(): NumberFormatSettings {
-	return settings;
+function getLocale(): string {
+	const metadata = getLocaleData()?.[ '' ];
+	const lang = Array.isArray( metadata ) ? undefined : metadata?.lang;
+	return typeof lang === 'string' && lang ? lang : DEFAULT_LOCALE;
 }
 
 /**
@@ -38,9 +20,10 @@ export function getSettings(): NumberFormatSettings {
  * user's locale, for example `1,234,567.5` in English or `1.234.567,5` in
  * German.
  *
- * Use it for displayed counts and quantities, and pass the formatted value to
- * `sprintf` with a `%s` placeholder. Keep the numeric value for plural
- * selection with `_n`.
+ * The locale is the `lang` of the locale data of the default text domain, as
+ * set by `setLocaleData`. Use the function for displayed counts and
+ * quantities, and pass the formatted value to `sprintf` with a `%s`
+ * placeholder. Keep the numeric value for plural selection with `_n`.
  *
  * @param value   The number to format.
  * @param options Options of `Intl.NumberFormat`, for example
@@ -52,7 +35,8 @@ export function formatNumber(
 	value: number,
 	options?: Intl.NumberFormatOptions
 ): string {
-	const locale = settings.locale.replace( /_/g, '-' );
+	// WordPress locales use underscores (`de_DE`), `Intl` expects hyphens.
+	const locale = getLocale().replace( /_/g, '-' );
 	try {
 		return new Intl.NumberFormat( locale, options ).format( value );
 	} catch ( error ) {
