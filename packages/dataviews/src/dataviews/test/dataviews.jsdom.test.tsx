@@ -163,7 +163,7 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 			setTimeout( () => {
 				callback( [
 					{
-						borderBoxSize: [ { inlineSize: 500 } ],
+						borderBoxSize: [ { inlineSize: 500, blockSize: 48 } ],
 					},
 				] );
 			}, 0 );
@@ -302,7 +302,7 @@ describe( 'DataViews component', () => {
 		expect( callback ).not.toHaveBeenCalled();
 	} );
 
-	it( 'moves default table bulk actions into the header and preserves focus', async () => {
+	it( 'shows bulk actions outside the table without adding rows and preserves focus', async () => {
 		render( <DataViewWrapper actions={ actions } /> );
 		expect( screen.getByText( '3 items' ) ).toBeInTheDocument();
 		expect(
@@ -317,9 +317,9 @@ describe( 'DataViews component', () => {
 		const tableHeader = within( screen.getByRole( 'table' ) ).getAllByRole(
 			'rowgroup'
 		)[ 0 ];
-		const toolbarCell = within( tableHeader ).getByRole( 'cell', {
-			name: /3 items selected/,
-		} );
+		const toolbar = getBulkActionToolbar();
+		expect( screen.getByRole( 'table' ) ).not.toContainElement( toolbar );
+		expect( within( tableHeader ).getAllByRole( 'row' ) ).toHaveLength( 1 );
 		const titleHeader = within( tableHeader ).getByRole( 'columnheader', {
 			name: 'Title',
 		} );
@@ -327,7 +327,7 @@ describe( 'DataViews component', () => {
 			within( titleHeader ).getByRole( 'button', { hidden: true } )
 		).toHaveAttribute( 'inert' );
 		expect(
-			within( toolbarCell ).getByRole( 'checkbox', {
+			within( toolbar ).getByRole( 'checkbox', {
 				name: 'Deselect all',
 			} )
 		).toHaveFocus();
@@ -336,7 +336,7 @@ describe( 'DataViews component', () => {
 		).toBeInTheDocument();
 
 		await user.click(
-			within( toolbarCell ).getByRole( 'button', { name: 'Cancel' } )
+			within( toolbar ).getByRole( 'button', { name: 'Cancel' } )
 		);
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
 		expect(
