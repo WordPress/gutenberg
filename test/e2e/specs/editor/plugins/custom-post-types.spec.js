@@ -70,6 +70,33 @@ test.describe( 'Test Custom Post Types', () => {
 		await expect( parentPageLocator ).toHaveValue( parentPage );
 	} );
 
+	test( 'does not show parent controls for a non-hierarchical post type with page attributes', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const postType = await requestUtils.rest( {
+			path: '/wp/v2/types/non-hierarchical?context=edit',
+		} );
+		expect( postType.hierarchical ).toBe( false );
+		expect( postType.supports[ 'page-attributes' ] ).toBe( true );
+
+		await admin.createNewPost( { postType: 'non-hierarchical' } );
+		const summary = await openPostSummary( {
+			editor,
+			page,
+			tab: 'Non-Hierarchical',
+		} );
+
+		await expect(
+			summary.getByText( 'Parent', { exact: true } )
+		).toHaveCount( 0 );
+		await expect(
+			summary.getByRole( 'button', { name: 'Edit Parent' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'should not be able to rename a post that lacks title support', async ( {
 		admin,
 		editor,

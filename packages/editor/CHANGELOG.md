@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85595](https://github.com/WordPress/gutenberg/issues/85595)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
