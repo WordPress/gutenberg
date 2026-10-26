@@ -526,6 +526,7 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
+	const resizeUnitRef = useRef( { unit: 'px', pixelsPerUnit: 1 } );
 	// State, not a ref, so that the element is there on the next render.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	const blockProps = useBlockProps( {
@@ -749,21 +750,51 @@ function CoverEdit( {
 		/>
 	);
 
+	const updateHeightAfterResize = ( pixelHeight ) => {
+		const { unit, pixelsPerUnit } = resizeUnitRef.current;
+		setAttributes( {
+			minHeight: Number( ( pixelHeight / pixelsPerUnit ).toFixed( 2 ) ),
+			minHeightUnit: unit,
+		} );
+	};
+
 	const resizableCoverProps = {
 		className: 'block-library-cover__resize-container',
 		clientId,
 		height,
 		minHeight: minHeightWithUnit,
 		onResizeStart: () => {
-			setAttributes( { minHeightUnit: 'px' } );
+			// The resize handle can be outside the canvas iframe. Resolve units
+			// against the Cover itself, independently of its content's height.
+			const element = ref.current;
+			const view = element?.ownerDocument.defaultView;
+			const pixelsPerUnit = {
+				px: 1,
+				em:
+					view &&
+					parseFloat( view.getComputedStyle( element ).fontSize ),
+				rem:
+					view &&
+					parseFloat(
+						view.getComputedStyle(
+							element.ownerDocument.documentElement
+						).fontSize
+					),
+				vw: view && view.innerWidth / 100,
+				vh: view && view.innerHeight / 100,
+			}[ minHeightUnit ];
+			// Keep the existing pixel fallback for custom units that cannot be
+			// resolved here, or when their reference dimension is zero.
+			resizeUnitRef.current =
+				Number.isFinite( pixelsPerUnit ) && pixelsPerUnit > 0
+					? { unit: minHeightUnit, pixelsPerUnit }
+					: { unit: 'px', pixelsPerUnit: 1 };
 			toggleSelection( false );
 		},
-		onResize: ( value ) => {
-			setAttributes( { minHeight: value } );
-		},
+		onResize: updateHeightAfterResize,
 		onResizeStop: ( newMinHeight ) => {
 			toggleSelection( true );
-			setAttributes( { minHeight: newMinHeight } );
+			updateHeightAfterResize( newMinHeight );
 		},
 		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
 		showHandle: ! attributes.style?.dimensions?.aspectRatio,
