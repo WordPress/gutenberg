@@ -16,6 +16,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Deprecations
+
+-   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5. For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
+
 ### Bug Fixes
 
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
