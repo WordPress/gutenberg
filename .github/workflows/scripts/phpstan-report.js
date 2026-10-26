@@ -135,7 +135,9 @@ function readErrors( reportPath ) {
 
 	/** @type {PhpstanError[]} */
 	const errors = [];
-	for ( const [ absolutePath, file ] of Object.entries( report.files ) ) {
+	for ( const [ key, file ] of Object.entries( report.files ) ) {
+		// An error in a trait is keyed by the trait's file, followed by the class it was analyzed in.
+		const absolutePath = key.replace( / \(in context of .+\)$/, '' );
 		const relativePath = absolutePath.startsWith( workspace )
 			? absolutePath.slice( workspace.length )
 			: absolutePath;
