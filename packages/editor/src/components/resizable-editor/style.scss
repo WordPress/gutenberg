@@ -1,5 +1,6 @@
 @use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // Don't apply transition when resized using the resizer handle.
@@ -42,6 +43,12 @@
 		width: $grid-unit-05;
 		background-color: rgba($gray-700, 0.4);
 		border-radius: $radius-full;
+		// Keep the handle visible in Windows High Contrast mode.
+		outline: 1px solid transparent;
+	}
+
+	&:focus-visible::after {
+		@include outset-ring__focus();
 	}
 
 	&.is-left {
