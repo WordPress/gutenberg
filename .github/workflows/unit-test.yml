@@ -116,7 +116,7 @@ jobs:
                       ./build/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on Linux
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
         needs: [build-assets]
         runs-on: 'ubuntu-24.04'
         permissions:
