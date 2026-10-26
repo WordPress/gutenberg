@@ -28,9 +28,13 @@ final class WpBuildTemplateParser implements Parser {
 	 *
 	 * Placeholders that the build expands to several lines of generated code are replaced with
 	 * the same code on a single line.
+	 *
+	 * The prefix is one that no built file uses, since the files in `build` are scanned too. With
+	 * the plugin's own prefix, a template would declare the same functions as the files built from
+	 * it, so a call could resolve to an outdated build rather than to the template.
 	 */
 	private const REPLACEMENTS = array(
-		'{{PREFIX}}'                 => 'gutenberg',
+		'{{PREFIX}}'                 => 'wp_build_template',
 		'{{HANDLE_PREFIX}}'          => 'wp',
 		'{{PAGE_SLUG}}'              => 'example-page',
 		'{{PAGE_SLUG_UNDERSCORE}}'   => 'example_page',

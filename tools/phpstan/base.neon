@@ -60,9 +60,10 @@ parameters:
 		- ../../build
 
 services:
-	# Renders the wp-build templates into valid PHP before they are parsed, in place of the parser
-	# that PHPStan uses for analyzed files. If a PHPStan update renames this service, the templates
-	# fail to parse and are reported as syntax errors, so the analysis does not silently skip them.
+	# Renders the wp-build templates into valid PHP before they are parsed, in place of the parsers
+	# that PHPStan uses for analyzed files and for discovering the symbols a file declares. If a
+	# PHPStan update renames these services, the templates fail to parse and are reported as syntax
+	# errors, or the functions they declare as not found, so the analysis does not silently skip them.
 	wpBuildTemplateWrappedRichParser:
 		class: PHPStan\Parser\RichParser
 		arguments:
@@ -72,4 +73,14 @@ services:
 		class: Gutenberg\PHPStan\WpBuildTemplateParser
 		arguments:
 			parser: @wpBuildTemplateWrappedRichParser
+		autowired: false
+	wpBuildTemplateWrappedSimpleParser:
+		class: PHPStan\Parser\SimpleParser
+		arguments:
+			parser: @currentPhpVersionPhpParser
+		autowired: false
+	currentPhpVersionSimpleDirectParser:
+		class: Gutenberg\PHPStan\WpBuildTemplateParser
+		arguments:
+			parser: @wpBuildTemplateWrappedSimpleParser
 		autowired: false
