@@ -4,7 +4,8 @@
 
 ### Enhancements
 
--   Use the design system focus ring for the crop area and crop handles in the image cropper.
+-   Use the design system focus ring for the crop area and crop handles in the image cropper ([#85545](https://github.com/WordPress/gutenberg/pull/85545)).
+-   Use the design system focus ring for the rotation ruler ([#85535](https://github.com/WordPress/gutenberg/pull/85535)).
 
 ## 0.21.0 (2026-10-20)
 
