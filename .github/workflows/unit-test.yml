@@ -565,8 +565,21 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*') }}-
 
+            # The report is written to a file for the next step. PHPStan exits with 1 when it reports
+            # errors, which that step handles; anything higher means the analysis did not finish.
             - name: Run PHPStan
-              run: composer phpstan -- --error-format=github --no-progress
+              run: |
+                  status=0
+                  composer phpstan -- --error-format=json --no-progress > "${RUNNER_TEMP}/phpstan-report.json" || status=$?
+                  if [ "${status}" -gt 1 ]; then
+                      echo "::error title=PHPStan did not complete::The analysis exited with status ${status}, so the code was not fully checked."
+                      exit "${status}"
+                  fi
+
+            # Annotates the errors and lists all of them in the job summary, including those on lines
+            # the pull request did not change and those with no line, such as an out-of-date baseline.
+            - name: Report the PHPStan results
+              run: node .github/workflows/scripts/phpstan-report.js "${RUNNER_TEMP}/phpstan-report.json"
 
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
