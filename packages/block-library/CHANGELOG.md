@@ -6,8 +6,8 @@
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
--   Post Template, Comment Template, Term Template: Pass the template block's own context (the keys it declares in `usesContext`, or that `render_block_context` filters add to it) on to its inner blocks when rendering on the server, as the editor already does ([#68608](https://github.com/WordPress/gutenberg/issues/68608)).
--   Term Template: Register the block with `skip_inner_blocks`, so its inner blocks are no longer rendered an extra time, without term context, before the per-term render ([#68608](https://github.com/WordPress/gutenberg/issues/68608)).
+-   Post Template, Comment Template, Term Template: Pass the template block's own context (the keys it declares in `usesContext`, or that `render_block_context` filters add to it) on to its inner blocks when rendering on the server, as the editor already does ([#85558](https://github.com/WordPress/gutenberg/pull/85558)).
+-   Term Template: Register the block with `skip_inner_blocks`, so its inner blocks are no longer rendered an extra time, without term context, before the per-term render ([#85558](https://github.com/WordPress/gutenberg/pull/85558)).
 
 ## 12.0.0 (2026-10-20)
 
