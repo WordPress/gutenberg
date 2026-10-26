@@ -4,8 +4,8 @@ const DEFAULT_LOCALE = 'en';
 
 /**
  * Returns the locale of the default text domain, such as `de_DE`. It is the
- * `lang` of the locale data, which translation files include, and which
- * WordPress also sets for the default domain.
+ * `lang` of the locale data, which translation files include. English sites
+ * without a translation file have none.
  *
  * @return The locale, or the default locale if the locale data has none.
  */
@@ -20,9 +20,9 @@ function getLocale(): string {
  * user's locale, for example `1,234,567.5` in English or `1.234.567,5` in
  * German.
  *
- * The locale is the `lang` of the locale data of the default text domain, as
- * set by `setLocaleData`. Use the function for displayed counts and
- * quantities, and pass the formatted value to `sprintf` with a `%s`
+ * The locale is the `lang` of the locale data of the default text domain, which
+ * WordPress sets from the translation files. Use the function for displayed
+ * counts and quantities, and pass the formatted value to `sprintf` with a `%s`
  * placeholder. Keep the numeric value for plural selection with `_n`.
  *
  * @param value   The number to format.

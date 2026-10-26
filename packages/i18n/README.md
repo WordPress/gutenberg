@@ -49,7 +49,7 @@ Default, singleton instance of `I18n`.
 
 Formats a number for display with the separators and decimal mark of the user's locale, for example `1,234,567.5` in English or `1.234.567,5` in German.
 
-The locale is the `lang` of the locale data of the default text domain, as set by `setLocaleData`. Use the function for displayed counts and quantities, and pass the formatted value to `sprintf` with a `%s` placeholder. Keep the numeric value for plural selection with `_n`.
+The locale is the `lang` of the locale data of the default text domain, which WordPress sets from the translation files. Use the function for displayed counts and quantities, and pass the formatted value to `sprintf` with a `%s` placeholder. Keep the numeric value for plural selection with `_n`.
 
 _Parameters_
 
