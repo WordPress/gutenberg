@@ -5,10 +5,12 @@ import useRefEffect from '../use-ref-effect';
 /**
  * Determines focus behavior when the element mounts.
  *
- * @param focusOnMount Behavioral mode. Defaults to `"firstElement"` which focuses the
+ * @param focusOnMount Focus options. Defaults to `"firstElement"` which focuses the
  *                     first tabbable element within; `"firstInputElement"` focuses the
  *                     first value control within; `true` focuses the element itself;
- *                     `false` does nothing.
+ *                     `false` does nothing. For dynamic resolution of the focus option
+ *                     pass a callback whose return value is one of the preceding
+ *                     options, `undefined` to default or an `HTMLElement` to focus.
  * @return Ref callback.
  *
  * @example
@@ -27,7 +29,7 @@ import useRefEffect from '../use-ref-effect';
  * ```
  */
 export function useFocusOnMount(
-	focusOnMount: useFocusOnMount.Mode = 'firstElement'
+	focusOnMount: useFocusOnMount.FocusOptions = 'firstElement'
 ) {
 	const focusOnMountRef = useRef( focusOnMount );
 
@@ -50,7 +52,8 @@ export function useFocusOnMount(
 	}, [ focusOnMount ] );
 
 	return useRefEffect< HTMLElement >( ( node ) => {
-		if ( focusOnMountRef.current === false ) {
+		const currentFocusOnMount = focusOnMountRef.current;
+		if ( currentFocusOnMount === false ) {
 			return;
 		}
 
@@ -58,17 +61,31 @@ export function useFocusOnMount(
 			return;
 		}
 
-		if (
-			focusOnMountRef.current !== 'firstElement' &&
-			focusOnMountRef.current !== 'firstInputElement'
-		) {
+		if ( currentFocusOnMount === true ) {
 			setFocus( node );
 			return;
 		}
 
 		const timerId = setTimeout( () => {
+			let usedFocusOnMount;
+			if ( typeof currentFocusOnMount === 'function' ) {
+				usedFocusOnMount =
+					currentFocusOnMount( node ) ?? 'firstElement';
+				if ( typeof usedFocusOnMount === 'boolean' ) {
+					if ( usedFocusOnMount ) {
+						setFocus( node );
+					}
+					return;
+				}
+				// Focus the element returned.
+				if ( ! ( typeof usedFocusOnMount === 'string' ) ) {
+					setFocus( usedFocusOnMount );
+					return;
+				}
+			}
+			usedFocusOnMount ??= 'firstElement';
 			// For 'firstInputElement' mode, try to find a form input element first
-			if ( focusOnMountRef.current === 'firstInputElement' ) {
+			if ( currentFocusOnMount === 'firstInputElement' ) {
 				const formInput = node.querySelector< HTMLElement >(
 					'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
 				);
@@ -78,11 +95,12 @@ export function useFocusOnMount(
 					return;
 				}
 			}
-
 			// Fallback to the first tabbable element
-			const firstTabbable = focus.tabbable.find( node )[ 0 ];
-			if ( firstTabbable ) {
-				setFocus( firstTabbable );
+			if ( usedFocusOnMount === 'firstElement' ) {
+				const firstTabbable = focus.tabbable.find( node )[ 0 ];
+				if ( firstTabbable ) {
+					setFocus( firstTabbable );
+				}
 			}
 		}, 0 );
 
@@ -94,4 +112,8 @@ export function useFocusOnMount(
 
 export namespace useFocusOnMount {
 	export type Mode = boolean | 'firstElement' | 'firstInputElement';
+	export type ModeResolver = (
+		node: HTMLElement
+	) => Mode | HTMLElement | undefined;
+	export type FocusOptions = Mode | ModeResolver;
 }
