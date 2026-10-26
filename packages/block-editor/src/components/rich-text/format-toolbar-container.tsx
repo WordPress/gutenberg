@@ -96,13 +96,19 @@ function useHasFocusWithin(
 }
 
 /**
- * Whether the selection starts on the first line of the editable element,
- * where a toolbar above it would cover the block toolbar.
+ * The room the selection toolbar needs above the selection: its 40px height
+ * and the space around it.
+ */
+const SELECTION_TOOLBAR_SPACE = 56;
+
+/**
+ * Whether a toolbar above the selection would reach the top of the editable
+ * element, where it would cover the block toolbar.
  *
  * @param editableContentElement The editable element.
- * @return Whether the selection starts on the first line.
+ * @return Whether the selection is too close to the top of the element.
  */
-function isSelectionOnFirstLine( editableContentElement: HTMLElement ) {
+function isSelectionNearTop( editableContentElement: HTMLElement ) {
 	const selection =
 		editableContentElement.ownerDocument.defaultView?.getSelection();
 	if ( ! selection?.rangeCount ) {
@@ -115,13 +121,13 @@ function isSelectionOnFirstLine( editableContentElement: HTMLElement ) {
 		return false;
 	}
 	const editableRect = editableContentElement.getBoundingClientRect();
-	return firstRect.top - editableRect.top < firstRect.height;
+	return firstRect.top - editableRect.top < SELECTION_TOOLBAR_SPACE;
 }
 
 /**
  * The format toolbar of the block toolbar redesign. It appears above the
- * selected text, or below it when the selection is on the first line, so
- * it does not cover the block toolbar.
+ * selected text, or below it when the selection is near the top of the
+ * block, so it does not cover the block toolbar.
  *
  * @param props                        Component props.
  * @param props.editableContentElement The editable element.
@@ -144,7 +150,7 @@ function SelectionToolbar( {
 		return null;
 	}
 
-	const placement = isSelectionOnFirstLine( editableContentElement )
+	const placement = isSelectionNearTop( editableContentElement )
 		? 'bottom'
 		: 'top';
 
