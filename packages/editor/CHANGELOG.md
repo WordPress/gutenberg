@@ -5,8 +5,8 @@
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
--   Revisions: the slider tooltip, its `aria-valuetext` and the "Restored to revision from…" notice show the revision time in the site timezone instead of shifting it by the browser's timezone offset.
--   Collab sidebar: the full-date tooltip on a note's byline shows the note time in the site timezone instead of shifting it by the browser's timezone offset.
+-   Revisions: the slider tooltip, its `aria-valuetext` and the "Restored to revision from…" notice show the revision time in the site timezone instead of shifting it by the browser's timezone offset ([#85559](https://github.com/WordPress/gutenberg/pull/85559)).
+-   Collab sidebar: the full-date tooltip on a note's byline shows the note time in the site timezone instead of shifting it by the browser's timezone offset ([#85559](https://github.com/WordPress/gutenberg/pull/85559)).
 
 ## 16.0.0 (2026-10-20)
 
