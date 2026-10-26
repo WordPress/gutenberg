@@ -14,8 +14,8 @@
  * @global int|string $_sidebar_being_rendered
  *
  * @param array    $attributes The block attributes.
- * @param string   $content The block content.
- * @param WP_Block $block The block.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      The block.
  *
  * @return string Rendered block.
  */
@@ -70,7 +70,7 @@ add_action( 'init', 'register_block_core_widget_group' );
  *
  * @global int|string $_sidebar_being_rendered
  *
- * @param int|string $index       Index, name, or ID of the dynamic sidebar.
+ * @param int|string $index Index, name, or ID of the dynamic sidebar.
  */
 function note_sidebar_being_rendered( $index ) {
 	global $_sidebar_being_rendered;

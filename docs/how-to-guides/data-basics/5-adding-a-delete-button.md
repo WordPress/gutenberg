@@ -5,7 +5,7 @@ and in this part we will add a *Delete* feature to our app.
 
 Here's a glimpse of what we're going to build:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
+![](https://developer.wordpress.org/files/2026/06/delete-button.png)
 
 ### Step 1: Add a _Delete_ button
 
@@ -58,7 +58,7 @@ function PagesList( { hasResolved, pages } ) {
 
 This is what the PagesList should look like now:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
+![](https://developer.wordpress.org/files/2026/06/delete-button.png)
 
 ### Step 2: Wire the button to a delete action
 
@@ -122,7 +122,7 @@ const DeletePageButton = ({ pageId }) => {
 
 Here's what it looks like in action:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/deleting-in-progress.png)
+![](https://developer.wordpress.org/files/2026/06/deleting-in-progress.png)
 
 ### Step 4: Handle errors
 
@@ -172,7 +172,7 @@ There are many ways to turn that object into an error message, but in this tutor
 
 WordPress has an established pattern of displaying status information using the `Snackbar` component. Here's what it looks like **in the Widgets editor**:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-example.png)
+![](https://developer.wordpress.org/files/2026/06/snackbar-example.png)
 
 Let's use the same type of notifications in our plugin! There are two parts to this:
 
@@ -185,53 +185,23 @@ Our application only knows how to display pages but does not know how to display
 
 WordPress conveniently provides us with all the React components we need to render notifications. A [component called `Snackbar`](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--default) represents a single notification:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar.png)
+![](https://developer.wordpress.org/files/2026/06/snackbar.png)
 
-We won't use `Snackbar` directly, though. We'll use the `SnackbarList` component, which can display multiple notices using smooth animations and automatically hide them after a few seconds. In fact, WordPress uses the same component used in the Widgets editor and other wp-admin pages!
+We won't use `Snackbar` directly, though. We'll use `SnackbarNotices` from `@wordpress/notices`, which can display multiple notices using smooth animations and automatically hide them after a few seconds. In fact, WordPress uses the same component in the Widgets editor and other wp-admin pages!
 
 Let's create our own `Notifications` components:
 
 ```js
-import { SnackbarList } from '@wordpress/components';
-import { store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices } from '@wordpress/notices';
 
 function Notifications() {
-	const notices = []; // We'll come back here in a second!
-
-	return (
-		<SnackbarList
-			notices={ notices }
-			className="components-editor-notices__snackbar"
-		/>
-	);
+	return <SnackbarNotices className="notifications__snackbar" />;
 }
 ```
 
-The basic structure is in place, but the list of notifications it renders is empty. How do we populate it? We'll lean on the same package as WordPress: [`@wordpress/notices`](https://github.com/WordPress/gutenberg/blob/895ca1f6a7d7e492974ea55f693aecbeb1d5bbe3/docs/reference-guides/data/data-core-notices.md).
-
-Here's how:
+The basic structure is in place. `SnackbarNotices` reads from the notices store automatically, so all you need to do is render it once in your app:
 
 ```js
-import { SnackbarList } from '@wordpress/components';
-import { store as noticesStore } from '@wordpress/notices';
-
-function Notifications() {
-	const notices = useSelect(
-		( select ) => select( noticesStore ).getNotices(),
-		[]
-	);
-	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = notices.filter( ({ type }) => type === 'snackbar' );
-
-	return (
-		<SnackbarList
-			notices={ snackbarNotices }
-			className="components-editor-notices__snackbar"
-			onRemove={ removeNotice }
-		/>
-	);
-}
-
 function MyFirstApp() {
 	// ...
 	return (
@@ -292,13 +262,13 @@ function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
 
 Once you refresh the page and click any `Delete` button, you should see the following error message:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-error.png)
+![](https://developer.wordpress.org/files/2026/06/snackbar-error.png)
 
 Fantastic! We can now **remove the `pageId = pageId * 1000;` line.**
 
 Let's now try actually deleting a page. Here's what you should see after refreshing your browser and clicking the Delete button:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-success.png)
+![](https://developer.wordpress.org/files/2026/06/snackbar-success.png)
 
 And that's it!
 
@@ -344,21 +314,8 @@ function MyFirstApp() {
 	);
 }
 
-function SnackbarNotices() {
-	const notices = useSelect(
-		( select ) => select( noticesStore ).getNotices(),
-		[]
-	);
-	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = notices.filter( ( { type } ) => type === 'snackbar' );
-
-	return (
-		<SnackbarList
-			notices={ snackbarNotices }
-			className="components-editor-notices__snackbar"
-			onRemove={ removeNotice }
-		/>
-	);
+function Notifications() {
+	return <SnackbarNotices className="notifications__snackbar" />;
 }
 
 function PagesList( { hasResolved, pages } ) {

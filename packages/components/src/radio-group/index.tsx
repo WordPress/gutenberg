@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { useMemo, forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import ButtonGroup from '../button-group';
 import type { WordPressComponentProps } from '../context';
 import { RadioGroupContext } from './context';
@@ -74,4 +63,5 @@ function UnforwardedRadioGroup(
  * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
  */
 export const RadioGroup = forwardRef( UnforwardedRadioGroup );
+RadioGroup.displayName = 'RadioGroup';
 export default RadioGroup;

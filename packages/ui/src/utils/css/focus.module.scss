@@ -1,0 +1,27 @@
+@use "./mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer utilities {
+		/*
+		 * Shared focus-ring utility classes. For new code, prefer using the
+		 * mixin directly in the component stylesheet.
+		 */
+		.outset-ring--focus:focus,
+		.outset-ring--focus-visible:focus-visible,
+		.outset-ring--focus-within:focus-within {
+			@include mixins.focus-ring();
+		}
+
+		.outset-ring--focus-except-active:focus,
+		.outset-ring--focus-within-except-active:focus-within {
+			outline: none;
+		}
+
+		.outset-ring--focus-except-active:focus:not(:active),
+		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)) {
+			@include mixins.focus-ring();
+		}
+	}
+}

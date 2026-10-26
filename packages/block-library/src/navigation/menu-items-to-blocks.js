@@ -1,8 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
+import { buildNavigationLinkEntityBinding } from '../navigation-link/shared/use-entity-binding';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -36,7 +34,7 @@ function mapMenuItemsToBlocks( menuItems, level = 0 ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = [ ...menuItems ].sort(
+	const sortedItems = menuItems.toSorted(
 		( a, b ) => a.menu_order - b.menu_order
 	);
 
@@ -145,12 +143,14 @@ function menuItemToBlockAttributes(
 		object = 'tag';
 	}
 
+	const inferredKind = menuItemTypeField?.replace( '_', '-' ) || 'custom';
+
 	return {
 		label: menuItemTitleField?.rendered || '',
 		...( object?.length && {
 			type: object,
 		} ),
-		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		kind: inferredKind,
 		url: url || '',
 		...( xfn?.length &&
 			xfn.join( ' ' ).trim() && {
@@ -165,8 +165,11 @@ function menuItemToBlockAttributes(
 			title: attr_title,
 		} ),
 		...( object_id &&
-			'custom' !== object && {
+			( inferredKind === 'post-type' || inferredKind === 'taxonomy' ) && {
 				id: object_id,
+				metadata: {
+					bindings: buildNavigationLinkEntityBinding( inferredKind ),
+				},
 			} ),
 		/* eslint-enable camelcase */
 		...( description?.length && {

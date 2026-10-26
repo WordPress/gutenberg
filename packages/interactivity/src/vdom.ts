@@ -1,44 +1,72 @@
-/**
- * External dependencies
- */
 import { h, type ComponentChild, type JSX } from 'preact';
-/**
- * Internal dependencies
- */
-import { directivePrefix as p } from './constants';
 import { warn } from './utils';
 import { type DirectiveEntry } from './hooks';
 
-const ignoreAttr = `data-${ p }-ignore`;
-const islandAttr = `data-${ p }-interactive`;
-const fullPrefix = `data-${ p }-`;
+const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
+const invalidCharsRegex = /[^a-z0-9-_]/i;
 
-/**
- * This regex pattern must be kept in sync with the server-side implementation in
- * wp-includes/interactivity-api/class-wp-interactivity-api.php.
- *
- * The pattern validates directive attribute names to ensure consistency between
- * client and server processing. Invalid directive names (containing characters like
- * square brackets or colons) should be ignored by both client and server.
- *
- * @see https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/interactivity-api/class-wp-interactivity-api.php
- */
-const directiveParser = new RegExp(
-	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.
-		// Match alphanumeric characters including hyphen-separated
-		// segments. It excludes underscore intentionally to prevent confusion.
-		// E.g., "custom-directive".
-		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
-		// (Optional) Match '--' followed by any alphanumeric characters. It
-		// excludes underscore intentionally to prevent confusion, but it can
-		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9_-]+))?$',
-	'i' // Case insensitive.
-);
+function parseDirectiveName( directiveName: string ): {
+	prefix: string;
+	suffix: string | null;
+	uniqueId: string | null;
+} | null {
+	const name = directiveName.substring( 8 );
+
+	// If the name contains invalid characters, it's not a valid directive name.
+	if ( invalidCharsRegex.test( name ) ) {
+		return null;
+	}
+
+	// Finds the first "--" to separate the prefix.
+	const suffixIndex = name.indexOf( '--' );
+	// A prefix cannot start with "-" and a leading "--" is empty.
+	if ( suffixIndex === 0 || name[ 0 ] === '-' ) {
+		return null;
+	}
+
+	// If "--" is not found, everything is part of the prefix.
+	if ( suffixIndex === -1 ) {
+		return { prefix: name, suffix: null, uniqueId: null };
+	}
+
+	// The prefix is the part before the first "--".
+	const prefix = name.substring( 0, suffixIndex );
+	// The remaining is the part that starts from "--".
+	const remaining = name.substring( suffixIndex );
+
+	// If the suffix starts with "---" (but not "----"), there is no suffix and
+	// the remaining is the unique ID.
+	if ( remaining.startsWith( '---' ) && remaining[ 3 ] !== '-' ) {
+		return {
+			prefix,
+			suffix: null,
+			uniqueId: remaining.substring( 3 ) || null,
+		};
+	}
+
+	// Otherwise, the remaining is a potential suffix. The first two dashes are
+	// removed.
+	let suffix: string | null = remaining.substring( 2 );
+	// Search for "---" for a unique ID within the suffix.
+	const uniqueIdIndex = suffix.indexOf( '---' );
+
+	// If "---" is found, split the suffix and the unique ID.
+	if (
+		uniqueIdIndex !== -1 &&
+		suffix.substring( uniqueIdIndex )[ 3 ] !== '-'
+	) {
+		const uniqueId = suffix.substring( uniqueIdIndex + 3 ) || null;
+		suffix = suffix.substring( 0, uniqueIdIndex ) || null;
+		return { prefix, suffix, uniqueId };
+	}
+
+	// Otherwise, the rest is the entire suffix.
+	return { prefix, suffix: suffix || null, uniqueId: null };
+}
 
 // Regular expression for reference parsing. It can contain a namespace before
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
@@ -46,10 +74,45 @@ const directiveParser = new RegExp(
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
-export const hydratedIslands = new WeakSet();
+/**
+ * Parses the namespace and value from a directive attribute value.
+ *
+ * JSON is retained only when it produces a plain object. All other values use
+ * the raw value after any namespace prefix has been removed.
+ *
+ * @param rawValue The raw directive attribute value.
+ * @return An object with the optional `namespace` and interpreted `value`.
+ */
+export function parseDirectiveValue( rawValue: string ): {
+	namespace: string | null;
+	value: string | Record< string, unknown >;
+} {
+	const regexResult = nsPathRegExp.exec( rawValue );
+	const namespace = regexResult?.[ 1 ] ?? null;
+	const rawDirectiveValue = regexResult?.[ 2 ] ?? rawValue;
+	let value: string | Record< string, unknown > = rawDirectiveValue;
+
+	// The parsed value is only ever used if it is a plain object, so a value
+	// can only be worth parsing if it starts with `{` (allowing leading
+	// whitespace, which JSON.parse tolerates for values set via setAttribute).
+	// This gates the common case of plain string values (e.g.
+	// `data-wp-interactive="myplugin"`), avoiding the relatively expensive
+	// SyntaxError that JSON.parse throws for every non-JSON value.
+	if ( /^\s*\{/.test( rawDirectiveValue ) ) {
+		try {
+			const parsedValue: unknown = JSON.parse( rawDirectiveValue );
+			if ( isObject( parsedValue ) ) {
+				value = parsedValue;
+			}
+		} catch {}
+	}
+
+	return { namespace, value };
+}
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
+ * Directive attributes are interpreted with {@link parseDirectiveValue}.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -74,7 +137,7 @@ export function toVdom( root: Node ): ComponentChild {
 		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			nodesToReplace.add( node );
-			return node.nodeValue;
+			return ( node as CDATASection ).data;
 		}
 
 		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
@@ -84,7 +147,6 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		const elementNode = node as HTMLElement;
-		const { attributes } = elementNode;
 		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
 
 		const props: Record< string, any > = {};
@@ -92,82 +154,138 @@ export function toVdom( root: Node ): ComponentChild {
 		const directives: Array<
 			[ name: string, namespace: string | null, value: unknown ]
 		> = [];
-		let ignore = false;
 		let island = false;
 
-		for ( let i = 0; i < attributes.length; i++ ) {
-			const attributeName = attributes[ i ].name;
-			const attributeValue = attributes[ i ].value;
+		// `getAttributeNames()` copies the attribute names into a plain JS
+		// array, which is much faster than per-attribute access to the live
+		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
+		// and property read crosses the JS/DOM boundary and may allocate an
+		// `Attr` wrapper object.
+		const attributeNames = elementNode.getAttributeNames();
+		for ( let i = 0; i < attributeNames.length; i++ ) {
+			const attributeName = attributeNames[ i ];
+			const attributeValue =
+				elementNode.getAttribute( attributeName ) ?? '';
 			if (
-				attributeName[ fullPrefix.length ] &&
-				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
+				attributeName[ directivePrefix.length ] &&
+				attributeName.slice( 0, directivePrefix.length ) ===
+					directivePrefix
 			) {
-				if ( attributeName === ignoreAttr ) {
-					ignore = true;
-				} else {
-					const regexResult = nsPathRegExp.exec( attributeValue );
-					const namespace = regexResult?.[ 1 ] ?? null;
-					let value: any = regexResult?.[ 2 ] ?? attributeValue;
-					try {
-						const parsedValue = JSON.parse( value );
-						value = isObject( parsedValue ) ? parsedValue : value;
-					} catch {}
-					if ( attributeName === islandAttr ) {
-						island = true;
-						const islandNamespace =
-							// eslint-disable-next-line no-nested-ternary
-							typeof value === 'string'
-								? value
-								: typeof value?.namespace === 'string'
-								? value.namespace
-								: null;
-						namespaces.push( islandNamespace );
-					} else {
-						directives.push( [ attributeName, namespace, value ] );
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( attributeName === 'data-wp-ignore' ) {
+						warn(
+							'The data-wp-ignore directive has been removed. The element and its descendants are now hydrated like any other element. Please remove the attribute.'
+						);
 					}
 				}
+				const { namespace, value } =
+					parseDirectiveValue( attributeValue );
+				if ( attributeName === 'data-wp-interactive' ) {
+					island = true;
+					const islandNamespace =
+						// eslint-disable-next-line no-nested-ternary
+						typeof value === 'string'
+							? value
+							: typeof value?.namespace === 'string'
+								? value.namespace
+								: null;
+					namespaces.push( islandNamespace );
+				} else {
+					directives.push( [ attributeName, namespace, value ] );
+				}
+				// Directive attributes are never boolean properties, so skip
+				// the boolean check below and assign the value directly.
+				props[ attributeName ] = attributeValue;
+				continue;
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ attributeName ] = attributeValue;
-		}
-
-		if ( ignore && ! island ) {
-			return [
-				h< any, any >( localName, {
-					...props,
-					innerHTML: elementNode.innerHTML,
-					__directives: { ignore: true },
-				} ),
-			];
-		}
-		if ( island ) {
-			hydratedIslands.add( elementNode );
+			// For boolean attributes with empty string values, use `true`.
+			// This prevents Preact from coercing "" to false. Camelcase
+			// mismatches (readonly→readOnly) are `undefined`, not `true`,
+			// falling through to Preact's setAttribute path, which handles them
+			// correctly: https://github.com/preactjs/preact/blob/bf7a195ac4b1706468e876e41b27428e3d8a08f3/src/diff/props.js#L114
+			if (
+				attributeValue === '' &&
+				elementNode[ attributeName ] === true
+			) {
+				props[ attributeName ] = true;
+			} else {
+				props[ attributeName ] = attributeValue;
+			}
 		}
 
 		if ( directives.length ) {
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
 			>( ( obj, [ name, ns, value ] ) => {
-				const directiveMatch = directiveParser.exec( name );
-				if ( directiveMatch === null ) {
-					warn( `Found malformed directive name: ${ name }.` );
+				const directiveParsed = parseDirectiveName( name );
+				if ( directiveParsed === null ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn( `Found malformed directive name: ${ name }.` );
+					}
 					return obj;
 				}
-				const prefix = directiveMatch[ 1 ] || '';
-				const suffix = directiveMatch[ 2 ] || null;
+				const { prefix, suffix, uniqueId } = directiveParsed;
 
 				obj[ prefix ] = obj[ prefix ] || [];
 				obj[ prefix ].push( {
 					namespace: ns ?? currentNamespace()!,
 					value: value as DirectiveEntry[ 'value' ],
 					suffix,
+					uniqueId,
 				} );
 				return obj;
 			}, {} );
+
+			// Sort directive arrays to ensure stable ordering across browsers.
+			// Put nulls first, then sort by suffix and finally by uniqueIds.
+			for ( const prefix in props.__directives ) {
+				props.__directives[ prefix ].sort(
+					( a: DirectiveEntry, b: DirectiveEntry ) => {
+						const aSuffix = a.suffix ?? '';
+						const bSuffix = b.suffix ?? '';
+						if ( aSuffix !== bSuffix ) {
+							return aSuffix < bSuffix ? -1 : 1;
+						}
+						const aId = a.uniqueId ?? '';
+						const bId = b.uniqueId ?? '';
+						return +( aId > bId ) - +( aId < bId );
+					}
+				);
+			}
 		}
 
-		if ( localName === 'template' ) {
+		if ( props.__directives?.html ) {
+			const conflictingPrefixes = [
+				'text',
+				'each',
+				'router-region',
+			].filter( ( prefix ) => prefix in props.__directives );
+			if ( conflictingPrefixes.length ) {
+				warn(
+					`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
+				);
+				delete props.__directives.html;
+			}
+		}
+
+		const hasDefaultHtmlDirective = props.__directives?.html?.some(
+			( { suffix }: DirectiveEntry ) => suffix === null
+		);
+
+		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
+			// `data-wp-html` owns this element's content entirely — whether
+			// that's still the server-rendered fallback or HTML the
+			// directive has since applied — so it's treated as opaque here,
+			// the same way `each-child` is: don't walk its children into
+			// vnodes, since the directive writes to the DOM directly rather
+			// than through Preact's own props diffing (see
+			// `directives/html.ts`).
+			props.dangerouslySetInnerHTML = {
+				__html: elementNode.innerHTML,
+			};
+		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
 			].map( ( childNode ) => toVdom( childNode ) );
@@ -200,7 +318,7 @@ export function toVdom( root: Node ): ComponentChild {
 	);
 	nodesToReplace.forEach( ( node: Node ) =>
 		( node as CDATASection ).replaceWith(
-			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			new window.Text( ( node as CDATASection ).data )
 		)
 	);
 

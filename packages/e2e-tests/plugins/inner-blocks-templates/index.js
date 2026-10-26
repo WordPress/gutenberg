@@ -51,15 +51,10 @@
 		title: 'Test Inner Blocks no locking',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		edit: function InnerBlocksNoLockingEdit() {
-			return el(
-				'div',
-				useBlockProps(),
-				el( InnerBlocks, {
-					template: TEMPLATE,
-				} )
-			);
+			return el( 'div', useBlockProps(), el( InnerBlocks ) );
 		},
 
 		save,
@@ -70,13 +65,13 @@
 		title: 'Test InnerBlocks locking all',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		edit: function InnerBlocksBlocksLockingAllEdit() {
 			return el(
 				'div',
 				useBlockProps(),
 				el( InnerBlocks, {
-					template: TEMPLATE,
 					templateLock: 'all',
 				} )
 			);
@@ -133,8 +128,23 @@
 		title: 'Test Inner Blocks Paragraph Placeholder',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
+		templateInsertUpdatesSelection: true,
 
 		edit: function InnerBlocksParagraphPlaceholderEdit() {
+			return el( 'div', useBlockProps(), el( InnerBlocks ) );
+		},
+
+		save,
+	} );
+
+	registerBlockType( 'test/test-inner-blocks-deprecated-props', {
+		apiVersion: 3,
+		title: 'Test Inner Blocks deprecated props',
+		icon: 'cart',
+		category: 'text',
+
+		edit: function InnerBlocksDeprecatedPropsEdit() {
 			return el(
 				'div',
 				useBlockProps(),
@@ -153,6 +163,7 @@
 		title: 'Test Inner Blocks transformer target',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		transforms: {
 			from: [
@@ -189,13 +200,7 @@
 		},
 
 		edit: function InnerBlocksTransformerTargetEdit() {
-			return el(
-				'div',
-				useBlockProps(),
-				el( InnerBlocks, {
-					template: TEMPLATE,
-				} )
-			);
+			return el( 'div', useBlockProps(), el( InnerBlocks ) );
 		},
 
 		save,
