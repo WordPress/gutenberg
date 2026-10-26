@@ -166,3 +166,6 @@ jobs:
     - name: Show PHPCS results in PR
       if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
       run: cs2pr ./.cache/phpcs-report.xml
+
+    - name: Ensure version-controlled files are not modified during the tests
+      run: git diff --exit-code
