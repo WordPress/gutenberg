@@ -527,7 +527,7 @@ alert( `My name is ${ name }.` );
 
 ### Formatting numbers
 
-Format displayed counts and quantities with [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) so separators and decimal marks follow the user's locale (for example **17,810.25** vs. **17 810,25** vs. **17.810,25**). Never hardcode separators or rely on the browser's default locale, which can differ from the language WordPress is set to.
+Format displayed counts and quantities with [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) so separators and decimal marks follow the user's locale (for example **17,810.25** vs. **17 810,25** vs. **17.810,25**). Do not rely on the browser's default locale, which can differ from the language WordPress is set to.
 
 -   Pass the locale from `getSettings().l10n.locale` in `@wordpress/date`. WordPress locales use underscores (`de_DE`), while `Intl` expects BCP 47 tags (`de-DE`), so replace `_` with `-`.
 -   Prefer full counts. Use `notation: 'compact'` only when the available space needs an abbreviation and an approximate value is sufficient.
