@@ -631,7 +631,10 @@ function buildMoment(
 	timezone: string | number = ''
 ) {
 	let dateMoment;
-	if ( typeof dateValue === 'string' && ZONELESS_ISO_DATE.test( dateValue ) ) {
+	if (
+		typeof dateValue === 'string' &&
+		ZONELESS_ISO_DATE.test( dateValue )
+	) {
 		// Zoneless ISO strings are wall time in the site's configured
 		// timezone, matching getDate(). Every other string shape keeps the
 		// historical moment.js parsing behavior.
