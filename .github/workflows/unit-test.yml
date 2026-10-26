@@ -557,13 +557,15 @@ jobs:
 
             # Each run saves its own cache, and restores the latest one for the same configuration
             # and dependencies. PHPStan invalidates the parts of the cache that the changed files affect.
+            # The baseline is left out of the key, since it only filters the errors and does not
+            # change the analysis, so a change to it can reuse the cache.
             - name: Cache PHPStan result cache
               uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: .cache/phpstan # This is defined in tools/phpstan/base.neon.
-                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*') }}-${{ github.run_id }}
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', '!tools/phpstan/baseline.neon') }}-${{ github.run_id }}
                   restore-keys: |
-                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*') }}-
+                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', '!tools/phpstan/baseline.neon') }}-
 
             # The report is written to a file for the next step. PHPStan exits with 1 when it reports
             # errors, which that step handles; anything higher means the analysis did not finish.
