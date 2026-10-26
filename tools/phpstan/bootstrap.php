@@ -1,8 +1,7 @@
 <?php
 /**
- * Defines default WordPress constants for discovery.
+ * Defines WordPress constants which are not available in the stubs, for discovery.
  */
 
 define( 'WPINC', 'wp-includes' );
-define( 'SITECOOKIEPATH', '/' );
-define( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED', 'uncategorized' );
+define( 'MEDIA_TRASH', false );
