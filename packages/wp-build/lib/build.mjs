@@ -151,6 +151,28 @@ const BASE_CHECKS = {
 	// Don't warn about directives like 'use client' in bundled dependencies.
 	moduleLevelDirective: false,
 };
+// Rolldown's `__toESM` gives namespace imports a `default` unless the module has
+// its own, even when flagged `__esModule`. Follow the flag alone, like esbuild.
+const TO_ESM_OWN_DEFAULT_CHECK = ' || !__hasOwnProp.call(mod, "default")';
+const esModuleInteropPlugin = {
+	name: 'es-module-interop',
+	renderChunk( code ) {
+		if ( ! code.includes( 'var __toESM = ' ) ) {
+			return null;
+		}
+		if ( ! code.includes( TO_ESM_OWN_DEFAULT_CHECK ) ) {
+			throw new Error( 'Unexpected Rolldown `__toESM` helper.' );
+		}
+		// A same-length replacement keeps the source map valid.
+		return {
+			code: code.replace(
+				TO_ESM_OWN_DEFAULT_CHECK,
+				' '.repeat( TO_ESM_OWN_DEFAULT_CHECK.length )
+			),
+			map: null,
+		};
+	},
+};
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
@@ -1500,13 +1522,15 @@ async function transpilePackage( packageName ) {
 					transform: { target, jsx: JSX_OPTIONS },
 					// Every import is kept, as the imported files are transpiled on their own.
 					treeshake: { moduleSideEffects: true },
-					plugins,
+					plugins: [ ...plugins, esModuleInteropPlugin ],
 					output: {
 						dir: buildDir,
 						entryFileNames: '[name].cjs',
 						chunkFileNames: '_chunks/[name]-[hash].cjs',
 						paths: replaceExtension( '.cjs' ),
 						format: 'cjs',
+						esModule: true,
+						strict: true,
 						exports: 'named',
 						sourcemap: true,
 					},
