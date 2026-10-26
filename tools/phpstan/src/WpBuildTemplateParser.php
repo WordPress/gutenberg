@@ -48,10 +48,8 @@ final class WpBuildTemplateParser implements Parser {
 
 	/**
 	 * The parser that parses the rendered code.
-	 *
-	 * @var Parser
 	 */
-	private $parser;
+	private Parser $parser;
 
 	/**
 	 * Constructor.
@@ -76,14 +74,11 @@ final class WpBuildTemplateParser implements Parser {
 
 		$template = file_get_contents( $file );
 		if ( false === $template ) {
-			throw new ParserErrorsException( array( new \PhpParser\Error( 'The template could not be read.' ) ), $file );
+			// Let the wrapped parser report the file as unreadable.
+			return $this->parser->parseFile( $file );
 		}
 
-		try {
-			return $this->parser->parseString( self::render( $template ) );
-		} catch ( ParserErrorsException $e ) {
-			throw new ParserErrorsException( $e->getErrors(), $file );
-		}
+		return $this->parser->parseString( self::render( $template, $file ) );
 	}
 
 	/**
@@ -110,9 +105,11 @@ final class WpBuildTemplateParser implements Parser {
 	 * Renders a template into valid PHP, keeping each line where it is.
 	 *
 	 * @param string $template The template.
+	 * @param string $file     Path to the template, for the error message.
 	 * @return string The rendered code.
+	 * @throws \LogicException When the template has a placeholder without a substitute.
 	 */
-	private static function render( string $template ): string {
+	private static function render( string $template, string $file ): string {
 		$code = strtr( $template, self::REPLACEMENTS );
 
 		// A template for a fragment of generated code has no opening tag of its own.
@@ -120,17 +117,16 @@ final class WpBuildTemplateParser implements Parser {
 			$code = '<?php ' . $code;
 		}
 
-		// Report any placeholder that this parser does not know, rather than a syntax error.
-		if ( preg_match( '/\{\{([A-Z_]+)\}\}/', $code, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$line = substr_count( $code, "\n", 0, $matches[0][1] ) + 1;
-			throw new ParserErrorsException(
-				array(
-					new \PhpParser\Error(
-						sprintf( 'The wp-build template placeholder %s has no substitute in %s.', $matches[0][0], __CLASS__ ),
-						array( 'startLine' => $line )
-					),
-				),
-				null
+		// Fail on any placeholder that this parser does not know, rather than report a syntax error in the template.
+		if ( preg_match( '/\{\{[A-Z_]+\}\}/', $code, $matches, PREG_OFFSET_CAPTURE ) ) {
+			throw new \LogicException(
+				sprintf(
+					'The wp-build template placeholder %1$s on line %2$d of %3$s has no substitute in %4$s.',
+					$matches[0][0],
+					substr_count( $code, "\n", 0, $matches[0][1] ) + 1,
+					$file,
+					__CLASS__
+				)
 			);
 		}
 
