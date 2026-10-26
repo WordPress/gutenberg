@@ -133,8 +133,20 @@ function readErrors( reportPath ) {
 	}
 	const workspace = `${ GITHUB_WORKSPACE || process.cwd() }/`;
 
+	/*
+	 * Errors that are not specific to a file come first, so that the limits on
+	 * annotations and summary rows never drop them. They are about the run
+	 * itself, such as an internal error, and are the hardest to find otherwise.
+	 */
 	/** @type {PhpstanError[]} */
-	const errors = [];
+	const errors = report.errors.map( ( message ) => ( {
+		file: null,
+		line: null,
+		message,
+		identifier: null,
+		tip: null,
+	} ) );
+
 	for ( const [ key, file ] of Object.entries( report.files ) ) {
 		// An error in a trait is keyed by the trait's file, followed by the class it was analyzed in.
 		const absolutePath = key.replace( / \(in context of .+\)$/, '' );
@@ -150,17 +162,6 @@ function readErrors( reportPath ) {
 				tip: message.tip ?? null,
 			} );
 		}
-	}
-
-	// Errors that are not specific to a file.
-	for ( const message of report.errors ) {
-		errors.push( {
-			file: null,
-			line: null,
-			message,
-			identifier: null,
-			tip: null,
-		} );
 	}
 
 	return errors;
