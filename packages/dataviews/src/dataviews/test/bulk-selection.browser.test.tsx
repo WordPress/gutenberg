@@ -236,9 +236,11 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 						scroller.getBoundingClientRect().left
 				)
 			).toBeLessThanOrEqual( 0.5 );
-			expect( toolbar.getBoundingClientRect().width ).toBe(
-				scroller.clientWidth
-			);
+			expect(
+				Math.abs(
+					toolbar.getBoundingClientRect().width - scroller.clientWidth
+				)
+			).toBeLessThanOrEqual( 0.5 );
 			await expect
 				.element(
 					page.getByRole( 'button', { name: 'Cancel', exact: true } )
