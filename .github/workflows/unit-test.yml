@@ -504,6 +504,67 @@ jobs:
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
 
+    phpstan:
+        name: PHP static analysis
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes, build-assets]
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # The PHP versions to analyze for are set by `phpVersion` in tools/phpstan/base.neon,
+            # so the version PHPStan runs on does not affect the results.
+            - name: Set up PHP
+              uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+              with:
+                  php-version: '8.4'
+                  coverage: none
+
+            # This date is used to ensure that the Composer cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            # The build generates the PHP files that define the gutenberg_* functions and *_Gutenberg
+            # classes that lib/ calls, which PHPStan scans.
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                  name: build-assets
+                  path: build
+
+            # Each run saves its own cache, and restores the latest one for the same configuration
+            # and dependencies. PHPStan invalidates the parts of the cache that the changed files affect.
+            - name: Cache PHPStan result cache
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpstan # This is defined in tools/phpstan/base.neon.
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*') }}-${{ github.run_id }}
+                  restore-keys: |
+                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*') }}-
+
+            - name: Run PHPStan
+              run: composer phpstan -- --error-format=github --no-progress
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
     # Runs on every event so it can serve as the workflow's only required status check while the
     # preceding jobs are path-filtered away.
     #
@@ -531,6 +592,7 @@ jobs:
                 unit-js-date,
                 test-php,
                 phpcs,
+                phpstan,
             ]
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
