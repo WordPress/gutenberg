@@ -25,11 +25,34 @@ async function isPortAvailable( port ) {
 
 		server.once( 'listening', () => {
 			server.close( () => {
-				resolve( true );
+				// Listening can succeed while another server answers on the
+				// port: one on 127.0.0.1 or ::1 only, or, on Windows, one
+				// that set SO_REUSEADDR, like PHP's built-in server.
+				isPortAnswering( port ).then( ( answering ) =>
+					resolve( ! answering )
+				);
 			} );
 		} );
 
 		server.listen( port, '0.0.0.0' );
+	} );
+}
+
+/**
+ * Checks if a server on this computer answers on a port. Unlike listening,
+ * connecting doesn't make Windows ask to open the firewall.
+ *
+ * @param {number} port The port to check.
+ * @return {Promise<boolean>} True if a server answers, false otherwise.
+ */
+function isPortAnswering( port ) {
+	return new Promise( ( resolve ) => {
+		const socket = net.connect( port, 'localhost' );
+		socket.once( 'connect', () => {
+			socket.destroy();
+			resolve( true );
+		} );
+		socket.once( 'error', () => resolve( false ) );
 	} );
 }
 
@@ -78,6 +101,7 @@ async function findAvailablePort( {
 
 module.exports = {
 	isPortAvailable,
+	isPortAnswering,
 	findAvailablePort,
 	DEFAULT_MIN_PORT,
 	DEFAULT_MAX_PORT,
