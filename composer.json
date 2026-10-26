@@ -33,10 +33,11 @@
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev",
 		"phpstan/extension-installer": "^1.4",
-		"phpstan/phpstan": "^2.1",
-		"phpstan/phpstan-phpunit": "^2.0",
-		"php-stubs/wordpress-tests-stubs": "^7.0",
-		"szepeviktor/phpstan-wordpress": "^2.0"
+		"phpstan/phpstan": "2.3.2",
+		"phpstan/phpstan-phpunit": "2.1.1",
+		"php-stubs/wordpress-stubs": "7.1.2",
+		"php-stubs/wordpress-tests-stubs": "7.1.0",
+		"szepeviktor/phpstan-wordpress": "2.0.4"
 	},
 	"autoload-dev": {
 		"psr-4": {
