@@ -179,6 +179,8 @@ export async function buildWorkers(
 			workerBuilds.push(
 				buildWithConcurrency( {
 					input: workerEntryPoint,
+					// wasm-vips uses eval, don't warn about it
+					checks: { eval: false },
 					platform: 'browser',
 					// Rolldown's default conditions lack esbuild's module condition.
 					resolve: {
@@ -226,6 +228,8 @@ export async function buildWorkers(
 			workerBuilds.push(
 				buildWithConcurrency( {
 					input: workerEntryPoint,
+					// wasm-vips uses eval, don't warn about it
+					checks: { eval: false },
 					platform: 'node',
 					resolve: {
 						conditionNames: [ 'module', 'node', 'default' ],

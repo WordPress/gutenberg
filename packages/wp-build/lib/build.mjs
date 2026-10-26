@@ -141,6 +141,16 @@ const baseDefine = {
 // Rolldown's default conditions lack esbuild's module condition.
 const defaultConditions = [ 'module', 'browser', 'default' ];
 const developmentConditions = [ 'development', ...defaultConditions ];
+/*
+ * The `jsx` option overrides the tsconfig's `jsx`, which is `preserve` for the
+ * type checker.
+ */
+const JSX_OPTIONS = { runtime: 'automatic', importSource: 'react' };
+const BASE_CHECKS = {
+	configurationFieldConflict: false,
+	// Don't warn about directives like 'use client' in bundled dependencies.
+	moduleLevelDirective: false,
+};
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
@@ -601,6 +611,11 @@ async function bundlePackage( packageName, options = {} ) {
 			input: entryPoint,
 			moduleTypes: LOADER_CONFIG,
 			platform: 'browser',
+			checks: {
+				...BASE_CHECKS,
+				// The script global plugin exposes the exports, not `output.name`.
+				missingNameOptionForIifeExport: false,
+			},
 		};
 
 		const baseOutput = {
@@ -637,7 +652,11 @@ async function bundlePackage( packageName, options = {} ) {
 		builds.push(
 			buildWithConcurrency( {
 				...baseConfig,
-				transform: { target, define: getDefine( false ) },
+				transform: {
+					target,
+					define: getDefine( false ),
+					jsx: JSX_OPTIONS,
+				},
 				resolve: { conditionNames: defaultConditions },
 				plugins: [
 					...baseBundlePlugins,
@@ -656,7 +675,11 @@ async function bundlePackage( packageName, options = {} ) {
 			} ),
 			buildWithConcurrency( {
 				...baseConfig,
-				transform: { target, define: getDefine( true ) },
+				transform: {
+					target,
+					define: getDefine( true ),
+					jsx: JSX_OPTIONS,
+				},
 				resolve: { conditionNames: developmentConditions },
 				plugins: [
 					...baseBundlePlugins,
@@ -715,9 +738,14 @@ async function bundlePackage( packageName, options = {} ) {
 			builds.push(
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: entryPoint,
 					platform: 'browser',
-					transform: { target, define: getDefine( false ) },
+					transform: {
+						target,
+						define: getDefine( false ),
+						jsx: JSX_OPTIONS,
+					},
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
 						styleRuntimeAliasPlugin(),
@@ -745,9 +773,14 @@ async function bundlePackage( packageName, options = {} ) {
 				builds.push(
 					buildWithConcurrency( {
 						moduleTypes: LOADER_CONFIG,
+						checks: BASE_CHECKS,
 						input: entryPoint,
 						platform: 'browser',
-						transform: { target, define: getDefine( true ) },
+						transform: {
+							target,
+							define: getDefine( true ),
+							jsx: JSX_OPTIONS,
+						},
 						resolve: { conditionNames: developmentConditions },
 						plugins: [
 							styleRuntimeAliasPlugin(),
@@ -1461,9 +1494,10 @@ async function transpilePackage( packageName ) {
 			builds.push(
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: entryPoints,
 					platform: 'node',
-					transform: { target },
+					transform: { target, jsx: JSX_OPTIONS },
 					// Every import is kept, as the imported files are transpiled on their own.
 					treeshake: { moduleSideEffects: true },
 					plugins,
@@ -1498,9 +1532,10 @@ async function transpilePackage( packageName ) {
 			builds.push(
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: entryPoints,
 					platform: 'neutral',
-					transform: { target },
+					transform: { target, jsx: JSX_OPTIONS },
 					// Every import is kept, as the imported files are transpiled on their own.
 					treeshake: { moduleSideEffects: true },
 					plugins,
@@ -1722,10 +1757,12 @@ async function buildRoute( routeName ) {
 			await Promise.all( [
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: routeEntryPoints,
 					transform: {
 						target: getEsbuildTarget(),
 						define: getDefine( false ),
+						jsx: JSX_OPTIONS,
 					},
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
@@ -1746,10 +1783,12 @@ async function buildRoute( routeName ) {
 				} ),
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: routeEntryPoints,
 					transform: {
 						target: getEsbuildTarget(),
 						define: getDefine( true ),
+						jsx: JSX_OPTIONS,
 					},
 					resolve: { conditionNames: developmentConditions },
 					plugins: [
@@ -1785,10 +1824,12 @@ async function buildRoute( routeName ) {
 		await Promise.all( [
 			buildWithConcurrency( {
 				moduleTypes: LOADER_CONFIG,
+				checks: BASE_CHECKS,
 				input: [ tempEntryPath ],
 				transform: {
 					target: getEsbuildTarget(),
 					define: getDefine( false ),
+					jsx: JSX_OPTIONS,
 				},
 				resolve: { conditionNames: defaultConditions },
 				plugins: [
@@ -1809,10 +1850,12 @@ async function buildRoute( routeName ) {
 			} ),
 			buildWithConcurrency( {
 				moduleTypes: LOADER_CONFIG,
+				checks: BASE_CHECKS,
 				input: [ tempEntryPath ],
 				transform: {
 					target: getEsbuildTarget(),
 					define: getDefine( true ),
+					jsx: JSX_OPTIONS,
 				},
 				resolve: { conditionNames: developmentConditions },
 				plugins: [
@@ -1907,10 +1950,12 @@ async function buildWidget( widgetName ) {
 			await Promise.all( [
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: renderEntryPoints,
 					transform: {
 						target: getEsbuildTarget(),
 						define: getDefine( false ),
+						jsx: JSX_OPTIONS,
 					},
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
@@ -1931,10 +1976,12 @@ async function buildWidget( widgetName ) {
 				} ),
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: renderEntryPoints,
 					transform: {
 						target: getEsbuildTarget(),
 						define: getDefine( true ),
+						jsx: JSX_OPTIONS,
 					},
 					resolve: { conditionNames: developmentConditions },
 					plugins: [
@@ -1969,10 +2016,12 @@ async function buildWidget( widgetName ) {
 			await Promise.all( [
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: widgetEntryPoints,
 					transform: {
 						target: getEsbuildTarget(),
 						define: getDefine( false ),
+						jsx: JSX_OPTIONS,
 					},
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
@@ -1993,10 +2042,12 @@ async function buildWidget( widgetName ) {
 				} ),
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
+					checks: BASE_CHECKS,
 					input: widgetEntryPoints,
 					transform: {
 						target: getEsbuildTarget(),
 						define: getDefine( true ),
+						jsx: JSX_OPTIONS,
 					},
 					resolve: { conditionNames: developmentConditions },
 					plugins: [
