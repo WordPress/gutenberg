@@ -148,7 +148,7 @@ export function generateContentEntryPoint( files ) {
 	const lines = [];
 
 	/*
-	 * Import the full file name rather than relying on esbuild extending an
+	 * Import the full file name rather than relying on the bundler extending an
 	 * extensionless path: that resolution never tries `.mts` or `.cts`.
 	 */
 	if ( files.stage ) {
