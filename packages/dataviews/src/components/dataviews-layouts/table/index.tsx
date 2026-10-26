@@ -489,7 +489,6 @@ function ViewTable< Item >( {
 					ref={ bulkActionsRef }
 					hidden={ ! showBulkActions }
 					inert={ inertValue( !! isLoading ) }
-					aria-busy={ isLoading }
 				>
 					<BulkActionToolbar
 						onActionInProgressChange={ setIsActionInProgress }
