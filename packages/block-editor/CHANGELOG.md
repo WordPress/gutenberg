@@ -11,7 +11,7 @@
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
--   Writing flow: When the up or down arrow key reaches side by side fields of one block (the Search block's input and button), move to the field under the caret instead of the first or last one in DOM order, so the same fields are visited in both directions ([#38261](https://github.com/WordPress/gutenberg/issues/38261)).
+-   Writing flow: When the up or down arrow key reaches side by side fields of one block (the Search block's input and button, the cells of a Table row, the buttons of a block placeholder), move to the field under the caret instead of the first or last one in DOM order, so the same fields are visited in both directions ([#85555](https://github.com/WordPress/gutenberg/pull/85555)).
 
 ### Internal
 
