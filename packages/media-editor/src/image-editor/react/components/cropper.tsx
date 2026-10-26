@@ -17,7 +17,7 @@ import type {
 	Size,
 	NormalizedRect,
 } from '../../core/types';
-import type { CropperController } from '../hooks/use-cropper-reducer';
+import type { CropperController } from '../hooks/use-cropper-controller';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
 import {
@@ -66,7 +66,7 @@ const SETTLE_STENCIL_TRANSITION = [
 export interface CropperProps {
 	/** Image source URL. */
 	src: string;
-	/** The cropper controller from `useCropperReducer` or a composite store. */
+	/** The cropper controller from `useCropperController` or a composite store. */
 	controller: CropperController;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
@@ -132,7 +132,7 @@ export interface CropperProps {
  *
  * @param root0                   Component props implementing CropperProps.
  * @param root0.src               Image source URL.
- * @param root0.controller        The cropper controller from `useCropperReducer` or a composite store.
+ * @param root0.controller        The cropper controller from `useCropperController` or a composite store.
  * @param root0.stencil           Custom stencil component.
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.

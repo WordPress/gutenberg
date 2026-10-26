@@ -12,11 +12,7 @@ export type {
 } from './types';
 
 // Constants
-export {
-	DEFAULT_STATE,
-	DEFAULT_ASPECT_RATIOS,
-	ORIGINAL_ASPECT_RATIO,
-} from './constants';
+export { DEFAULT_STATE, ORIGINAL_ASPECT_RATIO } from './constants';
 export type { AspectRatioPreset } from './constants';
 
 // Reducer + state helpers. `CropperAction` and `cropperReducer` are
