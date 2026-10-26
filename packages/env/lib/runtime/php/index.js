@@ -241,14 +241,15 @@ class PhpRuntime {
 			throw new Error( 'The site is not set up yet. Start it first.' );
 		}
 		// Replacing the database while the server writes to it can corrupt it.
-		const isRunning = !! ( await getServer( config ) );
+		const server = await getServer( config );
 		await this.stop( config, { spinner } );
 		await rimraf( [ `${ database }-wal`, `${ database }-shm` ] );
 		await fs.copyFile( clean, database );
 		// Plugins added to the config since installation.
 		install( config, path.join( config.workDirectoryPath, 'php' ) );
-		if ( isRunning ) {
-			await this._startServer( config );
+		// Back on its port, which `--auto-port` may have picked.
+		if ( server ) {
+			await this._startServer( config, server.port );
 		}
 		spinner.text = 'Reset the database.';
 	}
@@ -309,9 +310,9 @@ class PhpRuntime {
 	 * Start the PHP built-in server in the background.
 	 *
 	 * @param {Object} config The wp-env config object.
+	 * @param {number} port   The port to serve on.
 	 */
-	async _startServer( config ) {
-		const { port } = config.env.development;
+	async _startServer( config, port = config.env.development.port ) {
 		const { logFile, pidFile } = getServerPaths( config );
 		const log = await fs.open( logFile, 'w' );
 		const child = spawn(
