@@ -25,6 +25,7 @@ import type {
 } from 'react';
 import type { SelectFunction } from '@wordpress/data';
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
+import type { UseBlockEditorAutocompletePropsOptions } from '../autocomplete/types';
 import { useBlockEditContext } from '../block-edit';
 import {
 	blockBindingsKey,
@@ -78,6 +79,146 @@ const RichTextInputEvent =
 
 const instanceIdKey = Symbol( 'instanceId' );
 
+type AutocompleteAttributes = Pick<
+	ReturnType< typeof useBlockEditorAutocompleteProps >,
+	| 'aria-autocomplete'
+	| 'aria-haspopup'
+	| 'aria-controls'
+	| 'aria-owns'
+	| 'aria-activedescendant'
+>;
+
+/**
+ * The autocomplete of a field. Completions are only offered while typing in
+ * the field, so it only renders for the selected field, sparing the others its
+ * hooks, effects and completers. It attaches to the field as a ref on it
+ * would, and renders as its child, where the popover rendered before.
+ *
+ * @param props               Component props.
+ * @param props.element       The field.
+ * @param props.record        The field's rich text value.
+ * @param props.onChange      Changes the field's value.
+ * @param props.onReplace     Replaces the block.
+ * @param props.completers    The field's completers.
+ * @param props.setAttributes Sets the ARIA attributes describing the
+ *                            autocomplete state, for the field to render.
+ */
+function SelectedFieldAutocomplete( {
+	element,
+	record,
+	onChange,
+	onReplace,
+	completers,
+	setAttributes,
+}: {
+	element: HTMLElement;
+	record: UseBlockEditorAutocompletePropsOptions[ 'record' ];
+	onChange: UseBlockEditorAutocompletePropsOptions[ 'onChange' ];
+	onReplace: RichTextProps[ 'onReplace' ];
+	completers: RichTextProps[ 'autocompleters' ];
+	setAttributes: ( attributes?: AutocompleteAttributes ) => void;
+} ) {
+	const {
+		ref,
+		children: popover,
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = useBlockEditorAutocompleteProps( {
+		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
+		onReplace,
+		completers,
+		record,
+		onChange,
+	} );
+
+	useLayoutEffect( () => {
+		ref( element );
+		return () => {
+			ref( null );
+		};
+	}, [ ref, element ] );
+
+	// The field renders the attributes, as it renders its other props.
+	useLayoutEffect( () => {
+		if (
+			! ariaAutocomplete &&
+			! ariaHasPopup &&
+			! ariaControls &&
+			! ariaOwns &&
+			! ariaActiveDescendant
+		) {
+			return;
+		}
+
+		setAttributes( {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		} );
+
+		return () => {
+			setAttributes( undefined );
+		};
+	}, [
+		setAttributes,
+		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	useEffect( () => {
+		const host = element.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value ] of Object.entries( attributes ) ) {
+			if ( value === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		element,
+		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
+	return popover ?? null;
+}
+
 function RichTextWrapper(
 	{
 		children,
@@ -116,6 +257,8 @@ function RichTextWrapper(
 	const [ anchorElement, setAnchorElement ] = useState< HTMLElement | null >(
 		null
 	);
+	const [ autocompleteAttributes, setAutocompleteAttributes ] =
+		useState< AutocompleteAttributes >();
 	const context = useBlockEditContext();
 	const { isSelected: isBlockSelected, name: blockName } = context;
 	// Outside a block, the store matches the undefined client ID to nothing.
@@ -536,68 +679,6 @@ function RichTextWrapper(
 		}
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
-	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
-		onReplace,
-		completers: autocompleters,
-		record: value,
-		onChange,
-	} );
-
-	// While a focused editing host owns the selection (the block supports
-	// `editableRoot`), ARIA attributes describing the autocomplete state must
-	// be mirrored onto the host: assistive technology resolves them relative
-	// to the focused element.
-	const {
-		'aria-autocomplete': ariaAutocomplete,
-		'aria-haspopup': ariaHasPopup,
-		'aria-controls': ariaControls,
-		'aria-owns': ariaOwns,
-		'aria-activedescendant': ariaActiveDescendant,
-	} = autocompleteProps;
-	useEffect( () => {
-		if ( ! isSelected ) {
-			return;
-		}
-
-		const host = anchorRef.current?.parentElement?.closest(
-			'[contenteditable="true"]'
-		);
-
-		if ( ! host ) {
-			return;
-		}
-
-		const attributes = {
-			'aria-autocomplete': ariaAutocomplete,
-			'aria-haspopup': ariaHasPopup,
-			'aria-controls': ariaControls,
-			'aria-owns': ariaOwns,
-			'aria-activedescendant': ariaActiveDescendant,
-		};
-
-		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
-			if ( value_ === undefined ) {
-				host.removeAttribute( key );
-			} else {
-				host.setAttribute( key, value_ );
-			}
-		}
-
-		return () => {
-			for ( const key of Object.keys( attributes ) ) {
-				host.removeAttribute( key );
-			}
-		};
-	}, [
-		isSelected,
-		ariaAutocomplete,
-		ariaHasPopup,
-		ariaControls,
-		ariaOwns,
-		ariaActiveDescendant,
-	] );
-
 	useMarkPersistent( {
 		html: adjustedValue,
 		value,
@@ -672,14 +753,13 @@ function RichTextWrapper(
 				aria-label={
 					bindingsLabel || props[ 'aria-label' ] || placeholder
 				}
-				{ ...autocompleteProps }
+				{ ...autocompleteAttributes }
 				ref={ useMergeRefs( [
 					// Rich text ref must be first because its focus listener
 					// must be set up before any other ref calls .focus() on
 					// mount.
 					richTextRef,
 					forwardedRef,
-					autocompleteProps.ref,
 					props.ref,
 					useEventListeners( {
 						registry,
@@ -719,7 +799,18 @@ function RichTextWrapper(
 				) }
 				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
-			/>
+			>
+				{ isSelected && anchorElement && (
+					<SelectedFieldAutocomplete
+						element={ anchorElement }
+						record={ value }
+						onChange={ onChange }
+						onReplace={ onReplace }
+						completers={ autocompleters }
+						setAttributes={ setAutocompleteAttributes }
+					/>
+				) }
+			</TagName>
 		</>
 	);
 }
