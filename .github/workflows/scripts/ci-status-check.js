@@ -198,7 +198,7 @@ async function fetchEvaluatedJobs() {
 
 			for ( const job of running ) {
 				console.log(
-					`::error::${ job.name } still reads as ${ job.status } after re-checking it, so it was never evaluated. Either it is missing from this job's \`needs\` (add it there, or pass it as \`--ignore\`), or the GitHub API is still lagging and re-running this job will clear it: ${ job.html_url }`
+					`::error::${ job.name } still reads as ${ job.status } after re-checking it, so it was never evaluated. Either it is missing from this job's \`needs\` (add it there, or pass it as \`--ignore\`), or the GitHub API is still lagging, and re-running this status check will clear it: ${ job.html_url }`
 				);
 			}
 			throw new Error( `${ running.length } job(s) had not finished.` );

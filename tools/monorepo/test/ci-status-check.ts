@@ -232,7 +232,7 @@ describe( 'ci-status-check', () => {
 
 		expect( error?.message ).toBe( '1 job(s) had not finished.' );
 		expect( output ).toContain(
-			`::error::${ UNIT_JOB_NAME } still reads as in_progress after re-checking it, so it was never evaluated. Either it is missing from this job's \`needs\` (add it there, or pass it as \`--ignore\`), or the GitHub API is still lagging and re-running this job will clear it: https://github.com/job/${ UNIT_JOB_ID }`
+			`::error::${ UNIT_JOB_NAME } still reads as in_progress after re-checking it, so it was never evaluated. Either it is missing from this job's \`needs\` (add it there, or pass it as \`--ignore\`), or the GitHub API is still lagging, and re-running this status check will clear it: https://github.com/job/${ UNIT_JOB_ID }`
 		);
 	} );
 } );
