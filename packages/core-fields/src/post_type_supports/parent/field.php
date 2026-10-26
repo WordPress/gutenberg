@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Parent', 'gutenberg' ),
+	'label'         => __( 'Parent' ),
 	'enableSorting' => true,
 	'filterBy'      => false,
 );

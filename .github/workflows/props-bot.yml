@@ -58,7 +58,7 @@ env:
 jobs:
     pull-request:
         name: Resolve the pull request target
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             pull-requests: read
             # Reading the target's copy of this workflow.
@@ -117,7 +117,7 @@ jobs:
         name: Generate a list of props
         needs: pull-request
         if: ${{ needs.pull-request.outputs.routing-current == 'true' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             # Read is enough: the action posts nothing, see `post-comment`.
             pull-requests: read
@@ -129,11 +129,15 @@ jobs:
         steps:
             - name: Gather a list of contributors
               id: props
-              uses: WordPress/props-bot-action@6ff24f6b95fee6aeee3f49a8365cb62a525b2ce7 # trunk
+              uses: WordPress/props-bot-action@1cde16a46fe7a1bfa8e3bbbcb80647bb59756751 # trunk
               with:
                   # The PR meta comment carries the list, so the action renders
                   # it to an output and posts nothing itself.
                   post-comment: false
+                  # The intro is what an older standalone props bot searches
+                  # for, and it would find this comment. Our own note about
+                  # refreshing replaces it, worded so that it will not.
+                  include-intro: false
 
     # Other branches retain standalone props until they carry this routing and
     # its writers. Otherwise the base gate would discard every fresh list.
@@ -141,14 +145,14 @@ jobs:
         name: Update the standalone props comment
         needs: pull-request
         if: ${{ needs.pull-request.outputs.routing-current == 'false' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             pull-requests: write
             contents: read
         timeout-minutes: 20
 
         steps:
-            - uses: WordPress/props-bot-action@6ff24f6b95fee6aeee3f49a8365cb62a525b2ce7 # trunk
+            - uses: WordPress/props-bot-action@1cde16a46fe7a1bfa8e3bbbcb80647bb59756751 # trunk
               with:
                   post-comment: true
 
@@ -158,7 +162,7 @@ jobs:
         # Only when the list was gathered: an empty body from a failed run would
         # clear a props list nothing had disproved.
         if: ${{ needs.props-bot.result == 'success' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
@@ -197,10 +201,7 @@ jobs:
                     exit 0
                   fi
 
-                  # Drop the intro wherever it sits: it is what the standalone
-                  # props bot searches for, and it would find this comment. Its
-                  # note about refreshing goes back in wording that will not.
-                  printf '%s\n' "$BODY" | sed '/^The following accounts have interacted/d' > pr-meta/body.md
+                  printf '%s\n' "$BODY" > pr-meta/body.md
 
                   cat >> pr-meta/body.md <<'EOF'
 

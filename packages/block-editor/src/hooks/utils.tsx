@@ -63,7 +63,7 @@ export const cleanEmptyObject = < T, >(
 };
 
 export function transformStyles(
-	activeSupports: Record< string, boolean >,
+	activeSupports: Record< string, unknown >,
 	migrationPaths: Record< string, string[][] >,
 	result: Block,
 	source: Block[],
@@ -169,7 +169,7 @@ export function useStyleOverride( {
 	css,
 }: {
 	id?: string | null;
-	css: string;
+	css?: string;
 } ) {
 	return usePrivateStyleOverride( { id, css } );
 }
@@ -678,11 +678,11 @@ function BlockProps( {
 	index: number;
 	useBlockProps: BlockListBlockFeature[ 'useBlockProps' ];
 	setAllWrapperProps: Dispatch<
-		SetStateAction< ( BlockWrapperProps | undefined )[] >
+		SetStateAction< ( BlockWrapperProps | null | undefined )[] >
 	>;
 } & BlockListBlockFeatureProps ) {
 	const wrapperProps = hook( props );
-	const setWrapperProps = ( next: BlockWrapperProps | undefined ) =>
+	const setWrapperProps = ( next: BlockWrapperProps | null | undefined ) =>
 		setAllWrapperProps( ( prev ) => {
 			const nextAll = [ ...prev ];
 			nextAll[ index ] = next;
@@ -710,7 +710,7 @@ export function createBlockListBlockFilter(
 		( BlockListBlock ) =>
 			function WithBlockListBlockHooks( props: BlockListBlockHookProps ) {
 				const [ allWrapperProps, setAllWrapperProps ] = useState<
-					( BlockWrapperProps | undefined )[]
+					( BlockWrapperProps | null | undefined )[]
 				>( Array( features.length ).fill( undefined ) );
 				return [
 					...features.map( ( feature, i ) => {
