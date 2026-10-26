@@ -23,7 +23,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'stylez'  => array(),
 				),
-				array( 'theme_json_unknown_key', array( 'stylez' ), 'dropped' ),
+				array( 'theme_json_unknown_key', array( 'stylez' ) ),
 			),
 			'unknown setting key'                      => array(
 				array(
@@ -35,7 +35,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_unknown_key', array( 'settings', 'color', 'invention' ), 'dropped' ),
+				array( 'theme_json_unknown_key', array( 'settings', 'color', 'invention' ) ),
 			),
 			'unknown style key'                        => array(
 				array(
@@ -47,7 +47,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_unknown_key', array( 'styles', 'typography', 'fontSizes' ), 'dropped' ),
+				array( 'theme_json_unknown_key', array( 'styles', 'typography', 'fontSizes' ) ),
 			),
 			'unregistered block in settings'           => array(
 				array(
@@ -58,7 +58,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_unregistered_block', array( 'settings', 'blocks', 'core/not-a-block' ), 'dropped' ),
+				array( 'theme_json_unregistered_block', array( 'settings', 'blocks', 'core/not-a-block' ) ),
 			),
 			'unregistered block in styles'             => array(
 				array(
@@ -69,7 +69,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_unregistered_block', array( 'styles', 'blocks', 'core/not-a-block' ), 'dropped' ),
+				array( 'theme_json_unregistered_block', array( 'styles', 'blocks', 'core/not-a-block' ) ),
 			),
 			'unregistered block style variation'       => array(
 				array(
@@ -84,7 +84,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_unregistered_variation', array( 'styles', 'blocks', 'core/button', 'variations', 'not-a-variation' ), 'dropped' ),
+				array( 'theme_json_unregistered_variation', array( 'styles', 'blocks', 'core/button', 'variations', 'not-a-variation' ) ),
 			),
 			'unregistered shared style variation'      => array(
 				array(
@@ -95,35 +95,35 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_unregistered_variation', array( 'styles', 'variations', 'not-a-variation' ), 'dropped' ),
+				array( 'theme_json_unregistered_variation', array( 'styles', 'variations', 'not-a-variation' ) ),
 			),
 			'scalar where an object is expected'       => array(
 				array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'styles'  => array( 'color' => 'red' ),
 				),
-				array( 'theme_json_invalid_type', array( 'styles', 'color' ), 'dropped' ),
+				array( 'theme_json_invalid_type', array( 'styles', 'color' ) ),
 			),
 			'non-boolean for a boolean setting'        => array(
 				array(
 					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'settings' => array( 'lightbox' => array( 'enabled' => 'yes' ) ),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'lightbox', 'enabled' ), 'dropped' ),
+				array( 'theme_json_invalid_type', array( 'settings', 'lightbox', 'enabled' ) ),
 			),
 			'styles subtree that is not an object'     => array(
 				array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'styles'  => 'none',
 				),
-				array( 'theme_json_invalid_type', array( 'styles' ), 'dropped' ),
+				array( 'theme_json_invalid_type', array( 'styles' ) ),
 			),
 			'preset item that is not an object'        => array(
 				array(
 					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'settings' => array( 'color' => array( 'palette' => array( 'red' ) ) ),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'color', 'palette', 0 ), 'dropped' ),
+				array( 'theme_json_invalid_type', array( 'settings', 'color', 'palette', 0 ) ),
 			),
 			'preset slug that is not scalar'           => array(
 				array(
@@ -140,7 +140,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'typography', 'fontSizes', 0, 'slug' ), 'dropped' ),
+				array( 'theme_json_invalid_type', array( 'settings', 'typography', 'fontSizes', 0, 'slug' ) ),
 			),
 			'origin-keyed preset item that is not an object' => array(
 				array(
@@ -151,14 +151,14 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				array( 'theme_json_invalid_type', array( 'settings', 'blocks', 'core/paragraph', 'color', 'palette', 'custom', 0 ), 'dropped' ),
+				array( 'theme_json_invalid_type', array( 'settings', 'blocks', 'core/paragraph', 'color', 'palette', 'custom', 0 ) ),
 			),
 			'viewport breakpoint replaced by defaults' => array(
 				array(
 					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'settings' => array( 'viewport' => array( 'mobile' => '50%' ) ),
 				),
-				array( 'theme_json_invalid_viewport', array( 'settings', 'viewport' ), 'coerced' ),
+				array( 'theme_json_invalid_viewport', array( 'settings', 'viewport' ) ),
 			),
 		);
 	}
@@ -167,14 +167,14 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 	 * @dataProvider data_dropped_values_are_reported
 	 *
 	 * @param array $theme_json Structure with one invalid value.
-	 * @param array $expected   The expected code, path and severity.
+	 * @param array $expected   The expected code and path.
 	 */
 	public function test_dropped_values_are_reported( $theme_json, $expected ) {
 		$diagnostics = gutenberg_validate_theme_json( $theme_json );
 
 		$this->assertCount( 1, $diagnostics, 'Exactly one diagnostic is expected: ' . wp_json_encode( $diagnostics ) );
-		$this->assertSame( $expected, array( $diagnostics[0]['code'], $diagnostics[0]['path'], $diagnostics[0]['severity'] ) );
-		$this->assertSame( array( 'code', 'path', 'severity', 'data', 'message' ), array_keys( $diagnostics[0] ) );
+		$this->assertSame( $expected, array( $diagnostics[0]['code'], $diagnostics[0]['path'] ) );
+		$this->assertSame( array( 'code', 'path', 'data', 'message' ), array_keys( $diagnostics[0] ) );
 		$this->assertNotSame( '', $diagnostics[0]['message'] );
 	}
 

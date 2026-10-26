@@ -35,21 +35,6 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	private static $diagnostics = null;
 
 	/**
-	 * Severity of each diagnostic code: what happened to the value, `dropped` or `coerced`.
-	 *
-	 * @since 7.2.0
-	 * @var array<string, string>
-	 */
-	const DIAGNOSTIC_CODES = array(
-		'theme_json_missing_version'        => 'dropped',
-		'theme_json_unknown_key'            => 'dropped',
-		'theme_json_unregistered_block'     => 'dropped',
-		'theme_json_unregistered_variation' => 'dropped',
-		'theme_json_invalid_type'           => 'dropped',
-		'theme_json_invalid_viewport'       => 'coerced',
-	);
-
-	/**
 	 * Sanitizes the input according to the schemas.
 	 *
 	 * @since 5.8.0
@@ -563,11 +548,10 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * @param callable $callback Code to run, typically a `sanitize()` call.
 	 * @return array[] Diagnostics recorded while the callback ran, in no particular order. Each has:
-	 *                 - `code`     string  Stable identifier, one of the `DIAGNOSTIC_CODES` keys.
-	 *                 - `path`     array   Keys from the root of the structure to the value.
-	 *                 - `severity` string  `dropped` or `coerced`.
-	 *                 - `data`     array   Extra keys documented per code, such as `expected` and `actual`. May grow.
-	 *                 - `message`  string  Translated text for display. Not part of the contract; never branch on it.
+	 *                 - `code`    string  Stable identifier, one of the codes `get_diagnostic_message()` knows.
+	 *                 - `path`    array   Keys from the root of the structure to the value.
+	 *                 - `data`    array   Extra keys documented per code, such as `expected` and `actual`. May grow.
+	 *                 - `message` string  Translated text for display. Not part of the contract; never branch on it.
 	 */
 	public static function collect( callable $callback ) {
 		$previous          = self::$diagnostics;
@@ -591,7 +575,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * @since 7.2.0
 	 *
-	 * @param string $code Diagnostic code, one of the `DIAGNOSTIC_CODES` keys.
+	 * @param string $code Diagnostic code, one of the codes `get_diagnostic_message()` knows.
 	 * @param array  $path Path to the value in the theme.json structure. Empty for the whole structure.
 	 * @param array  $data Optional. Additional data. A `value` entry is replaced by its JSON type name
 	 *                     under `actual`, so the diagnostic describes the type rather than carrying the value.
@@ -607,11 +591,10 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 		}
 
 		self::$diagnostics[] = array(
-			'code'     => $code,
-			'path'     => $path,
-			'severity' => self::DIAGNOSTIC_CODES[ $code ],
-			'data'     => $data,
-			'message'  => static::get_diagnostic_message( $code, $path, $data ),
+			'code'    => $code,
+			'path'    => $path,
+			'data'    => $data,
+			'message' => static::get_diagnostic_message( $code, $path, $data ),
 		);
 	}
 
