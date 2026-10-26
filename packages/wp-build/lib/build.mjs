@@ -247,16 +247,21 @@ function getSassOptions( workingDir ) {
  * @return {import('rolldown').Plugin} Rolldown plugin.
  */
 function sassPlugin( { filter, transform, ...sassOptions } ) {
+	// Files transpiled on their own share the plugin, and often a stylesheet.
+	const cache = new Map();
+	const compile = async ( id ) => {
+		const css = await compileStylesheet( id, sassOptions );
+		return transform( css, path.dirname( id ), id );
+	};
 	return {
 		name: 'sass',
 		load: {
 			filter: { id: filter },
 			async handler( id ) {
-				const css = await compileStylesheet( id, sassOptions );
-				return {
-					code: await transform( css, path.dirname( id ), id ),
-					moduleType: 'js',
-				};
+				if ( ! cache.has( id ) ) {
+					cache.set( id, compile( id ) );
+				}
+				return { code: await cache.get( id ), moduleType: 'js' };
 			},
 		},
 	};
@@ -1495,29 +1500,30 @@ async function transpilePackage( packageName ) {
 		externalizeJsImportsPlugin,
 	].filter( Boolean );
 
-	// Name each entry after its path in `src`, so the output mirrors it.
-	const entryPoints = Object.fromEntries(
-		srcFiles.map( ( file ) => [
-			normalizePath( path.relative( srcDir, file ) ).replace(
-				/\.[^./]+$/,
-				''
-			),
-			file,
-		] )
-	);
+	/*
+	 * Name each entry after its path in `src`, so the output mirrors it. Each
+	 * file is built on its own, so the modules it bundles (styles, the style
+	 * runtime, SVGs) are inlined into it instead of moved to shared chunks,
+	 * which would also reorder their side effects.
+	 */
+	const entryPoints = srcFiles.map( ( file ) => ( {
+		[ normalizePath( path.relative( srcDir, file ) ).replace(
+			/\.[^./]+$/,
+			''
+		) ]: file,
+	} ) );
 
 	// Make sure that file extension is always `.mjs` or `.cjs`.
 	const replaceExtension = ( extension ) => ( id ) =>
 		id.startsWith( '.' ) ? id.replace( /\.[cm]?[jt]sx?$/, extension ) : id;
 
 	if ( packageJson.main ) {
-		// Rolldown requires at least one entry point.
-		if ( srcFiles.length > 0 ) {
+		for ( const input of entryPoints ) {
 			builds.push(
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
 					checks: BASE_CHECKS,
-					input: entryPoints,
+					input,
 					platform: 'node',
 					transform: { target, jsx: JSX_OPTIONS },
 					// Every import is kept, as the imported files are transpiled on their own.
@@ -1526,7 +1532,7 @@ async function transpilePackage( packageName ) {
 					output: {
 						dir: buildDir,
 						entryFileNames: '[name].cjs',
-						chunkFileNames: '_chunks/[name]-[hash].cjs',
+						codeSplitting: false,
 						paths: replaceExtension( '.cjs' ),
 						format: 'cjs',
 						esModule: true,
@@ -1551,13 +1557,12 @@ async function transpilePackage( packageName ) {
 	}
 
 	if ( packageJson.module ) {
-		// Rolldown requires at least one entry point.
-		if ( srcFiles.length > 0 ) {
+		for ( const input of entryPoints ) {
 			builds.push(
 				buildWithConcurrency( {
 					moduleTypes: LOADER_CONFIG,
 					checks: BASE_CHECKS,
-					input: entryPoints,
+					input,
 					platform: 'neutral',
 					transform: { target, jsx: JSX_OPTIONS },
 					// Every import is kept, as the imported files are transpiled on their own.
@@ -1566,7 +1571,7 @@ async function transpilePackage( packageName ) {
 					output: {
 						dir: buildModuleDir,
 						entryFileNames: '[name].mjs',
-						chunkFileNames: '_chunks/[name]-[hash].mjs',
+						codeSplitting: false,
 						paths: replaceExtension( '.mjs' ),
 						format: 'esm',
 						sourcemap: true,
