@@ -555,12 +555,13 @@ jobs:
                   name: build-assets
                   path: build
 
-            # Each run saves its own cache, and restores the latest one for the same configuration
-            # and dependencies. PHPStan invalidates the parts of the cache that the changed files affect.
-            # The baseline is left out of the key, since it only filters the errors and does not
-            # change the analysis, so a change to it can reuse the cache.
-            - name: Cache PHPStan result cache
-              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+            # Restores the latest cache saved on trunk for the same configuration and dependencies.
+            # PHPStan invalidates the parts of the cache that the changed files affect. The baseline is
+            # left out of the key, since it only filters the errors and does not change the analysis,
+            # so a change to it can reuse the cache.
+            - name: Restore PHPStan result cache
+              id: restore-phpstan-cache
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: .cache/phpstan # This is defined in tools/phpstan/base.neon.
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', '!tools/phpstan/baseline.neon') }}-${{ github.run_id }}
@@ -577,6 +578,16 @@ jobs:
                       echo "::error title=PHPStan did not complete::The analysis exited with status ${status}, so the code was not fully checked."
                       exit "${status}"
                   fi
+
+            # Only runs on trunk save a cache. One saved for a pull request could only be restored by
+            # that pull request, so it would mostly use up the repository's cache storage, and push
+            # out the caches that every run restores.
+            - name: Save PHPStan result cache
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpstan
+                  key: ${{ steps.restore-phpstan-cache.outputs.cache-primary-key }}
 
             # Annotates the errors and lists all of them in the job summary, including those on lines
             # the pull request did not change and those with no line, such as an out-of-date baseline.
