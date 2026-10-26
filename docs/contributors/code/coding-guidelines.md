@@ -525,6 +525,33 @@ alert( 'My name is ' + name + '.' );
 alert( `My name is ${ name }.` );
 ```
 
+### Formatting numbers
+
+Format displayed counts and quantities with [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) so separators and decimal marks follow the user's locale (for example **17,810.25** vs. **17 810,25** vs. **17.810,25**). Never hardcode separators or rely on the browser's default locale, which can differ from the language WordPress is set to.
+
+-   Pass the locale from `getSettings().l10n.locale` in `@wordpress/date`. WordPress locales use underscores (`de_DE`), while `Intl` expects BCP 47 tags (`de-DE`), so replace `_` with `-`.
+-   Prefer full counts. Use `notation: 'compact'` only when the available space needs an abbreviation and an approximate value is sufficient.
+-   `Intl.NumberFormat` rounds to three fraction digits by default. Set `minimumFractionDigits` or `maximumFractionDigits` explicitly when displaying fractional measurements or rates, and use `style: 'currency'` for monetary amounts.
+-   Keep the underlying values numeric for calculations, sorting, filtering, and plural selection: pass the original count to `_n()` and format only the displayed value. In `sprintf()`, use `%s` placeholders for formatted numbers, since `%d` would discard their separators.
+-   Format quantities, but leave identifiers, version numbers, years, HTTP status codes, and port numbers in their expected formats.
+-   Verify large counts (for example, `1234567`), zero and singular values, fractional values where relevant, and a locale with different separators such as German.
+
+```js
+import { getSettings } from '@wordpress/date';
+import { _n, sprintf } from '@wordpress/i18n';
+
+function formatNumber( value, options ) {
+	const locale = getSettings().l10n.locale.replace( '_', '-' );
+	return new Intl.NumberFormat( locale, options ).format( value );
+}
+
+const label = sprintf(
+	/* translators: %s: formatted number of items. */
+	_n( '%s item', '%s items', count ),
+	formatNumber( count )
+);
+```
+
 ### Optional chaining
 
 [Optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) is a new language feature introduced in version 2020 of the ECMAScript specification. While the feature can be very convenient for property access on objects which are potentially null-ish (`null` or `undefined`), there are a number of common pitfalls to be aware of when using optional chaining. These may be issues that linting and/or type-checking can help protect against at some point in the future. In the meantime, you will want to be cautious of the following items:
