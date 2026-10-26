@@ -2,12 +2,13 @@
 /**
  * Declares the polyfills that WordPress provides in wp-includes/compat.php, for discovery.
  *
- * The WordPress stubs omit these, since they are defined conditionally, and with `phpVersion`
- * starting at PHP 7.4, PHPStan otherwise reports the newer PHP functions as not found.
+ * The WordPress stubs omit compat.php, and could not include it, since the stubs are executed as a
+ * bootstrap file, where a polyfill would redeclare a function that the running PHP version has.
+ * With `phpVersion` starting at PHP 7.4, PHPStan otherwise reports the newer PHP functions as not
+ * found. Like the stubs, these follow core trunk.
  *
- * Only the polyfills available in the minimum supported WordPress version (7.0) are declared,
- * so that relying on a newer one is still reported. Those added in WordPress 7.1, `mb_chr()`,
- * `mb_ord()`, and `clamp()`, are therefore omitted.
+ * The polyfills for `mb_chr()`, `mb_ord()`, `mb_substr()`, and `mb_strlen()` are not declared,
+ * since PHPStan already knows those mbstring functions.
  *
  * This file is only scanned, never executed.
  */
@@ -99,3 +100,17 @@ function array_first( array $array ) {}
  * @return TValue|null
  */
 function array_last( array $array ) {}
+
+/**
+ * Polyfill for `clamp()`, added in PHP 8.6 and polyfilled since WordPress 7.1.
+ *
+ * @template TValue
+ * @template TMin
+ * @template TMax
+ *
+ * @param TValue $value
+ * @param TMin   $min
+ * @param TMax   $max
+ * @return TValue|TMin|TMax
+ */
+function clamp( $value, $min, $max ) {}
