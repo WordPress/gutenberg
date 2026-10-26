@@ -11,6 +11,19 @@
  */
 class Gutenberg_Navigation_Remove_Deleted_Links_Test extends WP_UnitTestCase {
 
+	protected static $admin_id;
+
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$admin_id );
+	}
+
 	public function tear_down() {
 		foreach ( array( 'wp_navigation', 'page', 'post' ) as $post_type ) {
 			$posts = get_posts(
@@ -34,7 +47,7 @@ class Gutenberg_Navigation_Remove_Deleted_Links_Test extends WP_UnitTestCase {
 				'post_type'    => 'wp_navigation',
 				'post_status'  => 'publish',
 				'post_title'   => 'Menu',
-				'post_content' => $content,
+				'post_content' => wp_slash( $content ),
 			)
 		);
 	}
@@ -273,6 +286,59 @@ class Gutenberg_Navigation_Remove_Deleted_Links_Test extends WP_UnitTestCase {
 		wp_delete_post( $page_id, true );
 
 		$this->assertCount( 1, $this->get_menu_blocks( $menu_id ) );
+	}
+
+	public function test_a_wrapper_block_keeps_its_own_markup_when_a_link_inside_it_is_removed() {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$menu_id = $this->create_menu(
+			'<!-- wp:group {"layout":{"type":"flex"}} --><div class="wp-block-group">' .
+			$this->custom_link() . $this->page_link( $page_id ) . $this->custom_link( 'About' ) .
+			'</div><!-- /wp:group -->'
+		);
+
+		wp_delete_post( $page_id, true );
+
+		$content = get_post( $menu_id )->post_content;
+		$this->assertStringContainsString( '<div class="wp-block-group">', $content );
+		$this->assertStringContainsString( '</div><!-- /wp:group -->', $content );
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertSame( 'core/group', $blocks[0]['blockName'] );
+		$this->assertSame( array( 'Home', 'About' ), array_column( array_column( $blocks[0]['innerBlocks'], 'attrs' ), 'label' ) );
+	}
+
+	public function test_a_link_whose_id_is_written_with_spaces_is_removed() {
+		// kses compacts block JSON on save for users without `unfiltered_html`,
+		// so save the hand-written markup as an administrator to keep the spaces.
+		wp_set_current_user( self::$admin_id );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$menu_id = $this->create_menu(
+			'<!-- wp:navigation-link {"label": "Page", "type": "page", "id": ' . $page_id . ', "kind": "post-type", "metadata": {"bindings": {"url": {"source": "core/post-data", "args": {"field": "link"}}}}} /-->'
+		);
+
+		$this->assertStringContainsString( '"id": ' . $page_id, get_post( $menu_id )->post_content );
+
+		wp_delete_post( $page_id, true );
+
+		$this->assertSame( array(), $this->get_menu_blocks( $menu_id ) );
+	}
+
+	public function test_a_deletion_with_no_current_user_keeps_the_other_labels_intact() {
+		// Emptying the trash runs from cron, where there is no user and kses
+		// filters the menu content on save.
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$menu_id = $this->create_menu( $this->custom_link( 'Tom & Jerry\'s "Day"' ) . $this->page_link( $page_id ) );
+		wp_set_current_user( 0 );
+		kses_init();
+
+		wp_delete_post( $page_id, true );
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		// kses re-encodes block attributes on a save without `unfiltered_html`:
+		// the structure survives and the label is entity-encoded, as it would
+		// be for any post saved by a user without that capability.
+		$this->assertSame( 'Tom &amp; Jerry\'s "Day"', $blocks[0]['attrs']['label'] );
+		kses_remove_filters();
 	}
 
 	/*

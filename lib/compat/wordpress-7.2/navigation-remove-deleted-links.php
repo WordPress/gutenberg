@@ -44,20 +44,24 @@ function gutenberg_navigation_block_links_to_object( $block, $kind, $id ) {
  * A Navigation Link bound to the object is removed. A Navigation Submenu
  * bound to it keeps its label and inner blocks and loses its link attributes.
  *
- * @param array[] $blocks Parsed blocks, modified in place.
- * @param string  $kind   Either 'post-type' or 'taxonomy'.
- * @param int     $id     Post or term ID.
+ * @param array[]    $blocks        Parsed blocks, modified in place.
+ * @param string     $kind          Either 'post-type' or 'taxonomy'.
+ * @param int        $id            Post or term ID.
+ * @param array|null $inner_content The parent block's `innerContent`, modified in
+ *                                  place so that its `null` placeholders keep
+ *                                  matching the remaining inner blocks.
  * @return bool Whether any block changed.
  */
-function gutenberg_navigation_remove_links_to_object( &$blocks, $kind, $id ) {
+function gutenberg_navigation_remove_links_to_object( &$blocks, $kind, $id, &$inner_content = null ) {
 	$changed = false;
+	$removed = array();
 	foreach ( $blocks as $index => &$block ) {
 		if ( gutenberg_navigation_block_links_to_object( $block, $kind, $id ) ) {
-			$changed = true;
 			if ( 'core/navigation-link' === $block['blockName'] ) {
-				unset( $blocks[ $index ] );
+				$removed[] = $index;
 				continue;
 			}
+			$changed = true;
 			unset( $block['attrs']['id'], $block['attrs']['url'], $block['attrs']['kind'], $block['attrs']['type'] );
 			unset( $block['attrs']['metadata']['bindings']['url'] );
 			if ( empty( $block['attrs']['metadata']['bindings'] ) ) {
@@ -67,18 +71,38 @@ function gutenberg_navigation_remove_links_to_object( &$blocks, $kind, $id ) {
 				unset( $block['attrs']['metadata'] );
 			}
 		}
-		if ( ! empty( $block['innerBlocks'] ) && gutenberg_navigation_remove_links_to_object( $block['innerBlocks'], $kind, $id ) ) {
-			$changed               = true;
-			$block['innerHTML']    = '';
-			$block['innerContent'] = array_fill( 0, count( $block['innerBlocks'] ), null );
+		if ( ! empty( $block['innerBlocks'] ) && gutenberg_navigation_remove_links_to_object( $block['innerBlocks'], $kind, $id, $block['innerContent'] ) ) {
+			$changed = true;
 		}
 	}
 	unset( $block );
 
-	if ( $changed ) {
-		$blocks = array_values( $blocks );
+	if ( empty( $removed ) ) {
+		return $changed;
 	}
-	return $changed;
+
+	// The n-th `null` in the parent's `innerContent` stands for its n-th inner
+	// block; drop the placeholders of the removed blocks and keep the HTML
+	// around them.
+	if ( is_array( $inner_content ) ) {
+		$position = 0;
+		foreach ( $inner_content as $key => $chunk ) {
+			if ( null !== $chunk ) {
+				continue;
+			}
+			if ( in_array( $position, $removed, true ) ) {
+				unset( $inner_content[ $key ] );
+			}
+			++$position;
+		}
+		$inner_content = array_values( $inner_content );
+	}
+	foreach ( $removed as $index ) {
+		unset( $blocks[ $index ] );
+	}
+	$blocks = array_values( $blocks );
+
+	return true;
 }
 
 /**
@@ -102,7 +126,7 @@ function gutenberg_navigation_remove_links_to_deleted_object( $kind, $id ) {
 
 	foreach ( $menus as $menu ) {
 		// A link block carries the ID as `"id":<id>`; skip the parse when it cannot be there.
-		if ( false === strpos( $menu->post_content, '"id":' . (int) $id ) ) {
+		if ( ! preg_match( '/"id"\s*:\s*' . (int) $id . '(?!\d)/', $menu->post_content ) ) {
 			continue;
 		}
 		$blocks = parse_blocks( $menu->post_content );
