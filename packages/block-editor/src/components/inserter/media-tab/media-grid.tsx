@@ -9,6 +9,7 @@ import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import type { MediaItem, MediaType } from './types';
+import formatNumber from '../../../utils/format-number';
 
 type MediaGridProps = {
 	// Results.
@@ -143,10 +144,10 @@ function getItemRange( {
 	const start = ( page - 1 ) * perPage + 1;
 	return sprintf(
 		/* translators: 1: The first item shown on the page. 2: The last item shown on the page. 3: The total number of items. */
-		__( '%1$d–%2$d of %3$d' ),
-		start,
-		Math.min( page * perPage, totalItems ),
-		totalItems
+		__( '%1$s–%2$s of %3$s' ),
+		formatNumber( start ),
+		formatNumber( Math.min( page * perPage, totalItems ) ),
+		formatNumber( totalItems )
 	);
 }
 

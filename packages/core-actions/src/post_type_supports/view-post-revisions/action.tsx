@@ -1,15 +1,16 @@
 import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import type { Post, ActionScriptParts } from '../../shared/types';
+import formatNumber from '../../shared/format-number';
 
 const viewPostRevisions: ActionScriptParts< Post > = {
 	label( items ) {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return sprintf(
-			/* translators: %d: number of revisions. */
-			__( 'View revisions (%d)' ),
-			revisionsCount
+			/* translators: %s: formatted number of revisions. */
+			__( 'View revisions (%s)' ),
+			formatNumber( revisionsCount )
 		);
 	},
 	isEligible( post ) {
