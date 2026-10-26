@@ -6,7 +6,7 @@
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
--   `receiveEntityRecords`: clear only the default "Auto Draft" title on auto-draft posts, so custom titles are no longer lost on save.
+-   `receiveEntityRecords`: clear only the default "Auto Draft" title on auto-draft posts, so custom titles are no longer lost on save ([#85544](https://github.com/WordPress/gutenberg/pull/85544)).
 
 ## 9.1.0 (2026-11-04)
 
