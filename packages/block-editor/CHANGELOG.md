@@ -32,6 +32,7 @@
 -   Convert the inserter hooks, patterns tab and media tab to TypeScript ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 -   Convert the inserter components, the block autocompleter, the change design control and the block parent selector to TypeScript ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 -   Convert the grid visualizer, the entry points and the remaining stories and tests to TypeScript ([#85035](https://github.com/WordPress/gutenberg/pull/85035)).
+-   `useBlockProps`: Drop the double-click handler's check against a non-existent `editedContentOnlySection` selector, left over from [#73268](https://github.com/WordPress/gutenberg/pull/73268); `isSectionBlock` already rules out the edited section.
 
 ## 19.0.0 (2026-10-20)
 
