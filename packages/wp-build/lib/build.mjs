@@ -521,6 +521,7 @@ async function bundlePackage( packageName, options = {} ) {
 		handlePrefix = HANDLE_PREFIX,
 		scriptGlobal = SCRIPT_GLOBAL,
 		packageNamespace = PACKAGE_NAMESPACE,
+		noScriptDebug = false,
 	} = options;
 
 	const builtModules = [];
@@ -616,24 +617,29 @@ async function bundlePackage( packageName, options = {} ) {
 						true // Generate asset file for minified build
 					),
 				],
-			} ),
-			buildWithConcurrency( {
-				...baseConfig,
-				outfile: path.join( outputDir, 'index.js' ),
-				minify: false,
-				define: getDefine( true ),
-				conditions: developmentConditions,
-				plugins: [
-					...baseBundlePlugins,
-					wordpressExternalsPlugin(
-						'index.min',
-						'iife',
-						packageJson.wpScriptExtraDependencies || [],
-						false // Skip asset file for non-minified build
-					),
-				],
 			} )
 		);
+
+		if ( ! noScriptDebug ) {
+			builds.push(
+				buildWithConcurrency( {
+					...baseConfig,
+					outfile: path.join( outputDir, 'index.js' ),
+					minify: false,
+					define: getDefine( true ),
+					conditions: developmentConditions,
+					plugins: [
+						...baseBundlePlugins,
+						wordpressExternalsPlugin(
+							'index.min',
+							'iife',
+							packageJson.wpScriptExtraDependencies || [],
+							false // Skip asset file for non-minified build
+						),
+					],
+				} )
+			);
+		}
 
 		builtScripts.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -703,7 +709,7 @@ async function bundlePackage( packageName, options = {} ) {
 				} )
 			);
 
-			if ( ! isWasmWorker ) {
+			if ( ! noScriptDebug && ! isWasmWorker ) {
 				builds.push(
 					buildWithConcurrency( {
 						loader: LOADER_CONFIG,
@@ -770,18 +776,17 @@ async function bundlePackage( packageName, options = {} ) {
 			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
 			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
 
-			// Always produce both versions (like JavaScript does):
-			// 1. Non-minified version (for SCRIPT_DEBUG=true)
-			// 2. Minified version (for SCRIPT_DEBUG=false)
 			builds.push(
 				( async () => {
 					await mkdir( destDir, { recursive: true } );
 					const content = await readFile( cssFile, 'utf8' );
 
-					// Write non-minified version
-					await writeFile( destPath, content );
+					// Write non-minified version (for SCRIPT_DEBUG=true)
+					if ( ! noScriptDebug ) {
+						await writeFile( destPath, content );
+					}
 
-					// Write minified version
+					// Write minified version (for SCRIPT_DEBUG=false)
 					const result = await postcss( [
 						cssnano( {
 							preset: [
@@ -1681,10 +1686,12 @@ function getPackageName( filename ) {
 /**
  * Build a single route's files.
  *
- * @param {string} routeName Route name.
+ * @param {string}  routeName           Route name.
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildRoute( routeName ) {
+async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 	const startTime = Date.now();
 	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
 	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
@@ -1702,8 +1709,7 @@ async function buildRoute( routeName ) {
 		} );
 
 		if ( routeEntryPoints.length > 0 ) {
-			// Build both minified and non-minified versions in parallel
-			await Promise.all( [
+			const routeBuilds = [
 				buildWithConcurrency( {
 					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
@@ -1723,27 +1729,34 @@ async function buildRoute( routeName ) {
 						),
 					],
 				} ),
-				buildWithConcurrency( {
-					loader: LOADER_CONFIG,
-					entryPoints: routeEntryPoints,
-					outfile: path.join( outputDir, 'route.js' ),
-					bundle: true,
-					format: 'esm',
-					target: getEsbuildTarget(),
-					minify: false,
-					define: getDefine( true ),
-					conditions: developmentConditions,
-					plugins: [
-						styleRuntimeAliasPlugin(),
-						wordpressExternalsPlugin(
-							'route.min',
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} ),
-			] );
+			];
+
+			if ( ! noScriptDebug ) {
+				routeBuilds.push(
+					buildWithConcurrency( {
+						loader: LOADER_CONFIG,
+						entryPoints: routeEntryPoints,
+						outfile: path.join( outputDir, 'route.js' ),
+						bundle: true,
+						format: 'esm',
+						target: getEsbuildTarget(),
+						minify: false,
+						define: getDefine( true ),
+						conditions: developmentConditions,
+						plugins: [
+							styleRuntimeAliasPlugin(),
+							wordpressExternalsPlugin(
+								'route.min',
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
+
+			await Promise.all( routeBuilds );
 		}
 	}
 
@@ -1756,8 +1769,7 @@ async function buildRoute( routeName ) {
 		// Write temporary entry file
 		await writeFile( tempEntryPath, syntheticEntry );
 
-		// Build both minified and non-minified versions in parallel
-		await Promise.all( [
+		const contentBuilds = [
 			buildWithConcurrency( {
 				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
@@ -1777,27 +1789,34 @@ async function buildRoute( routeName ) {
 					),
 				],
 			} ),
-			buildWithConcurrency( {
-				loader: LOADER_CONFIG,
-				entryPoints: [ tempEntryPath ],
-				outfile: path.join( outputDir, 'content.js' ),
-				bundle: true,
-				format: 'esm',
-				target: getEsbuildTarget(),
-				minify: false,
-				define: getDefine( true ),
-				conditions: developmentConditions,
-				plugins: [
-					...createStyleBundlingPlugins( routeDir ),
-					wordpressExternalsPlugin(
-						'content.min',
-						'esm',
-						[],
-						false // Skip asset file for non-minified build
-					),
-				],
-			} ),
-		] );
+		];
+
+		if ( ! noScriptDebug ) {
+			contentBuilds.push(
+				buildWithConcurrency( {
+					loader: LOADER_CONFIG,
+					entryPoints: [ tempEntryPath ],
+					outfile: path.join( outputDir, 'content.js' ),
+					bundle: true,
+					format: 'esm',
+					target: getEsbuildTarget(),
+					minify: false,
+					define: getDefine( true ),
+					conditions: developmentConditions,
+					plugins: [
+						...createStyleBundlingPlugins( routeDir ),
+						wordpressExternalsPlugin(
+							'content.min',
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+					],
+				} )
+			);
+		}
+
+		await Promise.all( contentBuilds );
 
 		await unlink( tempEntryPath );
 	}
@@ -1812,9 +1831,14 @@ async function buildRoute( routeName ) {
  * empty set (the default) to build every route.
  *
  * @param {Set<string>} experimentalPageIds Page ids marked experimental.
+ * @param {Object}      root1               Options object.
+ * @param {boolean}     root1.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<void>}
  */
-async function buildRoutes( experimentalPageIds = new Set() ) {
+async function buildRoutes(
+	experimentalPageIds = new Set(),
+	{ noScriptDebug = false } = {}
+) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
 	const allRoutes = getAllRoutes( ROOT_DIR );
@@ -1839,7 +1863,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 
 	await Promise.all(
 		routes.map( async ( routeName ) => {
-			const buildTime = await buildRoute( routeName );
+			const buildTime = await buildRoute( routeName, { noScriptDebug } );
 			console.log( `   ✔ Built route ${ routeName } (${ buildTime }ms)` );
 		} )
 	);
@@ -1848,10 +1872,12 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 /**
  * Build a single widget's files.
  *
- * @param {string} widgetName Widget name.
+ * @param {string}  widgetName          Widget name.
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildWidget( widgetName ) {
+async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 	const startTime = Date.now();
 	const widgetDir = path.join( ROOT_DIR, 'widgets', widgetName );
 	const outputDir = path.join( BUILD_DIR, 'widgets', widgetName );
@@ -1869,8 +1895,8 @@ async function buildWidget( widgetName ) {
 		} );
 
 		if ( renderEntryPoints.length > 0 ) {
-			// Build both minified and non-minified versions in parallel
-			await Promise.all( [
+			// Build minified and (unless skipped) non-minified versions in parallel
+			const renderBuilds = [
 				buildWithConcurrency( {
 					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
@@ -1890,27 +1916,34 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				buildWithConcurrency( {
-					loader: LOADER_CONFIG,
-					entryPoints: renderEntryPoints,
-					outfile: path.join( outputDir, 'render.js' ),
-					bundle: true,
-					format: 'esm',
-					target: getEsbuildTarget(),
-					minify: false,
-					define: getDefine( true ),
-					conditions: developmentConditions,
-					plugins: [
-						...createStyleBundlingPlugins( widgetDir ),
-						wordpressExternalsPlugin(
-							'render.min',
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} ),
-			] );
+			];
+
+			if ( ! noScriptDebug ) {
+				renderBuilds.push(
+					buildWithConcurrency( {
+						loader: LOADER_CONFIG,
+						entryPoints: renderEntryPoints,
+						outfile: path.join( outputDir, 'render.js' ),
+						bundle: true,
+						format: 'esm',
+						target: getEsbuildTarget(),
+						minify: false,
+						define: getDefine( true ),
+						conditions: developmentConditions,
+						plugins: [
+							...createStyleBundlingPlugins( widgetDir ),
+							wordpressExternalsPlugin(
+								'render.min',
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
+
+			await Promise.all( renderBuilds );
 		}
 	}
 
@@ -1922,8 +1955,8 @@ async function buildWidget( widgetName ) {
 		} );
 
 		if ( widgetEntryPoints.length > 0 ) {
-			// Build both minified and non-minified versions in parallel
-			await Promise.all( [
+			// Build minified and (unless skipped) non-minified versions in parallel
+			const widgetBuilds = [
 				buildWithConcurrency( {
 					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
@@ -1943,27 +1976,34 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				buildWithConcurrency( {
-					loader: LOADER_CONFIG,
-					entryPoints: widgetEntryPoints,
-					outfile: path.join( outputDir, 'widget.js' ),
-					bundle: true,
-					format: 'esm',
-					target: getEsbuildTarget(),
-					minify: false,
-					define: getDefine( true ),
-					conditions: developmentConditions,
-					plugins: [
-						styleRuntimeAliasPlugin(),
-						wordpressExternalsPlugin(
-							'widget.min',
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} ),
-			] );
+			];
+
+			if ( ! noScriptDebug ) {
+				widgetBuilds.push(
+					buildWithConcurrency( {
+						loader: LOADER_CONFIG,
+						entryPoints: widgetEntryPoints,
+						outfile: path.join( outputDir, 'widget.js' ),
+						bundle: true,
+						format: 'esm',
+						target: getEsbuildTarget(),
+						minify: false,
+						define: getDefine( true ),
+						conditions: developmentConditions,
+						plugins: [
+							styleRuntimeAliasPlugin(),
+							wordpressExternalsPlugin(
+								'widget.min',
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
+
+			await Promise.all( widgetBuilds );
 		}
 	}
 
@@ -1973,9 +2013,11 @@ async function buildWidget( widgetName ) {
 /**
  * Build all discovered widgets.
  *
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  * @return {Promise<void>}
  */
-async function buildAllWidgets() {
+async function buildAllWidgets( { noScriptDebug = false } = {} ) {
 	console.log( '\n🧩 Phase 4: Building widgets...\n' );
 
 	const widgets = getAllWidgets( ROOT_DIR );
@@ -1991,7 +2033,9 @@ async function buildAllWidgets() {
 
 	await Promise.all(
 		widgets.map( async ( widgetName ) => {
-			const buildTime = await buildWidget( widgetName );
+			const buildTime = await buildWidget( widgetName, {
+				noScriptDebug,
+			} );
 			console.log(
 				`   ✔ Built widget ${ widgetName } (${ buildTime }ms)`
 			);
@@ -2322,8 +2366,10 @@ async function generateWidgetsPhp( widgets, replacements ) {
  * Main build function.
  *
  * @param {string?} baseUrlExpression
+ * @param {Object}  root0               Options object.
+ * @param {boolean} root0.noScriptDebug Whether to skip unminified builds.
  */
-async function buildAll( baseUrlExpression ) {
+async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
@@ -2364,7 +2410,9 @@ async function buildAll( baseUrlExpression ) {
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
-			const ret = await bundlePackage( packageName );
+			const ret = await bundlePackage( packageName, {
+				noScriptDebug,
+			} );
 			const buildTime = Date.now() - startBundleTime;
 			if ( ret ) {
 				console.log(
@@ -2419,10 +2467,10 @@ async function buildAll( baseUrlExpression ) {
 					.map( ( page ) => page.id )
 			)
 		: new Set();
-	await buildRoutes( experimentalPageIds );
+	await buildRoutes( experimentalPageIds, { noScriptDebug } );
 
 	// Build widgets
-	await buildAllWidgets();
+	await buildAllWidgets( { noScriptDebug } );
 
 	// Collect widget data for PHP generation
 	const widgets = collectWidgets();
@@ -2476,6 +2524,9 @@ async function buildAll( baseUrlExpression ) {
 		ROOT_DIR,
 		baseUrlExpression
 	);
+	phpReplacements[ '{{HAS_DEBUG_ASSETS}}' ] = noScriptDebug
+		? 'false'
+		: 'true';
 	await Promise.all( [
 		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
@@ -2852,6 +2903,10 @@ async function main() {
 				short: 'w',
 				default: false,
 			},
+			'no-script-debug': {
+				type: 'boolean',
+				default: false,
+			},
 			'base-url': {
 				type: 'string',
 				default:
@@ -2871,7 +2926,16 @@ async function main() {
 	setBuildConcurrency( buildConcurrency );
 	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 
-	await buildAll( baseUrlExpression );
+	let noScriptDebug = values[ 'no-script-debug' ];
+
+	if ( noScriptDebug && values.watch ) {
+		console.warn(
+			'⚠️  --no-script-debug is ignored in watch mode (watch is for development).'
+		);
+		noScriptDebug = false;
+	}
+
+	await buildAll( baseUrlExpression, { noScriptDebug } );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
