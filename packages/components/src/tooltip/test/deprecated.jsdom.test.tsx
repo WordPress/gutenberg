@@ -16,7 +16,7 @@ describe( 'Deprecated Tooltip', () => {
 		);
 
 		expect( console ).toHaveWarnedWith(
-			'wp.components.Tooltip is deprecated since version 7.2 and will be removed in version 7.4. Please use Tooltip from @wordpress/ui instead.'
+			'wp.components.Tooltip is deprecated since version 7.3 and will be removed in version 7.5. Please use Tooltip from @wordpress/ui instead.'
 		);
 		expect( ref.current ).toBe(
 			screen.getByRole( 'button', { name: 'Publish' } )

@@ -8,8 +8,8 @@ function UnforwardedDeprecatedTooltip(
 	ref: React.ForwardedRef< any >
 ) {
 	deprecated( 'wp.components.Tooltip', {
-		since: '7.2',
-		version: '7.4',
+		since: '7.3',
+		version: '7.5',
 		alternative: 'Tooltip from @wordpress/ui',
 	} );
 
