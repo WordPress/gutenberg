@@ -21,6 +21,8 @@ const {
 	ensureDockerInitialized,
 } = require( './docker-config' );
 const getHostUser = require( './get-host-user' );
+const { findDatabaseDowngrade } = require( './database-downgrade' );
+const { DatabaseDowngradeError } = require( '../errors' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
 const {
@@ -229,12 +231,31 @@ class DockerRuntime {
 		if ( testsEnabled ) {
 			wpServices.push( 'tests-wordpress', 'tests-cli' );
 		}
-		await dockerCompose.upMany( wpServices, {
-			...dockerComposeConfig,
-			commandOptions: shouldConfigureWp
-				? [ '--build', '--force-recreate' ]
-				: [],
-		} );
+		try {
+			await dockerCompose.upMany( wpServices, {
+				...dockerComposeConfig,
+				commandOptions: shouldConfigureWp
+					? [ '--build', '--force-recreate' ]
+					: [],
+			} );
+		} catch ( error ) {
+			// The WordPress services wait for a healthy database, so a database
+			// that cannot start fails here. Docker only reports that a
+			// dependency failed, so explain the case users can act on: a
+			// database last used by a newer MariaDB version.
+			const downgrade = await findDatabaseDowngrade(
+				mysqlServices,
+				dockerComposeConfig
+			);
+			if ( downgrade ) {
+				throw new DatabaseDowngradeError(
+					downgrade.service === 'mysql' ? 'development' : 'tests',
+					downgrade.dataVersion,
+					downgrade.serverVersion
+				);
+			}
+			throw error;
+		}
 
 		if ( fullConfig.env.development.phpmyadmin ) {
 			await dockerCompose.upOne( 'phpmyadmin', {
