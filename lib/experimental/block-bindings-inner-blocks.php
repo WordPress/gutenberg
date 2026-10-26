@@ -42,10 +42,13 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 }
 
 /**
- * Removes the bindings to a source from blocks and their inner blocks.
+ * Removes, from the blocks a source supplies and their inner blocks, the
+ * bindings to that source and every `innerBlocks` binding.
  *
  * The blocks a source supplies are its value as a whole, so none of them is
- * bound to it on its own. This also keeps a value from containing itself.
+ * bound to it on its own. And none of them gets its inner blocks from a
+ * source, so that two sources whose values bind each other's can't render
+ * forever.
  *
  * @param array[] $blocks      The parsed blocks.
  * @param string  $source_name The name of the source.
@@ -56,7 +59,7 @@ function gutenberg_block_bindings_remove_source( $blocks, $source_name ) {
 		$bindings = $block['attrs']['metadata']['bindings'] ?? null;
 		if ( is_array( $bindings ) ) {
 			foreach ( $bindings as $name => $binding ) {
-				if ( isset( $binding['source'] ) && $binding['source'] === $source_name ) {
+				if ( 'innerBlocks' === $name || ( isset( $binding['source'] ) && $binding['source'] === $source_name ) ) {
 					unset( $block['attrs']['metadata']['bindings'][ $name ] );
 				}
 			}
@@ -103,7 +106,9 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	}
 
 	// The markup skips the filters that sanitize post content when it's saved,
-	// and the user who supplied it may not be allowed unfiltered HTML.
+	// and the user who supplied it may not be allowed unfiltered HTML. Like on
+	// save, this also sanitizes the attributes of the blocks, through the
+	// `pre_kses` filter.
 	$markup = wp_kses_post( $value );
 	if ( $wp_embed instanceof WP_Embed ) {
 		$markup = $wp_embed->autoembed( $wp_embed->run_shortcode( $markup ) );
