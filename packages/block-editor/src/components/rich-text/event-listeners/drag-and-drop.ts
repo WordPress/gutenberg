@@ -103,6 +103,7 @@ export const dragStart: RichTextEventListener = ( props ) => ( element ) => {
 	const defaultView = ownerDocument.defaultView!;
 
 	function stop() {
+		props.current.onTextDrag?.( false );
 		textDrags.delete( ownerDocument );
 		defaultView.removeEventListener( 'dragenter', stopPropagation, true );
 		defaultView.removeEventListener( 'dragover', stopPropagation, true );
@@ -150,6 +151,7 @@ export const dragStart: RichTextEventListener = ( props ) => ( element ) => {
 			},
 			stop,
 		} );
+		props.current.onTextDrag?.( true );
 
 		// The block drop zones cancel every drag over them, which hides the
 		// browser's drop caret and shows the block insertion point instead.

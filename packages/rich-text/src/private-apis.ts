@@ -1,6 +1,7 @@
 import { lock } from './lock-unlock';
 import { useRichText, getDomPositionKey } from './hook';
 import { useFormatTypes } from './hook/use-format-types';
+import { useInactiveRichText } from './hook/use-inactive-rich-text';
 import { KeyboardShortcutContext, InputEventContext } from './contexts';
 import { RichTextShortcut } from './keyboard-shortcut';
 import { RichTextInputEvent } from './input-event';
@@ -16,6 +17,7 @@ lock( privateApis, {
 	useRichText,
 	getDomPositionKey,
 	useFormatTypes,
+	useInactiveRichText,
 	KeyboardShortcutContext,
 	InputEventContext,
 	RichTextShortcut,

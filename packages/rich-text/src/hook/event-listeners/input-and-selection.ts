@@ -329,17 +329,21 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		element,
 		'input',
 		onInput,
+		true,
 		true
 	);
 	const unsubscribeCompositionStart = subscribeOwnedListener(
 		element,
 		'compositionstart',
-		onCompositionStart
+		onCompositionStart,
+		false,
+		true
 	);
 	const unsubscribeCompositionEnd = subscribeOwnedListener(
 		element,
 		'compositionend',
 		onCompositionEnd,
+		true,
 		true
 	);
 	const unsubscribeFocus = subscribeDelegatedListener(
@@ -369,7 +373,9 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 	const unsubscribeSelectionChange = subscribeOwnedListener(
 		element,
 		'selectionchange',
-		handleSelectionChange
+		handleSelectionChange,
+		false,
+		true
 	);
 	// The native `selectionchange` event is asynchronous and coalesced: the
 	// record and the store selection can be one selection behind the DOM when
@@ -392,9 +398,28 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 			element,
 			eventType,
 			handleSelectionChange,
+			true,
 			true
 		)
 	);
+
+	// An element can be focused, or own the selection, before this listens
+	// to it: an element rendered with `useInactiveRichText` mounts
+	// `useRichText` when it receives focus or the selection. As the focus
+	// handler does for an element that is not selected, synchronize the
+	// selection, and its active formats, from the document.
+	if ( ownerDocument.activeElement === element || ownsSelection( element ) ) {
+		// `RichTextValue` types `start` and `end` as required for now.
+		const index = undefined as unknown as number;
+		const { record } = props.current;
+		record.current = {
+			...record.current,
+			start: index,
+			end: index,
+			activeFormats: EMPTY_ACTIVE_FORMATS,
+		};
+		window.queueMicrotask( handleSelectionChange );
+	}
 
 	return () => {
 		unsubscribeInput();

@@ -72,6 +72,11 @@ export type MarkPersistentSnapshot = {
 };
 
 export type UseMarkPersistentOptions = {
+	/**
+	 * Whether another instance marks the changes, in which case this one only
+	 * keeps track of the value.
+	 */
+	isDisabled?: boolean;
 	html: unknown;
 	value: Pick< RichTextValue, 'text' | 'activeFormats' >;
 	onMarkPersistent: () => void;
@@ -271,6 +276,11 @@ export type RichTextEventListenerProps = {
 	inputEvents: InputEvents;
 	supportsSplitting?: boolean;
 	preserveWhiteSpace?: boolean;
+	/**
+	 * Called when a drag of text selected in the field starts, and when it
+	 * ends.
+	 */
+	onTextDrag?: ( isDragging: boolean ) => void;
 };
 
 /**

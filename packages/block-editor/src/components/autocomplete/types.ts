@@ -20,6 +20,12 @@ export type UseBlockEditorAutocompletePropsOptions = Omit<
 	completers?: Completer[];
 };
 
+export type UseBlockEditorAutocompleteOptions =
+	UseBlockEditorAutocompletePropsOptions & {
+		// The field to attach to, once there is one.
+		element: HTMLElement | null;
+	};
+
 export type BlockEditorAutocompleteProps = Omit<
 	ComponentProps< typeof WCAutocomplete< Block | Block[] > >,
 	'completers'

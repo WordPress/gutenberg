@@ -3,13 +3,14 @@ import {
 	Autocomplete as WCAutocomplete,
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
 import type {
 	BlockEditorAutocompleteProps,
 	Completer,
+	UseBlockEditorAutocompleteOptions,
 	UseBlockEditorAutocompletePropsOptions,
 } from './types';
 
@@ -66,6 +67,110 @@ export function useBlockEditorAutocompleteProps(
 		...props,
 		completers: useCompleters( props ),
 	} );
+}
+
+/**
+ * Sets attributes on an element, and returns a function that restores the
+ * values they had.
+ *
+ * @param element    The element.
+ * @param attributes The attribute values, by name. Undefined ones are left as
+ *                   they are.
+ * @return Restores the attributes.
+ */
+function setAttributes(
+	element: Element,
+	attributes: Record< string, string | undefined >
+) {
+	const previous = new Map< string, string | null >();
+	for ( const [ name, value ] of Object.entries( attributes ) ) {
+		if ( value !== undefined ) {
+			previous.set( name, element.getAttribute( name ) );
+			element.setAttribute( name, value );
+		}
+	}
+	return () => {
+		for ( const [ name, value ] of previous ) {
+			if ( value === null ) {
+				element.removeAttribute( name );
+			} else {
+				element.setAttribute( name, value );
+			}
+		}
+	};
+}
+
+/**
+ * Runs the autocomplete of a field: attaches to the field, sets the ARIA
+ * attributes describing the autocomplete state on it, and returns the popover
+ * to render.
+ *
+ * Unlike `useBlockEditorAutocompleteProps`, it needs no props spread on the
+ * field, so it can run in a component that only renders while the field is
+ * selected, which is when completions are offered.
+ *
+ * @param options         Autocomplete options.
+ * @param options.element The field.
+ * @return The popover to render.
+ */
+export function useBlockEditorAutocomplete( {
+	element,
+	...options
+}: UseBlockEditorAutocompleteOptions ) {
+	const {
+		ref,
+		children: popover,
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = useBlockEditorAutocompleteProps( options );
+	const attributes = useMemo(
+		() => ( {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		} ),
+		[
+			ariaAutocomplete,
+			ariaHasPopup,
+			ariaControls,
+			ariaOwns,
+			ariaActiveDescendant,
+		]
+	);
+
+	useLayoutEffect( () => {
+		if ( ! element ) {
+			return;
+		}
+		ref( element );
+		return () => {
+			ref( null );
+		};
+	}, [ ref, element ] );
+
+	// Set along with the popover, before it paints.
+	useLayoutEffect(
+		() => ( element ? setAttributes( element, attributes ) : undefined ),
+		[ element, attributes ]
+	);
+
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	useEffect( () => {
+		const host = element?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+		return host ? setAttributes( host, attributes ) : undefined;
+	}, [ element, attributes ] );
+
+	return popover;
 }
 
 /**

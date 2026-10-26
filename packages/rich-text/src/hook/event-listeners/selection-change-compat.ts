@@ -1,7 +1,6 @@
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { isRangeEqual } from '../../is-range-equal';
 import { unlock } from '../../lock-unlock';
-import type { EventListenerEffect } from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
@@ -11,7 +10,8 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * detect no `selectionchange` or `input` event between the up and down events,
  * we fire a `selectionchange` event.
  */
-const selectionChangeCompat: EventListenerEffect = () => ( element ) => {
+// Takes no props, so that inactive fields can use it too.
+const selectionChangeCompat = () => ( element: HTMLElement ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 	const selection = defaultView?.getSelection();

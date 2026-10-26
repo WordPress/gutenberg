@@ -4,7 +4,7 @@ import { unlock } from './lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
-// ownerDocument -> eventTypeKey -> WeakMap< element, Set< callback > >.
+// ownerDocument -> eventTypeKey -> WeakMap< element, callbacks >.
 //
 // Subscribers share one delegated listener per document, event type and phase.
 // Its callback works out which element owns the event and fires its callbacks,
@@ -12,9 +12,16 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 // document, all of them run on every event, which with an editable element per
 // block is O(blocks) per keystroke. The element map is weak so a detached
 // element (or the iframe holding it) can be garbage-collected.
+// An element's callbacks, in the order they fire: those subscribed to fire
+// first, then the others, each in subscription order.
+type Callbacks = {
+	first: Set< EventListener >;
+	rest: Set< EventListener >;
+};
+
 const registries = new WeakMap<
 	Document,
-	Map< string, WeakMap< Node, Set< EventListener > > >
+	Map< string, WeakMap< Node, Callbacks > >
 >();
 
 /**
@@ -26,6 +33,9 @@ const registries = new WeakMap<
  * @param eventType DOM event name.
  * @param callback  Listener to be invoked with the event.
  * @param capture   Use the capture phase. Defaults to `false`.
+ * @param first     Fire before the callbacks of the element not subscribed
+ *                  with `first`, whenever subscribed, as rich text's own
+ *                  listeners must. Defaults to `false`.
  *
  * @return Unsubscribe function.
  */
@@ -33,7 +43,8 @@ export function subscribeOwnedListener(
 	element: HTMLElement,
 	eventType: string,
 	callback: EventListener,
-	capture = false
+	capture = false,
+	first = false
 ) {
 	const { ownerDocument } = element;
 
@@ -70,7 +81,10 @@ export function subscribeOwnedListener(
 				) {
 					const callbacks = elements.get( node );
 					if ( callbacks && ownsSelection( node as HTMLElement ) ) {
-						for ( const cb of callbacks ) {
+						for ( const cb of callbacks.first ) {
+							cb( event );
+						}
+						for ( const cb of callbacks.rest ) {
 							cb( event );
 						}
 					}
@@ -80,11 +94,12 @@ export function subscribeOwnedListener(
 		);
 	}
 
-	let set = elements.get( element );
-	if ( ! set ) {
-		set = new Set();
-		elements.set( element, set );
+	let callbacks = elements.get( element );
+	if ( ! callbacks ) {
+		callbacks = { first: new Set(), rest: new Set() };
+		elements.set( element, callbacks );
 	}
+	const set = first ? callbacks.first : callbacks.rest;
 	set.add( callback );
 
 	return () => {

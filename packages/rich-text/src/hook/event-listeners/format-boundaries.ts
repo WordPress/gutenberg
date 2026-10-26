@@ -95,6 +95,7 @@ const formatBoundaries: EventListenerEffect = ( props ) => ( element ) => {
 		element,
 		'keydown',
 		onKeyDown as EventListener,
+		true,
 		true
 	);
 };

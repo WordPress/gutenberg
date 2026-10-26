@@ -1,10 +1,10 @@
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { unlock } from '../../lock-unlock';
-import type { EventListenerEffect } from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
-const selectObject: EventListenerEffect = () => ( element ) => {
+// Takes no props, so that inactive fields can use it too.
+const selectObject = () => ( element: HTMLElement ) => {
 	function onClick( event: Event ) {
 		const target = event.target as HTMLElement;
 

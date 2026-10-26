@@ -30,6 +30,7 @@ export function useMarkPersistent( {
 	html,
 	value,
 	onMarkPersistent,
+	isDisabled,
 }: UseMarkPersistentOptions ) {
 	const { text } = value;
 	const hasActiveFormats = !! value.activeFormats?.length;
@@ -64,6 +65,10 @@ export function useMarkPersistent( {
 
 		previousRef.current = next;
 
+		if ( isDisabled ) {
+			return;
+		}
+
 		if ( changeType === 'typing' ) {
 			markPersistentDebounced();
 			return;
@@ -75,7 +80,10 @@ export function useMarkPersistent( {
 		html,
 		text,
 		hasActiveFormats,
+		isDisabled,
 		markPersistent,
 		markPersistentDebounced,
 	] );
+
+	return markPersistentDebounced;
 }

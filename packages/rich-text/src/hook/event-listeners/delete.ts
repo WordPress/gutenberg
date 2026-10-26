@@ -29,7 +29,9 @@ const deleteHandler: EventListenerEffect = ( props ) => ( element ) => {
 	return subscribeOwnedListener(
 		element,
 		'keydown',
-		onKeyDown as EventListener
+		onKeyDown as EventListener,
+		false,
+		true
 	);
 };
 

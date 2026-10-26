@@ -6,13 +6,24 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
+	useInsertionEffect,
 	useMemo,
 	forwardRef,
 	useContext,
+	flushSync,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import {
+	privateApis as composePrivateApis,
+	useMergeRefs,
+	useInstanceId,
+	useRefEffect,
+} from '@wordpress/compose';
+import {
+	privateApis as richTextPrivateApis,
+	create,
+	RichTextData,
+} from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import type { DistributiveOmit } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
@@ -24,7 +35,7 @@ import type {
 	RefAttributes,
 } from 'react';
 import type { SelectFunction } from '@wordpress/data';
-import { useBlockEditorAutocompleteProps } from '../autocomplete';
+import { useBlockEditorAutocomplete } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
 import {
 	blockBindingsKey,
@@ -63,6 +74,7 @@ import type {
 // `@wordpress/format-library` imports them from `@wordpress/block-editor`).
 const {
 	useRichText,
+	useInactiveRichText,
 	getDomPositionKey,
 	KeyboardShortcutContext,
 	InputEventContext,
@@ -76,7 +88,326 @@ const RichTextShortcut =
 const RichTextInputEvent =
 	UntypedRichTextInputEvent as ComponentType< RichTextInputEventProps >;
 
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
+
 const instanceIdKey = Symbol( 'instanceId' );
+
+type ActiveRichTextProps = Pick<
+	RichTextProps,
+	| 'children'
+	| 'inlineToolbar'
+	| 'autocompleters'
+	| 'onReplace'
+	| 'onRemove'
+	| 'onMerge'
+	| 'onSplit'
+	| 'preserveWhiteSpace'
+	| 'disableLineBreaks'
+	| 'withoutInteractiveFormatting'
+	| '__unstableAllowPrefixTransformations'
+	| '__unstableEmbedURLOnPaste'
+> & {
+	elementRef: { current: HTMLElement | null };
+	tagName: NonNullable< RichTextProps[ 'tagName' ] >;
+	value: NonNullable< RichTextProps[ 'value' ] >;
+	onChange: RichTextProps[ 'onChange' ];
+	isSelected?: boolean;
+	selectionStart?: number;
+	selectionEnd?: number;
+	crossBlockStart?: number;
+	crossBlockEnd?: number;
+	onSelectionChange: ( start?: number, end?: number ) => void;
+	placeholder?: string;
+	allowedFormats?: readonly string[];
+	hasFormats: boolean;
+	disableFormats?: boolean;
+	formatTypeHandlerContext: object;
+	onSplitAtEnd: RichTextProps[ '__unstableOnSplitAtEnd' ];
+	onSplitAtDoubleLineEnd: RichTextProps[ '__unstableOnSplitAtDoubleLineEnd' ];
+	pastePlainText: RichTextProps[ '__unstablePastePlainText' ];
+	supportsSplitting?: boolean;
+	flushMarkPersistentRef: { current?: () => void };
+	onTextDrag: ( isDragging: boolean ) => void;
+};
+
+/**
+ * Edits a field: the rich text value, the selection, input, keyboard
+ * shortcuts, formats and completions. Rendered while the field is being
+ * edited, and attached to the field, which `RichTextWrapper` renders.
+ */
+function ActiveRichText( {
+	elementRef,
+	children,
+	tagName,
+	value: adjustedValue,
+	onChange: adjustedOnChange,
+	isSelected,
+	selectionStart,
+	selectionEnd,
+	crossBlockStart,
+	crossBlockEnd,
+	onSelectionChange,
+	inlineToolbar,
+	autocompleters,
+	onReplace,
+	placeholder,
+	allowedFormats,
+	hasFormats,
+	withoutInteractiveFormatting,
+	onRemove,
+	onMerge,
+	onSplit,
+	onSplitAtEnd,
+	onSplitAtDoubleLineEnd,
+	preserveWhiteSpace,
+	pastePlainText,
+	__unstableEmbedURLOnPaste,
+	disableFormats,
+	disableLineBreaks,
+	__unstableAllowPrefixTransformations,
+	formatTypeHandlerContext,
+	supportsSplitting,
+	flushMarkPersistentRef,
+	onTextDrag,
+}: ActiveRichTextProps ) {
+	const registry = useRegistry();
+	const { selectionChange, __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+	// The field, once attached, to render with.
+	const [ attachedElement, setAttachedElement ] =
+		useState< HTMLElement | null >( null );
+	const attachRef =
+		useRef< ( node: HTMLElement | null ) => void >( undefined );
+
+	// Attach to the field, as a ref on it would, in the commit that renders
+	// it (the field renders before), and before `useRichText`'s layout
+	// effects, which use it.
+	useLayoutEffect( () => {
+		const node = elementRef.current;
+		attachRef.current!( node );
+		setAttachedElement( node );
+		return () => {
+			attachRef.current!( null );
+		};
+	}, [ elementRef ] );
+
+	const {
+		value,
+		getValue,
+		onChange,
+		ref: richTextRef,
+		formatTypes,
+		[ getDomPositionKey ]: getDomPosition,
+	} = useRichText( {
+		value: adjustedValue,
+		onChange: adjustedOnChange,
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder,
+		__unstableIsSelected: isSelected,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		__unstableDependencies: [ tagName ],
+		allowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: formatTypeHandlerContext,
+	} );
+
+	const [ keyboardShortcuts ] = useState(
+		() => new Set< ( event: KeyboardEvent ) => void >()
+	);
+	const [ inputEvents ] = useState(
+		() => new Set< ( event: InputEvent ) => void >()
+	);
+
+	const ref = useMergeRefs( [
+		// Rich text ref must be first because its focus listener must be set
+		// up before any other ref calls .focus() on mount.
+		richTextRef,
+		useEventListeners( {
+			registry,
+			getValue,
+			onChange,
+			__unstableAllowPrefixTransformations,
+			formatTypes,
+			onReplace,
+			// The action also takes no arguments.
+			selectionChange:
+				selectionChange as RichTextEventListenerProps[ 'selectionChange' ],
+			isSelected,
+			disableFormats,
+			value,
+			tagName,
+			onSplit,
+			__unstableEmbedURLOnPaste,
+			pastePlainText,
+			onMerge,
+			onRemove,
+			disableLineBreaks,
+			onSplitAtEnd,
+			onSplitAtDoubleLineEnd,
+			keyboardShortcuts,
+			inputEvents,
+			supportsSplitting,
+			onTextDrag,
+		} ),
+	] );
+
+	useInsertionEffect( () => {
+		attachRef.current = ref;
+	} );
+
+	// Focus follows the selection while focus is inside the canvas or was
+	// lost to the body. Focus placed elsewhere stays. Runs after
+	// `useRichText` applied the content, so the field is current when its
+	// focus handler applies the selection.
+	useLayoutEffect( () => {
+		const element = elementRef.current;
+		// A pointer press outside the field makes it non editable until the
+		// release (see rich text's preventFocusCapture). Focusing it then
+		// makes the block focus handler drop the text selection.
+		if ( ! isSelected || element?.contentEditable !== 'true' ) {
+			return;
+		}
+
+		const { ownerDocument } = element;
+		// Focus lost to the body of the parent document (a removed toolbar
+		// button) leaves the frame document without focus.
+		const focusedDocument = [
+			ownerDocument,
+			// The field's document has a window.
+			ownerDocument.defaultView!.frameElement?.ownerDocument,
+		].find( ( doc ) => doc?.hasFocus() );
+
+		if ( ! focusedDocument ) {
+			return;
+		}
+
+		const { activeElement, body } = focusedDocument;
+		const canvas =
+			element.parentElement?.closest< HTMLElement >(
+				'[contenteditable]'
+			);
+		// A field inside an editing host cannot hold focus.
+		const target = canvas?.isContentEditable ? canvas : element;
+
+		if ( activeElement === body || canvas?.contains( activeElement ) ) {
+			target.focus();
+		}
+	}, [ selectionStart, selectionEnd, isSelected, elementRef ] );
+
+	// One end of a text selection across blocks is in this field: put that
+	// end of the native selection back after rendering, as a field does for
+	// a selection within it. The field at the other end does the same.
+	useLayoutEffect( () => {
+		const element = elementRef.current;
+		if (
+			( crossBlockStart === undefined && crossBlockEnd === undefined ) ||
+			! element
+		) {
+			return;
+		}
+		const { ownerDocument } = element;
+		if (
+			( ownerDocument.activeElement as HTMLElement | null )
+				?.contentEditable !== 'true'
+		) {
+			return;
+		}
+		// The field's document has a window, which has a selection.
+		const selection = ownerDocument.defaultView!.getSelection()!;
+		if ( ! selection.rangeCount ) {
+			return;
+		}
+		if ( crossBlockStart !== undefined ) {
+			const { node, offset } = getDomPosition( crossBlockStart );
+			if (
+				selection.anchorNode !== node ||
+				selection.anchorOffset !== offset
+			) {
+				selection.setBaseAndExtent(
+					node,
+					offset,
+					// A selection with a range has a focus node.
+					selection.focusNode!,
+					selection.focusOffset
+				);
+			}
+		} else {
+			const { node, offset } = getDomPosition( crossBlockEnd );
+			if (
+				selection.focusNode !== node ||
+				selection.focusOffset !== offset
+			) {
+				selection.extend( node, offset );
+			}
+		}
+	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition, elementRef ] );
+
+	const popover = useBlockEditorAutocomplete( {
+		element: attachedElement,
+		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
+		onReplace,
+		completers: autocompleters,
+		record: value,
+		onChange,
+	} );
+
+	const markPersistentDebounced = useMarkPersistent( {
+		html: adjustedValue,
+		value,
+		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
+	} );
+
+	// Lets the field mark the last change, still pending after typing, as
+	// persistent when it stops being edited.
+	useLayoutEffect( () => {
+		flushMarkPersistentRef.current = () => markPersistentDebounced.flush();
+		return () => {
+			flushMarkPersistentRef.current = undefined;
+		};
+	}, [ flushMarkPersistentRef, markPersistentDebounced ] );
+
+	const formatEditRef = useMemo(
+		() => ( { current: attachedElement } ),
+		[ attachedElement ]
+	);
+
+	function onFocus() {
+		attachedElement?.focus();
+	}
+
+	return (
+		<>
+			{ isSelected && (
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
+						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+							{ children &&
+								children( { value, onChange, onFocus } ) }
+
+							<FormatEdit
+								value={ value }
+								onChange={ onChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ formatEditRef }
+							/>
+						</Popover.__unstableSlotNameProvider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
+			) }
+			{ isSelected && hasFormats && (
+				<FormatToolbarContainer
+					inline={ inlineToolbar }
+					editableContentElement={ attachedElement }
+				/>
+			) }
+			{ popover }
+		</>
+	);
+}
 
 function RichTextWrapper(
 	{
@@ -112,10 +443,13 @@ function RichTextWrapper(
 ) {
 	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
-	const anchorRef = useRef< HTMLElement >( null );
-	const [ anchorElement, setAnchorElement ] = useState< HTMLElement | null >(
-		null
-	);
+	const elementRef = useRef< HTMLElement | null >( null );
+	// Whether something is dragged over the field, which may be dropped in it.
+	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
+	// Whether text dragged from the field may still be dropped, which removes
+	// it from the field.
+	const [ isTextDragSource, setIsTextDragSource ] = useState( false );
+	const flushMarkPersistentRef = useRef< () => void >( undefined );
 	const context = useBlockEditContext();
 	const { isSelected: isBlockSelected, name: blockName } = context;
 	// Outside a block, the store matches the undefined client ID to nothing.
@@ -126,7 +460,6 @@ function RichTextWrapper(
 		Record< string, RichTextBinding > | null | undefined;
 	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
-	const registry = useRegistry();
 	const selector = ( select: SelectFunction ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected, alone or with others.
@@ -420,200 +753,171 @@ function RichTextWrapper(
 		]
 	);
 
-	const {
-		value,
-		getValue,
-		onChange,
-		ref: richTextRef,
-		formatTypes,
-		[ getDomPositionKey ]: getDomPosition,
-	} = useRichText( {
+	// The field is edited with `useRichText` while it holds the selection or
+	// one end of it, or while something dragged over it may be dropped in it,
+	// or text dragged from it. Other fields only render their value.
+	const isActive = !! (
+		isSelected ||
+		crossBlockStart !== undefined ||
+		crossBlockEnd !== undefined ||
+		isDraggedOver ||
+		isTextDragSource
+	);
+
+	const formatTypeHandlerContext = useMemo(
+		() => ( {
+			richTextIdentifier: identifier,
+			blockClientId: clientId,
+		} ),
+		[ identifier, clientId ]
+	);
+
+	const inactiveRef = useInactiveRichText( {
 		value: adjustedValue,
-		onChange: adjustedOnChange,
-		selectionStart,
-		selectionEnd,
-		onSelectionChange,
 		placeholder: bindingsPlaceholder || placeholder,
-		__unstableIsSelected: isSelected,
-		__unstableDisableFormats: disableFormats,
-		preserveWhiteSpace,
-		__unstableDependencies: [ tagName ],
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting,
-		__unstableFormatTypeHandlerContext: useMemo(
-			() => ( {
-				richTextIdentifier: identifier,
-				blockClientId: clientId,
-			} ),
-			[ identifier, clientId ]
-		),
+		__unstableDisableFormats: disableFormats,
+		__unstableDependencies: [ tagName ],
+		__unstableFormatTypeHandlerContext: formatTypeHandlerContext,
+		isActive,
+		// Select the field, as `useRichText` does, which renders it active.
+		onActivate( event: Event, editableElement: HTMLElement ) {
+			// Focus is handled here, as `useRichText` would, before the
+			// render: rendering selects the block, which may make the editor
+			// an editing host before the caret is placed. The active field
+			// synchronizes the selection once mounted, after the event.
+			if ( event.type === 'focusin' ) {
+				activate( event, editableElement );
+				return;
+			}
+			// Synchronously, so that the active field's listeners, which
+			// listen first, also handle the event.
+			flushSync( () => activate( event, editableElement ) );
+		},
 	} );
-	// Focus follows the selection while focus is inside the canvas or was
-	// lost to the body. Focus placed elsewhere stays. Runs after
-	// `useRichText` applied the content, so the field is current when its
-	// focus handler applies the selection.
-	useLayoutEffect( () => {
-		const element = anchorRef.current;
 
-		// A pointer press outside the field makes it non editable until the
-		// release (see rich text's preventFocusCapture). Focusing it then
-		// makes the block focus handler drop the text selection.
-		if ( ! isSelected || element?.contentEditable !== 'true' ) {
+	function activate( event: Event, editableElement: HTMLElement ) {
+		if ( event.type === 'focusin' ) {
+			// When the whole editor is editable, writing flow handles
+			// selection. A nested editable element does not receive a
+			// caret from being focused, unlike an editing host, so place
+			// it at the start, which selects the field through the
+			// selection change.
+			if (
+				editableElement.parentElement!.closest(
+					'[contenteditable="true"]'
+				)
+			) {
+				const selection =
+					editableElement.ownerDocument.defaultView!.getSelection()!;
+				if (
+					! selection.anchorNode ||
+					! editableElement.contains( selection.anchorNode )
+				) {
+					selection.collapse( editableElement, 0 );
+				}
+				return;
+			}
+
+			onSelectionChange( undefined, undefined );
 			return;
 		}
 
-		const { ownerDocument } = element;
-		// Focus lost to the body of the parent document (a removed toolbar
-		// button) leaves the frame document without focus.
-		const focusedDocument = [
-			ownerDocument,
-			// The field's document has a window.
-			ownerDocument.defaultView!.frameElement?.ownerDocument,
-		].find( ( doc ) => doc?.hasFocus() );
+		// The field owns the selection.
+		const selection =
+			editableElement.ownerDocument.defaultView!.getSelection()!;
+		const { start, end } = create( {
+			element: editableElement,
+			range: selection.rangeCount ? selection.getRangeAt( 0 ) : null,
+			__unstableIsEditableTree: true,
+		} );
+		onSelectionChange( start, end );
+	}
 
-		if ( ! focusedDocument ) {
-			return;
-		}
+	// Something dragged over the field may be dropped in it, which the active
+	// field handles. Activate it on capture, before the event reaches the
+	// field, so that the active field handles the event too.
+	const dragRef = useRefEffect(
+		( node: HTMLElement ) => {
+			if ( isActive ) {
+				return;
+			}
 
-		const { activeElement, body } = focusedDocument;
-		const canvas =
-			element.parentElement?.closest< HTMLElement >(
-				'[contenteditable]'
+			function onDragEvent() {
+				flushSync( () => setIsDraggedOver( true ) );
+			}
+
+			const unsubscribers = [ 'dragenter', 'dragover', 'drop' ].map(
+				( eventType ) =>
+					subscribeDelegatedListener(
+						node,
+						eventType,
+						onDragEvent,
+						true
+					)
 			);
-		// A field inside an editing host cannot hold focus.
-		const target = canvas?.isContentEditable ? canvas : element;
+			return () => {
+				unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
+			};
+		},
+		[ isActive ]
+	);
 
-		if ( activeElement === body || canvas?.contains( activeElement ) ) {
-			target.focus();
-		}
-	}, [ selectionStart, selectionEnd, isSelected ] );
-
-	// One end of a text selection across blocks is in this field: put that
-	// end of the native selection back after rendering, as a field does for
-	// a selection within it. The field at the other end does the same.
+	// Stop editing the field once the drag ends. Subscribed as the field is
+	// activated, in case it ends with that event.
 	useLayoutEffect( () => {
-		if ( crossBlockStart === undefined && crossBlockEnd === undefined ) {
+		const element = elementRef.current;
+		if ( ! isDraggedOver || ! element ) {
 			return;
 		}
-		const element = anchorRef.current;
-		if ( ! element ) {
-			return;
-		}
-		const { ownerDocument } = element;
-		if (
-			( ownerDocument.activeElement as HTMLElement | null )
-				?.contentEditable !== 'true'
-		) {
-			return;
-		}
-		// The field's document has a window, which has a selection.
-		const selection = ownerDocument.defaultView!.getSelection()!;
-		if ( ! selection.rangeCount ) {
-			return;
-		}
-		if ( crossBlockStart !== undefined ) {
-			const { node, offset } = getDomPosition( crossBlockStart );
+		const { defaultView } = element.ownerDocument;
+		function onDragEnd( event: Event ) {
 			if (
-				selection.anchorNode !== node ||
-				selection.anchorOffset !== offset
+				event.type === 'dragleave' &&
+				element!.contains(
+					( event as DragEvent ).relatedTarget as Node | null
+				)
 			) {
-				selection.setBaseAndExtent(
-					node,
-					offset,
-					// A selection with a range has a focus node.
-					selection.focusNode!,
-					selection.focusOffset
-				);
+				return;
 			}
-		} else {
-			const { node, offset } = getDomPosition( crossBlockEnd );
-			if (
-				selection.focusNode !== node ||
-				selection.focusOffset !== offset
-			) {
-				selection.extend( node, offset );
-			}
+			setIsDraggedOver( false );
 		}
-	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
-
-	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
-		onReplace,
-		completers: autocompleters,
-		record: value,
-		onChange,
-	} );
-
-	// While a focused editing host owns the selection (the block supports
-	// `editableRoot`), ARIA attributes describing the autocomplete state must
-	// be mirrored onto the host: assistive technology resolves them relative
-	// to the focused element.
-	const {
-		'aria-autocomplete': ariaAutocomplete,
-		'aria-haspopup': ariaHasPopup,
-		'aria-controls': ariaControls,
-		'aria-owns': ariaOwns,
-		'aria-activedescendant': ariaActiveDescendant,
-	} = autocompleteProps;
-	useEffect( () => {
-		if ( ! isSelected ) {
-			return;
-		}
-
-		const host = anchorRef.current?.parentElement?.closest(
-			'[contenteditable="true"]'
-		);
-
-		if ( ! host ) {
-			return;
-		}
-
-		const attributes = {
-			'aria-autocomplete': ariaAutocomplete,
-			'aria-haspopup': ariaHasPopup,
-			'aria-controls': ariaControls,
-			'aria-owns': ariaOwns,
-			'aria-activedescendant': ariaActiveDescendant,
-		};
-
-		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
-			if ( value_ === undefined ) {
-				host.removeAttribute( key );
-			} else {
-				host.setAttribute( key, value_ );
-			}
-		}
-
+		element.addEventListener( 'dragleave', onDragEnd );
+		defaultView!.addEventListener( 'drop', onDragEnd );
+		defaultView!.addEventListener( 'dragend', onDragEnd );
 		return () => {
-			for ( const key of Object.keys( attributes ) ) {
-				host.removeAttribute( key );
-			}
+			element.removeEventListener( 'dragleave', onDragEnd );
+			defaultView!.removeEventListener( 'drop', onDragEnd );
+			defaultView!.removeEventListener( 'dragend', onDragEnd );
 		};
-	}, [
-		isSelected,
-		ariaAutocomplete,
-		ariaHasPopup,
-		ariaControls,
-		ariaOwns,
-		ariaActiveDescendant,
-	] );
+	}, [ isDraggedOver ] );
 
+	// Changes made while the field is not edited, for example by undo, are
+	// marked as the active field marks them. While it is active, its own
+	// instance does, and this one keeps track of the value.
 	useMarkPersistent( {
 		html: adjustedValue,
-		value,
+		value: useMemo(
+			() => ( {
+				text:
+					adjustedValue instanceof RichTextData
+						? adjustedValue.text
+						: create( { html: String( adjustedValue ) } ).text,
+			} ),
+			[ adjustedValue ]
+		),
 		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
+		isDisabled: isActive,
 	} );
 
-	const [ keyboardShortcuts ] = useState(
-		() => new Set< ( event: KeyboardEvent ) => void >()
-	);
-	const [ inputEvents ] = useState(
-		() => new Set< ( event: InputEvent ) => void >()
-	);
-
-	function onFocus() {
-		anchorRef.current?.focus();
-	}
+	// Mark the last change, still pending after typing, as persistent when
+	// the field stops being edited.
+	useLayoutEffect( () => {
+		if ( ! isActive ) {
+			flushMarkPersistentRef.current?.();
+		}
+	}, [ isActive ] );
 
 	// Setting tabIndex to 0 is unnecessary, the element is already focusable
 	// because it's contentEditable. This also fixes a Safari bug where it's
@@ -634,30 +938,6 @@ function RichTextWrapper(
 	const TagName = tagName;
 	return (
 		<>
-			{ isSelected && (
-				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<InputEventContext.Provider value={ inputEvents }>
-						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
-							{ children &&
-								children( { value, onChange, onFocus } ) }
-
-							<FormatEdit
-								value={ value }
-								onChange={ onChange }
-								onFocus={ onFocus }
-								formatTypes={ formatTypes }
-								forwardedRef={ anchorRef }
-							/>
-						</Popover.__unstableSlotNameProvider>
-					</InputEventContext.Provider>
-				</KeyboardShortcutContext.Provider>
-			) }
-			{ isSelected && hasFormats && (
-				<FormatToolbarContainer
-					inline={ inlineToolbar }
-					editableContentElement={ anchorElement }
-				/>
-			) }
 			<TagName
 				// Overridable props.
 				role="textbox"
@@ -672,43 +952,12 @@ function RichTextWrapper(
 				aria-label={
 					bindingsLabel || props[ 'aria-label' ] || placeholder
 				}
-				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
-					// Rich text ref must be first because its focus listener
-					// must be set up before any other ref calls .focus() on
-					// mount.
-					richTextRef,
+					inactiveRef,
 					forwardedRef,
-					autocompleteProps.ref,
 					props.ref,
-					useEventListeners( {
-						registry,
-						getValue,
-						onChange,
-						__unstableAllowPrefixTransformations,
-						formatTypes,
-						onReplace,
-						// The action also takes no arguments.
-						selectionChange:
-							selectionChange as RichTextEventListenerProps[ 'selectionChange' ],
-						isSelected,
-						disableFormats,
-						value,
-						tagName,
-						onSplit,
-						__unstableEmbedURLOnPaste,
-						pastePlainText,
-						onMerge,
-						onRemove,
-						disableLineBreaks,
-						onSplitAtEnd,
-						onSplitAtDoubleLineEnd,
-						keyboardShortcuts,
-						inputEvents,
-						supportsSplitting,
-					} ),
-					anchorRef,
-					setAnchorElement,
+					dragRef,
+					elementRef,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
@@ -720,6 +969,54 @@ function RichTextWrapper(
 				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
+			{ isActive && (
+				<ActiveRichText
+					// The field is a new element when its tag changes.
+					key={ typeof tagName === 'string' ? tagName : undefined }
+					elementRef={ elementRef }
+					tagName={ tagName }
+					value={ adjustedValue }
+					onChange={ adjustedOnChange }
+					isSelected={ isSelected }
+					selectionStart={ selectionStart }
+					selectionEnd={ selectionEnd }
+					crossBlockStart={ crossBlockStart }
+					crossBlockEnd={ crossBlockEnd }
+					onSelectionChange={ onSelectionChange }
+					inlineToolbar={ inlineToolbar }
+					autocompleters={ autocompleters }
+					onReplace={ onReplace }
+					placeholder={
+						// Bindings sources have string labels.
+						( bindingsPlaceholder || placeholder ) as
+							string | undefined
+					}
+					allowedFormats={ adjustedAllowedFormats }
+					hasFormats={ hasFormats }
+					withoutInteractiveFormatting={
+						withoutInteractiveFormatting
+					}
+					onRemove={ onRemove }
+					onMerge={ onMerge }
+					onSplit={ onSplit }
+					onSplitAtEnd={ onSplitAtEnd }
+					onSplitAtDoubleLineEnd={ onSplitAtDoubleLineEnd }
+					preserveWhiteSpace={ preserveWhiteSpace }
+					pastePlainText={ pastePlainText }
+					__unstableEmbedURLOnPaste={ __unstableEmbedURLOnPaste }
+					disableFormats={ disableFormats }
+					disableLineBreaks={ disableLineBreaks }
+					__unstableAllowPrefixTransformations={
+						__unstableAllowPrefixTransformations
+					}
+					formatTypeHandlerContext={ formatTypeHandlerContext }
+					supportsSplitting={ supportsSplitting }
+					flushMarkPersistentRef={ flushMarkPersistentRef }
+					onTextDrag={ setIsTextDragSource }
+				>
+					{ children }
+				</ActiveRichText>
+			) }
 		</>
 	);
 }
