@@ -12,7 +12,7 @@ import { getMinZoom, restrictPanZoom } from './containment';
  * the crop center. Returns `null` when the clamped zoom matches the
  * current zoom (no-op).
  *
- * Extracted so multiple hooks (the pure `useCropperReducer` and the
+ * Extracted so multiple hooks (the pure `useCropperController` and the
  * composite `useMediaEditorState`) can share the math without
  * duplicating it.
  *
