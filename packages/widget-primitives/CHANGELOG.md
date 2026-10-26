@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. `WidgetRender` provides it from the `widgetType` it already holds; absent a provider, the hook returns `{}`.
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes
