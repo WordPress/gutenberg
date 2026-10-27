@@ -13,7 +13,6 @@ import { unlock } from '../../lock-unlock';
 import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
-	EDITOR_INTENT_VIEW,
 } from '../../store/constants';
 import PostTypeSupportCheck from '../post-type-support-check';
 
@@ -68,18 +67,12 @@ const INTENTS: Array< {
 		info: __( 'Propose changes the author can apply or reject.' ),
 		shortcut: intentShortcut( 'x' ),
 	},
-	{
-		value: EDITOR_INTENT_VIEW,
-		label: __( 'Viewing' ),
-		info: __( 'Read-only preview of the content.' ),
-		shortcut: intentShortcut( 'c' ),
-	},
 ];
 
 /**
- * Editor intent switcher. Lets the user pick between direct editing,
- * suggesting changes, or viewing in read-only. Only rendered for post
- * types that declare the `editor.notes` support.
+ * Editor intent switcher. Lets the user pick between direct editing and
+ * suggesting changes. Only rendered for post types that declare the
+ * `editor.notes` support.
  */
 function IntentSwitcher() {
 	// The intent API is private while Suggest mode is experimental.

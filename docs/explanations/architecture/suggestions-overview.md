@@ -21,7 +21,7 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 
 **Glossary**
 
-- **Mode** (the `editorIntent` in code): Editing, Suggesting or Viewing, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing.
+- **Mode** (the `editorIntent` in code): Editing or Suggesting, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing.
 - **Note**: a `note`-type comment (the Notes feature, GA in WordPress 6.9). A suggestion is a Note with a JSON payload in `_wp_suggestion` comment meta and a lifecycle in `_wp_suggestion_status`.
 - **Marker**: the in-content record of a pending suggestion. Inline markers are rich-text formats. Block markers live in `metadata.suggestion` and are typed `pending-insert`, `pending-remove`, `pending-move` or `pending-attributes`. Both kinds carry the Note's comment id.
 - **Proposal**: the attribute values a block marker carries in `after`. In every mode the editor renders the block with the proposal merged over its live attributes, so everyone sees what is proposed. The HOC that does this is still named `withSuggestionOverlay`, from the in-memory overlay it replaced.
@@ -33,7 +33,7 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 ```mermaid
 flowchart TB
     subgraph UI["Editor UI"]
-        Switcher["Mode switcher<br/>Editing / Suggesting / Viewing"]
+        Switcher["Mode switcher<br/>Editing / Suggesting"]
         Canvas["Block canvas"]
         Sidebar["Notes sidebar<br/>summary + Accept / Reject"]
     end
@@ -97,7 +97,7 @@ flowchart BT
 
 | Layer | PR | What it owns | Where to look |
 | --- | --- | --- | --- |
-| 1 | [#80427](https://github.com/WordPress/gutenberg/pull/80427) Editor mode (intent) | Session-scoped `editorIntent` in `core/editor` (private `setEditorIntent` / `getEditorIntent`), the Editing / Suggesting / Viewing switcher in the Options menu, Google Docs shortcuts (Shift+Alt+Cmd+Z/X/C), Viewing as read-only via `isPreviewMode`, the experiment gate `isSuggestionModeEnabled` / `useCanSuggest` | `editor/src/store/*`, `intent-switcher/`, `suggestion-mode/gate.ts` |
+| 1 | [#80427](https://github.com/WordPress/gutenberg/pull/80427) Editor mode (intent) | Session-scoped `editorIntent` in `core/editor` (private `setEditorIntent` / `getEditorIntent`), the Editing / Suggesting switcher in the Options menu, Google Docs shortcuts (Shift+Alt+Cmd+Z/X), the experiment gate `isSuggestionModeEnabled` / `useCanSuggest` | `editor/src/store/*`, `intent-switcher/`, `suggestion-mode/gate.ts` |
 | 2 | [#80428](https://github.com/WordPress/gutenberg/pull/80428) Storage, REST, provider | `_wp_suggestion` and `_wp_suggestion_status` meta (64 KB cap, KSES on block snapshots), the 7.1 REST comment controller subclass, the first provider (create, update, apply, reject, schema versioning), an in-memory overlay store, the auto-save loop. No capture yet. #80433 later replaces the overlay and splits the provider | `lib/compat/wordpress-7.1/block-suggestions.php`, `suggestion-mode/provider.ts`, `overlay-context.tsx`, `auto-save.ts` |
 | 3 | [#80429](https://github.com/WordPress/gutenberg/pull/80429) Block-level capture | Store interceptor (attribute drift and structural insert / remove / move, list indent and outdent), the `setAttributes` HOC, pending treatments and move ghosts, revert and undo guards, PHP structural strip and move-order restore | `suggestion-mode/store-interceptor.ts`, `with-suggestion-overlay.tsx`, `block-list/content-suggestion.scss` |
 | 4 | [#80430](https://github.com/WordPress/gutenberg/pull/80430) Inline marker primitive | Format-agnostic rich-text utilities shared with Notes: wrap a range, find a marker by id (the only offset resolver), read caret and selection, reconcile after edits, decorate via annotations | `editor/src/components/inline-markers/` |
