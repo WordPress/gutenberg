@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The package no longer steps a host-provided column count down at `960px` and `600px` of container width. `gridSettings.columns` travels to the `@wordpress/grid` surface untouched, as a number or as a map from container width to count, so a host that passed a count and relied on the steps now states them: `columns: { 0: 1, 600: 2, 960: <count> }`. A host that sets neither `columns` nor `minColumnWidth` gets the same three steps as before, now `DEFAULT_GRID.columns` ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+-   Honor any positive `gridSettings.rowHeight` as-is. `normalizeGridSettings` no longer snaps the value to `ROW_HEIGHT_PRESETS`; it only fills an absent or invalid value with the default ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+
+### Enhancements
+
+-   Honor `gridSettings.minColumnWidth` as a per-column floor: the surface fits as many columns as the container allows at that width, capped by `columns` when set ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes
