@@ -134,15 +134,7 @@ describe( 'classifyOverlap', () => {
 		// Toggle a format over a range.
 		[ 'format inside an addition', 'add', 'format', 3, 5, 'allow' ],
 		[ 'format the whole addition', 'add', 'format', 2, 6, 'allow' ],
-		[
-			'format across an addition’s edge',
-			'add',
-			'format',
-			0,
-			4,
-			'refuse',
-			'format-straddles-add',
-		],
+		[ 'format across an addition’s edge', 'add', 'format', 0, 4, 'allow' ],
 		[ 'format inside a deletion', 'del', 'format', 3, 5, 'allow' ],
 		[ 'format across a deletion', 'del', 'format', 0, 4, 'allow' ],
 		[
@@ -151,8 +143,7 @@ describe( 'classifyOverlap', () => {
 			'format',
 			3,
 			5,
-			'refuse',
-			'format-on-format',
+			'allow',
 		],
 		[
 			'format across a formatting change',
@@ -160,8 +151,7 @@ describe( 'classifyOverlap', () => {
 			'format',
 			0,
 			4,
-			'refuse',
-			'format-on-format',
+			'allow',
 		],
 		// Type over a selection.
 		[ 'type over inside an addition', 'add', 'type-over', 3, 5, 'allow' ],
@@ -252,7 +242,7 @@ describe( 'classifyOverlap', () => {
 		expect( verdict( formats, 'format', 2, 5 ).verdict ).toBe( 'allow' );
 	} );
 
-	it( 'compares every stacked addition when formatting', () => {
+	it( 'allows formatting across the edge of a stacked addition', () => {
 		// An addition by author 3 nested in an addition by author 2.
 		const formats = create( {
 			html: `a${ mark(
@@ -263,11 +253,9 @@ describe( 'classifyOverlap', () => {
 		} ).formats;
 		// Inside the nested addition only.
 		expect( verdict( formats, 'format', 3, 5 ).verdict ).toBe( 'allow' );
-		// From the outer addition into the nested one crosses its edge.
+		// From the outer addition into the nested one, across its edge.
 		expect( verdict( formats, 'format', 2, 5 ) ).toEqual( {
-			verdict: 'refuse',
-			reason: 'format-straddles-add',
-			blocking: { id: '5', kind: 'add', authorId: '3' },
+			verdict: 'allow',
 		} );
 	} );
 
