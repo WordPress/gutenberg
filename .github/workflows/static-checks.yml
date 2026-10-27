@@ -49,6 +49,8 @@ jobs:
 
             - name: Type checking
               run: npm run build:package-types
+              env:
+                  NODE_OPTIONS: --max-old-space-size=4096
 
             - name: Check local changes
               run: npm run other:check-local-changes
