@@ -111,10 +111,19 @@
 	width: 100%;
 
 	// The block editor only shows the toggle when the submenu itself is selected.
+	// Use a light style so it stands apart from the dark top-level appender.
 	.block-editor-inserter__toggle.components-button.has-icon {
 		display: flex;
 		margin-right: 0;
 		margin-left: auto;
+		background-color: transparent;
+		color: $gray-900;
+		border: $border-width solid currentColor;
+
+		&:hover {
+			background-color: transparent;
+			color: var(--wp-admin-theme-color);
+		}
 	}
 }
 
