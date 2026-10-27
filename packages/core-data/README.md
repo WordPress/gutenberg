@@ -178,11 +178,11 @@ Returns an action object used in adding new entities.
 
 _Parameters_
 
--   _entities_ `Array< EntityConfig >`: Entities received.
+- _entities_ `Array`: Entities received.
 
 _Returns_
 
--   `ActionOf< 'ADD_ENTITIES' >`: Action object.
+- `Object`: Action object.
 
 ### clearEntityRecordEdits
 
@@ -190,13 +190,13 @@ Action triggered to clear all edits from an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _recordId_ `number | string`: Is omitted for keyless entities.
+- _kind_ `string`: Kind of the entity.
+- _name_ `string`: Name of the entity.
+- _recordId_ `[number|string]`: Is omitted for keyless entities.
 
 _Returns_
 
--   Action object.
+- `Object`: Action object.
 
 ### deleteEntityRecord
 
@@ -204,13 +204,13 @@ Action triggered to delete an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the deleted entity.
--   _name_ `string`: Name of the deleted entity.
--   _recordId_ `string | number`: Record ID of the deleted entity.
--   _query_ `Query | null`: Special query parameters for the DELETE API call.
--   _options_ `DeleteEntityRecordOptions`: Delete options.
--   _options.\_\_unstableFetch_ `DeleteEntityRecordOptions[ '__unstableFetch' ]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
--   _options.throwOnError_ `DeleteEntityRecordOptions[ 'throwOnError' ]`: If false, this action suppresses all the exceptions. Defaults to false.
+- _kind_ `string`: Kind of the deleted entity.
+- _name_ `string`: Name of the deleted entity.
+- _recordId_ `number|string`: Record ID of the deleted entity.
+- _query_ `?Object`: Special query parameters for the DELETE API call.
+- _options_ `[Object]`: Delete options.
+- _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+- _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### editEntityRecord
 
@@ -218,17 +218,17 @@ Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the edited entity record.
--   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number | string | undefined`: Pass `undefined` for keyless entities.
--   _edits_ `object`: The edits.
--   _options_ `EditEntityRecordOptions`: Options for the edit.
--   _options.undoIgnore_ `EditEntityRecordOptions[ 'undoIgnore' ]`: Whether to ignore the edit in undo history or not.
--   _options.isCached_ `EditEntityRecordOptions[ 'isCached' ]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
+- _kind_ `string`: Kind of the edited entity record.
+- _name_ `string`: Name of the edited entity record.
+- _recordId_ `number|string|undefined`: Pass `undefined` for keyless entities.
+- _edits_ `Object`: The edits.
+- _options_ `Object`: Options for the edit.
+- _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+- _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
--   Action object.
+- `Object`: Action object.
 
 ### receiveDefaultTemplateId
 
@@ -236,12 +236,12 @@ Returns an action object used to set the template for a given query.
 
 _Parameters_
 
--   _query_ `Query`: The lookup query.
--   _templateId_ `string`: The resolved template id.
+- _query_ `Object`: The lookup query.
+- _templateId_ `string`: The resolved template id.
 
 _Returns_
 
--   `ActionOf< 'RECEIVE_DEFAULT_TEMPLATE' >`: Action object.
+- `Object`: Action object.
 
 ### receiveEntityRecords
 
@@ -249,17 +249,17 @@ Returns an action object used in signalling that entity records have been receiv
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity record.
--   _name_ `string`: Name of the received entity record.
--   _records_ `object | Array< object >`: Records received.
--   _query_ `Query | null | undefined`: Query Object.
--   _invalidateCache_ `boolean | null`: Should invalidate query caches.
--   _edits_ `object | null | undefined`: Edits to reset.
--   _meta_ `QueriedMeta | null | undefined`: Meta information about pagination.
+- _kind_ `string`: Kind of the received entity record.
+- _name_ `string`: Name of the received entity record.
+- _records_ `Array|Object`: Records received.
+- _query_ `?Object`: Query Object.
+- _invalidateCache_ `?boolean`: Should invalidate query caches.
+- _edits_ `?Object`: Edits to reset.
+- _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
--   Action object.
+- `Object`: Action object.
 
 ### receiveNavigationFallbackId
 
@@ -267,11 +267,11 @@ Returns an action object signalling that the fallback Navigation Menu id has bee
 
 _Parameters_
 
--   _fallbackId_ `number | null | undefined`: the id of the fallback Navigation Menu
+- _fallbackId_ `integer`: the id of the fallback Navigation Menu
 
 _Returns_
 
--   `ActionOf< 'RECEIVE_NAVIGATION_FALLBACK_ID' >`: Action object.
+- `Object`: Action object.
 
 ### receiveRevisions
 
@@ -279,13 +279,13 @@ Action triggered to receive revision items.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity record revisions.
--   _name_ `string`: Name of the received entity record revisions.
--   _recordKey_ `number | string`: The key of the entity record whose revisions you want to fetch.
--   _records_ `object | Array< object >`: Revisions received.
--   _query_ `Query | null`: Query Object.
--   _invalidateCache_ `boolean | null`: Should invalidate query caches.
--   _meta_ `QueriedMeta | null`: Meta information about pagination.
+- _kind_ `string`: Kind of the received entity record revisions.
+- _name_ `string`: Name of the received entity record revisions.
+- _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+- _records_ `Array|Object`: Revisions received.
+- _query_ `?Object`: Query Object.
+- _invalidateCache_ `?boolean`: Should invalidate query caches.
+- _meta_ `?Object`: Meta information about pagination.
 
 ### receiveThemeSupports
 
@@ -295,7 +295,7 @@ Returns an action object used in signalling that the index has been received.
 
 _Returns_
 
--   `{ type: 'DO_NOTHING'; }`: Action object.
+- `Object`: Action object.
 
 ### receiveUploadPermissions
 
@@ -309,7 +309,7 @@ _Parameters_
 
 _Returns_
 
--   `ActionOf< 'RECEIVE_USER_PERMISSION' >`: Action object.
+- `Object`: Action object.
 
 ### redo
 
@@ -321,10 +321,10 @@ Action triggered to save an entity record's edits.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _recordId_ `number | string`: Is omitted for keyless entities.
--   _options_ `SaveEntityRecordOptions`: Saving options.
+- _kind_ `string`: Kind of the entity.
+- _name_ `string`: Name of the entity.
+- _recordId_ `[number|string]`: Is omitted for keyless entities.
+- _options_ `[Object]`: Saving options.
 
 ### saveEntityRecord
 
@@ -332,20 +332,19 @@ Action triggered to save an entity record.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity.
--   _name_ `string`: Name of the received entity.
--   _record_ `object`: Record to be saved.
--   _options_ `SaveEntityRecordOptions`: Saving options.
--   _options.isAutosave_ `SaveEntityRecordOptions[ 'isAutosave' ]`: Whether this is an autosave.
--   _options.\_\_unstableFetch_ `SaveEntityRecordOptions[ '__unstableFetch' ]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
--   _options.throwOnError_ `SaveEntityRecordOptions[ 'throwOnError' ]`: If false, this action suppresses all the exceptions. Defaults to false.
+- _kind_ `string`: Kind of the received entity.
+- _name_ `string`: Name of the received entity.
+- _record_ `Object`: Record to be saved.
+- _options_ `Object`: Saving options.
+- _options.isAutosave_ `[boolean]`: Whether this is an autosave.
+- _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+- _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### undo
 
 Action triggered to undo the last edit to an entity record, if any.
 
-
-<!-- END TOKEN(Autogenerated actions|src/actions.ts) -->
+<!-- END TOKEN(Autogenerated actions|src/actions.js) -->
 
 ## Selectors
 
@@ -1047,14 +1046,14 @@ The return value has the shape `[ blocks, onInput, onChange ]`. `onInput` is for
 
 _Parameters_
 
--   _kind_ `string`: The entity kind.
--   _name_ `string`: The entity name.
--   _options_ `EntityBlockEditorOptions`:
--   _options.id_ `EntityBlockEditorOptions[ 'id' ]`: An entity ID to use instead of the context-provided one.
+- _kind_ `string`: The entity kind.
+- _name_ `string`: The entity name.
+- _options_ `Object`:
+- _options.id_ `[string]`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 
--   `EntityBlockEditorResult`: The block array and setters.
+- `[unknown[], Function, Function]`: The block array and setters.
 
 ### useEntityId
 
@@ -1071,14 +1070,14 @@ Hook that returns the value and a setter for the specified property of the neare
 
 _Parameters_
 
--   _kind_ `string`: The entity kind.
--   _name_ `string`: The entity name.
--   _prop_ `string`: The property name.
--   _\_id_ `number | string`: An entity ID to use instead of the context-provided one.
+- _kind_ `string`: The entity kind.
+- _name_ `string`: The entity name.
+- _prop_ `string`: The property name.
+- _\_id_ `[number|string]`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 
--   `EntityPropResult< Value, FullValue >`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
+- `[*, Function, *]`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
 
 ### useEntityRecord
 

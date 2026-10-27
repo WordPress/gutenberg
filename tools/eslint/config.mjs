@@ -427,6 +427,7 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Card: 'WCCard',
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
@@ -1196,7 +1197,11 @@ export default dedupePlugins( [
 
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
-		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+		files: [
+			'packages/eslint-plugin/**',
+			'packages/theme/**',
+			'packages/theme-build-tools/**',
+		],
 		rules: {
 			'@wordpress/no-setting-ds-tokens': 'off',
 			'@wordpress/no-unknown-ds-tokens': 'off',
