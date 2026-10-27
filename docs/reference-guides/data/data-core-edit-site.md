@@ -12,71 +12,71 @@ Returns whether the current user can create media or not.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `Object`: Whether the current user can create media or not.
+-   `Object`: Whether the current user can create media or not.
 
 ### getCurrentTemplateNavigationPanelSubMenu
 
-> **Deprecated**
+> **Deprecated** 
 
 ### getCurrentTemplateTemplateParts
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns the template parts and their blocks for the current edited template.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `Array`: Template parts and their blocks in an array.
+-   `Array`: Template parts and their blocks in an array.
 
 ### getEditedPostContext
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns the edited post's context object.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `Object`: Page.
+-   `Object`: Page.
 
 ### getEditedPostId
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns the ID of the currently edited template or template part.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `?string`: Post ID.
+-   `?string`: Post ID.
 
 ### getEditedPostType
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns the current edited post type (wp_template or wp_template_part).
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `?TemplateType`: Template type.
+-   `?TemplateType`: Template type.
 
 ### getEditorMode
 
@@ -84,33 +84,33 @@ Returns the current editing mode.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `string`: Editing mode.
+-   `string`: Editing mode.
 
 ### getHomeTemplateId
 
-> **Deprecated**
+> **Deprecated** 
 
 ### getNavigationPanelActiveMenu
 
-> **Deprecated**
+> **Deprecated** 
 
 ### getPage
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns the current page object.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `Object`: Page.
+-   `Object`: Page.
 
 ### getReusableBlocks
 
@@ -118,11 +118,11 @@ Returns any available Reusable blocks.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `Array`: The available reusable blocks.
+-   `Array`: The available reusable blocks.
 
 ### getSettings
 
@@ -130,50 +130,50 @@ Returns the site editor settings.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `Object`: Settings.
+-   `Object`: Settings.
 
 ### hasPageContentFocus
 
-> **Deprecated**
+> **Deprecated** 
 
 Whether or not the editor allows only page content to be edited.
 
 _Returns_
 
-- `boolean`: Whether or not focus is on editing page content.
+-   `boolean`: Whether or not focus is on editing page content.
 
 ### isFeatureActive
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns whether the given feature is enabled or not.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
-- _featureName_ `string`: Feature slug.
+-   _state_ `Object`: Global application state.
+-   _featureName_ `string`: Feature slug.
 
 _Returns_
 
-- `boolean`: Is active.
+-   `boolean`: Is active.
 
 ### isInserterOpened
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns true if the inserter is opened.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `boolean`: Whether the inserter is opened.
+-   `boolean`: Whether the inserter is opened.
 
 ### isListViewOpened
 
@@ -181,33 +181,33 @@ Returns true if the list view is opened.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `boolean`: Whether the list view is opened.
+-   `boolean`: Whether the list view is opened.
 
 ### isNavigationOpened
 
-> **Deprecated**
+> **Deprecated** 
 
 ### isPage
 
-> **Deprecated**
+> **Deprecated** 
 
 Whether or not the editor has a page loaded into it.
 
 _Related_
 
-- setPage
+-   setPage
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `boolean`: Whether or not the editor has a page loaded into it.
+-   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -215,11 +215,12 @@ Returns the current opened/closed state of the save panel.
 
 _Parameters_
 
-- _state_ `Object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
-- `boolean`: True if the save panel should be open; false if closed.
+-   `boolean`: True if the save panel should be open; false if closed.
+
 
 <!-- END TOKEN(Autogenerated selectors|../../../packages/edit-site/src/store/selectors.js) -->
 
@@ -235,11 +236,11 @@ Action that adds a new template and sets it as the current template.
 
 _Parameters_
 
-- _template_ `Object`: The template.
+-   _template_ `Object`: The template.
 
 _Returns_
 
-- `Object`: Action object used to set the current template.
+-   `Object`: Action object used to set the current template.
 
 ### closeGeneralSidebar
 
@@ -251,7 +252,7 @@ Action that opens an editor sidebar.
 
 _Parameters_
 
-- _name_ `?string`: Sidebar name to be opened.
+-   _name_ `?string`: Sidebar name to be opened.
 
 ### openNavigationPanelToMenu
 
@@ -265,7 +266,7 @@ Action that removes a template.
 
 _Parameters_
 
-- _template_ `Object`: The template object.
+-   _template_ `Object`: The template object.
 
 ### revertTemplate
 
@@ -273,9 +274,9 @@ Reverts a template to its original theme-provided file.
 
 _Parameters_
 
-- _template_ `Object`: The template to revert.
-- _options_ `[Object]`:
-- _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
+-   _template_ `Object`: The template to revert.
+-   _options_ `[Object]`:
+-   _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
 
 ### setEditedEntity
 
@@ -285,13 +286,13 @@ Action that sets an edited entity.
 
 _Parameters_
 
-- _postType_ `string`: The entity's post type.
-- _postId_ `string`: The entity's ID.
-- _context_ `Object`: The entity's context.
+-   _postType_ `string`: The entity's post type.
+-   _postId_ `string`: The entity's ID.
+-   _context_ `Object`: The entity's context.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### setEditedPostContext
 
@@ -301,11 +302,11 @@ Set's the current block editor context.
 
 _Parameters_
 
-- _context_ `Object`: The context object.
+-   _context_ `Object`: The context object.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### setHasPageContentFocus
 
@@ -313,7 +314,7 @@ Sets whether or not the editor allows only page content to be edited.
 
 _Parameters_
 
-- _hasPageContentFocus_ `boolean`: True to allow only page content to be edited, false to allow template to be edited.
+-   _hasPageContentFocus_ `boolean`: True to allow only page content to be edited, false to allow template to be edited.
 
 ### setHomeTemplateId
 
@@ -327,7 +328,7 @@ Returns an action object used to open/close the inserter.
 
 _Parameters_
 
-- _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false).
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false).
 
 ### setIsListViewOpened
 
@@ -337,7 +338,7 @@ Returns an action object used to open/close the list view.
 
 _Parameters_
 
-- _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
+-   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
 
 ### setIsNavigationPanelOpened
 
@@ -351,7 +352,7 @@ Sets whether the save view panel should be open.
 
 _Parameters_
 
-- _isOpen_ `boolean`: If true, opens the save view. If false, closes it. It does not toggle the state, but sets it directly.
+-   _isOpen_ `boolean`: If true, opens the save view. If false, closes it. It does not toggle the state, but sets it directly.
 
 ### setNavigationMenu
 
@@ -361,11 +362,11 @@ Action that sets a navigation menu.
 
 _Parameters_
 
-- _navigationMenuId_ `string`: The Navigation Menu Post ID.
+-   _navigationMenuId_ `string`: The Navigation Menu Post ID.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### setNavigationPanelActiveMenu
 
@@ -375,7 +376,7 @@ Action that sets the active navigation panel menu.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### setPage
 
@@ -385,7 +386,7 @@ Resolves the template for a page and displays both. If no path is given, attempt
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### setTemplate
 
@@ -393,7 +394,7 @@ Action that sets a template, optionally fetching it from REST API.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### setTemplatePart
 
@@ -403,11 +404,11 @@ Action that sets a template part.
 
 _Parameters_
 
-- _templatePartId_ `string`: The template part ID.
+-   _templatePartId_ `string`: The template part ID.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 ### switchEditorMode
 
@@ -417,7 +418,7 @@ Triggers an action used to switch editor mode.
 
 _Parameters_
 
-- _mode_ `string`: The editor mode.
+-   _mode_ `string`: The editor mode.
 
 ### toggleDistractionFree
 
@@ -431,7 +432,7 @@ Dispatches an action that toggles a feature flag.
 
 _Parameters_
 
-- _featureName_ `string`: Feature name.
+-   _featureName_ `string`: Feature name.
 
 ### updateSettings
 
@@ -439,10 +440,10 @@ Returns an action object used to update the settings.
 
 _Parameters_
 
-- _settings_ `Object`: New settings.
+-   _settings_ `Object`: New settings.
 
 _Returns_
 
-- `Object`: Action object.
+-   `Object`: Action object.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/edit-site/src/store/actions.js) -->

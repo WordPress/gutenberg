@@ -28,13 +28,13 @@ Given a block object, returns a copy of the block object, optionally merging new
 
 _Parameters_
 
-- _block_ `Block`: Block instance.
-- _mergeAttributes_ `Record< string, unknown >`: Block attributes.
-- _newInnerBlocks_ `Block[]`: Nested blocks.
+-   _block_ `Block`: Block instance.
+-   _mergeAttributes_ `Record< string, unknown >`: Block attributes.
+-   _newInnerBlocks_ `Block[]`: Nested blocks.
 
 _Returns_
 
-- `Block`: A cloned block.
+-   `Block`: A cloned block.
 
 ### cloneSanitizedBlock
 
@@ -42,13 +42,13 @@ Given a block object, returns a copy of the block object while sanitizing its at
 
 _Parameters_
 
-- _block_ `Block`: Block instance.
-- _mergeAttributes_ `Record< string, unknown >`: Block attributes.
-- _newInnerBlocks_ `Block[]`: Nested blocks.
+-   _block_ `Block`: Block instance.
+-   _mergeAttributes_ `Record< string, unknown >`: Block attributes.
+-   _newInnerBlocks_ `Block[]`: Nested blocks.
 
 _Returns_
 
-- `Block`: A cloned block.
+-   `Block`: A cloned block.
 
 ### createBlock
 
@@ -56,14 +56,14 @@ Returns a block object given its type and attributes.
 
 _Parameters_
 
-- _name_ `string`: Block name.
-- _attributes_ `Record< string, unknown >`: Block attributes.
-- _innerBlocks_ `Block[]`: Nested blocks.
-- _innerContent_ `Array< string | null >`: Static HTML fragments interleaved with inner blocks, where `null` entries mark inner block positions. Only applies to the Custom HTML block.
+-   _name_ `string`: Block name.
+-   _attributes_ `Record< string, unknown >`: Block attributes.
+-   _innerBlocks_ `Block[]`: Nested blocks.
+-   _innerContent_ `Array< string | null >`: Static HTML fragments interleaved with inner blocks, where `null` entries mark inner block positions. Only applies to the Custom HTML block.
 
 _Returns_
 
-- `Block`: Block object.
+-   `Block`: Block object.
 
 ### createBlocksFromInnerBlocksTemplate
 
@@ -71,11 +71,11 @@ Given an array of InnerBlocks templates or Block Objects, returns an array of cr
 
 _Parameters_
 
-- _innerBlocksOrTemplate_ `Array< Block | TemplateBlock >`: Nested blocks or InnerBlocks templates.
+-   _innerBlocksOrTemplate_ `Array< Block | TemplateBlock >`: Nested blocks or InnerBlocks templates.
 
 _Returns_
 
-- `Block[]`: Array of Block objects.
+-   `Block[]`: Array of Block objects.
 
 ### doBlocksMatchTemplate
 
@@ -83,12 +83,12 @@ Checks whether a list of blocks matches a template by comparing the block names.
 
 _Parameters_
 
-- _blocks_ `Block[]`: Block list.
-- _template_ `TemplateItem[]`: Block template.
+-   _blocks_ `Block[]`: Block list.
+-   _template_ `TemplateItem[]`: Block template.
 
 _Returns_
 
-- `boolean`: Whether the list of blocks matches a templates.
+-   `boolean`: Whether the list of blocks matches a templates.
 
 ### findTransform
 
@@ -96,12 +96,12 @@ Given an array of transforms, returns the highest-priority transform where the p
 
 _Parameters_
 
-- _transforms_ `T[]`: Transforms to search.
-- _predicate_ `( transform: T ) => boolean`: Function returning true on matching transform.
+-   _transforms_ `T[]`: Transforms to search.
+-   _predicate_ `( transform: T ) => boolean`: Function returning true on matching transform.
 
 _Returns_
 
-- `T | null`: Highest-priority transform candidate.
+-   `T | null`: Highest-priority transform candidate.
 
 ### getBlockAttributes
 
@@ -109,13 +109,13 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
-- _blockTypeOrName_ `string | BlockType`: Block type or name.
-- _innerHTML_ `string | Node | undefined`: Raw block content.
-- _attributes_ `Record< string, unknown >`: Known block attributes (from delimiters).
+-   _blockTypeOrName_ `string | BlockType`: Block type or name.
+-   _innerHTML_ `string | Node | undefined`: Raw block content.
+-   _attributes_ `Record< string, unknown >`: Known block attributes (from delimiters).
 
 _Returns_
 
-- `Record< string, unknown >`: All block attributes.
+-   `Record< string, unknown >`: All block attributes.
 
 ### getBlockAttributesNamesByRole
 
@@ -123,12 +123,12 @@ Filter block attributes by `role` and return their names.
 
 _Parameters_
 
-- _name_ `string`: Block attribute's name.
-- _role_ `string`: The role of a block attribute.
+-   _name_ `string`: Block attribute's name.
+-   _role_ `string`: The role of a block attribute.
 
 _Returns_
 
-- `string[]`: The attribute names that have the provided role.
+-   `string[]`: The attribute names that have the provided role.
 
 ### getBlockBindingsSource
 
@@ -136,11 +136,11 @@ Returns a registered block bindings source by its name.
 
 _Parameters_
 
-- _name_ `string`: Block bindings source name.
+-   _name_ `string`: Block bindings source name.
 
 _Returns_
 
-- `BlockBindingsSource | undefined`: Block bindings source.
+-   `BlockBindingsSource | undefined`: Block bindings source.
 
 _Changelog_
 
@@ -152,7 +152,7 @@ Returns all registered block bindings sources.
 
 _Returns_
 
-- `Record< string, BlockBindingsSource >`: Block bindings sources.
+-   `Record< string, BlockBindingsSource >`: Block bindings sources.
 
 _Changelog_
 
@@ -164,11 +164,11 @@ Given a block object, returns the Block's Inner HTML markup.
 
 _Parameters_
 
-- _block_ `Block`: Block instance.
+-   _block_ `Block`: Block instance.
 
 _Returns_
 
-- `string`: HTML.
+-   `string`: HTML.
 
 ### getBlockDefaultClassName
 
@@ -176,11 +176,11 @@ Returns the block's default classname from its name.
 
 _Parameters_
 
-- _blockName_ `string`: The block name.
+-   _blockName_ `string`: The block name.
 
 _Returns_
 
-- `string`: The block's default class.
+-   `string`: The block's default class.
 
 ### getBlockFromExample
 
@@ -192,11 +192,11 @@ Returns the block's default menu item classname from its name.
 
 _Parameters_
 
-- _blockName_ `string`: The block name.
+-   _blockName_ `string`: The block name.
 
 _Returns_
 
-- `string`: The block's default menu item class.
+-   `string`: The block's default menu item class.
 
 ### getBlockSupport
 
@@ -204,13 +204,13 @@ Returns the block support value for a feature, if defined.
 
 _Parameters_
 
-- _nameOrType_ `string | BlockType`: Block name or type object
-- _feature_ `string | string[]`: Feature to retrieve, as a dot-separated path or an array of path segments
-- _defaultSupports_ `unknown`: Default value to return if not explicitly defined
+-   _nameOrType_ `string | BlockType`: Block name or type object
+-   _feature_ `string | string[]`: Feature to retrieve, as a dot-separated path or an array of path segments
+-   _defaultSupports_ `unknown`: Default value to return if not explicitly defined
 
 _Returns_
 
-- `unknown`: Block support value
+-   `unknown`: Block support value
 
 ### getBlockTransforms
 
@@ -218,12 +218,12 @@ Returns normal block transforms for a given transform direction, optionally for 
 
 _Parameters_
 
-- _direction_ `'to' | 'from'`: Transform direction ("to", "from").
-- _blockTypeOrName_ `string | BlockType`: Block type or name.
+-   _direction_ `'to' | 'from'`: Transform direction ("to", "from").
+-   _blockTypeOrName_ `string | BlockType`: Block type or name.
 
 _Returns_
 
-- `NormalizedBlockTransform[]`: Block transforms for direction.
+-   `NormalizedBlockTransform[]`: Block transforms for direction.
 
 ### getBlockType
 
@@ -231,11 +231,11 @@ Returns a registered block type.
 
 _Parameters_
 
-- _name_ `string`: Block name.
+-   _name_ `string`: Block name.
 
 _Returns_
 
-- `BlockType | undefined`: Block type.
+-   `BlockType | undefined`: Block type.
 
 ### getBlockTypes
 
@@ -243,7 +243,7 @@ Returns all registered blocks.
 
 _Returns_
 
-- `BlockType[]`: Block settings.
+-   `BlockType[]`: Block settings.
 
 ### getChildBlockNames
 
@@ -251,11 +251,11 @@ Returns an array with the child blocks of a given block.
 
 _Parameters_
 
-- _blockName_ `string`: Name of block (example: “latest-posts”).
+-   _blockName_ `string`: Name of block (example: “latest-posts”).
 
 _Returns_
 
-- `string[]`: Array of child block names.
+-   `string[]`: Array of child block names.
 
 ### getDefaultBlockName
 
@@ -263,7 +263,7 @@ Retrieves the default block name.
 
 _Returns_
 
-- `string | null`: Block name.
+-   `string | null`: Block name.
 
 ### getFreeformContentHandlerName
 
@@ -271,7 +271,7 @@ Retrieves name of block handling non-block content, or undefined if no handler h
 
 _Returns_
 
-- `string | null`: Block name.
+-   `string | null`: Block name.
 
 ### getGroupingBlockName
 
@@ -279,7 +279,7 @@ Retrieves name of block used for handling grouping interactions.
 
 _Returns_
 
-- `string | null`: Block name.
+-   `string | null`: Block name.
 
 ### getPhrasingContentSchema
 
@@ -291,11 +291,11 @@ Returns an array of block types that the set of blocks received as argument can 
 
 _Parameters_
 
-- _blocks_ `Block[]`: Blocks array.
+-   _blocks_ `Block[]`: Blocks array.
 
 _Returns_
 
-- `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
+-   `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -303,13 +303,13 @@ Given a block type containing a save render implementation and attributes, retur
 
 _Parameters_
 
-- _blockTypeOrName_ `string | BlockType | undefined | null`: Block type or name.
-- _attributes_ `Record< string, unknown >`: Block attributes.
-- _innerBlocks_ `Block[]`: Nested blocks.
+-   _blockTypeOrName_ `string | BlockType | undefined | null`: Block type or name.
+-   _attributes_ `Record< string, unknown >`: Block attributes.
+-   _innerBlocks_ `Block[]`: Nested blocks.
 
 _Returns_
 
-- `string`: Save content.
+-   `string`: Save content.
 
 ### getSaveElement
 
@@ -317,13 +317,13 @@ Given a block type containing a save render implementation and attributes, retur
 
 _Parameters_
 
-- _blockTypeOrName_ `string | BlockType`: Block type or name.
-- _attributes_ `Record< string, unknown >`: Block attributes.
-- _innerBlocks_ `Block[] | ReactElement`: Nested blocks, or an element to render in their place.
+-   _blockTypeOrName_ `string | BlockType`: Block type or name.
+-   _attributes_ `Record< string, unknown >`: Block attributes.
+-   _innerBlocks_ `Block[] | ReactElement`: Nested blocks, or an element to render in their place.
 
 _Returns_
 
-- `unknown`: Save element or raw HTML string.
+-   `unknown`: Save element or raw HTML string.
 
 ### getUnregisteredTypeHandlerName
 
@@ -331,7 +331,7 @@ Retrieves name of block handling unregistered block types, or undefined if no ha
 
 _Returns_
 
-- `string | null`: Block name.
+-   `string | null`: Block name.
 
 ### hasBlockSupport
 
@@ -339,13 +339,13 @@ Returns true if the block defines support for a feature, or false otherwise.
 
 _Parameters_
 
-- _nameOrType_ `string | BlockType`: Block name or type object.
-- _feature_ `string | string[]`: Feature to test, as a dot-separated path or an array of path segments.
-- _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
+-   _nameOrType_ `string | BlockType`: Block name or type object.
+-   _feature_ `string | string[]`: Feature to test, as a dot-separated path or an array of path segments.
+-   _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
 _Returns_
 
-- `boolean`: Whether block supports feature.
+-   `boolean`: Whether block supports feature.
 
 ### hasChildBlocks
 
@@ -353,11 +353,11 @@ Returns a boolean indicating if a block has child blocks or not.
 
 _Parameters_
 
-- _blockName_ `string`: Name of block (example: “latest-posts”).
+-   _blockName_ `string`: Name of block (example: “latest-posts”).
 
 _Returns_
 
-- `boolean`: True if a block contains child blocks and false otherwise.
+-   `boolean`: True if a block contains child blocks and false otherwise.
 
 ### hasChildBlocksWithInserterSupport
 
@@ -365,11 +365,11 @@ Returns a boolean indicating if a block has at least one child block with insert
 
 _Parameters_
 
-- _blockName_ `string`: Block type name.
+-   _blockName_ `string`: Block type name.
 
 _Returns_
 
-- `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
+-   `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
 ### isReusableBlock
 
@@ -377,11 +377,11 @@ Determines whether or not the given block is a reusable block. This is a special
 
 _Parameters_
 
-- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
+-   _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
-- `boolean`: Whether the given block is a reusable block.
+-   `boolean`: Whether the given block is a reusable block.
 
 ### isTemplatePart
 
@@ -389,11 +389,11 @@ Determines whether or not the given block is a template part. This is a special 
 
 _Parameters_
 
-- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
+-   _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
-- `boolean`: Whether the given block is a template part.
+-   `boolean`: Whether the given block is a template part.
 
 ### isUnmodifiedBlock
 
@@ -401,12 +401,12 @@ Determines whether the block's attributes are equal to the default attributes wh
 
 _Parameters_
 
-- _block_ `Block`: Block Object.
-- _role_ `string`: Optional role to filter attributes for modification check.
+-   _block_ `Block`: Block Object.
+-   _role_ `string`: Optional role to filter attributes for modification check.
 
 _Returns_
 
-- `boolean`: Whether the block is an unmodified block.
+-   `boolean`: Whether the block is an unmodified block.
 
 ### isUnmodifiedDefaultBlock
 
@@ -414,12 +414,12 @@ Determines whether the block is a default block and its attributes are equal to 
 
 _Parameters_
 
-- _block_ `Block`: Block Object
-- _role_ `string`: Optional role to filter attributes for modification check.
+-   _block_ `Block`: Block Object
+-   _role_ `string`: Optional role to filter attributes for modification check.
 
 _Returns_
 
-- `boolean`: Whether the block is an unmodified default block.
+-   `boolean`: Whether the block is an unmodified default block.
 
 ### isValidBlockContent
 
@@ -431,13 +431,13 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
-- _blockTypeOrName_ `BlockType | string`: Block type.
-- _attributes_ `Record< string, unknown >`: Parsed block attributes.
-- _originalBlockContent_ `string`: Original block content.
+-   _blockTypeOrName_ `BlockType | string`: Block type.
+-   _attributes_ `Record< string, unknown >`: Parsed block attributes.
+-   _originalBlockContent_ `string`: Original block content.
 
 _Returns_
 
-- `boolean`: Whether block is valid.
+-   `boolean`: Whether block is valid.
 
 ### isValidIcon
 
@@ -445,11 +445,11 @@ Function that checks if the parameter is a valid icon.
 
 _Parameters_
 
-- _icon_ `unknown`: Parameter to be checked.
+-   _icon_ `unknown`: Parameter to be checked.
 
 _Returns_
 
-- `boolean`: True if the parameter is a valid icon and false otherwise.
+-   `boolean`: True if the parameter is a valid icon and false otherwise.
 
 ### normalizeIconObject
 
@@ -457,11 +457,11 @@ Function that receives an icon as set by the blocks during the registration and 
 
 _Parameters_
 
-- _icon_ `BlockTypeIcon | undefined`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
+-   _icon_ `BlockTypeIcon | undefined`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
 
 _Returns_
 
-- `BlockTypeIconDescriptor`: Object describing the icon.
+-   `BlockTypeIconDescriptor`: Object describing the icon.
 
 ### parse
 
@@ -471,16 +471,16 @@ This is a recursive-descent parser that scans linearly once through the input do
 
 _Related_
 
-- <https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/>
+-   <https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/>
 
 _Parameters_
 
-- _content_ `string`: The post content.
-- _options_ `ParseOptions`: Extra options for handling block parsing.
+-   _content_ `string`: The post content.
+-   _options_ `ParseOptions`: Extra options for handling block parsing.
 
 _Returns_
 
-- `Block[]`: Block list.
+-   `Block[]`: Block list.
 
 ### parseWithAttributeSchema
 
@@ -488,12 +488,12 @@ Given a block's raw content and an attribute's schema returns the attribute's va
 
 _Parameters_
 
-- _innerHTML_ `string | Node | undefined`: Block's raw content.
-- _attributeSchema_ `BlockAttribute`: Attribute's schema.
+-   _innerHTML_ `string | Node | undefined`: Block's raw content.
+-   _attributeSchema_ `BlockAttribute`: Attribute's schema.
 
 _Returns_
 
-- `unknown`: Attribute value.
+-   `unknown`: Attribute value.
 
 ### pasteHandler
 
@@ -501,15 +501,15 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
-- _options_ `RawHandlerOptions`:
-- _options.HTML_ `RawHandlerOptions[ 'HTML' ]`: The HTML to convert.
-- _options.plainText_ `RawHandlerOptions[ 'plainText' ]`: Plain text version.
-- _options.mode_ `RawHandlerOptions[ 'mode' ]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
-- _options.tagName_ `RawHandlerOptions[ 'tagName' ]`: The tag into which content will be inserted.
+-   _options_ `RawHandlerOptions`: 
+-   _options.HTML_ `RawHandlerOptions[ 'HTML' ]`: The HTML to convert.
+-   _options.plainText_ `RawHandlerOptions[ 'plainText' ]`: Plain text version.
+-   _options.mode_ `RawHandlerOptions[ 'mode' ]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
+-   _options.tagName_ `RawHandlerOptions[ 'tagName' ]`: The tag into which content will be inserted.
 
 _Returns_
 
-- `Block[] | string`: A list of blocks or a string, depending on `handlerMode`.
+-   `Block[] | string`: A list of blocks or a string, depending on `handlerMode`.
 
 ### privateApis
 
@@ -529,12 +529,12 @@ const blocks = rawHandler( { HTML: '<p>Hello</p><p>World</p>' } );
 
 _Parameters_
 
-- _options_ `{ HTML?: string; }`: Options.
-- _options.HTML_ `string`: The HTML to convert.
+-   _options_ `{ HTML?: string; }`: Options.
+-   _options.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
-- `Block[]`: A list of blocks.
+-   `Block[]`: A list of blocks.
 
 ### registerBlockBindingsSource
 
@@ -544,21 +544,21 @@ _Usage_
 
 ```js
 import { _x } from '@wordpress/i18n';
-import { registerBlockBindingsSource } from '@wordpress/blocks';
+import { registerBlockBindingsSource } from '@wordpress/blocks'
 
 registerBlockBindingsSource( {
-	name: 'plugin/my-custom-source',
-	label: _x( 'My Custom Source', 'block bindings source' ),
-	usesContext: [ 'postType' ],
-	getValues: getSourceValues,
-	setValues: updateMyCustomValuesInBatch,
-	canUserEditValue: () => true,
+    name: 'plugin/my-custom-source',
+    label: _x( 'My Custom Source', 'block bindings source' ),
+    usesContext: [ 'postType' ],
+    getValues: getSourceValues,
+    setValues: updateMyCustomValuesInBatch,
+    canUserEditValue: () => true,
 } );
 ```
 
 _Parameters_
 
-- _source_ `BlockBindingsSource`: Object describing a block bindings source.
+-   _source_ `BlockBindingsSource`: Object describing a block bindings source.
 
 _Changelog_
 
@@ -576,23 +576,23 @@ import { registerBlockCollection, registerBlockType } from '@wordpress/blocks';
 
 // Register the collection.
 registerBlockCollection( 'my-collection', {
-	title: __( 'Custom Collection' ),
+    title: __( 'Custom Collection' ),
 } );
 
 // Register a block in the same namespace to add it to the collection.
 registerBlockType( 'my-collection/block-name', {
-	title: __( 'My First Block' ),
-	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>'Hello from the saved content!</div>,
+    title: __( 'My First Block' ),
+    edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+    save: () => <div>'Hello from the saved content!</div>,
 } );
 ```
 
 _Parameters_
 
-- _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
-- _settings_ `{ title: string; icon?: Icon; }`: The block collection settings.
-- _settings.title_ `string`: The title to display in the block inserter.
-- _settings.icon_ `Icon`: The icon to display in the block inserter.
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
+-   _settings_ `{ title: string; icon?: Icon; }`: The block collection settings.
+-   _settings.title_ `string`: The title to display in the block inserter.
+-   _settings.icon_ `Icon`: The icon to display in the block inserter.
 
 ### registerBlockStyle
 
@@ -607,26 +607,27 @@ import { __ } from '@wordpress/i18n';
 import { registerBlockStyle } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
+
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				registerBlockStyle( 'core/quote', {
-					name: 'fancy-quote',
-					label: __( 'Fancy Quote' ),
-				} );
-			} }
-		>
-			{ __( 'Add a new block style for core/quote' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                registerBlockStyle( 'core/quote', {
+                    name: 'fancy-quote',
+                    label: __( 'Fancy Quote' ),
+                } );
+            } }
+        >
+            { __( 'Add a new block style for core/quote' ) }
+        </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _blockNames_ `string | string[]`: Name of blocks e.g. “core/latest-posts” or `[“core/group”, “core/columns”]`.
-- _styleVariation_ `BlockStyle | BlockStyle[]`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+-   _blockNames_ `string | string[]`: Name of blocks e.g. “core/latest-posts” or `[“core/group”, “core/columns”]`.
+-   _styleVariation_ `BlockStyle | BlockStyle[]`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
 
 ### registerBlockType
 
@@ -638,23 +639,23 @@ _Usage_
 
 ```js
 import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType } from '@wordpress/blocks'
 
 registerBlockType( 'namespace/block-name', {
-	title: __( 'My First Block' ),
-	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>Hello from the saved content!</div>,
+    title: __( 'My First Block' ),
+    edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+    save: () => <div>Hello from the saved content!</div>,
 } );
 ```
 
 _Parameters_
 
-- _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
-- _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
+-   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
+-   _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
 
-- `BlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
+-   `BlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### registerBlockVariation
 
@@ -688,8 +689,8 @@ const ExampleComponent = () => {
 
 _Parameters_
 
-- _blockName_ `string`: Name of the block (example: “core/columns”).
-- _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
 
 ### sanitizeBlockAttributes
 
@@ -697,12 +698,12 @@ Ensure attributes contains only values defined by block type, and merge default 
 
 _Parameters_
 
-- _name_ `string`: The block's name.
-- _attributes_ `Record< string, unknown >`: The block's attributes.
+-   _name_ `string`: The block's name.
+-   _attributes_ `Record< string, unknown >`: The block's attributes.
 
 _Returns_
 
-- `Record< string, unknown >`: The sanitized attributes.
+-   `Record< string, unknown >`: The sanitized attributes.
 
 ### serialize
 
@@ -710,12 +711,12 @@ Takes a block or set of blocks and returns the serialized post content.
 
 _Parameters_
 
-- _blocks_ `Block | Block[]`: Block(s) to serialize.
-- _options_ `BlockSerializationOptions`: Serialization options.
+-   _blocks_ `Block | Block[]`: Block(s) to serialize.
+-   _options_ `BlockSerializationOptions`: Serialization options.
 
 _Returns_
 
-- `string`: The post content.
+-   `string`: The post content.
 
 ### serializeRawBlock
 
@@ -723,19 +724,19 @@ Serializes a block node into the native HTML-comment-powered block format. CAVEA
 
 _Related_
 
-- serializeBlock
-- serialize For more on the format of block nodes as returned by valid parsers:
-- `@wordpress/block-serialization-default-parser` package
-- `@wordpress/block-serialization-spec-parser` package
+-   serializeBlock
+-   serialize For more on the format of block nodes as returned by valid parsers:
+-   `@wordpress/block-serialization-default-parser` package
+-   `@wordpress/block-serialization-spec-parser` package
 
 _Parameters_
 
-- _rawBlock_ `RawBlock`: A block node as returned by a valid parser.
-- _options_ `[SerializeRawBlockOptions]`: Serialization options.
+-   _rawBlock_ `RawBlock`: A block node as returned by a valid parser.
+-   _options_ `[SerializeRawBlockOptions]`: Serialization options.
 
 _Returns_
 
-- `string`: An HTML string representing a block.
+-   `string`: An HTML string representing a block.
 
 ### setCategories
 
@@ -750,31 +751,31 @@ import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	// Retrieve the list of current categories.
-	const blockCategories = useSelect(
-		( select ) => select( blocksStore ).getCategories(),
-		[]
-	);
+    // Retrieve the list of current categories.
+    const blockCategories = useSelect(
+        ( select ) => select( blocksStore ).getCategories(),
+        []
+    );
 
-	return (
-		<Button
-			onClick={ () => {
-				// Add a custom category to the existing list.
-				setCategories( [
-					...blockCategories,
-					{ title: 'Custom Category', slug: 'custom-category' },
-				] );
-			} }
-		>
-			{ __( 'Add a new custom block category' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                // Add a custom category to the existing list.
+                setCategories( [
+                    ...blockCategories,
+                    { title: 'Custom Category', slug: 'custom-category' },
+                ] );
+            } }
+        >
+            { __( 'Add a new custom block category' ) }
+        </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _categories_ `BlockCategory[]`: Block categories.
+-   _categories_ `BlockCategory[]`: Block categories.
 
 ### setDefaultBlockName
 
@@ -786,17 +787,18 @@ _Usage_
 import { setDefaultBlockName } from '@wordpress/blocks';
 
 const ExampleComponent = () => {
-	return (
-		<Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
-			{ __( 'Set the default block to Heading' ) }
-		</Button>
-	);
+
+    return (
+        <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+            { __( 'Set the default block to Heading' ) }
+        </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _name_ `string`: Block name.
+-   _name_ `string`: Block name.
 
 ### setFreeformContentHandlerName
 
@@ -804,7 +806,7 @@ Assigns name of block for handling non-block content.
 
 _Parameters_
 
-- _blockName_ `string`: Block name.
+-   _blockName_ `string`: Block name.
 
 ### setGroupingBlockName
 
@@ -818,17 +820,18 @@ _Usage_
 import { setGroupingBlockName } from '@wordpress/blocks';
 
 const ExampleComponent = () => {
-	return (
-		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
-			{ __( 'Wrap in columns' ) }
-		</Button>
-	);
+
+    return (
+        <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
+            { __( 'Wrap in columns' ) }
+        </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _name_ `string`: Block name.
+-   _name_ `string`: Block name.
 
 ### setUnregisteredTypeHandlerName
 
@@ -836,7 +839,7 @@ Assigns name of block handling unregistered block types.
 
 _Parameters_
 
-- _blockName_ `string`: Block name.
+-   _blockName_ `string`: Block name.
 
 ### store
 
@@ -844,7 +847,7 @@ Store definition for the blocks namespace.
 
 _Related_
 
-- <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 ### switchToBlockType
 
@@ -852,13 +855,13 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
-- _blocks_ `Block[] | Block`: Blocks array or block object.
-- _name_ `string`: Block name.
-- _variationName_ `string`: Optional target block variation name.
+-   _blocks_ `Block[] | Block`: Blocks array or block object.
+-   _name_ `string`: Block name.
+-   _variationName_ `string`: Optional target block variation name.
 
 _Returns_
 
-- `Block[] | null`: Array of blocks or null.
+-   `Block[] | null`: Array of blocks or null.
 
 ### synchronizeBlocksWithTemplate
 
@@ -868,12 +871,12 @@ Synchronizing a block list with a block template means that we loop over the blo
 
 _Parameters_
 
-- _blocks_ `Block[]`: Block list.
-- _template_ `TemplateItem[]`: Block template.
+-   _blocks_ `Block[]`: Block list.
+-   _template_ `TemplateItem[]`: Block template.
 
 _Returns_
 
-- `Block[]`: Updated Block list.
+-   `Block[]`: Updated Block list.
 
 ### unregisterBlockBindingsSource
 
@@ -889,7 +892,7 @@ unregisterBlockBindingsSource( 'plugin/my-custom-source' );
 
 _Parameters_
 
-- _name_ `string`: The name of the block bindings source to unregister.
+-   _name_ `string`: The name of the block bindings source to unregister.
 
 _Changelog_
 
@@ -907,22 +910,22 @@ import { unregisterBlockStyle } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				unregisterBlockStyle( 'core/quote', 'plain' );
-			} }
-		>
-			{ __( 'Remove the "Plain" block style for core/quote' ) }
-		</Button>
-	);
+    return (
+    <Button
+        onClick={ () => {
+            unregisterBlockStyle( 'core/quote', 'plain' );
+        } }
+    >
+        { __( 'Remove the "Plain" block style for core/quote' ) }
+    </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _blockName_ `string`: Name of block (example: “core/latest-posts”).
-- _styleVariationName_ `string`: Name of class applied to the block.
+-   _blockName_ `string`: Name of block (example: “core/latest-posts”).
+-   _styleVariationName_ `string`: Name of class applied to the block.
 
 ### unregisterBlockType
 
@@ -935,23 +938,25 @@ import { __ } from '@wordpress/i18n';
 import { unregisterBlockType } from '@wordpress/blocks';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => unregisterBlockType( 'my-collection/block-name' ) }
-		>
-			{ __( 'Unregister my custom block.' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () =>
+                unregisterBlockType( 'my-collection/block-name' )
+            }
+        >
+            { __( 'Unregister my custom block.' ) }
+        </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _name_ `string`: Block name.
+-   _name_ `string`: Block name.
 
 _Returns_
 
-- `BlockType | undefined`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+-   `BlockType | undefined`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### unregisterBlockVariation
 
@@ -965,22 +970,22 @@ import { unregisterBlockVariation } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				unregisterBlockVariation( 'core/embed', 'youtube' );
-			} }
-		>
-			{ __( 'Remove the YouTube variation from core/embed' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                unregisterBlockVariation( 'core/embed', 'youtube' );
+            } }
+        >
+            { __( 'Remove the YouTube variation from core/embed' ) }
+        </Button>
+    );
 };
 ```
 
 _Parameters_
 
-- _blockName_ `string`: Name of the block (example: “core/columns”).
-- _variationName_ `string | string[]`: Name of the variation defined for the block.
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variationName_ `string | string[]`: Name of the variation defined for the block.
 
 ### updateCategory
 
@@ -994,22 +999,22 @@ import { updateCategory } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				updateCategory( 'text', { title: __( 'Written Word' ) } );
-			} }
-		>
-			{ __( 'Update Text category title' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                updateCategory( 'text', { title: __( 'Written Word' ) } );
+            } }
+        >
+            { __( 'Update Text category title' ) }
+        </Button>
+)    ;
 };
 ```
 
 _Parameters_
 
-- _slug_ `string`: Block category slug.
-- _category_ `Partial< BlockCategory >`: Object containing the category properties that should be updated.
+-   _slug_ `string`: Block category slug.
+-   _category_ `Partial< BlockCategory >`: Object containing the category properties that should be updated.
 
 ### validateBlock
 
@@ -1017,26 +1022,27 @@ Returns an object with `isValid` property set to `true` if the parsed block is v
 
 _Parameters_
 
-- _block_ `Block`: Block object.
-- _blockTypeOrName_ `BlockType | string`: Block type or name, inferred from block if not given.
+-   _block_ `Block`: Block object.
+-   _blockTypeOrName_ `BlockType | string`: Block type or name, inferred from block if not given.
 
 _Returns_
 
-- `[ boolean, LoggerItem[] ]`: Validation results.
+-   `[ boolean, LoggerItem[] ]`: Validation results.
 
 ### withBlockContentContext
 
-> **Deprecated**
+> **Deprecated** 
 
 A Higher Order Component used to inject BlockContent using context to the wrapped component.
 
 _Parameters_
 
-- _OriginalComponent_ `T`: The component to enhance.
+-   _OriginalComponent_ `T`: The component to enhance.
 
 _Returns_
 
-- `T`: The same component.
+-   `T`: The same component.
+
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
