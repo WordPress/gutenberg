@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
 import type { ControlPoint } from '../types';
 

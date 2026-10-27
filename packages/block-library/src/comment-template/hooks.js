@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -66,7 +63,7 @@ export const useCommentQueryArgs = ( { postId } ) => {
 					post: postId,
 					per_page: perPage,
 					page,
-			  }
+				}
 			: null;
 	}, [ postId, perPage, page ] );
 };

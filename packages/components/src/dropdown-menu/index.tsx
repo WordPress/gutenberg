@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { menu } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';
@@ -96,7 +85,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
-					if ( disableOpenOnArrowDown ) {
+					// A toggle disabled with `accessibleWhenDisabled` can still be
+					// focused, and `Button` only blocks its mouse events.
+					if ( disableOpenOnArrowDown || toggleProps?.disabled ) {
 						return;
 					}
 
@@ -225,6 +216,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
  * MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover
  * after the user has interacted with an element (a button or icon) or when
  * they perform a specific action.
+ *
+ * When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead.
+ * Otherwise, continue using `DropdownMenu` for now.
  *
  * Render a Dropdown Menu with a set of controls:
  *

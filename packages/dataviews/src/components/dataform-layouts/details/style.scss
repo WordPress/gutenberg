@@ -1,6 +1,6 @@
 .dataforms-layouts-details__summary-content {
 	display: inline-flex;
-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-sm);
 }
 
 .dataforms-layouts-details__content {

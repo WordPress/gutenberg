@@ -1,8 +1,6 @@
 # ClipboardButton
 
-<div class="callout callout-alert">
-This component is deprecated. Please use the `useCopyToClipboard` hook from the `@wordpress/compose` package instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Please use the `useCopyToClipboard` hook from the `@wordpress/compose` package instead.</p>
 
 With a clipboard button, users copy text (or other elements) with a single click or tap.
 
@@ -51,15 +49,15 @@ The text that will be copied to the clipboard.
 
 The function that will be called when the text is copied.
 
--- Type: `() => void`
--- Required: yes
+- Type: `() => void`
+- Required: yes
 
 ### onFinishCopy
 
 The function that will be called when the text is copied and the copy animation is finished.
 
--- Type: `() => void`
--- Required: no
+- Type: `() => void`
+- Required: no
 
 ### Inherited props
 

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { pages } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit.js';
+import edit from './edit.jsx';
 
 const { name } = metadata;
 

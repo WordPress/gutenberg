@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import {
 	createHigherOrderComponent,

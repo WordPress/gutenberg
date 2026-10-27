@@ -60,6 +60,14 @@
 		}
 	}
 
+	// In the placeholder the icon is disabled like the rest of the toolbar.
+	.is-placeholder & .components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
+		&,
+		&:hover {
+			color: $gray-600;
+		}
+	}
+
 	&.is-synced,
 	&.is-connected {
 		.block-editor-block-toolbar__block-icon {
@@ -178,6 +186,58 @@
 }
 
 .show-icon-labels {
+	// Text labels make the toolbar long, so let it wrap instead of
+	// overflowing the available width (e.g. behind an open sidebar).
+	.block-editor-block-contextual-toolbar:not(.editor-header__toolbar *) {
+		background-color: transparent;
+		border: none;
+
+		.block-editor-block-toolbar {
+			flex-wrap: wrap;
+			overflow: visible;
+			max-width: 100%;
+
+			.block-editor-block-toolbar__slot {
+				flex-wrap: wrap;
+			}
+			.components-toolbar-group {
+				background-color: $white;
+			}
+			// Groups can wrap onto several rows, so each one carries its own
+			// border instead of the toolbar having a single outer border.
+			.components-toolbar-group,
+			.components-toolbar,
+			.block-editor-block-parent-selector:not(:has(.components-toolbar-group)) {
+				border: $border-width solid $gray-900;
+				margin: 0 (-$border-width) (-$border-width) 0;
+				padding: 0;
+
+				//Nested groups shouldn't duplicate border styles.
+				.components-toolbar-group {
+					border: none;
+					margin: 0;
+
+					// Except if there are adjacent groups which need a border between them.
+					+ .components-toolbar-group {
+						border-left: 1px solid $gray-900;
+					}
+				}
+			}
+
+			.block-editor-block-parent-selector,
+			.block-editor-block-parent-selector__button {
+				border: none;
+				margin: 0;
+
+				// Overrides an override: https://github.com/WordPress/gutenberg/blob/fix/text-labels-toolbar/packages/block-editor/src/components/block-tools/style.scss#L176
+				.components-toolbar-group:last-child {
+					border-right: 1px solid $gray-900;
+				}
+			}
+		}
+	}
+
+
 	.block-editor-block-toolbar {
 		.components-button.has-icon:where(:not(.has-text)) {
 			width: auto;
@@ -295,12 +355,9 @@
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-gap: $grid-unit-15;
+		gap: $grid-unit-15;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
-		}
-		.block-editor-inserter__media-list__list-item {
-			min-height: 100px;
 		}
 	}
 }

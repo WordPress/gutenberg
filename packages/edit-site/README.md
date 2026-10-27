@@ -13,14 +13,7 @@ npm install @wordpress/edit-site
 ## Usage
 
 ```js
-/**
- * WordPress dependencies
- */
 import { initialize } from '@wordpress/edit-site';
-
-/**
- * Internal dependencies
- */
 import blockEditorSettings from './block-editor-settings';
 
 initialize( '#editor-root', blockEditorSettings );

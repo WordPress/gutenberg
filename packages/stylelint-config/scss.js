@@ -1,9 +1,9 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
-module.exports = {
-	extends: [ './', 'stylelint-config-recommended-scss' ].map(
-		require.resolve
+export default {
+	extends: [ './', 'stylelint-config-recommended-scss' ].map( ( m ) =>
+		fileURLToPath( import.meta.resolve( m ) )
 	),
 
 	plugins: [ 'stylelint-scss' ],

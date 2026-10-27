@@ -1,27 +1,16 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
 	ToolsPanelHeaderProps,
@@ -36,7 +25,11 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
-	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
+	const resetSuffix = (
+		<span aria-hidden className={ styles[ 'reset-label' ] }>
+			{ __( 'Reset' ) }
+		</span>
+	);
 
 	return (
 		<>
@@ -48,8 +41,8 @@ const DefaultControlsGroup = ( {
 							className={ itemClassName }
 							role="menuitem"
 							label={ sprintf(
-								// translators: %s: The name of the control being reset e.g. "Padding".
-								__( 'Reset %s' ),
+								// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the reset action, to match the visible menu label order.
+								__( '%s, reset to default' ),
 								label
 							) }
 							onClick={ () => {
@@ -100,15 +93,15 @@ const OptionalControlsGroup = ( {
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
-							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
-							__( 'Hide and reset %s' ),
+							// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the hide and reset action.
+							__( '%s, hide and reset' ),
 							label
-					  )
+						)
 					: sprintf(
-							// translators: %s: The name of the control to display e.g. "Padding".
-							_x( 'Show %s', 'input control' ),
+							// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the show action.
+							_x( '%s, show', 'input control' ),
 							label
-					  );
+						);
 
 				return (
 					<MenuItem

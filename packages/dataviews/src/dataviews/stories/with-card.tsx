@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { Card } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import {
 	LAYOUT_GRID,

@@ -8,7 +8,7 @@
 		border-radius: 0;
 		display: inline-flex;
 		color: $gray-900;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
+		border-color: $gray-900;
 
 		& + .components-button {
 			margin-left: -1px;
@@ -28,11 +28,6 @@
 		&.is-primary {
 			position: relative;
 			z-index: 1;
-		}
-
-		// The active button should look pressed.
-		&.is-primary {
-			box-shadow: inset 0 0 0 $border-width $gray-900;
 		}
 	}
 }

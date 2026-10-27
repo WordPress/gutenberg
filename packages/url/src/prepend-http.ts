@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isEmail } from './is-email';
 
 const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;

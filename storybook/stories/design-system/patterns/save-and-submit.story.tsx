@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Card, CardBody } from '@wordpress/components';
+import { Button, Card as WCCard, CardBody } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import { useState } from '@wordpress/element';
 
@@ -8,7 +8,7 @@ const LayoutCardSaveExample = () => {
 
 	return (
 		<div style={ { maxWidth: '480px' } }>
-			<Card
+			<WCCard
 				size={ {
 					blockStart: 'medium',
 					blockEnd: 'medium',
@@ -41,11 +41,12 @@ const LayoutCardSaveExample = () => {
 						variant="primary"
 						isBusy
 						style={ { marginTop: '16px' } }
+						__next40pxDefaultSize
 					>
 						Save
 					</Button>
 				</CardBody>
-			</Card>
+			</WCCard>
 		</div>
 	);
 };
@@ -56,7 +57,7 @@ const meta: Meta< typeof LayoutCardSaveExample > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
+	tags: [ 'docs-only' ],
 };
 
 export default meta;

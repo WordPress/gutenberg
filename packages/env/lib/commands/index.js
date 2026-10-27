@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const start = require( './start' );
 const stop = require( './stop' );
 const reset = require( './reset' );

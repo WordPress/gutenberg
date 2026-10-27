@@ -1,0 +1,4 @@
+.fixture {
+	/* stylelint-disable-next-line plugin-wpds/no-unknown-ds-tokens -- This fixture verifies the plugin's error. */
+	color: var(--wpds-not-a-token);
+}

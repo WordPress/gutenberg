@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Canvas from '../canvas';
 import type { CanvasData } from '../../store/types';
 

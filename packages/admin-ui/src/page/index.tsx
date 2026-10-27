@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
+import type { NavigationConfig } from '../navigation/types';
 import Header from './header';
+import type { PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
 import styles from './style.module.css';
@@ -21,6 +16,8 @@ function Page( {
 	children,
 	className,
 	actions,
+	navigation,
+	components,
 	ariaLabel,
 	hasPadding = false,
 	showSidebarToggle = true,
@@ -45,6 +42,15 @@ function Page( {
 	children: React.ReactNode;
 	className?: string;
 	actions?: React.ReactNode;
+	/**
+	 * Section navigation shown in the page header: the list of links and the
+	 * `href` of the current one.
+	 */
+	navigation?: NavigationConfig;
+	/**
+	 * Overrides for default elements rendered by the page's sub-components.
+	 */
+	components?: PageComponents;
 	ariaLabel?: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
@@ -55,7 +61,12 @@ function Page( {
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
-			{ ( title || breadcrumbs || badges || actions || visual ) && (
+			{ ( title ||
+				breadcrumbs ||
+				badges ||
+				actions ||
+				visual ||
+				!! navigation?.items?.length ) && (
 				<Header
 					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }
@@ -64,6 +75,8 @@ function Page( {
 					title={ title }
 					subTitle={ subTitle }
 					actions={ actions }
+					navigation={ navigation }
+					components={ components }
 					showSidebarToggle={ showSidebarToggle }
 				/>
 			) }

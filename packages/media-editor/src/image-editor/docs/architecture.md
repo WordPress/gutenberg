@@ -1,97 +1,63 @@
-# Image Editor — Architecture
+# Image Editor Architecture
+
+## Layers
+
+| Layer | Files | Responsibility |
+| --- | --- | --- |
+| Core cropper | `src/image-editor/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
+| React cropper | `src/image-editor/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
+| Media editor state | `src/state/` | Composite state for the media editor: cropper state, crop options, undo/redo, and gesture boundaries. |
+
+The cropper layer does not own editor history. History belongs to the media editor session because sidebar controls and cropper gestures need one shared undo stack.
 
 ## Coordinate Spaces
 
 | Space | What lives here | Coordinates |
-|-------|----------------|-------------|
-| **World** | Image, crop rect | Normalized 0–1, origin top-left of image |
-| **Camera** | View transform (zoom, pan, rotation, flip) | A `mat2d` mapping world → screen |
-| **Screen** | DOM container, mouse events, CSS | Pixels relative to container |
+| --- | --- | --- |
+| World | Image and crop rectangle | Normalized 0-1, origin at the top-left of the image. |
+| Camera | Pan, zoom, rotation, and flip transform | `mat2d` mapping world to screen. |
+| Screen | DOM container, pointer events, CSS transforms | Pixels relative to the cropper canvas. |
+| Viewport | Display-only pan/zoom of the cropper stage | CSS pixels; does not affect export. |
 
 ## Data Flow
 
-The camera is the source of truth for restriction (ensuring the image covers the crop). The render path uses lightweight manual math for CSS transforms and stencil positioning — these are simple, correct, and deliberately not routed through the camera to avoid prop-threading complexity.
+`MediaEditorState` delegates cropper actions to `cropperReducer()`. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
 
-```mermaid
-graph TD
-    subgraph State["CropperState"]
-        pan["pan.x, pan.y"]
-        zoom["zoom"]
-        rotation["rotation"]
-        flip["flip"]
-        cropRect["cropRect"]
-    end
+## Design Decisions
 
-    subgraph Camera["camera.ts — coordinate primitives"]
-        createCamera["createCamera()"]
-        getImageFit["getImageFit()"]
-        createExportCamera["createExportCamera()"]
-    end
+### Containment
 
-    subgraph Containment["containment.ts — restriction source of truth"]
-        restrictPanZoom["restrictPanZoom()\nbuilds camera → inverse → clamp"]
-        restrictCropRect["restrictCropRect()"]
-        getMinZoom["getMinZoom()"]
-        getMinZoomForCover["getMinZoomForCover()"]
-        getImageCropBounds["getImageCropBounds()"]
-    end
+Restriction logic projects crop corners through the camera and checks that they stay inside the image.
 
-    subgraph Rendering["Render Path"]
-        useTransformStyle["use-transform-style.ts\ncos/sin → CSS matrix()"]
-        stencil["rectangle-stencil.tsx\noffset + cropRect * visualSize"]
-        dimming["dimming-overlay.tsx\noffset + cropRect * visualSize"]
-        grid["grid-overlay.tsx\noffset + cropRect * visualSize"]
-    end
+### Rendering
 
-    subgraph Interaction["Interaction Path"]
-        useInteraction["use-interaction.ts\ndelta / visualSize → restrictPanZoom"]
-    end
+The render path uses focused calculations for CSS transforms, stencil placement, dimming, and grid overlays.
 
-    subgraph Export["Export Path"]
-        canvasRenderer["canvas-renderer.ts"]
-    end
+### State
 
-    State --> restrictPanZoom
-    State --> restrictCropRect
-    restrictPanZoom --> |"corrected crop/zoom"| State
-    restrictCropRect --> |"corrected cropRect"| State
+The core reducer is framework-agnostic and serializable. React and media-editor layers add DOM measurement, gestures, undo/redo, save behavior, and UI state.
 
-    State --> getImageFit
-    getImageFit --> |"elementSize"| imgStyle["img element style"]
-    getImageFit --> |"visualSize"| stencil
-    getImageFit --> |"visualSize"| dimming
-    getImageFit --> |"visualSize"| grid
-    getImageFit --> |"visualSize"| useInteraction
-    getImageFit --> |"visualSize"| useTransformStyle
+### Session
 
-    useInteraction --> |"named controller actions"| State
+`useMediaEditorState()` returns the media editor session. The session owns the source image, every editing slice, the shared undo/redo history, gesture boundaries, and whether the edits change the saved image (`hasOutputEdits`). The cropper is one participant: `session.cropper` is a geometry-only `CropperController` that a `<Cropper>` takes via its `controller` prop, and its `isDirty` covers geometry alone. Replacing the source image (`setSourceImage`, which the cropper's `setImage` also calls) starts a fresh session with default geometry and crop options, a clean baseline, and no history. Save code asks the session, not the cropper, whether image output needs saving.
 
-    State --> createExportCamera --> canvasRenderer
-```
+The session also holds named edits other than crop: `session.edits`, set with `session.setEdit( name, value )` and removed by passing `undefined`. They share the crop history, so undo, redo and gestures treat them like any crop change, and a different source image clears them. Values are plain data (`EditValue`: strings, numbers, booleans, `null`, and arrays and objects of those), because the session compares them by content to tell a real change from a no-op. Edits do not yet count towards `hasOutputEdits`; nothing saves them.
 
-### Design decisions
+`session.reset()` puts every slice back to its starting state in one undo entry: default geometry and crop options, no edits, same image. The Reset button calls it; it does not compose per-slice resets itself.
 
-**Why restriction uses the camera but rendering doesn't:**
-- `restrictPanZoom` builds a camera internally and projects crop corners through its inverse. This guarantees the restriction and rendering agree on geometry — the camera IS the screen transform.
-- The render path (`use-transform-style`, stencils, overlays) uses simple manual math because the CSS transform operates in a different coordinate system (element-center origin vs container-center). Deriving CSS matrix from the camera mat2d would be more complex, not less.
+### Viewport
 
-**Why `getImageFit` exists:**
-- `createCamera` needs to know the fitted image dimensions to build its matrix. `cropper.tsx` also needs them to size the `<img>` element and compute `visualSize` for overlays. `getImageFit` is the shared contain-fit calculation used by both — no duplication.
+Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
 
-**UX invariant:**
-> After `restrictPanZoom`, transforming the 4 crop corners through `screenToWorld(camera, corner)` must produce world points inside [0,1]×[0,1].
+## Internal Integration Points
 
-This is both the restriction algorithm AND the test. If the camera says it's covered, it's covered on screen — because the camera IS the screen transform.
+These APIs let code inside `@wordpress/media-editor` compose the cropper. They are not supported extension points for themes or plugins.
 
-## Extension points
-
-See [recipes.md](recipes.md) for the full developer guide. Summary:
-
-| Extension | Mechanism |
-|-----------|-----------|
-| Custom crop area UI | `stencil` prop — any component implementing `StencilProps` |
-| AI agent control | `TransformOperation[]` pipeline — JSON-serializable, replayable |
-| Custom export | `exportCroppedImage()` or `applyToCanvas()` for multi-step pipelines |
-| Theming | BEM CSS classes (`.wp-media-editor-image-editor__*`) |
-| State observation | `onStateChange` (every frame), `onGestureStart`/`onGestureEnd` (gesture boundaries) |
-| Undo/redo | Snapshot state at gesture boundaries, `reset()` to restore — see recipes.md |
+| Task | API |
+| --- | --- |
+| Alternate crop UI inside media-editor | `stencil` prop implementing `StencilProps`. |
+| Programmatic edits | `TransformOperation[]`, `applyOperation`, or `stateFromPipeline`. |
+| Crop data for REST requests | `getSourceRegion()` and `getSourceRegionPercent()`. |
+| Canvas export | `exportCroppedImage()` or `applyToCanvas()`. |
+| Shared cropper state across internal components | `CropperProvider` / `useCropper()`. |
+| Media editor history | `useMediaEditorState()` session. |

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block', () => {
@@ -450,7 +447,7 @@ test.describe( 'Navigation block', () => {
 			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
 				// Move focus to the submenu navigation appender
 				await pageUtils.pressKeys( 'ArrowDown' );
-				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+				await pageUtils.pressKeys( 'ArrowRight' );
 
 				await pageUtils.pressKeys( 'ArrowDown' );
 
@@ -571,7 +568,7 @@ test.describe( 'Navigation block', () => {
 			 */
 			// Add a link back so we can delete the first submenu link.
 			await pageUtils.pressKeys( 'ArrowDown' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+			await pageUtils.pressKeys( 'ArrowRight' );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
@@ -1012,6 +1009,182 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	// Blocks the Navigation allows are listed alongside the link results, so
+	// a Home Link can be found by typing "Home".
+	// See https://github.com/WordPress/gutenberg/issues/76803.
+	test.describe( 'Block search results', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+			// Each shares its first word with a block, so the block is listed
+			// in the same results as a page.
+			await requestUtils.createPage( {
+				title: 'Home Office',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Paragraph Guide',
+				status: 'publish',
+			} );
+		} );
+
+		test.beforeEach(
+			async ( { admin, editor, requestUtils, navigation } ) => {
+				await admin.createNewPost();
+
+				await requestUtils.createNavigationMenu( {
+					title: 'Block search',
+					content: '',
+				} );
+
+				await editor.insertBlock( { name: 'core/navigation' } );
+
+				await navigation.getNavBlockInserter().click();
+			}
+		);
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'can insert a block from the search results', async ( {
+			page,
+			navigation,
+		} ) => {
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results/,
+			} );
+
+			await test.step( 'List the block with the page results', async () => {
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+				await page.keyboard.type( 'Home' );
+
+				await expect(
+					searchResults.getByRole( 'option', { name: /Home Office/ } )
+				).toBeVisible();
+				const blockResult = searchResults.getByRole( 'option' ).first();
+				await expect( blockResult ).toHaveText( /Home Link.*Block/ );
+				// The block's own icon, as the inserter shows it.
+				await expect(
+					blockResult.locator(
+						'.block-editor-link-control__search-item-icon svg'
+					)
+				).toBeVisible();
+			} );
+
+			await test.step( 'Replace the new link with the block', async () => {
+				await searchResults
+					.getByRole( 'option', { name: /Home Link/ } )
+					.click();
+
+				await expect( navigation.getLinkPopover() ).toBeHidden();
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', { name: 'Block: Home Link' } )
+				).toBeVisible();
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', { name: 'Block: Page Link' } )
+				).toHaveCount( 0 );
+			} );
+		} );
+
+		test( 'can insert a block from the search results with the keyboard', async ( {
+			page,
+			navigation,
+		} ) => {
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Home' );
+
+			const blockResult = page
+				.getByRole( 'listbox', { name: /Search results/ } )
+				.getByRole( 'option', { name: /Home Link/ } );
+			await expect( blockResult ).toBeVisible();
+
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( blockResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			await page.keyboard.press( 'Enter' );
+
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+			await expect(
+				navigation
+					.getNavBlock()
+					.getByRole( 'document', { name: 'Block: Home Link' } )
+			).toBeVisible();
+		} );
+
+		test( 'does not list blocks the Navigation does not allow', async ( {
+			page,
+			navigation,
+		} ) => {
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Paragraph' );
+
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results/,
+			} );
+
+			// Wait for the page result, so the results have arrived before
+			// counting them.
+			await expect(
+				searchResults.getByRole( 'option', { name: /Paragraph Guide/ } )
+			).toBeVisible();
+			await expect( searchResults.getByRole( 'option' ) ).toHaveCount(
+				1
+			);
+		} );
+
+		// A submenu with no URL of its own still holds its items, so a block
+		// chosen from its search results goes beside it, as with "Add block",
+		// rather than replacing it.
+		test( 'keeps a submenu and its items when a block is chosen from its search results', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			requestUtils,
+			navigation,
+		} ) => {
+			await admin.createNewPost();
+			const { id: menuId } = await requestUtils.createNavigationMenu( {
+				title: 'Block search in a submenu',
+				content:
+					'<!-- wp:navigation-submenu {"label":"Parent"} --><!-- wp:navigation-link {"label":"Child","url":"https://example.com"} /--><!-- /wp:navigation-submenu -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menuId },
+			} );
+
+			const submenu = navigation
+				.getNavBlock()
+				.getByRole( 'document', { name: 'Block: Submenu' } );
+			await submenu.getByText( 'Parent' ).click();
+			await pageUtils.pressKeys( 'primary+k' );
+
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Home' );
+			await page
+				.getByRole( 'listbox', { name: /Search results/ } )
+				.getByRole( 'option', { name: /Home Link/ } )
+				.click();
+
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+			await expect(
+				navigation
+					.getNavBlock()
+					.getByRole( 'document', { name: 'Block: Home Link' } )
+			).toHaveCount( 1 );
+			await expect( submenu ).toHaveCount( 1 );
+			await expect( submenu.getByText( 'Child' ) ).toBeVisible();
+		} );
+	} );
+
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
 		admin,
 		page,
@@ -1088,10 +1261,10 @@ test.describe( 'Navigation block', () => {
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select the Post name permalink structure (/%postname%/)
-			await page.click( '#permalink-input-post-name' );
+			await page.locator( '#permalink-input-post-name' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
@@ -1122,25 +1295,28 @@ test.describe( 'Navigation block', () => {
 		test.afterEach( async ( { admin, page, requestUtils } ) => {
 			await requestUtils.deleteAllPages();
 
-			// Restore plain permalinks
-			// TODO: Encapsulate permalink teardown in an admin.setPermalinks( '' ) style util
+			// Restore the "Day and name" permalink structure
+			// (/%year%/%monthnum%/%day%/%postname%/) that wp-env configures at
+			// install time. Restoring "Plain" instead would leave the shared
+			// site without pretty permalinks for every spec that runs after
+			// this one in the same shard (e.g. the preload specs assert
+			// /wp-json/-style request URLs).
+			// TODO: Encapsulate permalink teardown in an admin.setPermalinks() style util
 			// We need to run this in afterEach instead of afterAll since we don't have page context
 			// in afterAll
 			await admin.visitAdminPage( 'options-permalink.php' );
 
-			// Select Plain permalinks
-			await page.click( '#permalink-input-plain' );
+			// Select the Day and name permalink structure
+			await page.locator( '#permalink-input-day-name' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
 
-			// Force re-discovery of REST API root URL after disabling pretty permalinks.
-			// When permalinks change from pretty to plain, the REST API URL changes
-			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
-			// to prevent 404 errors.
+			// Force re-discovery of the REST API root URL after changing the
+			// permalink structure, so the cached URL cannot go stale.
 			await requestUtils.setupRest();
 		} );
 
@@ -1541,24 +1717,27 @@ test.describe( 'Navigation block', () => {
 			const itemCount = await pageItems.count();
 			expect( itemCount ).toBeGreaterThan( 0 );
 
-			// Step 4: Convert Page List using Edit button
+			// Step 4: Convert Page List using the Detach button
 			// Select the Page List block
 			await editor.selectBlocks( pageListBlock );
 
-			// Try using the toolbar Edit button instead
-			const editButton = page
-				.getByRole( 'button', { name: 'Edit' } )
+			// Try using the toolbar Detach button instead
+			const detachButton = page
+				.getByRole( 'button', { name: 'Detach' } )
 				.first();
-			await expect( editButton ).toBeVisible();
+			await expect( detachButton ).toBeVisible();
 
-			await editButton.click();
+			await detachButton.click();
 
-			// Wait for modal and approve conversion
-			await expect(
-				page.getByRole( 'dialog', { name: 'Edit Page List' } )
-			).toBeVisible();
+			// Wait for the confirmation dialog and approve conversion
+			const detachDialog = page.getByRole( 'dialog', {
+				name: 'Detach Page List',
+			} );
+			await expect( detachDialog ).toBeVisible();
 
-			await page.getByRole( 'button', { name: 'Edit' } ).last().click();
+			await detachDialog
+				.getByRole( 'button', { name: 'Detach' } )
+				.click();
 
 			// Wait for conversion - check that Page List is gone
 			await expect( pageListBlock ).toBeHidden();
@@ -1863,7 +2042,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is shown
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			} );
 
@@ -1884,7 +2063,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is gone now
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeHidden();
 
 				await expect( linkInput ).toHaveValue(
@@ -1895,10 +2074,90 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	test( 'can change open in new tab from the Link UI popover', async ( {
+		admin,
+		editor,
+		navigation,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"wordpress.org","type":"custom","url":"https://wordpress.org","kind":"custom"} /-->',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menu.id,
+			},
+		} );
+
+		const navLinkBlock = navigation
+			.getNavBlock()
+			.getByRole( 'document', { name: 'Block: Custom Link' } );
+		await expect( navLinkBlock ).toBeVisible();
+
+		await editor.openDocumentSettingsSidebar();
+		await editor.selectBlocks( navLinkBlock );
+
+		const sidebarCheckbox = navigation
+			.getContentControls()
+			.getByRole( 'checkbox', { name: 'Open in new tab' } );
+		await expect( sidebarCheckbox ).not.toBeChecked();
+
+		const linkPopover = navigation.getLinkPopover();
+		const popoverCheckbox = linkPopover.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+
+		await test.step( 'Check open in new tab and apply', async () => {
+			await pageUtils.pressKeys( 'primary+k' );
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+			await linkPopover
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+
+			await popoverCheckbox.check();
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect( sidebarCheckbox ).toBeChecked();
+		} );
+
+		await test.step( 'Uncheck open in new tab and apply', async () => {
+			// The Advanced settings stay expanded, as the editor persists
+			// their open state.
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+			await expect( popoverCheckbox ).toBeChecked();
+
+			await popoverCheckbox.uncheck();
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect( sidebarCheckbox ).not.toBeChecked();
+		} );
+	} );
+
 	test.describe( 'Navigation Link Inspector Link Editing', () => {
+		// WordPress always has this category, so nothing needs creating or
+		// removing.
+		const DEFAULT_CATEGORY_NAME = 'Uncategorized';
 		let testPage1;
 
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			// Shares a word with the default category, so one search returns
+			// both a page and a term and their order can be asserted.
+			await requestUtils.createPage( {
+				title: `${ DEFAULT_CATEGORY_NAME } Notes`,
+				status: 'publish',
+			} );
+
 			// Create test pages
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
@@ -2016,6 +2275,73 @@ test.describe( 'Navigation block', () => {
 					.first();
 
 				await expect( navLinkBlock ).toContainText( 'Test Page 1' );
+			} );
+
+			// The search is not limited to the entity type of the link being
+			// edited, so a page link can be pointed at a category.
+			// See https://github.com/WordPress/gutenberg/issues/77072.
+			await test.step( 'Select a category from suggestions', async () => {
+				const settingsControls = navigation.getContentControls();
+
+				await settingsControls
+					.getByRole( 'button', { name: /Link to:/ } )
+					.click();
+
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+
+				await page.keyboard.type( DEFAULT_CATEGORY_NAME, {
+					delay: 50,
+				} );
+
+				const searchResults = page.getByRole( 'listbox', {
+					name: /Search results/,
+				} );
+				await expect( searchResults ).toBeVisible();
+
+				await searchResults
+					// The page sharing the word sorts first, so match the term's URL.
+					.getByRole( 'option', { name: /\/category\// } )
+					.click();
+
+				await expect( navigation.getLinkPopover() ).toBeHidden();
+			} );
+
+			await test.step( 'Verify the link became a category link', async () => {
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', {
+							name: 'Block: Category Link',
+						} )
+						.first()
+				).toBeVisible();
+			} );
+
+			// Ordering follows the block's own entity type, so a category link
+			// lists categories before pages and posts.
+			await test.step( 'Verify categories are listed first when editing a category link', async () => {
+				const settingsControls = navigation.getContentControls();
+
+				await settingsControls
+					.getByRole( 'button', { name: /Link to:/ } )
+					.click();
+
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+
+				await page.keyboard.type( DEFAULT_CATEGORY_NAME, {
+					delay: 50,
+				} );
+
+				const searchResults = page.getByRole( 'listbox', {
+					name: /Search results/,
+				} );
+				await expect( searchResults ).toBeVisible();
+
+				// The page fixture shares the word, so assert on the type
+				// rather than the label.
+				await expect(
+					searchResults.getByRole( 'option' ).first()
+				).toContainText( 'Category' );
 			} );
 		} );
 
@@ -2202,6 +2528,184 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Button inside the menu', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+		} );
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllMenus(),
+				requestUtils.deleteAllPages(),
+			] );
+		} );
+
+		test( 'shows the content settings panel in the sidebar', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://wordpress.org/">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A Button in a menu edits like the links beside it.
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'heading', { name: 'Settings' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Text' } )
+			).toHaveValue( 'Testing' );
+			await expect(
+				settings.getByRole( 'button', { name: /^Link to/ } )
+			).toHaveText( /wordpress\.org/ );
+			await expect(
+				settings.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).toBeVisible();
+		} );
+
+		test( 'offers pages first when picking a link', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const linkPicker = settings.getByRole( 'button', {
+				name: /^Link to/,
+			} );
+			await expect( linkPicker ).toHaveText( /Add link/ );
+			// Without a link there is nothing to open in a new tab.
+			const newTabCheckbox = settings.getByRole( 'checkbox', {
+				name: 'Open in new tab',
+			} );
+			await expect( newTabCheckbox ).toBeHidden();
+			await linkPicker.click();
+
+			// Like a navigation link, the picker suggests pages before
+			// anything is typed, not posts or terms.
+			const searchInput = page.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			await expect( searchInput ).toBeFocused();
+			const firstResult = page.getByRole( 'option', {
+				name: /Test Page 1/,
+			} );
+			await expect( firstResult ).toBeVisible();
+			await expect(
+				page.getByRole( 'option', { name: /Uncategorized/ } )
+			).toBeHidden();
+
+			await firstResult.click();
+
+			// The preview shows the page, and the button links to it.
+			await expect( linkPicker ).toHaveText( /Test Page 1/ );
+			await expect( linkPicker ).toHaveText( /Page/ );
+			const clientId = await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.getAttribute( 'data-block' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						( id ) =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getBlockAttributes( id ).url,
+						clientId
+					)
+				)
+				.toMatch( /test-page-1/ );
+			await expect( newTabCheckbox ).toBeVisible();
+		} );
+
+		test( 'strips an anchor tag typed into the Text field', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			const button = editor.canvas.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+			} );
+			await button.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A link inside the button's own link is invalid HTML. The canvas
+			// strips the tag as it is typed, and the sidebar must do the same.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } )
+				.fill( '<a href="https://example.com/">Nested</a> link' );
+			await expect( button.getByRole( 'textbox' ) ).toHaveText(
+				'Nested link'
+			);
+			const clientId = await button.getAttribute( 'data-block' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						( id ) =>
+							String(
+								window.wp.data
+									.select( 'core/block-editor' )
+									.getBlockAttributes( id ).text
+							),
+						clientId
+					)
+				)
+				.toBe( 'Nested link' );
+		} );
+	} );
 } );
 
 class Navigation {
@@ -2221,6 +2725,7 @@ class Navigation {
 	getNavBlock() {
 		return this.editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 	}
 
@@ -2307,7 +2812,7 @@ class Navigation {
 
 		// Check appender has focus
 		if ( submenu ) {
-			// chec for the submenu appender
+			// check for the submenu appender
 			await expect( this.getSubmenuBlockInserter() ).toBeFocused();
 		} else {
 			await expect( this.getNavBlockInserter() ).toBeFocused();

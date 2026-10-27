@@ -1,11 +1,9 @@
-/**
- * Add type guard for isPlainObject until the below PR gets merged:
- *
- * @see https://github.com/jonschlinkert/is-plain-object/pull/29
- */
+import type { AnyAction } from 'redux';
 
-declare module 'is-plain-object' {
-	export function isPlainObject(
-		value: unknown
-	): value is Record< PropertyKey, unknown >;
-}
+/** Object of control handlers keyed by action type. */
+export type Controls = Record< string, ( value: AnyAction ) => unknown >;
+
+/** Dispatches a generator through the co-routine runtime. */
+export type RoutineDispatch = (
+	routine: Generator< unknown, unknown, unknown >
+) => Promise< unknown >;

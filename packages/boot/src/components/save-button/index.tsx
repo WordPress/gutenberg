@@ -1,19 +1,22 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
+import {
+	ariaKeyShortcut,
+	displayShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
-import { Button, Modal, Tooltip as WCTooltip } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import './style.scss';
+import { Button, Modal } from '@wordpress/components';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	Tooltip,
+	useKeyboardShortcutProps,
+} from '@wordpress/ui';
+import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 
 export default function SaveButton() {
@@ -59,6 +62,14 @@ export default function SaveButton() {
 	const shouldShowButton = hasChanges || showSavedState;
 
 	useSaveShortcut( { openSavePanel: () => setIsSaveViewOpened( true ) } );
+	const shortcut = {
+		displayShortcut: displayShortcut.primary( 's' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+		label: shortcutAriaLabel.primary( 's' ),
+	};
+	const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+		shortcut,
+	} );
 
 	if ( ! shouldShowButton ) {
 		return null;
@@ -85,25 +96,39 @@ export default function SaveButton() {
 
 	return (
 		<>
-			<WCTooltip
-				text={ hasChanges ? label : undefined }
-				shortcut={ displayShortcut.primary( 's' ) }
-			>
-				<Button
-					variant="primary"
-					size="compact"
-					onClick={ () => setIsSaveViewOpened( true ) }
-					onBlur={ hideSavedState }
-					disabled={ disabled }
-					accessibleWhenDisabled
-					isBusy={ isSaving }
-					aria-keyshortcuts={ rawShortcut.primary( 's' ) }
-					className="boot-save-button"
-					icon={ isInSavedState ? check : undefined }
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					{ ...targetProps }
+					render={
+						<Button
+							variant="primary"
+							size="compact"
+							onClick={ () => setIsSaveViewOpened( true ) }
+							onBlur={ hideSavedState }
+							disabled={ disabled }
+							accessibleWhenDisabled
+							isBusy={ isSaving }
+							className={ styles[ 'save-button' ] }
+							icon={ isInSavedState ? check : undefined }
+						/>
+					}
 				>
 					{ label }
-				</Button>
-			</WCTooltip>
+					{ descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
+				</Tooltip.Trigger>
+				<Tooltip.Popup>
+					{ hasChanges && <span>{ label }</span> }
+					<KeyboardShortcutDisplay
+						className={ styles.shortcut }
+						shortcut={ shortcut }
+					/>
+				</Tooltip.Popup>
+			</Tooltip.Root>
 			{ isSaveViewOpen && (
 				<Modal
 					title={ __( 'Review changes' ) }

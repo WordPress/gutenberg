@@ -347,6 +347,62 @@ The `wp-text` directive is executed:
 
 The returned value is used to change the inner content of the element: `<div>value</div>`.
 
+### `wp-html`
+
+It sets the inner HTML of an element from a value created with `asDangerousHTML()`, exported from `@wordpress/interactivity`. Because rendering arbitrary HTML is a security concern, a plain string is never rendered as HTML, by design: the plugin's JavaScript has to explicitly opt in.
+
+```html
+<div data-wp-interactive="myPlugin">
+	<article data-wp-html="state.description">
+		<p>Loading description.</p>
+	</article>
+</div>
+```
+
+```js
+import { asDangerousHTML, store } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	state: {
+		get description() {
+			return asDangerousHTML(
+				'<p>A <strong>formatted</strong> description.</p>'
+			);
+		},
+	},
+} );
+```
+
+#### Values
+
+The element shows what its reference resolves to, calling it first when it is a function:
+
+-   A value returned by `asDangerousHTML()` renders its HTML.
+-   A pending value, which is server-computed derived state that the client hasn't defined yet, keeps the current content. This is how the server-rendered fallback stays visible while a store loads.
+-   The object `{ "wpServerHtml": true }`, which stands for an `asDangerousHTML()` value in the page's data, keeps the current content the same way, whether it comes from `state`, `context` or a [`data-wp-each`](#wp-each) item. It never renders anything itself: other properties it carries are ignored.
+-   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
+-   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
+
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
+
+#### Inert content
+
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
+
+#### Conflicts with other directives
+
+On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`, `data-wp-html` is ignored, and the element behaves as it does without it. A warning is shown in development mode.
+
+#### Security contract
+
+-   **`asDangerousHTML()` does not sanitize.** It performs no processing at all on the HTML it's given — the same responsibility a developer takes on using React's `dangerouslySetInnerHTML`. Treating untrusted input as trusted here is an XSS risk. Never pass it raw user-supplied content or a `context` value directly: `context` is meant for selecting *which* trusted markup to show (e.g. an ID or a flag), while the actual HTML should come from `state`, computed by your plugin's own code from a source it trusts (its own bundled markup, or a response from an endpoint it controls).
+-   **The returned value is opaque and identity-based, not content-based.** It carries no inspectable trace of the HTML it wraps. Adding it to `data-wp-context`, spreading it into a new object, or serializing it as JSON does not carry the "trusted" marker along with it — only a `wp-html` reference that resolves directly to the exact value `asDangerousHTML()` returned is ever rendered.
+-   **Trusted Types.**
+    -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
+    -   A rejected value empties the element, and a warning is shown in development mode.
+    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
+-   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
+
 ### `wp-on`
 
 <div class="callout callout-info">
@@ -377,6 +433,17 @@ store( 'myPlugin', {
 The `wp-on` directive is executed each time the associated event is triggered.
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
+
+You can attach several callbacks to the same event of a DOM element by using the syntax `data-wp-on--[event]---[unique-id]` (note the three hyphens before the unique ID). Everything between `data-wp-on--` and the three hyphens is used as the event name, so `data-wp-on--click--counter` listens for an event named `click--counter`, not for `click`.
+
+```html
+<button
+	data-wp-on--click="actions.logTime"
+	data-wp-on--click---counter="actions.countClick"
+>
+	Click Me!
+</button>
+```
 
 ### `wp-on-window`
 
@@ -411,6 +478,8 @@ store( 'myPlugin', {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
+You can attach several callbacks to the same window event by using the syntax `data-wp-on-window--[window-event]---[unique-id]` (note the three hyphens before the unique ID), like `data-wp-on-window--resize---log-width`.
+
 ### `wp-on-document`
 
 <div class="callout callout-info">
@@ -444,13 +513,13 @@ store( 'myPlugin', {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
+You can attach several callbacks to the same document event by using the syntax `data-wp-on-document--[document-event]---[unique-id]` (note the three hyphens before the unique ID), like `data-wp-on-document--keydown---log-key`.
+
 ### `wp-watch`
 
 It runs a callback **when the node is created and runs it again when the state or context changes**.
 
 You can attach several side effects to the same DOM element by using the syntax `data-wp-watch---[unique-id]` (note the three hyphens before the unique ID).
-
-> **Deprecation notice:** The two-hyphen syntax `data-wp-watch--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-watch` directives of that DOM element.
 
@@ -510,8 +579,6 @@ This directive runs a callback **only when the node is created**.
 
 You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init---[unique-id]` (note the three hyphens before the unique ID).
 
-> **Deprecation notice:** The two-hyphen syntax `data-wp-init--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
-
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-init` directives of that DOM element.
 
 ```html
@@ -559,8 +626,6 @@ This directive runs the passed callback **during the node's render execution**.
 You can use and compose hooks like `useState`, `useWatch`, or `useEffect` inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
 You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run---[unique-id]` (note the three hyphens before the unique ID).
-
-> **Deprecation notice:** The two-hyphen syntax `data-wp-run--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-run` directives of that DOM element.
 
@@ -714,6 +779,8 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 </ul>
 ```
 
+Inside an interactive region, interactive islands inside server-rendered `data-wp-each-child` items aren't hydrated on their own. They initialize as part of the items the list renders.
+
 ## Values of directives are references to store properties
 
 The value assigned to a directive is a string pointing to a specific state, action, or side effect.
@@ -738,6 +805,8 @@ And then, the string value `"state.isPlaying"` is used to assign the result of t
 	<iframe ...></iframe>
 </div>
 ```
+
+The `!` operator negates the referenced value. It only works with values, such as state, context, or derived state defined with a getter. If the reference points to a function, such as an action or a callback, the function is not called and the directive receives `undefined` instead (with a warning when `SCRIPT_DEBUG` is enabled). To negate the result of a computation, define it as derived state with a getter and negate that.
 
 These values assigned to directives are **references** to a particular property in the store. They are wired to the directives automatically so that each directive “knows” what store element refers to, without any additional configuration.
 
@@ -988,7 +1057,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 #### On the client side
 
-_In the `view.js` file of each block_ the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
+*In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
 The `store` method used to set the store in JavaScript can be imported from `@wordpress/interactivity`.
 
@@ -1021,7 +1090,7 @@ The state defined on the server with `wp_interactivity_state()` gets merged with
 
 The `wp_interactivity_state` function receives two arguments, a `string` with the namespace that will be used as a reference and an [associative array](https://www.php.net/manual/en/language.types.array.php) containing the values.
 
-_Example of store initialized from the server with a `state` = `{ someValue: 123 }`_
+*Example of store initialized from the server with a `state` = `{ someValue: 123 }`*
 
 ```php
 // render.php
@@ -1310,6 +1379,8 @@ store( 'myPlugin', {
 Subscribes to changes in any signal accessed inside the callback, re-running the callback whenever those signals change. Returns a cleanup function to stop watching.
 
 Unlike `data-wp-watch`, which is a directive tied to a DOM element's lifecycle, the `watch()` function is a programmatic API that can be used anywhere in your JavaScript code, independently of the DOM.
+
+The callback runs without a directive scope, even when you call `watch()` from inside an action or a callback that has one. `getContext()` and `getElement()` are therefore not available inside it, and calling them throws, exactly as it does in a `setTimeout()` callback. Use `watch()` for work that only reads the store, and `data-wp-watch` when the callback needs the element or its context.
 
 ```js
 import { store, watch } from '@wordpress/interactivity';

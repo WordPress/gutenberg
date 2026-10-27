@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'Collaboration - CRDT persistence', () => {
@@ -51,7 +48,9 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		// Wait for collaboration runtime to initialize separately first, then
 		// wait for the entity record resolver to finish.
 		await page.waitForFunction(
-			() => ( window as any )._wpCollaborationEnabled === true,
+			() =>
+				( window as any ).__experimentalEnableRealTimeCollaboration ===
+				true,
 			undefined,
 			{ timeout: 5000 }
 		);

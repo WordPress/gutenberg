@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TimePicker from '../time-picker';
 
 const meta: Meta< typeof TimePicker > = {
-	title: 'Components/Selection & Input/Time & Date/TimePicker',
+	title: 'Components/@wordpress-components/Selection & Input/Time & Date/TimePicker',
 	id: 'components-timepicker',
 	component: TimePicker,
 	subcomponents: { 'TimePicker.TimeInput': TimePicker.TimeInput },

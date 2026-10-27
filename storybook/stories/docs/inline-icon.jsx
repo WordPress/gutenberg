@@ -1,14 +1,13 @@
-/**
- * External dependencies
- */
-import styled from '@emotion/styled';
+import clsx from 'clsx';
+import styles from './inline-icon.module.scss';
 
-const IconWrapper = ( { icon, ...props } ) => {
+export const InlineIcon = ( { icon, className, ...props } ) => {
 	const IconComponent = icon;
-	return <IconComponent aria-hidden { ...props } />;
+	return (
+		<IconComponent
+			aria-hidden
+			className={ clsx( styles.icon, className ) }
+			{ ...props }
+		/>
+	);
 };
-
-export const InlineIcon = styled( IconWrapper )`
-	display: inline-block !important;
-	width: 14px;
-`;

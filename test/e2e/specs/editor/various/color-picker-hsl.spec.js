@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 test.describe( 'ColorPicker HSL inputs', () => {
@@ -17,7 +14,11 @@ test.describe( 'ColorPicker HSL inputs', () => {
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Text' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 
 		await page
@@ -25,9 +26,8 @@ test.describe( 'ColorPicker HSL inputs', () => {
 			.click();
 
 		// Switch to HSL mode.
-		await page
-			.getByRole( 'combobox', { name: 'Color format' } )
-			.selectOption( 'hsl' );
+		await page.getByRole( 'combobox', { name: 'Color format' } ).click();
+		await page.getByRole( 'option', { name: 'HSL', exact: true } ).click();
 	} );
 
 	test( 'should preserve hue and saturation when lightness is set to white', async ( {

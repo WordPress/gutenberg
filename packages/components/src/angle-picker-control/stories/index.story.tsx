@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { AnglePickerControl } from '..';
 
 const meta: Meta< typeof AnglePickerControl > = {
-	title: 'Components/AnglePickerControl',
+	id: 'components-anglepickercontrol',
+	title: 'Components/@wordpress-components/AnglePickerControl',
 	component: AnglePickerControl,
 	argTypes: {
 		as: { control: false },

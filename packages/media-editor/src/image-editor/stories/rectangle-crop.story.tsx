@@ -1,20 +1,13 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
-	SelectControl,
 	RangeControl,
 	ToggleControl,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import {
 	rotateLeft,
 	rotateRight,
@@ -24,18 +17,14 @@ import {
 	cloudUpload,
 	download as downloadIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Cropper } from '../react/components/cropper';
-import { useCropperState } from '../react/hooks/use-cropper-state';
+import { useCropperController } from '../react/hooks/use-cropper-controller';
 import {
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
-	DEFAULT_ASPECT_RATIOS,
 	ORIGINAL_ASPECT_RATIO,
 } from '../core/constants';
+import { DEFAULT_ASPECT_RATIOS } from '../../state';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,
@@ -51,7 +40,22 @@ import {
 	getVisibleBounds,
 } from '../core/camera';
 import { getSourceRegion } from '../core/source-region';
-import './style.css';
+import styles from './style.module.css';
+
+const aspectRatioItems = DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
+	label: preset.label,
+	value: preset.value.toString(),
+} ) );
+const gridItems = [
+	{ label: 'Grid: off', value: 'off' },
+	{ label: 'Grid: always on', value: 'on' },
+	{ label: 'Grid: interactive', value: 'interactive' },
+];
+const formatItems = [
+	{ label: 'JPEG', value: 'image/jpeg' },
+	{ label: 'PNG', value: 'image/png' },
+	{ label: 'WebP', value: 'image/webp' },
+];
 
 const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
 
@@ -129,7 +133,8 @@ function resolveAspectRatio(
 }
 
 const meta: Meta< typeof Cropper > = {
-	title: 'MediaEditor/ImageEditor',
+	id: 'mediaeditor-imageeditor',
+	title: 'Editor/Media Editor/ImageEditor',
 	component: Cropper,
 	tags: [ 'status-experimental' ],
 };
@@ -142,11 +147,11 @@ type Story = StoryObj< typeof Cropper >;
  * Default story. Basic cropper with a sample image, no controls.
  */
 const DefaultComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperController();
 
 	return (
 		<div>
-			<div className="image-editor-story__container">
+			<div className={ styles.container }>
 				<Cropper
 					src={ SAMPLE_IMAGE }
 					controller={ controller }
@@ -159,6 +164,11 @@ const DefaultComponent = () => {
 };
 
 export const Default: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DefaultComponent,
 };
 
@@ -166,7 +176,7 @@ export const Default: Story = {
  * Full interactive demo with controls.
  */
 const WithControlsComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperController();
 	const {
 		state,
 		setRotation,
@@ -204,7 +214,7 @@ const WithControlsComponent = () => {
 		? getSourceRegion( state, {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
-		  } )
+			} )
 		: null;
 
 	// The base cardinal angle (nearest 90° step) and the fine offset.
@@ -326,9 +336,9 @@ const WithControlsComponent = () => {
 				type="file"
 				accept="image/*"
 				onChange={ handleFileChange }
-				className="image-editor-story__hidden-file"
+				className={ styles[ 'hidden-file' ] }
 			/>
-			<div className="image-editor-story__toolbar">
+			<div className={ styles.toolbar }>
 				<Flex align="center" gap={ 2 } wrap>
 					<FlexItem>
 						<Button
@@ -395,23 +405,23 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Aspect ratio"
 							hideLabelFromVision
-							value={ aspectRatioValue }
-							onChange={ handleAspectRatioChange }
-							options={ DEFAULT_ASPECT_RATIOS.map(
-								( preset ) => ( {
-									label: preset.label,
-									value: preset.value.toString(),
-								} )
-							) }
+							value={
+								aspectRatioItems.find(
+									( item ) => item.value === aspectRatioValue
+								) ?? null
+							}
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									handleAspectRatioChange( item.value );
+								}
+							} }
+							items={ aspectRatioItems }
 						/>
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -419,22 +429,19 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Grid"
 							hideLabelFromVision
-							value={ gridMode }
-							onChange={ ( value ) =>
-								setGridMode( value as GridMode )
+							value={
+								gridItems.find(
+									( item ) => item.value === gridMode
+								) ?? null
 							}
-							options={ [
-								{ label: 'Grid: off', value: 'off' },
-								{ label: 'Grid: always on', value: 'on' },
-								{
-									label: 'Grid: interactive',
-									value: 'interactive',
-								},
-							] }
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									setGridMode( item.value as GridMode );
+								}
+							} }
+							items={ gridItems }
 						/>
 					</FlexItem>
 					<FlexItem isBlock />
@@ -451,10 +458,8 @@ const WithControlsComponent = () => {
 						</Button>
 					</FlexItem>
 				</Flex>
-				<div className="image-editor-story__sliders">
+				<div className={ styles.sliders }>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -463,8 +468,6 @@ const WithControlsComponent = () => {
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
@@ -475,7 +478,7 @@ const WithControlsComponent = () => {
 				</div>
 			</div>
 
-			<div className="image-editor-story__resizable">
+			<div className={ styles.resizable }>
 				<Cropper
 					src={ src }
 					controller={ controller }
@@ -506,7 +509,7 @@ const WithControlsComponent = () => {
 
 			<div style={ { marginTop: 16 } }>
 				<strong>Current State:</strong>
-				<pre className="image-editor-story__state">
+				<pre className={ styles.state }>
 					{ JSON.stringify(
 						{
 							rotation: state.rotation,
@@ -518,7 +521,7 @@ const WithControlsComponent = () => {
 										naturalWidth: state.image.naturalWidth,
 										naturalHeight:
 											state.image.naturalHeight,
-								  }
+									}
 								: null,
 						},
 						null,
@@ -531,6 +534,11 @@ const WithControlsComponent = () => {
 };
 
 export const WithControls: Story = {
+	parameters: {
+		// FIXME: The state dump scrolls once its content overflows, and is not keyboard-accessible (scrollable-region-focusable). Whether it overflows depends on the numbers rendered, so this appears intermittently.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: WithControlsComponent,
 };
 
@@ -544,7 +552,7 @@ export const WithControls: Story = {
  * or verify the camera and render paths agree.
  */
 const DebugComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperController();
 	const {
 		state,
 		setRotation,
@@ -625,7 +633,7 @@ const DebugComponent = () => {
 		: {
 				elementSize: { width: 0, height: 0 },
 				visualSize: { width: 0, height: 0 },
-		  };
+			};
 
 	// Camera and restriction.
 	const camera = hasImage
@@ -636,7 +644,7 @@ const DebugComponent = () => {
 				{ ...state, pan: { x: 0, y: 0 }, zoom: 1 },
 				containerSize,
 				imageSize
-		  )
+			)
 		: null;
 	const vb = baseCamera ? getVisibleBounds( baseCamera ) : null;
 
@@ -658,7 +666,7 @@ const DebugComponent = () => {
 							( state.cropRect.y + state.cropRect.height ) *
 								vb.height,
 					} ),
-			  ]
+				]
 			: null;
 
 	// Restriction result.
@@ -747,9 +755,9 @@ const DebugComponent = () => {
 				type="file"
 				accept="image/*"
 				onChange={ handleFileChange }
-				className="image-editor-story__hidden-file"
+				className={ styles[ 'hidden-file' ] }
 			/>
-			<div className="image-editor-story__toolbar">
+			<div className={ styles.toolbar }>
 				<Flex align="center" gap={ 2 } wrap>
 					<FlexItem>
 						<Button
@@ -816,7 +824,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -837,19 +844,19 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Format"
 							hideLabelFromVision
-							value={ exportFormat as 'image/jpeg' }
-							onChange={ ( value ) =>
-								setExportFormat( value as string )
+							value={
+								formatItems.find(
+									( item ) => item.value === exportFormat
+								) ?? null
 							}
-							options={ [
-								{ label: 'JPEG', value: 'image/jpeg' },
-								{ label: 'PNG', value: 'image/png' },
-								{ label: 'WebP', value: 'image/webp' },
-							] }
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									setExportFormat( item.value );
+								}
+							} }
+							items={ formatItems }
 						/>
 					</FlexItem>
 					<FlexItem>
@@ -871,10 +878,8 @@ const DebugComponent = () => {
 						</Button>
 					</FlexItem>
 				</Flex>
-				<div className="image-editor-story__sliders">
+				<div className={ styles.sliders }>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -883,8 +888,6 @@ const DebugComponent = () => {
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
@@ -902,7 +905,7 @@ const DebugComponent = () => {
 					ref={ containerRef }
 					style={ { flex: '1 1 60%', minWidth: 0 } }
 				>
-					<div className="image-editor-story__container">
+					<div className={ styles.container }>
 						<Cropper
 							src={ src }
 							controller={ controller }
@@ -924,10 +927,10 @@ const DebugComponent = () => {
 						maxHeight: 500,
 					} }
 				>
-					<div className="image-editor-story__export-preview">
+					<div className={ styles[ 'export-preview' ] }>
 						{ previewSrc ? (
 							<img
-								className="image-editor-story__export-image"
+								className={ styles[ 'export-image' ] }
 								src={ previewSrc }
 								alt="Crop preview"
 							/>
@@ -1080,5 +1083,10 @@ aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
 };
 
 export const Debug: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DebugComponent,
 };

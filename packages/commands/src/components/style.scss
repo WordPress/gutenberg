@@ -144,7 +144,7 @@ $palette-header-height: 48px;
 			padding: $grid-unit-10 $grid-unit-20;
 			line-height: $grid-unit-20;
 			font-size: $font-size-x-small;
-			font-weight: $font-weight-medium;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			text-transform: uppercase;
 			color: $gray-900;
 		}
@@ -196,5 +196,5 @@ $palette-header-height: 48px;
 .commands-command-menu__item mark {
 	color: inherit;
 	background: unset;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }

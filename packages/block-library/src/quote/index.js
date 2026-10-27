@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { quote as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -17,6 +10,8 @@ import transforms from './transforms';
 const { name } = metadata;
 
 export { metadata, name };
+
+const TEMPLATE = [ [ 'core/paragraph', {} ] ];
 
 export const settings = {
 	icon,
@@ -34,6 +29,8 @@ export const settings = {
 		],
 	},
 	transforms,
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 	deprecated,

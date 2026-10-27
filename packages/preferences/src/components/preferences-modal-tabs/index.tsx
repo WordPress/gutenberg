@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Navigator,
@@ -10,7 +7,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	FlexItem,
-	Card,
+	Card as WCCard,
 	CardHeader,
 	CardBody,
 	privateApis as componentsPrivateApis,
@@ -18,10 +15,6 @@ import {
 import { useMemo, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 import { isRTL, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -105,7 +98,7 @@ export default function PreferencesModalTabs( {
 		modalContent = (
 			<Navigator initialPath="/" className="preferences__provider">
 				<Navigator.Screen path="/">
-					<Card isBorderless size="small">
+					<WCCard isBorderless size="small">
 						<CardBody>
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
@@ -113,9 +106,7 @@ export default function PreferencesModalTabs( {
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
-											// @ts-expect-error: Navigator.Button is currently typed in a way that prevents Item from being passed in
 											as={ Item }
-											isAction
 										>
 											<HStack justify="space-between">
 												<FlexItem>
@@ -138,7 +129,7 @@ export default function PreferencesModalTabs( {
 								} ) }
 							</ItemGroup>
 						</CardBody>
-					</Card>
+					</WCCard>
 				</Navigator.Screen>
 				{ sections.length &&
 					sections.map( ( section ) => {
@@ -147,7 +138,7 @@ export default function PreferencesModalTabs( {
 								key={ `${ section.name }-menu` }
 								path={ `/${ section.name }` }
 							>
-								<Card isBorderless size="large">
+								<WCCard isBorderless size="large">
 									<CardHeader
 										isBorderless={ false }
 										justify="left"
@@ -168,7 +159,7 @@ export default function PreferencesModalTabs( {
 										</WCText>
 									</CardHeader>
 									<CardBody>{ section.content }</CardBody>
-								</Card>
+								</WCCard>
 							</Navigator.Screen>
 						);
 					} ) }

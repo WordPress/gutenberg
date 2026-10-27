@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { parse, serialize, createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from './utils';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { unlock } from '../../lock-unlock';

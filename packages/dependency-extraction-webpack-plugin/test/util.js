@@ -1,11 +1,8 @@
-/**
- * Internal dependencies
- */
-const {
-	camelCaseDash,
-	defaultRequestToExternal,
-	defaultRequestToHandle,
-} = require( '../lib/util' );
+import { createRequire } from 'node:module';
+import { describe, expect, test } from 'vitest';
+
+const { camelCaseDash, defaultRequestToExternal, defaultRequestToHandle } =
+	createRequire( import.meta.url )( '../lib/util' );
 
 describe( 'camelCaseDash', () => {
 	test( 'does not change a single word', () => {
@@ -60,6 +57,15 @@ describe( 'defaultRequestToExternal', () => {
 		expect( defaultRequestToExternal( 'react-dom/client' ) ).toBe(
 			'ReactDOM'
 		);
+	} );
+
+	test( 'Does not externalize bundled @wordpress packages', () => {
+		expect(
+			defaultRequestToExternal( '@wordpress/global-styles-engine' )
+		).toBeUndefined();
+		expect(
+			defaultRequestToExternal( '@wordpress/global-styles-ui' )
+		).toBeUndefined();
 	} );
 } );
 

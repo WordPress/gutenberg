@@ -1,16 +1,14 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"checkJs": false
-	},
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"references": [
-		{ "path": "../compose" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
-		{ "path": "../private-apis" },
-		{ "path": "../is-shallow-equal" },
-		{ "path": "../priority-queue" },
-		{ "path": "../redux-routine" }
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
+		{ "path": "../priority-queue/tsconfig.build.json" },
+		{ "path": "../redux-routine/tsconfig.build.json" }
 	]
 }

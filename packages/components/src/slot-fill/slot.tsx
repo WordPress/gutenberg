@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, Key } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useObservableValue } from '@wordpress/compose';
 import {
 	useContext,
@@ -15,10 +8,6 @@ import {
 	cloneElement,
 	isEmptyElement,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SlotFillContext from './context';
 import type { SlotComponentProps } from './types';
 

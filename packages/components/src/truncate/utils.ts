@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isValueDefined } from '../utils/values';
 import type { TruncateProps } from './types';
 

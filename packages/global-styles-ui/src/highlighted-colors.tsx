@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __unstableMotion as motion } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useStylesPreviewColors } from './preview-hooks';
 
 interface HighlightedColorsProps {
