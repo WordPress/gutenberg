@@ -6,7 +6,7 @@ Build tool for WordPress plugins.
 
 `@wordpress/build` is an opinionated build system designed for WordPress plugins. It provides:
 
-- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using esbuild
+- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using Rolldown
 - **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
 - **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
 - **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
@@ -54,7 +54,7 @@ or via npm script:
 
 ### Build Concurrency
 
-By default, `wp-build` limits concurrent `esbuild` build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
+By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
 
 ### Testing Generated Styles
 

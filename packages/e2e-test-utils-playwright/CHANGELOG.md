@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `RequestUtils`: `activateTheme()` and `setupRest()` now use the site the `RequestUtils` was created with, rather than always the `WP_BASE_URL` environment variable ([#85420](https://github.com/WordPress/gutenberg/pull/85420)).
+
 ### Internal
 
 -   Convert the remaining viewport and widget utilities to TypeScript ([#84917](https://github.com/WordPress/gutenberg/pull/84917)).

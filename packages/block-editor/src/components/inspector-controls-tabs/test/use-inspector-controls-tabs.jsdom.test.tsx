@@ -19,6 +19,24 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 } );
 
 describe( 'useInspectorControlsTabs', () => {
+	it( 'includes Styles when Rotation is the only style control', () => {
+		const PositionToolsFill = groups[ 'position-tools' ].Fill;
+		const { result } = renderHook(
+			() =>
+				useInspectorControlsTabs( 'test/rotatable', [], false, false ),
+			{
+				wrapper: ( { children }: { children: ReactNode } ) => (
+					<SlotFillProvider>
+						<PositionToolsFill>Rotation</PositionToolsFill>
+						{ children }
+					</SlotFillProvider>
+				),
+			}
+		);
+
+		expect( result.current ).toEqual( [ TAB_STYLES ] );
+	} );
+
 	it( 'includes Settings when Allowed blocks is the only settings control', () => {
 		const { result } = renderHook(
 			() =>

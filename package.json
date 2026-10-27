@@ -118,6 +118,7 @@
 	},
 	"scripts": {
 		"agents:setup": "npm run --workspace @wordpress/agent-tools setup --",
+		"browse": "npm run browse --workspace @wordpress/e2e-tests-playwright --",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "npm run --workspace @wordpress/release-tools build-plugin-zip --",
 		"check:type-declarations": "npm run --workspace @wordpress/build-scripts check-type-declarations --",

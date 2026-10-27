@@ -251,6 +251,7 @@ export interface AlignAttributes {
 export interface AlignEditProps {
 	name: string;
 	align?: string;
+	clientId: string;
 	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
 }
 

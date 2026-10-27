@@ -23,7 +23,7 @@ const meta: Meta< typeof CustomSelectControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now. See the [migration guide](?path=/docs/components-customselectcontrol--migration-guide).',
 		},
 	},
 	decorators: [

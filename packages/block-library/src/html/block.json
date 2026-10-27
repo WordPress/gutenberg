@@ -22,7 +22,6 @@
 		},
 		"listView": true,
 		"customCSS": false,
-		"rotate": false,
 		"visibility": false
 	},
 	"editorStyle": "wp-block-html-editor"

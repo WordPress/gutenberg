@@ -16,6 +16,8 @@
 ### Enhancements
 
 -   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
+-   `manifest.json`: Add 39 icons from the `core` collection to the `core-admin` collection, so the admin interface can render them in place of the Dashicons they replace ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
+-   `manifest.json`: New `dashicons` property, listing the Dashicon class names a `core-admin` icon replaces. `manifest.php` includes it too ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
 
 ### Bug Fixes
 

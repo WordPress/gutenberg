@@ -93,6 +93,14 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
+	 * Names of the icons that replace Dashicons, keyed by Dashicon class name.
+	 * Built from the manifest on first use.
+	 *
+	 * @var array<string, string>|null
+	 */
+	protected $dashicon_replacements = null;
+
+	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
 	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
@@ -409,6 +417,50 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		}
 
 		return $icons;
+	}
+
+	/**
+	 * Returns the name of the icon that replaces a Dashicon in the admin interface.
+	 *
+	 * The replacements come from the `dashicons` property of the `core-admin`
+	 * icons in the Gutenberg manifest, so they follow the icons the plugin ships
+	 * rather than the ones in WordPress core.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $dashicon Dashicon class name, such as `dashicons-admin-post`.
+	 * @return string|null Namespaced name of the replacement icon, such as `core-admin/pin`,
+	 *                     or null if the Dashicon has no replacement or the replacement
+	 *                     is not registered.
+	 */
+	public function get_admin_icon_name_for_dashicon( $dashicon ) {
+		if ( ! is_string( $dashicon ) ) {
+			return null;
+		}
+
+		if ( null === $this->dashicon_replacements ) {
+			$this->dashicon_replacements = array();
+
+			$manifest_path = gutenberg_dir_path() . 'packages/icons/src/manifest.php';
+			$manifest      = is_readable( $manifest_path ) ? include $manifest_path : array();
+
+			foreach ( is_array( $manifest ) ? $manifest : array() as $icon_name => $icon_data ) {
+				if (
+					empty( $icon_data['dashicons'] ) ||
+					! in_array( 'core-admin', $icon_data['collections'] ?? array(), true )
+				) {
+					continue;
+				}
+
+				foreach ( $icon_data['dashicons'] as $replaced_dashicon ) {
+					$this->dashicon_replacements[ $replaced_dashicon ] = 'core-admin/' . $icon_name;
+				}
+			}
+		}
+
+		$icon_name = $this->dashicon_replacements[ $dashicon ] ?? null;
+
+		return null !== $icon_name && $this->is_registered( $icon_name ) ? $icon_name : null;
 	}
 
 	/**
