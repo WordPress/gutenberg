@@ -7,6 +7,12 @@
  * variant value adds. PHP renders the markup from a small template, and the
  * recipe says which classes go on it.
  *
+ * A component without a recipe gets its markup from React instead: the build
+ * renders it with placeholders for its content and free-form props, once with
+ * the defaults and once per variant value, and stores the default render plus
+ * what each value changes. PHP applies those changes and fills in the
+ * placeholders.
+ *
  * Recipes name classes as in the component's own stylesheet (`is-brand` in
  * `src/button/style.module.css`), or as `<stylesheet>:<class>` for a shared
  * one (`utils/css/resets:box-sizing` in `src/utils/css/resets.module.css`).
@@ -33,6 +39,7 @@ import {
 	compileStyleFile,
 	disposeSassCompiler,
 } from '@wordpress/build/compile-style';
+import { compileVariantChanges } from './php/variant-changes.mjs';
 
 const PACKAGE_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -84,6 +91,61 @@ function getCombinations( variants ) {
 				} ) )
 			),
 		[ {} ]
+	);
+}
+
+/**
+ * Renders a component with React, with placeholders for its content and
+ * free-form props, and compacts the renders into a base render plus what
+ * each variant value changes.
+ *
+ * @param {Object}                                     options
+ * @param {Object}                                     options.props       Props schema.
+ * @param {Array}                                      options.variants    `[ prop, values ]` for enum and boolean props.
+ * @param {(props: Object, content: string) => string} options.renderReact Renders the component with PHP props and content.
+ * @return {Object} `{ base, changes, exceptions }`.
+ */
+function compileMarkup( { props, variants, renderReact } ) {
+	const slots = Object.fromEntries(
+		Object.entries( props )
+			.filter(
+				( [ , schema ] ) => ! schema.enum && 'boolean' !== schema.type
+			)
+			.map( ( [ prop ] ) => [ prop, `__wpuislot_${ prop }__` ] )
+	);
+	const defaults = Object.fromEntries(
+		variants.map( ( [ prop, values ] ) => [
+			prop,
+			props[ prop ].default ?? values[ 0 ],
+		] )
+	);
+	const keyOf = ( combination ) =>
+		variants
+			.map( ( [ prop ] ) => `${ prop }=${ combination[ prop ] }` )
+			.join( '&' );
+
+	const renders = new Map();
+	const render = ( combination ) =>
+		renders.set( keyOf( combination ), {
+			combination,
+			html: renderReact(
+				{ ...combination, ...slots },
+				'__wpuislot_content__'
+			),
+		} );
+	render( defaults );
+	for ( const [ prop, values ] of variants ) {
+		for ( const value of values ) {
+			if ( value !== defaults[ prop ] ) {
+				render( { ...defaults, [ prop ]: value } );
+			}
+		}
+	}
+
+	return compileVariantChanges(
+		variants.map( ( [ prop, values ] ) => ( { prop, values } ) ),
+		defaults,
+		renders
 	);
 }
 
@@ -157,7 +219,6 @@ async function main() {
 			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
 		);
 		const { name, content, props, classes, react } = component;
-		checkRecipe( component );
 		const resolve = ( references ) =>
 			references.map( ( reference ) => {
 				const qualified = reference.includes( ':' )
@@ -167,28 +228,31 @@ async function main() {
 				return resolveClass( qualified, name );
 			} );
 
-		manifest.components[ name ] = {
-			content,
-			props,
-			classes: {
-				base: resolve( classes.base ),
-				variants: Object.fromEntries(
-					Object.entries( classes.variants ).map(
-						( [ prop, values ] ) => [
-							prop,
-							Object.fromEntries(
-								Object.entries( values ).map(
-									( [ value, references ] ) => [
-										value,
-										resolve( references ),
-									]
-								)
-							),
-						]
-					)
-				),
-			},
-		};
+		if ( classes ) {
+			checkRecipe( component );
+			manifest.components[ name ] = {
+				content,
+				props,
+				classes: {
+					base: resolve( classes.base ),
+					variants: Object.fromEntries(
+						Object.entries( classes.variants ).map(
+							( [ prop, values ] ) => [
+								prop,
+								Object.fromEntries(
+									Object.entries( values ).map(
+										( [ value, references ] ) => [
+											value,
+											resolve( references ),
+										]
+									)
+								),
+							]
+						)
+					),
+				},
+			};
+		}
 
 		// Every combination of enums and booleans, rendered with React.
 		const variants = Object.entries( props )
@@ -218,6 +282,26 @@ async function main() {
 				createElement( ui[ react.component ], reactProps, text )
 			);
 		};
+		if ( ! classes ) {
+			manifest.components[ name ] = {
+				content,
+				props,
+				markup: compileMarkup( { props, variants, renderReact } ),
+			};
+			for ( const [ key, { classNames } ] of stylesheets ) {
+				const markup = JSON.stringify(
+					manifest.components[ name ].markup
+				);
+				if (
+					Object.values( classNames ?? {} ).some( ( className ) =>
+						markup.includes( className )
+					)
+				) {
+					usedStylesheets.add( key );
+				}
+			}
+		}
+
 		for ( const { props: phpProps, content: text } of cases ) {
 			fixtures.push( {
 				component: name,
