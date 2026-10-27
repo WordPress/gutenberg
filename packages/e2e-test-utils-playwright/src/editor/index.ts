@@ -49,7 +49,7 @@ export class Editor {
 	clickBlockToolbarButton: typeof clickBlockToolbarButton =
 		clickBlockToolbarButton.bind( this );
 	// Throwaway: a new helper that trunk doesn't have.
-	throwawayGetBlocks = () => this.getBlocks();
+	throwawayGetBlocks: typeof getBlocks = getBlocks.bind( this );
 	/** @borrows getBlocks as this.getBlocks */
 	getBlocks: typeof getBlocks = getBlocks.bind( this );
 	/** @borrows getEditedPostContent as this.getEditedPostContent */
