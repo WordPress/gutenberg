@@ -16,6 +16,7 @@ import {
 import { select, dispatch } from '@wordpress/data';
 import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { store } from '../';
+import { unlock } from '../../lock-unlock';
 import { isFiltered } from '../utils';
 import type { BlockPattern, TreeBlock } from '../types';
 
@@ -151,6 +152,74 @@ describe( 'selectors', () => {
 					}
 				)
 			).toHaveLength( 0 );
+		} );
+	} );
+
+	describe( 'hasAllowedPatterns', () => {
+		beforeAll( async () => {
+			await dispatch( store ).resetBlocks( [
+				partial< Block >( {
+					clientId: 'block1',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				} ),
+				partial< Block >( {
+					clientId: 'block2',
+					name: 'core/test-block-b',
+					innerBlocks: [],
+				} ),
+			] );
+			await dispatch( store ).updateSettings( {
+				__experimentalBlockPatterns: [
+					{
+						name: 'pattern-a',
+						title: 'pattern with a',
+						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
+					},
+					{
+						name: 'pattern-b',
+						title: 'pattern with b',
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						name: 'pattern-c',
+						title: 'pattern hidden from UI',
+						inserter: false,
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+					},
+				],
+			} );
+			await dispatch( store ).updateBlockListSettings( 'block1', {
+				allowedBlocks: [ 'core/test-block-b' ],
+			} );
+		} );
+
+		afterAll( async () => {
+			await dispatch( store ).resetBlocks( [] );
+			await dispatch( store ).updateSettings( {
+				__experimentalBlockPatterns: [],
+			} );
+			await dispatch( store ).updateBlockListSettings( 'block1', {} );
+		} );
+
+		it( 'should return true if any patterns are allowed for root level', () => {
+			expect( unlock( select( store ) ).hasAllowedPatterns( null ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'should return true when allowed patterns exist for the specified client ID', () => {
+			expect(
+				unlock( select( store ) ).hasAllowedPatterns( 'block1' )
+			).toBe( true );
+		} );
+
+		it( 'should return false when no patterns are allowed for the specified client ID', () => {
+			expect(
+				unlock( select( store ) ).hasAllowedPatterns( 'block2' )
+			).toBe( false );
 		} );
 	} );
 
