@@ -66,4 +66,4 @@ jobs:
                   PART: ${{ matrix.part }}
               run: |
                   mapfile -t tests < <( awk -v part="$PART" 'NR % 4 == part - 1' < ~/.jest-e2e-tests )
-                  ./node_modules/.bin/wp-scripts test-e2e --config=packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath "${tests[@]}"
+                  ./node_modules/.bin/wp-scripts test-e2e --config=packages/e2e-tests/jest.config.js --runTestsByPath "${tests[@]}"
