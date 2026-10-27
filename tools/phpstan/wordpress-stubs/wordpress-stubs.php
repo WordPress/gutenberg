@@ -1,6 +1,7 @@
 <?php
 /**
- * Loads the WordPress stubs generated from core trunk.
+ * Loads the WordPress stubs generated from core trunk, or from a core pull request that a change
+ * depends on.
  *
  * The szepeviktor/phpstan-wordpress extension loads this file as a bootstrap file, from where the
  * php-stubs/wordpress-stubs package would install it. The stubs themselves have the .stub

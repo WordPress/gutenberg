@@ -5,7 +5,7 @@
  * Generated from https://github.com/WordPress/wordpress-develop/commit/8dd36d03d3492b54b5191955a8a157f485c0f318 (r64757)
  * with https://github.com/php-stubs/wordpress-stubs/commit/7c32aeca37ad7defa54758674ff62a70a521c8b5.
  *
- * Do not edit. Regenerate with tools/phpstan/generate-wordpress-stubs.sh.
+ * Do not edit. Regenerate with `composer phpstan:generate-wordpress-stubs`.
  */
 
 namespace {
