@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Revisions: Show the code diff's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85368](https://github.com/WordPress/gutenberg/pull/85368)).
+
 ### Bug Fixes
 
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
