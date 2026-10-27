@@ -12,7 +12,7 @@
 		{ "path": "packages/block-editor/tsconfig.build.json" },
 		{ "path": "packages/block-library/tsconfig.build.json" },
 		{ "path": "packages/block-serialization-default-parser" },
-		{ "path": "packages/blocks" },
+		{ "path": "packages/blocks/tsconfig.build.json" },
 		{ "path": "packages/boot/tsconfig.build.json" },
 		{ "path": "packages/commands/tsconfig.build.json" },
 		{ "path": "packages/components/tsconfig.build.json" },
