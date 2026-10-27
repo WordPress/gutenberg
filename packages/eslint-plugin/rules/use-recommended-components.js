@@ -144,7 +144,8 @@ const DENYLIST = {
 			'Use `RadioGroupControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
-		TabbableContainer: '{{ name }} is planned for deprecation.',
+		TabbableContainer:
+			'For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TextControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
