@@ -78,7 +78,7 @@ jobs:
                   npm run wp-env-test start
 
             # A test counts as changed when a changed line falls between its
-            # start and the next test's start. Failing tests are expected, so
+            # first line and its closing brace. Failing tests are expected, so
             # they never fail this step.
             - name: Warn on tests that pass on trunk
               env:
@@ -109,12 +109,12 @@ jobs:
                   // The first changed line of each test, which is where the warning goes.
                   const tests = new Map();
                   const listed = playwright( [ '--list', ...Object.keys( changed ).map( ( f ) => f.replace( 'test/e2e/', '' ) ) ] );
-                  for ( const [ file, lines ] of Object.entries( changed ) ) {
-                  	const starts = listed.filter( ( spec ) => spec.file === file ).map( ( spec ) => spec.line ).sort( ( a, b ) => a - b );
-                  	for ( const line of lines ) {
-                  		const start = starts.findLast( ( s ) => s <= line );
-                  		if ( start && ! tests.has( `${ file }:${ start }` ) ) tests.set( `${ file }:${ start }`, line );
-                  	}
+                  for ( const spec of listed ) {
+                  	const source = readFileSync( spec.file, 'utf8' ).split( '\n' );
+                  	const indent = source[ spec.line - 1 ].match( /^\s*/ )[ 0 ];
+                  	const end = source.findIndex( ( text, i ) => i >= spec.line && text.startsWith( `${ indent }}` ) ) + 1;
+                  	const line = changed[ spec.file ]?.find( ( l ) => l >= spec.line && l <= end );
+                  	if ( line ) tests.set( `${ spec.file }:${ spec.line }`, line );
                   }
                   if ( ! tests.size ) process.exit();
 
