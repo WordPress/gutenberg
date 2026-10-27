@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+-   Rename the `lockOutline` icon to `lock`, replacing the previous `lock` icon. The stroke-drawn outline is the drawing that pairs with `unlock`, so it becomes the canonical lock ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
+-   Remove the `lockSmall` icon. Use `lock`, which is stroke-drawn and can therefore be scaled down for the dense contexts `lockSmall` served, such as the list view ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
 -   Remove the `insertBefore` and `insertAfter` icons. These were old Dashicons that were never used; use `create` or `plus` instead ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
 -   Remove the `offline` icon. It was added in error for a React Native client that is no longer used, so it has no direct replacement; `info` or `error` can stand in ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
 
