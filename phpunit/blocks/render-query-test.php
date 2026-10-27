@@ -14,6 +14,8 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 
 	private $original_wp_interactivity;
 
+	private $original_wp_styles;
+
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		register_block_type(
 			'test/plugin-block',
@@ -63,14 +65,18 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		global $wp_interactivity;
+		global $wp_interactivity, $wp_styles;
 		$this->original_wp_interactivity = $wp_interactivity;
 		$wp_interactivity                = new WP_Interactivity_API();
+		$this->original_wp_styles        = $wp_styles;
+		$wp_styles                       = null;
+		wp_styles();
 	}
 
 	public function tear_down() {
-		global $wp_interactivity;
+		global $wp_interactivity, $wp_styles;
 		$wp_interactivity = $this->original_wp_interactivity;
+		$wp_styles        = $this->original_wp_styles;
 		parent::tear_down();
 	}
 
@@ -302,5 +308,93 @@ HTML;
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
 		$router_config = wp_interactivity_config( 'core/router' );
 		$this->assertArrayNotHasKey( 'clientNavigationDisabled', $router_config );
+	}
+
+	/**
+	 * Tests that rendering the block enqueues its style handle regardless of
+	 * the enhanced pagination setting, so that the `theme.json` styles for the
+	 * block are added by `wp_add_global_styles_for_blocks()`.
+	 *
+	 * @dataProvider data_rendering_query_enqueues_style_handle
+	 *
+	 * @param string $block_attributes JSON encoded block attributes.
+	 */
+	public function test_rendering_query_enqueues_style_handle( $block_attributes ) {
+		/*
+		 * The block ships no front end stylesheet, so its handle is registered
+		 * without a source. `set_up()` replaced `$wp_styles`, and enqueueing an
+		 * unregistered handle does not add it to the queue, so register it again.
+		 */
+		wp_register_style( 'wp-block-query', false );
+
+		do_blocks( "<!-- wp:query $block_attributes --><div class=\"wp-block-query\"></div><!-- /wp:query -->" );
+
+		$this->assertContains( 'wp-block-query', wp_styles()->queue );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_rendering_query_enqueues_style_handle() {
+		return array(
+			'enhanced pagination disabled' => array( '{"queryId":0,"query":{"inherit":true}}' ),
+			'enhanced pagination enabled'  => array( '{"queryId":0,"query":{"inherit":true},"enhancedPagination":true}' ),
+		);
+	}
+
+	/**
+	 * Tests that the `theme.json` styles for the block are added to the global
+	 * styles once the block is rendered without enhanced pagination.
+	 */
+	public function test_rendering_query_without_enhanced_pagination_adds_theme_json_styles() {
+		add_filter( 'should_load_separate_core_block_assets', '__return_true' );
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/query' => array(
+								'css' => 'background-color: hotpink',
+							),
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			wp_register_style( 'wp-block-query', false );
+			wp_register_style( 'global-styles', false );
+
+			gutenberg_add_global_styles_for_blocks();
+			$this->assertNotContains(
+				':root :where(.wp-block-query){background-color: hotpink}',
+				$this->get_global_styles(),
+				'The block styles should not be added before the block is rendered.'
+			);
+
+			do_blocks( '<!-- wp:query {"queryId":0,"query":{"inherit":true}} --><div class="wp-block-query"></div><!-- /wp:query -->' );
+			gutenberg_add_global_styles_for_blocks();
+
+			$this->assertContains(
+				':root :where(.wp-block-query){background-color: hotpink}',
+				$this->get_global_styles(),
+				'The block styles should be added once the block is rendered.'
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	private function get_global_styles() {
+		$styles = wp_styles()->get_data( 'global-styles', 'after' );
+		return is_array( $styles ) ? $styles : array();
 	}
 }
