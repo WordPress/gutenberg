@@ -33,7 +33,9 @@ import {
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
-export const ROTATE_SUPPORT_KEY = 'rotate';
+export const ROTATION_SUPPORT_KEY = 'rotation';
+
+const ROTATE_STYLE_KEY = 'rotate';
 
 type BlockStyle = Record< string, any >;
 
@@ -53,9 +55,9 @@ interface RotateEditProps {
 const ROTATE_BLOCK_PROPS_REFERENCE = {};
 
 /**
- * Returns whether a block supports rotation. Blocks do unless they opt out
- * with `supports.rotate: false`, or define a `style` attribute of their own
- * that is not an object, which rotation could not be stored in.
+ * Returns whether a block supports rotation. Blocks must opt in with
+ * `supports.rotation: true`, and must not define a `style` attribute of their
+ * own that is not an object, which rotation could not be stored in.
  *
  * @param nameOrType Block name or block type object.
  *
@@ -69,25 +71,8 @@ export function hasRotateSupport( nameOrType: string | BlockType ): boolean {
 	const styleType = blockType?.attributes?.style?.type;
 	return (
 		( styleType === undefined || styleType === 'object' ) &&
-		hasBlockSupport( nameOrType, ROTATE_SUPPORT_KEY, true )
+		hasBlockSupport( nameOrType, ROTATION_SUPPORT_KEY, false )
 	);
-}
-
-/**
- * Returns whether rotation is edited and shown for a block: the block rotation
- * experiment is on and the block supports rotation.
- *
- * When this is false, a rotation that is already stored is kept but not shown,
- * as on the front end.
- *
- * @param nameOrType Block name or block type object.
- *
- * @return Whether rotation is edited and shown.
- */
-export function isRotateEnabled( nameOrType: string | BlockType ): boolean {
-	const { __experimentalEnableBlockRotation: isExperimentEnabled } =
-		window as Window & { __experimentalEnableBlockRotation?: boolean };
-	return !! isExperimentEnabled && hasRotateSupport( nameOrType );
 }
 
 /**
@@ -100,10 +85,10 @@ export function isRotateEnabled( nameOrType: string | BlockType ): boolean {
 function hasRotateValue( style: BlockStyle | undefined ): boolean {
 	return Object.entries( getStyleObject( style ) ?? {} ).some(
 		( [ key, value ] ) =>
-			key === ROTATE_SUPPORT_KEY ||
+			key === ROTATE_STYLE_KEY ||
 			( key.startsWith( '@' ) &&
 				isPlainObject( value ) &&
-				value[ ROTATE_SUPPORT_KEY ] !== undefined )
+				value[ ROTATE_STYLE_KEY ] !== undefined )
 	);
 }
 
@@ -221,7 +206,7 @@ function RotateControl( { clientId, setAttributes, style }: RotateEditProps ) {
 		// The provider scopes the panel's "Reset all" to the selected state.
 		<BlockStyleStateProvider value={ selectedState }>
 			<InspectorControls
-				group="dimensions"
+				group="position-tools"
 				resetAllFilter={ resetRotate }
 			>
 				<ToolsPanelItem
@@ -274,8 +259,6 @@ export default {
 	edit: RotateControl,
 	useBlockProps,
 	attributeKeys: [ 'style' ],
-	// Blocks without the experiment keep their stored rotation, which the
-	// style attribute registered for them holds, but it isn't applied.
-	hasSupport: isRotateEnabled,
+	hasSupport: hasRotateSupport,
 	isMatch: ( { style }: { style?: BlockStyle } ) => hasRotateValue( style ),
 };

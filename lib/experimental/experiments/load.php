@@ -34,11 +34,6 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
-				array(
-					'id'          => 'gutenberg-block-rotation',
-					'label'       => __( 'Block rotation', 'gutenberg' ),
-					'description' => __( 'Adds a Rotation control to the Dimensions panel of blocks. When this is off, blocks that were rotated keep their rotation but are shown unrotated.', 'gutenberg' ),
-				),
 			),
 		),
 		array(
