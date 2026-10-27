@@ -28,7 +28,11 @@ import {
 } from './format';
 import type { SuggestionMarkerKind } from './format';
 import { toRichTextRecord } from './rich-text-record';
-import { decideFormatSuggestion } from './format-delta';
+import {
+	decideFormatSuggestion,
+	isEmptyFormatDelta,
+	rebaseFormatDelta,
+} from './format-delta';
 import type { FormatDelta, FormatRevision } from './format-delta';
 import {
 	formatOriginalAligns,
@@ -254,6 +258,34 @@ export function resolveInlineSuggestion(
 			if ( lost.get( markerId ) === total.get( markerId ) ) {
 				affected.set( markerId, 'emptied' );
 				formatRemovals.delete( markerId );
+			}
+		}
+		/*
+		 * A formatting change whose remaining characters it changes nothing
+		 * on has no effect left: it is emptied, and its marker goes.
+		 */
+		if ( formatDeltas ) {
+			for ( const [ markerId, offsets ] of formatRemovals ) {
+				const delta = formatDeltas( markerId );
+				if (
+					delta &&
+					isEmptyFormatDelta( rebaseFormatDelta( delta, offsets ) )
+				) {
+					affected.set( markerId, 'emptied' );
+					formatRemovals.delete( markerId );
+					const remaining = toRichTextRecord( next );
+					if ( remaining ) {
+						next = new RichTextData(
+							removeSuggestionMarker(
+								remaining,
+								SUGGESTION_TYPE_FORMAT,
+								markerId,
+								0,
+								remaining.text.length
+							) as any
+						);
+					}
+				}
 			}
 		}
 	}
