@@ -86,6 +86,12 @@
 	.global-styles-ui-block-types-item__icon {
 		min-width: variables.$grid-unit-30;
 	}
+
+	// Bordered and already inside the screen padding, so it lines up with its
+	// heading without the inset.
+	&.global-styles-ui-element-block-overrides__list {
+		margin-inline: 0;
+	}
 }
 
 .global-styles-ui-block-types-item-list__no-results {

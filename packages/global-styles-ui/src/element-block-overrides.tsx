@@ -43,7 +43,7 @@ export default function ElementBlockOverrides( {
 				<ItemGroup
 					isBordered
 					isSeparated
-					className="global-styles-ui-block-types-item-list"
+					className="global-styles-ui-block-types-item-list global-styles-ui-element-block-overrides__list"
 				>
 					{ blockTypes.map( ( block ) => (
 						<BlockMenuItem block={ block } key={ block.name } />
