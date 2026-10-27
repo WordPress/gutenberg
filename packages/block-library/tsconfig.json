@@ -4,6 +4,7 @@
 	"compilerOptions": {
 		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
 	},
+	"files": [ "src/latest-posts/edit.jsx" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
