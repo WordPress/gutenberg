@@ -59,7 +59,6 @@
 	min-width: 0;
 }
 
-// One class of specificity: theme.json and theme class rules can override it, but element resets like `div { padding: 0 }` can't.
 :root :where(.wp-block-media-text > .wp-block-media-text__content) {
 	padding: 0 8%;
 }
