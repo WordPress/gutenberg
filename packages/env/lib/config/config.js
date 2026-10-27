@@ -10,7 +10,11 @@ const os = require( 'os' );
  * Internal dependencies
  */
 const detectDirectoryType = require( './detect-directory-type' );
-const { validateConfig, ValidationError } = require( './validate-config' );
+const {
+	validateConfig,
+	checkMariaDBVersion,
+	ValidationError,
+} = require( './validate-config' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
 const { includeTestsPath, parseSourceString } = parseConfig;
@@ -33,13 +37,14 @@ const md5 = require( '../md5' );
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
- * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources Plugins to load in the environment.
- * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port to use.
- * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {WPSource}                  coreSource     The WordPress installation to load in the environment.
+ * @property {WPSource[]}                pluginSources  Plugins to load in the environment.
+ * @property {WPSource[]}                themeSources   Themes to load in the environment.
+ * @property {number}                    port           The port to use.
+ * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string}                    phpVersion     Version of PHP to use in the environments, of the format 0.0.
+ * @property {string}                    mariadbVersion Version of MariaDB to use in the environments: "lts", "latest", or of the format 0.0. Null uses the default.
  */
 
 /**
@@ -88,6 +93,7 @@ module.exports = async function readConfig( configPath ) {
 	const defaultConfiguration = {
 		core: null, // Indicates that the latest stable version should ultimately be used.
 		phpVersion: null,
+		mariadbVersion: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
@@ -271,6 +277,18 @@ function withOverrides( config ) {
 		process.env.WP_ENV_PHP_VERSION || config.env.development.phpVersion;
 	config.env.tests.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
+
+	// Override MariaDB version with environment variable.
+	if ( process.env.WP_ENV_MARIADB_VERSION ) {
+		checkMariaDBVersion(
+			'environment variable',
+			'WP_ENV_MARIADB_VERSION',
+			process.env.WP_ENV_MARIADB_VERSION
+		);
+		config.env.development.mariadbVersion =
+			process.env.WP_ENV_MARIADB_VERSION;
+		config.env.tests.mariadbVersion = process.env.WP_ENV_MARIADB_VERSION;
+	}
 
 	const updateEnvUrl = ( configKey ) => {
 		[ 'development', 'tests' ].forEach( ( envKey ) => {
