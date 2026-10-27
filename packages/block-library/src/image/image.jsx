@@ -720,21 +720,41 @@ export default function Image( {
 		);
 	};
 
+	const hasCustomSize =
+		( !! activeWidth && activeWidth !== 'auto' ) ||
+		( !! activeHeight && activeHeight !== 'auto' );
+
 	const dimensionsControl =
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
-				onChange={ ( { aspectRatio: newAspectRatio } ) => {
+				value={ {
+					width: activeWidth,
+					height: activeHeight,
+					aspectRatio: activeAspectRatio,
+					scale: activeScale,
+				} }
+				onChange={ ( {
+					width: newWidth,
+					height: newHeight,
+					aspectRatio: newAspectRatio,
+				} ) => {
 					setDimensionAttributes( {
+						width: ! newWidth && newHeight ? 'auto' : newWidth,
+						height: newHeight,
 						aspectRatio: newAspectRatio,
 						scale: 'cover',
 					} );
 				} }
 				defaultAspectRatio="auto"
-				tools={ [ 'aspectRatio' ] }
+				unitsOptions={ dimensionsUnitsOptions }
+				tools={
+					hasCustomSize
+						? [ 'aspectRatio', 'widthHeight' ]
+						: [ 'aspectRatio' ]
+				}
 			/>
 		) : (
 			<DimensionsTool
