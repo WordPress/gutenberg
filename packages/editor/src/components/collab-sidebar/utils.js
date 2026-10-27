@@ -97,7 +97,7 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
  * preserving insertion order. Handles both scalar (legacy, possibly
  * string-typed) and array (new) values.
  *
- * @param {Object} metadata Block metadata object
+ * @param {Object|undefined} metadata Block metadata object
  * @return {number[]} Array of note IDs (may be empty)
  */
 export function getNoteIdsFromMetadata( metadata ) {
@@ -679,8 +679,8 @@ export function pickPrimaryNote( threads ) {
 /**
  * Removes a note ID from the metadata.
  *
- * @param {Object} metadata Existing block metadata
- * @param {number} noteId   Note ID to remove
+ * @param {Object|undefined} metadata Existing block metadata
+ * @param {number}           noteId   Note ID to remove
  * @return {Object} Updated metadata object
  */
 export function removeNoteIdFromMetadata( metadata, noteId ) {
