@@ -1,4 +1,4 @@
-import { useState, useMemo, useLayoutEffect } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { debounce, useInstanceId } from '@wordpress/compose';
 import {
@@ -25,81 +25,6 @@ const noop = () => {};
 
 const getCompositeItemId = ( instanceId: string, style: BlockStyle ) =>
 	`${ instanceId }-${ style.name }`;
-
-function useIsTruncated( element: HTMLElement | null ) {
-	const [ isTruncated, setIsTruncated ] = useState( false );
-
-	useLayoutEffect( () => {
-		if ( ! element ) {
-			return;
-		}
-		const update = () =>
-			setIsTruncated( element.scrollHeight > element.clientHeight );
-		update();
-		const resizeObserver = new window.ResizeObserver( update );
-		resizeObserver.observe( element );
-		return () => resizeObserver.disconnect();
-	}, [ element ] );
-
-	return isTruncated;
-}
-
-type BlockStylesItemProps = {
-	id: string;
-	label: string;
-	isActive: boolean;
-	onSelect: () => void;
-	onHover: ( isHovered: boolean ) => void;
-};
-
-function BlockStylesItem( {
-	id,
-	label,
-	isActive,
-	onSelect,
-	onHover,
-}: BlockStylesItemProps ) {
-	const [ labelElement, setLabelElement ] = useState< HTMLElement | null >(
-		null
-	);
-	const isTruncated = useIsTruncated( labelElement );
-
-	return (
-		// Show the full label in a tooltip only when it's visually truncated.
-		<Tooltip.Root disabled={ ! isTruncated }>
-			<Composite.Item
-				id={ id }
-				render={
-					<Tooltip.Trigger
-						render={
-							<Button
-								className="block-editor-block-styles__item"
-								tone="neutral"
-								variant={ isActive ? 'solid' : 'outline' }
-							/>
-						}
-					/>
-				}
-				role="radio"
-				aria-checked={ isActive }
-				onMouseEnter={ () => onHover( true ) }
-				onFocus={ () => onHover( true ) }
-				onMouseLeave={ () => onHover( false ) }
-				onBlur={ () => onHover( false ) }
-				onClick={ onSelect }
-			>
-				<Truncate
-					ref={ setLabelElement }
-					numberOfLines={ 2 }
-					className="block-editor-block-styles__item-text"
-				>
-					{ label }
-				</Truncate>
-			</Composite.Item>
-			<Tooltip.Popup>{ label }</Tooltip.Popup>
-		</Tooltip.Root>
-	);
-}
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
@@ -244,27 +169,65 @@ function BlockStyles( {
 								key={ rowIndex }
 								className="block-editor-block-styles__row"
 							>
-								{ row.map( ( style ) => (
-									<BlockStylesItem
-										key={ style.name }
-										id={ getCompositeItemId(
-											instanceId,
-											style
-										) }
-										label={ style.label || style.name }
-										isActive={
-											activeStyle.name === style.name
-										}
-										onSelect={ () =>
-											onSelectStylePreview( style )
-										}
-										onHover={ ( isHovered ) =>
-											styleItemHandler(
-												isHovered ? style : null
-											)
-										}
-									/>
-								) ) }
+								{ row.map( ( style ) => {
+									const label = style.label || style.name;
+									const isActive =
+										activeStyle.name === style.name;
+									return (
+										<Tooltip.Root key={ style.name }>
+											<Composite.Item
+												id={ getCompositeItemId(
+													instanceId,
+													style
+												) }
+												render={
+													<Tooltip.Trigger
+														render={
+															<Button
+																className="block-editor-block-styles__item"
+																tone="neutral"
+																variant={
+																	isActive
+																		? 'solid'
+																		: 'outline'
+																}
+															/>
+														}
+													/>
+												}
+												role="radio"
+												aria-checked={ isActive }
+												onMouseEnter={ () =>
+													styleItemHandler( style )
+												}
+												onFocus={ () =>
+													styleItemHandler( style )
+												}
+												onMouseLeave={ () =>
+													styleItemHandler( null )
+												}
+												onBlur={ () =>
+													styleItemHandler( null )
+												}
+												onClick={ () =>
+													onSelectStylePreview(
+														style
+													)
+												}
+											>
+												<Truncate
+													numberOfLines={ 2 }
+													className="block-editor-block-styles__item-text"
+												>
+													{ label }
+												</Truncate>
+											</Composite.Item>
+											<Tooltip.Popup>
+												{ label }
+											</Tooltip.Popup>
+										</Tooltip.Root>
+									);
+								} ) }
 							</Composite.Row>
 						) ) }
 					</Composite>
