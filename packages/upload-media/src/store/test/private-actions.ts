@@ -1455,7 +1455,7 @@ describe( 'private actions', () => {
 			},
 		} );
 
-		const runGenerate = ( item ) => {
+		const runGenerate = ( item: ReturnType< typeof makeItem > ) => {
 			const dispatch = {
 				addSideloadItem: vi.fn(),
 				finishOperation: vi.fn(),
@@ -1468,12 +1468,13 @@ describe( 'private actions', () => {
 					bigImageSizeThreshold: 2560,
 				} ),
 			};
-			return generateThumbnails( item.id )( { select, dispatch } ).then(
-				() => dispatch
-			);
+			return generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs ).then( () => dispatch );
 		};
 
-		let originalCreateImageBitmap;
+		let originalCreateImageBitmap: typeof createImageBitmap;
 
 		beforeEach( () => {
 			vi.clearAllMocks();
@@ -1490,56 +1491,46 @@ describe( 'private actions', () => {
 					'The source image could not be decoded.',
 					'InvalidStateError'
 				);
-			} );
-			return vi.spyOn( console, 'warn' ).mockImplementation( () => {} );
+			} ) as unknown as typeof createImageBitmap;
 		};
 
 		it( 'still finishes the operation when the browser cannot decode the image for the threshold check', async () => {
-			const warnSpy = mockUndecodable();
+			mockUndecodable();
 
-			try {
-				const item = makeItem();
-				const dispatch = await runGenerate( item );
+			const item = makeItem();
+			const dispatch = await runGenerate( item );
 
-				expect( dispatch.finishOperation ).toHaveBeenCalledWith(
-					item.id,
-					{}
-				);
-			} finally {
-				warnSpy.mockRestore();
-			}
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				item.id,
+				{}
+			);
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'still sideloads the regular sub-sizes when the threshold check fails to decode the image', async () => {
-			const warnSpy = mockUndecodable();
+			mockUndecodable();
 
-			try {
-				const item = makeItem();
-				const dispatch = await runGenerate( item );
+			const item = makeItem();
+			const dispatch = await runGenerate( item );
 
-				const sizes = dispatch.addSideloadItem.mock.calls.map(
-					( [ args ] ) => args.additionalData.image_size
-				);
-				expect( sizes ).toContain( 'thumbnail' );
-			} finally {
-				warnSpy.mockRestore();
-			}
+			const sizes = dispatch.addSideloadItem.mock.calls.map(
+				( [ args ] ) => args.additionalData.image_size
+			);
+			expect( sizes ).toContain( 'thumbnail' );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'does not sideload a -scaled version when the threshold check fails to decode the image', async () => {
-			const warnSpy = mockUndecodable();
+			mockUndecodable();
 
-			try {
-				const item = makeItem();
-				const dispatch = await runGenerate( item );
+			const item = makeItem();
+			const dispatch = await runGenerate( item );
 
-				const scaledCall = dispatch.addSideloadItem.mock.calls.find(
-					( [ args ] ) => args.additionalData.image_size === 'scaled'
-				);
-				expect( scaledCall ).toBeUndefined();
-			} finally {
-				warnSpy.mockRestore();
-			}
+			const scaledCall = dispatch.addSideloadItem.mock.calls.find(
+				( [ args ] ) => args.additionalData.image_size === 'scaled'
+			);
+			expect( scaledCall ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'still sideloads a -scaled version when the image can be decoded and exceeds the threshold', async () => {
@@ -1547,7 +1538,7 @@ describe( 'private actions', () => {
 				width: 5000,
 				height: 4000,
 				close: vi.fn(),
-			} ) );
+			} ) ) as unknown as typeof createImageBitmap;
 
 			const item = makeItem();
 			const dispatch = await runGenerate( item );
