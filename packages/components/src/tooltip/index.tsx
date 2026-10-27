@@ -22,7 +22,7 @@ const CONTEXT_VALUE = {
 	isNestedInTooltip: true,
 };
 
-export function UnforwardedTooltip(
+function UnforwardedTooltip(
 	props: TooltipProps,
 	ref: React.ForwardedRef< any >
 ) {

@@ -1,6 +1,6 @@
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
-import { UnforwardedTooltip } from '.';
+import Tooltip from '.';
 import type { TooltipProps } from './types';
 
 function UnforwardedDeprecatedTooltip(
@@ -13,7 +13,7 @@ function UnforwardedDeprecatedTooltip(
 		alternative: 'Tooltip from @wordpress/ui',
 	} );
 
-	return UnforwardedTooltip( props, ref );
+	return <Tooltip { ...props } ref={ ref } />;
 }
 
 /**
