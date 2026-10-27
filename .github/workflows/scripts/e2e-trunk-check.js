@@ -9,7 +9,7 @@
  *     node e2e-trunk-check.js <pull request commit>
  *
  * A failing test is the expected result, so test results never fail this
- * script. Set `PLAYWRIGHT_JSON_OUTPUT_FILE` to where Playwright writes results.
+ * script; only a setup that runs no test does. Set `PLAYWRIGHT_JSON_OUTPUT_FILE` to where Playwright writes results.
  */
 
 const { execFileSync } = require( 'node:child_process' );
@@ -80,7 +80,7 @@ for ( const line of diff.split( '\n' ) ) {
 
 // A test changed when a changed line falls between its first line and its
 // closing brace, found by its indentation. Keep the first such line, which is
-// where the warning goes.
+// where the annotation goes.
 const tests = new Map();
 for ( const spec of playwright( [
 	'--list',
@@ -100,13 +100,19 @@ for ( const spec of playwright( [
 }
 
 if ( tests.size ) {
-	const results = playwright( [ ...tests.keys() ].map( relative ) ).map(
-		( spec ) => ( {
+	// Playwright matches the file part of each argument as a pattern, so it
+	// can run other tests too.
+	const results = playwright( [ ...tests.keys() ].map( relative ) )
+		.filter( ( spec ) => tests.has( `${ spec.file }:${ spec.line }` ) )
+		.map( ( spec ) => ( {
 			path: spec.file,
 			line: tests.get( `${ spec.file }:${ spec.line }` ),
 			status: spec.tests[ 0 ].results[ 0 ]?.status,
-		} )
-	);
+		} ) );
+	// Without any result, the setup broke, which says nothing about the tests.
+	if ( ! results.some( ( { status } ) => status ) ) {
+		throw new Error( 'No test ran on trunk.' );
+	}
 	const failing = results.filter( ( { status } ) =>
 		[ 'failed', 'timedOut' ].includes( status )
 	);
