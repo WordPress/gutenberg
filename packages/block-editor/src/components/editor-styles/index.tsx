@@ -13,12 +13,9 @@ import type { EditorStylesProps, EditorStylesStyle } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName(
-	styles: ( string | null )[],
-	scope?: string
-) {
+function useDarkThemeBodyClassName( styles: unknown[], scope?: string ) {
 	return useCallback(
-		( node: HTMLStyleElement | null ) => {
+		( node: HTMLElement | null ) => {
 			if ( ! node ) {
 				return;
 			}
@@ -103,12 +100,26 @@ function EditorStyles( {
 			}
 		}
 
+		// The filter keeps the styles with CSS.
+		const stylesWithCSS = _styles.filter(
+			( style ) => style?.css
+		) as EditorStyle[];
+		// Without a scope, the CSS is inserted as it is, but for its URLs,
+		// which a linked file resolves relative to itself. The link takes
+		// the place of the CSS, so the order of the styles is kept.
+		const isLinked = ( style: EditorStyle ) => ! scope && !! style.href;
+		const transformed = transformStyles(
+			stylesWithCSS.filter( ( style ) => ! isLinked( style ) ),
+			scope,
+			transformOptions
+		);
+		let transformedIndex = 0;
+
 		return [
-			transformStyles(
-				// The filter keeps the styles with CSS.
-				_styles.filter( ( style ) => style?.css ) as EditorStyle[],
-				scope,
-				transformOptions
+			stylesWithCSS.map( ( style ) =>
+				isLinked( style )
+					? { href: style.href as string }
+					: transformed[ transformedIndex++ ]
 			),
 			_styles
 				.filter( ( style ) => style.__unstableType === 'svgs' )
@@ -116,17 +127,31 @@ function EditorStyles( {
 				.join( '' ),
 		];
 	}, [ styles, overrides, scope, transformOptions ] );
+	const updateDarkThemeBodyClassName = useDarkThemeBodyClassName(
+		transformedStyles,
+		scope
+	);
 
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style
-				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
-			/>
-			{ transformedStyles.map( ( css, index ) => (
-				<style key={ index }>{ css }</style>
-			) ) }
+			<style ref={ updateDarkThemeBodyClassName } />
+			{ transformedStyles.map( ( style, index ) =>
+				typeof style === 'object' && style !== null ? (
+					<link
+						key={ index }
+						rel="stylesheet"
+						href={ style.href }
+						// The linked styles may change the background color.
+						onLoad={ ( event ) =>
+							updateDarkThemeBodyClassName( event.currentTarget )
+						}
+					/>
+				) : (
+					<style key={ index }>{ style }</style>
+				)
+			) }
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 0 0"
