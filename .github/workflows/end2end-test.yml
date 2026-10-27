@@ -5,7 +5,12 @@ on:
     paths-ignore:
     - '**.md'
   push:
-    branches: [master]
+    branches:
+      - trunk
+      - 'release/[0-9]+.[0-9]'
+      - 'wp/[0-9]+.[0-9]'
+      - wp/latest
+      - wp/next
     paths-ignore:
     - '**.md'
 
