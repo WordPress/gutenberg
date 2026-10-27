@@ -4,9 +4,9 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-A widget type's identity — `title`, and the rest of the identity layer in **Anatomy** — lives on `WidgetType`. The host already shows the translated title in its chrome. The render body sometimes needs that same string: a focusable chart whose accessible name should say what it shows, in the user's language.
+A widget type's identity — `title`, and the rest of the identity layer in **Anatomy** — lives on `WidgetType`. The host already shows it in chrome. The render body sometimes needs the same data.
 
-`useWidgetIdentity` is that channel. It is not a host capability.
+`useWidgetIdentity` is how consumers read that identity consistently. It is not a host capability. A focusable chart that builds an accessible name from the title is one casual example; the hook itself only exposes identity.
 
 ![WidgetRender holds the resolved WidgetType, including its translated title. It mounts the render module with attributes and setAttributes, and lends the subtree a filtered identity context. The widget body reads useWidgetIdentity for the title to build an accessible name. Host capabilities such as links stay on a separate seam.](./assets/widget-identity-flow.svg)
 
@@ -18,7 +18,7 @@ Three concerns, three APIs:
 -   Host materialization: `useWidgetHost` for what only the host or application can provide (`links`, `actions`). See **Widget Host**.
 -   Type identity for the body: `useWidgetIdentity` for the filtered slice of the type the render may need.
 
-Putting `title` on `WidgetHost` would mix the type's own metadata with capabilities the host originates. Passing the whole `WidgetType` as render props would couple the body to chrome and schema fields it should not own. Reading a WordPress entity store from the render would couple portable widgets to one host's discovery path.
+Identity belongs to the type. Host capabilities belong to the host. Keeping them apart leaves widgets portable across hosts.
 
 ## Contract
 

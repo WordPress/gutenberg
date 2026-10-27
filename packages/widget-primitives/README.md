@@ -51,7 +51,7 @@ Error handling and chrome stay with the host, which wraps the lazy render in a `
 
 ### `useWidgetIdentity()`
 
-It reads the translated `title` of the widget type from context. `WidgetRender` provides it from the `widgetType` it already holds, so any host that mounts through that entry point needs no extra wiring. Absent a provider (a host that mounts the render module directly), the hook returns `{}` and the widget names its content itself.
+It is how a mounted widget reads its type's identity consistently — today the translated `title`. `WidgetRender` provides it from the `widgetType` it already holds, so any host that mounts through that entry point needs no extra wiring. Absent a provider, the hook returns `{}`.
 
 This is not a host capability. Identity belongs to the type; `useWidgetHost` stays the seam for what only the host/app can materialize (`links`, `actions`). The Widget Identity Storybook page covers the contract and the flow.
 
