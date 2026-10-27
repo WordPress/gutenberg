@@ -58,6 +58,7 @@ describe( 'suggestionRelations', () => {
 			],
 			partlyIn: [],
 			alsoDeleting: [],
+			builtOn: [],
 		} );
 	} );
 
@@ -67,6 +68,7 @@ describe( 'suggestionRelations', () => {
 			children: [],
 			partlyIn: [],
 			alsoDeleting: [],
+			builtOn: [],
 		} );
 		expect( suggestionRelations( annezazu(), 2 ).parents[ 0 ]?.id ).toBe(
 			'1'
@@ -87,6 +89,7 @@ describe( 'suggestionRelations', () => {
 			children: [],
 			partlyIn: [ { id: '6', kind: 'add', authorId: '2' } ],
 			alsoDeleting: [],
+			builtOn: [],
 		} );
 		// The addition holds part of the deletion: not a child of it.
 		expect( suggestionRelations( value, 6 ).children ).toEqual( [] );
@@ -142,7 +145,24 @@ describe( 'suggestionRelations', () => {
 			children: [],
 			partlyIn: [],
 			alsoDeleting: [],
+			builtOn: [],
 		} );
 		expect( suggestionRelations( 'plain', 1 ).children ).toEqual( [] );
+	} );
+
+	it( 'names the formatting changes a formatting change was made on', () => {
+		const value = RichTextData.fromHTMLString(
+			`a${ mark(
+				'format',
+				4,
+				`b${ mark( 'format', 9, '<em>cd</em>', 3 ) }`,
+				2
+			) }${ mark( 'format', 9, '<em>e</em>', 3 ) }`
+		);
+		expect( suggestionRelations( value, 9 ).builtOn ).toEqual( [
+			{ id: '4', kind: 'format', authorId: '2' },
+		] );
+		// The older change was not made on the newer one.
+		expect( suggestionRelations( value, 4 ).builtOn ).toEqual( [] );
 	} );
 } );
