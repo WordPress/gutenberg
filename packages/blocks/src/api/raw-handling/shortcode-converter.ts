@@ -59,17 +59,10 @@ function segmentHTMLToShortcodeBlock(
 	const beforeHTML = HTML.substr( 0, match.index );
 	const afterHTML = HTML.substr( lastIndex );
 
-	// Like images, a shortcode in text stays inline, unless it's on its own
-	// line, or aligned at the start or end of a line.
+	// A shortcode in the middle of a line stays inline.
 	const isLineStart = beforeLineRegexp.test( beforeHTML );
 	const isLineEnd = afterLineRegexp.test( afterHTML );
-	const isAligned = /^align(left|center|right)$/.test(
-		match.shortcode.attrs.named.align ?? ''
-	);
-	if (
-		! ( isLineStart && isLineEnd ) &&
-		! ( isAligned && ( isLineStart || isLineEnd ) )
-	) {
+	if ( ! isLineStart && ! isLineEnd ) {
 		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 	}
 
@@ -154,6 +147,19 @@ function segmentHTMLToShortcodeBlock(
 		block = applyBuiltInValidationFixes( block, transformationBlockType );
 
 		blocks = [ block ];
+	}
+
+	// Like images, a shortcode at the start or end of a line only moves out of
+	// the text if its block is aligned.
+	if (
+		! ( isLineStart && isLineEnd ) &&
+		! blocks.every( ( block ) =>
+			[ 'left', 'center', 'right' ].includes(
+				block.attributes.align as string
+			)
+		)
+	) {
+		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 	}
 
 	// Text after a shortcode moved from the start of a line keeps the line's
