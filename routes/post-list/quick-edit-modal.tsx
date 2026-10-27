@@ -14,6 +14,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { StatusSelectEdit } from './status-select-edit';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
@@ -55,6 +56,56 @@ function withEditorAssets( FieldEdit: any ) {
 }
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
+
+/*
+ * Opening the modal is already the choice to edit, so the frequently edited
+ * fields render their controls inline rather than behind a panel, and the
+ * fields that keep one are pinned below them, above the modal's buttons. A
+ * group among them (`status`) is split into its members, so each renders as
+ * a field of its own. The form config is shared with the editor's document
+ * sidebar, which keeps its panels.
+ */
+const fieldsWithRegularLayout = [
+	'status',
+	'slug',
+	'author',
+	'template',
+	'excerpt',
+];
+
+const regularLayout = {
+	type: 'regular' as const,
+	labelPosition: 'top' as const,
+};
+
+function splitQuickEditForm( form: Form ) {
+	const formFields = ( form.fields ?? [] ).flatMap( ( field ) => {
+		const id = typeof field === 'string' ? field : field.id;
+		if ( ! fieldsWithRegularLayout.includes( id ) ) {
+			return [ field ];
+		}
+		const members =
+			typeof field !== 'string' && field.children
+				? field.children
+				: [ field ];
+		return members.map( ( member ) => ( {
+			...( typeof member === 'string' ? { id: member } : member ),
+			layout: regularLayout,
+		} ) );
+	} );
+	const isRegular = ( field: ( typeof formFields )[ number ] ) =>
+		( typeof field === 'string'
+			? form.layout
+			: ( field.layout ?? form.layout )
+		)?.type === 'regular';
+	return {
+		inlineForm: { ...form, fields: formFields.filter( isRegular ) },
+		panelForm: {
+			...form,
+			fields: formFields.filter( ( field ) => ! isRegular( field ) ),
+		},
+	};
+}
 
 interface QuickEditModalProps {
 	postType: string;
@@ -123,6 +174,7 @@ export function QuickEditModal( {
 				if ( field.id === 'status' ) {
 					return {
 						...field,
+						Edit: StatusSelectEdit,
 						elements: field.elements.filter(
 							( element: { value: string } ) =>
 								element.value !== 'trash'
@@ -148,21 +200,19 @@ export function QuickEditModal( {
 		[ _fields, canSwitchTemplate ]
 	);
 
-	const form = useMemo( (): Form => {
+	const { inlineForm, panelForm } = useMemo( () => {
 		if ( ! quickEditForm ) {
-			return { layout: { type: 'panel' }, fields: [] };
+			const emptyForm: Form = { layout: { type: 'panel' }, fields: [] };
+			return { inlineForm: emptyForm, panelForm: emptyForm };
 		}
-		if ( ! isBulk ) {
-			return quickEditForm;
-		}
-		return {
-			...quickEditForm,
-			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
-				fieldsWithBulkEditSupport.includes(
-					typeof field === 'string' ? field : field.id
+		const formFields = isBulk
+			? ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 				)
-			),
-		};
+			: quickEditForm.fields;
+		return splitQuickEditForm( { ...quickEditForm, fields: formFields } );
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
@@ -231,11 +281,21 @@ export function QuickEditModal( {
 					<DataForm
 						data={ { ...record, ...localEdits } }
 						fields={ fields }
-						form={ form }
+						form={ inlineForm }
 						onChange={ onChange }
 					/>
 				) }
 			</div>
+			{ hasFinishedResolution && !! panelForm.fields?.length && (
+				<div className="dataviews-action-modal__quick-edit-panels">
+					<DataForm
+						data={ { ...record, ...localEdits } }
+						fields={ fields }
+						form={ panelForm }
+						onChange={ onChange }
+					/>
+				</div>
+			) }
 			<HStack className="dataviews-action-modal__quick-edit-footer">
 				<Button
 					__next40pxDefaultSize

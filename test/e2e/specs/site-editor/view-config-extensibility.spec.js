@@ -179,8 +179,10 @@ test.describe( 'View config extensibility', () => {
 		await expect(
 			quickEditModal.getByRole( 'textbox', { name: 'Link' } )
 		).toBeVisible();
+		// The quick edit drawer renders the slug inline on its own, so the
+		// date shows the filtered `regular` layout reaching the form.
 		await expect(
-			quickEditModal.getByRole( 'button', { name: 'Edit Slug' } )
+			quickEditModal.getByRole( 'button', { name: 'Edit Date' } )
 		).toHaveCount( 0 );
 		await expect(
 			quickEditModal.getByRole( 'button', { name: 'Edit Status' } )
