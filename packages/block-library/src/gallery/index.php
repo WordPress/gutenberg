@@ -755,10 +755,27 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 			)
 		);
-		while ( $processor->next_tag( 'figure' ) ) {
+		$trigger_button_aria_label = null;
+		while ( $processor->next_tag() ) {
+			if ( 'BUTTON' === $processor->get_tag() ) {
+				// Gives the trigger button its positional name before JavaScript runs.
+				if ( null !== $trigger_button_aria_label && $processor->has_class( 'lightbox-trigger' ) ) {
+					$processor->set_attribute( 'aria-label', $trigger_button_aria_label );
+					$trigger_button_aria_label = null;
+				}
+				continue;
+			}
+			if ( 'FIGURE' !== $processor->get_tag() ) {
+				continue;
+			}
 			$wp_key = $processor->get_attribute( 'data-wp-key' );
 			if ( $wp_key && isset( $state['metadata'][ $wp_key ] ) ) {
-				$alt = $state['metadata'][ $wp_key ]['alt'];
+				$alt                       = $state['metadata'][ $wp_key ]['alt'];
+				$trigger_button_aria_label = empty( $alt )
+					/* translators: %1$s: current image index, %2$s: total number of images. */
+					? sprintf( __( 'Enlarge image %1$s of %2$s' ), $lightbox_index + 1, $total )
+					/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text. */
+					: sprintf( __( 'Enlarge image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, wp_trim_words( $alt, 15, '…' ) );
 				wp_interactivity_state(
 					'core/image',
 					array(
@@ -769,11 +786,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $lightbox_index + 1, $total )
 									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
 									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, $alt ),
-								'triggerButtonAriaLabel' => empty( $alt )
-									/* translators: %1$s: current image index, %2$s: total number of images. */
-									? sprintf( __( 'Enlarge image %1$s of %2$s' ), $lightbox_index + 1, $total )
-									/* translators: %1$s: current image index, %2$s: total number of images */
-									: sprintf( __( 'Enlarge image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, wp_trim_words( $alt, 15, '…' ) ),
+								'triggerButtonAriaLabel' => $trigger_button_aria_label,
 								'order'                  => $lightbox_index,
 							),
 						),

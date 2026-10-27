@@ -509,7 +509,7 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 	public function test_lightbox_trigger_button_aria_labels_include_position_and_alt() {
 		$image = '<!-- wp:image {"lightbox":{"enabled":true}} --><figure class="wp-block-image"><img src="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2021/04/canola.jpg"%s/></figure><!-- /wp:image -->';
 
-		do_blocks(
+		$output = do_blocks(
 			'<!-- wp:gallery --><figure class="wp-block-gallery has-nested-images columns-default is-cropped">'
 			. sprintf( $image, ' alt="A red barn"' )
 			. sprintf( $image, '' )
@@ -523,11 +523,17 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				'Enlarge image 1 of 3: A red barn',
-				'Enlarge image 3 of 3: A red barn surrounded by green fields under a bright blue sky on a sunny…',
 				'Enlarge image 2 of 3',
+				'Enlarge image 3 of 3: A red barn surrounded by green fields under a bright blue sky on a sunny…',
 			),
 			array_slice( $labels, -3 )
 		);
+
+		preg_match_all( '/<button[^>]*class="lightbox-trigger"[^>]*>/', $output, $buttons );
+		$this->assertCount( 3, $buttons[0] );
+		$this->assertStringContainsString( 'aria-label="Enlarge image 1 of 3: A red barn"', $buttons[0][0] );
+		$this->assertStringContainsString( 'aria-label="Enlarge image 2 of 3"', $buttons[0][1] );
+		$this->assertStringContainsString( 'sunny…"', $buttons[0][2] );
 
 		remove_all_filters( 'render_block_core/image' );
 	}
