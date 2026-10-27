@@ -6,6 +6,10 @@
 
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 
+### Bug Fixes
+
+-   Image: Refresh backed-up image URLs after edits while preserving caption markup ([#83541](https://github.com/WordPress/gutenberg/pull/83541)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements

@@ -107,6 +107,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 					if ( $saved_src === $backup_url ) {
 						$processor->set_attribute( 'src', $current_image[0] );
+
+						// Apply the URL change before capturing empty caption offsets.
+						$processor->get_updated_html();
 						break;
 					}
 				}

@@ -171,9 +171,11 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 	/**
 	 * @ticket 65960
 	 *
+	 * @dataProvider data_stale_image_captions
+	 *
 	 * @covers ::render_block_core_image
 	 */
-	public function test_should_replace_stale_backed_up_intermediate_image_src() {
+	public function test_should_replace_stale_backed_up_intermediate_image_src( $caption, $expected_caption ) {
 		$attachment_id = self::factory()->post->create(
 			array(
 				'post_type'      => 'attachment',
@@ -235,6 +237,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$content =
 		'<figure class="wp-block-image size-medium">' .
 		'<img src="' . esc_url( $stale_src ) . '" class="wp-image-' . $attachment_id . '"/>' .
+		$caption .
 		'</figure>';
 
 		$parsed_blocks = parse_blocks(
@@ -258,6 +261,18 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$this->assertSame(
 			$current_image[0],
 			$processor->get_attribute( 'src' )
+		);
+		$this->assertSame(
+			'<figure class="wp-block-image size-medium"><img src="' . esc_url( $current_image[0] ) . '" class="wp-image-' . $attachment_id . '"/>' . $expected_caption . '</figure>',
+			$rendered_block
+		);
+	}
+
+	public static function data_stale_image_captions() {
+		return array(
+			'no caption'       => array( '', '' ),
+			'empty caption'    => array( '<figcaption class="wp-element-caption"></figcaption>', '' ),
+			'nonempty caption' => array( '<figcaption class="wp-element-caption">Image caption</figcaption>', '<figcaption class="wp-element-caption">Image caption</figcaption>' ),
 		);
 	}
 
