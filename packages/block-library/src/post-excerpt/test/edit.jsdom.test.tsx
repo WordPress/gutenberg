@@ -9,11 +9,12 @@ import {
 	initializeEditor,
 	selectBlock,
 } from '@wordpress/integration-tests/helpers/integration-test-editor';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Post Excerpt block', () => {
 	test( 'shows the settings when there is no post to display', async () => {
-		await initializeEditor( { name: 'core/post-excerpt' } );
+		await initializeEditor( { name: 'core/post-excerpt' }, true, {} );
 
 		await selectBlock( 'Block: Excerpt' );
 
@@ -64,7 +65,8 @@ describe( 'Post Excerpt block', () => {
 				attributes: { postId: 1, postType: 'post' },
 				innerBlocks: [ createBlock( 'core/post-excerpt' ) ],
 			},
-			false
+			false,
+			{}
 		);
 
 		await selectBlock( 'Block: Excerpt' );
