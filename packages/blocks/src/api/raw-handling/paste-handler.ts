@@ -1,3 +1,4 @@
+import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
@@ -111,7 +112,11 @@ export function pasteHandler( {
 		// Check plain text if there is no HTML.
 		const content = HTML ? HTML : plainText;
 
-		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
+		// HTML outside delimiters is pasted as HTML, below.
+		if (
+			content.indexOf( '<!-- wp:' ) !== -1 &&
+			grammarParse( content ).some( ( { blockName } ) => blockName )
+		) {
 			const parseResult = parse( content );
 			const isSingleFreeFormBlock =
 				parseResult.length === 1 &&

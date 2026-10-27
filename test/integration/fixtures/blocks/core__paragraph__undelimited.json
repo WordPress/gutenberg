@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/paragraph",
+		"isValid": true,
+		"attributes": {
+			"content": "Testing freeform block with some",
+			"dropCap": false
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/html",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [],
+		"innerContent": [
+			"<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>"
+		]
+	}
+]

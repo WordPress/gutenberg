@@ -13,6 +13,7 @@ import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import { addSource, canReadHTML, parseUndelimited } from '../undelimited';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
 
 /**
@@ -150,18 +151,82 @@ function applyBlockValidation(
 	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
 }
 
+interface ParseContext {
+	isTopLevel?: boolean;
+	writtenBlocks?: WeakMap< RawBlock, string >;
+}
+
+// The default block parser's pattern for delimiters.
+const DELIMITER =
+	/<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
+
+/**
+ * Finds the text each block was written as, so it can be saved exactly that
+ * way. The parser doesn't report where blocks start and end, so this walks
+ * the delimiters the same way; blocks appear in the order of their openers.
+ *
+ * @param content   Post content.
+ * @param rawBlocks Blocks the parser read from it.
+ */
+function getWrittenBlocks(
+	content: string,
+	rawBlocks: RawBlock[]
+): WeakMap< RawBlock, string > {
+	const written: Array< { name: string; text?: string } > = [];
+	const open: Array< { index: number; start: number } > = [];
+	for ( const match of content.matchAll( DELIMITER ) ) {
+		const [ token, isCloser, namespace, name, , , isVoid ] = match;
+		const start = match.index as number;
+		if ( isCloser ) {
+			const opener = open.pop();
+			if ( opener ) {
+				written[ opener.index ].text = content.slice(
+					opener.start,
+					start + token.length
+				);
+			}
+			continue;
+		}
+		written.push( {
+			name: ( namespace ?? 'core/' ) + name,
+			text: isVoid ? token : undefined,
+		} );
+		if ( ! isVoid ) {
+			open.push( { index: written.length - 1, start } );
+		}
+	}
+
+	const writtenBlocks = new WeakMap< RawBlock, string >();
+	let index = 0;
+	const visit = ( rawBlock: RawBlock ) => {
+		if ( rawBlock.blockName ) {
+			const { name, text } = written[ index++ ] ?? {};
+			if ( text && name === rawBlock.blockName ) {
+				writtenBlocks.set( rawBlock, text );
+			}
+		}
+		rawBlock.innerBlocks?.forEach( visit );
+	};
+	rawBlocks.forEach( visit );
+	return writtenBlocks;
+}
+
 /**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
  * @param rawBlock The raw block object.
  * @param options  Extra options for handling block parsing.
+ * @param context  Whether the block is top level, and the text each block was
+ *                 written as, for optional block delimiters.
  *
  * @return Fully parsed block.
  */
 export function parseRawBlock(
 	rawBlock: RawBlock,
-	options?: ParseOptions
+	options?: ParseOptions,
+	context: ParseContext = {}
 ): Block | undefined {
+	const { isTopLevel = false, writtenBlocks } = context;
 	let normalizedBlock = normalizeRawBlock( rawBlock, options );
 
 	// During the lifecycle of the project, we renamed some old blocks
@@ -192,9 +257,21 @@ export function parseRawBlock(
 
 	// Parse inner blocks recursively.
 	const parsedInnerBlocks = normalizedBlock.innerBlocks
-		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
+		.map( ( innerBlock ) =>
+			parseRawBlock( innerBlock, options, { writtenBlocks } )
+		)
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
+
+	// Remember the block as written, so it can be saved that way unless it's
+	// edited. `content` is the HTML to apply edits to.
+	const withSource = ( block: Block, content: string ) =>
+		addSource(
+			block,
+			writtenBlocks?.get( rawBlock ) ?? serializeRawBlock( rawBlock ),
+			content,
+			{ isInnerBlocks: ! isTopLevel }
+		);
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
@@ -218,7 +295,7 @@ export function parseRawBlock(
 		];
 		parsedBlock.isValid = true;
 		parsedBlock.validationIssues = [];
-		return parsedBlock;
+		return withSource( parsedBlock, normalizedBlock.innerHTML );
 	}
 
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
@@ -264,7 +341,14 @@ export function parseRawBlock(
 		validationIssues!.forEach( ( { log, args } ) => log( ...args ) );
 	}
 
-	return updatedBlock;
+	// A block read from an old format, or holding one, is saved in the new
+	// format.
+	return updatedBlock === validatedBlock &&
+		updatedBlock.innerBlocks.every( ( { undelimitedSource } ) =>
+			Boolean( undelimitedSource )
+		)
+		? withSource( updatedBlock, normalizedBlock.innerHTML )
+		: updatedBlock;
 }
 
 /**
@@ -292,17 +376,23 @@ export default function parse(
 	content: string,
 	options?: ParseOptions
 ): Block[] {
-	return grammarParse( content ).reduce(
-		( accumulator: Block[], rawBlock ) => {
-			const block = parseRawBlock(
-				rawBlock as unknown as RawBlock,
-				options
-			);
-			if ( block ) {
-				accumulator.push( block );
-			}
-			return accumulator;
-		},
-		[] as Block[]
+	const rawBlocks = grammarParse( content ) as unknown as RawBlock[];
+	const writtenBlocks = getWrittenBlocks( content, rawBlocks );
+	const parseTopLevel = ( rawBlock: RawBlock ) =>
+		parseRawBlock( rawBlock, options, { isTopLevel: true, writtenBlocks } );
+	if ( ! canReadHTML() ) {
+		return rawBlocks
+			.map( parseTopLevel )
+			.filter( ( block ): block is Block => !! block );
+	}
+	// HTML outside delimiters is read as blocks, not Classic blocks.
+	return parseUndelimited(
+		rawBlocks
+			.map( ( rawBlock ) =>
+				rawBlock.blockName
+					? parseTopLevel( rawBlock )
+					: rawBlock.innerHTML
+			)
+			.filter( ( part ): part is string | Block => !! part )
 	);
 }

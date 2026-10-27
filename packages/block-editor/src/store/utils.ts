@@ -63,10 +63,15 @@ export function mapUserPattern(
 	};
 }
 
+// Pattern blocks are inserted as new blocks, not as the pattern is written.
+function withoutSource( { undelimitedSource, ...block }: Block ): Block {
+	return { ...block, innerBlocks: block.innerBlocks.map( withoutSource ) };
+}
+
 function parsePattern( pattern: BlockPattern ): ParsedBlockPattern {
 	const blocks = parse( pattern.content, {
 		__unstableSkipMigrationLogs: true,
-	} );
+	} ).map( withoutSource );
 	if ( blocks.length === 1 ) {
 		blocks[ 0 ].attributes = {
 			...blocks[ 0 ].attributes,

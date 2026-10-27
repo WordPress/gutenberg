@@ -797,6 +797,52 @@ export interface Block<
 	 * Un-processed original copy of block if created through parser.
 	 */
 	__unstableBlockSource?: RawBlock;
+	/**
+	 * Where a block read from HTML without delimiters came from, so saving it
+	 * can keep that HTML as written. Experimental.
+	 */
+	undelimitedSource?: UndelimitedSource;
+}
+
+/**
+ * The original HTML of a block read without delimiters.
+ */
+export interface UndelimitedSource {
+	/**
+	 * The block, exactly as written, with its delimiters if it had them.
+	 */
+	html: string;
+	/**
+	 * The block's HTML, without delimiters.
+	 */
+	content: string;
+	/**
+	 * The whitespace written before the block.
+	 */
+	before: string;
+	/**
+	 * The whitespace written after the block, if it was the last one.
+	 */
+	after: string;
+	/**
+	 * Whether the block was the first one, so the whitespace before it starts
+	 * the content.
+	 */
+	isFirst: boolean;
+	/**
+	 * Whether the block was text without a wrapping element, such as a
+	 * paragraph in a classic post.
+	 */
+	bare: boolean;
+	/**
+	 * The block's `save` output when it was read, to tell what an edit changed.
+	 */
+	savedHTML: string;
+	/**
+	 * The block's delimited serialization when it was read, to tell whether it
+	 * changed at all.
+	 */
+	fingerprint: string;
 }
 
 /**

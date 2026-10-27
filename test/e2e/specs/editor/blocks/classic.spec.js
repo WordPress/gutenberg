@@ -31,7 +31,11 @@ test.describe( 'Classic', () => {
 		await page.keyboard.type( 'test' );
 		await page.getByRole( 'button', { name: 'Save' } ).click();
 
-		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
+		// A new Classic block keeps its delimiter, or it would be read back as
+		// a paragraph.
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toBe( '<!-- wp:freeform -->\n<p>test</p>\n<!-- /wp:freeform -->' );
 	} );
 
 	test( 'should insert media, convert to blocks, and undo in one step', async ( {
@@ -138,7 +142,11 @@ test.describe( 'Classic', () => {
 		await classicBlock.click();
 
 		expect( errors ).toHaveLength( 0 );
-		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
+		// A new Classic block keeps its delimiter, or it would be read back as
+		// a paragraph.
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toBe( '<!-- wp:freeform -->\n<p>test</p>\n<!-- /wp:freeform -->' );
 	} );
 } );
 

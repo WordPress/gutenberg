@@ -16,6 +16,7 @@ import {
 } from './registration';
 import { serializeRawBlock } from './parser/serialize-raw-block';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
+import { canReadHTML, serializeUndelimited } from './undelimited';
 import type { Block, BlockType, BlockSerializationOptions } from '../types';
 
 /**
@@ -437,6 +438,28 @@ export function getCommentDelimitedContent(
  */
 export function serializeBlock(
 	block: Block,
+	options: BlockSerializationOptions = {}
+): string {
+	const serialized = serializeBlockWithoutSource( block, options );
+	// A block that wasn't edited is saved exactly as it was written.
+	const source = block.undelimitedSource;
+	return source && serialized === source.fingerprint
+		? source.html
+		: serialized;
+}
+
+/**
+ * Returns the content of a block, including comment delimiters, ignoring the
+ * HTML it was read from.
+ *
+ * @param block                 Block instance.
+ * @param options               Serialization options.
+ *
+ * @param options.isInnerBlocks
+ * @return Serialized block.
+ */
+export function serializeBlockWithoutSource(
+	block: Block,
 	{ isInnerBlocks = false }: BlockSerializationOptions = {}
 ): string {
 	if ( ! block.isValid && block.__unstableBlockSource ) {
@@ -487,10 +510,12 @@ export const __unstableSerializeAndClean = ( () => {
 		// For compatibility, treat a post consisting of a
 		// single freeform block as legacy content and apply
 		// pre-block-editor removep'd content formatting.
+		// A delimited one isn't legacy content.
 		if (
 			effectiveBlocks.length === 1 &&
 			effectiveBlocks[ 0 ].name === getFreeformContentHandlerName() &&
-			effectiveBlocks[ 0 ].name === 'core/freeform'
+			effectiveBlocks[ 0 ].name === 'core/freeform' &&
+			! content.startsWith( '<!-- wp:' )
 		) {
 			content = removep( content );
 		}
@@ -513,6 +538,9 @@ export default function serialize(
 	options?: BlockSerializationOptions
 ): string {
 	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
+	if ( ! options?.isInnerBlocks && canReadHTML() ) {
+		return serializeUndelimited( blocksArray );
+	}
 	return blocksArray
 		.map( ( block ) => serializeBlock( block, options ) )
 		.join( '\n\n' );

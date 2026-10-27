@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `parse` reads HTML outside block delimiters as blocks instead of one Classic block, and `serialize` saves blocks that weren't edited as they were read: blocks with delimiters exactly, and HTML outside delimiters as the browser writes it, with nothing added. Blocks read without delimiters are saved without them unless an edit needs one; new blocks get delimiters, Classic blocks too ([#85524](https://github.com/WordPress/gutenberg/pull/85524)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
