@@ -22,21 +22,6 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
-	// Throwaway: fails on trunk, so no warning is expected.
-	test( 'throwaway test that fails on trunk', async ( { editor, page } ) => {
-		await editor.canvas
-			.locator( 'role=document[name="Add default block"i]' )
-			.click();
-		await page.keyboard.type( '## Title' );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/heading',
-				attributes: { content: 'Title', level: 4 },
-			},
-		] );
-	} );
-
 	// Throwaway: passes on trunk, so a warning is expected.
 	test( 'throwaway test that passes on trunk', async ( { editor, page } ) => {
 		await editor.canvas
