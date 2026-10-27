@@ -131,4 +131,45 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
 	} );
+
+	describe( 'mariadbVersion', () => {
+		it( 'uses mariadb:lts by default', () => {
+			const config = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: { development: CONFIG, tests: CONFIG },
+			} );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:lts' );
+			expect( config.services[ 'tests-mysql' ].image ).toBe(
+				'mariadb:lts'
+			);
+		} );
+
+		it( 'treats null the same as unset', () => {
+			const config = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: { ...CONFIG, mariadbVersion: null },
+					tests: { ...CONFIG, mariadbVersion: null },
+				},
+			} );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:lts' );
+		} );
+
+		it( 'uses each environment’s own version', () => {
+			const config = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: { ...CONFIG, mariadbVersion: '10.6.4' },
+					tests: { ...CONFIG, mariadbVersion: 'latest' },
+				},
+			} );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:10.6.4' );
+			expect( config.services[ 'tests-mysql' ].image ).toBe(
+				'mariadb:latest'
+			);
+		} );
+	} );
 } );
