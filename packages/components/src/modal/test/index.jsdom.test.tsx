@@ -323,6 +323,27 @@ describe( 'Modal', () => {
 		expect( container ).not.toHaveAttribute( 'aria-hidden' );
 	} );
 
+	it( 'should keep the newest modal accessible when a modal opened before it stays open', () => {
+		const { container } = render(
+			<>
+				<Modal title="First" onRequestClose={ noop }>
+					<p>First modal content</p>
+				</Modal>
+				<Modal title="Second" onRequestClose={ noop }>
+					<p>Second modal content</p>
+				</Modal>
+			</>
+		);
+
+		expect(
+			screen.queryByRole( 'dialog', { name: 'First' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'dialog', { name: 'Second' } )
+		).toBeVisible();
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+	} );
+
 	it( 'keeps the @wordpress/ui compat overlay slot exposed while open', async () => {
 		const user = userEvent.setup();
 

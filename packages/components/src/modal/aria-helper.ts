@@ -6,7 +6,8 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 	'timer',
 ] );
 
-const hiddenElementsByModal = new Map< Element, Element[] >();
+const modalElements: Element[] = [];
+const hiddenElements = new Set< Element >();
 
 /**
  * Hides all elements in the body element from screen-readers except
@@ -21,17 +22,15 @@ const hiddenElementsByModal = new Map< Element, Element[] >();
  * @param modalElement The element that should not be hidden.
  */
 export function modalize( modalElement: HTMLDivElement ) {
-	const elements = Array.from( document.body.children );
-	const hiddenElements: Element[] = [];
-	hiddenElementsByModal.set( modalElement, hiddenElements );
-	for ( const element of elements ) {
-		if ( element === modalElement ) {
-			continue;
-		}
-
-		if ( elementShouldBeHidden( element ) ) {
+	modalElements.push( modalElement );
+	// A modal opened in the same commit may have hidden this one.
+	if ( hiddenElements.delete( modalElement ) ) {
+		modalElement.removeAttribute( 'aria-hidden' );
+	}
+	for ( const element of Array.from( document.body.children ) ) {
+		if ( element !== modalElement && elementShouldBeHidden( element ) ) {
 			element.setAttribute( 'aria-hidden', 'true' );
-			hiddenElements.push( element );
+			hiddenElements.add( element );
 		}
 	}
 }
@@ -55,27 +54,18 @@ export function elementShouldBeHidden( element: Element ) {
 }
 
 /**
- * Accessibly reveals the elements hidden by the provided modal.
- *
- * Modals can close in any order, so elements the closing modal hid stay hidden
- * while another modal is open, and are revealed once that modal closes.
+ * Accessibly reveals the topmost remaining modal, or all hidden elements once
+ * the last modal closes.
  *
  * @param modalElement The element of the closing modal.
  */
 export function unmodalize( modalElement: HTMLDivElement ) {
-	const hiddenElements = hiddenElementsByModal.get( modalElement );
-	if ( ! hiddenElements ) {
-		return;
-	}
-	hiddenElementsByModal.delete( modalElement );
-
-	const [ topModalElement, topModalHiddenElements ] =
-		Array.from( hiddenElementsByModal ).pop() ?? [];
+	modalElements.splice( modalElements.indexOf( modalElement ), 1 );
+	const topModalElement = modalElements[ modalElements.length - 1 ];
 	for ( const element of hiddenElements ) {
-		if ( topModalHiddenElements && element !== topModalElement ) {
-			topModalHiddenElements.push( element );
-		} else {
+		if ( ! topModalElement || element === topModalElement ) {
 			element.removeAttribute( 'aria-hidden' );
+			hiddenElements.delete( element );
 		}
 	}
 }
