@@ -1,7 +1,11 @@
 import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { IconButton, Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton.
+	IconButton,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
 
