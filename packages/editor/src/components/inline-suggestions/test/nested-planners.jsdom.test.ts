@@ -1,7 +1,7 @@
 /**
  * The edit and format planners on text that carries another author's
- * marker: nested and spanning suggestions they now plan, and the overlaps
- * they still refuse, with the marker that blocks them.
+ * marker: nested, stacked and spanning suggestions they plan, and the
+ * formatting overlaps they still refuse, with the marker that blocks them.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -87,31 +87,75 @@ describe( 'planners over nested suggestions', () => {
 			] );
 		} );
 
-		it( 'refuses a deletion over another author’s deletion, naming it', () => {
+		it( 'plans a second deletion over another author’s deletion', () => {
 			const prev = rtd( `ab${ mark( 'del', 7, 'CDEF' ) }gh` );
 			const next = rtd( `ab${ mark( 'del', 7, 'CF' ) }gh` );
 			const plan = planEditMarkers( prev, next, { authorId: ME } );
-			expect( plan.actions ).toEqual( [] );
-			expect( plan.refusal ).toEqual( {
-				reason: 'del-over-del',
-				blocking: { id: '7', kind: 'del', authorId: '2' },
+			expect( plan.refusal ).toBeUndefined();
+			expect( plan.actions ).toEqual( [
+				{ type: 'wrap-del', start: 3, end: 5, newNote: true },
+			] );
+			const marked = applyEditPlan( prev, plan.actions, {
+				authorId: ME,
+				ids: [ 9 ],
 			} );
+			// Both deletions keep their characters; the older one outermost.
+			expect( marked.toHTMLString() ).toBe(
+				`ab${ mark( 'del', 7, `C${ mark( 'del', 9, 'DE', ME ) }F` ) }gh`
+			);
 		} );
 
-		it( 'refuses typing inside another author’s addition', () => {
+		it( 'nests text typed inside another author’s addition', () => {
 			const prev = withAddition();
 			const next = rtd( `ab${ mark( 'add', 7, 'CDxEF' ) }gh` );
 			const plan = planEditMarkers( prev, next, { authorId: ME } );
-			expect( plan.actions ).toEqual( [] );
-			expect( plan.refusal?.reason ).toBe( 'add-in-add' );
+			expect( plan.refusal ).toBeUndefined();
+			expect( plan.actions ).toMatchObject( [
+				{ type: 'insert-add', at: 4, text: 'x', newNote: true },
+			] );
+			const marked = applyEditPlan( prev, plan.actions, {
+				authorId: ME,
+				ids: [ 9 ],
+			} );
+			// One element per suggestion: the addition stays whole and the
+			// typed text nests in it.
+			expect( marked.toHTMLString() ).toBe(
+				`ab${ mark( 'add', 7, `CD${ mark( 'add', 9, 'x', ME ) }EF` ) }gh`
+			);
+			expect( findSuggestionText( marked, 7 ) ).toBe( 'CDxEF' );
 		} );
 
-		it( 'refuses typing inside another author’s deletion', () => {
+		it( 'puts text typed inside another author’s deletion between its halves', () => {
 			const prev = rtd( `ab${ mark( 'del', 7, 'CDEF' ) }gh` );
 			const next = rtd( `ab${ mark( 'del', 7, 'CDxEF' ) }gh` );
-			expect(
-				planEditMarkers( prev, next, { authorId: ME } ).refusal?.reason
-			).toBe( 'insert-in-del' );
+			const plan = planEditMarkers( prev, next, { authorId: ME } );
+			expect( plan.refusal ).toBeUndefined();
+			const marked = applyEditPlan( prev, plan.actions, {
+				authorId: ME,
+				ids: [ 9 ],
+			} );
+			expect( marked.toHTMLString() ).toBe(
+				`ab${ mark( 'del', 7, 'CD' ) }${ mark(
+					'add',
+					9,
+					'x',
+					ME
+				) }${ mark( 'del', 7, 'EF' ) }gh`
+			);
+		} );
+
+		it( 'nests both halves of a type-over inside another author’s addition', () => {
+			const prev = withAddition();
+			const next = rtd( `ab${ mark( 'add', 7, 'CxF' ) }gh` );
+			const plan = planEditMarkers( prev, next, { authorId: ME } );
+			expect( plan.refusal ).toBeUndefined();
+			const marked = applyEditPlan( prev, plan.actions, {
+				authorId: ME,
+				ids: [ 9, 9 ],
+			} );
+			expect( findSuggestionText( marked, 7 ) ).toBe( 'CDExF' );
+			expect( kindsAt( marked, 3 ) ).toEqual( [ 'add', 'del' ] );
+			expect( kindsAt( marked, 5 ) ).toEqual( [ 'add', 'add' ] );
 		} );
 
 		it( 'adds next to, not into, another author’s formatting change', () => {

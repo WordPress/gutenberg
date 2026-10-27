@@ -327,9 +327,9 @@ export function collapsedDeleteDisposition( {
 
 /**
  * Why a deletion of `[start, end)` cannot be marked, or null when it can: a
- * deletion may sit inside someone's addition or over a formatting change, but
- * not over someone's deletion (or a mix of the author's own markers, which
- * the own-marker paths handle first).
+ * deletion may sit inside someone's addition, over a formatting change, or
+ * over someone's deletion as a second deletion of the same text, but not over
+ * the author's own markers, which the own-marker paths handle first.
  *
  * @param formats     Per-character format stacks.
  * @param start       Range start.
@@ -357,14 +357,14 @@ export function deletionRefusal(
 /**
  * Grow a new deletion run by the repeats buffered while its note was being
  * created, one grapheme per repeat, stopping at the value's edge or at the
- * first grapheme that already carries a suggestion marker.
+ * first grapheme a deletion cannot be marked over.
  *
  * The buffered keystrokes were each checked against the character at the
  * caret, but `preventDefault` never moved the caret, so every one of them
  * checked the same character. The range they add has to be checked here, or
- * the replay wraps a neighbouring deletion's text in this deletion's marker
- * and takes its identity away. Someone's addition is fine to grow into: the
- * deletion nests inside it.
+ * the replay wraps the author's own marker in this deletion. Someone's
+ * addition or deletion is fine to grow into: the deletion nests inside the
+ * addition, and stacks with the deletion.
  *
  * @param options
  * @param options.text        Plain text of the attribute value.
@@ -509,13 +509,11 @@ export default function SuggestionDeletionKeyboard() {
 	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 
 	/*
-	 * A deletion whose range overlaps an existing marker can be expressed
-	 * neither as a marker (`applyFormat` over the range would re-attribute
-	 * part of the existing marker to the new id, so its accept/reject would
-	 * act on a partial range) nor as an overlay (a whole-attribute snapshot
-	 * is marker-free, so it would hide the existing marker — #73411, F-09).
-	 * Cancel the native edit and say so, rather than letting the browser
-	 * apply it and the overlay swallow the result.
+	 * A deletion over a mix of the author's own markers that no own-marker
+	 * path took can be expressed neither as a marker nor as an overlay (a
+	 * whole-attribute snapshot is marker-free, so it would hide the existing
+	 * markers — #73411, F-09). Cancel the native edit and say so, rather than
+	 * letting the browser apply it and the overlay swallow the result.
 	 */
 	const refuseDeletion = useCallback(
 		( event: any, refusal?: EditRefusal | null ) => {

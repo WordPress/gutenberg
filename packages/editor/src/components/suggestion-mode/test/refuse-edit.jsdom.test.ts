@@ -86,17 +86,6 @@ describe( 'notifyEditRefused', () => {
 
 	it.each( [
 		[
-			'add-in-add',
-			'add',
-			'Anne suggested adding this text. Reply to their suggestion to propose a change.',
-		],
-		[
-			'insert-in-del',
-			'del',
-			'Anne suggested deleting this text. Reply to their suggestion to propose a change.',
-		],
-		[ 'del-over-del', 'del', 'Anne already suggested deleting this text.' ],
-		[
 			'format-on-format',
 			'format',
 			'Anne already suggested formatting this text.',
@@ -120,11 +109,11 @@ describe( 'notifyEditRefused', () => {
 	it( 'falls back to a name-free message when the author is unknown', () => {
 		const { registry, createNotice } = fakeRegistry();
 		notifyEditRefused( registry, {
-			reason: 'del-over-del',
-			blocking: { id: '7', kind: 'del', authorId: '2' },
+			reason: 'format-on-format',
+			blocking: { id: '7', kind: 'format', authorId: '2' },
 		} );
 		expect( lastNotice( createNotice )[ 1 ] ).toBe(
-			'Someone already suggested deleting this text.'
+			'Someone already suggested formatting this text.'
 		);
 	} );
 
@@ -132,7 +121,7 @@ describe( 'notifyEditRefused', () => {
 		const { registry, createNotice, enableComplementaryArea, selectNote } =
 			fakeRegistry( { 7: { id: 7, author_name: 'Anne' } } );
 		notifyEditRefused( registry, {
-			reason: 'add-in-add',
+			reason: 'format-straddles-add',
 			blocking: { id: '7', kind: 'add', authorId: '2' },
 		} );
 		const options = lastNotice( createNotice )[ 2 ];
