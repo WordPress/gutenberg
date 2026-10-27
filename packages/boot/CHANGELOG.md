@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Error boundary: Confirm success or failure when copying an error, and announce the result ([#85477](https://github.com/WordPress/gutenberg/pull/85477)).
+
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes
