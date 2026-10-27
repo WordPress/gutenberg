@@ -46,6 +46,9 @@ describe( 'Comment Query Loop', () => {
 			'.post-publish-panel__postpublish-buttons .is-primary'
 		);
 
+		await page.waitForSelector( 'textarea#comment' );
+		const postUrl = page.url();
+
 		// TODO: We can extract this into a util once we find we need it elsewhere.
 		// Create three comments for that post.
 		for ( let i = 0; i < 3; i++ ) {
@@ -61,6 +64,15 @@ describe( 'Comment Query Loop', () => {
 				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 			] );
 		}
+
+		/*
+		 * After a comment is posted, WordPress redirects to the comments page it
+		 * is on. That page is worked out by counting the comments posted before
+		 * it, to the second, so the redirect goes to the wrong page when two
+		 * comments are posted in the same second. Load the post itself, which
+		 * always shows the newest comments page.
+		 */
+		await page.goto( postUrl );
 
 		// We check that there is a previous comments page link.
 		expect(
