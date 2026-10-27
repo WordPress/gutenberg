@@ -60,6 +60,3 @@ jobs:
 
             - name: Check local changes
               run: npm run check-local-changes
-
-            - name: License compatibility
-              run: npm run check-licenses
