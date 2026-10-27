@@ -8,7 +8,7 @@
  */
 
 return array(
-	'label'             => __( 'Reset…', 'gutenberg' ),
+	'label'             => __( 'Reset…' ),
 	'supportsBulk'      => true,
 	'hideModalHeader'   => true,
 	'modalFocusOnMount' => 'firstContentElement',

@@ -9,7 +9,7 @@
  */
 
 return array(
-	'label'             => __( 'Permanently delete…', 'gutenberg' ),
+	'label'             => __( 'Permanently delete…' ),
 	'supportsBulk'      => true,
 	'hideModalHeader'   => true,
 	'modalFocusOnMount' => 'firstContentElement',

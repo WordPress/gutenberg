@@ -325,7 +325,7 @@ describe( 'Post actions', () => {
 			expect( notice ).toMatchObject( {
 				status: 'error',
 				content:
-					'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+					'Updating failed. Keep this page open and try updating again.',
 				details: 'Details from server.',
 			} );
 			expect( notice.actions ).toEqual( [] );
@@ -333,7 +333,7 @@ describe( 'Post actions', () => {
 			// The message is a plain string again, so the notice announces
 			// itself and nothing has to be spoken by hand.
 			expect( notice.spokenMessage ).toBe(
-				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
+				'Updating failed. Keep this page open and try updating again.'
 			);
 		} );
 
@@ -427,7 +427,7 @@ describe( 'Post actions', () => {
 						},
 					},
 				},
-				'There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+				'Error code 500. There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
 			],
 			[
 				'ignores a PHP error message that is not a string',
@@ -436,7 +436,25 @@ describe( 'Post actions', () => {
 					message: 'Server error.',
 					data: { status: 500, error: { message: [ 'unexpected' ] } },
 				},
-				'Server error.',
+				'Error code 500. Server error.',
+			],
+			[
+				'shows the status of a response that is not JSON',
+				{
+					code: 'invalid_json',
+					message: 'The response is not a valid JSON response.',
+					data: { status: 502 },
+				},
+				'Error code 502.',
+			],
+			[
+				'shows no details for a successful response that is not JSON',
+				{
+					code: 'invalid_json',
+					message: 'The response is not a valid JSON response.',
+					data: { status: 200 },
+				},
+				undefined,
 			],
 		] )( '%s', async ( _description, serverError, expectedDetails ) => {
 			const post = {
@@ -539,7 +557,7 @@ describe( 'Post actions', () => {
 			[
 				'fetch_error',
 				'Could not get a valid response from the server.',
-				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+				'Updating failed. Keep this page open and try updating again.',
 			],
 		].forEach( ( [ code, message, expectedNotice ] ) => {
 			it( `omits the details disclosure for ${ code } failures`, async () => {

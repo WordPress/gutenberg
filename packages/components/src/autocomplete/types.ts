@@ -9,20 +9,27 @@ export type InsertOption = {
 };
 
 // Replace the current block with the block specified in the `value` property
-export type ReplaceOption = { action: 'replace'; value: RichTextValue };
+export type ReplaceOption< TReplacement = RichTextValue > = {
+	action: 'replace';
+	value: TReplacement;
+};
 
-export type OptionCompletion = React.ReactNode | InsertOption | ReplaceOption;
+export type OptionCompletion< TReplacement = RichTextValue > =
+	React.ReactNode | InsertOption | ReplaceOption< TReplacement >;
 
 type OptionLabel = string | ReactElement | Array< string | ReactElement >;
 export type KeyedOption = {
 	key: string;
 	value: any;
 	label: OptionLabel;
-	keywords: Array< string >;
+	keywords?: Array< string >;
 	isDisabled: boolean;
 };
 
-export type WPCompleter< TCompleterOption = any > = {
+export type WPCompleter<
+	TCompleterOption = any,
+	TReplacement = RichTextValue,
+> = {
 	/**
 	 * The name of the completer. Useful for identifying a specific completer to
 	 * be overridden via extensibility hooks.
@@ -78,7 +85,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	getOptionCompletion?: (
 		option: TCompleterOption,
 		query: string
-	) => OptionCompletion;
+	) => OptionCompletion< TReplacement >;
 	/**
 	 * A function that returns an array of items to be displayed in the
 	 * Autocomplete UI. These items have uniform shape and have been filtered by
@@ -95,13 +102,21 @@ export type WPCompleter< TCompleterOption = any > = {
 	className?: string;
 };
 
+/**
+ * A completer that takes the options it lists, whatever it replaces with.
+ */
+export type ListedOptionCompleter< TReplacement = unknown > = WPCompleter<
+	KeyedOption[ 'value' ],
+	TReplacement
+>;
+
 type ContentRef = React.RefObject< HTMLElement | null >;
 
 export type AutocompleterUIProps = {
 	/**
 	 * The autocompleter configuration object.
 	 */
-	autocompleter: WPCompleter;
+	autocompleter: ListedOptionCompleter;
 	/**
 	 * The value to filter the options by.
 	 */
@@ -146,7 +161,7 @@ export type CancelablePromise< T = void > = Promise< T > & {
 	canceled?: boolean;
 };
 
-export type UseAutocompleteProps = {
+export type UseAutocompleteProps< TReplacement = RichTextValue > = {
 	/**
 	 * The rich text value object the autocompleter is being applied to.
 	 */
@@ -163,11 +178,11 @@ export type UseAutocompleteProps = {
 	 * A function to be called when an option is selected to replace the
 	 * existing text.
 	 */
-	onReplace: ( values: RichTextValue[] ) => void;
+	onReplace: ( values: TReplacement[] ) => void;
 	/**
 	 * An array of all of the completers to apply to the current element.
 	 */
-	completers: Array< WPCompleter >;
+	completers: Array< ListedOptionCompleter< TReplacement > >;
 	/**
 	 * A ref containing the editable element that will serve as the anchor for
 	 * `Autocomplete`'s `Popover`.
@@ -175,29 +190,34 @@ export type UseAutocompleteProps = {
 	contentRef: ContentRef;
 };
 
-export type AutocompleteState = {
+export type AutocompleteState< TReplacement = RichTextValue > = {
 	selectedIndex: number;
 	filteredOptions: KeyedOption[];
 	filterValue: string;
-	autocompleter: WPCompleter | null;
+	autocompleter: ListedOptionCompleter< TReplacement > | null;
 };
 
-export type AutocompleteAction =
+export type AutocompleteAction< TReplacement = RichTextValue > =
 	| { type: 'RESET' }
 	| { type: 'SELECT'; index: number }
 	| { type: 'OPTIONS'; options: KeyedOption[] }
-	| { type: 'MATCH'; completer: WPCompleter; query: string };
+	| {
+			type: 'MATCH';
+			completer: ListedOptionCompleter< TReplacement >;
+			query: string;
+	  };
 
-export type AutocompleteProps = UseAutocompleteProps & {
-	/**
-	 * A function that returns nodes to be rendered within the Autocomplete.
-	 */
-	children: (
-		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
-	) => React.ReactNode;
-	/**
-	 * Whether or not the Autocomplete component is selected, and if its
-	 * `Popover` should be displayed.
-	 */
-	isSelected: boolean;
-};
+export type AutocompleteProps< TReplacement = RichTextValue > =
+	UseAutocompleteProps< TReplacement > & {
+		/**
+		 * A function that returns nodes to be rendered within the Autocomplete.
+		 */
+		children: (
+			props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
+		) => React.ReactNode;
+		/**
+		 * Whether or not the Autocomplete component is selected, and if its
+		 * `Popover` should be displayed.
+		 */
+		isSelected: boolean;
+	};

@@ -9,6 +9,6 @@
  */
 
 return array(
-	'label'   => __( 'View revisions', 'gutenberg' ),
+	'label'   => __( 'View revisions' ),
 	'context' => 'list',
 );

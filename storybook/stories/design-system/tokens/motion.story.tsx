@@ -238,6 +238,7 @@ function MotionDemo() {
 const meta: Meta< typeof MotionDemo > = {
 	title: 'Design System/Tokens/Motion',
 	component: MotionDemo,
+	tags: [ 'docs-only' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },

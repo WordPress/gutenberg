@@ -27,7 +27,7 @@ jobs:
     # list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
         name: Detect changes relevant to E2E tests
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             pull-requests: read
@@ -51,8 +51,8 @@ jobs:
                           - '!test/{integration,performance,php,storybook-playwright,unit}/**'
                           - '!{packages,tools}/**/{test,tests}/**'
                           # Development tooling and its configuration.
-                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
-                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,stylelint-config}/**'
+                          - '!tools/{docs,eslint,project-management-automation,stylelint,validation}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
                           - '!{phpcs,phpunit}*'
                           # Repository metadata.
@@ -151,15 +151,16 @@ jobs:
                   workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium firefox webkit
 
-            - name: Install WordPress and start the server
+            - name: Install WordPress and start one server per two cores
               run: |
-                  npm run wp-env-test start
+                  urls=$( test/e2e/wp-env-instances.sh )
+                  echo "WP_BASE_URLS=$urls" >> "$GITHUB_ENV"
 
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }} --fully-parallel
 
             - name: Archive blob reports (HTML)
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -421,7 +422,7 @@ jobs:
         # means the run was clean rather than that rendering it failed.
         # Skipped on a fork, whose token cannot write a comment.
         if: ${{ needs.merge-artifacts.result == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
             pull-requests: write
@@ -466,7 +467,7 @@ jobs:
     # housekeeping that runs alongside it.
     e2e-status-check:
         name: End-to-End Tests - Status Check
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             contents: read

@@ -424,7 +424,7 @@ Use `--_wp-components-*` for new private custom properties. These are implementa
 
 Components no longer use Emotion. Do not add new Emotion imports.
 
-The [Emotion-to-SCSS migration guide](./emotion-to-scss-modules.md) records compatibility checks, cascade and custom-property pitfalls, verification, and examples from the completed source migrations.
+For styling compatibility and verification, follow [Change a package safely](/docs/contributors/design/design-system-packages.md#change-a-package-safely) and the [cross-document setup guidance](/packages/theme/README.md#across-documents-iframes-and-other-portals).
 
 ### Deprecating styles
 

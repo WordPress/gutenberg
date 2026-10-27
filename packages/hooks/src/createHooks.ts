@@ -6,6 +6,7 @@ import createCurrentHook from './createCurrentHook';
 import createDoingHook from './createDoingHook';
 import createDidHook from './createDidHook';
 import type { Store } from './types';
+import type { RemoveHook, RemoveAllHooks } from './createRemoveHook';
 
 /**
  * Internal class for constructing hooks. Use `createHooks()` function
@@ -20,12 +21,12 @@ export class _Hooks {
 
 	public addAction: ReturnType< typeof createAddHook >;
 	public addFilter: ReturnType< typeof createAddHook >;
-	public removeAction: ReturnType< typeof createRemoveHook >;
-	public removeFilter: ReturnType< typeof createRemoveHook >;
+	public removeAction: RemoveHook;
+	public removeFilter: RemoveHook;
 	public hasAction: ReturnType< typeof createHasHook >;
 	public hasFilter: ReturnType< typeof createHasHook >;
-	public removeAllActions: ReturnType< typeof createRemoveHook >;
-	public removeAllFilters: ReturnType< typeof createRemoveHook >;
+	public removeAllActions: RemoveAllHooks;
+	public removeAllFilters: RemoveAllHooks;
 	public doAction: ReturnType< typeof createRunHook >;
 	public doActionAsync: ReturnType< typeof createRunHook >;
 	public applyFilters: ReturnType< typeof createRunHook >;
