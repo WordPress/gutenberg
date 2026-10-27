@@ -372,7 +372,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @param string $icon_path Icon file path, resolved with `realpath()`.
 	 * @return bool Whether the file is in the core icon library.
 	 */
-	protected function is_core_icon_file( $icon_path ) {
+	private function is_core_icon_file( $icon_path ) {
 		static $library_directory = null;
 
 		if ( null === $library_directory ) {
