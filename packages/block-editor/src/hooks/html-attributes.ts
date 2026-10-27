@@ -1,6 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
+import { getReactStyleKey } from './style';
 import type { BlockListBlockFeatureProps, BlockWrapperProps } from './types';
 
 type HtmlAttributes = Record< string, string >;
@@ -34,37 +35,11 @@ function getStyleObject( style: string ): Record< string, string > {
 		if ( colonAt === -1 || ! property ) {
 			continue;
 		}
-		const key = property.startsWith( '--' )
-			? property
-			: property
-					.toLowerCase()
-					.replace( /^-ms-/, 'ms-' )
-					.replace( /-([a-z])/g, ( _match, letter ) =>
-						letter.toUpperCase()
-					);
-		styleObject[ key ] = declaration.slice( colonAt + 1 ).trim();
+		styleObject[ getReactStyleKey( property ) ] = declaration
+			.slice( colonAt + 1 )
+			.trim();
 	}
 	return styleObject;
-}
-
-/**
- * Adds the entries of one object to another that it doesn't have yet.
- *
- * @param target Object to add to.
- * @param source Entries to add.
- */
-function withMissing< T extends object >(
-	target: T,
-	source: Record< string, string >
-): T {
-	return {
-		...target,
-		...Object.fromEntries(
-			Object.entries( source ).filter(
-				( [ name ] ) => ! ( name in target )
-			)
-		),
-	};
 }
 
 /**
@@ -79,12 +54,14 @@ function mergeHtmlAttributes(
 	htmlAttributes: HtmlAttributes
 ): BlockWrapperProps {
 	const { style, ...attributes } = htmlAttributes;
-	const merged = withMissing( props, attributes );
+	// The block's own props go first and last: they keep their place and win.
+	const merged = { ...props, ...attributes, ...props };
 	if ( style ) {
-		merged.style = withMissing(
-			props.style ?? {},
-			getStyleObject( style )
-		);
+		merged.style = {
+			...props.style,
+			...getStyleObject( style ),
+			...props.style,
+		};
 	}
 	return merged;
 }

@@ -1,5 +1,6 @@
 import { getSaveContent } from '../serializer';
 import { getStyleProperties } from '../validation';
+import { parseHtml } from './get-block-attributes';
 import type { BlockType } from '../../types';
 
 /**
@@ -7,23 +8,17 @@ import type { BlockType } from '../../types';
  *
  * @param innerHTML Markup string.
  *
- * @return Attributes of the root element, or none if it isn't one element.
+ * @return Attributes of the root element.
  */
 function getHTMLRootElementAttributes(
 	innerHTML: string
 ): Map< string, string > {
-	const { body } = document.implementation.createHTMLDocument( '' );
-	body.innerHTML = innerHTML.trim();
-	const root = body.childNodes.length === 1 ? body.firstElementChild : null;
+	const root = parseHtml( innerHTML ).firstElementChild;
 	return new Map(
-		root
-			? root
-					.getAttributeNames()
-					.map( ( name ) => [
-						name,
-						root.getAttribute( name ) ?? '',
-					] )
-			: []
+		Array.from( root?.attributes ?? [], ( { name, value } ) => [
+			name,
+			value,
+		] )
 	);
 }
 
