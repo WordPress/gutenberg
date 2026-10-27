@@ -2,4 +2,4 @@
 
 ## Unreleased
 
--   Initial release, with the build and Stylelint plugins moved from `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Initial release, with the build and Stylelint plugins moved from `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568), [#85388](https://github.com/WordPress/gutenberg/pull/85388)).
