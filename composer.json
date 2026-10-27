@@ -17,9 +17,6 @@
 	},
 	"config": {
 		"process-timeout": 0,
-		"platform": {
-			"php": "7.4"
-		},
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"composer/installers": true
@@ -44,6 +41,7 @@
 		}
 	],
 	"require": {
+		"php": ">=7.2.24",
 		"composer/installers": "^1.0 || ^2.0"
 	},
 	"scripts": {
