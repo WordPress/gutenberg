@@ -169,7 +169,7 @@ describe( 'Notice.List', () => {
 		const status = screen.getByRole( 'status' );
 		await waitFor( () =>
 			expect( status ).toHaveTextContent(
-				/^تم الحفظ؟\. تم حفظ المسودة\.$/,
+				/^تم الحفظ؟ تم حفظ المسودة\.$/,
 				{
 					normalizeWhitespace: false,
 				}

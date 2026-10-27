@@ -63,9 +63,10 @@ function readMessage( root: HTMLElement ) {
 			.filter( Boolean )
 			.join( ' ' );
 	}
-	return [ readText( 'title' ), readText( 'description' ) ]
+	const title = readText( 'title' );
+	return [ title, readText( 'description' ) ]
 		.filter( Boolean )
-		.join( '. ' );
+		.join( /\p{Sentence_Terminal}$/u.test( title ) ? ' ' : '. ' );
 }
 
 /**
@@ -112,41 +113,40 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 			);
 			// Descendant components can change their own text without re-rendering
 			// Notice.Root. Observe message props and content in the same DOM batch.
-			const observer =
-				new element.ownerDocument.defaultView!.MutationObserver( () => {
-					const current = readNotices();
-					const changed = new Map< HTMLElement, Announcement >();
-					for ( const [ notice, announcement ] of current ) {
-						const before = previous.get( notice );
+			const observer = new MutationObserver( () => {
+				const current = readNotices();
+				const changed = new Map< HTMLElement, Announcement >();
+				for ( const [ notice, announcement ] of current ) {
+					const before = previous.get( notice );
+					if (
+						announcement.message &&
+						announcement.politeness !== 'off' &&
+						( announcement.message !== before?.message ||
+							announcement.politeness !== before?.politeness )
+					) {
+						changed.set( notice, announcement );
+					}
+				}
+				previous = current;
+				setAnnouncements( ( existing ) => {
+					const next = new Map( existing );
+					for ( const notice of existing.keys() ) {
+						const announcement = current.get( notice );
 						if (
-							announcement.message &&
-							announcement.politeness !== 'off' &&
-							( announcement.message !== before?.message ||
-								announcement.politeness !== before?.politeness )
+							! announcement?.message ||
+							announcement.politeness === 'off'
 						) {
-							changed.set( notice, announcement );
+							next.delete( notice );
 						}
 					}
-					previous = current;
-					setAnnouncements( ( existing ) => {
-						const next = new Map( existing );
-						for ( const notice of existing.keys() ) {
-							const announcement = current.get( notice );
-							if (
-								! announcement?.message ||
-								announcement.politeness === 'off'
-							) {
-								next.delete( notice );
-							}
-						}
-						for ( const [ notice, announcement ] of changed ) {
-							next.set( notice, announcement );
-						}
-						return changed.size || next.size !== existing.size
-							? next
-							: existing;
-					} );
+					for ( const [ notice, announcement ] of changed ) {
+						next.set( notice, announcement );
+					}
+					return changed.size || next.size !== existing.size
+						? next
+						: existing;
 				} );
+			} );
 			observer.observe( element, {
 				childList: true,
 				characterData: true,

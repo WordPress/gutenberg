@@ -16,11 +16,11 @@ Leave static notices without an announcement. Users can read the message and rea
 
 ## Announce a list of notices
 
-Keep `Notice.List` mounted, including when it is empty, and render keyed `Notice.Root` children inside it. The list stacks its children with a small gap. It announces added notices and changes to their messages. Notices present when the list mounts stay silent.
+Keep `Notice.List` mounted, including when it is empty, and render keyed `Notice.Root` children inside it. The list stacks its children with a small gap. It announces added notices and changes to their messages, including when a new save result replaces a message under the same key. Notices present when the list mounts stay silent.
 
 <Canvas of={ NoticeStories.DynamicNotices } />
 
-The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with `. ` as a separator, preserving their supplied text. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
+The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with a space if the title already ends in Unicode sentence-ending punctuation, or `. ` otherwise. The supplied text is preserved. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
 
 Announcements are `polite` by default, including error notices. Set `politeness="assertive"` on a notice only when its message needs immediate attention. Set `politeness="off"` to skip announcements for a notice. These props only affect notices inside `Notice.List`.
 
