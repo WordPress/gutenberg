@@ -469,6 +469,46 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 
+		// Enter on the wrapper of a placeholder used to be treated by writing
+		// flow as "insert another link", which left a duplicate "Select page"
+		// item behind and opened the UI on the duplicate.
+		// See https://github.com/WordPress/gutenberg/issues/60051.
+		test( 'Enter on an empty link opens the link UI for that link', async ( {
+			admin,
+			editor,
+			navigation,
+			page,
+			pageUtils,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			const { id: menuId } = await requestUtils.createNavigationMenu( {
+				title: 'Enter on an empty link',
+				content:
+					'<!-- wp:navigation-submenu {"label":"Parent","url":"https://example.com/parent"} --><!-- wp:navigation-link {"label":""} /--><!-- /wp:navigation-submenu -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menuId },
+			} );
+
+			const submenu = navigation
+				.getNavBlock()
+				.getByRole( 'document', { name: 'Block: Submenu' } );
+			await submenu.getByText( 'Parent' ).click();
+			await pageUtils.pressKeys( 'ArrowDown' );
+
+			// The empty link is selected, and nothing has opened its link UI.
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+
+			await page.keyboard.press( 'Enter' );
+
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await expect(
+				submenu.locator( '[data-type="core/navigation-link"]' )
+			).toHaveCount( 1 );
+		} );
+
 		test( 'Can add submenu item(custom-link) using the keyboard', async ( {
 			page,
 			pageUtils,
