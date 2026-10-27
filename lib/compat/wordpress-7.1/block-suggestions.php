@@ -783,8 +783,9 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  * - `inner_markers`: how many other markers open inside its run.
  *
  * @param string $html HTML fragment.
- * @return array[]|null Markers in document order, or null when the walk could
- *                      not tell where a token is (callers fail closed).
+ * @return list<array{kind: string, legacy: bool, id: int, run: string|null, start: int, length: int, end: int|null, closer: array{int, int}|null, lexical_end: int|null, lexical_closer: array{int, int}|null, balanced: bool, inner_markers: int}>|null
+ *         Markers in document order, or null when the walk could not tell
+ *         where a token is (callers fail closed).
  */
 function gutenberg_pair_inline_suggestion_markers( $html ) {
 	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
@@ -816,6 +817,11 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 	$scope_boundary = array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' );
 	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
 	$open_elements  = array();
+	// Where the tree walk ends each marker, and its own closer if that ends it.
+	$ends    = array();
+	$closers = array();
+	// The `</mark>` a lexical pairing gives each marker.
+	$lexical_closers = array();
 	// `<mark>` openers only, each with its marker index or null.
 	$lexical_marks = array();
 	$query         = array( 'tag_closers' => 'visit' );
@@ -832,8 +838,7 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 			if ( 'MARK' === $tag && $lexical_marks ) {
 				$index = array_pop( $lexical_marks );
 				if ( null !== $index ) {
-					$markers[ $index ]['lexical_end']    = $span[0] + $span[1];
-					$markers[ $index ]['lexical_closer'] = $span;
+					$lexical_closers[ $index ] = $span;
 				}
 			}
 
@@ -856,9 +861,9 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 				if ( null === $element[1] ) {
 					continue;
 				}
-				$is_own                           = count( $open_elements ) === $match;
-				$markers[ $element[1] ]['end']    = $is_own ? $span[0] + $span[1] : $span[0];
-				$markers[ $element[1] ]['closer'] = $is_own ? $span : null;
+				$is_own                 = count( $open_elements ) === $match;
+				$ends[ $element[1] ]    = $is_own ? $span[0] + $span[1] : $span[0];
+				$closers[ $element[1] ] = $is_own ? $span : null;
 			}
 			continue;
 		}
@@ -881,37 +886,42 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 		}
 
 		$run             = $processor->get_attribute( 'data-suggestion-run' );
+		$id              = $processor->get_attribute( 'data-suggestion-id' );
 		$markers[]       = array(
-			'kind'           => $kind,
-			'legacy'         => $legacy,
-			'id'             => (int) $processor->get_attribute( 'data-suggestion-id' ),
-			'run'            => is_string( $run ) ? $run : null,
-			'start'          => $span[0],
-			'length'         => $span[1],
-			'end'            => null,
-			'closer'         => null,
-			'lexical_end'    => null,
-			'lexical_closer' => null,
+			'kind'   => $kind,
+			'legacy' => $legacy,
+			'id'     => is_string( $id ) ? (int) $id : 0,
+			'run'    => is_string( $run ) ? $run : null,
+			'start'  => $span[0],
+			'length' => $span[1],
 		);
 		$open_elements[] = array( $tag, count( $markers ) - 1 );
 		$lexical_marks[] = count( $markers ) - 1;
 	}
 
-	$count = count( $markers );
+	$count  = count( $markers );
+	$paired = array();
 	foreach ( $markers as $index => $marker ) {
-		$markers[ $index ]['balanced'] = null !== $marker['closer'] && $marker['lexical_end'] === $marker['end'];
-		$reach                         = max( (int) $marker['end'], (int) $marker['lexical_end'] );
-		if ( null === $marker['end'] ) {
-			$reach = strlen( $html );
-		}
-		$inner = 0;
+		$end            = $ends[ $index ] ?? null;
+		$closer         = $closers[ $index ] ?? null;
+		$lexical_closer = $lexical_closers[ $index ] ?? null;
+		$lexical_end    = null === $lexical_closer ? null : $lexical_closer[0] + $lexical_closer[1];
+		$reach          = null === $end ? strlen( $html ) : max( $end, (int) $lexical_end );
+		$inner          = 0;
 		for ( $next = $index + 1; $next < $count && $markers[ $next ]['start'] < $reach; $next++ ) {
 			++$inner;
 		}
-		$markers[ $index ]['inner_markers'] = $inner;
+		$paired[] = $marker + array(
+			'end'            => $end,
+			'closer'         => $closer,
+			'lexical_end'    => $lexical_end,
+			'lexical_closer' => $lexical_closer,
+			'balanced'       => null !== $closer && $lexical_end === $end,
+			'inner_markers'  => $inner,
+		);
 	}
 
-	return $markers;
+	return $paired;
 }
 
 /**
