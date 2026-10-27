@@ -1,8 +1,8 @@
 <?php
 /**
- * Rotate block support flag.
+ * Rotation block support flag.
  *
- * Blocks support rotation unless they opt out with `supports.rotate: false`.
+ * Blocks support rotation when they opt in with `supports.rotation: true`.
  * The rotation is a number of degrees stored in `style.rotate`, with viewport
  * overrides in `style['@tablet'].rotate` and `style['@mobile'].rotate`.
  *
@@ -15,7 +15,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_rotate_support( $block_type ) {
-	if ( ! block_has_support( $block_type, 'rotate', true ) ) {
+	if ( ! block_has_support( $block_type, 'rotation', false ) ) {
 		return;
 	}
 
@@ -134,7 +134,7 @@ function gutenberg_render_rotate_support( $block_content, $block ) {
 	}
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	if ( ! $block_type || ! block_has_support( $block_type, 'rotate', true ) ) {
+	if ( ! $block_type || ! block_has_support( $block_type, 'rotation', false ) ) {
 		return $block_content;
 	}
 
@@ -178,7 +178,7 @@ function gutenberg_render_rotate_support( $block_content, $block ) {
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
-	'rotate',
+	'rotation',
 	array(
 		'register_attribute' => 'gutenberg_register_rotate_support',
 	)

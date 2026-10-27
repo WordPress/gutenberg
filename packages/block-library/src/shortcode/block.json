@@ -18,7 +18,6 @@
 		"customClassName": false,
 		"html": false,
 		"customCSS": false,
-		"rotate": false,
 		"visibility": false
 	},
 	"editorStyle": "wp-block-shortcode-editor"

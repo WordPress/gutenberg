@@ -1,11 +1,11 @@
 <?php
 /**
- * Tests the rotate block support.
+ * Tests the rotation block support.
  *
  * @package gutenberg
  */
 
-class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
+class WP_Block_Supports_Rotation_Test extends WP_UnitTestCase {
 	/**
 	 * @var string|null
 	 */
@@ -33,7 +33,7 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 	 * @param array $attributes Block attributes.
 	 * @return WP_Block_Type The registered block type.
 	 */
-	private function register_test_block( $supports = array(), $attributes = array() ) {
+	private function register_test_block( $supports = array( 'rotation' => true ), $attributes = array() ) {
 		$this->test_block_name = 'test/rotate-block';
 		register_block_type(
 			$this->test_block_name,
@@ -84,19 +84,19 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that every block supports rotation unless it opts out.
+	 * Tests that a block supports rotation only when it opts in.
 	 *
 	 * @covers ::gutenberg_register_rotate_support
 	 */
-	public function test_registers_style_attribute_unless_block_opts_out() {
-		$block_type = $this->register_test_block();
+	public function test_registers_style_attribute_only_when_block_opts_in() {
+		$block_type = $this->register_test_block( array( 'rotation' => true ) );
 		gutenberg_register_rotate_support( $block_type );
-		$this->assertSame( array( 'type' => 'object' ), $block_type->attributes['style'] ?? null, 'A block supports rotation by default.' );
+		$this->assertSame( array( 'type' => 'object' ), $block_type->attributes['style'] ?? null, 'A block that opts in supports rotation.' );
 		unregister_block_type( $this->test_block_name );
 
-		$block_type = $this->register_test_block( array( 'rotate' => false ) );
+		$block_type = $this->register_test_block( array() );
 		gutenberg_register_rotate_support( $block_type );
-		$this->assertArrayNotHasKey( 'style', $block_type->attributes, 'A block that opts out of rotation does not get a style attribute from it.' );
+		$this->assertArrayNotHasKey( 'style', $block_type->attributes, 'A block that does not opt in does not get a style attribute from rotation.' );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 			'type'    => 'object',
 			'default' => array( 'color' => array( 'text' => 'red' ) ),
 		);
-		$block_type      = $this->register_test_block( array(), array( 'style' => $style_attribute ) );
+		$block_type      = $this->register_test_block( array( 'rotation' => true ), array( 'style' => $style_attribute ) );
 		gutenberg_register_rotate_support( $block_type );
 
 		$this->assertSame( $style_attribute, $block_type->attributes['style'] );
@@ -302,7 +302,7 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_rotate_support
 	 */
 	public function test_does_not_render_when_style_attribute_is_not_an_object() {
-		$this->register_test_block( array(), array( 'style' => array( 'type' => 'string' ) ) );
+		$this->register_test_block( array( 'rotation' => true ), array( 'style' => array( 'type' => 'string' ) ) );
 		$block_content = '<div class="wp-block-test-rotate-block">Content</div>';
 
 		$this->assertSame( $block_content, $this->render_test_block( array( 'rotate' => 15 ), $block_content ) );
@@ -361,7 +361,7 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_rotate_support
 	 */
 	public function test_does_not_render_when_block_opts_out() {
-		$this->register_test_block( array( 'rotate' => false ) );
+		$this->register_test_block( array() );
 		$block_content = '<div class="wp-block-test-rotate-block">Content</div>';
 
 		$this->assertSame( $block_content, $this->render_test_block( array( 'rotate' => 15 ), $block_content ) );

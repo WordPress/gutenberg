@@ -32,7 +32,7 @@ import {
 	hasViewportBlockStyleState,
 } from './block-style-state';
 import { getRotateForState, getUpdatedRotateStyle } from '../utils/rotation';
-import { isRotateEnabled } from './rotate';
+import { hasRotateSupport } from './rotation';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -608,7 +608,7 @@ function GridTools( {
 		! isBlockItselfCurrentlyHidden &&
 		blockEditingMode === 'default' &&
 		! hasPseudoBlockStyleState( selectedState ) &&
-		isRotateEnabled( name );
+		hasRotateSupport( name );
 
 	function updateLayout( layout: ChildLayout ) {
 		updateGridChildLayout( clientId, layout );
