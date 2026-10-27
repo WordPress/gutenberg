@@ -8,7 +8,6 @@ import {
 } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -26,7 +25,6 @@ import {
 } from './hooks';
 import {
 	focusNoteThread,
-	getNoteExcerpt,
 	hasFocusWithin,
 	scrollNoteThreadIntoView,
 } from './utils';
@@ -38,7 +36,7 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
 function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 	const { initialValue, setDraft } = useNoteDraft( note.id );
 	return (
-		<NoteCard role="treeitem">
+		<NoteCard>
 			<NoteForm
 				onSubmit={ ( inputComment ) => {
 					if ( 'approved' === note.status ) {
@@ -232,22 +230,6 @@ export function NoteThread( {
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
-	const noteExcerpt = getNoteExcerpt(
-		stripHTML( note.content?.rendered ),
-		10
-	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-			)
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-			);
-
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
@@ -288,24 +270,33 @@ export function NoteThread( {
 				}
 			} }
 			tabIndex={ 0 }
-			role="treeitem"
-			aria-label={ ariaLabel }
-			aria-expanded={ isSelected }
+			// No `aria-label`: screen readers handle one on a list item
+			// inconsistently, so the thread is announced from its content.
+			// No `aria-current` either: VoiceOver repeats it on every element
+			// inside the thread. The expanded replies show the selection.
+			role="listitem"
 		>
-			<Button
-				className="editor-collab-sidebar-panel__skip-to-note"
-				variant="secondary"
-				size="compact"
-				onClick={ () => {
-					focusNoteThread(
-						note.id,
-						sidebarRef.current,
-						'[role="textbox"]'
-					);
-				} }
-			>
-				{ __( 'Add new reply' ) }
-			</Button>
+			{ /*
+			 * Only the selected thread has a reply field to skip to. Rendered
+			 * on every thread, the link would be the first thing a screen
+			 * reader announces for each one.
+			 */ }
+			{ isSelected && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-note"
+					variant="secondary"
+					size="compact"
+					onClick={ () => {
+						focusNoteThread(
+							note.id,
+							sidebarRef.current,
+							'[role="textbox"]'
+						);
+					} }
+				>
+					{ __( 'Add new reply' ) }
+				</Button>
+			) }
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
