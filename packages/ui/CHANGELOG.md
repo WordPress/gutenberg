@@ -20,6 +20,7 @@
 ### Bug Fixes
 
 -   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
+-   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
 
 ### Documentation
 
