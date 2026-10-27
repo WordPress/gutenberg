@@ -101,6 +101,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	protected $dashicon_replacements = null;
 
 	/**
+	 * Names of the core icons in the "core-admin" collection, as keys.
+	 *
+	 * @var array<string, true>
+	 */
+	protected $core_admin_icon_names = array();
+
+	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
 	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
@@ -280,17 +287,42 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 		$this->registered_icons[ $qualified_name ] = $icon;
 
+		// Remember the core icons in the "core-admin" collection, which cannot be unregistered.
+		if (
+			'core-admin' === $collection &&
+			isset( $icon_properties['file_path'] ) &&
+			str_starts_with( $icon_properties['file_path'], gutenberg_dir_path() . 'packages/icons/src/' )
+		) {
+			$this->core_admin_icon_names[ $qualified_name ] = true;
+		}
+
 		return true;
 	}
 
 	/**
 	 * Unregisters an icon.
 	 *
+	 * The core icons in the "core-admin" collection are used by the WordPress
+	 * administration interface and cannot be unregistered.
+	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
 	 *                          (e.g. "core/arrow-left").
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
 	public function unregister( $icon_name ) {
+		if ( is_string( $icon_name ) && isset( $this->core_admin_icon_names[ $icon_name ] ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon name. */
+					__( 'Icon "%s" is used by the administration interface and cannot be unregistered.', 'gutenberg' ),
+					$icon_name
+				),
+				'7.2.0'
+			);
+			return false;
+		}
+
 		if ( ! $this->is_registered( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
