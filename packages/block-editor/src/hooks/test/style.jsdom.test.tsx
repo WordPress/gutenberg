@@ -1072,13 +1072,15 @@ describe( 'addAttribute', () => {
 		 ).attributes;
 
 	it( 'adds the style attribute for rotation alone', () => {
-		expect( addAttribute( { customCSS: false } ) ).toEqual( {
-			style: { type: 'object' },
-		} );
+		expect( addAttribute( { customCSS: false, rotation: true } ) ).toEqual(
+			{
+				style: { type: 'object' },
+			}
+		);
 	} );
 
 	it( "doesn't add it to a block without any style support", () => {
-		expect( addAttribute( { customCSS: false, rotate: false } ) ).toEqual(
+		expect( addAttribute( { customCSS: false, rotation: false } ) ).toEqual(
 			{}
 		);
 	} );

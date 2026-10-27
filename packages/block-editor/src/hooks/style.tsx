@@ -58,7 +58,7 @@ import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
-import { hasRotateSupport } from './rotate';
+import { hasRotateSupport } from './rotation';
 import { unlock } from '../lock-unlock';
 import type {
 	PanelBorderSide,
