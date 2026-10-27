@@ -19,7 +19,7 @@ class Tests_Suggestion_Overlap_Fixtures extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const LANDED_PHASES = array( 'current', 'A' );
+	const LANDED_PHASES = array( 'current', 'A', 'B' );
 
 	/**
 	 * Returns one data set per generated fixture file.
@@ -125,9 +125,7 @@ class Tests_Suggestion_Overlap_Fixtures extends WP_UnitTestCase {
 
 	/**
 	 * Every stored decision order publishes, through the server's view of
-	 * the markers, what the oracle publishes. Until formatting deltas land
-	 * (phase B) the view keeps a formatting change that is not accepted, so
-	 * those orders are left out.
+	 * the markers, what the oracle publishes.
 	 *
 	 * @dataProvider data_fixtures
 	 *
@@ -143,33 +141,42 @@ class Tests_Suggestion_Overlap_Fixtures extends WP_UnitTestCase {
 				$formats[] = $suggestion['key'];
 			}
 		}
-		$html    = preg_replace_callback(
+		$html      = preg_replace_callback(
 			'/\{\{(?:id|author):(\w+)\}\}/',
 			static function ( array $matches ) use ( $ids ): string {
 				return (string) $ids[ $matches[1] ];
 			},
 			$fixture['html']
 		);
-		$deltas  = in_array( 'B', self::LANDED_PHASES, true ) || in_array( 'B', array_map( 'trim', explode( ',', (string) getenv( 'OVERLAP_PHASES' ) ) ), true );
+		$originals = array();
+		foreach ( (array) $fixture['suggestions'] as $suggestion ) {
+			if ( is_array( $suggestion ) && is_array( $suggestion['operation'] ) && is_string( $suggestion['operation']['beforeHTML'] ?? null ) && is_string( $suggestion['key'] ) ) {
+				$originals[ (int) $ids[ $suggestion['key'] ] ] = $suggestion['operation']['beforeHTML'];
+			}
+		}
 		$checked = 0;
 		foreach ( $fixture['orders']['list'] as $order ) {
-			if ( ! $deltas && array_diff( $formats, $order['accepted'] ) ) {
-				continue;
-			}
 			$accepted = array();
 			foreach ( $order['accepted'] as $key ) {
 				$accepted[] = $ids[ $key ];
 			}
+			/*
+			 * A formatting change accepted on top of an older one that is
+			 * not applies its delta to the original, which only the editor
+			 * computes; the server does not render that state.
+			 */
+			if ( $formats && null === gutenberg_revert_inline_format_suggestions( (string) $html, $originals, $accepted ) ) {
+				$this->assertNotEmpty( $accepted );
+				continue;
+			}
 			$this->assertSame(
 				$this->merge_adjacent_formats( $order['publishedHTML'] ),
-				$this->merge_adjacent_formats( gutenberg_get_inline_suggestion_view( (string) $html, $accepted ) ),
+				$this->merge_adjacent_formats( gutenberg_get_inline_suggestion_view( (string) $html, $accepted, $originals ) ),
 				$order['label']
 			);
 			++$checked;
 		}
-		if ( ! $checked ) {
-			$this->markTestSkipped( 'Every order leaves a formatting change unaccepted, which needs phase B.' );
-		}
+		$this->assertGreaterThan( 0, $checked );
 	}
 
 	/**
