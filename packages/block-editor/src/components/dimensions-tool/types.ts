@@ -87,6 +87,16 @@ export interface DimensionsToolProps {
 	 */
 	unitsOptions?: UnitOption[];
 	/**
+	 * Natural width of the content, e.g. an image, in pixels. When both
+	 * natural dimensions are given, the width and height fields suggest
+	 * fractions of them and only accept pixel values.
+	 */
+	naturalWidth?: number;
+	/**
+	 * Natural height of the content, e.g. an image, in pixels.
+	 */
+	naturalHeight?: number;
+	/**
 	 * The tools to show.
 	 */
 	tools?: string[];
@@ -203,7 +213,56 @@ export interface WidthHeightToolProps {
 	 */
 	units?: UnitOption[];
 	/**
+	 * Natural width of the content, e.g. an image, in pixels. When both
+	 * natural dimensions are given, the fields suggest fractions of them and
+	 * only accept pixel values.
+	 */
+	naturalWidth?: number;
+	/**
+	 * Natural height of the content, e.g. an image, in pixels.
+	 */
+	naturalHeight?: number;
+	/**
 	 * Whether the panel is shown by default.
 	 */
 	isShownByDefault?: boolean;
+}
+
+/**
+ * A size `SizeSuggestionsControl` suggests.
+ */
+export interface SizeSuggestion {
+	/**
+	 * Percentage of the natural size.
+	 */
+	percentage: number;
+	/**
+	 * The size in pixels, as it is entered in the field.
+	 */
+	size: string;
+}
+
+/**
+ * Props of `SizeSuggestionsControl`.
+ */
+export interface SizeSuggestionsControlProps {
+	/**
+	 * Label of the field.
+	 */
+	label: string;
+	/**
+	 * Current size in pixels, without the unit. An empty string means there
+	 * is no value.
+	 */
+	value: string;
+	/**
+	 * Callback to update the size, with a CSS value such as `800px`, or
+	 * undefined when the value is removed.
+	 */
+	onChange: ( nextValue?: string ) => void;
+	/**
+	 * Natural size of the content in pixels, which the suggestions are
+	 * fractions of.
+	 */
+	naturalSize: number;
 }
