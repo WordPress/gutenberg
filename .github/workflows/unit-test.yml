@@ -22,7 +22,7 @@ concurrency:
 jobs:
     unit-js:
         name: JavaScript
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
@@ -56,7 +56,7 @@ jobs:
 
     unit-php:
         name: PHP
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
