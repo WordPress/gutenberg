@@ -13,6 +13,11 @@
 /**
  * Renders a button.
  *
+ * Internal: called by `gutenberg_get_ui_component()`, which validates the
+ * props first. Use that instead.
+ *
+ * @access private
+ *
  * @param array    $props   Validated props.
  * @param string[] $classes Class names from the component's recipe.
  * @param string   $content Label, as plain text.
