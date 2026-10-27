@@ -1,7 +1,10 @@
 import { useMemo } from '@wordpress/element';
-import { DEFAULT_ASPECT_RATIOS } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
-import { useMediaEditor, resolveAspectRatio } from '../../state';
+import {
+	DEFAULT_ASPECT_RATIOS,
+	useMediaEditor,
+	resolveAspectRatio,
+} from '../../state';
 
 interface UseCropOptionsArgs {
 	aspectRatioPresets?: AspectRatioPreset[];
