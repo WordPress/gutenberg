@@ -11,7 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
-	Spinner,
+	Spinner as WCSpinner,
 	Notice,
 	ComboboxControl,
 	Button,
@@ -64,7 +64,7 @@ function BlockContent( {
 		return (
 			<div { ...blockProps }>
 				<div className="wp-block-page-list__loading-indicator-container">
-					<Spinner className="wp-block-page-list__loading-indicator" />
+					<WCSpinner className="wp-block-page-list__loading-indicator" />
 				</div>
 			</div>
 		);

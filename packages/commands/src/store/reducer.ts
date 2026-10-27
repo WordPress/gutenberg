@@ -110,11 +110,16 @@ function loaderStates(
 	action: Action
 ): State[ 'loaderStates' ] {
 	switch ( action.type ) {
-		case 'SET_LOADER_LOADING':
-			return {
-				...state,
-				[ action.name ]: action.isLoading,
-			};
+		case 'SET_LOADER_LOADING': {
+			if ( action.isLoading ) {
+				return { ...state, [ action.name ]: true };
+			}
+			if ( ! ( action.name in state ) ) {
+				return state;
+			}
+			const { [ action.name ]: _, ...remainingState } = state;
+			return remainingState;
+		}
 	}
 
 	return state;

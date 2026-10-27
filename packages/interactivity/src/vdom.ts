@@ -23,6 +23,10 @@ function parseDirectiveName( directiveName: string ): {
 
 	// Finds the first "--" to separate the prefix.
 	const suffixIndex = name.indexOf( '--' );
+	// A prefix cannot start with "-" and a leading "--" is empty.
+	if ( suffixIndex === 0 || name[ 0 ] === '-' ) {
+		return null;
+	}
 
 	// If "--" is not found, everything is part of the prefix.
 	if ( suffixIndex === -1 ) {
@@ -88,17 +92,23 @@ export function parseDirectiveValue( rawValue: string ): {
 	const rawDirectiveValue = regexResult?.[ 2 ] ?? rawValue;
 	let value: string | Record< string, unknown > = rawDirectiveValue;
 
-	try {
-		const parsedValue: unknown = JSON.parse( rawDirectiveValue );
-		if ( isObject( parsedValue ) ) {
-			value = parsedValue;
-		}
-	} catch {}
+	// The parsed value is only ever used if it is a plain object, so a value
+	// can only be worth parsing if it starts with `{` (allowing leading
+	// whitespace, which JSON.parse tolerates for values set via setAttribute).
+	// This gates the common case of plain string values (e.g.
+	// `data-wp-interactive="myplugin"`), avoiding the relatively expensive
+	// SyntaxError that JSON.parse throws for every non-JSON value.
+	if ( /^\s*\{/.test( rawDirectiveValue ) ) {
+		try {
+			const parsedValue: unknown = JSON.parse( rawDirectiveValue );
+			if ( isObject( parsedValue ) ) {
+				value = parsedValue;
+			}
+		} catch {}
+	}
 
 	return { namespace, value };
 }
-
-export const hydratedIslands = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
@@ -127,7 +137,7 @@ export function toVdom( root: Node ): ComponentChild {
 		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			nodesToReplace.add( node );
-			return node.nodeValue;
+			return ( node as CDATASection ).data;
 		}
 
 		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
@@ -137,7 +147,6 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		const elementNode = node as HTMLElement;
-		const { attributes } = elementNode;
 		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
 
 		const props: Record< string, any > = {};
@@ -147,9 +156,16 @@ export function toVdom( root: Node ): ComponentChild {
 		> = [];
 		let island = false;
 
-		for ( let i = 0; i < attributes.length; i++ ) {
-			const attributeName = attributes[ i ].name;
-			const attributeValue = attributes[ i ].value;
+		// `getAttributeNames()` copies the attribute names into a plain JS
+		// array, which is much faster than per-attribute access to the live
+		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
+		// and property read crosses the JS/DOM boundary and may allocate an
+		// `Attr` wrapper object.
+		const attributeNames = elementNode.getAttributeNames();
+		for ( let i = 0; i < attributeNames.length; i++ ) {
+			const attributeName = attributeNames[ i ];
+			const attributeValue =
+				elementNode.getAttribute( attributeName ) ?? '';
 			if (
 				attributeName[ directivePrefix.length ] &&
 				attributeName.slice( 0, directivePrefix.length ) ===
@@ -177,6 +193,10 @@ export function toVdom( root: Node ): ComponentChild {
 				} else {
 					directives.push( [ attributeName, namespace, value ] );
 				}
+				// Directive attributes are never boolean properties, so skip
+				// the boolean check below and assign the value directly.
+				props[ attributeName ] = attributeValue;
+				continue;
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
@@ -193,10 +213,6 @@ export function toVdom( root: Node ): ComponentChild {
 			} else {
 				props[ attributeName ] = attributeValue;
 			}
-		}
-
-		if ( island ) {
-			hydratedIslands.add( elementNode );
 		}
 
 		if ( directives.length ) {
@@ -240,6 +256,20 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
+		if ( props.__directives?.html ) {
+			const conflictingPrefixes = [
+				'text',
+				'each',
+				'router-region',
+			].filter( ( prefix ) => prefix in props.__directives );
+			if ( conflictingPrefixes.length ) {
+				warn(
+					`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
+				);
+				delete props.__directives.html;
+			}
+		}
+
 		const hasDefaultHtmlDirective = props.__directives?.html?.some(
 			( { suffix }: DirectiveEntry ) => suffix === null
 		);
@@ -252,18 +282,6 @@ export function toVdom( root: Node ): ComponentChild {
 			// vnodes, since the directive writes to the DOM directly rather
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
-			//
-			// Any interactive islands inside are marked as already hydrated
-			// so `hydrateRegions()` doesn't also initialize them
-			// independently; nested router regions aren't excluded yet and
-			// may still process on their own.
-			if ( hasDefaultHtmlDirective ) {
-				elementNode
-					.querySelectorAll( '[data-wp-interactive]' )
-					.forEach( ( islandNode ) => {
-						hydratedIslands.add( islandNode );
-					} );
-			}
 			props.dangerouslySetInnerHTML = {
 				__html: elementNode.innerHTML,
 			};
@@ -300,7 +318,7 @@ export function toVdom( root: Node ): ComponentChild {
 	);
 	nodesToReplace.forEach( ( node: Node ) =>
 		( node as CDATASection ).replaceWith(
-			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			new window.Text( ( node as CDATASection ).data )
 		)
 	);
 

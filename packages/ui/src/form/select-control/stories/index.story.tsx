@@ -1,5 +1,9 @@
+import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
 import { SelectControl } from '../';
+import { Stack } from '../../../stack';
+import { Text } from '../../../text';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
@@ -13,6 +17,7 @@ const meta: Meta< typeof SelectControl > = {
 	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
 	subcomponents: {
+		'SelectControl.Trigger': SelectControl.Trigger,
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
@@ -70,6 +75,112 @@ export const WithCustomPlaceholder: Story = {
 	args: {
 		...Default.args,
 		placeholder: 'Choose an item',
+	},
+};
+
+/**
+ * Preserve an empty string in application state by giving each choice a unique,
+ * non-empty serialization. The callback still receives the original item.
+ * This `itemToStringValue` serializer also changes the value submitted with a form.
+ */
+export const WithEmptyStringValue: Story = {
+	args: {
+		label: 'Position',
+		items: [
+			{ value: '', label: 'Default' },
+			{ value: 'sticky', label: 'Sticky' },
+		],
+		itemToStringValue: ( item ) =>
+			item.value === null ? '' : `option:${ item.value }`,
+	},
+	argTypes: {
+		value: { control: false },
+		defaultValue: { control: false },
+	},
+	render: function Template( args ) {
+		const [ position, setPosition ] = useState( '' );
+
+		return (
+			<Stack direction="column" gap="sm" align="start">
+				<SelectControl
+					{ ...args }
+					value={
+						args.items?.find(
+							( item ) => item.value === position
+						) ?? null
+					}
+					onValueChange={ ( item, eventDetails ) => {
+						if ( item && item.value !== null ) {
+							setPosition( item.value );
+						}
+						args.onValueChange?.( item, eventDetails );
+					} }
+				/>
+				<Text>
+					Stored value: <code>{ JSON.stringify( position ) }</code>
+				</Text>
+			</Stack>
+		);
+	},
+};
+
+const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
+	{
+		value: '1',
+		label: 'User 1 (Admin)',
+	},
+	{
+		value: '2',
+		label: 'User 2 (Editor)',
+	},
+	{
+		value: '3',
+		label: 'User 3 (Author)',
+	},
+];
+
+const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
+	<span
+		style={ {
+			display: 'flex',
+			alignItems: 'center',
+			gap: 8,
+		} }
+	>
+		<img
+			src={ `https://gravatar.com/avatar/?d=initials&name=${
+				user.value ?? 'null'
+			}` }
+			alt=""
+			width="20"
+			style={ {
+				borderRadius: '50%',
+			} }
+		/>
+
+		{ user.label }
+	</span>
+);
+
+/**
+ * Pass a `SelectControl.Trigger` element to `trigger` to customize the button's
+ * props, including focus and blur handlers. Trigger props override the control's
+ * `size` and `placeholder`. Children can be a render function receiving the
+ * selected item. The popup keeps the standard item rendering.
+ */
+export const WithCustomTrigger: Story = {
+	args: {
+		...Default.args,
+		items: userOptions,
+		defaultValue: userOptions[ 0 ],
+		trigger: (
+			<SelectControl.Trigger
+				onFocus={ action( 'onFocus' ) }
+				onBlur={ action( 'onBlur' ) }
+			>
+				{ ( item ) => <User user={ item } /> }
+			</SelectControl.Trigger>
+		),
 	},
 };
 
@@ -235,59 +346,17 @@ export const WithSeparator: Story = {
 	},
 };
 
-const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
-	{
-		value: '1',
-		label: 'User 1 (Admin)',
-	},
-	{
-		value: '2',
-		label: 'User 2 (Editor)',
-	},
-	{
-		value: '3',
-		label: 'User 3 (Author)',
-	},
-];
-
-const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
-	<span
-		style={ {
-			display: 'flex',
-			alignItems: 'center',
-			gap: 8,
-		} }
-	>
-		<img
-			src={ `https://gravatar.com/avatar/?d=initials&name=${
-				user.value ?? 'null'
-			}` }
-			alt=""
-			width="20"
-			style={ {
-				borderRadius: '50%',
-			} }
-		/>
-
-		{ user.label }
-	</span>
-);
-
 /**
- * To customize what is rendered inside the trigger element, pass a
- * render function to the `triggerContent` prop.
- *
- * The item list can be customized by passing an array of
+ * Customize the item list by passing an array of
  * `SelectControl.Item` as children. Note that the `label` prop of a `SelectControl.Item`
  * is used as the string to match against in the typeahead functionality, while the
  * item content is determined by `children`.
  */
-export const WithCustomTriggerAndItems: Story = {
+export const WithCustomItems: Story = {
 	args: {
 		items: userOptions,
 		label: 'Label',
 		description: 'This is the description.',
-		triggerContent: ( item ) => <User user={ item } />,
 		children: [
 			userOptions.map( ( item ) => (
 				<SelectControl.Item
@@ -308,9 +377,9 @@ export const WithCustomTriggerAndItems: Story = {
 
 /**
  * By default, the `items` array is used to render both the Trigger
- * and the Item list. Passing a custom `triggerContent` or `children` in addition
+ * and the Item list. Passing a custom `trigger` or `children` in addition
  * to `items` will override that particular aspect of the behavior.
- * In other words, if you pass both an `items` array and a custom `triggerContent`,
+ * In other words, if you pass both an `items` array and a custom `trigger`,
  * the Item list in the popover will still be rendered based on the `items` array.
  */
 export const WithItemsArrayAndPartialCustomization: Story = {

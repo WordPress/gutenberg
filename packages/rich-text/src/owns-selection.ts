@@ -31,7 +31,12 @@ export function ownsSelection( element: HTMLElement ) {
 		return false;
 	}
 
-	const selection = ownerDocument.defaultView!.getSelection()!;
+	const selection = ownerDocument.defaultView?.getSelection();
+
+	if ( ! selection ) {
+		return false;
+	}
+
 	const { anchorNode, focusNode } = selection;
 
 	return (

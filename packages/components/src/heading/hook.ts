@@ -2,7 +2,6 @@ import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../utils/font-size';
-import { CONFIG, COLORS } from '../utils';
 import type { HeadingProps } from './types';
 
 export function useHeading(
@@ -11,9 +10,9 @@ export function useHeading(
 	const {
 		as: asProp,
 		level = 2,
-		color = COLORS.theme.foreground,
+		color,
 		isBlock = true,
-		weight = CONFIG.fontWeightEmphasis as React.CSSProperties[ 'fontWeight' ],
+		weight = 'var(--wpds-typography-font-weight-emphasis)',
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 

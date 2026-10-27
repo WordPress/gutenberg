@@ -559,13 +559,6 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	$style_attr = is_array( $attributes['style'] ?? null )
 		? $attributes['style']
 		: array();
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
-	}
 
 	$global_settings          = wp_get_global_settings();
 	$viewport_settings        = $global_settings['viewport'] ?? null;

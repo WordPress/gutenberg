@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
-import { Spinner, Composite } from '@wordpress/components';
+import { Spinner as WCSpinner, Composite } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -513,14 +513,14 @@ function ViewPickerTable< Item >( {
 				{ ! hasData &&
 					( isLoading ? (
 						<p>
-							<Spinner />
+							<WCSpinner />
 						</p>
 					) : (
 						empty
 					) ) }
 				{ hasData && isLoading && (
 					<p className="dataviews-loading-more">
-						<Spinner />
+						<WCSpinner />
 					</p>
 				) }
 			</div>
