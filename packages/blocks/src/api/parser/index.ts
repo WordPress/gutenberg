@@ -13,7 +13,7 @@ import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
-import { fixHtmlAttributes } from './fix-html-attributes';
+import { applyHtmlAttributes } from './fix-html-attributes';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
 
 /**
@@ -238,15 +238,8 @@ export function parseRawBlock(
 	// Keep attributes the block doesn't know, once its deprecations had the
 	// chance to read them.
 	if ( ! updatedBlock.isValid ) {
-		const fixedBlock = {
-			...updatedBlock,
-			attributes: fixHtmlAttributes(
-				updatedBlock.attributes,
-				blockType,
-				normalizedBlock.innerHTML
-			),
-		};
-		if ( validateBlock( fixedBlock, blockType )[ 0 ] ) {
+		const fixedBlock = applyHtmlAttributes( updatedBlock, blockType );
+		if ( fixedBlock ) {
 			updatedBlock = {
 				...fixedBlock,
 				isValid: true,

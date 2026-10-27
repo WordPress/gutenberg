@@ -1,7 +1,7 @@
 import { getSaveContent } from '../serializer';
-import { getStyleProperties } from '../validation';
+import { getStyleProperties, validateBlock } from '../validation';
 import { parseHtml } from './get-block-attributes';
-import type { BlockType } from '../../types';
+import type { Block, BlockType } from '../../types';
 
 /**
  * Given an HTML string, returns the attributes of its root element.
@@ -69,4 +69,30 @@ export function fixHtmlAttributes(
 	return Object.keys( unknownAttributes ).length
 		? { ...attributes, htmlAttributes: unknownAttributes }
 		: attributes;
+}
+
+/**
+ * Given a block and its original markup in `originalContent`, keeps the
+ * attributes of its root element that its `save` doesn't produce, if the block
+ * then matches its markup.
+ *
+ * @param block     Block with its original markup.
+ * @param blockType Block type settings.
+ *
+ * @return The block with the attributes kept, or undefined if it still doesn't
+ *         match.
+ */
+export function applyHtmlAttributes(
+	block: Block,
+	blockType: BlockType
+): Block | undefined {
+	const fixedBlock = {
+		...block,
+		attributes: fixHtmlAttributes(
+			block.attributes,
+			blockType,
+			block.originalContent ?? ''
+		),
+	};
+	return validateBlock( fixedBlock, blockType )[ 0 ] ? fixedBlock : undefined;
 }
