@@ -110,13 +110,9 @@
 	position: static;
 	width: 100%;
 
-	// Colors need to work in both dark themes, and dark dropdown colors.
-	// This customization would be nice to retire in a refactor of the canvas appender button.
-	.block-editor-button-block-appender {
-		color: $white;
-		background: $gray-900;
-		padding: 0;
-		width: $button-size-small;
+	// The block editor only shows the toggle when the submenu itself is selected.
+	.block-editor-inserter__toggle.components-button.has-icon {
+		display: flex;
 		margin-right: 0;
 		margin-left: auto;
 	}
@@ -209,40 +205,9 @@ $color-control-label-height: 20px;
 	}
 }
 
-// Override inner padding on default appender.
-// This should be a temporary fix, to be replaced by improvements to
-// the sibling inserter.
-// See https://github.com/WordPress/gutenberg/issues/37572.
-.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
-	background-color: $gray-900;
-	color: $white;
-	height: $button-size-small;
-	width: $button-size-small;
-
-	// This needs specificity to override an inherited padding.
-	// That source padding in turn has high specificity to protect
-	// from theme CSS bleed.
-	&.block-editor-button-block-appender.block-editor-button-block-appender {
-		padding: 0;
-	}
-}
-
-.wp-block-navigation .wp-block .wp-block .block-editor-button-block-appender {
-	background-color: transparent;
-	color: $gray-900;
-}
-
-// Place the dropdown appender right after the last item, in the flow of the
-// layout, instead of absolutely positioned in the corner of the block.
-.wp-block-navigation__container > .block-list-appender .block-editor-default-block-appender {
-	.block-editor-inserter {
-		position: static;
-	}
-
-	// Keep the toggle visible even when a child block is selected.
-	.block-editor-inserter__toggle.components-button.has-icon {
-		display: flex;
-	}
+// Keep the appender toggle visible even when a child block is selected.
+.wp-block-navigation__container > .block-list-appender .block-editor-inserter__toggle.components-button.has-icon {
+	display: flex;
 }
 
 
