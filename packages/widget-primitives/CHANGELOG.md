@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. `WidgetRender` provides it from the `widgetType` it already holds; absent a provider, the hook returns `{}`.
+-   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. `WidgetRender` provides it from the `widgetType` it already holds; absent a provider, the hook returns `{}` ([#85729](https://github.com/WordPress/gutenberg/pull/85729)).
 
 ## 0.10.0 (2026-10-20)
 
