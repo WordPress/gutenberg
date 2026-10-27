@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: the add-reaction button now opens a full searchable emoji picker with a per-user skin tone preference, powered by a self-hosted Emojibase dataset configured via the `noteEmojibaseUrl` editor setting ([#83538](https://github.com/WordPress/gutenberg/pull/83538)).
+
 ### Bug Fixes
 
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).

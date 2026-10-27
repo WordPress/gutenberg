@@ -101,6 +101,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'isRTL',
 	'locale',
 	'maxWidth',
+	'noteEmojibaseUrl',
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',

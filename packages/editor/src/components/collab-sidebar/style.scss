@@ -342,9 +342,146 @@ mark.wp-note {
 	outline: none;
 }
 
-.editor-collab-sidebar-panel__reaction-button-emoji,
-.editor-collab-sidebar-panel__reaction-option-emoji {
+.editor-collab-sidebar-panel__reaction-button-emoji {
 	font-size: var(--wpds-typography-font-size-lg);
+}
+
+// The picker is the `Autocomplete.Popup` itself, which supplies the
+// surface, radius, and elevation; the rules below own its layout.
+.editor-collab-sidebar-panel__picker {
+	// Grid geometry from the design: six 40px cells with a 4px gap and
+	// 16px padding on both sides.
+	--emoji-picker-cell-size: var(--wpds-dimension-size-lg);
+	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
+	--emoji-picker-padding: var(--wpds-dimension-padding-lg);
+	--emoji-picker-grid-width: calc(var(--emoji-picker-cell-size) * 6 + var(--emoji-picker-gap) * 5);
+
+	display: flex;
+	flex-direction: column;
+	// Sized by the grid viewport, whose max-content width includes any
+	// scrollbar gutter, so the six columns never overflow into it.
+	width: max-content;
+	height: 360px;
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-sm);
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+// Search field with the skin-tone toggle beside it.
+.editor-collab-sidebar-panel__picker-search {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	// The bottom padding keeps the scrolling grid, and the heading stuck
+	// to its top, clear of the input's focus ring.
+	padding: var(--emoji-picker-padding) var(--emoji-picker-padding) var(--wpds-dimension-padding-sm);
+	// Stretch to the grid's width rather than widening the picker.
+	contain: inline-size;
+}
+
+.editor-collab-sidebar-panel__picker-input {
+	flex: 1;
+	min-width: 0;
+}
+
+.editor-collab-sidebar-panel__skin-tone-toggle {
+	flex-shrink: 0;
+	// Fixed square, so the toggle doesn't grow with its emoji content.
+	width: var(--emoji-picker-cell-size);
+	padding: 0;
+	font-size: 24px;
+	line-height: 1;
+	justify-content: center;
+}
+
+.editor-collab-sidebar-panel__skin-tone-swatch {
+	font-size: 18px;
+	line-height: 1;
+}
+
+.editor-collab-sidebar-panel__picker-viewport {
+	flex: 1;
+	overflow: auto;
+	// Overlay scrollbars reserve nothing; classic ones get an equal gutter
+	// on both edges, so the grid stays centered either way.
+	scrollbar-gutter: stable both-edges;
+	padding-inline: var(--emoji-picker-padding);
+	// A keyboard-scrolled cell stays clear of the sticky category heading.
+	scroll-padding-block: var(--wpds-dimension-size-md) 0;
+}
+
+// Hold the grid's width even while it is empty (loading, or no search
+// results) so the popup doesn't resize and reposition.
+.editor-collab-sidebar-panel__picker-list {
+	min-inline-size: var(--emoji-picker-grid-width);
+}
+
+// The last row gets the same padding as the sides.
+.editor-collab-sidebar-panel__picker-list {
+	padding-block-end: var(--emoji-picker-padding);
+}
+
+// While browsing, the category heading spaces the grid from the input.
+// Search results have no heading, so pad them instead: the full picker
+// padding below the input, with the search row's bottom padding.
+.editor-collab-sidebar-panel__picker-list.is-searching {
+	padding-block-start: calc(var(--emoji-picker-padding) - var(--wpds-dimension-padding-sm));
+}
+
+.editor-collab-sidebar-panel__picker-group + .editor-collab-sidebar-panel__picker-group {
+	margin-block-start: var(--emoji-picker-padding);
+}
+
+// The Design System group label (small, uppercase, muted), pinned while
+// its category scrolls beneath it.
+.editor-collab-sidebar-panel__picker-category {
+	position: sticky;
+	top: 0;
+	// Rows scroll behind it, so match the `Autocomplete.Popup` surface.
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	z-index: 1;
+	// Align the heading with the grid's first column.
+	padding-inline: 0;
+}
+
+.editor-collab-sidebar-panel__picker-row {
+	display: grid;
+	grid-template-columns: repeat(6, var(--emoji-picker-cell-size));
+	gap: var(--emoji-picker-gap);
+	// Skip offscreen rows so the ~330-row list mounts quickly; the
+	// intrinsic-size hint matches the real row height to keep scroll
+	// geometry accurate.
+	content-visibility: auto;
+	contain-intrinsic-size: auto var(--emoji-picker-cell-size);
+}
+
+// The row's grid track sets the cell width; the Design System item
+// supplies the flex centering, radius, cursor, and the highlight that
+// follows the arrow keys and pointer.
+.editor-collab-sidebar-panel__picker-emoji {
+	justify-content: center;
+	height: var(--emoji-picker-cell-size);
+	padding: 0;
+
+	// The brand outline marks the user's own reactions, as on the pills.
+	&.is-reacted {
+		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-brand);
+	}
+}
+
+.editor-collab-sidebar-panel__picker-emoji-label {
+	font-size: 24px;
+}
+
+// Forced colors repaint text in a system color, which turns color emoji into
+// flat monochrome glyphs and drops skin tones. Opt the picker glyphs out, but
+// not the buttons around them, so their borders still follow the system
+// colors; skin tones can't be told apart by shape. Reaction pills keep the
+// user's preference.
+.editor-collab-sidebar-panel__picker-emoji-label,
+.editor-collab-sidebar-panel__skin-tone-toggle-emoji,
+.editor-collab-sidebar-panel__skin-tone-swatch {
+	forced-color-adjust: none;
 }
 
 // Mention chips, both in the note input and the rendered note content. A

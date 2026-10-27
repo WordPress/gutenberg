@@ -26,8 +26,12 @@ collab-sidebar/
 │
 ├── reactions/                       emoji reactions on a note
 │   ├── use-note-reactions.ts        useNoteReactions( noteId ) - [ reaction_summary, toggleReaction ]
-│   ├── note-reactions.tsx           NoteReactions - reaction pills with reactor-name tooltips + add-reaction Menu
-│   └── reaction-emojis.ts           the reaction emoji and their storage keys
+│   ├── note-reactions.tsx           NoteReactions - reaction pills with reactor-name tooltips + the emoji picker
+│   ├── emoji-picker.tsx             EmojiPicker - Autocomplete trigger + popup grid over the Emojibase dataset
+│   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference Menu
+│   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
+│   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
+│   └── reaction-emojis.ts           curated reaction emoji and storage keys
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor

@@ -9,6 +9,7 @@
 ### New Features
 
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
+-   `Autocomplete`: Add a `Trigger` subcomponent that opens the popup from a button, for pickers that put the input inside the popup ([#83538](https://github.com/WordPress/gutenberg/pull/83538)).
 
 ### Enhancements
 

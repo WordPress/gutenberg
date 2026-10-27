@@ -547,6 +547,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	public function data_reaction_raw_content_slugs() {
 		return array(
 			'curated emoji' => array( '2764' ),
+			'other emoji'   => array( '1f44d' ),
 		);
 	}
 
@@ -801,15 +802,18 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	public function data_invalid_reaction_inputs() {
 		return array(
-			'no parent'                     => array( 'none', '2764', true, 'rest_comment_invalid_parent', 400 ),
-			'parent is a regular comment'   => array( 'comment', '2764', true, 'rest_comment_invalid_parent', 400 ),
-			'content is not in emoji list'  => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
-			'emoji outside the curated set' => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
-			'uppercase hex key'             => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
-			'emoji name instead of hex'     => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
-			'anonymous user'                => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
-			'raw content not a key'         => array( 'note', array( 'raw' => 'invalid_emoji' ), true, 'rest_comment_invalid_reaction', 400 ),
-			'content without raw'           => array( 'note', array( 'rendered' => '2764' ), true, 'rest_comment_invalid_reaction', 400 ),
+			'no parent'                    => array( 'none', '2764', true, 'rest_comment_invalid_parent', 400 ),
+			'parent is a regular comment'  => array( 'comment', '2764', true, 'rest_comment_invalid_parent', 400 ),
+			'content is not in emoji list' => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
+			'hex above U+10FFFF'           => array( 'note', '110000', true, 'rest_comment_invalid_reaction', 400 ),
+			'hex in surrogate range'       => array( 'note', 'd800', true, 'rest_comment_invalid_reaction', 400 ),
+			'hex with a bad segment'       => array( 'note', '1f468-200d-dfff', true, 'rest_comment_invalid_reaction', 400 ),
+			'uppercase hex key'            => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
+			'unpadded hex key'             => array( 'note', 'a9', true, 'rest_comment_invalid_reaction', 400 ),
+			'emoji name instead of hex'    => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
+			'anonymous user'               => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
+			'raw content not a key'        => array( 'note', array( 'raw' => 'invalid_emoji' ), true, 'rest_comment_invalid_reaction', 400 ),
+			'content without raw'          => array( 'note', array( 'rendered' => '2764' ), true, 'rest_comment_invalid_reaction', 400 ),
 		);
 	}
 
@@ -941,13 +945,17 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public function data_valid_reaction_emojis() {
-		// The five quick reactions: heart, celebration, smile, eyes, rocket.
 		return array(
-			'heart'       => array( '2764' ),
-			'celebration' => array( '1f389' ),
-			'smile'       => array( '1f604' ),
-			'eyes'        => array( '1f440' ),
-			'rocket'      => array( '1f680' ),
+			// The five quick reactions.
+			'heart'             => array( '2764' ),
+			'celebration'       => array( '1f389' ),
+			'smile'             => array( '1f604' ),
+			'eyes'              => array( '1f440' ),
+			'rocket'            => array( '1f680' ),
+			// Any other emoji from the picker.
+			'single code point' => array( '1f44d' ),
+			'ZWJ sequence'      => array( '1f468-200d-1f4bb' ),
+			'padded key'        => array( '00a9' ),
 		);
 	}
 
