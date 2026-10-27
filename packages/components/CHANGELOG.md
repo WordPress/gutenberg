@@ -9,6 +9,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Bug Fixes
+
+-   `UnitControl`: Use a neutral text color for static unit labels ([#85532](https://github.com/WordPress/gutenberg/pull/85532)).
+
 ## 43.0.0 (2026-10-20)
 
 ### Breaking Changes
