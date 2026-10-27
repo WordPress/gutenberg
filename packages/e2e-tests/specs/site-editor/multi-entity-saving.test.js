@@ -260,6 +260,23 @@ describe( 'Multi-entity save flow', () => {
 			await page.click( entitiesSaveSelector );
 		};
 
+		/*
+		 * The block inspector can show the controls of more than one block at
+		 * once, so clicking a font size picker does not reliably change the
+		 * block under test. Change the attribute through the block editor store
+		 * instead: the test covers the edit tracking, not the picker.
+		 */
+		const setFontSize = ( clientId, fontSize ) =>
+			page.evaluate(
+				( id, size ) => {
+					wp.data
+						.dispatch( 'core/block-editor' )
+						.updateBlockAttributes( id, { fontSize: size } );
+				},
+				clientId,
+				fontSize
+			);
+
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
 			await visitSiteEditor( {
@@ -310,27 +327,19 @@ describe( 'Multi-entity save flow', () => {
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );
-
-			// Open the block settings.
-			await page.click( 'button[aria-label="Settings"]' );
-
-			// Wait for the font size picker controls.
-			await page.waitForSelector(
-				'.components-font-size-picker__controls'
+			const paragraphClientId = await page.evaluate( () =>
+				wp.data.select( 'core/block-editor' ).getSelectedBlockClientId()
 			);
 
 			// Change the font size.
-			await page.click(
-				'.components-font-size-picker__controls button[aria-label="Small"]'
-			);
+			await setFontSize( paragraphClientId, 'small' );
 
-			// Save all changes.
+			// Save all changes and wait for the save to finish.
 			await saveAllChanges();
+			await page.waitForSelector( disabledSaveSiteSelector );
 
-			// Change the font size.
-			await page.click(
-				'.components-font-size-picker__controls button[aria-label="Medium"]'
-			);
+			// Change the same attribute again.
+			await setFontSize( paragraphClientId, 'medium' );
 
 			// Assert that the save button has been re-enabled.
 			const saveButton = await page.waitForSelector(
