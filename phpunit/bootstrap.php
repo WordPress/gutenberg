@@ -93,7 +93,6 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-guidelines'              => 1,
 		'gutenberg-dashboard-widgets'       => 1,
 		'gutenberg-real-time-collaboration' => 1,
-		'gutenberg-block-rotation'          => 1,
 	),
 );
 

@@ -1,10 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { BlockType } from '@wordpress/blocks';
-import rotate, {
-	getRotateCSS,
-	hasRotateSupport,
-	isRotateEnabled,
-} from '../rotate';
+import rotate, { getRotateCSS, hasRotateSupport } from '../rotation';
 import {
 	getRotateForState,
 	getRotateValue,
@@ -14,10 +10,6 @@ import {
 const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
 const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
 const TABLET_STATE = { viewport: '@tablet', pseudo: 'default' };
-
-const testWindow = window as Window & {
-	__experimentalEnableBlockRotation?: boolean;
-};
 
 /**
  * Returns a block type with only the settings a test needs. Rotation support
@@ -32,26 +24,22 @@ function createBlockType( settings: Partial< BlockType > ): BlockType {
 }
 
 describe( 'rotate block support', () => {
-	afterEach( () => {
-		delete testWindow.__experimentalEnableBlockRotation;
-	} );
-
 	describe( 'hasRotateSupport()', () => {
-		it( 'is on for blocks that do not opt out', () => {
-			expect(
-				hasRotateSupport( createBlockType( { supports: {} } ) )
-			).toBe( true );
+		it( 'is on for blocks that opt in', () => {
 			expect(
 				hasRotateSupport(
-					createBlockType( { supports: { rotate: true } } )
+					createBlockType( { supports: { rotation: true } } )
 				)
 			).toBe( true );
 		} );
 
-		it( 'is off for blocks that opt out', () => {
+		it( 'is off for blocks that do not opt in', () => {
+			expect(
+				hasRotateSupport( createBlockType( { supports: {} } ) )
+			).toBe( false );
 			expect(
 				hasRotateSupport(
-					createBlockType( { supports: { rotate: false } } )
+					createBlockType( { supports: { rotation: false } } )
 				)
 			).toBe( false );
 		} );
@@ -60,7 +48,7 @@ describe( 'rotate block support', () => {
 			expect(
 				hasRotateSupport(
 					createBlockType( {
-						supports: {},
+						supports: { rotation: true },
 						attributes: { style: { type: 'string' } },
 					} )
 				)
@@ -68,32 +56,11 @@ describe( 'rotate block support', () => {
 			expect(
 				hasRotateSupport(
 					createBlockType( {
-						supports: {},
+						supports: { rotation: true },
 						attributes: { style: { type: 'object' } },
 					} )
 				)
 			).toBe( true );
-		} );
-	} );
-
-	describe( 'isRotateEnabled()', () => {
-		it( 'needs the block rotation experiment', () => {
-			expect(
-				isRotateEnabled( createBlockType( { supports: {} } ) )
-			).toBe( false );
-			testWindow.__experimentalEnableBlockRotation = true;
-			expect(
-				isRotateEnabled( createBlockType( { supports: {} } ) )
-			).toBe( true );
-		} );
-
-		it( 'needs the block to support rotation', () => {
-			testWindow.__experimentalEnableBlockRotation = true;
-			expect(
-				isRotateEnabled(
-					createBlockType( { supports: { rotate: false } } )
-				)
-			).toBe( false );
 		} );
 	} );
 
@@ -348,11 +315,15 @@ describe( 'rotate block support', () => {
 	} );
 
 	describe( 'hasSupport()', () => {
-		it( 'needs the block rotation experiment, so a stored rotation is only applied with it', () => {
-			const blockType = createBlockType( { supports: {} } );
-			expect( rotate.hasSupport( blockType ) ).toBe( false );
-			testWindow.__experimentalEnableBlockRotation = true;
-			expect( rotate.hasSupport( blockType ) ).toBe( true );
+		it( 'needs the block to opt in', () => {
+			expect(
+				rotate.hasSupport( createBlockType( { supports: {} } ) )
+			).toBe( false );
+			expect(
+				rotate.hasSupport(
+					createBlockType( { supports: { rotation: true } } )
+				)
+			).toBe( true );
 		} );
 	} );
 
