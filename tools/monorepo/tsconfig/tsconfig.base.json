@@ -5,9 +5,6 @@
 		"paths": {
 			"@wordpress/block-library": [
 				"../typings/untyped-packages/any-module.d.ts"
-			],
-			"@wordpress/patterns": [
-				"../typings/untyped-packages/any-module.d.ts"
 			]
 		},
 		"checkJs": true,

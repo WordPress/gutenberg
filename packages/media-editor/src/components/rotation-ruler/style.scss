@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // Default to WordPress core's admin theme blue when the host hasn't
@@ -38,8 +39,7 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	}
 
 	&:has(.rotation-ruler__input:focus-visible) {
-		outline: 2px solid $rotation-ruler-accent;
-		outline-offset: 2px;
+		@include outset-ring__focus();
 		border-radius: 4px;
 	}
 }
