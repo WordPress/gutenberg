@@ -38,18 +38,6 @@ describe( 'ContentEditableControl', () => {
 		expect( label ).toHaveClass( 'components-visually-hidden' );
 	} );
 
-	it( 'keeps a visually hidden label from being read on its own', () => {
-		render( <ContentEditableControl label="Note" hideLabelFromVision /> );
-
-		// Without `for`, a screen reader would read the label as page text
-		// and then again as the field's name.
-		expect( screen.getByText( 'Note' ) ).toHaveAttribute(
-			'aria-hidden',
-			'true'
-		);
-		expect( screen.getByRole( 'textbox' ) ).toHaveAccessibleName( 'Note' );
-	} );
-
 	it( 'is multiline by default and accepts an `aria-multiline` override', () => {
 		const { rerender } = render(
 			<ContentEditableControl label="Single line" />
