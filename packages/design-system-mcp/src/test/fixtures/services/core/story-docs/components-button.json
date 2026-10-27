@@ -1,0 +1,15 @@
+{
+	"components": {
+		"components-button": {
+			"id": "components-button",
+			"name": "Button",
+			"stories": {
+				"components-button--default": {
+					"id": "components-button--default",
+					"name": "Default",
+					"snippet": "<Button />"
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,24 @@
+{
+	"v": 1,
+	"components": {
+		"ui-badge": {
+			"id": "ui-badge",
+			"name": "Badge",
+			"description": "A badge.",
+			"docgen": {
+				"$ref": "../services/core/docgen/ui-badge.json#/components/ui-badge"
+			}
+		},
+		"components-button": {
+			"id": "components-button",
+			"name": "Button",
+			"description": "A button.",
+			"docgen": {
+				"$ref": "../services/core/docgen/components-button.json#/components/components-button"
+			},
+			"stories": {
+				"$ref": "../services/core/story-docs/components-button.json#/components/components-button"
+			}
+		}
+	}
+}

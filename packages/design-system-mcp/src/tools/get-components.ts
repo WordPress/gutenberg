@@ -13,7 +13,7 @@ export function register( server: McpServer ): void {
 		{
 			title: 'Get Components',
 			description:
-				'Get a list of all available WordPress Design System components with their package names and descriptions.',
+				'Get a list of all available WordPress Design System components with their descriptions.',
 			annotations: {
 				readOnlyHint: true,
 			},
