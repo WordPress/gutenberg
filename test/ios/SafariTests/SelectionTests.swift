@@ -8,8 +8,10 @@ final class SelectionTests: XCTestCase {
 	let app = XCUIApplication()
 
 	/// How long the first tap gets to focus the paragraph before a retry.
-	/// Focus shows within about a second when the tap lands.
-	static let focusRetryTimeout: TimeInterval = 3
+	/// Focus can take over 3 seconds to show when the tap lands, and a
+	/// retry on a paragraph that is about to focus opens the edit menu, so
+	/// retry only once the tap has clearly been dropped.
+	static let focusRetryTimeout: TimeInterval = 10
 	/// How long the keyboard and the canvas get to settle after focus.
 	static let settleTimeout: TimeInterval = 5
 	/// The pause between two reads of a frame while it settles.
@@ -89,9 +91,16 @@ final class SelectionTests: XCTestCase {
 		// own frame.
 		let bravo = web.staticTexts[ "bravo" ].frame
 
-		// Double tap the first word, "Delta".
+		// Double tap the first word, "Delta". The simulator now and then
+		// delivers the double tap as two single taps: the second lands on
+		// the caret the first placed and opens the Paste, Select, Select All
+		// menu. Its Select selects the word at the caret, "Delta".
 		point( target.minX + 15, target.midY ).doubleTap()
 		let cut = app.menuItems[ "Cut" ]
+		let select = app.menuItems[ "Select" ]
+		if !cut.waitForExistence( timeout: 5 ) && select.exists {
+			select.tap()
+		}
 		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word" )
 
 		// The start handle's knob sits above the line, at the start of the
