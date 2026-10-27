@@ -1104,16 +1104,6 @@
 		"dashicons": [ "dashicons-lock", "dashicons-lock-duplicate" ]
 	},
 	{
-		"slug": "lock-outline",
-		"label": "Lock Outline",
-		"filePath": "library/lock-outline.svg"
-	},
-	{
-		"slug": "lock-small",
-		"label": "Lock Small",
-		"filePath": "library/lock-small.svg"
-	},
-	{
 		"slug": "login",
 		"label": "Login",
 		"filePath": "library/login.svg"
