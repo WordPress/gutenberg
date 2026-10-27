@@ -94,8 +94,9 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		const linked = panel.getByRole( 'checkbox', { name: 'Linked menu' } );
 		await expect( linked ).toBeChecked();
 		await expect( linked ).toBeDisabled();
-		// Each menu links to its editor.
-		const link = panel.getByRole( 'link', { name: 'Edit Main menu' } );
+		// Each menu links to its editor, in a new tab.
+		const link = panel.getByRole( 'link', { name: /^View Main menu/ } );
+		await expect( link ).toHaveAttribute( 'target', '_blank' );
 		const href = decodeURIComponent( await link.getAttribute( 'href' ) );
 		expect( href ).toContain( menuEditorPath( autoMenu.id ) );
 

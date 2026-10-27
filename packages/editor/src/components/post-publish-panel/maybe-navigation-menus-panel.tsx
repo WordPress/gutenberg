@@ -1,5 +1,5 @@
 import { PanelBody } from '@wordpress/components';
-import { CheckboxControl } from '@wordpress/ui';
+import { CheckboxControl, Link } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/block-serialization-default-parser';
@@ -216,16 +216,17 @@ export default function MaybeNavigationMenusPanel() {
 									setChecked( row, value )
 								}
 							/>
-							<a
+							<Link
 								href={ getMenuEditorUrl( row.id ) }
+								openInNewTab
 								aria-label={ sprintf(
 									/* translators: %s: A menu name. */
-									__( 'Edit %s' ),
+									__( 'View %s' ),
 									title
 								) }
 							>
-								{ __( 'Edit' ) }
-							</a>
+								{ __( 'View' ) }
+							</Link>
 						</li>
 					);
 				} ) }
