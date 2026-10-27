@@ -1,0 +1,79 @@
+import { createBlock } from '@wordpress/blocks';
+import { inertValue } from '@wordpress/react-inert-value';
+import type { Block } from '@wordpress/blocks';
+import type { ReactElement, SyntheticEvent } from 'react';
+import FilePreview from './file-preview';
+import type { MediaItem, MediaType } from './types';
+
+const mediaTypeTag: Partial< Record< MediaType, 'img' | 'video' > > = {
+	image: 'img',
+	video: 'video',
+};
+
+/**
+ * A media item minus `title`, which the interface types as a required
+ * string while core sources spread in the REST record's `{ raw, rendered }`
+ * object and others may omit it. Neither helper here reads it.
+ */
+type MediaItemFields = Omit< MediaItem, 'title' >;
+
+/**
+ * A media item's id, used for item identity in the grid.
+ *
+ * Library items carry a numeric `id` and external ones (e.g. Openverse) carry
+ * a `sourceId`, but both are optional in `InserterMediaItem`, so a category
+ * registered through the public API may supply neither. `url` is required, so
+ * it serves as the fallback rather than stringifying `undefined` and giving
+ * every such item the same id.
+ *
+ * @param media The media object.
+ * @return The id, as a string.
+ */
+export function getItemId( media: MediaItemFields ): string {
+	return String( media.id ?? media.sourceId ?? media.url );
+}
+
+/**
+ * Creates a block and a preview element from a media object.
+ *
+ * @param media     The media object to create the block from.
+ * @param mediaType The media type to create the block for.
+ * @return An array containing the block and the preview element.
+ */
+export function getBlockAndPreviewFromMedia(
+	media: MediaItemFields,
+	mediaType: MediaType
+): [ Block, ReactElement ] {
+	// Add the common attributes between the different media types.
+	const attributes: Record< string, unknown > = {
+		id: media.id || undefined,
+		caption: media.caption || undefined,
+	};
+	const mediaSrc = media.url;
+	const alt = media.alt || undefined;
+	if ( mediaType === 'image' ) {
+		attributes.url = mediaSrc;
+		attributes.alt = alt;
+	} else if ( [ 'video', 'audio' ].includes( mediaType ) ) {
+		attributes.src = mediaSrc;
+	}
+	const PreviewTag = mediaTypeTag[ mediaType ];
+	const preview = PreviewTag ? (
+		<PreviewTag
+			src={ media.previewUrl || mediaSrc }
+			alt={ alt }
+			inert={ inertValue( true ) }
+			onError={ ( {
+				currentTarget,
+			}: SyntheticEvent< HTMLImageElement | HTMLVideoElement > ) => {
+				// Fall back to the media source if the preview cannot be loaded.
+				if ( currentTarget.src === media.previewUrl ) {
+					currentTarget.src = mediaSrc;
+				}
+			} }
+		/>
+	) : (
+		<FilePreview url={ mediaSrc } mediaType={ mediaType } />
+	);
+	return [ createBlock( `core/${ mediaType }`, attributes ), preview ];
+}

@@ -231,6 +231,12 @@ Behind the scenes, the script will:
 -   Add a comment to the PR indicating it’s been cherry-picked
 -   Remove the label `Backport to Gutenberg RC` from the PR
 
+To preview the cherry-picks without pushing or changing PRs, add `--dry-run`:
+
+```bash
+npm run other:cherry-pick -- --dry-run "Backport to Gutenberg RC"
+```
+
 Here is a screenshot of the process:
 
 ![Automated cherry-picking](https://developer.wordpress.org/files/2023/07/image-7.png)
