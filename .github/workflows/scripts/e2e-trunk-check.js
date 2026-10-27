@@ -112,14 +112,14 @@ if ( tests.size ) {
 	);
 	for ( const { path, line } of failing ) {
 		console.log(
-			`::notice file=${ path },line=${ line }::This test fails on trunk, so it proves the fix.`
+			`::notice file=${ path },line=${ line }::This test fails on trunk. Check that it fails because of the bug.`
 		);
 	}
 	if ( ! failing.length ) {
 		for ( const { path, line, status } of results ) {
 			if ( status === 'passed' ) {
 				console.log(
-					`::warning file=${ path },line=${ line }::No new or changed test fails on trunk, so none of them proves the fix.`
+					`::warning file=${ path },line=${ line }::No new or changed test fails on trunk, so none of them catches the bug.`
 				);
 			}
 		}
