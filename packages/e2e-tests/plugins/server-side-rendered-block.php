@@ -87,6 +87,30 @@ add_action(
 			)
 		);
 
+		// Context provider block that provides the `postId`/`postType` block
+		// context from its attributes, simulating query-like blocks whose
+		// items can reference posts the current user can't edit.
+		register_block_type(
+			'test/post-context-provider',
+			array(
+				'attributes'            => array(
+					'postId'   => array(
+						'type'    => 'number',
+						'default' => 0,
+					),
+					'postType' => array(
+						'type'    => 'string',
+						'default' => 'post',
+					),
+				),
+				'provides_context'      => array(
+					'postId'   => 'postId',
+					'postType' => 'postType',
+				),
+				'editor_script_handles' => array( 'server-side-rendered-block' ),
+			)
+		);
+
 		// Add binding support for the auto-register-with-controls block.
 		add_filter(
 			'block_bindings_supported_attributes_test/auto-register-with-controls',
