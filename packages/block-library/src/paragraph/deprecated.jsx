@@ -452,12 +452,18 @@ const deprecated = [
 				default: '',
 			},
 		},
-		// Paragraphs saved without their `<p>`. A paragraph with one isn't
-		// nested in another.
+		// Paragraphs saved without their `<p>`. Saving nothing for content
+		// that is one `<p>` stops it being nested in another.
 		save( { attributes } ) {
-			return /^\s*<p[\s>]/i.test( attributes.content ) ? null : (
-				<RawHTML>{ attributes.content }</RawHTML>
-			);
+			const { body } = document.implementation.createHTMLDocument( '' );
+			body.innerHTML = attributes.content.trim();
+			if (
+				body.childNodes.length === 1 &&
+				body.firstChild.nodeName === 'P'
+			) {
+				return null;
+			}
+			return <RawHTML>{ attributes.content }</RawHTML>;
 		},
 		migrate: ( attributes ) => attributes,
 	},
