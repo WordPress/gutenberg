@@ -193,6 +193,10 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_get_items() {
+		if ( PHP_VERSION_ID >= 80000 ) {
+			$this->markTestSkipped( "WordPress 5.7's WP_Widget_RSS::widget() never returns on PHP 8 when the feed URL is empty (fixed in WordPress 5.8, r51107)." );
+		}
+
 		$this->setup_widget(
 			'widget_rss',
 			1,
