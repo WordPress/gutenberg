@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
