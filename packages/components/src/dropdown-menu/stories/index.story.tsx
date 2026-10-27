@@ -124,6 +124,9 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
  * open when the selection changes.
  */
 export const SingleSelection: StoryObj< typeof DropdownMenu > = {
+	parameters: {
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
 	args: {
 		label: 'Editor options',
 		icon: more,
@@ -156,6 +159,9 @@ export const SingleSelection: StoryObj< typeof DropdownMenu > = {
  * by updating the selection without calling `onClose`.
  */
 export const MultiSelection: StoryObj< typeof DropdownMenu > = {
+	parameters: {
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
 	args: {
 		label: 'Typography options',
 		icon: more,
