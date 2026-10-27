@@ -319,13 +319,43 @@ function isOwnStylePath( path: string ) {
 	return ! path.startsWith( ':' ) && ! path.startsWith( '@' );
 }
 
-// A shorthand such as `border.radius` and a longhand such as
-// `border.radius.topLeft` set the same CSS, whichever side sets which.
+const BOX_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+// Shorthands whose longhands live elsewhere in the tree. Nested longhands,
+// such as `border.radius.topLeft` or `spacing.padding.top`, sit under their
+// shorthand and match by path.
+const SHORTHAND_LONGHANDS: Record< string, string[] > = {
+	'border.color': BOX_SIDES.map( ( side ) => `border.${ side }.color` ),
+	'border.style': BOX_SIDES.map( ( side ) => `border.${ side }.style` ),
+	'border.width': BOX_SIDES.map( ( side ) => `border.${ side }.width` ),
+	// Output as the `background` shorthand.
+	'color.gradient': [
+		'color.background',
+		'background.backgroundImage',
+		'background.backgroundPosition',
+		'background.backgroundRepeat',
+		'background.backgroundSize',
+		'background.backgroundAttachment',
+		'background.backgroundClip',
+	],
+};
+
 function isSameOrNestedPath( path: string, otherPath: string ) {
 	return (
 		path === otherPath ||
 		path.startsWith( `${ otherPath }.` ) ||
 		otherPath.startsWith( `${ path }.` )
+	);
+}
+
+// Whether two paths set any of the same CSS, whichever sets the shorthand.
+function setsSameProperty( path: string, otherPath: string ) {
+	const longhands = SHORTHAND_LONGHANDS[ path ] ?? [ path ];
+	const otherLonghands = SHORTHAND_LONGHANDS[ otherPath ] ?? [ otherPath ];
+	return longhands.some( ( longhand ) =>
+		otherLonghands.some( ( otherLonghand ) =>
+			isSameOrNestedPath( longhand, otherLonghand )
+		)
 	);
 }
 
@@ -360,7 +390,7 @@ export function getOverridingBlockTypes(
 				isOwnStylePath( path ) &&
 				sources[ path ].layer === 'block' &&
 				elementPaths.some( ( elementPath ) =>
-					isSameOrNestedPath( path, elementPath )
+					setsSameProperty( path, elementPath )
 				)
 		);
 	} );
