@@ -324,6 +324,52 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should refuse to unregister a default icon in the "core-admin" collection.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister
+	 */
+	public function test_unregister_core_admin_icon_is_rejected() {
+		gutenberg_register_default_icons();
+		$svg = wp_get_icon( 'core-admin/dashboard' );
+
+		$this->assertNotSame( '', $svg, 'The core-admin/dashboard icon should be registered.' );
+		$this->assertFalse( wp_unregister_icon( 'core-admin/dashboard' ) );
+		$this->assertTrue( $this->registry->is_registered( 'core-admin/dashboard' ) );
+		$this->assertSame( $svg, wp_get_icon( 'core-admin/dashboard' ) );
+	}
+
+	/**
+	 * Should allow registering a custom icon in the "core-admin" collection,
+	 * but refuse to unregister it.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister
+	 */
+	public function test_custom_core_admin_icon_can_be_registered_but_not_unregistered() {
+		$this->assertTrue(
+			$this->register(
+				'core-admin/my-plugin-icon',
+				array(
+					'label'   => 'My Plugin Icon',
+					'content' => '<svg></svg>',
+				)
+			)
+		);
+		$this->assertFalse( $this->registry->unregister( 'core-admin/my-plugin-icon' ) );
+		$this->assertTrue( $this->registry->is_registered( 'core-admin/my-plugin-icon' ) );
+	}
+
+	/**
+	 * Should still allow unregistering icons in the "core" collection.
+	 */
+	public function test_unregister_core_icon() {
+		gutenberg_register_default_icons();
+
+		$this->assertTrue( $this->registry->unregister( 'core/arrow-down' ) );
+		$this->assertFalse( $this->registry->is_registered( 'core/arrow-down' ) );
+		$this->assertTrue( $this->registry->is_registered( 'core-admin/arrow-down' ), 'The core-admin copy of the icon should be unaffected.' );
+	}
+
+	/**
 	 * Should fail to unregister an icon that was never registered.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister

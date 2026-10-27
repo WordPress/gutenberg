@@ -286,11 +286,27 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Unregisters an icon.
 	 *
+	 * Icons in the "core-admin" collection are used by the WordPress administration
+	 * interface and cannot be unregistered.
+	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
 	 *                          (e.g. "core/arrow-left").
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
 	public function unregister( $icon_name ) {
+		if ( is_string( $icon_name ) && str_starts_with( $icon_name, 'core-admin/' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon name. */
+					__( 'Icon "%s" cannot be unregistered because it belongs to the "core-admin" collection.', 'gutenberg' ),
+					$icon_name
+				),
+				'7.2.0'
+			);
+			return false;
+		}
+
 		if ( ! $this->is_registered( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
