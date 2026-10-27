@@ -186,7 +186,7 @@ export {
 	ToolsPanelItem as __experimentalToolsPanelItem,
 	ToolsPanelContext as __experimentalToolsPanelContext,
 } from './tools-panel';
-export { default as Tooltip } from './tooltip';
+export { default as Tooltip } from './tooltip/deprecated';
 export {
 	default as __experimentalTreeGrid,
 	TreeGridRow as __experimentalTreeGridRow,
