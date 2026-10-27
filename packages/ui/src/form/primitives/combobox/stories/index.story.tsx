@@ -282,8 +282,9 @@ function HiddenResultCount() {
 
 /**
  * Render `Combobox.LoadingIndicator` inside `Combobox.Status` while fetching
- * items. Pass `children` to customize its message. After loading, `Status`
- * announces the result count. Use `Empty` for no results.
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {

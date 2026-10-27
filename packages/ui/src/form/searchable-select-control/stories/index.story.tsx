@@ -244,8 +244,9 @@ function HiddenResultCount() {
 
 /**
  * Pass `SearchableSelectControl.LoadingIndicator` as `statusContent` while fetching
- * items. Pass `children` to customize its message. After loading, `statusContent`
- * announces the result count. Pass `emptyContent={ null }` while loading.
+ * items. Pass `children` to customize its message. After loading, pass a
+ * visually hidden result count as `statusContent` to announce it. Pass
+ * `emptyContent={ null }` while loading.
  */
 export const AsyncItems: Story = {
 	args: {
