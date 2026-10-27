@@ -9,12 +9,12 @@
  * every marker in that block and leaves the marker's note describing text the
  * reviewer can no longer see.
  *
- * Some edits can be expressed as neither. Markers of different kinds may
- * share text (a deletion inside someone's addition), but two markers of one
- * kind may not, so typing inside someone's addition, deleting over someone's
- * deletion or formatting over someone's formatting change is declined at the
- * seam that saw it (see `classifyOverlap`). The user is told whose suggestion
- * is in the way and can reply to it instead.
+ * Some edits can be expressed as neither. Markers stack, so typing or
+ * deleting inside someone's suggestion nests in it, but formatting over
+ * someone's formatting change, or across the edge of someone's addition, is
+ * declined at the seam that saw it (see `classifyOverlap`), as is splitting a
+ * block inside someone's suggestion. The user is told whose suggestion is in
+ * the way and can reply to it instead.
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -43,38 +43,6 @@ function refusalMessage(
 	name: string | undefined
 ): string | null {
 	switch ( reason ) {
-		case 'add-in-add':
-			return name
-				? sprintf(
-						/* translators: %s: name of the person who suggested the addition. */
-						__(
-							'%s suggested adding this text. Reply to their suggestion to propose a change.'
-						),
-						name
-					)
-				: __(
-						'Someone suggested adding this text. Reply to their suggestion to propose a change.'
-					);
-		case 'insert-in-del':
-			return name
-				? sprintf(
-						/* translators: %s: name of the person who suggested the deletion. */
-						__(
-							'%s suggested deleting this text. Reply to their suggestion to propose a change.'
-						),
-						name
-					)
-				: __(
-						'Someone suggested deleting this text. Reply to their suggestion to propose a change.'
-					);
-		case 'del-over-del':
-			return name
-				? sprintf(
-						/* translators: %s: name of the person who suggested the deletion. */
-						__( '%s already suggested deleting this text.' ),
-						name
-					)
-				: __( 'Someone already suggested deleting this text.' );
 		case 'format-on-format':
 			return name
 				? sprintf(

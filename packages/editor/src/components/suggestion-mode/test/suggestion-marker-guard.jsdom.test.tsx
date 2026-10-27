@@ -1,7 +1,7 @@
 /**
- * The marker guard: content that reaches the block editor carrying two
- * markers of one kind over the same characters (a real-time collaboration
- * merge) is resolved once, the same way on every peer.
+ * The marker guard: content that reaches the block editor with stacked
+ * markers out of canonical order (a real-time collaboration merge) is put in
+ * order once, the same way on every peer, keeping every marker.
  */
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
@@ -75,13 +75,23 @@ describe( 'SuggestionMarkerGuard', () => {
 		getBlockTypes().forEach( ( type ) => unregisterBlockType( type.name ) );
 	} );
 
-	it( 'gives overlapping same-kind characters to the older note, once', async () => {
+	it( 'puts a merged stack in canonical order once, keeping both markers', async () => {
 		const { writes, content } = setup(
 			`a${ mark( 21, `b${ mark( 20, 'cd' ) }` ) }e`
 		);
 		expect( findSuggestionText( content(), 20 ) ).toBe( 'cd' );
-		expect( findSuggestionText( content(), 21 ) ).toBe( 'b' );
+		expect( findSuggestionText( content(), 21 ) ).toBe( 'bcd' );
+		expect( content().toHTMLString() ).toBe(
+			`a${ mark( 21, 'b' ) }${ mark( 20, mark( 21, 'cd' ) ) }e`
+		);
 		expect( writes ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'leaves a canonical stack alone', async () => {
+		const { writes } = setup(
+			`a${ mark( 20, `b${ mark( 21, 'cd' ) }` ) }e`
+		);
+		expect( writes ).not.toHaveBeenCalled();
 	} );
 
 	it( 'resolves content that arrives later, and only touches what needs it', async () => {
@@ -97,7 +107,7 @@ describe( 'SuggestionMarkerGuard', () => {
 				} );
 		} );
 		expect( findSuggestionText( content(), 4 ) ).toBe( 'z' );
-		expect( findSuggestionText( content(), 9 ) ).toBe( 'y' );
+		expect( findSuggestionText( content(), 9 ) ).toBe( 'yz' );
 		// The incoming write plus one correction.
 		expect( writes ).toHaveBeenCalledTimes( 2 );
 	} );

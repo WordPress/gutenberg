@@ -15,11 +15,11 @@
  * wired for text edits. `analyzeTextEdit` sees no text change for a format-only
  * edit, so format detection needs this separate pass.
  */
-import { RichTextData, slice, removeFormat } from '@wordpress/rich-text';
+import { RichTextData, slice } from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
-	SUGGESTION_FORMAT_NAMES,
+	removeAllSuggestionMarkers,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_FORMAT,
 	canonicalizeSuggestionStack,
@@ -350,11 +350,11 @@ function sliceToUnmarkedHTML(
 	start: number,
 	end: number
 ): string {
-	let unmarked = record;
-	for ( const name of SUGGESTION_FORMAT_NAMES ) {
-		unmarked = removeFormat( unmarked, name, start, end );
-	}
-	return sliceToHTML( unmarked, start, end );
+	return sliceToHTML(
+		removeAllSuggestionMarkers( record, start, end ),
+		start,
+		end
+	);
 }
 
 /**
