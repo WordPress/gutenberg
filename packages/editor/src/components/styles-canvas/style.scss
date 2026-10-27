@@ -36,6 +36,172 @@
 	}
 }
 
+.editor-styles-canvas-revisions {
+	height: 100%;
+	// Stack the panes when the canvas, not the window, is narrow. The grid
+	// is a child, as an element can't be its own query container.
+	container-type: inline-size;
+}
+
+.editor-styles-canvas-revisions__layout {
+	height: 100%;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr);
+	grid-template-areas:
+		"current-header"
+		"current";
+
+	// The code view takes the whole width under the headers.
+	.editor-styles-canvas-revisions:not(.is-visual) > & {
+		grid-template-areas:
+			"current-header"
+			"code";
+	}
+
+	// Comparing, each pane sits under its own header.
+	.is-comparing > & {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-areas:
+			"selected-header current-header"
+			"selected current";
+	}
+
+	.is-comparing:not(.is-visual) > & {
+		grid-template-areas:
+			"selected-header current-header"
+			"code code";
+	}
+}
+
+.editor-styles-canvas-revisions__pane-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-10 $grid-unit-20;
+	// A 40px row under 4px of padding puts the toggle and the details on the
+	// same centre line as the 32px close button at 8px from the top.
+	min-height: $button-size-compact + $grid-unit-10;
+	padding: $grid-unit-05 $grid-unit-20;
+	border-bottom: $border-width solid $gray-200;
+	background: $white;
+
+	// The details take the room they need, and the toggle moves to its own
+	// line when both don't fit, rather than squeezing the details.
+	> .editor-styles-canvas-revision-details {
+		flex: 1 1 14rem;
+	}
+
+	&.is-selected {
+		grid-area: selected-header;
+	}
+
+	&.is-current {
+		grid-area: current-header;
+		// This header holds the toggle, in the top right corner, so it leaves
+		// room for the close button that sits over it.
+		padding-right: $grid-unit-10 + $button-size-compact + $grid-unit-10;
+	}
+
+	.is-comparing &.is-current {
+		border-left: $border-width solid $gray-200;
+	}
+}
+
+.editor-styles-canvas-revisions__view-toggle {
+	display: flex;
+	justify-content: flex-end;
+	margin-left: auto;
+}
+
+.editor-styles-canvas-revisions__code {
+	grid-area: code;
+	min-height: 0;
+}
+
+.editor-styles-canvas-revisions__pane {
+	min-width: 0;
+	min-height: 0;
+
+	&.is-selected {
+		grid-area: selected;
+	}
+
+	&.is-current {
+		grid-area: current;
+	}
+
+	.is-comparing &.is-current {
+		border-left: $border-width solid $gray-200;
+	}
+}
+
+// Below this width each pane would be too narrow to read, so the visual
+// panes stack, each under its header. The current version goes first, as in
+// the revisions list, which keeps the view toggle in the top row. The code
+// view stays side by side.
+@container (width < 782px) {
+	.is-comparing.is-visual > .editor-styles-canvas-revisions__layout {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr);
+		grid-template-areas:
+			"current-header"
+			"current"
+			"selected-header"
+			"selected";
+
+		.editor-styles-canvas-revisions__pane-header.is-current,
+		.editor-styles-canvas-revisions__pane.is-current {
+			border-left: 0;
+		}
+
+		.editor-styles-canvas-revisions__pane-header.is-selected {
+			border-top: $border-width solid $gray-200;
+		}
+	}
+}
+
+// In preview mode there is no close button to leave room for.
+.editor-styles-canvas.is-preview-mode .editor-styles-canvas-revisions__pane-header {
+	padding-right: $grid-unit-20;
+}
+
+.editor-styles-canvas-revision-details {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-05 $grid-unit-10;
+	margin: 0;
+	color: $gray-900;
+	font-size: $default-font-size;
+}
+
+.editor-styles-canvas-revision-details__current {
+	display: inline-flex;
+	align-items: center;
+	gap: $grid-unit-05;
+
+	&::before {
+		content: "";
+		width: $grid-unit-10;
+		height: $grid-unit-10;
+		border-radius: 50%;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.editor-styles-canvas-revision-details__author {
+	display: inline-flex;
+	align-items: center;
+	gap: $grid-unit-05;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		border-radius: 50%;
+	}
+}
+
 .editor-styles-canvas__close-button {
 	position: absolute;
 	right: $grid-unit-10;

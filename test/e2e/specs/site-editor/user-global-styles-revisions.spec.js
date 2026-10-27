@@ -553,6 +553,125 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should show what changed since a revision as code', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+		await page.getByRole( 'radio', { name: 'Code' } ).click();
+
+		const changes = page.getByRole( 'region', {
+			name: 'Changes since this revision',
+		} );
+		await expect(
+			changes.getByRole( 'row', {
+				name: /Removed.*"background": "blue"/,
+			} )
+		).toBeVisible();
+		await expect(
+			changes.getByRole( 'row', { name: /Added.*"background": "red"/ } )
+		).toBeVisible();
+
+		// The visual preview comes back in place of the code.
+		await page.getByRole( 'radio', { name: 'Visual' } ).click();
+		await expect( changes ).toBeHidden();
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+	} );
+
+	test( 'should say when a revision matches the current styles', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'green' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// The newest revision is the styles the editor shows.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+		await page.getByRole( 'radio', { name: 'Code' } ).click();
+
+		const changes = page.getByRole( 'region', {
+			name: 'Changes since this revision',
+		} );
+		await expect( changes ).toHaveText(
+			'This revision matches the current styles.'
+		);
+		await expect( changes.getByRole( 'table' ) ).toBeHidden();
+	} );
+
+	test( 'should show the selected revision next to the current version', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(255, 0, 0)' );
+	} );
+
+	test( 'should show a single preview when the current version is selected', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'green' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// The newest revision is the styles the editor shows.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions-current"]' )
+		).toBeHidden();
+	} );
+
 	test( 'should paginate', async ( { page, userGlobalStylesRevisions } ) => {
 		// Create > 10 revisions to display pagination navigation component.
 		for ( let i = 9; i < 21; i++ ) {
