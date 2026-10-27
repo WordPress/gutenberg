@@ -22,6 +22,7 @@ jobs:
     e2e-puppeteer:
         name: Puppeteer - ${{ matrix.part }}
         runs-on: ubuntu-latest
+        timeout-minutes: 45
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -70,6 +71,7 @@ jobs:
     e2e-playwright:
         name: Playwright
         runs-on: ubuntu-latest
+        timeout-minutes: 60
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
