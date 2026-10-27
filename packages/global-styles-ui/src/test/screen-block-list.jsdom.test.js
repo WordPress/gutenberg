@@ -187,4 +187,27 @@ describe( 'getOverridingBlockTypes', () => {
 			'core/post-title',
 		] );
 	} );
+
+	it.each( [
+		[
+			'a per-side block value against an element shorthand',
+			{ border: { radius: '4px' } },
+			{ border: { radius: { topLeft: '8px' } } },
+		],
+		[
+			'a block shorthand against a per-side element value',
+			{ spacing: { padding: { top: '4px' } } },
+			{ spacing: { padding: '8px' } },
+		],
+	] )( 'lists %s', ( _, elementStyle, blockStyle ) => {
+		const config = {
+			styles: {
+				elements: { button: elementStyle },
+				blocks: { 'core/button': blockStyle },
+			},
+		};
+		expect( getOverridingBlockTypes( config, 'button' ) ).toEqual( [
+			'core/button',
+		] );
+	} );
 } );

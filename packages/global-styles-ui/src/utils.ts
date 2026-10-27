@@ -319,6 +319,16 @@ function isOwnStylePath( path: string ) {
 	return ! path.startsWith( ':' ) && ! path.startsWith( '@' );
 }
 
+// A shorthand such as `border.radius` and a longhand such as
+// `border.radius.topLeft` set the same CSS, whichever side sets which.
+function isSameOrNestedPath( path: string, otherPath: string ) {
+	return (
+		path === otherPath ||
+		path.startsWith( `${ otherPath }.` ) ||
+		otherPath.startsWith( `${ path }.` )
+	);
+}
+
 /**
  * The block types an element paints whose own Global Styles beat the element
  * for at least one property it sets. Block style variations are not counted.
@@ -340,13 +350,18 @@ export function getOverridingBlockTypes(
 		blockName: ELEMENT_ONLY_BLOCK_NAME,
 		elements,
 	} );
+	const elementPaths = Object.keys( elementSources ).filter(
+		( path ) => elementSources[ path ].layer === 'element'
+	);
 	return blockNames.filter( ( blockName ) => {
 		const { sources } = resolveStyle( config, { blockName, elements } );
 		return Object.keys( sources ).some(
 			( path ) =>
 				isOwnStylePath( path ) &&
 				sources[ path ].layer === 'block' &&
-				elementSources[ path ]?.layer === 'element'
+				elementPaths.some( ( elementPath ) =>
+					isSameOrNestedPath( path, elementPath )
+				)
 		);
 	} );
 }
