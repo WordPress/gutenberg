@@ -95,11 +95,6 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
-	if ( 'wp-i18n' === $handle ) {
-		$ltr    = 'rtl' === _x( 'ltr', 'text direction', 'default' ) ? 'rtl' : 'ltr';
-		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
-		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
-	}
 }
 
 /**
@@ -238,14 +233,6 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		array(),
 		'4.17.19',
 		true
-	);
-
-	gutenberg_register_vendor_script(
-		$scripts,
-		'object-fit-polyfill',
-		'https://unpkg.com/objectFitPolyfill@2.3.0/dist/objectFitPolyfill.min.js',
-		array(),
-		'2.3.0'
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
@@ -719,29 +706,3 @@ function gutenberg_extend_block_editor_styles_html() {
 	echo "<script>window.__editorStyles = $editor_styles</script>";
 }
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
-
-/**
- * Adds a polyfill for object-fit in environments which do not support it.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
- *
- * @since 9.1.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_object_fit_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'"objectFit" in document.documentElement.style' => 'object-fit-polyfill',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_object_fit_polyfill', 20 );

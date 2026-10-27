@@ -113,9 +113,6 @@ require __DIR__ . '/query-utils.php';
 if ( ! class_exists( 'WP_Block_Supports' ) ) {
 	require_once __DIR__ . '/class-wp-block-supports.php';
 }
-require __DIR__ . '/block-supports/generated-classname.php';
 require __DIR__ . '/block-supports/colors.php';
-require __DIR__ . '/block-supports/align.php';
 require __DIR__ . '/block-supports/typography.php';
-require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
