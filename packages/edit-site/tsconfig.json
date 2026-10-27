@@ -7,7 +7,7 @@
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../block-library/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },
-		{ "path": "../blocks" },
+		{ "path": "../blocks/tsconfig.build.json" },
 		{ "path": "../commands/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
