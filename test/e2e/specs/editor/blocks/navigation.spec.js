@@ -418,9 +418,7 @@ test.describe( 'Navigation block', () => {
 				).toBeVisible();
 
 				await pageUtils.pressKeys( 'ArrowDown' );
-				// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
-				// TODO: Use Enter after that bug is resolved
-				await navigation.useLinkShortcut();
+				await page.keyboard.press( 'Enter' );
 
 				await navigation.addSubmenuPage( 'Dog' );
 				// Navigate to the Dog link content using ArrowLeft (ArrowUp skips
@@ -549,9 +547,7 @@ test.describe( 'Navigation block', () => {
 				editor.canvas.locator( 'a' ).filter( { hasText: 'Add link' } )
 			).toBeVisible();
 			await pageUtils.pressKeys( 'ArrowDown' );
-			// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
-			// TODO: Use Enter after that bug is resolved
-			await navigation.useLinkShortcut();
+			await page.keyboard.press( 'Enter' );
 			await navigation.addPage( 'Dog' );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
