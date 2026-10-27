@@ -105,6 +105,47 @@ describe( 'CustomGradientPicker', () => {
 		} );
 	} );
 
+	describe( 'GradientTypePicker selection', () => {
+		it( 'keeps an empty gradient unchanged when Linear is reselected', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker value={ null } onChange={ onChange } />
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Type' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not emit a change when the current gradient type is reselected', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value="linear-gradient(125deg,#ff0000 0%,#0000ff 100%)"
+					onChange={ onChange }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Type' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear', selected: true } )
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'GradientTypePicker angle persistence', () => {
 		it( 'should restore the previous linear angle when switching from radial back to linear', async () => {
 			const user = userEvent.setup();
