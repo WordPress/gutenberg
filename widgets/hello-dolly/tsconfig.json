@@ -12,7 +12,8 @@
 	"references": [
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
-		{ "path": "../../packages/ui/tsconfig.build.json" }
+		{ "path": "../../packages/ui/tsconfig.build.json" },
+		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "**/test/**", "build", "node_modules" ]
