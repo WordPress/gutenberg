@@ -1,7 +1,8 @@
 /**
- * Runs the e2e tests a pull request adds or changes, and warns on each one that
- * passes, since a bug fix's test should fail without the fix. Meant to run
- * against trunk's code with the pull request's spec files in place.
+ * Runs the e2e tests a pull request adds or changes, since a bug fix needs at
+ * least one test that fails without it. Adds a notice on each test that fails,
+ * or a warning on each test when none fail. Meant to run against trunk's code
+ * with the pull request's spec files in place.
  *
  * Usage:
  *
@@ -99,12 +100,28 @@ for ( const spec of playwright( [
 }
 
 if ( tests.size ) {
-	for ( const spec of playwright( [ ...tests.keys() ].map( relative ) ) ) {
-		if ( spec.tests[ 0 ].results[ 0 ]?.status === 'passed' ) {
-			const line = tests.get( `${ spec.file }:${ spec.line }` );
-			console.log(
-				`::warning file=${ spec.file },line=${ line }::This test passes on trunk, so it doesn't prove the fix.`
-			);
+	const results = playwright( [ ...tests.keys() ].map( relative ) ).map(
+		( spec ) => ( {
+			path: spec.file,
+			line: tests.get( `${ spec.file }:${ spec.line }` ),
+			status: spec.tests[ 0 ].results[ 0 ]?.status,
+		} )
+	);
+	const failing = results.filter( ( { status } ) =>
+		[ 'failed', 'timedOut' ].includes( status )
+	);
+	for ( const { path, line } of failing ) {
+		console.log(
+			`::notice file=${ path },line=${ line }::This test fails on trunk, so it proves the fix.`
+		);
+	}
+	if ( ! failing.length ) {
+		for ( const { path, line, status } of results ) {
+			if ( status === 'passed' ) {
+				console.log(
+					`::warning file=${ path },line=${ line }::No new or changed test fails on trunk, so none of them proves the fix.`
+				);
+			}
 		}
 	}
 }
