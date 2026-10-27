@@ -16,11 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ```js
 import { useState } from 'react';
-import {
-	BlockCanvas,
-	BlockEditorProvider,
-	BlockList,
-} from '@wordpress/block-editor';
+import { BlockCanvas, BlockEditorProvider } from '@wordpress/block-editor';
 
 function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -45,7 +41,7 @@ In this example, we're instantiating a block editor. A block editor is composed 
 
 Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
 
-In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#api) for the list of all the available components).
+In the example above we're rendering the `BlockCanvas`, which shows and edits the blocks (using `BlockList`) inside an iframe. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#api) for the list of all the available components).
 
 The `BlockTools` component is used to render the toolbar for a selected block.
 
@@ -55,12 +51,29 @@ In the example above, there's no registered block type, in order to use the bloc
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 registerCoreBlocks();
-
-// Make sure to load the block stylesheets too
-// import '@wordpress/block-library/build-style/style.css';
-// import '@wordpress/block-library/build-style/editor.css';
-// import '@wordpress/block-library/build-style/theme.css';
 ```
+
+`registerCoreBlocks()` registers every core block, including blocks that need a WordPress site to work, such as Query Loop and Navigation. To register only the blocks you need, see [registering individual blocks](/packages/block-library/README.md#registering-individual-blocks).
+
+`BlockCanvas` renders the blocks inside an iframe, so stylesheets loaded on the page do not reach them. Pass the block styles to the canvas as strings with the `styles` prop instead. How you load a CSS file as a string depends on your bundler; this example uses the Vite `?raw` suffix:
+
+```js
+import contentStyles from '@wordpress/block-editor/build-style/content.css?raw';
+import blockStyles from '@wordpress/block-library/build-style/style.css?raw';
+import blockEditorStyles from '@wordpress/block-library/build-style/editor.css?raw';
+import blockThemeStyles from '@wordpress/block-library/build-style/theme.css?raw';
+
+const styles = [
+	contentStyles,
+	blockStyles,
+	blockEditorStyles,
+	blockThemeStyles,
+].map( ( css ) => ( { css } ) );
+
+<BlockCanvas height="400px" styles={ styles } />;
+```
+
+For working examples, see the [block editor playground](https://wordpress.github.io/gutenberg/?path=/story/playground-block-editor--default) in Storybook and [its source](/storybook/stories/playground).
 
 ## API
 

@@ -24,7 +24,7 @@ By the end of this article, you will have a solid understanding of the block edi
 
 ## Code syntax
 
-The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so all code examples in the Block Editor Handbook use this syntax.
+The code snippets in this guide use JSX syntax. You could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so all code examples in the Block Editor Handbook use this syntax.
 
 ## What you're going to be building
 
@@ -177,7 +177,7 @@ wp_enqueue_style(
 
 ### Inlining the editor settings
 
-Looking at the `@wordpress/block-editor` package, you can see that it accepts a [settings object](https://github.com/WordPress/gutenberg/tree/4c472c3443513d070a50ba1e96f3a476861447b3/packages/block-editor#SETTINGS_DEFAULTS) to configure the default settings for the editor. These are available on the server side, so you need to expose them for use within JavaScript.
+Looking at the `@wordpress/block-editor` package, you can see that it accepts a [settings object](/packages/block-editor/README.md#settings_defaults) to configure the default settings for the editor. These are available on the server side, so you need to expose them for use within JavaScript.
 
 To do this, let's [inline the settings object as JSON](https://github.com/getdave/standalone-block-editor/blob/974a59dcbc539a0595e8fa34670e75ec541853ab/init.php#L48) assigned to the global `window.getdaveSbeSettings` object:
 
@@ -199,7 +199,7 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 
 ```js
 // File: src/index.js
-import { createRoot } from 'react-dom';
+import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import Editor from './editor';
@@ -222,10 +222,6 @@ domReady( function () {
 	);
 } );
 ```
-
-<div class="callout callout-info">
-	It is possible to render the editor from PHP without creating an unnecessary JS global. Check out the <a href="https://href.li/?https://github.com/WordPress/gutenberg/blob/c6821d7e64a54eb322583a35daedc6c192ece850/lib/edit-site-page.php#L135">Edit Site</a> package in the Gutenberg plugin for an example of this.
-</div>
 
 ## Reviewing the `<Editor>` component
 
@@ -259,23 +255,20 @@ With these components available, you can define the `<Editor>` component.
 
 function Editor( { settings } ) {
 	return (
-		<DropZoneProvider>
-			<div className="getdavesbe-block-editor-layout">
-				<Notices />
-				<Header />
-				<Sidebar />
-				<BlockEditor settings={ settings } />
-			</div>
-		</DropZoneProvider>
+		<div className="getdavesbe-block-editor-layout">
+			<Notices />
+			<Header />
+			<Sidebar />
+			<BlockEditor settings={ settings } />
+		</div>
 	);
 }
 ```
 
-In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://react.dev/reference/react/createContext#provider) that make specific functionality available throughout the component hierarchy.
+In this process, the core of the editor's layout is being scaffolded.
 
 Let's examine these in more detail:
 
--   `<DropZoneProvider>` – Enables the use of [dropzones for drag and drop functionality](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/drop-zone)
 -   `<Notices>` – Provides a "snack bar" Notice that will be rendered if any messages are dispatched to the `core/notices` store
 -   `<Header>` – Renders the static title "Standalone Block Editor" at the top of the editor UI
 -   `<BlockEditor>` – The custom block editor component
@@ -283,7 +276,7 @@ Let's examine these in more detail:
 ### Keyboard navigation
 
 With this basic component structure in place, the only remaining thing left to do
-is wrap everything in the [`navigateRegions` HOC](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/higher-order/navigate-regions) to provide keyboard navigation between the different "regions" in the layout.
+is wrap everything in the [`navigateRegions` HOC](/packages/components/src/higher-order/navigate-regions/README.md) to provide keyboard navigation between the different "regions" in the layout.
 
 ```jsx
 // File: src/editor.js
@@ -319,11 +312,11 @@ return (
 );
 ```
 
-The key components are `<BlockEditorProvider>` and `<BlockList>`. Let's examine these.
+The key components are `<BlockEditorProvider>` and `<BlockCanvas>`. Let's examine these.
 
 ### Understanding the `<BlockEditorProvider>` component
 
-[`<BlockEditorProvider>`](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/provider) is one of the most important components in the hierarchy. It establishes a new block editing context for a new block editor.
+[`<BlockEditorProvider>`](/packages/block-editor/src/components/provider/README.md) is one of the most important components in the hierarchy. It establishes a new block editing context for a new block editor.
 
 As a result, it is _fundamental_ to the entire goal of this project.
 
@@ -344,7 +337,7 @@ The children of `<BlockEditorProvider>` comprise the UI for the block editor. Th
 
 You can see that `<BlockEditorProvider>` accepts an array of (parsed) block objects as its `value` prop and, when there's a change detected within the editor, calls the `onChange` and/or `onInput` handler prop (passing the new Blocks as an argument).
 
-Internally it does this by subscribing to the provided `registry` (via the [`withRegistryProvider` HOC](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/provider/index.js#L158)), listening to block change events, determining whether the block changing was persistent, and then calling the appropriate `onChange|Input` handler accordingly.
+Internally it does this by subscribing to the provided `registry` (via the [`withRegistryProvider` HOC](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/with-registry-provider.tsx)), listening to block change events, determining whether the block changing was persistent, and then calling the appropriate `onChange|Input` handler accordingly.
 
 For the purposes of this simple project, these features allow you to:
 
@@ -353,11 +346,11 @@ For the purposes of this simple project, these features allow you to:
     `updateBlocks(blocks)`.
 -   Handle basic persistence of blocks into `localStorage` using `onChange`. This is [fired when block updates are considered "committed"](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/provider#onchange).
 
-It's also worth recalling that the component accepts a `settings` property. This is where you will add the editor settings inlined earlier as JSON within `init.php`. You can use these settings to configure features such as custom colors, available image sizes, and [much more](https://github.com/WordPress/gutenberg/tree/4c472c3443513d070a50ba1e96f3a476861447b3/packages/block-editor#SETTINGS_DEFAULTS).
+It's also worth recalling that the component accepts a `settings` property. This is where you will add the editor settings inlined earlier as JSON within `init.php`. You can use these settings to configure features such as custom colors, available image sizes, and [much more](/packages/block-editor/README.md#settings_defaults).
 
-### Understanding the `<BlockList>` component
+### Understanding the `<BlockCanvas>` component
 
-Alongside `<BlockEditorProvider>` the next most interesting component is [`<BlockList>`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/block-list/index.js).
+Alongside `<BlockEditorProvider>` the next most interesting component is [`<BlockCanvas>`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-canvas/index.tsx). It renders the blocks inside an iframe, so they are isolated from the styles of the surrounding page. Inside the iframe, it renders [`<BlockList>`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-list/index.tsx).
 
 This is one of the most important components as it's role is to **render a list of blocks into the editor**.
 
@@ -388,10 +381,10 @@ The hierarchy of these components can be _approximated_ as follows:
 Here is roughly how this works together to render the list of blocks:
 
 -   `<BlockList>` loops over all the block `clientIds` and
-    renders each via [`<BlockListBlock />`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/block-list/block.js).
+    renders each via [`<BlockListBlock />`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-list/block.tsx).
 -   `<BlockListBlock />`, in turn, renders the individual block
-    using its own subcomponent [`<BlockEdit>`](https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-editor/src/components/block-edit/index.js).
--   Finally, the [block itself](https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-editor/src/components/block-edit/edit.js) is rendered using the `Component` placeholder component.
+    using its own subcomponent [`<BlockEdit>`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-edit/index.tsx).
+-   Finally, the [block itself](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-edit/edit.tsx) is rendered using the `Component` placeholder component.
 
 The `@wordpress/block-editor` package components are among the most complex and involved. Understanding them is crucial if you want to grasp how the editor functions at a fundamental level. Studying these components is strongly advised.
 
@@ -444,8 +437,8 @@ This might seem overly complex, but it is required in order for `<BlockInspector
 And with that you have covered the render of you custom `<BlockEditor>`.
 
 <div class="callout callout-tip">
-<a href="https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-editor/src/components/block-inspector/index.js"><code>&lt;BlockInspector&gt;</code></a>
-itself actually renders a <code>Slot</code> for <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inspector-controls"><code>&lt;InspectorControls&gt;</code></a>. This is what allows you <a href="https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-library/src/paragraph/edit.js#L127">render</a> a <code>&lt;InspectorControls&gt;</code> component inside
+<a href="https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/index.tsx"><code>&lt;BlockInspector&gt;</code></a>
+itself actually renders a <code>Slot</code> for <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inspector-controls"><code>&lt;InspectorControls&gt;</code></a>. This is what allows you <a href="https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/paragraph/edit.jsx">render</a> a <code>&lt;InspectorControls&gt;</code> component inside
 the <code>edit()</code> definition for your block and have
 it display within the editor's sidebar. Exploring this component in more detail is recommended.
 </div>
@@ -486,11 +479,11 @@ function persistBlocks( newBlocks ) {
 }
 ```
 
-This function accepts an array of "committed" block changes and calls the state setter `updateBlocks`. It also stores the blocks within LocalStorage under the key `getdavesbeBlocks`. In order to achieve this, the block data is serialized into [Gutenberg "Block Grammar"](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks) format, meaning it can be safely stored as a string.
+This function accepts an array of "committed" block changes and calls the state setter `updateBlocks`. It also stores the blocks within LocalStorage under the key `getdavesbeBlocks`. In order to achieve this, the block data is serialized into [Gutenberg "Block Grammar"](/docs/explanations/architecture/key-concepts.md#blocks) format, meaning it can be safely stored as a string.
 
 If you open DeveloperTools and inspect the LocalStorage you will see serialized block data stored and updated as changes occur within the editor. Below is an example of the format:
 
-```
+```html
 <!-- wp:heading -->
 <h2>An experiment with a standalone Block Editor in the WordPress admin</h2>
 <!-- /wp:heading -->

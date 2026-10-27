@@ -55,7 +55,9 @@ For more info, see the [Working with JavaScript for the Block Editor guide](/doc
 
 ## Block Editor
 
-The [`@wordpress/block-editor` package](https://developer.wordpress.org/block-editor/packages/packages-block-editor/) allows you to create and use standalone block editors.
+The [`@wordpress/block-editor` package](https://developer.wordpress.org/block-editor/packages/packages-block-editor/) allows you to create and use standalone block editors. Its [usage guide](/packages/block-editor/README.md#usage) shows how to render a block editor in any React app.
 
-You can learn more by reading the [tutorial "Building a custom block editor"](/docs/how-to-guides/platform/custom-block-editor.md).
+To try a standalone block editor in the browser, open the [block editor playground](https://wordpress.github.io/gutenberg/?path=/story/playground-block-editor--default) in Storybook.
+
+To build a custom block editor inside the WordPress admin, read the [tutorial "Building a custom block editor"](/docs/how-to-guides/platform/custom-block-editor.md).
 
