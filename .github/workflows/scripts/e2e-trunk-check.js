@@ -112,7 +112,7 @@ if ( tests.size ) {
 	);
 	for ( const { path, line } of failing ) {
 		console.log(
-			`::notice file=${ path },line=${ line }::This test fails on trunk. Check that it fails because of the bug.`
+			`::notice file=${ path },line=${ line }::This test fails on trunk, a good sign that it catches the bug.`
 		);
 	}
 	if ( ! failing.length ) {
