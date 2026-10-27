@@ -25,6 +25,7 @@ describe( 'post_type_supports', () => {
 		expect( postTypeSupports.author ).toEqual( {
 			getElements: expect.any( Function ),
 			setValue: expect.any( Function ),
+			Edit: expect.any( Function ),
 			render: expect.any( Function ),
 			isVisible: expect.any( Function ),
 		} );
