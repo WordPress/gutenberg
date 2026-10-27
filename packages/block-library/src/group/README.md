@@ -45,6 +45,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `minWidth`: `true`
 - [`position`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#position):
   - `sticky`: `true`
+- `rotation`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
