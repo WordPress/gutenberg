@@ -66,6 +66,7 @@
 		"lint": "phpcs --standard=phpcs.xml.dist",
 		"phpstan": "phpstan analyse --memory-limit=2G",
 		"phpstan:baselines": "@phpstan --configuration=phpstan.neon.dist --generate-baseline=tools/phpstan/baseline.neon --allow-empty-baseline",
+		"phpstan:generate-wordpress-stubs": "tools/phpstan/generate-wordpress-stubs.sh",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}

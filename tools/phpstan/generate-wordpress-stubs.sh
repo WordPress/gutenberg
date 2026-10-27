@@ -8,8 +8,8 @@
 # from trunk, they are generated here with its generator, and installed through the path repository
 # in composer.json in place of the released package.
 #
-# To update the stubs, change the commits below, run this script, then `composer update` and
-# `composer phpstan:baselines`.
+# To update the stubs, change the commits below, run `composer phpstan:generate-wordpress-stubs`,
+# then `composer update` and `composer phpstan:baselines`.
 
 # Exit if any command fails.
 set -euo pipefail
