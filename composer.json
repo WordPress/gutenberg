@@ -29,7 +29,8 @@
 		"phpcompatibility/php-compatibility": "^9.3",
 		"wp-coding-standards/wpcs": "^2.2",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
-		"wp-phpunit/wp-phpunit": "^5.4"
+		"wp-phpunit/wp-phpunit": "~5.5.0",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require": {
 		"composer/installers": "~1.0"
