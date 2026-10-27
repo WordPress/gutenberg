@@ -98,7 +98,7 @@ jobs:
                   path: ./build/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on 'ubuntu-24.04'
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
         needs: [build-assets]
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 20
@@ -108,11 +108,9 @@ jobs:
             matrix:
                 php:
                     - '7.2'
-                    - '7.3'
                     - '7.4'
                     - '8.0'
-                    - '8.1'
-                    - '8.2'
+                    - '8.3'
                 multisite: [false, true]
 
         env:
