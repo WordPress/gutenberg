@@ -26,7 +26,6 @@
 		"lock": false,
 		"reusable": false,
 		"renaming": false,
-		"rotate": false,
 		"visibility": false,
 		"interactivity": {
 			"clientNavigation": true
