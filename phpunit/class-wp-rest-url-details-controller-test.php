@@ -112,7 +112,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$this->assertSame( 'rest_cannot_view_url_details', $data['code'] );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			strtolower( 'you are not allowed to process remote urls' ),
 			strtolower( $data['message'] )
 		);
@@ -134,7 +134,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$this->assertSame( 'rest_cannot_view_url_details', $data['code'] );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			strtolower( 'you are not allowed to process remote urls' ),
 			strtolower( $data['message'] )
 		);
@@ -159,7 +159,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$this->assertSame( 'rest_invalid_param', $data['code'] );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			strtolower( 'Invalid parameter(s): url' ),
 			strtolower( $data['message'] )
 		);
@@ -202,7 +202,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$this->assertSame( 'no_response', $data['code'] );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			strtolower( 'Not found' ),
 			strtolower( $data['message'] )
 		);
@@ -228,7 +228,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$this->assertSame( 'no_content', $data['code'] );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			strtolower( 'Unable to retrieve body from response at this URL' ),
 			strtolower( $data['message'] )
 		);
@@ -299,7 +299,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$data     = $response->get_data();
 
 		// Data should be that from cache not from mocked network response.
-		$this->assertContains( 'This value from cache', $data['title'] );
+		$this->assertStringContainsString( 'This value from cache', $data['title'] );
 
 		remove_all_filters( "pre_site_transient_{$transient_name}" );
 	}
