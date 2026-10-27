@@ -33,6 +33,17 @@ function gutenberg_ui_components_enqueue_preview_assets( $hook_suffix ) {
 add_action( 'admin_enqueue_scripts', 'gutenberg_ui_components_enqueue_preview_assets' );
 
 /**
+ * Reads the examples the build rendered with React.
+ *
+ * @return array Examples, or an empty array when they haven't been built.
+ */
+function gutenberg_ui_components_get_examples() {
+	$file     = gutenberg_dir_path() . 'packages/ui/build-php/examples.json';
+	$examples = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null;
+	return is_array( $examples ) ? $examples : array();
+}
+
+/**
  * Prints component HTML. Components escape their own output.
  *
  * @param string $html Component HTML.
@@ -84,28 +95,22 @@ function gutenberg_ui_components_render_preview_page() {
 			</p>
 		</form>
 
-		<h2><?php esc_html_e( 'Button', 'gutenberg' ); ?></h2>
+		<h2><?php esc_html_e( 'Examples', 'gutenberg' ); ?></h2>
+		<p><?php esc_html_e( 'Each example rendered by PHP, next to the markup React rendered at build time.', 'gutenberg' ); ?></p>
 		<table class="widefat striped" style="max-width: 960px;">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'Example', 'gutenberg' ); ?></th>
+					<th><?php esc_html_e( 'PHP', 'gutenberg' ); ?></th>
+					<th><?php esc_html_e( 'React (static)', 'gutenberg' ); ?></th>
+				</tr>
+			</thead>
 			<tbody>
-				<?php foreach ( $manifest['button']['props']['tone']['enum'] as $tone ) : ?>
+				<?php foreach ( gutenberg_ui_components_get_examples() as $example ) : ?>
 					<tr>
-						<th scope="row"><code><?php echo esc_html( $tone ); ?></code></th>
-						<?php foreach ( $manifest['button']['props']['variant']['enum'] as $variant ) : ?>
-							<td>
-								<?php
-								gutenberg_ui_components_print(
-									gutenberg_get_ui_component(
-										'button',
-										array(
-											'tone'    => $tone,
-											'variant' => $variant,
-										),
-										$variant
-									)
-								);
-								?>
-							</td>
-						<?php endforeach; ?>
+						<td><code><?php echo esc_html( $example['component'] . ': ' . $example['name'] ); ?></code></td>
+						<td><?php gutenberg_ui_components_print( gutenberg_get_ui_component( $example['component'], $example['props'], $example['content'] ) ); ?></td>
+						<td><?php gutenberg_ui_components_print( $example['html'] ); ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>

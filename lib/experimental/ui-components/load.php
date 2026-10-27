@@ -38,6 +38,10 @@ function gutenberg_ui_components_get_manifest() {
 
 /**
  * Enqueues the components' stylesheet, registering it the first time.
+ *
+ * Rendering a component enqueues it too, but by then the head may already be
+ * printed, so the styles would load in the footer. Screens that render
+ * components should call this on `admin_enqueue_scripts`.
  */
 function gutenberg_ui_components_enqueue_assets() {
 	$file = gutenberg_dir_path() . 'packages/ui/build-php/style.css';

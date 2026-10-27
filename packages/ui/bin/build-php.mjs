@@ -104,6 +104,7 @@ async function main() {
 
 	const manifest = { components: {} };
 	const fixtures = [];
+	const examples = [];
 	const usedStylesheets = new Set();
 
 	for ( const file of (
@@ -161,19 +162,46 @@ async function main() {
 			{ props: { class: 'my-plugin-button' }, content: 'Save changes' },
 			{ props: {}, content: 'Save & <continue> "now"' },
 		];
-		for ( const { props: phpProps, content: text } of cases ) {
+		const renderReact = ( phpProps, text ) => {
 			const reactProps = { ...react.props };
 			for ( const [ prop, value ] of Object.entries( phpProps ) ) {
 				reactProps[ 'class' === prop ? 'className' : prop ] = value;
 			}
+			return renderToStaticMarkup(
+				createElement( ui[ react.component ], reactProps, text )
+			);
+		};
+		for ( const { props: phpProps, content: text } of cases ) {
 			fixtures.push( {
 				component: name,
 				props: phpProps,
 				content: text,
-				html: renderToStaticMarkup(
-					createElement( ui[ react.component ], reactProps, text )
-				),
+				html: renderReact( phpProps, text ),
 			} );
+		}
+
+		// For the preview page: the default, then each value on its own.
+		const exampleContent = 'Save changes';
+		examples.push( {
+			component: name,
+			name: 'example',
+			props: {},
+			content: exampleContent,
+			html: renderReact( {}, exampleContent ),
+		} );
+		for ( const [ prop, values ] of variants ) {
+			for ( const value of values ) {
+				if ( value === ( props[ prop ].default ?? false ) ) {
+					continue;
+				}
+				examples.push( {
+					component: name,
+					name: `${ prop }: ${ value }`,
+					props: { [ prop ]: value },
+					content: exampleContent,
+					html: renderReact( { [ prop ]: value }, exampleContent ),
+				} );
+			}
 		}
 	}
 
@@ -189,6 +217,10 @@ async function main() {
 	await writeFile(
 		path.join( OUT_DIR, 'manifest.json' ),
 		JSON.stringify( manifest, null, '\t' ) + '\n'
+	);
+	await writeFile(
+		path.join( OUT_DIR, 'examples.json' ),
+		JSON.stringify( examples, null, '\t' ) + '\n'
 	);
 	await writeFile(
 		path.join( OUT_DIR, 'test/fixtures.json' ),
