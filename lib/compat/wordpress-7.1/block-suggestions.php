@@ -716,8 +716,8 @@ function gutenberg_get_suggestion_content_owner() {
  * Tells the kind of the inline suggestion marker the processor is on.
  *
  * Each kind has its own class token - `wp-suggestion-add`, `wp-suggestion-del`
- * and `wp-suggestion-format` - so markers of different kinds can nest over the
- * same text, as rich text stores one format per type per character. The class
+ * and `wp-suggestion-format`. Markers stack, one per suggestion, so any of
+ * them can nest over the same text, two of one kind included. The class
  * is authoritative: `data-suggestion-type` is written alongside it for styling
  * and is ignored here. `has_class()` matches exact tokens, so an unrelated
  * class such as `wp-suggestion-foo` is never taken for a marker.
@@ -960,9 +960,12 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  * so an unrelated `<mark>` (a `core/text-color` highlight, a `wp-note`, or a
  * `wp-suggestion-foo` class) survives byte-for-byte.
  *
- * Markers of different kinds nest (a deletion inside someone else's addition).
- * The editor writes them in one order - add outermost, then format, then del -
- * which never splits a format marker. Merged or hand-edited markup can still
+ * Markers nest, one per suggestion: a deletion inside someone else's addition,
+ * an addition inside another addition, two deletions of the same text. The
+ * editor writes them in one order - add outermost, then format, then del, and
+ * within a kind by id, oldest outermost - which never splits a format marker.
+ * A character carrying any addition is removed, whatever else it carries; see
+ * `gutenberg_get_inline_suggestion_view()`. Merged or hand-edited markup can still
  * split one around a deletion; the first fragment of a format id then restores
  * the whole original and later fragments render nothing.
  *
@@ -1087,6 +1090,68 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	}
 
 	return $html;
+}
+
+/**
+ * Renders inline suggestion markup as published after a set of decisions.
+ *
+ * Markers stack, one per suggestion, so a character can carry several
+ * addition ids and several deletion ids. A character is published when every
+ * addition on it is accepted and no deletion on it is accepted; every addition
+ * or deletion marker is then unwrapped. Decisions commute, so the result does
+ * not depend on the order they were made in. With nothing accepted this is
+ * what `gutenberg_strip_inline_suggestion_markers()` renders for additions and
+ * deletions.
+ *
+ * An accepted formatting change is unwrapped, keeping what it proposes. One
+ * that is not accepted is left as it is: its original run lives on its note.
+ * An unbalanced addition is removed through the later of its possible ends,
+ * accepted or not, and an unbalanced deletion keeps its text, as in the render
+ * strip.
+ *
+ * @param string $html     HTML fragment.
+ * @param int[]  $accepted Ids of the accepted suggestions.
+ * @return string The fragment as published, or '' when its markers cannot
+ *                be paired.
+ */
+function gutenberg_get_inline_suggestion_view( string $html, array $accepted ): string {
+	if ( false === strpos( $html, 'wp-suggestion' ) ) {
+		return $html;
+	}
+	$markers = gutenberg_pair_inline_suggestion_markers( $html );
+	if ( null === $markers ) {
+		return '';
+	}
+
+	$accepted = array_fill_keys( array_map( 'intval', $accepted ), true );
+	$length   = strlen( $html );
+	$edits    = array();
+	foreach ( $markers as $marker ) {
+		$is_accepted = isset( $accepted[ $marker['id'] ] );
+		$end         = $marker['end'] ?? $length;
+
+		if ( 'format' === $marker['kind'] && ! $is_accepted ) {
+			continue;
+		}
+		if ( 'add' === $marker['kind'] && ( ! $is_accepted || ! $marker['balanced'] ) ) {
+			$edits[] = array( $marker['start'], max( $end, (int) $marker['lexical_end'] ), '' );
+			continue;
+		}
+		if ( 'del' === $marker['kind'] && $is_accepted && $marker['balanced'] ) {
+			$edits[] = array( $marker['start'], $end, '' );
+			continue;
+		}
+
+		$edits[] = array( $marker['start'], $marker['start'] + $marker['length'], '' );
+		if ( null !== $marker['closer'] ) {
+			$edits[] = array( $marker['closer'][0], $marker['closer'][0] + $marker['closer'][1], '' );
+		}
+		if ( null !== $marker['lexical_closer'] && $marker['lexical_end'] !== $end ) {
+			$edits[] = array( $marker['lexical_closer'][0], $marker['lexical_end'], '' );
+		}
+	}
+
+	return gutenberg_apply_suggestion_splices( $html, $edits );
 }
 
 /**
