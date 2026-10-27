@@ -71,7 +71,6 @@ jobs:
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
-                  check-latest: true
                   package-manager-cache: false
 
             - name: Setup Node.js (for WP major version)
@@ -80,7 +79,6 @@ jobs:
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
-                  check-latest: true
                   package-manager-cache: false
 
             - name: Publish development packages to npm ("next" dist-tag)
