@@ -454,7 +454,7 @@ const deprecated = [
 			wrapper: {
 				type: 'string',
 				source: 'tag',
-				selector: ':scope > p',
+				selector: 'p',
 			},
 		},
 		// Paragraphs saved without their `<p>`. Saving nothing for content
