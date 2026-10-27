@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -17,7 +17,12 @@ import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/ui';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useInstanceId,
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
@@ -31,12 +36,67 @@ import {
 	useIsDraggingWithin,
 	selectLabelText,
 } from './shared';
+import { unlock } from '../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
+
+/**
+ * Opens the link UI when Enter is pressed on the block wrapper, matching what
+ * clicking a placeholder does.
+ *
+ * Writing flow treats Enter on a selected block as "insert the container's
+ * default block after it", which adds a duplicate placeholder instead of
+ * editing the one that is selected. Claiming Enter here keeps that behaviour
+ * for links that already have a URL.
+ *
+ * @param {Object}                  props               Hook props.
+ * @param {boolean}                 props.enabled       Whether Enter opens the link UI.
+ * @param {(open: boolean) => void} props.setIsLinkOpen Opens the link UI.
+ */
+function useOpenLinkUIOnEnter( { enabled, setIsLinkOpen } ) {
+	return useRefEffect(
+		( element ) => {
+			if ( ! enabled ) {
+				return;
+			}
+
+			function onKeyDown( event ) {
+				// Leave Enter to the label's RichText, which splits and merges
+				// labels, and to the link UI's own fields and buttons.
+				if (
+					event.defaultPrevented ||
+					event.keyCode !== ENTER ||
+					event.altKey ||
+					event.ctrlKey ||
+					event.metaKey ||
+					event.shiftKey ||
+					event.target !== element
+				) {
+					return;
+				}
+
+				event.preventDefault();
+				setIsLinkOpen( true );
+			}
+
+			// Capture phase so we run before writing-flow's ancestor-bubble
+			// keydown handlers that gate on `event.defaultPrevented`.
+			return subscribeDelegatedListener(
+				element,
+				'keydown',
+				onKeyDown,
+				true
+			);
+		},
+		[ enabled ]
+	);
+}
 
 function getMissingText( type ) {
 	let missingText = '';
@@ -297,6 +357,19 @@ export default function NavigationLinkEdit( {
 		}
 	}
 
+	const needsValidLink =
+		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
+		isInvalid ||
+		isDraft ||
+		( hasUrlBinding && ! isBoundEntityAvailable );
+
+	// Enter on the wrapper of a link that still needs a URL opens the link UI,
+	// the same thing clicking the placeholder does.
+	const openLinkUIOnEnterRef = useOpenLinkUIOnEnter( {
+		enabled: isSelected && needsValidLink,
+		setIsLinkOpen,
+	} );
+
 	const instanceId = useInstanceId( NavigationLinkEdit );
 	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
 	const missingEntityDescriptionId = hasMissingEntity
@@ -304,7 +377,11 @@ export default function NavigationLinkEdit( {
 		: undefined;
 
 	const blockProps = useBlockProps( {
-		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
+		ref: useMergeRefs( [
+			setPopoverAnchor,
+			listItemRef,
+			openLinkUIOnEnterRef,
+		] ),
 		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
@@ -335,12 +412,6 @@ export default function NavigationLinkEdit( {
 			renderAppender: false,
 		}
 	);
-
-	const needsValidLink =
-		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
-		isInvalid ||
-		isDraft ||
-		( hasUrlBinding && ! isBoundEntityAvailable );
 
 	if ( needsValidLink ) {
 		blockProps.onClick = () => {
