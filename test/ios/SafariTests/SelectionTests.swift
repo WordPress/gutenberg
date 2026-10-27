@@ -77,4 +77,39 @@ final class SelectionTests: XCTestCase {
 		// of them into one.
 		editor.expectBlocks( [ Block( title: "Paragraph", content: "Alpha  echo foxtrot" ) ] )
 	}
+
+	func testTapAfterDismissingKeyboardPlacesCaret() throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem(
+			name: "content",
+			value: "<!-- wp:paragraph --><p>Alpha bravo charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta echo foxtrot</p><!-- /wp:paragraph -->"
+		) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		// Two blocks, so the selected one is edited through the canvas
+		// wrapper: a single block is edited on its own.
+		let paragraph = editor.block( title: "Paragraph", content: "Alpha bravo charlie" )
+		XCTAssertTrue( paragraph.waitForExistence( timeout: 240 ), "The post did not load" )
+
+		paragraph.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		let keyboard = app.keyboards.firstMatch
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+
+		// The Done button above the keyboard ends editing but leaves the
+		// block selected.
+		app.buttons[ "Done" ].tap()
+		XCTAssertTrue( keyboard.waitForNonExistence( timeout: 5 ), "The keyboard did not close" )
+
+		// Tapping the selected block again places the caret there.
+		paragraph.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 5 ), "The second tap did not open the keyboard" )
+		app.typeText( "X" )
+
+		editor.expectBlocks( [
+			Block( title: "Paragraph", content: "XAlpha bravo charlie" ),
+			Block( title: "Paragraph", content: "Delta echo foxtrot" ),
+		] )
+	}
 }
