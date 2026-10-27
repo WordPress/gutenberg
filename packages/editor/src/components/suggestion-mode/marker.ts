@@ -626,7 +626,7 @@ export function markerAnchorKeys(
 		const ids =
 			own > 0
 				? [ own ]
-				: getNoteIdsFromMetadata( metadata )
+				: getNoteIdsFromMetadata( metadata ?? undefined )
 						.map( Number )
 						.filter(
 							( id: number ) => id > 0 && ! claimed.has( id )
