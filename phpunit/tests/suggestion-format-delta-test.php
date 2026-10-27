@@ -200,7 +200,20 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 								),
 								array( 'type' => 'not a type' ),
 							),
-							'removed' => array( array( 'type' => 'core/bold' ) ),
+							'removed' => array(
+								array( 'type' => 'core/bold' ),
+								array(
+									'type'                   => 'core/text-color',
+									'attributes'             => array(
+										'style' => 'color:red;background-image:url(javascript:alert(1))',
+									),
+									'unregisteredAttributes' => array(
+										'OnMouseOver' => 'alert(1)',
+										'srcdoc'      => '<script>alert(1)</script>',
+										'data-x'      => 'kept',
+									),
+								),
+							),
 						),
 						array(
 							'offset' => -1,
@@ -223,12 +236,22 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 						array(
 							'type'       => 'core/link',
 							'attributes' => array(
-								'url'     => 'alert(1)',
-								'onclick' => 'x',
+								'url' => 'alert(1)',
 							),
 						),
 					),
-					'removed' => array( array( 'type' => 'core/bold' ) ),
+					'removed' => array(
+						array( 'type' => 'core/bold' ),
+						array(
+							'type'                   => 'core/text-color',
+							'attributes'             => array(
+								'style' => 'color:red',
+							),
+							'unregisteredAttributes' => array(
+								'data-x' => 'kept',
+							),
+						),
+					),
 				),
 			),
 			$operation['delta']

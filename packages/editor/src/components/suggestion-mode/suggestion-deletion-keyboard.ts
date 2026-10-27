@@ -991,7 +991,8 @@ export default function SuggestionDeletionKeyboard() {
 				isDeferredInsertion( clientId ) ||
 				isPartOfPendingInsertion(
 					{ getBlockAttributes, getBlockParents },
-					clientId
+					clientId,
+					authorId
 				)
 			) {
 				resetRun();
@@ -1173,6 +1174,7 @@ export default function SuggestionDeletionKeyboard() {
 			getSelectionEnd,
 			getBlockAttributes,
 			getBlockParents,
+			authorId,
 			isDeferredInsertion,
 			deleteSelection,
 			deleteAcrossOwnSelection,
@@ -1210,7 +1212,8 @@ export default function SuggestionDeletionKeyboard() {
 				isDeferredInsertion( anchor.clientId ) ||
 				isPartOfPendingInsertion(
 					{ getBlockAttributes, getBlockParents },
-					anchor.clientId
+					anchor.clientId,
+					authorId
 				)
 			) {
 				return;
@@ -1235,6 +1238,7 @@ export default function SuggestionDeletionKeyboard() {
 			getSelectionEnd,
 			getBlockAttributes,
 			getBlockParents,
+			authorId,
 			isDeferredInsertion,
 			deleteAcrossOwnSelection,
 		]

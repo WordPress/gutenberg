@@ -121,3 +121,108 @@ export function suggestionContextLines( {
 	}
 	return lines;
 }
+
+/**
+ * The context lines for a block suggestion that shares its block with other
+ * authors' suggestions: who else suggested what, and, for a suggested block,
+ * that rejecting it outdates what others suggested on it.
+ *
+ * @param args            Arguments.
+ * @param args.markers    The block's markers, outermost first.
+ * @param args.noteId     This suggestion's note id.
+ * @param args.nameOf     Display name of a note's author, by note id.
+ * @param args.isResolved Whether this suggestion has been decided.
+ * @return Lines of text.
+ */
+export function blockSuggestionContextLines( {
+	markers,
+	noteId,
+	nameOf,
+	isResolved = false,
+}: {
+	markers: Array< { type: string; commentId?: number | string } >;
+	noteId: string;
+	nameOf: ( noteId: string ) => string | undefined;
+	isResolved?: boolean;
+} ): string[] {
+	const own = markers.find(
+		( marker ) => String( marker.commentId ) === String( noteId )
+	);
+	if ( ! own || markers.length < 2 ) {
+		return [];
+	}
+	const lines: string[] = [];
+	for ( const marker of markers ) {
+		if ( marker === own ) {
+			continue;
+		}
+		const name =
+			marker.commentId !== undefined
+				? nameOf( String( marker.commentId ) )
+				: undefined;
+		switch ( marker.type ) {
+			case 'pending-insert':
+				lines.push(
+					name
+						? sprintf(
+								/* translators: %s: name of the person who suggested the block. */
+								__( '%s suggested adding this block' ),
+								name
+							)
+						: __( 'Someone else suggested adding this block' )
+				);
+				break;
+			case 'pending-remove':
+				lines.push(
+					name
+						? sprintf(
+								/* translators: %s: name of the person who suggested removing the block. */
+								__( '%s also suggested removing this block' ),
+								name
+							)
+						: __(
+								'Someone else also suggested removing this block'
+							)
+				);
+				break;
+			case 'pending-move':
+				lines.push(
+					name
+						? sprintf(
+								/* translators: %s: name of the person who suggested moving the block. */
+								__( '%s also suggested moving this block' ),
+								name
+							)
+						: __( 'Someone else also suggested moving this block' )
+				);
+				break;
+			default:
+				lines.push(
+					name
+						? sprintf(
+								/* translators: %s: name of the person who suggested the changes. */
+								__( '%s also suggested changes to this block' ),
+								name
+							)
+						: __(
+								'Someone else also suggested changes to this block'
+							)
+				);
+		}
+	}
+	if ( ! isResolved && own.type === 'pending-insert' ) {
+		const count = markers.length - 1;
+		lines.push(
+			sprintf(
+				/* translators: %d: number of suggestions. */
+				_n(
+					'Rejecting also makes %d suggestion outdated.',
+					'Rejecting also makes %d suggestions outdated.',
+					count
+				),
+				count
+			)
+		);
+	}
+	return lines;
+}
