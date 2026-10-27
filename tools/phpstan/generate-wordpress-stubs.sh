@@ -8,6 +8,9 @@
 # from trunk, they are generated here with its generator, and installed through the path repository
 # in composer.json in place of the released package.
 #
+# This is temporary. Once php-stubs/wordpress-stubs publishes builds from trunk, require a pinned one
+# instead, and remove this script, the wordpress-stubs/ package, and the path repository.
+#
 # To update the stubs, change the commits below, run `composer phpstan:generate-wordpress-stubs`,
 # then `composer update` and `composer phpstan:baselines`.
 
