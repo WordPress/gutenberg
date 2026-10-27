@@ -1121,15 +1121,16 @@ function gutenberg_serialize_inline_suggestion_characters( array $chars ): strin
  * editor keeps current as other decisions land. A character carrying
  * formatting suggestions therefore gets the formatting the oldest one not
  * accepted recorded for it, or keeps what it shows when every one is
- * accepted; every formatting marker is dropped and addition and deletion
- * markers are kept for the strip.
+ * accepted. A change accepted on top of an older one that is not replays on
+ * the oldest original what it added and removed: the difference between the
+ * original of the next change up (or what the character shows) and its own,
+ * in id order, as the editor applies deltas. Every formatting marker is
+ * dropped and addition and deletion markers are kept for the strip.
  *
  * The run between the first and last formatting marker is rebuilt from its
  * characters. Null is returned, so the caller can fall back, when that run is
- * not plain inline markup, an original is missing or no longer has the same
- * text, or a change accepted on a character is newer than
- * one that is not (its delta would apply on top, which only the editor
- * computes).
+ * not plain inline markup, or an original is missing or no longer has the
+ * same text.
  *
  * @param string             $html      HTML fragment.
  * @param array<int, string> $originals Recorded original (`beforeHTML`) of each formatting suggestion.
@@ -1197,12 +1198,11 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 			$positions[ $id ] = $offsets[ $id ] + 1;
 		}
 
-		$below = null;
+		$below  = null;
+		$replay = false;
 		foreach ( $ids as $id ) {
 			if ( isset( $accepted[ $id ] ) ) {
-				if ( null !== $below ) {
-					return null;
-				}
+				$replay = $replay || null !== $below;
 				continue;
 			}
 			$below ??= $id;
@@ -1212,28 +1212,55 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 		foreach ( $char['stack'] as $element ) {
 			if ( null !== $element['kind'] && ! ( 'format' === $element['kind'] && ! $element['run'] ) ) {
 				$kept[] = $element;
-			} elseif ( null === $below && null === $element['kind'] ) {
+			} elseif ( null === $element['kind'] && ( null === $below || ( $replay && $element['note'] ) ) ) {
 				$kept[] = $element;
 			}
 		}
 		if ( null !== $below ) {
-			if ( ! isset( $parsed[ $below ] ) ) {
-				if ( ! isset( $originals[ $below ] ) ) {
+			// The formatting below each change on this character, oldest
+			// first, then what the character shows.
+			$states = array();
+			foreach ( $replay ? $ids : array( $below ) as $id ) {
+				if ( ! isset( $parsed[ $id ] ) ) {
+					if ( ! isset( $originals[ $id ] ) ) {
+						return null;
+					}
+					$parsed[ $id ] = gutenberg_get_inline_suggestion_characters( $originals[ $id ] );
+				}
+				$original = $parsed[ $id ][ $offsets[ $id ] ] ?? null;
+				// A formatting change never changes text.
+				if ( null === $original || $original['html'] !== $char['html'] ) {
 					return null;
 				}
-				$parsed[ $below ] = gutenberg_get_inline_suggestion_characters( $originals[ $below ] );
+				$states[] = $original['stack'];
 			}
-			$original = $parsed[ $below ][ $offsets[ $below ] ] ?? null;
-			// A formatting change never changes text.
-			if ( null === $original || $original['html'] !== $char['html'] ) {
-				return null;
-			}
-			foreach ( $original['stack'] as $element ) {
+			$states[] = $char['stack'];
+			foreach ( $states as $k => $stack ) {
 				// Markers and note highlights are not the text's formatting.
-				if ( null === $element['kind'] && ! $element['note'] ) {
-					$kept[] = $element;
+				$states[ $k ] = array();
+				foreach ( $stack as $element ) {
+					if ( null === $element['kind'] && ! $element['note'] ) {
+						$states[ $k ][ $element['opener'] ] = $element;
+					}
 				}
 			}
+
+			/*
+			 * An accepted change newer than a pending one applies on top of
+			 * the oldest original: what it added and removed is the
+			 * difference between the formatting below it and above it.
+			 */
+			$formatting = $states[0];
+			if ( $replay ) {
+				foreach ( $ids as $k => $id ) {
+					if ( ! isset( $accepted[ $id ] ) ) {
+						continue;
+					}
+					$formatting = array_diff_key( $formatting, array_diff_key( $states[ $k ], $states[ $k + 1 ] ) );
+					$formatting = $formatting + array_diff_key( $states[ $k + 1 ], $states[ $k ] );
+				}
+			}
+			array_push( $kept, ...array_values( $formatting ) );
 		}
 		$chars[ $index ]['stack'] = $kept;
 	}
