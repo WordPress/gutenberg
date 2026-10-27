@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `PostPublishPanel`: The pre-publish panel of a page lists the Navigation Menus the page is added to when it is published, with a link to each menu.
+
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
