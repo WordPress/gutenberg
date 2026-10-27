@@ -73,8 +73,13 @@ function extractSelectionEndNode(
 		isSelectionForward( selection ) &&
 		isTripleClick
 	) {
-		// A node at offset 0 of a forward selection has a parent.
-		return ( focusNode!.previousSibling ?? focusNode!.parentElement )!;
+		// Return the node before the focus node. Its parent may still be in
+		// the next block (e.g. a list item's rich text), so walk up.
+		let node = focusNode!;
+		while ( ! node.previousSibling && node.parentNode ) {
+			node = node.parentNode;
+		}
+		return node.previousSibling ?? node;
 	}
 
 	return focusNode!.childNodes[ focusOffset ];
