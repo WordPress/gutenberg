@@ -9,21 +9,14 @@
  * every marker in that block and leaves the marker's note describing text the
  * reviewer can no longer see.
  *
- * Some edits can be expressed as neither. Markers stack, so typing or
- * deleting inside someone's suggestion nests in it, but formatting over
- * someone's formatting change, or across the edge of someone's addition, is
- * declined at the seam that saw it (see `classifyOverlap`), as is splitting a
- * block inside someone's suggestion. The user is told whose suggestion is in
- * the way and can reply to it instead.
+ * Markers stack, so typing, deleting or formatting inside or across someone's
+ * suggestion nests in it or stacks on it (see `classifyOverlap`). What is
+ * left can be expressed as neither: splitting a block inside someone's
+ * suggestion, and an edit that would hide a marker under a whole-attribute
+ * proposal.
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as interfaceStore } from '@wordpress/interface';
-import type { EditRefusal } from '../inline-suggestions';
-import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Fixed notice id so repeating a declined gesture (holding Backspace against a
@@ -32,114 +25,28 @@ import { unlock } from '../../lock-unlock';
 export const REFUSED_EDIT_NOTICE_ID = 'editor/suggestion-mode/edit-refused';
 
 /**
- * The refusal message for a marker in the way, naming its author when known.
- *
- * @param reason Why the edit was refused.
- * @param name   Display name of the blocking suggestion's author.
- * @return The message, or null to use the generic one.
- */
-function refusalMessage(
-	reason: EditRefusal[ 'reason' ],
-	name: string | undefined
-): string | null {
-	switch ( reason ) {
-		case 'format-on-format':
-			return name
-				? sprintf(
-						/* translators: %s: name of the person who suggested the formatting change. */
-						__( '%s already suggested formatting this text.' ),
-						name
-					)
-				: __( 'Someone already suggested formatting this text.' );
-		case 'format-straddles-add':
-			return name
-				? sprintf(
-						/* translators: %s: name of the person who suggested the addition. */
-						__(
-							'This formatting crosses a suggested addition by %s. Format the added text and the text around it separately.'
-						),
-						name
-					)
-				: __(
-						'This formatting crosses a suggested addition. Format the added text and the text around it separately.'
-					);
-		default:
-			return null;
-	}
-}
-
-/**
- * Open the notes sidebar on a suggestion's thread and focus it, so the user
- * can reply to the suggestion their edit ran into.
- *
- * @param registry Data registry.
- * @param noteId   Note id of the suggestion.
- */
-export function openSuggestionThread( registry: any, noteId: number ) {
-	registry
-		?.dispatch?.( interfaceStore )
-		?.enableComplementaryArea?.( 'core', ALL_NOTES_SIDEBAR );
-	const editor = registry?.dispatch?.( editorStore );
-	if ( editor ) {
-		unlock( editor ).selectNote?.( noteId, { focus: true } );
-	}
-}
-
-/**
  * Tell the user their edit was declined because it overlaps a pending
  * suggestion, and what to do about it.
- *
- * With a refusal naming the marker in the way, the message says whose
- * suggestion it is and what they suggested, and offers to reply to it. The
- * author's own markers and edits with no single marker in the way (a
- * proposal that would hide a marker) keep the generic message.
  *
  * Takes a registry rather than a bound `createNotice` so the per-block overlay
  * HOC can call it without adding a `useDispatch` to every block's render; the
  * dispatch is resolved at call time. Silently does nothing when the notices
  * store isn't registered (isolated unit tests).
  *
- * @param registry  Data registry.
- * @param [refusal] Why the edit was refused, and the marker in the way.
+ * @param registry Data registry.
  */
-export function notifyEditRefused( registry: any, refusal?: EditRefusal ) {
-	const blocking = refusal?.blocking;
-	const note = blocking
-		? registry
-				?.select?.( coreStore )
-				?.getEntityRecord?.( 'root', 'comment', Number( blocking.id ) )
-		: undefined;
-	const message =
-		blocking && refusal
-			? refusalMessage( refusal.reason, note?.author_name || undefined )
-			: null;
+export function notifyEditRefused( registry: any ) {
 	registry
 		?.dispatch?.( noticesStore )
 		?.createNotice?.(
 			'warning',
-			message ??
-				__(
-					'This change overlaps a pending suggestion, so it was not captured. Accept or reject that suggestion first.'
-				),
+			__(
+				'This change overlaps a pending suggestion, so it was not captured. Accept or reject that suggestion first.'
+			),
 			{
 				id: REFUSED_EDIT_NOTICE_ID,
 				type: 'snackbar',
 				isDismissible: true,
-				...( message &&
-					blocking && {
-						// An action needs time to be read and used.
-						explicitDismiss: true,
-						actions: [
-							{
-								label: __( 'Reply to this suggestion' ),
-								onClick: () =>
-									openSuggestionThread(
-										registry,
-										Number( blocking.id )
-									),
-							},
-						],
-					} ),
 			}
 		);
 }
