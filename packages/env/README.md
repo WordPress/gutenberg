@@ -298,6 +298,8 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
+_Note: the MariaDB version can be chosen with the `WP_ENV_MARIADB_VERSION` environment variable, such as `WP_ENV_MARIADB_VERSION=10.5`. It defaults to `latest`. MariaDB cannot start on a database written by a newer version. When switching to a lower version, run `wp-env destroy` first. It removes the environment's Docker containers, volumes, and networks, and its local files, not only the database, so everything is recreated on the next start. With a version older than 11.4, `wp db` commands in the `cli` and `tests-cli` containers fail, and `wp-env clean` leaves the database as it is: the MariaDB client in the `wordpress:cli` image requires TLS, and MariaDB servers before 11.4 do not offer it. WordPress itself is not affected. To start over with an empty database, run `wp-env destroy`._
+
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
 | Type              | Format                        | Example(s)                                               |
