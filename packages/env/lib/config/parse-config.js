@@ -18,6 +18,7 @@ const {
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
+	checkMariaDBVersion,
 	checkValidURL,
 } = require( './validate-config' );
 const getConfigFromEnvironmentVars = require( './get-config-from-environment-vars' );
@@ -46,13 +47,14 @@ const mergeConfigs = require( './merge-configs' );
  * The environment-specific configuration options. (development/tests/etc)
  *
  * @typedef WPEnvironmentConfig
- * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources Plugins to load in the environment.
- * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port to use.
- * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {WPSource}                  coreSource     The WordPress installation to load in the environment.
+ * @property {WPSource[]}                pluginSources  Plugins to load in the environment.
+ * @property {WPSource[]}                themeSources   Themes to load in the environment.
+ * @property {number}                    port           The port to use.
+ * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string|null}               phpVersion     Version of PHP to use in the environments, of the format 0.0.
+ * @property {string|null}               mariadbVersion Version of MariaDB to use in the environments: "lts", "latest", or of the format 0.0. Null uses the default.
  */
 
 /**
@@ -81,6 +83,7 @@ const mergeConfigs = require( './merge-configs' );
 const DEFAULT_ENVIRONMENT_CONFIG = {
 	core: null,
 	phpVersion: null,
+	mariadbVersion: null,
 	plugins: [],
 	themes: [],
 	port: 8888,
@@ -293,6 +296,13 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
 	}
 
+	if ( overrides.mariadbVersion ) {
+		overrideConfig.mariadbVersion = overrides.mariadbVersion;
+		overrideConfig.env.development.mariadbVersion =
+			overrides.mariadbVersion;
+		overrideConfig.env.tests.mariadbVersion = overrides.mariadbVersion;
+	}
+
 	return overrideConfig;
 }
 
@@ -451,6 +461,18 @@ async function parseEnvironmentConfig(
 			);
 		}
 		parsedConfig.phpVersion = config.phpVersion;
+	}
+
+	if ( config.mariadbVersion !== undefined ) {
+		// Support null as a valid input.
+		if ( config.mariadbVersion !== null ) {
+			checkMariaDBVersion(
+				configFile,
+				`${ environmentPrefix }mariadbVersion`,
+				config.mariadbVersion
+			);
+		}
+		parsedConfig.mariadbVersion = config.mariadbVersion;
 	}
 
 	if ( config.core !== undefined ) {
