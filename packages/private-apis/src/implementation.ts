@@ -10,16 +10,22 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
+	'@wordpress/admin-ui',
+	'@wordpress/api-fetch',
 	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
 	'@wordpress/boot',
 	'@wordpress/commands',
+	'@wordpress/compose',
+	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',
+	'@wordpress/core-actions',
 	'@wordpress/core-commands',
 	'@wordpress/core-data',
+	'@wordpress/core-fields',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',
 	'@wordpress/edit-post',
@@ -28,21 +34,33 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/editor',
 	'@wordpress/font-list-route',
 	'@wordpress/format-library',
+	'@wordpress/notices',
 	'@wordpress/patterns',
 	'@wordpress/preferences',
-	'@wordpress/reusable-blocks',
+	'@wordpress/rich-text',
 	'@wordpress/route',
 	'@wordpress/router',
 	'@wordpress/routes',
-	'@wordpress/sync',
+	'@wordpress/storybook',
 	'@wordpress/theme',
+	// Do not remove: older `@wordpress/dataviews` versions published to npm
+	// call the opt-in at module load, so a plugin bundling one of those
+	// copies throws at load time if this entry is missing.
 	'@wordpress/dataviews',
+	// Do not remove: older `@wordpress/sync` versions published to npm call
+	// the opt-in at module load, so a plugin bundling one of those copies
+	// throws at load time if this entry is missing.
+	'@wordpress/sync',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
+	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
+	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
+	'@wordpress/views',
+	'@wordpress/widget-dashboard',
 ];
 
 /*
@@ -63,7 +81,7 @@ const requiredConsent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
 /**
- * Called by a @wordpress package wishing to opt-in to accessing or exposing
+ * Called by a `@wordpress` package wishing to opt-in to accessing or exposing
  * private private APIs.
  *
  * @param consent    The consent string.

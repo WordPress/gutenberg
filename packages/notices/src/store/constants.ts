@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Notice } from './types';
 
 /**
@@ -14,3 +11,10 @@ export const DEFAULT_CONTEXT = 'global';
  * Default notice status.
  */
 export const DEFAULT_STATUS: Notice[ 'status' ] = 'info';
+
+/**
+ * Private notice option naming a slot rendered after the notice's message,
+ * for content that changes while the notice is shown. The message stays the
+ * notice's text, which is what gets announced and copied.
+ */
+export const NOTICE_SLOT = Symbol( 'NOTICE_SLOT' );

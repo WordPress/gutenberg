@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { MutableRefObject, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
+import type { RefObject, ReactNode } from 'react';
 import type { NoticeProps, NoticeAction } from '../notice/types';
 
 type SnackbarOnlyProps = {
@@ -17,7 +10,8 @@ type SnackbarOnlyProps = {
 	icon?: ReactNode;
 	/**
 	 * Whether to require user action to dismiss the snackbar.
-	 * By default, this is dismissed on a timeout, without user interaction.
+	 * By default, this is dismissed on a timeout, without user interaction:
+	 * after 6 seconds, or after 10 seconds when the snackbar has an action.
 	 *
 	 * @default false
 	 */
@@ -25,7 +19,7 @@ type SnackbarOnlyProps = {
 	/**
 	 * A ref to the list that contains the snackbar.
 	 */
-	listRef?: MutableRefObject< HTMLDivElement | null >;
+	listRef?: RefObject< HTMLDivElement | null >;
 };
 
 export type SnackbarProps = Pick<

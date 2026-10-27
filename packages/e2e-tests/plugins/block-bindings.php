@@ -28,6 +28,11 @@ function gutenberg_test_block_bindings_registration() {
 			'value' => $testing_url,
 			'type'  => 'string',
 		),
+		'icon_field'          => array(
+			'label' => 'Icon Field Label',
+			'value' => 'core/arrow-right',
+			'type'  => 'string',
+		),
 		'empty_field'         => array(
 			'label' => 'Empty Field Label',
 			'value' => '',
@@ -46,11 +51,6 @@ function gutenberg_test_block_bindings_registration() {
 		plugins_url( 'block-bindings/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
-			'wp-block-editor',
-			'wp-components',
-			'wp-compose',
-			'wp-element',
-			'wp-hooks',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'block-bindings/index.js' ),
 		true
@@ -177,7 +177,7 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'number',
 			'show_in_rest' => true,
 			'single'       => true,
-			'default'      => 5.5,
+			'default'      => 0.5,
 		)
 	);
 	register_meta(
@@ -188,7 +188,7 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'integer',
 			'show_in_rest' => true,
 			'single'       => true,
-			'default'      => 5,
+			'default'      => 3,
 		)
 	);
 	register_meta(

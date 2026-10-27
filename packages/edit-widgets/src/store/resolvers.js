@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { persistStubPost, setWidgetAreasOpenState } from './actions';
 import {
 	KIND,

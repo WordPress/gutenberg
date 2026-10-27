@@ -2,6 +2,59 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Correct remove-all hook signatures while keeping namespaces required for individual removal ([#85141](https://github.com/WordPress/gutenberg/pull/85141)).
+
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85141](https://github.com/WordPress/gutenberg/pull/85141)).
+
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 4.57.0 (2026-10-07)
+
+## 4.56.0 (2026-09-23)
+
+## 4.55.0 (2026-09-10)
+
+## 4.54.0 (2026-08-26)
+
+## 4.53.0 (2026-08-12)
+
+
+## 4.52.0 (2026-07-29)
+
+## 4.51.0 (2026-07-14)
+
+## 4.50.0 (2026-07-01)
+
+## 4.49.0 (2026-06-24)
+
+## 4.48.1 (2026-06-16)
+
+## 4.48.0 (2026-06-10)
+
+## 4.47.0 (2026-05-27)
+
+## 4.46.0 (2026-05-14)
+
+## 4.45.0 (2026-04-29)
+
+## 4.44.0 (2026-04-15)
+
+## 4.43.0 (2026-04-01)
+
+## 4.42.0 (2026-03-18)
+
+## 4.41.0 (2026-03-04)
+
+## 4.40.0 (2026-02-18)
+
 ## 4.39.0 (2026-01-29)
 
 ## 4.38.0 (2026-01-16)

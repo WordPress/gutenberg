@@ -1,33 +1,19 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import styled from '@emotion/styled';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 } from '../../toggle-group-control';
-
-/**
- * Internal dependencies
- */
 import { ToolsPanel, ToolsPanelItem } from '..';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+import styles from './style.module.scss';
 
 const meta: Meta< typeof ToolsPanel > = {
-	title: 'Components/ToolsPanel',
+	id: 'components-toolspanel',
+	title: 'Components/@wordpress-components/ToolsPanel',
 	component: ToolsPanel,
 	subcomponents: { ToolsPanelItem },
 	argTypes: {
@@ -45,6 +31,10 @@ const meta: Meta< typeof ToolsPanel > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -67,35 +57,35 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 	};
 
 	return (
-		<PanelWrapperView>
+		<div className={ styles[ 'panel-wrapper' ] }>
 			<Panel>
 				<ToolsPanel { ...props } resetAll={ resetAll }>
-					<SingleColumnItem
+					<ToolsPanelItem
+						className={ styles[ 'single-column-item' ] }
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
 						/>
-					</SingleColumnItem>
-					<SingleColumnItem
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						className={ styles[ 'single-column-item' ] }
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
 						/>
-					</SingleColumnItem>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => !! minHeight }
 						label="Minimum height"
@@ -103,7 +93,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Minimum height"
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
@@ -115,7 +104,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) => setScale( next ) }
@@ -137,7 +125,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</Panel>
-		</PanelWrapperView>
+		</div>
 	);
 };
 Default.args = {
@@ -158,42 +146,42 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 	};
 
 	return (
-		<PanelWrapperView>
+		<div className={ styles[ 'panel-wrapper' ] }>
 			<Panel>
 				<ToolsPanel { ...props } resetAll={ resetAll }>
-					<IntroText>
+					<div className={ styles[ 'intro-text' ] }>
 						This text illustrates not all items must be wrapped in a
 						ToolsPanelItem and represented in the panel menu.
-					</IntroText>
-					<SingleColumnItem
+					</div>
+					<ToolsPanelItem
+						className={ styles[ 'single-column-item' ] }
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
 						/>
-					</SingleColumnItem>
-					<SingleColumnItem
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						className={ styles[ 'single-column-item' ] }
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
 						/>
-					</SingleColumnItem>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</Panel>
-		</PanelWrapperView>
+		</div>
 	);
 };
 WithNonToolsPanelItems.args = {
@@ -222,7 +210,7 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 
 	return (
 		<>
-			<PanelWrapperView>
+			<div className={ styles[ 'panel-wrapper' ] }>
 				<Panel>
 					<ToolsPanel
 						{ ...props }
@@ -235,7 +223,8 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 								: 'false'
 						}
 					>
-						<SingleColumnItem
+						<ToolsPanelItem
+							className={ styles[ 'single-column-item' ] }
 							hasValue={ () => !! minWidth }
 							label="Minimum width"
 							onDeselect={ () => setMinWidth( undefined ) }
@@ -244,41 +233,40 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							}
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Minimum width"
 								value={ minWidth }
 								onChange={ ( next ) => setMinWidth( next ) }
 							/>
-						</SingleColumnItem>
-						<SingleColumnItem
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							className={ styles[ 'single-column-item' ] }
 							hasValue={ () => !! width }
 							label="Width"
 							onDeselect={ () => setWidth( undefined ) }
 							isShownByDefault={ false }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Width"
 								value={ width }
 								onChange={ ( next ) => setWidth( next ) }
 							/>
-						</SingleColumnItem>
-						<SingleColumnItem
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							className={ styles[ 'single-column-item' ] }
 							hasValue={ () => !! height }
 							label="Height"
 							onDeselect={ () => setHeight( undefined ) }
 							isShownByDefault={ false }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Height"
 								value={ height }
 								onChange={ ( next ) => setHeight( next ) }
 							/>
-						</SingleColumnItem>
+						</ToolsPanelItem>
 					</ToolsPanel>
 				</Panel>
-			</PanelWrapperView>
+			</div>
 
 			<button
 				onClick={ () =>
@@ -343,7 +331,8 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
-				<SingleColumnItem
+				<ToolsPanelItem
+					className={ styles[ 'single-column-item' ] }
 					hasValue={ () => !! width }
 					label="Injected Width"
 					onDeselect={ () => updateAttribute( 'width', undefined ) }
@@ -351,15 +340,15 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Width"
 						value={ width }
 						onChange={ ( next ) =>
 							updateAttribute( 'width', next )
 						}
 					/>
-				</SingleColumnItem>
-				<SingleColumnItem
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					className={ styles[ 'single-column-item' ] }
 					hasValue={ () => !! height }
 					label="Injected Height"
 					onDeselect={ () => updateAttribute( 'height', undefined ) }
@@ -367,14 +356,13 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
 							updateAttribute( 'height', next )
 						}
 					/>
-				</SingleColumnItem>
+				</ToolsPanelItem>
 				<ToolsPanelItem
 					hasValue={ () => true }
 					label="Item for alternate panel"
@@ -388,7 +376,7 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					</p>
 				</ToolsPanelItem>
 			</ToolsPanelItems>
-			<PanelWrapperView>
+			<div className={ styles[ 'panel-wrapper' ] }>
 				<Panel>
 					<ToolsPanel
 						{ ...props }
@@ -398,7 +386,7 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 						<Slot />
 					</ToolsPanel>
 				</Panel>
-			</PanelWrapperView>
+			</div>
 		</SlotFillProvider>
 	);
 };
@@ -444,7 +432,8 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
-				<SingleColumnItem
+				<ToolsPanelItem
+					className={ styles[ 'single-column-item' ] }
 					hasValue={ () => !! height }
 					label="Injected Height"
 					onDeselect={ () => updateAttribute( 'height', undefined ) }
@@ -453,14 +442,13 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
 							updateAttribute( 'height', next )
 						}
 					/>
-				</SingleColumnItem>
+				</ToolsPanelItem>
 				<ToolsPanelItem
 					hasValue={ () => !! scale }
 					label="Scale"
@@ -470,7 +458,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
-						__next40pxDefaultSize
 						label="Scale"
 						value={ scale }
 						onChange={ ( next ) =>
@@ -487,7 +474,7 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					</ToggleGroupControl>
 				</ToolsPanelItem>
 			</ToolsPanelItems>
-			<PanelWrapperView>
+			<div className={ styles[ 'panel-wrapper' ] }>
 				<Panel>
 					<ToolsPanel
 						{ ...props }
@@ -497,7 +484,7 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 						<Slot />
 					</ToolsPanel>
 				</Panel>
-			</PanelWrapperView>
+			</div>
 		</SlotFillProvider>
 	);
 };
@@ -541,7 +528,8 @@ export const WithConditionallyRenderedControl: StoryFn<
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
-				<SingleColumnItem
+				<ToolsPanelItem
+					className={ styles[ 'single-column-item' ] }
 					hasValue={ () => !! height }
 					label="Injected Height"
 					onDeselect={ () => {
@@ -553,14 +541,13 @@ export const WithConditionallyRenderedControl: StoryFn<
 					isShownByDefault
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
 							updateAttribute( 'height', next )
 						}
 					/>
-				</SingleColumnItem>
+				</ToolsPanelItem>
 				{ !! height && (
 					<ToolsPanelItem
 						hasValue={ () => !! scale }
@@ -573,7 +560,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 						isShownByDefault
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) =>
@@ -597,7 +583,7 @@ export const WithConditionallyRenderedControl: StoryFn<
 					</ToolsPanelItem>
 				) }
 			</ToolsPanelItems>
-			<PanelWrapperView>
+			<div className={ styles[ 'panel-wrapper' ] }>
 				<Panel>
 					<ToolsPanel
 						{ ...props }
@@ -607,7 +593,7 @@ export const WithConditionallyRenderedControl: StoryFn<
 						<Slot />
 					</ToolsPanel>
 				</Panel>
-			</PanelWrapperView>
+			</div>
 		</SlotFillProvider>
 	);
 };
@@ -616,19 +602,3 @@ WithConditionallyRenderedControl.args = {
 	label: 'Tools Panel With Conditionally Rendered Item via SlotFill',
 	panelId: 'unique-tools-panel-id',
 };
-
-const PanelWrapperView = styled.div`
-	font-size: 13px;
-
-	.components-dropdown-menu__menu {
-		max-width: 220px;
-	}
-`;
-
-const SingleColumnItem = styled( ToolsPanelItem )`
-	grid-column: span 1;
-`;
-
-const IntroText = styled.div`
-	grid-column: span 2;
-`;

@@ -1,9 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useId } from '@wordpress/element';
 import { VisuallyHidden } from '../';
 
 const meta: Meta< typeof VisuallyHidden > = {
-	title: 'Design System/Components/VisuallyHidden',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/VisuallyHidden',
+	id: 'design-system-components-visuallyhidden',
 	component: VisuallyHidden,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -19,4 +28,28 @@ export const Default: Story = {
 			</div>
 		</>
 	),
+};
+
+/**
+ * Use the `render` prop to change the underlying HTML element.
+ * By default, `VisuallyHidden` renders a `<div>`. Here it renders
+ * a `<label>` instead, keeping the native label–input association
+ * while hiding the label text visually.
+ */
+export const WithCustomElement: Story = {
+	render: function WithCustomElementStory() {
+		const inputId = useId();
+		return (
+			<>
+				{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
+				<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
+					Accessible label
+				</VisuallyHidden>
+				<input
+					id={ inputId }
+					placeholder="This input has a visually hidden label"
+				/>
+			</>
+		);
+	},
 };

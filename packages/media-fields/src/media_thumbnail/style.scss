@@ -7,6 +7,27 @@
 	align-items: center;
 	position: relative;
 	height: 100%;
+
+	&.is-loading,
+	&.is-loaded {
+		img {
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.1s linear;
+			}
+		}
+	}
+
+	&.is-loading {
+		img {
+			opacity: 0;
+		}
+	}
+
+	&.is-loaded {
+		img {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-media-field__media-thumbnail--image {

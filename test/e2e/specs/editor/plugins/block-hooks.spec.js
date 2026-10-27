@@ -1,7 +1,7 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	setCollaboration,
+} = require( '../../editor/collaboration/fixtures/collaboration-utils' );
 
 const dummyBlocksContent = `<!-- wp:heading -->
 <h2 class="wp-block-heading">This is a dummy heading</h2>
@@ -38,6 +38,7 @@ test.describe( 'Block Hooks API', () => {
 	].forEach( ( { name, postType, blockType, createMethod } ) => {
 		test.describe( `Hooked blocks in ${ name } (blocks)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -65,6 +66,12 @@ test.describe( 'Block Hooks API', () => {
 				} else {
 					containerPost = postObject;
 				}
+
+				/**
+				 * Since the Block Hooks API relies on server-side rendering to insert
+				 * the hooked blocks, there is a fundamental incompatibility with RTC.
+				 */
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test.afterAll( async ( { requestUtils } ) => {
@@ -74,6 +81,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -171,6 +179,7 @@ test.describe( 'Block Hooks API', () => {
 
 		test.describe( `Hooked blocks in ${ name } (classic)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -198,6 +207,12 @@ test.describe( 'Block Hooks API', () => {
 				} else {
 					containerPost = postObject;
 				}
+
+				/**
+				 * Since the Block Hooks API relies on server-side rendering to insert
+				 * the hooked blocks, there is a fundamental incompatibility with RTC.
+				 */
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test.afterAll( async ( { requestUtils } ) => {
@@ -207,6 +222,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -287,6 +303,7 @@ test.describe( 'Block Hooks API', () => {
 
 	test.describe( 'Hooked blocks in Navigation Menu', () => {
 		let postObject, containerPost;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			postObject = await requestUtils.createNavigationMenu( {
 				title: 'Navigation Menu',
@@ -325,7 +342,7 @@ test.describe( 'Block Hooks API', () => {
 				page.locator( '.wp-block-navigation__container > *' )
 			).toHaveClass( [
 				'wp-block-navigation-item wp-block-home-link',
-				' wp-block-navigation-item wp-block-navigation-link',
+				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-page-list',
 			] );
 		} );
@@ -403,7 +420,7 @@ test.describe( 'Block Hooks API', () => {
 			await expect(
 				page.locator( '.wp-block-navigation__container > *' )
 			).toHaveClass( [
-				' wp-block-navigation-item wp-block-navigation-link',
+				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-navigation-item wp-block-home-link',
 				'wp-block-page-list',
 			] );

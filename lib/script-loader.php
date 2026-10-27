@@ -17,21 +17,43 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
  * @return void
  */
 function gutenberg_enqueue_global_styles() {
-	$separate_assets  = wp_should_load_separate_core_block_assets();
+	$assets_on_demand = wp_should_load_block_assets_on_demand();
 	$is_block_theme   = wp_is_block_theme();
 	$is_classic_theme = ! $is_block_theme;
 
-	/*
-	 * Global styles should be printed in the head when loading all styles combined.
-	 * The footer should only be used to print global styles for classic themes with separate core assets enabled.
+	/**
+	 * Global styles should be printed in the HEAD for block themes, or for classic themes when loading assets on
+	 * demand is disabled (which is no longer the default since WordPress 6.9).
 	 *
-	 * See https://core.trac.wordpress.org/ticket/53494.
+	 * @link https://core.trac.wordpress.org/ticket/53494
+	 * @link https://core.trac.wordpress.org/ticket/61965
 	 */
 	if (
-		( $is_block_theme && doing_action( 'wp_footer' ) ) ||
-		( $is_classic_theme && doing_action( 'wp_footer' ) && ! $separate_assets ) ||
-		( $is_classic_theme && doing_action( 'wp_enqueue_scripts' ) && $separate_assets )
+		doing_action( 'wp_footer' ) &&
+		(
+			$is_block_theme ||
+			( $is_classic_theme && ! $assets_on_demand )
+		)
 	) {
+		return;
+	}
+
+	/**
+	 * The footer should only be used for classic themes when loading assets on demand is enabled. In WP 6.9 this is the
+	 * default with the introduction of hoisting late-printed styles (via {@see wp_load_classic_theme_block_styles_on_demand()}).
+	 * So even though the main global styles are not printed here in the HEAD for classic themes with on-demand asset
+	 * loading, a placeholder for the global styles is still enqueued. Then when {@see wp_hoist_late_printed_styles()}
+	 * processes the output buffer, it can locate the placeholder and inject the global styles from the footer into the
+	 * HEAD, replacing the placeholder.
+	 *
+	 * @link https://core.trac.wordpress.org/ticket/64099
+	 */
+	if ( $is_classic_theme && doing_action( 'wp_enqueue_scripts' ) && $assets_on_demand ) {
+		if ( has_action( 'wp_template_enhancement_output_buffer_started', 'wp_hoist_late_printed_styles' ) ) {
+			wp_register_style( 'wp-global-styles-placeholder', false );
+			wp_add_inline_style( 'wp-global-styles-placeholder', ':root { --wp-internal-comment: "Placeholder for wp_hoist_late_printed_styles() to replace with the global-styles printed at wp_footer." }' );
+			wp_enqueue_style( 'wp-global-styles-placeholder' );
+		}
 		return;
 	}
 

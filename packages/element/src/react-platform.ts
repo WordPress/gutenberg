@@ -1,38 +1,39 @@
-/**
- * External dependencies
- */
-import {
-	createPortal,
-	findDOMNode,
-	flushSync,
-	render,
-	hydrate,
-	unmountComponentAtNode,
-} from 'react-dom';
+import * as ReactDOM from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+
+const {
+	createPortal,
+	flushSync,
+	/* eslint-disable react/no-deprecated */
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
+	findDOMNode,
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
+	render,
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
+	hydrate,
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
+	unmountComponentAtNode,
+	/* eslint-enable react/no-deprecated */
+} = ReactDOM;
 
 /**
  * Creates a portal into which a component can be rendered.
  *
- * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
- *
- * @param {import('react').ReactElement} child     Any renderable child, such as an element,
- *                                                 string, or fragment.
- * @param {HTMLElement}                  container DOM node into which element should be rendered.
+ * @see https://react.dev/reference/react-dom/createPortal
  */
 export { createPortal };
 
 /**
  * Finds the dom node of a React component.
  *
- * @param {import('react').ComponentType} component Component's instance.
+ * @param {React.ComponentType} component Component's instance.
  */
 export { findDOMNode };
 
 /**
  * Forces React to flush any updates inside the provided callback synchronously.
  *
- * @param {Function} callback Callback to run synchronously.
+ * @see https://react.dev/reference/react-dom/flushSync
  */
 export { flushSync };
 

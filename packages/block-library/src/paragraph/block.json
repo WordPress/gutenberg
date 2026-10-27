@@ -31,12 +31,19 @@
 		"splitting": true,
 		"anchor": true,
 		"className": false,
+		"background": {
+			"backgroundClip": true,
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"style": true,
 			"width": true
 		},
+		"shadow": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -44,6 +51,10 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"spacing": {
 			"margin": true,
@@ -58,6 +69,7 @@
 			"lineHeight": true,
 			"textAlign": true,
 			"textColumns": true,
+			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,
@@ -65,6 +77,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
+			"textShadow": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
@@ -74,6 +87,12 @@
 		"__unstablePasteTextInline": true,
 		"interactivity": {
 			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"root": "p",
+		"typography": {
+			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
 		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",

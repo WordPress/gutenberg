@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentPropsWithoutRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 
 export const GridItems = forwardRef<
@@ -19,7 +8,7 @@ export const GridItems = forwardRef<
 		className?: string;
 		previewSize: number | undefined;
 	} & ComponentPropsWithoutRef< 'div' >
->( ( { className, previewSize, ...props }, ref ) => {
+>( ( { className, previewSize, style, ...props }, ref ) => {
 	return (
 		<div
 			ref={ ref }
@@ -28,6 +17,7 @@ export const GridItems = forwardRef<
 				gridTemplateColumns:
 					previewSize &&
 					`repeat(auto-fill, minmax(${ previewSize }px, 1fr))`,
+				...style,
 			} }
 			{ ...props }
 		/>

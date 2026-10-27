@@ -14,7 +14,7 @@ export function getQueryString( url: string ): string | void {
 	let query;
 	try {
 		query = new URL( url, 'http://example.com' ).search.substring( 1 );
-	} catch ( error ) {}
+	} catch {}
 
 	if ( query ) {
 		return query;

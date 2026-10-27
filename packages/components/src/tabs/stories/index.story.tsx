@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { wordpress, more, link } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import Button from '../../button';
@@ -20,20 +9,24 @@ import Tooltip from '../../tooltip';
 import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components/Containers/Tabs',
+	title: 'Components/@wordpress-components/Containers/Tabs',
 	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
 		'Tabs.TabList': Tabs.TabList,
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.TabPanel': Tabs.TabPanel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Tabs`](?path=/docs/design-system-components-tabs--docs) from `@wordpress/ui` instead.',
+		},
 	},
 	args: {
 		onActiveTabIdChange: fn(),

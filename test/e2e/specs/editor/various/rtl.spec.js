@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -151,7 +148,7 @@ test.describe( 'RTL', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( ARABIC_ONE );

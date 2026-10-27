@@ -14,8 +14,8 @@
 	&.wp-block-categories-dropdown.aligncenter {
 		text-align: center;
 	}
-	& .wp-block-categories__label:not(.screen-reader-text) {
-		width: 100%;
-		display: block;
-	}
+}
+:where(.wp-block-categories__label:not(.screen-reader-text)) {
+	width: 100%;
+	display: block;
 }

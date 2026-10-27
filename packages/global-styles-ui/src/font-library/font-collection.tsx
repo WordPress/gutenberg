@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -10,20 +7,24 @@ import {
 } from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Navigator,
 	__experimentalHeading as Heading,
 	Notice,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Flex,
 	Button,
-	DropdownMenu,
 	SearchControl,
-	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Progress,
+	Select,
+} from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import {
@@ -40,10 +41,6 @@ import type {
 	FontFamily,
 	CollectionFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
@@ -76,6 +73,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ selectedFont, setSelectedFont ] = useState< FontFamily | null >(
 		null
 	);
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
 	const [ notice, setNotice ] = useState< {
 		type: 'success' | 'error' | 'info';
 		message: string;
@@ -91,7 +91,8 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { installFonts, isInstalling } = useContext( FontLibraryContext );
+	const { installFonts, isInstalling, baseCustomFonts } =
+		useContext( FontLibraryContext );
 	const { record: selectedCollection, isResolving: isLoading } =
 		useEntityRecord< FontCollectionType >( 'root', 'fontCollection', slug );
 
@@ -123,8 +124,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const collectionFonts = useMemo(
 		() =>
 			( selectedCollection?.font_families as
-				| CollectionFontFamily[]
-				| undefined ) ?? [],
+				CollectionFontFamily[] | undefined ) ?? [],
 		[ selectedCollection ]
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
@@ -155,8 +155,11 @@ function FontCollection( { slug }: { slug: string } ) {
 		setPage( 1 );
 	};
 
-	// @ts-expect-error
-	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
+	const debouncedUpdateSearchInput = debounce(
+		// @ts-expect-error `debounce` expects a `(...args: unknown[]) => unknown` callback.
+		handleUpdateSearchInput,
+		300
+	);
 
 	const handleToggleVariant = ( font: FontFamily, face?: FontFace ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );
@@ -164,6 +167,29 @@ function FontCollection( { slug }: { slug: string } ) {
 	};
 
 	const fontToInstallOutline = getFontsOutline( fontsToInstall );
+	const installedFontsOutline = getFontsOutline( baseCustomFonts );
+
+	const isFontFaceInstalled = ( face: FontFace ) =>
+		!! selectedFont &&
+		isFontFontFaceInOutline(
+			selectedFont.slug,
+			selectedFont.fontFace ? face : null, // If the font has no fontFace, we want to check if the font is installed
+			installedFontsOutline
+		);
+
+	const installableFontFaces = selectedFont?.fontFace?.filter(
+		( face ) => ! isFontFaceInstalled( face )
+	);
+
+	const isAllInstalled =
+		!! selectedFont &&
+		( selectedFont.fontFace?.length
+			? installableFontFaces?.length === 0
+			: isFontFontFaceInOutline(
+					selectedFont.slug,
+					null,
+					installedFontsOutline
+				) );
 
 	const resetFontsToInstall = () => {
 		setFontsToInstall( [] );
@@ -171,23 +197,25 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	const selectFontCount =
 		fontsToInstall.length > 0
-			? fontsToInstall[ 0 ]?.fontFace?.length ?? 0
+			? ( fontsToInstall[ 0 ]?.fontFace?.length ?? 0 )
 			: 0;
 
 	// Check if any fonts are selected.
 	const isIndeterminate =
-		selectFontCount > 0 &&
-		selectFontCount !== selectedFont?.fontFace?.length;
+		selectFontCount > 0 && selectFontCount !== installableFontFaces?.length;
 
-	// Check if all fonts are selected.
-	const isSelectAllChecked =
-		selectFontCount === selectedFont?.fontFace?.length;
+	// Check if all installable fonts are selected.
+	const isSelectAllChecked = selectFontCount === installableFontFaces?.length;
 
 	// Toggle select all fonts.
 	const toggleSelectAll = () => {
 		const newFonts: FontFamily[] = [];
 		if ( ! isSelectAllChecked && selectedFont ) {
-			newFonts.push( selectedFont );
+			newFonts.push(
+				selectedFont.fontFace
+					? { ...selectedFont, fontFace: installableFontFaces }
+					: selectedFont
+			);
 		}
 
 		setFontsToInstall( newFonts );
@@ -210,7 +238,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					} )
 				);
 			}
-		} catch ( error ) {
+		} catch {
 			// If any of the fonts fail to download,
 			// show an error notice and stop the request from being sent.
 			setNotice( {
@@ -257,35 +285,23 @@ function FontCollection( { slug }: { slug: string } ) {
 		return <GoogleFontsConfirmDialog />;
 	}
 
-	const ActionsComponent = () => {
-		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
-			return null;
-		}
-		return (
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Actions' ) }
-				popoverProps={ {
-					position: 'bottom left',
-				} }
-				controls={ [
-					{
-						title: __( 'Revoke access to Google Fonts' ),
-						onClick: revokeAccess,
-					},
-				] }
-			/>
-		);
-	};
+	const showActions =
+		slug === 'google-fonts' && ! renderConfirmDialog && ! selectedFont;
 
 	return (
 		<div className="font-library__tabpanel-layout">
 			{ isLoading && (
 				<div className="font-library__loading">
-					<ProgressBar />
+					<Progress.Root
+						value={ null }
+						aria-label={ __( 'Loading fonts' ) }
+					>
+						<Progress.Track>
+							<Progress.Indicator />
+						</Progress.Track>
+					</Progress.Root>
 				</div>
 			) }
-
 			{ ! isLoading && selectedCollection && (
 				<>
 					<Navigator
@@ -298,23 +314,51 @@ function FontCollection( { slug }: { slug: string } ) {
 									<Heading level={ 2 } size={ 13 }>
 										{ selectedCollection.name }
 									</Heading>
-									<Text>
+									<WCText>
 										{ selectedCollection.description }
-									</Text>
+									</WCText>
 								</VStack>
-								<ActionsComponent />
+								{ showActions && (
+									<Menu.Root>
+										<Menu.Trigger
+											render={
+												<Button
+													size="small"
+													icon={ moreVertical }
+													label={ __( 'Actions' ) }
+												/>
+											}
+										/>
+										<Menu.Popup
+											positioner={
+												<Menu.Positioner
+													side="bottom"
+													align="end"
+												/>
+											}
+										>
+											<Menu.Item onClick={ revokeAccess }>
+												<Menu.ItemLabel>
+													{ __(
+														'Revoke access to Google Fonts'
+													) }
+												</Menu.ItemLabel>
+											</Menu.Item>
+										</Menu.Popup>
+									</Menu.Root>
+								) }
 							</HStack>
 							<Spacer margin={ 4 } />
 							<HStack spacing={ 4 } justify="space-between">
 								<SearchControl
+									className="font-library__search"
 									value={ filters.search }
 									placeholder={ __( 'Font name…' ) }
 									label={ __( 'Search' ) }
 									onChange={ debouncedUpdateSearchInput }
 									hideLabelFromVision={ false }
 								/>
-								<SelectControl
-									__next40pxDefaultSize
+								<WCSelectControl
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }
@@ -328,18 +372,18 @@ function FontCollection( { slug }: { slug: string } ) {
 												{ category.name }
 											</option>
 										) ) }
-								</SelectControl>
+								</WCSelectControl>
 							</HStack>
 
 							<Spacer margin={ 4 } />
 
 							{ !! selectedCollection?.font_families?.length &&
 								! fonts.length && (
-									<Text>
+									<WCText>
 										{ __(
 											'No fonts found. Try with a different search term.'
 										) }
-									</Text>
+									</WCText>
 								) }
 
 							<div className="font-library__fonts-grid__main">
@@ -364,6 +408,11 @@ function FontCollection( { slug }: { slug: string } ) {
 													font.font_family_settings
 												}
 												navigatorPath="/fontFamily"
+												shouldFocus={
+													font.font_family_settings
+														.slug ===
+													lastSelectedFontSlug
+												}
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -385,6 +434,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											selectedFont?.slug
+										);
 										setSelectedFont( null );
 										setNotice( null );
 									} }
@@ -411,16 +463,17 @@ function FontCollection( { slug }: { slug: string } ) {
 								</>
 							) }
 							<Spacer margin={ 4 } />
-							<Text>
+							<WCText>
 								{ __( 'Select font variants to install.' ) }
-							</Text>
+							</WCText>
 							<Spacer margin={ 4 } />
-							<CheckboxControl
+							<WCCheckboxControl
 								className="font-library__select-all"
 								label={ __( 'Select all' ) }
-								checked={ isSelectAllChecked }
+								checked={ isSelectAllChecked || isAllInstalled }
 								onChange={ toggleSelectAll }
 								indeterminate={ isIndeterminate }
+								disabled={ isAllInstalled }
 							/>
 							<VStack spacing={ 0 }>
 								{ /*
@@ -451,6 +504,9 @@ function FontCollection( { slug }: { slug: string } ) {
 																? face
 																: null, // If the font has no fontFace, we want to check if the font is in the outline
 															fontToInstallOutline
+														) }
+														installed={ isFontFaceInstalled(
+															face
 														) }
 													/>
 												</li>
@@ -508,32 +564,47 @@ function FontCollection( { slug }: { slug: string } ) {
 									),
 									{
 										div: <div aria-hidden />,
+										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
-											<SelectControl
-												aria-label={ __(
-													'Current page'
-												) }
+											<Select.Root
 												value={ page.toString() }
-												options={ [
-													...Array( totalPages ),
-												].map( ( e, i ) => {
-													return {
-														label: (
+												onValueChange={ ( newPage ) => {
+													if ( newPage !== null ) {
+														setPage(
+															parseInt( newPage )
+														);
+													}
+												} }
+											>
+												<Select.Trigger
+													className="font-library__page-selection-trigger"
+													size="small"
+													variant="minimal"
+													aria-label={ __(
+														'Current page'
+													) }
+												/>
+												<Select.Popup width="content">
+													{ [
+														...Array( totalPages ),
+													].map( ( e, i ) => {
+														const value = (
 															i + 1
-														).toString(),
-														value: (
-															i + 1
-														).toString(),
-													};
-												} ) }
-												onChange={ ( newPage ) =>
-													setPage(
-														parseInt( newPage )
-													)
-												}
-												size="small"
-												variant="minimal"
-											/>
+														).toString();
+														return (
+															<Select.Item
+																key={ value }
+																value={ value }
+																size="small"
+															>
+																<Select.ItemLabel>
+																	{ value }
+																</Select.ItemLabel>
+															</Select.Item>
+														);
+													} ) }
+												</Select.Popup>
+											</Select.Root>
 										),
 									}
 								) }

@@ -1,18 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const util = require( 'util' );
 const { v2: dockerCompose } = require( 'docker-compose' );
-
-/**
- * Promisified dependencies
- */
 const copyDir = util.promisify( require( 'copy-dir' ) );
-
-/**
- * Internal dependencies
- */
 const { readWordPressVersion } = require( '../../wordpress' );
 
 /**
@@ -48,20 +37,6 @@ function isWPMajorMinorVersionLower( version, compareVersion ) {
 }
 
 /**
- * Checks a WordPress database connection. An error is thrown if the test is
- * unsuccessful.
- *
- * @param {WPConfig} config The wp-env config object.
- */
-async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
-	await dockerCompose.run( 'cli', 'wp db check', {
-		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: debug,
-	} );
-}
-
-/**
  * Configures WordPress for the given environment by installing WordPress,
  * activating all plugins, and activating the first theme. These steps are
  * performed sequentially so as to not overload the WordPress instance.
@@ -78,7 +53,7 @@ async function configureWordPress( environment, config, spinner ) {
 			spinner,
 			config.debug
 		);
-	} catch ( err ) {
+	} catch {
 		// Ignore error.
 	}
 
@@ -100,6 +75,11 @@ async function configureWordPress( environment, config, spinner ) {
 		'set -eo pipefail',
 		cliConfigCommand,
 		installCommand,
+		// Enable pretty permalinks by default to match what WordPress core
+		// does on a fresh install. The loopback test that WordPress normally
+		// uses to verify pretty permalinks fails in Docker because the CLI
+		// container can't reach the WordPress container at the site URL.
+		`wp rewrite structure '/%year%/%monthnum%/%day%/%postname%/' --hard`,
 	];
 
 	// Bootstrap .htaccess for multisite
@@ -316,7 +296,6 @@ async function copyCoreFiles( fromPath, toPath ) {
 }
 
 module.exports = {
-	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,

@@ -1,20 +1,7 @@
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-import { css } from '@emotion/react';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { customLink, formatCapitalize } from '@wordpress/icons';
 import { useState, useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { useCx } from '../../utils';
 import { Menu } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
@@ -25,7 +12,7 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components/Actions/Menu',
+	title: 'Components/@wordpress-components/Deprecated/Menu',
 	component: Menu,
 	subcomponents: {
 		Item: Menu.Item,
@@ -33,7 +20,6 @@ const meta: Meta< typeof Menu > = {
 		Group: Menu.Group,
 		GroupLabel: Menu.GroupLabel,
 		Separator: Menu.Separator,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
 		RadioItem: Menu.RadioItem,
 		ItemLabel: Menu.ItemLabel,
@@ -54,6 +40,11 @@ const meta: Meta< typeof Menu > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Deprecated. When building for the Gutenberg repo, use [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
 		},
 	},
 };
@@ -175,7 +166,7 @@ export const WithSubmenu: StoryObj< typeof Menu > = {
 };
 
 export const WithCheckboxes: StoryObj< typeof Menu > = {
-	render: function WithCheckboxes( props: Props ) {
+	render: function WithCheckboxesRender( props: Props ) {
 		const [ isAChecked, setAChecked ] = useState( false );
 		const [ isBChecked, setBChecked ] = useState( true );
 		const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] =
@@ -325,7 +316,7 @@ export const WithCheckboxes: StoryObj< typeof Menu > = {
 };
 
 export const WithRadios: StoryObj< typeof Menu > = {
-	render: function WithRadios( props: Props ) {
+	render: function WithRadiosRender( props: Props ) {
 		const [ radioValue, setRadioValue ] = useState( 'two' );
 		const onRadioChange: React.ComponentProps<
 			typeof Menu.RadioItem
@@ -396,19 +387,9 @@ export const WithRadios: StoryObj< typeof Menu > = {
 	},
 };
 
-const modalOnTopOfMenuPopover = css`
-	&& {
-		z-index: 1000000;
-	}
-`;
-
-export const WithModals: StoryObj< typeof Menu > = {
-	render: function WithModals( props: Props ) {
-		const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
-		const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
-
-		const cx = useCx();
-		const modalOverlayClassName = cx( modalOnTopOfMenuPopover );
+export const WithModal: StoryObj< typeof Menu > = {
+	render: function WithModalRender( props: Props ) {
+		const [ isModalOpen, setModalOpen ] = useState( false );
 
 		return (
 			<>
@@ -421,42 +402,15 @@ export const WithModals: StoryObj< typeof Menu > = {
 						Open menu
 					</Menu.TriggerButton>
 					<Menu.Popover>
-						<Menu.Item
-							onClick={ () => setOuterModalOpen( true ) }
-							hideOnClick={ false }
-						>
-							<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
+						<Menu.Item onClick={ () => setModalOpen( true ) }>
+							<Menu.ItemLabel>Open modal</Menu.ItemLabel>
 						</Menu.Item>
-						<Menu.Item
-							onClick={ () => setInnerModalOpen( true ) }
-							hideOnClick={ false }
-						>
-							<Menu.ItemLabel>Open inner modal</Menu.ItemLabel>
-						</Menu.Item>
-						{ isInnerModalOpen && (
-							<Modal
-								onRequestClose={ () =>
-									setInnerModalOpen( false )
-								}
-								overlayClassName={ modalOverlayClassName }
-							>
-								Modal&apos;s contents
-								<button
-									onClick={ () => setInnerModalOpen( false ) }
-								>
-									Close
-								</button>
-							</Modal>
-						) }
 					</Menu.Popover>
 				</Menu>
-				{ isOuterModalOpen && (
-					<Modal
-						onRequestClose={ () => setOuterModalOpen( false ) }
-						overlayClassName={ modalOverlayClassName }
-					>
+				{ isModalOpen && (
+					<Modal onRequestClose={ () => setModalOpen( false ) }>
 						Modal&apos;s contents
-						<button onClick={ () => setOuterModalOpen( false ) }>
+						<button onClick={ () => setModalOpen( false ) }>
 							Close
 						</button>
 					</Modal>
@@ -508,7 +462,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup
@@ -611,7 +565,7 @@ export const ToolbarVariant: StoryObj< typeof Menu > = {
 };
 
 export const InsideModal: StoryObj< typeof Menu > = {
-	render: function InsideModal( props: Props ) {
+	render: function InsideModalRender( props: Props ) {
 		const [ isModalOpen, setModalOpen ] = useState( false );
 		return (
 			<>

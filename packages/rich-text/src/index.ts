@@ -23,16 +23,39 @@ export { toggleFormat } from './toggle-format';
 export { unregisterFormatType } from './unregister-format-type';
 export { createElement as __unstableCreateElement } from './create-element';
 
-export { useAnchorRef } from './component/use-anchor-ref';
-export { useAnchor } from './component/use-anchor';
+export { privateApis } from './private-apis';
+export { useAnchorRef } from './hook/use-anchor-ref';
+export { useAnchor } from './hook/use-anchor';
+export { useDeprecatedRichText as __unstableUseRichText } from './hook';
 
-export {
-	default as __experimentalRichText,
-	useRichText as __unstableUseRichText,
-} from './component';
+// Remnant that is left in an abundance of caution to ensure there's no errors.
+export function __experimentalRichText() {}
 
 /**
  * An object which represents a formatted string. See main `@wordpress/rich-text`
  * documentation for more information.
  */
 export type { RichTextValue } from './types';
+
+/**
+ * The text, formats and replacements of a `RichTextValue`, without the
+ * selection.
+ */
+export type { RichTextContent } from './types';
+
+/**
+ * A single format, such as `core/bold`, applied to a range of characters within
+ * a `RichTextValue`. See main `@wordpress/rich-text` documentation for more
+ * information.
+ */
+export type { RichTextFormat } from './types';
+
+/**
+ * The formats applied to a single character of a `RichTextValue`.
+ */
+export type { RichTextFormatList } from './types';
+
+/**
+ * A Set of callbacks that format types register for an event.
+ */
+export type { EventCallbacksSet } from './event-listeners';

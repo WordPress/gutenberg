@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { WP_BASE_URL } from '../config';
 import type { PageUtils } from './';
 

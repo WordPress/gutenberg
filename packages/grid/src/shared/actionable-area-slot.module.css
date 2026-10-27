@@ -1,0 +1,16 @@
+.actionable-area-slot {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.actionable-area-slot {
+		transition:
+			opacity var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle);
+	}
+}
+
+:global([data-wp-grid-resizing]) .actionable-area-slot {
+	opacity: 0;
+	pointer-events: none;
+}

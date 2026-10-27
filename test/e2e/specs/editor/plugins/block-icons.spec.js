@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const dashIconRegex = /<span.*?class=".*?dashicons-cart.*?">.*?<\/span>/;

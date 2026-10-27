@@ -6,11 +6,6 @@
 	"category": "theme",
 	"description": "Display a post's comments count.",
 	"textdomain": "default",
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"usesContext": [ "postId" ],
 	"example": {
 		"viewportWidth": 350
@@ -18,6 +13,9 @@
 	"supports": {
 		"anchor": true,
 		"html": false,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"__experimentalDefaultControls": {
@@ -32,6 +30,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

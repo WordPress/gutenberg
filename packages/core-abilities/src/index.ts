@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { registerAbility, registerAbilityCategory } from '@wordpress/abilities';
 import type {
 	Ability,
@@ -142,5 +139,5 @@ async function initialize(): Promise< void > {
 	await initializeAbilities();
 }
 
-// Auto-initialize on import
-initialize();
+// Auto-initialize on import.
+export const ready: Promise< void > = initialize();

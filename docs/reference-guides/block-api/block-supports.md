@@ -84,7 +84,7 @@ supports: {
 }
 ```
 
-## auto_register
+## autoRegister
 
 -   Type: `boolean`
 -   Default value: `false`
@@ -102,7 +102,7 @@ register_block_type( 'my-plugin/server-block', array(
 		);
 	},
 	'supports' => array(
-		'auto_register' => true,
+		'autoRegister' => true,
 	),
 ) );
 ```
@@ -178,20 +178,27 @@ _**Note:** Since WordPress 6.5._
 -   Subproperties
     -   `backgroundImage`: type `boolean`, default value `false`
     -   `backgroundSize`: type `boolean`, default value `false`
+    -   `backgroundClip`: type `boolean`, default value `false` _(since WordPress 7.2)_
 
 This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 `backgroundImage` adds UI controls which allow the user to select a background image.
 `backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
+`backgroundClip` sets which box the background is painted into, and can clip it to the block's text.
 
 ```js
 supports: {
 	background: {
 		backgroundImage: true // Enable background image control.
-		backgroundSize: true // Enable background image + size control.
+		backgroundSize: true, // Enable background image + size control.
+		backgroundClip: true // Enable background clip.
 	}
 }
 ```
+
+Declaring `backgroundClip` alongside `gradient` gives the block a text gradient. The Typography panel then offers a Gradient control that fills the text, storing the gradient in `style.background.gradient` and `text` in `style.background.backgroundClip`. A block with a text gradient is not given the `has-background` class, because the gradient paints the text rather than the block's background.
+
+Which clip values may be used is a theme's decision, through `settings.background.backgroundClip`. It takes `true` for every value, `false` for none, or an array naming the ones to allow, for example `[ "border-box", "text" ]`. A block declaring the support only stands in where a theme has not set it. The clip control appears only when a value other than `text` is allowed, since the Typography panel's Gradient control already expresses the text value.
 
 When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
 
@@ -208,6 +215,7 @@ When a background images is selected and its position or size are changed, the b
             - `title`: type `string`, title of the media attachment
         - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
         - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+        - `backgroundClip`: an attribute of `string` type, defining the CSS [`background-clip`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip) value. One of `border-box`, `padding-box`, `content-box` or `text`.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
 
@@ -401,7 +409,7 @@ supports: {
 
 _**Note:** Deprecated since WordPress 6.3._
 
-This property has been replaced by [`filter.duotone`](#filterduotone).
+This property has been replaced by [`filter.duotone`](#filter-duotone).
 
 ### color.gradients
 
@@ -608,6 +616,21 @@ When the block declares support for `color.text`, the attributes definition is e
     }
     ```
 
+## contentRole
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Marks the block itself as content. It is intended primarily for blocks that do not declare `content` attributes, or whose content is expressed only through their inner blocks. When enabled, content-only editing modes can still edit these blocks and allow inner blocks to be added or removed.
+
+```js
+supports: {
+	contentRole: true
+}
+```
+
 ## customClassName
 
 -   Type: `boolean`
@@ -629,8 +652,10 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `aspectRatio`: type `boolean`, default value `false`
     -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
+    -   `minWidth`: type `boolean`, default value `false`
     -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
@@ -638,17 +663,18 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		height: true // Enable height control.
-		minHeight: true // Enable min height control.
-		width: true // Enable width control.
+		aspectRatio: true, // Enable aspect ratio control.
+		height: true, // Enable height control.
+		minHeight: true, // Enable min height control.
+		minWidth: true, // Enable min width control.
+		width: true, // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, `minWidth`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
@@ -657,11 +683,25 @@ attributes: {
             aspectRatio: "16/9",
             height: "40vh",
             minHeight: "50vh",
+            minWidth: "200px",
             width: "400px",
         }
     }
 }
 ```
+
+## editableRoot
+
+-   Type: `boolean`
+-   Default value: `false`
+
+When set to `true`, the block declares that it keeps working when an ancestor
+element (the editor canvas) is the `contenteditable` editing host, with focus
+and the native selection residing there instead of on the block's own editable
+elements. The editor uses this to keep the canvas editable while such a block
+is selected, enabling native partial selection across blocks. Blocks that rely
+on `event.target` or DOM focus pointing at their own elements should not
+declare this support.
 
 ## filter
 
@@ -756,8 +796,7 @@ supports: {
 
 Indicates if the block is using Interactivity API features.
 
-The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
-Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation. See the [Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md) guide for details.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
@@ -816,7 +855,7 @@ For the `flow` layout type only, determines display of the "Inner blocks use con
 -   Type: `boolean`
 -   Default value: `false`
 
-For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max width/Fixed) on all child blocks of the flex block.
 
 ### layout.allowVerticalAlignment
 
@@ -852,6 +891,25 @@ For the `flex` layout type only, determines display of the "Allow to wrap to mul
 -   Default value: `true`
 
 For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
+
+## listView
+
+_**Note:** Since WordPress 7.0._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Enables a List View panel in the block inspector for the block's inner blocks.
+
+When this support is enabled, the inspector shows a List View tree allowing users to inspect and manage the block's inner blocks from the sidebar instead of only using the global document List View.
+
+```js
+supports: {
+	listView: true
+}
+```
+
+The `listView` support only affects the editor UI and does not add any attributes to the block.
 
 ## lock
 
@@ -992,7 +1050,7 @@ When the block declares support for `shadow`, the attributes definition is exten
     -   `padding`: type `boolean` or `array`, default value `false`
     -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#spacing-control).
 
 ```js
 supports: {
@@ -1043,6 +1101,7 @@ supports: {
     -   `fontSize`: type `boolean`, default value `false`
     -   `lineHeight`: type `boolean`, default value `false`
     -   `textAlign`: type `boolean` or `array`, default value `false`
+    -   `textShadow`: type `boolean`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -1174,6 +1233,50 @@ attributes: {
         default: {
             typography: {
                 textAlign: 'value'
+            }
+        }
+    }
+}
+```
+
+### typography.textShadow
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports the text-shadow CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for text-shadow.
+        textShadow: true,
+    },
+}
+```
+
+When the block declares support for `textShadow`, the attributes definition is extended to include two new attributes: `textShadow` and `style`:
+
+-   `textShadow`: an attribute of `string` type with no default assigned. It stores any preset value selected by the user. The block can apply a default preset text shadow by specifying its own `textShadow` attribute with a default. For example:
+
+```js
+attributes: {
+    textShadow: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+-   `style`: an attribute of `object` type with no default assigned. It stores the custom value set by the user and is shared with other block supports such as color. The block can apply a default style by specifying its own `style` attribute with a default. For example:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                textShadow: 'value'
             }
         }
     }

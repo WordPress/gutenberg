@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { DataViewRenderFieldProps } from '../../types';
 import useElements from '../../hooks/use-elements';
 

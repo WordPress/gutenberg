@@ -1,19 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
-import type { ReactNode, ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
+import type { ForwardedRef } from 'react';
 import ResizeTooltip from './resize-tooltip';
 
 const HANDLE_CLASS_NAME = 'components-resizable-box__handle';
@@ -88,7 +77,6 @@ const HANDLE_STYLES = {
 };
 
 type ResizableBoxProps = ResizableProps & {
-	children: ReactNode;
 	showHandle?: boolean;
 	__experimentalShowTooltip?: boolean;
 	__experimentalTooltipProps?: Parameters< typeof ResizeTooltip >[ 0 ];
@@ -104,7 +92,7 @@ function UnforwardedResizableBox(
 		...props
 	}: ResizableBoxProps,
 	ref: ForwardedRef< Resizable >
-): JSX.Element {
+) {
 	return (
 		<Resizable
 			className={ clsx(
@@ -114,7 +102,7 @@ function UnforwardedResizableBox(
 			) }
 			// Add a focusable element within the drag handle. Unfortunately,
 			// `re-resizable` does not make them properly focusable by default,
-			// causing focus to move the the block wrapper which triggers block
+			// causing focus to move the block wrapper which triggers block
 			// drag.
 			handleComponent={ Object.fromEntries(
 				Object.keys( HANDLE_CLASSES ).map( ( key ) => [
@@ -133,6 +121,10 @@ function UnforwardedResizableBox(
 	);
 }
 
+/**
+ * `ResizableBox` wraps content in a container with draggable handles, letting
+ * users interactively resize it along one or more edges or corners.
+ */
 export const ResizableBox = forwardRef( UnforwardedResizableBox );
 ResizableBox.displayName = 'ResizableBox';
 

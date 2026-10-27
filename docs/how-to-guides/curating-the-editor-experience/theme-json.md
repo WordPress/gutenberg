@@ -124,7 +124,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 Beyond defining default values, using theme.json allows you to also remove options entirely and instead rely on what the theme has set in place. Below is a visual showing two extremes with the same paragraph block: 
 
-![Image of restricted interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20comparison%20visual.png?raw=true)
+![Image of restricted interface](https://developer.wordpress.org/files/2026/06/Locking-comparison-visual.png)
 
 Continuing the examples with duotone, this means you could allow full access to all Duotone functionality for Image blocks and only limit the Post Featured Image block like so:
 

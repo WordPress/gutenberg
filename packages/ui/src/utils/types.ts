@@ -1,24 +1,30 @@
-import type {
-	ElementType,
-	ComponentPropsWithoutRef,
-	HTMLAttributes,
-	ReactElement,
-	Ref,
+import {
+	type ElementType,
+	type ComponentPropsWithoutRef,
+	type HTMLAttributes,
+	type Ref,
 } from 'react';
 
 type HTMLAttributesWithRef< T extends ElementType = any > =
 	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
 
-type ComponentRenderFn< Props > = ( props: Props ) => ReactElement< unknown >;
+type ComponentRenderFn< Props > = (
+	props: Props
+) => React.ReactElement< unknown >;
 
 export type ComponentProps< E extends ElementType > = Omit<
 	ComponentPropsWithoutRef< E >,
-	'className' | 'children' | 'render'
+	'className' | 'children' | 'render' | 'style'
 > & {
 	/**
-	 * CSS class name to apply to the component.
+	 * CSS class name to apply to the element.
 	 */
 	className?: string;
+
+	/**
+	 * CSS style to apply to the element.
+	 */
+	style?: React.CSSProperties;
 
 	/**
 	 * Replaces the component's default HTML element using a given React
@@ -26,5 +32,5 @@ export type ComponentProps< E extends ElementType > = Omit<
 	 */
 	render?:
 		| ComponentRenderFn< HTMLAttributesWithRef >
-		| ReactElement< Record< string, unknown > >;
+		| React.ReactElement< Record< string, unknown > >;
 };

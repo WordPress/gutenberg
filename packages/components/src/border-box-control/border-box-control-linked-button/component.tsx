@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { link, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControlLinkedButton } from './hook';
-
 import type { LinkedButtonProps } from '../types';
 
 const BorderBoxControlLinkedButton = (

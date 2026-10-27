@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -132,7 +129,7 @@ export default {
 		const clientId = getSelectedBlockClientId();
 		const blockName = getBlockName( clientId );
 
-		// Navigaton block types are read-only.
+		// Navigation block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
 			return false;

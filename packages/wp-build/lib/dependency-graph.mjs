@@ -1,7 +1,7 @@
 /**
  * Dependency graph utilities for WordPress packages.
  *
- * This module provides functions to analyze dependencies between @wordpress/* packages
+ * This module provides functions to analyze dependencies between `@wordpress/*` packages
  * and determine the correct build order using topological sorting.
  */
 
@@ -154,7 +154,7 @@ function findScriptsToRebundle( changedPackage, workspacePackages ) {
 		return [];
 	}
 
-	const scriptsToRebundle = new Set();
+	const scriptsToRebundle = /** @type {Set<string>} */ ( new Set() );
 	const visited = new Set();
 	const queue = [ changedPackage ];
 
@@ -241,7 +241,7 @@ function findRoutesToRebuild(
 		return [];
 	}
 
-	const routesToRebuild = new Set();
+	const routesToRebuild = /** @type {Set<string>} */ ( new Set() );
 	const visited = new Set();
 	const queue = [ changedPackage ];
 

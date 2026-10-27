@@ -30,6 +30,16 @@
 		"anchor": true,
 		"className": true,
 		"splitting": true,
+		"background": {
+			"backgroundClip": true,
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -44,6 +54,11 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -56,6 +71,7 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"textAlign": true,
+			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
@@ -63,6 +79,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalWritingMode": true,
+			"textShadow": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

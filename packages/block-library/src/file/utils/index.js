@@ -54,7 +54,7 @@ const createActiveXObject = ( type ) => {
 	let ax;
 	try {
 		ax = new window.ActiveXObject( type );
-	} catch ( e ) {
+	} catch {
 		ax = undefined;
 	}
 	return ax;

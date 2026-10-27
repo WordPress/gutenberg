@@ -1,24 +1,19 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { createHttpPollingProvider } from './http-polling/http-polling-provider';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns the defeault provider creators. HTTP polling is the current default
- * provider.
+ * Returns the default provider creators. HTTP polling is the default when
+ * real-time collaboration is enabled.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 export function getDefaultProviderCreators(): ProviderCreator[] {
-	return [ createHttpPollingProvider() ];
+	return window.__experimentalEnableRealTimeCollaboration
+		? [ createHttpPollingProvider() ]
+		: [];
 }
 
 /**
@@ -41,12 +36,17 @@ export function getProviderCreators(): ProviderCreator[] {
 		return providerCreators;
 	}
 
+	// Check if real-time collaboration is enabled.
+	if ( ! window.__experimentalEnableRealTimeCollaboration ) {
+		return [];
+	}
+
 	/**
-	 * Filter the
+	 * Filter the available provider creators.
 	 */
 	const filteredProviderCreators: unknown = applyFilters(
 		'sync.providers',
-		[] // Replace with `getDefaultProviderCreators()` to enable sync
+		getDefaultProviderCreators()
 	);
 
 	// If the returned value is not an array, ignore and set to empty array.

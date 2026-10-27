@@ -1,25 +1,15 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
-	_CustomSelectInternalProps,
+	CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import InputBase from '../input-control/input-base';
@@ -31,7 +21,7 @@ export const CustomSelectContext =
 CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
@@ -48,7 +38,7 @@ function defaultRenderSelectedValue(
 					// translators: %d: number of items selected (it will always be 2 or more items)
 					_n( '%d item selected', '%d items selected', value.length ),
 					value.length
-			  );
+				);
 	}
 
 	return value;
@@ -58,6 +48,7 @@ const CustomSelectButton = ( {
 	renderSelectedValue,
 	size = 'default',
 	store,
+	className,
 	...restProps
 }: Omit<
 	React.ComponentProps< typeof Ariakit.Select > &
@@ -74,19 +65,22 @@ const CustomSelectButton = ( {
 	);
 
 	return (
-		<Styled.Select
+		<Ariakit.Select
 			{ ...restProps }
-			size={ size }
-			hasCustomRenderProp={ !! renderSelectedValue }
+			className={ clsx( styles.select, className, {
+				[ styles[ 'is-compact' ] ]: size === 'compact',
+				[ styles[ 'is-small' ] ]: size === 'small',
+				[ styles[ 'has-custom-render' ] ]: !! renderSelectedValue,
+			} ) }
 			store={ store }
 		>
 			{ computedRenderSelectedValue( currentValue ) }
-		</Styled.Select>
+		</Ariakit.Select>
 	);
 };
 
-function _CustomSelect(
-	props: _CustomSelectInternalProps &
+function CustomSelect(
+	props: CustomSelectInternalProps &
 		_CustomSelectProps &
 		CustomSelectStore &
 		CustomSelectButtonSize
@@ -131,11 +125,7 @@ function _CustomSelect(
 			>
 				{ label }
 			</Ariakit.SelectLabel>
-			<InputBase
-				__next40pxDefaultSize
-				size={ size }
-				suffix={ <SelectControlChevronDown /> }
-			>
+			<InputBase size={ size } suffix={ <SelectControlChevronDown /> }>
 				<CustomSelectButton
 					{ ...restProps }
 					size={ size }
@@ -143,7 +133,8 @@ function _CustomSelect(
 					// Match legacy behavior (move selection rather than open the popover)
 					showOnKeyDown={ ! isLegacy }
 				/>
-				<Styled.SelectPopover
+				<Ariakit.SelectPopover
+					className={ styles.popover }
 					gutter={ 12 }
 					store={ store }
 					sameWidth
@@ -155,10 +146,10 @@ function _CustomSelect(
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }
 					</CustomSelectContext.Provider>
-				</Styled.SelectPopover>
+				</Ariakit.SelectPopover>
 			</InputBase>
 		</div>
 	);
 }
 
-export default _CustomSelect;
+export default CustomSelect;

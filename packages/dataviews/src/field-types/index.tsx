@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Field,
 	FieldTypeName,
@@ -19,6 +16,7 @@ import { default as number } from './number';
 import { default as text } from './text';
 import { default as datetime } from './datetime';
 import { default as date } from './date';
+import { default as time } from './time';
 import { default as boolean } from './boolean';
 import { default as media } from './media';
 import { default as array } from './array';
@@ -45,6 +43,7 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 		text,
 		datetime,
 		date,
+		time,
 		boolean,
 		media,
 		array,
@@ -96,6 +95,10 @@ export default function normalizeFields< Item >(
 			getElements: field.getElements,
 			hasElements: hasElements( field ),
 			isVisible: field.isVisible,
+			isDisabled:
+				typeof field.isDisabled === 'function'
+					? field.isDisabled
+					: () => !! field.isDisabled,
 			enableHiding: field.enableHiding ?? true,
 			readOnly: field.readOnly ?? false,
 			// The type provides defaults for the following props

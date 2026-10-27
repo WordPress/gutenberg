@@ -39,7 +39,7 @@
 	}
 
 	> button[aria-expanded] {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		width: 100%;
 		display: flex;
 		justify-content: space-between;
@@ -52,8 +52,10 @@
 		&:focus-visible::after {
 			content: "";
 			position: absolute;
-			inset: var(--wp-admin-border-width-focus);
-			@include button-style__focus();
+			inset: 0;
+			@include outset-ring__focus();
+			// Keep the ring inside the panel, which clips overflowing content.
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 		> svg {
 			fill: currentColor;
@@ -110,24 +112,30 @@
 	clear: both;
 }
 
-// Only when the split view is active the visual editor should allow shrinking and
-// its main size should be zero.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
-	flex-shrink: 1;
-	flex-basis: 0%;
+// When split view is active the editors should allow shrinking so the meta box
+// pane remains visible and reachable. Apply common sizing to both editors, then
+// specialise overflow handling per editor so scroll behavior is correct.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) {
+	// Shared sizing for both editors.
+	.editor-visual-editor,
+	.editor-text-editor {
+		flex-shrink: 1;
+		flex-basis: 0%;
+		isolation: isolate;
+	}
+
+	// Visual editor: inner container provides the scrollable viewport.
+	.editor-visual-editor {
+		overflow: hidden;
+	}
+
+	// Code (text) editor: allow internal scrolling so long content doesn't push
+	// the meta box pane outside the viewport.
+	.editor-text-editor {
+		overflow: auto;
+	}
 }
 
-.has-metaboxes .editor-visual-editor.is-iframed {
-	isolation: isolate;
+.edit-post-layout__snackbar {
+	@include snackbar-container();
 }
-
-// Adjust the position of the notices
-.components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 24px;
-	padding-left: 24px;
-	padding-right: 24px;
-}
-
-@include editor-left(".edit-post-layout .components-editor-notices__snackbar");

@@ -19,12 +19,14 @@ import { VisuallyHidden } from '../../../visually-hidden';
  * so the readout is not unnecessarily verbose for screen reader users.
  */
 export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
-	function Details( { className, ...restProps }, ref ) {
+	function UnforwardedDetails( { className, ...restProps }, ref ) {
 		return (
 			<>
-				<_Field.Description render={ <VisuallyHidden /> }>
+				{ /* VisuallyHidden is the host so that _Field.Description's
+				   semantic element is preserved. See VisuallyHidden docs. */ }
+				<VisuallyHidden render={ <_Field.Description /> }>
 					{ __( 'More details follow the field.' ) }
-				</_Field.Description>
+				</VisuallyHidden>
 				<div
 					ref={ ref }
 					className={ clsx( fieldStyles.description, className ) }

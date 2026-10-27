@@ -2,6 +2,63 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   The package now bundles TypeScript types ([#84312](https://github.com/WordPress/gutenberg/pull/84312)).
+
+### Bug Fixes
+
+-   Load preferences when local storage is blocked or holds invalid JSON, and ignore persisted data that is not an object ([#84375](https://github.com/WordPress/gutenberg/pull/84375)).
+
+### Internal
+
+-   Convert the tests to TypeScript ([#85162](https://github.com/WordPress/gutenberg/pull/85162)).
+
+## 2.57.0 (2026-10-07)
+
+## 2.56.0 (2026-09-23)
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
+## 2.41.0 (2026-03-04)
+
+## 2.40.0 (2026-02-18)
+
 ## 2.39.0 (2026-01-29)
 
 ## 2.38.0 (2026-01-16)

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { TextareaHTMLAttributes } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type TextareaControlProps = Pick<

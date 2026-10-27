@@ -1,41 +1,44 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
 		"types": [
 			"gutenberg-env",
-			"gutenberg-test-env",
-			"css-modules",
-			"jest"
+			"gutenberg-vitest-test-env",
+			"react-css-custom-properties",
+			"style-imports"
 		]
 	},
-	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../compose" },
-		{ "path": "../date" },
-		{ "path": "../deprecated" },
-		{ "path": "../dom" },
-		{ "path": "../element" },
-		{ "path": "../escape-html" },
-		{ "path": "../hooks" },
-		{ "path": "../html-entities" },
-		{ "path": "../i18n" },
-		{ "path": "../icons" },
-		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" },
-		{ "path": "../primitives" },
-		{ "path": "../private-apis" },
-		{ "path": "../react-i18n" },
-		{ "path": "../rich-text" },
-		{ "path": "../warning" }
-	],
 	"files": [ "global.d.ts" ],
-	"exclude": [
-		"src/**/*.android.js",
-		"src/**/*.ios.js",
-		"src/**/*.native.js",
-		"src/**/react-native-*",
-		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
+	"include": [
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
+	],
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../date/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../dom/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../escape-html/tsconfig.build.json" },
+		{ "path": "../hooks/tsconfig.build.json" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../primitives/tsconfig.build.json" },
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
+		{ "path": "../rich-text/tsconfig.build.json" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../ui/tsconfig.build.json" },
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }

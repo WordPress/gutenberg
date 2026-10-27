@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
-import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
+import type { ConnectionError } from './errors';
 
-/**
- * Internal dependencies
- */
-import type { AwarenessState } from './awareness/awareness-state';
-import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+/* globalThis */
+declare global {
+	interface Window {
+		__experimentalEnableRealTimeCollaboration?: boolean;
+	}
+}
 
 export type CRDTDoc = Y.Doc;
 export type AwarenessID = string;
@@ -27,25 +21,89 @@ export type ObjectType = string;
 // its origin.
 export type Origin = any;
 
-// Object data represents any entity record, post, term, user, site, etc. There
-// are not many expectations that can hold on its shape.
-export interface ObjectData extends Record< string, unknown > {
-	meta?: ObjectMeta;
+// Object data represents any entity record. There are not any expectations that
+// can hold on its shape, beyond a record with string keys and unknown values.
+export type ObjectData = Record< string, unknown >;
+
+/**
+ * Event map for provider events.
+ * Add new event types here as needed.
+ */
+export interface ProviderEventMap {
+	status: ConnectionStatus;
 }
 
-export interface ObjectMeta extends Record< string, unknown > {
-	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
-}
+/**
+ * Generic event listener type for providers.
+ * Providers should call registered callbacks when events occur like connection status changes.
+ * Providers are responsible for cleaning up listeners in their destroy() method.
+ */
+export type ProviderOn = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
 
 export interface ProviderCreatorResult {
 	destroy: () => void;
+	on: ProviderOn;
 }
 
+/**
+ * Current connection status of a sync provider.
+ */
+export interface ConnectionStatusConnected {
+	status: 'connected';
+}
+
+export interface ConnectionStatusConnecting {
+	status: 'connecting';
+}
+
+export interface ConnectionStatusDisconnected {
+	status: 'disconnected';
+
+	/** Optional error information. */
+	error?: ConnectionError;
+
+	/** Whether the error condition is retryable via user action. */
+	canManuallyRetry?: boolean;
+
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
+	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
+	willAutoRetryInMs?: number;
+}
+
+export type ConnectionStatus =
+	| ConnectionStatusConnected
+	| ConnectionStatusConnecting
+	| ConnectionStatusDisconnected;
+
+export type OnStatusChangeCallback = (
+	status: ConnectionStatus | null
+) => void;
+
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * The Yjs module used by the editor. Providers must use this instance
+	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
+	 * on the same document cause silent data corruption:
+	 *
+	 * https://github.com/yjs/yjs/issues/438
+	 */
+	Y: typeof Y;
 }
 
 export type ProviderCreator = (
@@ -53,10 +111,12 @@ export type ProviderCreator = (
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecords: () => Promise< void >;
 }
 
 export interface SyncManagerUpdateOptions {
+	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
 }
@@ -68,12 +128,15 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	onStatusChange: OnStatusChangeCallback;
+	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	saveRecord: () => Promise< void >;
+	// Called when a local change to the record opened a new undo level.
+	onUndoLevelOpened?: () => void;
 }
 
-export interface SyncConfig< State extends object = {} > {
+export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
@@ -81,23 +144,39 @@ export interface SyncConfig< State extends object = {} > {
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
-	) => AwarenessState< State > | undefined;
+	) => Awareness | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
-	supports?: Record< string, true >;
+	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	shouldSync?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => boolean;
+	supportsPersistence?: boolean;
 }
 
 export interface SyncManager {
-	createMeta: (
+	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => Record< string, string >;
-	getAwareness: < State extends AwarenessState< any > >(
+	) => Promise< string | null >;
+	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	) => State | undefined;
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	) => boolean;
+	// Whether the entity was loaded for syncing and has not been unloaded.
+	isLoaded: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -110,9 +189,10 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
-	// undoManager is undefined until the first entity is loaded.
-	undoManager: SyncUndoManager | undefined;
+	// The undo history of the loaded entities. See `SyncUndoManager`.
+	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	unloadAll: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -122,10 +202,19 @@ export interface SyncManager {
 	) => void;
 }
 
-export interface SyncUndoManager extends WPUndoManager< ObjectData > {
-	addToScope: (
-		ymap: Y.Map< any >,
-		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
-	) => void;
+/**
+ * The undo history of the entities a sync manager has loaded, one Yjs undo
+ * manager per entity. Yjs tracks their changes, one level per stack item, and
+ * reports each new level through the record's `onUndoLevelOpened` handler. It
+ * is not an undo manager for the editor: the consumer keeps its own, in which
+ * each level names its entity, and delegates the level to that entity here
+ * when it is the one to undo or redo.
+ */
+export interface SyncUndoManager {
+	clearRedo: () => void;
+	hasRedo: () => boolean;
+	hasUndo: () => boolean;
+	redo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	stopCapturing: () => void;
+	undo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 }

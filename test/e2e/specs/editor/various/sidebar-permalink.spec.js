@@ -1,7 +1,5 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 // This tests are not together with the remaining sidebar tests,
 // because we need to publish/save a post, to correctly test the permalink row.
@@ -24,7 +22,7 @@ test.describe( 'Sidebar Permalink', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'public_q_not_public' } );
-		await editor.openDocumentSettingsSidebar();
+		const summary = await openPostSummary( { editor, page } );
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
@@ -33,8 +31,12 @@ test.describe( 'Sidebar Permalink', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaa (Updated)' );
+		// A hidden check passes on an empty sidebar, so wait for the summary first.
 		await expect(
-			page.getByRole( 'button', { name: 'Change link' } )
+			summary.getByRole( 'button', { name: 'Edit Status' } )
+		).toBeVisible();
+		await expect(
+			summary.getByRole( 'button', { name: 'Edit Slug' } )
 		).toBeHidden();
 	} );
 
@@ -44,7 +46,7 @@ test.describe( 'Sidebar Permalink', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'not_public_q_public' } );
-		await editor.openDocumentSettingsSidebar();
+		const summary = await openPostSummary( { editor, page } );
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
@@ -53,8 +55,12 @@ test.describe( 'Sidebar Permalink', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaa (Updated)' );
+		// A hidden check passes on an empty sidebar, so wait for the summary first.
 		await expect(
-			page.getByRole( 'button', { name: 'Change link' } )
+			summary.getByRole( 'button', { name: 'Edit Status' } )
+		).toBeVisible();
+		await expect(
+			summary.getByRole( 'button', { name: 'Edit Slug' } )
 		).toBeHidden();
 	} );
 
@@ -64,7 +70,7 @@ test.describe( 'Sidebar Permalink', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'public_q_public' } );
-		await editor.openDocumentSettingsSidebar();
+		const summary = await openPostSummary( { editor, page } );
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
@@ -75,7 +81,123 @@ test.describe( 'Sidebar Permalink', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaa (Updated)' );
 		await expect(
-			page.getByRole( 'button', { name: 'Change link' } )
+			summary.getByRole( 'button', { name: 'Edit Slug' } )
+		).toBeVisible();
+	} );
+
+	test( 'should not save the placeholder slug of a new post when the slug field loses focus', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		const summary = await openPostSummary( { editor, page } );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		await summary.getByRole( 'button', { name: 'Edit Slug' } ).click();
+		await page.getByRole( 'textbox', { name: 'Link' } ).click();
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Escape' );
+
+		const postId = await editor.publishPost();
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.slug ).toBe( 'hello-slug' );
+	} );
+
+	test( 'should not clean a slug the user did not change when the slug field loses focus', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// The server keeps the emoji in the slug, but `cleanForSlug()` strips it.
+		const { id: postId, slug } = await requestUtils.createPost( {
+			title: 'Hello ❤️',
+			status: 'publish',
+		} );
+		expect( slug ).toBe( 'hello-%e2%9d%a4%ef%b8%8f' );
+
+		await admin.editPost( postId );
+		const summary = await openPostSummary( { editor, page } );
+		await summary.getByRole( 'button', { name: 'Edit Slug' } ).click();
+		await page.getByRole( 'textbox', { name: 'Link' } ).click();
+		await page.keyboard.press( 'Tab' );
+
+		const editedSlug = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/editor' )
+				.getEditedPostAttribute( 'slug' )
+		);
+		expect( editedSlug ).toBe( slug );
+	} );
+
+	test( 'should save a cleaned slug when the user changes it', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		const summary = await openPostSummary( { editor, page } );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		await summary.getByRole( 'button', { name: 'Edit Slug' } ).click();
+		await page.getByRole( 'textbox', { name: 'Link' } ).fill( 'Foo Bar' );
+		await page.keyboard.press( 'Escape' );
+
+		const postId = await editor.publishPost();
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.slug ).toBe( 'foo-bar' );
+	} );
+
+	test( 'should derive the slug from the title after an autosave', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		const summary = await openPostSummary( { editor, page } );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		// An autosave of a new post saves the title to the post itself.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await expect(
+			summary.getByRole( 'button', { name: 'Edit Slug' } )
+		).toHaveAccessibleDescription( 'hello-slug' );
+	} );
+
+	test( 'should not show a slug for a post without a title', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		const summary = await openPostSummary( { editor, page } );
+
+		const slugButton = summary.getByRole( 'button', { name: 'Edit Slug' } );
+		await expect( slugButton ).toHaveAccessibleDescription( 'None' );
+		await slugButton.click();
+
+		// Without a slug, the post only has its plain permalink.
+		await expect(
+			page.getByRole( 'textbox', { name: 'Link' } )
+		).toHaveValue( '' );
+		await expect(
+			page.getByRole( 'link', { name: /\?p=\d+/ } )
 		).toBeVisible();
 	} );
 } );
