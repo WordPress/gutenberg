@@ -56,11 +56,12 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            # Keeps this workflow's script too, so a change to it is what runs.
+            # Keeps all test-only code and this workflow's script from the pull
+            # request, so a test that needs a new helper or test plugin still runs.
             - name: Use trunk's code with the pull request's tests
               run: |
                   git checkout HEAD^1
-                  git checkout "$GITHUB_SHA" -- test/e2e/specs .github/workflows/scripts/e2e-trunk-check.js
+                  git checkout "$GITHUB_SHA" -- test/e2e packages/e2e-test-utils-playwright packages/e2e-tests .github/workflows/scripts/e2e-trunk-check.js
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node

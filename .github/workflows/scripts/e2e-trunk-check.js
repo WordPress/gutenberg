@@ -2,7 +2,7 @@
  * Runs the e2e tests a pull request adds or changes, since a bug fix needs at
  * least one test that fails without it. Adds a notice on each test that fails,
  * or a warning on each test when none fail. Meant to run against trunk's code
- * with the pull request's spec files in place.
+ * with the pull request's test code in place.
  *
  * Usage:
  *
