@@ -25,6 +25,7 @@ import {
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
+import { useWidgetIdentity } from '../../../widget-identity';
 import { HostLink, WidgetHostProvider } from '../../../widget-host';
 import type { WidgetHost, WidgetHostLinks } from '../../../widget-host';
 import type {
@@ -216,6 +217,74 @@ The minimal contract between a host and a widget:
 - The widget writes back through \`setAttributes\`, which the host provides. The "Next world" button calls it from inside the widget, and the host applies the change.
 
 The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
+`,
+			},
+		},
+	},
+};
+
+function IdentityWidget() {
+	const { title } = useWidgetIdentity();
+
+	return (
+		<figure
+			aria-label={ title ? `Chart: ${ title }` : 'Chart' }
+			style={ {
+				background: 'var(--wpds-color-background-surface-info-weak)',
+				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
+				borderRadius: 'var(--wpds-border-radius-md)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-sm)',
+				justifyItems: 'center',
+				margin: 0,
+				padding: 'var(--wpds-dimension-padding-xl)',
+			} }
+		>
+			<strong style={ { fontSize: '1.25em' } }>
+				{ title ?? 'Untitled' }
+			</strong>
+			<span style={ { opacity: 0.75 } }>
+				{ title
+					? `Accessible name: Chart: ${ title }`
+					: 'No identity provided' }
+			</span>
+		</figure>
+	);
+}
+
+const identityWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/sales-by-device',
+	title: 'Sales by device',
+	description:
+		'Demo widget that reads its type title through useWidgetIdentity.',
+	renderModule: 'demo/widgets/sales-by-device/render',
+};
+
+const resolveIdentityModule = async () => ( {
+	default: IdentityWidget as ComponentType< WidgetRenderProps< unknown > >,
+} );
+
+function WithIdentityStory() {
+	return (
+		<Suspense fallback={ null }>
+			<WidgetRender
+				widgetType={ identityWidgetType }
+				attributes={ {} }
+				resolveWidgetModule={ resolveIdentityModule }
+			/>
+		</Suspense>
+	);
+}
+
+export const WithIdentity: StoryObj = {
+	render: () => <WithIdentityStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+\`WidgetRender\` lends the type's identity into the subtree. The widget reads the translated \`title\` with \`useWidgetIdentity\`: it names a \`figure\` for assistive technology and shows the same string in the body.
 `,
 			},
 		},
