@@ -1,8 +1,8 @@
 /**
- * The RTC guard: content merged from a peer can carry two markers of one kind
- * over the same characters, or a marker whose id changed under a
- * last-writer-wins attribute merge. The guard resolves both the same way on
- * every peer, so they converge.
+ * The RTC guard: content merged from a peer can carry stacked markers in
+ * whatever order the merge produced, or a marker whose id changed under a
+ * last-writer-wins attribute merge. The guard puts stacks in canonical order
+ * and restores swapped ids the same way on every peer, so they converge.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { RichTextData, create } from '@wordpress/rich-text';
@@ -39,20 +39,26 @@ describe( 'marker integrity', () => {
 	} );
 
 	describe( 'normalizeSuggestionMarkers', () => {
-		it( 'gives overlapping same-kind characters to the older (lower) id', () => {
+		it( 'keeps both same-kind markers, the older one outermost', () => {
 			const merged = `a${ mark(
 				'add',
 				15,
 				`bc${ mark( 'add', 12, 'de' ) }f`
 			) }g`;
-			const value = RichTextData.fromHTMLString(
-				normalizeHTML( merged )
-			);
+			const html = normalizeHTML( merged );
+			const value = RichTextData.fromHTMLString( html );
 			expect( findSuggestionText( value, 12 ) ).toBe( 'de' );
-			expect( findSuggestionText( value, 15 ) ).toBe( 'bcf' );
+			expect( findSuggestionText( value, 15 ) ).toBe( 'bcdef' );
+			expect( html ).toBe(
+				`a${ mark( 'add', 15, 'bc' ) }${ mark(
+					'add',
+					12,
+					mark( 'add', 15, 'de' )
+				) }${ mark( 'add', 15, 'f' ) }g`
+			);
 		} );
 
-		it( 'resolves crossing deletions by two authors the same way', () => {
+		it( 'keeps crossing deletions by two authors', () => {
 			// Peer one wrapped "bcd" in 21, peer two "cde" in 20; the HTML merge
 			// nests them.
 			const merged = `a${ mark( 'del', 21, `b${ mark( 'del', 20, 'cd' ) }` ) }${ mark(
@@ -64,7 +70,14 @@ describe( 'marker integrity', () => {
 				normalizeHTML( merged )
 			);
 			expect( findSuggestionText( value, 20 ) ).toBe( 'cde' );
-			expect( findSuggestionText( value, 21 ) ).toBe( 'b' );
+			expect( findSuggestionText( value, 21 ) ).toBe( 'bcd' );
+		} );
+
+		it( 'keeps one marker when a merge repeats it on a character', () => {
+			const merged = `a${ mark( 'del', 20, mark( 'del', 20, 'bc' ) ) }d`;
+			expect( normalizeHTML( merged ) ).toBe(
+				`a${ mark( 'del', 20, 'bc' ) }d`
+			);
 		} );
 
 		it( 'converges whichever way the merge nested the markers', () => {
@@ -158,7 +171,7 @@ describe( 'marker integrity', () => {
 			).toBe( next );
 		} );
 
-		it( 'also resolves same-kind overlap in the merged value', () => {
+		it( 'also orders same-kind overlap in the merged value', () => {
 			const prev = create( { html: 'abcdefg' } );
 			const next = create( {
 				html: `a${ mark( 'add', 15, `bc${ mark( 'add', 12, 'de' ) }f` ) }g`,
@@ -169,7 +182,24 @@ describe( 'marker integrity', () => {
 				} ) as any
 			);
 			expect( findSuggestionText( value, 12 ) ).toBe( 'de' );
-			expect( findSuggestionText( value, 15 ) ).toBe( 'bcf' );
+			expect( findSuggestionText( value, 15 ) ).toBe( 'bcdef' );
+		} );
+
+		it( 'restores a swapped id in a stack, keeping the other marker', () => {
+			const prev = create( {
+				html: `a${ mark( 'del', 5, mark( 'del', 6, 'bc' ) ) }d`,
+			} );
+			const next = create( {
+				html: `a${ mark( 'del', 5, mark( 'del', 9, 'bc' ) ) }d`,
+			} );
+			const value = new RichTextData(
+				guardMarkerIntegrity( prev, next, {
+					isPending: pending( '5', '6' ),
+				} ) as any
+			);
+			expect( findSuggestionText( value, 6 ) ).toBe( 'bc' );
+			expect( findSuggestionText( value, 5 ) ).toBe( 'bc' );
+			expect( findSuggestionText( value, 9 ) ).toBe( '' );
 		} );
 	} );
 } );

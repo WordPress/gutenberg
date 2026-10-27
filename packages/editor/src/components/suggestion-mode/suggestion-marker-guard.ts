@@ -2,18 +2,16 @@
  * Keeps synced content from re-attributing inline suggestion markers.
  *
  * Real-time collaboration merges rich text as HTML strings, so two peers
- * marking overlapping text with the same kind come out of the merge as two
- * markers of one kind on the same characters, and a last-writer-wins
- * attribute merge can swap a marker's id. Left alone, the next write of that
- * kind flattens them and one author's marker takes the other's text.
+ * marking overlapping text come out of the merge as stacked markers in
+ * whatever order the merge produced, possibly with one marker repeated, and a
+ * last-writer-wins attribute merge can swap a marker's id.
  *
- * The local writers never produce that state: rich text applies one format
- * of a kind per character, and every marker write keeps the other kinds. So
- * the guard can run on every content change, whatever its origin, and only
- * ever acts on merged content. It resolves it with `guardMarkerIntegrity`,
- * whose rule (the older note id keeps the characters) every peer applies the
- * same way, so the corrective writes converge. The correction is not an edit:
- * it bypasses Suggestion mode's interceptor and stays off the undo stack.
+ * The local writers always leave stacks in canonical order. So the guard can
+ * run on every content change, whatever its origin, and only ever acts on
+ * merged content. It resolves it with `guardMarkerIntegrity`, whose rule
+ * (canonical order, swapped ids restored) every peer applies the same way, so
+ * the corrective writes converge. The correction is not an edit: it bypasses
+ * Suggestion mode's interceptor and stays off the undo stack.
  */
 import { useEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
@@ -22,30 +20,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { RichTextData } from '@wordpress/rich-text';
 import {
 	guardMarkerIntegrity,
+	isCanonicalSuggestionStack,
 	isSuggestionFormat,
-	suggestionKindOf,
 } from '../inline-suggestions';
 import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
 import { getBlockTreeVersion } from './block-tree-version';
 import { useSuggestionSession } from './suggestion-session';
-
-/**
- * Whether some character of a value carries two markers of one kind.
- *
- * @param value Rich-text value.
- * @return True when any character carries two markers of one kind.
- */
-function hasSameKindOverlap( value: RichTextData ): boolean {
-	return ( value.formats as any[] ).some( ( stack ) => {
-		if ( ! Array.isArray( stack ) || stack.length < 2 ) {
-			return false;
-		}
-		const kinds = stack
-			.filter( isSuggestionFormat )
-			.map( ( format ) => suggestionKindOf( format ) );
-		return new Set( kinds ).size < kinds.length;
-	} );
-}
 
 /**
  * Whether a value carries any marker.
@@ -120,7 +100,10 @@ export default function SuggestionMarkerGuard() {
 						before &&
 						before.text === value.text &&
 						hasMarkers( value );
-					if ( ! swapCandidate && ! hasSameKindOverlap( value ) ) {
+					if (
+						! swapCandidate &&
+						isCanonicalSuggestionStack( value.formats as any[] )
+					) {
 						continue;
 					}
 					const next = toRichTextRecord( value )!;

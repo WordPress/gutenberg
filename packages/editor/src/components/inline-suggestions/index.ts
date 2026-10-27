@@ -45,8 +45,14 @@ export {
 	suggestionKindOf,
 	suggestionFormatNameFor,
 	suggestionMarkersAt,
+	suggestionMarkerListsAt,
 	suggestionMarkersIn,
+	suggestionMarkerId,
+	compareSuggestionIds,
 	canonicalizeSuggestionStack,
+	addSuggestionMarker,
+	removeSuggestionMarker,
+	removeAllSuggestionMarkers,
 	findSuggestionRange,
 	findSuggestionText,
 	getSuggestionMarkerSelector,
@@ -94,6 +100,7 @@ export { suggestionRelations } from './relations';
 export type { RelatedSuggestion, SuggestionRelations } from './relations';
 export {
 	normalizeSuggestionMarkers,
+	isCanonicalSuggestionStack,
 	guardMarkerIntegrity,
 } from './marker-integrity';
 export { computeDeleteRange } from './delete-range';
