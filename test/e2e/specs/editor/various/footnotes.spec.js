@@ -370,7 +370,7 @@ test.describe( 'Footnotes', () => {
 			.getByRole( 'tab', { name: 'Post' } )
 			.click();
 		await page
-			.locator( '.editor-private-post-last-revision__button' )
+			.getByRole( 'button', { name: /Open revisions screen/ } )
 			.click();
 		await page.locator( '.components-range-control__slider' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );

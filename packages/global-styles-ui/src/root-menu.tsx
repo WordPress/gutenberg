@@ -1,13 +1,13 @@
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import {
 	background,
+	blockDefault,
 	typography,
 	color,
 	layout,
 	shadow as shadowIcon,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -72,6 +72,9 @@ function RootMenu() {
 						{ __( 'Layout' ) }
 					</NavigationButtonAsItem>
 				) }
+				<NavigationButtonAsItem icon={ blockDefault } path="/blocks">
+					{ __( 'Blocks & Elements' ) }
+				</NavigationButtonAsItem>
 			</ItemGroup>
 		</>
 	);

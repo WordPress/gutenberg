@@ -8,7 +8,7 @@
 
 return array(
 	'type'     => 'datetime',
-	'label'    => __( 'Date added', 'gutenberg' ),
+	'label'    => __( 'Date added' ),
 	'filterBy' => array(
 		'operators' => array( 'before', 'after' ),
 	),

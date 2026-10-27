@@ -9,7 +9,7 @@
  */
 
 return array(
-	'label'             => __( 'Set as posts page…', 'gutenberg' ),
-	'modalHeader'       => __( 'Set as posts page', 'gutenberg' ),
+	'label'             => __( 'Set as posts page…' ),
+	'modalHeader'       => __( 'Set as posts page' ),
 	'modalFocusOnMount' => 'firstContentElement',
 );

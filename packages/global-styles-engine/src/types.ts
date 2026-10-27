@@ -174,17 +174,53 @@ export interface TypographySettings {
  * Layout constraint settings
  */
 export interface LayoutSettings {
-	wideSize?: string;
-	contentSize?: string;
+	/** `false` when the block does not support the control. */
+	wideSize?: string | false;
+	/** `false` when the block does not support the control. */
+	contentSize?: string | false;
+}
+
+/**
+ * Size preset definition, such as a spacing or border radius size
+ */
+export interface SizePreset extends BasePreset {
+	size: string;
 }
 
 /**
  * Spacing settings
  */
 export interface SpacingSettings {
-	padding?: string | Record< string, string >;
-	margin?: string | Record< string, string >;
-	blockGap?: string;
+	/** Whether padding is enabled, or the sides a block supports. */
+	padding?:
+		| boolean
+		| string[]
+		| { sides?: string[] }
+		| string
+		| Record< string, string >;
+	/** Whether margin is enabled, or the sides a block supports. */
+	margin?:
+		| boolean
+		| string[]
+		| { sides?: string[] }
+		| string
+		| Record< string, string >;
+	/** Whether block gap is enabled; `null` also disables layout styles. */
+	blockGap?: boolean | null | string[] | { sides?: string[] } | string;
+	units?: string[];
+	spacingSizes?: SizePreset[] | Record< string, SizePreset[] >;
+	defaultSpacingSizes?: boolean;
+}
+
+/**
+ * Border settings
+ */
+export interface BorderSettings {
+	color?: boolean;
+	radius?: boolean;
+	style?: boolean;
+	width?: boolean;
+	radiusSizes?: SizePreset[] | Record< string, SizePreset[] >;
 }
 
 // =============================================================================
@@ -203,6 +239,7 @@ export interface GlobalStylesSettings {
 	typography?: TypographySettings;
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
+	border?: BorderSettings;
 	color?: {
 		palette?:
 			| Color[]
