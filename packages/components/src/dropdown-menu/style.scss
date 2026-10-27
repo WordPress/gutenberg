@@ -69,6 +69,7 @@
 		padding-bottom: $grid-unit-05 - $border-width;
 
 		&.has-icon {
+			// Matches the `.has-icon` padding of Button.
 			padding-top: 6px - $border-width;
 			padding-bottom: 6px - $border-width;
 		}
