@@ -505,4 +505,30 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'object-fit:fill', $stylesheet );
 		$this->assertStringContainsString( 'display:block', $stylesheet );
 	}
+
+	public function test_lightbox_trigger_button_aria_labels_include_position_and_alt() {
+		$image = '<!-- wp:image {"lightbox":{"enabled":true}} --><figure class="wp-block-image"><img src="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2021/04/canola.jpg"%s/></figure><!-- /wp:image -->';
+
+		do_blocks(
+			'<!-- wp:gallery --><figure class="wp-block-gallery has-nested-images columns-default is-cropped">'
+			. sprintf( $image, ' alt="A red barn"' )
+			. sprintf( $image, '' )
+			. sprintf( $image, ' alt="A red barn surrounded by green fields under a bright blue sky on a sunny summer afternoon"' )
+			. '</figure><!-- /wp:gallery -->'
+		);
+
+		$state  = wp_interactivity_state( 'core/image' );
+		$labels = wp_list_pluck( array_values( $state['metadata'] ), 'triggerButtonAriaLabel' );
+
+		$this->assertSame(
+			array(
+				'Enlarge image 1 of 3: A red barn',
+				'Enlarge image 3 of 3: A red barn surrounded by green fields under a bright blue sky on a sunny…',
+				'Enlarge image 2 of 3',
+			),
+			array_slice( $labels, -3 )
+		);
+
+		remove_all_filters( 'render_block_core/image' );
+	}
 }

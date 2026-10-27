@@ -183,14 +183,19 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 		$state = wp_interactivity_state( 'core/image' );
 		$meta  = array_values( $state['metadata'] );
+
 		$this->assertSame( $expected, end( $meta )['triggerButtonAriaLabel'] );
 
-		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
+		remove_all_filters( 'render_block_core/image' );
 	}
 
 	public function data_lightbox_trigger_aria_label() {
 		return array(
 			'with alt'  => array( ' alt="A red barn"', 'Enlarge image: A red barn' ),
+			'long alt'  => array(
+				' alt="A red barn surrounded by green fields under a bright blue sky on a sunny summer afternoon"',
+				'Enlarge image: A red barn surrounded by green fields under a bright blue sky on a sunny…',
+			),
 			'empty alt' => array( ' alt=""', 'Enlarge image' ),
 			'no alt'    => array( '', 'Enlarge image' ),
 		);

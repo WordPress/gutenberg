@@ -769,8 +769,11 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $lightbox_index + 1, $total )
 									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
 									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, $alt ),
-								/* translators: %1$s: current image index, %2$s: total number of images */
-								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $lightbox_index + 1, $total ),
+								'triggerButtonAriaLabel' => empty( $alt )
+									/* translators: %1$s: current image index, %2$s: total number of images. */
+									? sprintf( __( 'Enlarge image %1$s of %2$s' ), $lightbox_index + 1, $total )
+									/* translators: %1$s: current image index, %2$s: total number of images */
+									: sprintf( __( 'Enlarge image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, wp_trim_words( $alt, 15, '…' ) ),
 								'order'                  => $lightbox_index,
 							),
 						),

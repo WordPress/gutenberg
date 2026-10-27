@@ -215,7 +215,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		/* translators: %s: Image alt text. */
 		$custom_aria_label = sprintf( __( 'Enlarged image: %s' ), $alt );
 		/* translators: %s: Image alt text. */
-		$trigger_button_aria_label = sprintf( __( 'Enlarge image: %s' ), $alt );
+		$trigger_button_aria_label = sprintf( __( 'Enlarge image: %s' ), wp_trim_words( $alt, 15, '…' ) );
 	}
 
 	if ( isset( $block['attrs']['id'] ) ) {
@@ -302,6 +302,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
+			aria-label="' . esc_attr( $trigger_button_aria_label ) . '"
 			data-wp-bind--aria-label="state.thisImage.triggerButtonAriaLabel"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on--click="actions.showLightbox"
