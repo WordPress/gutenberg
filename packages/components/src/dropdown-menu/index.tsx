@@ -230,7 +230,11 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 									label={ control.label }
 									onMouseMove={ (
 										event: React.MouseEvent< HTMLButtonElement >
-									) => event.currentTarget.focus() }
+									) =>
+										event.currentTarget.focus( {
+											preventScroll: true,
+										} )
+									}
 									aria-checked={
 										control.role === 'menuitemcheckbox' ||
 										control.role === 'menuitemradio'

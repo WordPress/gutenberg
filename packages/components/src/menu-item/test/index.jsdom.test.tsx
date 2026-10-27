@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { more } from '@wordpress/icons';
 import MenuItem from '../';
 
@@ -129,5 +129,41 @@ describe( 'MenuItem', () => {
 		expect( screen.getByText( 'Icon' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
 		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'keeps text focus when hovering an option', () => {
+		render(
+			<>
+				<input aria-label="Search" />
+				<MenuItem role="option">Result</MenuItem>
+			</>
+		);
+		const input = screen.getByRole( 'textbox', { name: 'Search' } );
+		input.focus();
+		fireEvent.mouseMove( screen.getByRole( 'option', { name: 'Result' } ) );
+		expect( input ).toHaveFocus();
+	} );
+
+	it( 'preserves focus moved by an item hover handler', () => {
+		render(
+			<>
+				<button>Original</button>
+				<button>Destination</button>
+				<MenuItem
+					onMouseMove={ () =>
+						screen
+							.getByRole( 'button', { name: 'Destination' } )
+							.focus()
+					}
+				>
+					Item
+				</MenuItem>
+			</>
+		);
+		screen.getByRole( 'button', { name: 'Original' } ).focus();
+		fireEvent.mouseMove( screen.getByRole( 'menuitem', { name: 'Item' } ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Destination' } )
+		).toHaveFocus();
 	} );
 } );

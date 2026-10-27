@@ -2,8 +2,6 @@
 
 This component is used to provide autocompletion support for a child input component.
 
-Moving the pointer over a result makes it the active result while keeping focus in the text field. Arrow keys continue from that result, and Enter applies the active result.
-
 ## Props
 
 The following props are used to control the behavior of the component.

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
@@ -118,5 +118,23 @@ describe( 'DropdownMenu hover navigation', () => {
 		await expect.element( first ).toHaveFocus();
 		await user.hover( screen.getByRole( 'menuitem', { name: 'Second' } ) );
 		expect( first ).toHaveFocus();
+	} );
+
+	it( 'does not scroll a partially visible item into view on hover', async () => {
+		await render(
+			<div
+				aria-label="Scrollable"
+				style={ { height: 40, overflow: 'auto' } }
+			>
+				<div style={ { height: 30 } } />
+				<MenuItem>Item</MenuItem>
+				<div style={ { height: 100 } } />
+			</div>
+		);
+		const container = screen.getByLabelText( 'Scrollable' );
+		const item = screen.getByRole( 'menuitem', { name: 'Item' } );
+		fireEvent.mouseMove( item );
+		expect( item ).toHaveFocus();
+		expect( container.scrollTop ).toBe( 0 );
 	} );
 } );
