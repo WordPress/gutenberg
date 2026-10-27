@@ -1,10 +1,10 @@
 import { type LinearGradientNode } from 'gradient-parser';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { SelectControl } from '@wordpress/ui';
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
 import { Flex, FlexBlock } from '../flex';
-import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
 import {
 	getGradientAstWithDefault,
@@ -105,10 +105,20 @@ const GradientTypePicker = ( {
 		<SelectControl
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
-			labelPosition="top"
-			onChange={ handleOnChange }
-			options={ GRADIENT_OPTIONS }
-			value={ hasGradient ? type : undefined }
+			items={ GRADIENT_OPTIONS }
+			value={
+				hasGradient
+					? ( GRADIENT_OPTIONS.find(
+							( option ) => option.value === type
+						) ?? null )
+					: null
+			}
+			placeholder={ GRADIENT_OPTIONS[ 0 ].label }
+			onValueChange={ ( item ) => {
+				if ( item && item.value !== null ) {
+					handleOnChange( item.value );
+				}
+			} }
 		/>
 	);
 };
