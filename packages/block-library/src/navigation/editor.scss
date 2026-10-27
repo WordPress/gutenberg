@@ -209,18 +209,39 @@ $color-control-label-height: 20px;
 	}
 }
 
-/**
- * Position the appender in the bottom right corner.
- */
-.wp-block-navigation .block-editor-default-block-appender {
-	margin: 0;
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	line-height: 0;
+// Override inner padding on default appender.
+// This should be a temporary fix, to be replaced by improvements to
+// the sibling inserter.
+// See https://github.com/WordPress/gutenberg/issues/37572.
+.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
+	background-color: $gray-900;
+	color: $white;
+	height: $button-size-small;
+	width: $button-size-small;
 
-	& .block-editor-default-block-appender__content {
-		display: none;
+	// This needs specificity to override an inherited padding.
+	// That source padding in turn has high specificity to protect
+	// from theme CSS bleed.
+	&.block-editor-button-block-appender.block-editor-button-block-appender {
+		padding: 0;
+	}
+}
+
+.wp-block-navigation .wp-block .wp-block .block-editor-button-block-appender {
+	background-color: transparent;
+	color: $gray-900;
+}
+
+// Place the dropdown appender right after the last item, in the flow of the
+// layout, instead of absolutely positioned in the corner of the block.
+.wp-block-navigation__container > .block-list-appender .block-editor-default-block-appender {
+	.block-editor-inserter {
+		position: static;
+	}
+
+	// Keep the toggle visible even when a child block is selected.
+	.block-editor-inserter__toggle.components-button.has-icon {
+		display: flex;
 	}
 }
 

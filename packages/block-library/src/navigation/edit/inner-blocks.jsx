@@ -1,9 +1,8 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
-	DefaultBlockAppender,
+	InnerBlocks,
 	store as blockEditorStore,
-	ButtonBlockAppender,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -21,7 +20,6 @@ export default function NavigationInnerBlocks( {
 		selectedBlockHasChildren,
 		isSelected,
 		hasSelectedDescendant,
-		hasInnerBlocks,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -42,7 +40,6 @@ export default function NavigationInnerBlocks( {
 				// This prop is already available but computing it here ensures it's
 				// fresh compared to isImmediateParentOfSelectedBlock.
 				isSelected: selectedBlockId === clientId,
-				hasInnerBlocks: getBlockCount( clientId ) > 0,
 			};
 		},
 		[ clientId ]
@@ -71,6 +68,18 @@ export default function NavigationInnerBlocks( {
 	const showPlaceholder =
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
+	// When the block is selected but has no items yet, show the button
+	// appender. Otherwise, show the dropdown appender used by the Group block.
+	// As an exception to other blocks which feature nesting, the appender stays
+	// visible even when a child block (or a submenu item) is selected.
+	// See https://github.com/WordPress/gutenberg/issues/37572.
+	let renderAppender = false;
+	if ( isSelected && ! hasMenuItems ) {
+		renderAppender = InnerBlocks.ButtonBlockAppender;
+	} else if ( parentOrChildHasSelection || hasSelectedDescendant ) {
+		renderAppender = InnerBlocks.DefaultBlockAppender;
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -84,45 +93,12 @@ export default function NavigationInnerBlocks( {
 			directInsert: true,
 			orientation,
 			templateLock,
-			// Appender shown explicitly below.
-			// Since the default appender needs to be shown even when child blocks are selected.
-			renderAppender: false,
+			renderAppender,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,
 			__unstableDisableLayoutClassNames: true,
 		}
 	);
 
-	const renderAppender = () => {
-		// If the block is selected and has no inner blocks, show the
-		// button appender.
-		if ( isSelected && ! hasInnerBlocks ) {
-			return <ButtonBlockAppender rootClientId={ clientId } />;
-		}
-
-		// Show the default block appender if the block is selected, if the
-		// parent or child has selection, if the block is the immediate parent
-		// of the selected block and that block has no children, or if any
-		// descendant (such as a submenu item) is selected.
-		if (
-			isSelected ||
-			parentOrChildHasSelection ||
-			( isImmediateParentOfSelectedBlock &&
-				! selectedBlockHasChildren ) ||
-			hasSelectedDescendant
-		) {
-			return <DefaultBlockAppender rootClientId={ clientId } />;
-		}
-
-		// If the block is not selected and has no inner blocks, do not render
-		// an appender.
-		return null;
-	};
-
-	return (
-		<>
-			<div { ...innerBlocksProps } />
-			{ renderAppender() }
-		</>
-	);
+	return <div { ...innerBlocksProps } />;
 }
