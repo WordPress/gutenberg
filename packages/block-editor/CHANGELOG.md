@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   Inserter, Document Overview: Remove the invisible tab stop on the scrolling tab panel in Firefox, so Tab moves from the selected tab straight to the panel's content.
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

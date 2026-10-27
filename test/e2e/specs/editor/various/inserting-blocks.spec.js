@@ -498,6 +498,29 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( options.nth( 2 ) ).toHaveAttribute( 'tabindex', '-1' );
 	} );
 
+	// A test for https://github.com/WordPress/gutenberg/issues/84044.
+	test( 'moves from the selected tab straight to the search input', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		await expect(
+			blockLibrary.getByRole( 'tab', { name: 'Blocks' } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			blockLibrary.getByRole( 'searchbox', { name: 'Search' } )
+		).toBeFocused();
+	} );
+
 	test( 'should insert block with the slash inserter when using multiple words', async ( {
 		admin,
 		editor,

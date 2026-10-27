@@ -96,6 +96,8 @@ function TabbedSidebar(
 						key={ tab.name }
 						tabId={ tab.name }
 						focusable={ false }
+						// Firefox puts scrollable panels in the tab order.
+						tabIndex={ -1 }
 						className="block-editor-tabbed-sidebar__tabpanel"
 						ref={ tab.panelRef }
 					>
