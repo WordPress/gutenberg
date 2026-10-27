@@ -102,8 +102,8 @@ jobs:
                   let file;
                   for ( const line of execFileSync( 'git', [ 'diff', '-U0', 'HEAD', process.env.GITHUB_SHA, '--', 'test/e2e/specs' ] ).toString().split( '\n' ) ) {
                   	file = line.startsWith( '+++ b/' ) ? line.slice( 6 ) : file;
-                  	const [ , start, count = 1 ] = line.match( /^@@ .* \+(\d+)(?:,(\d+))? @@/ ) ?? [];
-                  	for ( let i = 0; i < count; i++ ) ( changed[ file ] ??= [] ).push( Number( start ) + i );
+                  	const hunk = line.match( /^@@ .* \+(\d+)(?:,(\d+))? @@/ );
+                  	if ( hunk ) for ( let i = 0; i < ( hunk[ 2 ] ?? 1 ); i++ ) ( changed[ file ] ??= [] ).push( Number( hunk[ 1 ] ) + i );
                   }
 
                   // The first changed line of each test, which is where the warning goes.
