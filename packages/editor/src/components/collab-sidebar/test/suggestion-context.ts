@@ -9,9 +9,10 @@ describe( 'suggestionContextLines', () => {
 		expect(
 			suggestionContextLines( {
 				relations: {
-					parent: { id: '1', kind: 'add', authorId: '1' },
+					parents: [ { id: '1', kind: 'add', authorId: '1' } ],
 					children: [],
 					partlyIn: [],
+					alsoDeleting: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -19,16 +20,56 @@ describe( 'suggestionContextLines', () => {
 		).toEqual( [ 'Inside a suggested addition by Anne' ] );
 	} );
 
+	it( 'names every addition a nested suggestion sits in', () => {
+		expect(
+			suggestionContextLines( {
+				relations: {
+					parents: [
+						{ id: '1', kind: 'add', authorId: '1' },
+						{ id: '2', kind: 'add', authorId: '2' },
+					],
+					children: [],
+					partlyIn: [],
+					alsoDeleting: [],
+				},
+				emptiedCount: 0,
+				nameOf,
+			} )
+		).toEqual( [ 'Inside suggested additions by Anne, Bob' ] );
+	} );
+
+	it( 'says who else suggested deleting the same text', () => {
+		expect(
+			suggestionContextLines( {
+				relations: {
+					parents: [],
+					children: [],
+					partlyIn: [],
+					alsoDeleting: [
+						{ id: '1', kind: 'del', authorId: '1' },
+						{ id: '3', kind: 'del', authorId: '3' },
+					],
+				},
+				emptiedCount: 0,
+				nameOf,
+			} )
+		).toEqual( [
+			'Anne also suggested deleting this text',
+			'Someone else also suggested deleting this text',
+		] );
+	} );
+
 	it( 'counts the suggestions others made inside an addition, and warns before rejecting it', () => {
 		expect(
 			suggestionContextLines( {
 				relations: {
-					parent: null,
+					parents: [],
 					children: [
 						{ id: '2', kind: 'format', authorId: '2' },
 						{ id: '3', kind: 'del', authorId: '3' },
 					],
 					partlyIn: [],
+					alsoDeleting: [],
 				},
 				emptiedCount: 2,
 				nameOf,
@@ -43,9 +84,10 @@ describe( 'suggestionContextLines', () => {
 		expect(
 			suggestionContextLines( {
 				relations: {
-					parent: null,
+					parents: [],
 					children: [ { id: '2', kind: 'del', authorId: '2' } ],
 					partlyIn: [],
+					alsoDeleting: [],
 				},
 				emptiedCount: 1,
 				nameOf,
@@ -60,9 +102,10 @@ describe( 'suggestionContextLines', () => {
 		expect(
 			suggestionContextLines( {
 				relations: {
-					parent: null,
+					parents: [],
 					children: [],
 					partlyIn: [ { id: '2', kind: 'add', authorId: '2' } ],
+					alsoDeleting: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -74,9 +117,10 @@ describe( 'suggestionContextLines', () => {
 		expect(
 			suggestionContextLines( {
 				relations: {
-					parent: { id: '9', kind: 'add', authorId: '9' },
+					parents: [ { id: '9', kind: 'add', authorId: '9' } ],
 					children: [],
 					partlyIn: [],
+					alsoDeleting: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -88,9 +132,10 @@ describe( 'suggestionContextLines', () => {
 		expect(
 			suggestionContextLines( {
 				relations: {
-					parent: null,
+					parents: [],
 					children: [ { id: '2', kind: 'del', authorId: '2' } ],
 					partlyIn: [],
+					alsoDeleting: [],
 				},
 				emptiedCount: 1,
 				nameOf,
@@ -102,7 +147,12 @@ describe( 'suggestionContextLines', () => {
 	it( 'says nothing for a suggestion that overlaps no other', () => {
 		expect(
 			suggestionContextLines( {
-				relations: { parent: null, children: [], partlyIn: [] },
+				relations: {
+					parents: [],
+					children: [],
+					partlyIn: [],
+					alsoDeleting: [],
+				},
 				emptiedCount: 0,
 				nameOf,
 			} )

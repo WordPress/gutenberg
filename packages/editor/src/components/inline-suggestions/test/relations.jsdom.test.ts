@@ -1,6 +1,7 @@
 /**
  * How one inline suggestion sits relative to the others in its value: inside
- * someone's addition, holding others' suggestions, or partly inside one.
+ * other people's additions, holding others' suggestions, partly inside one,
+ * or deleting text someone else also proposed to delete.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { RichTextData } from '@wordpress/rich-text';
@@ -50,22 +51,26 @@ describe( 'suggestionRelations', () => {
 
 	it( 'lists the suggestions others made inside an addition', () => {
 		expect( suggestionRelations( annezazu(), 1 ) ).toEqual( {
-			parent: null,
+			parents: [],
 			children: [
 				{ id: '2', kind: 'format', authorId: '2' },
 				{ id: '3', kind: 'del', authorId: '3' },
 			],
 			partlyIn: [],
+			alsoDeleting: [],
 		} );
 	} );
 
 	it( 'names the addition a nested suggestion sits in', () => {
 		expect( suggestionRelations( annezazu(), 3 ) ).toEqual( {
-			parent: { id: '1', kind: 'add', authorId: '1' },
+			parents: [ { id: '1', kind: 'add', authorId: '1' } ],
 			children: [],
 			partlyIn: [],
+			alsoDeleting: [],
 		} );
-		expect( suggestionRelations( annezazu(), 2 ).parent?.id ).toBe( '1' );
+		expect( suggestionRelations( annezazu(), 2 ).parents[ 0 ]?.id ).toBe(
+			'1'
+		);
 	} );
 
 	it( 'reports a deletion that is only partly inside an addition', () => {
@@ -78,9 +83,10 @@ describe( 'suggestionRelations', () => {
 			) }`
 		);
 		expect( suggestionRelations( value, 5 ) ).toEqual( {
-			parent: null,
+			parents: [],
 			children: [],
 			partlyIn: [ { id: '6', kind: 'add', authorId: '2' } ],
+			alsoDeleting: [],
 		} );
 		// The addition holds part of the deletion: not a child of it.
 		expect( suggestionRelations( value, 6 ).children ).toEqual( [] );
@@ -91,14 +97,51 @@ describe( 'suggestionRelations', () => {
 			mark( 'add', 1, `a${ mark( 'format', 4, 'b', 1 ) }c`, 1 )
 		);
 		expect( suggestionRelations( value, 1 ).children ).toEqual( [] );
-		expect( suggestionRelations( value, 4 ).parent ).toBeNull();
+		expect( suggestionRelations( value, 4 ).parents ).toEqual( [] );
+	} );
+
+	it( 'lists every addition a nested addition sits in, oldest first', () => {
+		// Anne (1) adds, Bob (2) types inside it, Carl (3) types inside Bob's.
+		const value = RichTextData.fromHTMLString(
+			`a${ mark(
+				'add',
+				10,
+				`b${ mark(
+					'add',
+					11,
+					`c${ mark( 'add', 12, 'd', 3 ) }e`,
+					2
+				) }f`,
+				1
+			) }g`
+		);
+		expect( suggestionRelations( value, 12 ).parents ).toEqual( [
+			{ id: '10', kind: 'add', authorId: '1' },
+			{ id: '11', kind: 'add', authorId: '2' },
+		] );
+		expect(
+			suggestionRelations( value, 10 ).children.map( ( { id } ) => id )
+		).toEqual( [ '11', '12' ] );
+	} );
+
+	it( 'reports another author deleting the same text', () => {
+		const value = RichTextData.fromHTMLString(
+			`a${ mark( 'del', 5, `b${ mark( 'del', 6, 'cd', 2 ) }`, 1 ) }e`
+		);
+		expect( suggestionRelations( value, 6 ).alsoDeleting ).toEqual( [
+			{ id: '5', kind: 'del', authorId: '1' },
+		] );
+		expect( suggestionRelations( value, 5 ).alsoDeleting ).toEqual( [
+			{ id: '6', kind: 'del', authorId: '2' },
+		] );
 	} );
 
 	it( 'reports nothing for a marker that is not in the value', () => {
 		expect( suggestionRelations( annezazu(), 99 ) ).toEqual( {
-			parent: null,
+			parents: [],
 			children: [],
 			partlyIn: [],
+			alsoDeleting: [],
 		} );
 		expect( suggestionRelations( 'plain', 1 ).children ).toEqual( [] );
 	} );

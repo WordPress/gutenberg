@@ -213,6 +213,16 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 		text-underline-offset: 0.35em;
 	}
 
+	// An addition typed inside someone's addition. Both underlines would
+	// sit on one line, the outer author's under the inner's, so the inner
+	// one drops lower and its author's color fills the run: the outer
+	// author's line stays visible above it. Two deletions of the same text
+	// keep the one line-through.
+	&.wp-suggestion-add .wp-suggestion-add {
+		background: color-mix(in srgb, #{$suggestion-color} 15%, transparent);
+		text-underline-offset: 0.35em;
+	}
+
 	// Everything above is color and text-decoration, which conveys nothing to
 	// a screen reader: a proposed deletion reads as ordinary prose. The editor
 	// nests a `.wp-suggestion-a11y` span inside each marker (a rich-text
