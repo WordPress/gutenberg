@@ -25,10 +25,6 @@ jobs:
   unit-js:
     name: JavaScript
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [12, 14]
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -46,10 +42,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js ${{ matrix.node }}.x
+    - name: Use Node.js
       uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
-        node-version: ${{ matrix.node }}
+        node-version-file: '.nvmrc'
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret
