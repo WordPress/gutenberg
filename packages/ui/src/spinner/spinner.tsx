@@ -12,7 +12,7 @@ export const Spinner = forwardRef< SVGSVGElement, SpinnerProps >(
 			<svg
 				className={ clsx( styles.spinner, className ) }
 				style={ color === undefined ? style : { ...style, color } }
-				viewBox="0 0 100 100"
+				viewBox="0 0 24 24"
 				xmlns="http://www.w3.org/2000/svg"
 				role="presentation"
 				focusable="false"
@@ -21,8 +21,7 @@ export const Spinner = forwardRef< SVGSVGElement, SpinnerProps >(
 			>
 				<path
 					className={ styles.indicator }
-					d="m 50 0 a 50 50 0 0 1 0 100"
-					vectorEffect="non-scaling-stroke"
+					d="m 12 0 a 12 12 0 0 1 0 24"
 				/>
 			</svg>
 		);
