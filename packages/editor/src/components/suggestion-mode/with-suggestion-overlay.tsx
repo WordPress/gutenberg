@@ -88,7 +88,7 @@ function mergeOverlayAttributes(
  * the editor is in `suggest` intent, so the overlay's context lookup,
  * refs, and memoized merge don't run on every `BlockEdit` render for every
  * block across the entire editor when suggestions are inactive. This split
- * matters for large documents — in Edit/View intent the outer wrapper
+ * matters for large documents — in Edit intent the outer wrapper
  * executes a single `useSelect` and renders the original `BlockEdit`
  * untouched.
  *
@@ -315,7 +315,7 @@ function structuralMarkerClass( type: string | undefined ): string | null {
  * uncommitted edits living in the local overlay, which other intents have no
  * way to interact with. Structural markers, by contrast, are persisted on the
  * live block (synced through the same path as block content), so reviewers in
- * Edit or View intent see and can act on them too — that's the visual cue a
+ * Edit intent see and can act on them too — that's the visual cue a
  * post author needs to spot a pending removal/insertion/move at a glance.
  */
 const withSuggestionBlockClassName = createHigherOrderComponent(

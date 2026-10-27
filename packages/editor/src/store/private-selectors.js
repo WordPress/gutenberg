@@ -29,7 +29,6 @@ import {
 import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
-	EDITOR_INTENT_VIEW,
 	STORE_NAME,
 	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from './constants';
@@ -707,9 +706,8 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 
 /**
  * Returns the current editor intent. The intent represents the user's
- * editing purpose — directly editing content (`edit`), suggesting changes
- * that the author can apply or reject (`suggest`), or viewing the post in
- * a read-only mode (`view`).
+ * editing purpose — directly editing content (`edit`), or suggesting
+ * changes that the author can apply or reject (`suggest`).
  *
  * Mostly orthogonal to the `editorMode` preference (visual vs. code); the
  * exception is `suggest`, which forces `getEditorMode` to report `visual`
@@ -723,7 +721,7 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
  *
  * @param {Object} state Global application state.
  *
- * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
+ * @return {string} The current editor intent. One of `edit`, `suggest`.
  */
 export function getEditorIntent( state ) {
 	return state.editorIntent ?? EDITOR_INTENT_EDIT;
@@ -745,38 +743,17 @@ export function hasSuggestionUndo( state ) {
 }
 
 /**
- * Whether the editor is in a read-only intent.
- *
- * The `view` intent is offered in the Mode menu as a "Read-only preview of
- * the content", so nothing reachable from the editor may change the post
- * while it is active. The block canvas is handled by `isPreviewMode` on the
- * block editor settings; this selector is what the editor-level mutation
- * paths - the code editor and the undo/redo history - gate on, so all three
- * answer to the same intent.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the current intent forbids editing the post.
- */
-export function isEditorIntentReadOnly( state ) {
-	return getEditorIntent( state ) === EDITOR_INTENT_VIEW;
-}
-
-/**
  * Why the code editor cannot be opened right now, or `null` when it can.
  *
  * The code editor edits raw `post_content`: there is nowhere in that textarea
  * to render an inline suggestion marker, and the document it hands back is
  * re-parsed from scratch, so an edit made there both escapes suggestion
- * capture and takes down the markers already in the post. It is also the one
- * editing surface the read-only canvas does not cover - `isPreviewMode`
- * freezes the visual editor and leaves the textarea fully writable.
+ * capture and takes down the markers already in the post.
  *
- * Three situations are refused:
+ * Two situations are refused:
  *
- *   - The `view` intent, a read-only preview of the post.
  *   - The `suggest` intent, where every edit is meant to be captured as a
- *     suggestion. Both are cheap checks, and the only ones the UI runs.
+ *     suggestion. A cheap check, and the only one the UI runs.
  *   - Any intent while the document still carries pending markers - what the
  *     author meets after leaving Suggesting with suggestions left to resolve.
  *     Re-parsing an edited document corrupts markers whatever the intent was
@@ -805,12 +782,6 @@ export function getCodeEditorUnavailableReason(
 	state,
 	{ checkPendingSuggestions = false } = {}
 ) {
-	if ( isEditorIntentReadOnly( state ) ) {
-		return __(
-			'The code editor is unavailable while viewing. Switch to Editing to change the content.'
-		);
-	}
-
 	if ( getEditorIntent( state ) === EDITOR_INTENT_SUGGEST ) {
 		return __(
 			'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
