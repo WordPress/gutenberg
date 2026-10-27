@@ -141,10 +141,12 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 		$this->assertSame( '<strong>word</strong>', $view );
 	}
 
-	public function test_revert_declines_an_accepted_change_over_a_pending_one(): void {
+	public function test_revert_replays_an_accepted_change_over_a_pending_one(): void {
+		// A (12) bolds "word"; B (15), on top, removes bold and adds italic.
 		$html = self::mark( 12, 'format', self::mark( 15, 'format', '<em>word</em>' ) );
 
-		$this->assertNull(
+		$this->assertSame(
+			'<em>word</em>',
 			gutenberg_revert_inline_format_suggestions(
 				$html,
 				array(

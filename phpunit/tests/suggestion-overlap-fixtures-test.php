@@ -133,13 +133,9 @@ class Tests_Suggestion_Overlap_Fixtures extends WP_UnitTestCase {
 	 */
 	public function test_every_order_publishes_what_the_oracle_publishes( array $fixture ): void {
 		$this->skip_unless_landed( $fixture );
-		$ids     = array();
-		$formats = array();
+		$ids = array();
 		foreach ( $fixture['suggestions'] as $index => $suggestion ) {
 			$ids[ $suggestion['key'] ] = $index + 1;
-			if ( 'format' === $suggestion['operation']['suggestionType'] ) {
-				$formats[] = $suggestion['key'];
-			}
 		}
 		$html      = preg_replace_callback(
 			'/\{\{(?:id|author):(\w+)\}\}/',
@@ -159,15 +155,6 @@ class Tests_Suggestion_Overlap_Fixtures extends WP_UnitTestCase {
 			$accepted = array();
 			foreach ( $order['accepted'] as $key ) {
 				$accepted[] = $ids[ $key ];
-			}
-			/*
-			 * A formatting change accepted on top of an older one that is
-			 * not applies its delta to the original, which only the editor
-			 * computes; the server does not render that state.
-			 */
-			if ( $formats && null === gutenberg_revert_inline_format_suggestions( (string) $html, $originals, $accepted ) ) {
-				$this->assertNotEmpty( $accepted );
-				continue;
 			}
 			$this->assertSame(
 				$this->merge_adjacent_formats( $order['publishedHTML'] ),
