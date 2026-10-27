@@ -15,7 +15,20 @@ test.use( {
 } );
 
 test.describe( 'Post Editor Template mode', () => {
+	let originalSiteTitle;
+
 	test.beforeAll( async ( { requestUtils } ) => {
+		// The classic theme snapshot below includes the site title, which
+		// wp-env derives from the checkout directory name. Pin it so the
+		// tests do not depend on where the repository was cloned.
+		const settings = await requestUtils.rest( { path: '/wp/v2/settings' } );
+		originalSiteTitle = settings.title;
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/settings',
+			data: { title: 'gutenberg' },
+		} );
+
 		await requestUtils.activatePlugin( 'gutenberg-test-block-templates' );
 	} );
 
@@ -29,6 +42,11 @@ test.describe( 'Post Editor Template mode', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-templates' );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/settings',
+			data: { title: originalSiteTitle },
+		} );
 	} );
 
 	test( 'Allow to switch to template mode, edit the template and check the result', async ( {
