@@ -200,8 +200,9 @@ function HiddenResultCount() {
 }
 
 /**
- * Fetches matching items asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Autocomplete.LoadingIndicator` inside `Autocomplete.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, `Status`
+ * announces the result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
@@ -231,7 +232,7 @@ export const AsyncItems: Story = {
 							)
 						);
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 			>

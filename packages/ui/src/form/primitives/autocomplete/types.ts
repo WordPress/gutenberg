@@ -2,7 +2,6 @@ import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete'
 import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
-import type { LoadingIndicatorProps } from '../../../utils/item-popup/types';
 
 export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
 
@@ -134,5 +133,3 @@ export type AutocompleteStatusProps = ComponentProps<
 };
 
 export type AutocompleteValueProps = _Autocomplete.Value.Props;
-
-export type AutocompleteLoadingIndicatorProps = LoadingIndicatorProps;

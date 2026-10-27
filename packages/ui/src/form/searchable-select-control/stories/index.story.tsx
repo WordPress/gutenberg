@@ -243,9 +243,9 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. `statusContent` shows loading, then
- * a visually hidden result count. Pass `emptyContent={ null }` while
- * loading so Empty does not claim there are no results.
+ * Pass `SearchableSelectControl.LoadingIndicator` as `statusContent` while fetching
+ * items. Pass `children` to customize its message. After loading, `statusContent`
+ * announces the result count. Pass `emptyContent={ null }` while loading.
  */
 export const AsyncItems: Story = {
 	args: {
@@ -281,7 +281,7 @@ export const AsyncItems: Story = {
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 				} }
 			/>
 		);

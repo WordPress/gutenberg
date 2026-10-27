@@ -281,8 +281,9 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Combobox.LoadingIndicator` inside `Combobox.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, `Status`
+ * announces the result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
@@ -318,7 +319,7 @@ export const AsyncItems: Story = {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 				} }
 			>
 				<Combobox.Trigger aria-label="Fruit" />
@@ -597,64 +598,4 @@ export const PopupWidth: Story = {
 			</Combobox.Popup>
 		</Combobox.Root>
 	),
-};
-
-/**
- * Use children to customize the loading message. The spinner and message
- * share the prefix and label layout of regular and creatable items.
- */
-export const WithLoadingIndicator: Story = {
-	render: function Template( args ) {
-		const items = ITEMS.slice( 0, 2 );
-		const creatableItem = {
-			value: 'new-fruit',
-			label: 'Create a new fruit',
-		};
-		return (
-			<Combobox.Root { ...args } items={ [ ...items, creatableItem ] }>
-				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup aria-label="Fruit" width="sm">
-					<div style={ inputWrapperStyle }>
-						<Combobox.Input
-							aria-label="Search"
-							placeholder="Search"
-						/>
-					</div>
-					<Combobox.Status>
-						<Combobox.LoadingIndicator>
-							Loading more fruit from the available suppliers…
-						</Combobox.LoadingIndicator>
-					</Combobox.Status>
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item: FixtureItem ) =>
-									item.value !== creatableItem.value && (
-										<Combobox.Item
-											key={ item.value }
-											value={ item }
-										>
-											<Combobox.ItemLabel>
-												{ item.label }
-											</Combobox.ItemLabel>
-										</Combobox.Item>
-									)
-								}
-							</Combobox.Collection>
-						</Combobox.ListBody>
-						<Combobox.ListFooter>
-							<Combobox.Item
-								value={ creatableItem }
-								variant="creatable"
-							>
-								<Combobox.ItemLabel>
-									{ creatableItem.label }
-								</Combobox.ItemLabel>
-							</Combobox.Item>
-						</Combobox.ListFooter>
-					</Combobox.List>
-				</Combobox.Popup>
-			</Combobox.Root>
-		);
-	},
 };

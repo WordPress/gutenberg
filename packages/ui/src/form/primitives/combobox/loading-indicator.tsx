@@ -1,6 +1,6 @@
 import { forwardRef } from '@wordpress/element';
 import { LoadingIndicator as ItemPopupLoadingIndicator } from '../../../utils/item-popup/loading-indicator';
-import type { ComboboxLoadingIndicatorProps } from './types';
+import type { LoadingIndicatorProps } from '../../../utils/item-popup/types';
 
 /**
  * A non-interactive loading row aligned with popup items. Render it inside
@@ -9,7 +9,7 @@ import type { ComboboxLoadingIndicatorProps } from './types';
  */
 export const LoadingIndicator = forwardRef<
 	HTMLDivElement,
-	ComboboxLoadingIndicatorProps
+	LoadingIndicatorProps
 >( function ComboboxLoadingIndicator( props, ref ) {
 	return <ItemPopupLoadingIndicator ref={ ref } { ...props } />;
 } );

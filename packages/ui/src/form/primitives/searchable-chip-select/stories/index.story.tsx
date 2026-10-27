@@ -56,6 +56,10 @@ export const Default: Story = {
 };
 
 // TODO: Remove this temporary story before merge.
+/**
+ * Pass `SearchableChipSelect.LoadingIndicator` as `statusContent` while loading.
+ * Pass `children` to customize its message.
+ */
 export const AsyncItemsPermanentLoading: Story = {
 	args: {
 		'aria-label': 'Fruit',
@@ -66,6 +70,11 @@ export const AsyncItemsPermanentLoading: Story = {
 };
 
 // TODO: Remove this temporary story before merge.
+/**
+ * Pass `SearchableChipSelect.LoadingIndicator` as `statusContent` while fetching
+ * items. Pass `children` to customize its message. Offer a creatable item when
+ * the query has no matches.
+ */
 export const AsyncItemsWithCreatable: Story = {
 	args: {
 		'aria-label': 'Fruit',
