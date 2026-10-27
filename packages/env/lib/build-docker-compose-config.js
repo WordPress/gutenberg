@@ -68,7 +68,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
-	const localMounts = [ ...directoryMounts, ...pluginMounts, ...themeMounts ];
+	// docker-compose fails to start if a volume is listed more than once, which
+	// happens when a mapping and a plugin resolve to the same path.
+	const localMounts = [
+		...new Set( [ ...directoryMounts, ...pluginMounts, ...themeMounts ] ),
+	];
 
 	const developmentMounts = [
 		`${
