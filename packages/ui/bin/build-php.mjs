@@ -108,6 +108,43 @@ async function main() {
 		return scoped;
 	};
 
+	// Props are the public contract and the recipe is how each value looks, so
+	// they're kept apart. Check they agree, so a value can't be added to one
+	// and forgotten in the other.
+	const checkRecipe = ( { name, props, classes } ) => {
+		const problems = [];
+		for ( const [ prop, values ] of Object.entries( classes.variants ) ) {
+			const schema = props[ prop ];
+			const allowed =
+				schema?.enum ??
+				( 'boolean' === schema?.type ? [ false, true ] : null );
+			if ( ! allowed ) {
+				problems.push(
+					`the recipe has "${ prop }", which isn't an enum or boolean prop`
+				);
+				continue;
+			}
+			const expected = allowed.map( String );
+			for ( const value of Object.keys( values ) ) {
+				if ( ! expected.includes( value ) ) {
+					problems.push(
+						`the recipe has "${ prop }: ${ value }", which isn't an allowed value`
+					);
+				}
+			}
+			for ( const value of expected ) {
+				if ( ! ( value in values ) ) {
+					problems.push(
+						`the recipe is missing "${ prop }: ${ value }" (use [] if it adds no classes)`
+					);
+				}
+			}
+		}
+		if ( problems.length ) {
+			throw new Error( `${ name }: ${ problems.join( '; ' ) }.` );
+		}
+	};
+
 	const manifest = { components: {} };
 	const fixtures = [];
 	const examples = [];
@@ -120,6 +157,7 @@ async function main() {
 			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
 		);
 		const { name, content, props, classes, react } = component;
+		checkRecipe( component );
 		const resolve = ( references ) =>
 			references.map( ( reference ) => {
 				const qualified = reference.includes( ':' )
