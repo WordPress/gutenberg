@@ -79,7 +79,7 @@ Everything after the REST record is the job of [`@wordpress/widget-primitives`](
 
 An attribute may also reference a field type by name (`"type": "location"`). The application registers those definitions up front through `registerFieldType()` (the dashboard route registers its own on boot), and `useWidgetTypes` resolves every named reference through that registry while building each `WidgetType`: the registered definition supplies the field's behavior on top of its DataViews `baseType`, and hosts receive plain DataViews fields. The widget declaration stays serializable; resolution happens once, at this boundary.
 
-`<WidgetRender>` then resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`; hosts with other loading strategies supply their own.
+`<WidgetRender>` then resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. It also lends the subtree a filtered slice of the type's identity (`useWidgetIdentity`, today the translated `title`) so the body can build accessible names without hardcoding a second copy of the string or reading a WordPress store. On a WordPress page the resolver can be as simple as `( id ) => import( id )`; hosts with other loading strategies supply their own.
 
 For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](https://github.com/WordPress/gutenberg/blob/HEAD/packages/widget-primitives/src/stories/anatomy.md).
 

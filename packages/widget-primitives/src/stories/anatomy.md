@@ -16,6 +16,8 @@ What the widget is: `name`, `title`, `description`, `help`, `icon`, `category`, 
 
 The host shows this almost verbatim, in pickers, headers, and help. It decides _where_ identity appears and _whether_ to show it, never _what it says_. Identity is copied, not interpreted: two hosts displaying the same widget show the same title.
 
+When the render body itself needs the translated title — for example to build an accessible name for a focusable chart — it reads it through `useWidgetIdentity`, which `<WidgetRender>` lends from the `WidgetType` it already holds. See **Widget Identity**. That channel is not a host capability; `useWidgetHost` stays the seam for what only the host or application can materialize.
+
 ## Framing
 
 How the widget asks to sit in the host's frame. Today this layer holds one property, `presentation`.

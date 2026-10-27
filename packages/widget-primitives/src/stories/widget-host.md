@@ -10,7 +10,7 @@ A widget renders inside a host, and the host inside an application. Some of what
 
 ## Contract
 
-`WidgetHost` is a bag of optional capabilities. An absent capability degrades to the host-agnostic behavior, so consumers guard each one and never assume it exists.
+`WidgetHost` is a bag of optional capabilities. An absent capability degrades to the host-agnostic behavior, so consumers guard each one and never assume it exists. The widget type's own identity (its translated `title`, for example) is not a host capability; that channel is `useWidgetIdentity`. See **Widget Identity**.
 
 The provider merges its value over the inherited one, so an application can mount a base host once and layer capabilities per subtree. Reading without any provider yields `{}`.
 
