@@ -6,7 +6,9 @@
  * what that value publishes must be what the suggestions mean.
  *
  * Seeded: a failure prints its seed. `OVERLAP_CONVERGENCE_RUNS=10000` runs
- * more interleavings, `OVERLAP_CONVERGENCE_SEED=<n>` replays one.
+ * more interleavings, `OVERLAP_CONVERGENCE_SEED=<n>` replays one, and
+ * `OVERLAP_CONVERGENCE_REPORT=1` / `OVERLAP_CONVERGENCE_TRACE=1` print the
+ * outcome counts and each round.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
@@ -36,8 +38,9 @@ import { lcg, published as oraclePublished } from './fixtures/overlap-oracle';
 import type { Decision, OracleState } from './fixtures/overlap-oracle';
 
 type Diff = ( a: string, b: string ) => StringEdit;
-type Kind = 'add' | 'del';
-type Lists = { add: string[]; del: string[] };
+type Kind = 'add' | 'del' | 'format';
+type Lists = { add: string[]; del: string[]; format: string[] };
+const KINDS: Kind[] = [ 'add', 'del', 'format' ];
 
 const RUNS = Number( process.env.OVERLAP_CONVERGENCE_RUNS ) || 60;
 const ONLY_SEED = Number( process.env.OVERLAP_CONVERGENCE_SEED ) || 0;
@@ -66,6 +69,7 @@ function membership( record: any ): Map< string, Lists > {
 		chars.set( ch, {
 			add: lists.add.map( suggestionMarkerId ).sort(),
 			del: lists.del.map( suggestionMarkerId ).sort(),
+			format: lists.format.map( suggestionMarkerId ).sort(),
 		} );
 	} );
 	return chars;
@@ -90,13 +94,17 @@ function published(
 			base: [],
 			ins: chars.get( ch )!.add,
 			del: chars.get( ch )!.del,
-			fmt: [],
+			fmt: chars.get( ch )!.format,
 			deltas: {},
 		} ) ),
 		suggestions: [],
 	};
 	const ids = new Set(
-		[ ...chars.values() ].flatMap( ( l ) => [ ...l.add, ...l.del ] )
+		[ ...chars.values() ].flatMap( ( l ) => [
+			...l.add,
+			...l.del,
+			...l.format,
+		] )
 	);
 	const assignment: Record< string, Decision > = {};
 	ids.forEach( ( id ) => {
@@ -159,7 +167,7 @@ function runInterleaving(
 	const kinds = new Map< string, Kind >();
 	const baseCount = pick( 3 );
 	for ( let i = 1; i <= baseCount; i++ ) {
-		const kind: Kind = random() < 0.5 ? 'add' : 'del';
+		const kind = KINDS[ pick( 3 ) ];
 		const [ lo, hi ] = disjoint
 			? bounds( i % peerCount )
 			: [ 0, base.text.length ];
@@ -199,6 +207,7 @@ function runInterleaving(
 			const decidable = [ ...kinds.keys() ].filter(
 				( candidate ) =>
 					Number( candidate ) < 100 &&
+					kinds.get( candidate ) !== 'format' &&
 					! claimed.has( candidate ) &&
 					( ! disjoint || owner.get( candidate ) === peer ) &&
 					value
@@ -222,17 +231,20 @@ function runInterleaving(
 				} );
 				kinds.set( String( id ), 'add' );
 			} else {
+				// A deletion, or a formatting change (its marker only: what
+				// it changes lives on its note).
+				const kind: Kind = roll < 0.85 ? 'del' : 'format';
 				const start = lo + pick( length );
 				const end = Math.min( hi, start + 1 + pick( 4 ) );
 				value = new RichTextData(
 					addSuggestionMarker(
 						create( { html: value.toHTMLString() } ),
-						marker( 'del', id, peer + 1 ),
+						marker( kind, id, peer + 1 ),
 						start,
 						end
 					) as any
 				);
-				kinds.set( String( id ), 'del' );
+				kinds.set( String( id ), kind );
 			}
 		}
 		locals.push( create( { html: value.toHTMLString() } ) );
@@ -248,8 +260,8 @@ function runInterleaving(
 			removedChars.add( ch );
 			continue;
 		}
-		const next: Lists = { add: [], del: [] };
-		for ( const kind of [ 'add', 'del' ] as Kind[] ) {
+		const next: Lists = { add: [], del: [], format: [] };
+		for ( const kind of KINDS ) {
 			const kept = lists[ kind ].filter( ( id ) =>
 				peerChars.every( ( chars ) =>
 					chars.get( ch )![ kind ].includes( id )
@@ -306,9 +318,18 @@ function runInterleaving(
 		shared = merged;
 		rounds++;
 		const next = create( { html: merged } );
-		const corrections = prevs.map( ( prev, peer ) =>
-			guardSyncedValue( prev, next, peerOptions[ peer ] )
-		);
+		// A correction that serializes to the shared string changes nothing
+		// in it, so it never reaches the other peers.
+		const corrections = prevs.map( ( prev, peer ) => {
+			const correction = guardSyncedValue(
+				prev,
+				next,
+				peerOptions[ peer ]
+			);
+			return correction && html( correction ) !== merged
+				? correction
+				: null;
+		} );
 		if ( process.env.OVERLAP_CONVERGENCE_TRACE ) {
 			process.stderr.write(
 				`TRACE ${ rounds } ${ merged }\n` +
@@ -343,7 +364,8 @@ function runInterleaving(
 		return (
 			! want ||
 			want.add.join() !== got.add.join() ||
-			want.del.join() !== got.del.join()
+			want.del.join() !== got.del.join() ||
+			want.format.join() !== got.format.join()
 		);
 	} );
 	const intendedText = [ ...intended.keys() ]
