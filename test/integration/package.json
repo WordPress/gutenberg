@@ -24,7 +24,7 @@
 	},
 	"devDependencies": {
 		"@testing-library/react": "^16.3.3",
-		"@testing-library/user-event": "^14.6.1",
+		"@testing-library/user-event": "^14.6.8",
 		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/block-library": "file:../../packages/block-library",
 		"@wordpress/block-serialization-default-parser": "file:../../packages/block-serialization-default-parser",
