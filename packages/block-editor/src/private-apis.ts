@@ -33,6 +33,7 @@ import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
 import TextAlignmentControl from './components/text-alignment-control';
 import { usesContextKey } from './components/rich-text/format-edit';
+import { PrivateRichTextToolbarButton } from './components/rich-text/toolbar-button';
 import {
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,
@@ -96,6 +97,7 @@ lock( privateApis, {
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,
+	PrivateRichTextToolbarButton,
 	PrivateQuickInserter,
 	SEARCH_RANK,
 	normalizeString,

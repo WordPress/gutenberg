@@ -8,7 +8,7 @@ import {
 	useAnchor,
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
@@ -17,6 +17,9 @@ import {
 } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
+import { unlock } from '../lock-unlock';
+
+const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 interface InlineMathUIProps {
 	value: RichTextValue;
@@ -193,8 +196,8 @@ function Edit( {
 
 	return (
 		<>
-			<RichTextToolbarButton
-				name="math"
+			<PrivateRichTextToolbarButton
+				order={ 90 }
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }

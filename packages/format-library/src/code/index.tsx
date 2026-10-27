@@ -1,12 +1,15 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import {
-	RichTextToolbarButton,
 	RichTextShortcut,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';
 import type { FormatEditProps } from '../types';
+import { unlock } from '../lock-unlock';
+
+const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 const name = 'core/code';
 const title = __( 'Inline code' );
@@ -71,8 +74,8 @@ export const code = {
 					character="x"
 					onUse={ onClick }
 				/>
-				<RichTextToolbarButton
-					name="code"
+				<PrivateRichTextToolbarButton
+					order={ 30 }
 					icon={ codeIcon }
 					title={ title }
 					onClick={ onClick }

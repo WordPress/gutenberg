@@ -1,6 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
+import {
+	useSettings,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import {
 	Icon,
 	color as colorIcon,
@@ -10,6 +13,9 @@ import { removeFormat } from '@wordpress/rich-text';
 import type { FormatEditProps } from '../types';
 import { default as InlineColorUI, getActiveColors } from './inline';
 import type { ColorObject } from './inline';
+import { unlock } from '../lock-unlock';
+
+const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
@@ -83,8 +89,8 @@ function TextColorEdit( {
 
 	return (
 		<>
-			<RichTextToolbarButton
-				name="text-color"
+			<PrivateRichTextToolbarButton
+				order={ 10 }
 				className="format-library-text-color-button"
 				isActive={ isActive }
 				icon={
