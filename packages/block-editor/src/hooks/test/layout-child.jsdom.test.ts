@@ -6,6 +6,7 @@ import {
 	switchToBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import {
 	addTransforms,
 	getChildLayoutStyleRules,
@@ -236,7 +237,11 @@ describe( 'layout child', () => {
 			rowSpan: 2,
 		};
 
-		function getBlock( clientId, attributes = {}, innerBlocks = [] ) {
+		function getBlock(
+			clientId: string,
+			attributes: Record< string, unknown > = {},
+			innerBlocks: Block[] = []
+		): Block {
 			return {
 				name: 'core/test',
 				clientId,
@@ -252,15 +257,20 @@ describe( 'layout child', () => {
 			} );
 		} );
 
-		it.each( [
+		const sourceFactories: Array<
+			[ string, ( block: Block ) => Block | Block[] ]
+		> = [
 			[ 'a block', ( block ) => block ],
 			[ 'an array of one block', ( block ) => [ block ] ],
-		] )(
+		];
+
+		it.each( sourceFactories )(
 			'keeps the child layout when %s is switched to a block type that drops its style',
 			( _, getSource ) => {
 				registerBlockType( 'core/test-from', {
 					apiVersion: 3,
 					title: 'From',
+					category: 'common',
 					attributes: { style: { type: 'object' } },
 					transforms: {
 						to: [
@@ -276,11 +286,12 @@ describe( 'layout child', () => {
 				registerBlockType( 'core/test-to', {
 					apiVersion: 3,
 					title: 'To',
+					category: 'common',
 					attributes: { style: { type: 'object' } },
 					save: () => null,
 				} );
 
-				const [ transformed ] = switchToBlockType(
+				const transformed = switchToBlockType(
 					getSource(
 						createBlock( 'core/test-from', {
 							style: {
@@ -292,7 +303,13 @@ describe( 'layout child', () => {
 					'core/test-to'
 				);
 
-				expect( transformed.attributes.style ).toEqual( {
+				if ( ! transformed ) {
+					throw new Error(
+						'Expected the block transform to succeed.'
+					);
+				}
+
+				expect( transformed[ 0 ].attributes.style ).toEqual( {
 					layout: gridLayout,
 					'@mobile': { layout: { columnSpan: 1 } },
 				} );
@@ -326,8 +343,8 @@ describe( 'layout child', () => {
 				[ result ]
 			);
 
-			expect( transformed.attributes.style.layout ).toEqual( {
-				columnSpan: 1,
+			expect( transformed.attributes.style ).toEqual( {
+				layout: { columnSpan: 1 },
 			} );
 		} );
 
@@ -340,8 +357,8 @@ describe( 'layout child', () => {
 
 			expect(
 				addTransforms( results[ 1 ], source, 1, results ).attributes
-					.style.layout
-			).toEqual( { columnStart: 3 } );
+					.style
+			).toEqual( { layout: { columnStart: 3 } } );
 		} );
 
 		it( 'does not copy the child layout to a block that wraps the transformed blocks', () => {

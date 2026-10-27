@@ -3,6 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import {
@@ -603,12 +604,14 @@ function GridTools( {
  * @param {Object|undefined} style Block style attributes.
  * @return {Array} Pairs of style object path and child layout.
  */
-function getChildLayoutEntries( style ) {
+function getChildLayoutEntries(
+	style: unknown
+): Array< [ string[], Record< string, unknown > ] > {
 	if ( ! isPlainObject( style ) ) {
 		return [];
 	}
 
-	const entries = [];
+	const entries: Array< [ string[], Record< string, unknown > ] > = [];
 	if ( isPlainObject( style.layout ) ) {
 		entries.push( [ [ 'layout' ], style.layout ] );
 	}
@@ -637,7 +640,12 @@ function getChildLayoutEntries( style ) {
  * @param {Array}        results All blocks that resulted from the transformation.
  * @return {Object} Modified transformed block.
  */
-export function addTransforms( result, source, index, results ) {
+export function addTransforms(
+	result: Block,
+	source: Block | Block[],
+	index: number,
+	results: Block[]
+): Block {
 	// `switchToBlockType` passes on a single original block as it got it.
 	const sourceBlocks = Array.isArray( source ) ? source : [ source ];
 
@@ -660,9 +668,10 @@ export function addTransforms( result, source, index, results ) {
 	getChildLayoutEntries( sourceBlocks[ index ]?.attributes?.style ).forEach(
 		( [ path, layout ] ) => {
 			// A transform that sets a child layout itself knows best.
-			if ( getValueFromObjectPath( style, path ) === undefined ) {
+			const styleObject = isPlainObject( style ) ? style : undefined;
+			if ( getValueFromObjectPath( styleObject, path ) === undefined ) {
 				// Setting a path on the style object keeps it an object.
-				style = setImmutably( style, path, layout );
+				style = setImmutably( styleObject, path, layout );
 			}
 		}
 	);
