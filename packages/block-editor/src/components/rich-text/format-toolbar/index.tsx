@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { ToolbarItem, DropdownMenu, Slot } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import type { ComponentProps } from 'react';
+import { orderBy } from '../../../utils/sorting';
 import { OrderedToolbarButton } from '../toolbar-button';
 import type { ToolbarControlFill } from '../types';
 
@@ -15,15 +16,7 @@ const POPOVER_PROPS: { placement: 'bottom-start' } = {
 // Only the buttons of `PrivateRichTextToolbarButton` have an order. The others
 // come last, in the order they were rendered.
 const getOrder = ( [ element ]: ToolbarControlFill ) =>
-	element.type === OrderedToolbarButton
-		? element.props.order ?? Infinity
-		: Infinity;
-
-const byOrder = ( a: ToolbarControlFill, b: ToolbarControlFill ) => {
-	const orderA = getOrder( a );
-	const orderB = getOrder( b );
-	return orderA === orderB ? 0 : orderA - orderB;
-};
+	element.type === OrderedToolbarButton ? element.props.order : Infinity;
 
 const FormatToolbar = () => {
 	return (
@@ -44,9 +37,9 @@ const FormatToolbar = () => {
 						return null;
 					}
 
-					const allProps = [ ...fills ]
-						.sort( byOrder )
-						.map( ( [ { props } ] ) => props );
+					const allProps = orderBy( fills, getOrder ).map(
+						( [ { props } ] ) => props
+					);
 					const hasActive = allProps.some(
 						( { isActive } ) => isActive
 					);
