@@ -62,6 +62,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * anchor form, any marker the pairing walk sees as unbalanced, and the
 		 * markers of `$exclude`d notes.
 		 *
+		 * An addition takes every marker inside it verbatim, so suggestions
+		 * nested in another addition (more additions, deletions) are stored on
+		 * the outermost addition's note, and the anchor index finds them in the
+		 * re-inflated content.
+		 *
 		 * @param string             $content Serialized content, as kses left it.
 		 * @param array<int, true>   $notes   Suggestion note ids of the post.
 		 * A formatting change is only moved out when its note recorded the

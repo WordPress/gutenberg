@@ -122,6 +122,22 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 				$paragraph( $mark( '%2', 'del', 'kept ' . $mark( '%1', 'add', 'sprout' ) . ' text' ) ),
 				array( 'sprout' ),
 			),
+			'an addition inside another note\'s addition' => array(
+				$paragraph( 'a ' . $mark( '%1', 'add', 'outer ' . $mark( '%2', 'add', 'nestling' ) . ' tail' ) . ' b' ),
+				array( 'outer', 'nestling', 'tail' ),
+			),
+			'three nested additions'                      => array(
+				$paragraph( $mark( '%1', 'add', 'one ' . $mark( '%2', 'add', 'two ' . $mark( '%3', 'add', 'three' ) ) ) ),
+				array( 'one', 'two', 'three' ),
+			),
+			'two deletions of the same text'              => array(
+				$paragraph( 'keep ' . $mark( '%1', 'del', 'twice ' . $mark( '%2', 'del', 'struck' ) ) . $mark( '%2', 'del', ' more' ) ),
+				array(),
+			),
+			'deletions over nested additions'             => array(
+				$paragraph( 'The' . $mark( '%1', 'add', ' ' . $mark( '%3', 'del', 'quick' ) . $mark( '%2', 'add', $mark( '%3', 'del', ' brown' ) ) ) . ' fox.' ),
+				array( 'quick', 'brown' ),
+			),
 			'next to an inline note'                      => array(
 				$paragraph( '<mark class="wp-note" data-id="9">noted</mark>' . $mark( '%1', 'add', 'pinned' ) ),
 				array( 'pinned' ),
