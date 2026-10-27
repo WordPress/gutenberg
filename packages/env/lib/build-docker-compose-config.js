@@ -297,7 +297,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				},
 			},
 			composer: {
-				image: 'composer',
+				image: 'composer:2',
 				volumes: [ `${ config.configDirectoryPath }:/app` ],
 			},
 			phpunit: {
