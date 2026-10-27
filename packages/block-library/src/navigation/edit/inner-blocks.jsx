@@ -69,7 +69,7 @@ export default function NavigationInnerBlocks( {
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
 	// When the block is selected but has no items yet, show the button
-	// appender. Otherwise, show the dropdown appender used by the Group block.
+	// appender. Otherwise, show the dropdown appender.
 	// As an exception to other blocks which feature nesting, the appender stays
 	// visible even when a child block (or a submenu item) is selected.
 	// See https://github.com/WordPress/gutenberg/issues/37572.
