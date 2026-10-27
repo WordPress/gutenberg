@@ -11,7 +11,6 @@ import {
 	useState,
 	useMemo,
 } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Select, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import { useContextSystem, contextConnect } from '../context';
@@ -75,8 +74,6 @@ const UnconnectedColorPicker = (
 		return colord( color || '' );
 	}, [ color ] );
 
-	const debouncedSetColor = useDebounce( setColor );
-
 	// Internal HSLA state preserves hue and saturation values that
 	// would otherwise be lost when converting to/from hex at achromatic
 	// colors (e.g. pure black or white where any H/S maps to the same hex).
@@ -114,8 +111,7 @@ const UnconnectedColorPicker = (
 	// Handler for HSL inputs (and the HSVA picker after it converts to HSLA).
 	// Apply the user's HSLA, then notify the parent only when the color
 	// actually changes. setColor must not run inside setInternalHSLA
-	// (state updaters must be pure). Uses direct setColor (not debounced)
-	// to avoid races with hex/RGB's debouncedSetColor.
+	// (state updaters must be pure).
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
 			setInternalHSLA( nextHSLA );
@@ -130,16 +126,15 @@ const UnconnectedColorPicker = (
 	);
 
 	// Handler for components that provide Colord values (RGB, Hex inputs).
-	// Uses debouncedSetColor since the hex input fires per keystroke.
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
 			const nextHSLA = nextValue.toHsl();
 			setInternalHSLA( ( prev ) => mergeHSLA( nextHSLA, prev ) );
 			const nextHex = nextValue.toHex();
 			lastProducedHexRef.current = nextHex;
-			debouncedSetColor( nextHex );
+			setColor( nextHex );
 		},
-		[ debouncedSetColor ]
+		[ setColor ]
 	);
 
 	const [ colorType, setColorType ] = useState< ColorType >(

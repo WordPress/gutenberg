@@ -1,8 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 /**

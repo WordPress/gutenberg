@@ -7,8 +7,10 @@ import {
 	useState,
 } from '@wordpress/element';
 import { lockOutline } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+} from '@wordpress/ui';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
