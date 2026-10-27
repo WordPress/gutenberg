@@ -4,7 +4,6 @@ inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
-        type: string
 
 runs:
     using: 'composite'
