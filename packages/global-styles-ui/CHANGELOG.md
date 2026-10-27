@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   List Bold and Italic in the Elements group of Blocks & Elements, so that the weight of bold text and the style of italic text can be set for the whole site ([#85745](https://github.com/WordPress/gutenberg/pull/85745)).
+-   List Bold and Italic in the Elements group of Blocks & Elements, so that the weight of bold text and the style of italic text can be set for the whole site ([#85748](https://github.com/WordPress/gutenberg/pull/85748)).
 -   Show icons for elements in the Blocks & Elements list, and rename Input, Select and Button (element) to Form input, Form select and Form button ([#85363](https://github.com/WordPress/gutenberg/pull/85363)).
 
 ## 2.0.0 (2026-10-20)
