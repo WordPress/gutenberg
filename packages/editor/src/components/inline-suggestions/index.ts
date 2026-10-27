@@ -114,6 +114,8 @@ export {
 	normalizeSuggestionMarkers,
 	isCanonicalSuggestionStack,
 	guardMarkerIntegrity,
+	guardSyncedValue,
+	isWellFormedSuggestionId,
 } from './marker-integrity';
 export { computeDeleteRange } from './delete-range';
 export {
