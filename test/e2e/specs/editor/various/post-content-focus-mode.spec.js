@@ -91,6 +91,29 @@ test.describe( 'Post Content focus mode', () => {
 				'core/heading',
 			] );
 		} );
+
+		await test.step( 'Hiding the template removes it from the canvas', async () => {
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			const showTemplateButton = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show template',
+			} );
+			await showTemplateButton.click();
+			await expect( showTemplateButton ).toHaveAttribute(
+				'aria-checked',
+				'false'
+			);
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				editor.canvas.getByRole( 'document', { name: 'Block: header' } )
+			).toBeHidden();
+			await expect(
+				editor.canvas.getByText( 'Initial paragraph' )
+			).toBeVisible();
+		} );
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
