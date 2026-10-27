@@ -32,8 +32,10 @@
 	}
 
 	.block-editor-block-styles__item-text {
-		// Align wrapped lines to the start. Short labels stay centered.
-		text-align: start;
+		text-align: center;
+		// Without this, the ellipsis of a centered line is partially clipped.
+		padding-inline: $grid-unit-05;
+		margin-inline: -$grid-unit-05;
 	}
 }
 
