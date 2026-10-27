@@ -1,5 +1,5 @@
 /**
- * The intent shortcuts (Edit / Suggest / View) are only usable where the
+ * The intent shortcuts (Edit / Suggest) are only usable where the
  * Mode menu is offered: the Suggestion Mode experiment on AND the current
  * post type supporting `editor.notes`. Registering them lists them in the
  * Keyboard Shortcuts help modal, so registration has to follow the same
