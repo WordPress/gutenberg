@@ -96,22 +96,78 @@ export default function PostExcerptEditor( props ) {
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
 
+	const inspectorControls = (
+		<InspectorControls>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						showMoreOnNewLine: true,
+						excerptLength: 55,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					hasValue={ () => showMoreOnNewLine !== true }
+					label={ __( 'Show link on new line' ) }
+					onDeselect={ () =>
+						setAttributes( { showMoreOnNewLine: true } )
+					}
+					isShownByDefault
+				>
+					<ToggleControl
+						label={ __( 'Show link on new line' ) }
+						checked={ showMoreOnNewLine }
+						onChange={ ( newShowMoreOnNewLine ) =>
+							setAttributes( {
+								showMoreOnNewLine: newShowMoreOnNewLine,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					hasValue={ () => excerptLength !== 55 }
+					label={ __( 'Max number of words' ) }
+					onDeselect={ () => setAttributes( { excerptLength: 55 } ) }
+					isShownByDefault
+				>
+					<RangeControl
+						label={ __( 'Max number of words' ) }
+						value={ excerptLength }
+						onChange={ ( value ) => {
+							setAttributes( { excerptLength: value } );
+						} }
+						min="10"
+						max="100"
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	if ( ! postType || ! postId ) {
 		return (
-			<div { ...blockProps }>
-				<p>{ __( 'This block will display the excerpt.' ) }</p>
-			</div>
+			<>
+				{ inspectorControls }
+				<div { ...blockProps }>
+					<p>{ __( 'This block will display the excerpt.' ) }</p>
+				</div>
+			</>
 		);
 	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __(
-						'The content is currently protected and does not have the available excerpt.'
-					) }
-				</Warning>
-			</div>
+			<>
+				{ inspectorControls }
+				<div { ...blockProps }>
+					<Warning>
+						{ __(
+							'The content is currently protected and does not have the available excerpt.'
+						) }
+					</Warning>
+				</div>
+			</>
 		);
 	}
 	const readMoreLink = (
@@ -199,55 +255,7 @@ export default function PostExcerptEditor( props ) {
 	);
 	return (
 		<>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							showMoreOnNewLine: true,
-							excerptLength: 55,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						hasValue={ () => showMoreOnNewLine !== true }
-						label={ __( 'Show link on new line' ) }
-						onDeselect={ () =>
-							setAttributes( { showMoreOnNewLine: true } )
-						}
-						isShownByDefault
-					>
-						<ToggleControl
-							label={ __( 'Show link on new line' ) }
-							checked={ showMoreOnNewLine }
-							onChange={ ( newShowMoreOnNewLine ) =>
-								setAttributes( {
-									showMoreOnNewLine: newShowMoreOnNewLine,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => excerptLength !== 55 }
-						label={ __( 'Max number of words' ) }
-						onDeselect={ () =>
-							setAttributes( { excerptLength: 55 } )
-						}
-						isShownByDefault
-					>
-						<RangeControl
-							label={ __( 'Max number of words' ) }
-							value={ excerptLength }
-							onChange={ ( value ) => {
-								setAttributes( { excerptLength: value } );
-							} }
-							min="10"
-							max="100"
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			</InspectorControls>
+			{ inspectorControls }
 			<div { ...blockProps }>
 				{ excerptContent }
 				{ ! showMoreOnNewLine && ' ' }
