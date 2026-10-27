@@ -101,6 +101,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	protected $dashicon_replacements = null;
 
 	/**
+	 * Resolved path of the core icon library directory.
+	 *
+	 * @var string|false|null
+	 */
+	private $core_icon_library_directory = null;
+
+	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
 	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
@@ -330,7 +337,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *
 	 * Overridden so that the file validation is applied even when the base
 	 * `WP_Icons_Registry` is provided by WordPress core rather than the
-	 * Gutenberg compat shim.
+	 * Gutenberg compat shim, and so that core icons skip sanitization.
 	 *
 	 * @param string $icon_name Icon name including namespace.
 	 * @return string|null The content of the icon, if found.
@@ -354,7 +361,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				return null;
 			}
 
-			$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
+			$content = file_get_contents( $icon_path );
+
+			// Core icons are trusted, so skip the costly sanitization.
+			if ( ! $this->is_core_icon_file( $icon_path ) ) {
+				$content = $this->sanitize_icon_content( $content );
+			}
 
 			if ( empty( $content ) ) {
 				wp_trigger_error(
@@ -367,6 +379,20 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			$this->registered_icons[ $icon_name ]['content'] = $content;
 		}
 		return $this->registered_icons[ $icon_name ]['content'];
+	}
+
+	/**
+	 * Determines whether an icon file is a core icon.
+	 *
+	 * @param string $icon_path Icon file path, resolved with `realpath()`.
+	 * @return bool Whether the file is in the core icon library.
+	 */
+	private function is_core_icon_file( $icon_path ) {
+		if ( null === $this->core_icon_library_directory ) {
+			$this->core_icon_library_directory = realpath( gutenberg_dir_path() . 'packages/icons/src/library' );
+		}
+
+		return is_string( $this->core_icon_library_directory ) && str_starts_with( $icon_path, $this->core_icon_library_directory . DIRECTORY_SEPARATOR );
 	}
 
 	/**
