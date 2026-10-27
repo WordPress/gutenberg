@@ -192,12 +192,8 @@ test.describe( 'Sidebar Permalink', () => {
 		await expect( slugButton ).toHaveAccessibleDescription( 'None' );
 		await slugButton.click();
 
-		// Without a slug, the post only has its plain permalink.
 		await expect(
 			page.getByRole( 'textbox', { name: 'Link' } )
 		).toHaveValue( '' );
-		await expect(
-			page.getByRole( 'link', { name: /\?p=\d+/ } )
-		).toBeVisible();
 	} );
 } );

@@ -14,7 +14,7 @@ type TemplateEditProps = DataFormControlProps< PostWithTemplate >;
 
 type TemplateEditComponentProps = Pick<
 	TemplateEditProps,
-	'data' | 'field'
+	'data' | 'field' | 'hideLabelFromVision'
 > & {
 	onChange: ( value: string ) => void;
 };
@@ -67,6 +67,7 @@ function ClassicTemplateEdit( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 }: TemplateEditComponentProps ) {
 	const value = field.getValue( { item: data } );
 	const items = useMemo(
@@ -83,7 +84,7 @@ function ClassicTemplateEdit( {
 	return (
 		<SelectControl
 			label={ __( 'Template' ) }
-			hideLabelFromVision
+			hideLabelFromVision={ hideLabelFromVision }
 			value={
 				items.find( ( item ) => item.value === toItemValue( value ) ) ??
 				items[ 0 ] ??
@@ -102,6 +103,7 @@ function BlockThemeTemplateEdit( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 }: TemplateEditComponentProps ) {
 	const postType = data.type;
 	const postId = data.id;
@@ -138,7 +140,7 @@ function BlockThemeTemplateEdit( {
 	return (
 		<SelectControl
 			label={ __( 'Template' ) }
-			hideLabelFromVision
+			hideLabelFromVision={ hideLabelFromVision }
 			value={
 				items.find( ( item ) => item.value === toItemValue( value ) ) ??
 				items[ 0 ] ??
@@ -157,6 +159,7 @@ export default function TemplateEdit( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 }: TemplateEditProps ) {
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -171,5 +174,12 @@ export default function TemplateEdit( {
 	}
 	const Edit =
 		mode === 'classic' ? ClassicTemplateEdit : BlockThemeTemplateEdit;
-	return <Edit data={ data } field={ field } onChange={ onChangeControl } />;
+	return (
+		<Edit
+			data={ data }
+			field={ field }
+			onChange={ onChangeControl }
+			hideLabelFromVision={ hideLabelFromVision }
+		/>
+	);
 }
