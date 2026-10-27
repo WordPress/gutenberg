@@ -51,9 +51,9 @@ jobs:
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-              if: always()
+              if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts--puppeteer-${{ matrix.part }}
                   path: artifacts
                   if-no-files-found: ignore
                   retention-days: 14
@@ -94,9 +94,27 @@ jobs:
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-              if: always()
+              if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts--playwright-${{ matrix.part }}
                   path: artifacts/test-results
                   if-no-files-found: ignore
+                  retention-days: 14
+
+    merge-artifacts:
+        name: Merge Artifacts
+        if: ${{ !cancelled() }}
+        needs: [e2e-puppeteer, e2e-playwright]
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        steps:
+            - name: Merge failures artifacts
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              # Don't fail the job if there aren't any artifacts to merge.
+              continue-on-error: true
+              with:
+                  name: failures-artifacts
+                  # Retain the merged artifacts in case of a rerun.
+                  pattern: failures-artifacts*
+                  delete-merged: true
                   retention-days: 14
