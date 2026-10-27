@@ -10,6 +10,7 @@ export interface Post {
 }
 
 export interface CreatePostPayload {
+	title?: string;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
 }
