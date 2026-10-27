@@ -37,7 +37,7 @@ const FormatToolbar = () => {
 						// Only the buttons of `PrivateRichTextToolbarButton`
 						// have an order. The others come last, in the order
 						// they were rendered.
-						( [ element ] ) =>
+						( [ element ]: ToolbarControlFill ) =>
 							element.type === OrderedToolbarButton
 								? element.props.order
 								: Infinity
