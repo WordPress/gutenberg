@@ -1,6 +1,6 @@
 # Suggestion mode: Architecture Overview for Reviewers
 
-This page is the map. It explains how Suggestion mode fits together across the whole nine-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is [Suggestions Architecture](./suggestions.md).
+This page is the map. It explains how Suggestion mode fits together across the whole ten-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is [Suggestions Architecture](./suggestions.md).
 
 Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). Try it: [Playground for the combined branch #78994](https://playground.wordpress.net/gutenberg.html?pr=78994).
 
@@ -78,21 +78,22 @@ Every marker is content, so it saves with the post, syncs over RTC and replays t
 
 ## The PR stack
 
-Nine PRs, each based on the one below it. Review bottom up, and comment on the PR that owns the code. If time is short, [#80429](https://github.com/WordPress/gutenberg/pull/80429) and [#80431](https://github.com/WordPress/gutenberg/pull/80431) hold most of the logic.
+Ten PRs, each based on the one below it. Review bottom up, and comment on the PR that owns the code. If time is short, [#80429](https://github.com/WordPress/gutenberg/pull/80429) and [#80431](https://github.com/WordPress/gutenberg/pull/80431) hold most of the logic.
 
 ```mermaid
 flowchart BT
     T["trunk"]
-    P1["1/9 #80427<br/>Editor mode + experiment gate"]
-    P2["2/9 #80428<br/>Storage, REST, provider"]
-    P3["3/9 #80429<br/>Block-level capture"]
-    P4["4/9 #80430<br/>Inline marker primitive"]
-    P5["5/9 #80431<br/>Inline suggestion operations"]
-    P6["6/9 #80432<br/>Review UI"]
-    P7["7/9 #80433<br/>Inline live wiring"]
-    P8["8/9 #82047<br/>Architecture docs"]
-    P9["9/9 #82048<br/>End-to-end tests"]
-    T --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9
+    P1["1/10 #80427<br/>Editor mode + experiment gate"]
+    P2["2/10 #80428<br/>Storage, REST, provider"]
+    P3["3/10 #80429<br/>Block-level capture"]
+    P4["4/10 #80430<br/>Inline marker primitive"]
+    P5["5/10 #80431<br/>Inline suggestion operations"]
+    P6["6/10 #80432<br/>Review UI"]
+    P7["7/10 #80433<br/>Inline live wiring"]
+    P8["8/10 #82047<br/>Architecture docs"]
+    P9["9/10 #82048<br/>End-to-end tests"]
+    P10["10/10 suggest/overlap<br/>Overlapping suggestions"]
+    T --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10
 ```
 
 | Layer | PR | What it owns | Where to look |
@@ -106,6 +107,7 @@ flowchart BT
 | 7 | [#80433](https://github.com/WordPress/gutenberg/pull/80433) Inline live wiring | The addition, deletion and format keyboards, the content reconciler, author colors and marker reveal, Note garbage collection, post title suggestions, clipboard strip, refusals (post status, publish), List View labels, PHP inline strip, a `core-data` CRDT serializer fix. Also the move of attribute suggestions onto the block marker (the overlay context becomes `suggestion-session.tsx`, auto-save walks markers) and the provider split into `SuggestionStore`, submission and decision hooks, and pure `operations/` | `suggestion-mode/suggestion-*-keyboard.ts`, `suggestion-content-reconciler.ts`, `suggestion-note-gc.ts`, `marker.ts`, `suggestion-session.tsx`, `suggestion-store.ts`, `use-suggestion-*.ts`, `operations/` |
 | 8 | [#82047](https://github.com/WordPress/gutenberg/pull/82047) Docs | This page and [suggestions.md](./suggestions.md) | `docs/explanations/architecture/` |
 | 9 | [#82048](https://github.com/WordPress/gutenberg/pull/82048) E2E | 19 Playwright specs covering every path above, plus perf harness changes. No production code | `test/e2e/specs/editor/various/suggestion-mode*.spec.ts`, `test/e2e/specs/site-editor/suggestion-mode-intent-shortcuts.spec.ts` |
+| 10 | `suggest/overlap` Overlapping suggestions <!-- TODO(overlap PR): replace the branch name with the PR link once it is opened. --> | Suggestions of one kind stack on the same text (one marker per suggestion, nested oldest outermost), formatting changes recorded as per-suggestion deltas, the refusals for typing, deleting and formatting inside or across someone's suggestion lifted, other authors' block suggestions nested on a block's marker, the server's per-character format revert and published view, and the shared overlap fixtures with the oracle that checks every accept/reject order at the Vitest, PHPUnit and Playwright layers | `inline-suggestions/format.ts`, `format-delta.ts`, `overlap.ts`, `resolution.ts`, `inline-suggestions/test/fixtures/overlaps/`, `suggestion-mode/marker.ts`, `block-suggestions.php`, `suggestion-mode-overlap*.spec.ts` |
 
 Some files are deliberately split across layers: `with-suggestion-overlay.tsx` and `store-interceptor.ts` start in #80429 and gain inline hand-offs in #80433; `provider.ts` starts in #80428 and becomes a thin composition of `SuggestionStore` and the submission and decision hooks in #80433; `overlay-context.tsx` starts in #80428 and is replaced by `suggestion-session.tsx` and `marker.ts` in #80433; `block-suggestions.php` gains meta in #80428, the structural strip in #80429 and the inline strip in #80433.
 
@@ -159,7 +161,7 @@ The inline marker serializes as one class per kind:
 <mark class="wp-suggestion-add" data-suggestion-id="42" data-suggestion-type="add" data-author="7">new words</mark>
 ```
 
-Markers of different kinds nest, so another author can suggest deleting or reformatting words inside a pending addition; rejecting the addition takes those suggestions with it, accepting it leaves them pending. Two suggestions of one kind on the same text are refused, naming the other author. See [Overlapping suggestions](./suggestions.md#overlapping-suggestions).
+Markers of different kinds nest, so another author can suggest deleting or reformatting words inside a pending addition; rejecting the addition takes those suggestions with it, accepting it leaves them pending. Markers of one kind stack too, the Google Docs model: text typed inside someone's addition carries both additions, two people can suggest deleting the same words, and two formatting changes on the same words each keep their own delta. A character is published when every addition on it is accepted and no deletion on it is, so any order of the same decisions ends at the same text. See [Overlapping suggestions](./suggestions.md#overlapping-suggestions).
 
 ## Data flow: an inline text suggestion
 
@@ -189,9 +191,9 @@ sequenceDiagram
     Note over S: Later keystrokes in the same run grow the same marker and note
 ```
 
-Deletes work the same way, wrapping the removed range in a `del` marker. Type-over produces one `replace` note with a `del` and an `add` run. Bold, italic and links produce one `format` marker whose Note records the original run as `beforeHTML`. Edits that arrive only as a new `content` value (IME commit, autocorrect, drag-drop) are diffed by the content reconciler into the same markers. The paste handler only takes a paste the editor would insert as exact plain text. Any paste the editor transforms (Markdown, a linked email, a URL over a selection, formatting a Code block drops) goes through the normal paste pipeline, so the result matches Editing mode, and the reconciler proposes it.
+Deletes work the same way, wrapping the removed range in a `del` marker. Type-over produces one `replace` note with a `del` and an `add` run. Bold, italic and links produce one `format` marker whose Note records what the change adds and removes as a `delta`, with the run before and after it as `beforeHTML` and `afterHTML`. Edits that arrive only as a new `content` value (IME commit, autocorrect, drag-drop) are diffed by the content reconciler into the same markers. The paste handler only takes a paste the editor would insert as exact plain text. Any paste the editor transforms (Markdown, a linked email, a URL over a selection, formatting a Code block drops) goes through the normal paste pipeline, so the result matches Editing mode, and the reconciler proposes it.
 
-An edit that would overlap someone else's marker is declined with a notice rather than nesting markers.
+An edit inside or across someone else's marker nests in it or stacks on it. Only splitting a block inside someone's suggestion is still declined, with a notice.
 
 ## Data flow: a structural suggestion
 
@@ -276,7 +278,7 @@ sequenceDiagram
     P->>API: PUT status approved, _wp_suggestion_status = applied
 ```
 
-Reject is the mirror image: drop an `add` with its text, unwrap a `del`, restore a `format` run from `beforeHTML`, undo a pending insert or move, clear a `pending-remove` marker, or drop an attribute proposal. Clearing a structural marker keeps a proposal that rode on it as its own `pending-attributes` marker. Decisions are kept out of undo history (`history: 'ignore'`).
+Reject is the mirror image: drop an `add` with its text, unwrap a `del`, drop a `format` marker and recompute the run from the formatting changes still pending, undo a pending insert or move, clear a `pending-remove` marker, or drop an attribute proposal. Clearing a structural marker keeps a proposal that rode on it as its own `pending-attributes` marker. Decisions are kept out of undo history (`history: 'ignore'`).
 
 ## Persistence and the front end
 
@@ -289,7 +291,7 @@ flowchart LR
     RB --> Ins["pending-insert block<br/>dropped"]
     RB --> Add["add marker<br/>wrapper and text dropped"]
     RB --> Del["del marker<br/>wrapper dropped, text kept"]
-    RB --> Fmt["format marker<br/>replaced by original run"]
+    RB --> Fmt["format marker<br/>reverted per character to the original"]
     RB --> Rem["pending-remove block<br/>rendered as normal"]
     RB --> Att["pending-attributes block<br/>live attributes, no PHP needed"]
     Ins & Add & Del & Fmt & Rem & Att --> Out["Published HTML<br/>as if nothing were pending"]
@@ -311,12 +313,12 @@ An architecture review on 2026-10-04 found the data model sound and the cost con
 - **A3.** Marker ids are server comment ids, so the first keystroke waits on a REST round trip. Client-generated ids would remove the buffering.
 - **A4.** Input is captured at the DOM `beforeinput` level. A private `transformChange` hook on `useRichText` would sit at the right altitude, and depends on A3.
 
-One product question is open: a block has one marker, so a second suggester's attribute change to a block that already has a pending proposal joins the first suggester's marker and Note.
+Several authors can suggest on one block: the block's marker is the first suggestion, and every other author's removal or attribute proposal nests on it with its own Note, decided on its own. See [Overlapping suggestions](./suggestions.md#overlapping-suggestions).
 
 ## Questions for reviewers
 
 1. Is the two-place storage (inline marks in content, one `metadata.suggestion` marker per block) the right shape?
-2. Should a block hold one marker per suggester, or is one shared marker acceptable while concurrent suggestions ([#79220](https://github.com/WordPress/gutenberg/issues/79220)) are paused?
+2. Is a `nested` list on the block's marker, one entry per author, the right shape for several authors' suggestions on one block, or should proposals move to a map keyed by note id once notes can be opened before auto-save?
 3. Is a data-registry subscriber the right capture point for structural changes, or should block-editor grow a private action-interceptor API (A1)?
 4. Should the marker id stay the server comment id, or move to a client-generated id that the Note adopts (A3)?
 5. Is it acceptable that pending `add` text and proposed attribute values are visible in `post_content` and REST `raw` to anyone who can read raw content?
