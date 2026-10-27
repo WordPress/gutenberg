@@ -21,14 +21,13 @@ function cycleValue( value: number, total: number, offset: number ) {
 function getFocusableContext(
 	container: HTMLElement,
 	target: Element,
-	tabbableOnly: boolean,
-	allowContainer: boolean
+	tabbableOnly: boolean
 ) {
 	const finder = tabbableOnly ? focus.tabbable : focus.focusable;
 	const focusables = finder.find( container );
 
 	const index = focusables.indexOf( target as HTMLElement );
-	if ( index > -1 || ( allowContainer && target === container ) ) {
+	if ( index > -1 || ( ! tabbableOnly && target === container ) ) {
 		return { index, target, focusables };
 	}
 	return null;
@@ -98,14 +97,7 @@ function UnforwardedNavigableContainer(
 			const context = getFocusableContext(
 				container!,
 				activeElement,
-				!! onlyBrowserTabstops,
-				! onlyBrowserTabstops &&
-					[
-						'ArrowDown',
-						'ArrowUp',
-						'ArrowLeft',
-						'ArrowRight',
-					].includes( event.code )
+				!! onlyBrowserTabstops
 			);
 			if ( ! context ) {
 				return;
@@ -123,9 +115,9 @@ function UnforwardedNavigableContainer(
 				focusables[ nextIndex ].focus();
 				onNavigate( nextIndex, focusables[ nextIndex ] as HTMLElement );
 
-				// Prevent scrolling when entering from the container, and keep
-				// Tab from moving focus again after navigation has handled it.
-				if ( index === -1 || event.code === 'Tab' ) {
+				// `preventDefault()` on tab to avoid having the browser move the focus
+				// after this component has already moved it.
+				if ( event.code === 'Tab' ) {
 					event.preventDefault();
 				}
 			}

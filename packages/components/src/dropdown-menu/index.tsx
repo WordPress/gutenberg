@@ -90,6 +90,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	) => {
 		popoverProps?.onFocusCapture?.( event );
 
+		// A consumer's focus handler may already have moved focus elsewhere.
 		if (
 			! focusFirstItem &&
 			popoverProps?.focusOnMount === undefined &&
@@ -251,12 +252,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 			} }
 			open={ open }
 			defaultOpen={ defaultOpen }
-			onToggle={ ( isOpen ) => {
-				if ( ! isOpen ) {
-					setFocusFirstItem( true );
-				}
-				onToggleProp?.( isOpen );
-			} }
+			onToggle={ onToggleProp }
 		/>
 	);
 }
