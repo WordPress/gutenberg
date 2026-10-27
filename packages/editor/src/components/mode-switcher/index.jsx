@@ -62,7 +62,7 @@ function ModeSwitcher() {
 	if ( ! isCodeEditingEnabled && mode === 'text' ) {
 		selectedMode = 'visual';
 	}
-	// Suggesting and Viewing are visual-only intents: see `getEditorMode`.
+	// Suggesting is a visual-only intent: see `getEditorMode`.
 	if ( codeEditorUnavailableReason ) {
 		selectedMode = 'visual';
 	}

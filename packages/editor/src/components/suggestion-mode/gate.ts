@@ -59,9 +59,8 @@ function hasNotesSupport(
 }
 
 /**
- * Runtime predicate for entering Suggest (and the related read-only View)
- * intent: the experiment must be enabled AND the current post type must
- * support notes.
+ * Runtime predicate for entering the Suggest intent: the experiment must be
+ * enabled AND the current post type must support notes.
  *
  * @return True when the current editor can host suggestions.
  */

@@ -9,7 +9,6 @@ import { store as editorStore } from '../../store';
 import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
-	EDITOR_INTENT_VIEW,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { useCanSuggest } from '../suggestion-mode/gate';
@@ -135,14 +134,6 @@ export default function EditorKeyboardShortcuts() {
 		}
 		event.preventDefault();
 		setEditorIntent( EDITOR_INTENT_SUGGEST );
-	} );
-
-	useShortcut( 'core/editor/intent-view', ( event ) => {
-		if ( ! canSuggest ) {
-			return;
-		}
-		event.preventDefault();
-		setEditorIntent( EDITOR_INTENT_VIEW );
 	} );
 
 	useShortcut( 'core/editor/toggle-sidebar', ( event ) => {
