@@ -14,7 +14,6 @@ import layoutChild from '../layout-child';
 
 type TestWindow = Window & {
 	__experimentalEnableGridInteractivity?: boolean;
-	__experimentalEnableBlockRotation?: boolean;
 };
 
 const GRID_LAYOUT = {
@@ -109,18 +108,17 @@ describe( 'grid item rotate handle', () => {
 			title: 'Grid item',
 			category: 'text',
 			attributes: {},
+			supports: { rotation: true },
 			edit: () => null,
 			save: () => null,
 		} );
 		( window as TestWindow ).__experimentalEnableGridInteractivity = true;
-		( window as TestWindow ).__experimentalEnableBlockRotation = true;
 	} );
 
 	afterEach( () => {
 		unregisterBlockType( GRID_BLOCK );
 		unregisterBlockType( ITEM_BLOCK );
 		delete ( window as TestWindow ).__experimentalEnableGridInteractivity;
-		delete ( window as TestWindow ).__experimentalEnableBlockRotation;
 	} );
 
 	it( 'is shown for blocks in a manual grid', () => {
@@ -128,8 +126,16 @@ describe( 'grid item rotate handle', () => {
 		expect( queryRotator() ).toBeInTheDocument();
 	} );
 
-	it( 'is not shown without the block rotation experiment', () => {
-		delete ( window as TestWindow ).__experimentalEnableBlockRotation;
+	it( "is not shown for blocks that don't opt in to rotation", () => {
+		unregisterBlockType( ITEM_BLOCK );
+		registerBlockType( ITEM_BLOCK, {
+			apiVersion: 3,
+			title: 'Grid item',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+		} );
 		renderGridItemTools();
 		expect( queryRotator() ).not.toBeInTheDocument();
 	} );
@@ -173,18 +179,17 @@ describe( 'grid item resizer', () => {
 			title: 'Grid item',
 			category: 'text',
 			attributes: {},
+			supports: { rotation: true },
 			edit: () => null,
 			save: () => null,
 		} );
 		( window as TestWindow ).__experimentalEnableGridInteractivity = true;
-		( window as TestWindow ).__experimentalEnableBlockRotation = true;
 	} );
 
 	afterEach( () => {
 		unregisterBlockType( GRID_BLOCK );
 		unregisterBlockType( ITEM_BLOCK );
 		delete ( window as TestWindow ).__experimentalEnableGridInteractivity;
-		delete ( window as TestWindow ).__experimentalEnableBlockRotation;
 	} );
 
 	it( 'is shown for blocks that are not rotated', () => {

@@ -28,7 +28,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `clientNavigation`: `true`
 - [`listView`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 - `customCSS`: `false`
-- `rotate`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Block Markup

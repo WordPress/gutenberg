@@ -12,7 +12,6 @@
 		"customClassName": false,
 		"className": false,
 		"html": false,
-		"rotate": false,
 		"visibility": false,
 		"interactivity": {
 			"clientNavigation": true
