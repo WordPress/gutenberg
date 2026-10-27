@@ -25,6 +25,7 @@
 
 -   `DropdownMenu`: Keep the height of `MenuItem` consistent regardless of whether it has an icon ([#85503](https://github.com/WordPress/gutenberg/pull/85503)).
 -   `ColorPicker`: Fire `onChange` immediately for hex and RGB input, so an edit is no longer lost when the picker closes right after it ([#85734](https://github.com/WordPress/gutenberg/pull/85734)).
+-   `Modal`: Keep an open modal exposed to screen readers when a modal opened before it closes ([#85720](https://github.com/WordPress/gutenberg/pull/85720)).
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
