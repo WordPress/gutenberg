@@ -740,7 +740,7 @@ export function SuggestionOverlayProvider( {
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
 	// The block-count subscription only runs when there are entries to
-	// prune; in Edit / View intent (no entries) there's no point watching
+	// prune; in Edit intent (no entries) there's no point watching
 	// the block tree at all.
 	const blockCount = useSelect(
 		( select ) => {
