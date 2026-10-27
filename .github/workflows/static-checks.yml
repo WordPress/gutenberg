@@ -3,7 +3,12 @@ name: Static Analysis (Linting, License, Type checks...)
 on:
   pull_request:
   push:
-    branches: [master]
+    branches:
+    - trunk
+    - 'release/[0-9]+.[0-9]'
+    - 'wp/[0-9]+.[0-9]'
+    - wp/latest
+    - wp/next
 
 jobs:
   check:
