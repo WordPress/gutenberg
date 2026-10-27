@@ -13,11 +13,21 @@ import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
 
 function ControlledCustomGradientPicker( {
 	initialValue = 'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)',
+	onChange,
 }: {
 	initialValue?: string;
+	onChange?: ( value: string ) => void;
 } ) {
 	const [ value, setValue ] = useState( initialValue );
-	return <CustomGradientPicker value={ value } onChange={ setValue } />;
+	return (
+		<CustomGradientPicker
+			value={ value }
+			onChange={ ( nextValue ) => {
+				setValue( nextValue );
+				onChange?.( nextValue );
+			} }
+		/>
+	);
 }
 
 describe( 'CustomGradientPicker', () => {
@@ -101,8 +111,8 @@ describe( 'CustomGradientPicker', () => {
 			const onChange = vi.fn();
 
 			await render(
-				<CustomGradientPicker
-					value="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				<ControlledCustomGradientPicker
+					initialValue="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 					onChange={ onChange }
 				/>
 			);
@@ -110,8 +120,14 @@ describe( 'CustomGradientPicker', () => {
 			const typeSelect = screen.getByRole( 'combobox', {
 				name: /type/i,
 			} );
-			await user.selectOptions( typeSelect, 'radial-gradient' );
-			await user.selectOptions( typeSelect, 'linear-gradient' );
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Radial' } )
+			);
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
 
 			// Verify the angle from before the radial switch is restored, not the default
 			const lastCall =
@@ -134,7 +150,10 @@ describe( 'CustomGradientPicker', () => {
 			const typeSelect = screen.getByRole( 'combobox', {
 				name: /type/i,
 			} );
-			await user.selectOptions( typeSelect, 'linear-gradient' );
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
 
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
@@ -155,7 +174,10 @@ describe( 'CustomGradientPicker', () => {
 			const typeSelect = screen.getByRole( 'combobox', {
 				name: /type/i,
 			} );
-			await user.selectOptions( typeSelect, 'radial-gradient' );
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Radial' } )
+			);
 
 			// Radial gradients have no orientation, so deg should not appear in the output
 			const lastCall =
@@ -229,9 +251,11 @@ describe( 'CustomGradientPicker', () => {
 				/>
 			);
 
-			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: /type/i } ),
-				'radial-gradient'
+			await user.click(
+				screen.getByRole( 'combobox', { name: /type/i } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Radial' } )
 			);
 
 			const lastCall =
