@@ -39,7 +39,7 @@ export default function ElementBlockOverrides( {
 	return (
 		<ScreenBody>
 			<Stack direction="column" gap="sm">
-				<Subtitle level={ 3 }>{ __( 'Applies to' ) }</Subtitle>
+				<Subtitle level={ 3 }>{ __( 'Overridden by' ) }</Subtitle>
 				<ItemGroup
 					isBordered
 					isSeparated
