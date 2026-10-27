@@ -1,8 +1,0 @@
-watch:
-  directories:
-    - ./lib/
-    - ./phpunit/
-
-notifications:
-  passingTests: false
-  failingTests: false
