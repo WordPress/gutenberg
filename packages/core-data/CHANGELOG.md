@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content.
+-   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
 
 ### Internal
 
