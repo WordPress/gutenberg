@@ -149,10 +149,22 @@ function segmentHTMLToShortcodeBlock(
 		blocks = [ block ];
 	}
 
-	// Like images, a shortcode at the start or end of a line only moves out of
-	// the text if its block is aligned.
+	// On its own line, a shortcode becomes a block.
+	if ( isLineStart && isLineEnd ) {
+		return [
+			...segmentHTMLToShortcodeBlock(
+				beforeHTML.replace( beforeLineRegexp, '' )
+			),
+			...blocks,
+			...segmentHTMLToShortcodeBlock(
+				afterHTML.replace( afterLineRegexp, '' )
+			),
+		];
+	}
+
+	// Like images, at the start or end of a line it only moves out of the text
+	// if its block is aligned.
 	if (
-		! ( isLineStart && isLineEnd ) &&
 		! blocks.every( ( block ) =>
 			[ 'left', 'center', 'right' ].includes(
 				block.attributes.align as string
@@ -162,9 +174,8 @@ function segmentHTMLToShortcodeBlock(
 		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 	}
 
-	// An aligned shortcode at the start of a line moves before the line, and the
-	// line's opening tag stays with the text after it.
-	if ( ! isLineEnd ) {
+	// At the start, it moves before the line, which keeps its opening tag.
+	if ( isLineStart ) {
 		const lineStart = beforeHTML.search( beforeLineRegexp );
 		return [
 			...segmentHTMLToShortcodeBlock( beforeHTML.slice( 0, lineStart ) ),
@@ -175,10 +186,9 @@ function segmentHTMLToShortcodeBlock(
 		];
 	}
 
+	// At the end, it moves after the line.
 	return [
-		...segmentHTMLToShortcodeBlock(
-			beforeHTML.replace( beforeLineRegexp, '' )
-		),
+		...segmentHTMLToShortcodeBlock( beforeHTML ),
 		...blocks,
 		...segmentHTMLToShortcodeBlock(
 			afterHTML.replace( afterLineRegexp, '' )
