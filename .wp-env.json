@@ -2,6 +2,7 @@
 	"core": "WordPress/WordPress#5.5-branch",
 	"plugins": [ "." ],
 	"mappings": {
+		"wp-content/plugins/gutenberg": ".",
 		"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
 		"wp-content/plugins/gutenberg-test-plugins": "./packages/e2e-tests/plugins"
 	}
