@@ -676,7 +676,7 @@ You can tell `wp-env` which MariaDB version the database should run, for compati
 
 MariaDB cannot start on a database written by a newer version. When switching to a lower version, run `wp-env destroy` first. It removes the environment's Docker containers, volumes, networks, and local files, not only the databases, so everything is recreated on the next start.
 
-**Note:** With a `mariadbVersion` older than 11.4, `wp db` commands in the `cli` containers fail, and `wp-env clean` leaves the database as it is: the MariaDB client in the CLI image requires TLS when `phpVersion` is unset or 8.1 or newer, and MariaDB servers before 11.4 do not offer it. WordPress itself is not affected. To start over with an empty database, run `wp-env destroy`.
+**Note:** With a `mariadbVersion` older than 11.4, `wp db` commands in the `cli` containers fail, and `wp-env clean` leaves the database as it is: the MariaDB client in the CLI image requires TLS when `phpVersion` is unset or 8.1 or newer, and MariaDB servers before 11.4 do not offer it. `wp-env start` and WordPress itself are not affected. To start over with an empty database, run `wp-env destroy`.
 
 **Note:** MariaDB 5.5 images are not published for ARM processors. Apple silicon devices can still run version 5.5 under emulation by setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` before running `wp-env start`. Be aware that every container in the environment runs under emulation, not only the database, so the whole environment runs more slowly.
 
