@@ -22,22 +22,6 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
-	test( 'throwaway: uses a new helper and passes on trunk', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.canvas
-			.locator( 'role=document[name="Add default block"i]' )
-			.click();
-		await page.keyboard.type( '### 3' );
-
-		await expect
-			.poll( editor.throwawayGetBlocks )
-			.toMatchObject( [
-				{ name: 'core/heading', attributes: { level: 3 } },
-			] );
-	} );
-
 	test( 'can be created by prefixing existing content with number signs and a space', async ( {
 		editor,
 		page,
