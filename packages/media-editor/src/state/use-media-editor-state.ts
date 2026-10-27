@@ -6,18 +6,20 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
-	DEFAULT_STATE,
 	ORIGINAL_ASPECT_RATIO,
-	areCropperStatesEqual,
-	buildCropperSetters,
-	enforceContainment,
 	exportCroppedImage,
-	type CropperAction,
 	type CropperController,
 	type CropperState,
 	type NormalizedRect,
 	type Size,
 } from '../image-editor';
+import {
+	DEFAULT_STATE,
+	areCropperStatesEqual,
+	enforceContainment,
+	type CropperAction,
+} from '../image-editor/core';
+import { buildCropperSetters } from '../image-editor/react/hooks';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,

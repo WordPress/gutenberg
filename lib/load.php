@@ -101,6 +101,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-utils.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/entity-fields-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/preload.php';
