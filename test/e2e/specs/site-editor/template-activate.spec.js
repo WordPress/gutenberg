@@ -7,9 +7,8 @@ test.describe( 'Template Activate', () => {
 	let originalSiteTitle;
 
 	test.beforeAll( async ( { requestUtils } ) => {
-		// The template rendered below includes the site title, which wp-env
-		// derives from the checkout directory name. Pin it so the test does
-		// not depend on where the repository was cloned.
+		// The site title assertion below expects "gutenberg". Pin it so
+		// the tests do not depend on where the repository was cloned.
 		originalSiteTitle = ( await requestUtils.getSiteSettings() ).title;
 		await requestUtils.updateSiteSettings( { title: 'gutenberg' } );
 
