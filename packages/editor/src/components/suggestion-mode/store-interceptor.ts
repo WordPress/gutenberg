@@ -518,6 +518,29 @@ function captureTreeSnapshot( blockEditor: any ) {
 }
 
 /**
+ * Whether a marker is a pending insertion the author may edit as part of it:
+ * theirs, or one with no recorded author. Another author's suggested block
+ * is suggested content like any other, so edits to it are suggestions.
+ *
+ * @param suggestion `metadata.suggestion` value.
+ * @param authorId   Current author; omitted, any insertion counts.
+ * @return Whether it counts.
+ */
+function isAuthorsInsertion(
+	suggestion: any,
+	authorId?: number | string | null
+): boolean {
+	return (
+		suggestion?.type === 'pending-insert' &&
+		( authorId === undefined ||
+			authorId === null ||
+			suggestion.authorId === undefined ||
+			suggestion.authorId === null ||
+			String( suggestion.authorId ) === String( authorId ) )
+	);
+}
+
+/**
  * Whether a block is part of a pending block-insertion suggestion: either the
  * block itself carries a `pending-insert` marker, or one of its ancestors
  * does (the children of a suggested-in Group are part of the Group's
@@ -525,29 +548,33 @@ function captureTreeSnapshot( blockEditor: any ) {
  *
  * Edits inside such a block are part of the insertion — the block has no
  * "before" state to preserve — so callers let them write through to the real
- * attributes instead of opening a separate suggestion.
+ * attributes instead of opening a separate suggestion. Given an author, only
+ * their own insertions count.
  *
  * @param blockEditor Block-editor selectors (anything exposing
  *                    `getBlockAttributes` and `getBlockParents`).
  * @param clientId    Block client ID.
+ * @param authorId    Current author, when edits by others matter.
  * @return True when the block or an ancestor is a pending insert.
  */
 function isPartOfPendingInsertion(
 	blockEditor: any,
-	clientId: string
+	clientId: string,
+	authorId?: number | string | null
 ): boolean {
 	if ( ! blockEditor ) {
 		return false;
 	}
-	const markerType = ( id: string ) =>
-		blockEditor.getBlockAttributes?.( id )?.metadata?.suggestion?.type;
-	if ( markerType( clientId ) === 'pending-insert' ) {
+	const counts = ( id: string ) =>
+		isAuthorsInsertion(
+			blockEditor.getBlockAttributes?.( id )?.metadata?.suggestion,
+			authorId
+		);
+	if ( counts( clientId ) ) {
 		return true;
 	}
 	const parents = blockEditor.getBlockParents?.( clientId ) ?? [];
-	return parents.some(
-		( id: string ) => markerType( id ) === 'pending-insert'
-	);
+	return parents.some( counts );
 }
 
 /**
@@ -673,15 +700,17 @@ const pendingInsertionsByVersion = new WeakMap< object, Set< string > >();
  *
  * @param blockEditor Block-editor selectors.
  * @param clientId    Block client ID.
+ * @param authorId    Current author, when edits by others matter.
  * @return True when the block or an ancestor is a pending insert.
  */
 function isPartOfPendingInsertionCached(
 	blockEditor: any,
-	clientId: string
+	clientId: string,
+	authorId?: number | string | null
 ): boolean {
 	const version = getBlockTreeVersion( blockEditor );
 	if ( ! version ) {
-		return isPartOfPendingInsertion( blockEditor, clientId );
+		return isPartOfPendingInsertion( blockEditor, clientId, authorId );
 	}
 	let pending = pendingInsertionsByVersion.get( version );
 	if ( ! pending ) {
@@ -701,7 +730,13 @@ function isPartOfPendingInsertionCached(
 		}
 		pendingInsertionsByVersion.set( version, pending );
 	}
-	return pending.has( clientId );
+	if ( ! pending.has( clientId ) ) {
+		return false;
+	}
+	// Rare: a block inside an insertion. Whose it is takes the walk.
+	return authorId === undefined
+		? true
+		: isPartOfPendingInsertion( blockEditor, clientId, authorId );
 }
 
 /**
@@ -1547,7 +1582,11 @@ export default function SuggestionStoreInterceptor() {
 					// an empty child is adopted right away.
 					if (
 						parentClientId !== null &&
-						isPartOfPendingInsertion( blockEditor, parentClientId )
+						isPartOfPendingInsertion(
+							blockEditor,
+							parentClientId,
+							currentUserId
+						)
 					) {
 						adoptInheritedBlock( clientId, current );
 						continue;
@@ -1739,7 +1778,13 @@ export default function SuggestionStoreInterceptor() {
 				// collaborators) instead of being diverted into the overlay,
 				// where it would surface as a second note next to the
 				// "Insert block" one.
-				if ( isPartOfPendingInsertion( blockEditor, clientId ) ) {
+				if (
+					isPartOfPendingInsertion(
+						blockEditor,
+						clientId,
+						currentUserId
+					)
+				) {
 					snapshot.set( clientId, current );
 					continue;
 				}

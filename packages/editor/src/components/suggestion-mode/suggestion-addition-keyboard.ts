@@ -672,7 +672,8 @@ export default function SuggestionAdditionKeyboard() {
 				isDeferredInsertion( clientId ) ||
 				isPartOfPendingInsertion(
 					{ getBlockAttributes, getBlockParents },
-					clientId
+					clientId,
+					authorId
 				)
 			) {
 				resetRun();
