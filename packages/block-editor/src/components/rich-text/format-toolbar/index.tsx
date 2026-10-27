@@ -13,11 +13,6 @@ const POPOVER_PROPS: { placement: 'bottom-start' } = {
 	placement: 'bottom-start',
 };
 
-// Only the buttons of `PrivateRichTextToolbarButton` have an order. The others
-// come last, in the order they were rendered.
-const getOrder = ( [ element ]: ToolbarControlFill ) =>
-	element.type === OrderedToolbarButton ? element.props.order : Infinity;
-
 const FormatToolbar = () => {
 	return (
 		<>
@@ -37,9 +32,16 @@ const FormatToolbar = () => {
 						return null;
 					}
 
-					const allProps = orderBy( fills, getOrder ).map(
-						( [ { props } ] ) => props
-					);
+					const allProps = orderBy(
+						fills,
+						// Only the buttons of `PrivateRichTextToolbarButton`
+						// have an order. The others come last, in the order
+						// they were rendered.
+						( [ element ] ) =>
+							element.type === OrderedToolbarButton
+								? element.props.order
+								: Infinity
+					).map( ( [ { props } ] ) => props );
 					const hasActive = allProps.some(
 						( { isActive } ) => isActive
 					);
