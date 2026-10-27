@@ -31,7 +31,14 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 			return [];
 		}
 
-		return [ createBlock( 'core/navigation', { ref: navigationMenuId } ) ];
+		// Locking the menu to its content gives its items the same editing
+		// experience as content-only List View editing.
+		return [
+			createBlock( 'core/navigation', {
+				ref: navigationMenuId,
+				templateLock: 'contentOnly',
+			} ),
+		];
 	}, [ navigationMenuId ] );
 
 	if ( ! navigationMenuId || ! blocks?.length ) {

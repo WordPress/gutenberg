@@ -1,12 +1,4 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '../../store';
-import { ALL_NOTES_SIDEBAR } from './constants';
-import { unlock } from '../../lock-unlock';
 
 /*
  * Anchoring-only format: it serializes an inline note's in-content marker as
@@ -23,51 +15,4 @@ export const noteFormat = {
 	attributes: {
 		'data-id': 'data-id',
 	},
-	edit: NoteFormat,
 };
-
-function NoteFormat( { isActive, activeAttributes } ) {
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { get: getPreference } = useSelect( preferencesStore );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const noteId = activeAttributes?.[ 'data-id' ];
-
-	useEffect( () => {
-		if ( ! isActive || ! noteId ) {
-			return;
-		}
-
-		// Sync visible notes to the marker under the caret. Read imperatively
-		// so it triggers on caret movement, not sidebar state.
-		const canShowFloatingNotes =
-			isLargeViewport &&
-			getPreference( 'core', 'notesDisplayMode' ) !== 'hidden';
-		if (
-			! canShowFloatingNotes &&
-			getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR
-		) {
-			return;
-		}
-
-		if ( String( getSelectedNote() ) === String( noteId ) ) {
-			return;
-		}
-
-		// Select-only; no cleanup on leave. The block-level sync owns
-		// clearing/reverting, and deselecting here would drop the block's
-		// note while the caret is still inside the block.
-		selectNote( Number( noteId ) );
-	}, [
-		isActive,
-		noteId,
-		isLargeViewport,
-		getActiveComplementaryArea,
-		getPreference,
-		getSelectedNote,
-		selectNote,
-	] );
-
-	return null;
-}

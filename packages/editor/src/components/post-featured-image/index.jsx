@@ -4,7 +4,7 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
@@ -232,7 +232,7 @@ function PostFeaturedImage( {
 										) }
 										{ ( isLoading ||
 											isRequestingFeaturedImageMedia ) && (
-											<Spinner />
+											<WCSpinner />
 										) }
 										{ ! featuredImageId &&
 											! isLoading &&

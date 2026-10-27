@@ -38,7 +38,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"install-vscode-settings": "node scripts/install-vscode-settings.mts",
 		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
 		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}

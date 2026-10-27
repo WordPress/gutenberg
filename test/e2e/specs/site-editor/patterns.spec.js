@@ -23,6 +23,7 @@ test.describe( 'Patterns', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllUsers();
 		// Drop persisted view state (search and filters) so one test's
 		// filtering doesn't hide another test's fixtures.
 		await requestUtils.resetPreferences();
@@ -107,7 +108,7 @@ test.describe( 'Patterns', () => {
 				page.getByRole( 'tab', { name: 'All patterns' } )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'tab', { name: 'My patterns' } )
+				page.getByRole( 'tab', { name: 'Site patterns' } )
 			).toBeVisible();
 		} else {
 			await page
@@ -121,7 +122,7 @@ test.describe( 'Patterns', () => {
 			).toContainText( '1' );
 			await expect(
 				patterns.navigation.getByRole( 'button', {
-					name: 'My patterns',
+					name: 'Site patterns',
 				} )
 			).toContainText( '1' );
 			await expect(
@@ -223,6 +224,45 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 1 );
 		await expect( patterns.item ).toContainText( 'Unsynced footer' );
+	} );
+
+	test( 'filter patterns by author', async ( {
+		admin,
+		requestUtils,
+		patterns,
+		page,
+	} ) => {
+		const editorUser = await requestUtils.createUser( {
+			username: 'patterneditor',
+			email: 'patterneditor@example.com',
+			password: 'patterneditorpassword',
+			roles: [ 'editor' ],
+		} );
+		await Promise.all( [
+			requestUtils.createBlock( {
+				title: 'Editor pattern',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Editor pattern</p>\n<!-- /wp:paragraph -->`,
+				author: editorUser.id,
+			} ),
+			requestUtils.createBlock( {
+				title: 'Administrator pattern',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Administrator pattern</p>\n<!-- /wp:paragraph -->`,
+			} ),
+		] );
+
+		await admin.visitSiteEditor( { postType: 'wp_block' } );
+		await expect( patterns.item ).toHaveCount( 2 );
+
+		await patterns.content
+			.getByRole( 'button', { name: 'Add filter' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Author' } ).click();
+		await page.getByRole( 'option', { name: 'patterneditor' } ).click();
+
+		await expect( patterns.item ).toHaveCount( 1 );
+		await expect( patterns.item ).toContainText( 'Editor pattern' );
 	} );
 
 	test( 'sort patterns', async ( {

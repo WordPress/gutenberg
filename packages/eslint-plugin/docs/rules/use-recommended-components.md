@@ -13,12 +13,14 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 - `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextareaControl` — [`TextareaControl` migration guide][textareacontrol-migration-guide]
+- `Tip` — [`Tip` migration guide][tip-migration-guide]
 
 [checkboxcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
 [radiocontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide
 [togglecontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide
 [textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
+[tip-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-tip--migration-guide
 
 ## Rule details
 
@@ -49,6 +51,19 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 
 const { SomethingElse } = unlock( componentsPrivateApis );
+```
+
+## Inline exceptions
+
+Prefer placing `eslint-disable-next-line` immediately above the individual import specifier in a multiline import. This keeps other components in the import checked, including components added later.
+
+```js
+import {
+	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 ```
 
 ## Options

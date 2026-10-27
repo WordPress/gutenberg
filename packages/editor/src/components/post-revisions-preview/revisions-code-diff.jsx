@@ -1,5 +1,5 @@
 import { diffLines } from 'diff';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -118,13 +118,13 @@ export default function ConnectedRevisionsCodeDiff() {
 		const editorSelectors = select( editorStore );
 		const coreSelectors = select( coreStore );
 		const {
-			getCurrentRevision,
-			getPreviousRevision,
+			getShownVersion,
+			getComparedVersion,
 			getRevisionPage,
 			getRevisionsPerPage,
 			isShowingRevisionDiff,
 		} = unlock( editorSelectors );
-		const _previousRevision = getPreviousRevision();
+		const _previousRevision = getComparedVersion();
 		const _showDiff = isShowingRevisionDiff();
 		const revisionPage = getRevisionPage();
 		const totalPages =
@@ -156,7 +156,7 @@ export default function ConnectedRevisionsCodeDiff() {
 		}
 
 		return {
-			revision: getCurrentRevision(),
+			revision: getShownVersion(),
 			previousRevision: _previousRevision,
 			...getCodeDiffDisplayState( {
 				previousRevision: _previousRevision,
@@ -201,7 +201,7 @@ export function RevisionsCodeDiff( {
 	if ( ! revision || isPreviousRevisionLoading ) {
 		return (
 			<div className="editor-revisions-canvas__loading">
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

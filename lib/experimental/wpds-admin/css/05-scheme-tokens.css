@@ -3,7 +3,7 @@
  *
  * GENERATED FILE. Do not edit. Regenerate with:
  *
- *     npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
+ *     npm run wpds:admin-scheme-tokens --workspace=@wordpress/monorepo-tools
  *
  * React admin screens derive these values at runtime through ThemeProvider.
  * PHP-rendered screens have no provider, so without this file every token

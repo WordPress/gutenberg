@@ -181,7 +181,6 @@
 - name: BaseControl
   props:
       - __nextHasNoMarginBottom
-      - as
       - children
       - className
       - help
@@ -873,12 +872,15 @@
       - label
 - name: MenuItem
   props:
+      - accessibleWhenDisabled
       - children
       - className
+      - href
       - icon
       - iconPosition
       - info
       - isDestructive
+      - isPressed
       - isSelected
       - label
       - role
@@ -1203,6 +1205,7 @@
       - separatorType
       - shiftStep
       - showTooltip
+      - size
       - step
       - trackColor
       - type
@@ -1523,7 +1526,7 @@
       - required
       - searchPlaceholder
       - statusContent
-      - triggerContent
+      - trigger
       - value
       - virtualized
   subcomponents:
@@ -1571,6 +1574,16 @@
         props:
             - className
             - render
+            - style
+      - name: SearchableSelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: SearchControl
   props:
@@ -1731,7 +1744,7 @@
       - ref
       - required
       - size
-      - triggerContent
+      - trigger
       - value
   subcomponents:
       - name: SelectControl.Group
@@ -1772,6 +1785,16 @@
         props:
             - className
             - render
+            - style
+      - name: SelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: Shortcut
   props:

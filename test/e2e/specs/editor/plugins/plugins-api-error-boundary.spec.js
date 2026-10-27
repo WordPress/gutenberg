@@ -28,7 +28,7 @@ test.describe( 'Plugins API Error Boundary', () => {
 
 		expect( hasError ).toBe( true );
 		await expect(
-			page.locator( '.is-error .components-notice__content' )
+			page.locator( '.notices-inline-notices__notice.is-error' )
 		).toContainText(
 			'The "my-error-plugin" plugin has encountered an error and cannot be rendered.'
 		);

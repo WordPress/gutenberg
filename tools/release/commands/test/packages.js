@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 const logger = require( '../../lib/logger' );
 let {
 	backportCommitsToBranch,
@@ -1564,8 +1564,8 @@ describe( 'prepared release refs', () => {
 		const repositoryPath = join( root, 'repository' );
 		await mkdir( remotePath );
 		await mkdir( repositoryPath );
-		await SimpleGit( remotePath ).init( true );
-		const git = SimpleGit( repositoryPath );
+		await simpleGit( remotePath ).init( true );
+		const git = simpleGit( repositoryPath );
 		await git.init();
 		await git.addConfig( 'user.name', 'Release test' );
 		await git.addConfig( 'user.email', 'release-test@example.com' );
@@ -1576,7 +1576,7 @@ describe( 'prepared release refs', () => {
 		return {
 			cleanup: () => rm( root, { recursive: true, force: true } ),
 			git,
-			remote: SimpleGit( remotePath ),
+			remote: simpleGit( remotePath ),
 			repositoryPath,
 		};
 	}

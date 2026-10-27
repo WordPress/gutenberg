@@ -466,7 +466,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expect( notice ).toBeVisible();
 		// A notes column beside the canvas would cut the notice short.
 		const noticeBox = await page
-			.locator( '.components-notice' )
+			.locator( '.notices-inline-notices__notice' )
 			.filter( { hasText: 'Test notice' } )
 			.boundingBox();
 		const canvasBox = await page
@@ -537,6 +537,44 @@ test.describe( 'Block Notes: floating notes', () => {
 		const thread = getThread( page, 'Low note' );
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		await expectAligned( thread, getParagraph( editor, 'Noted' ) );
+	} );
+
+	test( 'keeps the new note form in view on a scrolled canvas', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Top note',
+		} );
+		await addSpacerParagraphs( editor );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Last block' },
+		} );
+		const last = getParagraph( editor, 'Last block' );
+		await editor.selectBlocks( last );
+		await expect
+			.poll( () => getCanvasScrollTop( editor ) )
+			.toBeGreaterThan( 100 );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+		const form = getFloatingNotes( page ).getByRole( 'treeitem', {
+			name: 'New note',
+			exact: true,
+		} );
+		const input = form.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await expect( input ).toBeFocused();
+		// Placed first: an unplaced form sits in view at the panel's top.
+		await expectAligned( form, last );
+		await expect( input ).toBeInViewport();
+		await expect( last ).toBeInViewport();
 	} );
 
 	test( 'pushes earlier threads above the canvas to keep the selected one aligned', async ( {
@@ -863,21 +901,6 @@ test.describe( 'Block Notes: floating notes', () => {
 			return paragraph;
 		}
 
-		// Selection top in page coordinates.
-		async function getSelectionTop( editor ) {
-			const frameBox = await editor.canvas.owner().boundingBox();
-			const top = await editor.canvas.locator( 'body' ).evaluate( () => {
-				const selection = window.getSelection();
-				return selection.rangeCount
-					? selection.getRangeAt( 0 ).getBoundingClientRect().top
-					: null;
-			} );
-			if ( top === null ) {
-				throw new Error( 'The canvas has no text selection.' );
-			}
-			return frameBox.y + top;
-		}
-
 		test( 'aligns the floating thread with its inline marker', async ( {
 			editor,
 			page,
@@ -898,7 +921,7 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expectAligned( thread, mark );
 		} );
 
-		test( 'aligns the pending new-note form with the text selection', async ( {
+		test( 'aligns the pending new-note form with its draft marker', async ( {
 			editor,
 			page,
 			blockNoteUtils,
@@ -909,15 +932,50 @@ test.describe( 'Block Notes: floating notes', () => {
 			} );
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 
-			// There is no marker yet, so the form anchors to the selection the
-			// note will attach to. The canvas keeps it while the form has focus.
+			// The selected text carries a draft marker until the note is sent,
+			// so the form anchors to it even once the canvas selection is gone.
 			const form = getFloatingNotes( page ).getByRole( 'treeitem', {
 				name: 'New note',
 				exact: true,
 			} );
+			const mark = editor.canvas.locator( 'mark.wp-note[data-id="new"]' );
 			await expect( form ).toHaveClass( /is-floating/ );
-			await expectBelow( () => getSelectionTop( editor ), paragraph );
-			await expectAligned( form, () => getSelectionTop( editor ) );
+			await expectBelow( mark, paragraph );
+			await expectAligned( form, mark );
+		} );
+	} );
+
+	test.describe( 'Drafts', () => {
+		test( 'restores an unsent draft once its block is selected again', async ( {
+			editor,
+			page,
+		} ) => {
+			// The middle block keeps the selected block's toolbar from
+			// covering the other block's click target.
+			for ( const content of [
+				'First block',
+				'Middle block',
+				'Second block',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+
+			// With no notes to show, the floating board unmounts entirely.
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( getFloatingNotes( page ) ).toBeHidden();
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 	} );
 

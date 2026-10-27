@@ -267,6 +267,11 @@
 
 	// Show Icon Label Styles
 	.show-icon-labels & {
+		// The popover content is sized to max-content, so cap it at the canvas
+		// width (the viewport of the iframe) to let the toolbar wrap.
+		.components-popover__content {
+			max-width: fit-content;
+		}
 
 		.block-editor-block-parent-selector {
 			position: relative;

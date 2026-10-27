@@ -39,11 +39,10 @@ test.describe( 'changing image size', () => {
 		// Select the new size updated with the plugin.
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'tab', { name: 'Settings' } ).click();
+		await page.getByRole( 'combobox', { name: 'Resolution' } ).click();
 		await page
-			.getByRole( 'combobox', { name: 'Resolution' } )
-			.selectOption( {
-				label: 'Custom Size One',
-			} );
+			.getByRole( 'option', { name: 'Custom Size One', exact: true } )
+			.click();
 
 		// Verify that the custom size was applied to the image.
 		await expect(

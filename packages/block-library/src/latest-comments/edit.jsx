@@ -2,7 +2,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	RangeControl,
 	SelectControl as WCSelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -145,7 +145,7 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 			</InspectorControls>
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (
