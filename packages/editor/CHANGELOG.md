@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+
 ### Bug Fixes
 
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
