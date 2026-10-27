@@ -20,7 +20,7 @@ exports[`hooks > enhanceNavigationLinkVariations > enhances variations with icon
         xmlns="http://www.w3.org/2000/svg"
       >
         <Path
-          d="M8 12V8M8 4V8M8 8H12M8 8H4M8 8L10.8284 10.8284M8 8L5.17157 5.17157M8 8L10.8284 5.17157M8 8L5.17157 10.8284M4 15H20M4 19H13"
+          d="M4 15H20M4 19H13M8 12V8.00001M8 8.00001V7.99999M8 8.00001L11.4641 10M8 8.00001L7.99999 8M8 7.99999V4M8 7.99999L11.4641 6M8 7.99999L7.99999 8M7.99999 8L4.53589 6M7.99999 8L4.53589 10"
         />
       </SVG>,
       "isActive": [Function],
