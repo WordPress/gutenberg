@@ -53,10 +53,11 @@ function withRenderableIcons(
 type WidgetAttributes = NonNullable< WidgetType[ 'attributes' ] >;
 
 /*
- * Record entries lead, each completed by the module entry sharing its `id`
- * (the record wins a shared key); module-only entries follow. `isValid`
- * merges rule by rule, so the record's serializable rules keep the
- * module's `custom` validator.
+ * Module entries keep their position, each completed by the record entry
+ * sharing its `id` (the record wins a shared key); new record-only
+ * entries are appended after the module's list. `isValid` merges rule by
+ * rule, so the record's serializable rules keep the module's `custom`
+ * validator.
  */
 function mergeAttributes(
 	recordAttributes: WidgetAttributeRecord[] | null | undefined,
@@ -69,30 +70,37 @@ function mergeAttributes(
 		return recordAttributes as WidgetAttributes;
 	}
 
-	const moduleById = new Map(
-		moduleAttributes.map(
+	const recordById = new Map(
+		recordAttributes.map(
 			( attribute ) => [ attribute.id, attribute ] as const
 		)
 	);
-	const recordIds = new Set(
-		recordAttributes.map( ( attribute ) => attribute.id )
+	const moduleIds = new Set(
+		moduleAttributes.map( ( attribute ) => attribute.id )
 	);
 
 	return [
-		...recordAttributes.map( ( attribute ) => {
-			const moduleAttribute = moduleById.get( attribute.id );
-			if ( ! moduleAttribute?.isValid || ! attribute.isValid ) {
-				return { ...moduleAttribute, ...attribute };
+		...moduleAttributes.map( ( moduleAttribute ) => {
+			const recordAttribute = recordById.get( moduleAttribute.id );
+			if ( ! recordAttribute ) {
+				return moduleAttribute;
+			}
+
+			if ( ! moduleAttribute.isValid || ! recordAttribute.isValid ) {
+				return { ...moduleAttribute, ...recordAttribute };
 			}
 
 			return {
 				...moduleAttribute,
-				...attribute,
-				isValid: { ...moduleAttribute.isValid, ...attribute.isValid },
+				...recordAttribute,
+				isValid: {
+					...moduleAttribute.isValid,
+					...recordAttribute.isValid,
+				},
 			};
 		} ),
-		...moduleAttributes.filter(
-			( attribute ) => ! recordIds.has( attribute.id )
+		...recordAttributes.filter(
+			( attribute ) => ! moduleIds.has( attribute.id )
 		),
 	] as WidgetAttributes;
 }
@@ -129,13 +137,13 @@ function recordOverlay( record: WidgetModuleRecord ) {
  * module's default export with the runtime fields (`name`, `renderModule`).
  * A record without a metadata module resolves from its own fields alone,
  * so a widget declared entirely by its manifest needs no module stub.
- * A record's `attributes` lead the module's, merged by `id` with `isValid`
- * merged rule by rule; the merged schema passes through `resolveFields`, so
- * attributes referencing registered field types reach hosts as plain
- * DataViews fields. Icon references resolve through the registered icon
- * resolver, off the loading flag: widget types emit as soon as their modules
- * land, and each resolved icon patches in afterwards. Action icon references
- * resolve the same way.
+ * A record's `attributes` merge over the module's by `id`, keeping the
+ * module's order, with `isValid` merged rule by rule; the merged schema
+ * passes through `resolveFields`, so attributes referencing registered
+ * field types reach hosts as plain DataViews fields. Icon references
+ * resolve through the registered icon resolver, off the loading flag:
+ * widget types emit as soon as their modules land, and each resolved icon
+ * patches in afterwards. Action icon references resolve the same way.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.

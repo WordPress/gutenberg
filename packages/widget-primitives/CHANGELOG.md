@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useWidgetTypes`: preserve the module's attribute position when merging with record attributes ([#85171](https://github.com/WordPress/gutenberg/pull/85171)).
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes
