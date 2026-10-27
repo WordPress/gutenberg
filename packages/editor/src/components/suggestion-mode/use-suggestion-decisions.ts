@@ -17,13 +17,22 @@ import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { createProposedTerms } from './create-proposed-terms';
-import { withoutProposedAttributes } from './marker';
+import {
+	nestedMarkerFor,
+	withoutMarkerEntry,
+	withoutOutdatedProposals,
+	withoutProposedAttributes,
+} from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import {
+	formatDeltaFromOriginal,
+	rebaseFormatDelta,
 	rebaseFormatOriginal,
 	resolveInlineSuggestion,
 } from '../inline-suggestions';
 import type {
+	FormatDelta,
+	FormatRevision,
 	InlineSuggestionType,
 	ResolutionEffect,
 } from '../inline-suggestions';
@@ -81,6 +90,21 @@ function rebasedOriginalsOf( registry: object ) {
 		rebasedOriginals.set( registry, originals );
 	}
 	return originals;
+}
+
+/*
+ * Revised deltas of formatting changes, per registry, from the moment a
+ * decision computes them, for the same reason as `rebasedOriginals`.
+ */
+const revisedDeltas = new WeakMap< object, Map< string, FormatDelta > >();
+
+function revisedDeltasOf( registry: object ) {
+	let deltas = revisedDeltas.get( registry );
+	if ( ! deltas ) {
+		deltas = new Map();
+		revisedDeltas.set( registry, deltas );
+	}
+	return deltas;
 }
 
 function clearProposedAttributes(
@@ -303,6 +327,79 @@ export function useSuggestionDecisions() {
 		[ store, registry ]
 	);
 
+	/*
+	 * The delta of each formatting change in a value, as its note has it now:
+	 * a decision's revision, the payload's `delta`, or for a note written
+	 * before deltas, one derived from its recorded original.
+	 */
+	const formatDeltasFor = useCallback(
+		( value: any ) => ( formatId: string ) => {
+			const revised = revisedDeltasOf( registry ).get( formatId );
+			if ( revised ) {
+				return revised;
+			}
+			const op = findInlineOp(
+				parseSuggestionPayload(
+					store.getNote( Number( formatId ) )?.meta?._wp_suggestion
+				)?.operations
+			);
+			if ( op?.suggestionType !== 'format' ) {
+				return null;
+			}
+			if ( Array.isArray( op.delta ) ) {
+				return op.delta as FormatDelta;
+			}
+			const original =
+				rebasedOriginalsOf( registry ).get( formatId ) ?? op.beforeHTML;
+			return typeof original === 'string'
+				? formatDeltaFromOriginal( value, formatId, original )
+				: null;
+		},
+		[ store, registry ]
+	);
+
+	/*
+	 * Write a formatting change's revised payload to its note, keeping the
+	 * revision locally until the write lands.
+	 */
+	const reviseFormatNote = useCallback(
+		( formatId: string, revise: ( op: any ) => any ) => {
+			const noteId = Number( formatId );
+			const formatPayload = parseSuggestionPayload(
+				store.getNote( noteId )?.meta?._wp_suggestion
+			);
+			if ( ! formatPayload ) {
+				return;
+			}
+			const index = formatPayload.operations.findIndex(
+				( op: any ) =>
+					op.type === INLINE_OP_TYPE && op.suggestionType === 'format'
+			);
+			if ( index === -1 ) {
+				return;
+			}
+			const revised = revise( formatPayload.operations[ index ] );
+			const operations = formatPayload.operations.slice();
+			operations[ index ] = revised;
+			if ( typeof revised.beforeHTML === 'string' ) {
+				rebasedOriginalsOf( registry ).set(
+					formatId,
+					revised.beforeHTML
+				);
+			}
+			if ( Array.isArray( revised.delta ) ) {
+				revisedDeltasOf( registry ).set( formatId, revised.delta );
+			}
+			store
+				.updateNote( noteId, { ...formatPayload, operations } )
+				.catch( () => {
+					// The note keeps what it had; a later decision on that
+					// change reads the local revision until reload.
+				} );
+		},
+		[ store, registry ]
+	);
+
 	const reportResolution = useCallback(
 		( effect: ResolutionEffect ) => {
 			let emptied = 0;
@@ -332,65 +429,40 @@ export function useSuggestionDecisions() {
 				);
 			}
 			for ( const [ formatId, offsets ] of effect.formatRemovals ) {
-				const noteId = Number( formatId );
-				const formatPayload = parseSuggestionPayload(
-					store.getNote( noteId )?.meta?._wp_suggestion
-				);
-				if ( ! formatPayload ) {
-					continue;
-				}
-				let rebased = false;
-				const operations = formatPayload.operations.map(
-					( op: any ) => {
-						if (
-							op.type !== INLINE_OP_TYPE ||
-							op.suggestionType !== 'format' ||
-							typeof op.beforeHTML !== 'string'
-						) {
-							return op;
-						}
-						rebased = true;
-						return {
-							...op,
-							beforeHTML: rebaseFormatOriginal(
-								rebasedOriginalsOf( registry ).get(
-									String( noteId )
-								) ?? op.beforeHTML,
-								offsets
-							),
-							...( typeof op.afterHTML === 'string' && {
-								afterHTML: rebaseFormatOriginal(
-									op.afterHTML,
-									offsets
-								),
-							} ),
-						};
-					}
-				);
-				if ( rebased ) {
-					const formatOp = operations.find(
-						( op: any ) =>
-							op.type === INLINE_OP_TYPE &&
-							op.suggestionType === 'format'
-					);
-					rebasedOriginalsOf( registry ).set(
-						String( noteId ),
-						formatOp.beforeHTML
-					);
-					store
-						.updateNote( noteId, {
-							...formatPayload,
-							operations,
-						} )
-						.catch( () => {
-							// The original stays as it was; a later reject
-							// of that change falls back to dropping its
-							// marker rather than restoring the wrong text.
-						} );
-				}
+				reviseFormatNote( formatId, ( op: any ) => ( {
+					...op,
+					...( typeof op.beforeHTML === 'string' && {
+						beforeHTML: rebaseFormatOriginal(
+							rebasedOriginalsOf( registry ).get( formatId ) ??
+								op.beforeHTML,
+							offsets
+						),
+					} ),
+					...( typeof op.afterHTML === 'string' && {
+						afterHTML: rebaseFormatOriginal(
+							op.afterHTML,
+							offsets
+						),
+					} ),
+					...( Array.isArray(
+						revisedDeltasOf( registry ).get( formatId ) ?? op.delta
+					) && {
+						delta: rebaseFormatDelta(
+							revisedDeltasOf( registry ).get( formatId ) ??
+								op.delta,
+							offsets
+						),
+					} ),
+				} ) );
+			}
+			for ( const [ formatId, revision ] of effect.formatRevisions ) {
+				reviseFormatNote( formatId, ( op: any ): any => ( {
+					...op,
+					...( revision as FormatRevision ),
+				} ) );
 			}
 		},
-		[ store, createNotice, registry ]
+		[ createNotice, registry, reviseFormatNote ]
 	);
 
 	/**
@@ -514,6 +586,11 @@ export function useSuggestionDecisions() {
 								id: commentId,
 								suggestionType: inlineTypeOf( inlineOp ),
 								decision: 'accept',
+								formatDeltas: formatDeltasFor(
+									selectBlockAttributes( targetClientId )?.[
+										attributeKey
+									]
+								),
 							}
 						);
 						// The same block can hold a pending attribute proposal
@@ -536,6 +613,42 @@ export function useSuggestionDecisions() {
 			// mutate the tree rather than a single block's attributes, so they
 			// run a planned set of block-editor actions.
 			const structuralOp = findStructuralOp( payload.operations );
+			/*
+			 * A suggestion nested on another author's (a second proposal, or
+			 * a removal of their suggested block) is decided on its own: an
+			 * accepted removal removes the block, an accepted proposal lands
+			 * and leaves the block's other suggestions pending.
+			 */
+			const nested = nestedMarkerFor(
+				selectBlockAttributes( targetClientId ),
+				commentId
+			);
+			if ( nested && structuralOp?.type !== 'block-remove' ) {
+				return decide(
+					commentId,
+					'applied',
+					() => {
+						const currentAttributes =
+							selectBlockAttributes( targetClientId );
+						const applied = applyOperations(
+							currentAttributes,
+							payload.operations
+						);
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							...applied,
+							metadata: withoutOutdatedProposals(
+								withoutMarkerEntry(
+									currentAttributes?.metadata,
+									commentId
+								),
+								applied
+							),
+						} );
+					},
+					failureMessage
+				);
+			}
 			if ( structuralOp ) {
 				return decide(
 					commentId,
@@ -562,20 +675,27 @@ export function useSuggestionDecisions() {
 					const currentAttributes =
 						selectBlockAttributes( targetClientId );
 					// One update lands the proposed values and drops the
-					// proposal.
+					// proposal, with any other author's proposal it left
+					// with nothing to change.
 					const clearedProposal =
 						clearProposedAttributes( currentAttributes );
+					const applied = applyOperations(
+						currentAttributes,
+						payload.operations
+					);
+					const metadata = withoutOutdatedProposals(
+						clearedProposal?.metadata ??
+							currentAttributes?.metadata,
+						applied
+					);
 					// Bypass the Suggestion mode interceptor for this dispatch
 					// so the applied attributes land on the live block instead
 					// of being diverted into a proposal. Outside Suggestion
 					// mode the interceptor isn't running and this is a no-op.
 					requestInterceptorBypass( targetClientId );
 					updateBlockAttributes( targetClientId, {
-						...applyOperations(
-							currentAttributes,
-							payload.operations
-						),
-						...( clearedProposal ?? {} ),
+						...applied,
+						...( metadata ? { metadata } : {} ),
 					} );
 				},
 				failureMessage
@@ -592,6 +712,7 @@ export function useSuggestionDecisions() {
 			clearPostFieldProposals,
 			registry,
 			reportResolution,
+			formatDeltasFor,
 		]
 	);
 
@@ -672,6 +793,11 @@ export function useSuggestionDecisions() {
 									commentId,
 									inlineOp
 								),
+								formatDeltas: formatDeltasFor(
+									selectBlockAttributes( inlineTarget )?.[
+										attributeKey
+									]
+								),
 							}
 						);
 						// As on the apply path: a co-resident attribute
@@ -698,7 +824,31 @@ export function useSuggestionDecisions() {
 				commentId,
 				'rejected',
 				() => {
-					if ( structuralOp && clientId ) {
+					/*
+					 * A suggestion nested on another author's made no change
+					 * of its own to the block: rejecting it drops it and
+					 * leaves the block's other suggestions as they are.
+					 */
+					const remaining =
+						clientId &&
+						nestedMarkerFor(
+							selectBlockAttributes( clientId ),
+							commentId
+						)
+							? withoutMarkerEntry(
+									selectBlockAttributes( clientId )?.metadata,
+									commentId
+								)
+							: null;
+					if ( clientId && remaining ) {
+						requestInterceptorBypass( clientId );
+						markNextChangeAsNotPersistent?.( {
+							history: 'ignore',
+						} );
+						updateBlockAttributes( clientId, {
+							metadata: remaining,
+						} );
+					} else if ( structuralOp && clientId ) {
 						runPlan(
 							planStructuralReject(
 								structuralOp,
@@ -742,6 +892,7 @@ export function useSuggestionDecisions() {
 			registry,
 			reportResolution,
 			liveBeforeHTML,
+			formatDeltasFor,
 		]
 	);
 

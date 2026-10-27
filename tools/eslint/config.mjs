@@ -1086,6 +1086,36 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Suggestion mode markers stack (several markers of one type on
+	// a character), and these helpers keep one format of a type per character.
+	{
+		files: [
+			'packages/editor/src/components/inline-suggestions/**',
+			'packages/editor/src/components/inline-markers/**',
+		],
+		ignores: [ '**/test/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@wordpress/rich-text',
+							importNames: [
+								'applyFormat',
+								'removeFormat',
+								'toggleFormat',
+							],
+							message:
+								'These replace every format of a type on a character, which flattens stacked suggestion markers. Use addSuggestionMarker and removeSuggestionMarker instead.',
+						},
+					],
+				},
+			],
+		},
+	},
+
 	// Override: block-library — the waveform player's default entry initializes
 	// every `[data-waveform-player]` element on the page when it is imported.
 	{

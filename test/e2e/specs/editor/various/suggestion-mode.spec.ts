@@ -993,10 +993,9 @@ test.describe( 'Suggestion mode', () => {
 		).toHaveCount( 0 );
 	} );
 
-	test( 'type-over inside another author’s pending addition is refused', async ( {
+	test( 'type-over inside another author’s pending addition nests a replacement', async ( {
 		editor,
 		page,
-		pageUtils,
 		requestUtils,
 	} ) => {
 		await editor.insertBlock( {
@@ -1060,21 +1059,45 @@ test.describe( 'Suggestion mode', () => {
 
 		await switchIntent( page, 'Suggesting' );
 		await paragraph().click();
-		await page.keyboard.press( 'End' );
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 2 } );
+		// Select "ro" in "Hello wrold" through the store: arrow keys stop at
+		// each marker boundary first.
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const [ block ] = select( 'core/block-editor' ).getBlocks();
+			dispatch( 'core/block-editor' ).selectionChange(
+				block.clientId,
+				'content',
+				7,
+				9
+			);
+		} );
 		await page.keyboard.type( 'o' );
 
+		// The replacement nests inside the other author's addition, which
+		// keeps its id and author.
+		const outer = paragraph().locator(
+			`mark.wp-suggestion-add[data-suggestion-id="${ noteId }"]`
+		);
+		await expect( outer.first() ).toHaveAttribute(
+			'data-author',
+			String( otherAuthor.id )
+		);
+		await expect( outer.locator( 'mark.wp-suggestion-add' ) ).toHaveText(
+			'o'
+		);
+		await expect( outer.locator( 'mark.wp-suggestion-del' ) ).toHaveText(
+			'ro'
+		);
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByText( 'Inside a suggested addition by othertypeover' )
+		).toBeVisible();
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
-				.getByText(
-					'othertypeover suggested adding this text. Reply to their suggestion to propose a change.'
-				)
-		).toBeVisible();
-		await expect( added() ).toHaveCount( 1 );
-		await expect( added() ).toHaveText( ' wrold' );
-		await expect( paragraph() ).toHaveText( 'Hello wrold' );
+				.getByText( 'Reply to their suggestion', { exact: false } )
+		).toHaveCount( 0 );
 	} );
 
 	test( 'Backspace corrects the new text of a type-over', async ( {
@@ -1693,14 +1716,14 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).not.toContain( 'metadata' );
 	} );
 
-	test( 'style — bolding a whole paragraph over your own pending suggestions is refused', async ( {
+	test( 'style — bolding a whole paragraph over your own pending suggestions adds one formatting suggestion', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
 		// Reported on #73411: Ctrl+B over a whole paragraph that already holds
 		// the suggester's add, delete and replace suggestions. Formatting
-		// across those markers is declined like a text edit over them.
+		// stacks over those markers as one more suggestion.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
@@ -1766,18 +1789,21 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 
+		await expect( summaries ).toHaveCount( 4 );
+		await expect(
+			summaries.filter( { hasText: 'Add formatting:' } )
+		).toHaveCount( 1 );
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-format' ).first()
+		).toBeVisible();
+		await expect( paragraph.locator( 'strong' ).first() ).toBeVisible();
+		expect( await editor.getEditedPostContent() ).not.toBe( before );
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
 				.getByText( 'overlaps a pending suggestion' )
-		).toBeVisible();
-		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
-		await expect(
-			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toHaveCount( 0 );
-		expect( await editor.getEditedPostContent() ).toBe( before );
-		await expect( summaries ).toHaveCount( 3 );
-		expect( notesWritten ).toEqual( [] );
+		await expect.poll( () => notesWritten.length ).toBeGreaterThan( 0 );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
