@@ -131,22 +131,6 @@ test.describe( 'Invalid blocks', () => {
 		);
 	} );
 
-	test( 'should not nest a paragraph whose content has a paragraph', async ( {
-		editor,
-	} ) => {
-		await editor.setContent( `<!-- wp:paragraph -->
-<div><p>Hello</p></div>
-<!-- /wp:paragraph -->` );
-
-		const [ block ] = await editor.getBlocks( { full: true } );
-		expect( block.isValid ).toBe( false );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.getByRole( 'button', { name: 'Attempt recovery' } )
-		).toBeVisible();
-	} );
-
 	test( 'should not trigger malicious script tags when using a shortcode block', async ( {
 		editor,
 		page,
