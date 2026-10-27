@@ -6,6 +6,10 @@
 
 -   `WidgetModuleRecord.example`: a record carries the `example` `widget.json` declares, in the shape of the runtime field; `useWidgetTypes` reads it for a record without a metadata module, and when the module declares no `example` of its own ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 
+### Bug Fixes
+
+-   `useWidgetTypes`: preserve the module's attribute position when merging with record attributes ([#85171](https://github.com/WordPress/gutenberg/pull/85171)).
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes

@@ -137,14 +137,14 @@ function recordOverlay( record: WidgetModuleRecord ) {
  * module's default export with the runtime fields (`name`, `renderModule`).
  * A record without a metadata module resolves from its own fields alone,
  * so a widget declared entirely by its manifest needs no module stub.
- * A record's `attributes` lead the module's, merged by `id` with `isValid`
- * merged rule by rule; the merged schema passes through `resolveFields`, so
- * attributes referencing registered field types reach hosts as plain
- * DataViews fields. Icon references resolve through the registered icon
- * resolver, off the loading flag: widget types emit as soon as their modules
- * land, and each resolved icon patches in afterwards. Action icon references
- * resolve the same way. A record's `example` stands in when the module
- * declares none.
+ * A record's `attributes` merge over the module's by `id`, keeping the
+ * module's order, with `isValid` merged rule by rule; the merged schema
+ * passes through `resolveFields`, so attributes referencing registered
+ * field types reach hosts as plain DataViews fields. Icon references
+ * resolve through the registered icon resolver, off the loading flag:
+ * widget types emit as soon as their modules land, and each resolved icon
+ * patches in afterwards. Action icon references resolve the same way. A
+ * record's `example` stands in when the module declares none.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
