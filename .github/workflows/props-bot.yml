@@ -48,7 +48,7 @@ jobs:
     # - Removes the props-bot label, if necessary.
     props-bot:
         name: Generate a list of props
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             # The action needs permission `write` permission for PRs in order to add a comment.
             pull-requests: write
