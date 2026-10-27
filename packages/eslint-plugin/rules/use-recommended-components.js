@@ -139,7 +139,8 @@ const DENYLIST = {
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
-		ProgressBar: 'Use `Progress` from `@wordpress/ui` instead.',
+		ProgressBar:
+			'Use `Progress` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide',
 		RadioControl:
 			'Use `RadioGroupControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
