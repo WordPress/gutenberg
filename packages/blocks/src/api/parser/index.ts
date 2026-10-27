@@ -5,7 +5,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 } from '../registration';
-import { getSaveContent, loadedInnerContent } from '../serializer';
+import { getSaveContent, loadedBlocks } from '../serializer';
 import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
@@ -239,10 +239,10 @@ export function parseRawBlock(
 		updatedBlock.attributes === parsedBlock.attributes &&
 		! isFallbackBlock
 	) {
-		loadedInnerContent.set(
-			updatedBlock.attributes,
-			normalizedBlock.innerContent
-		);
+		loadedBlocks.set( updatedBlock.attributes, {
+			attributes: { ...updatedBlock.attributes },
+			innerContent: normalizedBlock.innerContent,
+		} );
 	}
 
 	if ( ! updatedBlock.isValid ) {
