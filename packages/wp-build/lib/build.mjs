@@ -11,7 +11,6 @@ import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import { camelCase } from 'change-case';
-import { NodePackageImporter } from 'sass-embedded';
 import createDsTokenFallbacksPlugin from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
 import {
 	groupByDepth,
@@ -47,7 +46,11 @@ import {
 	compileInlineStyle,
 	dsTokenFallbacks,
 } from './compile-inline-style.mjs';
-import { compileStylesheet, disposeSassCompiler } from './sass-compiler.mjs';
+import {
+	compileStylesheet,
+	disposeSassCompiler,
+	getSassOptions,
+} from './sass-compiler.mjs';
 import {
 	buildWithConcurrency,
 	getDefaultBuildConcurrency,
@@ -210,30 +213,6 @@ function styleRuntimeAliasPlugin() {
 			filter: { id: /^@wordpress\/style-runtime$/ },
 			handler: () => STYLE_RUNTIME_ENTRY,
 		},
-	};
-}
-
-/**
- * Get SASS options for the given working directory.
- *
- * Uses NodePackageImporter from sass-embedded for resolving package imports
- * (like `@wordpress/base-styles`) which works with any package manager (npm, pnpm, yarn).
- *
- * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
- * @return {Object} SASS options object with importers and loadPaths.
- */
-function getSassOptions( workingDir ) {
-	return {
-		importers: [ new NodePackageImporter( workingDir ) ],
-		// loadPaths for resolving @wordpress/base-styles imports and local base-styles imports
-		loadPaths: [
-			// Package's own node_modules (for pnpm isolated deps)
-			path.join( workingDir, 'node_modules' ),
-			// Root node_modules (for npm hoisted deps)
-			path.join( ROOT_DIR, 'node_modules' ),
-			// For local imports like @use "mixins"
-			path.join( PACKAGES_DIR, 'base-styles' ),
-		],
 	};
 }
 

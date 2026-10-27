@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { compileInlineStyle } from '../compile-inline-style.mjs';
+import { compileCss, compileInlineStyle } from '../compile-inline-style.mjs';
 
 async function compileStyleModule() {
 	return compileInlineStyle( { minify: false } )(
@@ -65,5 +65,27 @@ describe( 'compileInlineStyle', () => {
 		const source = await compileStyleModule();
 
 		expect( executeStyleModule( source, undefined ) ).toBe( 1 );
+	} );
+} );
+
+describe( 'compileCss', () => {
+	test( 'scopes class names like the JavaScript module does', async () => {
+		const cssText = '.button { color: red; } .is-small { padding: 0; }';
+		const filePath = `${ import.meta.dirname }/fixture.module.css`;
+
+		const { css, classNames } = await compileCss( cssText, filePath, {
+			cssModules: true,
+		} );
+		const source = await compileInlineStyle( { cssModules: true } )(
+			cssText,
+			import.meta.dirname,
+			filePath
+		);
+
+		expect( Object.keys( classNames ) ).toEqual( [ 'button', 'is-small' ] );
+		expect( source ).toContain(
+			`export default ${ JSON.stringify( classNames ) };`
+		);
+		expect( css ).toContain( `.${ classNames.button }` );
 	} );
 } );
