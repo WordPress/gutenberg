@@ -349,9 +349,7 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-html`
 
-It sets the inner HTML of an element, rendering markup instead of the plain text `wp-text` would produce. Plain strings, `null`, and any other value that isn't explicitly marked as trusted are ignored, leaving the element's existing content in place — this is what lets a derived-state getter return `null` while content is loading and keep the server-rendered fallback visible.
-
-Because rendering arbitrary HTML is a security concern, `wp-html` only accepts a value returned by `asDangerousHTML()`, exported from `@wordpress/interactivity`. Passing a plain string directly does nothing, by design: the plugin's JavaScript has to explicitly opt in to rendering that string as markup.
+It sets the inner HTML of an element from a value created with `asDangerousHTML()`, exported from `@wordpress/interactivity`. Because rendering arbitrary HTML is a security concern, a plain string is never rendered as HTML, by design: the plugin's JavaScript has to explicitly opt in.
 
 ```html
 <div data-wp-interactive="myPlugin">
@@ -375,14 +373,35 @@ store( 'myPlugin', {
 } );
 ```
 
+#### Values
+
+The element shows what its reference resolves to, calling it first when it is a function:
+
+-   A value returned by `asDangerousHTML()` renders its HTML.
+-   A pending value, which is server-computed derived state that the client hasn't defined yet, keeps the current content. This is how the server-rendered fallback stays visible while a store loads.
+-   The object `{ "wpServerHtml": true }`, which stands for an `asDangerousHTML()` value in the page's data, keeps the current content the same way, whether it comes from `state`, `context` or a [`data-wp-each`](#wp-each) item. It never renders anything itself: other properties it carries are ignored.
+-   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
+-   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
+
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
+
+#### Inert content
+
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
+
+#### Conflicts with other directives
+
+On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`, `data-wp-html` is ignored, and the element behaves as it does without it. A warning is shown in development mode.
+
 #### Security contract
 
 -   **`asDangerousHTML()` does not sanitize.** It performs no processing at all on the HTML it's given — the same responsibility a developer takes on using React's `dangerouslySetInnerHTML`. Treating untrusted input as trusted here is an XSS risk. Never pass it raw user-supplied content or a `context` value directly: `context` is meant for selecting *which* trusted markup to show (e.g. an ID or a flag), while the actual HTML should come from `state`, computed by your plugin's own code from a source it trusts (its own bundled markup, or a response from an endpoint it controls).
 -   **The returned value is opaque and identity-based, not content-based.** It carries no inspectable trace of the HTML it wraps. Adding it to `data-wp-context`, spreading it into a new object, or serializing it as JSON does not carry the "trusted" marker along with it — only a `wp-html` reference that resolves directly to the exact value `asDangerousHTML()` returned is ever rendered.
--   **This package creates no Trusted Types policy.** On a site that enforces Trusted Types with no default policy, passing a plain string causes the browser to reject the write, and the element's existing content (the server-rendered fallback, or the last HTML that did render successfully) is left in place. The supported way to render on such a site is to pass a `TrustedHTML` value from the site's own policy: `asDangerousHTML( myPolicy.createHTML( markup ) )`. This package deliberately doesn't create a policy of its own — that's a decision for the site to make.
--   **"Inert" means inert to the Interactivity API only.** Directives inside the HTML `wp-html` inserts are never processed, and interactive islands nested inside it are not hydrated (nested [client-side navigation](./core-concepts/client-side-navigation.md) regions aren't excluded from processing yet). But the inserted content is still live browser HTML: a `<script>` tag inside it won't execute, but that's an artifact of how `innerHTML` works, not a security boundary you should rely on. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
-
-The server leaves `wp-html` unprocessed, so the element's server-rendered content serves as a fallback until hydration runs (and stays visible if JavaScript never loads, or on a version of the Interactivity API that doesn't support this directive yet).
+-   **Trusted Types.**
+    -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
+    -   A rejected value empties the element, and a warning is shown in development mode.
+    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
+-   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
 
@@ -759,6 +778,8 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 	<li data-wp-each-child>olá</li>
 </ul>
 ```
+
+Inside an interactive region, interactive islands inside server-rendered `data-wp-each-child` items aren't hydrated on their own. They initialize as part of the items the list renders.
 
 ## Values of directives are references to store properties
 

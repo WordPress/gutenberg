@@ -667,6 +667,31 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should keep active formatting for input after an inline paste', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( '123' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		pageUtils.setClipboardData( { plainText: 'a' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		await pageUtils.pressKeys( 'primary+v' );
+		await page.keyboard.type( 'b' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>1aab23</strong>' },
+			},
+		] );
+	} );
+
 	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
 	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,
@@ -996,6 +1021,46 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				],
 			},
 			{ name: 'core/paragraph', attributes: { content: 'Outside' } },
+		] );
+	} );
+
+	test( 'should replace selected non-breaking spaces from the toolbar', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Replace non-breaking spaces' } );
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'one' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await editor.showBlockToolbar();
+		await expect( button ).toBeVisible();
+
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await page.keyboard.type( 'three' );
+		await editor.showBlockToolbar();
+		await expect( button ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await button.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two three' },
+			},
+		] );
+		await expect( button ).toHaveCount( 0 );
+
+		await page.keyboard.type( '!' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two!' },
+			},
 		] );
 	} );
 } );

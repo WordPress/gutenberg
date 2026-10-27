@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
+### Internal
+
+-   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   Export the `$description` of token groups on their `groups` nodes in `design-tokens.js`, and add descriptions for the dimension and border width groups ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
+
+### Enhancements
+
+-   `ThemeProvider` uses the prebuilt ramps of the default seed colors instead of building them, so a provider seeded with the default colors (such as the default admin color scheme) builds no ramp at all ([#85182](https://github.com/WordPress/gutenberg/pull/85182)).
+
+### Internal
+
+-   Update `@testing-library/user-event` to 14.6.8 for Theme tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
+-   Update Terrazzo token-generation tools to 2.9.0 ([#85067](https://github.com/WordPress/gutenberg/pull/85067)).
+-   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
+-   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
+
+### Documentation
+
+-   Add Color, Border, Dimension, and Cursor pages to the Storybook design tokens docs, and show token descriptions on the Typography page ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
+
+## 2.3.0 (2026-10-07)
+
 ### New Features
 
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
@@ -15,6 +52,7 @@
 
 ### Internal
 
+-   Generate and commit complete border radius and width tokens for Figma mode imports during the theme build. ([#84035](https://github.com/WordPress/gutenberg/pull/84035))
 -   Update the Vite development dependency to 8.3.2 ([#83992](https://github.com/WordPress/gutenberg/pull/83992)).
 -   Update the Vite development dependency to 8.3.1. ([#83569](https://github.com/WordPress/gutenberg/pull/83569))
 -   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).

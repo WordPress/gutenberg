@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `WidgetModuleRecord.example`: a record carries the `example` `widget.json` declares, in the shape of the runtime field; `useWidgetTypes` reads it for a record without a metadata module, and when the module declares no `example` of its own ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+
+## 0.10.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 0.9.0 (2026-10-07)
+
 ### New Features
 
 -   `useWidgetActions( actions )`: a mounted widget declares actions for its host to place, fulfilled by an `href` or a runtime-only `callback`. Adds the `actions` host capability (`WidgetHostActions`) and the types `WidgetActionEnvelope`, `WidgetCallbackAction` and `WidgetRuntimeAction` ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).

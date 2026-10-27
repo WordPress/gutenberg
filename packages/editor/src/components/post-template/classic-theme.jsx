@@ -1,10 +1,6 @@
 import { __ } from '@wordpress/i18n';
-import {
-	SelectControl as WCSelectControl,
-	Dropdown,
-	Button,
-	Notice,
-} from '@wordpress/components';
+import { Dropdown, Button, Notice } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -15,6 +11,10 @@ import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
 import PostPanelRow from '../post-panel-row';
+
+// The default template is stored as an empty string, but the select treats an
+// empty value as no selection and shows its placeholder.
+const DEFAULT_TEMPLATE_VALUE = '//default';
 
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const templateTitle = useSelect( ( select ) => {
@@ -119,13 +119,16 @@ function PostTemplateDropdownContent( { onClose } ) {
 						title.rendered,
 					] )
 				),
-			} ).map( ( [ slug, title ] ) => ( { value: slug, label: title } ) ),
+			} ).map( ( [ slug, title ] ) => ( {
+				value: slug || DEFAULT_TEMPLATE_VALUE,
+				label: title,
+			} ) ),
 		[ availableTemplates, fetchedTemplates ]
 	);
 
 	const selectedOption =
 		options.find( ( option ) => option.value === selectedTemplateSlug ) ??
-		options.find( ( option ) => ! option.value ); // The default option has '' value.
+		options.find( ( option ) => option.value === DEFAULT_TEMPLATE_VALUE );
 
 	const { editPost } = useDispatch( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -156,13 +159,19 @@ function PostTemplateDropdownContent( { onClose } ) {
 					{ __( 'The posts page template cannot be changed.' ) }
 				</Notice>
 			) : (
-				<WCSelectControl
+				<SelectControl
 					hideLabelFromVision
 					label={ __( 'Template' ) }
-					value={ selectedOption?.value ?? '' }
-					options={ options }
-					onChange={ ( slug ) =>
-						editPost( { template: slug || '' } )
+					value={ selectedOption ?? null }
+					items={ options }
+					onValueChange={ ( item ) =>
+						editPost( {
+							template:
+								! item?.value ||
+								item.value === DEFAULT_TEMPLATE_VALUE
+									? ''
+									: item.value,
+						} )
 					}
 				/>
 			) }

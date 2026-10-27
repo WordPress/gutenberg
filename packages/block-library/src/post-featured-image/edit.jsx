@@ -6,7 +6,7 @@ import {
 	ToggleControl,
 	Placeholder,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	TextControl,
 	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
@@ -479,7 +479,7 @@ export default function PostFeaturedImageEdit( {
 						}
 						style={ imageStyles }
 					/>
-					{ temporaryURL && <Spinner /> }
+					{ temporaryURL && <WCSpinner /> }
 				</>
 			);
 	}

@@ -46,6 +46,7 @@
 			}
 		},
 		"padding": {
+			"$description": "Space between the edge of a container and its content.",
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
 				"$description": "Extra small padding",
@@ -97,6 +98,7 @@
 			}
 		},
 		"gap": {
+			"$description": "Space between sibling elements in a flex or grid layout.",
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
 				"$description": "Extra small gap",
@@ -148,6 +150,7 @@
 			}
 		},
 		"size": {
+			"$description": "Width and height of controls, icons, and markers.",
 			"5xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
 				"$description": "Notification indicators",
@@ -206,6 +209,7 @@
 			}
 		},
 		"surface-width": {
+			"$description": "Widths for surfaces such as popovers, dialogs, and panels.",
 			"xs": {
 				"$value": { "value": 240, "unit": "px" },
 				"$description": "Extra small surface width",

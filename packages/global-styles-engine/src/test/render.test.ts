@@ -391,6 +391,24 @@ describe( 'global styles renderer', () => {
 			presets: false,
 			rootPadding: false,
 		};
+		const textInputSelectorWith = ( pseudoSelector: string ) =>
+			`textarea${ pseudoSelector }, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])${ pseudoSelector }`;
+		const transformTextInputStyles = (
+			textInputStyles: Record< string, unknown >
+		) =>
+			transformToStyles(
+				Object.freeze( {
+					styles: {
+						elements: { textInput: textInputStyles },
+					},
+				} as unknown as GlobalStylesConfig ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
 
 		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
 			const tree: GlobalStylesConfig = {
@@ -807,6 +825,100 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'renders text input focus color styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':focus'
+				) }){color: blue;}`
+			);
+		} );
+
+		it( 'renders text input user-invalid spacing styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':user-invalid': { spacing: { padding: { top: '1rem' } } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':user-invalid'
+				) }){padding-top: 1rem;}`
+			);
+		} );
+
+		it( 'renders text input placeholder typography styles with the pseudo-element after :where()', () => {
+			const css = transformTextInputStyles( {
+				'::placeholder': { typography: { fontStyle: 'italic' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					''
+				) })::placeholder{font-style: italic;}`
+			);
+		} );
+
+		it( 'outputs focus after validation states so focus color wins when both states match', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+				':user-valid': { color: { text: 'green' } },
+				':user-invalid': { color: { text: 'red' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':user-valid'
+				) }){color: green;}` +
+					`:root :where(${ textInputSelectorWith(
+						':user-invalid'
+					) }){color: red;}` +
+					`:root :where(${ textInputSelectorWith(
+						':focus'
+					) }){color: blue;}`
+			);
+		} );
+
+		it( 'should handle select element pseudo selectors', () => {
+			const tree = {
+				styles: {
+					elements: {
+						select: {
+							color: {
+								text: 'red',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							':visited': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'select{color: red;}:root :where(select:hover){color: blue;}'
+			);
+		} );
+
 		it( 'outputs default pseudo styles after responsive base styles', () => {
 			const tree = {
 				styles: {
@@ -849,6 +961,237 @@ describe( 'global styles renderer', () => {
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: black;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}'
 			);
+		} );
+
+		describe( 'state styles under a text clip', () => {
+			const textGradient = {
+				background: {
+					gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+					backgroundClip: 'text',
+				},
+			};
+			const blockSelectors = {
+				'core/paragraph': { selector: '.wp-block-paragraph' },
+			};
+
+			const render = ( paragraphStyles: object ) =>
+				transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: { 'core/paragraph': paragraphStyles },
+						},
+					} as unknown as GlobalStylesConfig ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+			it( 'clears the inherited gradient when a breakpoint escapes the clip', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: { backgroundClip: 'border-box' },
+					},
+				} );
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}'
+				);
+			} );
+
+			it( 'leaves a background the breakpoint paints itself', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: {
+							gradient: 'linear-gradient(135deg,#00ff00,#ffff00)',
+							backgroundClip: 'border-box',
+						},
+					},
+				} );
+
+				expect( result ).not.toContain( 'background-image: unset' );
+			} );
+
+			it( 'restores the fill for a breakpoint text color', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': { color: { text: '#00ff00' } },
+				} );
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-paragraph){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'adds nothing when the breakpoint keeps the text clip', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: {
+							gradient: 'linear-gradient(135deg,#00ff00,#ffff00)',
+							backgroundClip: 'text',
+						},
+					},
+				} );
+
+				expect( result ).not.toContain( 'background-image: unset' );
+				expect( result ).not.toContain(
+					'-webkit-text-fill-color: currentColor'
+				);
+			} );
+
+			it( 'reads the clip the breakpoint sets for itself', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									background: {
+										backgroundClip: 'border-box',
+									},
+									'@mobile': {
+										background: {
+											gradient:
+												'linear-gradient(135deg,#ff0000,#0000ff)',
+											backgroundClip: 'text',
+										},
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'reads the variation clip for a breakpoint inside it', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/group': {
+									variations: {
+										flashy: {
+											...textGradient,
+											'@mobile': {
+												background: {
+													backgroundClip:
+														'border-box',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								flashy: '.is-style-flashy.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain( 'background-image: unset' );
+			} );
+
+			it( 'reads the block clip for a breakpoint inside a variation', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/group': {
+									...textGradient,
+									variations: {
+										flashy: {
+											'@mobile': {
+												background: {
+													backgroundClip:
+														'border-box',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								flashy: '.is-style-flashy.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-group){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}'
+				);
+			} );
+
+			it( 'reads the breakpoint clip for a pseudo state inside it', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									...textGradient,
+									'@mobile': {
+										background: {
+											backgroundClip: 'border-box',
+										},
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				// The breakpoint already escaped the clip, so no fill is needed.
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
+				);
+			} );
 		} );
 
 		it( 'ignores root-level state styles', () => {
@@ -1111,7 +1454,7 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'handles legacy responsive block styles', () => {
+		it( 'ignores deprecated responsive block state aliases', () => {
 			const tree = {
 				styles: {
 					blocks: {
@@ -1146,7 +1489,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+				':root :where(.wp-block-button){color: red;}'
 			);
 		} );
 
@@ -1601,6 +1944,75 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'appends responsive style variation pseudo-element selectors after the :where() wrapper', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								'section-1': {
+									'@mobile': {
+										elements: {
+											textInput: {
+												':focus': {
+													color: { text: 'blue' },
+												},
+												'::placeholder': {
+													color: { text: 'green' },
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						'section-1': '.wp-block-group.is-style-section-1',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			const scoped = ( pseudoSelector: string ) =>
+				textInputSelectorWith( pseudoSelector )
+					.split( ', ' )
+					.map(
+						( part ) =>
+							`.wp-block-group.is-style-section-1 ${ part }`
+					)
+					.join( ', ' );
+
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					':focus'
+				) }){color: blue;}}`
+			);
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					''
+				) })::placeholder{color: green;}}`
+			);
+		} );
+
 		it( 'should handle duotone filter', () => {
 			const tree = {
 				styles: {
@@ -1687,6 +2099,50 @@ describe( 'global styles renderer', () => {
 			expect( customCssStylesheet.css ).not.toContain(
 				':root :where(p){color:red;}'
 			);
+		} );
+
+		it( 'should render viewport and pseudo-state block custom CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							css: 'color:blue;',
+							':hover': {
+								css: 'color:green;',
+							},
+							'@mobile': {
+								css: 'color:pink;',
+								':hover': {
+									css: 'color:yellow;',
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/button',
+					selectors: {
+						root: '.wp-block-button .wp-block-button__link',
+						typography: { writingMode: '.wp-block-button' },
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const combinedCss = styles.map( ( s: any ) => s.css ).join( '\n' );
+			expect( combinedCss ).toContain( 'color:blue' );
+			expect( combinedCss ).toContain( 'color:green' );
+			expect( combinedCss ).toContain( 'color:pink' );
+			expect( combinedCss ).toContain( 'color:yellow' );
 		} );
 
 		it( 'should use css feature selector object form with root subkey for block custom CSS', () => {

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `RequestUtils`: `activateTheme()` and `setupRest()` now use the site the `RequestUtils` was created with, rather than always the `WP_BASE_URL` environment variable ([#85420](https://github.com/WordPress/gutenberg/pull/85420)).
+
+### Internal
+
+-   Convert the remaining viewport and widget utilities to TypeScript ([#84917](https://github.com/WordPress/gutenberg/pull/84917)).
+
+## 3.1.0 (2026-10-20)
+
+## 3.0.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   `RequestUtils.setGutenbergExperiments()`: An experiment left out of the call now returns to its default rather than being switched off, and an experiment can default to on.To pin an experiment off regardless of its default, the function now supports an object argument with boolean values ([#83784](https://github.com/WordPress/gutenberg/pull/83784)).

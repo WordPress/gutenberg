@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 10.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 9.22.0 (2026-10-07)
+
 ### Enhancements
 
 -   Remove the unused Jest peer dependency from the fixture package ([#83502](https://github.com/WordPress/gutenberg/pull/83502)).

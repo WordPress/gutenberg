@@ -1,33 +1,22 @@
-import type { MutableRefObject } from 'react';
-
-/*
- * Format types register their keyboard shortcut and input event callbacks
- * into these Sets via `KeyboardShortcutContext` / `InputEventContext` (see
- * `./contexts`). The rich text field that owns the editable element provides
- * the Sets and attaches these listeners to dispatch the callbacks.
+/**
+ * A Set of callbacks that format types register for an event.
  */
-export type EventListenersProps = {
-	keyboardShortcuts: MutableRefObject<
-		Set< ( event: KeyboardEvent ) => void >
-	>;
-	inputEvents: MutableRefObject< Set< ( event: Event ) => void > >;
-};
+export type EventCallbacksSet< E extends Event > = Set< ( event: E ) => void >;
 
 /**
  * Attaches a `keydown` listener that dispatches the keyboard shortcut
  * callbacks format types registered through `KeyboardShortcutContext`.
  *
- * @param props Ref holding the registered callback Sets.
+ * @param keyboardShortcuts The Set the field provides on the context.
  *
  * @return Function that attaches the listener to an element and returns its
  *         cleanup function.
  */
 export const shortcutsListener =
-	( props: MutableRefObject< EventListenersProps > ) =>
+	( keyboardShortcuts: EventCallbacksSet< KeyboardEvent > ) =>
 	( element: HTMLElement ) => {
-		const { keyboardShortcuts } = props.current;
 		function onKeyDown( event: KeyboardEvent ) {
-			for ( const keyboardShortcut of keyboardShortcuts.current ) {
+			for ( const keyboardShortcut of keyboardShortcuts ) {
 				keyboardShortcut( event );
 			}
 		}
@@ -42,17 +31,16 @@ export const shortcutsListener =
  * Attaches an `input` listener that dispatches the `InputEvent` callbacks
  * format types registered through `InputEventContext`.
  *
- * @param props Ref holding the registered callback Sets.
+ * @param inputEvents The Set the field provides on the context.
  *
  * @return Function that attaches the listener to an element and returns its
  *         cleanup function.
  */
 export const inputEventsListener =
-	( props: MutableRefObject< EventListenersProps > ) =>
+	( inputEvents: EventCallbacksSet< InputEvent > ) =>
 	( element: HTMLElement ) => {
-		const { inputEvents } = props.current;
-		function onInput( event: Event ) {
-			for ( const inputEventHandler of inputEvents.current ) {
+		function onInput( event: InputEvent ) {
+			for ( const inputEventHandler of inputEvents ) {
 				inputEventHandler( event );
 			}
 		}

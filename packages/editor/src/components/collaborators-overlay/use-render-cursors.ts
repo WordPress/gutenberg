@@ -98,11 +98,16 @@ export function useRenderCursors(
 			return;
 		}
 
-		// Pre-compute the overlay rect once, same for every user.
-		const overlayRect = overlayElement.getBoundingClientRect();
-		const overlayContext = {
-			editorDocument: blockEditorDocument,
-			overlayRect,
+		// Measure the overlay rect once, same for every user, and only when
+		// there is a cursor to draw: measuring forces a layout.
+		let overlayContext:
+			{ editorDocument: Document; overlayRect: DOMRect } | undefined;
+		const getOverlayContext = () => {
+			overlayContext ??= {
+				editorDocument: blockEditorDocument,
+				overlayRect: overlayElement.getBoundingClientRect(),
+			};
+			return overlayContext;
 		};
 
 		const results: CursorData[] = [];
@@ -213,7 +218,7 @@ export function useRenderCursors(
 				selection,
 				start,
 				end,
-				overlayContext
+				getOverlayContext()
 			);
 
 			const hasCoords = Boolean( selectionVisual.coords );

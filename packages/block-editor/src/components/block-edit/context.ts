@@ -1,0 +1,36 @@
+import { createContext, useContext } from '@wordpress/element';
+import type { BlockEditContextValue } from './types';
+
+export const mayDisplayControlsKey = Symbol( 'mayDisplayControls' );
+export const mayDisplayParentControlsKey = Symbol( 'mayDisplayParentControls' );
+export const mayDisplayPatternEditingControlsKey = Symbol(
+	'mayDisplayPatternEditingControls'
+);
+export const blockEditingModeKey = Symbol( 'blockEditingMode' );
+export const blockBindingsKey = Symbol( 'blockBindings' );
+export const isPreviewModeKey = Symbol( 'isPreviewMode' );
+export const isMultiSelectedKey = Symbol( 'isMultiSelected' );
+export const isInListViewBlockSupportTreeKey = Symbol(
+	'isInListViewBlockSupportTree'
+);
+
+export const DEFAULT_BLOCK_EDIT_CONTEXT: BlockEditContextValue = {
+	name: '',
+	isSelected: false,
+};
+
+const Context = createContext( DEFAULT_BLOCK_EDIT_CONTEXT );
+Context.displayName = 'BlockEditContext';
+
+const { Provider } = Context;
+
+export { Provider as BlockEditContextProvider };
+
+/**
+ * A hook that returns the block edit context.
+ *
+ * @return Block edit context
+ */
+export function useBlockEditContext() {
+	return useContext( Context );
+}

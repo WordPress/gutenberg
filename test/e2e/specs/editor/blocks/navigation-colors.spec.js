@@ -160,7 +160,7 @@ test.describe( 'Navigation colors', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Elements options' } ).click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )

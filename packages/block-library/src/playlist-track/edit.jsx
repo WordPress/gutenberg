@@ -17,7 +17,7 @@ import {
 	TextControl,
 	TextareaControl as WCTextareaControl,
 	BaseControl,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
 import { useDispatch } from '@wordpress/data';
@@ -327,7 +327,7 @@ const PlaylistTrackEdit = ( {
 						) }
 						{ length }
 						{ !! temporaryURL && (
-							<Spinner className="wp-block-playlist-track__spinner" />
+							<WCSpinner className="wp-block-playlist-track__spinner" />
 						) }
 					</span>
 					<span className="screen-reader-text">{ __( 'Play' ) }</span>

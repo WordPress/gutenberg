@@ -31,9 +31,7 @@ export function getCanvasMarginCSS( isCompact ) {
 		tiers
 			.map(
 				( { minCanvasWidth, width } ) =>
-					`@media (min-width:${ minCanvasWidth }px){:root{padding-inline-end:${ width }px;min-height:var(--wp-editor-canvas-min-height,0);}body{overflow-x:clip;}:root::after{content:"";position:fixed;inset-block:0;inset-inline-end:${
-						width - 1
-					}px;width:1px;background:color-mix(in srgb,currentColor 10%,transparent);pointer-events:none;}}`
+					`@media (min-width:${ minCanvasWidth }px){:root{padding-inline-end:${ width }px;min-height:var(--wp-editor-canvas-min-height,0);}body{overflow-x:clip;}}`
 			)
 			.join( '' )
 	);

@@ -1,14 +1,10 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
-import {
-	useEntityRecord,
-	store as coreStore,
-	useEntityBlockEditor,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
-	Spinner,
+	Spinner as WCSpinner,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -25,8 +21,9 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { getBlockBindingsSource } from '@wordpress/blocks';
+import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
+import EditOriginalInspectorButton from '../utils/edit-original-inspector-button';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { isOverridableBlock } = unlock( patternsPrivateApis );
@@ -139,22 +136,68 @@ function ReusableBlockControl( {
 }
 
 const EMPTY_OBJECT = {};
+const EMPTY_ARRAY = [];
 
 function ReusableBlockEdit( {
 	name,
+	clientId,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 } ) {
-	const { record, hasResolved } = useEntityRecord(
-		'postType',
-		'wp_block',
-		ref
+	const { record, isResolving } = useSelect(
+		( select ) => {
+			// Prefer the `edit` record once it's loaded, for example by "Edit
+			// original", so the pattern's edits and saves show up straight
+			// away. core-data doesn't update `view` records.
+			if (
+				select( coreStore ).hasEntityRecord(
+					'postType',
+					'wp_block',
+					ref
+				)
+			) {
+				return {
+					record: select( coreStore ).getEditedEntityRecord(
+						'postType',
+						'wp_block',
+						ref
+					),
+					isResolving: false,
+				};
+			}
+			// Otherwise use the `view` record, which every user who can read
+			// the pattern can load, even if they can't edit it.
+			const args = [ 'postType', 'wp_block', ref, { context: 'view' } ];
+			const viewRecord = select( coreStore ).getEntityRecord( ...args );
+			return {
+				record: viewRecord,
+				// Not `isResolving`: resolution starts after a timeout, so on the
+				// first render it'd read as missing and flash the warning.
+				isResolving:
+					! viewRecord &&
+					! select( coreStore ).hasFinishedResolution(
+						'getEntityRecord',
+						args
+					),
+			};
+		},
+		[ ref ]
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
-	const isMissing = hasResolved && ! record;
+	// The `view` record's content is an object with its raw value, the
+	// `edit` record's is the raw value itself.
+	const patternContent = record?.content?.raw ?? record?.content;
+	const blocks = useMemo( () => {
+		if ( record?.blocks ) {
+			return record.blocks;
+		}
+		// Once the pattern is edited, its content is a function that
+		// serializes its blocks, which are returned above.
+		return typeof patternContent === 'string' && patternContent
+			? parse( patternContent )
+			: EMPTY_ARRAY;
+	}, [ record?.blocks, patternContent ] );
+	const isMissing = ! isResolving && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
@@ -238,28 +281,35 @@ function ReusableBlockEdit( {
 		);
 	}
 
-	if ( ! hasResolved ) {
+	if ( isResolving ) {
 		children = (
 			<Placeholder>
-				<Spinner />
+				<WCSpinner />
 			</Placeholder>
 		);
 	}
 
 	return (
 		<>
-			{ hasResolved && ! isMissing && (
-				<ReusableBlockControl
-					recordId={ ref }
-					canOverrideBlocks={ canOverrideBlocks }
-					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
-					resetContent={ resetContent }
-				/>
+			{ ! isResolving && ! isMissing && (
+				<>
+					<EditOriginalInspectorButton
+						clientId={ clientId }
+						postType="wp_block"
+						postId={ ref }
+					/>
+					<ReusableBlockControl
+						recordId={ ref }
+						canOverrideBlocks={ canOverrideBlocks }
+						hasContent={ !! content }
+						handleEditOriginal={
+							onNavigateToEntityRecord
+								? handleEditOriginal
+								: undefined
+						}
+						resetContent={ resetContent }
+					/>
+				</>
 			) }
 
 			{ children === null ? (

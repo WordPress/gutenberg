@@ -22,6 +22,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 */
 	final class WP_Style_Engine {
 		/**
+		 * The values `background-clip` accepts.
+		 *
+		 * @var string[]
+		 */
+		const VALID_BACKGROUND_CLIP_VALUES = array( 'border-box', 'padding-box', 'content-box', 'text' );
+
+		/**
 		 * Style definitions that contain the instructions to parse/output valid Gutenberg styles from a block's attributes.
 		 *
 		 * For every style definition, the following properties are valid:
@@ -717,16 +724,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string $style_value      A single raw style value from $block_styles array.
 		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
-		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
 		 */
 		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
 		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
-			if ( empty( $style_value ) || ! is_string( $style_value ) ) {
-				return array();
-			}
-
-			$valid_values = array( 'border-box', 'padding-box', 'content-box', 'text' );
-			if ( ! in_array( $style_value, $valid_values, true ) ) {
+			if ( ! in_array( $style_value, static::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
 				return array();
 			}
 
