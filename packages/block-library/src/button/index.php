@@ -75,7 +75,7 @@ function render_block_core_button( $attributes, $content ) {
 
 		// Mirror the background block support defaults.
 		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+			$background_styles['backgroundSize'] ??= 'cover';
 			if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
 				$background_styles['backgroundPosition'] = '50% 50%';
 			}

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import type { Block } from '@wordpress/blocks';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { MediaCategoryPanel } from './media-panel';
@@ -31,11 +32,11 @@ function MediaTab( {
 	rootClientId,
 	onInsert,
 }: {
-	rootClientId?: string;
+	rootClientId?: string | null;
 	/**
 	 * Called with the block to insert.
 	 */
-	onInsert: ( block: unknown ) => void;
+	onInsert: ( block: Block ) => void;
 } ) {
 	const { categories: mediaCategories, hasResolved } =
 		useMediaCategories( rootClientId );
