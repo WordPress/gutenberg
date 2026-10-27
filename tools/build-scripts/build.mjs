@@ -8,6 +8,11 @@ import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import path from 'path';
 
+/**
+ * Internal dependencies
+ */
+import { getTypeScriptBuildOrder } from './packages/typescript-build-order.mjs';
+
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
@@ -76,6 +81,26 @@ function exec( command, args = [], options = {} ) {
 }
 
 /**
+ * Builds the TypeScript types.
+ *
+ * A single `tsc --build` checks every project in one process, with several
+ * type checkers per project. On runners with fewer resources, such as those
+ * used by private forks, that runs out of memory. In CI, build one project at
+ * a time instead, in the same order and with a single checker.
+ *
+ * @return {Promise<void>} Promise that resolves when the types are built.
+ */
+async function buildTypes() {
+	if ( ! process.env.CI ) {
+		await exec( 'tsc', [ '--build' ] );
+		return;
+	}
+	for ( const project of getTypeScriptBuildOrder( ROOT_DIR ) ) {
+		await exec( 'tsc', [ '--build', project, '--checkers', '1' ] );
+	}
+}
+
+/**
  * Main build orchestration function.
  */
 async function build() {
@@ -141,7 +166,7 @@ async function build() {
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsc', [ '--build' ] ).catch( () => {
+			await buildTypes().catch( () => {
 				console.error(
 					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 				);
