@@ -15,6 +15,7 @@
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
 -   Heading: Generate anchors with `cleanForSlug`, so headings in scripts like Devanagari, Tamil and Bengali keep their vowel signs, and anchors follow the same rules as post slugs ([#85096](https://github.com/WordPress/gutenberg/pull/85096)).
+-   Query Pagination: Explain in the "Show label text" help that screen readers still announce a hidden label on the site ([#83160](https://github.com/WordPress/gutenberg/pull/83160)).
 
 ## 12.0.0 (2026-10-20)
 
