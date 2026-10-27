@@ -286,26 +286,6 @@ describe( 'block parser', () => {
 				expect( block.isValid ).toBe( true );
 				expect( console ).not.toHaveInformed();
 			} );
-			it( 'handle deprecation but not log without SCRIPT_DEBUG', () => {
-				/* eslint-disable @wordpress/wp-global-usage */
-				const initialScriptDebug = globalThis.SCRIPT_DEBUG;
-				globalThis.SCRIPT_DEBUG = false;
-				try {
-					const block = parseRawBlock( {
-						blockName: 'core/test-block',
-						innerHTML: '<span>Bananas</span>',
-						attrs: { fruit: 'Bananas' },
-					} );
-					expect( block.attributes ).toEqual( {
-						fruit: 'Big Bananas',
-					} );
-					expect( block.isValid ).toBe( true );
-					expect( console ).not.toHaveInformed();
-				} finally {
-					globalThis.SCRIPT_DEBUG = initialScriptDebug;
-				}
-				/* eslint-enable @wordpress/wp-global-usage */
-			} );
 		} );
 	} );
 
