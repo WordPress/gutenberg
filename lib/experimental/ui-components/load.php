@@ -92,11 +92,18 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 		return '';
 	}
 
-	if ( ! empty( $component['content']['required'] ) && ( ! is_string( $content ) || '' === $content ) ) {
+	$allows_components = ! empty( $component['content']['components'] );
+	$content           = gutenberg_ui_components_render_content( $content, $allows_components );
+	if ( null === $content || ( ! empty( $component['content']['required'] ) && '' === $content ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
-			/* translators: %s: Component name. */
-			esc_html( sprintf( __( 'The "%s" component needs text content.', 'gutenberg' ), $name ) ),
+			esc_html(
+				$allows_components
+					/* translators: %s: Component name. */
+					? sprintf( __( 'The "%s" component needs text or other components as content.', 'gutenberg' ), $name )
+					/* translators: %s: Component name. */
+					: sprintf( __( 'The "%s" component needs text content.', 'gutenberg' ), $name )
+			),
 			'24.4.0'
 		);
 		return '';
@@ -105,7 +112,7 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	gutenberg_ui_components_enqueue_assets();
 
 	if ( isset( $component['markup'] ) ) {
-		return gutenberg_ui_components_render_markup( $component, $props, (string) $content );
+		return gutenberg_ui_components_render_markup( $component, $props, $content, $allows_components );
 	}
 
 	$classes = $component['classes']['base'];
@@ -115,7 +122,50 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 		$classes = array_merge( $classes, $values[ $value ] ?? array() );
 	}
 
-	return $render( $props, $classes, (string) $content );
+	return $render( $props, $classes, $content );
+}
+
+/**
+ * Turns the content passed to `gutenberg_get_ui_component()` into a string.
+ *
+ * Content is plain text. Components that accept other components as content
+ * also take a component as `array( 'component' => 'button', 'props' => …,
+ * 'content' => … )`, or a list of text and components. Those are rendered here,
+ * and text is escaped, so the result is HTML that only ever comes from
+ * components and escaped text, never from the caller.
+ *
+ * @param mixed $content           Content.
+ * @param bool  $allows_components Whether the content can include components.
+ * @return string|null Plain text, or HTML when components are allowed. Null when
+ *                     the content isn't valid.
+ */
+function gutenberg_ui_components_render_content( $content, $allows_components ) {
+	if ( null === $content ) {
+		return '';
+	}
+	if ( is_string( $content ) ) {
+		return $allows_components ? htmlspecialchars( $content, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ) : $content;
+	}
+	if ( ! $allows_components || ! is_array( $content ) ) {
+		return null;
+	}
+	if ( isset( $content['component'] ) ) {
+		return gutenberg_get_ui_component(
+			(string) $content['component'],
+			isset( $content['props'] ) ? (array) $content['props'] : array(),
+			$content['content'] ?? null
+		);
+	}
+
+	$html = '';
+	foreach ( $content as $item ) {
+		$item_html = gutenberg_ui_components_render_content( $item, true );
+		if ( null === $item_html ) {
+			return null;
+		}
+		$html .= $item_html;
+	}
+	return $html;
 }
 
 /**

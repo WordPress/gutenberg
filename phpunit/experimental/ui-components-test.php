@@ -35,7 +35,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 		$cases = array();
 		foreach ( json_decode( file_get_contents( $file ), true ) as $fixture ) {
-			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . $fixture['content'] ] = array( $fixture );
+			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . wp_json_encode( $fixture['content'] ) ] = array( $fixture );
 		}
 		return $cases;
 	}
@@ -95,6 +95,49 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 			'empty' => array( '' ),
 			'array' => array( array( 'Save' ) ),
 		);
+	}
+
+	public function test_html_passed_as_content_is_escaped() {
+		$html = gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			'<img src=x onerror=alert(1)>'
+		);
+
+		$this->assertStringNotContainsString( '<img', $html );
+		$this->assertStringContainsString( '&lt;img', $html );
+	}
+
+	public function test_nested_components_are_rendered_and_text_is_escaped() {
+		$html = gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			array(
+				'<b>Save</b> your changes.',
+				array(
+					'component' => 'button',
+					'content'   => 'Save',
+				),
+			)
+		);
+
+		$this->assertStringContainsString( '&lt;b&gt;Save&lt;/b&gt; your changes.', $html );
+		$this->assertStringContainsString( '<button', $html );
+	}
+
+	public function test_an_unknown_nested_component_renders_nothing_for_it() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
+
+		$html = gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			array(
+				'Text',
+				array( 'component' => 'not-a-component' ),
+			)
+		);
+
+		$this->assertStringContainsString( 'Text', $html );
 	}
 
 	public function test_an_unknown_component_renders_nothing() {
