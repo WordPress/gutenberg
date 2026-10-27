@@ -1,6 +1,10 @@
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 import { validateBlock } from '../validation';
-import { getBlockAttributes } from './get-block-attributes';
+import {
+	getBlockAttributes,
+	isValidByType,
+	isValidByEnum,
+} from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import { omit } from '../utils';
 import type { Block, BlockDeprecation, BlockType, RawBlock } from '../../types';
@@ -98,6 +102,29 @@ export function applyBlockDeprecatedVersions(
 			continue;
 		}
 
+		// Preserve explicitly saved current attributes without changing the
+		// historical schema or the attributes passed to its migration.
+		const preservedAttributes = Object.fromEntries(
+			Object.entries( block.attributes ).filter( ( [ name ] ) => {
+				const schema = blockType.attributes?.[ name ];
+				return (
+					schema &&
+					Object.hasOwn( blockType.attributes ?? {}, name ) &&
+					schema.source === undefined &&
+					schema.role !== 'local' &&
+					schema.__experimentalRole !== 'local' &&
+					Object.hasOwn( parsedAttributes, name ) &&
+					! Object.hasOwn(
+						deprecatedBlockType.attributes ?? {},
+						name
+					) &&
+					! Object.hasOwn( migratedBlock.attributes, name ) &&
+					isValidByType( parsedAttributes[ name ], schema.type ) &&
+					isValidByEnum( parsedAttributes[ name ], schema.enum )
+				);
+			} )
+		);
+
 		let migratedInnerBlocks = migratedBlock.innerBlocks;
 		let migratedAttributes = migratedBlock.attributes;
 
@@ -121,7 +148,7 @@ export function applyBlockDeprecatedVersions(
 
 		block = {
 			...block,
-			attributes: migratedAttributes,
+			attributes: { ...preservedAttributes, ...migratedAttributes },
 			innerBlocks: migratedInnerBlocks,
 			isValid: true,
 			validationIssues: [],
