@@ -1,5 +1,6 @@
 import { PanelBody } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { CheckboxControl } from '@wordpress/ui';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/block-serialization-default-parser';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -8,6 +9,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../store';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
+const CHOICE_FIELD = 'navigation_menus';
 const LINK_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
 type ParsedBlock = ReturnType< typeof parse >[ number ];
@@ -19,17 +21,21 @@ type NavigationMenuRecord = {
 	meta?: Record< string, unknown >;
 };
 
-type MenuTarget = {
+type MenuRow = {
 	id: number;
 	title: string;
+	/** The menu already links to the page; the link goes live with it. */
+	isLinked: boolean;
+	/** The "Auto add pages" setting would add the page to this menu. */
+	isAddedByDefault: boolean;
 	/** The label of the parent page's link the new link goes under. */
 	parentLabel?: string;
 };
 
 /**
  * Finds the first Navigation Link or Submenu block in a tree that points at
- * a page. Mirrors the server's check so the panel only lists menus the server
- * will actually add the page to.
+ * a page. Mirrors the server's check so the panel reflects what the server
+ * does on publish.
  *
  * @param blocks Parsed blocks.
  * @param pageId Page ID.
@@ -72,17 +78,19 @@ function getMenuEditorUrl( menuId: number ) {
 }
 
 /**
- * Lists the Navigation Menus a page appears in once it is published: the
- * menus that already link to it, whose links go live with the page, and the
- * menus with "Auto add pages" switched on that add a link to it. A child page
- * is only added to a menu that links to its parent.
+ * Lets the author choose the Navigation Menus a page is added to when it is
+ * published. The menus with "Auto add pages" switched on that would add the
+ * page start checked, a menu that already links to the page is checked and
+ * cannot be unchecked, and any other menu can be checked to add the page to
+ * it. A change is sent with the page as its `navigation_menus` field, which
+ * replaces the setting's choice for this page only.
  */
 export default function MaybeNavigationMenusPanel() {
-	const targets = useSelect( ( select ): MenuTarget[] => {
+	const { rows, choice } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPostId, getEditedPostAttribute } =
 			select( editorStore );
 		if ( getCurrentPostType() !== 'page' ) {
-			return [];
+			return { rows: [] as MenuRow[], choice: undefined };
 		}
 		const menus = select( coreStore ).getEntityRecords(
 			'postType',
@@ -90,88 +98,137 @@ export default function MaybeNavigationMenusPanel() {
 			{ per_page: -1, status: 'any' }
 		) as NavigationMenuRecord[] | null;
 		if ( ! menus?.length ) {
-			return [];
+			return { rows: [] as MenuRow[], choice: undefined };
 		}
 
 		const pageId = Number( getCurrentPostId() );
 		const parentId = Number( getEditedPostAttribute( 'parent' ) ) || 0;
-		const result: MenuTarget[] = [];
-		for ( const menu of menus ) {
+		const result: MenuRow[] = menus.map( ( menu ) => {
 			const blocks = parse( menu.content?.raw ?? '' );
 			const title = decodeEntities(
 				menu.title?.raw || menu.title?.rendered || ''
 			);
 			if ( findLinkToPage( blocks, pageId ) ) {
-				result.push( { id: menu.id, title } );
-				continue;
+				return {
+					id: menu.id,
+					title,
+					isLinked: true,
+					isAddedByDefault: false,
+				};
 			}
-			if ( ! menu.meta?.[ META_KEY ] ) {
-				continue;
-			}
-			if ( ! parentId ) {
-				result.push( { id: menu.id, title } );
-				continue;
-			}
-			const parentLink = findLinkToPage( blocks, parentId );
-			if ( ! parentLink ) {
-				continue;
-			}
+			const parentLink = parentId
+				? findLinkToPage( blocks, parentId )
+				: undefined;
 			const parentLabel = (
-				parentLink.attrs as Record< string, unknown > | undefined
+				parentLink?.attrs as Record< string, unknown > | undefined
 			 )?.label;
-			result.push( {
+			return {
 				id: menu.id,
 				title,
+				isLinked: false,
+				isAddedByDefault:
+					!! menu.meta?.[ META_KEY ] &&
+					( ! parentId || !! parentLink ),
 				parentLabel:
 					typeof parentLabel === 'string'
 						? decodeEntities( parentLabel )
 						: undefined,
-			} );
-		}
-		return result;
+			};
+		} );
+		return {
+			rows: result,
+			choice: getEditedPostAttribute( CHOICE_FIELD ) as
+				number[] | undefined,
+		};
 	}, [] );
+	const { editPost } = useDispatch( editorStore );
 
-	if ( ! targets.length ) {
+	if ( ! rows.length ) {
 		return null;
 	}
 
-	const summary =
-		targets.length === 1
-			? targets[ 0 ].title
-			: sprintf(
-					/* translators: %d: Number of navigation menus. */
-					_n( '%d menu', '%d menus', targets.length ),
-					targets.length
-				);
+	const checkedIds = new Set(
+		choice ??
+			rows
+				.filter( ( row ) => row.isAddedByDefault )
+				.map( ( row ) => row.id )
+	);
+	const isChecked = ( row: MenuRow ) =>
+		row.isLinked || checkedIds.has( row.id );
+	const checkedRows = rows.filter( isChecked );
+
+	const setChecked = ( row: MenuRow, value: boolean ) => {
+		const next = rows
+			.filter( ( other ) =>
+				other.id === row.id
+					? value
+					: ! other.isLinked && checkedIds.has( other.id )
+			)
+			.map( ( other ) => other.id );
+		editPost( { [ CHOICE_FIELD ]: next } );
+	};
+
+	let summary: string;
+	if ( checkedRows.length === 0 ) {
+		summary = __( 'None' );
+	} else if ( checkedRows.length === 1 ) {
+		summary = checkedRows[ 0 ].title || __( 'Untitled menu' );
+	} else {
+		summary = sprintf(
+			/* translators: %d: Number of navigation menus. */
+			_n( '%d menu', '%d menus', checkedRows.length ),
+			checkedRows.length
+		);
+	}
 
 	return (
 		<PanelBody
 			initialOpen={ false }
 			title={ sprintf(
-				/* translators: %s: A menu name, or a count of menus. */
+				/* translators: %s: A menu name, a count of menus, or "None". */
 				__( 'Menus: %s' ),
 				summary
 			) }
 		>
 			<p>
 				{ __(
-					'This page appears in these menus once it is published.'
+					'This page appears in the checked menus once it is published.'
 				) }
 			</p>
 			<ul className="editor-post-publish-panel__menus">
-				{ targets.map( ( { id, title, parentLabel } ) => (
-					<li key={ id }>
-						<a href={ getMenuEditorUrl( id ) }>
-							{ title || __( 'Untitled menu' ) }
-						</a>
-						{ parentLabel &&
-							sprintf(
-								/* translators: %s: The label of the parent page's link in the menu. */
-								__( ', under %s' ),
-								parentLabel
-							) }
-					</li>
-				) ) }
+				{ rows.map( ( row ) => {
+					const title = row.title || __( 'Untitled menu' );
+					return (
+						<li key={ row.id }>
+							<CheckboxControl
+								label={ title }
+								description={
+									row.parentLabel &&
+									sprintf(
+										/* translators: %s: The label of the parent page's link in the menu. */
+										__( 'Under %s' ),
+										row.parentLabel
+									)
+								}
+								checked={ isChecked( row ) }
+								disabled={ row.isLinked }
+								onCheckedChange={ ( value: boolean ) =>
+									setChecked( row, value )
+								}
+							/>
+							<a
+								href={ getMenuEditorUrl( row.id ) }
+								aria-label={ sprintf(
+									/* translators: %s: A menu name. */
+									__( 'Edit %s' ),
+									title
+								) }
+							>
+								{ __( 'Edit' ) }
+							</a>
+						</li>
+					);
+				} ) }
 			</ul>
 		</PanelBody>
 	);

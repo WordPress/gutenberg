@@ -152,6 +152,7 @@ require __DIR__ . '/compat/wordpress-7.2/kses.php';
 require __DIR__ . '/compat/wordpress-7.2/media.php';
 require __DIR__ . '/compat/wordpress-7.2/post.php';
 require __DIR__ . '/compat/wordpress-7.2/navigation-auto-add-pages.php';
+require __DIR__ . '/compat/wordpress-7.2/navigation-choose-menus-on-publish.php';
 require __DIR__ . '/compat/wordpress-7.2/navigation-remove-deleted-links.php';
 
 // Experimental features.
