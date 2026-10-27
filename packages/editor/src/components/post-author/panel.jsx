@@ -8,6 +8,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import PostAuthorCheck from './check';
 import PostAuthorControl from './index';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 import { BASE_QUERY } from './constants';
 import { store as editorStore } from '../../store';
 
@@ -18,6 +19,7 @@ function PostAuthorToggle( { isOpen, onClick } ) {
 			postAuthor: select( coreStore ).getUser( id, BASE_QUERY ),
 		};
 	}, [] );
+	const lockedProps = useLockedPostSettingProps();
 	const authorName =
 		decodeEntities( postAuthor?.name ) || __( '(No author)' );
 	return (
@@ -30,6 +32,7 @@ function PostAuthorToggle( { isOpen, onClick } ) {
 				sprintf( __( 'Change author: %s' ), authorName )
 			}
 			onClick={ onClick }
+			{ ...lockedProps }
 		>
 			{ authorName }
 		</Button>
