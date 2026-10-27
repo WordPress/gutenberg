@@ -28,7 +28,6 @@
 			"clientNavigation": true
 		},
 		"customCSS": false,
-		"rotate": false,
 		"visibility": false
 	}
 }

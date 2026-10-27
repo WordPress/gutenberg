@@ -49,7 +49,7 @@ function render_block_core_icon( $attributes ) {
 
 		// Mirror of the defaults in the background block support.
 		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+			$background_styles['backgroundSize'] ??= 'cover';
 			if ( 'contain' === $background_styles['backgroundSize'] && empty( $background_styles['backgroundPosition'] ) ) {
 				$background_styles['backgroundPosition'] = '50% 50%';
 			}

@@ -598,6 +598,19 @@ describe( 'Blocks raw handling', () => {
 			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
+
+		it( 'should preserve anchors on headings and paragraphs', () => {
+			const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+			const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+
+			expect( blocks ).toHaveLength( 2 );
+			expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+			expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+			expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+			expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 
@@ -700,5 +713,36 @@ describe( 'rawHandler', () => {
 			// Image blocks don't have a default sizeSlug, so when not provided it should be undefined
 			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
 		} );
+	} );
+
+	it( 'should preserve anchors on headings and paragraphs', () => {
+		const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+		expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+	} );
+
+	it( 'should preserve the anchor and class of a raw transform without a transform function', () => {
+		const HTML = '<hr id="divider" class="is-fancy">';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/separator' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'divider' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'is-fancy' );
+	} );
+
+	it( 'should not copy the class a block adds itself into className', () => {
+		const HTML = '<ul class="wp-block-list fancy"><li>One</li></ul>';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/list' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'fancy' );
 	} );
 } );

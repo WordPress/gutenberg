@@ -11,10 +11,11 @@ import {
 	BlockEditContextProvider,
 	mayDisplayControlsKey,
 } from '../../components/block-edit/context';
-import InspectorControlsSlot from '../../components/inspector-controls/slot';
+import InspectorControls from '../../components/inspector-controls';
+import PositionControls from '../../components/inspector-controls-tabs/position-controls-panel';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import rotate from '../rotate';
+import rotate from '../rotation';
 
 const BLOCK_NAME = 'test/rotate-control';
 const GRID_BLOCK_NAME = 'test/rotate-control-grid';
@@ -61,7 +62,13 @@ function RotateEdit( { clientId }: { clientId: string } ) {
 
 function showRotateControl(
 	style?: BlockStyle,
-	{ gridLayout }: { gridLayout?: Record< string, unknown > } = {}
+	{
+		gridLayout,
+		hasPositionControl = false,
+	}: {
+		gridLayout?: Record< string, unknown >;
+		hasPositionControl?: boolean;
+	} = {}
 ) {
 	const block = createBlock( BLOCK_NAME, { style } );
 	const rootBlock = gridLayout
@@ -82,8 +89,13 @@ function showRotateControl(
 		<SlotFillProvider>
 			<BlockEditContextProvider value={ blockEditContext }>
 				<RotateEdit clientId={ block.clientId } />
+				{ hasPositionControl && (
+					<InspectorControls group="position">
+						<div>Position selector</div>
+					</InspectorControls>
+				) }
 			</BlockEditContextProvider>
-			<InspectorControlsSlot group="dimensions" label="Dimensions" />
+			<PositionControls />
 		</SlotFillProvider>
 	);
 	return { clientId: block.clientId, rootClientId: rootBlock.clientId };
@@ -96,6 +108,7 @@ describe( 'Rotation control', () => {
 			title: 'Rotate control test',
 			category: 'text',
 			attributes: { style: { type: 'object' } },
+			supports: { rotation: true },
 			edit: () => null,
 			save: () => null,
 		} );
@@ -134,6 +147,81 @@ describe( 'Rotation control', () => {
 
 		fireEvent.change( input, { target: { value: '0' } } );
 		expect( getStyle( clientId ) ).toBeUndefined();
+	} );
+
+	it( 'offers Rotation without a Position option when the block has no position control', () => {
+		const { clientId } = showRotateControl();
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Position options' } )
+		);
+		expect(
+			screen.queryByRole( 'menuitem', { name: /Position,/ } )
+		).not.toBeInTheDocument();
+		fireEvent.click(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Rotation, show' } )
+		);
+		fireEvent.change(
+			screen.getByRole( 'spinbutton', { name: 'Rotation' } ),
+			{ target: { value: '45' } }
+		);
+		expect( getStyle( clientId ) ).toEqual( { rotate: 45 } );
+	} );
+
+	it( 'keeps the existing Position option alongside Rotation', () => {
+		showRotateControl(
+			{ position: { type: 'sticky' } },
+			{ hasPositionControl: true }
+		);
+
+		expect( screen.getByText( 'Position selector' ) ).toBeInTheDocument();
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Position options' } )
+		);
+		expect(
+			screen.getByRole( 'menuitem', {
+				name: 'Position, reset to default',
+			} )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Rotation, show' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'hides Rotation without changing the existing position', () => {
+		const { clientId } = showRotateControl(
+			{ position: { type: 'sticky' }, rotate: 30 },
+			{ hasPositionControl: true }
+		);
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Position options' } )
+		);
+		fireEvent.click(
+			screen.getByRole( 'menuitemcheckbox', {
+				name: 'Rotation, hide and reset',
+			} )
+		);
+		expect( getStyle( clientId ) ).toEqual( {
+			position: { type: 'sticky' },
+		} );
+	} );
+
+	it( 'resets Position without changing the existing rotation', () => {
+		const { clientId } = showRotateControl(
+			{ position: { type: 'sticky', top: '0px' }, rotate: 30 },
+			{ hasPositionControl: true }
+		);
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Position options' } )
+		);
+		fireEvent.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Position, reset to default',
+			} )
+		);
+		expect( getStyle( clientId ) ).toEqual( { rotate: 30 } );
 	} );
 
 	it( 'edits the rotation of the selected viewport', () => {
@@ -211,12 +299,68 @@ describe( 'Rotation control', () => {
 		} );
 
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Dimensions options' } )
+			screen.getByRole( 'button', { name: 'Position options' } )
 		);
 		fireEvent.click(
 			screen.getByRole( 'menuitem', { name: 'Reset all' } )
 		);
 
 		expect( getStyle( clientId ) ).toEqual( { rotate: 15 } );
+	} );
+
+	it( 'resets Position and Rotation together without clearing other styles', () => {
+		const { clientId } = showRotateControl(
+			{
+				position: { type: 'sticky', top: '0px' },
+				rotate: 30,
+				color: { text: 'red' },
+			},
+			{ hasPositionControl: true }
+		);
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Position options' } )
+		);
+		fireEvent.click(
+			screen.getByRole( 'menuitem', { name: 'Reset all' } )
+		);
+		expect( getStyle( clientId ) ).toEqual( {
+			color: { text: 'red' },
+		} );
+	} );
+
+	it( 'resets both controls in the selected viewport without clearing desktop styles', () => {
+		act( () => {
+			unlock( dispatch( blockEditorStore ) ).setStyleStateViewport(
+				'@mobile'
+			);
+		} );
+		const { clientId } = showRotateControl(
+			{
+				rotate: 15,
+				position: { type: 'sticky', top: '0px' },
+				'@mobile': {
+					rotate: 30,
+					position: { type: 'fixed', top: '0px' },
+					color: { text: 'red' },
+				},
+			},
+			{ hasPositionControl: true }
+		);
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Position options' } )
+		);
+		fireEvent.click(
+			screen.getByRole( 'menuitem', { name: 'Reset all' } )
+		);
+		expect( getStyle( clientId ) ).toEqual( {
+			rotate: 15,
+			position: { type: 'sticky', top: '0px' },
+			'@mobile': {
+				position: { type: '' },
+				color: { text: 'red' },
+			},
+		} );
 	} );
 } );

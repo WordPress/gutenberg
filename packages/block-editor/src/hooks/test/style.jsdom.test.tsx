@@ -1062,24 +1062,25 @@ describe( 'omitStyle', () => {
 } );
 
 describe( 'addAttribute', () => {
-	// Filters return `unknown`; this one returns the block settings.
-	const addAttribute = ( supports: BlockType[ 'supports' ] ) =>
+	const addAttribute = ( supports: Record< string, boolean > ) =>
 		(
 			applyFilters(
 				'blocks.registerBlockType',
 				{ attributes: {}, supports },
 				'core/foo'
-			) as BlockType
+			) as { attributes: Record< string, unknown > }
 		 ).attributes;
 
 	it( 'adds the style attribute for rotation alone', () => {
-		expect( addAttribute( { customCSS: false } ) ).toEqual( {
-			style: { type: 'object' },
-		} );
+		expect( addAttribute( { customCSS: false, rotation: true } ) ).toEqual(
+			{
+				style: { type: 'object' },
+			}
+		);
 	} );
 
 	it( "doesn't add it to a block without any style support", () => {
-		expect( addAttribute( { customCSS: false, rotate: false } ) ).toEqual(
+		expect( addAttribute( { customCSS: false, rotation: false } ) ).toEqual(
 			{}
 		);
 	} );

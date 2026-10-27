@@ -309,26 +309,33 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 }
 
 /**
- * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
- * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
+ * Checks a string for a unit and value and returns an array
+ * consisting of `'value'` and `'unit'`, e.g. array( '42', 'rem' ).
  *
- * @access private
+ * @since 6.1.0
  *
  * @param string|int|float $raw_value Raw size value from theme.json.
  * @param array            $options   {
  *     Optional. An associative array of options. Default is empty array.
  *
- *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
- *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
- *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
+ *     @type string   $coerce_to        Coerce the value to rem or px. Default `'rem'`.
+ *     @type int      $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
+ *     @type string[] $acceptable_units An array of font size units. Default `array( 'rem', 'px', 'em' )`;
  * }
- * @return array An array consisting of `'value'` and `'unit'` properties.
+ * @return array|null An array consisting of `'value'` and `'unit'` properties on success.
+ *                    `null` on failure.
+ * @phpstan-param array{
+ *     coerce_to?: string,
+ *     root_size_value?: positive-int,
+ *     acceptable_units?: non-empty-array<non-empty-string>,
+ * } $options
+ * @phpstan-return array{ value: float, unit: non-empty-string }|null
  */
-function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
+function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ): ?array {
 	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) && ! is_float( $raw_value ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
-			__( 'Raw size value must be a string, integer or a float.', 'gutenberg' ),
+			__( 'Raw size value must be a string, integer, or float.', 'gutenberg' ),
 			'6.1.0'
 		);
 		return null;
@@ -338,7 +345,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
-	// Converts numeric values to pixel values by default.
+	// Converts numbers to pixel values by default.
 	if ( is_numeric( $raw_value ) ) {
 		$raw_value = $raw_value . 'px';
 	}
@@ -349,22 +356,31 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		'acceptable_units' => array( 'rem', 'px', 'em' ),
 	);
 
+	/**
+	 * @var array{
+	 *     coerce_to: string,
+	 *     root_size_value: positive-int,
+	 *     acceptable_units: non-empty-array<non-empty-string>,
+	 * } $options
+	 */
 	$options = wp_parse_args( $options, $defaults );
 
-	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
-	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
-
-	preg_match( $pattern, $raw_value, $matches );
-
-	// We need a number value and a px or rem unit.
-	if ( ! isset( $matches[1] ) || ! isset( $matches[2] ) ) {
+	// Bails out if the raw value can't be parsed.
+	if ( ! preg_match( '/^(\d*\.?\d+)([a-zA-Z]+|%)$/', $raw_value, $matches ) ) {
 		return null;
 	}
 
-	$value = $matches[1];
+	$value = (float) $matches[1];
 	$unit  = $matches[2];
 
-	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
+	if ( ! in_array( $unit, $options['acceptable_units'], true ) ) {
+		return null;
+	}
+
+	/*
+	 * Default browser font size. Later, possibly could inject some JS to
+	 * compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
+	 */
 	if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
 		$value = $value * $options['root_size_value'];
 		$unit  = $options['coerce_to'];

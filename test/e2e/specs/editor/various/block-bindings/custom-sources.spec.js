@@ -18,8 +18,9 @@ test.describe( 'Registered sources', () => {
 		testingImgSrc = testingImgMedia.source_url;
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost( { title: 'Test bindings' } );
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
