@@ -24,22 +24,11 @@
 	}
 
 	.wp-social-link {
-		svg {
-			width: 1em;
-			height: 1em;
-		}
-
 		span:not(.screen-reader-text) {
 			margin-left: 0.5em;
 			margin-right: 0.5em;
 			font-size: 0.65em;
 		}
-	}
-
-	// Make the icons bigger for the logos only style.
-	&.is-style-logos-only .wp-social-link svg {
-		width: 1.25em;
-		height: 1.25em;
 	}
 
 	// Icon sizes.
@@ -138,6 +127,18 @@
 	.wp-social-link {
 		width: auto;
 	}
+}
+
+// The following rules have their selector specificity set to 0-1-0 to
+// facilitate theme.json styling of the inner social-link block icon size.
+:root :where(.wp-block-social-links .wp-social-link svg) {
+	width: 1em;
+	height: 1em;
+}
+// Make the icons bigger for the logos only style.
+:root :where(.wp-block-social-links.is-style-logos-only .wp-social-link svg) {
+	width: 1.25em;
+	height: 1.25em;
 }
 
 // The following rules have their selector specificity set to 0-1-0 to
