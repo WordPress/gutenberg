@@ -6,8 +6,7 @@
  */
 
 /**
- * Adds collection visibility to the WordPress icon collections registry, and
- * prevents the "core-admin" collection from being unregistered.
+ * Adds collection visibility to the WordPress icon collections registry.
  *
  * @since 7.2.0
  */
