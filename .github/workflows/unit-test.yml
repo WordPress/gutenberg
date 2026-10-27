@@ -90,6 +90,8 @@ jobs:
 
             - name: Run build scripts
               run: npm run build
+              env:
+                  NODE_OPTIONS: --max-old-space-size=4096
 
             - name: Upload built JavaScript assets
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
