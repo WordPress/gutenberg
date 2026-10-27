@@ -356,6 +356,16 @@ function serializeInnerContent(
 }
 
 /**
+ * The loaded markup of blocks that parsed valid with no fixes or migrations,
+ * keyed by the attributes object the parser made. Any edit to a block gives
+ * it a new attributes object.
+ */
+export const loadedInnerContent = new WeakMap<
+	Block[ 'attributes' ],
+	Array< string | null >
+>();
+
+/**
  * Given a block object, returns the Block's Inner HTML markup.
  *
  * @param block Block instance.
@@ -367,6 +377,17 @@ export function getBlockInnerHTML( block: Block ): string {
 	// than from a `save` implementation.
 	if ( block.innerContent && block.name === 'core/html' ) {
 		return serializeInnerContent( block.innerContent, block.innerBlocks );
+	}
+
+	// A block untouched since it was parsed keeps its loaded markup, as long
+	// as each inner block still has its place in it.
+	const loaded = loadedInnerContent.get( block.attributes );
+	if (
+		loaded &&
+		loaded.filter( ( item ) => item === null ).length ===
+			block.innerBlocks.length
+	) {
+		return serializeInnerContent( loaded, block.innerBlocks );
 	}
 
 	// If block was parsed as invalid or encounters an error while generating
