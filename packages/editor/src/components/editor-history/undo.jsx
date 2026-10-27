@@ -9,17 +9,7 @@ import { unlock } from '../../lock-unlock';
 
 function EditorHistoryUndo( props, ref ) {
 	const hasUndo = useSelect( ( select ) => {
-		/*
-		 * Undo rewrites the post, so the read-only Viewing intent refuses it
-		 * the same way it refuses a keystroke. `undo` in the editor store
-		 * refuses it too — this only keeps the button from advertising an
-		 * action it would decline. `isEditorIntentReadOnly` is private while
-		 * Suggest mode is experimental.
-		 */
 		const editor = unlock( select( editorStore ) );
-		if ( editor.isEditorIntentReadOnly() ) {
-			return false;
-		}
 		// A pending suggestion Undo would withdraw may not be in the
 		// history at all (see `hasSuggestionUndo`).
 		return editor.hasEditorUndo() || editor.hasSuggestionUndo();

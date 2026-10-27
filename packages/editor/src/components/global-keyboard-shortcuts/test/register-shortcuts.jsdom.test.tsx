@@ -32,7 +32,6 @@ vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
 const INTENT_SHORTCUTS = [
 	'core/editor/intent-edit',
 	'core/editor/intent-suggest',
-	'core/editor/intent-view',
 ];
 
 /*

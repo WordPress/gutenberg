@@ -56,14 +56,9 @@ test.describe( 'Editor intent switcher', () => {
 		const suggestChoice = page.getByRole( 'menuitemradio', {
 			name: /^Suggesting/,
 		} );
-		const viewChoice = page.getByRole( 'menuitemradio', {
-			name: 'Viewing',
-			exact: true,
-		} );
 
 		await expect( editChoice ).toBeVisible();
 		await expect( suggestChoice ).toBeVisible();
-		await expect( viewChoice ).toBeVisible();
 		await expect( editChoice ).toHaveAttribute( 'aria-checked', 'true' );
 
 		// The intent is session-scoped: switching to Suggest and reloading
@@ -129,15 +124,8 @@ test.describe( 'Editor intent switcher', () => {
 			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
-		// The menu stays open across the switch; the shortcut works from
-		// inside it and the choice's state updates in place.
-		await pageUtils.pressKeys( 'secondary+C' );
-		await openIntentSwitcher( page );
-		await expect(
-			page.getByRole( 'menuitemradio', { name: 'Viewing', exact: true } )
-		).toHaveAttribute( 'aria-checked', 'true' );
-
-		// Back to Edit.
+		// Back to Edit. The menu stays open across the switch; the shortcut
+		// works from inside it and the choice's state updates in place.
 		await pageUtils.pressKeys( 'secondary+Z' );
 		await openIntentSwitcher( page );
 		await expect(
