@@ -54,6 +54,7 @@ jobs:
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
+                  package-manager-cache: false
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
