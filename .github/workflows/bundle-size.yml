@@ -35,6 +35,7 @@ jobs:
     build:
         name: Check
         runs-on: ubuntu-latest
+        timeout-minutes: 30
 
         steps:
             - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
