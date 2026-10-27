@@ -339,99 +339,105 @@ export default function URLInput( props: URLInputProps ) {
 		}
 	}
 
-	const handleNonIMEKeyDown = useEvent( ( event: KeyboardEvent< HTMLInputElement > ) => {
-		onKeyDown?.( event );
+	const handleNonIMEKeyDown = useEvent(
+		( event: KeyboardEvent< HTMLInputElement > ) => {
+			onKeyDown?.( event );
 
-		// When closing on navigate-outside is enabled, Escape dismisses a
-		// visible suggestions list. The event mustn't propagate any further,
-		// so that a popover the component is rendered within stays open.
-		if (
-			closeSuggestionsOnNavigateOutside &&
-			event.keyCode === ESCAPE &&
-			showSuggestions &&
-			suggestions.length > 0
-		) {
-			event.preventDefault();
-			event.stopPropagation();
-			closeSuggestionsList();
-			return;
-		}
-
-		// Unless the list can consume them, the keys must reach the editor for
-		// block navigation, so they mustn't be prevented.
-		if ( ! showSuggestions || ! suggestions.length || isLoading ) {
-			// Holding Shift extends the selection, which the browser handles.
+			// When closing on navigate-outside is enabled, Escape dismisses a
+			// visible suggestions list. The event mustn't propagate any further,
+			// so that a popover the component is rendered within stays open.
 			if (
-				! event.shiftKey &&
-				( event.keyCode === UP || event.keyCode === DOWN )
+				closeSuggestionsOnNavigateOutside &&
+				event.keyCode === ESCAPE &&
+				showSuggestions &&
+				suggestions.length > 0
 			) {
-				// Firefox on Windows leaves the caret in place, trapping focus,
-				// since the editor only navigates away from an edge.
-				// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
-				// The key events come from the input element.
-				const caret =
-					event.keyCode === UP
-						? 0
-						: ( event.target as HTMLInputElement ).value.length;
+				event.preventDefault();
+				event.stopPropagation();
+				closeSuggestionsList();
+				return;
+			}
 
-				// UP moves the caret to the start of the text, DOWN to the end.
-				// Once it is already there, with nothing selected, the key is
-				// left to the editor to navigate out of the field.
+			// Unless the list can consume them, the keys must reach the editor for
+			// block navigation, so they mustn't be prevented.
+			if ( ! showSuggestions || ! suggestions.length || isLoading ) {
+				// Holding Shift extends the selection, which the browser handles.
 				if (
-					( event.target as HTMLInputElement ).selectionStart !==
-						caret ||
-					( event.target as HTMLInputElement ).selectionEnd !== caret
+					! event.shiftKey &&
+					( event.keyCode === UP || event.keyCode === DOWN )
 				) {
+					// Firefox on Windows leaves the caret in place, trapping focus,
+					// since the editor only navigates away from an edge.
+					// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
+					// The key events come from the input element.
+					const caret =
+						event.keyCode === UP
+							? 0
+							: ( event.target as HTMLInputElement ).value.length;
+
+					// UP moves the caret to the start of the text, DOWN to the end.
+					// Once it is already there, with nothing selected, the key is
+					// left to the editor to navigate out of the field.
+					if (
+						( event.target as HTMLInputElement ).selectionStart !==
+							caret ||
+						( event.target as HTMLInputElement ).selectionEnd !==
+							caret
+					) {
+						event.preventDefault();
+						( event.target as HTMLInputElement ).setSelectionRange(
+							caret,
+							caret
+						);
+					}
+				} else if ( event.keyCode === ENTER && onSubmit ) {
 					event.preventDefault();
-					( event.target as HTMLInputElement ).setSelectionRange(
-						caret,
-						caret
+					onSubmit( null, event );
+				}
+
+				return;
+			}
+
+			// A `null` index looks up no suggestion.
+			const suggestion =
+				suggestions[ selectedSuggestion as number ] ?? null;
+
+			switch ( event.keyCode ) {
+				case UP:
+				case DOWN: {
+					event.preventDefault();
+
+					const offset = event.keyCode === UP ? -1 : 1;
+					// An unselected list is entered from the end nearest the key,
+					// and the ends wrap into each other.
+					const from =
+						selectedSuggestion ?? ( offset === -1 ? 0 : -1 );
+
+					setSelectedSuggestion(
+						( from + offset + suggestions.length ) %
+							suggestions.length
 					);
+					break;
 				}
-			} else if ( event.keyCode === ENTER && onSubmit ) {
-				event.preventDefault();
-				onSubmit( null, event );
-			}
-
-			return;
-		}
-
-		// A `null` index looks up no suggestion.
-		const suggestion = suggestions[ selectedSuggestion as number ] ?? null;
-
-		switch ( event.keyCode ) {
-			case UP:
-			case DOWN: {
-				event.preventDefault();
-
-				const offset = event.keyCode === UP ? -1 : 1;
-				// An unselected list is entered from the end nearest the key,
-				// and the ends wrap into each other.
-				const from = selectedSuggestion ?? ( offset === -1 ? 0 : -1 );
-
-				setSelectedSuggestion(
-					( from + offset + suggestions.length ) % suggestions.length
-				);
-				break;
-			}
-			case TAB: {
-				if ( suggestion ) {
-					selectLink( suggestion );
-					speak( __( 'Link selected.' ) );
+				case TAB: {
+					if ( suggestion ) {
+						selectLink( suggestion );
+						speak( __( 'Link selected.' ) );
+					}
+					break;
 				}
-				break;
-			}
-			case ENTER: {
-				event.preventDefault();
-				if ( suggestion ) {
-					selectLink( suggestion );
-				}
+				case ENTER: {
+					event.preventDefault();
+					if ( suggestion ) {
+						selectLink( suggestion );
+					}
 
-				onSubmit?.( suggestion, event );
-				break;
+					onSubmit?.( suggestion, event );
+					break;
+				}
 			}
 		}
-	} );
+	);
 
 	// Keystrokes within an IME composition control the IME, not the field.
 	// The default control filters them out by itself; wrapping covers inputs
