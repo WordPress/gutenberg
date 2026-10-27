@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 const util = require( 'util' );
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
@@ -190,7 +190,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	const siteUrl = config.env.development.config.WP_SITEURL;
 	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
 	const mySQLAddress = await exec(
-		`docker-compose -f ${ dockerComposeConfigPath } port mysql 3306`
+		`docker compose -f ${ dockerComposeConfigPath } port mysql 3306`
 	);
 	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
 
