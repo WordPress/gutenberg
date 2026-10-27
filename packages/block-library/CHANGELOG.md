@@ -103,6 +103,7 @@
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
 -   Post Title: Render the title of the post supplied through block context when it differs from the global post ([#85495](https://github.com/WordPress/gutenberg/pull/85495)).
+-   Navigation Link: Open the link UI when Enter is pressed on a link that still needs a URL, instead of inserting a duplicate link next to it ([#60051](https://github.com/WordPress/gutenberg/issues/60051)).
 
 ## 12.0.0 (2026-10-20)
 
