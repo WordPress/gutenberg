@@ -7,7 +7,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	FlexItem,
-	Card,
+	Card as WCCard,
 	CardHeader,
 	CardBody,
 	privateApis as componentsPrivateApis,
@@ -98,7 +98,7 @@ export default function PreferencesModalTabs( {
 		modalContent = (
 			<Navigator initialPath="/" className="preferences__provider">
 				<Navigator.Screen path="/">
-					<Card isBorderless size="small">
+					<WCCard isBorderless size="small">
 						<CardBody>
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
@@ -129,7 +129,7 @@ export default function PreferencesModalTabs( {
 								} ) }
 							</ItemGroup>
 						</CardBody>
-					</Card>
+					</WCCard>
 				</Navigator.Screen>
 				{ sections.length &&
 					sections.map( ( section ) => {
@@ -138,7 +138,7 @@ export default function PreferencesModalTabs( {
 								key={ `${ section.name }-menu` }
 								path={ `/${ section.name }` }
 							>
-								<Card isBorderless size="large">
+								<WCCard isBorderless size="large">
 									<CardHeader
 										isBorderless={ false }
 										justify="left"
@@ -159,7 +159,7 @@ export default function PreferencesModalTabs( {
 										</WCText>
 									</CardHeader>
 									<CardBody>{ section.content }</CardBody>
-								</Card>
+								</WCCard>
 							</Navigator.Screen>
 						);
 					} ) }
