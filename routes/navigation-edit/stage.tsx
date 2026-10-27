@@ -1,10 +1,12 @@
 import { useParams } from '@wordpress/route';
 import { Page, Breadcrumbs } from '@wordpress/admin-ui';
+import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import NavigationMenuEditor from './editor';
+import AutoAddPagesToggle from './auto-add-pages-toggle';
 import styles from './style.module.scss';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
@@ -53,7 +55,10 @@ function NavigationEditStage() {
 			}
 		>
 			<div className={ styles.content }>
-				<NavigationMenuEditor id={ navigationId } />
+				<Stack direction="column" gap="lg" align="stretch">
+					<NavigationMenuEditor id={ navigationId } />
+					<AutoAddPagesToggle id={ navigationId } />
+				</Stack>
 			</div>
 		</Page>
 	);

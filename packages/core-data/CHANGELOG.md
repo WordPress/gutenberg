@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Invalidate the loaded `wp_navigation` records when a page publish is received, so a Navigation block picks up the link that "Auto add pages" appended on the server without a reload ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).

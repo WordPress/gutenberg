@@ -644,6 +644,13 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin-left: 24px;
 }
 
+// The menu's own settings follow its items and their appender, set apart by a line.
+.wp-block-navigation__auto-add-pages {
+	margin-top: $grid-unit-30;
+	padding-top: $grid-unit-30;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
 .editor-sidebar__panel .wp-block-navigation__submenu-header {
 	margin-top: 0;
 	margin-bottom: 0;
