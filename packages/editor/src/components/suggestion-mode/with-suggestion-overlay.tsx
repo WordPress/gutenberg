@@ -33,7 +33,6 @@ import { addFilter } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-import { RichTextData } from '@wordpress/rich-text';
 import { useSuggestionSessionActions } from './suggestion-session';
 import {
 	mergeProposedAttributes,
@@ -147,30 +146,6 @@ function SuggestingBlockEdit( {
 	// store.
 	const registry = useRegistry();
 
-	/*
-	 * Rich text applies a toggle to its own record before the block hears of
-	 * it, so a declined edit stays painted until the value changes. Hand it a
-	 * fresh copy of the unchanged content so it re-renders from props. The
-	 * copy is equal, so the interceptor sees no change, and it stays off the
-	 * undo stack.
-	 */
-	const repaintDeclined = useCallback(
-		( prevContent: any ) => {
-			if ( ! ( prevContent instanceof RichTextData ) ) {
-				return;
-			}
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkNextChangeAsNotPersistent?.();
-			setAttributes( {
-				content: RichTextData.fromHTMLString(
-					prevContent.toHTMLString()
-				),
-			} );
-		},
-		[ registry, setAttributes ]
-	);
-
 	// Track the latest attributes via a ref so the wrapped `setAttributes`
 	// callback stays stable across renders. `useRef` seeds it with the initial
 	// value, and this effect keeps it in sync after each commit so the callback
@@ -243,20 +218,7 @@ function SuggestingBlockEdit( {
 			const plan = planFormatMarkers( prevContent, nextContent, {
 				authorId,
 			} );
-			/*
-			 * Formatting over someone's formatting change, or across the edge
-			 * of someone's addition, is declined here, naming whose
-			 * suggestion is in the way. The toggle never reaches the block.
-			 */
-			if ( plan.kind === 'refuse' ) {
-				notifyEditRefused( registry, {
-					reason: plan.reason!,
-					blocking: plan.blocking,
-				} );
-				repaintDeclined( prevContent );
-				return true;
-			}
-			if ( plan.kind !== 'format' ) {
+			if ( plan.kind !== 'format' && plan.kind !== 'merge-own' ) {
 				return false;
 			}
 			// `prevContent` rides along so the handler can re-validate the
@@ -270,14 +232,7 @@ function SuggestingBlockEdit( {
 				plan,
 			} );
 		},
-		[
-			clientId,
-			name,
-			authorId,
-			requestFormatSuggestion,
-			registry,
-			repaintDeclined,
-		]
+		[ clientId, name, authorId, requestFormatSuggestion ]
 	);
 
 	// Detect a text edit that reaches the block as a whole new `content` value
@@ -317,22 +272,6 @@ function SuggestingBlockEdit( {
 				authorId,
 			} );
 			const actions = plan?.actions ?? [];
-			/*
-			 * Typing inside someone's addition or deletion, or deleting over
-			 * someone's deletion, is declined, naming whose suggestion is in
-			 * the way. Over the author's own markers the plan has no single
-			 * marker to name, so the edit takes the path below, which
-			 * declines it too.
-			 */
-			if (
-				actions.length === 0 &&
-				plan.refusal?.blocking &&
-				plan.refusal.reason !== 'own-marker'
-			) {
-				notifyEditRefused( registry, plan.refusal );
-				repaintDeclined( prevContent );
-				return true;
-			}
 			if ( actions.length === 0 ) {
 				return false;
 			}
@@ -358,14 +297,7 @@ function SuggestingBlockEdit( {
 				plan,
 			} );
 		},
-		[
-			clientId,
-			name,
-			authorId,
-			requestContentSuggestion,
-			registry,
-			repaintDeclined,
-		]
+		[ clientId, name, authorId, requestContentSuggestion ]
 	);
 
 	const wrappedSetAttributes = useCallback(
