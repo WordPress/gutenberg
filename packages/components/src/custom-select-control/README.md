@@ -99,7 +99,7 @@ The list of options that can be chosen from.
 
 -   Required: Yes
 
-#### `size`: `'default' | 'small' | '\_\_unstable-large'`
+#### `size`: `'default' | 'small'`
 
 The size of the control.
 

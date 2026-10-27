@@ -5,6 +5,7 @@
 ### Internal
 
 -   Load design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Declare `@wordpress/theme` as an optional peer dependency, so the design token Stylelint plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).
 
 ## 27.0.0 (2026-10-20)
 
