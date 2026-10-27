@@ -53,6 +53,19 @@ import { unlock } from '../../lock-unlock';
 const { SomethingElse } = unlock( componentsPrivateApis );
 ```
 
+## Inline exceptions
+
+Prefer placing `eslint-disable-next-line` immediately above the individual import specifier in a multiline import. This keeps other components in the import checked, including components added later.
+
+```js
+import {
+	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
+```
+
 ## Options
 
 This rule has an object option:
