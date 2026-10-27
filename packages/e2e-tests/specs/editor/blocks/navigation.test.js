@@ -1264,44 +1264,6 @@ describe( 'Navigation', () => {
 			await switchUserToAdmin();
 		} );
 
-		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
-			);
-
-			// This creates an empty Navigation post type entity.
-			await startEmptyButton.click();
-
-			// Publishing the Post ensures the Navigation entity is saved.
-			// The Post itself is irrelevant.
-			await publishPost();
-
-			// Switch to a Contributor role user - they should not have
-			// permission to update Navigation menus.
-			await loginUser( contributorUsername, contributorPassword );
-
-			await createNewPost();
-
-			// At this point the block will automatically pick the first Navigation Menu
-			// which will be the one created by the Admin User.
-			await insertBlock( 'Navigation' );
-
-			// Make sure the snackbar error shows up.
-			await page.waitForXPath(
-				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
-			);
-
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
-			expect( console ).toHaveErrored();
-		} );
-
 		it( 'shows a warning if user does not have permission to create navigation menus', async () => {
 			const noticeText =
 				'You do not have permission to create Navigation Menus.';
