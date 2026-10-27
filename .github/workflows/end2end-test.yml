@@ -17,6 +17,11 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Runs WordPress on PHP 8.3, the highest version WordPress 6.5 supports, instead of
+# whatever version the floating `wordpress` image uses.
+env:
+    WP_ENV_PHP_VERSION: '8.3'
+
 jobs:
     e2e-puppeteer:
         name: Puppeteer
