@@ -136,7 +136,6 @@
 		"fast-average-color": "^9.1.1",
 		"html-react-parser": "^5.2.11",
 		"memize": "^2.1.1",
-		"remove-accents": "^0.5.0",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
