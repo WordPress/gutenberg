@@ -14,8 +14,9 @@
 # Exit if any command fails.
 set -euo pipefail
 
-# The commit of WordPress/wordpress-develop trunk to generate the stubs from.
-WORDPRESS_DEVELOP_COMMIT=8dd36d03d3492b54b5191955a8a157f485c0f318
+# The commit of WordPress/wordpress-develop trunk to generate the stubs from, with its SVN revision
+# and $wp_version noted after it. Update the note along with the commit.
+WORDPRESS_DEVELOP_COMMIT=8dd36d03d3492b54b5191955a8a157f485c0f318 # r64757, 7.2-beta1-64606-src
 
 # The commit of php-stubs/wordpress-stubs whose generator is used. This is the head of
 # https://github.com/php-stubs/wordpress-stubs/pull/498, without which the function map adds a
