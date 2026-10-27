@@ -72,6 +72,7 @@
 		"position": {
 			"sticky": true
 		},
+		"rotation": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
