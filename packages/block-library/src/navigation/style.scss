@@ -750,6 +750,79 @@ button.wp-block-navigation-item__content {
 						right: auto;
 						left: 0;
 					}
+
+					// The default overlay unfolds every submenu into the flow. A
+					// custom overlay keeps them collapsible, so they are still
+					// flyouts: absolutely positioned, and painted over whatever
+					// follows them. Lay them out in the flow instead, so an
+					// expanded submenu pushes the items after it down.
+					// See https://github.com/WordPress/gutenberg/issues/83319.
+					.wp-block-navigation-item.has-child:not(.open-always) {
+						// Wraps the submenu onto a line of its own, below the
+						// label and its indicator.
+						flex-wrap: wrap;
+
+						> .wp-block-navigation-item__content {
+							// A label wider than the line would take a line of
+							// its own, leaving the indicator after it stranded
+							// on the next one. Grow into the line from nothing
+							// instead of starting out as wide as the text.
+							flex-basis: 0;
+							flex-grow: 1;
+							min-width: 0;
+							// The indicator of a top level item sits next to
+							// its label, so the label must not grow past its
+							// text when the submenu below it is wider.
+							max-width: max-content;
+						}
+
+						> .wp-block-navigation__submenu-container {
+							// A collapsed flyout is out of the flow, so its zero
+							// sized box costs nothing. In the flow the border
+							// around that box still takes up space, so hide it
+							// with `display` instead.
+							display: none;
+							position: static;
+							flex-basis: 100%;
+							// The flyout minimum would push a nested submenu out
+							// of a narrow overlay.
+							min-width: 0;
+						}
+
+						// Mirrors the conditions that reveal a flyout, above.
+						@media (hover: hover) {
+							&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+								display: flex;
+							}
+						}
+
+						&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
+						> .wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+							display: flex;
+						}
+					}
+
+					// In a submenu the indicator is right aligned, so the label
+					// there grows to the full width, as it does in a flyout.
+					.wp-block-navigation__submenu-container .wp-block-navigation-item.has-child:not(.open-always) > .wp-block-navigation-item__content {
+						max-width: none;
+					}
+
+					// Wide viewports turn the chevron of a nested submenu
+					// sideways, since a nested flyout opens to the side there. In
+					// the overlay it opens downwards at every width.
+					.wp-block-navigation__submenu-container {
+						.wp-block-navigation__submenu-icon > svg {
+							transform: none;
+						}
+
+						.wp-block-navigation-submenu__toggle[aria-expanded="true"] {
+							+ .wp-block-navigation__submenu-icon > svg,
+							> svg {
+								transform: rotate(180deg);
+							}
+						}
+					}
 				}
 			}
 		}
