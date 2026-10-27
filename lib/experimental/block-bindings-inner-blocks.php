@@ -42,20 +42,29 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 }
 
 /**
- * Removes, from the blocks a source supplies and their inner blocks, the
- * bindings to that source and every `innerBlocks` binding.
+ * Prepares the blocks a source supplies, and their inner blocks, to render.
  *
- * The blocks a source supplies are its value as a whole, so none of them is
- * bound to it on its own. And none of them gets its inner blocks from a
- * source, so that two sources whose values bind each other's can't render
- * forever.
+ * Removes the bindings to that source and every `innerBlocks` binding. The
+ * blocks a source supplies are its value as a whole, so none of them is bound
+ * to it on its own. And none of them gets its inner blocks from a source, so
+ * that two sources whose values bind each other's can't render forever.
+ *
+ * Also removes their custom CSS, which only users who can edit CSS may add:
+ * whoever supplied the value is unknown.
  *
  * @param array[] $blocks      The parsed blocks.
  * @param string  $source_name The name of the source.
  * @return array[] The parsed blocks.
  */
-function gutenberg_block_bindings_remove_source( $blocks, $source_name ) {
+function gutenberg_block_bindings_prepare_inner_blocks( $blocks, $source_name ) {
 	foreach ( $blocks as &$block ) {
+		if ( isset( $block['attrs']['style'] ) ) {
+			$block['attrs']['style'] = gutenberg_strip_custom_css_from_style_array( $block['attrs']['style'] );
+			if ( empty( $block['attrs']['style'] ) ) {
+				unset( $block['attrs']['style'] );
+			}
+		}
+
 		$bindings = $block['attrs']['metadata']['bindings'] ?? null;
 		if ( is_array( $bindings ) ) {
 			foreach ( $bindings as $name => $binding ) {
@@ -71,7 +80,7 @@ function gutenberg_block_bindings_remove_source( $blocks, $source_name ) {
 				unset( $block['attrs']['metadata'] );
 			}
 		}
-		$block['innerBlocks'] = gutenberg_block_bindings_remove_source( $block['innerBlocks'], $source_name );
+		$block['innerBlocks'] = gutenberg_block_bindings_prepare_inner_blocks( $block['innerBlocks'], $source_name );
 	}
 	return $blocks;
 }
@@ -113,23 +122,32 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	if ( $wp_embed instanceof WP_Embed ) {
 		$markup = $wp_embed->autoembed( $wp_embed->run_shortcode( $markup ) );
 	}
-	$blocks = gutenberg_block_bindings_remove_source( parse_blocks( $markup ), $source_name );
+	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ), $source_name );
 
-	// Group and Column wrap their inner blocks in one element: they go before its closer.
-	$html   = implode( '', array_filter( $block_instance->parsed_block['innerContent'], 'is_string' ) );
-	$offset = strrpos( $html, '</' );
-	if ( false === $offset ) {
-		return null;
+	// The blocks go where the block's own inner blocks were.
+	$inner_content = $block_instance->parsed_block['innerContent'];
+	$slots         = array_keys( $inner_content, null, true );
+	if ( $slots ) {
+		$opener = implode( '', array_slice( $inner_content, 0, $slots[0] ) );
+		$closer = implode( '', array_slice( $inner_content, end( $slots ) + 1 ) );
+	} else {
+		// Without any, Group and Column wrap them in one element: they go before
+		// its closer, or before the closer of the inner container of a legacy Group.
+		$html   = implode( '', $inner_content );
+		$offset = strrpos( $html, '</' );
+		if ( false !== $offset && str_contains( $html, 'wp-block-group__inner-container' ) ) {
+			$offset = strrpos( substr( $html, 0, $offset ), '</' );
+		}
+		if ( false === $offset ) {
+			return null;
+		}
+		$opener = substr( $html, 0, $offset );
+		$closer = substr( $html, $offset );
 	}
-	$inner_content = array_merge(
-		array( substr( $html, 0, $offset ) ),
-		array_fill( 0, count( $blocks ), null ),
-		array( substr( $html, $offset ) )
-	);
 
 	$block_instance->parsed_block['innerBlocks']  = $blocks;
-	$block_instance->parsed_block['innerContent'] = $inner_content;
-	$block_instance->parsed_block['innerHTML']    = $html;
+	$block_instance->parsed_block['innerContent'] = array_merge( array( $opener ), array_fill( 0, count( $blocks ), null ), array( $closer ) );
+	$block_instance->parsed_block['innerHTML']    = $opener . $closer;
 	$block_instance->refresh_parsed_block_dependents();
 	// The refresh keeps the previous inner blocks when there are none.
 	if ( empty( $blocks ) ) {

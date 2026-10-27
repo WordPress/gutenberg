@@ -36,16 +36,17 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Renders a Group block with the given bindings and a `Default` paragraph
-	 * as its own inner blocks.
+	 * Renders a Group block with the given bindings and, by default, a
+	 * `Default` paragraph as its own inner blocks.
 	 *
-	 * @param array $bindings The bindings of the Group block.
+	 * @param array  $bindings   The bindings of the Group block.
+	 * @param string $inner_html The markup inside the Group's wrapper.
 	 * @return string The rendered block.
 	 */
-	private function render_group( $bindings = null ) {
+	private function render_group( $bindings = null, $inner_html = '<!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph -->' ) {
 		$bindings = $bindings ?? array( 'innerBlocks' => array( 'source' => self::SOURCE ) );
 		$markup   = '<!-- wp:group {"metadata":{"bindings":' . wp_json_encode( $bindings ) . '}} -->';
-		$markup  .= '<div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div>';
+		$markup  .= '<div class="wp-block-group">' . $inner_html . '</div>';
 		$markup  .= '<!-- /wp:group -->';
 		$block    = new WP_Block( parse_blocks( $markup )[0] );
 		return $block->render();
@@ -122,7 +123,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function test_attribute_bindings_inside_the_value_to_other_sources_are_kept() {
-		$blocks = gutenberg_block_bindings_remove_source(
+		$blocks = gutenberg_block_bindings_prepare_inner_blocks(
 			parse_blocks( '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/other"}}}} --><p>One</p><!-- /wp:paragraph -->' ),
 			'test/source'
 		);
@@ -137,10 +138,32 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function test_removed_bindings_leave_no_empty_metadata() {
-		$blocks = gutenberg_block_bindings_remove_source(
+		$blocks = gutenberg_block_bindings_prepare_inner_blocks(
 			parse_blocks( '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source"}}}} --><p>One</p><!-- /wp:paragraph -->' ),
 			'test/source'
 		);
 		$this->assertArrayNotHasKey( 'metadata', $blocks[0]['attrs'] );
+	}
+
+	public function test_custom_css_in_the_value_is_removed() {
+		$this->value = '<!-- wp:paragraph {"style":{"css":"color:red","color":{"text":"#00f"},":hover":{"css":"color:green"}}} --><p>Styled</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group();
+		$this->assertStringNotContainsString( 'wp-custom-css-', $output );
+		$this->assertStringContainsString( '>Styled</p>', $output );
+
+		$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $this->value ), self::SOURCE );
+		$this->assertSame( array( 'color' => array( 'text' => '#00f' ) ), $blocks[0]['attrs']['style'] );
+	}
+
+	public function test_value_goes_inside_the_inner_container_of_a_legacy_group() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div>' );
+		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div></div>$#', $output );
+	}
+
+	public function test_value_goes_inside_the_inner_container_of_an_empty_legacy_group() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"></div>' );
+		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div></div>$#', $output );
 	}
 }
