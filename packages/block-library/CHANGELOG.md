@@ -15,6 +15,7 @@
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
 -   Heading: Generate anchors with `cleanForSlug`, so headings in scripts like Devanagari, Tamil and Bengali keep their vowel signs, and anchors follow the same rules as post slugs ([#85096](https://github.com/WordPress/gutenberg/pull/85096)).
+-   Gallery: Pass clicks on a caption laid over an image, links in it included, through to the image when "Enlarge on click" is enabled, so a caption long enough to cover the image no longer makes the lightbox impossible to open. Captions that the rounded and bordered styles place under the image instead are left as they were ([#85381](https://github.com/WordPress/gutenberg/pull/85381)).
 
 ## 12.0.0 (2026-10-20)
 
