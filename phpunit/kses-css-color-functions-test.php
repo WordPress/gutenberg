@@ -59,6 +59,12 @@ class Gutenberg_Kses_CSS_Color_Functions_Test extends WP_UnitTestCase {
 			'unclosed bracket'              => array( 'color: rgb(0 0 0' ),
 			'prefixed name'                 => array( 'color: x-rgb(0 0 0)' ),
 			'nesting beyond the pass limit' => array( 'color: ' . str_repeat( 'rgb(', 40 ) . '0' . str_repeat( ')', 40 ) ),
+			'comment after function'        => array( 'color: rgb(0 0 0) /* x */' ),
+			'backslash after function'      => array( 'color: rgb(0 0 0) \\30' ),
+			'bracket after function'        => array( 'color: rgb(0 0 0) (' ),
+			'ampersand after function'      => array( 'color: rgb(0 0 0) &' ),
+			'equals after function'         => array( 'color: rgb(0 0 0) =' ),
+			'closing brace after function'  => array( 'color: rgb(0 0 0) }' ),
 		);
 	}
 
@@ -68,16 +74,37 @@ class Gutenberg_Kses_CSS_Color_Functions_Test extends WP_UnitTestCase {
 		$this->assertSame( 'box-shadow:1px 1px 1px rgba(0,0,0,0.5);', $styles['css'] ?? '' );
 	}
 
-	public function test_does_not_override_another_filters_rejection() {
+	/**
+	 * @dataProvider data_rejecting_filter_priorities
+	 *
+	 * @param int $priority Priority of the rejecting filter.
+	 */
+	public function test_does_not_override_another_filters_rejection( $priority ) {
 		$reject = static function ( $allow_css, $css_test_string ) {
-			return 'display: none' === $css_test_string ? false : $allow_css;
+			return 'color: rgb(0 0 0)' === $css_test_string ? false : $allow_css;
 		};
-		add_filter( 'safecss_filter_attr_allow_css', $reject, 5, 2 );
+		add_filter( 'safecss_filter_attr_allow_css', $reject, $priority, 2 );
 
-		$result = safecss_filter_attr( 'display: none' );
+		$result = safecss_filter_attr( 'color: rgb(0 0 0)' );
 
-		remove_filter( 'safecss_filter_attr_allow_css', $reject, 5 );
+		remove_filter( 'safecss_filter_attr_allow_css', $reject, $priority );
 
 		$this->assertSame( '', $result );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_rejecting_filter_priorities() {
+		return array(
+			'priority 5'  => array( 5 ),
+			'priority 10' => array( 10 ),
+		);
+	}
+
+	public function test_keeps_an_allowed_result() {
+		$this->assertTrue( gutenberg_allow_css_color_functions( true, 'color: rgb(0 0 0) /* x */' ) );
 	}
 }

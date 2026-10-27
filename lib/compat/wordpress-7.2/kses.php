@@ -56,6 +56,9 @@ add_filter( 'safe_style_css', 'gutenberg_add_background_clip_to_safe_style_css' 
  * Replaces each color function whose contents are plain color syntax,
  * innermost first, then reruns Core's leftover check.
  *
+ * Runs at the lowest priority so it acts like Core's own check, and a later
+ * filter can still reject the declaration.
+ *
  * @param bool   $allow_css       Whether the CSS is allowed.
  * @param string $css_test_string The CSS declaration to test.
  * @return bool Whether the CSS is allowed.
@@ -93,4 +96,4 @@ function gutenberg_allow_css_color_functions( $allow_css, $css_test_string ) {
 
 	return $allow_css;
 }
-add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', 10, 2 );
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', PHP_INT_MIN, 2 );
