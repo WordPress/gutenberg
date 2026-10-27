@@ -109,7 +109,7 @@ export function loadOverlapFixtures(): OverlapFixture[] {
  * Phases of the overlap plan that have landed. Add a phase when it lands;
  * set `OVERLAP_PHASES=A` to run a phase's tests before then.
  */
-export const LANDED_PHASES = [ 'current', 'A' ];
+export const LANDED_PHASES = [ 'current', 'A', 'B' ];
 
 /**
  * Whether a phase has landed, or is forced on through `OVERLAP_PHASES`.

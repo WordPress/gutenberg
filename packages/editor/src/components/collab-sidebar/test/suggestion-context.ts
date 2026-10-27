@@ -13,6 +13,7 @@ describe( 'suggestionContextLines', () => {
 					children: [],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -31,6 +32,7 @@ describe( 'suggestionContextLines', () => {
 					children: [],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -49,6 +51,7 @@ describe( 'suggestionContextLines', () => {
 						{ id: '1', kind: 'del', authorId: '1' },
 						{ id: '3', kind: 'del', authorId: '3' },
 					],
+					builtOn: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -56,6 +59,28 @@ describe( 'suggestionContextLines', () => {
 		).toEqual( [
 			'Anne also suggested deleting this text',
 			'Someone else also suggested deleting this text',
+		] );
+	} );
+
+	it( 'says whose formatting change a formatting change was made on', () => {
+		expect(
+			suggestionContextLines( {
+				relations: {
+					parents: [],
+					children: [],
+					partlyIn: [],
+					alsoDeleting: [],
+					builtOn: [
+						{ id: '1', kind: 'format', authorId: '1' },
+						{ id: '3', kind: 'format', authorId: '3' },
+					],
+				},
+				emptiedCount: 0,
+				nameOf,
+			} )
+		).toEqual( [
+			'Built on a suggested formatting change by Anne',
+			'Built on another suggested formatting change',
 		] );
 	} );
 
@@ -70,6 +95,7 @@ describe( 'suggestionContextLines', () => {
 					],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 2,
 				nameOf,
@@ -88,6 +114,7 @@ describe( 'suggestionContextLines', () => {
 					children: [ { id: '2', kind: 'del', authorId: '2' } ],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 1,
 				nameOf,
@@ -106,6 +133,7 @@ describe( 'suggestionContextLines', () => {
 					children: [],
 					partlyIn: [ { id: '2', kind: 'add', authorId: '2' } ],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -121,6 +149,7 @@ describe( 'suggestionContextLines', () => {
 					children: [],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 0,
 				nameOf,
@@ -136,6 +165,7 @@ describe( 'suggestionContextLines', () => {
 					children: [ { id: '2', kind: 'del', authorId: '2' } ],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 1,
 				nameOf,
@@ -152,6 +182,7 @@ describe( 'suggestionContextLines', () => {
 					children: [],
 					partlyIn: [],
 					alsoDeleting: [],
+					builtOn: [],
 				},
 				emptiedCount: 0,
 				nameOf,

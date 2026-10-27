@@ -2,11 +2,10 @@
  * Suggesting over another author's pending suggestion (#73411). Each marker
  * kind has its own format, so a deletion or a formatting change can sit
  * inside someone's addition, and a deletion and a formatting change can
- * share text. Additions and deletions of one kind stack too: typing in
- * someone's addition nests an addition, and deleting over their deletion adds
- * a second one. Formatting over someone's formatting change, and formatting
- * that crosses the edge of their addition, are still refused with the other
- * author named.
+ * share text. Markers of one kind stack too: typing in someone's addition
+ * nests an addition, deleting over their deletion adds a second one,
+ * formatting over their formatting change stacks a second one, and
+ * formatting may cross the edge of their addition.
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
@@ -61,7 +60,7 @@ async function selectText( page: any, start: number, end = start ) {
 	);
 }
 
-function refusal( page: any, text: string ) {
+function refusal( page: any, text: string | RegExp ) {
 	return page.locator( '.components-snackbar-list' ).getByText( text );
 }
 
@@ -344,15 +343,20 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 		} );
 	} );
 
-	test.describe( 'refused', () => {
-		test( 'formatting over another author’s formatting change names them', async ( {
+	/*
+	 * The gesture matrix of the overlap plan (section 5), phase B rows: a
+	 * formatting change stacks on someone's formatting change and may cross
+	 * the edge of their addition.
+	 */
+	test.describe( 'gesture matrix, phase B', () => {
+		test( 'R4: formatting over another author’s formatting change stacks a second one', async ( {
 			admin,
 			editor,
 			page,
 			pageUtils,
 			requestUtils,
 		} ) => {
-			await openWithSuggestions(
+			const [ bobId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'format', author: 'bob', beforeHTML: 'red apples' } ],
 				'Intro. {0}<strong>red apples</strong></mark> fell.'
@@ -361,21 +365,28 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			const paragraph = paragraphOf( editor );
 			await paragraph.click();
 			await selectText( page, 7, 10 );
+			const saved = noteSaved( page );
 			await pageUtils.pressKeys( 'primary+i' );
+			await saved;
 			await expect(
-				refusal( page, 'Bob already suggested formatting this text.' )
-			).toBeVisible();
-			await expect( paragraph.locator( 'em' ) ).toHaveCount( 0 );
+				paragraph.locator(
+					`mark.wp-suggestion-format[data-suggestion-id="${ bobId }"] mark.wp-suggestion-format`
+				)
+			).toHaveText( 'red' );
+			await expect( paragraph.locator( 'em' ) ).toHaveText( 'red' );
+			await expect(
+				refusal( page, /overlaps a pending suggestion/ )
+			).toHaveCount( 0 );
 		} );
 
-		test( 'formatting across the edge of another author’s addition names them', async ( {
+		test( 'R5: formatting across the edge of another author’s addition is one change partly inside it', async ( {
 			admin,
 			editor,
 			page,
 			pageUtils,
 			requestUtils,
 		} ) => {
-			await openWithSuggestions(
+			const [ anneId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'add', author: 'anne' } ],
 				'Intro.{0} Bright red apples fell.</mark>'
@@ -384,14 +395,23 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			const paragraph = paragraphOf( editor );
 			await paragraph.click();
 			await selectText( page, 2, 13 );
+			const saved = noteSaved( page );
 			await pageUtils.pressKeys( 'primary+b' );
+			await saved;
+			const formats = paragraph.locator( 'mark.wp-suggestion-format' );
+			await expect( formats ).toHaveText( [ 'tro.', ' Bright' ] );
 			await expect(
-				refusal(
-					page,
-					'This formatting crosses a suggested addition by Anne. Format the added text and the text around it separately.'
+				paragraph.locator(
+					`mark.wp-suggestion-add[data-suggestion-id="${ anneId }"] mark.wp-suggestion-format`
 				)
-			).toBeVisible();
-			await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
+			).toHaveText( ' Bright' );
+			await expect( paragraph.locator( 'strong' ) ).toHaveText( [
+				'tro.',
+				' Bright',
+			] );
+			await expect(
+				refusal( page, /overlaps a pending suggestion/ )
+			).toHaveCount( 0 );
 		} );
 	} );
 

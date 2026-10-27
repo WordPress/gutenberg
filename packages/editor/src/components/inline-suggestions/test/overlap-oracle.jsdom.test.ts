@@ -19,6 +19,8 @@ import {
 	isSuggestionFormat,
 } from '../format';
 import { rebaseFormatOriginal, resolveInlineSuggestion } from '../resolution';
+import { rebaseFormatDelta } from '../format-delta';
+import type { FormatDelta } from '../format-delta';
 import {
 	HTML_TAGS,
 	applyDecision,
@@ -58,7 +60,8 @@ function renderValue( value: RichTextData ): string {
 
 /**
  * Drive one decision sequence through `resolveInlineSuggestion`, keeping each
- * pending formatting change's original rebased as the real decision hook does,
+ * pending formatting change's delta and original current as the real
+ * decision hook does,
  * and compare with the oracle after every step.
  *
  * @param start    Starting state.
@@ -69,9 +72,11 @@ function replay( start: OracleState, sequence: Step[] ) {
 	expect( renderValue( value ) ).toBe( displayed( start ) );
 	let oracle = start;
 	const originals = new Map< string, string >();
+	const deltas = new Map< string, FormatDelta >();
 	for ( const s of start.suggestions ) {
 		if ( s.kind === 'format' ) {
 			originals.set( s.id, formatOriginalHTML( start, s.id ) );
+			deltas.set( s.id, formatDelta( start, s.id ) );
 		}
 	}
 	const outdated = new Set< string >();
@@ -85,11 +90,8 @@ function replay( start: OracleState, sequence: Step[] ) {
 			suggestionType: suggestion.kind,
 			decision: step.decision,
 			beforeHTML: originals.get( step.id ),
-			// Phase B: the formatting delta replaces `beforeHTML`.
-			...( suggestion.kind === 'format' && {
-				delta: formatDelta( start, step.id ),
-			} ),
-		} as any );
+			formatDeltas: ( id ) => deltas.get( id ),
+		} );
 		expect( effect.restored ).not.toBe( false );
 		value = effect.value;
 		for ( const [ id, change ] of effect.affected ) {
@@ -102,6 +104,11 @@ function replay( start: OracleState, sequence: Step[] ) {
 				id,
 				rebaseFormatOriginal( originals.get( id )!, offsets )
 			);
+			deltas.set( id, rebaseFormatDelta( deltas.get( id )!, offsets ) );
+		}
+		for ( const [ id, revision ] of effect.formatRevisions ) {
+			originals.set( id, revision.beforeHTML );
+			deltas.set( id, revision.delta );
 		}
 		oracle = applyDecision( oracle, step );
 		expect( renderValue( value ) ).toBe( displayed( oracle ) );

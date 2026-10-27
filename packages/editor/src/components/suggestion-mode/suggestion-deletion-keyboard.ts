@@ -516,9 +516,9 @@ export default function SuggestionDeletionKeyboard() {
 	 * letting the browser apply it and the overlay swallow the result.
 	 */
 	const refuseDeletion = useCallback(
-		( event: any, refusal?: EditRefusal | null ) => {
+		( event: any ) => {
 			event.preventDefault();
-			notifyEditRefused( registry, refusal ?? undefined );
+			notifyEditRefused( registry );
 		},
 		[ registry ]
 	);
@@ -905,7 +905,7 @@ export default function SuggestionDeletionKeyboard() {
 				newRun.end = grown.end;
 				newRun.caret += shift;
 				if ( grown.blocked ) {
-					notifyEditRefused( registry, grown.refusal );
+					notifyEditRefused( registry );
 				}
 				if ( isBackward ) {
 					newRun.caret = newRun.start;
@@ -1039,7 +1039,7 @@ export default function SuggestionDeletionKeyboard() {
 				);
 				if ( refusal ) {
 					resetRun();
-					refuseDeletion( event, refusal );
+					refuseDeletion( event );
 					return;
 				}
 				event.preventDefault();
@@ -1107,22 +1107,7 @@ export default function SuggestionDeletionKeyboard() {
 					// Neither outcome can grow the run, so it ends here.
 					resetRun();
 					if ( disposition === 'refuse' ) {
-						const target = collapsedDeleteTarget(
-							text,
-							pos,
-							isBackward,
-							run
-						);
-						refuseDeletion(
-							event,
-							target &&
-								deletionRefusal(
-									formats,
-									target.start,
-									target.end,
-									authorToken
-								)
-						);
+						refuseDeletion( event );
 					}
 					return;
 				}
@@ -1172,7 +1157,7 @@ export default function SuggestionDeletionKeyboard() {
 			);
 			if ( rangeRefusal ) {
 				resetRun();
-				refuseDeletion( event, rangeRefusal );
+				refuseDeletion( event );
 				return;
 			}
 			event.preventDefault();
@@ -1334,7 +1319,7 @@ export default function SuggestionDeletionKeyboard() {
 			const refusal = deletionRefusal( formats, start, end, authorToken );
 			if ( refusal ) {
 				resetRun();
-				notifyEditRefused( registry, refusal );
+				notifyEditRefused( registry );
 				return;
 			}
 			deleteSelection( { clientId, attributeKey, start, end } );

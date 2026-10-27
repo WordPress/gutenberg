@@ -96,6 +96,18 @@ export {
 	suggestionsEmptiedBy,
 } from './resolution';
 export type { InlineSuggestionType, ResolutionEffect } from './resolution';
+export {
+	computeFormatDelta,
+	formatDeltaFromOriginal,
+	isEmptyFormatDelta,
+	rebaseFormatDelta,
+} from './format-delta';
+export type {
+	FormatDelta,
+	FormatDeltaRun,
+	FormatDescriptor,
+	FormatRevision,
+} from './format-delta';
 export { suggestionRelations } from './relations';
 export type { RelatedSuggestion, SuggestionRelations } from './relations';
 export {

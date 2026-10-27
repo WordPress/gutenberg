@@ -1,8 +1,8 @@
 /**
  * Context lines for a suggestion that overlaps others: it sits inside other
  * people's additions, its addition holds others' suggestions, it is only
- * partly inside someone's addition, or someone else also suggested deleting
- * the same text. For a pending addition that holds others' suggestions, a
+ * partly inside someone's addition, someone else also suggested deleting
+ * the same text, or it changes formatting someone else already suggested. For a pending addition that holds others' suggestions, a
  * consequence line says what rejecting it does to them.
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -78,6 +78,18 @@ export function suggestionContextLines( {
 						name
 					)
 				: __( 'Someone else also suggested deleting this text' )
+		);
+	}
+	for ( const other of relations.builtOn ) {
+		const name = nameOf( other.id );
+		lines.push(
+			name
+				? sprintf(
+						/* translators: %s: name of the person who suggested the earlier formatting change. */
+						__( 'Built on a suggested formatting change by %s' ),
+						name
+					)
+				: __( 'Built on another suggested formatting change' )
 		);
 	}
 	const count = relations.children.length;

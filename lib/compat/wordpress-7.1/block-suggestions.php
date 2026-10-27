@@ -124,12 +124,82 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
 			if ( isset( $operation['block'] ) && is_array( $operation['block'] ) ) {
 				$operation['block'] = gutenberg_kses_suggestion_block_snapshot( $operation['block'] );
 			}
+			if ( array_key_exists( 'delta', $operation ) ) {
+				$delta = gutenberg_sanitize_suggestion_format_delta( $operation['delta'] );
+				if ( null === $delta ) {
+					unset( $operation['delta'] );
+				} else {
+					$operation['delta'] = $delta;
+				}
+			}
 			$decoded['operations'][ $index ] = $operation;
 		}
 	}
 
 	$encoded = wp_json_encode( $decoded );
 	return false === $encoded ? '' : $encoded;
+}
+
+/**
+ * Sanitizes a formatting suggestion's delta.
+ *
+ * A delta lists runs of a suggestion's characters, `offset` and `length`
+ * counting the characters its marker covers, with the rich-text formats the
+ * suggestion `added` and `removed` there, each a format `type` (`core/bold`)
+ * with optional string `attributes` and `unregisteredAttributes`. Anything
+ * else is dropped, and URL attributes lose disallowed protocols.
+ *
+ * @param mixed $delta Delta from the payload.
+ * @return list<array{offset: int, length: int, added: list<array<string, mixed>>, removed: list<array<string, mixed>>}>|null
+ *         The sanitized delta, or null when it is not a list.
+ */
+function gutenberg_sanitize_suggestion_format_delta( $delta ): ?array {
+	if ( ! is_array( $delta ) || array_values( $delta ) !== $delta ) {
+		return null;
+	}
+	$descriptors = static function ( $formats ): array {
+		$clean = array();
+		foreach ( is_array( $formats ) ? $formats : array() as $format ) {
+			if ( ! is_array( $format ) || ! isset( $format['type'] ) || ! is_string( $format['type'] ) || ! preg_match( '~^[a-z0-9-]+/[a-z0-9-]+$~', $format['type'] ) ) {
+				continue;
+			}
+			$descriptor = array( 'type' => $format['type'] );
+			foreach ( array( 'attributes', 'unregisteredAttributes' ) as $key ) {
+				if ( ! isset( $format[ $key ] ) || ! is_array( $format[ $key ] ) ) {
+					continue;
+				}
+				$attributes = array();
+				foreach ( $format[ $key ] as $name => $value ) {
+					if ( ! is_string( $name ) || ! preg_match( '~^[A-Za-z][A-Za-z0-9_:.-]*$~', $name ) || ! is_scalar( $value ) ) {
+						continue;
+					}
+					$value = wp_strip_all_tags( (string) $value );
+					if ( in_array( strtolower( $name ), array( 'url', 'href', 'src' ), true ) ) {
+						$value = wp_kses_bad_protocol( $value, wp_allowed_protocols() );
+					}
+					$attributes[ $name ] = $value;
+				}
+				if ( $attributes ) {
+					$descriptor[ $key ] = $attributes;
+				}
+			}
+			$clean[] = $descriptor;
+		}
+		return $clean;
+	};
+	$runs        = array();
+	foreach ( $delta as $run ) {
+		if ( ! is_array( $run ) || ! isset( $run['offset'], $run['length'] ) || ! is_int( $run['offset'] ) || ! is_int( $run['length'] ) || $run['offset'] < 0 || $run['length'] < 1 ) {
+			continue;
+		}
+		$runs[] = array(
+			'offset'  => $run['offset'],
+			'length'  => $run['length'],
+			'added'   => $descriptors( $run['added'] ?? array() ),
+			'removed' => $descriptors( $run['removed'] ?? array() ),
+		);
+	}
+	return $runs;
 }
 
 /**
@@ -925,6 +995,250 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 }
 
 /**
+ * Splits inline HTML into characters, each with the elements open around it.
+ *
+ * Only the inline elements rich text writes are understood (formats, links,
+ * marks, spans, line breaks and inline images); anything else, an element
+ * left open or a closer that does not match, makes the split fail so callers
+ * can fail closed. Text is decoded and split into code points; a line break
+ * or image counts as one character.
+ *
+ * @param string $html Inline HTML.
+ * @return list<array{html: string, stack: list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}>}>|null
+ *         Characters in order, or null when the HTML is not plain inline
+ *         markup.
+ */
+function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
+	$inline    = array( 'A', 'ABBR', 'B', 'BDI', 'BDO', 'CODE', 'EM', 'I', 'KBD', 'MARK', 'S', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'U' );
+	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
+	$stack     = array();
+	$chars     = array();
+	while ( $processor->next_token() ) {
+		$type = $processor->get_token_type();
+		if ( '#text' === $type ) {
+			$characters = preg_split( '//u', $processor->get_modifiable_text(), -1, PREG_SPLIT_NO_EMPTY );
+			if ( false === $characters ) {
+				return null;
+			}
+			foreach ( $characters as $character ) {
+				$chars[] = array(
+					'html'  => htmlspecialchars( $character, ENT_NOQUOTES, 'UTF-8' ),
+					'stack' => $stack,
+				);
+			}
+			continue;
+		}
+		$tag  = $processor->get_tag();
+		$span = $processor->get_token_span();
+		if ( '#tag' !== $type || null === $tag || null === $span ) {
+			return null;
+		}
+		$bytes = substr( $html, $span[0], $span[1] );
+		if ( 'BR' === $tag || 'IMG' === $tag ) {
+			if ( $processor->is_tag_closer() ) {
+				return null;
+			}
+			$chars[] = array(
+				'html'  => $bytes,
+				'stack' => $stack,
+			);
+			continue;
+		}
+		if ( ! in_array( $tag, $inline, true ) ) {
+			return null;
+		}
+		if ( $processor->is_tag_closer() ) {
+			$top = array_pop( $stack );
+			if ( null === $top || $top['tag'] !== $tag ) {
+				return null;
+			}
+			continue;
+		}
+		$id      = $processor->get_attribute( 'data-suggestion-id' );
+		$stack[] = array(
+			'tag'    => $tag,
+			'opener' => $bytes,
+			'kind'   => gutenberg_get_suggestion_marker_kind( $processor ),
+			'id'     => is_string( $id ) ? (int) $id : 0,
+			'run'    => is_string( $processor->get_attribute( 'data-suggestion-run' ) ),
+			'note'   => 'MARK' === $tag && true === $processor->has_class( 'wp-note' ),
+		);
+	}
+	if ( $stack || $processor->paused_at_incomplete_token() ) {
+		return null;
+	}
+	return $chars;
+}
+
+/**
+ * Serializes characters split by `gutenberg_get_inline_suggestion_characters()`.
+ *
+ * Adjacent characters share an element when their stacks open it with the
+ * same bytes.
+ *
+ * @param list<array{html: string, stack: list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}>}> $chars Characters.
+ * @return string HTML.
+ */
+function gutenberg_serialize_inline_suggestion_characters( array $chars ): string {
+	$html = '';
+	$open = array();
+	foreach ( $chars as $char ) {
+		$stack  = $char['stack'];
+		$common = 0;
+		while ( $common < count( $open ) && $common < count( $stack ) && $open[ $common ]['opener'] === $stack[ $common ]['opener'] ) {
+			++$common;
+		}
+		for ( $i = count( $open ) - 1; $i >= $common; $i-- ) {
+			$html .= '</' . strtolower( $open[ $i ]['tag'] ) . '>';
+		}
+		for ( $i = $common, $count = count( $stack ); $i < $count; $i++ ) {
+			$html .= $stack[ $i ]['opener'];
+		}
+		$open  = $stack;
+		$html .= $char['html'];
+	}
+	for ( $i = count( $open ) - 1; $i >= 0; $i-- ) {
+		$html .= '</' . strtolower( $open[ $i ]['tag'] ) . '>';
+	}
+	return $html;
+}
+
+/**
+ * Takes formatting suggestions out of inline HTML, character by character.
+ *
+ * Formatting suggestions stack on the same words and cross the edges of
+ * additions, so one cannot be undone by swapping its whole run for its
+ * original. Each formatting suggestion's note records, as `beforeHTML`, its
+ * characters as they are without it and the newer ones on them, which the
+ * editor keeps current as other decisions land. A character carrying
+ * formatting suggestions therefore gets the formatting the oldest one not
+ * accepted recorded for it, or keeps what it shows when every one is
+ * accepted; every formatting marker is dropped and addition and deletion
+ * markers are kept for the strip.
+ *
+ * The run between the first and last formatting marker is rebuilt from its
+ * characters. Null is returned, so the caller can fall back, when that run is
+ * not plain inline markup, an original is missing or no longer has the same
+ * text, or a change accepted on a character is newer than
+ * one that is not (its delta would apply on top, which only the editor
+ * computes).
+ *
+ * @param string             $html      HTML fragment.
+ * @param array<int, string> $originals Recorded original (`beforeHTML`) of each formatting suggestion.
+ * @param int[]              $accepted  Ids of the accepted suggestions.
+ * @return string|null The fragment without formatting suggestions, or null.
+ */
+function gutenberg_revert_inline_format_suggestions( string $html, array $originals, array $accepted = array() ): ?string {
+	if ( ! str_contains( $html, 'wp-suggestion-format' ) ) {
+		return $html;
+	}
+	$markers = gutenberg_pair_inline_suggestion_markers( $html );
+	if ( null === $markers ) {
+		return null;
+	}
+
+	// The smallest run holding every formatting marker and whatever marker
+	// it overlaps, so the run is balanced.
+	$start = null;
+	$end   = null;
+	foreach ( $markers as $marker ) {
+		if ( 'format' !== $marker['kind'] || null !== $marker['run'] ) {
+			continue;
+		}
+		if ( ! $marker['balanced'] || null === $marker['end'] ) {
+			return null;
+		}
+		$start = null === $start ? $marker['start'] : min( $start, $marker['start'] );
+		$end   = null === $end ? $marker['end'] : max( $end, $marker['end'] );
+	}
+	if ( null === $start || null === $end ) {
+		return $html;
+	}
+	do {
+		$grown = false;
+		foreach ( $markers as $marker ) {
+			$marker_end = $marker['end'] ?? strlen( $html );
+			if ( $marker['start'] < $end && $marker_end > $start && ( $marker['start'] < $start || $marker_end > $end ) ) {
+				$start = min( $start, $marker['start'] );
+				$end   = max( $end, $marker_end );
+				$grown = true;
+			}
+		}
+	} while ( $grown );
+
+	$chars = gutenberg_get_inline_suggestion_characters( substr( $html, $start, $end - $start ) );
+	if ( null === $chars ) {
+		return null;
+	}
+
+	$accepted  = array_fill_keys( array_map( 'intval', $accepted ), true );
+	$positions = array();
+	$parsed    = array();
+	foreach ( $chars as $index => $char ) {
+		$ids = array();
+		foreach ( $char['stack'] as $element ) {
+			if ( 'format' === $element['kind'] && ! $element['run'] ) {
+				$ids[] = $element['id'];
+			}
+		}
+		$ids = array_values( array_unique( $ids ) );
+		sort( $ids );
+		$offsets = array();
+		foreach ( $ids as $id ) {
+			$offsets[ $id ]   = $positions[ $id ] ?? 0;
+			$positions[ $id ] = $offsets[ $id ] + 1;
+		}
+
+		$below = null;
+		foreach ( $ids as $id ) {
+			if ( isset( $accepted[ $id ] ) ) {
+				if ( null !== $below ) {
+					return null;
+				}
+				continue;
+			}
+			$below ??= $id;
+		}
+
+		$kept = array();
+		foreach ( $char['stack'] as $element ) {
+			if ( null !== $element['kind'] && ! ( 'format' === $element['kind'] && ! $element['run'] ) ) {
+				$kept[] = $element;
+			} elseif ( null === $below && null === $element['kind'] ) {
+				$kept[] = $element;
+			}
+		}
+		if ( null !== $below ) {
+			if ( ! isset( $parsed[ $below ] ) ) {
+				if ( ! isset( $originals[ $below ] ) ) {
+					return null;
+				}
+				$parsed[ $below ] = gutenberg_get_inline_suggestion_characters( $originals[ $below ] );
+			}
+			$original = $parsed[ $below ][ $offsets[ $below ] ] ?? null;
+			// A formatting change never changes text.
+			if ( null === $original || $original['html'] !== $char['html'] ) {
+				return null;
+			}
+			foreach ( $original['stack'] as $element ) {
+				// Markers and note highlights are not the text's formatting.
+				if ( null === $element['kind'] && ! $element['note'] ) {
+					$kept[] = $element;
+				}
+			}
+		}
+		$chars[ $index ]['stack'] = $kept;
+	}
+	foreach ( $positions as $id => $count ) {
+		if ( isset( $parsed[ $id ] ) && count( (array) $parsed[ $id ] ) !== $count ) {
+			return null;
+		}
+	}
+
+	return substr( $html, 0, $start ) . gutenberg_serialize_inline_suggestion_characters( $chars ) . substr( $html, $end );
+}
+
+/**
  * Strip inline suggestion markers from rendered block output.
  *
  * The public HTML must never expose suggestion metadata, and an un-accepted
@@ -939,8 +1253,10 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  *   The save pass already leaves an addition's anchor empty in post content;
  *   it goes the same way.
  * - `format` (suggested formatting change): the marked run carries the proposed
- *   formatting, so the whole span is replaced with the original run recorded on
- *   the note (see `gutenberg_get_pending_format_suggestion_html()`). The note
+ *   formatting, so each character gets back the formatting recorded on the
+ *   note (see `gutenberg_revert_inline_format_suggestions()` and
+ *   `gutenberg_get_pending_format_suggestion_html()`). Where that cannot be
+ *   done, the whole span is replaced with the original run. The note
  *   is resolved against the post whose content is being rendered (see
  *   `gutenberg_push_suggestion_content_owner()`, and
  *   `gutenberg_push_suggestion_block_owner()` for blocks rendered from
@@ -1001,6 +1317,34 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	$markers = gutenberg_pair_inline_suggestion_markers( $block_content );
 	if ( null === $markers ) {
 		return '';
+	}
+
+	/*
+	 * Formatting suggestions come out character by character first, so
+	 * stacked ones and ones crossing an addition's edge render their
+	 * original. When that cannot be done, each format marker is handled
+	 * below on its own.
+	 */
+	if ( ! $restoring && str_contains( $block_content, 'wp-suggestion-format' ) ) {
+		$originals = array();
+		foreach ( $markers as $marker ) {
+			if ( 'format' === $marker['kind'] && null === $marker['run'] && ! isset( $originals[ $marker['id'] ] ) ) {
+				$original = gutenberg_get_pending_format_suggestion_html( $marker['id'], $post_id );
+				if ( null === $original ) {
+					$originals = null;
+					break;
+				}
+				$originals[ $marker['id'] ] = $original;
+			}
+		}
+		$reverted = null === $originals ? null : gutenberg_revert_inline_format_suggestions( $block_content, $originals );
+		if ( null !== $reverted && $reverted !== $block_content ) {
+			$block_content = $reverted;
+			$markers       = gutenberg_pair_inline_suggestion_markers( $block_content );
+			if ( null === $markers ) {
+				return '';
+			}
+		}
 	}
 
 	foreach ( $markers as $index => $marker ) {
@@ -1104,19 +1448,26 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
  * deletions.
  *
  * An accepted formatting change is unwrapped, keeping what it proposes. One
- * that is not accepted is left as it is: its original run lives on its note.
- * An unbalanced addition is removed through the later of its possible ends,
+ * that is not accepted takes its characters back to their recorded original
+ * when `$originals` holds it (see
+ * `gutenberg_revert_inline_format_suggestions()`), and is otherwise left as it
+ * is. An unbalanced addition is removed through the later of its possible ends,
  * accepted or not, and an unbalanced deletion keeps its text, as in the render
  * strip.
  *
- * @param string $html     HTML fragment.
- * @param int[]  $accepted Ids of the accepted suggestions.
+ * @param string             $html      HTML fragment.
+ * @param int[]              $accepted  Ids of the accepted suggestions.
+ * @param array<int, string> $originals Recorded original (`beforeHTML`) of
+ *                                      each formatting suggestion.
  * @return string The fragment as published, or '' when its markers cannot
  *                be paired.
  */
-function gutenberg_get_inline_suggestion_view( string $html, array $accepted ): string {
+function gutenberg_get_inline_suggestion_view( string $html, array $accepted, array $originals = array() ): string {
 	if ( false === strpos( $html, 'wp-suggestion' ) ) {
 		return $html;
+	}
+	if ( $originals ) {
+		$html = gutenberg_revert_inline_format_suggestions( $html, $originals, $accepted ) ?? $html;
 	}
 	$markers = gutenberg_pair_inline_suggestion_markers( $html );
 	if ( null === $markers ) {
