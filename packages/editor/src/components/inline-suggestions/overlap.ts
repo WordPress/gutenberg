@@ -9,13 +9,9 @@
  *   someone's deletion sits between its two halves;
  * - a deletion inside or across someone's addition nests in it, and one over
  *   someone's deletion adds a second deletion of the same words;
- * - a deletion over someone's formatting change, and the reverse.
- *
- * Formatting is the exception still refused here: a formatting change on
- * someone's formatting change, or one crossing the edge of someone's
- * addition, would record as its original run text or formatting that is
- * itself only proposed. Refusals name the marker in the way so the message
- * can say whose suggestion it is.
+ * - a deletion over someone's formatting change, and the reverse;
+ * - a formatting change inside or across someone's addition, and one on
+ *   someone's formatting change, which stacks as a second delta.
  *
  * Gestures over the editing author's own add and del markers are handled
  * before this is asked (growing, revising or deleting across their own
@@ -25,16 +21,17 @@ import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_ID_ATTRIBUTE,
 	suggestionKindOf,
-	suggestionMarkerId,
-	suggestionMarkerListsAt,
 	suggestionMarkersIn,
 } from './format';
 import type { SuggestionMarkerKind } from './format';
 
 export type OverlapGesture = 'insert' | 'delete' | 'format' | 'type-over';
 
-export type OverlapReason =
-	'format-on-format' | 'format-straddles-add' | 'own-marker';
+/**
+ * Why a gesture was declined: it reached the author's own addition or
+ * deletion, which the own-marker paths handle before asking.
+ */
+export type OverlapReason = 'own-marker';
 
 export interface OverlapBlocking {
 	/** Note id the blocking marker carries. */
@@ -117,56 +114,17 @@ export function classifyOverlap(
 		return ALLOW;
 	}
 
-	const from = Math.max( 0, start );
-	const to = Math.min( end, formats.length );
-
+	/*
+	 * A formatting change nests in someone's addition, stacks on someone's
+	 * formatting change, may cross the edge of either, and over the author's
+	 * own addition revises it; see `planFormatMarkers`.
+	 */
 	if ( gesture === 'format' ) {
-		/*
-		 * Formatting inside someone's addition is a child of it only when the
-		 * whole range sits in the same additions. Crossing an edge would
-		 * record, as the original run to restore on reject, text that is
-		 * itself only proposed.
-		 */
-		let enclosing: string | null = null;
-		for ( let i = from; i < to; i++ ) {
-			const markers = suggestionMarkerListsAt( formats[ i ] );
-			if ( markers.format.length ) {
-				const own = markers.format.find( ( marker ) =>
-					isOwn( marker, authorToken )
-				);
-				return own
-					? refuse( 'own-marker', own )
-					: refuse( 'format-on-format', markers.format[ 0 ] );
-			}
-			const ownAddition = markers.add.find( ( marker ) =>
-				isOwn( marker, authorToken )
-			);
-			if ( ownAddition ) {
-				return refuse( 'own-marker', ownAddition );
-			}
-			const additions = markers.add.map( suggestionMarkerId ).join( ' ' );
-			if ( i === from ) {
-				enclosing = additions;
-			} else if ( additions !== enclosing ) {
-				const previous = suggestionMarkerListsAt(
-					formats[ i - 1 ]
-				).add;
-				const has = ( list: any[], marker: any ) =>
-					list.some(
-						( other ) =>
-							suggestionMarkerId( other ) ===
-							suggestionMarkerId( marker )
-					);
-				const crossed =
-					markers.add.find(
-						( marker ) => ! has( previous, marker )
-					) ??
-					previous.find( ( marker ) => ! has( markers.add, marker ) );
-				return refuse( 'format-straddles-add', crossed );
-			}
-		}
 		return ALLOW;
 	}
+
+	const from = Math.max( 0, start );
+	const to = Math.min( end, formats.length );
 
 	/*
 	 * Deleting or typing over someone's markers nests in their additions and

@@ -767,10 +767,7 @@ export default function SuggestionAdditionKeyboard() {
 					: null;
 			if ( verdict?.verdict === 'refuse' ) {
 				resetRun();
-				notifyEditRefused( registry, {
-					reason: verdict.reason!,
-					blocking: verdict.blocking,
-				} );
+				notifyEditRefused( registry );
 				return true;
 			}
 			const run = runRef.current;

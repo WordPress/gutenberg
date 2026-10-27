@@ -2,8 +2,9 @@
  * How one inline suggestion sits among the others in its value, derived from
  * the markers on every read (never stored): inside other authors' additions
  * (its parents), holding other authors' suggestions (its children), only
- * partly inside someone's addition, or deleting text someone else also
- * proposed to delete. Used for the sidebar's context lines; resolution itself
+ * partly inside someone's addition, deleting text someone else also
+ * proposed to delete, or formatting text someone else already proposed to
+ * format. Used for the sidebar's context lines; resolution itself
  * never needs it (see `resolution.ts`).
  */
 import {
@@ -34,6 +35,11 @@ export interface SuggestionRelations {
 	partlyIn: RelatedSuggestion[];
 	/** Other authors' deletions of some of the text this one deletes. */
 	alsoDeleting: RelatedSuggestion[];
+	/**
+	 * Other authors' older formatting changes on some of the text this
+	 * formatting change covers: it was made on top of them.
+	 */
+	builtOn: RelatedSuggestion[];
 }
 
 const NONE: SuggestionRelations = {
@@ -41,6 +47,7 @@ const NONE: SuggestionRelations = {
 	children: [],
 	partlyIn: [],
 	alsoDeleting: [],
+	builtOn: [],
 };
 
 /**
@@ -118,9 +125,11 @@ export function suggestionRelations(
 		children: [],
 		partlyIn: [],
 		alsoDeleting: [],
+		builtOn: [],
 	};
 	const ownAddition = additionChars( target );
 	const ownDeletion = charsOfKind( target, 'del' );
+	const ownFormat = charsOfKind( target, 'format' );
 	for ( const [ otherId, chars ] of charsOf ) {
 		const other = info.get( otherId )!;
 		if ( otherId === target || ! isOtherAuthor( other ) ) {
@@ -142,6 +151,15 @@ export function suggestionRelations(
 		) {
 			relations.alsoDeleting.push( other );
 		}
+		if (
+			ownFormat.size &&
+			compareSuggestionIds( otherId, target ) < 0 &&
+			[ ...charsOfKind( otherId, 'format' ) ].some( ( index ) =>
+				ownFormat.has( index )
+			)
+		) {
+			relations.builtOn.push( other );
+		}
 		if ( other.kind !== 'add' ) {
 			continue;
 		}
@@ -157,5 +175,6 @@ export function suggestionRelations(
 		}
 	}
 	relations.parents.sort( ( a, b ) => compareSuggestionIds( a.id, b.id ) );
+	relations.builtOn.sort( ( a, b ) => compareSuggestionIds( a.id, b.id ) );
 	return relations;
 }
