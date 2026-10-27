@@ -29,7 +29,7 @@ This package ships no stylesheets; there is nothing to enqueue or import.
 The contract types, `<WidgetRender>`, and `useWidgetTypes()` work in any
 React application. The host fetches the widget-module records however it
 wants and passes them in; `useWidgetTypes( records )` imports each record's
-metadata module and returns the resolved `WidgetType[]`.
+metadata module, when it declares one, and returns the resolved `WidgetType[]`.
 
 On a WordPress site the records come from the `/wp/v2/widget-modules` REST
 endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
@@ -55,7 +55,7 @@ It is how a mounted widget reads its type's identity consistently — today the 
 
 ### `useWidgetTypes( records )`
 
-It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
+It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module when it declares one. A record without one resolves from its own fields. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
 
 ### `useWidgetActions( actions )`
 

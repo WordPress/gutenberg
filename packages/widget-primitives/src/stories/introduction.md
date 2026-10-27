@@ -29,7 +29,7 @@ How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) 
 
 ### Discovery
 
-`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module, and returns:
+`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module when it declares one (a record without one resolves from its own fields), and returns:
 
 -   `WidgetType[]`
 -   `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing

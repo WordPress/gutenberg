@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+
 ### New Features
 
--   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. `WidgetRender` provides it from the `widgetType` it already holds; absent a provider, the hook returns `{}` ([#85729](https://github.com/WordPress/gutenberg/pull/85729)).
+-   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. ([#85729](https://github.com/WordPress/gutenberg/pull/85729)).
+
+### Enhancements
+
+-   `WidgetModuleRecord.example`: a record carries the `example` `widget.json` declares, in the shape of the runtime field ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 
 ## 0.10.0 (2026-10-20)
 
