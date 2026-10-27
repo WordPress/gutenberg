@@ -317,8 +317,15 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		const settings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await settings.getByRole( 'tab', { name: 'Settings' } ).click();
+		await settings.getByRole( 'tab', { name: 'List View' } ).click();
 
+		// The setting follows the menu's items and their appender, so it
+		// reads as part of the menu structure rather than as a block setting.
+		await expect(
+			settings.locator(
+				'xpath=.//*[@role="treegrid"]/following::*[@role="switch"]'
+			)
+		).toHaveAccessibleName( 'Auto add pages' );
 		const toggle = settings.getByRole( 'switch', {
 			name: 'Auto add pages',
 		} );

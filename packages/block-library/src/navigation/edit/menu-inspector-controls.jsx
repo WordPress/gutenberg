@@ -14,6 +14,7 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
+import AutoAddPagesControl from './auto-add-pages-control';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -82,6 +83,9 @@ const MainContent = ( {
 				additionalBlockContent={ NavigationLinkUI }
 				onSelect={ openListViewContentPanel }
 			/>
+			{ navigationMenu && (
+				<AutoAddPagesControl menuId={ navigationMenu.id } />
+			) }
 		</div>
 	);
 };

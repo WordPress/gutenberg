@@ -1,7 +1,3 @@
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -16,9 +12,6 @@ type NavigationMenuRecord = {
 type Props = {
 	/** The `wp_navigation` post the block displays. */
 	menuId: number;
-	dropdownMenuProps?: React.ComponentProps<
-		typeof ToolsPanel
-	>[ 'dropdownMenuProps' ];
 };
 
 /**
@@ -26,28 +19,36 @@ type Props = {
  *
  * It belongs to the Navigation Menu rather than to the block, so a change is
  * an edit to the menu record and is saved along with the block's other menu
- * edits.
+ * edits. It renders nothing for a user who cannot update the menu.
  *
  * @param props
  * @param props.menuId
- * @param props.dropdownMenuProps
  */
-export default function AutoAddPagesControl( {
-	menuId,
-	dropdownMenuProps,
-}: Props ) {
-	const isEnabled = useSelect(
+export default function AutoAddPagesControl( { menuId }: Props ) {
+	const { canUpdate, isEnabled } = useSelect(
 		( select ) => {
-			const record = select( coreStore ).getEditedEntityRecord(
+			const { canUser, getEditedEntityRecord } = select( coreStore );
+			const record = getEditedEntityRecord(
 				'postType',
 				'wp_navigation',
 				menuId
 			) as NavigationMenuRecord | undefined;
-			return !! record?.meta?.[ META_KEY ];
+			return {
+				canUpdate: !! canUser( 'update', {
+					kind: 'postType',
+					name: 'wp_navigation',
+					id: menuId,
+				} ),
+				isEnabled: !! record?.meta?.[ META_KEY ],
+			};
 		},
 		[ menuId ]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
+
+	if ( ! canUpdate ) {
+		return null;
+	}
 
 	const setEnabled = ( value: boolean ) => {
 		editEntityRecord( 'postType', 'wp_navigation', menuId, {
@@ -56,26 +57,15 @@ export default function AutoAddPagesControl( {
 	};
 
 	return (
-		<ToolsPanel
-			label={ __( 'Menu' ) }
-			resetAll={ () => setEnabled( false ) }
-			dropdownMenuProps={ dropdownMenuProps }
-		>
-			<ToolsPanelItem
-				hasValue={ () => isEnabled }
+		<div className="wp-block-navigation__auto-add-pages">
+			<SwitchControl
 				label={ __( 'Auto add pages' ) }
-				onDeselect={ () => setEnabled( false ) }
-				isShownByDefault
-			>
-				<SwitchControl
-					label={ __( 'Auto add pages' ) }
-					description={ __(
-						'Add a link to each new page when it is published. A child page is added under the link to its parent.'
-					) }
-					checked={ isEnabled }
-					onCheckedChange={ setEnabled }
-				/>
-			</ToolsPanelItem>
-		</ToolsPanel>
+				description={ __(
+					'Add a link to each new page when it is published. A child page is added under the link to its parent.'
+				) }
+				checked={ isEnabled }
+				onCheckedChange={ setEnabled }
+			/>
+		</div>
 	);
 }

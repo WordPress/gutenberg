@@ -56,8 +56,8 @@ function NavigationEditStage() {
 		>
 			<div className={ styles.content }>
 				<Stack direction="column" gap="lg" align="stretch">
-					<AutoAddPagesToggle id={ navigationId } />
 					<NavigationMenuEditor id={ navigationId } />
+					<AutoAddPagesToggle id={ navigationId } />
 				</Stack>
 			</div>
 		</Page>
