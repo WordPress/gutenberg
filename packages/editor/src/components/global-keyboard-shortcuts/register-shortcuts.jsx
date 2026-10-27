@@ -15,7 +15,6 @@ import { useCanSuggest } from '../suggestion-mode/gate';
 const INTENT_SHORTCUT_NAMES = [
 	'core/editor/intent-edit',
 	'core/editor/intent-suggest',
-	'core/editor/intent-view',
 ];
 
 /**
@@ -208,16 +207,6 @@ function EditorKeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'x',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/editor/intent-view',
-			category: 'global',
-			description: __( 'Switch to View mode.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'c',
 			},
 		} );
 

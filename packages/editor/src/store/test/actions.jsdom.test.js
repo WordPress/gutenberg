@@ -11,7 +11,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import warning from '@wordpress/warning';
 import { store as editorStore } from '..';
 import * as actions from '../actions';
-import { EDITOR_INTENT_SUGGEST, EDITOR_INTENT_VIEW } from '../constants';
+import { EDITOR_INTENT_SUGGEST } from '../constants';
 import { installSuggestPostEditGuard } from '../suggest-post-edit-guard';
 import { unlock } from '../../lock-unlock';
 
@@ -512,52 +512,6 @@ describe( 'Post actions', () => {
 					.select( coreStore )
 					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
 			).not.toHaveProperty( 'status' );
-		} );
-
-		it( 'refuses a post settings edit while viewing', () => {
-			const registry = setupPost();
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				EDITOR_INTENT_VIEW
-			);
-
-			registry
-				.dispatch( editorStore )
-				.editPost( { excerpt: 'new crackers' } );
-
-			expect(
-				registry
-					.select( editorStore )
-					.getEditedPostAttribute( 'excerpt' )
-			).toBe( draftPost.excerpt );
-			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
-				false
-			);
-			expect(
-				registry
-					.select( noticesStore )
-					.getNotices()
-					.filter( ( { id } ) => id === 'editor-view-read-only' )
-			).toHaveLength( 1 );
-		} );
-
-		it( 'lets block content edits through while viewing', () => {
-			const registry = setupPost();
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				EDITOR_INTENT_VIEW
-			);
-
-			/*
-			 * `savePost` and block sync write `content`/`blocks`; the canvas
-			 * owns their read-only handling, so the post-level guard must not
-			 * block them.
-			 */
-			registry.dispatch( editorStore ).editPost( { content: 'baz' } );
-
-			expect(
-				registry
-					.select( editorStore )
-					.getEditedPostAttribute( 'content' )
-			).toBe( 'baz' );
 		} );
 
 		it( 'applies a post status edit while editing', () => {
@@ -2096,53 +2050,6 @@ describe( 'Editor actions', () => {
 			expect( speak ).not.toHaveBeenCalled();
 		} );
 
-		it( 'refuses the code editor in the read-only view intent', () => {
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
-			);
-
-			registry.dispatch( editorStore ).switchEditorMode( 'text' );
-
-			expect( registry.select( editorStore ).getEditorMode() ).toBe(
-				'visual'
-			);
-			// The refusal must not write the preference: returning to
-			// Editing has to leave the user where they were.
-			expect(
-				registry.select( preferencesStore ).get( 'core', 'editorMode' )
-			).toBeUndefined();
-			expect(
-				registry
-					.select( noticesStore )
-					.getNotices()
-					.map( ( notice ) => notice.content )
-			).toContain(
-				'The code editor is unavailable while viewing. Switch to Editing to change the content.'
-			);
-		} );
-
-		it( 'masks a stored code editor preference while viewing', () => {
-			registry.dispatch( editorStore ).switchEditorMode( 'text' );
-			expect( registry.select( editorStore ).getEditorMode() ).toBe(
-				'text'
-			);
-
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
-			);
-			expect( registry.select( editorStore ).getEditorMode() ).toBe(
-				'visual'
-			);
-
-			// Leaving the intent hands the code editor back.
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'edit'
-			);
-			expect( registry.select( editorStore ).getEditorMode() ).toBe(
-				'text'
-			);
-		} );
-
 		it( 'still opens the code editor with no suggestions pending', () => {
 			registry.dispatch( editorStore ).switchEditorMode( 'text' );
 
@@ -2292,62 +2199,6 @@ describe( 'Editor actions', () => {
 		} );
 	} );
 
-	describe( 'undo/redo in the read-only view intent', () => {
-		let registry;
-
-		beforeEach( () => {
-			registry = createRegistryWithStores();
-			registry
-				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', [
-					{ id: postId, title: 'original', type: 'post' },
-				] );
-			registry
-				.dispatch( coreStore )
-				.editEntityRecord( 'postType', 'post', postId, {
-					title: 'edited',
-				} );
-		} );
-
-		const editedTitle = () =>
-			registry
-				.select( coreStore )
-				.getEditedEntityRecord( 'postType', 'post', postId ).title;
-
-		it( 'refuses undo while viewing and allows it again after', () => {
-			expect( registry.select( coreStore ).hasUndo() ).toBe( true );
-
-			// The intent API is private while Suggest mode is experimental.
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
-			);
-			registry.dispatch( editorStore ).undo();
-
-			expect( editedTitle() ).toBe( 'edited' );
-			expect( registry.select( coreStore ).hasUndo() ).toBe( true );
-
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'edit'
-			);
-			registry.dispatch( editorStore ).undo();
-
-			expect( editedTitle() ).toBe( 'original' );
-		} );
-
-		it( 'refuses redo while viewing', () => {
-			registry.dispatch( editorStore ).undo();
-			expect( registry.select( coreStore ).hasRedo() ).toBe( true );
-
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
-			);
-			registry.dispatch( editorStore ).redo();
-
-			expect( editedTitle() ).toBe( 'original' );
-			expect( registry.select( coreStore ).hasRedo() ).toBe( true );
-		} );
-	} );
-
 	describe( 'setEditorIntent', () => {
 		let registry;
 
@@ -2362,20 +2213,13 @@ describe( 'Editor actions', () => {
 			).toEqual( 'edit' );
 		} );
 
-		it( 'switches between edit, suggest, and view', () => {
+		it( 'switches between edit and suggest', () => {
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
 			expect(
 				unlock( registry.select( editorStore ) ).getEditorIntent()
 			).toEqual( 'suggest' );
-
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
-			);
-			expect(
-				unlock( registry.select( editorStore ) ).getEditorIntent()
-			).toEqual( 'view' );
 
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'edit'
@@ -2444,14 +2288,14 @@ describe( 'Editor actions', () => {
 			speak.mockClear();
 
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
+				'suggest'
 			);
 
 			// The snackbar speaks this, once and politely; the action does
 			// not announce as well.
 			const [ notice ] = registry.select( noticesStore ).getNotices();
-			expect( notice.content ).toBe( "You're viewing" );
-			expect( notice.spokenMessage ).toBe( "You're viewing" );
+			expect( notice.content ).toBe( "You're suggesting" );
+			expect( notice.spokenMessage ).toBe( "You're suggesting" );
 			expect( speak ).not.toHaveBeenCalled();
 		} );
 
@@ -2480,24 +2324,9 @@ describe( 'Editor actions', () => {
 			expect( getNotices() ).toHaveLength( 1 );
 		} );
 
-		it( 'leaves the announcement to the snackbar', () => {
-			// `Snackbar` speaks its own content politely from an effect. The
-			// action must not announce as well, or the mode is said twice and
-			// the assertive update interrupts the polite one.
-			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
-			);
-
-			const [ notice ] = registry.select( noticesStore ).getNotices();
-			expect( notice.content ).toBe( "You're viewing" );
-			// The snackbar speaks this, once, politely.
-			expect( notice.spokenMessage ).toBe( "You're viewing" );
-			expect( speak ).not.toHaveBeenCalled();
-		} );
-
 		it( 'does not write to the preferences store (session-scoped only)', () => {
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'view'
+				'suggest'
 			);
 			expect(
 				registry

@@ -15,7 +15,6 @@ import {
 	EDITOR_INTENTS,
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
-	EDITOR_INTENT_VIEW,
 	SUGGEST_LOCKED_POST_FIELDS,
 } from './constants';
 import {
@@ -1106,12 +1105,12 @@ export function selectNote( noteId, options = { focus: false } ) {
  * Sets the current editor intent.
  *
  * The intent represents the user's editing purpose: directly editing content
- * (`edit`), suggesting changes that the author can apply or reject
- * (`suggest`), or viewing the post in a read-only mode (`view`).
+ * (`edit`), or suggesting changes that the author can apply or reject
+ * (`suggest`).
  *
  * The intent is *session-scoped* — held in the editor reducer (not the
  * preferences store), so reloading the editor always returns to `edit`.
- * Persisting suggest/view across reloads surprises users who don't realize
+ * Persisting suggest across reloads surprises users who don't realize
  * they left the editor in a non-default state.
  *
  * Unknown intents are silently rejected (no dispatch, no announcement) so
@@ -1124,7 +1123,7 @@ export function selectNote( noteId, options = { focus: false } ) {
  * has nowhere to suggest. Refusing here covers the keyboard shortcut and any
  * programmatic dispatch; the intent menu offers the choice disabled.
  *
- * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
+ * @param {'edit'|'suggest'} intent The editor intent to set.
  */
 export const setEditorIntent =
 	( intent ) =>
@@ -1171,13 +1170,6 @@ export const setEditorIntent =
 		const previousMode = select.getEditorMode();
 
 		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
-
-		// The view intent puts the canvas in preview mode, where nothing can
-		// be inserted. An inserter left open over it offers a library that
-		// can't do anything, so close it on the way in.
-		if ( intent === EDITOR_INTENT_VIEW && select.isInserterOpened() ) {
-			dispatch.setIsInserterOpened( false );
-		}
 
 		/*
 		 * `editPost` refuses new status edits while suggesting, but a status
@@ -1226,8 +1218,6 @@ export const setEditorIntent =
 			label = __( "You're editing" );
 		} else if ( intent === EDITOR_INTENT_SUGGEST ) {
 			label = __( "You're suggesting" );
-		} else if ( intent === EDITOR_INTENT_VIEW ) {
-			label = __( "You're viewing" );
 		}
 
 		if ( label ) {
