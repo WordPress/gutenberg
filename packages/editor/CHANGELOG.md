@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The "Choose a pattern" modal for new pages shows its patterns 20 at a time, with pagination, instead of rendering a preview of every starter pattern at once ([#85233](https://github.com/WordPress/gutenberg/pull/85233)).
+
 ### Bug Fixes
 
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).

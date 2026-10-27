@@ -21,12 +21,13 @@ $pattern-min-width: 220px;
 		z-index: 1;
 	}
 
-	.block-editor-block-patterns-list {
+	.editor-start-page-options__modal-content {
 		// Since the actions container is positioned absolutely,
 		// this padding bottom ensures that the content wrapper will properly
 		// detect overflowing content and start showing scrollbars at the right
-		// moment. Without this padding, the content would render under the actions
-		// bar without causing the wrapper to show a scrollbar.
+		// moment. Without this padding, the patterns and their paging would
+		// render under the actions bar without causing the wrapper to show a
+		// scrollbar.
 		padding-bottom: $actions-height;
 	}
 
