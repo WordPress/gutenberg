@@ -60,6 +60,8 @@ export default function useClipboardHandler() {
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
 		getBlockRootClientId,
+		getBlockAttributes,
+		getSelectionStart,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -103,6 +105,18 @@ export default function useClipboardHandler() {
 			return true;
 		}
 
+		// A bound field's text belongs to its source, not to the block.
+		function isSelectedFieldBound() {
+			const { clientId, attributeKey } = getSelectionStart();
+			const bindings = clientId
+				? getBlockAttributes( clientId )?.metadata?.bindings
+				: undefined;
+			return !! (
+				( attributeKey && bindings?.[ attributeKey ] ) ||
+				bindings?.__default
+			);
+		}
+
 		function handler( event: WritingFlowClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
@@ -132,6 +146,7 @@ export default function useClipboardHandler() {
 			const isWholeSingleBlockCopy =
 				event.type === 'copy' &&
 				! hasMultiSelection() &&
+				! isSelectedFieldBound() &&
 				isBlockEntirelySelected(
 					( event.target as Element ).ownerDocument,
 					selectedBlockClientIds[ 0 ]

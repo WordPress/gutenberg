@@ -23,7 +23,6 @@
 		"className": false,
 		"html": false,
 		"multiple": false,
-		"rotate": false,
 		"visibility": false,
 		"interactivity": {
 			"clientNavigation": true
