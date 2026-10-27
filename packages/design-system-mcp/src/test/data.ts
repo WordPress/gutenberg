@@ -208,28 +208,7 @@ describe( 'data', () => {
 			await getPatterns();
 			await getPatternDetail( 'error-messages' );
 
-			expect( globalThis.fetch ).toHaveBeenCalledTimes( 2 );
-		} );
-
-		it( 'should return patterns when the components manifest fails', async () => {
-			mockFetchResponses( {
-				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
-				[ MANIFEST_URL ]: { ok: false, body: null },
-			} );
-
-			expect( await getPatterns() ).toHaveLength( 2 );
-		} );
-
-		it( 'should share the components manifest with the component tools', async () => {
-			mockFetchResponses( {
-				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
-				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
-			} );
-
-			await getComponents();
-			await getPatterns();
-
-			expect( globalThis.fetch ).toHaveBeenCalledTimes( 2 );
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'should throw on fetch failure', async () => {

@@ -3,9 +3,7 @@ export interface ManifestComponent {
 	name: string;
 	path: string;
 	description?: string;
-	import?: string;
 	stories?: Array< {
-		id?: string;
 		name: string;
 		snippet?: string;
 		description?: string;
@@ -55,7 +53,6 @@ export interface ComponentDetail {
 
 export interface ManifestDoc {
 	id: string;
-	path?: string;
 	title?: string;
 	content?: string;
 }

@@ -3,65 +3,68 @@ import { Button, Card as WCCard, CardBody } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import { useState } from '@wordpress/element';
 
-const meta: Meta = {
+const LayoutCardSaveExample = () => {
+	const [ data, setData ] = useState( { title: '' } );
+
+	return (
+		<div style={ { maxWidth: '480px' } }>
+			<WCCard
+				size={ {
+					blockStart: 'medium',
+					blockEnd: 'medium',
+					inlineStart: 'medium',
+					inlineEnd: 'medium',
+				} }
+			>
+				<CardBody>
+					<DataForm
+						data={ data }
+						fields={ [
+							{
+								id: 'title',
+								label: 'Title',
+								type: 'text',
+							},
+						] }
+						form={ {
+							layout: { type: 'regular' },
+							fields: [ 'title' ],
+						} }
+						onChange={ ( edits ) =>
+							setData( ( previous ) => ( {
+								...previous,
+								...edits,
+							} ) )
+						}
+					/>
+					<Button
+						variant="primary"
+						isBusy
+						style={ { marginTop: '16px' } }
+						__next40pxDefaultSize
+					>
+						Save
+					</Button>
+				</CardBody>
+			</WCCard>
+		</div>
+	);
+};
+
+const meta: Meta< typeof LayoutCardSaveExample > = {
 	title: 'Design System/Patterns/Save & Submit',
+	component: LayoutCardSaveExample,
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ 'docs-only', 'manifest' ],
+	tags: [ 'docs-only' ],
 };
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj< typeof LayoutCardSaveExample >;
 
 export const SaveFormLayoutCard: Story = {
 	name: 'Save form layout card',
-	render: function Render() {
-		const [ data, setData ] = useState( { title: '' } );
-
-		return (
-			<div style={ { maxWidth: '480px' } }>
-				<WCCard
-					size={ {
-						blockStart: 'medium',
-						blockEnd: 'medium',
-						inlineStart: 'medium',
-						inlineEnd: 'medium',
-					} }
-				>
-					<CardBody>
-						<DataForm
-							data={ data }
-							fields={ [
-								{
-									id: 'title',
-									label: 'Title',
-									type: 'text',
-								},
-							] }
-							form={ {
-								layout: { type: 'regular' },
-								fields: [ 'title' ],
-							} }
-							onChange={ ( edits ) =>
-								setData( ( previous ) => ( {
-									...previous,
-									...edits,
-								} ) )
-							}
-						/>
-						<Button
-							variant="primary"
-							isBusy
-							style={ { marginTop: '16px' } }
-							__next40pxDefaultSize
-						>
-							Save
-						</Button>
-					</CardBody>
-				</WCCard>
-			</div>
-		);
-	},
+	render: () => <LayoutCardSaveExample />,
 };
