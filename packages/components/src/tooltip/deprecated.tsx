@@ -3,7 +3,10 @@ import { forwardRef } from '@wordpress/element';
 import InternalTooltip from '.';
 import type { TooltipProps } from './types';
 
-function Tooltip( props: TooltipProps, ref: React.ForwardedRef< any > ) {
+function UnforwardedDeprecatedTooltip(
+	props: TooltipProps,
+	ref: React.ForwardedRef< any >
+) {
 	deprecated( 'wp.components.Tooltip', {
 		since: '7.3',
 		version: '7.5',
@@ -18,7 +21,7 @@ function Tooltip( props: TooltipProps, ref: React.ForwardedRef< any > ) {
  *
  * @deprecated Use `Tooltip` from `@wordpress/ui` instead.
  */
-const DeprecatedTooltip = forwardRef( Tooltip );
+const DeprecatedTooltip = forwardRef( UnforwardedDeprecatedTooltip );
 DeprecatedTooltip.displayName = 'Tooltip';
 
 export default DeprecatedTooltip;
