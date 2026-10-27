@@ -333,9 +333,29 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should load and sanitize the icon content from a readable SVG file referenced by `file_path`.
+	 * Should load the icon content from a readable SVG file referenced by `file_path`.
 	 */
 	public function test_get_content_reads_from_valid_file_path() {
+		$path = $this->create_temp_icon_file( '<svg><path d="M0 0"/></svg>' );
+
+		$this->register(
+			'test-collection/from-file',
+			array(
+				'label'     => 'From File',
+				'file_path' => $path,
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( 'test-collection/from-file' );
+		$this->assertStringContainsString( '<path', $icon['content'] );
+	}
+
+	/**
+	 * Should sanitize the content of an icon file outside the core icon library.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_content
+	 */
+	public function test_get_content_sanitizes_non_core_icon_file() {
 		$path = $this->create_temp_icon_file( '<svg><script>alert( 1 )</script><path d="M0 0"/></svg>' );
 
 		$this->register(
