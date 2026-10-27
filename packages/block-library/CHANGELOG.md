@@ -15,6 +15,7 @@
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
 -   Heading: Generate anchors with `cleanForSlug`, so headings in scripts like Devanagari, Tamil and Bengali keep their vowel signs, and anchors follow the same rules as post slugs ([#85096](https://github.com/WordPress/gutenberg/pull/85096)).
+-   Page List: Fetch every page in the editor instead of the first 100, and page through them by ID so none are repeated or skipped. The preview and the Parent setting now match the front end on sites with more than 100 pages, and "Detach" is no longer offered on those sites, where it converted only the first 100 pages ([#83162](https://github.com/WordPress/gutenberg/pull/83162)).
 
 ## 12.0.0 (2026-10-20)
 

@@ -137,12 +137,18 @@ export default function PageListEdit( {
 		'postType',
 		'page',
 		{
-			per_page: MAX_PAGE_COUNT,
+			// The front end lists every page, so fetch them all here too. The
+			// REST API caps `per_page` at 100; `-1` makes apiFetch page through
+			// the whole collection.
+			per_page: -1,
 			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
+			// The pages are sorted client side (see `pagesByParentId`) because
+			// the REST API can't order by menu order and title together
+			// (https://core.trac.wordpress.org/ticket/39037). Paging through
+			// the collection needs a unique sort key: with `menu_order`, which
+			// most pages share, the database may repeat rows on one request
+			// and skip them on the next.
+			orderby: 'id',
 			order: 'asc',
 		}
 	);
@@ -157,10 +163,11 @@ export default function PageListEdit( {
 			return new Map();
 		}
 
-		// TODO: Once the REST API supports passing multiple values to
-		// 'orderby', this can be removed.
-		// https://core.trac.wordpress.org/ticket/39037
-		const sortedPages = pages.sort( ( a, b ) => {
+		// Sort by menu order, then title, to match the order the front end
+		// renders (`get_pages()` sorted by `menu_order,post_title`). Sort a
+		// copy: `pages` is the array core-data caches for this query and hands
+		// to every other consumer of it, and `sort` reorders in place.
+		const sortedPages = [ ...pages ].sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
 			}
