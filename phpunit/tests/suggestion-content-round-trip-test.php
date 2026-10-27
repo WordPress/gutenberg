@@ -134,6 +134,18 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 				$paragraph( 'keep ' . $mark( '%1', 'del', 'twice ' . $mark( '%2', 'del', 'struck' ) ) . $mark( '%2', 'del', ' more' ) ),
 				array(),
 			),
+			'a second author\'s proposal nested on a block' => array(
+				"<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-attributes\",\"authorId\":1,\"after\":{\"level\":3},\"commentId\":%1,\"nested\":[{\"type\":\"pending-attributes\",\"authorId\":2,\"after\":{\"textAlign\":\"zigzag\"},\"commentId\":%2}]},\"noteId\":[%1,%2]}} -->\n<h2 class=\"wp-block-heading\">My Heading</h2>\n<!-- /wp:heading -->",
+				array( '"after"', '"level":3', 'zigzag' ),
+			),
+			'a proposal nested on a removal'              => array(
+				"<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-remove\",\"authorId\":1,\"commentId\":%1,\"nested\":[{\"type\":\"pending-attributes\",\"authorId\":2,\"after\":{\"textAlign\":\"zigzag\"},\"commentId\":%2}]}}} -->\n<h2 class=\"wp-block-heading\">Going</h2>\n<!-- /wp:heading -->",
+				array( '"after"', 'zigzag' ),
+			),
+			'a removal nested on a suggested block'       => array(
+				"<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1,\"commentId\":%1,\"nested\":[{\"type\":\"pending-remove\",\"authorId\":2,\"commentId\":%2},{\"type\":\"pending-attributes\",\"authorId\":3,\"after\":{\"align\":\"wide\"},\"commentId\":%3}]}}} -->\n<p>Quixotic doubly suggested paragraph</p>\n<!-- /wp:paragraph -->",
+				array( 'Quixotic', 'wide' ),
+			),
 			'deletions over nested additions'             => array(
 				$paragraph( 'The' . $mark( '%1', 'add', ' ' . $mark( '%3', 'del', 'quick' ) . $mark( '%2', 'add', $mark( '%3', 'del', ' brown' ) ) ) . ' fox.' ),
 				array( 'quick', 'brown' ),
