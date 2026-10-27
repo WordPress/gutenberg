@@ -1,0 +1,126 @@
+name: Check new e2e tests on trunk
+
+# A bug fix's new or changed e2e test should fail without the fix. This runs
+# those tests against trunk's code and warns on each one that passes there.
+on:
+    pull_request:
+        types: [opened, reopened, synchronize, labeled, unlabeled]
+        paths:
+            - 'test/e2e/specs/**'
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    label:
+        name: Check for the bug label
+        runs-on: 'ubuntu-slim'
+        # Other labels change nothing here.
+        if: ${{ ! contains( fromJSON( '["labeled", "unlabeled"]' ), github.event.action ) || github.event.label.name == '[Type] Bug' }}
+        permissions:
+            pull-requests: read
+        timeout-minutes: 5
+        outputs:
+            bug: ${{ steps.check.outputs.bug }}
+        steps:
+            # Read the labels now rather than from the event payload, which a
+            # re-run of an older run would still use.
+            - id: check
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PR_NUMBER: ${{ github.event.number }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  if gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" --jq '.[].name' | grep -qxF '[Type] Bug'; then
+                    echo "bug=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+    e2e-on-trunk:
+        name: Run new e2e tests on trunk
+        needs: label
+        if: ${{ needs.label.outputs.bug == 'true' }}
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        permissions:
+            contents: read
+        timeout-minutes: 45
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.event.number }}
+            cancel-in-progress: true
+
+        steps:
+            # The merge commit's first parent is trunk.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  fetch-depth: 2
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use trunk's code with the pull request's tests
+              run: |
+                  git checkout HEAD^1
+                  git checkout "$GITHUB_SHA" -- test/e2e/specs
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build
+
+            - name: Install Playwright dependencies
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/e2e-tests-playwright'
+                  browsers: chromium
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            # A test counts as changed when a changed line falls between its
+            # start and the next test's start. Failing tests are expected, so
+            # they never fail this step.
+            - name: Warn on tests that pass on trunk
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/results.json
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- node <<'EOF'
+                  const { execFileSync } = require( 'child_process' );
+                  const { readFileSync } = require( 'fs' );
+
+                  const playwright = ( args ) => {
+                  	try {
+                  		execFileSync( 'npm', [ 'run', '--workspace', '@wordpress/e2e-tests-playwright', 'test:e2e', '--', '--project=chromium', '--retries=0', '--reporter=json', ...args ], { stdio: 'inherit' } );
+                  	} catch {}
+                  	const specsOf = ( suite ) => [ ...( suite.specs ?? [] ), ...( suite.suites ?? [] ).flatMap( specsOf ) ];
+                  	return JSON.parse( readFileSync( process.env.PLAYWRIGHT_JSON_OUTPUT_FILE ) ).suites.flatMap( specsOf ).map( ( spec ) => ( { ...spec, file: `test/e2e/specs/${ spec.file }` } ) );
+                  };
+
+                  // Lines the pull request adds or changes, per file.
+                  const changed = {};
+                  let file;
+                  for ( const line of execFileSync( 'git', [ 'diff', '-U0', 'HEAD', process.env.GITHUB_SHA, '--', 'test/e2e/specs' ] ).toString().split( '\n' ) ) {
+                  	file = line.startsWith( '+++ b/' ) ? line.slice( 6 ) : file;
+                  	const [ , start, count = 1 ] = line.match( /^@@ .* \+(\d+)(?:,(\d+))? @@/ ) ?? [];
+                  	for ( let i = 0; i < count; i++ ) ( changed[ file ] ??= [] ).push( Number( start ) + i );
+                  }
+
+                  // The first changed line of each test, which is where the warning goes.
+                  const tests = new Map();
+                  const listed = playwright( [ '--list', ...Object.keys( changed ).map( ( f ) => f.replace( 'test/e2e/', '' ) ) ] );
+                  for ( const [ file, lines ] of Object.entries( changed ) ) {
+                  	const starts = listed.filter( ( spec ) => spec.file === file ).map( ( spec ) => spec.line ).sort( ( a, b ) => a - b );
+                  	for ( const line of lines ) {
+                  		const start = starts.findLast( ( s ) => s <= line );
+                  		if ( start && ! tests.has( `${ file }:${ start }` ) ) tests.set( `${ file }:${ start }`, line );
+                  	}
+                  }
+                  if ( ! tests.size ) process.exit();
+
+                  for ( const spec of playwright( [ ...tests.keys() ].map( ( t ) => t.replace( 'test/e2e/', '' ) ) ) ) {
+                  	if ( spec.tests[ 0 ].results[ 0 ]?.status === 'passed' ) {
+                  		console.log( `::warning file=${ spec.file },line=${ tests.get( `${ spec.file }:${ spec.line }` ) }::This test passes on trunk, so it doesn't prove the fix.` );
+                  	}
+                  }
+                  EOF
