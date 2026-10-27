@@ -30,14 +30,25 @@
 # Exit if any command fails.
 set -euo pipefail
 
-# The commit of php-stubs/wordpress-stubs whose generator is used. This is the head of
+# Each of the following can be overridden with an environment variable of the same name, such as to
+# try a generator change, or a fork of wordpress-develop.
+
+# The GitHub repository and commit of the generator, which is cached by its commit, so this needs to
+# be a commit hash rather than a branch. This is the head of
 # https://github.com/php-stubs/wordpress-stubs/pull/498, without which the function map adds a
 # second `@phpstan-return` to the docblocks for which core trunk now has its own.
-WORDPRESS_STUBS_COMMIT=7c32aeca37ad7defa54758674ff62a70a521c8b5
+WORDPRESS_STUBS_REPO="${WORDPRESS_STUBS_REPO:-php-stubs/wordpress-stubs}"
+WORDPRESS_STUBS_COMMIT="${WORDPRESS_STUBS_COMMIT:-7c32aeca37ad7defa54758674ff62a70a521c8b5}"
 
-WORDPRESS_DEVELOP_REPO=WordPress/wordpress-develop
+# The GitHub repository that commits and pull requests are fetched from.
+WORDPRESS_DEVELOP_REPO="${WORDPRESS_DEVELOP_REPO:-WordPress/wordpress-develop}"
+
 PACKAGE_DIR="$(cd "$(dirname "$0")" && pwd)/wordpress-stubs"
 GUTENBERG_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+
+# Where the generator is kept with its dependencies installed, one directory per repository and
+# commit, so that it is only set up once.
+WORDPRESS_STUBS_CACHE_DIR="${WORDPRESS_STUBS_CACHE_DIR:-$GUTENBERG_DIR/.cache/wordpress-stubs-generator}"
 
 usage() {
 	sed -n 's/^# \{0,1\}//; /^Usage/,/^A commit/p' "$0" | sed '$d' >&2
@@ -164,12 +175,22 @@ else
 	COMMIT_IS_TRUNK="$(git -C "$SOURCE_DIR" log -1 --format=%B "$COMMIT" | grep -c '^git-svn-id: ' || true)"
 fi
 
-echo "Fetching php-stubs/wordpress-stubs@$WORDPRESS_STUBS_COMMIT"
-fetch_commit "$WORK_DIR/wordpress-stubs" php-stubs/wordpress-stubs "$WORDPRESS_STUBS_COMMIT" '/*'
+# Set up the generator unless it is cached. Its Composer scripts would install the latest WordPress
+# release in source/wordpress, where it reads the WordPress source from, so they are skipped. It is
+# moved into the cache only once set up, so that an interrupted run leaves nothing behind.
+GENERATOR_DIR="$WORDPRESS_STUBS_CACHE_DIR/${WORDPRESS_STUBS_REPO//\//-}-$WORDPRESS_STUBS_COMMIT"
+if [[ -d "$GENERATOR_DIR" ]]; then
+	echo "Using $WORDPRESS_STUBS_REPO@$WORDPRESS_STUBS_COMMIT from $GENERATOR_DIR"
+else
+	echo "Fetching $WORDPRESS_STUBS_REPO@$WORDPRESS_STUBS_COMMIT"
+	fetch_commit "$WORK_DIR/generator" "$WORDPRESS_STUBS_REPO" "$WORDPRESS_STUBS_COMMIT" '/*'
+	composer --working-dir="$WORK_DIR/generator" update --no-interaction --no-progress --no-scripts
+	mkdir -p "$WORDPRESS_STUBS_CACHE_DIR"
+	mv "$WORK_DIR/generator" "$GENERATOR_DIR"
+fi
 
-# The generator reads the WordPress source from source/wordpress. Its Composer scripts would install
-# the latest WordPress release there, so they are skipped.
-composer --working-dir="$WORK_DIR/wordpress-stubs" update --no-interaction --no-progress --no-scripts
+# Generate in a copy, keeping the cached generator unchanged.
+cp -R "$GENERATOR_DIR" "$WORK_DIR/wordpress-stubs"
 cp -R "$SOURCE_DIR/src" "$WORK_DIR/wordpress-stubs/source/wordpress"
 
 echo "Generating the stubs"
@@ -208,7 +229,7 @@ fi
 		 * Generated stub declarations for WordPress trunk, for Gutenberg's PHPStan analysis.
 		 *
 		 * Generated from $SOURCE
-		 * with https://github.com/php-stubs/wordpress-stubs/commit/$WORDPRESS_STUBS_COMMIT.
+		 * with https://github.com/$WORDPRESS_STUBS_REPO/commit/$WORDPRESS_STUBS_COMMIT.
 		 *
 		 * Do not edit. Regenerate with \`composer phpstan:generate-wordpress-stubs\`.
 		 */
