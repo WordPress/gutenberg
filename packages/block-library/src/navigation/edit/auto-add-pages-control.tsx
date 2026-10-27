@@ -61,7 +61,7 @@ export default function AutoAddPagesControl( { menuId }: Props ) {
 			<SwitchControl
 				label={ __( 'Auto add pages' ) }
 				description={ __(
-					'Add a link to each new page when it is published. A child page is added under the link to its parent.'
+					'Automatically adds newly published pages to this navigation.'
 				) }
 				checked={ isEnabled }
 				onCheckedChange={ setEnabled }
