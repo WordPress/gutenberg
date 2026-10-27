@@ -34,6 +34,7 @@ test.describe( 'Block template registration', () => {
 		admin,
 		editor,
 		page,
+		requestUtils,
 		blockTemplateRegistrationUtils,
 	} ) => {
 		// Verify template is applied to the frontend.
@@ -45,7 +46,7 @@ test.describe( 'Block template registration', () => {
 		// Verify template is listed in the Site Editor.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Gutenberg',
+			activeView: await getPluginTemplatesView( requestUtils ),
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Template'
@@ -200,7 +201,7 @@ test.describe( 'Block template registration', () => {
 		// Make an edit to the template.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Gutenberg',
+			activeView: await getPluginTemplatesView( requestUtils ),
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Template'
@@ -402,4 +403,23 @@ class BlockTemplateRegistrationUtils {
 			.poll( async () => this.page.url() )
 			.toContain( `search=${ encodeURIComponent( searchTerm ) }` );
 	}
+}
+
+/**
+ * Returns the name of the Site Editor view that lists the plugin-registered
+ * templates.
+ *
+ * The view is named after the templates' author text, which is the name of the
+ * plugin whose directory matches the template namespace (`gutenberg`). It only
+ * reads "Gutenberg" when the repository is checked out into a directory named
+ * `gutenberg`, so read it from the REST API instead of assuming it.
+ *
+ * @param {Object} requestUtils The request utils fixture.
+ * @return {Promise<string>} The view name.
+ */
+async function getPluginTemplatesView( requestUtils ) {
+	const template = await requestUtils.rest( {
+		path: '/wp/v2/templates/gutenberg//plugin-template',
+	} );
+	return template.author_text;
 }
