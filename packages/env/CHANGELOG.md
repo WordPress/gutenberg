@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `composer` service uses the `composer:2` image instead of the floating `composer` image, so a new major version of Composer can't break `wp-env run composer` ([#84965](https://github.com/WordPress/gutenberg/pull/84965)).
+
 ## 2.0.0 (2020-09-03)
 
 ### Breaking Changes
