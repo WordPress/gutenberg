@@ -101,6 +101,14 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	protected $dashicon_replacements = null;
 
 	/**
+	 * Names of the core icons in the "core-admin" collection, as keys.
+	 * Built from the manifest on first use.
+	 *
+	 * @var array<string, true>|null
+	 */
+	protected $core_admin_icon_names = null;
+
+	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
 	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
@@ -286,20 +294,20 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Unregisters an icon.
 	 *
-	 * Icons in the "core-admin" collection are used by the WordPress administration
-	 * interface and cannot be unregistered.
+	 * The core icons in the "core-admin" collection are used by the WordPress
+	 * administration interface and cannot be unregistered.
 	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
 	 *                          (e.g. "core/arrow-left").
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
 	public function unregister( $icon_name ) {
-		if ( is_string( $icon_name ) && str_starts_with( $icon_name, 'core-admin/' ) ) {
+		if ( $this->is_core_admin_icon( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf(
 					/* translators: %s: Icon name. */
-					__( 'Icon "%s" cannot be unregistered because it belongs to the "core-admin" collection.', 'gutenberg' ),
+					__( 'Icon "%s" is used by the administration interface and cannot be unregistered.', 'gutenberg' ),
 					$icon_name
 				),
 				'7.2.0'
@@ -322,6 +330,35 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 		unset( $this->registered_icons[ $icon_name ] );
 		return true;
+	}
+
+	/**
+	 * Checks whether an icon is one of the core icons in the "core-admin" collection.
+	 *
+	 * Custom icons registered in the collection are not core icons.
+	 *
+	 * @param string $icon_name Namespaced icon name.
+	 * @return bool True if the icon is a core "core-admin" icon, false otherwise.
+	 */
+	protected function is_core_admin_icon( $icon_name ) {
+		if ( ! is_string( $icon_name ) || ! str_starts_with( $icon_name, 'core-admin/' ) ) {
+			return false;
+		}
+
+		if ( null === $this->core_admin_icon_names ) {
+			$this->core_admin_icon_names = array();
+
+			$manifest_path = gutenberg_dir_path() . 'packages/icons/src/manifest.php';
+			$manifest      = is_readable( $manifest_path ) ? include $manifest_path : array();
+
+			foreach ( is_array( $manifest ) ? $manifest : array() as $manifest_icon_name => $icon_data ) {
+				if ( in_array( 'core-admin', $icon_data['collections'] ?? array(), true ) ) {
+					$this->core_admin_icon_names[ 'core-admin/' . $manifest_icon_name ] = true;
+				}
+			}
+		}
+
+		return isset( $this->core_admin_icon_names[ $icon_name ] );
 	}
 
 	/**

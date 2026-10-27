@@ -339,12 +339,9 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should allow registering a custom icon in the "core-admin" collection,
-	 * but refuse to unregister it.
-	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister
+	 * Should allow registering and unregistering a custom icon in the "core-admin" collection.
 	 */
-	public function test_custom_core_admin_icon_can_be_registered_but_not_unregistered() {
+	public function test_custom_core_admin_icon_can_be_registered_and_unregistered() {
 		$this->assertTrue(
 			$this->register(
 				'core-admin/my-plugin-icon',
@@ -354,8 +351,8 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				)
 			)
 		);
-		$this->assertFalse( $this->registry->unregister( 'core-admin/my-plugin-icon' ) );
-		$this->assertTrue( $this->registry->is_registered( 'core-admin/my-plugin-icon' ) );
+		$this->assertTrue( $this->registry->unregister( 'core-admin/my-plugin-icon' ) );
+		$this->assertFalse( $this->registry->is_registered( 'core-admin/my-plugin-icon' ) );
 	}
 
 	/**
