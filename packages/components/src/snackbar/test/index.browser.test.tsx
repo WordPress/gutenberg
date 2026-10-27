@@ -70,6 +70,94 @@ describe( 'Snackbar', () => {
 		expect( removeNotice ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'should auto-dismiss after 6 seconds when it has no action', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
+		await render(
+			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
+				Message
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 5999 ) );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+
+		await act( async () => vi.advanceTimersByTime( 1 ) );
+
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should auto-dismiss after 10 seconds when it has an action', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
+		await render(
+			<Snackbar
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+				onDismiss={ onDismiss }
+			>
+				Post published.
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 9999 ) );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+
+		await act( async () => vi.advanceTimersByTime( 1 ) );
+
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not restart auto-dismissal when rerendered with a new actions array', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const { rerender } = await render(
+			<Snackbar
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+			>
+				Post published.
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 9000 ) );
+		await rerender(
+			<Snackbar
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+			>
+				Post published.
+			</Snackbar>
+		);
+		await act( async () => vi.advanceTimersByTime( 1000 ) );
+
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not auto-dismiss a snackbar with an action when the `explicitDismiss` prop is set to `true`', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		await render(
+			<Snackbar
+				explicitDismiss
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+			>
+				Post published.
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 10000 ) );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+	} );
+
 	it( 'should be dismissible by clicking the snackbar', async () => {
 		const onRemove = vi.fn();
 		const onDismiss = vi.fn();

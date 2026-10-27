@@ -5,8 +5,9 @@ test.describe( 'Post Data source', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost( { title: 'Test bindings' } );
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

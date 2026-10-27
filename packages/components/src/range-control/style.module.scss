@@ -11,6 +11,10 @@
 	touch-action: none;
 	width: 100%;
 	min-height: 40px;
+
+	&:where(.is-compact) {
+		min-height: 32px;
+	}
 }
 
 // Private prop values. Reset each instance to prevent inherited values leaking in.
@@ -23,6 +27,11 @@
 	color: var(--_wp-components-range-control-color);
 	height: 30px;
 	min-height: 30px;
+}
+
+// Static tokens do not follow admin color schemes outside a ThemeProvider.
+.default-color {
+	color: $components-color-accent;
 }
 
 .before-icon,
@@ -58,7 +67,7 @@
 	margin-top: 13px;
 	top: 0;
 	border-radius: $radius-full;
-	background: var(--_wp-components-range-control-rail-color);
+	background: var(--_wp-components-range-control-rail-color, var(--wpds-color-background-track-neutral));
 
 	&:where(.is-disabled) {
 		background: $components-color-gray-100;
@@ -259,11 +268,6 @@
 	}
 	:where(.root.is-rtl) & {
 		margin-right: $grid-unit-20 !important; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
-	}
-
-	@at-root input[type="number"]#{&} {
-		height: 30px;
-		min-height: 30px;
 	}
 }
 .action-right {

@@ -1,4 +1,9 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.prefix {
+	color: $components-color-accent;
+}
 
 .number-control {
 	width: 96px;

@@ -191,6 +191,16 @@ class BlockNoteUtils {
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}
 
+	async addReactionToComment( emoji ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Add reaction' } )
+			.click();
+		await this.#page
+			.getByRole( 'menu', { name: 'Add reaction' } )
+			.getByRole( 'menuitemcheckbox', { name: emoji, exact: true } )
+			.click();
+	}
+
 	/**
 	 * Deletes a note through its actions menu and waits for the delete to
 	 * finish.

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
+-   `isReusableBlock`, `isTemplatePart`: Accept any object with a name ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
+-   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor, and pasting one keeps it again, as before WordPress 7.0 ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion no longer copies the classes a block adds itself into `className`. `<ul class="wp-block-list fancy">` now converts to a List block with `className: "fancy"`, where before it got `"wp-block-list fancy"` ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+
+### Internal
+
+-   Convert the `isInlineContent` test to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85534](https://github.com/WordPress/gutenberg/pull/85534)).
+
+## 17.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -12,6 +26,7 @@
 -   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
 -   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
 -   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
+-   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
 
 ## 16.2.0 (2026-10-07)
 

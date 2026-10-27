@@ -31,7 +31,9 @@ test.describe( 'Global styles sidebar', () => {
 			name: 'Editor settings',
 		} );
 
-		await settings.getByRole( 'button', { name: 'Blocks' } ).click();
+		await settings
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
+			.click();
 		await settings
 			.getByRole( 'button', { name: 'Heading', exact: true } )
 			.click();
@@ -65,14 +67,14 @@ test.describe( 'Global styles sidebar', () => {
 	} );
 
 	test( 'should filter blocks list results', async ( { page } ) => {
-		// Navigate to Styles -> Blocks.
+		// Navigate to Styles -> Blocks & Elements.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Blocks' } )
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
 			.click();
 
 		await page
@@ -86,6 +88,10 @@ test.describe( 'Global styles sidebar', () => {
 		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', { name: 'Accordion Item' } )
+		).toBeVisible();
+		// Matching elements are listed alongside the blocks.
+		await expect(
+			page.getByRole( 'button', { name: 'All headings' } )
 		).toBeVisible();
 	} );
 } );

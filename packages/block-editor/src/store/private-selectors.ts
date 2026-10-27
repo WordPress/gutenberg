@@ -32,6 +32,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
@@ -643,7 +644,8 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 					block,
 					state.settings[ userPatternCategoriesSelectKey ]?.(
 						select
-					) ?? state.settings.__experimentalUserPatternCategories
+					) ?? state.settings.__experimentalUserPatternCategories,
+					state.settings[ currentUserIdSelectKey ]?.( select )
 				);
 			}
 
@@ -659,6 +661,7 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				? [
 						unlock( select( STORE_NAME ) ).getReusableBlocks(),
 						state.settings.__experimentalReusableBlocks,
+						state.settings[ currentUserIdSelectKey ]?.( select ),
 					]
 				: [
 						state.settings.__experimentalBlockPatterns,
@@ -677,7 +680,8 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 						userPattern,
 						state.settings[ userPatternCategoriesSelectKey ]?.(
 							select
-						) ?? state.settings.__experimentalUserPatternCategories
+						) ?? state.settings.__experimentalUserPatternCategories,
+						state.settings[ currentUserIdSelectKey ]?.( select )
 					)
 				),
 			// This setting is left for back compat.
@@ -1197,17 +1201,15 @@ export const isBlockParentHiddenAtViewport = (
 };
 
 /**
- * Returns true if there is a spotlighted block.
- *
- * The spotlight is also active when a contentOnly section is being edited, the selector
- * also returns true if this is the case.
+ * Returns true if there is a spotlighted block, which is the case while a
+ * contentOnly section is being edited.
  *
  * @param state Global application state.
  *
  * @return Whether the block is currently spotlighted.
  */
 export function hasBlockSpotlight( state: State ) {
-	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
+	return !! state.editedContentOnlySection;
 }
 
 /**

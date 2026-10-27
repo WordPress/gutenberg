@@ -379,10 +379,11 @@ The element shows what its reference resolves to, calling it first when it is a 
 
 -   A value returned by `asDangerousHTML()` renders its HTML.
 -   A pending value, which is server-computed derived state that the client hasn't defined yet, keeps the current content. This is how the server-rendered fallback stays visible while a store loads.
+-   The object `{ "wpServerHtml": true }`, which stands for an `asDangerousHTML()` value in the page's data, keeps the current content the same way, whether it comes from `state`, `context` or a [`data-wp-each`](#wp-each) item. It never renders anything itself: other properties it carries are ignored.
 -   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
--   Anything else, plain strings included, empties the element, and a warning is shown in development mode.
+-   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
 
-To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page.
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
 
 #### Inert content
 
@@ -399,7 +400,7 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending must have an empty fallback on sites enforcing Trusted Types.
+    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`

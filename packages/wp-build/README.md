@@ -6,7 +6,7 @@ Build tool for WordPress plugins.
 
 `@wordpress/build` is an opinionated build system designed for WordPress plugins. It provides:
 
-- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using esbuild
+- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using Rolldown
 - **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
 - **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
 - **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
@@ -51,6 +51,10 @@ or via npm script:
 	}
 }
 ```
+
+### Build Concurrency
+
+By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
 
 ### Testing Generated Styles
 
@@ -440,6 +444,18 @@ This configuration:
 - **Dependencies**: `@wordpress/*` packages are always externalized to `wp.*` globals
 - **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
 - **Asset files**: `.asset.php` files are always generated for WordPress dependency management
+
+## SVG imports
+
+SVG files can be imported from JavaScript. The file is inlined into the JavaScript and the import resolves to a `data:` URI:
+
+```js
+import logo from './logo.svg';
+
+const Example = () => <img src={ logo } alt="" />;
+```
+
+Because the SVG travels with the JavaScript, it works in bundles and in transpiled packages (`build/`, `build-module/`) without a public path or an extra file to ship. Other image formats are not supported yet.
 
 ## Output Structure
 

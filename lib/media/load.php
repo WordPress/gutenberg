@@ -186,11 +186,34 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
 	$image_max_bit_depth = (int) apply_filters( 'image_max_bit_depth', 16, 16 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
+	/**
+	 * Filters whether sub-sizes of animated images should keep their animation.
+	 *
+	 * By default, every sub-size of an animated GIF or WebP image keeps its
+	 * animation, including cropped sizes such as `thumbnail`, which cut every
+	 * frame with the same crop. Return false to generate static sub-sizes
+	 * from the first frame only, matching WordPress core's server-side
+	 * behavior, for example when encoding every frame per sub-size takes too
+	 * long on the devices that upload to the site.
+	 *
+	 * Uploads that take the server-side path (e.g. some Media Library
+	 * uploads) still produce static sub-sizes, as core has no animated resize
+	 * support.
+	 *
+	 * @since 24.3.0
+	 *
+	 * @param bool $generate_animated_image_subsizes Whether to generate animated
+	 *                                                sub-sizes for animated images.
+	 *                                                Default true.
+	 */
+	$generate_animated_image_subsizes = (bool) apply_filters( 'wp_generate_animated_image_subsizes', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 	if ( current_user_can( 'upload_files' ) ) {
-		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
-		$response->data['image_size_threshold'] = $image_size_threshold;
-		$response->data['image_strip_meta']     = $image_strip_meta;
-		$response->data['image_max_bit_depth']  = $image_max_bit_depth;
+		$response->data['image_sizes']                      = gutenberg_get_all_image_sizes();
+		$response->data['image_size_threshold']             = $image_size_threshold;
+		$response->data['image_strip_meta']                 = $image_strip_meta;
+		$response->data['image_max_bit_depth']              = $image_max_bit_depth;
+		$response->data['generate_animated_image_subsizes'] = $generate_animated_image_subsizes;
 	}
 
 	return $response;

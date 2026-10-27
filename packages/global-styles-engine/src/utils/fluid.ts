@@ -228,7 +228,8 @@ export function getComputedFluidTypographyValue( {
  * @return An object consisting of `'value'` and `'unit'` properties.
  */
 export function getTypographyValueAndUnit(
-	rawValue?: string | number,
+	// Layout sizes are `false` when unsupported, which returns `null`.
+	rawValue?: string | number | false,
 	options = {}
 ) {
 	if ( typeof rawValue !== 'string' && typeof rawValue !== 'number' ) {
