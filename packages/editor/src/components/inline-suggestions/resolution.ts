@@ -19,6 +19,8 @@ import {
 	toHTMLString,
 } from '@wordpress/rich-text';
 import {
+	canonicalizeSuggestionStack,
+	removeSuggestionMarker,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_FORMAT,
 	suggestionKindOf,
@@ -26,6 +28,8 @@ import {
 } from './format';
 import type { SuggestionMarkerKind } from './format';
 import { toRichTextRecord } from './rich-text-record';
+import { decideFormatSuggestion } from './format-delta';
+import type { FormatDelta, FormatRevision } from './format-delta';
 import {
 	formatOriginalAligns,
 	acceptInlineAddition,
@@ -54,10 +58,62 @@ export interface ResolutionEffect {
 	 */
 	formatRemovals: Map< string, number[] >;
 	/**
+	 * Formatting changes a formatting decision re-derived on the new state
+	 * below them: their effective delta and the originals to record.
+	 */
+	formatRevisions: Map< string, FormatRevision >;
+	/**
 	 * For a rejected formatting change, whether its original could be
 	 * restored; false means only the marker was dropped.
 	 */
 	restored?: boolean;
+}
+
+/**
+ * Decide a formatting change from the deltas of the formatting changes on
+ * its characters. A formatting change left with no effect has its marker
+ * removed too, and is reported as emptied.
+ *
+ * @param value    Block attribute value.
+ * @param id       Suggestion id.
+ * @param decision Accept or reject.
+ * @param deltaOf  Delta of a pending formatting change by id.
+ * @return The decided value and what it did, or null when a delta on the
+ *         way is unknown.
+ */
+function decideFormatByDelta(
+	value: any,
+	id: string,
+	decision: 'accept' | 'reject',
+	deltaOf: ( id: string ) => FormatDelta | null | undefined
+) {
+	const record = toRichTextRecord( value );
+	if ( ! record ) {
+		return null;
+	}
+	const result = decideFormatSuggestion( record as any, {
+		id,
+		decision,
+		deltaOf,
+	} );
+	if ( ! result ) {
+		return null;
+	}
+	let next: any = { ...record, formats: result.formats };
+	for ( const markerId of [ id, ...result.emptied ] ) {
+		next = removeSuggestionMarker(
+			next,
+			SUGGESTION_TYPE_FORMAT,
+			markerId,
+			0,
+			record.text.length
+		);
+	}
+	return {
+		value: new RichTextData( canonicalizeSuggestionStack( next ) ),
+		revisions: result.revisions,
+		emptied: result.emptied,
+	};
 }
 
 /**
@@ -90,7 +146,11 @@ function removedKind(
  * @param options.id             Suggestion (note) id.
  * @param options.suggestionType Inline suggestion type from the payload.
  * @param options.decision       Accept or reject.
- * @param options.beforeHTML     Recorded original, for rejecting a format.
+ * @param options.beforeHTML     Recorded original, for rejecting a format
+ *                               written before deltas.
+ * @param options.formatDeltas   Delta of a pending formatting change by id.
+ *                               A formatting decision uses the deltas when
+ *                               every one it needs is known.
  * @return The effect.
  */
 export function resolveInlineSuggestion(
@@ -100,16 +160,35 @@ export function resolveInlineSuggestion(
 		suggestionType,
 		decision,
 		beforeHTML,
+		formatDeltas,
 	}: {
 		id: number | string;
 		suggestionType: InlineSuggestionType;
 		decision: 'accept' | 'reject';
 		beforeHTML?: string;
+		formatDeltas?: ( id: string ) => FormatDelta | null | undefined;
 	}
 ): ResolutionEffect {
 	const target = String( id );
 	const kind = removedKind( suggestionType, decision );
 	const removed = kind ? suggestionMarkerRuns( value, id, kind ) : [];
+
+	const byDelta =
+		suggestionType === SUGGESTION_TYPE_FORMAT && formatDeltas
+			? decideFormatByDelta( value, target, decision, formatDeltas )
+			: null;
+	if ( byDelta ) {
+		return {
+			value: byDelta.value,
+			removed,
+			affected: new Map(
+				byDelta.emptied.map( ( markerId ) => [ markerId, 'emptied' ] )
+			),
+			formatRemovals: new Map(),
+			formatRevisions: byDelta.revisions,
+			...( decision === 'reject' && { restored: true } ),
+		};
+	}
 
 	let next;
 	let restored: boolean | undefined;
@@ -184,6 +263,7 @@ export function resolveInlineSuggestion(
 		removed,
 		affected,
 		formatRemovals,
+		formatRevisions: new Map(),
 		...( restored !== undefined && { restored } ),
 	};
 }
