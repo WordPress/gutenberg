@@ -116,14 +116,33 @@ function toDescriptor( format: any ): FormatDescriptor {
 	return descriptor;
 }
 
+/**
+ * Drops event handler and inline frame attributes from a stored descriptor,
+ * which another author wrote and a reviewer's decision writes into content.
+ *
+ * @param attributes Descriptor attributes.
+ * @return Attributes without script-running names.
+ */
+function safeAttributes(
+	attributes: Record< string, string >
+): Record< string, string > {
+	return Object.fromEntries(
+		Object.entries( attributes ).filter(
+			( [ name ] ) => ! /^(on|srcdoc$|formaction$)/i.test( name )
+		)
+	);
+}
+
 function toFormat( descriptor: FormatDescriptor ): any {
 	return {
 		type: descriptor.type,
 		...( descriptor.attributes && {
-			attributes: { ...descriptor.attributes },
+			attributes: safeAttributes( descriptor.attributes ),
 		} ),
 		...( descriptor.unregisteredAttributes && {
-			unregisteredAttributes: { ...descriptor.unregisteredAttributes },
+			unregisteredAttributes: safeAttributes(
+				descriptor.unregisteredAttributes
+			),
 		} ),
 	};
 }

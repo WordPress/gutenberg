@@ -314,4 +314,33 @@ describe( 'formatting deltas', () => {
 		expect( effect.value.toHTMLString() ).toBe( 'abcd' );
 		expect( isEmptyFormatDelta( [] ) ).toBe( true );
 	} );
+	it( 'drops event handlers from a delta when restoring formats', () => {
+		const value = rtd( `a${ mark( 'format', 6, 'bc' ) }d` );
+		const effect = decide(
+			value,
+			{
+				'6': [
+					{
+						offset: 0,
+						length: 2,
+						added: [],
+						removed: [
+							{
+								type: BOLD,
+								unregisteredAttributes: {
+									onclick: 'alert(1)',
+									'data-x': 'y',
+								},
+							},
+						],
+					},
+				],
+			},
+			6,
+			'reject'
+		);
+		expect( effect.value.toHTMLString() ).toBe(
+			'a<strong data-x="y">bc</strong>d'
+		);
+	} );
 } );
