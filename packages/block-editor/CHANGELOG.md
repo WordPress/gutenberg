@@ -9,7 +9,6 @@
 ### Bug Fixes
 
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
--   Invalidate the memoized block insertion selectors when `isPreviewMode` changes, and refuse the writing flow's cross-block input handling while the canvas is a preview. Preview mode already refused insertion, but nothing recomputed when it was turned on after the editor had booted, so an editor switched into a read-only preview at runtime went on believing it could insert: Enter split a paragraph and the block library listed every type ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
 
 ### Internal

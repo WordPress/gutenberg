@@ -6,7 +6,6 @@ import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
-	isEditorIntentReadOnly,
 } from '../private-selectors';
 import { lock } from '../../lock-unlock';
 
@@ -250,49 +249,19 @@ describe( 'getDefaultRenderingMode', () => {
 	} );
 } );
 
-describe( 'the read-only Viewing intent', () => {
-	describe( 'isEditorIntentReadOnly', () => {
-		it( 'is true only in the view intent', () => {
-			expect( isEditorIntentReadOnly( { editorIntent: 'view' } ) ).toBe(
-				true
-			);
-			expect( isEditorIntentReadOnly( { editorIntent: 'edit' } ) ).toBe(
-				false
-			);
-			expect(
-				isEditorIntentReadOnly( { editorIntent: 'suggest' } )
-			).toBe( false );
-		} );
-
-		it( 'defaults to editable when no intent has been set', () => {
-			expect( isEditorIntentReadOnly( {} ) ).toBe( false );
-		} );
+describe( 'getCodeEditorUnavailableReason', () => {
+	it( 'returns null in the edit intent', () => {
+		expect(
+			getCodeEditorUnavailableReason( { editorIntent: 'edit' } )
+		).toBeNull();
+		expect( getCodeEditorUnavailableReason( {} ) ).toBeNull();
 	} );
 
-	describe( 'getCodeEditorUnavailableReason', () => {
-		it( 'returns a reason in the view intent', () => {
-			expect(
-				getCodeEditorUnavailableReason( { editorIntent: 'view' } )
-			).toBe(
-				'The code editor is unavailable while viewing. Switch to Editing to change the content.'
-			);
-		} );
-
-		it( 'returns null in the edit intent', () => {
-			expect(
-				getCodeEditorUnavailableReason( { editorIntent: 'edit' } )
-			).toBeNull();
-			expect( getCodeEditorUnavailableReason( {} ) ).toBeNull();
-		} );
-
-		it( 'gives the suggest intent its own reason', () => {
-			// Suggesting refuses the code editor for a different reason -
-			// markers, not read-only - so the two must not be collapsed.
-			expect(
-				getCodeEditorUnavailableReason( { editorIntent: 'suggest' } )
-			).toBe(
-				'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
-			);
-		} );
+	it( 'returns a reason in the suggest intent', () => {
+		expect(
+			getCodeEditorUnavailableReason( { editorIntent: 'suggest' } )
+		).toBe(
+			'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+		);
 	} );
 } );
