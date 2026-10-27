@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
@@ -121,19 +121,36 @@ describe( 'DropdownMenu hover navigation', () => {
 	} );
 
 	it( 'does not scroll a partially visible item into view on hover', async () => {
+		const user = userEvent.setup();
 		await render(
 			<div
 				aria-label="Scrollable"
 				style={ { height: 40, overflow: 'auto' } }
 			>
 				<div style={ { height: 30 } } />
-				<MenuItem>Item</MenuItem>
+				<MenuItem aria-label="Item" style={ { position: 'relative' } }>
+					{ /* Keep the pointer target fully visible without scrolling the partially visible item. */ }
+					<span
+						style={ {
+							position: 'absolute',
+							top: 2,
+							left: 4,
+							height: 4,
+							overflow: 'hidden',
+						} }
+					>
+						Item
+					</span>
+				</MenuItem>
 				<div style={ { height: 100 } } />
 			</div>
 		);
 		const container = screen.getByLabelText( 'Scrollable' );
 		const item = screen.getByRole( 'menuitem', { name: 'Item' } );
-		fireEvent.mouseMove( item );
+		expect( item.getBoundingClientRect().bottom ).toBeGreaterThan(
+			container.getBoundingClientRect().bottom
+		);
+		await user.hover( screen.getByText( 'Item' ) );
 		expect( item ).toHaveFocus();
 		expect( container.scrollTop ).toBe( 0 );
 	} );
