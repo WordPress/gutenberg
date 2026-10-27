@@ -2,62 +2,29 @@
  * Keeps synced content from re-attributing inline suggestion markers.
  *
  * Real-time collaboration merges rich text as HTML strings, so two peers
- * marking overlapping text with the same kind come out of the merge as two
- * markers of one kind on the same characters, and a last-writer-wins
- * attribute merge can swap a marker's id. Left alone, the next write of that
- * kind flattens them and one author's marker takes the other's text.
+ * marking overlapping text come out of the merge as stacked markers in
+ * whatever order the merge produced, possibly with one marker repeated, and a
+ * last-writer-wins attribute merge can swap a marker's id.
  *
- * The local writers never produce that state: rich text applies one format
- * of a kind per character, and every marker write keeps the other kinds. So
- * the guard can run on every content change, whatever its origin, and only
- * ever acts on merged content. It resolves it with `guardMarkerIntegrity`,
- * whose rule (the older note id keeps the characters) every peer applies the
- * same way, so the corrective writes converge. The correction is not an edit:
- * it bypasses Suggestion mode's interceptor and stays off the undo stack.
+ * The local writers always leave stacks in canonical order. So the guard can
+ * run on every content change, whatever its origin, and only ever acts on
+ * merged content. It resolves it with `guardSyncedValue`: canonical order,
+ * swapped ids restored, and markers dropped when they are empty or their id
+ * is not a suggestion on this post. One peer writes each correction (see
+ * `guardSyncedValue`), so the corrective writes converge. The correction is
+ * not an edit: it bypasses Suggestion mode's interceptor and stays off the
+ * undo stack.
  */
 import { useEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { RichTextData } from '@wordpress/rich-text';
-import {
-	guardMarkerIntegrity,
-	isSuggestionFormat,
-	suggestionKindOf,
-} from '../inline-suggestions';
+import { guardSyncedValue } from '../inline-suggestions';
 import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
+import { store as editorStore } from '../../store';
 import { getBlockTreeVersion } from './block-tree-version';
 import { useSuggestionSession } from './suggestion-session';
-
-/**
- * Whether some character of a value carries two markers of one kind.
- *
- * @param value Rich-text value.
- * @return True when any character carries two markers of one kind.
- */
-function hasSameKindOverlap( value: RichTextData ): boolean {
-	return ( value.formats as any[] ).some( ( stack ) => {
-		if ( ! Array.isArray( stack ) || stack.length < 2 ) {
-			return false;
-		}
-		const kinds = stack
-			.filter( isSuggestionFormat )
-			.map( ( format ) => suggestionKindOf( format ) );
-		return new Set( kinds ).size < kinds.length;
-	} );
-}
-
-/**
- * Whether a value carries any marker.
- *
- * @param value Rich-text value.
- * @return True when a marker is present.
- */
-function hasMarkers( value: RichTextData ): boolean {
-	return ( value.formats as any[] ).some(
-		( stack ) => Array.isArray( stack ) && stack.some( isSuggestionFormat )
-	);
-}
 
 /**
  * Invisible component that guards every rich-text attribute in the editor.
@@ -90,6 +57,55 @@ export default function SuggestionMarkerGuard() {
 			);
 		};
 
+		// Slots holding an id whose note is still being looked up, with the
+		// value they held before it arrived, to check again once it is.
+		const awaiting = new Map< string, RichTextData | undefined >();
+		const rechecking = new Map< string, RichTextData | undefined >();
+		let lookingUp = false;
+
+		/*
+		 * Only a lookup that answered settles it: the note exists on another
+		 * post, or the server has no such comment. A failed request or a
+		 * note not loaded yet is not proof, since a peer's marker can arrive
+		 * before its note.
+		 */
+		const isForeign = ( id: string ) => {
+			const core: any = registry.select( coreStore );
+			if ( ! core?.getEntityRecord ) {
+				return false;
+			}
+			const args = [ 'root', 'comment', Number( id ) ];
+			const note =
+				core.__experimentalGetEntityRecordNoResolver( ...args ) ??
+				core.getEntityRecord( ...args );
+			if ( note ) {
+				const postId = registry
+					.select( editorStore )
+					.getCurrentPostId();
+				return (
+					( note.post !== undefined && note.post !== postId ) ||
+					( note.type !== undefined && note.type !== 'note' )
+				);
+			}
+			if ( ! core.hasFinishedResolution( 'getEntityRecord', args ) ) {
+				lookingUp = true;
+				return false;
+			}
+			const error: any = core.getResolutionError?.(
+				'getEntityRecord',
+				args
+			);
+			return (
+				error?.code === 'rest_comment_invalid_id' ||
+				error?.data?.status === 404
+			);
+		};
+
+		const userId = () => {
+			const id = registry.select( coreStore )?.getCurrentUser?.()?.id;
+			return id ? String( id ) : undefined;
+		};
+
 		const check = () => {
 			const version = getBlockTreeVersion( blockEditor );
 			if ( ! version || version === lastVersion ) {
@@ -109,27 +125,20 @@ export default function SuggestionMarkerGuard() {
 					}
 					checked.add( value );
 					const slot = `${ clientId }:${ key }`;
-					const before = previous.get( slot );
+					const before = rechecking.has( slot )
+						? rechecking.get( slot )
+						: previous.get( slot );
 					previous.set( slot, value );
-					/*
-					 * An id swap only counts when the text is unchanged, the
-					 * mark of an attribute merge; a local edit that changes
-					 * text never swaps one pending marker for another.
-					 */
-					const swapCandidate =
-						before &&
-						before.text === value.text &&
-						hasMarkers( value );
-					if ( ! swapCandidate && ! hasSameKindOverlap( value ) ) {
-						continue;
-					}
-					const next = toRichTextRecord( value )!;
-					const guarded = guardMarkerIntegrity(
-						swapCandidate ? toRichTextRecord( before )! : next,
-						next,
-						{ isPending }
+					lookingUp = false;
+					const guarded = guardSyncedValue(
+						before && toRichTextRecord( before )!,
+						toRichTextRecord( value )!,
+						{ isPending, isForeign, userId: userId() }
 					);
-					if ( guarded === next ) {
+					if ( lookingUp ) {
+						awaiting.set( slot, before );
+					}
+					if ( ! guarded ) {
 						continue;
 					}
 					const fixed = new RichTextData( guarded as any );
@@ -145,8 +154,35 @@ export default function SuggestionMarkerGuard() {
 			}
 		};
 
+		// A lookup that settled can make a marker foreign: check its slot
+		// again, against what it held before the marker arrived.
+		const recheck = () => {
+			if ( ! awaiting.size ) {
+				return;
+			}
+			rechecking.clear();
+			for ( const [ pending, before ] of awaiting ) {
+				rechecking.set( pending, before );
+				const [ clientId, key ] = pending.split( ':' );
+				const value =
+					blockEditor.getBlockAttributes( clientId )?.[ key ];
+				if ( value instanceof RichTextData ) {
+					checked.delete( value );
+				}
+			}
+			awaiting.clear();
+			lastVersion = null;
+			check();
+			rechecking.clear();
+		};
+
 		check();
-		return registry.subscribe( check, blockEditorStore );
+		const unsubscribeBlocks = registry.subscribe( check, blockEditorStore );
+		const unsubscribeCore = registry.subscribe( recheck, coreStore );
+		return () => {
+			unsubscribeBlocks();
+			unsubscribeCore();
+		};
 	}, [ registry, requestInterceptorBypass ] );
 
 	return null;

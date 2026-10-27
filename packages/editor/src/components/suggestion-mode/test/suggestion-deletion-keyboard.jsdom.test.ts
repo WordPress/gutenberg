@@ -348,7 +348,7 @@ describe( 'collapsedDeleteDisposition', () => {
 		).toBe( 'mark' );
 	} );
 
-	it( 'refuses a grapheme in another author’s deletion', () => {
+	it( 'marks a grapheme in another author’s deletion as a second deletion', () => {
 		const deletion = [
 			{
 				type: 'core/suggestion-del',
@@ -365,7 +365,7 @@ describe( 'collapsedDeleteDisposition', () => {
 				pos: 2,
 				authorToken: '1',
 			} )
-		).toBe( 'refuse' );
+		).toBe( 'mark' );
 	} );
 
 	it( 'refuses a forward run that has reached the end of the value', () => {
@@ -472,7 +472,7 @@ describe( 'expandBufferedDeleteRun', () => {
 		).toEqual( { start: 0, end: 3, blocked: false } );
 	} );
 
-	it( 'names the marker that stopped the run', () => {
+	it( 'grows over another author’s deletion', () => {
 		const deletion = [
 			{
 				type: 'core/suggestion-del',
@@ -492,13 +492,36 @@ describe( 'expandBufferedDeleteRun', () => {
 				repeats: 2,
 				authorToken: '1',
 			} )
+		).toEqual( { start: 0, end: 3, blocked: false } );
+	} );
+
+	it( 'names the marker that stopped the run', () => {
+		const deletion = [
+			{
+				type: 'core/suggestion-del',
+				attributes: {
+					'data-suggestion-id': '4',
+					'data-author': '1',
+				},
+			},
+		];
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'Xab',
+				formats: [ deletion, undefined, undefined ],
+				start: 2,
+				end: 3,
+				isBackward: true,
+				repeats: 2,
+				authorToken: '1',
+			} )
 		).toEqual( {
 			start: 1,
 			end: 3,
 			blocked: true,
 			refusal: {
-				reason: 'del-over-del',
-				blocking: { id: '4', kind: 'del', authorId: '2' },
+				reason: 'own-marker',
+				blocking: { id: '4', kind: 'del', authorId: '1' },
 			},
 		} );
 	} );

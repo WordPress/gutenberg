@@ -122,6 +122,34 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 				$paragraph( $mark( '%2', 'del', 'kept ' . $mark( '%1', 'add', 'sprout' ) . ' text' ) ),
 				array( 'sprout' ),
 			),
+			'an addition inside another note\'s addition' => array(
+				$paragraph( 'a ' . $mark( '%1', 'add', 'outer ' . $mark( '%2', 'add', 'nestling' ) . ' tail' ) . ' b' ),
+				array( 'outer', 'nestling', 'tail' ),
+			),
+			'three nested additions'                      => array(
+				$paragraph( $mark( '%1', 'add', 'one ' . $mark( '%2', 'add', 'two ' . $mark( '%3', 'add', 'three' ) ) ) ),
+				array( 'one', 'two', 'three' ),
+			),
+			'two deletions of the same text'              => array(
+				$paragraph( 'keep ' . $mark( '%1', 'del', 'twice ' . $mark( '%2', 'del', 'struck' ) ) . $mark( '%2', 'del', ' more' ) ),
+				array(),
+			),
+			'a second author\'s proposal nested on a block' => array(
+				"<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-attributes\",\"authorId\":1,\"after\":{\"level\":3},\"commentId\":%1,\"nested\":[{\"type\":\"pending-attributes\",\"authorId\":2,\"after\":{\"textAlign\":\"zigzag\"},\"commentId\":%2}]},\"noteId\":[%1,%2]}} -->\n<h2 class=\"wp-block-heading\">My Heading</h2>\n<!-- /wp:heading -->",
+				array( '"after"', '"level":3', 'zigzag' ),
+			),
+			'a proposal nested on a removal'              => array(
+				"<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-remove\",\"authorId\":1,\"commentId\":%1,\"nested\":[{\"type\":\"pending-attributes\",\"authorId\":2,\"after\":{\"textAlign\":\"zigzag\"},\"commentId\":%2}]}}} -->\n<h2 class=\"wp-block-heading\">Going</h2>\n<!-- /wp:heading -->",
+				array( '"after"', 'zigzag' ),
+			),
+			'a removal nested on a suggested block'       => array(
+				"<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1,\"commentId\":%1,\"nested\":[{\"type\":\"pending-remove\",\"authorId\":2,\"commentId\":%2},{\"type\":\"pending-attributes\",\"authorId\":3,\"after\":{\"align\":\"wide\"},\"commentId\":%3}]}}} -->\n<p>Quixotic doubly suggested paragraph</p>\n<!-- /wp:paragraph -->",
+				array( 'Quixotic', 'wide' ),
+			),
+			'deletions over nested additions'             => array(
+				$paragraph( 'The' . $mark( '%1', 'add', ' ' . $mark( '%3', 'del', 'quick' ) . $mark( '%2', 'add', $mark( '%3', 'del', ' brown' ) ) ) . ' fox.' ),
+				array( 'quick', 'brown' ),
+			),
 			'next to an inline note'                      => array(
 				$paragraph( '<mark class="wp-note" data-id="9">noted</mark>' . $mark( '%1', 'add', 'pinned' ) ),
 				array( 'pinned' ),
