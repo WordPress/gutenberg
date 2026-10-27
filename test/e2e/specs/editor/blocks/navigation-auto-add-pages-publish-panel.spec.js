@@ -24,7 +24,7 @@ async function openPrePublishPanel( page ) {
 	return panel;
 }
 
-test.describe( 'Pre-publish panel: menus a page is added to', () => {
+test.describe( 'Pre-publish panel: menus a page appears in', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
@@ -67,7 +67,7 @@ test.describe( 'Pre-publish panel: menus a page is added to', () => {
 		await expect( panel.getByText( 'Other menu' ) ).toBeHidden();
 	} );
 
-	test( 'is not shown when no menu has the setting on', async ( {
+	test( 'is not shown when no menu adds or links the page', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -106,7 +106,7 @@ test.describe( 'Pre-publish panel: menus a page is added to', () => {
 		).toBeHidden();
 	} );
 
-	test( 'says which link a child page goes under and skips menus that would not add it', async ( {
+	test( 'says which link a child page goes under, lists menus that already link it, and skips menus that would not add it', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -139,24 +139,28 @@ test.describe( 'Pre-publish panel: menus a page is added to', () => {
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
 			meta: { [ META_KEY ]: true },
 		} );
-		// Already links the child, so it is not added again.
+		// Already links the child, so its link goes live on publish even
+		// though the menu does not add pages itself.
 		await requestUtils.createNavigationMenu( {
 			title: 'Team menu',
 			content: `<!-- wp:navigation-submenu {"label":"About","type":"page","kind":"post-type","id":${ parent.id },"url":"${ parent.link }"} --><!-- wp:navigation-link {"label":"Team","type":"page","kind":"post-type","id":${ child.id },"url":"${ child.link }"} /--><!-- /wp:navigation-submenu -->`,
-			meta: { [ META_KEY ]: true },
 		} );
 
 		await admin.editPost( child.id );
 		const panel = await openPrePublishPanel( page );
 
-		await panel.getByRole( 'button', { name: 'Menus: Main menu' } ).click();
+		await panel.getByRole( 'button', { name: 'Menus: 2 menus' } ).click();
 		const items = panel.getByRole( 'listitem' );
-		await expect( items ).toHaveCount( 1 );
-		await expect( items.first() ).toHaveText( 'Main menu, under About' );
+		await expect( items ).toHaveText( [
+			'Main menu, under About',
+			'Team menu',
+		] );
 		await expect(
 			items.first().getByRole( 'link', { name: 'Main menu' } )
 		).toBeVisible();
+		await expect(
+			items.last().getByRole( 'link', { name: 'Team menu' } )
+		).toBeVisible();
 		await expect( panel.getByText( 'Footer menu' ) ).toBeHidden();
-		await expect( panel.getByText( 'Team menu' ) ).toBeHidden();
 	} );
 } );

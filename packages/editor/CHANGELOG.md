@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `PostPublishPanel`: The pre-publish panel of a page lists the Navigation Menus the page is added to when it is published, with a link to each menu.
+-   `PostPublishPanel`: The pre-publish panel of a page lists the Navigation Menus the page appears in once it is published, the ones that already link to it and the ones that add a link to it, with a link to each menu.
 
 ### Bug Fixes
 

@@ -72,9 +72,10 @@ function getMenuEditorUrl( menuId: number ) {
 }
 
 /**
- * Lists the Navigation Menus a page is added to when it is published: the
- * menus with "Auto add pages" switched on that do not link to the page yet.
- * A child page is only added to a menu that links to its parent.
+ * Lists the Navigation Menus a page appears in once it is published: the
+ * menus that already link to it, whose links go live with the page, and the
+ * menus with "Auto add pages" switched on that add a link to it. A child page
+ * is only added to a menu that links to its parent.
  */
 export default function MaybeNavigationMenusPanel() {
 	const targets = useSelect( ( select ): MenuTarget[] => {
@@ -96,16 +97,17 @@ export default function MaybeNavigationMenusPanel() {
 		const parentId = Number( getEditedPostAttribute( 'parent' ) ) || 0;
 		const result: MenuTarget[] = [];
 		for ( const menu of menus ) {
-			if ( ! menu.meta?.[ META_KEY ] ) {
-				continue;
-			}
 			const blocks = parse( menu.content?.raw ?? '' );
-			if ( findLinkToPage( blocks, pageId ) ) {
-				continue;
-			}
 			const title = decodeEntities(
 				menu.title?.raw || menu.title?.rendered || ''
 			);
+			if ( findLinkToPage( blocks, pageId ) ) {
+				result.push( { id: menu.id, title } );
+				continue;
+			}
+			if ( ! menu.meta?.[ META_KEY ] ) {
+				continue;
+			}
 			if ( ! parentId ) {
 				result.push( { id: menu.id, title } );
 				continue;
@@ -153,7 +155,7 @@ export default function MaybeNavigationMenusPanel() {
 		>
 			<p>
 				{ __(
-					'A link to this page is added to these menus when it is published.'
+					'This page appears in these menus once it is published.'
 				) }
 			</p>
 			<ul className="editor-post-publish-panel__menus">
