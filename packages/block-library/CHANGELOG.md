@@ -32,6 +32,7 @@
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
 -   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
+-   Media & Text: Restore the content area's default padding in classic themes whose CSS reset sets `padding: 0` on `div`, which overrode it on the front end since the padding's specificity was lowered. Theme overrides keep working ([#85200](https://github.com/WordPress/gutenberg/pull/85200)).
 
 ## 11.2.0 (2026-10-07)
 
