@@ -93,7 +93,7 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
 		typeof action.label === 'string' ? action.label : action.label( items );
 	const menuLabel =
 		'RenderModal' in action &&
-		! /(?:\s*(?:[…⋯]|[.。．]{3,}))+\s*$/u.test( label )
+		! /(?:\s*(?:[…⋯]|[.。．]{3,}(?![.。．])))+\s*$/u.test( label )
 			? sprintf(
 					/* translators: %s: Action label. Use the ellipsis and spacing appropriate for your language. */
 					_x( '%s…', 'menu item requiring further input' ),

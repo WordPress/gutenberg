@@ -58,7 +58,13 @@ describe( 'action labels', () => {
 		}
 	);
 
-	it.each( [ 'Delete.', 'Delete..', 'Delete… item', '  Delete  ' ] )(
+	it.each( [
+		'Delete.',
+		'Delete..',
+		'Delete… item',
+		'  Delete  ',
+		`Delete ${ '.'.repeat( 100 ) } item`,
+	] )(
 		'keeps button label "%s" unchanged when it has no recognized trailing ellipsis',
 		( label ) => {
 			expect( getActionLabel( { ...modalAction, label }, items ) ).toBe(

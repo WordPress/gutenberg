@@ -2,7 +2,8 @@ import { sprintf, _x } from '@wordpress/i18n';
 import type { Action } from '../types';
 
 // Best-effort support for legacy labels. New labels must omit the ellipsis.
-const TRAILING_ELLIPSIS = /(?:\s*(?:[…⋯]|[.。．]{3,}))+\s*$/u;
+// Match each dot run in full to avoid exponential backtracking.
+const TRAILING_ELLIPSIS = /(?:\s*(?:[…⋯]|[.。．]{3,}(?![.。．])))+\s*$/u;
 
 export default function getActionLabel< Item >(
 	action: Action< Item >,
