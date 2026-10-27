@@ -3,6 +3,6 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"references": [
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../primitives" }
+		{ "path": "../primitives/tsconfig.build.json" }
 	]
 }

@@ -375,6 +375,59 @@ function gutenberg_sanitize_widget_attributes( $attributes ) {
 }
 
 /**
+ * Whether a value is JSON data: null, a boolean, a finite number, a string,
+ * or an array of such values.
+ *
+ * @param mixed $value Value to check.
+ * @return bool True when the value encodes as JSON data.
+ */
+function gutenberg_is_widget_json_value( $value ) {
+	if ( is_array( $value ) ) {
+		foreach ( $value as $item ) {
+			if ( ! gutenberg_is_widget_json_value( $item ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	if ( is_float( $value ) ) {
+		return is_finite( $value );
+	}
+
+	return null === $value || is_bool( $value ) || is_int( $value ) || is_string( $value );
+}
+
+/**
+ * Sanitizes a widget example to its `attributes`: a map of attribute names
+ * to JSON values (null, booleans, finite numbers, strings, and arrays of
+ * those). Any other key drops. An attribute without a string name, or whose
+ * value is not JSON data, drops, never the example; an example left without
+ * attributes becomes null.
+ *
+ * This is the registration gate for manifest-sourced widget types, the same
+ * boundary `gutenberg_sanitize_widget_attributes()` guards.
+ *
+ * @param array|null $example Example from the build manifest.
+ * @return array|null Sanitized example, or null.
+ */
+function gutenberg_sanitize_widget_example( $example ) {
+	if ( ! is_array( $example ) || ! isset( $example['attributes'] ) || ! is_array( $example['attributes'] ) ) {
+		return null;
+	}
+
+	$attributes = array();
+	foreach ( $example['attributes'] as $name => $value ) {
+		if ( ! is_string( $name ) || '' === $name || ! gutenberg_is_widget_json_value( $value ) ) {
+			continue;
+		}
+		$attributes[ $name ] = $value;
+	}
+
+	return $attributes ? array( 'attributes' => $attributes ) : null;
+}
+
+/**
  * Constrains a widget icon reference to a registered icon name
  * (`collection/icon-name`). Anything else drops silently, so authoring
  * forms not accepted yet degrade to no icon rather than warn.
@@ -433,6 +486,7 @@ function gutenberg_register_widget_types() {
 					$widget['dir_name'] ?? ''
 				),
 				'attributes'    => gutenberg_sanitize_widget_attributes( $widget['attributes'] ?? null ),
+				'example'       => gutenberg_sanitize_widget_example( $widget['example'] ?? null ),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

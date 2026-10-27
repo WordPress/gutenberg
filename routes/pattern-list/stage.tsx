@@ -233,7 +233,7 @@ function PatternListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
-	const postTypeActions: Action< any >[] = usePostActions( {
+	const actions: Action< any >[] = usePostActions( {
 		postType: PATTERN_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: NormalizedPattern[] ) => {
@@ -246,19 +246,6 @@ function PatternListView( {
 			}
 		},
 	} );
-
-	const actions = useMemo( () => {
-		return [
-			...postTypeActions?.flatMap< Action< any > >( ( action ) => {
-				// Skip revisions as the admin does not support it
-				if ( action.id === 'view-post-revisions' ) {
-					return [];
-				}
-
-				return [ action ];
-			} ),
-		];
-	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
 		( typeSlug: string ) => {

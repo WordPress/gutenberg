@@ -3,7 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { Cropper } from '../cropper';
-import type { CropperController } from '../../hooks/use-cropper-reducer';
+import type { CropperController } from '../../hooks/use-cropper-controller';
 import { DEFAULT_STATE } from '../../../core/constants';
 import { getSourceRegion } from '../../../core/source-region';
 // Browser Mode needs the package's real styles for layout and transitions.
