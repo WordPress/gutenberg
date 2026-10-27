@@ -23,7 +23,7 @@ const MyLoadingComponent = ( { progress = null } ) => (
 );
 ```
 
-Provide a task-specific accessible name with `aria-label`, `aria-labelledby`, or `Progress.Label`. Unlike `ProgressBar`, `Progress.Root` does not provide a default accessible name. Add `Progress.Value` when a visible progress value is useful.
+Give the progress bar an accessible name that describes the operation in progress, such as "Uploading files" or "Exporting a report". Set this name with `aria-label`, `aria-labelledby`, or `Progress.Label`. Unlike `ProgressBar`, `Progress.Root` does not provide a default accessible name. Add `Progress.Value` when a visible progress value is useful.
 
 ## Props and styling
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Link to the `ProgressBar` migration guide in lint messages and rule documentation ([#85520](https://github.com/WordPress/gutenberg/pull/85520)).
+
 ## 28.0.0 (2026-10-20)
 
 ### Breaking Changes
