@@ -298,8 +298,8 @@
 	}
 	@layer compositions {
 		.loading-spinner {
-			width: var(--wpds-dimension-size-4xs);
-			height: var(--wpds-dimension-size-4xs);
+			width: var(--wpds-dimension-size-3xs);
+			height: var(--wpds-dimension-size-3xs);
 		}
 	}
 }
