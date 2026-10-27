@@ -102,6 +102,8 @@ jobs:
 
             - name: Npm build
               run: npm run build
+              env:
+                  NODE_OPTIONS: --max-old-space-size=4096
 
             - name: Docker debug information
               run: |
