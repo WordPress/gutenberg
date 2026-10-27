@@ -128,32 +128,32 @@ const DENYLIST = {
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
 		CheckboxControl:
-			'Use `CheckboxControl` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide',
+			'Use `CheckboxControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FormToggle:
-			'Use `Switch` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
+			'Use `Switch` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
 		__experimentalInputControl:
-			'Use `InputControl` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ProgressBar: 'Use `Progress` from `@wordpress/ui` instead.',
 		RadioControl:
-			'Use `RadioGroupControl` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
+			'Use `RadioGroupControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer:
 			'For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TextControl:
-			'Use `InputControl` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
 		TextareaControl:
-			'Use `TextareaControl` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide',
-		Tip: 'Use `Notice` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-tip--migration-guide',
+			'Use `TextareaControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide',
+		Tip: 'Use `Notice` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-tip--migration-guide',
 		ToggleControl:
-			'Use `SwitchControl` from `@wordpress/ui` instead. See https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
+			'Use `SwitchControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
