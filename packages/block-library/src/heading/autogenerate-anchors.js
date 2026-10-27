@@ -1,4 +1,4 @@
-import removeAccents from 'remove-accents';
+import { cleanForSlug } from '@wordpress/url';
 
 /**
  * Object map tracking anchors.
@@ -27,18 +27,7 @@ const getTextWithoutMarkup = ( text ) => {
  *
  * @return {string} Returns the slug.
  */
-const getSlug = ( content ) => {
-	// Get the slug.
-	return (
-		removeAccents( getTextWithoutMarkup( content ) )
-			// Convert anything that's not a letter or number to a hyphen.
-			.replace( /[^\p{L}\p{N}]+/gu, '-' )
-			// Convert to lowercase
-			.toLowerCase()
-			// Remove any remaining leading or trailing hyphens.
-			.replace( /(^-+)|(-+$)/g, '' )
-	);
-};
+const getSlug = ( content ) => cleanForSlug( getTextWithoutMarkup( content ) );
 
 /**
  * Generate the anchor for a heading.
