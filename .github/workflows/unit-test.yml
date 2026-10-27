@@ -47,12 +47,6 @@ jobs:
             - name: Install npm dependencies
               run: npm ci
 
-            # It's not necessary to run the full build, since Jest can interpret
-            # source files with `babel-jest`. Some packages have their own custom
-            # build tasks, however. These must be run.
-            - name: Run build scripts
-              run: ./node_modules/.bin/lerna run build
-
             - name: Running the tests
               run: npm run test-unit:ci -- --cacheDirectory="$HOME/.jest-cache"
 
