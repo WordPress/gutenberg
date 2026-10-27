@@ -16,8 +16,13 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Deprecations
+
+-   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5. For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
+
 ### Bug Fixes
 
+-   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
