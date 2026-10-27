@@ -50,6 +50,7 @@ module.exports = async function run( { container, command, spinner, debug } ) {
  */
 function spawnCommandDirectly( { container, command, config, spinner } ) {
 	const composeCommand = [
+		'compose',
 		'-f',
 		config.dockerComposeConfigPath,
 		'run',
@@ -60,10 +61,10 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
-		// cannot use it to spawn an interactive command. Thus, we run docker-
+		// cannot use it to spawn an interactive command. Thus, we run docker
 		// compose on the CLI directly.
 		const childProc = spawn(
-			'docker-compose',
+			'docker',
 			composeCommand,
 			{
 				stdio: 'inherit',
