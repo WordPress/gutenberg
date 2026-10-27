@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { createInterpolateElement, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 import {
@@ -169,6 +169,30 @@ export default function ElementPreview( {
 			break;
 		case 'link':
 			sample = <a href="#anchor">{ __( 'A link' ) }</a>;
+			break;
+		// Bold and italic are shown beside unstyled text, because what matters
+		// is how they read against the text they sit in.
+		case 'strong':
+			sample = (
+				<p>
+					{ createInterpolateElement(
+						__( 'Text with a <bold>bold phrase</bold> in it.' ),
+						{ bold: <strong /> }
+					) }
+				</p>
+			);
+			break;
+		case 'em':
+			sample = (
+				<p>
+					{ createInterpolateElement(
+						__(
+							'Text with an <italic>italic phrase</italic> in it.'
+						),
+						{ italic: <em /> }
+					) }
+				</p>
+			);
 			break;
 		case 'heading':
 			// The shared heading entry has no tag of its own; any level shows
