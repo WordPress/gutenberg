@@ -9,7 +9,7 @@
 
 ### Internal
 
--   Update Terrazzo token-generation tools to 2.10.0.
+-   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).
 
 ## 3.0.0 (2026-10-20)
 
