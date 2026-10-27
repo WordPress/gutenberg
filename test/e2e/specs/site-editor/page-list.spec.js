@@ -738,11 +738,8 @@ test.describe( 'Page List', () => {
 				.getByRole( 'checkbox', { name: 'Sample Page' } )
 				.check();
 
-			// Every row renders its own primary "Quick Edit" action, so the
-			// bulk one has to be taken from the selection footer.
 			await page
-				.locator( '.dataviews-bulk-actions-footer__container' )
-				.getByRole( 'button', { name: 'Quick Edit' } )
+				.getByRole( 'button', { name: 'Bulk edit', exact: true } )
 				.click();
 
 			await expect(
