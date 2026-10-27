@@ -141,6 +141,12 @@ RUN sed -i 's|deb.debian.org/debian buster|archive.debian.org/debian buster|g' /
 RUN sed -i 's|security.debian.org/debian-security buster/updates|archive.debian.org/debian-security buster/updates|g' /etc/apt/sources.list
 RUN sed -i '/buster-updates/d' /etc/apt/sources.list
 
+# bullseye (https://www.debian.org/News/2026/20260831)
+RUN sed -i 's|deb.debian.org/debian bullseye|archive.debian.org/debian bullseye|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security bullseye-security|archive.debian.org/debian-security bullseye-security|g' /etc/apt/sources.list
+RUN sed -i 's|deb.debian.org/debian-security bullseye-security|archive.debian.org/debian-security bullseye-security|g' /etc/apt/sources.list
+RUN sed -i '/bullseye-updates/d' /etc/apt/sources.list
+
 # Create the host's user so that we can match ownership in the container.
 ARG HOST_USERNAME
 ARG HOST_UID
