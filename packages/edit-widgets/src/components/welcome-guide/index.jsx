@@ -15,7 +15,7 @@ export default function WelcomeGuide() {
 		[]
 	);
 
-	const { toggle } = useDispatch( preferencesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const widgetAreas = useSelect(
 		( select ) =>
@@ -45,7 +45,9 @@ export default function WelcomeGuide() {
 			className="edit-widgets-welcome-guide"
 			contentLabel={ __( 'Welcome to block Widgets' ) }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggle( 'core/edit-widgets', 'welcomeGuide' ) }
+			onFinish={ () =>
+				setPreference( 'core/edit-widgets', 'welcomeGuide', false )
+			}
 			pages={ [
 				{
 					image: (

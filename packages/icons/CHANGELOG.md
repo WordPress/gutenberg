@@ -2,11 +2,22 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `insertBefore` and `insertAfter` icons. These were old Dashicons that were never used; use `create` or `plus` instead ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+-   Remove the `offline` icon. It was added in error for a React Native client that is no longer used, so it has no direct replacement; `info` or `error` can stand in ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+
 ### New Features
 
 -   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
 -   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
 -   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Enhancements
+
+-   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
+-   `manifest.json`: Add 39 icons from the `core` collection to the `core-admin` collection, so the admin interface can render them in place of the Dashicons they replace ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
+-   `manifest.json`: New `dashicons` property, listing the Dashicon class names a `core-admin` icon replaces. `manifest.php` includes it too ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
 
 ### Bug Fixes
 

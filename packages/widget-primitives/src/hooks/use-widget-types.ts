@@ -135,7 +135,8 @@ function recordOverlay( record: WidgetModuleRecord ) {
  * DataViews fields. Icon references resolve through the registered icon
  * resolver, off the loading flag: widget types emit as soon as their modules
  * land, and each resolved icon patches in afterwards. Action icon references
- * resolve the same way.
+ * resolve the same way. A record's `example` stands in when the module
+ * declares none.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -186,6 +187,9 @@ export function useWidgetTypes(
 									),
 								}
 							: {} ),
+						...( record.example
+							? { example: record.example }
+							: {} ),
 						...( record.icon ? { icon: pendingIcon } : {} ),
 						...( record.actions
 							? {
@@ -226,6 +230,7 @@ export function useWidgetTypes(
 						record.attributes,
 						metadata.attributes
 					);
+					const example = metadata.example ?? record.example;
 
 					return {
 						apiVersion: DEFAULT_API_VERSION,
@@ -233,6 +238,7 @@ export function useWidgetTypes(
 						...( attributes
 							? { attributes: resolveFields( attributes ) }
 							: {} ),
+						...( example ? { example } : {} ),
 						icon,
 						/*
 						 * `title` is required:
