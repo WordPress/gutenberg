@@ -52,7 +52,7 @@ See **Widget Host** for the contract.
 
 ### Widget identity
 
-`useWidgetIdentity()` is how a render reads the type's identity consistently — today the translated `title`. `<WidgetRender />` provides it from the `widgetType` it already holds. This is not a host capability: identity belongs to the type. See **Widget Identity**.
+`useWidgetIdentity()` is how a render reads the type's identity consistently — today the translated `title`. `<WidgetRender />` provides it from the `widgetType` it already holds. See **Widget Identity**.
 
 ### Rendering
 

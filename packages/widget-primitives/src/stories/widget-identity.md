@@ -6,19 +6,17 @@ This package is still experimental. “Experimental” means this is an early im
 
 A widget type's identity — `title`, and the rest of the identity layer in **Anatomy** — lives on `WidgetType`. The host already shows it in chrome. The render body sometimes needs the same data.
 
-`useWidgetIdentity` is how consumers read that identity consistently. It is not a host capability. A focusable chart that builds an accessible name from the title is one casual example; the hook itself only exposes identity.
+`useWidgetIdentity` is how consumers read that identity consistently. A focusable chart that builds an accessible name from the title is one casual example; the hook itself only exposes identity.
 
-![WidgetRender holds the resolved WidgetType, including its translated title. It mounts the render module with attributes and setAttributes, and lends the subtree a filtered identity context. The widget body reads useWidgetIdentity for the title to build an accessible name. Host capabilities such as links stay on a separate seam.](./assets/widget-identity-flow.svg)
+![WidgetRender holds the resolved WidgetType, including its translated title. It mounts the render module with attributes and setAttributes, and lends the subtree a filtered identity context. The widget body reads useWidgetIdentity for the title.](./assets/widget-identity-flow.svg)
 
-## Why a separate channel
+## Where it sits
 
-Three concerns, three APIs:
+Alongside the other render-facing contracts:
 
--   Instance state: `attributes` / `setAttributes` on the render contract.
--   Host materialization: `useWidgetHost` for what only the host or application can provide (`links`, `actions`). See **Widget Host**.
--   Type identity for the body: `useWidgetIdentity` for the filtered slice of the type the render may need.
-
-Identity belongs to the type. Host capabilities belong to the host. Keeping them apart leaves widgets portable across hosts.
+-   Instance state: `attributes` / `setAttributes`.
+-   Type identity for the body: `useWidgetIdentity`.
+-   Host materialization when the widget needs it: `useWidgetHost` (`links`, `actions`). See **Widget Host**.
 
 ## Contract
 
@@ -36,7 +34,7 @@ The public surface is the hook and this type. The provider is an internal detail
 
 `<WidgetRender>` already receives `widgetType`. When it mounts the render module it lends the subtree `{ title: widgetType.title }`. Any host that mounts through that entry point needs no extra wiring: the dashboard tile, its previews, and Storybook hosts that use `WidgetRender` all get it.
 
-A host that mounts a render module directly, without `WidgetRender`, leaves identity absent. That is the same degradation pattern as an absent host capability.
+A host that mounts a render module directly, without `WidgetRender`, leaves identity absent and the hook returns `{}`.
 
 ## Consuming it
 
