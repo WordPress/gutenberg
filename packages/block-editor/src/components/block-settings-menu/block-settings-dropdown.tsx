@@ -4,13 +4,13 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, MouseEvent } from 'react';
 import type { Block } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
 import NoteIconSlotFill from '../../components/collab/note-icon-slot';
@@ -21,7 +21,12 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
+import type {
+	BlockSettingsDropdownProps,
+	CopyMenuItemProps,
+	CopyStylesMenuItemProps,
+} from './types';
+import { copyBlocksToClipboard } from '../writing-flow/utils';
 
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -36,35 +41,63 @@ function CopyMenuItem( {
 	eventType = 'copy',
 	__experimentalUpdateSelection: updateSelection = false,
 }: CopyMenuItemProps ) {
+	const registry = useRegistry();
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
+
+	// Write the same `text/plain` and `text/html` clipboard data as the
+	// keyboard shortcuts do, so that pasting behaves consistently no matter
+	// how the blocks were copied.
+	function onClick( event: MouseEvent< HTMLElement > ) {
+		const hasCopied = copyBlocksToClipboard(
+			event.currentTarget.ownerDocument,
+			// The copied blocks exist.
+			getBlocksByClientId( clientIds ) as Block[],
+			registry
+		);
+
+		if ( ! hasCopied ) {
+			return;
+		}
+
+		notifyCopy( eventType, clientIds );
+
+		if ( eventType === 'cut' ) {
+			removeBlocks( clientIds, updateSelection );
+		} else {
+			// Copy items always come with a copy handler.
+			onCopy!();
+		}
+	}
+
+	return (
+		<MenuItem onClick={ onClick } shortcut={ shortcut }>
+			{ label ? label : __( 'Copy' ) }
+		</MenuItem>
+	);
+}
+
+function CopyStylesMenuItem( {
+	clientIds,
+	onCopy,
+	label,
+}: CopyStylesMenuItemProps ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const notifyCopy = useNotifyCopy();
+
+	// Write the serialized blocks as plain text so that `usePasteStyles` can
+	// read them back from the clipboard with `navigator.clipboard.readText()`.
 	const ref = useCopyToClipboard(
 		// The copied blocks exist.
 		() => serialize( getBlocksByClientId( clientIds ) as Block[] ),
 		() => {
-			switch ( eventType ) {
-				case 'copy':
-				case 'copyStyles':
-					// Copy items always come with a copy handler.
-					onCopy!();
-					notifyCopy( eventType, clientIds );
-					break;
-				case 'cut':
-					notifyCopy( eventType, clientIds );
-					removeBlocks( clientIds, updateSelection );
-					break;
-				default:
-					break;
-			}
+			onCopy();
+			notifyCopy( 'copyStyles', clientIds );
 		}
 	);
-	const copyMenuItemLabel = label ? label : __( 'Copy' );
-	return (
-		<MenuItem ref={ ref } shortcut={ shortcut }>
-			{ copyMenuItemLabel }
-		</MenuItem>
-	);
+
+	return <MenuItem ref={ ref }>{ label }</MenuItem>;
 }
 
 export function BlockSettingsDropdown( {
@@ -360,11 +393,10 @@ export function BlockSettingsDropdown( {
 								</MenuGroup>
 								{ canCopyStyles && ! isContentOnly && (
 									<MenuGroup>
-										<CopyMenuItem
+										<CopyStylesMenuItem
 											clientIds={ clientIds }
 											onCopy={ onCopy }
 											label={ __( 'Copy styles' ) }
-											eventType="copyStyles"
 										/>
 										{ canEdit && (
 											<MenuItem onClick={ onPasteStyles }>

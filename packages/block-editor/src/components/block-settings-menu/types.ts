@@ -32,6 +32,15 @@ export interface CopyMenuItemProps {
 	__experimentalUpdateSelection?: boolean;
 }
 
+export interface CopyStylesMenuItemProps {
+	/** Client IDs of the blocks whose styles to copy. */
+	clientIds: string[];
+	/** Called after the blocks are copied. */
+	onCopy: () => void;
+	/** Label of the menu item. */
+	label: string;
+}
+
 export interface BlockSettingsDropdownProps extends Omit<
 	Partial< ComponentProps< typeof DropdownMenu > >,
 	'children'
