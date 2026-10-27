@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
+import type { Mock, MockInstance } from 'vitest';
 import {
 	act,
 	fireEvent,
@@ -656,7 +656,7 @@ describe( 'URLInput', () => {
 	} );
 
 	describe( 'closeSuggestionsOnNavigateOutside', () => {
-		let hasFocusSpy;
+		let hasFocusSpy: MockInstance< Document[ 'hasFocus' ] >;
 
 		beforeEach( () => {
 			// `useFocusOutside` treats a document without focus as the window

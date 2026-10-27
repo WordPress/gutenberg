@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from 'react';
+import type { FocusEvent, KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -322,7 +322,7 @@ export default function URLInput( props: URLInputProps ) {
 		setIsComposing( false );
 	}
 
-	function handleFocus( event ) {
+	function handleFocus( event: FocusEvent< HTMLInputElement > ) {
 		// Focus (re)entering the field cancels a pending focus-outside check.
 		focusOutsideProps.onFocus( event );
 
