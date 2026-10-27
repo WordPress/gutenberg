@@ -274,17 +274,7 @@ function PostListView( {
 	);
 
 	const actions = useMemo( () => {
-		const _actions = [
-			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					// Skip revisions as the admin does not support it
-					case 'view-post-revisions':
-						return [];
-				}
-
-				return [ action ];
-			} ),
-		];
+		const _actions = [ ...postTypeActions ];
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
 		}

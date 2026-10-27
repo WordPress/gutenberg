@@ -1,7 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { PanelBody, useNavigator } from '@wordpress/components';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type {
 	GlobalStylesSettings,
@@ -83,17 +82,15 @@ export const ELEMENTS = {
 	},
 	textInput: {
 		description: __( 'Manage the appearance of inputs.' ),
-		title: __( 'Input' ),
+		title: __( 'Form input' ),
 	},
 	select: {
 		description: __( 'Manage the appearance of selects.' ),
-		title: __( 'Select' ),
+		title: __( 'Form select' ),
 	},
 	button: {
 		description: __( 'Manage the appearance of buttons.' ),
-		// Disambiguated from the Button block, whose screen is also titled
-		// "Button" and which sits in the same list.
-		title: __( 'Button (element)' ),
+		title: __( 'Form button' ),
 	},
 };
 

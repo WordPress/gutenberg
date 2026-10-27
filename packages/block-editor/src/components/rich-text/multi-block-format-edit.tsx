@@ -261,9 +261,9 @@ function Fields( {
 			const fields = clientIds.map( ( clientId, i ) =>
 				getFieldFormatSettings( clientId, keys[ i ] )
 			);
-			const lists: string[][] = fields
+			const lists = fields
 				.map( ( field ) => field?.allowedFormats )
-				.filter( Boolean );
+				.filter( ( list ): list is readonly string[] => !! list );
 			return {
 				allowedFormats: lists.length
 					? lists.reduce( ( a, b ) =>
