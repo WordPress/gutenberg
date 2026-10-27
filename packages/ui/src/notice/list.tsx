@@ -92,7 +92,8 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 					)
 						.filter(
 							( notice ) =>
-								notice.closest( LIST_SELECTOR ) === element
+								notice.closest( LIST_SELECTOR ) === element &&
+								! isHidden( notice, element )
 						)
 						.map( ( notice ) => [
 							notice,

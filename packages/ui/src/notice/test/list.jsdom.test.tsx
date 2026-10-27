@@ -121,7 +121,7 @@ describe( 'Notice.List', () => {
 		} );
 	} );
 
-	it( 'omits hidden descendants from announcements', async () => {
+	it( 'omits hidden notices and descendants from announcements', async () => {
 		const { rerender } = render( <Notice.List /> );
 		const renderNotice = ( isHidden: boolean ) => (
 			<Notice.List>
@@ -139,6 +139,13 @@ describe( 'Notice.List', () => {
 						</span>
 					</Notice.Description>
 				</Notice.Root>
+				<Message
+					hidden={ isHidden }
+					spokenMessage="Hidden notice override."
+				/>
+				<div aria-hidden={ isHidden }>
+					<Message>Wrapped notice.</Message>
+				</div>
 			</Notice.List>
 		);
 		rerender( renderNotice( true ) );
@@ -146,13 +153,17 @@ describe( 'Notice.List', () => {
 		await waitFor( () =>
 			expect( status ).toHaveTextContent( 'Public message.' )
 		);
-		expect( status ).not.toHaveTextContent( /Decorative|Hidden|Excluded/ );
+		expect( status ).not.toHaveTextContent(
+			/Decorative|Hidden|Excluded|Wrapped/
+		);
 		rerender( renderNotice( false ) );
 		await waitFor( () =>
 			expect( status ).toHaveTextContent(
 				/Hidden detail\..*Excluded detail\./
 			)
 		);
+		expect( status ).toHaveTextContent( 'Hidden notice override.' );
+		expect( status ).toHaveTextContent( 'Wrapped notice.' );
 		expect( status ).not.toHaveTextContent( 'Decorative title' );
 	} );
 
