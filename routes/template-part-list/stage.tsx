@@ -230,7 +230,7 @@ function TemplatePartListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
-	const postTypeActions: Action< WpTemplatePart >[] = usePostActions( {
+	const actions: Action< WpTemplatePart >[] = usePostActions( {
 		postType: TEMPLATE_PART_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: WpTemplatePart[] ) => {
@@ -243,21 +243,6 @@ function TemplatePartListView( {
 			}
 		},
 	} );
-
-	const actions = useMemo( () => {
-		return [
-			...postTypeActions?.flatMap< Action< WpTemplatePart > >(
-				( action ) => {
-					// Skip revisions as the admin does not support it
-					if ( action.id === 'view-post-revisions' ) {
-						return [];
-					}
-
-					return [ action ];
-				}
-			),
-		];
-	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
 		( viewSlug: string ) => {
