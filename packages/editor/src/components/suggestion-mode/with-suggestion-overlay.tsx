@@ -35,9 +35,10 @@ import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 import { useSuggestionSessionActions } from './suggestion-session';
 import {
+	displayedProposal,
 	mergeProposedAttributes,
-	proposedAttributes,
 	readSuggestionMarker,
+	readSuggestionMarkers,
 	withProposedAttributes,
 } from './marker';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -165,7 +166,9 @@ function SuggestingBlockEdit( {
 
 	// The proposal is part of the attributes themselves, so it arrives with
 	// every attribute update (undo, RTC sync, a decision) at no extra cost.
-	const after = proposedAttributes( readSuggestionMarker( attributes ) );
+	const marker = readSuggestionMarker( attributes );
+	// Every author's proposal on the block, later notes on top.
+	const after = useMemo( () => displayedProposal( marker ), [ marker ] );
 	const mergedAttributes = useMemo(
 		() => mergeProposedAttributes( attributes, after ),
 		[ attributes, after ]
@@ -331,7 +334,11 @@ function SuggestingBlockEdit( {
 			if (
 				isDeferredInsertion( clientId ) ||
 				( blockEditor &&
-					( isPartOfPendingInsertion( blockEditor, clientId ) ||
+					( isPartOfPendingInsertion(
+						blockEditor,
+						clientId,
+						authorId
+					) ||
 						blockEditor.getMultiSelectedBlockClientIds?.()?.length >
 							0 ) )
 			) {
@@ -440,7 +447,9 @@ function ProposedBlockEdit( {
 } ) {
 	const { attributes, setAttributes } = props;
 	const registry = useRegistry();
-	const after = proposedAttributes( readSuggestionMarker( attributes ) );
+	const marker = readSuggestionMarker( attributes );
+	// Every author's proposal on the block, later notes on top.
+	const after = useMemo( () => displayedProposal( marker ), [ marker ] );
 	const mergedAttributes = useMemo(
 		() => mergeProposedAttributes( attributes, after ),
 		[ attributes, after ]
@@ -506,14 +515,18 @@ const withSuggestionOverlay = createHigherOrderComponent(
 					return {
 						isSuggestMode: suggesting,
 						// Only Suggest intent acts on it; skip the lookup
-						// for every block in the other intents.
+						// for every block in the other intents. Another
+						// author's suggested block takes suggestions.
 						isPendingInsert:
 							suggesting &&
 							isPartOfPendingInsertionCached(
 								blockEditor,
-								clientId
+								clientId,
+								(
+									select( coreStore ) as any
+								 )?.getCurrentUser?.()?.id ?? null
 							),
-						hasProposal: !! proposedAttributes(
+						hasProposal: !! displayedProposal(
 							readSuggestionMarker(
 								blockEditor?.getBlockAttributes?.( clientId )
 							)
@@ -599,13 +612,20 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			const { structuralClass, showBracket, authorId } = useSelect(
 				( select ) => {
 					const blockEditor: any = select( blockEditorStore );
-					const marker = readSuggestionMarker(
-						blockEditor?.getBlockAttributes?.( clientId )
+					const attributes =
+						blockEditor?.getBlockAttributes?.( clientId );
+					const marker = readSuggestionMarker( attributes );
+					// A removal nested under another suggestion still strikes
+					// the block through.
+					const removal = readSuggestionMarkers( attributes ).find(
+						( entry ) => entry.type === 'pending-remove'
 					);
 					return {
-						structuralClass: structuralMarkerClass( marker?.type ),
-						showBracket: !! proposedAttributes( marker ),
-						authorId: marker?.authorId ?? null,
+						structuralClass: structuralMarkerClass(
+							removal?.type ?? marker?.type
+						),
+						showBracket: !! displayedProposal( marker ),
+						authorId: ( removal ?? marker )?.authorId ?? null,
 					};
 				},
 				[ clientId ]
