@@ -3,9 +3,15 @@
  * admin screens.
  *
  * Each component PHP can render has a `php/<name>/component.json` with its
- * content, props and a recipe: the classes it always has, and the classes each variant
- * value adds. PHP renders the markup from a small template, and the recipe
- * says which classes go on it. The build:
+ * content, props and a recipe: the classes it always has, and the classes each
+ * variant value adds. PHP renders the markup from a small template, and the
+ * recipe says which classes go on it.
+ *
+ * Recipes name classes as in the component's own stylesheet (`is-brand` in
+ * `src/button/style.module.css`), or as `<stylesheet>:<class>` for a shared
+ * one (`utils/css/resets:box-sizing` in `src/utils/css/resets.module.css`).
+ *
+ * The build:
  *
  *   - Compiles the package's CSS modules with the same scoped class names as
  *     the React build, and writes the ones the recipes use to `style.css`.
@@ -116,8 +122,11 @@ async function main() {
 		const { name, content, props, classes, react } = component;
 		const resolve = ( references ) =>
 			references.map( ( reference ) => {
-				usedStylesheets.add( reference.split( ':' )[ 0 ] );
-				return resolveClass( reference, name );
+				const qualified = reference.includes( ':' )
+					? reference
+					: `${ name }/style:${ reference }`;
+				usedStylesheets.add( qualified.split( ':' )[ 0 ] );
+				return resolveClass( qualified, name );
 			} );
 
 		manifest.components[ name ] = {

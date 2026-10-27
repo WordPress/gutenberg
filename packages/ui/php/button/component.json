@@ -33,19 +33,19 @@
 		],
 		"variants": {
 			"tone": {
-				"brand": [ "button/style:is-brand" ],
-				"neutral": [ "button/style:is-neutral" ]
+				"brand": [ "is-brand" ],
+				"neutral": [ "is-neutral" ]
 			},
 			"variant": {
-				"solid": [ "button/style:button", "button/style:is-solid" ],
-				"outline": [ "button/style:button", "button/style:is-outline" ],
-				"minimal": [ "button/style:button", "button/style:is-minimal" ],
-				"unstyled": [ "button/style:is-unstyled" ]
+				"solid": [ "button", "is-solid" ],
+				"outline": [ "button", "is-outline" ],
+				"minimal": [ "button", "is-minimal" ],
+				"unstyled": [ "is-unstyled" ]
 			},
 			"size": {
 				"default": [],
-				"compact": [ "button/style:is-compact" ],
-				"small": [ "button/style:is-small" ]
+				"compact": [ "is-compact" ],
+				"small": [ "is-small" ]
 			}
 		}
 	},
