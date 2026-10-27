@@ -30,6 +30,8 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
+              with:
+                  cache: false
 
             - name: Build Storybook
               run: npm run storybook:build
