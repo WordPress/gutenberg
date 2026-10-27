@@ -1,11 +1,5 @@
-/**
- * Internal dependencies
- */
 import isShallowEqualObjects from './objects';
 import isShallowEqualArrays from './arrays';
-
-export { default as isShallowEqualObjects } from './objects';
-export { default as isShallowEqualArrays } from './arrays';
 
 export type ComparableObject = Record< string, any >;
 
@@ -29,3 +23,7 @@ export default function isShallowEqual( a: unknown, b: unknown ): boolean {
 
 	return a === b;
 }
+
+// `isShallowEqual` is exported also as a named export because esbuild cannot
+// expose the default export from the `window.wp.isShallowEqual` global.
+export { isShallowEqual, isShallowEqualObjects, isShallowEqualArrays };

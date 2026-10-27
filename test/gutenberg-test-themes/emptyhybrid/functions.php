@@ -2,7 +2,7 @@
 /**
  * Empty theme functions and definitions.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 if ( ! function_exists( 'emptyhybrid_support' ) ) :

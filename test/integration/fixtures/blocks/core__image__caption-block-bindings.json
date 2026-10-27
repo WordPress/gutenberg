@@ -1,0 +1,23 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"isDecorative": false,
+			"metadata": {
+				"bindings": {
+					"caption": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

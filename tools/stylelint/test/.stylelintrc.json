@@ -1,0 +1,13 @@
+{
+	"extends": "../config.js",
+	"overrides": [
+		{
+			"files": [ "*.scss", "**/*.scss" ],
+			"ignoreFiles": [ "*-invalid.scss" ]
+		},
+		{
+			"files": [ "*.css", "**/*.css" ],
+			"ignoreFiles": [ "*-invalid.css" ]
+		}
+	]
+}

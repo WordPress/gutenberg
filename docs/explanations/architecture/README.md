@@ -10,9 +10,11 @@ Let’s look at the big picture and the architectural and UX principles of the b
 -   [Site editing templates](/docs/explanations/architecture/full-site-editing-templates.md).
 -   [Styles in the editor](/docs/explanations/architecture/styles.md).
 -   [Performance](/docs/explanations/architecture/performance.md).
+-   [Client-side media processing](/docs/explanations/architecture/client-side-media-architecture.md).
 
 ## Gutenberg repository
 
 -   [Modularity and WordPress Packages](/docs/explanations/architecture/modularity.md).
 -   [Understand the repository folder structure](/docs/contributors/folder-structure.md).
--   **Outdated!** [Why is Puppeteer the tool of choice for end-to-end tests?](/docs/explanations/architecture/automated-testing.md).
+-   [Why is Playwright the tool of choice for end-to-end tests?](/docs/explanations/architecture/automated-testing.md).
+

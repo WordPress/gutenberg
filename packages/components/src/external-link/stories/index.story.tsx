@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import ExternalLink from '..';
 
 const meta: Meta< typeof ExternalLink > = {
 	component: ExternalLink,
-	title: 'Components/Navigation/ExternalLink',
+	title: 'Components/@wordpress-components/Navigation/ExternalLink',
 	id: 'components-externallink',
 	argTypes: {
 		children: { control: { type: 'text' } },
@@ -20,6 +13,11 @@ const meta: Meta< typeof ExternalLink > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Link`](?path=/docs/design-system-components-link--docs) from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
+		},
 	},
 };
 export default meta;

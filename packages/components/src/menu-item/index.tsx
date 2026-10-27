@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
@@ -56,7 +45,7 @@ function UnforwardedMenuItem(
 
 	return (
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			ref={ ref }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
@@ -67,6 +56,7 @@ function UnforwardedMenuItem(
 			role={ role }
 			icon={ iconPosition === 'left' ? icon : undefined }
 			className={ className }
+			accessibleWhenDisabled
 			{ ...buttonProps }
 		>
 			<span className="components-menu-item__item">{ children }</span>
@@ -108,5 +98,6 @@ function UnforwardedMenuItem(
  * ```
  */
 export const MenuItem = forwardRef( UnforwardedMenuItem );
+MenuItem.displayName = 'MenuItem';
 
 export default MenuItem;

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Style, StyleOptions } from '../../types';
 import { generateRule } from '../utils';
 
@@ -100,6 +97,18 @@ const textDecoration = {
 	},
 };
 
+const textIndent = {
+	name: 'textIndent',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textIndent' ],
+			'textIndent'
+		);
+	},
+};
+
 const textTransform = {
 	name: 'textTransform',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -124,6 +133,18 @@ const writingMode = {
 	},
 };
 
+const textShadow = {
+	name: 'textShadow',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textShadow' ],
+			'textShadow'
+		);
+	},
+};
+
 export default [
 	fontFamily,
 	fontSize,
@@ -133,6 +154,8 @@ export default [
 	lineHeight,
 	textColumns,
 	textDecoration,
+	textIndent,
+	textShadow,
 	textTransform,
 	writingMode,
 ];

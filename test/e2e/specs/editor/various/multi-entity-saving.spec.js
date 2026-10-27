@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editor - Multi-entity save flow', () => {
@@ -25,10 +22,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		} );
 	} );
 
-	// Reinstate once the patch that fixes the REST API endpoints is committed to core.
-	// https://core.trac.wordpress.org/ticket/41604.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'Save flow should work as expected', async ( {
+	test( 'Save flow should work as expected', async ( {
 		admin,
 		editor,
 		page,
@@ -149,10 +143,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		await expect( openSavePanel ).toBeEnabled();
 	} );
 
-	// Reinstate once the patch that fixes the REST API endpoints is committed to core.
-	// https://core.trac.wordpress.org/ticket/41604.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'Site blocks should save individually', async ( {
+	test( 'Site blocks should save individually', async ( {
 		admin,
 		editor,
 		page,

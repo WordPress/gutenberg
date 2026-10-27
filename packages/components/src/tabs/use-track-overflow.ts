@@ -1,7 +1,4 @@
 /* eslint-disable jsdoc/require-param */
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
 

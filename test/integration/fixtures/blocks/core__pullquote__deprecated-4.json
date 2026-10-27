@@ -6,9 +6,13 @@
 			"value": "pullquote",
 			"className": "is-style-solid-color",
 			"backgroundColor": "black",
-			"textAlign": "left",
 			"citation": "before block supports",
-			"textColor": "white"
+			"textColor": "white",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
 		},
 		"innerBlocks": []
 	}
