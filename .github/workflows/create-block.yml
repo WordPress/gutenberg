@@ -26,7 +26,6 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['16']
                 os: [macos-latest, ubuntu-latest, windows-latest]
 
         steps:
@@ -36,8 +35,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Create block
               shell: bash
