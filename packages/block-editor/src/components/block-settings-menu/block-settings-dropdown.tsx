@@ -10,7 +10,7 @@ import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, MouseEvent } from 'react';
 import type { Block } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
 import NoteIconSlotFill from '../../components/collab/note-icon-slot';
@@ -21,7 +21,11 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
+import type {
+	BlockSettingsDropdownProps,
+	CopyMenuItemProps,
+	CopyStylesMenuItemProps,
+} from './types';
 import { copyBlocksToClipboard } from '../writing-flow/utils';
 
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
@@ -45,10 +49,11 @@ function CopyMenuItem( {
 	// Write the same `text/plain` and `text/html` clipboard data as the
 	// keyboard shortcuts do, so that pasting behaves consistently no matter
 	// how the blocks were copied.
-	function onClick( event ) {
+	function onClick( event: MouseEvent< HTMLElement > ) {
 		const hasCopied = copyBlocksToClipboard(
 			event.currentTarget.ownerDocument,
-			getBlocksByClientId( clientIds ),
+			// The copied blocks exist.
+			getBlocksByClientId( clientIds ) as Block[],
 			registry
 		);
 
@@ -73,14 +78,19 @@ function CopyMenuItem( {
 	);
 }
 
-function CopyStylesMenuItem( { clientIds, onCopy, label } ) {
+function CopyStylesMenuItem( {
+	clientIds,
+	onCopy,
+	label,
+}: CopyStylesMenuItemProps ) {
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
 	// Write the serialized blocks as plain text so that `usePasteStyles` can
 	// read them back from the clipboard with `navigator.clipboard.readText()`.
 	const ref = useCopyToClipboard(
-		() => serialize( getBlocksByClientId( clientIds ) ),
+		// The copied blocks exist.
+		() => serialize( getBlocksByClientId( clientIds ) as Block[] ),
 		() => {
 			onCopy();
 			notifyCopy( 'copyStyles', clientIds );

@@ -76,17 +76,20 @@ export function setClipboardBlocks(
  * data. Unlike `setClipboardBlocks()` it can be called outside a clipboard
  * event handler, e.g. from a menu item click.
  *
- * @param {Document}  ownerDocument Document of the element that triggered the
- *                                  copy.
- * @param {WPBlock[]} blocks        Blocks to copy.
- * @param {Object}    registry      The registry to select from.
+ * @param ownerDocument Document of the element that triggered the copy.
+ * @param blocks        Blocks to copy.
+ * @param registry      The registry to select from.
  *
- * @return {boolean} Whether the blocks were written to the clipboard.
+ * @return Whether the blocks were written to the clipboard.
  */
-export function copyBlocksToClipboard( ownerDocument, blocks, registry ) {
+export function copyBlocksToClipboard(
+	ownerDocument: Document,
+	blocks: Block[],
+	registry: DataRegistry
+) {
 	let didSetData = false;
 
-	function onCopy( event ) {
+	function onCopy( event: ClipboardEvent ) {
 		setClipboardBlocks( event, blocks, registry );
 		event.preventDefault();
 		didSetData = true;
@@ -97,7 +100,8 @@ export function copyBlocksToClipboard( ownerDocument, blocks, registry ) {
 	// a hidden textarea holding the serialized blocks. Engines that ignore
 	// the clipboard data set in the listener then still copy the markup as
 	// plain text.
-	const { activeElement } = ownerDocument;
+	// The focused element, if any, is an element that can take focus back.
+	const activeElement = ownerDocument.activeElement as HTMLElement | null;
 	const textarea = ownerDocument.createElement( 'textarea' );
 	textarea.value = serialize( blocks );
 	textarea.setAttribute( 'readonly', '' );
