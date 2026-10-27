@@ -163,4 +163,28 @@ describe( 'getOverridingBlockTypes', () => {
 		const config = getConfig( { 'core/post-title': style } );
 		expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual( [] );
 	} );
+
+	it( 'resolves an element value that refers to block styles', () => {
+		const config = {
+			styles: {
+				elements: {
+					heading: {
+						typography: {
+							letterSpacing: {
+								ref: 'styles.blocks.core/heading.typography.letterSpacing',
+							},
+						},
+					},
+				},
+				blocks: {
+					'core/heading': { typography: { letterSpacing: '1px' } },
+					'core/post-title': { typography: { letterSpacing: '2px' } },
+				},
+			},
+		};
+		expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual( [
+			'core/heading',
+			'core/post-title',
+		] );
+	} );
 } );

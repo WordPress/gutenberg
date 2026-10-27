@@ -303,6 +303,10 @@ export function getNewIndexFromPresets(
 // Heading blocks render at any level, so every heading screen shares one list.
 const HEADING_ELEMENTS = [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
 
+// Has no block styles, so resolving with it leaves only the root and element
+// layers, while `{ ref }` values can still point into `styles.blocks`.
+const ELEMENT_ONLY_BLOCK_NAME = 'core/__element-only';
+
 function getElementKeys( element: string ): string[] {
 	return HEADING_ELEMENTS.includes( element )
 		? HEADING_ELEMENTS
@@ -332,11 +336,10 @@ export function getOverridingBlockTypes(
 		return [];
 	}
 	const elements = getElementKeys( element );
-	// Any block name works here: with block styles dropped, only root and element layers remain.
-	const { sources: elementSources } = resolveStyle(
-		{ ...config, styles: { ...config.styles, blocks: undefined } },
-		{ blockName: blockNames[ 0 ], elements }
-	);
+	const { sources: elementSources } = resolveStyle( config, {
+		blockName: ELEMENT_ONLY_BLOCK_NAME,
+		elements,
+	} );
 	return blockNames.filter( ( blockName ) => {
 		const { sources } = resolveStyle( config, { blockName, elements } );
 		return Object.keys( sources ).some(
