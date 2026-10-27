@@ -90,6 +90,47 @@ test.describe( 'Invalid blocks', () => {
 		);
 	} );
 
+	test( 'should keep attributes a block does not know', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph {"style":{"color":{"text":"#000000"}}} -->
+<p class="has-text-color" style="color:#000000;background-color:#fffbe6" data-note="tip" onclick="alert(1)">Hello</p>
+<!-- /wp:paragraph -->` );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const [ block ] = await editor.getBlocks( { full: true } );
+		expect( block.isValid ).toBe( true );
+		expect( block.attributes ).toEqual( {
+			content: 'Hello',
+			dropCap: false,
+			style: { color: { text: '#000000' } },
+			htmlAttributes: {
+				style: 'background-color:#fffbe6',
+				'data-note': 'tip',
+				onclick: 'alert(1)',
+			},
+		} );
+		await expect( paragraph ).toHaveAttribute( 'data-note', 'tip' );
+		await expect( paragraph ).toHaveCSS(
+			'background-color',
+			'rgb(255, 251, 230)'
+		);
+		await expect( paragraph ).not.toHaveAttribute( 'onclick' );
+
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph {"style":{"color":{"text":"#000000"}}} -->
+<p class="has-text-color" style="color:#000000;background-color:#fffbe6" data-note="tip" onclick="alert(1)">Hello world</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
 	test( 'should not trigger malicious script tags when using a shortcode block', async ( {
 		editor,
 		page,
