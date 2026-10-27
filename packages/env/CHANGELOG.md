@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an experimental `php` runtime that serves WordPress with the installed PHP's built-in web server and a SQLite database, without Docker ([#85512](https://github.com/WordPress/gutenberg/pull/85512), [#85574](https://github.com/WordPress/gutenberg/pull/85574)).
+
 ### Bug Fixes
 
 -   Point the `bullseye-security` apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org` instead of dropping them, so the images keep receiving Debian security updates ([#85469](https://github.com/WordPress/gutenberg/pull/85469)).
