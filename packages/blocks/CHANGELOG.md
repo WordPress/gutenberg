@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Keep the attributes of a block's element that its `save` doesn't produce in `htmlAttributes`, when the block has that attribute, instead of marking the block invalid. They're read after the block's deprecations ([#85716](https://github.com/WordPress/gutenberg/pull/85716)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).

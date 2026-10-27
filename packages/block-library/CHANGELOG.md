@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Paragraph: Don't nest an invalid paragraph in another `<p>` ([#85716](https://github.com/WordPress/gutenberg/pull/85716)).
 -   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
 -   Page List: Keep page items visible in the Navigation sidebar during content-only editing ([#85357](https://github.com/WordPress/gutenberg/pull/85357)).
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
