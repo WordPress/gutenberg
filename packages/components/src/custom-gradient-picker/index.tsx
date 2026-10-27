@@ -92,11 +92,20 @@ const GradientTypePicker = ( {
 		);
 	};
 
-	const handleOnChange = ( next: string ) => {
-		if ( next === 'linear-gradient' ) {
+	const selectedOption =
+		GRADIENT_OPTIONS.find(
+			( option ) => hasGradient && option.value === type
+		) ?? GRADIENT_OPTIONS[ 0 ];
+
+	const handleTypeChange = ( nextType: string | null | undefined ) => {
+		if ( ! nextType || nextType === selectedOption.value ) {
+			return;
+		}
+
+		if ( nextType === 'linear-gradient' ) {
 			onSetLinearGradient();
 		}
-		if ( next === 'radial-gradient' ) {
+		if ( nextType === 'radial-gradient' ) {
 			onSetRadialGradient();
 		}
 	};
@@ -106,19 +115,8 @@ const GradientTypePicker = ( {
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
 			items={ GRADIENT_OPTIONS }
-			value={
-				hasGradient
-					? ( GRADIENT_OPTIONS.find(
-							( option ) => option.value === type
-						) ?? null )
-					: null
-			}
-			placeholder={ GRADIENT_OPTIONS[ 0 ].label }
-			onValueChange={ ( item ) => {
-				if ( item && item.value !== null ) {
-					handleOnChange( item.value );
-				}
-			} }
+			value={ selectedOption }
+			onValueChange={ ( item ) => handleTypeChange( item?.value ) }
 		/>
 	);
 };
