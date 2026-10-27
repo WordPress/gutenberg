@@ -1011,7 +1011,7 @@ describe( 'Link submission', () => {
 		} );
 
 		const submitButton = screen.getByRole( 'button', {
-			name: 'Submit',
+			name: 'Apply',
 		} );
 
 		expect( submitButton ).toBeVisible();
@@ -1051,12 +1051,11 @@ describe( 'Link submission', () => {
 			name: 'Search or type URL',
 		} );
 
-		const createSubmitButton = screen.queryByRole( 'button', {
-			name: 'Submit',
-		} );
-
-		// Check the submit button for "creation" of links is not displayed.
-		expect( createSubmitButton ).not.toBeInTheDocument();
+		// Check the submit button for "creation" of links is not displayed
+		// alongside the one for editing.
+		expect(
+			screen.getAllByRole( 'button', { name: 'Apply' } )
+		).toHaveLength( 1 );
 
 		const editSubmitButton = screen.getByRole( 'button', {
 			name: 'Apply',

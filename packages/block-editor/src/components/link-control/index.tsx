@@ -780,7 +780,7 @@ function SearchSuffixControl( {
 		<InputControlSuffixWrapper variant="control">
 			<Button
 				onClick={ isDisabled ? noop : onSubmit }
-				label={ __( 'Submit' ) }
+				label={ __( 'Apply' ) }
 				icon={ keyboardReturn }
 				className="block-editor-link-control__search-submit"
 				aria-disabled={ isDisabled }
