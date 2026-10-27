@@ -62,7 +62,7 @@ function gutenberg_get_background_classes_and_styles( $block_attributes ) {
 	);
 
 	if ( ! empty( $background_styles['backgroundImage'] ) ) {
-		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+		$background_styles['backgroundSize'] ??= 'cover';
 		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
 			$background_styles['backgroundPosition'] = '50% 50%';
 		}
