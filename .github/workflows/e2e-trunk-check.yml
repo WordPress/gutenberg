@@ -1,7 +1,7 @@
 name: Check new e2e tests on trunk
 
-# A bug fix's new or changed e2e test should fail without the fix. This runs
-# those tests against trunk's code and warns on each one that passes there.
+# A bug fix needs at least one new or changed e2e test that fails without the
+# fix. This runs those tests against trunk's code and warns when none fail.
 on:
     pull_request:
         types: [opened, reopened, synchronize, labeled, unlabeled]
@@ -78,7 +78,7 @@ jobs:
               run: |
                   npm run wp-env-test start
 
-            - name: Warn on tests that pass on trunk
+            - name: Check the new tests on trunk
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
                   PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/results.json
