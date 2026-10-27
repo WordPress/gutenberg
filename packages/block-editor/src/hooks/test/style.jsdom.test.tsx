@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
@@ -1061,12 +1062,14 @@ describe( 'omitStyle', () => {
 } );
 
 describe( 'addAttribute', () => {
-	const addAttribute = ( supports ) =>
-		applyFilters(
-			'blocks.registerBlockType',
-			{ attributes: {}, supports },
-			'core/foo'
-		).attributes;
+	const addAttribute = ( supports: Record< string, boolean > ) =>
+		(
+			applyFilters(
+				'blocks.registerBlockType',
+				{ attributes: {}, supports },
+				'core/foo'
+			) as { attributes: Record< string, unknown > }
+		 ).attributes;
 
 	it( 'adds the style attribute for rotation alone', () => {
 		expect( addAttribute( { customCSS: false } ) ).toEqual( {
