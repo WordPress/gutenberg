@@ -721,8 +721,16 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( 'core-admin/pin', $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-admin-post' ) );
-		$this->assertSame( 'core-admin/pin', $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-format-standard' ) );
+		$this->assertSame(
+			'core-admin/pin',
+			$this->registry->get_admin_icon_name_for_dashicon( 'dashicons-admin-post' ),
+			'First Dashicon in the mapping is replaced'
+		);
+		$this->assertSame(
+			'core-admin/pin',
+			$this->registry->get_admin_icon_name_for_dashicon( 'dashicons-format-standard' ),
+			'Alternative Dashicons are also replaced'
+		);
 	}
 
 	/**

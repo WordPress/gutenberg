@@ -426,7 +426,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * icons in the Gutenberg manifest, so they follow the icons the plugin ships
 	 * rather than the ones in WordPress core.
 	 *
-	 * @access private
+	 * @since 7.2.0
 	 *
 	 * @param string $dashicon Dashicon class name, such as `dashicons-admin-post`.
 	 * @return string|null Namespaced name of the replacement icon, such as `core-admin/pin`,
