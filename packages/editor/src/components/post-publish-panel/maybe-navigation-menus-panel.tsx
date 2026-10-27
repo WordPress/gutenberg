@@ -1,6 +1,7 @@
 import { PanelBody } from '@wordpress/components';
 import { CheckboxControl, Link } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/block-serialization-default-parser';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -86,24 +87,38 @@ function getMenuEditorUrl( menuId: number ) {
  * replaces the setting's choice for this page only.
  */
 export default function MaybeNavigationMenusPanel() {
-	const { rows, choice } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId, getEditedPostAttribute } =
-			select( editorStore );
-		if ( getCurrentPostType() !== 'page' ) {
-			return { rows: [] as MenuRow[], choice: undefined };
+	// Only stable values come out of the selector: the records array keeps
+	// its reference until the menus change, and the rows derive from it.
+	const { isPage, menus, pageId, parentId, choice } = useSelect(
+		( select ) => {
+			const {
+				getCurrentPostType,
+				getCurrentPostId,
+				getEditedPostAttribute,
+			} = select( editorStore );
+			const _isPage = getCurrentPostType() === 'page';
+			return {
+				isPage: _isPage,
+				menus: _isPage
+					? ( select( coreStore ).getEntityRecords(
+							'postType',
+							'wp_navigation',
+							{ per_page: -1, status: 'any' }
+						) as NavigationMenuRecord[] | null )
+					: null,
+				pageId: Number( getCurrentPostId() ),
+				parentId: Number( getEditedPostAttribute( 'parent' ) ) || 0,
+				choice: getEditedPostAttribute( CHOICE_FIELD ) as
+					number[] | undefined,
+			};
+		},
+		[]
+	);
+	const rows = useMemo( (): MenuRow[] => {
+		if ( ! isPage || ! menus?.length ) {
+			return [];
 		}
-		const menus = select( coreStore ).getEntityRecords(
-			'postType',
-			'wp_navigation',
-			{ per_page: -1, status: 'any' }
-		) as NavigationMenuRecord[] | null;
-		if ( ! menus?.length ) {
-			return { rows: [] as MenuRow[], choice: undefined };
-		}
-
-		const pageId = Number( getCurrentPostId() );
-		const parentId = Number( getEditedPostAttribute( 'parent' ) ) || 0;
-		const result: MenuRow[] = menus.map( ( menu ) => {
+		return menus.map( ( menu ) => {
 			const blocks = parse( menu.content?.raw ?? '' );
 			const title = decodeEntities(
 				menu.title?.raw || menu.title?.rendered || ''
@@ -135,12 +150,7 @@ export default function MaybeNavigationMenusPanel() {
 						: undefined,
 			};
 		} );
-		return {
-			rows: result,
-			choice: getEditedPostAttribute( CHOICE_FIELD ) as
-				number[] | undefined,
-		};
-	}, [] );
+	}, [ isPage, menus, pageId, parentId ] );
 	const { editPost } = useDispatch( editorStore );
 
 	if ( ! rows.length ) {
