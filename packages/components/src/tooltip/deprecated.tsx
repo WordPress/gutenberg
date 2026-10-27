@@ -19,5 +19,6 @@ function Tooltip( props: TooltipProps, ref: React.ForwardedRef< any > ) {
  * @deprecated Use `Tooltip` from `@wordpress/ui` instead.
  */
 const DeprecatedTooltip = forwardRef( Tooltip );
+DeprecatedTooltip.displayName = 'Tooltip';
 
 export default DeprecatedTooltip;
