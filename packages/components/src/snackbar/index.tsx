@@ -47,10 +47,13 @@ function useSpokenMessage(
 	politeness: NonNullable< SnackbarProps[ 'politeness' ] >
 ) {
 	const messageContainerRef = useRef< HTMLDivElement >( null );
-	const previouslySpokenRef = useRef< {
-		message: string;
-		politeness: NonNullable< SnackbarProps[ 'politeness' ] >;
-	} >();
+	const previouslySpokenRef = useRef<
+		| {
+				message: string;
+				politeness: NonNullable< SnackbarProps[ 'politeness' ] >;
+		  }
+		| undefined
+	>( undefined );
 
 	useEffect( () => {
 		let spokenMessage;

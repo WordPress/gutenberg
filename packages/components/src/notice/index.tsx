@@ -27,10 +27,13 @@ function useSpokenMessage(
 	politeness: NoticeProps[ 'politeness' ]
 ) {
 	const messageContainerRef = useRef< HTMLDivElement >( null );
-	const previouslySpokenRef = useRef< {
-		message: string;
-		politeness: NoticeProps[ 'politeness' ];
-	} >();
+	const previouslySpokenRef = useRef<
+		| {
+				message: string;
+				politeness: NoticeProps[ 'politeness' ];
+		  }
+		| undefined
+	>( undefined );
 
 	useEffect( () => {
 		let spokenMessage;
