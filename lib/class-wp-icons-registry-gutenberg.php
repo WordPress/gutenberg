@@ -93,6 +93,13 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
+	 * Resolved path of the core icon library directory.
+	 *
+	 * @var string|false|null
+	 */
+	private $core_icon_library_directory = null;
+
+	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
 	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
@@ -373,13 +380,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @return bool Whether the file is in the core icon library.
 	 */
 	private function is_core_icon_file( $icon_path ) {
-		static $library_directory = null;
-
-		if ( null === $library_directory ) {
-			$library_directory = realpath( gutenberg_dir_path() . 'packages/icons/src/library' );
+		if ( null === $this->core_icon_library_directory ) {
+			$this->core_icon_library_directory = realpath( gutenberg_dir_path() . 'packages/icons/src/library' );
 		}
 
-		return is_string( $library_directory ) && str_starts_with( $icon_path, $library_directory . DIRECTORY_SEPARATOR );
+		return is_string( $this->core_icon_library_directory ) && str_starts_with( $icon_path, $this->core_icon_library_directory . DIRECTORY_SEPARATOR );
 	}
 
 	/**
