@@ -6,8 +6,13 @@
 
 -   `PostPublishPanel`: The pre-publish panel of a page lists the Navigation Menus with a checkbox each, so the author chooses the menus the page is added to when it is published. The menus that add new pages start checked, a menu that already links to the page is checked and locked, and each menu links to its editor.
 
+### Enhancements
+
+-   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+
 ### Bug Fixes
 
+-   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 16.0.0 (2026-10-20)

@@ -68,7 +68,7 @@
 }
 
 .global-styles-ui-block-types-filter {
-	margin-bottom: variables.$grid-unit-15;
+	margin-bottom: variables.$grid-unit-20;
 	padding: 0 variables.$grid-unit-20;
 }
 
@@ -77,6 +77,12 @@
 }
 
 .global-styles-ui-block-types-item-list {
+	// Inset the rows, and their focus rings, from the edges of the sidebar,
+	// like List View. Icons have about 4px of space inside their 24px box, so
+	// with the small item padding the icon itself lines up with the 16px inset
+	// of the header, search field and headings.
+	margin-inline: variables.$grid-unit-05;
+
 	.global-styles-ui-block-types-item__icon {
 		min-width: variables.$grid-unit-30;
 	}
@@ -86,13 +92,21 @@
 	padding-top: variables.$grid-unit-20;
 }
 
+// The rows above and below a group title already have about 5px of padding,
+// so these margins are smaller than the space they appear to leave.
 .global-styles-ui-block-types-group + .global-styles-ui-block-types-group {
-	margin-top: 16px;
+	margin-top: variables.$grid-unit-15;
+}
+
+// Keep the last row clear of the bottom of the scroll container. Padding
+// rather than margin, so it is kept at the end of the scrollable area.
+.global-styles-ui-block-types-group:last-child {
+	padding-bottom: variables.$grid-unit-15;
 }
 
 .global-styles-ui-block-types-group__title {
-	margin-bottom: 8px;
-	padding: 0 16px;
+	margin-bottom: variables.$grid-unit-15;
+	padding: 0 variables.$grid-unit-20;
 }
 
 .global-styles-ui-screen-typography__font-variants-count {
