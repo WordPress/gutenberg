@@ -1,0 +1,709 @@
+{
+	"name": "four-same-kind",
+	"phase": "A",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob",
+		"C": "overlap-carl",
+		"D": "overlap-dana"
+	},
+	"html": "The<mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"add\" data-author=\"{{author:A}}\" class=\"wp-suggestion-add\"> <mark data-suggestion-id=\"{{id:C}}\" data-suggestion-type=\"del\" data-author=\"{{author:C}}\" class=\"wp-suggestion-del\">quick</mark><mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"add\" data-author=\"{{author:B}}\" class=\"wp-suggestion-add\"><mark data-suggestion-id=\"{{id:C}}\" data-suggestion-type=\"del\" data-author=\"{{author:C}}\" class=\"wp-suggestion-del\"> </mark><mark data-suggestion-id=\"{{id:D}}\" data-suggestion-type=\"format\" data-author=\"{{author:D}}\" class=\"wp-suggestion-format\"><mark data-suggestion-id=\"{{id:C}}\" data-suggestion-type=\"del\" data-author=\"{{author:C}}\" class=\"wp-suggestion-del\"><strong>brown</strong></mark></mark></mark> red</mark> fox.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "add"
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "add"
+			}
+		},
+		{
+			"key": "C",
+			"author": "C",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "del"
+			}
+		},
+		{
+			"key": "D",
+			"author": "D",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "format",
+				"beforeHTML": "brown",
+				"afterHTML": "<strong>brown</strong>",
+				"delta": [
+					{
+						"offset": 0,
+						"length": 5,
+						"added": [
+							{
+								"type": "core/bold"
+							}
+						],
+						"removed": []
+					}
+				]
+			}
+		}
+	],
+	"views": {
+		"displayed": "The quick <b>brown</b> red fox.",
+		"acceptedHTML": "The  red fox.",
+		"rejectedHTML": "The fox."
+	},
+	"orders": {
+		"exhaustive": false,
+		"list": [
+			{
+				"label": "+A -C +B -D",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "D",
+						"decision": "reject",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The quick brown red fox.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "The quick brown red fox."
+			},
+			{
+				"label": "-A",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "B", "C", "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+B -C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "B" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+D -C +A +B",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The quick <b>brown</b> red fox.",
+				"accepted": [ "D", "A", "B" ],
+				"publishedHTML": "The quick <strong>brown</strong> red fox."
+			},
+			{
+				"label": "+C -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": [ "B", "D" ]
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "B", "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "C" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+D -B -A",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The quick red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "C" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "D" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "-B -C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The quick red fox.",
+						"outdated": [ "D" ]
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick red fox.",
+						"outdated": [ "D" ]
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+A +D +B -C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The quick <b>brown</b> red fox.",
+				"accepted": [ "A", "D", "B" ],
+				"publishedHTML": "The quick <strong>brown</strong> red fox."
+			},
+			{
+				"label": "+B +D +C +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The  red fox.",
+				"accepted": [ "B", "D", "C", "A" ],
+				"publishedHTML": "The  red fox."
+			},
+			{
+				"label": "+B +D -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "C" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "B", "D" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "-D +A -C +B",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "reject",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The quick brown red fox.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "The quick brown red fox."
+			},
+			{
+				"label": "-C +D +A -B",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The quick red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The quick red fox.",
+				"accepted": [ "D", "A" ],
+				"publishedHTML": "The quick red fox."
+			},
+			{
+				"label": "-C +B -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "B" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+D +C -A",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": [ "B" ]
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "B" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "D", "C" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+B +C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": [ "D" ]
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "B", "C" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+B +D +A +C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The  red fox.",
+				"accepted": [ "B", "D", "A", "C" ],
+				"publishedHTML": "The  red fox."
+			},
+			{
+				"label": "+B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "C", "D" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "B" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "-C -B +A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The quick red fox.",
+						"outdated": [ "D" ]
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick red fox.",
+						"outdated": [ "D" ]
+					}
+				],
+				"published": "The quick red fox.",
+				"accepted": [ "A" ],
+				"publishedHTML": "The quick red fox."
+			},
+			{
+				"label": "-D +B +C -A",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "reject",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": []
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "B", "C" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+A +C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": [ "B", "D" ]
+					}
+				],
+				"published": "The  red fox.",
+				"accepted": [ "A", "C" ],
+				"publishedHTML": "The  red fox."
+			},
+			{
+				"label": "+C +A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": [ "B", "D" ]
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The  red fox.",
+						"outdated": [ "B", "D" ]
+					}
+				],
+				"published": "The  red fox.",
+				"accepted": [ "C", "A" ],
+				"publishedHTML": "The  red fox."
+			},
+			{
+				"label": "-D -B -A",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "reject",
+						"displayed": "The quick brown red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The quick red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "C" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+D -C +B -A",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": []
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "D", "B" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "+D -A",
+				"steps": [
+					{
+						"key": "D",
+						"decision": "accept",
+						"displayed": "The quick <b>brown</b> red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": [ "B", "C" ]
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "D" ],
+				"publishedHTML": "The fox."
+			}
+		]
+	}
+}

@@ -1,0 +1,205 @@
+{
+	"name": "stacked-conflict",
+	"phase": "B",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob"
+	},
+	"html": "<mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"format\" data-author=\"{{author:A}}\" class=\"wp-suggestion-format\"><mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"format\" data-author=\"{{author:B}}\" class=\"wp-suggestion-format\"><em>word</em></mark></mark>",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "format",
+				"beforeHTML": "word",
+				"afterHTML": "<strong>word</strong>",
+				"delta": [
+					{
+						"offset": 0,
+						"length": 4,
+						"added": [
+							{
+								"type": "core/bold"
+							}
+						],
+						"removed": []
+					}
+				]
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "format",
+				"beforeHTML": "<strong>word</strong>",
+				"afterHTML": "<em>word</em>",
+				"delta": [
+					{
+						"offset": 0,
+						"length": 4,
+						"added": [
+							{
+								"type": "core/italic"
+							}
+						],
+						"removed": [
+							{
+								"type": "core/bold"
+							}
+						]
+					}
+				]
+			}
+		}
+	],
+	"views": {
+		"displayed": "<i>word</i>",
+		"acceptedHTML": "<em>word</em>",
+		"rejectedHTML": "word"
+	},
+	"orders": {
+		"exhaustive": true,
+		"list": [
+			{
+				"label": "+A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "<i>word</i>",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "<i>word</i>",
+						"outdated": []
+					}
+				],
+				"published": "<i>word</i>",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "<em>word</em>"
+			},
+			{
+				"label": "+A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "<i>word</i>",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "<b>word</b>",
+						"outdated": []
+					}
+				],
+				"published": "<b>word</b>",
+				"accepted": [ "A" ],
+				"publishedHTML": "<strong>word</strong>"
+			},
+			{
+				"label": "-A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "<i>word</i>",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "<i>word</i>",
+						"outdated": []
+					}
+				],
+				"published": "<i>word</i>",
+				"accepted": [ "B" ],
+				"publishedHTML": "<em>word</em>"
+			},
+			{
+				"label": "-A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "<i>word</i>",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "word",
+						"outdated": []
+					}
+				],
+				"published": "word",
+				"accepted": [],
+				"publishedHTML": "word"
+			},
+			{
+				"label": "+B",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "<i>word</i>",
+						"outdated": [ "A" ]
+					}
+				],
+				"published": "<i>word</i>",
+				"accepted": [ "B" ],
+				"publishedHTML": "<em>word</em>"
+			},
+			{
+				"label": "-B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "<b>word</b>",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "<b>word</b>",
+						"outdated": []
+					}
+				],
+				"published": "<b>word</b>",
+				"accepted": [ "A" ],
+				"publishedHTML": "<strong>word</strong>"
+			},
+			{
+				"label": "-B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "<b>word</b>",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "word",
+						"outdated": []
+					}
+				],
+				"published": "word",
+				"accepted": [],
+				"publishedHTML": "word"
+			}
+		]
+	}
+}
