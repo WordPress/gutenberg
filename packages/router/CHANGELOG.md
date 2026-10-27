@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Make the `routes` and `matchResolverArgs` properties of `RouterProvider` optional in its TypeScript declaration, matching the existing behavior ([#84385](https://github.com/WordPress/gutenberg/pull/84385)).
+
 ## 1.57.0 (2026-10-07)
 
 ### Bug Fixes

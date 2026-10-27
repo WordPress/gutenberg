@@ -9,13 +9,18 @@ import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import type { CommandConfig, CommandLoaderHook } from '@wordpress/commands';
-import type { WpTemplate, WpTemplatePart } from '@wordpress/core-data';
+import type {
+	Post,
+	Page,
+	WpTemplate,
+	WpTemplatePart,
+} from '@wordpress/core-data';
+import type { RouterPrivateApis } from '@wordpress/router';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 import type {
 	NavigationPostType,
 	NavigationTemplateType,
-	RouterPrivateApis,
 } from './private-types';
 
 const { useHistory } = unlock< RouterPrivateApis >( routerPrivateApis );
@@ -122,11 +127,9 @@ const getNavigationCommandLoaderPerPostType = (
 					],
 				};
 				return {
-					records: select( coreStore ).getEntityRecords(
-						'postType',
-						postType,
-						query
-					),
+					records: select( coreStore ).getEntityRecords<
+						Post | Page
+					>( 'postType', postType, query ),
 					isLoading: ! select( coreStore ).hasFinishedResolution(
 						'getEntityRecords',
 						[ 'postType', postType, query ]
@@ -243,6 +246,8 @@ const getNavigationCommandLoaderPerTemplate = (
 		const commands = useMemo< CommandConfig[] >( () => {
 			if (
 				! canCreateTemplate ||
+				// TODO: Fix the classic-theme guard separately from the TypeScript migration.
+				// See https://github.com/WordPress/gutenberg/pull/84385#discussion_r4256344528.
 				// @ts-expect-error Preserve the existing boolean/string comparison during migration.
 				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
 			) {

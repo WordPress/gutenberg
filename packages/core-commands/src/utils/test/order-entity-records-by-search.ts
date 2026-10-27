@@ -105,7 +105,10 @@ describe( 'orderEntityRecordsBySearch', () => {
 	} );
 
 	it( 'retains the non-array input guard for JavaScript consumers', () => {
-		// @ts-expect-error JavaScript callers can pass values outside the typed contract.
-		expect( orderEntityRecordsBySearch( {} ) ).toEqual( [] );
+		const result = orderEntityRecordsBySearch(
+			// @ts-expect-error JavaScript callers can pass values outside the typed contract.
+			{}
+		);
+		expect( result ).toEqual( [] );
 	} );
 } );

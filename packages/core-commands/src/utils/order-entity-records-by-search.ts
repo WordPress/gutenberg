@@ -1,4 +1,11 @@
-import type { SearchableEntityRecord } from '../types';
+/**
+ * The title fields used to prioritize entity search results.
+ */
+interface SearchableEntityRecord {
+	title?: {
+		raw?: string;
+	};
+}
 
 export function orderEntityRecordsBySearch< T extends SearchableEntityRecord >(
 	records: T[] | null = [],

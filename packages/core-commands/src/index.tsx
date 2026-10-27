@@ -1,11 +1,12 @@
 import { createRoot, StrictMode } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import type { RouterPrivateApis } from '@wordpress/router';
 import { CommandMenu } from '@wordpress/commands';
 import { useAdminNavigationCommands } from './admin-navigation-commands';
 import { useSiteEditorNavigationCommands } from './site-editor-navigation-commands';
 import { unlock } from './lock-unlock';
 import type { CommandPaletteSettings } from './types';
-import type { RouterPrivateApis } from './private-types';
+export type { AdminMenuCommand, CommandPaletteSettings } from './types';
 export { privateApis } from './private-apis';
 
 const { RouterProvider } = unlock< RouterPrivateApis >( routerPrivateApis );

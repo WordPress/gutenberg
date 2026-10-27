@@ -19,12 +19,3 @@ export interface CommandPaletteSettings {
 	/** Whether the palette is displayed in the network admin. */
 	is_network_admin?: boolean;
 }
-
-/**
- * The title fields used to prioritize entity search results.
- */
-export interface SearchableEntityRecord {
-	title?: {
-		raw?: string;
-	};
-}
