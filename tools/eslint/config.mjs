@@ -10,6 +10,7 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import useTypeScript from './rules/use-typescript.mjs';
+import noBroadComponentSuppression from './rules/no-broad-component-suppression.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -20,6 +21,7 @@ const wpPlugin = require( '@wordpress/eslint-plugin' );
 const gutenbergPlugin = {
 	rules: {
 		'use-typescript': useTypeScript,
+		'no-broad-component-suppression': noBroadComponentSuppression,
 	},
 };
 const gutenbergStorybookPlugin = {
@@ -352,8 +354,12 @@ export default dedupePlugins( [
 	{
 		plugins: {
 			'@eslint-community/eslint-comments': eslintCommentsPlugin,
+			gutenberg: gutenbergPlugin,
 		},
-		rules: eslintCommentsPlugin.configs.recommended.rules,
+		rules: {
+			...eslintCommentsPlugin.configs.recommended.rules,
+			'gutenberg/no-broad-component-suppression': 'error',
+		},
 	},
 
 	// Storybook recommended (array of 3).
@@ -421,6 +427,7 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Card: 'WCCard',
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
@@ -564,9 +571,6 @@ export default dedupePlugins( [
 			'tools/react-18/**',
 			'tools/react-19/**',
 		],
-		plugins: {
-			gutenberg: gutenbergPlugin,
-		},
 		rules: {
 			'gutenberg/use-typescript': 'error',
 		},
@@ -719,7 +723,7 @@ export default dedupePlugins( [
 			],
 		],
 		[
-			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.tsx',
 			[ 'expectPlaceholderState' ],
 		],
 		[
@@ -1193,7 +1197,11 @@ export default dedupePlugins( [
 
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
-		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+		files: [
+			'packages/eslint-plugin/**',
+			'packages/theme/**',
+			'packages/theme-build-tools/**',
+		],
 		rules: {
 			'@wordpress/no-setting-ds-tokens': 'off',
 			'@wordpress/no-unknown-ds-tokens': 'off',

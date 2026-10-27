@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
+-   Convert the entities saved states components to TypeScript ([#85075](https://github.com/WordPress/gutenberg/pull/85075)).
+-   Convert the selectors test to TypeScript ([#85074](https://github.com/WordPress/gutenberg/pull/85074)).
+-   Convert the hook and store tests to TypeScript ([#85071](https://github.com/WordPress/gutenberg/pull/85071)).
+-   Convert the actions and the store entry point to TypeScript ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+-   Convert the resolvers to TypeScript and add the store thunk arguments type ([#85069](https://github.com/WordPress/gutenberg/pull/85069)).
+-   Convert the entities config and the store reducer to TypeScript, and add the store `Action` type ([#85065](https://github.com/WordPress/gutenberg/pull/85065)).
+-   Convert the entity hooks, the entity providers and the parsed blocks cache to TypeScript ([#85063](https://github.com/WordPress/gutenberg/pull/85063)).
+-   Convert the batch and fetch helpers to TypeScript ([#85062](https://github.com/WordPress/gutenberg/pull/85062)).
+-   Convert the queried data to TypeScript ([#85061](https://github.com/WordPress/gutenberg/pull/85061)).
+-   Convert the store locks to TypeScript ([#85059](https://github.com/WordPress/gutenberg/pull/85059)).
+-   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes
