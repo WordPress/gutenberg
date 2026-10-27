@@ -74,6 +74,9 @@ const transpiledPackageNames = globSync(
 
 export default defineConfig( {
 	root: ROOT_DIR,
+	// Name the shared package base so files outside every package project do
+	// not search parent folders, which can hold another checkout's tsconfig.
+	tsconfig: 'tools/monorepo/tsconfig/tsconfig.base.json',
 	oxc: {
 		jsx: {
 			runtime: 'automatic',
