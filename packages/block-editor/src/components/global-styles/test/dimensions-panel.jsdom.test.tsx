@@ -4,6 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import DimensionsPanel from '../dimensions-panel';
 import type { DimensionsPanelProps } from '../types';
+import {
+	InheritanceToolsPanel,
+	RESET_MENU_NAME,
+} from './helpers/inheritance-tools-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -150,13 +154,11 @@ function renderPanel(
 	);
 }
 
-// A local override surfaces the accessible reset-to-inherited affordance, so
-// assert on that rather than the label's CSS class hook.
+// In the inspector's inheritance mode, a local value surfaces the panel's reset
+// menu, so assert on that rather than on a class hook.
 function expectLocalOverride() {
 	expect(
-		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
-		} )
+		screen.getByRole( 'button', { name: RESET_MENU_NAME } )
 	).toBeInTheDocument();
 }
 
@@ -605,6 +607,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 		it( 'renders a locally-set aspectRatio as the selected value with the local-override hook', () => {
 			renderPanel( {
+				as: InheritanceToolsPanel,
 				value: { dimensions: { aspectRatio: '1' } },
 				inheritedValue: { dimensions: { aspectRatio: '16/9' } },
 				settings: settingsWithDimensions,
@@ -614,10 +617,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				name: /aspect ratio/i,
 			} );
 			expect( aspectSelect ).toHaveTextContent( /^Square$/ );
-			// A local override now gets the same local-override flag as
-			// every other control, so the inline reset button can attach.
-			// The button itself is portaled and covered by the
-			// InheritanceResetButton unit tests.
 			expectLocalOverride();
 		} );
 
@@ -820,6 +819,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 	describe( 'local zero values (override, not inherited placeholder)', () => {
 		it( 'treats a local numeric zero minHeight as a local override instead of inherited placeholder', () => {
 			renderPanel( {
+				as: InheritanceToolsPanel,
 				value: { dimensions: { minHeight: 0 } },
 				inheritedValue: { dimensions: { minHeight: '200px' } },
 				settings: settingsWithDimensions,
@@ -840,6 +840,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 		it( 'treats a local zero block gap as a local value instead of inherited placeholder', () => {
 			renderPanel( {
+				as: InheritanceToolsPanel,
 				value: { spacing: { blockGap: 0 } },
 				inheritedValue: { spacing: { blockGap: '2rem' } },
 				settings: baseSettings,

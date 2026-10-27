@@ -129,13 +129,10 @@ export interface AspectRatioToolProps {
 	 */
 	className?: string;
 	/**
-	 * Whether the control is displaying an inherited Global Styles value.
+	 * Whether the control holds an inherited Global Styles value, whether or
+	 * not a local value overrides it.
 	 */
 	isInherited?: boolean;
-	/**
-	 * Whether a local value is overriding an inherited Global Styles value.
-	 */
-	hasLocalOverride?: boolean;
 }
 
 /**

@@ -11,6 +11,8 @@ import { useState } from '@wordpress/element';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
+import { PrivateToolsPanel } from '../tools-panel';
+import { PrivateToolsPanelItem } from '../tools-panel-item';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
@@ -1951,5 +1953,140 @@ describe( 'ToolsPanel', () => {
 			expect( screen.getByTestId( 'item-2' ) ).toHaveClass( 'first' );
 			expect( screen.getByTestId( 'item-3' ) ).toHaveClass( 'last' );
 		} );
+	} );
+} );
+
+describe( 'ToolsPanel inheritanceMode', () => {
+	// Two items with local values: one also inherits, one doesn't.
+	function InheritancePanel() {
+		const [ values, setValues ] = useState< Record< string, boolean > >( {
+			Inherited: true,
+			Local: true,
+		} );
+		const clear = ( label: string ) =>
+			setValues( ( current ) => ( { ...current, [ label ]: false } ) );
+
+		return (
+			<PrivateToolsPanel
+				label="Panel header"
+				resetAll={ () => setValues( {} ) }
+				inheritanceMode
+			>
+				{ [ 'Inherited', 'Local', 'Unset' ].map( ( label ) => (
+					<PrivateToolsPanelItem
+						key={ label }
+						label={ label }
+						hasValue={ () => !! values[ label ] }
+						onDeselect={ () => clear( label ) }
+						isInherited={ label === 'Inherited' }
+						isShownByDefault
+					>
+						<div>{ `${ label } control` }</div>
+					</PrivateToolsPanelItem>
+				) ) }
+			</PrivateToolsPanel>
+		);
+	}
+
+	const openResetMenu = async (
+		user: ReturnType< typeof userEvent.setup >
+	) =>
+		user.click(
+			screen.getByRole( 'button', { name: 'Reset Panel header' } )
+		);
+
+	it( 'shows items only while they hold a local or inherited value', () => {
+		render( <InheritancePanel /> );
+
+		expect( screen.getByText( 'Inherited control' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Local control' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Unset control' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'only adds and removes items from the panel menu', async () => {
+		const user = userEvent.setup();
+		render( <InheritancePanel /> );
+
+		const optionsToggle = screen.getByRole( 'button', {
+			name: 'Panel header controls',
+		} );
+		// The add icon shows even while some items are visible.
+		expect( optionsToggle ).not.toHaveAccessibleDescription();
+		await user.click( optionsToggle );
+
+		expect(
+			screen.queryByRole( 'menuitemcheckbox', { name: /^Inherited/ } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Local, remove' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'menuitem', { name: 'Reset all' } )
+		).not.toBeInTheDocument();
+		expect( screen.getByText( 'Controls' ) ).toBeInTheDocument();
+		expect(
+			within( screen.getByRole( 'menu' ) ).queryByText( 'Panel header' )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Unset, show' } )
+		);
+		expect( screen.getByText( 'Unset control' ) ).toBeInTheDocument();
+	} );
+
+	it( 'renders no panel menu when every item is inherited', () => {
+		render(
+			<PrivateToolsPanel
+				label="Panel header"
+				resetAll={ noop }
+				inheritanceMode
+			>
+				<PrivateToolsPanelItem
+					label="Inherited"
+					hasValue={ () => false }
+					isInherited
+				>
+					<div>Inherited control</div>
+				</PrivateToolsPanelItem>
+			</PrivateToolsPanel>
+		);
+
+		expect( screen.getByText( 'Inherited control' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Panel header controls' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'resets a single item, hiding it unless it is inherited', async () => {
+		const user = userEvent.setup();
+		render( <InheritancePanel /> );
+
+		await openResetMenu( user );
+		await user.click( screen.getByRole( 'menuitem', { name: 'Local' } ) );
+		expect( screen.queryByText( 'Local control' ) ).not.toBeInTheDocument();
+
+		await openResetMenu( user );
+		await user.click(
+			screen.getByRole( 'menuitem', { name: 'Inherited' } )
+		);
+		expect( screen.getByText( 'Inherited control' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reset Panel header',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'resets all items from the reset menu', async () => {
+		const user = userEvent.setup();
+		render( <InheritancePanel /> );
+
+		await openResetMenu( user );
+		await user.click(
+			screen.getByRole( 'menuitem', { name: 'Reset all' } )
+		);
+
+		expect( screen.getByText( 'Inherited control' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Local control' ) ).not.toBeInTheDocument();
 	} );
 } );

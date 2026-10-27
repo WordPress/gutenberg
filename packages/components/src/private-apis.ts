@@ -12,6 +12,8 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
+import { PrivateToolsPanel } from './tools-panel/tools-panel';
+import { PrivateToolsPanelItem } from './tools-panel/tools-panel-item';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -34,4 +36,6 @@ lock( privateApis, {
 	ValidatedInputControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
+	ToolsPanel: PrivateToolsPanel,
+	ToolsPanelItem: PrivateToolsPanelItem,
 } );

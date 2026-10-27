@@ -5,10 +5,13 @@ import { useToolsPanel } from './hook';
 import { Grid } from '../../grid';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import type { ToolsPanelProps } from '../types';
+import type { PrivateToolsPanelProps, ToolsPanelProps } from '../types';
 
 const UnconnectedToolsPanel = (
-	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
+	props: WordPressComponentProps<
+		ToolsPanelProps & PrivateToolsPanelProps,
+		'div'
+	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
@@ -16,6 +19,7 @@ const UnconnectedToolsPanel = (
 		label,
 		panelContext,
 		resetAllItems,
+		resetItem,
 		toggleItem,
 		headingLevel,
 		dropdownMenuProps,
@@ -36,6 +40,7 @@ const UnconnectedToolsPanel = (
 				<ToolsPanelHeader
 					label={ label }
 					resetAll={ resetAllItems }
+					resetItem={ resetItem }
 					toggleItem={ toggleItem }
 					headingLevel={ headingLevel }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -98,5 +103,17 @@ const UnconnectedToolsPanel = (
  * ```
  */
 export const ToolsPanel = contextConnect( UnconnectedToolsPanel, 'ToolsPanel' );
+
+/**
+ * `ToolsPanel` with the private `inheritanceMode` prop, available through the
+ * package's private APIs.
+ */
+export const PrivateToolsPanel = ToolsPanel as typeof ToolsPanel &
+	( (
+		props: WordPressComponentProps<
+			ToolsPanelProps & PrivateToolsPanelProps,
+			'div'
+		> & { ref?: ForwardedRef< any > }
+	) => ReturnType< typeof UnconnectedToolsPanel > );
 
 export default ToolsPanel;

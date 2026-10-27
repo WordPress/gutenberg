@@ -466,8 +466,8 @@ export default function BackgroundImagePanel( {
 			: { className: classNames };
 
 	// The inherited value arrives already resolved (refs + theme-file pointers)
-	// with non-cascading root values dropped, so a presence check drives the
-	// label affordance and matches what `BackgroundImageControl` renders.
+	// with non-cascading root values dropped, so a presence check marks the
+	// item as inherited and matches what `BackgroundImageControl` renders.
 	const inheritedBackgroundImage = hasBackgroundImageValue( {
 		background: {
 			backgroundImage: inheritedValue?.background?.backgroundImage,
@@ -490,7 +490,6 @@ export default function BackgroundImagePanel( {
 						hasLocalBackgroundImage && inheritedBackgroundImage,
 						'block-editor-color-gradient-item'
 					) }
-					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
@@ -505,9 +504,6 @@ export default function BackgroundImagePanel( {
 						// @ts-expect-error BackgroundImageControl takes no default controls.
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
-						showInheritanceLabelIndicators={
-							showInheritanceLabelIndicators
-						}
 					/>
 				</InheritanceToolsPanelItem>
 			) }

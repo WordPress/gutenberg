@@ -58,7 +58,7 @@ async function renderPanel( props: Partial< TypographyPanelProps > ) {
 
 const getItem = ( name: string | RegExp ) => {
 	const control = screen.getByRole( 'spinbutton', { name } );
-	// The class hooks sit on the wrapping ToolsPanelItem, which has no role.
+	// The layout class sits on the wrapping ToolsPanelItem, which has no role.
 	// eslint-disable-next-line testing-library/no-node-access
 	return control.closest( '.components-tools-panel-item' );
 };
@@ -75,9 +75,6 @@ describe( 'TypographyPanel with the indicator experiment off', () => {
 
 		const lineHeightItem = getItem( /line height/i );
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
 	} );
 
 	it( 'renders no reset dot by default when a local value shadows an inherited one', async () => {
@@ -86,9 +83,6 @@ describe( 'TypographyPanel with the indicator experiment off', () => {
 			inheritedValue: { typography: { lineHeight: '1.5' } },
 		} );
 
-		expect( getItem( /line height/i ) ).not.toHaveClass(
-			'has-local-override-from-global-styles'
-		);
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Reset to inherited value',
@@ -129,14 +123,6 @@ describe( 'TypographyPanel with the indicator experiment off', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: /line height/i } )
 		).toHaveValue( 1.5 );
-
-		const lineHeightItem = getItem( /line height/i );
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( lineHeightItem ).not.toHaveClass(
-			'has-local-override-from-global-styles'
-		);
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Reset to inherited value',

@@ -19,7 +19,6 @@ export default function AspectRatioTool( {
 	isShownByDefault = true,
 	className,
 	isInherited,
-	hasLocalOverride,
 }: AspectRatioToolProps ) {
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
@@ -79,7 +78,6 @@ export default function AspectRatioTool( {
 		<InheritanceToolsPanelItem
 			className={ className }
 			isInherited={ isInherited }
-			hasLocalOverride={ hasLocalOverride }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}

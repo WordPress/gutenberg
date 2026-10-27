@@ -1,2 +1,2 @@
-export { default } from './component';
+export { default, PrivateToolsPanelItem } from './component';
 export { useToolsPanelItem } from './hook';

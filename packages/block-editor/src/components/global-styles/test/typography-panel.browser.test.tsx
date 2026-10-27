@@ -5,6 +5,10 @@ import { render, renderHook } from 'vitest-browser-react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 import type { StyleSettings, TypographyPanelProps } from '../types';
+import {
+	InheritanceToolsPanel,
+	RESET_MENU_NAME,
+} from './helpers/inheritance-tools-panel';
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -626,7 +630,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: 0, textColumns: 0 },
 		};
 
-		await renderPanel( { value, inheritedValue } );
+		await renderPanel( {
+			value,
+			inheritedValue,
+			as: InheritanceToolsPanel,
+		} );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 0 );
@@ -639,13 +647,17 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		expect( columnsInput ).toHaveValue( 0 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
 
-		// Both zero values are local overrides, so each control surfaces the
-		// accessible reset-to-inherited affordance.
+		// Both zero values are local overrides, so the panel's reset menu
+		// lists each control.
+		await userEvent.click(
+			screen.getByRole( 'button', { name: RESET_MENU_NAME } )
+		);
 		expect(
-			screen.getAllByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).toHaveLength( 2 );
+			screen.getByRole( 'menuitem', { name: 'Line height' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Columns' } )
+		).toBeInTheDocument();
 	} );
 } );
 
@@ -965,16 +977,9 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
 		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( letterSpacingItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
 	} );
 
-	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', async () => {
+	it( 'keeps the single-column layout class when indicators are on', async () => {
 		await renderPanel( {
 			showInheritanceLabelIndicators: true,
 			value: {},
@@ -985,13 +990,7 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		const letterSpacingItem = getItem( /letter spacing/i );
 
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
-		expect( lineHeightItem ).toHaveClass(
-			'is-inherited-from-global-styles'
-		);
 		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-		expect( letterSpacingItem ).toHaveClass(
-			'is-inherited-from-global-styles'
-		);
 	} );
 } );
 

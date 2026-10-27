@@ -13,7 +13,6 @@ import type { ReactNode } from 'react';
 import ColorGradientControl from '../colors-gradients/control';
 import {
 	getInheritanceProps,
-	InheritanceResetButton,
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
@@ -219,8 +218,7 @@ export default function ColorGradientDropdownItem( {
 		useRef< HTMLButtonElement >( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
 	// A local override exists when the user has set a value that shadows an
-	// inherited one — only then do we offer the reset-to-inherited / push
-	// actions and the override label indicator.
+	// inherited one.
 	const hasLocalOverride =
 		showInheritanceLabelIndicators && hasValue() && hasInheritedValue;
 	const inheritanceProps = showInheritanceLabelIndicators
@@ -229,7 +227,6 @@ export default function ColorGradientDropdownItem( {
 	return (
 		<InheritanceToolsPanelItem
 			{ ...inheritanceProps }
-			showLocalOverrideActionsInLabel={ false }
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
@@ -261,34 +258,22 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() &&
-								( hasLocalOverride ? (
-									<InheritanceResetButton
-										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) : (
-									<Button
-										__next40pxDefaultSize
-										label={ __( 'Reset' ) }
-										className="block-editor-panel-color-gradient-settings__reset"
-										size="small"
-										icon={ resetIcon }
-										onClick={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) ) }
+							{ hasValue() && (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-panel-color-gradient-settings__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										colorGradientDropdownButtonRef.current?.focus();
+									} }
+								/>
+							) }
 							{ contrastWarning && (
 								// An icon-only warning that stays visible while a
 								// contrast warning is in effect. It is not a menu;

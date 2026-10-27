@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
-import FiltersPanel from '../filters-panel';
+import FiltersPanel, { FiltersInspectorToolsPanel } from '../filters-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -54,7 +54,7 @@ const baseSettings = {
 };
 
 describe( 'FiltersPanel — visual treatment and display-without-commit', () => {
-	it( 'renders the InheritanceResetButton for a local override', () => {
+	it( 'renders the plain reset button, not a reset dot, for a local override', () => {
 		const inheritedValue = {
 			filter: { duotone: [ '#000000', '#ffffff' ] },
 		};
@@ -73,10 +73,13 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 		);
 
 		expect(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'button', { name: /^reset$/i } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
 				name: /reset to inherited value/i,
 			} )
-		).toBeInTheDocument();
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders the default reset button for a locally-set duotone with no inherited value', () => {
@@ -273,5 +276,63 @@ describe( 'FiltersPanel — duplicate duotone presets', () => {
 		expect( onChange ).toHaveBeenCalledWith( {
 			filter: { duotone: 'var:preset|duotone|custom-duotone-2' },
 		} );
+	} );
+} );
+
+describe( 'FiltersPanel in the block inspector', () => {
+	it( 'hides duotone while it has no local or inherited value', () => {
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				as={ FiltersInspectorToolsPanel }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', { name: /duotone/i } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Filters controls' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows the reset menu while duotone holds a local value', () => {
+		render(
+			<FiltersPanel
+				value={ { filter: { duotone: [ '#8c00b7', '#fcff41' ] } } }
+				inheritedValue={ {
+					filter: { duotone: [ '#000000', '#ffffff' ] },
+				} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				as={ FiltersInspectorToolsPanel }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Reset Filters' } )
+		).toBeInTheDocument();
+		// Inherited, so there is nothing to add or remove.
+		expect(
+			screen.queryByRole( 'button', { name: 'Filters controls' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'keeps the trunk panel with the experiment off', () => {
+		delete window.__experimentalGlobalStylesInheritanceUI;
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ baseSettings }
+				onChange={ () => {} }
+				as={ FiltersInspectorToolsPanel }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /duotone/i } )
+		).toBeInTheDocument();
 	} );
 } );
