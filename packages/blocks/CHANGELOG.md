@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
+-   `serialize` writes a block that hasn't changed since it was parsed with the HTML it was loaded with, instead of running `save` again. Editing one block no longer rewrites the attribute order or style formatting of the others. Blocks that were fixed or migrated on load still save from `save` ([#85780](https://github.com/WordPress/gutenberg/pull/85780)).
 
 ### Bug Fixes
 
