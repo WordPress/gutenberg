@@ -1365,6 +1365,93 @@ test.describe( 'Image - dimensions forced by global styles', () => {
 	} );
 } );
 
+// Regression tests for https://github.com/WordPress/gutenberg/issues/18593.
+test.describe( 'Image - non-image files selected in the media modal', () => {
+	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/image' } );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	async function uploadAndSelectPDF( { editor, page } ) {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const mediaModal = page.getByRole( 'dialog', {
+			name: 'Select or Upload Media',
+		} );
+		await mediaModal
+			.locator( '.moxie-shim input[type=file]' )
+			.setInputFiles(
+				path.join( __dirname, '../../../assets/e2e-test-document.pdf' )
+			);
+
+		// The library only lists images, but the uploaded PDF is still
+		// selected and shown in the attachment details.
+		await expect(
+			mediaModal.getByRole( 'textbox', { name: 'Title' } )
+		).toHaveValue( 'e2e-test-document', { timeout: 30_000 } );
+		await mediaModal
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+	}
+
+	test.describe( 'when the server cannot generate PDF previews', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-plugin-disable-pdf-previews'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-disable-pdf-previews'
+			);
+		} );
+
+		test( 'shows an error and does not insert the PDF as an image', async ( {
+			editor,
+			page,
+		} ) => {
+			await uploadAndSelectPDF( { editor, page } );
+
+			await expect(
+				page.locator( '.components-snackbar' ).filter( {
+					hasText:
+						'e2e-test-document.pdf: Sorry, this file type is not supported here.',
+				} )
+			).toBeVisible();
+			await expect(
+				editor.canvas
+					.getByRole( 'document', { name: 'Block: Image' } )
+					.getByRole( 'button', { name: 'Media Library' } )
+			).toBeVisible();
+			const [ imageBlock ] = await editor.getBlocks();
+			expect( imageBlock.attributes.url ).toBeUndefined();
+		} );
+	} );
+
+	test( 'uses the preview image when the server generated one for the PDF', async ( {
+		editor,
+		page,
+	} ) => {
+		await uploadAndSelectPDF( { editor, page } );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: { url: expect.stringMatching( /-pdf\.jpg$/ ) },
+			},
+		] );
+	} );
+} );
+
 class ImageBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */
