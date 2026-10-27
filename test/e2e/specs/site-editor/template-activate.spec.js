@@ -4,7 +4,14 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Activate', () => {
+	let originalSiteTitle;
+
 	test.beforeAll( async ( { requestUtils } ) => {
+		// The site title assertion below expects "gutenberg". Pin it so
+		// the tests do not depend on where the repository was cloned.
+		originalSiteTitle = ( await requestUtils.getSiteSettings() ).title;
+		await requestUtils.updateSiteSettings( { title: 'gutenberg' } );
+
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -23,6 +30,7 @@ test.describe( 'Template Activate', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		// Disable the template activation experiment.
 		await requestUtils.setGutenbergExperiments( [] );
+		await requestUtils.updateSiteSettings( { title: originalSiteTitle } );
 	} );
 
 	test( 'should duplicate and activate', async ( {
