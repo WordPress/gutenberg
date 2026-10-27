@@ -7,7 +7,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { RichTextData, create } from '@wordpress/rich-text';
 import {
+	SUGGESTION_A11Y_FORMAT_NAME,
 	addSuggestionMarker,
+	addSuggestionRoleFormats,
 	findSuggestionText,
 	registerSuggestionFormat,
 	removeSuggestionMarker,
@@ -254,6 +256,31 @@ describe( 'stacked markers', () => {
 			} );
 			expect( effect.value.toHTMLString() ).toBe( 'af' );
 			expect( effect.affected.get( '9' ) ).toBe( 'emptied' );
+		} );
+	} );
+
+	describe( 'screen-reader decoration', () => {
+		it( 'announces at most three stacked markers, the outermost of them counting the rest', () => {
+			const value = rtd(
+				mark(
+					'add',
+					1,
+					mark( 'add', 2, mark( 'add', 3, mark( 'add', 4, 'x' ) ) )
+				)
+			);
+			const decorated = addSuggestionRoleFormats(
+				value.formats as any[]
+			)[ 0 ];
+			const decorations = decorated.filter(
+				( format: any ) => format.type === SUGGESTION_A11Y_FORMAT_NAME
+			);
+			expect( decorations ).toHaveLength( 3 );
+			expect( decorations[ 0 ].attributes.start ).toBe(
+				'Start of suggested addition. 1 more suggestion on this text.'
+			);
+			expect( decorations[ 1 ].attributes.start ).toBe(
+				'Start of suggested addition.'
+			);
 		} );
 	} );
 } );

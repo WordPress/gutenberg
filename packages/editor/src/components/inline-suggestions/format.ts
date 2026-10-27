@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
 import {
 	registerFormatType,
@@ -562,6 +562,9 @@ export function getSuggestionA11yDescriptor( type?: string | null ): {
 	}
 }
 
+/** How many stacked markers on one character are announced. */
+export const SUGGESTION_A11Y_MAX_ANNOUNCED = 3;
+
 /**
  * Editor-only decoration pass that gives suggestion markers screen-reader
  * semantics. A bare `<mark class="wp-suggestion-del">` is invisible to
@@ -578,11 +581,13 @@ export function getSuggestionA11yDescriptor( type?: string | null ): {
  * DOM but are ignored when the DOM is parsed back into a value (see
  * `toFormat` in `@wordpress/rich-text`), exactly like `core/annotation`.
  *
- * Every marker in a stack gets its own decoration, so nested suggestions read
- * as outer start, inner start, text, inner end, outer end. One decoration
- * object is reused across each marker's run (rich text merges adjacent
- * identical format references into a single element), so a marker gains
- * exactly one nested role element.
+ * Each marker in a stack gets its own decoration, so nested suggestions read
+ * as outer start, inner start, text, inner end, outer end. Only the innermost
+ * `SUGGESTION_A11Y_MAX_ANNOUNCED` markers on a character are announced; the
+ * outermost of those also says how many more there are, so a deep stack does
+ * not bury the text in announcements. One decoration object is reused across
+ * each marker's run (rich text merges adjacent identical format references
+ * into a single element), so a marker gains one nested role element.
  *
  * Each decoration is spliced in directly after its marker rather than pushed
  * onto the end of the stack. `toTree` decides whether to reuse an element by
@@ -600,15 +605,33 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 		return formats;
 	}
 	let out: any[] | null = null;
-	const decorations = new Map< any, any >();
-	const decorationFor = ( marker: any ) => {
-		let decoration = decorations.get( marker );
+	const decorations = new Map< string, any >();
+	const markerKeys = new Map< any, number >();
+	const decorationFor = ( marker: any, more: number ) => {
+		if ( ! markerKeys.has( marker ) ) {
+			markerKeys.set( marker, markerKeys.size );
+		}
+		const key = `${ markerKeys.get( marker ) }:${ more }`;
+		let decoration = decorations.get( key );
 		if ( decoration ) {
 			return decoration;
 		}
 		const type = suggestionKindOf( marker )!;
 		const author = marker.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ];
-		const { start, end, role } = getSuggestionA11yDescriptor( type );
+		const descriptor = getSuggestionA11yDescriptor( type );
+		const { end, role } = descriptor;
+		const start = more
+			? sprintf(
+					/* translators: 1: announcement of a suggestion's start, 2: number of further suggestions on the same text. */
+					_n(
+						'%1$s %2$d more suggestion on this text.',
+						'%1$s %2$d more suggestions on this text.',
+						more
+					),
+					descriptor.start,
+					more
+				)
+			: descriptor.start;
 		/*
 		 * Absent values are omitted rather than set to a falsy one: rich
 		 * text renders every key in this object, so an undefined entry would
@@ -630,7 +653,7 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 				...( author !== undefined && { author } ),
 			},
 		};
-		decorations.set( marker, decoration );
+		decorations.set( key, decoration );
 		return decoration;
 	};
 	for ( let i = 0; i < formats.length; i++ ) {
@@ -639,11 +662,19 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 			continue;
 		}
 		out ??= formats.slice();
+		const markers = stack.filter( isSuggestionFormat );
+		const skipped = Math.max(
+			0,
+			markers.length - SUGGESTION_A11Y_MAX_ANNOUNCED
+		);
 		const decorated: any[] = [];
 		for ( const format of stack ) {
 			decorated.push( format );
-			if ( isSuggestionFormat( format ) ) {
-				decorated.push( decorationFor( format ) );
+			const depth = markers.indexOf( format );
+			if ( depth >= skipped ) {
+				decorated.push(
+					decorationFor( format, depth === skipped ? skipped : 0 )
+				);
 			}
 		}
 		out[ i ] = decorated;
