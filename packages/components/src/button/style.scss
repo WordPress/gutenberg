@@ -3,7 +3,6 @@
 @use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
-@use "../utils/popup-item";
 
 /**
  * For easier testing of potential regressions, you can use a Button variant matrix
@@ -50,7 +49,7 @@
 	}
 
 	&[aria-expanded="true"],
-	&#{popup-item.$hover-selector}:not(:disabled, [aria-disabled="true"]) {
+	&:hover:not(:disabled, [aria-disabled="true"]) {
 		color: $components-color-accent;
 	}
 
@@ -65,7 +64,7 @@
 		text-decoration: none;
 		text-shadow: none;
 
-		&#{popup-item.$hover-selector}:not(:disabled) {
+		&:hover:not(:disabled) {
 			background: $components-color-accent-darker-10;
 			color: $components-color-accent-inverted;
 		}
@@ -136,7 +135,7 @@
 			border-color: transparent;
 		}
 
-		&#{popup-item.$hover-selector}:not(:disabled, [aria-disabled="true"], .is-pressed) {
+		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			border-color: $components-color-accent-darker-20;
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
@@ -162,7 +161,7 @@
 		color: $components-color-accent;
 		background: transparent;
 
-		&#{popup-item.$hover-selector}:not(:disabled, [aria-disabled="true"], .is-pressed) {
+		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 			color: $components-color-accent-darker-20;
 		}
@@ -189,7 +188,7 @@
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
 			color: $alert-red;
 
-			&#{popup-item.$hover-selector}:not(:disabled, [aria-disabled="true"]) {
+			&:hover:not(:disabled, [aria-disabled="true"]) {
 				color: color.adjust($alert-red, $lightness: -20%);
 			}
 
@@ -205,7 +204,7 @@
 
 		&.is-tertiary,
 		&.is-secondary {
-			&#{popup-item.$hover-selector}:not(:disabled, [aria-disabled="true"]) {
+			&:hover:not(:disabled, [aria-disabled="true"]) {
 				background: rgba($alert-red, 0.04);
 			}
 

@@ -39,6 +39,8 @@ Don’t use a DropdownMenu for frequently used actions. Use a Toolbar instead.
 
 #### Behavior
 
+Moving the pointer over a menu item moves focus to it. Arrow key navigation continues from that item.
+
 Generally, the parent button should have a triangular icon to the right of the icon or text to indicate that interacting with it will show a DropdownMenu. In rare cases where the parent button directly indicates that there'll be more content (through the use of an ellipsis or "More" label), this can be omitted.
 
 The parent button should retain the same visual styling regardless of whether the DropdownMenu is displayed or not.
