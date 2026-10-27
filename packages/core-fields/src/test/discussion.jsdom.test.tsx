@@ -1,14 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import discussionField from '../index';
-import type { BasePost } from '../../../types';
+import postTypeSupports from '../post_type_supports';
 
-const Discussion = discussionField.render!;
+const Discussion = postTypeSupports.discussion.render!;
 
-function renderDiscussion( item: Partial< BasePost > ) {
-	return render(
-		<Discussion item={ item as BasePost } field={ {} as never } />
-	);
+function renderDiscussion( item: {
+	comment_status?: 'open' | 'closed';
+	ping_status?: 'open' | 'closed';
+} ) {
+	return render( <Discussion item={ item } field={ {} as never } /> );
 }
 
 describe( 'discussion field', () => {

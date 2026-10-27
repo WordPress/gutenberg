@@ -1,21 +1,23 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import DateView from '../date-view';
-import type { BasePost } from '../../../types';
+import DateView from '../post_type_supports/date/view';
+import type { PostWithDate } from '../post_type_supports/date/types';
 
 describe( 'DateView', () => {
 	it( 'renders nothing when the post has no date', () => {
 		// `getDate( null )` falls back to the current time, so a missing date
 		// used to render "now" — a value the post has no relation to. This is
 		// what bulk Quick Edit hits, where the form starts from an empty record.
-		const { container } = render( <DateView item={ {} as BasePost } /> );
+		const { container } = render(
+			<DateView item={ {} as PostWithDate } />
+		);
 
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'renders nothing when the post has no date but a status', () => {
 		const { container } = render(
-			<DateView item={ { status: 'draft' } as BasePost } />
+			<DateView item={ { status: 'draft' } as PostWithDate } />
 		);
 
 		expect( container ).toBeEmptyDOMElement();
@@ -27,7 +29,9 @@ describe( 'DateView', () => {
 		// date, the current time is the right thing to show for it.
 		render(
 			<DateView
-				item={ { status: 'draft', date: null } as unknown as BasePost }
+				item={
+					{ status: 'draft', date: null } as unknown as PostWithDate
+				}
 			/>
 		);
 
@@ -41,7 +45,7 @@ describe( 'DateView', () => {
 					{
 						status: 'publish',
 						date: '2026-01-05T10:30:00',
-					} as BasePost
+					} as PostWithDate
 				}
 			/>
 		);
@@ -57,7 +61,7 @@ describe( 'DateView', () => {
 					{
 						status: 'future',
 						date: '2026-01-05T10:30:00',
-					} as BasePost
+					} as PostWithDate
 				}
 			/>
 		);
@@ -72,7 +76,7 @@ describe( 'DateView', () => {
 					{
 						status: 'draft',
 						date: '2026-01-05T10:30:00',
-					} as BasePost
+					} as PostWithDate
 				}
 			/>
 		);
@@ -87,7 +91,7 @@ describe( 'DateView', () => {
 					{
 						status: 'some-custom-status',
 						date: '2026-01-05T10:30:00',
-					} as unknown as BasePost
+					} as unknown as PostWithDate
 				}
 			/>
 		);
