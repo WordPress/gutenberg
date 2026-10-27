@@ -96,7 +96,7 @@ function gutenberg_test_customize_page_view_config( $data ) {
 	$data->replace(
 		array(
 			'form' => array(
-				'fields' => array( 'slug' ),
+				'fields' => array( 'slug', 'date' ),
 			),
 		),
 		1

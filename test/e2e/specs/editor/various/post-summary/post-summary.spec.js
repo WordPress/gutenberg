@@ -372,9 +372,8 @@ test.describe( 'Post Summary', () => {
 			await summary
 				.getByRole( 'button', { name: 'Edit Author' } )
 				.click();
-			await page
-				.getByRole( 'combobox', { name: 'Author' } )
-				.selectOption( { label: 'secondauthor' } );
+			await page.getByRole( 'combobox', { name: 'Author' } ).click();
+			await page.getByRole( 'option', { name: 'secondauthor' } ).click();
 			await page.keyboard.press( 'Escape' );
 
 			await expect(

@@ -206,12 +206,10 @@ test.describe( 'Entity fields API', () => {
 		);
 		await expect( quickEditModal ).toBeVisible();
 
-		// The replaced field offers the control of its new type.
-		await quickEditModal
-			.getByRole( 'button', { name: 'Edit Written by' } )
-			.click();
+		// The replaced field offers the control of its new type, inline
+		// since the drawer renders the author field in a regular layout.
 		await expect(
-			page.getByRole( 'spinbutton', { name: 'Written by' } )
+			quickEditModal.getByRole( 'spinbutton', { name: 'Written by' } )
 		).toHaveValue( String( authorId ) );
 	} );
 
