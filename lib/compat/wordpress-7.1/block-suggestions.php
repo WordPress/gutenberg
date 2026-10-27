@@ -716,8 +716,8 @@ function gutenberg_get_suggestion_content_owner() {
  * Tells the kind of the inline suggestion marker the processor is on.
  *
  * Each kind has its own class token - `wp-suggestion-add`, `wp-suggestion-del`
- * and `wp-suggestion-format` - so markers of different kinds can nest over the
- * same text, as rich text stores one format per type per character. The class
+ * and `wp-suggestion-format`. Markers stack, one per suggestion, so any of
+ * them can nest over the same text, two of one kind included. The class
  * is authoritative: `data-suggestion-type` is written alongside it for styling
  * and is ignored here. `has_class()` matches exact tokens, so an unrelated
  * class such as `wp-suggestion-foo` is never taken for a marker.
@@ -783,8 +783,9 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  * - `inner_markers`: how many other markers open inside its run.
  *
  * @param string $html HTML fragment.
- * @return array[]|null Markers in document order, or null when the walk could
- *                      not tell where a token is (callers fail closed).
+ * @return list<array{kind: string, legacy: bool, id: int, run: string|null, start: int, length: int, end: int|null, closer: array{int, int}|null, lexical_end: int|null, lexical_closer: array{int, int}|null, balanced: bool, inner_markers: int}>|null
+ *         Markers in document order, or null when the walk could not tell
+ *         where a token is (callers fail closed).
  */
 function gutenberg_pair_inline_suggestion_markers( $html ) {
 	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
@@ -816,6 +817,11 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 	$scope_boundary = array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' );
 	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
 	$open_elements  = array();
+	// Where the tree walk ends each marker, and its own closer if that ends it.
+	$ends    = array();
+	$closers = array();
+	// The `</mark>` a lexical pairing gives each marker.
+	$lexical_closers = array();
 	// `<mark>` openers only, each with its marker index or null.
 	$lexical_marks = array();
 	$query         = array( 'tag_closers' => 'visit' );
@@ -832,8 +838,7 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 			if ( 'MARK' === $tag && $lexical_marks ) {
 				$index = array_pop( $lexical_marks );
 				if ( null !== $index ) {
-					$markers[ $index ]['lexical_end']    = $span[0] + $span[1];
-					$markers[ $index ]['lexical_closer'] = $span;
+					$lexical_closers[ $index ] = $span;
 				}
 			}
 
@@ -856,9 +861,9 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 				if ( null === $element[1] ) {
 					continue;
 				}
-				$is_own                           = count( $open_elements ) === $match;
-				$markers[ $element[1] ]['end']    = $is_own ? $span[0] + $span[1] : $span[0];
-				$markers[ $element[1] ]['closer'] = $is_own ? $span : null;
+				$is_own                 = count( $open_elements ) === $match;
+				$ends[ $element[1] ]    = $is_own ? $span[0] + $span[1] : $span[0];
+				$closers[ $element[1] ] = $is_own ? $span : null;
 			}
 			continue;
 		}
@@ -881,37 +886,42 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 		}
 
 		$run             = $processor->get_attribute( 'data-suggestion-run' );
+		$id              = $processor->get_attribute( 'data-suggestion-id' );
 		$markers[]       = array(
-			'kind'           => $kind,
-			'legacy'         => $legacy,
-			'id'             => (int) $processor->get_attribute( 'data-suggestion-id' ),
-			'run'            => is_string( $run ) ? $run : null,
-			'start'          => $span[0],
-			'length'         => $span[1],
-			'end'            => null,
-			'closer'         => null,
-			'lexical_end'    => null,
-			'lexical_closer' => null,
+			'kind'   => $kind,
+			'legacy' => $legacy,
+			'id'     => is_string( $id ) ? (int) $id : 0,
+			'run'    => is_string( $run ) ? $run : null,
+			'start'  => $span[0],
+			'length' => $span[1],
 		);
 		$open_elements[] = array( $tag, count( $markers ) - 1 );
 		$lexical_marks[] = count( $markers ) - 1;
 	}
 
-	$count = count( $markers );
+	$count  = count( $markers );
+	$paired = array();
 	foreach ( $markers as $index => $marker ) {
-		$markers[ $index ]['balanced'] = null !== $marker['closer'] && $marker['lexical_end'] === $marker['end'];
-		$reach                         = max( (int) $marker['end'], (int) $marker['lexical_end'] );
-		if ( null === $marker['end'] ) {
-			$reach = strlen( $html );
-		}
-		$inner = 0;
+		$end            = $ends[ $index ] ?? null;
+		$closer         = $closers[ $index ] ?? null;
+		$lexical_closer = $lexical_closers[ $index ] ?? null;
+		$lexical_end    = null === $lexical_closer ? null : $lexical_closer[0] + $lexical_closer[1];
+		$reach          = null === $end ? strlen( $html ) : max( $end, (int) $lexical_end );
+		$inner          = 0;
 		for ( $next = $index + 1; $next < $count && $markers[ $next ]['start'] < $reach; $next++ ) {
 			++$inner;
 		}
-		$markers[ $index ]['inner_markers'] = $inner;
+		$paired[] = $marker + array(
+			'end'            => $end,
+			'closer'         => $closer,
+			'lexical_end'    => $lexical_end,
+			'lexical_closer' => $lexical_closer,
+			'balanced'       => null !== $closer && $lexical_end === $end,
+			'inner_markers'  => $inner,
+		);
 	}
 
-	return $markers;
+	return $paired;
 }
 
 /**
@@ -950,9 +960,12 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  * so an unrelated `<mark>` (a `core/text-color` highlight, a `wp-note`, or a
  * `wp-suggestion-foo` class) survives byte-for-byte.
  *
- * Markers of different kinds nest (a deletion inside someone else's addition).
- * The editor writes them in one order - add outermost, then format, then del -
- * which never splits a format marker. Merged or hand-edited markup can still
+ * Markers nest, one per suggestion: a deletion inside someone else's addition,
+ * an addition inside another addition, two deletions of the same text. The
+ * editor writes them in one order - add outermost, then format, then del, and
+ * within a kind by id, oldest outermost - which never splits a format marker.
+ * A character carrying any addition is removed, whatever else it carries; see
+ * `gutenberg_get_inline_suggestion_view()`. Merged or hand-edited markup can still
  * split one around a deletion; the first fragment of a format id then restores
  * the whole original and later fragments render nothing.
  *
@@ -1077,6 +1090,68 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	}
 
 	return $html;
+}
+
+/**
+ * Renders inline suggestion markup as published after a set of decisions.
+ *
+ * Markers stack, one per suggestion, so a character can carry several
+ * addition ids and several deletion ids. A character is published when every
+ * addition on it is accepted and no deletion on it is accepted; every addition
+ * or deletion marker is then unwrapped. Decisions commute, so the result does
+ * not depend on the order they were made in. With nothing accepted this is
+ * what `gutenberg_strip_inline_suggestion_markers()` renders for additions and
+ * deletions.
+ *
+ * An accepted formatting change is unwrapped, keeping what it proposes. One
+ * that is not accepted is left as it is: its original run lives on its note.
+ * An unbalanced addition is removed through the later of its possible ends,
+ * accepted or not, and an unbalanced deletion keeps its text, as in the render
+ * strip.
+ *
+ * @param string $html     HTML fragment.
+ * @param int[]  $accepted Ids of the accepted suggestions.
+ * @return string The fragment as published, or '' when its markers cannot
+ *                be paired.
+ */
+function gutenberg_get_inline_suggestion_view( string $html, array $accepted ): string {
+	if ( false === strpos( $html, 'wp-suggestion' ) ) {
+		return $html;
+	}
+	$markers = gutenberg_pair_inline_suggestion_markers( $html );
+	if ( null === $markers ) {
+		return '';
+	}
+
+	$accepted = array_fill_keys( array_map( 'intval', $accepted ), true );
+	$length   = strlen( $html );
+	$edits    = array();
+	foreach ( $markers as $marker ) {
+		$is_accepted = isset( $accepted[ $marker['id'] ] );
+		$end         = $marker['end'] ?? $length;
+
+		if ( 'format' === $marker['kind'] && ! $is_accepted ) {
+			continue;
+		}
+		if ( 'add' === $marker['kind'] && ( ! $is_accepted || ! $marker['balanced'] ) ) {
+			$edits[] = array( $marker['start'], max( $end, (int) $marker['lexical_end'] ), '' );
+			continue;
+		}
+		if ( 'del' === $marker['kind'] && $is_accepted && $marker['balanced'] ) {
+			$edits[] = array( $marker['start'], $end, '' );
+			continue;
+		}
+
+		$edits[] = array( $marker['start'], $marker['start'] + $marker['length'], '' );
+		if ( null !== $marker['closer'] ) {
+			$edits[] = array( $marker['closer'][0], $marker['closer'][0] + $marker['closer'][1], '' );
+		}
+		if ( null !== $marker['lexical_closer'] && $marker['lexical_end'] !== $end ) {
+			$edits[] = array( $marker['lexical_closer'][0], $marker['lexical_end'], '' );
+		}
+	}
+
+	return gutenberg_apply_suggestion_splices( $html, $edits );
 }
 
 /**
