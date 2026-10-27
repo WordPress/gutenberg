@@ -19,7 +19,7 @@ class Tests_Suggestion_Overlap_Fixtures extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const LANDED_PHASES = array( 'current' );
+	const LANDED_PHASES = array( 'current', 'A' );
 
 	/**
 	 * Returns one data set per generated fixture file.

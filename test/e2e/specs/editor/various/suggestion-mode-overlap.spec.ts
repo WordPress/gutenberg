@@ -2,11 +2,11 @@
  * Suggesting over another author's pending suggestion (#73411). Each marker
  * kind has its own format, so a deletion or a formatting change can sit
  * inside someone's addition, and a deletion and a formatting change can
- * share text. Two suggestions of one kind on the same text still cannot, and
- * neither can formatting that crosses the edge of someone's addition: those
- * are refused with the other author named and a way to reply to them. The
- * "gesture matrix, phase A" cells pin what each refused gesture does once
- * same-kind suggestions can stack.
+ * share text. Additions and deletions of one kind stack too: typing in
+ * someone's addition nests an addition, and deleting over their deletion adds
+ * a second one. Formatting over someone's formatting change, and formatting
+ * that crosses the edge of their addition, are still refused with the other
+ * author named.
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
@@ -345,91 +345,6 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 	} );
 
 	test.describe( 'refused', () => {
-		test( 'typing inside another author’s addition names them and offers a reply', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-		} ) => {
-			const [ addId ] = await openWithSuggestions(
-				{ admin, requestUtils },
-				[ { kind: 'add', author: 'anne' } ],
-				'Intro.{0} Bright red apples fell.</mark>'
-			);
-			await switchToSuggesting( page );
-			const paragraph = paragraphOf( editor );
-			await paragraph.click();
-			await selectText( page, 14 );
-			await page.keyboard.type( 'X' );
-			await expect(
-				refusal(
-					page,
-					'Anne suggested adding this text. Reply to their suggestion to propose a change.'
-				)
-			).toBeVisible();
-			await expect( paragraph ).toHaveText(
-				'Intro. Bright red apples fell.'
-			);
-			await page
-				.locator( '.components-snackbar-list' )
-				.getByRole( 'button', { name: 'Reply to this suggestion' } )
-				.click();
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.locator( `#note-thread-${ addId }` );
-			await expect( thread ).toBeVisible();
-			await expect( thread ).toBeFocused();
-		} );
-
-		test( 'deleting over another author’s deletion names them', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-		} ) => {
-			await openWithSuggestions(
-				{ admin, requestUtils },
-				[ { kind: 'del', author: 'carl' } ],
-				'Intro. {0}red apples</mark> fell.'
-			);
-			await switchToSuggesting( page );
-			const paragraph = paragraphOf( editor );
-			await paragraph.click();
-			await selectText( page, 5, 10 );
-			await page.keyboard.press( 'Backspace' );
-			await expect(
-				refusal( page, 'Carl already suggested deleting this text.' )
-			).toBeVisible();
-			await expect(
-				paragraph.locator( 'mark[data-suggestion-id]' )
-			).toHaveCount( 1 );
-		} );
-
-		test( 'typing inside another author’s deletion names them', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-		} ) => {
-			await openWithSuggestions(
-				{ admin, requestUtils },
-				[ { kind: 'del', author: 'carl' } ],
-				'Intro. {0}red apples</mark> fell.'
-			);
-			await switchToSuggesting( page );
-			const paragraph = paragraphOf( editor );
-			await paragraph.click();
-			await selectText( page, 9 );
-			await page.keyboard.type( 'X' );
-			await expect(
-				refusal(
-					page,
-					'Carl suggested deleting this text. Reply to their suggestion to propose a change.'
-				)
-			).toBeVisible();
-			await expect( paragraph ).toHaveText( 'Intro. red apples fell.' );
-		} );
-
 		test( 'formatting over another author’s formatting change names them', async ( {
 			admin,
 			editor,
@@ -481,10 +396,8 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 	} );
 
 	/*
-	 * The gesture matrix of the overlap plan (section 5), phase A rows: what
-	 * the gesture should do once same-kind markers can stack. Each is still
-	 * refused today, so it is expected to fail until phase A lands; then drop
-	 * `test.fail()` and the matching cells in "refused" above.
+	 * The gesture matrix of the overlap plan (section 5), phase A rows:
+	 * same-kind markers stack, so these gestures nest instead of refusing.
 	 */
 	test.describe( 'gesture matrix, phase A', () => {
 		const noRefusal = ( page: any ) =>
@@ -500,7 +413,6 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			page,
 			requestUtils,
 		} ) => {
-			test.fail();
 			const [ addId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'add', author: 'anne' } ],
@@ -530,7 +442,6 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			page,
 			requestUtils,
 		} ) => {
-			test.fail();
 			const [ delId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'del', author: 'carl' } ],
@@ -566,7 +477,6 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			page,
 			requestUtils,
 		} ) => {
-			test.fail();
 			const [ delId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'del', author: 'carl' } ],
@@ -596,7 +506,6 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			page,
 			requestUtils,
 		} ) => {
-			test.fail();
 			const [ addId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'add', author: 'anne' } ],
@@ -625,7 +534,6 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			page,
 			requestUtils,
 		} ) => {
-			test.fail();
 			const [ delId ] = await openWithSuggestions(
 				{ admin, requestUtils },
 				[ { kind: 'del', author: 'carl' } ],

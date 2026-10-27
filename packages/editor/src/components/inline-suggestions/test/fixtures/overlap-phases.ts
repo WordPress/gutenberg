@@ -8,7 +8,7 @@
  */
 import type { Phase } from './overlap-oracle';
 
-export const LANDED_PHASES: Phase[] = [ 'current' ];
+export const LANDED_PHASES: Phase[] = [ 'current', 'A' ];
 
 /**
  * Whether a phase has landed, or is forced on through `OVERLAP_PHASES`.
