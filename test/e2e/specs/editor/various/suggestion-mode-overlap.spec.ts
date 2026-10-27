@@ -4,7 +4,9 @@
  * inside someone's addition, and a deletion and a formatting change can
  * share text. Two suggestions of one kind on the same text still cannot, and
  * neither can formatting that crosses the edge of someone's addition: those
- * are refused with the other author named and a way to reply to them.
+ * are refused with the other author named and a way to reply to them. The
+ * "gesture matrix, phase A" cells pin what each refused gesture does once
+ * same-kind suggestions can stack.
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
@@ -475,6 +477,212 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 				)
 			).toBeVisible();
 			await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
+		} );
+	} );
+
+	/*
+	 * The gesture matrix of the overlap plan (section 5), phase A rows: what
+	 * the gesture should do once same-kind markers can stack. Each is still
+	 * refused today, so it is expected to fail until phase A lands; then drop
+	 * `test.fail()` and the matching cells in "refused" above.
+	 */
+	test.describe( 'gesture matrix, phase A', () => {
+		const noRefusal = ( page: any ) =>
+			expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( /suggested|crosses/ )
+			).toHaveCount( 0 );
+
+		test( 'R1: typing inside another author’s addition nests an addition in it', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			test.fail();
+			const [ addId ] = await openWithSuggestions(
+				{ admin, requestUtils },
+				[ { kind: 'add', author: 'anne' } ],
+				'Intro.{0} Bright red apples fell.</mark>'
+			);
+			await switchToSuggesting( page );
+			const paragraph = paragraphOf( editor );
+			await paragraph.click();
+			await selectText( page, 14 );
+			const saved = noteSaved( page );
+			await page.keyboard.type( 'X' );
+			await saved;
+			await expect(
+				paragraph.locator(
+					`mark.wp-suggestion-add[data-suggestion-id="${ addId }"] mark.wp-suggestion-add`
+				)
+			).toHaveText( 'X' );
+			await expect( paragraph ).toHaveText(
+				'Intro. Bright Xred apples fell.'
+			);
+			await noRefusal( page );
+		} );
+
+		test( 'R2: typing inside another author’s deletion adds next to it', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			test.fail();
+			const [ delId ] = await openWithSuggestions(
+				{ admin, requestUtils },
+				[ { kind: 'del', author: 'carl' } ],
+				'Intro. {0}red apples</mark> fell.'
+			);
+			await switchToSuggesting( page );
+			const paragraph = paragraphOf( editor );
+			await paragraph.click();
+			await selectText( page, 9 );
+			const saved = noteSaved( page );
+			await page.keyboard.type( 'X' );
+			await saved;
+			// A separate addition, which Carl's deletion fragments around.
+			await expect(
+				paragraph.locator( 'mark.wp-suggestion-add' )
+			).toHaveText( 'X' );
+			await expect(
+				paragraph.locator(
+					'mark.wp-suggestion-del mark.wp-suggestion-add'
+				)
+			).toHaveCount( 0 );
+			await expect(
+				paragraph.locator(
+					`mark.wp-suggestion-del[data-suggestion-id="${ delId }"]`
+				)
+			).toHaveText( [ 're', 'd apples' ] );
+			await noRefusal( page );
+		} );
+
+		test( 'R3: deleting over another author’s deletion adds a second deletion', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			test.fail();
+			const [ delId ] = await openWithSuggestions(
+				{ admin, requestUtils },
+				[ { kind: 'del', author: 'carl' } ],
+				'Intro. {0}red apples</mark> fell.'
+			);
+			await switchToSuggesting( page );
+			const paragraph = paragraphOf( editor );
+			await paragraph.click();
+			await selectText( page, 5, 10 );
+			const saved = noteSaved( page );
+			await page.keyboard.press( 'Backspace' );
+			await saved;
+			// Carl's older deletion is outermost; the shared word carries
+			// both.
+			await expect(
+				paragraph.locator(
+					`mark.wp-suggestion-del[data-suggestion-id="${ delId }"] mark.wp-suggestion-del`
+				)
+			).toHaveText( 'red' );
+			await expect( paragraph ).toHaveText( 'Intro. red apples fell.' );
+			await noRefusal( page );
+		} );
+
+		test( 'R6: typing over a selection inside another author’s addition nests both halves', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			test.fail();
+			const [ addId ] = await openWithSuggestions(
+				{ admin, requestUtils },
+				[ { kind: 'add', author: 'anne' } ],
+				'Intro.{0} Bright red apples fell.</mark>'
+			);
+			await switchToSuggesting( page );
+			const paragraph = paragraphOf( editor );
+			await paragraph.click();
+			await selectText( page, 14, 17 );
+			const saved = noteSaved( page );
+			await page.keyboard.type( 'blue' );
+			await saved;
+			const outer = `mark.wp-suggestion-add[data-suggestion-id="${ addId }"]`;
+			await expect(
+				paragraph.locator( `${ outer } mark.wp-suggestion-del` )
+			).toHaveText( 'red' );
+			await expect(
+				paragraph.locator( `${ outer } mark.wp-suggestion-add` )
+			).toHaveText( 'blue' );
+			await noRefusal( page );
+		} );
+
+		test( 'R6: typing over a selection inside another author’s deletion adds a second deletion and a separate addition', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			test.fail();
+			const [ delId ] = await openWithSuggestions(
+				{ admin, requestUtils },
+				[ { kind: 'del', author: 'carl' } ],
+				'Intro. {0}red apples</mark> fell.'
+			);
+			await switchToSuggesting( page );
+			const paragraph = paragraphOf( editor );
+			await paragraph.click();
+			await selectText( page, 8, 12 );
+			const saved = noteSaved( page );
+			await page.keyboard.type( 'Z' );
+			await saved;
+			await expect(
+				paragraph.locator(
+					`mark.wp-suggestion-del[data-suggestion-id="${ delId }"] mark.wp-suggestion-del`
+				)
+			).toHaveText( 'ed a' );
+			await expect(
+				paragraph.locator( 'mark.wp-suggestion-add' )
+			).toHaveText( 'Z' );
+			await expect(
+				paragraph.locator(
+					'mark.wp-suggestion-del mark.wp-suggestion-add'
+				)
+			).toHaveCount( 0 );
+			await noRefusal( page );
+		} );
+
+		test( 'typing at the edge of another author’s addition adds next to it', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const [ addId ] = await openWithSuggestions(
+				{ admin, requestUtils },
+				[ { kind: 'add', author: 'anne' } ],
+				'Intro.{0} Bright</mark> red.'
+			);
+			await switchToSuggesting( page );
+			const paragraph = paragraphOf( editor );
+			await paragraph.click();
+			await selectText( page, 13 );
+			const saved = noteSaved( page );
+			await page.keyboard.type( 'X' );
+			await saved;
+			await expect(
+				paragraph.locator(
+					`mark.wp-suggestion-add[data-suggestion-id="${ addId }"]`
+				)
+			).toHaveText( ' Bright' );
+			await expect(
+				paragraph.locator(
+					`mark.wp-suggestion-add:not([data-suggestion-id="${ addId }"])`
+				)
+			).toHaveText( 'X' );
+			await noRefusal( page );
 		} );
 	} );
 
