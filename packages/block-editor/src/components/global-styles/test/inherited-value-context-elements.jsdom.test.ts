@@ -15,6 +15,7 @@ describe( 'getBlockTypesForElement', () => {
 		const blockTypes = getBlockTypesForElement( 'link' );
 		expect( blockTypes ).toContain( 'core/read-more' );
 		expect( blockTypes ).not.toContain( 'core/post-author-name' );
+		expect( blockTypes ).not.toContain( 'core/loginout' );
 	} );
 
 	it.each( [ 'caption', 'h7', 'constructor' ] )(

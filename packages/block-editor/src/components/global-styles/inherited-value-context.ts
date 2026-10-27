@@ -120,11 +120,13 @@ function useContextHeadingLevel(
  * as a block property is tracked in
  * https://github.com/WordPress/gutenberg/issues/80438.
  *
- * Only blocks that *are* a link are listed under `link` (e.g. Read More,
- * Login/out and the pagination links render `<a>` as their whole selves).
- * Blocks that merely *contain* a link (the heading family, Paragraph, Group,
- * and the hybrid blocks with a Link colour control such as Post Author Name
- * and Post Date) are left out: their inner-link control reads the
+ * Only blocks whose visible text is the link are listed under `link`. Read
+ * More and the next and previous pagination links render `<a>` as their whole
+ * selves. The blocks in `LINK_WRAPPER_BLOCK_TYPES` wrap a single link in a
+ * `<div>`, so the element paints their text but their own styles land on the
+ * wrapper. Blocks that merely *contain* a link (the heading family, Paragraph,
+ * Group, and the hybrid blocks with a Link colour control such as Post Author
+ * Name and Post Date) are left out: their inner-link control reads the
  * `inheritedValue.elements.link` passthrough instead, so folding `link` in
  * would bleed link color into the block's own text.
  */
@@ -149,19 +151,24 @@ const ELEMENT_BLOCK_TYPES: Record< string, string[] > = {
 	// surfaces the inherited link color at its Text control.
 	link: [
 		'core/read-more',
-		'core/loginout',
-		'core/post-navigation-link',
 		'core/query-pagination-next',
 		'core/query-pagination-previous',
-		'core/query-pagination-numbers',
 		'core/comments-pagination-next',
 		'core/comments-pagination-previous',
-		'core/comments-pagination-numbers',
-		'core/comment-edit-link',
-		'core/comment-reply-link',
-		'core/post-comments-link',
 	],
 };
+
+// Painted by the `link` element, but their block styles reach only the wrapper,
+// so the element still wins on the inner `<a>`.
+const LINK_WRAPPER_BLOCK_TYPES = [
+	'core/loginout',
+	'core/post-navigation-link',
+	'core/query-pagination-numbers',
+	'core/comments-pagination-numbers',
+	'core/comment-edit-link',
+	'core/comment-reply-link',
+	'core/post-comments-link',
+];
 
 const HEADING_LEVEL_ELEMENT = /^h[1-6]$/;
 
@@ -181,6 +188,9 @@ function getElementLayers(
 	blockName: string,
 	headingLevel: number | undefined
 ): string[] {
+	if ( LINK_WRAPPER_BLOCK_TYPES.includes( blockName ) ) {
+		return [ 'link' ];
+	}
 	const element = Object.keys( ELEMENT_BLOCK_TYPES ).find( ( key ) =>
 		ELEMENT_BLOCK_TYPES[ key ].includes( blockName )
 	);
@@ -199,7 +209,8 @@ function getElementLayers(
 /**
  * The inverse of `getElementLayers`: the block types a root-level Global
  * Styles element paints as their whole selves. `h1`-`h6` give the heading
- * family, since its blocks can render at any level.
+ * family, since its blocks can render at any level. Blocks that wrap their
+ * link are left out.
  *
  * @param element Element key, e.g. `heading`, `h2` or `button`.
  * @return Block names, or an empty array for an element no block renders as.
