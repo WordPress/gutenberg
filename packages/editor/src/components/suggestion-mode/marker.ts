@@ -643,3 +643,32 @@ export function markerAnchorKeys(
 	}
 	return anchors;
 }
+
+/**
+ * Metadata with one of the block's markers replaced, wherever it sits.
+ *
+ * @param metadata Current block metadata.
+ * @param entry    The marker to replace, as read from the block.
+ * @param next     Its replacement.
+ * @return New metadata, or null when the marker is no longer on the block.
+ */
+export function withMarkerEntryReplaced(
+	metadata: Record< string, any > | null | undefined,
+	entry: SuggestionMarker,
+	next: SuggestionMarker
+): Record< string, any > | null {
+	const outer = readSuggestionMarker( { metadata } );
+	if ( ! outer ) {
+		return null;
+	}
+	if ( entry === outer ) {
+		return { ...metadata, suggestion: next };
+	}
+	const index = ( outer.nested ?? [] ).indexOf( entry );
+	if ( index < 0 ) {
+		return null;
+	}
+	const nested = [ ...( outer.nested ?? [] ) ];
+	nested[ index ] = next;
+	return { ...metadata, suggestion: { ...outer, nested } };
+}
