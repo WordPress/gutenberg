@@ -1,0 +1,62 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block-accordion-heading__icon-picker-control {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	width: 100%;
+}
+
+.wp-block-accordion-heading__icon-picker-grid {
+	display: flex;
+	gap: $grid-unit-10;
+	width: 100%;
+}
+
+.wp-block-accordion-heading__icon-picker {
+	flex: 1 1 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: $grid-unit-05;
+	height: auto;
+	min-height: 56px;
+	padding: $grid-unit-10 $grid-unit-05;
+	border: $border-width dashed $gray-400;
+	border-radius: $radius-small;
+	background: $white;
+	color: $gray-700;
+
+	&:hover {
+		border-color: $gray-700;
+		color: $gray-900;
+	}
+
+	&.is-set {
+		border-style: solid;
+		border-color: $gray-300;
+		color: $gray-900;
+	}
+}
+
+.wp-block-accordion-heading__icon-picker-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+
+	svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.wp-block-accordion-heading__icon-picker-state {
+	font-size: 11px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	line-height: 1.4;
+	text-transform: uppercase;
+}

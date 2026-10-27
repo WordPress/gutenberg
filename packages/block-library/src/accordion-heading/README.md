@@ -6,7 +6,7 @@ Displays a heading that toggles the accordion panel.
 - **Name:** `core/accordion-heading`
 - **Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 - **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
-- **Block Type:** [Static](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (saved in post content)
+- **Block Type:** [Hybrid](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (static save + server enhancements)
 
 ## Block Relationships
 
@@ -24,6 +24,8 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `level` | `number` | — | — |
 | `iconPosition` | `string` | `"right"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `left`, `right` |
 | `showIcon` | `boolean` | `true` | — |
+| `icon` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `iconStates` | `object` | — | — |
 
 ## Supports
 
@@ -67,7 +69,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 
 ## Block Markup
 
-This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
+This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
 <!-- wp:accordion-heading -->

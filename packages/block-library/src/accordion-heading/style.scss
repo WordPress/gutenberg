@@ -38,4 +38,40 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+/*
+ * State-aware icon references. Each reference is a span inside the slot,
+ * labeled with the state it belongs to; the control's own `is-open` class
+ * decides which span is visible. With no alternate reference, a lone resting
+ * span stays visible in both states.
+ */
+.wp-block-accordion-heading__toggle-icon.is-stateful > [data-icon-state] {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+
+	&[data-icon-state="expanded"] {
+		display: none;
+	}
+}
+
+.wp-block-accordion-item.is-open {
+	> .wp-block-accordion-heading
+	.wp-block-accordion-heading__toggle-icon.is-stateful {
+		> [data-icon-state="rest"]:not(:only-child) {
+			display: none;
+		}
+
+		> [data-icon-state="expanded"] {
+			display: flex;
+		}
+	}
 }

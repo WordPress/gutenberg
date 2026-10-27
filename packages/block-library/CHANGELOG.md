@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Accordion: Let headings store a state-aware icon reference on the toggle, with an alternate icon for the open state, so the control can switch between two registered icons (e.g. chevron down when closed, chevron up when open) instead of only rotating the `+` glyph ([#82700](https://github.com/WordPress/gutenberg/issues/82700)).
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

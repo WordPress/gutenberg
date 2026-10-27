@@ -235,4 +235,151 @@ test.describe( 'Accordion', () => {
 		await expect( accordionPanel ).toBeVisible();
 		await expect( targetParagraph ).toBeInViewport();
 	} );
+
+	test( 'should render and swap state-aware custom icons on the front end', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: {
+								title: 'Accordion Title',
+								icon: 'core/chevron-down',
+								iconStates: {
+									expanded: 'core/chevron-up',
+								},
+							},
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Accordion Panel Content',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const accordionToggle = page.getByRole( 'button', {
+			name: 'Accordion Title',
+		} );
+		const iconSlot = accordionToggle.locator(
+			'.wp-block-accordion-heading__toggle-icon'
+		);
+
+		// While the item is closed, the resting icon is visible and the
+		// expanded icon is not rendered.
+		await expect(
+			iconSlot.locator( '[data-icon-state="rest"] svg' )
+		).toBeVisible();
+		await expect(
+			iconSlot.locator( '[data-icon-state="expanded"]' )
+		).toBeHidden();
+
+		// Opening the item swaps to the expanded icon.
+		await accordionToggle.click();
+		await expect( accordionToggle ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+		await expect(
+			iconSlot.locator( '[data-icon-state="expanded"] svg' )
+		).toBeVisible();
+		await expect(
+			iconSlot.locator( '[data-icon-state="rest"]' )
+		).toBeHidden();
+
+		// Closing the item swaps back to the resting icon.
+		await accordionToggle.click();
+		await expect( accordionToggle ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
+		await expect(
+			iconSlot.locator( '[data-icon-state="rest"] svg' )
+		).toBeVisible();
+		await expect(
+			iconSlot.locator( '[data-icon-state="expanded"]' )
+		).toBeHidden();
+	} );
+
+	test( 'should allow choosing state-aware icons from the icon library', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: { title: 'Accordion Title' },
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Accordion Panel Content',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		// Select the heading block and open its settings.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Accordion Title' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+
+		// Pick the resting icon.
+		await page.getByRole( 'button', { name: /Choose icon/ } ).click();
+		const gridItems = page.locator(
+			'.wp-block-icon__inserter-grid-icons-list-item'
+		);
+		await expect( gridItems.first() ).toBeVisible();
+		await gridItems.first().click();
+
+		// The resting picker now shows Replace and the expanded picker
+		// appears; pick a different icon for the expanded state.
+		await expect(
+			page.getByRole( 'button', { name: /: Replace/ } )
+		).toBeVisible();
+		await page.getByRole( 'button', { name: /: Choose icon/ } ).click();
+		await expect( gridItems.first() ).toBeVisible();
+		await gridItems.nth( 1 ).click();
+
+		const content = await editor.getEditedPostContent();
+		expect( content ).toContain( '"icon":"core/' );
+		expect( content ).toContain( '"iconStates"' );
+		expect( content ).toContain(
+			'wp-block-accordion-heading__toggle-icon is-stateful'
+		);
+		expect( content ).toContain( '<span data-icon-state="rest"></span>' );
+		expect( content ).toContain(
+			'<span data-icon-state="expanded"></span>'
+		);
+	} );
 } );
