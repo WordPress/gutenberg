@@ -80,7 +80,10 @@ function LineageItem( {
  */
 function LineageMenu( { ancestors }: { ancestors: string[] } ) {
 	return (
-		<Menu.Root>
+		<Menu.Root
+			// Like the other toolbar dropdowns, the menu does not trap focus.
+			modal={ false }
+		>
 			<ToolbarItem>
 				{ ( toolbarItemProps ) => (
 					<Menu.Trigger

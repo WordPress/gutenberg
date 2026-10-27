@@ -19,6 +19,10 @@ import { useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { chevronDownSmall, copy, lock, Icon } from '@wordpress/icons';
 import type { ReactNode } from 'react';
+import SubmenuPopup, {
+	SUBMENU_TRIGGER_PROPS,
+	useFlyoutAim,
+} from './submenu-popup';
 import BlockIcon from '../../block-icon';
 import useBlockDisplayTitle from '../../block-title/use-block-display-title';
 import { useBlockLock } from '../../block-lock';
@@ -231,12 +235,12 @@ function TransformsAndStyles( {
 					{ ( !! restTransforms.length ||
 						!! transformedPatterns.length ) && (
 						<Menu.SubmenuRoot>
-							<Menu.SubmenuTrigger>
+							<Menu.SubmenuTrigger { ...SUBMENU_TRIGGER_PROPS }>
 								<Menu.ItemLabel>
 									{ __( 'More' ) }
 								</Menu.ItemLabel>
 							</Menu.SubmenuTrigger>
-							<Menu.Popup>
+							<SubmenuPopup>
 								{ restTransforms.map( transformItem ) }
 								{ !! transformedPatterns.length && (
 									<>
@@ -270,7 +274,7 @@ function TransformsAndStyles( {
 										</Menu.Group>
 									</>
 								) }
-							</Menu.Popup>
+							</SubmenuPopup>
 						</Menu.SubmenuRoot>
 					) }
 				</Menu.Group>
@@ -373,6 +377,7 @@ export default function BlockNameMenu( {
 		[ clientIds ]
 	);
 	const { isLocked } = useBlockLock( clientIds[ 0 ] );
+	const flyoutAimRef = useFlyoutAim();
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: clientIds[ 0 ],
 		maximumLength: 35,
@@ -459,7 +464,10 @@ export default function BlockNameMenu( {
 
 	return (
 		<ToolbarGroup className="block-editor-block-toolbar__block-name">
-			<Menu.Root>
+			<Menu.Root
+				// Like the other toolbar dropdowns, the menu does not trap focus.
+				modal={ false }
+			>
 				<ToolbarItem>
 					{ ( toolbarItemProps ) => (
 						<Menu.Trigger
@@ -481,6 +489,7 @@ export default function BlockNameMenu( {
 					) }
 				</ToolbarItem>
 				<Menu.Popup
+					ref={ flyoutAimRef }
 					className="block-editor-block-toolbar__block-name-menu"
 					positioner={
 						<Menu.Positioner

@@ -21,7 +21,10 @@ import type { BlockOptionsMenuItemProps } from './options-menu-item';
 
 function LayoutMenu( { items }: { items: BlockOptionsMenuItemProps[] } ) {
 	return (
-		<Menu.Root>
+		<Menu.Root
+			// Like the other toolbar dropdowns, the menu does not trap focus.
+			modal={ false }
+		>
 			<ToolbarItem>
 				{ ( toolbarItemProps ) => (
 					<Menu.Trigger

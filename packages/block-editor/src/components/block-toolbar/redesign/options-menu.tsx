@@ -29,6 +29,10 @@ import {
 	Icon,
 } from '@wordpress/icons';
 import type { ReactNode, RefObject } from 'react';
+import SubmenuPopup, {
+	SUBMENU_TRIGGER_PROPS,
+	useFlyoutAim,
+} from './submenu-popup';
 import BlockActions from '../../block-actions';
 import { BlockLockModal, useBlockLock } from '../../block-lock';
 import { BlockRenameModal, useBlockRename } from '../../block-rename';
@@ -160,12 +164,13 @@ function ChoiceSubmenu( { entry }: { entry: ChoiceEntry } ) {
 	return (
 		<Menu.SubmenuRoot>
 			<Menu.SubmenuTrigger
+				{ ...SUBMENU_TRIGGER_PROPS }
 				prefix={ getPrefix( entry.icon ) }
 				suffix={ current?.label }
 			>
 				<Menu.ItemLabel>{ entry.label }</Menu.ItemLabel>
 			</Menu.SubmenuTrigger>
-			<Menu.Popup>
+			<SubmenuPopup>
 				<Menu.RadioGroup
 					value={ entry.value ?? null }
 					onValueChange={ ( value ) => entry.onChange( value ) }
@@ -182,7 +187,7 @@ function ChoiceSubmenu( { entry }: { entry: ChoiceEntry } ) {
 						</Menu.RadioItem>
 					) ) }
 				</Menu.RadioGroup>
-			</Menu.Popup>
+			</SubmenuPopup>
 		</Menu.SubmenuRoot>
 	);
 }
@@ -202,10 +207,10 @@ function ActionsSubmenu( {
 	}
 	return (
 		<Menu.SubmenuRoot>
-			<Menu.SubmenuTrigger>
+			<Menu.SubmenuTrigger { ...SUBMENU_TRIGGER_PROPS }>
 				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 			</Menu.SubmenuTrigger>
-			<Menu.Popup>
+			<SubmenuPopup>
 				{ nonEmptySections.map( ( section, index ) => (
 					<Menu.Group key={ index }>
 						{ index > 0 && <Menu.Separator /> }
@@ -215,7 +220,7 @@ function ActionsSubmenu( {
 					</Menu.Group>
 				) ) }
 				{ children }
-			</Menu.Popup>
+			</SubmenuPopup>
 		</Menu.SubmenuRoot>
 	);
 }
@@ -955,6 +960,7 @@ export default function BlockOptionsMenu( {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ modal, setModal ] = useState< 'lock' | 'rename' | null >( null );
 	const shouldKeepFocusRef = useRef( false );
+	const flyoutAimRef = useFlyoutAim();
 	// The rich text with the selection, where formats return focus to.
 	const selectionStart = useSelect(
 		( select ) => select( blockEditorStore ).getSelectionStart(),
@@ -1034,6 +1040,7 @@ export default function BlockOptionsMenu( {
 					) }
 				</ToolbarItem>
 				<Menu.Popup
+					ref={ flyoutAimRef }
 					className="block-editor-block-toolbar__options-menu"
 					width="md"
 					finalFocus={ () => ! shouldKeepFocusRef.current }

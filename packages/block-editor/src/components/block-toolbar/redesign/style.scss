@@ -269,6 +269,11 @@ $toolbar-group-gap: $grid-unit-10; // Space on each side of a hairline.
 	z-index: z-index(".components-popover");
 }
 
+// Flyouts stack above the menu they open from, which they overlap.
+.block-editor-block-toolbar__submenu-positioner {
+	z-index: z-index(".components-popover") + 1;
+}
+
 .block-editor-block-toolbar__options-search {
 	grid-column: 1 / -1;
 	display: flex;
