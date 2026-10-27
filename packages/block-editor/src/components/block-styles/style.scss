@@ -32,9 +32,10 @@
 	}
 
 	.block-editor-block-styles__item-text {
-		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+		// Short labels stay centered because the text shrinks to fit within
+		// the Button. Labels that wrap are aligned to the start, so that every
+		// line lines up and the ellipsis isn't hidden by the Button padding.
 		text-align: start;
-		text-align-last: center;
 	}
 }
 

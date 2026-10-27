@@ -1,4 +1,4 @@
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useLayoutEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { debounce, useInstanceId } from '@wordpress/compose';
 import {
@@ -10,6 +10,7 @@ import {
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
+	Tooltip,
 } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { BlockStyle } from '@wordpress/blocks';
@@ -24,6 +25,81 @@ const noop = () => {};
 
 const getCompositeItemId = ( instanceId: string, style: BlockStyle ) =>
 	`${ instanceId }-${ style.name }`;
+
+function useIsTruncated( element: HTMLElement | null ) {
+	const [ isTruncated, setIsTruncated ] = useState( false );
+
+	useLayoutEffect( () => {
+		if ( ! element ) {
+			return;
+		}
+		const update = () =>
+			setIsTruncated( element.scrollHeight > element.clientHeight );
+		update();
+		const resizeObserver = new window.ResizeObserver( update );
+		resizeObserver.observe( element );
+		return () => resizeObserver.disconnect();
+	}, [ element ] );
+
+	return isTruncated;
+}
+
+type BlockStylesItemProps = {
+	id: string;
+	label: string;
+	isActive: boolean;
+	onSelect: () => void;
+	onHover: ( isHovered: boolean ) => void;
+};
+
+function BlockStylesItem( {
+	id,
+	label,
+	isActive,
+	onSelect,
+	onHover,
+}: BlockStylesItemProps ) {
+	const [ labelElement, setLabelElement ] = useState< HTMLElement | null >(
+		null
+	);
+	const isTruncated = useIsTruncated( labelElement );
+
+	return (
+		// Show the full label in a tooltip only when it's visually truncated.
+		<Tooltip.Root disabled={ ! isTruncated }>
+			<Composite.Item
+				id={ id }
+				render={
+					<Tooltip.Trigger
+						render={
+							<Button
+								className="block-editor-block-styles__item"
+								tone="neutral"
+								variant={ isActive ? 'solid' : 'outline' }
+							/>
+						}
+					/>
+				}
+				role="radio"
+				aria-checked={ isActive }
+				onMouseEnter={ () => onHover( true ) }
+				onFocus={ () => onHover( true ) }
+				onMouseLeave={ () => onHover( false ) }
+				onBlur={ () => onHover( false ) }
+				onClick={ onSelect }
+			>
+				<Truncate
+					ref={ setLabelElement }
+					numberOfLines={ 2 }
+					className="block-editor-block-styles__item-text"
+				>
+					{ label }
+				</Truncate>
+			</Composite.Item>
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
+	);
+}
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
@@ -169,51 +245,25 @@ function BlockStyles( {
 								className="block-editor-block-styles__row"
 							>
 								{ row.map( ( style ) => (
-									<Composite.Item
+									<BlockStylesItem
 										key={ style.name }
 										id={ getCompositeItemId(
 											instanceId,
 											style
 										) }
-										render={
-											<Button
-												className="block-editor-block-styles__item"
-												tone="neutral"
-												variant={
-													activeStyle.name ===
-													style.name
-														? 'solid'
-														: 'outline'
-												}
-											/>
-										}
-										role="radio"
-										aria-checked={
+										label={ style.label || style.name }
+										isActive={
 											activeStyle.name === style.name
 										}
-										onMouseEnter={ () =>
-											styleItemHandler( style )
-										}
-										onFocus={ () =>
-											styleItemHandler( style )
-										}
-										onMouseLeave={ () =>
-											styleItemHandler( null )
-										}
-										onBlur={ () =>
-											styleItemHandler( null )
-										}
-										onClick={ () =>
+										onSelect={ () =>
 											onSelectStylePreview( style )
 										}
-									>
-										<Truncate
-											numberOfLines={ 3 }
-											className="block-editor-block-styles__item-text"
-										>
-											{ style.label || style.name }
-										</Truncate>
-									</Composite.Item>
+										onHover={ ( isHovered ) =>
+											styleItemHandler(
+												isHovered ? style : null
+											)
+										}
+									/>
 								) ) }
 							</Composite.Row>
 						) ) }
