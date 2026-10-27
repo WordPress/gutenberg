@@ -19,6 +19,7 @@ export interface BadgeProps extends ComponentProps< 'span' > {
 	infotip?: {
 		/**
 		 * Pass the `Popover` export from `@wordpress/ui`.
+		 * Use this same export for the popup and all of its parts.
 		 */
 		popover: Pick< typeof Popover, 'Root' | 'Trigger' >;
 		/**
