@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
-import { getOverridingBlockTypes } from '../element-block-overrides';
+import { getOverridingBlockTypes } from '../utils';
 
 describe( 'hasUserStylesForBlock', () => {
 	it( 'returns false when there is no user config', () => {

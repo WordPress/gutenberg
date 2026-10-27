@@ -7,9 +7,13 @@ import type {
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from './lock-unlock';
 
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+const { getViewportBreakpoints, resolveStyle } = unlock(
+	globalStylesEnginePrivateApis
+);
+const { getBlockTypesForElement } = unlock( blockEditorPrivateApis );
 
 /**
  * State definition with value and label.
@@ -294,4 +298,52 @@ export function getNewIndexFromPresets(
 		return currentHighest;
 	}, 0 );
 	return highestPresetValue + 1;
+}
+
+// Heading blocks render at any level, so every heading screen shares one list.
+const HEADING_ELEMENTS = [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
+
+function getElementKeys( element: string ): string[] {
+	return HEADING_ELEMENTS.includes( element )
+		? HEADING_ELEMENTS
+		: [ element ];
+}
+
+// State and viewport styles go to other selectors, so they cannot override
+// the element itself.
+function isOwnStylePath( path: string ) {
+	return ! path.startsWith( ':' ) && ! path.startsWith( '@' );
+}
+
+/**
+ * The block types an element paints whose own Global Styles beat the element
+ * for at least one property it sets. Block style variations are not counted.
+ *
+ * @param config  Merged Global Styles config.
+ * @param element Element key, e.g. `heading`, `h2` or `button`.
+ * @return Block names, in map order.
+ */
+export function getOverridingBlockTypes(
+	config: GlobalStylesConfig | undefined,
+	element: string
+): string[] {
+	const blockNames: string[] = getBlockTypesForElement( element );
+	if ( ! blockNames.length || ! config?.styles ) {
+		return [];
+	}
+	const elements = getElementKeys( element );
+	// Any block name works here: with block styles dropped, only root and element layers remain.
+	const { sources: elementSources } = resolveStyle(
+		{ ...config, styles: { ...config.styles, blocks: undefined } },
+		{ blockName: blockNames[ 0 ], elements }
+	);
+	return blockNames.filter( ( blockName ) => {
+		const { sources } = resolveStyle( config, { blockName, elements } );
+		return Object.keys( sources ).some(
+			( path ) =>
+				isOwnStylePath( path ) &&
+				sources[ path ].layer === 'block' &&
+				elementSources[ path ]?.layer === 'element'
+		);
+	} );
 }

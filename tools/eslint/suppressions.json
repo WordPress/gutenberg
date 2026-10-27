@@ -10981,11 +10981,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/element-block-overrides.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/font-families.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
