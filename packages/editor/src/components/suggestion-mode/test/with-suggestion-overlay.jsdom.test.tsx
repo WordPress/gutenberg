@@ -585,7 +585,7 @@ describe( 'withSuggestionOverlay', () => {
 		);
 	} );
 
-	it.each( [ 'edit', 'suggest', 'view' ] )(
+	it.each( [ 'edit', 'suggest' ] )(
 		'merges the proposal over the live attributes for rendering in %s intent',
 		( intent ) => {
 			const block = createBlock( HOC_BLOCK, {
@@ -677,30 +677,6 @@ describe( 'withSuggestionOverlay', () => {
 			'proposed'
 		);
 		expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '4' );
-	} );
-
-	it( 'passes through in View intent for a block with no proposal', () => {
-		const setAttributes = vi.fn();
-		const block = createBlock( HOC_BLOCK, { content: 'Untouched' } );
-		renderWithProviders(
-			<Connected
-				clientId={ block.clientId }
-				setAttributes={ setAttributes }
-			/>,
-			{ intent: 'view', blocks: [ block ] }
-		);
-
-		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-			'Untouched'
-		);
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-
-		// In view intent the HOC is a pass-through, so the real
-		// setAttributes is invoked and no proposal is written.
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			content: 'proposed',
-		} );
 	} );
 
 	it( 'clears the marker when the proposal returns to the live value', () => {

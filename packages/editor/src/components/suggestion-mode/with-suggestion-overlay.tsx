@@ -116,7 +116,7 @@ function proposalWouldHideMarkers(
  * editor is in `suggest` intent, so the session lookup, refs, and the edit
  * handlers don't run on every `BlockEdit` render for every block across the
  * entire editor when suggestions are inactive. This split matters for large
- * documents: in Edit/View intent the outer wrapper executes a single
+ * documents: in Edit intent the outer wrapper executes a single
  * `useSelect` and renders the original `BlockEdit` untouched unless the block
  * carries a proposal (see `ProposedBlockEdit`).
  *
@@ -648,7 +648,7 @@ function structuralMarkerClass( type: string | undefined ): string | null {
  * overlays), both stored in `metadata.suggestion`.
  *
  * Both are persisted on the live block (synced through the same path as
- * block content), so reviewers in Edit or View intent see and can act on
+ * block content), so reviewers in Edit intent see and can act on
  * them too; that's the visual cue a post author needs to spot a pending
  * change at a glance.
  */
