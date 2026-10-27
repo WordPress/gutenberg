@@ -45,7 +45,9 @@ function gutenberg_ui_components_enqueue_assets() {
 		wp_register_style(
 			'wp-ui-components',
 			gutenberg_url( 'packages/ui/build-php/style.css' ),
-			array(),
+			// The stylesheet has fallbacks for every design token, but uses the
+			// tokens from the theme stylesheet when it's there.
+			wp_style_is( 'wp-theme', 'registered' ) ? array( 'wp-theme' ) : array(),
 			(string) filemtime( $file )
 		);
 	}
@@ -56,15 +58,17 @@ function gutenberg_ui_components_enqueue_assets() {
 /**
  * Returns the HTML of a `@wordpress/ui` component.
  *
- * Unknown or invalid props fall back to their default with a
- * `_doing_it_wrong()` notice, so the screen still renders. A missing or
- * invalid required prop renders nothing.
+ * The content is plain text, escaped when rendered. Unknown or invalid props
+ * fall back to their default with a `_doing_it_wrong()` notice, so the screen
+ * still renders. Missing required content, or a missing or invalid required
+ * prop, renders nothing.
  *
- * @param string $name  Component name, such as `button`.
- * @param array  $props Component props.
+ * @param string      $name    Component name, such as `button`.
+ * @param array       $props   Component props.
+ * @param string|null $content Component content, such as a button's label.
  * @return string HTML, or an empty string when the component can't render.
  */
-function gutenberg_get_ui_component( $name, $props = array() ) {
+function gutenberg_get_ui_component( $name, $props = array(), $content = null ) {
 	$components = gutenberg_ui_components_get_manifest();
 	$render     = 'gutenberg_ui_render_' . str_replace( '-', '_', $name );
 
@@ -84,14 +88,26 @@ function gutenberg_get_ui_component( $name, $props = array() ) {
 		return '';
 	}
 
+	if ( ! empty( $component['content']['required'] ) && ( ! is_string( $content ) || '' === $content ) ) {
+		_doing_it_wrong(
+			__FUNCTION__,
+			/* translators: %s: Component name. */
+			esc_html( sprintf( __( 'The "%s" component needs text content.', 'gutenberg' ), $name ) ),
+			'24.4.0'
+		);
+		return '';
+	}
+
 	$classes = $component['classes']['base'];
 	foreach ( $component['classes']['variants'] as $prop => $values ) {
-		$classes = array_merge( $classes, $values[ $props[ $prop ] ] ?? array() );
+		// Recipes are JSON, so their keys are strings, including `"true"` and `"false"`.
+		$value   = is_bool( $props[ $prop ] ) ? wp_json_encode( $props[ $prop ] ) : (string) $props[ $prop ];
+		$classes = array_merge( $classes, $values[ $value ] ?? array() );
 	}
 
 	gutenberg_ui_components_enqueue_assets();
 
-	return $render( $props, $classes );
+	return $render( $props, $classes, (string) $content );
 }
 
 /**

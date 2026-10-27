@@ -1,7 +1,7 @@
 {
 	"name": "button",
+	"content": { "required": true },
 	"props": {
-		"label": { "type": "string", "required": true },
 		"tone": {
 			"type": "string",
 			"enum": [ "brand", "neutral" ],
@@ -51,7 +51,6 @@
 	},
 	"react": {
 		"component": "Button",
-		"children": "label",
 		"props": { "focusableWhenDisabled": false }
 	}
 }

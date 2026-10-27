@@ -3,7 +3,7 @@
  * admin screens.
  *
  * Each component PHP can render has a `php/<name>/component.json` with its
- * props and a recipe: the classes it always has, and the classes each variant
+ * content, props and a recipe: the classes it always has, and the classes each variant
  * value adds. PHP renders the markup from a small template, and the recipe
  * says which classes go on it. The build:
  *
@@ -112,7 +112,7 @@ async function main() {
 		const component = JSON.parse(
 			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
 		);
-		const { name, props, classes, react } = component;
+		const { name, content, props, classes, react } = component;
 		const resolve = ( references ) =>
 			references.map( ( reference ) => {
 				usedStylesheets.add( reference.split( ':' )[ 0 ] );
@@ -120,6 +120,7 @@ async function main() {
 			} );
 
 		manifest.components[ name ] = {
+			content,
 			props,
 			classes: {
 				base: resolve( classes.base ),
@@ -150,31 +151,27 @@ async function main() {
 				prop,
 				schema.enum ?? [ false, true ],
 			] );
-		const example = { [ react.children ]: 'Save changes' };
-		// Plus a custom class, and text that needs escaping, so the tests also
-		// check that PHP escapes it the way React does.
+		// Plus a custom class, and content that needs escaping, so the tests
+		// also check that PHP escapes it the way React does.
 		const cases = [
-			...getCombinations( variants ),
-			{ class: 'my-plugin-button' },
-			{ [ react.children ]: 'Save & <continue> "now"' },
+			...getCombinations( variants ).map( ( values ) => ( {
+				props: values,
+				content: 'Save changes',
+			} ) ),
+			{ props: { class: 'my-plugin-button' }, content: 'Save changes' },
+			{ props: {}, content: 'Save & <continue> "now"' },
 		];
-		for ( const values of cases ) {
-			const phpProps = { ...example, ...values };
+		for ( const { props: phpProps, content: text } of cases ) {
 			const reactProps = { ...react.props };
 			for ( const [ prop, value ] of Object.entries( phpProps ) ) {
-				if ( prop !== react.children ) {
-					reactProps[ 'class' === prop ? 'className' : prop ] = value;
-				}
+				reactProps[ 'class' === prop ? 'className' : prop ] = value;
 			}
 			fixtures.push( {
 				component: name,
 				props: phpProps,
+				content: text,
 				html: renderToStaticMarkup(
-					createElement(
-						ui[ react.component ],
-						reactProps,
-						phpProps[ react.children ]
-					)
+					createElement( ui[ react.component ], reactProps, text )
 				),
 			} );
 		}

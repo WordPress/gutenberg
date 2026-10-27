@@ -75,10 +75,8 @@ function gutenberg_ui_components_render_preview_page() {
 				gutenberg_ui_components_print(
 					gutenberg_get_ui_component(
 						'button',
-						array(
-							'label' => __( 'Save changes', 'gutenberg' ),
-							'type'  => 'submit',
-						)
+						array( 'type' => 'submit' ),
+						__( 'Save changes', 'gutenberg' )
 					)
 				);
 				?>
@@ -99,10 +97,10 @@ function gutenberg_ui_components_render_preview_page() {
 									gutenberg_get_ui_component(
 										'button',
 										array(
-											'label'   => $variant,
 											'tone'    => $tone,
 											'variant' => $variant,
-										)
+										),
+										$variant
 									)
 								);
 								?>

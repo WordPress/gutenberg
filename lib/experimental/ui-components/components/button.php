@@ -15,9 +15,10 @@
  *
  * @param array    $props   Validated props.
  * @param string[] $classes Class names from the component's recipe.
+ * @param string   $content Label, as plain text.
  * @return string HTML.
  */
-function gutenberg_ui_render_button( $props, $classes ) {
+function gutenberg_ui_render_button( $props, $classes, $content ) {
 	if ( '' !== $props['class'] ) {
 		$classes[] = $props['class'];
 	}
@@ -27,6 +28,6 @@ function gutenberg_ui_render_button( $props, $classes ) {
 		esc_attr( $props['type'] ),
 		esc_attr( implode( ' ', $classes ) ),
 		$props['disabled'] ? ' data-disabled="" disabled=""' : '',
-		esc_html( $props['label'] )
+		esc_html( $content )
 	);
 }

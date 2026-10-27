@@ -35,7 +35,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 		$cases = array();
 		foreach ( json_decode( file_get_contents( $file ), true ) as $fixture ) {
-			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) ] = array( $fixture );
+			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . $fixture['content'] ] = array( $fixture );
 		}
 		return $cases;
 	}
@@ -43,10 +43,10 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_react_fixtures
 	 *
-	 * @param array|null $fixture Props and React's render.
+	 * @param array|null $fixture Props, content and React's render.
 	 */
 	public function test_renders_the_same_markup_as_react( $fixture ) {
-		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'] );
+		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'], $fixture['content'] );
 
 		$this->assertSame(
 			self::normalize_html( $fixture['html'] ),
@@ -58,10 +58,8 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	public function test_escapes_text_and_attributes() {
 		$html = gutenberg_get_ui_component(
 			'button',
-			array(
-				'label' => '<script>alert(1)</script>',
-				'class' => '" onclick="alert(1)',
-			)
+			array( 'class' => '" onclick="alert(1)' ),
+			'<script>alert(1)</script>'
 		);
 
 		$this->assertStringNotContainsString( '<script>', $html );
@@ -72,21 +70,31 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
 		$this->assertSame(
-			gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ),
-			gutenberg_get_ui_component(
-				'button',
-				array(
-					'label'   => 'Save',
-					'variant' => 'sparkly',
-				)
-			)
+			gutenberg_get_ui_component( 'button', array(), 'Save' ),
+			gutenberg_get_ui_component( 'button', array( 'variant' => 'sparkly' ), 'Save' )
 		);
 	}
 
-	public function test_a_missing_required_prop_renders_nothing() {
+	/**
+	 * @dataProvider data_missing_content
+	 *
+	 * @param mixed $content Content that isn't text, or is empty.
+	 */
+	public function test_missing_required_content_renders_nothing( $content ) {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
-		$this->assertSame( '', gutenberg_get_ui_component( 'button' ) );
+		$this->assertSame( '', gutenberg_get_ui_component( 'button', array(), $content ) );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function data_missing_content() {
+		return array(
+			'none'  => array( null ),
+			'empty' => array( '' ),
+			'array' => array( array( 'Save' ) ),
+		);
 	}
 
 	public function test_an_unknown_component_renders_nothing() {
@@ -96,7 +104,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	public function test_rendering_enqueues_the_stylesheet() {
-		gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) );
+		gutenberg_get_ui_component( 'button', array(), 'Save' );
 
 		$this->assertTrue( wp_style_is( 'wp-ui-components', 'enqueued' ) );
 	}
