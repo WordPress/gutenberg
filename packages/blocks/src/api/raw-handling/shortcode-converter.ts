@@ -13,8 +13,8 @@ import type {
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
-const beforeLineRegexp = /(\n|<p>|<br\s*\/?>)\s*$/;
-const afterLineRegexp = /^\s*(\n|<\/p>|<br\s*\/?>)/;
+const beforeLineRegexp = /(^|\n|<p>|<br\s*\/?>)\s*$/;
+const afterLineRegexp = /^\s*($|\n|<\/p>|<br\s*\/?>)/;
 
 function segmentHTMLToShortcodeBlock(
 	HTML: string,
@@ -59,16 +59,16 @@ function segmentHTMLToShortcodeBlock(
 	const beforeHTML = HTML.substr( 0, match.index );
 	const afterHTML = HTML.substr( lastIndex );
 
-	// If the shortcode content does not contain HTML and the shortcode is
-	// not on a new line (or in paragraph from Markdown converter),
-	// consider the shortcode as inline text, and thus skip conversion for
-	// this segment.
+	// Like images, a shortcode in text stays inline, unless it's on its own
+	// line, or aligned at the start or end of a line.
+	const isLineStart = beforeLineRegexp.test( beforeHTML );
+	const isLineEnd = afterLineRegexp.test( afterHTML );
+	const isAligned = /^align(left|center|right)$/.test(
+		match.shortcode.attrs.named.align ?? ''
+	);
 	if (
-		! match.shortcode.content?.includes( '<' ) &&
-		! (
-			beforeLineRegexp.test( beforeHTML ) &&
-			afterLineRegexp.test( afterHTML )
-		)
+		! ( isLineStart && isLineEnd ) &&
+		! ( isAligned && ( isLineStart || isLineEnd ) )
 	) {
 		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 	}
@@ -156,13 +156,19 @@ function segmentHTMLToShortcodeBlock(
 		blocks = [ block ];
 	}
 
+	// Text after a shortcode moved from the start of a line keeps the line's
+	// opening tag.
+	const lineStart = isLineEnd
+		? ''
+		: beforeHTML.match( beforeLineRegexp )![ 0 ];
+
 	return [
 		...segmentHTMLToShortcodeBlock(
 			beforeHTML.replace( beforeLineRegexp, '' )
 		),
 		...blocks,
 		...segmentHTMLToShortcodeBlock(
-			afterHTML.replace( afterLineRegexp, '' )
+			lineStart + afterHTML.replace( afterLineRegexp, '' )
 		),
 	];
 }
