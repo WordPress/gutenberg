@@ -35,7 +35,7 @@ jobs:
     # list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
         name: Detect changes relevant to unit tests
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             pull-requests: read
@@ -244,7 +244,7 @@ jobs:
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         needs: [detect-relevant-changes]
         if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions: {}
@@ -517,7 +517,7 @@ jobs:
     # housekeeping that runs alongside it.
     unit-status-check:
         name: Unit Tests - Status Check
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         timeout-minutes: 5
         permissions:
             contents: read

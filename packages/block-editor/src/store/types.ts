@@ -1,12 +1,18 @@
 import type {
 	Block,
+	BlockType,
 	BlockTypeIcon,
 	BlockVariation,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
+import type { Color } from '@wordpress/global-styles-engine';
 import type { BlockEditingMode } from '../components/block-editing-mode';
-import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
+import type { EditorStylesStyle } from '../components/editor-styles/types';
+import type {
+	BlockVisibility,
+	ViewportBreakpoints,
+} from '../components/block-visibility/use-block-visibility';
 import type {
 	FetchLinkSuggestions,
 	FetchRichUrlData,
@@ -18,6 +24,7 @@ import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
+	deviceTypeKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -236,8 +243,17 @@ export interface BlockPattern {
 	syncStatus?: string;
 	blockTypes?: string[];
 	inserter?: boolean;
+	/** Where the pattern comes from, e.g. `core` or `theme`. */
+	source?: string;
+	/** Whether the current user authored this user pattern. */
+	isCurrentUserPattern?: boolean;
 	[ key: string ]: unknown;
 }
+
+/**
+ * A pattern with its parsed blocks, as the allowed patterns come.
+ */
+export type ParsedBlockPattern = BlockPattern & { blocks: Array< Block > };
 
 /**
  * A user pattern as returned by the REST API.
@@ -303,7 +319,7 @@ export interface InserterItem {
 	ancestor?: string[];
 	variations?: InserterVariation[];
 	variationName?: string;
-	example?: unknown;
+	example?: BlockType[ 'example' ];
 	innerBlocks?: InserterVariation[ 'innerBlocks' ];
 	innerContent?: InserterVariation[ 'innerContent' ];
 	isSearchOnly?: boolean;
@@ -319,9 +335,12 @@ export type InitialPosition = 0 | -1 | null;
 export type HistoryMode = 'merge' | 'ignore';
 
 export type BlockListSettings = Record< string, unknown > & {
+	orientation?: 'horizontal' | 'vertical';
+	prioritizedInserterBlocks?: string[];
 	templateLock?: string | false;
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
-	directInsert?: boolean;
+	/** A function is deprecated. */
+	directInsert?: boolean | ( ( ...args: never[] ) => unknown );
 };
 
 export interface ShowInsertionPointOptions {
@@ -353,6 +372,8 @@ export type BlockTemplate = NonNullable<
  */
 export type FeatureSettings = Record< string, unknown > & {
 	blocks?: Record< string, Record< string, unknown > >;
+	blockVisibility?: { allowEditing?: boolean };
+	viewport?: ViewportBreakpoints;
 };
 
 /**
@@ -377,7 +398,42 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	/** The placeholder of the default block appender. */
+	bodyPlaceholder?: string;
+	/** Whether each block shows the inspector tabs, keyed by name or `default`. */
+	blockInspectorTabs?: Record< string, boolean >;
+	blockInspectorAnimation?: BlockInspectorAnimationSettings;
+	blockStatesEditingEnabled?: boolean;
+	/** The color palette. */
+	colors?: Color[];
+	/** Creates a draft page from the link UI. */
+	__experimentalCreatePageEntity?: ( page: {
+		title: string;
+		status: string;
+	} ) => Promise<
+		| {
+				id: number;
+				type: string;
+				title: { rendered: string };
+				link: string;
+		  }
+		// A failed save resolves without a page.
+		| undefined
+	>;
+	__experimentalUserCanCreatePages?: boolean;
+	/** Opens an entity, such as a template part, for editing. */
+	onNavigateToEntityRecord?: ( params: {
+		postId: number | string;
+		postType: string;
+		/** The canvas viewport to open the entity in, such as `mobile`. */
+		viewport?: string;
+		[ key: string ]: unknown;
+	} ) => void;
 	__experimentalUndo?: () => void;
+	/** Opens the inserter sidebar, or closes it with `false`. */
+	__experimentalSetIsInserterOpened?: (
+		value: boolean | Record< string, unknown >
+	) => void;
 	__unstableResolvedAssets?: ResolvedAssets;
 	__internalIsInitialized?: boolean;
 	supportsLayout?: boolean;
@@ -390,9 +446,13 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	__unstableIsBlockBasedTheme?: boolean;
+	/** The styles of the editor canvas, flagged when generated from global styles. */
+	styles?: Array< EditorStylesStyle & { isGlobalStyles?: boolean } >;
 	[ currentUserIdSelectKey ]?: (
 		select: typeof globalSelect
 	) => number | undefined;
+	/** The device the editor previews, such as `Desktop`. */
+	[ deviceTypeKey ]?: string;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
@@ -405,6 +465,14 @@ export type Settings = Record< string | symbol, unknown > & {
 		select: typeof globalSelect
 	) => UserPatternCategory[];
 };
+
+/**
+ * How the block inspector animates, keyed by the block names it animates.
+ */
+export type BlockInspectorAnimationSettings = {
+	/** The block whose descendants animate. */
+	animationParent?: string;
+} & Partial< Record< string, { enterDirection?: string } | string > >;
 
 /**
  * A reference to the element that had focus when focus left the editor canvas.

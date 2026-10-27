@@ -4,7 +4,7 @@ import {
 	__experimentalVStack as VStack,
 	FlexItem,
 	CardBody,
-	Card,
+	Card as WCCard,
 	CardMedia,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -24,7 +24,7 @@ function ScreenRoot() {
 	}, [] );
 
 	return (
-		<Card
+		<WCCard
 			size="small"
 			isBorderless
 			className="global-styles-ui-screen-root"
@@ -32,11 +32,11 @@ function ScreenRoot() {
 		>
 			<CardBody>
 				<VStack spacing={ 4 }>
-					<Card className="global-styles-ui-screen-root__active-style-tile">
+					<WCCard className="global-styles-ui-screen-root__active-style-tile">
 						<CardMedia className="global-styles-ui-screen-root__active-style-tile-preview">
 							<PreviewStyles />
 						</CardMedia>
-					</Card>
+					</WCCard>
 					{ hasVariations && (
 						<ItemGroup>
 							<NavigationButtonAsItem path="/variations">
@@ -56,7 +56,7 @@ function ScreenRoot() {
 					<RootMenu />
 				</VStack>
 			</CardBody>
-		</Card>
+		</WCCard>
 	);
 }
 

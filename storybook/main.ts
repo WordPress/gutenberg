@@ -3,8 +3,8 @@ import { fileURLToPath } from 'node:url';
 import { type InlineConfig, type PluginOption, mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
-import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
-import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
+import dsTokenFallbacksJs from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -149,7 +149,7 @@ const config: StorybookConfig = {
 						find: /^@wordpress\/block-editor$/,
 						replacement: path.resolve(
 							import.meta.dirname,
-							'../packages/block-editor/src/index.js'
+							'../packages/block-editor/src/index.ts'
 						),
 					},
 				],
