@@ -20,9 +20,9 @@ Keep `Notice.List` mounted, including when it is empty, and render keyed `Notice
 
 <Canvas of={ NoticeStories.DynamicNotices } />
 
-The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with a newline, preserving their punctuation. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
+The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with `. ` as a separator, preserving their supplied text. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
 
-Announcements are `polite` by default, including error notices. Set `politeness="assertive"` on a notice only when its message needs immediate attention. Set `politeness="off"` or `spokenMessage=""` to skip announcements for a notice. These props only affect notices inside `Notice.List`.
+Announcements are `polite` by default, including error notices. Set `politeness="assertive"` on a notice only when its message needs immediate attention. Set `politeness="off"` to skip announcements for a notice. These props only affect notices inside `Notice.List`.
 
 ```jsx
 <Notice.List>
@@ -39,7 +39,7 @@ Announcements are `polite` by default, including error notices. Set `politeness=
 </Notice.List>
 ```
 
-The list does not move focus. While focus is inside the list, announcements stop so they do not compete with the content the user is exploring. Updates made during that time do not replay when focus leaves. Removing a notice does not announce it or repeat the remaining notices. Give each notice a stable key. Use a new key for a new notification, including a repeated message.
+The list does not move focus, and notices continue to announce while focus is inside the list. If your application moves focus to a new notice, set `politeness="off"` on that notice when adding it to avoid announcing the same content twice. This leaves announcements for other notices enabled. Removing a notice does not announce it or repeat the remaining notices. Give each notice a stable key. Use a new key for a new notification, including a repeated message.
 
 The list renders separate, visually hidden live regions for polite and assertive messages. Keep live-region roles off the visible notices and do not also call `speak()` for the same update.
 

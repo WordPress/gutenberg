@@ -36,7 +36,7 @@ describe( 'Notice.List', () => {
 				</Notice.List>
 			</StrictMode>
 		);
-		// Flush the list's queued registration updates before checking silence.
+		// Flush observed DOM updates before checking silence.
 		await act( () => Promise.resolve() );
 		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 		expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
@@ -77,21 +77,21 @@ describe( 'Notice.List', () => {
 		);
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved Your draft has been saved\.$/
+				/^Draft saved\. Your draft has been saved\.$/
 			)
 		);
 		// Dispatch without moving focus so this isolates descendant text updates.
 		fireEvent.click( screen.getByRole( 'button', { name: 'Publish' } ) );
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved Your changes are now public\.$/
+				/^Draft saved\. Your changes are now public\.$/
 			)
 		);
 		const announcement = within( screen.getByRole( 'status' ) ).getByText(
-			'Draft saved Your changes are now public.'
+			'Draft saved. Your changes are now public.'
 		);
 		expect( announcement ).toHaveTextContent(
-			'Draft saved\nYour changes are now public.',
+			'Draft saved. Your changes are now public.',
 			{ normalizeWhitespace: false }
 		);
 		expect( announcement ).toHaveProperty( 'childNodes.length', 1 );
@@ -113,7 +113,7 @@ describe( 'Notice.List', () => {
 		);
 		await waitFor( () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved Your draft has been saved\.$/
+				/^Draft saved\. Your draft has been saved\.$/
 			);
 			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
 				/^Your session expires soon\.$/
@@ -169,7 +169,7 @@ describe( 'Notice.List', () => {
 		const status = screen.getByRole( 'status' );
 		await waitFor( () =>
 			expect( status ).toHaveTextContent(
-				/^تم الحفظ؟\nتم حفظ المسودة\.$/,
+				/^تم الحفظ؟\. تم حفظ المسودة\.$/,
 				{
 					normalizeWhitespace: false,
 				}
@@ -177,30 +177,60 @@ describe( 'Notice.List', () => {
 		);
 	} );
 
-	it( 'suppresses updates while focus is inside and does not replay them on blur', async () => {
+	it( 'announces new messages while another notice has focus', async () => {
 		const user = userEvent.setup();
 		const renderNotices = ( count: number ) => (
 			<>
 				<button>Outside</button>
 				<Notice.List>
 					{ Array.from( { length: count }, ( _, key ) => (
-						<Message key={ key } />
+						<Message
+							key={ key }
+							politeness={ key === 1 ? 'assertive' : 'polite' }
+						/>
 					) ) }
 				</Notice.List>
 			</>
 		);
 		const { rerender } = render( renderNotices( 1 ) );
 		await user.click( screen.getByRole( 'button', { name: 'Undo' } ) );
-		rerender( renderNotices( 2 ) );
-		expect( screen.queryByRole( 'status' ) ).not.toBeInTheDocument();
-		await user.click( screen.getByRole( 'button', { name: 'Outside' } ) );
-		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 		rerender( renderNotices( 3 ) );
-		await waitFor( () =>
+		await waitFor( () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Draft saved Your draft has been saved\.$/
-			)
+				/^Draft saved\. Your draft has been saved\.$/
+			);
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Draft saved\. Your draft has been saved\.$/
+			);
+		} );
+		await user.click( screen.getByRole( 'button', { name: 'Outside' } ) );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+			/^Draft saved\. Your draft has been saved\.$/
 		);
+	} );
+
+	it( 'does not repeat existing notices after a modal hides their ancestor', async () => {
+		const renderNotices = ( count: number ) => (
+			<div role="group" aria-label="Modal background">
+				<Notice.List>
+					{ Array.from( { length: count }, ( _, key ) => (
+						<Message key={ key } />
+					) ) }
+				</Notice.List>
+			</div>
+		);
+		const { rerender } = render( renderNotices( 2 ) );
+		const ancestor = screen.getByRole( 'group', {
+			name: 'Modal background',
+		} );
+		const status = screen.getByRole( 'status' );
+		ancestor.setAttribute( 'aria-hidden', 'true' );
+		rerender( renderNotices( 3 ) );
+		await act( () => Promise.resolve() );
+		ancestor.removeAttribute( 'aria-hidden' );
+		rerender( renderNotices( 2 ) );
+		await act( () => Promise.resolve() );
+		expect( status ).toBeEmptyDOMElement();
 	} );
 
 	it( 'removes dismissed announcements without repeating remaining messages', async () => {
@@ -218,7 +248,7 @@ describe( 'Notice.List', () => {
 		);
 		const status = screen.getByRole( 'status' );
 		const remainingMessage = within( status ).getByText(
-			'Draft saved Another draft was saved.'
+			'Draft saved. Another draft was saved.'
 		);
 		rerender(
 			<Notice.List>
@@ -227,11 +257,13 @@ describe( 'Notice.List', () => {
 		);
 		await waitFor( () =>
 			expect( status ).toHaveTextContent(
-				/^Draft saved Another draft was saved\.$/
+				/^Draft saved\. Another draft was saved\.$/
 			)
 		);
 		expect(
-			within( status ).getByText( 'Draft saved Another draft was saved.' )
+			within( status ).getByText(
+				'Draft saved. Another draft was saved.'
+			)
 		).toBe( remainingMessage );
 	} );
 } );

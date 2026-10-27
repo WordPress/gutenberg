@@ -26,7 +26,7 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 
 	/**
 	 * Message announced inside `Notice.List`. Defaults to the plaintext title and
-	 * description, excluding actions. Use an empty string to skip announcements.
+	 * description, excluding actions. Use `politeness="off"` to skip announcements.
 	 * Has no effect outside a list.
 	 */
 	spokenMessage?: string;

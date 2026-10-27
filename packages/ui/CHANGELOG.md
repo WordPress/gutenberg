@@ -11,7 +11,6 @@
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 -   `Notice.List`: Add announcements for added and changed notices, excluding hidden content, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
 
-
 ### Enhancements
 
 -   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. Spinners at the default size are now thinner, and large spinners are thicker ([#85378](https://github.com/WordPress/gutenberg/pull/85378)).
