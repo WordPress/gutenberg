@@ -655,6 +655,19 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
+	it( 'should convert a shortcode that is the whole content', () => {
+		const HTML = '[gallery ids="1,2"]';
+		expect( rawHandler( { HTML } ) ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{ name: 'core/image', attributes: { id: 1 } },
+					{ name: 'core/image', attributes: { id: 2 } },
+				],
+			},
+		] );
+	} );
+
 	it( 'should keep a caption shortcode in the middle of text', () => {
 		const HTML =
 			'<p>Look: [caption align="alignright"]<img src="a.png" /> A cat[/caption] nice.</p>';
