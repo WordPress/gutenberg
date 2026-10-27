@@ -44,6 +44,17 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            # The build starts many processes at once. On runners with fewer
+            # resources, such as those used by private forks, the kernel can
+            # refuse to start more of them (`spawn ENOMEM`). Extra swap raises
+            # the amount of memory that can be committed.
+            - name: Add swap space
+              run: |
+                  sudo fallocate -l 4G /mnt/swapfile-build
+                  sudo chmod 600 /mnt/swapfile-build
+                  sudo mkswap /mnt/swapfile-build
+                  sudo swapon /mnt/swapfile-build
+
             - name: Npm build
               run: npm run build -- --skip-types
 
