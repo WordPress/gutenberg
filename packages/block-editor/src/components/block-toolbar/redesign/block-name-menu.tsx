@@ -15,7 +15,7 @@ import {
 	Menu,
 } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { chevronDownSmall, copy, lock, Icon } from '@wordpress/icons';
 import type { ReactNode } from 'react';
@@ -23,6 +23,7 @@ import SubmenuPopup, {
 	SUBMENU_TRIGGER_PROPS,
 	useFlyoutAim,
 } from './submenu-popup';
+import SearchField from './search-field';
 import BlockIcon from '../../block-icon';
 import useBlockDisplayTitle from '../../block-title/use-block-display-title';
 import { useBlockLock } from '../../block-lock';
@@ -89,13 +90,46 @@ function BlockNameContent( {
 	);
 }
 
-function TransformsAndStyles( {
-	clientIds,
-	showTransforms,
-}: {
-	clientIds: string[];
-	showTransforms: boolean;
-} ) {
+/**
+ * An action the menus can find by searching.
+ */
+export interface SearchEntry {
+	key: string;
+	label: string;
+	icon?: IconType;
+	/**
+	 * Where the action lives, shown next to it in the results.
+	 */
+	context: string;
+	keywords?: string[];
+	onSelect: () => void;
+}
+
+/**
+ * Whether a search entry matches a search.
+ *
+ * @param entry  The entry.
+ * @param search The search, trimmed and lower case.
+ * @return Whether it matches.
+ */
+export function matchesSearchEntry( entry: SearchEntry, search: string ) {
+	return [ entry.label, entry.context, ...( entry.keywords ?? [] ) ].some(
+		( text ) => text.toLocaleLowerCase().includes( search )
+	);
+}
+
+/**
+ * The transforms, variations and style presets of the selected blocks, for
+ * the block name menu and the search of the options menu.
+ *
+ * @param clientIds      The client IDs of the blocks.
+ * @param showTransforms Whether the blocks can be transformed.
+ * @return The menu data, and the actions as search entries.
+ */
+export function useTransformsAndStyles(
+	clientIds: string[],
+	showTransforms: boolean
+) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const { possibleBlockTransformations, patterns, blocks, canRemove } =
@@ -200,6 +234,149 @@ function TransformsAndStyles( {
 		selectForMultipleBlocks( newBlocks );
 	}
 
+	function onPatternTransform( transformedBlocks: Block[] ) {
+		replaceBlocks( clientIds, transformedBlocks );
+		selectForMultipleBlocks( transformedBlocks );
+	}
+
+	function onVariation( name: string ) {
+		const variation = variations?.find(
+			( { name: variationName } ) => variationName === name
+		);
+		if ( variation ) {
+			updateBlockAttributes( clientIds[ 0 ], {
+				...variation.attributes,
+			} );
+		}
+	}
+
+	const styles = isSingleBlock ? ( stylesToRender ?? [] ) : [];
+	function onStyle( name: string ) {
+		const style = styles.find(
+			( { name: styleName } ) => styleName === name
+		);
+		if ( style ) {
+			onSelectStyle( style as BlockStyle );
+		}
+	}
+
+	const hasVariations = showTransforms && !! variations?.length;
+
+	const searchEntries: SearchEntry[] = [
+		...[ ...priorityTransforms, ...restTransforms ]
+			.filter( ( item ) => ! item.isDisabled )
+			.map( ( item ) => ( {
+				key: `transform-${ item.id || item.name }`,
+				label: item.title,
+				icon: item.icon as IconType,
+				context: __( 'Transform' ),
+				keywords: item.keywords,
+				onSelect: () => onTransform( item ),
+			} ) ),
+		...transformedPatterns.map( ( pattern ) => ( {
+			key: `pattern-${ pattern.name }`,
+			label: pattern.title,
+			context: __( 'Patterns' ),
+			onSelect: () => onPatternTransform( pattern.transformedBlocks ),
+		} ) ),
+		...( hasVariations ? variations! : [] )
+			.filter(
+				( variation ) => variation.name !== activeBlockVariationName
+			)
+			.map( ( variation ) => ( {
+				key: `variation-${ variation.name }`,
+				label: variation.title,
+				icon: variation.icon as IconType,
+				context: __( 'Variations' ),
+				keywords: variation.keywords,
+				onSelect: () => onVariation( variation.name ),
+			} ) ),
+		...styles
+			.filter( ( style ) => style.name !== activeStyle?.name )
+			.map( ( style ) => ( {
+				key: `style-${ style.name }`,
+				label: style.label || style.name,
+				context: __( 'Style presets' ),
+				onSelect: () => onStyle( style.name ),
+			} ) ),
+	];
+
+	return {
+		priorityTransforms,
+		restTransforms,
+		transformedPatterns,
+		onTransform,
+		onPatternTransform,
+		variations: hasVariations ? variations! : [],
+		activeBlockVariationName,
+		onVariation,
+		styles,
+		activeStyleName: activeStyle?.name,
+		onStyle,
+		searchEntries,
+	};
+}
+
+/**
+ * Lists the search entries that match a search, or says nothing matched.
+ *
+ * @param props         Component props.
+ * @param props.entries The entries.
+ * @param props.search  The search.
+ */
+export function SearchResults( {
+	entries,
+	search,
+}: {
+	entries: SearchEntry[];
+	search: string;
+} ) {
+	const normalizedSearch = search.trim().toLocaleLowerCase();
+	const results = entries.filter( ( entry ) =>
+		matchesSearchEntry( entry, normalizedSearch )
+	);
+	if ( ! results.length ) {
+		return (
+			<p className="block-editor-block-toolbar__options-no-results">
+				{ __( 'No results found.' ) }
+			</p>
+		);
+	}
+	return results.map( ( entry ) => (
+		<Menu.Item
+			key={ entry.key }
+			onClick={ entry.onSelect }
+			prefix={ entry.icon && <MenuIcon icon={ entry.icon } /> }
+			suffix={ entry.context }
+		>
+			<Menu.ItemLabel>{ entry.label }</Menu.ItemLabel>
+		</Menu.Item>
+	) );
+}
+
+function TransformsAndStyles( {
+	clientIds,
+	showTransforms,
+}: {
+	clientIds: string[];
+	showTransforms: boolean;
+} ) {
+	const [ search, setSearch ] = useState( '' );
+	const {
+		priorityTransforms,
+		restTransforms,
+		transformedPatterns,
+		onTransform,
+		onPatternTransform,
+		variations,
+		activeBlockVariationName,
+		onVariation,
+		styles,
+		activeStyleName,
+		onStyle,
+		searchEntries,
+	} = useTransformsAndStyles( clientIds, showTransforms );
+
 	const transformItem = ( item: InserterItem ) => (
 		<Menu.Item
 			key={ item.id || item.name }
@@ -211,12 +388,11 @@ function TransformsAndStyles( {
 		</Menu.Item>
 	);
 
-	const hasVariations = showTransforms && !! variations?.length;
+	const hasVariations = !! variations.length;
 	const hasTransformItems =
 		!! priorityTransforms.length ||
 		!! restTransforms.length ||
 		!! transformedPatterns.length;
-	const styles = isSingleBlock ? ( stylesToRender ?? [] ) : [];
 
 	if ( ! hasTransformItems && ! hasVariations && ! styles.length ) {
 		return (
@@ -226,8 +402,26 @@ function TransformsAndStyles( {
 		);
 	}
 
+	const searchField = (
+		<SearchField
+			label={ __( 'Search transforms and styles' ) }
+			value={ search }
+			onChange={ setSearch }
+		/>
+	);
+
+	if ( search.trim() ) {
+		return (
+			<>
+				{ searchField }
+				<SearchResults entries={ searchEntries } search={ search } />
+			</>
+		);
+	}
+
 	return (
 		<>
+			{ searchField }
 			{ hasTransformItems && (
 				<Menu.Group>
 					<Menu.GroupLabel>{ __( 'Transform' ) }</Menu.GroupLabel>
@@ -255,15 +449,11 @@ function TransformsAndStyles( {
 												( pattern ) => (
 													<Menu.Item
 														key={ pattern.name }
-														onClick={ () => {
-															replaceBlocks(
-																clientIds,
+														onClick={ () =>
+															onPatternTransform(
 																pattern.transformedBlocks
-															);
-															selectForMultipleBlocks(
-																pattern.transformedBlocks
-															);
-														} }
+															)
+														}
 													>
 														<Menu.ItemLabel>
 															{ pattern.title }
@@ -284,22 +474,12 @@ function TransformsAndStyles( {
 					{ hasTransformItems && <Menu.Separator /> }
 					<Menu.RadioGroup
 						value={ activeBlockVariationName ?? null }
-						onValueChange={ ( name ) => {
-							const variation = variations!.find(
-								( { name: variationName } ) =>
-									variationName === name
-							);
-							if ( variation ) {
-								updateBlockAttributes( clientIds[ 0 ], {
-									...variation.attributes,
-								} );
-							}
-						} }
+						onValueChange={ onVariation }
 					>
 						<Menu.GroupLabel>
 							{ __( 'Variations' ) }
 						</Menu.GroupLabel>
-						{ variations!.map( ( variation ) => (
+						{ variations.map( ( variation ) => (
 							<Menu.RadioItem
 								key={ variation.name }
 								value={ variation.name }
@@ -323,15 +503,8 @@ function TransformsAndStyles( {
 						<Menu.Separator />
 					) }
 					<Menu.RadioGroup
-						value={ activeStyle?.name ?? null }
-						onValueChange={ ( name ) => {
-							const style = styles.find(
-								( { name: styleName } ) => styleName === name
-							);
-							if ( style ) {
-								onSelectStyle( style as BlockStyle );
-							}
-						} }
+						value={ activeStyleName ?? null }
+						onValueChange={ onStyle }
 					>
 						<Menu.GroupLabel>
 							{ __( 'Style presets' ) }

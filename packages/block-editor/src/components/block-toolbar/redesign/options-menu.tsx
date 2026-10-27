@@ -20,13 +20,11 @@ import {
 	group as groupIcon,
 	lock as lockIcon,
 	pencil,
-	search as searchIcon,
 	seen,
 	settings,
 	ungroup as ungroupIcon,
 	unlock as unlockIcon,
 	unseen,
-	Icon,
 } from '@wordpress/icons';
 import type { ReactNode, RefObject } from 'react';
 import SubmenuPopup, {
@@ -41,6 +39,10 @@ import { RichTextToolbarControlsFills } from '../../rich-text/format-toolbar';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import SearchField from './search-field';
+import BlockIcon from '../../block-icon';
+import { matchesSearchEntry, useTransformsAndStyles } from './block-name-menu';
+import { getBlockIconVariant } from '../block-toolbar-icon';
 import { useNotifyCopy } from '../../../utils/use-notify-copy';
 import { useBlockElement } from '../../block-list/use-block-props/use-block-refs';
 import { groupBlocks } from '../../../utils/group-blocks';
@@ -98,6 +100,11 @@ interface ActionEntry {
 	 */
 	onCopied?: () => void;
 	/**
+	 * Content to show before the label in place of the icon, such as a block
+	 * icon.
+	 */
+	prefix?: ReactNode;
+	/**
 	 * Opens a dialog, so assistive technology is told.
 	 */
 	hasDialog?: boolean;
@@ -147,7 +154,7 @@ function ActionMenuItem( {
 			ref={ entry.getCopyText ? copyRef : undefined }
 			disabled={ entry.disabled }
 			onClick={ entry.onClick }
-			prefix={ getPrefix( entry.icon ) }
+			prefix={ entry.prefix ?? getPrefix( entry.icon ) }
 			shortcut={ entry.shortcut }
 			suffix={ suffix }
 			aria-haspopup={ entry.hasDialog ? 'dialog' : undefined }
@@ -427,59 +434,6 @@ function LegacyMenuControls( {
 	);
 }
 
-function SearchField( {
-	value,
-	onChange,
-}: {
-	value: string;
-	onChange: ( value: string ) => void;
-} ) {
-	const inputRef = useRef< HTMLInputElement >( null );
-
-	// Search as soon as the menu opens. The menu moves focus itself while
-	// it opens, so wait for that.
-	useEffect( () => {
-		const view = inputRef.current?.ownerDocument.defaultView;
-		const frame = view?.requestAnimationFrame( () =>
-			inputRef.current?.focus()
-		);
-		return () => {
-			if ( frame !== undefined ) {
-				view?.cancelAnimationFrame( frame );
-			}
-		};
-	}, [] );
-
-	return (
-		<div className="block-editor-block-toolbar__options-search">
-			<Icon icon={ searchIcon } size={ 24 } />
-			<input
-				ref={ inputRef }
-				type="search"
-				value={ value }
-				aria-label={ __( 'Search block options' ) }
-				autoComplete="off"
-				onChange={ ( event ) => onChange( event.target.value ) }
-				onKeyDown={ ( event ) => {
-					// Typing searches; leave typeahead and other keys to the
-					// menu, so arrow keys move into the items.
-					if (
-						event.key.length === 1 ||
-						event.key === 'Backspace' ||
-						event.key === 'Delete' ||
-						event.key === 'Home' ||
-						event.key === 'End' ||
-						event.key === 'ArrowLeft' ||
-						event.key === 'ArrowRight'
-					) {
-						event.stopPropagation();
-					}
-				} }
-			/>
-		</div>
-	);
-}
-
 /**
  * The contents of the options menu. Mounted only while the menu is open, as
  * it renders the rich text format slots that the selection toolbar renders
@@ -519,6 +473,20 @@ function OptionsMenuContent( {
 	const [ search, setSearch ] = useState( '' );
 	const shortcuts = useMenuShortcuts( SHORTCUT_NAMES );
 	const firstClientId = clientIds[ 0 ];
+	const blockNameMenuVariant = useSelect(
+		( select ) => getBlockIconVariant( { select, clientIds } ),
+		[ clientIds ]
+	);
+	const { searchEntries: allTransformSearchEntries } = useTransformsAndStyles(
+		clientIds,
+		blockNameMenuVariant === 'switcher'
+	);
+	// Only what the block name menu offers for these blocks.
+	const transformSearchEntries =
+		blockNameMenuVariant === 'switcher' ||
+		blockNameMenuVariant === 'styles-only'
+			? allTransformSearchEntries
+			: [];
 	const isSingleBlock = clientIds.length === 1;
 	const {
 		canCopyStyles,
@@ -827,6 +795,26 @@ function OptionsMenuContent( {
 
 	const normalizedSearch = search.trim().toLocaleLowerCase();
 	if ( normalizedSearch ) {
+		// Search also finds what the block name menu and the Layout menu
+		// offer, so one search reaches everything the block can do.
+		const otherEntries = [
+			...transformSearchEntries,
+			...items
+				.filter( ( item ) => item.group === 'layout' && item.choices )
+				.flatMap( ( item ) =>
+					item
+						.choices!.filter(
+							( choice ) => choice.value !== item.value
+						)
+						.map( ( choice ) => ( {
+							key: `${ item.name }-${ choice.value }`,
+							label: choice.label,
+							icon: choice.icon,
+							context: item.label,
+							onSelect: () => item.onChange?.( choice.value ),
+						} ) )
+				),
+		].filter( ( entry ) => matchesSearchEntry( entry, normalizedSearch ) );
 		const results: { entry: ActionEntry; context?: string }[] = (
 			[
 				...alignEntries.flatMap( ( alignEntry ) =>
@@ -858,15 +846,37 @@ function OptionsMenuContent( {
 					context: __( 'More' ),
 				} ) ),
 			] as { entry: ActionEntry; context?: string }[]
-		 ).filter(
-			( { entry, context } ) =>
-				matchesSearch( entry.label, normalizedSearch ) ||
-				( !! context && matchesSearch( context, normalizedSearch ) )
-		);
+		 )
+			.filter(
+				( { entry, context } ) =>
+					matchesSearch( entry.label, normalizedSearch ) ||
+					( !! context && matchesSearch( context, normalizedSearch ) )
+			)
+			.concat(
+				otherEntries.map( ( entry ) => ( {
+					entry: {
+						key: entry.key,
+						label: entry.label,
+						// Block and layout icons are block icons, not plain
+						// SVG elements.
+						prefix: entry.icon && (
+							<span className="block-editor-block-toolbar__menu-block-icon">
+								<BlockIcon icon={ entry.icon } />
+							</span>
+						),
+						onClick: entry.onSelect,
+					},
+					context: entry.context,
+				} ) )
+			);
 
 		return (
 			<>
-				<SearchField value={ search } onChange={ setSearch } />
+				<SearchField
+					label={ __( 'Search block options' ) }
+					value={ search }
+					onChange={ setSearch }
+				/>
 				{ results.map( ( { entry, context } ) => (
 					<ActionMenuItem
 						key={ entry.key }
@@ -885,7 +895,11 @@ function OptionsMenuContent( {
 
 	return (
 		<>
-			<SearchField value={ search } onChange={ setSearch } />
+			<SearchField
+				label={ __( 'Search block options' ) }
+				value={ search }
+				onChange={ setSearch }
+			/>
 			{ alignEntries.length > 0 && (
 				<>
 					<Menu.Group>
