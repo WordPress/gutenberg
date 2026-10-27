@@ -1,7 +1,7 @@
 {
 	"name": "straddle",
 	"description": "B bolds across the edge of A's addition: one formatting suggestion, partly inside it.",
-	"phase": "current",
+	"phase": "B",
 	"users": { "A": "overlap-anne", "B": "overlap-bob" },
 	"base": "Hello world.",
 	"suggestions": [
