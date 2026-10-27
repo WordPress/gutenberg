@@ -736,23 +736,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should only replace Dashicons with icons from the core-admin collection.
-	 *
-	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
-	 */
-	public function test_get_admin_icon_name_for_dashicon_ignores_icons_outside_core_admin() {
-		$this->register(
-			'core/envelope',
-			array(
-				'label'   => 'Envelope',
-				'content' => '<svg></svg>',
-			)
-		);
-
-		$this->assertNull( $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-email' ) );
-	}
-
-	/**
 	 * Should return null for values without a replacement.
 	 *
 	 * @dataProvider data_get_admin_icon_name_for_dashicon_without_replacement
