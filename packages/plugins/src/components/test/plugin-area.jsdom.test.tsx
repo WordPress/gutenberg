@@ -90,7 +90,7 @@ describe( 'PluginArea', () => {
 
 	test( 'does not rerender when a plugin is added to a different scope', () => {
 		const ComponentSpy: ComponentType< { content: string } > = vi.fn(
-			( { content } ) => {
+			( { content }: { content: string } ) => {
 				return `plugin: ${ content }.`;
 			}
 		);
