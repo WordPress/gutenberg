@@ -17,7 +17,12 @@ import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { createProposedTerms } from './create-proposed-terms';
-import { withoutProposedAttributes } from './marker';
+import {
+	nestedMarkerFor,
+	withoutMarkerEntry,
+	withoutOutdatedProposals,
+	withoutProposedAttributes,
+} from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import {
 	rebaseFormatOriginal,
@@ -536,6 +541,42 @@ export function useSuggestionDecisions() {
 			// mutate the tree rather than a single block's attributes, so they
 			// run a planned set of block-editor actions.
 			const structuralOp = findStructuralOp( payload.operations );
+			/*
+			 * A suggestion nested on another author's (a second proposal, or
+			 * a removal of their suggested block) is decided on its own: an
+			 * accepted removal removes the block, an accepted proposal lands
+			 * and leaves the block's other suggestions pending.
+			 */
+			const nested = nestedMarkerFor(
+				selectBlockAttributes( targetClientId ),
+				commentId
+			);
+			if ( nested && structuralOp?.type !== 'block-remove' ) {
+				return decide(
+					commentId,
+					'applied',
+					() => {
+						const currentAttributes =
+							selectBlockAttributes( targetClientId );
+						const applied = applyOperations(
+							currentAttributes,
+							payload.operations
+						);
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							...applied,
+							metadata: withoutOutdatedProposals(
+								withoutMarkerEntry(
+									currentAttributes?.metadata,
+									commentId
+								),
+								applied
+							),
+						} );
+					},
+					failureMessage
+				);
+			}
 			if ( structuralOp ) {
 				return decide(
 					commentId,
@@ -562,20 +603,27 @@ export function useSuggestionDecisions() {
 					const currentAttributes =
 						selectBlockAttributes( targetClientId );
 					// One update lands the proposed values and drops the
-					// proposal.
+					// proposal, with any other author's proposal it left
+					// with nothing to change.
 					const clearedProposal =
 						clearProposedAttributes( currentAttributes );
+					const applied = applyOperations(
+						currentAttributes,
+						payload.operations
+					);
+					const metadata = withoutOutdatedProposals(
+						clearedProposal?.metadata ??
+							currentAttributes?.metadata,
+						applied
+					);
 					// Bypass the Suggestion mode interceptor for this dispatch
 					// so the applied attributes land on the live block instead
 					// of being diverted into a proposal. Outside Suggestion
 					// mode the interceptor isn't running and this is a no-op.
 					requestInterceptorBypass( targetClientId );
 					updateBlockAttributes( targetClientId, {
-						...applyOperations(
-							currentAttributes,
-							payload.operations
-						),
-						...( clearedProposal ?? {} ),
+						...applied,
+						...( metadata ? { metadata } : {} ),
 					} );
 				},
 				failureMessage
@@ -698,7 +746,31 @@ export function useSuggestionDecisions() {
 				commentId,
 				'rejected',
 				() => {
-					if ( structuralOp && clientId ) {
+					/*
+					 * A suggestion nested on another author's made no change
+					 * of its own to the block: rejecting it drops it and
+					 * leaves the block's other suggestions as they are.
+					 */
+					const remaining =
+						clientId &&
+						nestedMarkerFor(
+							selectBlockAttributes( clientId ),
+							commentId
+						)
+							? withoutMarkerEntry(
+									selectBlockAttributes( clientId )?.metadata,
+									commentId
+								)
+							: null;
+					if ( clientId && remaining ) {
+						requestInterceptorBypass( clientId );
+						markNextChangeAsNotPersistent?.( {
+							history: 'ignore',
+						} );
+						updateBlockAttributes( clientId, {
+							metadata: remaining,
+						} );
+					} else if ( structuralOp && clientId ) {
 						runPlan(
 							planStructuralReject(
 								structuralOp,
