@@ -1,9 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { store as blocksStore } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import { ScreenBody } from './screen-body';
 import { Subtitle } from './subtitle';
@@ -13,26 +11,26 @@ import { getOverridingBlockTypes } from './utils';
 
 interface ElementBlockOverridesProps {
 	element: string;
+	blockTypes: BlockType[];
 }
 
 export default function ElementBlockOverrides( {
 	element,
+	blockTypes,
 }: ElementBlockOverridesProps ) {
 	const { merged } = useContext( GlobalStylesContext );
-	const allBlockTypes = useSelect(
-		( select ) => select( blocksStore ).getBlockTypes(),
-		[]
-	);
-	const blockTypes = useMemo( () => {
-		const names = getOverridingBlockTypes( merged, element );
-		return names
-			.map( ( name ) =>
-				allBlockTypes.find( ( blockType ) => blockType.name === name )
-			)
-			.filter( ( blockType ): blockType is BlockType => !! blockType );
-	}, [ merged, element, allBlockTypes ] );
+	const overridingBlockTypes = useMemo( () => {
+		const names = getOverridingBlockTypes(
+			merged,
+			element,
+			blockTypes.map( ( blockType ) => blockType.name )
+		);
+		return blockTypes.filter( ( blockType ) =>
+			names.includes( blockType.name )
+		);
+	}, [ merged, element, blockTypes ] );
 
-	if ( ! blockTypes.length ) {
+	if ( ! overridingBlockTypes.length ) {
 		return null;
 	}
 
@@ -45,7 +43,7 @@ export default function ElementBlockOverrides( {
 					isSeparated
 					className="global-styles-ui-block-types-item-list global-styles-ui-element-block-overrides__list"
 				>
-					{ blockTypes.map( ( block ) => (
+					{ overridingBlockTypes.map( ( block ) => (
 						<BlockMenuItem block={ block } key={ block.name } />
 					) ) }
 				</ItemGroup>

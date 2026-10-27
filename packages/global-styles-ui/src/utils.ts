@@ -7,13 +7,11 @@ import type {
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from './lock-unlock';
 
 const { getViewportBreakpoints, resolveStyle } = unlock(
 	globalStylesEnginePrivateApis
 );
-const { getBlockTypesForElement } = unlock( blockEditorPrivateApis );
 
 /**
  * State definition with value and label.
@@ -363,15 +361,16 @@ function setsSameProperty( path: string, otherPath: string ) {
  * The block types an element paints whose own Global Styles beat the element
  * for at least one property it sets. Block style variations are not counted.
  *
- * @param config  Merged Global Styles config.
- * @param element Element key, e.g. `heading`, `h2` or `button`.
- * @return Block names, in map order.
+ * @param config     Merged Global Styles config.
+ * @param element    Element key, e.g. `heading`, `h2` or `button`.
+ * @param blockNames Block types that paint the element.
+ * @return Block names, in the given order.
  */
 export function getOverridingBlockTypes(
 	config: GlobalStylesConfig | undefined,
-	element: string
+	element: string,
+	blockNames: string[]
 ): string[] {
-	const blockNames: string[] = getBlockTypesForElement( element );
 	if ( ! blockNames.length || ! config?.styles ) {
 		return [];
 	}

@@ -1,5 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
 import { getOverridingBlockTypes } from '../utils';
 
@@ -144,9 +143,12 @@ describe( 'getOverridingBlockTypes', () => {
 			const config = getConfig( {
 				'core/post-title': { typography: { fontSize: '3rem' } },
 			} );
-			expect( getOverridingBlockTypes( config, element ) ).toEqual( [
-				'core/post-title',
-			] );
+			expect(
+				getOverridingBlockTypes( config, element, [
+					'core/heading',
+					'core/post-title',
+				] )
+			).toEqual( [ 'core/post-title' ] );
 		}
 	);
 
@@ -162,31 +164,9 @@ describe( 'getOverridingBlockTypes', () => {
 		],
 	] )( 'skips %s', ( _, style ) => {
 		const config = getConfig( { 'core/post-title': style } );
-		expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual( [] );
-	} );
-
-	describe( 'with a heading block whose level defaults to 0', () => {
-		beforeAll( () => {
-			registerBlockType( 'core/site-tagline', {
-				apiVersion: 3,
-				title: 'Site Tagline',
-				category: 'theme',
-				attributes: { level: { type: 'number', default: 0 } },
-			} );
-		} );
-
-		afterAll( () => {
-			unregisterBlockType( 'core/site-tagline' );
-		} );
-
-		it( 'does not list it', () => {
-			const config = getConfig( {
-				'core/site-tagline': { typography: { fontWeight: '700' } },
-			} );
-			expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual(
-				[]
-			);
-		} );
+		expect(
+			getOverridingBlockTypes( config, 'heading', [ 'core/post-title' ] )
+		).toEqual( [] );
 	} );
 
 	it( 'resolves an element value that refers to block styles', () => {
@@ -207,10 +187,12 @@ describe( 'getOverridingBlockTypes', () => {
 				},
 			},
 		};
-		expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual( [
-			'core/heading',
-			'core/post-title',
-		] );
+		expect(
+			getOverridingBlockTypes( config, 'heading', [
+				'core/heading',
+				'core/post-title',
+			] )
+		).toEqual( [ 'core/heading', 'core/post-title' ] );
 	} );
 
 	function getButtonConfig( elementStyle, blockStyle ) {
@@ -302,7 +284,8 @@ describe( 'getOverridingBlockTypes', () => {
 		expect(
 			getOverridingBlockTypes(
 				getButtonConfig( elementStyle, blockStyle ),
-				'button'
+				'button',
+				[ 'core/button' ]
 			)
 		).toEqual( [ 'core/button' ] );
 	} );
@@ -337,7 +320,8 @@ describe( 'getOverridingBlockTypes', () => {
 		expect(
 			getOverridingBlockTypes(
 				getButtonConfig( elementStyle, blockStyle ),
-				'button'
+				'button',
+				[ 'core/button' ]
 			)
 		).toEqual( [] );
 	} );

@@ -1,6 +1,9 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { PanelBody, useNavigator } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type {
 	GlobalStylesSettings,
@@ -30,6 +33,7 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 	TypographyPanel: StylesTypographyPanel,
 	AdvancedPanel: StylesAdvancedPanel,
+	getBlockTypesForElement,
 } = unlock( blockEditorPrivateApis );
 
 /*
@@ -222,6 +226,25 @@ function ScreenElement( {
 		() => ( showStateControls ? getValidPseudoStates( element ) : [] ),
 		[ element, showStateControls ]
 	);
+	const allBlockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
+	const elementBlockTypes = useMemo(
+		() =>
+			getBlockTypesForElement( element )
+				.map( ( name: string ) =>
+					allBlockTypes.find(
+						( blockType ) => blockType.name === name
+					)
+				)
+				.filter(
+					(
+						blockType: BlockType | undefined
+					): blockType is BlockType => !! blockType
+				),
+		[ element, allBlockTypes ]
+	);
 	const state =
 		selectedPseudoState === 'default' ? undefined : selectedPseudoState;
 	// "Text" is the site's base text, stored at the root of the styles rather
@@ -268,7 +291,10 @@ function ScreenElement( {
 				inheritedStyle={ inheritedStyle }
 				setStyle={ setStyle }
 			/>
-			<ElementBlockOverrides element={ element } />
+			<ElementBlockOverrides
+				element={ element }
+				blockTypes={ elementBlockTypes }
+			/>
 		</>
 	);
 }
