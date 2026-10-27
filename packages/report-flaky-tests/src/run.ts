@@ -19,13 +19,34 @@ async function run() {
 		throw error;
 	} );
 
-	const flakyTests: FlakyTestResult[] = await Promise.all(
-		flakyTestsDir.map( ( filename ) =>
-			fs
-				.readFile( path.join( artifactPath, filename ), 'utf-8' )
-				.then( ( text ) => JSON.parse( text ) )
+	/*
+	 * A report that can't be parsed (e.g. a partially written file) must not
+	 * prevent the remaining flaky tests from being reported.
+	 */
+	const flakyTests = (
+		await Promise.all(
+			flakyTestsDir
+				.filter( ( filename ) => filename.endsWith( '.json' ) )
+				.map( async ( filename ) => {
+					try {
+						const text = await fs.readFile(
+							path.join( artifactPath, filename ),
+							'utf-8'
+						);
+						return JSON.parse( text ) as FlakyTestResult;
+					} catch ( error ) {
+						core.warning(
+							`Skipping unreadable flaky test report "${ filename }": ${
+								error instanceof Error
+									? error.message
+									: String( error )
+							}`
+						);
+						return null;
+					}
+				} )
 		)
-	);
+	).filter( ( result ): result is FlakyTestResult => result !== null );
 
 	if ( flakyTests.length === 0 ) {
 		core.info( 'No flaky tests to report.' );
