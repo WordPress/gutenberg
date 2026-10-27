@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { suggestionContextLines } from '../suggestion-context';
+import {
+	blockSuggestionContextLines,
+	suggestionContextLines,
+} from '../suggestion-context';
 
 const names: Record< string, string > = { '1': 'Anne', '2': 'Bob' };
 const nameOf = ( id: string ) => names[ id ];
@@ -154,6 +157,43 @@ describe( 'suggestionContextLines', () => {
 					alsoDeleting: [],
 				},
 				emptiedCount: 0,
+				nameOf,
+			} )
+		).toEqual( [] );
+	} );
+} );
+
+describe( 'blockSuggestionContextLines', () => {
+	const markers = [
+		{ type: 'pending-insert', authorId: 3, commentId: 1 },
+		{ type: 'pending-remove', authorId: 7, commentId: 2 },
+		{ type: 'pending-attributes', authorId: 9, after: { level: 3 } },
+	] as any[];
+
+	it( 'names the other suggestions on the block', () => {
+		expect(
+			blockSuggestionContextLines( { markers, noteId: '2', nameOf } )
+		).toEqual( [
+			'Anne suggested adding this block',
+			'Someone else also suggested changes to this block',
+		] );
+	} );
+
+	it( 'says rejecting a suggested block outdates what others suggested on it', () => {
+		expect(
+			blockSuggestionContextLines( { markers, noteId: '1', nameOf } )
+		).toEqual( [
+			'Bob also suggested removing this block',
+			'Someone else also suggested changes to this block',
+			'Rejecting also makes 2 suggestions outdated.',
+		] );
+	} );
+
+	it( 'says nothing for a block with one suggestion', () => {
+		expect(
+			blockSuggestionContextLines( {
+				markers: markers.slice( 0, 1 ),
+				noteId: '1',
 				nameOf,
 			} )
 		).toEqual( [] );
