@@ -169,65 +169,61 @@ function BlockStyles( {
 								key={ rowIndex }
 								className="block-editor-block-styles__row"
 							>
-								{ row.map( ( style ) => {
-									const label = style.label || style.name;
-									const isActive =
-										activeStyle.name === style.name;
-									return (
-										<Tooltip.Root key={ style.name }>
-											<Composite.Item
-												id={ getCompositeItemId(
-													instanceId,
-													style
-												) }
-												render={
-													<Tooltip.Trigger
-														render={
-															<Button
-																className="block-editor-block-styles__item"
-																tone="neutral"
-																variant={
-																	isActive
-																		? 'solid'
-																		: 'outline'
-																}
-															/>
-														}
-													/>
-												}
-												role="radio"
-												aria-checked={ isActive }
-												onMouseEnter={ () =>
-													styleItemHandler( style )
-												}
-												onFocus={ () =>
-													styleItemHandler( style )
-												}
-												onMouseLeave={ () =>
-													styleItemHandler( null )
-												}
-												onBlur={ () =>
-													styleItemHandler( null )
-												}
-												onClick={ () =>
-													onSelectStylePreview(
-														style
-													)
-												}
+								{ row.map( ( style ) => (
+									<Tooltip.Root key={ style.name }>
+										<Composite.Item
+											id={ getCompositeItemId(
+												instanceId,
+												style
+											) }
+											render={
+												<Tooltip.Trigger
+													render={
+														<Button
+															className="block-editor-block-styles__item"
+															tone="neutral"
+															variant={
+																activeStyle.name ===
+																style.name
+																	? 'solid'
+																	: 'outline'
+															}
+														/>
+													}
+												/>
+											}
+											role="radio"
+											aria-checked={
+												activeStyle.name === style.name
+											}
+											onMouseEnter={ () =>
+												styleItemHandler( style )
+											}
+											onFocus={ () =>
+												styleItemHandler( style )
+											}
+											onMouseLeave={ () =>
+												styleItemHandler( null )
+											}
+											onBlur={ () =>
+												styleItemHandler( null )
+											}
+											onClick={ () =>
+												onSelectStylePreview( style )
+											}
+										>
+											<Truncate
+												numberOfLines={ 2 }
+												className="block-editor-block-styles__item-text"
 											>
-												<Truncate
-													numberOfLines={ 2 }
-													className="block-editor-block-styles__item-text"
-												>
-													{ label }
-												</Truncate>
-											</Composite.Item>
-											<Tooltip.Popup>
-												{ label }
-											</Tooltip.Popup>
-										</Tooltip.Root>
-									);
-								} ) }
+												{ style.label || style.name }
+											</Truncate>
+										</Composite.Item>
+										<Tooltip.Popup>
+											{ style.label || style.name }
+										</Tooltip.Popup>
+									</Tooltip.Root>
+								) ) }
 							</Composite.Row>
 						) ) }
 					</Composite>
