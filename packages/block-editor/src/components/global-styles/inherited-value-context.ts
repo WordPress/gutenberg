@@ -1,6 +1,6 @@
 import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../../store';
@@ -210,16 +210,24 @@ function getElementLayers(
  * The inverse of `getElementLayers`: the block types a root-level Global
  * Styles element paints as their whole selves. `h1`-`h6` give the heading
  * family, since its blocks can render at any level. Blocks that wrap their
- * link are left out.
+ * link, and heading blocks that default to level `0` (a paragraph), are left
+ * out.
  *
  * @param element Element key, e.g. `heading`, `h2` or `button`.
  * @return Block names, or an empty array for an element no block renders as.
  */
 export function getBlockTypesForElement( element: string ): string[] {
 	const key = HEADING_LEVEL_ELEMENT.test( element ) ? 'heading' : element;
-	return Object.hasOwn( ELEMENT_BLOCK_TYPES, key )
-		? ELEMENT_BLOCK_TYPES[ key ]
-		: [];
+	if ( ! Object.hasOwn( ELEMENT_BLOCK_TYPES, key ) ) {
+		return [];
+	}
+	if ( key !== 'heading' ) {
+		return ELEMENT_BLOCK_TYPES[ key ];
+	}
+	return ELEMENT_BLOCK_TYPES.heading.filter(
+		( blockName ) =>
+			getBlockType( blockName )?.attributes?.level?.default !== 0
+	);
 }
 
 /**

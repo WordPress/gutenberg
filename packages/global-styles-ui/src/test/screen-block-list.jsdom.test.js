@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { hasUserStylesForBlock } from '../screen-block-list';
 import { getOverridingBlockTypes } from '../utils';
 
@@ -162,6 +163,30 @@ describe( 'getOverridingBlockTypes', () => {
 	] )( 'skips %s', ( _, style ) => {
 		const config = getConfig( { 'core/post-title': style } );
 		expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual( [] );
+	} );
+
+	describe( 'with a heading block whose level defaults to 0', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/site-tagline', {
+				apiVersion: 3,
+				title: 'Site Tagline',
+				category: 'theme',
+				attributes: { level: { type: 'number', default: 0 } },
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/site-tagline' );
+		} );
+
+		it( 'does not list it', () => {
+			const config = getConfig( {
+				'core/site-tagline': { typography: { fontWeight: '700' } },
+			} );
+			expect( getOverridingBlockTypes( config, 'heading' ) ).toEqual(
+				[]
+			);
+		} );
 	} );
 
 	it( 'resolves an element value that refers to block styles', () => {
