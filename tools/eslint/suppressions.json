@@ -2769,11 +2769,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation-link/link-ui/test/get-suggestions-query.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation-link/save.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -2844,11 +2839,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation-link/shared/test/use-link-preview.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation-link/shared/update-attributes.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -2880,11 +2870,6 @@
 		}
 	},
 	"packages/block-library/src/navigation-link/shared/use-is-invalid-link.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation-link/shared/use-link-preview.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -6359,11 +6344,6 @@
 			"count": 1
 		}
 	},
-	"packages/blocks/src/api/raw-handling/test/is-inline-content.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/blocks/src/api/raw-handling/test/latex-to-math.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6571,11 +6551,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/popover/test/utils/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/components/src/range-control/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 3
@@ -6669,315 +6644,14 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/create-batch.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/default-processor.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/test/create-batch.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/batch/test/default-processor.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
+	"packages/core-data/src/components/entities-saved-states/entity-record-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/core-data/src/components/entities-saved-states/entity-type-list.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/hooks/use-is-dirty.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/index.jsx": {
+	"packages/core-data/src/components/entities-saved-states/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/test/use-is-dirty.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/entities.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/entity-context.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/entity-provider.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/__experimental-fetch-url-data.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/test/__experimental-fetch-link-suggestions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/fetch/test/__experimental-fetch-url-data.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/get-footnotes-order.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/get-rich-text-values-cached.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/footnotes/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-entity-record.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-entity-records.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-query-select.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/test/use-resource-permissions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/use-entity-block-editor.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/use-entity-id.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/hooks/use-entity-prop.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/engine.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/test/engine.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/locks/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/name.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/parsed-blocks-cache.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/private-actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/get-query-parts.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/get-query-parts.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/queried-data/test/selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/resolvers.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/actions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/can-user.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/deprecated-entity-logging.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/entities.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/entity-provider.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/core-data/src/test/entity-sync.jsdom.test.js": {
@@ -6985,170 +6659,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/test/parsed-blocks-cache.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/private-actions.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/private-selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/resolvers.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/rtc-rich-text-offset-space.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/store.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/test/sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/conservative-map-item.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/forward-resolver.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-normalized-comma-separable.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-template-info.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/get-template-part-icon.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/if-matching-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/is-numeric-id.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/normalize-query-for-resolution.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/receive-intermediate-results.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/replace-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/save-crdt-doc.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/set-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/clear-unchanged-edits.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/conservative-map-item.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-normalized-comma-separable.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-pagination-meta.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/get-template-info.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/if-matching-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/is-numeric-id.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/log-entity-deprecation.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/replace-action.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -7163,32 +6674,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/utils/test/save-crdt-doc.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/set-nested-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/utils/test/sync-undo-levels.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/with-weak-map-cache.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/user-permissions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/with-weak-map-cache.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -7486,11 +6972,6 @@
 			"count": 1
 		}
 	},
-	"packages/dataviews/src/components/dataviews-view-config/infinite-scroll-toggle.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/dataviews/src/components/dataviews-view-config/properties-section.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7567,16 +7048,6 @@
 		}
 	},
 	"packages/docgen/test/get-type-annotation.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/e2e-test-utils-playwright/src/page-utils/set-browser-viewport.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/e2e-test-utils-playwright/src/request-utils/widgets.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -7865,14 +7336,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/media/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/more-menu/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -7958,17 +7421,6 @@
 		}
 	},
 	"packages/edit-site/src/components/page-templates/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/pagination/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -8100,17 +7552,6 @@
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-details-footer/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/sidebar-navigation-screen-global-styles/content.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -8564,21 +8005,6 @@
 		}
 	},
 	"packages/edit-site/src/utils/is-previewing-theme.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/utils/is-template-removable.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/utils/is-template-revertable.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/utils/template-part-create.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -11493,11 +10919,6 @@
 			"count": 8
 		}
 	},
-	"packages/global-styles-ui/src/font-library/library-font-details.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/global-styles-ui/src/font-library/library-font-variant.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -11596,7 +11017,7 @@
 	},
 	"packages/global-styles-ui/src/screen-block-list.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		},
 		"no-restricted-imports": {
 			"count": 1
@@ -11843,39 +11264,14 @@
 			"count": 1
 		}
 	},
-	"packages/patterns/src/api/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/allow-overrides-modal.jsx": {
+	"packages/patterns/src/components/allow-overrides-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/patterns/src/components/category-selector.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/create-pattern-modal.jsx": {
+	"packages/patterns/src/components/create-pattern-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/patterns/src/components/create-template-part-modal/index.tsx": {
@@ -11883,139 +11279,18 @@
 			"count": 4
 		}
 	},
-	"packages/patterns/src/components/create-template-part-modal/test/utils.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/duplicate-pattern-modal.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/overrides-panel.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/pattern-convert-button.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/pattern-overrides-controls.jsx": {
+	"packages/patterns/src/components/pattern-overrides-controls.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/patterns/src/components/patterns-manage-button.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/rename-pattern-category-modal.jsx": {
+	"packages/patterns/src/components/rename-pattern-category-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/patterns/src/components/rename-pattern-modal.jsx": {
+	"packages/patterns/src/components/rename-pattern-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/components/reset-overrides-control.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/lock-unlock.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/private-apis.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/private-hooks.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/patterns/src/store/selectors.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -12029,71 +11304,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/create/test/debounce-async.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/create/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/legacy-local-storage-data/test/convert-edit-post-panels.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/legacy-local-storage-data/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/legacy-local-storage-data/test/move-feature-preferences.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/legacy-local-storage-data/test/move-individual-preference.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/legacy-local-storage-data/test/move-interface-enable-items.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/legacy-local-storage-data/test/move-third-party-feature-preferences.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/preferences-package-data/test/convert-complementary-areas.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/preferences-package-data/test/convert-editor-settings.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/migrations/preferences-package-data/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/preferences-persistence/src/test/local-storage.jsdom.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -12279,32 +11489,6 @@
 	},
 	"packages/style-engine/src/test/index.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/store/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/store/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/test/if-viewport-matches.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/viewport/src/test/with-viewport-match.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -12554,11 +11738,6 @@
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"storybook/components/figma-embed/index.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
