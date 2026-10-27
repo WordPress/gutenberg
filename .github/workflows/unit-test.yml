@@ -23,13 +23,12 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
+        name: JavaScript ${{ matrix.shard }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22']
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
@@ -40,8 +39,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
@@ -58,13 +55,9 @@ jobs:
                     --cacheDirectory="$HOME/.jest-cache"
 
     unit-js-date:
-        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
+        name: JavaScript Date Tests
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        strategy:
-            fail-fast: false
-            matrix:
-                node: ['20', '22']
 
         steps:
             - name: Checkout repository
@@ -74,8 +67,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
