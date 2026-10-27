@@ -12,28 +12,43 @@ export function getNumber( value: unknown ) {
 }
 
 /**
- * Safely adds 2 values.
+ * Safely adds values together, handling floating-point precision issues.
  *
  * @param args Values to add together.
  *
  * @return The sum of values.
  */
 export function add( ...args: Array< number | string > ) {
-	return args.reduce< number >( ( sum, arg ) => sum + getNumber( arg ), 0 );
+	const precision = args.length
+		? Math.max( ...args.map( ( arg ) => getPrecision( getNumber( arg ) ) ) )
+		: 0;
+	const sum = args.reduce< number >(
+		( total, arg ) => total + getNumber( arg ),
+		0
+	);
+	return precision
+		? getNumber( sum.toFixed( Math.min( precision, 20 ) ) )
+		: sum;
 }
 
 /**
- * Safely subtracts 2 values.
+ * Safely subtracts values, handling floating-point precision issues.
  *
  * @param args Values to subtract together.
  *
  * @return The difference of the values.
  */
 export function subtract( ...args: Array< number | string > ) {
-	return args.reduce< number >( ( diff, arg, index ) => {
+	const precision = args.length
+		? Math.max( ...args.map( ( arg ) => getPrecision( getNumber( arg ) ) ) )
+		: 0;
+	const diff = args.reduce< number >( ( total, arg, index ) => {
 		const value = getNumber( arg );
-		return index === 0 ? value : diff - value;
+		return index === 0 ? value : total - value;
 	}, 0 );
+	return precision
+		? getNumber( diff.toFixed( Math.min( precision, 20 ) ) )
+		: diff;
 }
 
 /**

@@ -195,14 +195,19 @@ function UnforwardedUnitControl(
 	) : null;
 
 	let step = props.step;
+	let spinFactor = props.spinFactor;
 
 	/*
-	 * If no step prop has been passed, lookup the active unit and
-	 * try to get step from `units`, or default to a value of `1`
+	 * If no step prop has been passed, default to 'any' so that typed fractional
+	 * values are preserved across CSS units and browser validation accepts them,
+	 * while deriving spinFactor from the active unit for keyboard and drag stepping.
 	 */
-	if ( ! step && units ) {
-		const activeUnit = units.find( ( option ) => option.value === unit );
-		step = activeUnit?.step ?? 1;
+	if ( step === undefined ) {
+		const activeUnit = units?.find( ( option ) => option.value === unit );
+		const unitStep = activeUnit?.step ?? 1;
+
+		step = 'any';
+		spinFactor = ( props.spinFactor ?? 1 ) * unitStep;
 	}
 
 	return (
@@ -222,6 +227,7 @@ function UnforwardedUnitControl(
 			type={ isPressEnterToChange ? 'text' : 'number' }
 			value={ parsedQuantity ?? '' }
 			step={ step }
+			spinFactor={ spinFactor }
 			onFocus={ onFocusProp }
 			__unstableStateReducer={ __unstableStateReducer }
 		/>
