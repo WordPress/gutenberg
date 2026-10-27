@@ -412,31 +412,6 @@ describe( 'withSuggestionOverlay', () => {
 		);
 	} );
 
-	it( 'passes through in View intent — no overlay, no diversion', () => {
-		const setAttributes = vi.fn();
-		renderWithProviders(
-			<Wrapped
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'Untouched' } }
-				setAttributes={ setAttributes }
-			/>,
-			{ intent: 'view' }
-		);
-
-		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-			'Untouched'
-		);
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-
-		// In view intent the HOC is a pass-through, so the real
-		// setAttributes is invoked and the overlay is never used.
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			content: 'proposed',
-		} );
-	} );
-
 	it( 're-captures baseline when overlay is cleared then re-edited', () => {
 		// Regression: after Submit/Discard clears the overlay entry, a
 		// later edit must create a new baseline + overlay rather than

@@ -44,7 +44,7 @@ export const DESIGN_POST_TYPES = [
 
 /**
  * Editor intent values. The intent represents the user's current editing
- * purpose (edit the post directly, suggest changes, or view in read-only).
+ * purpose (edit the post directly, or suggest changes).
  *
  * Mostly orthogonal to the `editorMode` preference (visual vs. code). The
  * exception is `suggest`, which always reports `visual`: the code editor
@@ -78,11 +78,9 @@ export const DESIGN_POST_TYPES = [
  */
 export const EDITOR_INTENT_EDIT = 'edit';
 export const EDITOR_INTENT_SUGGEST = 'suggest';
-export const EDITOR_INTENT_VIEW = 'view';
 export const EDITOR_INTENTS = [
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
-	EDITOR_INTENT_VIEW,
 ] as const;
 export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
 
