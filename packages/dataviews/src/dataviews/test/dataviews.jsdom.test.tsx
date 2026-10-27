@@ -175,6 +175,33 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 } );
 
 describe( 'DataViews component', () => {
+	it.each( [ 'Delete', 'Delete……' ] )(
+		'uses button and item-menu labels for modal action "%s"',
+		async ( label ) => {
+			render(
+				<DataViewWrapper
+					actions={ [
+						{ ...actions[ 0 ], label, isPrimary: true },
+						{ id: 'view', label: 'View', callback: vi.fn() },
+					] }
+					data={ [ data[ 0 ] ] }
+				/>
+			);
+			const user = userEvent.setup();
+			expect(
+				screen.getByRole( 'button', { name: 'Delete' } )
+			).toBeInTheDocument();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+			expect(
+				await screen.findByRole( 'menuitem', {
+					name: label === 'Delete' ? 'Delete…' : label,
+				} )
+			).toBeInTheDocument();
+		}
+	);
+
 	it( 'renders header bulk actions once in a custom table composition', () => {
 		render(
 			<DataViewWrapper
@@ -1510,7 +1537,7 @@ describe( 'DataViews component', () => {
 			expect( callback ).not.toHaveBeenCalled();
 
 			await user.click(
-				screen.getByRole( 'menuitem', { name: 'Delete' } )
+				screen.getByRole( 'menuitem', { name: 'Delete…' } )
 			);
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 			expect(
