@@ -2135,7 +2135,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, example: import('./widget-utils.mjs').WidgetExampleMetadata | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2160,6 +2160,7 @@ function collectWidgets() {
 				icon: metadata.icon ?? null,
 				actions: metadata.actions ?? null,
 				attributes: metadata.attributes ?? null,
+				example: metadata.example ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
@@ -2371,6 +2372,29 @@ function toPhpAttributesLiteral( attributes ) {
 }
 
 /**
+ * Format a widget's example as a PHP array literal: `attributes` copied as
+ * declared, with the registration gate constraining the values. Returns the
+ * PHP literal `null` unless `example` carries a non-empty `attributes`
+ * object.
+ *
+ * @param {import('./widget-utils.mjs').WidgetExampleMetadata|null|undefined} example Source value.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpExampleLiteral( example ) {
+	const attributes = example?.attributes;
+	if (
+		! attributes ||
+		typeof attributes !== 'object' ||
+		Array.isArray( attributes ) ||
+		Object.keys( attributes ).length === 0
+	) {
+		return 'null';
+	}
+
+	return toPhpValueLiteral( { attributes } );
+}
+
+/**
  * Generate global widget registry file.
  * Creates a single registry with all widgets including file availability.
  *
@@ -2398,6 +2422,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const iconStr = toPhpStringLiteral( widget.icon );
 			const actionsStr = toPhpActionsLiteral( widget.actions );
 			const attributesStr = toPhpAttributesLiteral( widget.attributes );
+			const exampleStr = toPhpExampleLiteral( widget.example );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
 			const textdomainStr = toPhpStringLiteral( widget.textdomain );
 			return `\tarray(
@@ -2409,6 +2434,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'icon'         => ${ iconStr },
 		'actions'      => ${ actionsStr },
 		'attributes'   => ${ attributesStr },
+		'example'      => ${ exampleStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },
