@@ -102,6 +102,19 @@
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
+
+		// A percentage min-height on a child resolves against the container's
+		// height, which is `auto` here, so it collapses to zero. Stretching the
+		// container to the cover's height gives the child something to resolve
+		// against. This is limited to covers whose only child uses it: next to
+		// siblings it would overflow the cover, and in other covers stretching
+		// would change the position of the content.
+		&:has(
+			> [style*="min-height:100%"]:only-child,
+			> [style*="min-height: 100%"]:only-child
+		) {
+			align-self: stretch;
+		}
 	}
 
 	// Position: Top
