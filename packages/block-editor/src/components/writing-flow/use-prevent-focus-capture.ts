@@ -55,8 +55,10 @@ export default function usePreventFocusCapture() {
 			elements.clear();
 		}
 
+		// Only presses in this canvas. The shared document listener runs after
+		// React's, so `defaultPrevented` is already known.
 		const unsubscribePointerDown = subscribeDelegatedListener(
-			defaultView,
+			node,
 			'pointerdown',
 			onPointerDown as EventListener
 		);
