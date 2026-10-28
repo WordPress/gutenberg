@@ -2,7 +2,7 @@
 
 ## Unreleased
 
--   Widget footer: keep one strip height whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
+-   Widget footer: keep one strip height (compact control plus padding) whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
 
 ### Breaking Changes
 
