@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Preserve keyboard-focus styling when hovering style, color, and typography variation previews.
+-   Preserve keyboard-focus styling when hovering style, color, and typography variation previews ([#85816](https://github.com/WordPress/gutenberg/pull/85816)).
 
 ## 2.0.0 (2026-10-20)
 
