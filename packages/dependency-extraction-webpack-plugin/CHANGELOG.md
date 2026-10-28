@@ -2,15 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Externalize `@wordpress/dataviews/wp` as `wp-dataviews` instead of bundling it, so WordPress-script consumers get the shared runtime handle and its translations. [#80986](https://github.com/WordPress/gutenberg/pull/80986)
+
 ## 7.0.0 (2026-10-20)
 
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
-### Bug Fixes
-
--   Externalize `@wordpress/dataviews/wp` as `wp-dataviews` instead of bundling it, so WordPress-script consumers get the shared runtime handle and its translations. [#80986](https://github.com/WordPress/gutenberg/pull/80986)
 
 ## 6.57.0 (2026-10-07)
 
