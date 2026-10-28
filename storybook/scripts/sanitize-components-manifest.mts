@@ -8,6 +8,18 @@
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import assert from 'node:assert';
+import type { ComponentManifest } from 'storybook/internal/types';
+
+/**
+ * A manifest component with engine-specific prop data and recursive
+ * subcomponents, which Storybook's `ComponentManifest` does not type.
+ */
+type WPManifestNode = Omit< ComponentManifest, 'subcomponents' > & {
+	reactComponentMeta?: { props?: Record< string, unknown > };
+	reactDocgen?: { props?: Record< string, unknown > };
+	reactDocgenTypescript?: { props?: Record< string, unknown > };
+	subcomponents?: Record< string, WPManifestNode >;
+};
 
 const manifestPath = process.argv[ 2 ];
 
@@ -20,7 +32,10 @@ const ignoredPropsByComponent = new Map( [
 	[ 'GradientPicker', new Set( [ 'asButtons' ] ) ],
 ] );
 
-function sanitizeComponent( component ) {
+/**
+ * @param component A component or subcomponent to sanitize.
+ */
+function sanitizeComponent( component: WPManifestNode ) {
 	const ignoredProps = ignoredPropsByComponent.get( component.name );
 
 	for ( const propName of ignoredProps ?? [] ) {
@@ -37,7 +52,8 @@ function sanitizeComponent( component ) {
 }
 
 const raw = await readFile( manifestPath, 'utf8' );
-const manifest = JSON.parse( raw );
+const manifest: { components?: Record< string, WPManifestNode > } =
+	JSON.parse( raw );
 for ( const component of Object.values( manifest.components ?? {} ) ) {
 	sanitizeComponent( component );
 }
