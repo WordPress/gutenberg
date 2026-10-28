@@ -38,7 +38,7 @@
 		flex-grow: 0;
 		flex-shrink: 0;
 	}
-	&:not(.is-primary, .is-selected, :hover, :focus) .editor-autocompleters__user-slug {
+	&:not(.is-primary, .is-selected, :focus) .editor-autocompleters__user-slug {
 		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 }

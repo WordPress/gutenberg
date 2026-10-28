@@ -161,7 +161,7 @@ $block-editor-link-control-number-of-actions: 1;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
-	&:not(:hover, :focus, [aria-selected="true"]) .components-menu-item__shortcut {
+	&:not(:focus, [aria-selected="true"]) .components-menu-item__shortcut {
 		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 }
