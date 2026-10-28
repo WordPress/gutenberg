@@ -161,7 +161,9 @@ describe( 'router regions in HTML directive content', () => {
 		}
 	} );
 
-	test( 'updates a region carrying data-wp-html in either attribute order without writing its token', async () => {
+	// The runtime logs each warning once per module, so every region carrying
+	// `data-wp-html` stays in this test, the only one expecting the warning.
+	test( 'updates and restores a region carrying data-wp-html in either attribute order without writing its token', async () => {
 		store( namespace, {
 			state: {
 				// The conflicting HTML directive must never render this token.
@@ -173,43 +175,27 @@ describe( 'router regions in HTML directive content', () => {
 			const attributes = htmlFirst
 				? `data-wp-html="state.html" ${ regionAttribute }`
 				: `${ regionAttribute } data-wp-html="state.html"`;
-			const current = hydrateHtml(
-				`<div data-wp-interactive="${ namespace }" ${ attributes }><p>current</p></div>`
-			);
+			const body = ( content: string ) =>
+				`<div data-wp-interactive="${ namespace }" ${ attributes }><p>${ content }</p></div>`;
+			const current = hydrateHtml( body( 'current' ) );
 			expect( current.innerHTML ).toBe( '<p>current</p>' );
+			const previous = `${ url }-previous-${ htmlFirst }`;
+			await actions.prefetch( previous, {
+				html: pageHtml( body( 'current' ) ),
+			} );
 
-			await navigate(
-				`<div data-wp-interactive="${ namespace }" ${ attributes }><p>destination</p></div>`
-			);
-
+			await navigate( body( 'destination' ) );
 			expect( current.innerHTML ).toBe( '<p>destination</p>' );
+
+			traverseTo( previous );
+			await nextFrames();
+			expect( current.innerHTML ).toBe( '<p>current</p>' );
 			current.parentElement!.remove();
 		}
 		expect( console ).toHaveWarnedWith(
 			'The data-wp-html directive was ignored because it conflicts with data-wp-router-region.'
 		);
 	} );
-
-	for ( const htmlFirst of [ false, true ] ) {
-		test( `restores a region carrying html on Back (html first: ${ htmlFirst })`, async () => {
-			const regionAttribute = `data-wp-router-region="${ namespace }/r"`;
-			const attributes = htmlFirst
-				? `data-wp-html="state.html" ${ regionAttribute }`
-				: `${ regionAttribute } data-wp-html="state.html"`;
-			const body = ( letter: string ) =>
-				`<div data-wp-interactive="${ namespace }" ${ attributes }><p>${ letter }</p></div>`;
-			const current = hydrateHtml( body( 'A' ) );
-			const previous = `${ url }-previous`;
-			await actions.prefetch( previous, {
-				html: pageHtml( body( 'A' ) ),
-			} );
-			await navigate( body( 'B' ) );
-			expect( current.innerHTML ).toBe( '<p>B</p>' );
-			traverseTo( previous );
-			await nextFrames();
-			expect( current.innerHTML ).toBe( '<p>A</p>' );
-		} );
-	}
 
 	test( 'never initializes islands in fallback or inserted content inside an updated region', async () => {
 		const island = ( text: string ) =>
