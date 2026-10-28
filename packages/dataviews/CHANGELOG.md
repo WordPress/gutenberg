@@ -4,13 +4,20 @@
 
 ### Breaking Changes
 
+-   Action labels should omit ellipses. Menu items for actions with `RenderModal` now add a translated ellipsis. Common trailing ellipses in existing labels remain supported as a best-effort fallback ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
 
 ### Enhancements
 
+-   Omit trailing ellipses from action button labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
 -   Use the design system outline for keyboard focus on list items ([#85358](https://github.com/WordPress/gutenberg/pull/85358)).
+-   Use the design system outline for keyboard focus on grid cards ([#85364](https://github.com/WordPress/gutenberg/pull/85364)).
 -   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
+
+### Bug Fixes
+
+-   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 
 ## 21.0.0 (2026-10-20)
 

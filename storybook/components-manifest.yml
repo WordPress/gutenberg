@@ -977,7 +977,9 @@
       - className
       - icon
       - intent
+      - politeness
       - render
+      - spokenMessage
       - style
   subcomponents:
       - name: Notice.ActionButton
@@ -1021,6 +1023,12 @@
             - shortcut
             - style
       - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.List
         props:
             - children
             - className
