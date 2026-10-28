@@ -23,7 +23,7 @@ const note = `<div id="agent-docs-note">
 	<h1>Gutenberg Storybook</h1>
 	<p>This site needs JavaScript. To read its documentation without a browser, use these sources:</p>
 	<ul>
-		<li>The <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/design-system-mcp/README.md">WordPress Design System MCP server</a> provides recommended components, their props and usage, and design tokens.</li>
+		<li>The <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/design-system-mcp/README.md">WordPress Design System MCP server</a> provides AI agents with recommended components, their props and usage, and design tokens.</li>
 		<li><a href="./index.json">index.json</a> lists every page. The <code>path</code> parameter of a page URL, such as <code>?path=/docs/components-checkboxcontrol--migration-guide</code>, ends with the ID of its entry. The entry's <code>importPath</code> is the source file, relative to the <code>storybook</code> directory of the Gutenberg repository. For example, that page's source is <a href="${ rawBaseUrl }/packages/components/src/checkbox-control/stories/migration-guide.mdx">${ rawBaseUrl }/packages/components/src/checkbox-control/stories/migration-guide.mdx</a>.</li>
 		<li><a href="./manifests/components.json">manifests/components.json</a> contains the generated documentation of the recommended components.</li>
 	</ul>
