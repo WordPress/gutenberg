@@ -487,8 +487,12 @@ test.describe( 'Post Summary', () => {
 			const editButton = summary.getByRole( 'button', {
 				name: 'Edit Excerpt',
 			} );
-			// An empty excerpt renders only the label next to the edit button.
-			await expect( editButton.locator( '..' ) ).toHaveText( 'Excerpt' );
+			// An empty excerpt shows the field's placeholder as its value.
+			await expect(
+				editButton
+					.locator( '..' )
+					.getByText( 'Add an excerpt', { exact: true } )
+			).toBeVisible();
 
 			await editButton.click();
 			await page
