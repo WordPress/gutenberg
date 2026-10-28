@@ -464,9 +464,9 @@ test.describe( 'List View', () => {
 
 		// Focus the list view close button and make sure the shortcut will
 		// close the list view. This is to catch a bug where elements could be
-		// out of range of the sidebar region. Must shift+tab 2 times to reach
-		// close button before tab panel.
-		await pageUtils.pressKeys( 'shift+Tab' );
+		// out of range of the sidebar region. With Tabs.TabList rendered before
+		// the close button in the DOM, shift+tab from the list view reaches
+		// the close button directly.
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page
