@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add `htmlAttributes` to every block: attributes of its element it doesn't know, shown in the editor and saved again. Only global attributes that describe content are kept: `data-*`, `aria-*`, `role`, `id`, `title`, `lang`, `dir`, `translate` and microdata (`item*`) ([#85716](https://github.com/WordPress/gutenberg/pull/85716)).
+-   `htmlAttributes` also keeps the inline style properties a block doesn't write. They're saved as the browser writes them, for example `#fffbe6` as `rgb(255, 251, 230)` ([#85802](https://github.com/WordPress/gutenberg/pull/85802)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).

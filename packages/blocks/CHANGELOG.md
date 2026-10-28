@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Keep the attributes of a block's element that its `save` doesn't produce in `htmlAttributes`, when the block has that attribute, instead of marking the block invalid. They're read after the block's deprecations. `rawHandler` keeps them too, so converting classic content to blocks no longer drops them ([#85716](https://github.com/WordPress/gutenberg/pull/85716)).
+-   Block validation compares `style` attributes as the browser reads them, so `#fff` matches `rgb(255, 255, 255)` and a value like `url("data:image/png;base64,…")` is compared whole. The parser keeps the style properties `save` doesn't write in `htmlAttributes` ([#85802](https://github.com/WordPress/gutenberg/pull/85802)).
 -   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
 
 ### Bug Fixes
