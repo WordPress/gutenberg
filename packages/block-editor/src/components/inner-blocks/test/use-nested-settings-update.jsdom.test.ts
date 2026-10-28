@@ -6,10 +6,6 @@ import type { ReactNode } from 'react';
 import { store as blockEditorStore } from '../../../store';
 import useNestedSettingsUpdate from '../use-nested-settings-update';
 
-type TestWindow = Window & {
-	__experimentalEnableGridInteractivity?: boolean;
-};
-
 /**
  * Gets the block list settings a container ends up with.
  *
@@ -70,13 +66,11 @@ async function getSettings( {
 describe( 'useNestedSettingsUpdate', () => {
 	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
-		originalExperiment = ( window as TestWindow )
-			.__experimentalEnableGridInteractivity;
-		( window as TestWindow ).__experimentalEnableGridInteractivity = true;
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
 	} );
 	afterEach( () => {
-		( window as TestWindow ).__experimentalEnableGridInteractivity =
-			originalExperiment;
+		window.__experimentalEnableGridInteractivity = originalExperiment;
 	} );
 
 	it( "captures toolbars when the layout does and the block doesn't", async () => {
