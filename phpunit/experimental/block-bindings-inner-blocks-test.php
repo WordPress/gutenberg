@@ -166,4 +166,35 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"></div>' );
 		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div></div>$#', $output );
 	}
+
+	public function test_value_goes_where_the_own_inner_blocks_were() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group( null, '<!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --><span>Tail</span>' );
+		$this->assertMatchesRegularExpression( '#>One</p><span>Tail</span>#', $output );
+	}
+
+	public function test_inner_container_class_name_without_inner_container_keeps_value() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$block       = new WP_Block( parse_blocks( '<!-- wp:group {"className":"wp-block-group__inner-container-x","metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group wp-block-group__inner-container-x"></div><!-- /wp:group -->' )[0] );
+		$this->assertStringContainsString( '>One</p>', $block->render() );
+	}
+
+	public function test_nested_custom_css_in_the_value_is_removed() {
+		$this->value = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"@mobile":{":hover":{"css":"color:red"}}}} --><p>Styled</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$output      = $this->render_group();
+		$this->assertStringNotContainsString( 'wp-custom-css-', $output );
+		$this->assertStringContainsString( '>Styled</p>', $output );
+	}
+
+	public function test_block_without_inner_content_renders() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output      = render_block(
+			array(
+				'blockName'   => 'core/group',
+				'attrs'       => array( 'metadata' => array( 'bindings' => array( 'innerBlocks' => array( 'source' => self::SOURCE ) ) ) ),
+				'innerBlocks' => array(),
+			)
+		);
+		$this->assertIsString( $output );
+	}
 }
