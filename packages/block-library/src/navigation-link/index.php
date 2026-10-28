@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/item-term-ancestor-classes.php';
 require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 
 /**
@@ -204,7 +205,11 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$classes = array();
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$classes = gutenberg_block_core_shared_navigation_item_get_term_ancestor_classes( $attributes );
+	} else {
+		$classes = block_core_shared_navigation_item_get_term_ancestor_classes( $attributes );
+	}
 
 	// Render inner blocks first to check if any menu items will actually display.
 	$inner_blocks_html = '';
