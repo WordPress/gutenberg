@@ -117,6 +117,8 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **css**: `.wp-block-navigation:not(.wp-block-navigation__container)`
+- **typography**:
+  - textDecoration: `.wp-block-navigation, .wp-block-navigation .wp-block-navigation-item__content`
 
 ## Block Markup
 
