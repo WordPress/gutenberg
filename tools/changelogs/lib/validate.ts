@@ -3,133 +3,169 @@ import path from 'node:path';
 import yaml from 'js-yaml';
 import { loadChangieConfig } from './config.ts';
 
-export interface FragmentValidationError {
-	filePath: string;
-	message: string;
+export interface Fragment {
+	project: string;
+	kind: string;
+	body: string;
+	time?: unknown;
+	custom: { PR: string | number };
 }
 
-export function validateFragment(
+interface ValidationOptions {
+	pr?: string;
+	requirePr?: string;
+	project?: string;
+}
+
+/**
+ * Parse and validate a fragment once so all consumers use the same rules.
+ *
+ * @param filePath Fragment path for diagnostics.
+ * @param content  YAML source.
+ * @param options  Validation options.
+ * @param repoRoot Repository root.
+ * @return Validation errors and the parsed fragment when valid.
+ */
+export function parseFragment(
 	filePath: string,
 	content: string,
-	options: { pr?: string; requirePr?: string } = {},
-	repoRoot: string = process.cwd()
-): string[] {
-	const errors: string[] = [];
-	let parsed: any;
+	options: ValidationOptions = {},
+	repoRoot = process.cwd()
+): { errors: string[]; fragment?: Fragment } {
+	const errors = [];
+	let parsed;
 	try {
 		parsed = yaml.safeLoad( content );
-	} catch ( err: any ) {
-		return [ `${ filePath }: invalid YAML: ${ err.message }` ];
+	} catch ( error ) {
+		return {
+			errors: [
+				`${ filePath }: invalid YAML: ${ error instanceof Error ? error.message : String( error ) }`,
+			],
+		};
 	}
-
-	if ( ! parsed || typeof parsed !== 'object' ) {
-		return [ `${ filePath }: fragment must be a YAML object.` ];
+	if ( ! parsed || typeof parsed !== 'object' || Array.isArray( parsed ) ) {
+		return { errors: [ `${ filePath }: fragment must be a YAML object.` ] };
 	}
-
+	const data = parsed as Record< string, unknown >;
+	const { project, kind, body, custom } = data;
 	const config = loadChangieConfig( repoRoot );
 	const allowedKinds = [
 		'Stable Release',
-		...( config.kinds || [] ).map( ( k ) => k.label ),
+		...( config.kinds || [] ).map( ( item ) => item.label ),
 	];
-	const allowedProjects = ( config.projects || [] ).map( ( p ) => p.key );
-
-	if ( ! parsed.project ) {
+	const allowedProjects = config.projects.map( ( item ) => item.key );
+	if ( typeof project !== 'string' || ! project.trim() ) {
 		errors.push( `${ filePath }: missing required 'project' property.` );
-	} else if (
-		allowedProjects.length > 0 &&
-		! allowedProjects.includes( parsed.project )
-	) {
+	} else if ( ! allowedProjects.includes( project ) ) {
 		errors.push(
-			`${ filePath }: unknown project '${ parsed.project }'. Allowed projects: ${ allowedProjects.join( ', ' ) }`
+			`${ filePath }: unknown project '${ project }'. Allowed projects: ${ allowedProjects.join( ', ' ) }`
 		);
 	}
-
-	if ( ! parsed.kind ) {
+	if ( typeof kind !== 'string' || ! kind.trim() ) {
 		errors.push( `${ filePath }: missing required 'kind' property.` );
-	} else if (
-		allowedKinds.length > 0 &&
-		! allowedKinds.includes( parsed.kind )
-	) {
+	} else if ( ! allowedKinds.includes( kind ) ) {
 		errors.push(
-			`${ filePath }: unknown kind '${ parsed.kind }'. Allowed kinds: ${ allowedKinds.join( ', ' ) }`
+			`${ filePath }: unknown kind '${ kind }'. Allowed kinds: ${ allowedKinds.join( ', ' ) }`
 		);
 	}
-
-	if (
-		! parsed.body ||
-		typeof parsed.body !== 'string' ||
-		parsed.body.trim() === ''
-	) {
+	if ( typeof body !== 'string' || ! body.trim() ) {
 		errors.push( `${ filePath }: missing or empty 'body' description.` );
 	}
-
-	const fragmentPr = parsed.custom?.PR
-		? String( parsed.custom.PR ).trim()
-		: '';
-
-	if ( options.requirePr ) {
-		if ( ! fragmentPr ) {
-			errors.push(
-				`${ filePath }: must include custom.PR matching #${ options.requirePr }`
-			);
-		} else if ( fragmentPr !== options.requirePr ) {
-			errors.push(
-				`${ filePath }: PR #${ fragmentPr } does not match required PR #${ options.requirePr }`
-			);
-		}
+	const pr =
+		custom && typeof custom === 'object' && ! Array.isArray( custom )
+			? ( custom as Record< string, unknown > ).PR
+			: undefined;
+	const fragmentPr =
+		typeof pr === 'string' || typeof pr === 'number'
+			? String( pr ).trim()
+			: '';
+	if (
+		! /^[1-9]\d*$/.test( fragmentPr ) ||
+		! Number.isSafeInteger( Number( fragmentPr ) )
+	) {
+		errors.push(
+			`${ filePath }: custom.PR must be a positive integer. Add the Gutenberg pull request number.`
+		);
+	} else if ( options.requirePr && fragmentPr !== options.requirePr ) {
+		errors.push(
+			`${ filePath }: PR #${ fragmentPr } does not match required PR #${ options.requirePr }`
+		);
 	}
-
-	return errors;
+	if (
+		errors.length ||
+		typeof project !== 'string' ||
+		typeof kind !== 'string' ||
+		typeof body !== 'string' ||
+		( typeof pr !== 'string' && typeof pr !== 'number' )
+	) {
+		return { errors };
+	}
+	return {
+		errors,
+		fragment: { project, kind, body, time: data.time, custom: { PR: pr } },
+	};
 }
 
+/**
+ * @param filePath Fragment path.
+ * @param content  YAML source.
+ * @param options  Validation options.
+ * @param repoRoot Repository root.
+ * @return Validation errors.
+ */
+export function validateFragment(
+	filePath: string,
+	content: string,
+	options: ValidationOptions = {},
+	repoRoot = process.cwd()
+) {
+	return parseFragment( filePath, content, options, repoRoot ).errors;
+}
+
+/**
+ * @param options  Validation options.
+ * @param repoRoot Repository root.
+ * @return Validation errors.
+ */
 export function validateAllFragments(
-	options: { pr?: string; requirePr?: string; project?: string } = {},
-	repoRoot: string = process.cwd()
-): string[] {
+	options: ValidationOptions = {},
+	repoRoot = process.cwd()
+) {
 	const config = loadChangieConfig( repoRoot );
 	const unreleasedDir = path.resolve(
 		repoRoot,
 		config.changesDir || '.changes',
 		config.unreleasedDir || 'unreleased'
 	);
-	if ( ! fs.existsSync( unreleasedDir ) ) {
-		return [];
-	}
-
-	const files = fs
-		.readdirSync( unreleasedDir )
-		.filter( ( f ) => f.endsWith( '.yaml' ) );
-	const allErrors: string[] = [];
-
+	const files = fs.existsSync( unreleasedDir )
+		? fs
+				.readdirSync( unreleasedDir )
+				.filter( ( file ) => file.endsWith( '.yaml' ) )
+		: [];
+	const allErrors = [];
 	let matchedPrCount = 0;
-	for ( const f of files ) {
-		const filePath = path.join( unreleasedDir, f );
-		const content = fs.readFileSync( filePath, 'utf8' );
-		// When validating all fragments, individual fragments belong to different PRs.
-		// Only check fragment schema/syntax without requiring options.requirePr per fragment;
-		// options.requirePr is checked below across all fragments for the project.
-		const errors = validateFragment( filePath, content, {}, repoRoot );
+	for ( const file of files ) {
+		const filePath = path.join( unreleasedDir, file );
+		const { errors, fragment } = parseFragment(
+			filePath,
+			fs.readFileSync( filePath, 'utf8' ),
+			{},
+			repoRoot
+		);
 		allErrors.push( ...errors );
-
-		if ( options.requirePr ) {
-			const parsed = yaml.safeLoad( content ) as any;
-			if ( String( parsed?.custom?.PR ) === options.requirePr ) {
-				if (
-					! options.project ||
-					parsed?.project === options.project
-				) {
-					matchedPrCount++;
-				}
-			}
+		if (
+			fragment &&
+			String( fragment.custom.PR ).trim() === options.requirePr &&
+			( ! options.project || fragment.project === options.project )
+		) {
+			matchedPrCount++;
 		}
 	}
-
 	if ( options.requirePr && matchedPrCount === 0 ) {
 		allErrors.push(
 			`No unreleased fragment found citing required PR #${ options.requirePr }` +
 				( options.project ? ` for project '${ options.project }'` : '' )
 		);
 	}
-
 	return allErrors;
 }

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import yaml from 'js-yaml';
 import { loadChangieConfig } from './config.ts';
+import { parseFragment } from './validate.ts';
 import { execChangie } from './release.ts';
 
 export interface Fragment {
@@ -9,9 +9,9 @@ export interface Fragment {
 	project: string;
 	kind: string;
 	body: string;
-	time: string;
+	time?: unknown;
 	custom?: {
-		PR?: string;
+		PR?: string | number;
 		[ key: string ]: unknown;
 	};
 }
@@ -40,21 +40,22 @@ export function loadUnreleasedFragments(
 		.filter( ( f ) => f.endsWith( '.yaml' ) );
 	const fragments: Fragment[] = [];
 
+	const errors: string[] = [];
 	for ( const file of files ) {
 		const filePath = path.join( unreleasedDir, file );
-		try {
-			const data = yaml.safeLoad(
-				fs.readFileSync( filePath, 'utf8' )
-			) as any;
-			if ( data && typeof data === 'object' ) {
-				fragments.push( {
-					...data,
-					filePath,
-				} );
-			}
-		} catch {
-			// Skip corrupt or empty files
+		const result = parseFragment(
+			filePath,
+			fs.readFileSync( filePath, 'utf8' ),
+			{},
+			repoRoot
+		);
+		errors.push( ...result.errors );
+		if ( result.fragment ) {
+			fragments.push( { ...result.fragment, filePath } );
 		}
+	}
+	if ( errors.length ) {
+		throw new Error( errors.join( '\n' ) );
 	}
 
 	return fragments;

@@ -5,11 +5,14 @@ Tools for managing package changelogs and fragments using [Changie](https://chan
 ## Architecture
 
 -   The root `.changie.yaml` defines repo-wide kinds, formatting templates, and opted-in projects.
--   `lib/config.js`: loads configuration and detects whether a package is configured for Changie.
+-   `lib/config.ts`: loads configuration and detects whether a package is configured for Changie.
+-   `lib/validate.ts`: validates fragments for authoring, preview, and CI. Every fragment requires a positive integer `custom.PR`; `--require-pr` additionally requires a matching fragment for the target package.
 -   `lib/migrate.js`: bi-directional migration between traditional `CHANGELOG.md` files and Changie version/fragment files.
 -   `lib/preview.js`: preview unreleased notes across packages.
 -   `lib/promote-stable.js`: generate `Stable Release` fragments promoting 0.x packages to 1.0.0.
 -   `lib/release.js`: version bump calculation and batch/merge operations used during automated package publishing.
+
+The private workspace exports its shared configuration and validator as TypeScript source. Consumers declare a workspace dependency and import `@wordpress/changelog-tools/config` or `@wordpress/changelog-tools/validate`, rather than using relative imports into another workspace. Node runs these modules with type stripping, so changelog commands need no build step. The workspace uses the repository's Node TypeScript preset for type checking.
 
 ## Migrating a package to Changie
 
