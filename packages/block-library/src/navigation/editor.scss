@@ -117,12 +117,8 @@
 		margin-right: 0;
 		margin-left: auto;
 		border: $border-width solid currentColor;
-
-		&,
-		&:hover {
-			background-color: transparent;
-			color: $gray-900;
-		}
+		background-color: transparent;
+		color: $gray-900;
 	}
 }
 
