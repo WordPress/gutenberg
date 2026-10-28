@@ -29,7 +29,7 @@ export const strikethrough = {
 					onUse={ onClick }
 				/>
 				<RichTextToolbarButton
-					name={ name }
+					name="strikethrough"
 					icon={ formatStrikethrough }
 					title={ title }
 					onClick={ onClick }

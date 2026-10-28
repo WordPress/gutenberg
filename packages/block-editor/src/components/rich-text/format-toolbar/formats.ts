@@ -10,14 +10,14 @@ export const TOOLBAR_FORMATS = [
 
 // The core formats in the "More" dropdown, in the order they are listed.
 export const DROPDOWN_FORMATS = [
-	'core/text-color',
-	'core/image',
-	'core/code',
-	'core/keyboard',
-	'core/strikethrough',
-	'core/superscript',
-	'core/subscript',
-	'core/language',
-	'core/math',
-	'core/footnote',
+	'text-color',
+	'image',
+	'code',
+	'keyboard',
+	'strikethrough',
+	'superscript',
+	'subscript',
+	'language',
+	'math',
+	'footnote',
 ];
