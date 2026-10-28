@@ -1,5 +1,5 @@
 import { getSaveContent } from '../serializer';
-import { getStyleProperties, validateBlock } from '../validation';
+import { validateBlock } from '../validation';
 import { parseHtml } from './get-block-attributes';
 import type { Block, BlockType } from '../../types';
 
@@ -25,8 +25,7 @@ function getHTMLRootElementAttributes(
 /**
  * Given parsed block attributes, keeps the attributes of the block's root
  * element that its `save` doesn't produce in `htmlAttributes`, so they're
- * saved again. For `style`, only the properties `save` doesn't set are kept.
- * Classes are left to `fixCustomClassname`.
+ * saved again. Classes are left to `fixCustomClassname`.
  *
  * @param blockAttributes Original block attributes.
  * @param blockType       Block type settings.
@@ -47,21 +46,9 @@ export function fixHtmlAttributes(
 	const saved = getHTMLRootElementAttributes(
 		getSaveContent( blockType, attributes )
 	);
-	const savedStyle = getStyleProperties( saved.get( 'style' ) ?? '' );
 	const unknownAttributes: Record< string, string > = {};
 	for ( const [ name, value ] of getHTMLRootElementAttributes( innerHTML ) ) {
-		if ( name === 'style' ) {
-			const style = value
-				.split( ';' )
-				.filter( ( declaration ) => {
-					const property = declaration.split( ':' )[ 0 ].trim();
-					return property && ! ( property in savedStyle );
-				} )
-				.join( ';' );
-			if ( style ) {
-				unknownAttributes.style = style;
-			}
-		} else if ( name !== 'class' && ! saved.has( name ) ) {
+		if ( name !== 'class' && ! saved.has( name ) ) {
 			unknownAttributes[ name ] = value;
 		}
 	}

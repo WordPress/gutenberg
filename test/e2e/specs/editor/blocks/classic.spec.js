@@ -144,9 +144,7 @@ test.describe( 'Classic', () => {
 	test( 'should keep attributes a block does not know when converted to blocks', async ( {
 		editor,
 	} ) => {
-		await editor.setContent(
-			'<p data-note="tip" style="background-color:#fffbe6">Hello</p>'
-		);
+		await editor.setContent( '<p data-note="tip">Hello</p>' );
 		const classicBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Classic',
 		} );
@@ -161,17 +159,14 @@ test.describe( 'Classic', () => {
 				attributes: {
 					content: 'Hello',
 					dropCap: false,
-					htmlAttributes: {
-						'data-note': 'tip',
-						style: 'background-color:#fffbe6',
-					},
+					htmlAttributes: { 'data-note': 'tip' },
 				},
 				innerBlocks: [],
 			},
 		] );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->
-<p data-note="tip" style="background-color:#fffbe6">Hello</p>
+<p data-note="tip">Hello</p>
 <!-- /wp:paragraph -->`
 		);
 	} );

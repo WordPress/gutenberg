@@ -103,18 +103,24 @@ const hasStyleSupport = ( nameOrType: string | BlockType ) =>
  *
  * @return React style object key.
  */
-export function getReactStyleKey( key: string ): string {
+function getReactStyleKey( key: string ): string {
 	// Custom properties start with two dashes. React writes them verbatim.
-	if ( key.startsWith( '--' ) ) {
+	if ( ! key.startsWith( '-' ) || key.startsWith( '--' ) ) {
 		return key;
 	}
 
-	const camelCased = key.replace( /-([a-z])/g, ( _, character: string ) =>
-		character.toUpperCase()
-	);
+	const camelCased = key
+		.slice( 1 )
+		.replace( /-([a-z])/g, ( _, character: string ) =>
+			character.toUpperCase()
+		);
 
 	// `-ms-` is the one prefix React keeps lowercase, e.g. `msFlexAlign`.
-	return key.startsWith( '-ms-' ) ? 'ms' + camelCased.slice( 2 ) : camelCased;
+	return key.startsWith( '-ms-' )
+		? camelCased
+		: camelCased.replace( /^[a-z]/, ( character: string ) =>
+				character.toUpperCase()
+			);
 }
 
 /**

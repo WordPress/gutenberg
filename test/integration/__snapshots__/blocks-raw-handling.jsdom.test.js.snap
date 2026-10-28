@@ -219,6 +219,6 @@ exports[`rawHandler > should preserve all paragraphs 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p style="border:1px solid tomato"></p>
+<p></p>
 <!-- /wp:paragraph -->"
 `;

@@ -90,7 +90,7 @@ createBlockSaveFilter( [
 	fontFamily,
 	fontSize,
 	textShadow,
-	// Last, so the block's own styles win over these.
+	// Last, so the block's own props win over these.
 	htmlAttributes,
 ] );
 

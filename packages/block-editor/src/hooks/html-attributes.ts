@@ -1,7 +1,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
-import { getReactStyleKey } from './style';
 import type { BlockListBlockFeatureProps, BlockWrapperProps } from './types';
 
 type HtmlAttributes = Record< string, string >;
@@ -18,7 +17,6 @@ const ALLOWED_ATTRIBUTES = new Set( [
 	'itemtype',
 	'lang',
 	'role',
-	'style',
 	'title',
 	'translate',
 ] );
@@ -40,28 +38,7 @@ export function addAttribute( settings: BlockType ): BlockType {
 }
 
 /**
- * Turns an inline style into a style object, as React expects.
- *
- * @param style Value of a `style` attribute.
- */
-function getStyleObject( style: string ): Record< string, string > {
-	const styleObject: Record< string, string > = {};
-	for ( const declaration of style.split( ';' ) ) {
-		const colonAt = declaration.indexOf( ':' );
-		const property = declaration.slice( 0, colonAt ).trim();
-		if ( colonAt === -1 || ! property ) {
-			continue;
-		}
-		styleObject[ getReactStyleKey( property ) ] = declaration
-			.slice( colonAt + 1 )
-			.trim();
-	}
-	return styleObject;
-}
-
-/**
- * Adds the allowed attributes to props without replacing the block's own,
- * including its style properties.
+ * Adds the allowed attributes to props without replacing the block's own.
  *
  * @param props          Props.
  * @param htmlAttributes Attributes to add.
@@ -70,7 +47,7 @@ function mergeHtmlAttributes(
 	props: BlockWrapperProps,
 	htmlAttributes: HtmlAttributes
 ): BlockWrapperProps {
-	const { style, ...attributes } = Object.fromEntries(
+	const attributes = Object.fromEntries(
 		Object.entries( htmlAttributes ).filter(
 			( [ name ] ) =>
 				name.startsWith( 'data-' ) ||
@@ -79,15 +56,7 @@ function mergeHtmlAttributes(
 		)
 	);
 	// The block's own props go first and last: they keep their place and win.
-	const merged = { ...props, ...attributes, ...props };
-	if ( style ) {
-		merged.style = {
-			...props.style,
-			...getStyleObject( style ),
-			...props.style,
-		};
-	}
-	return merged;
+	return { ...props, ...attributes, ...props };
 }
 
 export function addSaveProps(
