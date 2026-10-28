@@ -7,7 +7,7 @@ import {
 import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
 
@@ -122,23 +122,12 @@ function NavigationMenuSelector( {
 		selectorLabel = currentTitle;
 	}
 
-	useEffect( () => {
-		if (
-			isUpdatingMenuRef &&
-			( createNavigationMenuIsSuccess || createNavigationMenuIsError )
-		) {
-			setIsUpdatingMenuRef( false );
-		}
-	}, [
-		hasResolvedNavigationMenus,
-		createNavigationMenuIsSuccess,
-		canUserCreateNavigationMenus,
-		createNavigationMenuIsError,
-		isUpdatingMenuRef,
-		menuUnavailable,
-		noBlockMenus,
-		noMenuSelected,
-	] );
+	if (
+		isUpdatingMenuRef &&
+		( createNavigationMenuIsSuccess || createNavigationMenuIsError )
+	) {
+		setIsUpdatingMenuRef( false );
+	}
 
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu

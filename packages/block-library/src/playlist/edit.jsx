@@ -156,21 +156,14 @@ const PlaylistEdit = ( {
 		[ validTracks ]
 	);
 
-	useEffect( () => {
-		if ( validTracks.length === 0 ) {
-			if ( currentTrackClientId !== null ) {
-				setCurrentTrackClientId( null );
-			}
-			return;
-		}
-
-		const currentTrackExists = validTracks.some(
-			( block ) => block.clientId === currentTrackClientId
-		);
-		if ( ! currentTrackExists ) {
-			setCurrentTrackClientId( validTracks[ 0 ].clientId );
-		}
-	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+	// Fall back to the first track, or none, when the current one is gone.
+	const currentTrackExists = validTracks.some(
+		( block ) => block.clientId === currentTrackClientId
+	);
+	const firstTrackClientId = validTracks[ 0 ]?.clientId ?? null;
+	if ( ! currentTrackExists && currentTrackClientId !== firstTrackClientId ) {
+		setCurrentTrackClientId( firstTrackClientId );
+	}
 
 	// Clean up placeholder tracks when reverting back to playlist placeholder state
 	useEffect( () => {
