@@ -115,6 +115,11 @@
 		"contentRole": true,
 		"html": false,
 		"inserter": true,
+		"color": {
+			"text": true,
+			"background": true,
+			"__experimentalSkipSerialization": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
