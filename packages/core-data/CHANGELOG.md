@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: store the content a conflicting document replaced as a permanent revision of the post, so it can be restored from the revisions screen.
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
