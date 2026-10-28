@@ -941,8 +941,9 @@ export default function TypographyPanel( {
 					text: undefined,
 				},
 			};
-			// A link color matching the text color is the copy `setTextColor`
-			// keeps in sync, so it goes with the text color, as in `resetTextColor`.
+			// Setting the text color also sets the link color while the two match,
+			// so clear that link color too, as resetting the Color item does. A link
+			// color that differs was set on purpose and stays.
 			const linkColor = previousValue?.elements?.link?.color?.text;
 			if (
 				linkColor !== undefined &&

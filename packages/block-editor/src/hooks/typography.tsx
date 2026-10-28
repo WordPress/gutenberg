@@ -163,8 +163,9 @@ function TypographyInspectorControl( {
 }: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
 		( attributes: TypographyAttributes, context?: ResetAllContext ) => {
-			// The panel passes only `style`; a palette text color is in
-			// `textColor`, which the link color reset compares against.
+			// "Reset all" passes `style` as the first argument and the block's other
+			// attributes in `context`. A palette text color is saved in `textColor`,
+			// so add it, or the reset can't tell that the link color matches it.
 			const existingStyle = attributesToStyle( {
 				textColor: context?.attributes?.textColor as string | undefined,
 				...attributes,
