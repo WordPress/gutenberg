@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Allow deleting a non editable object (footnote, math) at the end of a RichText with Backspace after `End`, or when it is selected ([#85554](https://github.com/WordPress/gutenberg/pull/85554)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes

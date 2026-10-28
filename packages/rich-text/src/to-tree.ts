@@ -3,10 +3,23 @@ import { getFormatType } from './get-format-type';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import type {
 	ParsedFormat,
+	RichTextFormat,
 	RichTextFormatList,
 	ToTreeOptions,
 	TreeAttributes,
 } from './types';
+
+/**
+ * Whether the replacement is rendered as a non editable element.
+ *
+ * @param replacement The replacement at an object replacement character.
+ */
+function isNonEditable( replacement?: RichTextFormat ) {
+	return (
+		!! replacement &&
+		getFormatType( replacement.type )?.contentEditable === false
+	);
+}
 
 function restoreOnAttributes(
 	attributes: TreeAttributes,
@@ -169,7 +182,13 @@ export function toTree< T >( {
 			( ! lastCharacter ||
 				// Pad the line if the previous character is a line break, otherwise
 				// the line break won't be visible.
-				lastCharacter === '\n' );
+				lastCharacter === '\n' ||
+				// Pad after a non editable element: some browsers like Safari
+				// and Firefox have issues placing the caret after one at the
+				// end of the field, so help them a little by providing a text
+				// node.
+				( lastCharacter === OBJECT_REPLACEMENT_CHARACTER &&
+					isNonEditable( replacements[ i - 1 ] ) ) );
 
 		const characterFormats = formats[ i ];
 		let pointer: T = getLastChild( tree )!;
@@ -278,15 +297,8 @@ export function toTree< T >( {
 							type: 'span',
 							attributes: attrs,
 						} );
-						// Some browsers like Safari and Firefox have issues placing
-						// the caret after a non-editable element when it's at the
-						// end of the field, so help them a little by providing a
-						// text element. Similar to `insertPadding` above.
-						if ( isEditableTree && i + 1 === text.length ) {
-							append( getParent( pointer ), ZWNBSP );
-						}
 					}
-					pointer = append(
+					const formatElement = append(
 						pointer,
 						fromFormat( {
 							...replacement,
@@ -294,9 +306,17 @@ export function toTree< T >( {
 						} )
 					);
 					if ( innerHTML ) {
-						append( pointer, {
+						append( formatElement, {
 							html: innerHTML,
 						} );
+					}
+					// Leave the pointer on the outermost element so the text
+					// node appended below follows it. In the editable tree
+					// that is the non editable wrapper: the browser cannot
+					// edit from a caret inside it, so a selection right
+					// after the object must land after the wrapper.
+					if ( ! isEditableTree ) {
+						pointer = formatElement;
 					}
 				}
 			} else {

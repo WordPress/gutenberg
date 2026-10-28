@@ -192,6 +192,43 @@ test.describe( 'Footnotes', () => {
 		expect( await getFootnotes( page ) ).toMatchObject( [] );
 	} );
 
+	test( 'can be deleted from the end of the paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'first paragraph' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+		await page.keyboard.type( 'first footnote' );
+
+		await expect.poll( () => getFootnotes( page ) ).toHaveLength( 1 );
+
+		// Click back into the paragraph text and move to the end of the line,
+		// which places the caret right after the footnote marker.
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'first paragraph' },
+			},
+			{
+				name: 'core/footnotes',
+			},
+		] );
+		expect( await getFootnotes( page ) ).toMatchObject( [] );
+	} );
+
 	test( 'can be inserted in a list', async ( { editor, page } ) => {
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )
