@@ -815,7 +815,9 @@ class WP_Navigation_Block_Renderer {
 			';
 			$responsive_container_directives         = '
 				data-wp-class--has-modal-open="state.isMenuOpen"
-				data-wp-class--is-menu-open="state.isMenuOpen"
+				data-wp-class--is-menu-open="state.isMenuVisible"
+				data-wp-class--is-menu-closing="state.isMenuClosing"
+				data-wp-on--animationend="actions.handleOverlayAnimationEnd"
 				data-wp-watch="callbacks.initMenu"
 				data-wp-on--keydown="actions.handleMenuKeydown"
 				data-wp-on--focusout="actions.handleMenuFocusout"
@@ -955,6 +957,7 @@ class WP_Navigation_Block_Renderer {
 					'hover' => false,
 					'focus' => false,
 				),
+				'isClosing'       => false,
 				'type'            => 'overlay',
 				'roleAttribute'   => '',
 				'ariaLabel'       => __( 'Menu' ),
