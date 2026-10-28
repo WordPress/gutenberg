@@ -1,7 +1,4 @@
-import {
-	Button,
-	IconButton,
-} from '@wordpress/ui';
+import { Button, IconButton } from '@wordpress/ui';
 import type { WidgetCallbackAction } from '@wordpress/widget-primitives';
 
 interface CallbackActionProps {

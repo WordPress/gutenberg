@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Drawer,

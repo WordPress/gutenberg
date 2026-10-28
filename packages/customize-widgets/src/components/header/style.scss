@@ -49,8 +49,8 @@
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed {
-			background: $gray-900;
+		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
 		&:focus:not(:active) {
@@ -64,7 +64,6 @@
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: $radius-small;
-		color: $white;
 		// Push the inserter toggle and the buttons after it to the end.
 		margin: $grid-unit-15 0 $grid-unit-15 auto;
 

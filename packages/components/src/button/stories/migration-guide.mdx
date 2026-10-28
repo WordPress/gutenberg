@@ -32,7 +32,8 @@ import { Button } from '@wordpress/ui';
 | \`variant="secondary"\` | \`variant="outline"\` | Keep \`tone="brand"\`, the default. |
 | \`variant="tertiary"\` | \`variant="minimal"\` | Keep \`tone="brand"\`, the default. |
 | no \`variant\` | \`tone="neutral"\` \`variant="minimal"\` | Use [\`IconButton\`](?path=/docs/design-system-components-iconbutton--docs) when the control is icon-only. |
-| \`variant="link"\` | [\`Link\`](?path=/docs/design-system-components-link--docs) | Use [\`ButtonLink\`](?path=/docs/design-system-components-buttonlink--docs) when the link should look like a button. |
+| \`variant="link"\` with \`href\` | [\`Link\`](?path=/docs/design-system-components-link--docs) | Use [\`ButtonLink\`](?path=/docs/design-system-components-buttonlink--docs) when the link should look like a button. |
+| \`variant="link"\` without \`href\` | \`Button\` with \`variant="minimal"\` | Keep button semantics for actions. |
 | \`href\` on a button-styled control | [\`ButtonLink\`](?path=/docs/design-system-components-buttonlink--docs) | \`Button\` no longer renders an anchor. |
 | \`isBusy\` | \`loading\` | \`loading\` also disables the button and announces the state. \`isBusy\` does neither. |
 | \`isPressed\` | \`aria-pressed\` | Pressed styling exists only on \`tone="neutral"\` \`variant="minimal"\`. |
@@ -99,7 +100,7 @@ Drop `__next40pxDefaultSize`. The default size is 40px. `compact` and `small` ke
 
 `Button` has no destructive tone. A control that starts a destructive action uses standard styling. Confirm an irreversible action in [`AlertDialog`](?path=/docs/design-system-components-alertdialog--docs) with `intent="irreversible"`, which styles the confirm button. See the [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs) pattern.
 
-`AlertDialog` is still marked use-with-caution. Until it is recommended, keep irreversible confirmations on [`Modal`](?path=/docs/components-modal--docs) from `@wordpress/components` with `isDestructive`.
+`AlertDialog` is still marked use-with-caution. Until it is recommended, keep irreversible confirmations on [`Modal`](?path=/docs/components-modal--docs) from `@wordpress/components` with `isDestructive` on the confirmation `Button`.
 
 ## Shortcuts
 

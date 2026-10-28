@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useCallback, useState } from '@wordpress/element';
-import {
-	Badge,
-	Button,
-	Text,
-} from '@wordpress/ui';
+import { Badge, Button, Text } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';

@@ -15,9 +15,7 @@ import {
 } from '@wordpress/element';
 import type { ColumnSteps } from '@wordpress/grid';
 import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
-import {
-	Button,
-} from '@wordpress/ui';
+import { Button } from '@wordpress/ui';
 import {
 	WidgetHostProvider,
 	useWidgetActions,

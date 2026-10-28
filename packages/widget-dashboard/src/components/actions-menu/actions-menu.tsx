@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton.
 	IconButton,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
