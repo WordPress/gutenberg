@@ -380,10 +380,7 @@ test.describe( 'Table of Contents', () => {
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			await expect( tableOfContents ).toContainText(
-				'Start adding Heading blocks to create a table of contents.'
-			);
-			await expect( tableOfContents ).toContainText(
-				'Headings with HTML anchors will be linked here.'
+				'Start adding Heading blocks to create a table of contents automatically.'
 			);
 
 			const postId = await editor.publishPost();
@@ -704,8 +701,7 @@ test.describe( 'Table of Contents', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 		} );
 
-		// Desired behavior: ToC in templates should list headings from the viewed post; trunk does not yet support template placement.
-		test.fixme( 'a table of contents added once to a shared template uses each viewed post heading list', async ( {
+		test( 'a table of contents added once to a shared template uses each viewed post heading list', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -803,8 +799,7 @@ test.describe( 'Table of Contents', () => {
 			).toBeInViewport();
 		} );
 
-		// Desired behavior: ToC in template editing should explain that it uses viewed post headings; trunk only shows the generic empty-heading placeholder.
-		test.fixme( 'template editing explains when a live example cannot be shown and the front of site uses the viewed post', async ( {
+		test( 'template editing explains when a live example cannot be shown and the front of site uses the viewed post', async ( {
 			admin,
 			editor,
 			page,
@@ -836,7 +831,7 @@ test.describe( 'Table of Contents', () => {
 			await expect(
 				getTableOfContentsEditorBlock( editor )
 			).toContainText(
-				'This table of contents will show headings from the post being viewed.'
+				'Headings from the post being viewed appear here'
 			);
 
 			await openPostOnFrontend( page, post.id );
@@ -851,8 +846,7 @@ test.describe( 'Table of Contents', () => {
 			).toBeVisible();
 		} );
 
-		// Desired behavior: ToC in templates should list only the viewed post's own headings.
-		test.fixme( 'only lists headings from the viewed post content boundary', async ( {
+		test( 'only lists headings from the viewed post content boundary', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -906,8 +900,7 @@ test.describe( 'Table of Contents', () => {
 			).toHaveCount( 0 );
 		} );
 
-		// Desired behavior: ToC in templates without post content should show a specific editor explanation; trunk only shows the generic empty-heading placeholder.
-		test.fixme( 'templates that do not render post content show an editor placeholder and render nothing to readers', async ( {
+		test( 'templates that do not render post content show an editor placeholder and render nothing to readers', async ( {
 			admin,
 			editor,
 			page,
@@ -924,11 +917,10 @@ test.describe( 'Table of Contents', () => {
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
-			// TODO: Make this placeholder explain how users can fix the template, not only why no ToC can render.
 			await expect(
 				getTableOfContentsEditorBlock( editor )
 			).toContainText(
-				'Table of Contents needs a single post or page to list headings.'
+				'Headings from the post being viewed appear here'
 			);
 
 			await page.goto( '/?m=202001' );

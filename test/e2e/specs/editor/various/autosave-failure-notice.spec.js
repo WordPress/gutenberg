@@ -5,6 +5,9 @@ const {
 
 const AUTOSAVE_FAILED = 'Auto-save failed. You can also save manually.';
 
+const AUTOSAVE_FAILED_NO_RESPONSE =
+	'Auto-save failed because there was no response from the server. You can also save manually.';
+
 const UPDATING_FAILED_OFFLINE =
 	'Updating failed because you were offline. Please verify your connection and try again.';
 
@@ -82,78 +85,84 @@ test.describe( 'Autosave failure notice', () => {
 			// WordPress version, so only its start is checked.
 			withDetails(
 				expect.stringMatching(
-					/^There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
+					/^Error code 500\. There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
 				)
 			),
 		],
 		[
 			'database connection lost',
 			'database-connection-lost',
-			withDetails( 'Error establishing a database connection' ),
+			withDetails(
+				'Error code 500. Error establishing a database connection'
+			),
 		],
 		[
 			'error message containing a link',
 			'link-in-message',
-			withDetails( 'Blocked. Learn more (https://example.com).' ),
+			withDetails(
+				'Error code 403. Blocked. Learn more (https://example.com).'
+			),
 		],
-		// TODO: Say the server could not be reached, and retry right away.
+		// TODO: Retry right away.
 		[
 			'connection dropped before a response',
 			'dropped-connection',
-			AUTOSAVE_FAILED,
+			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
-		// TODO: Show the status code.
-		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
+		[
+			'error without a message',
+			'no-message',
+			withDetails( 'Error code 500.' ),
+		],
 		[
 			'error with a plain text message',
 			'plain-message',
-			withDetails( 'Something went wrong on the server.' ),
+			withDetails(
+				'Error code 500. Something went wrong on the server.'
+			),
 		],
 		[
 			'permission denied',
 			'permission',
-			withDetails( 'Sorry, you are not allowed to edit this post.' ),
+			withDetails(
+				'Error code 403. Sorry, you are not allowed to edit this post.'
+			),
 		],
+		// The error's `data` is the database error, so there is no status in it.
 		[
 			'database write failed',
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
-		// TODO: Show the status code (502) instead.
-		[
-			'HTML error page',
-			'bad-gateway',
-			withDetails( 'The response is not a valid JSON response.' ),
-		],
-		// TODO: Show the status code (429) instead.
+		[ 'HTML error page', 'bad-gateway', withDetails( 'Error code 502.' ) ],
 		[
 			'too many requests',
 			'too-many-requests',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails( 'Error code 429.' ),
 		],
+		// The error is printed before the headers, so the status stays 200.
 		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		],
 		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		],
-		// TODO: Say the server could not be reached.
 		[
 			'redirected to another site',
 			'redirect-to-other-site',
-			AUTOSAVE_FAILED,
+			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
 		[
 			'maintenance mode',
 			'maintenance',
 			withDetails(
-				'Briefly unavailable for scheduled maintenance. Check back in a minute.'
+				'Error code 503. Briefly unavailable for scheduled maintenance. Check back in a minute.'
 			),
 		],
 		// TODO: Report the failure; the autosave fails without a notice.
@@ -208,7 +217,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.autosave();
 		// TODO: Say the session expired and offer to log in again.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'Cookie check failed' ),
+			withDetails( 'Error code 403. Cookie check failed' ),
 		] );
 	} );
 
@@ -221,7 +230,7 @@ test.describe( 'Autosave failure notice', () => {
 		const title = await autosaveFailure.autosave();
 		// TODO: Don't report a failure; the autosave was stored.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		] );
 
 		const postId = await page.evaluate( () =>
@@ -298,11 +307,11 @@ test.describe( 'Autosave failure notice', () => {
 				.locator( '.notices-inline-notices__notice' );
 			await expect( notice ).toContainText(
 				new RegExp(
-					`${ AUTOSAVE_FAILED.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
+					`${ AUTOSAVE_FAILED_NO_RESPONSE.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
 				)
 			);
 			await expect( notice ).toContainText(
-				`${ AUTOSAVE_FAILED } Retrying in 7 seconds.`
+				`${ AUTOSAVE_FAILED_NO_RESPONSE } Retrying in 7 seconds.`
 			);
 		} );
 
@@ -323,7 +332,7 @@ test.describe( 'Autosave failure notice', () => {
 				.getByRole( 'region', { name: 'Editor content' } )
 				.locator( '.notices-inline-notices__notice' );
 			await expect( notice ).toContainText(
-				`${ AUTOSAVE_FAILED } Retrying…`
+				`${ AUTOSAVE_FAILED_NO_RESPONSE } Retrying…`
 			);
 			await expect( notice ).toHaveCount( 0 );
 		} );
@@ -355,7 +364,7 @@ test.describe( 'Autosave failure notice', () => {
 					}
 				}
 				expect( await autosaveFailure.getNotices() ).toEqual( [
-					AUTOSAVE_FAILED,
+					AUTOSAVE_FAILED_NO_RESPONSE,
 				] );
 			} );
 		}
@@ -366,7 +375,7 @@ test.describe( 'Autosave failure notice', () => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await autosaveFailure.stopFailing();
@@ -381,7 +390,7 @@ test.describe( 'Autosave failure notice', () => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await autosaveFailure.stopFailing();
@@ -400,7 +409,7 @@ test.describe( 'Autosave failure notice', () => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await context.setOffline( true );
