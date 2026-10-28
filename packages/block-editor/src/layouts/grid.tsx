@@ -333,8 +333,11 @@ export default {
 		}
 
 		if ( shouldOutputGridRows ) {
+			// The aspect ratio gives empty rows a height, so cells are roughly
+			// square. Rows still grow if their content is taller.
 			rules.push(
-				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
+				`aspect-ratio: ${ columnCount } / ${ rowCount }`
 			);
 		}
 
