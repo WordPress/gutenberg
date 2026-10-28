@@ -3,6 +3,8 @@
 	inline-size: 24px;
 	/* Keep the icon full size when a long label wraps. */
 	flex-shrink: 0;
+	/* Centre the icon on the first line of the label. */
+	margin-block: calc((1lh - 24px) / 2);
 }
 
 .icon svg {
