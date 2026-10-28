@@ -18,11 +18,19 @@ export type LineHeightControlOnChange = NonNullable<
 >;
 
 /**
- * Props of `LineHeightControl`.
+ * Props of `LineHeightControl`. The control sets its label, range and spin
+ * behavior itself.
  */
 export interface LineHeightControlProps extends Omit<
 	NumberControlProps,
-	'value' | 'onChange'
+	| 'value'
+	| 'onChange'
+	| 'label'
+	| 'min'
+	| 'step'
+	| 'spinFactor'
+	| 'spinControls'
+	| '__unstableStateReducer'
 > {
 	/**
 	 * Start opting into the larger default height that will become the

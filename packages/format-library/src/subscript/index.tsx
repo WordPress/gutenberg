@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { subscript as subscriptIcon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';

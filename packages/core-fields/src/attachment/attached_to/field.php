@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Attached to', 'gutenberg' ),
+	'label'         => __( 'Attached to' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 );

@@ -8,7 +8,7 @@ Tokens must also be wrapped in `var()` syntax (e.g. `var(--wpds-color-foreground
 
 When a token name appears on the left-hand side of a CSS declaration (for example, `'--wpds-color-foreground-content-neutral: red;'`), the bare token check is skipped for that occurrence. Those cases are instead reported by [`no-setting-ds-tokens`](./no-setting-ds-tokens.md).
 
-This rule lints all string literals and template literals in JavaScript/TypeScript files. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
+This rule lints all string literals and template literals in JavaScript/TypeScript files. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme-build-tools/#stylelint-plugins) from the `@wordpress/theme-build-tools` package.
 
 ## Rule details
 

@@ -2,6 +2,7 @@ import { Avatar as _Avatar } from '@base-ui/react/avatar';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { RootProps } from './types';
+import { warnAvatarColor } from './dev-warnings';
 import resetStyles from '../utils/css/resets.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
@@ -27,6 +28,10 @@ export const Root = forwardRef< HTMLSpanElement, RootProps >(
 		{ size = 'md', shape = 'circle', color, className, style, ...props },
 		ref
 	) {
+		if ( process.env.NODE_ENV !== 'production' ) {
+			warnAvatarColor( color );
+		}
+
 		const customProperties =
 			color === undefined
 				? style

@@ -8,8 +8,8 @@
 
 return array(
 	'type'               => 'text',
-	'label'              => __( 'Template', 'gutenberg' ),
-	'placeholder'        => __( 'No title', 'gutenberg' ),
+	'label'              => __( 'Template' ),
+	'placeholder'        => __( 'No title' ),
 	'enableHiding'       => false,
 	'enableGlobalSearch' => true,
 	'filterBy'           => false,

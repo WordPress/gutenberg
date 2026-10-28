@@ -1,0 +1,29 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { CursorTokenPreview } from './cursor-preview';
+import '@wordpress/theme/design-tokens.css';
+
+<Meta title="Design System/Tokens/Cursor" />
+
+# Cursor tokens
+
+`@wordpress/theme` publishes cursor tokens as CSS custom properties.
+
+<CursorTokenPreview />
+
+<div style={{ height: 'var(--wpds-dimension-gap-3xl)' }} />
+
+## Using `--wpds-cursor-control` in custom components
+
+Set `cursor: var( --wpds-cursor-control )` on any custom interactive control that is not a link, such as a button, a checkbox, or a toggle. The control then follows the design system's cursor style and any future change to it, instead of hardcoding `pointer`.
+
+```css
+.my-toggle {
+	cursor: var( --wpds-cursor-control );
+}
+```
+
+Use it on the element that receives the click. For a custom checkbox, that is the label or the visible track, not a wrapper that also contains non-interactive text.
+
+Links keep the browser's default link cursor, so do not apply this token to `<a>` elements.
+
+See the [Design Tokens Reference](?path=/docs/design-system-tokens-introduction--docs) for guidance on choosing tokens.
