@@ -70,7 +70,7 @@ export const useCommentQueryArgs = ( { postId } ) => {
 /**
  * Return the index of the default page, depending on whether `defaultPage` is
  * `newest` or `oldest`. In the first case, the only way to know the page's
- * index is by using the `X-WP-TotalPages` header, which forces to make an
+ * index is by using the `X-WP-Total` header, which forces to make an
  * additional request.
  *
  * @param {Object} props             Hook props.
@@ -83,12 +83,12 @@ export const useCommentQueryArgs = ( { postId } ) => {
  */
 const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
 	const isNewest = defaultPage === 'newest';
-	// We need to fetch comments to know the index. Limit fields just to ID, to
-	// make this call as light as possible.
-	const { totalPages, hasResolved } = useEntityRecords(
+	// We need to fetch comments to know the index. Fetch a single ID, to make
+	// this call as light as possible.
+	const { totalItems, hasResolved } = useEntityRecords(
 		'root',
 		'comment',
-		{ ...queryArgs, post: postId, per_page: perPage, _fields: 'id' },
+		{ ...queryArgs, post: postId, per_page: 1, _fields: 'id' },
 		{ enabled: isNewest }
 	);
 
@@ -96,12 +96,13 @@ const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
 	if ( ! isNewest ) {
 		return 1;
 	}
-	if ( ! hasResolved ) {
+	// Keep the last known total while it's fetched again.
+	if ( totalItems === null && ! hasResolved ) {
 		return 0;
 	}
 	// With no comments, or when the request fails, there is no page count,
 	// but there is a first page.
-	return Math.max( totalPages ?? 1, 1 );
+	return Math.max( Math.ceil( ( totalItems ?? 0 ) / perPage ), 1 );
 };
 
 /**

@@ -46,7 +46,7 @@ export default function Edit( props ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { totalItems, status } = usePostCommentsCount( postId );
+	const { totalItems, hasResolved } = usePostCommentsCount( postId );
 	let commentsCount;
 	if ( isSiteEditor ) {
 		// Match the number of comments that will be shown in the comment-template/edit.js placeholder
@@ -61,10 +61,9 @@ export default function Edit( props ) {
 			parseInt( topLevelCommentsNumber );
 
 		commentsCount = Math.min( commentsNumber, 3 );
-	} else if ( status === 'ERROR' ) {
-		commentsCount = 0;
 	} else {
-		commentsCount = totalItems ?? undefined;
+		// A failed request has no total.
+		commentsCount = totalItems ?? ( hasResolved ? 0 : undefined );
 	}
 
 	const blockControls = (

@@ -26,7 +26,7 @@ export function useCanEditEntity( kind, name, recordId ) {
 
 /**
  * Returns the comments query of a post: `totalItems` is its comment count once
- * known, and `status` says whether the request failed.
+ * known, and stays null when the request fails.
  *
  * @param {number} postId Post ID. Nothing is fetched without one.
  */
