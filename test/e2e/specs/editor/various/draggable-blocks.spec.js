@@ -549,6 +549,39 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 
+	test( 'shows the hover outline on a block while the caret is in text (@firefox, @webkit)', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Text' },
+		} );
+		await editor.insertBlock( { name: 'core/separator' } );
+
+		// Move the caret from the selected separator into the paragraph.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Editor canvas' } )
+		).toHaveCount( 1 );
+
+		const separator = editor.canvas.getByRole( 'document', {
+			name: 'Block: Separator',
+		} );
+		await separator.hover();
+		await expect
+			.poll( () =>
+				separator.evaluate(
+					( n ) =>
+						n.ownerDocument.defaultView.getComputedStyle(
+							n,
+							'::after'
+						).outlineStyle
+				)
+			)
+			.toBe( 'solid' );
+	} );
+
 	test( 'can drag a multi-selection by dragging inside a selected block', async ( {
 		editor,
 		page,
