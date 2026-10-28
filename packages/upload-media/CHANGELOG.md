@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add JPEG XL (JXL) support. A JXL upload keeps its format, and its sub-sizes are generated as JXL client-side via vips. The vips-jxl.wasm module is loaded lazily on first use, keeping it out of the default bundle ([#77584](https://github.com/WordPress/gutenberg/pull/77584)).
+
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).

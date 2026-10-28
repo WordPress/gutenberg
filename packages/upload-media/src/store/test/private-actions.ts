@@ -1235,6 +1235,114 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'generateThumbnails (JPEG XL)', () => {
+		it( 'generates JXL sub-sizes from the JXL upload without a companion original', async () => {
+			const jxl = new File( [ 'x' ], 'photo.jxl', {
+				type: 'image/jxl',
+			} );
+			const item = {
+				id: 'j',
+				sourceFile: jxl,
+				file: jxl,
+				attachment: {
+					id: 21,
+					filename: 'photo.jxl',
+					missing_image_sizes: [ 'thumbnail' ],
+				},
+			};
+			const dispatchFn = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				addSideloadItem: vi.fn(),
+			} );
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+				} ),
+			};
+
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch: dispatchFn,
+			} as unknown as ThunkArgs );
+
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.file.type ).toBe( 'image/jxl' );
+			expect( sideload.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 21,
+					image_size: 'thumbnail',
+				} )
+			);
+			expect( sideload.operations[ 0 ][ 0 ] ).toBe(
+				OperationType.ResizeCrop
+			);
+		} );
+
+		it( 'scales a large JXL using the dimensions the server read', async () => {
+			// Chrome before 155 cannot decode JXL, so createImageBitmap rejects.
+			const originalCreateImageBitmap = global.createImageBitmap;
+			global.createImageBitmap = vi.fn( async () => {
+				throw new DOMException(
+					'The source image could not be decoded.',
+					'InvalidStateError'
+				);
+			} );
+
+			const jxl = new File( [ 'x' ], 'photo.jxl', {
+				type: 'image/jxl',
+			} );
+			const item = {
+				id: 'j',
+				sourceFile: jxl,
+				file: jxl,
+				attachment: {
+					id: 21,
+					filename: 'photo.jxl',
+					missing_image_sizes: [ 'thumbnail' ],
+					media_details: { width: 4000, height: 3000 },
+				},
+			};
+			const dispatchFn = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				addSideloadItem: vi.fn(),
+			} );
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+					bigImageSizeThreshold: 2560,
+				} ),
+			};
+
+			try {
+				await generateThumbnails( item.id )( {
+					select,
+					dispatch: dispatchFn,
+				} as unknown as ThunkArgs );
+			} finally {
+				global.createImageBitmap = originalCreateImageBitmap;
+			}
+
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					additionalData: expect.objectContaining( {
+						image_size: 'scaled',
+					} ),
+				} )
+			);
+			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
+				'j',
+				{}
+			);
+		} );
+	} );
+
 	describe( 'generateThumbnails UltraHDR gain-map routing', () => {
 		const ULTRAHDR_INFO = { width: 1024, height: 768, hdrCapacity: 3 };
 

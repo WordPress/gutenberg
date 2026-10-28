@@ -682,7 +682,41 @@ export function finishOperation(
 	};
 }
 
-const VALID_IMAGE_FORMATS = [ 'jpeg', 'webp', 'avif', 'png', 'gif' ] as const;
+/**
+ * Gets the pixel dimensions of an upload's source image.
+ *
+ * Browsers without JPEG XL support cannot decode a JXL, so for one this uses
+ * the dimensions the server read from its header.
+ *
+ * @param file       Source image.
+ * @param attachment Attachment created from the upload.
+ * @return Width and height, 0 when unknown.
+ */
+async function getSourceDimensions(
+	file: File,
+	attachment: Partial< Attachment >
+): Promise< { width: number; height: number } > {
+	if ( 'image/jxl' === file.type ) {
+		return {
+			width: Number( attachment.media_details?.width ) || 0,
+			height: Number( attachment.media_details?.height ) || 0,
+		};
+	}
+
+	const bitmap = await createImageBitmap( file );
+	const { width, height } = bitmap;
+	bitmap.close();
+	return { width, height };
+}
+
+const VALID_IMAGE_FORMATS = [
+	'jpeg',
+	'webp',
+	'avif',
+	'png',
+	'gif',
+	'jxl',
+] as const;
 
 /**
  * Checks if a format string is a valid ImageFormat.
@@ -850,18 +884,33 @@ export function prepareItem( id: QueueItemId ) {
 
 		let heicJpeg: File | null = null;
 
+		// `File.type` comes from the OS MIME registry, which has no `.jxl`
+		// mapping on many systems and hands back an empty string there. Fall
+		// back to the extension and re-label the file, so vips decodes it as
+		// JXL. Mirrors the server-side sniffing in
+		// gutenberg_filter_jxl_filetype_and_ext().
+		const isUntypedJxl = ! file.type && /\.jxl$/i.test( file.name );
+		const jxlFile = isUntypedJxl
+			? new File( [ file ], file.name, {
+					type: 'image/jxl',
+					lastModified: file.lastModified,
+				} )
+			: file;
+
 		// A HEIC photo can arrive with a .jpg or .png name, which is all the
 		// browser has to go on when it types the file, so this goes by content.
 		const isHeic = await isHeicFile( file );
 		const isMisnamedHeic =
 			isHeic && ! HEIC_MIME_TYPES.includes( file.type );
 
-		const isImage = file.type.startsWith( 'image/' ) || isHeic;
+		const isImage =
+			file.type.startsWith( 'image/' ) || isHeic || isUntypedJxl;
 
 		// A misnamed HEIC file claims a vips-processable type. vips cannot
 		// decode HEIC, and taking that branch is what strands the upload.
 		const isVipsSupported =
-			! isHeic && CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( file.type );
+			! isHeic &&
+			CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( jxlFile.type );
 
 		/*
 		 * Re-label a misnamed file so the rest of the pipeline sees HEIC: the
@@ -1016,6 +1065,7 @@ export function prepareItem( id: QueueItemId ) {
 			};
 		} else {
 			updates = {
+				...( isUntypedJxl && { file: jxlFile, sourceFile: jxlFile } ),
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: false,
@@ -1383,7 +1433,8 @@ export function transcodeImageItem(
 			| 'image/png'
 			| 'image/webp'
 			| 'image/avif'
-			| 'image/gif';
+			| 'image/gif'
+			| 'image/jxl';
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
@@ -1900,11 +1951,13 @@ export function generateThumbnails( id: QueueItemId ) {
 					// Check if the image actually exceeds the threshold.
 					// Only create a scaled version for images larger than the threshold,
 					// matching WordPress core's wp_create_image_subsizes() behavior.
-					const bitmap = await createImageBitmap( thumbnailSource );
+					const { width, height } = await getSourceDimensions(
+						thumbnailSource,
+						attachment
+					);
 					const needsScaling =
-						bitmap.width > bigImageSizeThreshold ||
-						bitmap.height > bigImageSizeThreshold;
-					bitmap.close();
+						width > bigImageSizeThreshold ||
+						height > bigImageSizeThreshold;
 
 					if ( needsScaling ) {
 						// Rename sourceFile to match the server attachment filename.
