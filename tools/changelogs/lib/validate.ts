@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
+import semver from 'semver';
 import { loadChangieConfig } from './config.ts';
 
 export interface Fragment {
@@ -49,10 +50,7 @@ export function parseFragment(
 	const data = parsed as Record< string, unknown >;
 	const { project, kind, body, custom } = data;
 	const config = loadChangieConfig( repoRoot );
-	const allowedKinds = [
-		'Stable Release',
-		...( config.kinds || [] ).map( ( item ) => item.label ),
-	];
+	const allowedKinds = ( config.kinds || [] ).map( ( item ) => item.label );
 	const allowedProjects = config.projects.map( ( item ) => item.key );
 	if ( typeof project !== 'string' || ! project.trim() ) {
 		errors.push( `${ filePath }: missing required 'project' property.` );
@@ -67,6 +65,32 @@ export function parseFragment(
 		errors.push(
 			`${ filePath }: unknown kind '${ kind }'. Allowed kinds: ${ allowedKinds.join( ', ' ) }`
 		);
+	}
+	if (
+		kind === 'Stable Release' &&
+		typeof project === 'string' &&
+		allowedProjects.includes( project )
+	) {
+		const packagePath = path.join(
+			repoRoot,
+			'packages',
+			project,
+			'package.json'
+		);
+		try {
+			const pkg = JSON.parse( fs.readFileSync( packagePath, 'utf8' ) );
+			const version =
+				typeof pkg?.version === 'string' && semver.valid( pkg.version );
+			if ( ! version || semver.major( version ) !== 0 ) {
+				errors.push(
+					`${ filePath }: Stable Release requires a 0.x package version; '@wordpress/${ project }' has version '${ pkg?.version }'. Choose another kind for an already-stable package.`
+				);
+			}
+		} catch ( error ) {
+			errors.push(
+				`${ filePath }: cannot check Stable Release eligibility using ${ packagePath }: ${ error instanceof Error ? error.message : String( error ) }`
+			);
+		}
 	}
 	if ( typeof body !== 'string' || ! body.trim() ) {
 		errors.push( `${ filePath }: missing or empty 'body' description.` );

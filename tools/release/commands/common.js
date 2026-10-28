@@ -71,6 +71,8 @@ function calculateVersionBumpFromChangelog(
 		if ( lineNormalized.startsWith( '### breaking change' ) ) {
 			if ( semver.lt( currentVersion, '1.0.0' ) ) {
 				versionBump = 'minor';
+				// A later Stable Release section takes precedence over this bump.
+				continue;
 			} else {
 				versionBump = 'major';
 			}

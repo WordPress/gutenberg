@@ -106,6 +106,52 @@ custom:
 } );
 
 describe( 'shared fragment validation entry points', () => {
+	it.each( [ '1.0.0', '2.1.0', '1.0.0-next.0' ] )(
+		'rejects Stable Release fragments for already-stable packages at %s',
+		( version ) => {
+			const root = fs.mkdtempSync(
+				path.join( os.tmpdir(), 'fragment-promotion-' )
+			);
+			directories.push( root );
+			fs.copyFileSync(
+				path.resolve( import.meta.dirname, '../../../.changie.yaml' ),
+				path.join( root, '.changie.yaml' )
+			);
+			const pkgDir = path.join( root, 'packages', 'ui' );
+			fs.mkdirSync( pkgDir, { recursive: true } );
+			fs.writeFileSync(
+				path.join( pkgDir, 'package.json' ),
+				JSON.stringify( { version } )
+			);
+			expect(
+				addFragment(
+					[
+						'-j',
+						'ui',
+						'-k',
+						'Stable Release',
+						'-b',
+						'Mark package as stable.',
+						'-m',
+						'PR=85369',
+						'--interactive=false',
+					],
+					root
+				)
+			).toBe( 1 );
+			expect( validateAllFragments( {}, root ) ).toEqual( [
+				expect.stringContaining(
+					'Stable Release requires a 0.x package version'
+				),
+			] );
+			expect( console ).toHaveErroredWith(
+				expect.stringContaining(
+					'Stable Release requires a 0.x package version'
+				)
+			);
+		}
+	);
+
 	it( 'allows older PRs and requires a matching fragment for the target package', () => {
 		const root = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'fragment-validation-' )
