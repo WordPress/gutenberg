@@ -2,8 +2,6 @@
 
 MenuItem is a component which renders a button intended to be used in combination with the [DropdownMenu component](/packages/components/src/dropdown-menu/README.md).
 
-Moving the pointer over a menu item focuses it. An `onMouseMove` handler can prevent this by calling `event.preventDefault()`.
-
 ## Usage
 
 ```jsx

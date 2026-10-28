@@ -60,14 +60,10 @@ function UnforwardedMenuItem(
 			accessibleWhenDisabled
 			{ ...buttonProps }
 			onMouseMove={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
-				const previousFocus =
-					event.currentTarget.ownerDocument.activeElement;
 				onMouseMove?.( event );
 				if (
 					! event.defaultPrevented &&
-					role.startsWith( 'menuitem' ) &&
-					event.currentTarget.ownerDocument.activeElement ===
-						previousFocus
+					role.startsWith( 'menuitem' )
 				) {
 					event.currentTarget.focus( { preventScroll: true } );
 				}

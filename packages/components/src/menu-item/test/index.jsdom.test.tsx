@@ -144,26 +144,34 @@ describe( 'MenuItem', () => {
 		expect( input ).toHaveFocus();
 	} );
 
-	it( 'preserves focus moved by an item hover handler', () => {
+	it( 'lets an item hover handler own focus across repeated movement', () => {
 		render(
 			<>
 				<button>Original</button>
 				<button>Destination</button>
 				<MenuItem
-					onMouseMove={ () =>
+					onMouseMove={ ( event ) => {
+						event.preventDefault();
 						screen
 							.getByRole( 'button', { name: 'Destination' } )
-							.focus()
-					}
+							.focus();
+					} }
 				>
 					Item
 				</MenuItem>
 			</>
 		);
-		screen.getByRole( 'button', { name: 'Original' } ).focus();
-		fireEvent.mouseMove( screen.getByRole( 'menuitem', { name: 'Item' } ) );
-		expect(
-			screen.getByRole( 'button', { name: 'Destination' } )
-		).toHaveFocus();
+		const original = screen.getByRole( 'button', { name: 'Original' } );
+		const item = screen.getByRole( 'menuitem', { name: 'Item' } );
+		const destination = screen.getByRole( 'button', {
+			name: 'Destination',
+		} );
+		for ( const initialFocus of [ original, destination ] ) {
+			initialFocus.focus();
+			for ( let move = 0; move < 3; move++ ) {
+				fireEvent.mouseMove( item );
+				expect( destination ).toHaveFocus();
+			}
+		}
 	} );
 } );
