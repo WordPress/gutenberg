@@ -1,7 +1,11 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
-import { GridVisualizer, useGridLayoutSync } from '../components/grid';
+import {
+	GridVisualizer,
+	useGridAutoRowSpan,
+	useGridLayoutSync,
+} from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
@@ -18,6 +22,7 @@ import type {
 
 function GridLayoutSync( props: GridLayoutSyncProps ) {
 	useGridLayoutSync( props );
+	useGridAutoRowSpan( props );
 	return undefined;
 }
 
