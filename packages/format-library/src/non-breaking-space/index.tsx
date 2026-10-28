@@ -5,7 +5,7 @@ import {
 	RichTextShortcut,
 	RichTextToolbarButton,
 } from '@wordpress/block-editor';
-import { Popover, SVG, Path } from '@wordpress/components';
+import { Popover as WCPopover, SVG, Path } from '@wordpress/components';
 import type { FormatEditProps } from '../types';
 
 const name = 'core/non-breaking-space';
@@ -40,11 +40,11 @@ function PopoverAnchor( {
 	} );
 
 	return (
-		<Popover anchor={ popoverAnchor }>
+		<WCPopover anchor={ popoverAnchor }>
 			<div style={ { whiteSpace: 'nowrap', padding: '4px' } }>
 				{ __( 'Non-breaking space' ) }
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }
 

@@ -1,6 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { TextControl, Button, Popover } from '@wordpress/components';
+import {
+	TextControl,
+	Button,
+	Popover as WCPopover,
+} from '@wordpress/components';
 import { SelectControl, Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
@@ -96,7 +100,7 @@ function InlineLanguageUI( {
 	];
 
 	return (
-		<Popover
+		<WCPopover
 			className="block-editor-format-toolbar__language-popover"
 			anchor={ popoverAnchor }
 			onClose={ onClose }
@@ -150,6 +154,6 @@ function InlineLanguageUI( {
 					/>
 				</Stack>
 			</Stack>
-		</Popover>
+		</WCPopover>
 	);
 }

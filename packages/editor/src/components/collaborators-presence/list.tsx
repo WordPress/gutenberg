@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, Button } from '@wordpress/components';
+import { Popover as WCPopover, Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
@@ -47,7 +47,7 @@ export function CollaboratorsList( {
 	};
 
 	return (
-		<Popover
+		<WCPopover
 			anchor={ popoverAnchor }
 			placement="bottom"
 			offset={ 8 }
@@ -116,6 +116,6 @@ export function CollaboratorsList( {
 					} ) }
 				</div>
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

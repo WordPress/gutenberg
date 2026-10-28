@@ -7,7 +7,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
 	RichTextData,
@@ -374,7 +374,7 @@ function Fields( {
 		<BlockEditContextProvider value={ BLOCK_EDIT_CONTEXT }>
 			<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 				<InputEventContext.Provider value={ inputEvents }>
-					<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+					<WCPopover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 						<FormatEdit
 							value={ value }
 							onChange={ onChange }
@@ -382,7 +382,7 @@ function Fields( {
 							formatTypes={ formatTypes }
 							forwardedRef={ contentRef }
 						/>
-					</Popover.__unstableSlotNameProvider>
+					</WCPopover.__unstableSlotNameProvider>
 				</InputEventContext.Provider>
 			</KeyboardShortcutContext.Provider>
 			<FormatToolbarContainer

@@ -3,7 +3,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	ValidatedTextareaControl,
@@ -73,7 +73,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 				</math>
 			) }
 			{ isSelected && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					offset={ 8 }
 					anchor={ blockRef }
@@ -135,7 +135,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							{ __( 'Learn more about LaTeX syntax' ) }
 						</Link>
 					</form>
-				</Popover>
+				</WCPopover>
 			) }
 		</div>
 	);

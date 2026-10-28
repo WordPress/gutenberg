@@ -4,7 +4,7 @@ import {
 	Button,
 	Icon as WCIcon,
 	Notice,
-	Popover,
+	Popover as WCPopover,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { check, chevronDown } from '@wordpress/icons';
@@ -96,7 +96,7 @@ export function UploadStatusPopover( {
 				{ buttonLabel }
 			</Button>
 			{ isOpen && (
-				<Popover
+				<WCPopover
 					className="media-upload-modal__upload-status__popover"
 					placement="top-start"
 					offset={ 8 }
@@ -151,7 +151,7 @@ export function UploadStatusPopover( {
 							</li>
 						) ) }
 					</ul>
-				</Popover>
+				</WCPopover>
 			) }
 		</div>
 	);

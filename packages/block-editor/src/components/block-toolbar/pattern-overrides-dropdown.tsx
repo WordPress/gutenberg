@@ -1,4 +1,4 @@
-import { Popover, ToolbarButton } from '@wordpress/components';
+import { Popover as WCPopover, ToolbarButton } from '@wordpress/components';
 import { Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
@@ -78,7 +78,7 @@ export default function PatternOverridesDropdown( {
 				aria-expanded={ isOpen }
 			/>
 			{ isOpen && (
-				<Popover
+				<WCPopover
 					anchor={ anchorRef.current }
 					onClose={ () => setIsOpen( false ) }
 					placement="bottom-start"
@@ -89,7 +89,7 @@ export default function PatternOverridesDropdown( {
 						clientIds={ clientIds }
 						blockTitle={ blockTitle }
 					/>
-				</Popover>
+				</WCPopover>
 			) }
 		</>
 	);
