@@ -1,23 +1,31 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+// Other schemes, such as `javascript:` and `data:`, can run script when the
+// link is opened, so they never resolve.
+const SAFE_PROTOCOLS = [ 'http:', 'https:', 'mailto:', 'tel:' ];
+
 /**
  * Resolves a link against a base URL, the way a browser resolves an `href`.
  *
  * @param url     The link, as stored in a block's attributes.
  * @param baseUrl The URL that relative links and hash links resolve against.
  * @return The absolute URL, or `undefined` when the link can't be resolved,
- *         such as a relative link with no base URL.
+ *         such as a relative link with no base URL, or isn't safe to open.
  */
 export function getResolvedUrl( url?: string, baseUrl?: string ) {
 	if ( ! url ) {
 		return undefined;
 	}
+	let resolved;
 	try {
-		return new URL( url, baseUrl ).href;
+		resolved = new URL( url, baseUrl );
 	} catch {
 		return undefined;
 	}
+	return SAFE_PROTOCOLS.includes( resolved.protocol )
+		? resolved.href
+		: undefined;
 }
 
 /**

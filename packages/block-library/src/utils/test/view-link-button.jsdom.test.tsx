@@ -31,6 +31,24 @@ describe( 'ViewLinkButton', () => {
 		expect( getViewLink( '/page' ) ).toBeNull();
 	} );
 
+	test.each( [
+		'javascript:alert(1)',
+		'JavaScript:alert(1)',
+		'data:text/html,<script>alert(1)</script>',
+		'vbscript:msgbox(1)',
+	] )( 'renders nothing for a %s link', ( url ) => {
+		expect( getViewLink( url ) ).toBeNull();
+	} );
+
+	test.each( [
+		[ 'https://wordpress.org', 'https://wordpress.org/' ],
+		[ 'http://wordpress.org', 'http://wordpress.org/' ],
+		[ 'mailto:hello@example.com', 'mailto:hello@example.com' ],
+		[ 'tel:+15555550100', 'tel:+15555550100' ],
+	] )( 'opens a %s link', ( url, href ) => {
+		expect( getViewLink( url ) ).toHaveAttribute( 'href', href );
+	} );
+
 	test( 'opens the link resolved against the home URL in a new tab', () => {
 		const viewLink = getViewLink( '#section' );
 		expect( viewLink ).toHaveAttribute(
