@@ -71,7 +71,7 @@ function gutenberg_ui_components_render_markup( $component, $props, $content ) {
 	// Fill every placeholder in one pass, so filled-in values are never read
 	// as placeholders themselves.
 	$values = array_merge( array_map( 'strval', $props ), array( 'content' => $content ) );
-	return preg_replace_callback(
+	$html   = preg_replace_callback(
 		'/__wpuislot_([a-z0-9_]+?)__(?:attr_([a-z0-9-]+)|text)__/',
 		static function ( $placeholder ) use ( $values ) {
 			$value = $values[ $placeholder[1] ] ?? '';
@@ -80,6 +80,16 @@ function gutenberg_ui_components_render_markup( $component, $props, $content ) {
 			}
 			// React escapes `&`, `<`, `>` and quotes, and never reads entities.
 			return htmlspecialchars( $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+		},
+		$html
+	);
+
+	// An empty `class` prop leaves extra spaces in the class attribute. React
+	// doesn't print those, and hydration compares the markup, so tidy them.
+	return preg_replace_callback(
+		'/ class="([^"]*)"/',
+		static function ( $attribute ) {
+			return ' class="' . trim( preg_replace( '/\\s+/', ' ', $attribute[1] ) ) . '"';
 		},
 		$html
 	);
