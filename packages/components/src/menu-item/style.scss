@@ -13,7 +13,7 @@
 		.components-menu-item__item:only-child {
 			// Ensure unchecked items have clearance for consistency
 			// with checked items containing an icon or shortcut.
-			padding-right: $grid-unit-60;
+			padding-right: $grid-unit-30 + $icon-size - 2px;
 			box-sizing: initial;
 		}
 	}
