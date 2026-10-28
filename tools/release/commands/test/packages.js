@@ -1,8 +1,17 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import {
+	mkdtemp,
+	mkdir,
+	readFile,
+	readdir,
+	rm,
+	writeFile,
+} from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { previewUnreleasedFragments } from '../../../changelogs/lib/preview.ts';
+import { loadChangieConfig } from '../../../changelogs/lib/config.ts';
 const require = createRequire( import.meta.url );
 const { simpleGit } = require( 'simple-git' );
 const logger = require( '../../lib/logger' );
@@ -1580,6 +1589,198 @@ describe( 'prepared release refs', () => {
 			repositoryPath,
 		};
 	}
+
+	it.each( [ true, false ] )(
+		'prepares and returns release commits to trunk with changelog fragments enabled: %s',
+		async ( usesFragments ) => {
+			const fixture = await createGitFixture();
+			try {
+				const root = fixture.repositoryPath;
+				const fragmentPath =
+					'.changes/unreleased/85369__ui__bug-fixes.yaml';
+				const newerFragmentPath =
+					'.changes/unreleased/85370__ui__bug-fixes.yaml';
+				const baseline =
+					'## 1.0.0 (2026-10-01)\n\n### Bug Fixes\n\n-   Previous fix.\n';
+				for ( const name of [ 'ui', 'manual' ] ) {
+					const directory = join( root, 'packages', name );
+					await mkdir( directory, { recursive: true } );
+					await writeFile(
+						join( directory, 'package.json' ),
+						JSON.stringify( {
+							name: `@wordpress/${ name }`,
+							version: '1.0.0',
+						} )
+					);
+					const pending =
+						usesFragments && name === 'ui'
+							? ''
+							: '\n### Bug Fixes\n\n-   Released fix ([#85369](https://github.com/WordPress/gutenberg/pull/85369)).\n';
+					await writeFile(
+						join( directory, 'CHANGELOG.md' ),
+						`# Changelog\n\n## Unreleased\n${ pending }\n${ baseline }`
+					);
+				}
+				if ( usesFragments ) {
+					const changieConfig = loadChangieConfig(
+						resolve( import.meta.dirname, '../../../..' )
+					);
+					await writeFile(
+						join( root, '.changie.yaml' ),
+						JSON.stringify( {
+							...changieConfig,
+							projects: changieConfig.projects.filter(
+								( project ) => project.key === 'ui'
+							),
+						} )
+					);
+					await mkdir( join( root, '.changes', 'unreleased' ), {
+						recursive: true,
+					} );
+					await mkdir( join( root, '.changes', 'ui' ) );
+					await writeFile(
+						join( root, '.changes', 'header.tpl.md' ),
+						'# Changelog\n\n## Unreleased\n'
+					);
+					await writeFile(
+						join( root, '.changes', 'ui', '1.0.0.md' ),
+						baseline
+					);
+					await writeFile(
+						join( root, fragmentPath ),
+						'project: ui\nkind: Bug Fixes\nbody: Released fix\ntime: 2026-10-01T00:00:00Z\ncustom:\n  PR: "85369"\n'
+					);
+				}
+				await fixture.git.add( '.' );
+				await fixture.git.commit( 'Pending package changes' );
+				await fixture.git.raw( 'branch', '-M', 'trunk' );
+				await fixture.git.push( [
+					'--set-upstream',
+					'origin',
+					'trunk',
+				] );
+				await fixture.git.checkoutLocalBranch( 'wp/latest' );
+				await fixture.git.push( [
+					'--set-upstream',
+					'origin',
+					'wp/latest',
+				] );
+				await fixture.git.checkout( 'trunk' );
+				if ( usesFragments ) {
+					await writeFile(
+						join( root, newerFragmentPath ),
+						'project: ui\nkind: Bug Fixes\nbody: Newer trunk fix\ntime: 2026-10-02T00:00:00Z\ncustom:\n  PR: "85370"\n'
+					);
+				} else {
+					await writeFile(
+						join( root, 'trunk.txt' ),
+						'Newer trunk work\n'
+					);
+				}
+				await fixture.git.add( '.' );
+				await fixture.git.commit( 'Newer trunk change' );
+				await fixture.git.push( 'origin', 'trunk' );
+				const config = {
+					gitWorkingDirectoryPath: root,
+					npmReleaseBranch: 'wp/latest',
+					releaseType: 'bugfix',
+					minimumVersionBump: 'patch',
+					interactive: false,
+				};
+				const state = await prepareNpmRelease( config );
+				expect( state.changelogCommit ).toBeTruthy();
+				const changes = await fixture.git.raw(
+					'show',
+					'--format=',
+					'--name-status',
+					state.changelogCommit
+				);
+				for ( const name of [ 'ui', 'manual' ] ) {
+					const changelog = await readFile(
+						join( root, 'packages', name, 'CHANGELOG.md' ),
+						'utf8'
+					);
+					expect( changelog ).toContain( '## 1.0.1 (' );
+					expect( changelog ).toContain( baseline );
+					expect( changes ).toContain(
+						`M\tpackages/${ name }/CHANGELOG.md`
+					);
+					const packagePath = join(
+						root,
+						'packages',
+						name,
+						'package.json'
+					);
+					const pkg = JSON.parse(
+						await readFile( packagePath, 'utf8' )
+					);
+					expect( pkg.version ).toBe( '1.0.1-prerelease' );
+					// Simulate Lerna's version commit without publishing to npm.
+					await writeFile(
+						packagePath,
+						JSON.stringify( { ...pkg, version: '1.0.1' } )
+					);
+				}
+				expect( changes.includes( 'A\t.changes/ui/1.0.1.md' ) ).toBe(
+					usesFragments
+				);
+				expect( changes.includes( `D\t${ fragmentPath }` ) ).toBe(
+					usesFragments
+				);
+				const releaseFragments = usesFragments
+					? await readdir( join( root, '.changes', 'unreleased' ) )
+					: [];
+				expect( releaseFragments ).toEqual( [] );
+				await fixture.git.add( '.' );
+				const { commit: publishCommit } =
+					await fixture.git.commit( 'Publish' );
+				await fixture.git.push( 'origin', 'wp/latest' );
+				await finalizePreparedNpmRelease( config, {
+					...state,
+					publishCommit,
+				} );
+				for ( const name of [ 'ui', 'manual' ] ) {
+					expect(
+						await fixture.remote.show( [
+							`trunk:packages/${ name }/package.json`,
+						] )
+					).toContain( '"version":"1.0.1"' );
+					expect(
+						await fixture.remote.show( [
+							`trunk:packages/${ name }/CHANGELOG.md`,
+						] )
+					).toContain( '## 1.0.1 (' );
+				}
+				const trunkFragments = usesFragments
+					? await readdir( join( root, '.changes', 'unreleased' ) )
+					: [];
+				expect( trunkFragments ).toEqual(
+					usesFragments
+						? [ newerFragmentPath.split( '/' ).pop() ]
+						: []
+				);
+				const preview = usesFragments
+					? previewUnreleasedFragments( 'ui', root )
+					: '';
+				expect( preview.includes( 'Newer trunk fix' ) ).toBe(
+					usesFragments
+				);
+				expect( preview ).not.toContain( 'Released fix' );
+				const compiled = usesFragments
+					? await fixture.remote.show( [
+							'trunk:.changes/ui/1.0.1.md',
+						] )
+					: '';
+				expect( compiled.includes( 'Released fix' ) ).toBe(
+					usesFragments
+				);
+				expect( ( await fixture.git.status() ).isClean() ).toBe( true );
+				expect( console ).toHaveLogged();
+			} finally {
+				await fixture.cleanup();
+			}
+		}
+	);
 
 	it( 'recovers the plugin branch from the prepared checkout version', () => {
 		expect(
