@@ -77,4 +77,38 @@ final class SelectionTests: XCTestCase {
 		// of them into one.
 		editor.expectBlocks( [ Block( title: "Paragraph", content: "Alpha  echo foxtrot" ) ] )
 	}
+
+	func testTapFromQuoteIntoHeadingPlacesCaret() throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem(
+			name: "content",
+			value: "<!-- wp:quote --><blockquote class=\"wp-block-quote\"><!-- wp:paragraph --><p>Quote here</p><!-- /wp:paragraph --></blockquote><!-- /wp:quote --><!-- wp:heading --><h2 class=\"wp-block-heading\">Heading here</h2><!-- /wp:heading --><!-- wp:paragraph --><p>Paragraph here</p><!-- /wp:paragraph -->"
+		) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		let quote = editor.block( title: "Paragraph", content: "Quote here" )
+		let heading = editor.block( title: "Heading 2", content: "Heading here" )
+		XCTAssertTrue( heading.waitForExistence( timeout: 240 ), "The post did not load" )
+
+		// The heading has siblings, so it is edited through the canvas
+		// wrapper. The paragraph in the quote has none and is edited on
+		// its own.
+		heading.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		let keyboard = app.keyboards.firstMatch
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+		quote.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		app.typeText( "Y" )
+
+		// Tapping the heading moves the caret there.
+		heading.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
+		app.typeText( "X" )
+
+		// Accessibility lists the blocks in a varying order, so check each.
+		XCTAssertTrue( editor.block( title: "Heading 2", content: "XHeading here" ).waitForExistence( timeout: 5 ), "The heading did not get the X" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "Quote hereY" ).exists, "The quote did not keep only the Y" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "Paragraph here" ).exists )
+		XCTAssertEqual( editor.getBlocks().count, 4 )
+	}
 }
