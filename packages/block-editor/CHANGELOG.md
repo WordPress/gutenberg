@@ -4,15 +4,21 @@
 
 ### Enhancements
 
+-   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
 
+-   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
+-   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
+-   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
+-   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 
 ### Internal
 

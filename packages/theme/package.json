@@ -60,12 +60,12 @@
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.6.1",
-		"@storybook/react-vite": "^10.6.1",
-		"@terrazzo/cli": "^2.9.0",
-		"@terrazzo/parser": "^2.9.0",
-		"@terrazzo/plugin-css": "^2.9.0",
-		"@terrazzo/token-tools": "^2.9.0",
+		"@storybook/addon-docs": "^10.6.3",
+		"@storybook/react-vite": "^10.6.3",
+		"@terrazzo/cli": "^2.10.0",
+		"@terrazzo/parser": "^2.10.0",
+		"@terrazzo/plugin-css": "^2.10.0",
+		"@terrazzo/token-tools": "^2.10.0",
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
@@ -73,7 +73,7 @@
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"postcss": "^8.4.38",
 		"prettier": "npm:wp-prettier@^3.9.6",
-		"storybook": "^10.6.2",
+		"storybook": "^10.6.3",
 		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
 	},
