@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `Modal`: Adapt colors and rounded corners to the design system theme.
+-   `Modal`: Adapt colors and rounded corners to the design system theme ([#85855](https://github.com/WordPress/gutenberg/pull/85855)).
 -   Popup menu and option items: Use solid WPDS brand highlights for the active item and keep inactive items neutral ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   `DropdownMenu`: Focus the menu on pointer opening and enter its items with arrow keys ([#85486](https://github.com/WordPress/gutenberg/pull/85486)).
 -   `RangeControl`: Use the design system outline for the slider thumb focus ring ([#85536](https://github.com/WordPress/gutenberg/pull/85536)).
