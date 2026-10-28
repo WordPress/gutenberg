@@ -11,10 +11,9 @@ import {
 	useState,
 	useMemo,
 } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Select, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import { useContextSystem, contextConnect } from '../context';
-import SelectControl from '../select-control';
 import { HStack } from '../h-stack';
 import { Flex } from '../flex';
 import { PolymorphicElement } from '../utils/polymorphic-element';
@@ -52,6 +51,8 @@ const UnconnectedColorPicker = (
 	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
+	useEnableWpCompatOverlaySlot();
+
 	const {
 		enableAlpha = false,
 		color: colorProp,
@@ -72,8 +73,6 @@ const UnconnectedColorPicker = (
 	const safeColordColor = useMemo( () => {
 		return colord( color || '' );
 	}, [ color ] );
-
-	const debouncedSetColor = useDebounce( setColor );
 
 	// Internal HSLA state preserves hue and saturation values that
 	// would otherwise be lost when converting to/from hex at achromatic
@@ -112,8 +111,7 @@ const UnconnectedColorPicker = (
 	// Handler for HSL inputs (and the HSVA picker after it converts to HSLA).
 	// Apply the user's HSLA, then notify the parent only when the color
 	// actually changes. setColor must not run inside setInternalHSLA
-	// (state updaters must be pure). Uses direct setColor (not debounced)
-	// to avoid races with hex/RGB's debouncedSetColor.
+	// (state updaters must be pure).
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
 			setInternalHSLA( nextHSLA );
@@ -128,16 +126,15 @@ const UnconnectedColorPicker = (
 	);
 
 	// Handler for components that provide Colord values (RGB, Hex inputs).
-	// Uses debouncedSetColor since the hex input fires per keystroke.
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
 			const nextHSLA = nextValue.toHsl();
 			setInternalHSLA( ( prev ) => mergeHSLA( nextHSLA, prev ) );
 			const nextHex = nextValue.toHex();
 			lastProducedHexRef.current = nextHex;
-			debouncedSetColor( nextHex );
+			setColor( nextHex );
 		},
-		[ debouncedSetColor ]
+		[ setColor ]
 	);
 
 	const [ colorType, setColorType ] = useState< ColorType >(
@@ -209,18 +206,34 @@ const UnconnectedColorPicker = (
 			/>
 			<div className={ styles.auxiliary }>
 				<HStack className={ styles.header } justify="space-between">
-					<SelectControl
-						className={ styles.select }
-						size="compact"
-						options={ options }
+					<Select.Root
+						items={ options }
 						value={ colorType }
-						onChange={ ( nextColorType ) =>
-							setColorType( nextColorType as ColorType )
-						}
-						label={ __( 'Color format' ) }
-						hideLabelFromVision
-						variant="minimal"
-					/>
+						onValueChange={ ( nextColorType ) => {
+							if ( nextColorType !== null ) {
+								setColorType( nextColorType );
+							}
+						} }
+					>
+						<Select.Trigger
+							size="compact"
+							variant="minimal"
+							aria-label={ __( 'Color format' ) }
+							className={ styles.select }
+						/>
+						<Select.Popup width="content">
+							{ options.map( ( option ) => (
+								<Select.Item
+									key={ option.value }
+									value={ option.value }
+								>
+									<Select.ItemLabel>
+										{ option.label }
+									</Select.ItemLabel>
+								</Select.Item>
+							) ) }
+						</Select.Popup>
+					</Select.Root>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }

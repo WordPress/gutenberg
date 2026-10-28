@@ -10,8 +10,8 @@
 
 return array(
 	'type'          => 'boolean',
-	'label'         => __( 'Enable pingbacks & trackbacks', 'gutenberg' ),
-	'header'        => __( 'Trackbacks & Pingbacks', 'gutenberg' ),
+	'label'         => __( 'Enable pingbacks & trackbacks' ),
+	'header'        => __( 'Trackbacks & Pingbacks' ),
 	'enableSorting' => false,
 	'enableHiding'  => false,
 	'filterBy'      => false,

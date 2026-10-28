@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "../utils/theme-variables" as *;
 
-// Variant selectors use :where() to retain the single-class Emotion specificity.
+// Variant selectors use :where() to retain single-class specificity.
 .select {
 	display: block;
 	background-color: $components-color-background;

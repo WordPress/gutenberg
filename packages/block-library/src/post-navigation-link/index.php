@@ -209,7 +209,7 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 
 	// Mirrors the background image defaults of the background block support.
 	if ( ! empty( $background_styles['backgroundImage'] ) ) {
-		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+		$background_styles['backgroundSize'] ??= 'cover';
 		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
 			$background_styles['backgroundPosition'] = '50% 50%';
 		}

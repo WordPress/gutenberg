@@ -8,7 +8,7 @@
 
 return array(
 	'type'        => 'media',
-	'label'       => __( 'Site Icon', 'gutenberg' ),
-	'description' => __( 'Shown in browser tabs, bookmarks, and mobile apps. It should be square and at least 512 by 512 pixels.', 'gutenberg' ),
-	'placeholder' => __( 'Choose icon', 'gutenberg' ),
+	'label'       => __( 'Site Icon' ),
+	'description' => __( 'Shown in browser tabs, bookmarks, and mobile apps. It should be square and at least 512 by 512 pixels.' ),
+	'placeholder' => __( 'Choose icon' ),
 );

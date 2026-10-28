@@ -9,7 +9,7 @@
 
 return array(
 	'type'     => 'datetime',
-	'label'    => __( 'Date', 'gutenberg' ),
+	'label'    => __( 'Date' ),
 	'filterBy' => array(
 		'operators' => array( 'before', 'after' ),
 	),

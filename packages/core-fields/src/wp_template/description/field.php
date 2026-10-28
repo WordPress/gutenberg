@@ -9,8 +9,8 @@
 
 return array(
 	'type'               => 'text',
-	'label'              => __( 'Description', 'gutenberg' ),
-	'placeholder'        => __( 'Add a description', 'gutenberg' ),
+	'label'              => __( 'Description' ),
+	'placeholder'        => __( 'Add a description' ),
 	'Edit'               => array(
 		'control' => 'textarea',
 		'rows'    => 4,
