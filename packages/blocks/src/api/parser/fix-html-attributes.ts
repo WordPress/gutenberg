@@ -4,28 +4,21 @@ import { parseHtml } from './get-block-attributes';
 import type { Block, BlockType } from '../../types';
 
 /**
- * Given an HTML string, returns the attributes of its root element.
+ * Given an HTML string, returns its root element.
  *
  * @param innerHTML Markup string.
  *
- * @return Attributes of the root element.
+ * @return Root element.
  */
-function getHTMLRootElementAttributes(
-	innerHTML: string
-): Map< string, string > {
-	const root = parseHtml( innerHTML ).firstElementChild;
-	return new Map(
-		Array.from( root?.attributes ?? [], ( { name, value } ) => [
-			name,
-			value,
-		] )
-	);
+function getHTMLRootElement( innerHTML: string ): HTMLElement | null {
+	return parseHtml( innerHTML ).firstElementChild as HTMLElement | null;
 }
 
 /**
  * Given parsed block attributes, keeps the attributes of the block's root
  * element that its `save` doesn't produce in `htmlAttributes`, so they're
- * saved again. Classes are left to `fixCustomClassname`.
+ * saved again. For `style`, only the properties `save` doesn't set are kept.
+ * Classes are left to `fixCustomClassname`.
  *
  * @param blockAttributes Original block attributes.
  * @param blockType       Block type settings.
@@ -43,14 +36,25 @@ export function fixHtmlAttributes(
 	}
 
 	const { htmlAttributes, ...attributes } = blockAttributes;
-	const saved = getHTMLRootElementAttributes(
-		getSaveContent( blockType, attributes )
-	);
+	const saved = getHTMLRootElement( getSaveContent( blockType, attributes ) );
+	const root = getHTMLRootElement( innerHTML );
 	const unknownAttributes: Record< string, string > = {};
-	for ( const [ name, value ] of getHTMLRootElementAttributes( innerHTML ) ) {
-		if ( name !== 'class' && ! saved.has( name ) ) {
+	for ( const { name, value } of Array.from( root?.attributes ?? [] ) ) {
+		if (
+			name !== 'class' &&
+			name !== 'style' &&
+			! saved?.hasAttribute( name )
+		) {
 			unknownAttributes[ name ] = value;
 		}
+	}
+	// The browser reads the declarations, so values like `url("data:…;…")`
+	// stay whole.
+	for ( const property of Array.from( saved?.style ?? [] ) ) {
+		root?.style.removeProperty( property );
+	}
+	if ( root?.style.length ) {
+		unknownAttributes.style = root.style.cssText;
 	}
 
 	return Object.keys( unknownAttributes ).length

@@ -219,6 +219,6 @@ exports[`rawHandler > should preserve all paragraphs 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p style="border-top-width:1px;border-right-width:1px;border-bottom-width:1px;border-left-width:1px;border-top-style:solid;border-right-style:solid;border-bottom-style:solid;border-left-style:solid;border-top-color:tomato;border-right-color:tomato;border-bottom-color:tomato;border-left-color:tomato;border-width:1px;border-style:solid;border-color:tomato;border-top:1px solid tomato;border-right:1px solid tomato;border-bottom:1px solid tomato;border-left:1px solid tomato;border:1px solid tomato;border-image:none"></p>
 <!-- /wp:paragraph -->"
 `;
