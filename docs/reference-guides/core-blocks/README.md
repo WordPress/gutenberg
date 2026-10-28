@@ -846,7 +846,7 @@ Display the total number of results in a query.
 
 ## Quote
 
-Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
+Give quoted text visual emphasis.
 
 -	**Name:** [core/quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
