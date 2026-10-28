@@ -341,7 +341,7 @@ export default function useSelectionObserver() {
 							// selection (also through a focused editing host).
 							// It may be temporarily non-editable while a drag
 							// that started outside it is in progress (see
-							// rich-text's preventFocusCapture).
+							// usePreventFocusCapture).
 							( richTextElement.contentEditable !== 'true' ||
 								( ownerDocument.activeElement !==
 									richTextElement &&
