@@ -21,17 +21,25 @@ describe( 'Autocomplete hover navigation', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		const items = [
-			{ key: 'apple', value: 'Apple', label: 'Apple', isDisabled: false },
+			{
+				key: 'apple',
+				value: 'Apple',
+				label: 'Apple',
+				keywords: [],
+				isDisabled: false,
+			},
 			{
 				key: 'orange',
 				value: 'Orange',
 				label: 'Orange',
+				keywords: [],
 				isDisabled: false,
 			},
 			{
 				key: 'grapes',
 				value: 'Grapes',
 				label: 'Grapes',
+				keywords: [],
 				isDisabled: false,
 			},
 		];
