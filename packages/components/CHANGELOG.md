@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Popup menu and option items: Use solid WPDS brand highlights for the active item and keep inactive items neutral ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+
 ## 43.0.0 (2026-10-20)
 
 ### Breaking Changes

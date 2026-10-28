@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+
 ## 16.0.0 (2026-10-20)
 
 ### Breaking Changes

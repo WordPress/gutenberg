@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+
+### Bug Fixes
+
+-   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
