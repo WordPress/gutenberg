@@ -1,5 +1,5 @@
 import {
-	Card,
+	Card as WCCard,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Notice,
 	__experimentalVStack as VStack,
@@ -138,7 +138,7 @@ export default function GuidelineActionsSection( {
 					{ error }
 				</Notice>
 			) }
-			<Card className="guidelines__actions-card">
+			<WCCard className="guidelines__actions-card">
 				{ /*
 				 * Disable reason: The `list` ARIA role is redundant but
 				 * Safari+VoiceOver won't announce the list otherwise.
@@ -155,7 +155,7 @@ export default function GuidelineActionsSection( {
 					) ) }
 				</ul>
 				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-			</Card>
+			</WCCard>
 
 			<ConfirmDialog
 				isOpen={ !! pendingImport }

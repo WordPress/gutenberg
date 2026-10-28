@@ -1,0 +1,78 @@
+import type {
+	ItemId,
+	QueriedItem,
+	QueriedMeta,
+	Query,
+	ReceiveItemsAction,
+	RemoveItemsAction,
+} from './types';
+
+/**
+ * Returns an action object used in signalling that items have been received.
+ *
+ * @param items Items received.
+ * @param edits Optional edits to reset.
+ * @param meta  Meta information about pagination.
+ *
+ * @return Action object.
+ */
+export function receiveItems(
+	items: QueriedItem | Array< QueriedItem >,
+	edits?: Record< string, unknown > | null,
+	meta?: QueriedMeta | null
+): ReceiveItemsAction {
+	return {
+		type: 'RECEIVE_ITEMS',
+		items,
+		persistedEdits: edits,
+		meta,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that entity records have been
+ * deleted and they need to be removed from entities state.
+ *
+ * @param kind            Kind of the removed entities.
+ * @param name            Name of the removed entities.
+ * @param records         Record IDs of the removed entities.
+ * @param invalidateCache Controls whether we want to invalidate the cache.
+ * @return Action object.
+ */
+export function removeItems(
+	kind: string,
+	name: string,
+	records: ItemId | Array< ItemId >,
+	invalidateCache = false
+): RemoveItemsAction {
+	return {
+		type: 'REMOVE_ITEMS',
+		itemIds: Array.isArray( records ) ? records : [ records ],
+		kind,
+		name,
+		invalidateCache,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that queried data has been
+ * received.
+ *
+ * @param items Queried items received.
+ * @param query Optional query object.
+ * @param edits Optional edits to reset.
+ * @param meta  Meta information about pagination.
+ *
+ * @return Action object.
+ */
+export function receiveQueriedItems(
+	items: QueriedItem | Array< QueriedItem >,
+	query: Query | null = {},
+	edits?: Record< string, unknown > | null,
+	meta?: QueriedMeta | null
+): ReceiveItemsAction & { query: Query | null } {
+	return {
+		...receiveItems( items, edits, meta ),
+		query,
+	};
+}
