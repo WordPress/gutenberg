@@ -127,6 +127,12 @@ Now, the npm packages should be ready and a patch can be created and committed i
 
 ## Standalone bugfix package releases
 
+### Backporting package changelog entries
+
+When a backported fix needs a package changelog entry on a target branch that does not use changelog fragments (via Changie), copy the rendered entry into that branch's package `CHANGELOG.md` under the appropriate `Unreleased` subsection. On the source branch, run `npm run changelog:preview -- -p <package-name>` (for example, `npm run changelog:preview -- -p ui`) to render pending entries; for an already-released entry, copy it from the source branch's package `CHANGELOG.md` instead. Preserve the category, description, and PR citation, and exclude the corresponding `.changes/unreleased/` fragment from the backport. Whether a package uses fragments is determined by the target branch's `.changie.yaml` `projects` list, not the source branch's configuration. This does not add a package-changelog requirement to Gutenberg plugin or WordPress Core backports.
+
+### Publishing a standalone bugfix
+
 The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a regular release cycle.
 
 Note: Both the `trunk` and `wp/latest` branches are restricted and can only be _pushed_ to by the Gutenberg Core team.
@@ -211,5 +217,4 @@ To publish development packages to npm, select `development` from the "Release t
 Behind the scenes, the release process is fully automated via `npm exec --no release-cli -- npm-next` command. It ensures
 the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid version collisions, development releases include a timestamp, for example, `@wordpress/block-editor@5.2.10-next.v.202607130915.0`.
 
-[plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
 [package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages
