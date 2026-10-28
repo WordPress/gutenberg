@@ -127,34 +127,20 @@ function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
 	}
 
 	// Without any, Group and Column wrap them in one element, so they go before
-	// its closer, or before the closer of the inner container of a legacy Group.
-	// Serializes the HTML token by token, as `WP_HTML_Processor::serialize()`
-	// does, and starts the second part at that closer.
+	// its closer. Serializes the HTML token by token, as
+	// `WP_HTML_Processor::serialize()` does, and starts the second part there.
 	$processor = WP_HTML_Processor::create_fragment( implode( '', $inner_content ) );
 	if ( null === $processor ) {
 		return null;
 	}
-	$parts           = array( '', '' );
-	$part            = 0;
-	$closer_depth    = null;
-	$is_after_opener = false;
+	$parts        = array( '', '' );
+	$part         = 0;
+	$closer_depth = null;
 	while ( $processor->next_token() ) {
-		$is_opener = '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer();
-		if ( null === $closer_depth ) {
-			if ( $is_opener ) {
-				$closer_depth    = $processor->get_current_depth() - 1;
-				$is_after_opener = true;
-			}
-		} elseif ( $is_after_opener && ( '#text' !== $processor->get_token_type() || '' !== trim( $processor->get_modifiable_text(), " \t\n\f\r" ) ) ) {
-			// As in `wp_restore_group_inner_container()`, the inner container comes
-			// first in the wrapper, after any whitespace.
-			$is_after_opener = false;
-			if ( $is_opener && 'DIV' === $processor->get_tag() && $processor->has_class( 'wp-block-group__inner-container' ) ) {
-				$closer_depth = $processor->get_current_depth() - 1;
-			}
-		}
-		// A closer is visited at the depth of the element that contains it.
-		if ( 0 === $part && null !== $closer_depth && $processor->is_tag_closer() && $processor->get_current_depth() === $closer_depth ) {
+		if ( null === $closer_depth && '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer() ) {
+			// A closer is visited at the depth of the element that contains it.
+			$closer_depth = $processor->get_current_depth() - 1;
+		} elseif ( 0 === $part && $processor->is_tag_closer() && $processor->get_current_depth() === $closer_depth ) {
 			$part = 1;
 		}
 		$parts[ $part ] .= $processor->serialize_token();
