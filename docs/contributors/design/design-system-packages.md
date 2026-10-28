@@ -164,7 +164,7 @@ A new component with a similar name is not necessarily a replacement. Use [Compa
 
 Add a `WC*` alias as soon as a public `@wordpress/ui` export has the same name as a `@wordpress/components` export, including a private API of `@wordpress/components`. The alias depends only on the name collision. It does not depend on the new component's status, or on whether the new component replaces the legacy one.
 
-Add the mapping to the `@wordpress/use-import-as` configuration in [`tools/eslint/config.mjs`](/tools/eslint/config.mjs), and rename every existing import, including destructuring from `unlock( privateApis )`. The alias is a convention of this repository, so it needs no changes to the `@wordpress/components` documentation or changelog. A reviewer should check that the pull request contains only the configuration entry and the renames.
+Add the mapping to the `@wordpress/use-import-as` configuration in [`tools/eslint/config.mjs`](/tools/eslint/config.mjs), and rename every existing import, including destructuring from `unlock( privateApis )`. The alias is a convention of this repository, so it needs no changes to the `@wordpress/components` documentation or changelog.
 
 #### 2. Try the replacement in Gutenberg
 
@@ -201,7 +201,6 @@ The deprecation pull request:
 - Calls `deprecated()` from `@wordpress/deprecated` with `since`, the planned removal `version`, and the `alternative`.
 - Adds a deprecation notice to the component's README.
 - Moves the story under `Deprecated`, with a stable story `id` so that existing links continue to work.
-- Updates the denylist message if it does not already name the replacement.
 - Adds a `@wordpress/components` changelog entry.
 
 A reviewer should check that no Gutenberg screen logs the warning, including through other components that render the legacy one.
