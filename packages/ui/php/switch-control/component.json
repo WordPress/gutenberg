@@ -1,0 +1,18 @@
+{
+	"name": "switch-control",
+	"props": {
+		"label": { "type": "string", "required": true },
+		"name": { "type": "string", "required": true },
+		"checked": { "type": "boolean", "default": false },
+		"disabled": { "type": "boolean", "default": false },
+		"class": { "type": "string", "default": "" }
+	},
+	"example": {
+		"props": { "label": "Enable taxes", "name": "enable_taxes" }
+	},
+	"interactive": "hydrate",
+	"react": {
+		"component": "SwitchControl",
+		"rename": { "checked": "defaultChecked" }
+	}
+}

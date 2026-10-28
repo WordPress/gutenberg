@@ -16,6 +16,7 @@
  */
 
 require_once __DIR__ . '/markup.php';
+require_once __DIR__ . '/interactive.php';
 require_once __DIR__ . '/preview-page.php';
 
 /**
@@ -76,7 +77,7 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	$components = gutenberg_ui_components_get_manifest();
 	$render     = 'gutenberg_ui_render_' . str_replace( '-', '_', $name );
 
-	if ( ! isset( $components[ $name ] ) || ( ! isset( $components[ $name ]['markup'] ) && ! function_exists( $render ) ) ) {
+	if ( ! isset( $components[ $name ] ) || ( ! isset( $components[ $name ]['markup'] ) && ! isset( $components[ $name ]['interactive'] ) && ! function_exists( $render ) ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
 			/* translators: %s: Component name. */
@@ -92,6 +93,10 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 		return '';
 	}
 
+	if ( 'mount' === ( $component['interactive']['how'] ?? null ) ) {
+		return gutenberg_ui_components_render_mount( $component, $props );
+	}
+
 	if ( ! empty( $component['content']['required'] ) && ( ! is_string( $content ) || '' === $content ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
@@ -105,7 +110,8 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	gutenberg_ui_components_enqueue_assets();
 
 	if ( isset( $component['markup'] ) ) {
-		return gutenberg_ui_components_render_markup( $component, $props, (string) $content );
+		$html = gutenberg_ui_components_render_markup( $component, $props, (string) $content );
+		return isset( $component['interactive'] ) ? gutenberg_ui_components_wrap_hydrate( $component, $props, $html ) : $html;
 	}
 
 	$classes = $component['classes']['base'];

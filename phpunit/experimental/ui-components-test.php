@@ -97,10 +97,73 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_a_mounted_component_prints_a_native_fallback() {
+		$html = gutenberg_get_ui_component(
+			'searchable-select-control',
+			array(
+				'label' => 'Base <country>',
+				'name'  => 'country',
+				'items' => array(
+					array(
+						'value' => 'ES',
+						'label' => 'Spain',
+					),
+					array(
+						'value' => 'PT',
+						'label' => 'Portugal',
+					),
+				),
+				'value' => 'PT',
+			)
+		);
+
+		$this->assertStringContainsString( '<select', $html );
+		$this->assertStringContainsString( 'name="country"', $html );
+		$this->assertMatchesRegularExpression( '/<option value="PT"\s+selected=[\'"]selected[\'"]>Portugal<\/option>/', $html );
+		$this->assertStringContainsString( 'Base &lt;country&gt;', $html );
+		$this->assertStringContainsString( '<wp-ui-interactive', $html );
+		$this->assertTrue( wp_script_is( 'wp-ui-interactive', 'enqueued' ) );
+	}
+
+	public function test_a_hydrated_component_gets_its_own_ids() {
+		$first  = gutenberg_get_ui_component(
+			'switch-control',
+			array(
+				'label' => 'Enable taxes',
+				'name'  => 'enable_taxes',
+			)
+		);
+		$second = gutenberg_get_ui_component(
+			'switch-control',
+			array(
+				'label'   => 'Enable coupons',
+				'name'    => 'enable_coupons',
+				'checked' => true,
+			)
+		);
+
+		$this->assertStringContainsString( '<wp-ui-interactive', $first );
+		$this->assertStringNotContainsString( '__wpuiid__', $first . $second );
+		$this->assertStringContainsString( '&quot;defaultChecked&quot;:true', $second );
+		$this->assertTrue( wp_script_is( 'wp-ui-interactive', 'enqueued' ) );
+
+		preg_match( '/idPrefix&quot;:&quot;([^&]+)&quot;/', $first, $first_prefix );
+		preg_match( '/idPrefix&quot;:&quot;([^&]+)&quot;/', $second, $second_prefix );
+		$this->assertNotSame( $first_prefix[1], $second_prefix[1] );
+	}
+
 	public function test_an_unknown_component_renders_nothing() {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
 		$this->assertSame( '', gutenberg_get_ui_component( 'not-a-component' ) );
+	}
+
+	public function test_static_components_load_no_script() {
+		wp_dequeue_script( 'wp-ui-interactive' );
+
+		gutenberg_get_ui_component( 'button', array(), 'Save' );
+
+		$this->assertFalse( wp_script_is( 'wp-ui-interactive', 'enqueued' ) );
 	}
 
 	public function test_rendering_enqueues_the_stylesheet() {
@@ -111,13 +174,15 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 	/**
 	 * Turns HTML into a list of tokens to compare, ignoring the order of
-	 * attributes and classes.
+	 * attributes and classes, the wrappers for interactive components, and the
+	 * prefix of generated IDs, which differs between the build and PHP.
 	 *
 	 * @param string $html HTML.
 	 * @return array Tokens.
 	 */
 	private static function normalize_html( $html ) {
 		$tokens    = array();
+		$ids       = array();
 		$processor = new WP_HTML_Tag_Processor( $html );
 
 		while ( $processor->next_token() ) {
@@ -131,7 +196,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 				continue;
 			}
 
-			if ( '#tag' !== $type ) {
+			if ( '#tag' !== $type || in_array( $processor->get_tag(), array( 'WP-UI-INTERACTIVE' ), true ) ) {
 				continue;
 			}
 
@@ -147,6 +212,18 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 					$classes = preg_split( '/\s+/', trim( (string) $value ) );
 					sort( $classes );
 					$value = implode( ' ', $classes );
+				}
+				if ( in_array( $name, array( 'id', 'for', 'aria-controls', 'aria-describedby', 'aria-labelledby' ), true ) ) {
+					$value = implode(
+						' ',
+						array_map(
+							static function ( $id ) use ( &$ids ) {
+								$ids[ $id ] = $ids[ $id ] ?? '#' . count( $ids );
+								return $ids[ $id ];
+							},
+							preg_split( '/\s+/', trim( (string) $value ) )
+						)
+					);
 				}
 				$attributes[ $name ] = true === $value ? '' : $value;
 			}
