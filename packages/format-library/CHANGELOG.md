@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Non-breaking space: Remove the spaces that HTML would collapse when replacing non-breaking spaces ([#85873](https://github.com/WordPress/gutenberg/pull/85873)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
