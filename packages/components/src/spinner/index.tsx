@@ -15,7 +15,7 @@ export function UnforwardedSpinner(
 				styles.spinner,
 				className
 			) }
-			viewBox="0 0 100 100"
+			viewBox="0 0 24 24"
 			width="16"
 			height="16"
 			xmlns="http://www.w3.org/2000/svg"
@@ -24,20 +24,9 @@ export function UnforwardedSpinner(
 			{ ...props }
 			ref={ forwardedRef }
 		>
-			{ /* Gray circular background */ }
-			<circle
-				className={ styles.track }
-				cx="50"
-				cy="50"
-				r="50"
-				vectorEffect="non-scaling-stroke"
-			/>
-
-			{ /* Theme-colored arc */ }
 			<path
 				className={ styles.indicator }
-				d="m 50 0 a 50 50 0 0 1 50 50"
-				vectorEffect="non-scaling-stroke"
+				d="m 12 0 a 12 12 0 0 1 0 24"
 			/>
 		</svg>
 	);

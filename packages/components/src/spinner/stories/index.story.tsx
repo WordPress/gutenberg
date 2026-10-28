@@ -26,6 +26,6 @@ const Template: StoryFn< typeof Spinner > = ( args ) => {
 
 export const Default: StoryFn< typeof Spinner > = Template.bind( {} );
 
-// The Spinner can be resized to any size, but the stroke width will remain unchanged.
+// The stroke scales with the size of the Spinner.
 export const CustomSize: StoryFn< typeof Spinner > = Template.bind( {} );
 CustomSize.args = { style: { width: space( 20 ), height: space( 20 ) } };
