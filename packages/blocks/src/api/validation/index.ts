@@ -1,5 +1,4 @@
 import { Tokenizer } from 'simple-html-tokenizer';
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
 import { createLogger, createQueuedLogger } from './logger';
@@ -31,11 +30,6 @@ const REGEXP_WHITESPACE = /[\t\n\r\v\f ]+/g;
  * Matches a string containing only whitespace
  */
 const REGEXP_ONLY_WHITESPACE = /^[\t\n\r\v\f ]*$/;
-
-/**
- * Matches a CSS URL type value
- */
-const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
 
 /**
  * Boolean attributes are attributes whose presence as being assigned is
@@ -319,68 +313,17 @@ export function isEquivalentTextTokens(
 }
 
 /**
- * Given a CSS length value, returns a normalized CSS length value for strict equality
- * comparison.
- *
- * @param value CSS length value.
- *
- * @return Normalized CSS length value.
- */
-export function getNormalizedLength( value: string ): string {
-	if ( 0 === parseFloat( value ) ) {
-		return '0';
-	}
-	// Normalize strings with floats to always include a leading zero.
-	if ( value.indexOf( '.' ) === 0 ) {
-		return '0' + value;
-	}
-
-	return value;
-}
-
-/**
- * Given a style value, returns a normalized style value for strict equality
- * comparison.
- *
- * @param value Style value.
- *
- * @return Normalized style value.
- */
-export function getNormalizedStyleValue( value: string ): string {
-	const textPieces = getTextPiecesSplitOnWhitespace( value );
-	const normalizedPieces = textPieces.map( getNormalizedLength );
-	const result = normalizedPieces.join( ' ' );
-
-	return (
-		result
-			// Normalize URL type to omit whitespace or quotes.
-			.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' )
-	);
-}
-
-/**
- * Given a style attribute string, returns an object of style properties.
+ * Given a style attribute string, returns its declarations as the browser
+ * reads them.
  *
  * @param text Style attribute.
  *
- * @return Style properties.
+ * @return Style declarations.
  */
-export function getStyleProperties( text: string ): Record< string, string > {
-	const pairs = text
-		// Trim ending semicolon (avoid including in split)
-		.replace( /;?\s*$/, '' )
-		// Split on property assignment.
-		.split( ';' )
-		// For each property assignment...
-		.map( ( style ) => {
-			// ...split further into key-value pairs.
-			const [ key, ...valueParts ] = style.split( ':' );
-			const value = valueParts.join( ':' );
-
-			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
-		} );
-
-	return Object.fromEntries( pairs );
+function getStyleDeclaration( text: string ): CSSStyleDeclaration {
+	const { style } = document.createElement( 'div' );
+	style.cssText = text;
+	return style;
 }
 
 /**
@@ -406,11 +349,20 @@ export const isEqualAttributesOfName: Record<
 		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual: string, expected: string ): boolean => {
-		return fastDeepEqual(
-			...( [ actual, expected ].map( getStyleProperties ) as [
-				Record< string, string >,
-				Record< string, string >,
-			] )
+		// The browser reads both, so `#fff` matches `rgb(255, 255, 255)` and
+		// values like `url("data:…;…")` stay whole.
+		const [ actualStyle, expectedStyle ] = [ actual, expected ].map(
+			getStyleDeclaration
+		);
+		return (
+			actualStyle.length === expectedStyle.length &&
+			Array.from( actualStyle ).every(
+				( property ) =>
+					actualStyle.getPropertyValue( property ) ===
+						expectedStyle.getPropertyValue( property ) &&
+					actualStyle.getPropertyPriority( property ) ===
+						expectedStyle.getPropertyPriority( property )
+			)
 		);
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough

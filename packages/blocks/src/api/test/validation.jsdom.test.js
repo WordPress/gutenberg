@@ -7,9 +7,6 @@ import {
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
 	isEquivalentTextTokens,
-	getNormalizedLength,
-	getNormalizedStyleValue,
-	getStyleProperties,
 	isEqualAttributesOfName,
 	isEqualTagAttributePairs,
 	isEqualTokensOfType,
@@ -156,83 +153,6 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'getNormalizedLength()', () => {
-		it( 'omits unit from zero px length', () => {
-			const normalizedLength = getNormalizedLength( '0px' );
-
-			expect( normalizedLength ).toBe( '0' );
-		} );
-
-		it( 'retains unit in non-zero px length', () => {
-			const normalizedLength = getNormalizedLength( '50px' );
-
-			expect( normalizedLength ).toBe( '50px' );
-		} );
-
-		it( 'omits unit from zero percentage', () => {
-			const normalizedLength = getNormalizedLength( '0%' );
-
-			expect( normalizedLength ).toBe( '0' );
-		} );
-
-		it( 'retains unit in non-zero percentage', () => {
-			const normalizedLength = getNormalizedLength( '50%' );
-
-			expect( normalizedLength ).toBe( '50%' );
-		} );
-
-		it( 'adds leading zero to percentage', () => {
-			const normalizedLength = getNormalizedLength( '.5%' );
-
-			expect( normalizedLength ).toBe( '0.5%' );
-		} );
-	} );
-
-	describe( 'getNormalizedStyleValue()', () => {
-		it( 'omits whitespace and quotes from url value', () => {
-			const normalizedValue = getNormalizedStyleValue(
-				'url( "https://wordpress.org/img.png" )'
-			);
-
-			expect( normalizedValue ).toBe(
-				'url(https://wordpress.org/img.png)'
-			);
-		} );
-
-		it( 'omits length units from zero values', () => {
-			const normalizedValue =
-				getNormalizedStyleValue( '44% 0% 18em 0em' );
-
-			expect( normalizedValue ).toBe( '44% 0 18em 0' );
-		} );
-
-		it( 'add leading zero to units that have it missing', () => {
-			const normalizedValue = getNormalizedStyleValue( '.23% .75em' );
-
-			expect( normalizedValue ).toBe( '0.23% 0.75em' );
-		} );
-
-		it( 'leaves zero values in calc() expressions alone', () => {
-			const normalizedValue =
-				getNormalizedStyleValue( 'calc(0em + 5px)' );
-
-			expect( normalizedValue ).toBe( 'calc(0em + 5px)' );
-		} );
-	} );
-
-	describe( 'getStyleProperties()', () => {
-		it( 'returns style property pairs', () => {
-			const pairs = getStyleProperties(
-				'background-image: url( "https://wordpress.org/img.png" ); color: red;'
-			);
-
-			expect( pairs ).toEqual( {
-				'background-image': 'url(https://wordpress.org/img.png)',
-				color: 'red',
-			} );
-		} );
-	} );
-
 	describe( 'isEqualAttributesOfName', () => {
 		describe( '.class()', () => {
 			it( 'ignores ordering', () => {
@@ -267,10 +187,46 @@ describe( 'validation', () => {
 			it( 'returns true if the same style', () => {
 				const isEqual = isEqualAttributesOfName.style(
 					'background-image: url( "https://wordpress.org/img.png" ); color: red;',
-					"color: red;   background-image: url('https://wordpress.org/img.png\n);"
+					"color: red;   background-image: url('https://wordpress.org/img.png'\n);"
 				);
 
 				expect( isEqual ).toBe( true );
+			} );
+
+			it( 'compares values as the browser reads them', () => {
+				const isEqual = isEqualAttributesOfName.style(
+					'color:#fffbe6;margin:0;padding:.5em',
+					'padding: 0.5em; margin: 0px; color: rgb(255, 251, 230);'
+				);
+
+				expect( isEqual ).toBe( true );
+			} );
+
+			it( 'keeps semicolons inside values', () => {
+				const style =
+					"background-image:url('data:image/png;base64,iVBORw0KGgo=')";
+
+				expect(
+					isEqualAttributesOfName.style(
+						style,
+						'background-image: url("data:image/png;base64,iVBORw0KGgo=");'
+					)
+				).toBe( true );
+				expect(
+					isEqualAttributesOfName.style(
+						style,
+						'background-image: url("data:image/png;base64,AAAA");'
+					)
+				).toBe( false );
+			} );
+
+			it( 'returns false if only one is important', () => {
+				const isEqual = isEqualAttributesOfName.style(
+					'color: red !important',
+					'color: red'
+				);
+
+				expect( isEqual ).toBe( false );
 			} );
 
 			it( 'returns false if not same style', () => {

@@ -1,6 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
+import { getReactStyleKey } from './style';
 import type { BlockListBlockFeatureProps, BlockWrapperProps } from './types';
 
 type HtmlAttributes = Record< string, string >;
@@ -17,6 +18,7 @@ const ALLOWED_ATTRIBUTES = new Set( [
 	'itemtype',
 	'lang',
 	'role',
+	'style',
 	'title',
 	'translate',
 ] );
@@ -38,7 +40,25 @@ export function addAttribute( settings: BlockType ): BlockType {
 }
 
 /**
- * Adds the allowed attributes to props without replacing the block's own.
+ * Turns an inline style into a style object, as React expects. The browser
+ * reads the declarations, so values like `url("data:…;…")` stay whole.
+ *
+ * @param style Value of a `style` attribute.
+ */
+function getStyleObject( style: string ): Record< string, string > {
+	const element = document.createElement( 'div' );
+	element.style.cssText = style;
+	return Object.fromEntries(
+		Array.from( element.style, ( property ) => [
+			getReactStyleKey( property ),
+			element.style.getPropertyValue( property ),
+		] )
+	);
+}
+
+/**
+ * Adds the allowed attributes to props without replacing the block's own,
+ * including its style properties.
  *
  * @param props          Props.
  * @param htmlAttributes Attributes to add.
@@ -47,7 +67,7 @@ function mergeHtmlAttributes(
 	props: BlockWrapperProps,
 	htmlAttributes: HtmlAttributes
 ): BlockWrapperProps {
-	const attributes = Object.fromEntries(
+	const { style, ...attributes } = Object.fromEntries(
 		Object.entries( htmlAttributes ).filter(
 			( [ name ] ) =>
 				name.startsWith( 'data-' ) ||
@@ -56,7 +76,15 @@ function mergeHtmlAttributes(
 		)
 	);
 	// The block's own props go first and last: they keep their place and win.
-	return { ...props, ...attributes, ...props };
+	const merged = { ...props, ...attributes, ...props };
+	if ( style ) {
+		merged.style = {
+			...props.style,
+			...getStyleObject( style ),
+			...props.style,
+		};
+	}
+	return merged;
 }
 
 export function addSaveProps(
