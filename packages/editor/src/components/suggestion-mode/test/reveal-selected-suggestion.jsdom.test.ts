@@ -10,26 +10,24 @@ vi.hoisted( () => {
 describe( 'buildSelectedSuggestionCss', () => {
 	it( 'emits nothing when no note is selected', () => {
 		expect( buildSelectedSuggestionCss() ).toBe( '' );
-		expect( buildSelectedSuggestionCss( undefined, 1 ) ).toBe( '' );
-		expect( buildSelectedSuggestionCss( null, 1 ) ).toBe( '' );
+		expect( buildSelectedSuggestionCss( null ) ).toBe( '' );
 	} );
 
 	it( 'targets the selected suggestion marker by id', () => {
-		const css = buildSelectedSuggestionCss( 42, 1 );
+		const css = buildSelectedSuggestionCss( 42 );
 		expect( css ).toContain(
 			'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)[data-suggestion-id="42"]{'
 		);
 	} );
 
-	it( 'tints and rings the marker in the suggester colour', () => {
-		// Author 1 → index 1 (#D94145).
-		const css = buildSelectedSuggestionCss( 7, 1 );
-		expect( css ).toContain( 'background-color:#D9414533;' );
-		expect( css ).toContain( 'outline:2px solid #D94145;' );
+	it( 'thickens the marker rule, like a selected note', () => {
+		const css = buildSelectedSuggestionCss( 7 );
+		expect( css ).toContain( 'text-decoration-thickness:3px;' );
+		expect( css ).not.toContain( 'outline' );
 	} );
 
 	it( 'only ever styles the selected marker', () => {
-		const css = buildSelectedSuggestionCss( 7, 1 );
+		const css = buildSelectedSuggestionCss( 7 );
 		expect( css.match( /\[data-suggestion-id=/g ) ).toHaveLength( 1 );
 	} );
 } );
