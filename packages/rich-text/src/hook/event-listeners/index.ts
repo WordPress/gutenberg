@@ -6,7 +6,6 @@ import formatBoundaries from './format-boundaries';
 import deleteHandler from './delete';
 import inputAndSelection from './input-and-selection';
 import selectionChangeCompat from './selection-change-compat';
-import { preventFocusCapture } from './prevent-focus-capture';
 import type { EventListenerEffect, EventListenerProps } from '../types';
 
 // `inputAndSelection` must come first: it subscribes the listener that
@@ -19,7 +18,6 @@ const allEventListeners: EventListenerEffect[] = [
 	formatBoundaries,
 	deleteHandler,
 	selectionChangeCompat,
-	preventFocusCapture,
 ];
 
 export function useEventListeners( props: EventListenerProps ) {
