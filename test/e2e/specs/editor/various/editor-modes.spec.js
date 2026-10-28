@@ -217,3 +217,128 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		] );
 	} );
 } );
+
+test.describe( 'Editing a block with inner blocks as HTML', () => {
+	let uploadedAudio;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		uploadedAudio = await requestUtils.uploadMedia(
+			'./assets/playlist-e2e-test.wav'
+		);
+	} );
+
+	test.beforeEach( async ( { admin, editor } ) => {
+		await admin.createNewPost();
+		const track = {
+			name: 'core/playlist-track',
+			attributes: {
+				id: uploadedAudio.id,
+				src: uploadedAudio.source_url,
+			},
+		};
+		await editor.insertBlock( {
+			name: 'core/playlist',
+			innerBlocks: [
+				{ ...track, attributes: { ...track.attributes, title: 'One' } },
+				{ ...track, attributes: { ...track.attributes, title: 'Two' } },
+			],
+		} );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Playlist',
+				exact: true,
+			} )
+		);
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'should keep the inner blocks when the block itself is edited', async ( {
+		editor,
+	} ) => {
+		const [ { innerBlocks } ] = await editor.getBlocks( { full: true } );
+		const playlistHTML = editor.canvas
+			.getByRole( 'document', { name: 'Block: Playlist', exact: true } )
+			.getByRole( 'textbox' );
+
+		await playlistHTML.fill(
+			( await playlistHTML.inputValue() ).replace(
+				'class="wp-block-playlist',
+				'class="wp-block-playlist is-test'
+			)
+		);
+		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
+
+		await expect
+			.poll( () => editor.getBlocks( { full: true } ) )
+			.toMatchObject( [
+				{
+					name: 'core/playlist',
+					isValid: true,
+					attributes: { className: 'is-test' },
+					innerBlocks: innerBlocks.map( ( { clientId } ) => ( {
+						clientId,
+					} ) ),
+				},
+			] );
+	} );
+
+	test( 'should remove an inner block removed from the HTML', async ( {
+		editor,
+	} ) => {
+		const playlistHTML = editor.canvas
+			.getByRole( 'document', { name: 'Block: Playlist', exact: true } )
+			.getByRole( 'textbox' );
+		const html = await playlistHTML.inputValue();
+		const tracks = html.match( /<!-- wp:playlist-track [^]*?\/-->/g );
+
+		await playlistHTML.fill( html.replace( tracks[ 1 ], '' ) );
+		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
+
+		await expect
+			.poll( () => editor.getBlocks( { full: true } ) )
+			.toMatchObject( [
+				{
+					name: 'core/playlist',
+					isValid: true,
+					innerBlocks: [ { attributes: { title: 'One' } } ],
+				},
+			] );
+		const [ playlist ] = await editor.getBlocks();
+		expect( playlist.innerBlocks ).toHaveLength( 1 );
+	} );
+
+	test( 'should keep the inner blocks when the HTML is emptied', async ( {
+		editor,
+	} ) => {
+		const playlistHTML = editor.canvas
+			.getByRole( 'document', { name: 'Block: Playlist', exact: true } )
+			.getByRole( 'textbox' );
+
+		// Emptying the field resets the block, which has to keep showing the
+		// inner blocks it keeps.
+		await playlistHTML.fill( '' );
+		await playlistHTML.blur();
+		await expect( playlistHTML ).toHaveValue( /wp:playlist-track/ );
+
+		// Leaving the field again without typing must not remove them.
+		await playlistHTML.focus();
+		await playlistHTML.blur();
+
+		await expect
+			.poll( () => editor.getBlocks( { full: true } ) )
+			.toMatchObject( [
+				{
+					name: 'core/playlist',
+					isValid: true,
+					innerBlocks: [
+						{ attributes: { title: 'One' } },
+						{ attributes: { title: 'Two' } },
+					],
+				},
+			] );
+	} );
+} );
