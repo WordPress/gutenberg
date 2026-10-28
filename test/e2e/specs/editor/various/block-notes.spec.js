@@ -1355,7 +1355,7 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
 			).toBeFocused();
-			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
 				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
 			).toBeFocused();
@@ -1373,6 +1373,19 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
 			).not.toBeChecked();
+
+			// The emoji name shows in a tooltip, and one Escape closes both.
+			await menu
+				.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				.hover();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeHidden();
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
