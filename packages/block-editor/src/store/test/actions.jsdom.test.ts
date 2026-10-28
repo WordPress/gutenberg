@@ -1319,6 +1319,8 @@ describe( 'actions', () => {
 					offset: 0,
 				} ),
 				getBlockEditingMode: () => 'default',
+				// `mergeBlocks` reads the merge attributes setting before replacing
+				// the blocks.
 				getSettings: () => ( {} ),
 			};
 			const dispatch = Object.assign( vi.fn(), {
@@ -1493,6 +1495,8 @@ describe( 'actions', () => {
 					offset: 0,
 				} ),
 				getBlockEditingMode: () => 'default',
+				// `mergeBlocks` reads the merge attributes setting before replacing
+				// the blocks.
 				getSettings: () => ( {} ),
 			};
 			const dispatch = Object.assign( vi.fn(), {
