@@ -430,6 +430,7 @@ export default dedupePlugins( [
 						Card: 'WCCard',
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
+						IconButton: 'WCIconButton',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
