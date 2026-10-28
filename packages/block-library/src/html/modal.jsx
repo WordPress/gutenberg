@@ -5,7 +5,7 @@ import {
 	Modal,
 	Button,
 	Flex,
-	Notice,
+	Notice as WCNotice,
 	privateApis as componentsPrivateApis,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -117,7 +117,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 							) }
 						</HStack>
 						{ hasRestrictedContent && (
-							<Notice
+							<WCNotice
 								status="warning"
 								isDismissible={ false }
 								className="block-library-html__modal-notice"
@@ -125,7 +125,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 								{ __(
 									'This block contains CSS or JavaScript that will be removed when you save because you do not have permission to use unfiltered HTML.'
 								) }
-							</Notice>
+							</WCNotice>
 						) }
 						<Flex
 							direction={ isMobileViewport ? 'column' : 'row' }
