@@ -273,7 +273,9 @@ test.describe( 'Big image size threshold', () => {
 			path: `/wp/v2/media/${ imageId }`,
 		} );
 
-		// The sub-sizes are generated, but no scaled copy replaces the upload.
+		// The sub-sizes are generated, but no scaled copy replaces the upload,
+		// even though it is larger than the threshold.
+		expect( media.media_details.width ).toBe( 4000 );
 		expect( media.media_details.sizes ).toHaveProperty( 'thumbnail' );
 		expect( media.media_details.original_image ).toBeUndefined();
 	} );
@@ -281,7 +283,8 @@ test.describe( 'Big image size threshold', () => {
 
 /**
  * Builds a JPEG with a valid header and a corrupt body: the start of a real
- * photo followed by 20 KB of deterministic noise.
+ * photo followed by 20 KB of deterministic noise, with its frame size raised
+ * above the big image threshold.
  *
  * @return {Buffer} Damaged JPEG data.
  */
@@ -297,7 +300,13 @@ function createDamagedJpeg() {
 			createHash( 'sha256' ).update( `83512-${ i }` ).digest()
 		)
 	);
-	return Buffer.concat( [ source.subarray( 0, 6000 ), noise ] );
+	const damaged = Buffer.concat( [ source.subarray( 0, 6000 ), noise ] );
+
+	// Declare a 4000x3000 frame, above the big image threshold.
+	const sof = damaged.indexOf( Buffer.from( [ 0xff, 0xc0 ] ) );
+	damaged.writeUInt16BE( 3000, sof + 5 );
+	damaged.writeUInt16BE( 4000, sof + 7 );
+	return damaged;
 }
 
 class ImageBlockUtils {
