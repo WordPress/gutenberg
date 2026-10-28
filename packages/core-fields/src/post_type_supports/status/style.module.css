@@ -1,6 +1,8 @@
 .icon {
 	block-size: 24px;
 	inline-size: 24px;
+	/* Keep the icon full size when a long label wraps. */
+	flex-shrink: 0;
 }
 
 .icon svg {
