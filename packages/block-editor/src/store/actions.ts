@@ -1585,8 +1585,8 @@ export const mergeBlocks =
 			);
 		}
 
-		// The block type's `merge` only knows about its own attributes, so the
-		// editor can carry over what it attaches to blocks, such as notes.
+		// The block type's `merge` only knows about its own attributes, so let
+		// the editor carry over the attributes it adds to blocks.
 		const mergeBlockAttributes = (
 			select.getSettings() as Record< symbol, unknown >
 		 )[ mergeBlockAttributesKey ] as
