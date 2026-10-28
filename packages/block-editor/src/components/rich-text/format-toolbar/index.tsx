@@ -4,7 +4,7 @@ import { ToolbarItem, DropdownMenu, Slot } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import type { ComponentProps } from 'react';
 import { orderBy } from '../../../utils/sorting';
-import { OrderedToolbarButton } from '../toolbar-button';
+import { DROPDOWN_FORMATS, TOOLBAR_FORMATS } from './formats';
 import type { ToolbarControlFill } from '../types';
 
 type DropdownMenuControls = ComponentProps< typeof DropdownMenu >[ 'controls' ];
@@ -16,14 +16,12 @@ const POPOVER_PROPS: { placement: 'bottom-start' } = {
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link', 'unknown', 'non-breaking-space' ].map(
-				( format ) => (
-					<Slot
-						name={ `RichText.ToolbarControls.${ format }` }
-						key={ format }
-					/>
-				)
-			) }
+			{ TOOLBAR_FORMATS.map( ( format ) => (
+				<Slot
+					name={ `RichText.ToolbarControls.${ format }` }
+					key={ format }
+				/>
+			) ) }
 			<Slot name="RichText.ToolbarControls">
 				{ ( slotFills ) => {
 					// The slot renders the fills of `RichTextToolbarButton`.
@@ -34,13 +32,15 @@ const FormatToolbar = () => {
 
 					const allProps = orderBy(
 						fills,
-						// Only the buttons of `PrivateRichTextToolbarButton`
-						// have an order. The others come last, in the order
-						// they were rendered.
-						( [ element ]: ToolbarControlFill ) =>
-							element.type === OrderedToolbarButton
-								? element.props.order
-								: Infinity
+						// The core formats are listed first. The other
+						// buttons come last, in the order they were
+						// rendered, whether or not they pass a name.
+						( [ { props } ]: ToolbarControlFill ) => {
+							const index = DROPDOWN_FORMATS.indexOf(
+								props.name ?? ''
+							);
+							return index === -1 ? Infinity : index;
+						}
 					).map( ( [ { props } ] ) => props );
 					const hasActive = allProps.some(
 						( { isActive } ) => isActive

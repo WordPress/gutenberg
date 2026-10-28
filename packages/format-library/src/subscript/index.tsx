@@ -1,11 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { subscript as subscriptIcon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 const name = 'core/subscript';
 const title = __( 'Subscript' );
@@ -26,8 +23,8 @@ export const subscript = {
 		}
 
 		return (
-			<PrivateRichTextToolbarButton
-				order={ 70 }
+			<RichTextToolbarButton
+				name={ name }
 				icon={ subscriptIcon }
 				title={ title }
 				onClick={ onClick }

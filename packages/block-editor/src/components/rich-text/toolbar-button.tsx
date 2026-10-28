@@ -1,10 +1,18 @@
 import { Fill, ToolbarButton } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
 import type { ComponentProps } from 'react';
-import type {
-	PrivateRichTextToolbarButtonProps,
-	RichTextToolbarButtonProps,
-} from './types';
+import { TOOLBAR_FORMATS } from './format-toolbar/formats';
+import type { RichTextToolbarButtonProps } from './types';
+
+// We need the `RichText.ToolbarControls` slot handler to identify core fills
+// by their `name` props, even though `name` isn't propagated to the actually
+// rendered elements.
+function NamedToolbarButton( {
+	name,
+	...props
+}: ComponentProps< typeof ToolbarButton > & { name?: string } ) {
+	return <ToolbarButton { ...props } />;
+}
 
 export function RichTextToolbarButton( {
 	name,
@@ -15,7 +23,9 @@ export function RichTextToolbarButton( {
 	let shortcut: string | undefined;
 	let fillName = 'RichText.ToolbarControls';
 
-	if ( name ) {
+	// Only the formats shown as their own button in the toolbar have a slot of
+	// their own. Other formats go in the "More" dropdown.
+	if ( name && TOOLBAR_FORMATS.includes( name ) ) {
 		fillName += `.${ name }`;
 	}
 
@@ -25,41 +35,9 @@ export function RichTextToolbarButton( {
 
 	return (
 		<Fill name={ fillName }>
-			<ToolbarButton { ...props } shortcut={ shortcut } />
-		</Fill>
-	);
-}
-
-// The format toolbar reads `order` from this element's props to sort the
-// "More" dropdown, so it isn't passed on to the button.
-export function OrderedToolbarButton( {
-	order,
-	...props
-}: ComponentProps< typeof ToolbarButton > & { order: number } ) {
-	return <ToolbarButton { ...props } />;
-}
-
-/**
- * Adds a button to the "More" dropdown, listed by `order`. The buttons of
- * `RichTextToolbarButton` come after these, in the order they were rendered.
- */
-export function PrivateRichTextToolbarButton( {
-	order,
-	shortcutType,
-	shortcutCharacter,
-	...props
-}: PrivateRichTextToolbarButtonProps ) {
-	let shortcut: string | undefined;
-
-	if ( shortcutType && shortcutCharacter ) {
-		shortcut = displayShortcut[ shortcutType ]( shortcutCharacter );
-	}
-
-	return (
-		<Fill name="RichText.ToolbarControls">
-			<OrderedToolbarButton
+			<NamedToolbarButton
 				{ ...props }
-				order={ order }
+				name={ name }
 				shortcut={ shortcut }
 			/>
 		</Fill>

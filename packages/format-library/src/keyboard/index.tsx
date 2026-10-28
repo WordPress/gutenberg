@@ -1,11 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { button } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 const name = 'core/keyboard';
 const title = __( 'Keyboard input' );
@@ -26,8 +23,8 @@ export const keyboard = {
 		}
 
 		return (
-			<PrivateRichTextToolbarButton
-				order={ 40 }
+			<RichTextToolbarButton
+				name={ name }
 				icon={ button }
 				title={ title }
 				onClick={ onClick }

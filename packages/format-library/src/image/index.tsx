@@ -12,13 +12,10 @@ import { insertObject, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	MediaUpload,
+	RichTextToolbarButton,
 	MediaUploadCheck,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import type { FormatEditProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 /**
  * The attributes the `core/image` format registers.
@@ -223,8 +220,8 @@ function Edit( {
 					onFocus();
 				} }
 				render={ ( { open }: { open: () => void } ) => (
-					<PrivateRichTextToolbarButton
-						order={ 20 }
+					<RichTextToolbarButton
+						name={ name }
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }

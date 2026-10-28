@@ -1,11 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { superscript as superscriptIcon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 const name = 'core/superscript';
 const title = __( 'Superscript' );
@@ -26,8 +23,8 @@ export const superscript = {
 		}
 
 		return (
-			<PrivateRichTextToolbarButton
-				order={ 60 }
+			<RichTextToolbarButton
+				name={ name }
 				icon={ superscriptIcon }
 				title={ title }
 				onClick={ onClick }

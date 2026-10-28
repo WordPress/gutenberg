@@ -1,14 +1,11 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import {
+	RichTextToolbarButton,
 	RichTextShortcut,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
@@ -31,8 +28,8 @@ export const strikethrough = {
 					character="d"
 					onUse={ onClick }
 				/>
-				<PrivateRichTextToolbarButton
-					order={ 50 }
+				<RichTextToolbarButton
+					name={ name }
 					icon={ formatStrikethrough }
 					title={ title }
 					onClick={ onClick }

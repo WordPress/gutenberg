@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { formatListNumbered as icon } from '@wordpress/icons';
 import { insertObject } from '@wordpress/rich-text';
 import {
+	RichTextToolbarButton,
 	store as blockEditorStore,
 	privateApis,
 } from '@wordpress/block-editor';
@@ -14,7 +15,7 @@ import { name as FOOTNOTES_BLOCK_NAME } from './';
 
 export const formatName = 'core/footnote';
 
-const { usesContextKey, PrivateRichTextToolbarButton } = unlock( privateApis );
+const { usesContextKey } = unlock( privateApis );
 const POST_CONTENT_BLOCK_NAME = 'core/post-content';
 const SYNCED_PATTERN_BLOCK_NAME = 'core/block';
 
@@ -188,8 +189,8 @@ export const format = {
 		}
 
 		return (
-			<PrivateRichTextToolbarButton
-				order={ 100 }
+			<RichTextToolbarButton
+				name={ formatName }
 				icon={ icon }
 				title={ __( 'Footnote' ) }
 				onClick={ onClick }

@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
+
 ### Enhancements
 
--   `RichTextToolbarButton`: List the formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale ([#85457](https://github.com/WordPress/gutenberg/pull/85457)).
+-   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
@@ -12,6 +16,7 @@
 
 ### Bug Fixes
 
+-   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).

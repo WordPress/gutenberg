@@ -97,17 +97,6 @@ export type RichTextToolbarButtonProps = {
 	shortcutCharacter?: string;
 } & ComponentProps< typeof ToolbarButton >;
 
-/**
- * Props of `PrivateRichTextToolbarButton`. Other props go to the toolbar
- * button.
- */
-export type PrivateRichTextToolbarButtonProps = Omit<
-	RichTextToolbarButtonProps,
-	'name'
-> & {
-	order: number;
-};
-
 export type FormatToolbarContainerProps = {
 	inline?: boolean;
 	editableContentElement?: HTMLElement | null;
@@ -119,11 +108,12 @@ export type FormatToolbarContainerProps = {
  */
 export type ToolbarControlFill = [
 	{
-		type: unknown;
 		props: ComponentProps< typeof ToolbarButton > & {
 			isActive?: boolean;
 			title: string;
-			order?: number;
+			// The name a button in the "More" dropdown was given, which
+			// sorts the core formats.
+			name?: string;
 		};
 	},
 ];

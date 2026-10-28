@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { TextControl, Button, Popover } from '@wordpress/components';
 import { SelectControl, Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
@@ -7,9 +7,6 @@ import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { PrivateRichTextToolbarButton } = unlock( blockEditorPrivateApis );
 
 interface LanguageFormat {
 	name: string;
@@ -53,8 +50,8 @@ function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 
 	return (
 		<>
-			<PrivateRichTextToolbarButton
-				order={ 80 }
+			<RichTextToolbarButton
+				name={ name }
 				icon={ languageIcon }
 				label={ title }
 				title={ title }
