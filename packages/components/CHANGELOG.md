@@ -27,6 +27,7 @@
 
 ### Bug Fixes
 
+-   `ContentEditableControl`: Stop screen readers from reading a label hidden with `hideLabelFromVision` twice, once as text and once as the field's name ([#85776](https://github.com/WordPress/gutenberg/pull/85776)).
 -   `DropdownMenu`: Keep the height of `MenuItem` consistent regardless of whether it has an icon ([#85503](https://github.com/WordPress/gutenberg/pull/85503)).
 -   `ColorPicker`: Fire `onChange` immediately for hex and RGB input, so an edit is no longer lost when the picker closes right after it ([#85734](https://github.com/WordPress/gutenberg/pull/85734)).
 -   `Modal`: Keep an open modal exposed to screen readers when a modal opened before it closes ([#85720](https://github.com/WordPress/gutenberg/pull/85720)).
