@@ -1,4 +1,8 @@
 import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 import { store as commandsStore } from '@wordpress/commands';
 import { store as coreStore } from '@wordpress/core-data';
 import { useNavigate } from '@wordpress/route';
@@ -41,9 +45,9 @@ function getTitle( title: TitleField ) {
 }
 
 /**
- * Names what the shell shows, with the type as its icon, and moves between
- * the site and the editor: Edit while browsing the site, View while editing.
- * It sits in the same place in both, so it carries over between the two.
+ * Names what the shell shows, with the type as its icon, and offers the ways
+ * to work with that document: viewing it on the site, or editing it. It sits
+ * in the same place in each, so it carries over between them.
  *
  * @param props              Component props.
  * @param props.editorCanvas The entity being edited, or none on the site.
@@ -131,54 +135,60 @@ export default function ShellDocumentBar( {
 		navigate( { to: '/' } );
 	};
 
+	// Styling the site is part of viewing it, so it is View here too.
+	const mode = editorCanvas ? 'edit' : 'view';
+
+	const onChangeMode = ( nextMode: string | number | undefined ) => {
+		if ( nextMode === mode ) {
+			return;
+		}
+		if ( nextMode === 'view' ) {
+			onView();
+		} else if ( nextMode === 'edit' && editLink ) {
+			navigate( { to: editLink } );
+		}
+	};
+
 	return (
-		<div className={ styles[ 'document-bar' ] }>
-			{ /* Like the editor's document bar, the title opens the command palette. */ }
-			<Button
-				variant="unstyled"
-				className={ styles[ 'title-button' ] }
-				aria-label={ sprintf(
-					/* translators: 1: Post type label, e.g. "Page". 2: Title. */
-					__( '%1$s: %2$s. Open command palette' ),
-					typeLabel ?? '',
-					displayTitle
-				) }
-				onClick={ () => openCommandPalette() }
+		<div className={ styles.document }>
+			<div className={ styles[ 'document-bar' ] }>
+				{ /* Like the editor's document bar, the title opens the command palette. */ }
+				<Button
+					variant="unstyled"
+					className={ styles[ 'title-button' ] }
+					aria-label={ sprintf(
+						/* translators: 1: Post type label, e.g. "Page". 2: Title. */
+						__( '%1$s: %2$s. Open command palette' ),
+						typeLabel ?? '',
+						displayTitle
+					) }
+					onClick={ () => openCommandPalette() }
+				>
+					<Icon
+						className={ styles.icon }
+						icon={ POST_TYPE_ICONS[ postType ] ?? page }
+						size={ 20 }
+					/>
+					<Text variant="body-sm" className={ styles.title }>
+						{ displayTitle }
+					</Text>
+				</Button>
+			</div>
+			{ /* Just outside the title box: related to what it names, but a choice of how to work with it. */ }
+			<ToggleGroupControl
+				className={ styles.modes }
+				label={ __( 'Mode' ) }
+				hideLabelFromVision
+				value={ mode }
+				onChange={ onChangeMode }
 			>
-				<Icon
-					className={ styles.icon }
-					icon={ POST_TYPE_ICONS[ postType ] ?? page }
-					size={ 20 }
+				<ToggleGroupControlOption value="view" label={ __( 'View' ) } />
+				<ToggleGroupControlOption
+					value="edit"
+					label={ __( 'Edit' ) }
+					disabled={ ! editorCanvas && ! editLink }
 				/>
-				<Text variant="body-sm" className={ styles.title }>
-					{ displayTitle }
-				</Text>
-			</Button>
-			{ editorCanvas ? (
-				<Button
-					variant="minimal"
-					tone="neutral"
-					size="compact"
-					onClick={ onView }
-				>
-					{ __( 'View' ) }
-				</Button>
-			) : (
-				<Button
-					variant="minimal"
-					tone="neutral"
-					size="compact"
-					disabled={ ! editLink }
-					focusableWhenDisabled
-					onClick={ () => {
-						if ( editLink ) {
-							navigate( { to: editLink } );
-						}
-					} }
-				>
-					{ __( 'Edit' ) }
-				</Button>
-			) }
+			</ToggleGroupControl>
 		</div>
 	);
 }

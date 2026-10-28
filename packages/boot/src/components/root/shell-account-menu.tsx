@@ -10,6 +10,7 @@ import {
 	Menu,
 } from '@wordpress/ui';
 import { store as bootStore } from '../../store';
+import styles from './shell-account-menu.module.scss';
 
 /**
  * The current user's account menu, at the end of the site shell's bar. A
@@ -34,7 +35,7 @@ export default function ShellAccountMenu() {
 					<Button
 						variant="minimal"
 						tone="neutral"
-						size="compact"
+						className={ styles.trigger }
 						aria-label={ __( 'Account' ) }
 					/>
 				}

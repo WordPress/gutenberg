@@ -6,6 +6,7 @@
 		"path": "/styles",
 		"page": [
 			"site-editor-v2",
+			"site-shell",
 			"theme-preview"
 		]
 	},

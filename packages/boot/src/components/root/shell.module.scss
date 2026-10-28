@@ -6,10 +6,16 @@
 .shell {
 	// The height of the editor header, so the two can share a row.
 	--site-shell-bar-height: #{variables.$header-height};
+	// How far the bar's end buttons sit from each separator and window edge,
+	// as the menu toggle does centred in its square.
+	--site-shell-slot-inset: calc((var(--site-shell-bar-height) - var(--wpds-dimension-size-lg)) / 2);
 	// Both match the values in `shell.tsx`, which places the site.
 	--site-shell-menu-width: 240px;
 	--site-shell-gap: 12px;
 	--site-shell-inset: 8px;
+	--site-shell-styles-width: 360px;
+	// How far the menu shifts as it is uncovered.
+	--site-shell-menu-shift: 24px;
 	--site-shell-pip-scale: 1;
 	--site-shell-transition-duration: var(--wpds-motion-duration-md);
 	--site-shell-transition-easing: var(--wpds-motion-easing-balanced);
@@ -70,8 +76,9 @@
 	gap: var(--wpds-dimension-gap-xs);
 }
 
+// Space between the middle of the bar and the end's own items.
 .bar-end {
-	padding-inline: var(--wpds-dimension-padding-sm);
+	padding-inline-start: var(--site-shell-slot-inset);
 }
 
 .bar-context {
@@ -84,12 +91,50 @@
 }
 
 // As wide as the bar is tall, like the site icon in the editor header.
-.bar-menu-toggle {
+.bar-menu-toggle,
+.bar-account {
+	position: relative;
 	display: flex;
 	flex: none;
 	align-items: center;
 	justify-content: center;
+	gap: var(--wpds-dimension-gap-xs);
+
+	// A hairline between each end's own slot and the next, to show where
+	// the bar's slots meet.
+	&::after {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		width: 1px;
+		height: var(--wpds-dimension-size-md);
+		margin-block: auto;
+		background: var(--wpds-color-stroke-surface-neutral);
+	}
+}
+
+// The menu toggle sits in a square as wide as the bar is tall.
+.bar-menu-toggle {
 	width: var(--site-shell-bar-height);
+	// So the site icon and name start as far from the separator as the
+	// toggle sits from it.
+	margin-inline-end: calc(var(--site-shell-slot-inset) - var(--wpds-dimension-gap-xs) - var(--wpds-dimension-padding-xs));
+}
+
+.bar-menu-toggle::after {
+	inset-inline-end: 0;
+}
+
+// The global items at the end, inset as far from the separator and the edge
+// as the menu toggle is in its square.
+.bar-account {
+	padding-inline: var(--site-shell-slot-inset);
+	// So the button before it ends as far from the separator.
+	margin-inline-start: calc(var(--site-shell-slot-inset) - var(--wpds-dimension-gap-xs));
+}
+
+.bar-account::after {
+	inset-inline-start: 0;
 }
 
 .body {
@@ -100,32 +145,37 @@
 	background: var(--site-shell-bar-background);
 }
 
-// The menu is docked beside the site, or slid out of view. It never covers
-// the site, and the site never covers it.
+// The menu sits beneath everything else. Opening it moves the site, the
+// editor or the admin screen aside to uncover it, and closing it moves them
+// back over it, while the menu itself only shifts a little.
 .menu {
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	inset-inline-start: 0;
-	// Above the admin layer, whose box spans the space beside it.
-	z-index: 2;
+	z-index: 0;
 	display: flex;
 	flex-direction: column;
 	width: var(--site-shell-menu-width);
 	background: var(--wpds-color-background-surface-neutral-weak);
-	transition-property: transform, visibility;
-	transition-duration: var(--site-shell-transition-duration), 0s;
+	transition-property: transform, visibility, opacity;
+	// Shown in full at once, since it is still covered when it opens.
+	transition-duration: var(--site-shell-transition-duration), 0s, 0s;
 	transition-timing-function: var(--site-shell-transition-easing);
 
 	// Visible at once when it opens, so focus can move into it, and hidden
-	// only once it has slid out.
+	// only once it has been covered again. It fades out mostly towards the
+	// end, so it does not linger in a gutter the covering screen leaves.
 	.shell:not(.is-menu-open) & {
 		visibility: hidden;
-		transform: translateX(-100%);
-		transition-delay: 0s, var(--site-shell-transition-duration);
+		opacity: 0;
+		transform: translateX(calc(-1 * var(--site-shell-menu-shift)));
+		transition-duration: var(--site-shell-transition-duration), 0s, var(--site-shell-transition-duration);
+		transition-delay: 0s, var(--site-shell-transition-duration), 0s;
+		transition-timing-function: var(--site-shell-transition-easing), linear, cubic-bezier(0.55, 0, 1, 0.45);
 
 		[dir="rtl"] & {
-			transform: translateX(100%);
+			transform: translateX(var(--site-shell-menu-shift));
 		}
 	}
 }
@@ -149,22 +199,33 @@
 	gap: var(--site-shell-inset);
 	// Flush with the bar above, inset from the window's other edges.
 	padding: 0 var(--site-shell-inset) var(--site-shell-inset);
-	transition-property: padding, visibility;
-	transition-duration: var(--site-shell-transition-duration), 0s;
+	transition-property: inset, padding, visibility;
+	transition-duration: var(--site-shell-transition-duration), var(--site-shell-transition-duration), 0s;
 	transition-timing-function: var(--site-shell-transition-easing);
 
 	// Hidden while covered, so nothing in it can be reached, but only once
 	// the site has grown back over it.
-	.shell:not(.is-admin) & {
+	.shell:not(.is-admin):not(.is-styling) & {
 		visibility: hidden;
-		transition-delay: 0s, var(--site-shell-transition-duration);
+		transition-delay: 0s, 0s, var(--site-shell-transition-duration);
 	}
 
-	// Room for the menu whenever it is open, on the site too, so entering an
-	// admin screen from the menu moves nothing but the site. The screen sits
+	// Beside the menu whenever it is open, on the site too, so entering an
+	// admin screen from the menu moves nothing but the site. Offset rather
+	// than padded, so it does not cover the menu beneath it. The screen sits
 	// right against the menu, like the site and the editor do.
 	.is-menu-open & {
-		padding-inline-start: var(--site-shell-menu-width);
+		inset-inline-start: var(--site-shell-menu-width);
+		padding-inline-start: 0;
+	}
+
+	// While styling, the route's styles panel is docked at the end, beside
+	// the site.
+	.is-styling & {
+		inset-inline-start: auto;
+		box-sizing: border-box;
+		width: calc(var(--site-shell-styles-width) + var(--site-shell-inset));
+		padding-inline-start: 0;
 	}
 }
 
@@ -187,13 +248,13 @@
 	.is-editing & {
 		z-index: 0;
 		visibility: hidden;
-		transition-delay: 0s, 0s, 0s, 0s, 0s, 300ms;
+		transition-delay: 0s, 0s, 0s, 0s, 300ms;
 	}
 	overflow: hidden;
 	background: var(--wpds-color-background-surface-neutral);
 	transform-origin: top left;
-	transition-property: transform, translate, height, border-radius, box-shadow, visibility;
-	transition-duration: var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), 0s;
+	transition-property: transform, height, border-radius, box-shadow, visibility;
+	transition-duration: var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), 0s;
 	transition-timing-function: var(--site-shell-transition-easing);
 
 	// Route changes crossfade the page. Named on its own, the site is left
@@ -213,16 +274,12 @@
 		// The radius and outline are scaled down along with the frame.
 		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
 		box-shadow: 0 0 0 calc(1px / var(--site-shell-pip-scale)) var(--wpds-color-stroke-surface-neutral-weak);
-	}
 
-	// Leaves with the menu when it is hidden on an admin screen.
-	&.is-hidden {
-		visibility: hidden;
-		translate: calc(-1 * var(--site-shell-menu-width)) 0;
-		transition-delay: 0s, 0s, 0s, 0s, 0s, var(--site-shell-transition-duration);
-
-		[dir="rtl"] & {
-			translate: var(--site-shell-menu-width) 0;
+		// The transform is set inline, so the grown one, worked out alongside
+		// it in `shell.tsx`, has to override it.
+		&:hover,
+		&:has(.site-return:focus-visible) {
+			transform: var(--site-shell-thumbnail-hover-transform) !important;
 		}
 	}
 }
@@ -336,6 +393,12 @@
 	// editor's own link to view it in a new tab is left out. It has no class
 	// of its own, so it is picked out by where and what it is.
 	:global(.editor-header__settings > a.components-button[target="_blank"]) {
+		display: none;
+	}
+
+	// Styles are edited in the Style mode instead, so the editor's toggle
+	// for its own styles panel is left out.
+	:global(.editor-header [aria-controls="edit-site:global-styles"]) {
 		display: none;
 	}
 

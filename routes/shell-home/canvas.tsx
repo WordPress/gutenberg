@@ -1,19 +1,51 @@
 import { useCallback, useEffect, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as bootStore } from '@wordpress/boot';
 import { useNavigate, useSearch } from '@wordpress/route';
+import { useEditorAssets } from '@wordpress/lazy-editor';
 import {
 	SitePreview,
 	useSiteUrl,
 	type SitePreviewContext,
+	type SitePreviewGlobalStyles,
 } from '@wordpress/routes-site-preview';
+import { usePreviewGlobalStyles } from '@wordpress/routes-site-preview/global-styles';
 
 type ShellSiteProps = {
 	/** Whether the site is the current route, rather than behind another. */
 	isActive?: boolean;
+	/** Whether the site's styles are being edited beside it. */
+	isStyling?: boolean;
 };
 
-function ShellSite( { isActive = true }: ShellSiteProps ) {
+/**
+ * Reports the global styles being edited, rendered for the site frame. A
+ * separate component, so the editor assets the rendering needs only load
+ * once styles are being edited.
+ *
+ * @param props          Component props.
+ * @param props.onChange Called with the rendered styles.
+ * @return Nothing.
+ */
+function EditedGlobalStyles( {
+	onChange,
+}: {
+	onChange: ( globalStyles: SitePreviewGlobalStyles | undefined ) => void;
+} ) {
+	const { isReady } = useEditorAssets();
+	const globalStyles = usePreviewGlobalStyles( { isEnabled: isReady } );
+
+	useEffect( () => {
+		onChange( globalStyles );
+	}, [ globalStyles, onChange ] );
+
+	useEffect( () => () => onChange( undefined ), [ onChange ] );
+
+	return null;
+}
+
+function ShellSite( { isActive = true, isStyling = false }: ShellSiteProps ) {
 	const siteUrl = useSiteUrl();
 	const navigate = useNavigate();
 	const { preview } = useSearch( { strict: false } ) as {
@@ -70,18 +102,40 @@ function ShellSite( { isActive = true }: ShellSiteProps ) {
 		[ isActive, navigate ]
 	);
 
+	// While styling, and afterwards until they are saved, the site shows the
+	// edited styles rather than the saved ones.
+	const [ globalStyles, setGlobalStyles ] = useState<
+		SitePreviewGlobalStyles | undefined
+	>();
+	const hasStyleEdits = useSelect( ( select ) => {
+		const {
+			__experimentalGetCurrentGlobalStylesId,
+			hasEditsForEntityRecord,
+		} = select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		return globalStylesId
+			? hasEditsForEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: false;
+	}, [] );
+
 	if ( ! siteUrl ) {
 		return null;
 	}
 
 	return (
-		<SitePreview
-			siteUrl={ siteUrl }
-			path={ path }
-			onPathChange={ onPathChange }
-			onContextChange={ onContextChange }
-			showAddressBar={ false }
-		/>
+		<>
+			{ ( isStyling || hasStyleEdits ) && (
+				<EditedGlobalStyles onChange={ setGlobalStyles } />
+			) }
+			<SitePreview
+				siteUrl={ siteUrl }
+				path={ path }
+				onPathChange={ onPathChange }
+				onContextChange={ onContextChange }
+				globalStyles={ globalStyles }
+				showAddressBar={ false }
+			/>
+		</>
 	);
 }
 

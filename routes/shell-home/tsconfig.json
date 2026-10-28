@@ -11,9 +11,11 @@
 	},
 	"references": [
 		{ "path": "../../packages/boot" },
+		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/route" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

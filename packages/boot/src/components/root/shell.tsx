@@ -13,7 +13,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
-import { wordpress } from '@wordpress/icons';
+import { styles as stylesIcon, wordpress } from '@wordpress/icons';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { inertValue } from '@wordpress/react-inert-value';
@@ -28,9 +28,11 @@ import {
 import { ThemeProvider } from '@wordpress/theme';
 import Navigation from '../navigation';
 import SavePanel from '../save-panel';
+import SaveButton from '../save-button';
 import ErrorBoundary from '../error-boundary';
 import CanvasRenderer from '../canvas-renderer';
 import ShellAccountMenu from './shell-account-menu';
+import ShellNotifications from './shell-notifications';
 import ShellDocumentBar from './shell-document-bar';
 import ShellSiteIdentity from './shell-site-identity';
 import PluginArea from '../plugin-area';
@@ -50,11 +52,18 @@ const BAR_SLOT = 'SiteShellBarActions';
  * Renders the canvas the site route exports, so the shell can keep the site
  * mounted behind every other route.
  *
- * @param props          Component props.
- * @param props.isActive Whether the site is the current route.
+ * @param props           Component props.
+ * @param props.isActive  Whether the site is the current route.
+ * @param props.isStyling Whether its styles are being edited beside it.
  * @return The site canvas, once loaded.
  */
-function SiteCanvas( { isActive }: { isActive: boolean } ) {
+function SiteCanvas( {
+	isActive,
+	isStyling,
+}: {
+	isActive: boolean;
+	isStyling: boolean;
+} ) {
 	const contentModule = useSelect(
 		( select ) =>
 			select( bootStore )
@@ -64,6 +73,7 @@ function SiteCanvas( { isActive }: { isActive: boolean } ) {
 	);
 	const [ CustomCanvas, setCustomCanvas ] = useState< ComponentType< {
 		isActive: boolean;
+		isStyling: boolean;
 	} > | null >( null );
 
 	useEffect( () => {
@@ -82,7 +92,7 @@ function SiteCanvas( { isActive }: { isActive: boolean } ) {
 		return null;
 	}
 
-	return <CustomCanvas isActive={ isActive } />;
+	return <CustomCanvas isActive={ isActive } isStyling={ isStyling } />;
 }
 
 // Matches `--site-shell-menu-width`, `--site-shell-gap` and
@@ -91,23 +101,28 @@ function SiteCanvas( { isActive }: { isActive: boolean } ) {
 const MENU_WIDTH = 240;
 const GAP = 12;
 const INSET = 8;
+// Matches `--site-shell-styles-width`, the styles panel beside the site.
+const STYLES_WIDTH = 360;
+const THUMBNAIL_HOVER_SCALE = 1.04;
 
-type SiteLayout = 'full' | 'beside-menu' | 'thumbnail';
+type SiteLayout = 'full' | 'beside-menu' | 'beside-styles' | 'thumbnail';
 
 /**
  * Places the site layer for each layout. The site is always scaled rather
  * than resized, so it keeps the layout of the full page and never reflows
  * while it moves.
  *
- * @param layout The site's layout.
- * @param width  Width of the area below the bar.
- * @param height Height of the area below the bar.
+ * @param layout     The site's layout.
+ * @param width      Width of the area below the bar.
+ * @param height     Height of the area below the bar.
+ * @param isMenuOpen Whether the menu is open beside the site.
  * @return The site layer's style, and the space the thumbnail takes.
  */
 function getSiteStyle(
 	layout: SiteLayout,
 	width: number,
-	height: number
+	height: number,
+	isMenuOpen: boolean
 ): { style: CSSProperties; thumbnailHeight: number } {
 	const direction = isRTL() ? -1 : 1;
 
@@ -132,16 +147,42 @@ function getSiteStyle(
 		};
 	}
 
+	// While styling, the site sits between the menu, when it is open, and the
+	// styles panel, flush with the bar like the panel.
+	if ( layout === 'beside-styles' ) {
+		const start = isMenuOpen ? MENU_WIDTH : INSET;
+		const scale = ( width - start - INSET - STYLES_WIDTH - INSET ) / width;
+		return {
+			style: {
+				height: ( height - INSET ) / scale,
+				transform: `translate(${
+					direction * start
+				}px, 0) scale(${ scale })`,
+				[ '--site-shell-pip-scale' as string ]: scale,
+			},
+			thumbnailHeight: 0,
+		};
+	}
+
 	// In the menu's footer, the site is scaled to the menu's width.
 	const scale = ( MENU_WIDTH - GAP * 2 ) / width;
+	const thumbnailWidth = MENU_WIDTH - GAP * 2;
 	const thumbnailHeight = height * scale;
+	const x = GAP;
+	const y = height - thumbnailHeight - GAP;
+	// Grown slightly about its own centre on hover and focus, to hint that it
+	// returns to the site.
+	const hoverGrowth = THUMBNAIL_HOVER_SCALE - 1;
 	return {
 		style: {
 			height,
-			transform: `translate(${ direction * GAP }px, ${
-				height - thumbnailHeight - GAP
-			}px) scale(${ scale })`,
+			transform: `translate(${ direction * x }px, ${ y }px) scale(${ scale })`,
 			[ '--site-shell-pip-scale' as string ]: scale,
+			[ '--site-shell-thumbnail-hover-transform' as string ]: `translate(${
+				direction * ( x - ( thumbnailWidth * hoverGrowth ) / 2 )
+			}px, ${ y - ( thumbnailHeight * hoverGrowth ) / 2 }px) scale(${
+				scale * THUMBNAIL_HOVER_SCALE
+			})`,
 		},
 		thumbnailHeight,
 	};
@@ -170,8 +211,10 @@ export default function RootShell() {
 	const editorCanvas =
 		routeCanvas && ! routeCanvas.isPreview ? routeCanvas : undefined;
 	const isSiteActive = pathname === '/';
+	// Styling the site, with the styles panel beside it.
+	const isStyling = pathname === '/styles';
 	const isEditing = !! editorCanvas;
-	const isAdminActive = ! isSiteActive && ! isEditing;
+	const isAdminActive = ! isSiteActive && ! isEditing && ! isStyling;
 	const menuId = useId();
 
 	// The menu toggle shows or hides the menu. It starts hidden on the site
@@ -187,7 +230,9 @@ export default function RootShell() {
 		setIsSiteMenuOpen( false );
 	}, [ pathname ] );
 
-	// Opening the menu moves focus into it.
+	// Opening the menu from the keyboard moves focus into it. A pointer
+	// leaves focus on the toggle, as with any other toggle, so nothing in the
+	// menu looks focused.
 	useEffect( () => {
 		if ( isMenuOpen && shouldFocusMenuRef.current ) {
 			shouldFocusMenuRef.current = false;
@@ -227,15 +272,16 @@ export default function RootShell() {
 	let siteLayout: SiteLayout = 'full';
 	if ( isAdminActive ) {
 		siteLayout = 'thumbnail';
+	} else if ( isStyling ) {
+		siteLayout = 'beside-styles';
 	} else if ( isSiteActive && isMenuOpen ) {
 		siteLayout = 'beside-menu';
 	}
-	// With the menu hidden on an admin screen, the thumbnail leaves with it.
-	const isSiteHidden = isAdminActive && ! isMenuOpen;
 	const { style: siteStyle, thumbnailHeight } = getSiteStyle(
 		siteLayout,
 		size.width,
-		size.height
+		size.height,
+		isMenuOpen
 	);
 
 	useRouteTitle();
@@ -255,6 +301,7 @@ export default function RootShell() {
 							[ styles[ 'is-site' ] ]: isSiteActive,
 							[ styles[ 'is-admin' ] ]: isAdminActive,
 							[ styles[ 'is-editing' ] ]: isEditing,
+							[ styles[ 'is-styling' ] ]: isStyling,
 							[ styles[ 'is-menu-open' ] ]: isMenuOpen,
 						} ) }
 						style={
@@ -314,9 +361,11 @@ export default function RootShell() {
 											label={ __( 'Menu' ) }
 											aria-expanded={ isMenuOpen }
 											aria-controls={ menuId }
-											onClick={ () => {
+											onClick={ ( event ) => {
+												// A click from the keyboard has no pointer detail.
 												shouldFocusMenuRef.current =
-													! isMenuOpen;
+													! isMenuOpen &&
+													event.detail === 0;
 												if ( isAdminActive ) {
 													setIsAdminMenuHidden(
 														! isAdminMenuHidden
@@ -333,8 +382,12 @@ export default function RootShell() {
 								</div>
 								<div className={ styles[ 'bar-context' ] }>
 									<Slot name={ BAR_SLOT } bubblesVirtually />
+									{ /* The editor saves its own changes. Elsewhere, such as edited styles. */ }
+									{ ! isEditing && <SaveButton /> }
 								</div>
-								{ ( isSiteActive || isEditing ) && (
+								{ ( isSiteActive ||
+									isEditing ||
+									isStyling ) && (
 									<ShellDocumentBar
 										editorCanvas={ editorCanvas }
 									/>
@@ -343,7 +396,33 @@ export default function RootShell() {
 									ref={ barEndRef }
 									className={ styles[ 'bar-end' ] }
 								>
-									<ShellAccountMenu />
+									{ /*
+									 * Styles apply to the whole site, so they
+									 * sit with the bar's global items rather
+									 * than with the document. Styling is part
+									 * of viewing the site, so it is offered
+									 * only there.
+									 */ }
+									{ ( isSiteActive || isStyling ) && (
+										<IconButton
+											variant="minimal"
+											tone="neutral"
+											icon={ stylesIcon }
+											label={ __( 'Styles' ) }
+											aria-pressed={ isStyling }
+											onClick={ () =>
+												navigate( {
+													to: isStyling
+														? '/'
+														: '/styles',
+												} )
+											}
+										/>
+									) }
+									<div className={ styles[ 'bar-account' ] }>
+										<ShellNotifications />
+										<ShellAccountMenu />
+									</div>
 								</div>
 							</header>
 						</ThemeProvider>
@@ -363,14 +442,26 @@ export default function RootShell() {
 							</ThemeProvider>
 							<div
 								className={ styles.admin }
-								inert={ inertValue( ! isAdminActive ) }
+								inert={ inertValue(
+									! isAdminActive && ! isStyling
+								) }
 							>
+								{ /*
+								 * Admin screens take the menu's dark tones.
+								 * The styles panel stays light: it is built
+								 * from `@wordpress/components`, which do not
+								 * read the theme's tokens, so its controls
+								 * would stay light on a dark panel.
+								 */ }
 								<ThemeProvider
-									color={ {
-										...themeColors,
-										// Reset to the default background color.
-										background: '#fcfcfc',
-									} }
+									color={
+										isStyling
+											? {
+													...themeColors,
+													background: '#fcfcfc',
+												}
+											: themeColors
+									}
 								>
 									<Outlet />
 								</ThemeProvider>
@@ -380,18 +471,23 @@ export default function RootShell() {
 									[ styles[ 'is-thumbnail' ] ]:
 										siteLayout === 'thumbnail',
 									[ styles[ 'is-beside-menu' ] ]:
-										siteLayout === 'beside-menu',
-									[ styles[ 'is-hidden' ] ]: isSiteHidden,
+										siteLayout === 'beside-menu' ||
+										siteLayout === 'beside-styles',
 								} ) }
 								style={ siteStyle }
-								inert={ inertValue( isSiteHidden ) }
 							>
 								<div
 									className={ styles[ 'site-frame' ] }
-									inert={ inertValue( ! isSiteActive ) }
+									// Browsable while styling too, to see the styles on other pages.
+									inert={ inertValue(
+										! isSiteActive && ! isStyling
+									) }
 								>
 									<ErrorBoundary>
-										<SiteCanvas isActive={ isSiteActive } />
+										<SiteCanvas
+											isActive={ isSiteActive }
+											isStyling={ isStyling }
+										/>
 									</ErrorBoundary>
 								</div>
 								{ siteLayout === 'thumbnail' && (
