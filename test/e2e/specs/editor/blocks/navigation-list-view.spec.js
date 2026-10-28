@@ -660,6 +660,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		editor,
 		requestUtils,
 	} ) => {
+		// Start from one menu, so the menu list ends in "Create new Menu".
+		await requestUtils.deleteAllMenus();
 		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Fail the first request that creates a menu.
