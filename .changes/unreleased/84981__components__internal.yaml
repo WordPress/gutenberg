@@ -1,6 +1,6 @@
 project: components
 kind: Internal
 body: '`MenuItem`: Accept `accessibleWhenDisabled` in the props types'
-time: '2026-10-22T04:39:12.244Z'
+time: '2026-10-28T06:38:01.537Z'
 custom:
     PR: '84981'

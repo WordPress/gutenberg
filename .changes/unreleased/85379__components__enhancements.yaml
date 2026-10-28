@@ -1,0 +1,8 @@
+project: components
+kind: Enhancements
+body: >-
+    `CheckboxControl`, `RadioControl`: Use the design system outline for focus
+    rings
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85379'

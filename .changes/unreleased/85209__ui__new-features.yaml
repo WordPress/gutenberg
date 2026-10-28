@@ -1,0 +1,8 @@
+project: ui
+kind: New Features
+body: >-
+    `Notice.List`: Add announcements for added and changed notices, excluding
+    hidden content, with per-notice message and urgency overrides
+time: '2026-10-28T06:38:07.091Z'
+custom:
+    PR: '85209'

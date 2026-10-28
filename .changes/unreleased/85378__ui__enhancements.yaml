@@ -1,0 +1,9 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px
+    stroke of 24px icons. Spinners at the default size are now thinner, and large
+    spinners are thicker
+time: '2026-10-28T06:38:07.091Z'
+custom:
+    PR: '85378'

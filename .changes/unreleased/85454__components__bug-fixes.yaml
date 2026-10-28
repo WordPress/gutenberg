@@ -1,0 +1,6 @@
+project: components
+kind: Bug Fixes
+body: '`ToggleGroupControl`: Keep the width stable when the pressed option changes'
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85454'

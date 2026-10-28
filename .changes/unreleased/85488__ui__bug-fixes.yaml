@@ -1,0 +1,6 @@
+project: ui
+kind: Bug Fixes
+body: '`Menu`: Show a focus ring on highlighted disabled items'
+time: '2026-10-28T06:38:07.092Z'
+custom:
+    PR: '85488'

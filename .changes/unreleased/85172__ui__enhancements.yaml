@@ -3,6 +3,6 @@ kind: Enhancements
 body: >-
     `SelectControl`: Warn in development when an item has an empty string `value`,
     which shows the placeholder instead of the item's label when selected
-time: '2026-10-22T04:39:05.501Z'
+time: '2026-10-28T06:38:07.091Z'
 custom:
     PR: '85172'

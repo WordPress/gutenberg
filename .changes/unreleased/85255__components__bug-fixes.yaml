@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `MenuItem`: Accept the `href` prop in the types, which renders the item as a
+    link
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85255'

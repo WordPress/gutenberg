@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `ColorPicker`: Fire `onChange` immediately for hex and RGB input, so an edit
+    is no longer lost when the picker closes right after it
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85734'

@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Modal`: Keep an open modal exposed to screen readers when a modal opened
+    before it closes
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85720'
