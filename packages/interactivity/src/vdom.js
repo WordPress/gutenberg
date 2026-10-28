@@ -6,6 +6,8 @@ import { h } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
+import { warn } from './utils/warn';
+import { isReservedKey, jsonReviver } from './utils/prototype-chain';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -25,7 +27,32 @@ const directiveParser = new RegExp(
 	'i' // Case insensitive.
 );
 
+/**
+ * Checks whether a directive name part is reserved after trimming hyphens and
+ * lowercasing it, as `kebabToCamelCase()` does on newer branches, where
+ * `data-wp-each--constructor-` names the item `constructor`.
+ *
+ * Directive names and suffixes become property keys: `data-wp-bind--[attribute]`,
+ * for example, assigns to the element's props.
+ *
+ * @param {string} part Part of a directive name.
+ * @return {boolean} Whether the part is reserved.
+ */
+const isReservedNamePart = ( part ) =>
+	isReservedKey( part.replace( /^-+|-+$/g, '' ).toLowerCase() );
+
 export const hydratedIslands = new WeakSet();
+
+const directiveMaps = new WeakSet();
+
+/**
+ * Checks whether the passed value is a directive map created by `toVdom()`.
+ *
+ * @param {unknown} value The value to check.
+ * @return {boolean} Whether the value is a directive map created by `toVdom()`.
+ */
+export const isDirectiveMap = ( value ) =>
+	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 // Recursive function that transforms a DOM tree into vDOM.
 export function toVdom( root ) {
@@ -51,7 +78,8 @@ export function toVdom( root ) {
 
 		const props = {};
 		const children = [];
-		const directives = {};
+		// Keyed by directive names from the markup, so it has no prototype.
+		const directives = Object.create( null );
 		let hasDirectives = false;
 		let ignore = false;
 		let island = false;
@@ -70,11 +98,19 @@ export function toVdom( root ) {
 					hasDirectives = true;
 					let val = attributes[ i ].value;
 					try {
-						val = JSON.parse( val );
+						val = JSON.parse( val, jsonReviver );
 					} catch ( e ) {}
-					const [ , prefix, suffix ] = directiveParser.exec( n );
-					directives[ prefix ] = directives[ prefix ] || {};
-					directives[ prefix ][ suffix || 'default' ] = val;
+					const [ , prefix, suffix = 'default' ] =
+						directiveParser.exec( n );
+					if (
+						isReservedNamePart( prefix ) ||
+						suffix.split( '--' ).some( isReservedNamePart )
+					) {
+						warn( `Found malformed directive name: ${ n }.` );
+					} else {
+						directives[ prefix ] = directives[ prefix ] || {};
+						directives[ prefix ][ suffix ] = val;
+					}
 				}
 			} else if ( n === 'ref' ) {
 				continue;
@@ -82,17 +118,26 @@ export function toVdom( root ) {
 			props[ n ] = attributes[ i ].value;
 		}
 
-		if ( ignore && ! island )
+		if ( ignore && ! island ) {
+			// Keyed by directive names, so it has no prototype.
+			const ignoreDirectives = Object.assign( Object.create( null ), {
+				ignore: true,
+			} );
+			directiveMaps.add( ignoreDirectives );
 			return [
 				h( node.localName, {
 					...props,
 					innerHTML: node.innerHTML,
-					__directives: { ignore: true },
+					__directives: ignoreDirectives,
 				} ),
 			];
+		}
 		if ( island ) hydratedIslands.add( node );
 
-		if ( hasDirectives ) props.__directives = directives;
+		if ( hasDirectives ) {
+			props.__directives = directives;
+			directiveMaps.add( directives );
+		}
 
 		let child = treeWalker.firstChild();
 		if ( child ) {

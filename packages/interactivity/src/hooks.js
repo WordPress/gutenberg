@@ -7,6 +7,9 @@ import { useRef, useCallback } from 'preact/hooks';
  * Internal dependencies
  */
 import { rawStore as store } from './store';
+import { warn } from './utils/warn';
+import { isReservedKey } from './utils/prototype-chain';
+import { isDirectiveMap } from './vdom';
 
 /** @typedef {import('preact').VNode} VNode */
 /** @typedef {typeof context} Context */
@@ -38,8 +41,9 @@ import { rawStore as store } from './store';
 const context = createContext( {} );
 
 // WordPress Directives.
-const directiveCallbacks = {};
-const directivePriorities = {};
+// Looked up by directive names from the markup, so they have no prototype.
+const directiveCallbacks = Object.create( null );
+const directivePriorities = Object.create( null );
 
 /**
  * Register a new directive type in the Interactivity API runtime.
@@ -113,8 +117,16 @@ export const directive = ( name, callback, { priority = 10 } = {} ) => {
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, ctx ) => {
+	const pathParts = path.split( '.' );
+	// Paths come from the markup.
+	if ( pathParts.some( isReservedKey ) ) {
+		warn(
+			`The path "${ path }" contains a reserved property name. The value for that path won't be resolved.`
+		);
+		return;
+	}
 	let current = { ...store, context: ctx };
-	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
+	pathParts.forEach( ( p ) => ( current = current[ p ] ) );
 	return current;
 };
 
@@ -202,6 +214,14 @@ const Directives = ( {
 // Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
 options.vnode = ( vnode ) => {
+	// Only maps built by `toVdom()` passed its directive name checks. Delete any
+	// other `__directives` value so Preact doesn't set it on the element.
+	if (
+		vnode.props.__directives &&
+		! isDirectiveMap( vnode.props.__directives )
+	) {
+		delete vnode.props.__directives;
+	}
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;

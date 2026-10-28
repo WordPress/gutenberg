@@ -12,9 +12,15 @@ export const Fill = ( { slot, children } ) => {
 
 	useEffect( () => {
 		if ( slot ) {
-			slots.value = { ...slots.value, [ slot ]: children };
+			slots.value = Object.assign( Object.create( null ), slots.value, {
+				[ slot ]: children,
+			} );
 			return () => {
-				slots.value = { ...slots.value, [ slot ]: null };
+				slots.value = Object.assign(
+					Object.create( null ),
+					slots.value,
+					{ [ slot ]: null }
+				);
 			};
 		}
 	}, [ slots, slot, children ] );
@@ -26,7 +32,8 @@ export const SlotProvider = ( { children } ) => {
 	return (
 		// TODO: We can change this to use deepsignal once this PR is merged.
 		// https://github.com/luisherranz/deepsignal/pull/38
-		<slotsContext.Provider value={ signal( {} ) }>
+		// Keyed by slot names from the markup, so it has no prototype.
+		<slotsContext.Provider value={ signal( Object.create( null ) ) }>
 			{ children }
 		</slotsContext.Provider>
 	);

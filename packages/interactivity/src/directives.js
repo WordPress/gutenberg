@@ -17,12 +17,20 @@ import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
 import { SlotProvider, Slot, Fill } from './slots';
+import { getSafeUrl, urlAttributes } from './url';
+import { warn } from './utils/warn';
+import { isReservedKey } from './utils/prototype-chain';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
 const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
+		// Assigning `__proto__` would replace the prototype of `target`.
+		if ( isReservedKey( k ) ) {
+			continue;
+		}
+
 		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
 				target[ `$${ k }` ].peek(),
@@ -33,6 +41,13 @@ const mergeDeepSignals = ( target, source, overwrite ) => {
 			target[ `$${ k }` ] = source[ `$${ k }` ];
 		}
 	}
+};
+
+// Warns that the data-wp-bind directive doesn't set a given prop.
+const warnUnbindableProp = ( suffix ) => {
+	warn(
+		`The data-wp-bind directive can't set the "${ suffix }" prop. Ignoring data-wp-bind--${ suffix }.`
+	);
 };
 
 export default () => {
@@ -150,32 +165,42 @@ export default () => {
 	const empty = ' ';
 
 	/**
-	 * Convert a css style string into a object.
+	 * Converts a CSS declaration list, like the value of a `style` attribute,
+	 * into an object that maps each property to its value.
 	 *
-	 * Made by Cristian Bote (@cristianbote) for Goober.
+	 * Only top-level `property: value;` declarations are read. Nested blocks
+	 * are skipped, because a `style` attribute can't contain them. The returned
+	 * object doesn't inherit from `Object.prototype`, so a property name can't
+	 * reach an inherited value.
+	 *
+	 * Based on the parser by Cristian Bote (@cristianbote) for Goober.
 	 * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
 	 *
 	 * @param {string} val CSS string.
 	 * @return {Object} CSS object.
 	 */
 	const cssStringToObject = ( val ) => {
-		const tree = [ {} ];
-		let block, left;
+		const result = Object.create( null );
+		const css = val.replace( ruleClean, '' );
+		let depth = 0;
+		let block;
 
-		while ( ( block = newRule.exec( val.replace( ruleClean, '' ) ) ) ) {
-			if ( block[ 4 ] ) {
-				tree.shift();
-			} else if ( block[ 3 ] ) {
-				left = block[ 3 ].replace( ruleNewline, empty ).trim();
-				tree.unshift( ( tree[ 0 ][ left ] = tree[ 0 ][ left ] || {} ) );
-			} else {
-				tree[ 0 ][ block[ 1 ] ] = block[ 2 ]
+		newRule.lastIndex = 0;
+		while ( ( block = newRule.exec( css ) ) ) {
+			if ( block[ 4 ] !== undefined ) {
+				// End of a block.
+				depth = Math.max( 0, depth - 1 );
+			} else if ( block[ 3 ] !== undefined ) {
+				// Start of a nested block. Its content is skipped.
+				depth++;
+			} else if ( depth === 0 ) {
+				result[ block[ 1 ] ] = block[ 2 ]
 					.replace( ruleNewline, empty )
 					.trim();
 			}
 		}
 
-		return tree[ 0 ];
+		return result;
 	};
 
 	// data-wp-style--[style-key]
@@ -220,9 +245,39 @@ export default () => {
 			Object.entries( bind )
 				.filter( ( n ) => n !== 'default' )
 				.forEach( ( [ attribute, path ] ) => {
-					const result = evaluate( path, {
+					if (
+						attribute === '__directives' ||
+						isReservedKey( attribute )
+					) {
+						warnUnbindableProp( attribute );
+						return;
+					}
+
+					if (
+						attribute === 'protocol' &&
+						( element.type === 'a' || element.type === 'area' )
+					) {
+						/*
+						 * The server renders the attribute, so it is removed from the props
+						 * too. Otherwise Preact sets it when the router updates the element.
+						 */
+						delete element.props[ attribute ];
+						return;
+					}
+
+					let result = evaluate( path, {
 						context: contextValue,
 					} );
+
+					/*
+					 * URLs are checked before the value reaches the props, because Preact
+					 * writes the attribute itself on every render after the hydration, and
+					 * on elements mounted on the client.
+					 */
+					if ( urlAttributes.has( attribute.toLowerCase() ) ) {
+						result = getSafeUrl( result );
+					}
+
 					element.props[ attribute ] = result;
 					// Preact doesn't handle the `role` attribute properly, as it doesn't remove it when `null`.
 					// We need this workaround until the following issue is solved:

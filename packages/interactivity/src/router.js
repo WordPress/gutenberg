@@ -49,7 +49,9 @@ const fetchPage = async ( url, { html } ) => {
 // Return an object with VDOM trees of those HTML regions marked with a
 // `navigation-id` directive.
 const regionsToVdom = ( dom ) => {
-	const regions = {};
+	// Keyed by navigation IDs found in the markup, so it doesn't inherit from
+	// `Object.prototype`.
+	const regions = Object.create( null );
 	const attrName = `data-${ directivePrefix }-navigation-id`;
 	dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
 		const id = region.getAttribute( attrName );
@@ -62,6 +64,9 @@ const regionsToVdom = ( dom ) => {
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
 // a page if a fetching has already started.
 export const prefetch = ( url, options = {} ) => {
+	// Only read the options passed as own properties.
+	options = Object.assign( Object.create( null ), options );
+
 	url = cleanUrl( url );
 	if ( options.force || ! pages.has( url ) ) {
 		pages.set( url, fetchPage( url, options ) );
@@ -86,6 +91,9 @@ let navigatingTo = '';
 
 // Navigate to a new page.
 export const navigate = async ( href, options = {} ) => {
+	// Only read the options passed as own properties.
+	options = Object.assign( Object.create( null ), options );
+
 	const url = cleanUrl( href );
 	navigatingTo = href;
 	prefetch( url, options );

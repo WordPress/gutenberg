@@ -203,6 +203,12 @@ test.describe( 'data-wp-bind', () => {
 			test( `${ name } is correctly hydrated for different values`, async ( {
 				page,
 			} ) => {
+				// Wait for the hydration before reading the attributes, which
+				// `getAttribute()` doesn't do.
+				await expect(
+					page.getByTestId( 'add missing checked at hydration' )
+				).toBeChecked();
+
 				for ( const type in values ) {
 					const [ attrValue, propValue ] = values[ type ];
 

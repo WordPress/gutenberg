@@ -3,12 +3,22 @@
  */
 import { deepSignal } from 'deepsignal';
 
+/**
+ * Internal dependencies
+ */
+import { isReservedKey, jsonReviver } from './utils/prototype-chain';
+
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
 const deepMerge = ( target, source ) => {
 	if ( isObject( target ) && isObject( source ) ) {
 		for ( const key in source ) {
+			// Assigning `__proto__` would replace the prototype of `target`.
+			if ( isReservedKey( key ) ) {
+				continue;
+			}
+
 			if ( isObject( source[ key ] ) ) {
 				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
 				deepMerge( target[ key ], source[ key ] );
@@ -25,7 +35,7 @@ const getSerializedState = () => {
 	);
 	if ( ! storeTag ) return {};
 	try {
-		const { state } = JSON.parse( storeTag.textContent );
+		const { state } = JSON.parse( storeTag.textContent, jsonReviver );
 		if ( isObject( state ) ) return state;
 		throw Error( 'Parsed state is not an object' );
 	} catch ( e ) {
