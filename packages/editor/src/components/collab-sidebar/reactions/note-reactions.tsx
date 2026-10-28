@@ -238,7 +238,6 @@ function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
 											className="editor-collab-sidebar-panel__reaction-option"
 											render={
 												<Button
-													size="compact"
 													variant="minimal"
 													tone="neutral"
 												/>

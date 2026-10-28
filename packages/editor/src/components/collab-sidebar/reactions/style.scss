@@ -76,7 +76,10 @@
 	}
 }
 
-.editor-collab-sidebar-panel__reaction-button-emoji,
-.editor-collab-sidebar-panel__reaction-option-emoji {
+.editor-collab-sidebar-panel__reaction-button-emoji {
 	font-size: var(--wpds-typography-font-size-lg);
+}
+
+.editor-collab-sidebar-panel__reaction-option-emoji {
+	font-size: var(--wpds-typography-font-size-xl);
 }
