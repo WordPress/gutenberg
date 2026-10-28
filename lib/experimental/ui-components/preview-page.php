@@ -44,6 +44,24 @@ function gutenberg_ui_components_get_examples() {
 }
 
 /**
+ * Turns example content, where nested components are described as data so the
+ * build can render them with React too, into the nested calls PHP code makes.
+ *
+ * @param mixed $content Example content.
+ * @return mixed Content for `gutenberg_get_ui_component()`.
+ */
+function gutenberg_ui_components_example_content( $content ) {
+	if ( is_array( $content ) && isset( $content['component'] ) ) {
+		return gutenberg_get_ui_component(
+			$content['component'],
+			$content['props'] ?? array(),
+			gutenberg_ui_components_example_content( $content['content'] ?? null )
+		);
+	}
+	return is_array( $content ) ? array_map( 'gutenberg_ui_components_example_content', $content ) : $content;
+}
+
+/**
  * Prints component HTML. Components escape their own output.
  *
  * @param string $html Component HTML.
@@ -109,7 +127,7 @@ function gutenberg_ui_components_render_preview_page() {
 				<?php foreach ( gutenberg_ui_components_get_examples() as $example ) : ?>
 					<tr>
 						<td><code><?php echo esc_html( $example['component'] . ': ' . $example['name'] ); ?></code></td>
-						<td><?php gutenberg_ui_components_print( gutenberg_get_ui_component( $example['component'], $example['props'], $example['content'] ) ); ?></td>
+						<td><?php gutenberg_ui_components_print( gutenberg_get_ui_component( $example['component'], $example['props'], gutenberg_ui_components_example_content( $example['content'] ) ) ); ?></td>
 						<td><?php gutenberg_ui_components_print( $example['html'] ); ?></td>
 					</tr>
 				<?php endforeach; ?>

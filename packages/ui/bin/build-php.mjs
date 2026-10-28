@@ -33,7 +33,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import glob from 'fast-glob';
-import { createElement } from 'react';
+import { createElement, Fragment } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
 	compileStyleFile,
@@ -91,6 +91,56 @@ function getCombinations( variants ) {
 				} ) )
 			),
 		[ {} ]
+	);
+}
+
+/**
+ * Returns the default value of each prop that has one.
+ *
+ * @param {Object} component Component definition.
+ * @return {Object} Defaults, by prop.
+ */
+function getDefaults( component ) {
+	return Object.fromEntries(
+		Object.entries( component.props )
+			.filter( ( [ , schema ] ) => 'default' in schema )
+			.map( ( [ prop, schema ] ) => [ prop, schema.default ] )
+	);
+}
+
+/**
+ * Creates a React element from a render tree in `component.json`, such as
+ * `[ "Card.Root", { "className": "$class" }, "$content" ]`. Strings starting
+ * with `$` are replaced with the value of that prop, or the content.
+ *
+ * @param {string|Array|Object} node   Render tree, or part of it.
+ * @param {Object}              values Prop values, and the content.
+ * @param {Object}              ui     The built `@wordpress/ui` package.
+ * @return {import('react').ReactNode} React node.
+ */
+function createNode( node, values, ui ) {
+	if ( 'string' === typeof node ) {
+		return node.startsWith( '$' ) ? values[ node.slice( 1 ) ] : node;
+	}
+	if ( ! Array.isArray( node ) ) {
+		return node;
+	}
+	const [ type, props, ...children ] = node;
+	const elementType = /^[A-Z]/.test( type )
+		? type.split( '.' ).reduce( ( object, key ) => object?.[ key ], ui )
+		: type;
+	if ( ! elementType ) {
+		throw new Error( `@wordpress/ui has no export "${ type }".` );
+	}
+	return createElement(
+		elementType,
+		Object.fromEntries(
+			Object.entries( props ?? {} ).map( ( [ key, value ] ) => [
+				key,
+				createNode( value, values, ui ),
+			] )
+		),
+		...children.map( ( child ) => createNode( child, values, ui ) )
 	);
 }
 
@@ -212,13 +262,58 @@ async function main() {
 	const examples = [];
 	const usedStylesheets = new Set();
 
+	const components = new Map();
 	for ( const file of (
 		await glob( 'php/*/component.json', { cwd: PACKAGE_DIR } )
 	).sort() ) {
 		const component = JSON.parse(
 			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
 		);
-		const { name, content, props, classes, react } = component;
+		components.set( component.name, component );
+	}
+
+	/*
+	 * Renders a component with React from PHP props and content, the way
+	 * `gutenberg_get_ui_component()` receives them. Content is text, another
+	 * component as `{ component, props, content }`, or a list of those.
+	 */
+	const toElement = ( name, phpProps, content ) => {
+		const { react } = components.get( name );
+		const children = toChildren( content );
+		if ( react.render ) {
+			return createNode(
+				react.render,
+				{ ...phpProps, content: children },
+				ui
+			);
+		}
+		const reactProps = { ...react.props };
+		for ( const [ prop, value ] of Object.entries( phpProps ) ) {
+			reactProps[ 'class' === prop ? 'className' : prop ] = value;
+		}
+		return createElement( ui[ react.component ], reactProps, children );
+	};
+	const toChildren = ( content ) => {
+		if ( Array.isArray( content ) ) {
+			return content.map( ( item, index ) =>
+				createElement( Fragment, { key: index }, toChildren( item ) )
+			);
+		}
+		if ( content && 'object' === typeof content ) {
+			return toElement(
+				content.component,
+				{
+					...getDefaults( components.get( content.component ) ),
+					...content.props,
+				},
+				content.content
+			);
+		}
+		return content;
+	};
+
+	for ( const component of components.values() ) {
+		const { name, content, props, classes } = component;
 		const resolve = ( references ) =>
 			references.map( ( reference ) => {
 				const qualified = reference.includes( ':' )
@@ -254,7 +349,6 @@ async function main() {
 			};
 		}
 
-		// Every combination of enums and booleans, rendered with React.
 		const variants = Object.entries( props )
 			.filter(
 				( [ , schema ] ) => schema.enum || 'boolean' === schema.type
@@ -263,30 +357,23 @@ async function main() {
 				prop,
 				schema.enum ?? [ false, true ],
 			] );
-		// Plus a custom class, and content that needs escaping, so the tests
-		// also check that PHP escapes it the way React does.
-		const cases = [
-			...getCombinations( variants ).map( ( values ) => ( {
-				props: values,
-				content: 'Save changes',
-			} ) ),
-			{ props: { class: 'my-plugin-button' }, content: 'Save changes' },
-			{ props: {}, content: 'Save & <continue> "now"' },
-		];
-		const renderReact = ( phpProps, text ) => {
-			const reactProps = { ...react.props };
-			for ( const [ prop, value ] of Object.entries( phpProps ) ) {
-				reactProps[ 'class' === prop ? 'className' : prop ] = value;
-			}
-			return renderToStaticMarkup(
-				createElement( ui[ react.component ], reactProps, text )
+		const defaults = getDefaults( component );
+		const example = component.example;
+		const renderReact = ( phpProps, text ) =>
+			renderToStaticMarkup(
+				toElement( name, { ...defaults, ...phpProps }, text )
 			);
-		};
+
 		if ( ! classes ) {
 			manifest.components[ name ] = {
 				content,
 				props,
-				markup: compileMarkup( { props, variants, renderReact } ),
+				markup: compileMarkup( {
+					props,
+					variants,
+					renderReact: ( phpProps, text ) =>
+						renderReact( { ...example.props, ...phpProps }, text ),
+				} ),
 			};
 			for ( const [ key, { classNames } ] of stylesheets ) {
 				const markup = JSON.stringify(
@@ -302,6 +389,26 @@ async function main() {
 			}
 		}
 
+		// Every combination of enums and booleans, plus a custom class,
+		// content that needs escaping, and the composition examples, so the
+		// tests also check escaping and nested components.
+		const cases = [
+			...getCombinations( variants ).map( ( values ) => ( {
+				props: { ...example.props, ...values },
+				content: example.content,
+			} ) ),
+			{
+				props: { ...example.props, class: 'my-plugin-class' },
+				content: example.content,
+			},
+			{ props: example.props ?? {}, content: 'Save & <continue> "now"' },
+			...( component.compositionExamples ?? [] ).map(
+				( composition ) => ( {
+					props: { ...example.props, ...composition.props },
+					content: composition.content,
+				} )
+			),
+		];
 		for ( const { props: phpProps, content: text } of cases ) {
 			fixtures.push( {
 				component: name,
@@ -311,28 +418,34 @@ async function main() {
 			} );
 		}
 
-		// For the preview page: the default, then each value on its own.
-		const exampleContent = 'Save changes';
-		examples.push( {
-			component: name,
-			name: 'example',
-			props: {},
-			content: exampleContent,
-			html: renderReact( {}, exampleContent ),
-		} );
+		// For the preview page: the example, each value on its own, and the
+		// composition examples.
+		const addExample = ( exampleName, phpProps, text ) =>
+			examples.push( {
+				component: name,
+				name: exampleName,
+				props: phpProps,
+				content: text,
+				html: renderReact( phpProps, text ),
+			} );
+		addExample( 'example', example.props ?? {}, example.content );
 		for ( const [ prop, values ] of variants ) {
 			for ( const value of values ) {
-				if ( value === ( props[ prop ].default ?? false ) ) {
-					continue;
+				if ( value !== defaults[ prop ] ) {
+					addExample(
+						`${ prop }: ${ value }`,
+						{ ...example.props, [ prop ]: value },
+						example.content
+					);
 				}
-				examples.push( {
-					component: name,
-					name: `${ prop }: ${ value }`,
-					props: { [ prop ]: value },
-					content: exampleContent,
-					html: renderReact( { [ prop ]: value }, exampleContent ),
-				} );
 			}
+		}
+		for ( const composition of component.compositionExamples ?? [] ) {
+			addExample(
+				composition.name,
+				{ ...example.props, ...composition.props },
+				composition.content
+			);
 		}
 	}
 
