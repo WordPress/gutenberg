@@ -44,6 +44,9 @@ on:
             - 'packages/wp-build/**'
             - '!packages/*/**/*.md'
             - 'packages/*/CHANGELOG.md'
+            - '.changes/**'
+            - '.changie.yaml'
+            - 'tools/changelogs/**'
             - 'tools/validation/validate-changelogs.ts'
             - '.github/workflows/check-package-changelogs.yml'
             - '!packages/*/**/stories/**'
@@ -240,8 +243,8 @@ jobs:
                       npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
                   fi
 
-    # Structure: For any revisions to CHANGELOGs (regardless of package),
-    # validate that the contents follow the expected format.
+    # Structure: Validate touched CHANGELOGs and fragments, or all entries when
+    # the Changie configuration or shared tooling changes.
     structure:
         name: Validate CHANGELOG structure
         runs-on: 'ubuntu-slim'
@@ -271,6 +274,13 @@ jobs:
               run: |
                   changelogs=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- 'packages/*/CHANGELOG.md')
                   fragments=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- '.changes/unreleased/*.yaml')
+                  changie_tooling=$(git diff --name-only "$BASE_SHA"...HEAD -- '.changie.yaml' 'tools/changelogs/**')
+
+                  if [ -n "$changie_tooling" ]; then
+                      echo "Changie configuration or tooling changed; validating all changelogs and fragments."
+                      npm run lint:changelogs -- --pr="${PR_NUMBER}"
+                      exit 0
+                  fi
 
                   if [ -z "$changelogs" ] && [ -z "$fragments" ]; then
                       echo "No package CHANGELOG.md or Changie fragment files changed; skipping structure check."
