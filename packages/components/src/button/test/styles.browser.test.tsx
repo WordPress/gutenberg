@@ -280,6 +280,8 @@ describe( 'Button styles', () => {
 				</ThemeProvider>
 			);
 			const button = screen.getByRole( 'button', { name: 'Action' } );
+			await userEvent.unhover( button );
+			expect( button.matches( ':hover' ) ).toBe( false );
 			expectToken(
 				button,
 				'color',
