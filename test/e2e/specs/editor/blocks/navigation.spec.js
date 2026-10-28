@@ -643,6 +643,49 @@ test.describe( 'Navigation block', () => {
 				] );
 		} );
 
+		test( 'keeps a line break in the label when editing the sidebar Text field', async ( {
+			page,
+			editor,
+			requestUtils,
+		} ) => {
+			const createdMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"Shop\\u003cbr\\u003e\\u003cem\\u003enow\\u003c/em\\u003e","url":"https://example.com"} /-->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: createdMenu?.id },
+			} );
+
+			const linkLabel = editor.canvas.getByRole( 'textbox', {
+				name: 'Navigation link text',
+			} );
+			await linkLabel.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A single-line field cannot hold a line break, so it shows a symbol.
+			const textInput = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } );
+			await expect( textInput ).toHaveValue( 'Shop↵now' );
+
+			// Typing elsewhere keeps the break and the formatting after it.
+			await textInput.fill( 'Shop↵now!' );
+			await expect( linkLabel.locator( 'em' ) ).toHaveText( 'now!' );
+			const navClientId = await editor.canvas
+				.locator( '[data-type="core/navigation"]', { has: linkLabel } )
+				.getAttribute( 'data-block' );
+			await expect
+				.poll( () => editor.getBlocks( { clientId: navClientId } ) )
+				.toMatchObject( [
+					{
+						name: 'core/navigation-link',
+						attributes: { label: 'Shop<br><em>now!</em>' },
+					},
+				] );
+		} );
+
 		test( 'should preserve focus in sidebar text input when typing (@firefox)', async ( {
 			page,
 			editor,

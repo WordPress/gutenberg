@@ -13,8 +13,14 @@ describe( 'getPlainText', () => {
 		expect( getPlainText( '' ) ).toBe( '' );
 	} );
 
-	test( 'shows a line break as a newline', () => {
-		expect( getPlainText( 'Shop<br>now' ) ).toBe( 'Shop\nnow' );
+	test( 'shows a line break as a return symbol, since a single-line field drops a newline', () => {
+		expect( getPlainText( 'Shop<br>now' ) ).toBe( 'Shop↵now' );
+	} );
+
+	test( 'shows an inline image as a picture emoji', () => {
+		expect(
+			getPlainText( 'Shop <img class="wp-image-1" src="x.png"> now' )
+		).toBe( 'Shop 🖼️ now' );
 	} );
 } );
 
@@ -77,10 +83,47 @@ describe( 'applyPlainTextEdit', () => {
 		expect( applyPlainTextEdit( '<strong>Shop</strong>', '' ) ).toBe( '' );
 	} );
 
-	test( 'keeps a line break', () => {
-		expect( applyPlainTextEdit( 'Shop<br>now', 'Shop\nnow!' ) ).toBe(
+	test( 'keeps a line break outside the edit', () => {
+		expect( applyPlainTextEdit( 'Shop<br>now', 'Shop↵now!' ) ).toBe(
 			'Shop<br>now!'
 		);
+		expect( applyPlainTextEdit( 'Shop<br>now', 'Shops↵now' ) ).toBe(
+			'Shops<br>now'
+		);
+		expect(
+			applyPlainTextEdit( 'Shop<br><em>now</em>', 'Shop↵now!' )
+		).toBe( 'Shop<br><em>now!</em>' );
+	} );
+
+	test( 'deleting the return symbol removes the line break', () => {
+		expect( applyPlainTextEdit( 'Shop<br>now', 'Shopnow' ) ).toBe(
+			'Shopnow'
+		);
+	} );
+
+	test( 'keeps an inline image outside the edit', () => {
+		const html = 'Shop <img class="wp-image-1" src="x.png"> now';
+		expect( applyPlainTextEdit( html, 'Shop 🖼️ now!' ) ).toBe(
+			'Shop <img class="wp-image-1" src="x.png"> now!'
+		);
+		// The emoji does not look like the space beside it, so deleting that
+		// space deletes the space, not the image.
+		expect( applyPlainTextEdit( html, 'Shop🖼️ now' ) ).toBe(
+			'Shop<img class="wp-image-1" src="x.png"> now'
+		);
+	} );
+
+	test( 'deleting the picture emoji removes the inline image', () => {
+		expect(
+			applyPlainTextEdit(
+				'Shop <img class="wp-image-1" src="x.png"> now',
+				'Shop  now'
+			)
+		).toBe( 'Shop  now' );
+	} );
+
+	test( 'a typed picture emoji stays text', () => {
+		expect( applyPlainTextEdit( 'Shop', 'Shop 🖼️' ) ).toBe( 'Shop 🖼️' );
 	} );
 
 	test( 'keeps an entity in the untouched text', () => {
