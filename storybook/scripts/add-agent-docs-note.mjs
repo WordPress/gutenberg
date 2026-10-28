@@ -17,8 +17,8 @@ assert( indexPath, 'Storybook index.html path is required' );
 const rawBaseUrl =
 	'https://raw.githubusercontent.com/WordPress/gutenberg/trunk';
 
-// Not an inline style, since Readability skips elements with an inline
-// `display: none`.
+// Not an inline style, since Mozilla Readability, which some tools use to
+// extract page text, skips elements with an inline `display: none`.
 const style = '<style>#agent-docs-note { display: none; }</style>';
 
 const note = `<div id="agent-docs-note">
