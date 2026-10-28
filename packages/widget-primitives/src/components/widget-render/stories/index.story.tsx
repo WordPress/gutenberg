@@ -10,6 +10,7 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
 import {
@@ -225,10 +226,17 @@ The primitive resolves the render component with \`lazy()\`, so the surrounding 
 
 function IdentityWidget() {
 	const { title } = useWidgetIdentity();
+	const accessibleName = title
+		? sprintf(
+				/* translators: %s: widget title */
+				__( 'Chart: %s' ),
+				title
+			)
+		: __( 'Chart' );
 
 	return (
 		<figure
-			aria-label={ title ? `Chart: ${ title }` : 'Chart' }
+			aria-label={ accessibleName }
 			style={ {
 				background: 'var(--wpds-color-background-surface-info-weak)',
 				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
@@ -246,7 +254,7 @@ function IdentityWidget() {
 			</strong>
 			<span style={ { opacity: 0.75 } }>
 				{ title
-					? `Accessible name: Chart: ${ title }`
+					? `Accessible name: ${ accessibleName }`
 					: 'No identity provided' }
 			</span>
 		</figure>
