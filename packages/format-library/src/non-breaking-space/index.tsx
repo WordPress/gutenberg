@@ -65,17 +65,8 @@ export const nonBreakingSpace = {
 				return;
 			}
 
-			let [ from, to ] = range;
+			const [ from, to ] = range;
 			const { text } = value;
-
-			// Spaces next to the range collapse with the replaced ones.
-			while ( text[ from - 1 ] === ' ' ) {
-				from--;
-			}
-			while ( text[ to ] === ' ' ) {
-				to++;
-			}
-
 			let newValue: RichTextValue = {
 				...value,
 				text:
@@ -83,25 +74,18 @@ export const nonBreakingSpace = {
 					text.slice( from, to ).replaceAll( NBSP, ' ' ) +
 					text.slice( to ),
 			};
-			const runs = [
-				...newValue.text.slice( from, to ).matchAll( / +/g ),
-			];
 
-			// HTML shows a run of spaces as one, and none at the start or end
-			// of a line, so remove the rest as reloading would.
-			for ( const { index, 0: spaces } of runs.reverse() ) {
-				const runStart = from + index;
-				const runEnd = runStart + spaces.length;
-				const isLineEdge = [
-					text[ runStart - 1 ],
-					text[ runEnd ],
-				].some(
-					( character ) =>
-						character === undefined || character === '\n'
+			// HTML collapses a space next to another space or at the start or
+			// end of a line, so remove the non-breaking space there instead.
+			for ( let index = to - 1; index >= from; index-- ) {
+				const isCollapsed = [
+					newValue.text[ index - 1 ],
+					newValue.text[ index + 1 ],
+				].some( ( character ) =>
+					[ undefined, ' ', '\n' ].includes( character )
 				);
-				const removeFrom = isLineEdge ? runStart : runStart + 1;
-				if ( removeFrom < runEnd ) {
-					newValue = remove( newValue, removeFrom, runEnd );
+				if ( text[ index ] === NBSP && isCollapsed ) {
+					newValue = remove( newValue, index, index + 1 );
 				}
 			}
 

@@ -1088,7 +1088,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'one two' },
+				attributes: { content: 'one  two' },
 			},
 		] );
 
@@ -1096,7 +1096,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'one !two' },
+				attributes: { content: 'one ! two' },
 			},
 		] );
 
@@ -1114,7 +1114,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await expect
 			.poll( editor.getBlocks )
 			.toMatchObject( [
-				{ attributes: { content: 'one !two' } },
+				{ attributes: { content: 'one ! two' } },
 				{ attributes: { content: 'one two' } },
 			] );
 	} );
