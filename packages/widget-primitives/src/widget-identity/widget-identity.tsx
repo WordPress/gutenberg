@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from '@wordpress/element';
+import { createContext, useContext } from '@wordpress/element';
 import type { ReactNode } from 'react';
 
 /**
@@ -35,13 +35,8 @@ export function WidgetIdentityProvider( {
 	value,
 	children,
 }: WidgetIdentityProviderProps ): React.ReactNode {
-	const identity = useMemo< WidgetIdentity >(
-		() => ( value.title !== undefined ? { title: value.title } : {} ),
-		[ value.title ]
-	);
-
 	return (
-		<WidgetIdentityContext.Provider value={ identity }>
+		<WidgetIdentityContext.Provider value={ value }>
 			{ children }
 		</WidgetIdentityContext.Provider>
 	);
