@@ -200,7 +200,7 @@ function CalendarDateTimeControl< Item >( {
 				{ /* Calendar widget */ }
 				{ ! compact && (
 					<Calendar
-						style={ { alignSelf: 'center' } }
+						className="dataviews-controls__calendar"
 						value={ value ? parseDateTime( value ) : null }
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
