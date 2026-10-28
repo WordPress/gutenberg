@@ -601,12 +601,6 @@ function MediaEditorContent( {
 		};
 	}, [] );
 
-	useEffect( () => {
-		setIsPlacementActive( false );
-		setIsCanvasGestureActive( false );
-		setIsSourceReplaced( false );
-	}, [ id ] );
-
 	// Restore-original: the edit root the edited attachment descends from,
 	// exposed by the server as the root-level `edit_root` id on the
 	// attachment (edit context, embeddable via the `wp:edit-root` link).
