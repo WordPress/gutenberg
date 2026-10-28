@@ -186,9 +186,11 @@ Make these changes in one pull request, so that the recommendation sources stay 
 
 A reviewer should check that the Storybook statuses, `manifest` tags, allowlist, and denylist agree, that the denylist message names a public alternative, and that the migration guide covers behavioral differences such as defaults and submitted form values, not only renamed props.
 
-#### 4. Migrate the remaining consumers
+#### 4. Migrate other consumers selectively
 
-Migrate the remaining Gutenberg consumers in focused pull requests, such as one area of the editor per pull request. When only a few remain, migrate them in the recommendation pull request. After each migration, run `npm run lint:js:prune-suppressions` and commit the reduced counts. A reviewer should check parity against the migration guide, including overlays that render next to `@wordpress/components` overlays.
+Do not migrate the remaining Gutenberg consumers only because a replacement is recommended. Each migration takes time to review and risks regressions. Migrate a consumer when you are already changing its file, when the new component brings a tangible benefit to that consumer, or when the legacy component is headed toward deprecation, which requires migrating every direct consumer first.
+
+When a migration is its own pull request, keep it focused, such as on one area of the editor. After each migration, run `npm run lint:js:prune-suppressions` and commit the reduced counts. A reviewer should check parity against the migration guide, including overlays that render next to `@wordpress/components` overlays.
 
 #### 5. Decide whether to deprecate
 
