@@ -1,5 +1,5 @@
 import { createRequire } from 'module';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import globals from 'globals';
 import { globSync } from 'glob';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
@@ -122,28 +122,25 @@ const typedFiles = globSync( 'packages/*/package.json', {
  * Every workspace is expected to be written in TypeScript, with the following
  * exceptions:
  *
- * - Packages that don't have a `tsconfig.json` TypeScript configuration.
+ * - Workspaces that don't have a `tsconfig.json` TypeScript configuration.
  * - Packages published to NPM, where only the source code and tests should be
  *   written as TypeScript so that the published code can be run in versions of
  *   Node.js without support for TypeScript syntax.
  */
 const { workspaces } = require( join( rootDir, 'package.json' ) );
-const typeScriptOnlyFiles = [
-	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
-		.sort()
-		.map( ( fileName ) =>
-			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
-		),
-	...workspaces
-		.filter(
-			( pattern ) =>
-				pattern !== 'packages/*' && ! pattern.startsWith( '!' )
-		)
-		.map( ( pattern ) => `${ pattern }/**/*.${ JS_EXT }` ),
-];
-const typeScriptOnlyIgnores = workspaces
-	.filter( ( pattern ) => pattern.startsWith( '!' ) )
-	.map( ( pattern ) => `${ pattern.slice( 1 ) }/**` );
+const typeScriptOnlyFiles = globSync(
+	workspaces
+		.filter( ( pattern ) => ! pattern.startsWith( '!' ) )
+		.map( ( pattern ) => `${ pattern }/tsconfig.json` ),
+	{ cwd: rootDir, posix: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const dir = dirname( fileName );
+		return dir.startsWith( 'packages/' )
+			? `${ dir }/@(src|test)/**/*.${ JS_EXT }`
+			: `${ dir }/**/*.${ JS_EXT }`;
+	} );
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -577,7 +574,6 @@ export default dedupePlugins( [
 	{
 		files: typeScriptOnlyFiles,
 		ignores: [
-			...typeScriptOnlyIgnores,
 			'**/fixtures/**',
 			// Editors load the ESLint config with their own Node, which
 			// may not strip types.
