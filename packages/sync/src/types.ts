@@ -150,6 +150,22 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	/**
+	 * Called when a remote peer replaced top-level keys of the record with
+	 * values from a document that shares no history with this one, which
+	 * happens when both peers built their document from the entity record.
+	 * Yjs keeps one of the two values and deletes the other, so the content
+	 * this peer held for those keys is gone from the shared document and from
+	 * its undo history.
+	 *
+	 * Receives the record as it was before the replacement, so the content
+	 * can be stored somewhere recoverable. It is not called when this peer
+	 * held nothing beyond the record it was loaded from.
+	 */
+	onRemoteReplacement?: (
+		record: ObjectData,
+		replacedKeys: string[]
+	) => void;
 	shouldSync?: (
 		objectType: ObjectType,
 		objectId: ObjectID | null
