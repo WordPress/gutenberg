@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `Spinner`: Use a neutral half-circle arc with a stroke that scales with its size ([#85859](https://github.com/WordPress/gutenberg/pull/85859)).
 -   `Tooltip`: Match the dark gray background of the design system tooltip ([#85858](https://github.com/WordPress/gutenberg/pull/85858)).
 -   `Modal`: Adapt colors and rounded corners to the design system theme ([#85855](https://github.com/WordPress/gutenberg/pull/85855)).
 -   Popup menu and option items: Use solid WPDS brand highlights for the active item and keep inactive items neutral ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
