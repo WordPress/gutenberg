@@ -923,6 +923,24 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Block library src — no effects. Existing ones are recorded in
+	// the suppressions file until they are replaced.
+	{
+		files: [ 'packages/block-library/src/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax,
+				{
+					selector:
+						'CallExpression[callee.name=/^use(Layout|Insertion)?Effect$/]',
+					message:
+						'Avoid effects in blocks. Compute the value during render, handle it in the event that causes it, read it with a store selector, or use `useRefEffect` to subscribe to a DOM node.',
+				},
+			],
+		},
+	},
+
 	// Override: Tests and Storybook — allow literal `id` attributes.
 	// Later than the components re-spread of `restrictedSyntax`. Ignore
 	// Playwright specs; `**/test/**` would replace their `$`/`$$` list.

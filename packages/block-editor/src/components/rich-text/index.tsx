@@ -265,7 +265,7 @@ function ActiveRichText( {
 	useLayoutEffect( () => {
 		const element = elementRef.current;
 		// A pointer press outside the field makes it non editable until the
-		// release (see rich text's preventFocusCapture). Focusing it then
+		// release (see usePreventFocusCapture). Focusing it then
 		// makes the block focus handler drop the text selection.
 		if ( ! isSelected || element?.contentEditable !== 'true' ) {
 			return;

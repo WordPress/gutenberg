@@ -10,7 +10,6 @@ import { apply } from '../to-dom';
 import { subscribeOwnedListener } from '../subscribe-owned-listener';
 import { unlock } from '../lock-unlock';
 import { useFormatTypes } from './use-format-types';
-import { preventFocusCapture } from './event-listeners/prevent-focus-capture';
 import selectObject from './event-listeners/select-object';
 import selectionChangeCompat from './event-listeners/selection-change-compat';
 import type { RichTextRecord } from './types';
@@ -184,7 +183,6 @@ export function useInactiveRichText( {
 			const unsubscribers = [
 				// Listeners of `useRichText` that act on fields not being
 				// edited.
-				preventFocusCapture()( element ),
 				selectObject()( element ),
 				selectionChangeCompat()( element ),
 				// First, as `useRichText`'s selection synchronization: other
