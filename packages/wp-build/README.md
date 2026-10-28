@@ -54,7 +54,7 @@ or via npm script:
 
 ### Build Concurrency
 
-By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
+By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once. Transpiling, which builds each source file on its own, runs four times the available CPU parallelism at once, since those builds are small.
 
 ### Testing Generated Styles
 

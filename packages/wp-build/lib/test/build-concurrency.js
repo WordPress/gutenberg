@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	enqueueBuild,
 	getDefaultBuildConcurrency,
+	getTranspileConcurrency,
 	setBuildConcurrency,
 } from '../build-concurrency.mjs';
 
@@ -23,6 +24,14 @@ describe( 'getDefaultBuildConcurrency()', () => {
 		expect( getDefaultBuildConcurrency( 5 ) ).toBe( 3 );
 		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 6 );
 		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 32 );
+	} );
+} );
+
+describe( 'getTranspileConcurrency()', () => {
+	it( 'uses four times the available parallelism', () => {
+		expect( getTranspileConcurrency( 1 ) ).toBe( 4 );
+		expect( getTranspileConcurrency( 4 ) ).toBe( 16 );
+		expect( getTranspileConcurrency( 12 ) ).toBe( 48 );
 	} );
 } );
 

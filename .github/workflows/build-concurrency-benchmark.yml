@@ -1,6 +1,6 @@
 name: Build concurrency benchmark
 
-# Temporary: measures wp-build phase times for several concurrency caps.
+# Temporary: compares wp-build phase times before and after this branch's change.
 on:
     push:
         branches:
@@ -20,19 +20,14 @@ jobs:
             matrix:
                 cores: [2, 4]
                 round: [1, 2, 3]
-                include:
-                    # Rotate the order so warm caches don't favour one cap.
-                    - round: 1
-                      caps: '1 2 4 8 16 32'
-                    - round: 2
-                      caps: '32 16 8 4 2 1'
-                    - round: 3
-                      caps: '4 16 1 32 2 8'
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   persist-credentials: false
+
+            - name: Fetch the commit this branch starts from
+              run: git fetch --depth=1 --no-tags origin e4d92945c5328652fa61f8eb5b47fdaba0c8dc90
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -40,21 +35,25 @@ jobs:
             - name: Warm-up build
               run: taskset -c 0-$(( ${{ matrix.cores }} - 1 )) npm run build > /dev/null
 
-            - name: Measure caps
+            - name: Measure before and after
               env:
                   CORES: ${{ matrix.cores }}
                   ROUND: ${{ matrix.round }}
-                  CAPS: ${{ matrix.caps }}
+                  BASE: e4d92945c5328652fa61f8eb5b47fdaba0c8dc90
               run: |
                   cpus="0-$(( CORES - 1 ))"
-                  taskset -c "$cpus" node -e 'console.log( "availableParallelism:", require( "os" ).availableParallelism() )'
-                  echo "cores,cap,round,transpile,bundle,routes,widgets,wp_build,total,max_rss_mb" > results.csv
-                  for cap in $CAPS; do
-                    WP_BUILD_CONCURRENCY="$cap" /usr/bin/time -f '%M' -o rss.txt \
-                      taskset -c "$cpus" npm run build 2>&1 |
-                      while IFS= read -r line; do echo "$( date +%s.%N ) $line"; done > "build-$cap.log"
-                    grep -q 'Using build concurrency: '"$cap" "build-$cap.log"
-                    awk -v cores="$CORES" -v cap="$cap" -v round="$ROUND" -v rss="$( tail -1 rss.txt )" '
+                  echo "cores,version,round,run,transpile,bundle,routes,widgets,wp_build,total,max_rss_mb" > results.csv
+                  run=0
+                  for version in before after before after; do
+                    run=$(( run + 1 ))
+                    if [[ "$version" == before ]]; then
+                      git checkout "$BASE" -- packages/wp-build/lib
+                    else
+                      git checkout HEAD -- packages/wp-build/lib
+                    fi
+                    /usr/bin/time -f '%M' -o rss.txt taskset -c "$cpus" npm run build 2>&1 |
+                      while IFS= read -r line; do echo "$( date +%s.%N ) $line"; done > "build-$run-$version.log"
+                    awk -v cores="$CORES" -v version="$version" -v round="$ROUND" -v run="$run" -v rss="$( tail -1 rss.txt )" '
                       NR == 1 { start = $1 }
                       /Phase 1:/ { p1 = $1 }
                       /Phase 2:/ { p2 = $1 }
@@ -64,8 +63,8 @@ jobs:
                       /Build completed successfully/ { end = $1 }
                       END {
                         if ( ! end ) { exit 1 }
-                        printf "%s,%s,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d\n", cores, cap, round, p2 - p1, p3 - p2, p4 - p3, p5 - p4, p5 - p1, end - start, rss / 1024
-                      }' "build-$cap.log" >> results.csv
+                        printf "%s,%s,%s,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d\n", cores, version, round, run, p2 - p1, p3 - p2, p4 - p3, p5 - p4, p5 - p1, end - start, rss / 1024
+                      }' "build-$run-$version.log" >> results.csv
                   done
                   cat results.csv
                   { echo '```'; cat results.csv; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

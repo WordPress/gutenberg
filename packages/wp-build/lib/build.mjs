@@ -51,6 +51,7 @@ import { compileStylesheet, disposeSassCompiler } from './sass-compiler.mjs';
 import {
 	buildWithConcurrency,
 	getDefaultBuildConcurrency,
+	getTranspileConcurrency,
 	setBuildConcurrency,
 } from './build-concurrency.mjs';
 
@@ -2503,6 +2504,7 @@ async function buildAll( baseUrlExpression ) {
 
 	console.log( '📝 Phase 1: Transpiling packages...\n' );
 
+	setBuildConcurrency( getTranspileConcurrency() );
 	for ( const level of levels ) {
 		await Promise.all(
 			level.map( async ( fullName ) => {
@@ -2514,6 +2516,7 @@ async function buildAll( baseUrlExpression ) {
 			} )
 		);
 	}
+	setBuildConcurrency( getDefaultBuildConcurrency() );
 
 	console.log( '\n📦 Phase 2: Bundling packages...\n' );
 	const modules = [];
@@ -3025,9 +3028,7 @@ async function main() {
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
-	const buildConcurrency =
-		Number( process.env.WP_BUILD_CONCURRENCY ) ||
-		getDefaultBuildConcurrency();
+	const buildConcurrency = getDefaultBuildConcurrency();
 	setBuildConcurrency( buildConcurrency );
 	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 

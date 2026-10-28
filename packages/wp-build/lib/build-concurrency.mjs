@@ -27,6 +27,20 @@ export function getDefaultBuildConcurrency(
 }
 
 /**
+ * Get the number of concurrent per-file transpile builds: four times the
+ * available parallelism. Each one is small and often waits on I/O, so running
+ * more at once keeps the CPU busy.
+ *
+ * @param {number} availableParallelism Available parallelism to use.
+ * @return {number} Transpile build concurrency.
+ */
+export function getTranspileConcurrency(
+	availableParallelism = os.availableParallelism()
+) {
+	return availableParallelism * 4;
+}
+
+/**
  * Set the maximum number of concurrent esbuild builds.
  *
  * @param {number} concurrency Build concurrency.
