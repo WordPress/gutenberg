@@ -50,7 +50,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: npm run build
+              run: npm run build -- --skip-types
               env:
                   NODE_OPTIONS: --max-old-space-size=4096
 
