@@ -60,7 +60,7 @@ function render_block_core_button( $attributes, $content ) {
 		return '';
 	}
 
-	// Background skips serialization, so apply it to the link like color.
+	// Background skips serialization, so apply it to the link element, like the color support does.
 	$background = $attributes['style']['background'] ?? null;
 
 	if ( is_array( $background ) ) {
@@ -75,7 +75,7 @@ function render_block_core_button( $attributes, $content ) {
 
 		// Mirror the background block support defaults.
 		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+			$background_styles['backgroundSize'] ??= 'cover';
 			if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
 				$background_styles['backgroundPosition'] = '50% 50%';
 			}

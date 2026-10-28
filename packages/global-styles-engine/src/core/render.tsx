@@ -221,6 +221,17 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
+	// Validation states come before focus states because an edited field can match
+	// both at once, so user action styles must be output last to win.
+	textInput: [
+		':required',
+		':user-valid',
+		':user-invalid',
+		':focus',
+		':focus-visible',
+		'::placeholder',
+	],
+	select: [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
 /**
@@ -1055,6 +1066,36 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 	} );
 }
 
+function isPseudoElementSelector( selectorSuffix?: string ): boolean {
+	return selectorSuffix?.startsWith( '::' ) ?? false;
+}
+
+/**
+ * Builds the specificity-capped selector for a pseudo selector rule.
+ *
+ * Pseudo-classes are appended to each part of the base selector inside the
+ * `:root :where()` wrapper, e.g. `:root :where(a:hover)`. Pseudo-elements are
+ * not valid inside `:where()`, so they are appended after the wrapper instead,
+ * e.g. `:root :where(textarea, input)::placeholder`, which keeps the same
+ * specificity regardless of where the element styles are defined.
+ *
+ * @param baseSelector   Selector without the pseudo selector.
+ * @param pseudoSelector Pseudo selector to apply, e.g. ':hover' or '::placeholder'.
+ * @return The selector to use for the rule.
+ */
+function getPseudoRuleSelector(
+	baseSelector: string,
+	pseudoSelector: string
+): string {
+	if ( isPseudoElementSelector( pseudoSelector ) ) {
+		return `:root :where(${ baseSelector })${ pseudoSelector }`;
+	}
+	return `:root :where(${ appendToSelector(
+		baseSelector,
+		pseudoSelector
+	) })`;
+}
+
 /**
  * Creates style nodes for configured responsive breakpoint states.
  *
@@ -1731,17 +1772,20 @@ function renderStylesNode(
 		Object.entries( featureDeclarations ).forEach(
 			( [ featureSelector, declarations ] ) => {
 				if ( declarations.length ) {
-					let selectorForRule = variationName
+					const selectorForRule = variationName
 						? getBlockStyleVariationFeatureSelector(
 								variationName,
 								featureSelector
 							)
 						: featureSelector;
-					selectorForRule = selectorSuffix
-						? appendToSelector( selectorForRule, selectorSuffix )
-						: selectorForRule;
+					const featureRuleSelector = selectorSuffix
+						? getPseudoRuleSelector(
+								selectorForRule,
+								selectorSuffix
+							)
+						: `:root :where(${ selectorForRule })`;
 					const rules = declarations.join( ';' );
-					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
+					ruleset += `${ featureRuleSelector }{${ rules };}`;
 				}
 			}
 		);
@@ -1793,9 +1837,12 @@ function renderStylesNode(
 		baseStyles
 	);
 	if ( styleDeclarations?.length ) {
-		const generalSelector = skipSelectorWrapper
-			? effectiveSelector
-			: `:root :where(${ effectiveSelector })`;
+		let generalSelector = `:root :where(${ effectiveSelector })`;
+		if ( skipSelectorWrapper ) {
+			generalSelector = effectiveSelector;
+		} else if ( selectorSuffix ) {
+			generalSelector = getPseudoRuleSelector( selector, selectorSuffix );
+		}
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {

@@ -13,19 +13,15 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { external } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
-import { getSuggestionsQuery } from '../link-ui';
-import { useLinkPreview } from './use-link-preview';
+import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
 import { useIsInvalidLink } from './use-is-invalid-link';
+import ViewLinkButton from '../../utils/view-link-button';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker, isHashLink, isRelativePath } = unlock(
-	blockEditorPrivateApis
-);
+const { LinkPicker } = unlock( blockEditorPrivateApis );
 
 /**
  * Get a human-readable entity type name.
@@ -119,11 +115,6 @@ export function Controls( {
 		[]
 	);
 
-	const homeUrl = useSelect( ( select ) => {
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
-	}, [] );
-
 	const blockEditingMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockEditingMode( clientId ),
@@ -139,16 +130,6 @@ export function Controls( {
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
-
-	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
-	const isViewableUrl =
-		!! url &&
-		( ! isHashLink( url ) ||
-			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
-
-	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
-	const viewUrl =
-		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	return (
 		<ToolsPanel
@@ -243,19 +224,7 @@ export function Controls( {
 								{ __( 'Edit' ) }
 							</Button>
 						) }
-					{ isViewableUrl && (
-						<Button
-							variant="secondary"
-							href={ viewUrl }
-							target="_blank"
-							icon={ external }
-							iconPosition="right"
-							__next40pxDefaultSize
-							className="navigation-link-to__action-button"
-						>
-							{ __( 'View' ) }
-						</Button>
-					) }
+					<ViewLinkButton url={ url } />
 				</>
 			) }
 

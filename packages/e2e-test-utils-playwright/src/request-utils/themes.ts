@@ -1,13 +1,10 @@
 import type { RequestUtils } from './index';
-import { WP_BASE_URL } from '../config';
-
-const THEMES_URL = new URL( 'wp-admin/themes.php', WP_BASE_URL ).href;
-
 async function activateTheme(
 	this: RequestUtils,
 	themeSlug: string
 ): Promise< void > {
-	let response = await this.request.get( THEMES_URL );
+	const themesURL = new URL( 'wp-admin/themes.php', this.baseURL ).href;
+	let response = await this.request.get( themesURL );
 	const html = await response.text();
 	const optionalFolder = '([a-z0-9-]+%2F)?';
 
@@ -40,7 +37,7 @@ async function activateTheme(
 
 	const [ activateQuery ] = matchGroup;
 	const activateLink =
-		THEMES_URL + `?${ activateQuery }`.replace( /&amp;/g, '&' );
+		themesURL + `?${ activateQuery }`.replace( /&amp;/g, '&' );
 
 	response = await this.request.get( activateLink );
 

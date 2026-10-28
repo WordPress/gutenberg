@@ -73,8 +73,13 @@ function extractSelectionEndNode(
 		isSelectionForward( selection ) &&
 		isTripleClick
 	) {
-		// A node at offset 0 of a forward selection has a parent.
-		return ( focusNode!.previousSibling ?? focusNode!.parentElement )!;
+		// Return the node before the focus node. Its parent may still be in
+		// the next block (e.g. a list item's rich text), so walk up.
+		let node = focusNode!;
+		while ( ! node.previousSibling && node.parentNode ) {
+			node = node.parentNode;
+		}
+		return node.previousSibling ?? node;
 	}
 
 	return focusNode!.childNodes[ focusOffset ];
@@ -112,6 +117,7 @@ export default function useSelectionObserver() {
 	const {
 		getBlockParents,
 		getBlockSelectionStart,
+		isDraggingBlocks,
 		isMultiSelecting,
 		getSelectionStart,
 		getSelectionEnd,
@@ -150,6 +156,13 @@ export default function useSelectionObserver() {
 			}
 
 			function onSelectionChange( event: Event | MouseEvent ) {
+				// While blocks are being dragged, the selection is driven
+				// by the drag, not by the caret the press may have left
+				// behind.
+				if ( isDraggingBlocks() ) {
+					return;
+				}
+
 				// A window has a selection.
 				const selection = defaultView!.getSelection()!;
 

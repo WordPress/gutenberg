@@ -9,6 +9,7 @@ import {
 	getQueriedTotalItems,
 	getQueriedTotalPages,
 } from './queried-data';
+import type { QueriesState } from './queried-data/types';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
@@ -65,19 +66,19 @@ interface EntitiesState {
 }
 
 interface QueriedData {
-	items: Record< ET.Context, Record< number, ET.EntityRecord > >;
-	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
-	queries: Record< ET.Context, Record< string, Array< number > > >;
+	items: Record< ET.Context, Record< EntityRecordKey, ET.EntityRecord > >;
+	itemIsComplete: Record< ET.Context, Record< EntityRecordKey, boolean > >;
+	queries: QueriesState;
 }
 
 type RevisionRecord =
-	| Record< ET.Context, Record< number, ET.PostRevision > >
-	| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+	| Record< ET.Context, Record< EntityRecordKey, ET.PostRevision > >
+	| Record< ET.Context, Record< EntityRecordKey, ET.GlobalStylesRevision > >;
 
 interface RevisionsQueriedData {
 	items: RevisionRecord;
-	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
-	queries: Record< ET.Context, Record< string, Array< number > > >;
+	itemIsComplete: Record< ET.Context, Record< EntityRecordKey, boolean > >;
+	queries: QueriesState;
 }
 
 interface EntityState< EntityRecord extends ET.EntityRecord > {
@@ -501,7 +502,7 @@ export function hasEntityRecord(
 
 	// When `query._fields` is provided, check that each requested field exists,
 	// including any nested paths, on the item; return false if any part is missing.
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;
@@ -729,10 +730,11 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
+	// The caller names the record type of the entity it queries.
 	return getQueriedItems( queriedState, query, {
 		supportsPagination: !! getEntityConfig( state, kind, name )
 			?.supportsPagination,
-	} );
+	} ) as Array< EntityRecord > | null;
 } ) as GetEntityRecords;
 
 /**
@@ -1657,7 +1659,7 @@ export function hasRevision(
 		return false;
 	}
 
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;

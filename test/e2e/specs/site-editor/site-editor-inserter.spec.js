@@ -301,7 +301,7 @@ class InserterUtils {
 	}
 
 	getBlockLibraryTab( name ) {
-		// `exact` needed so 'Patterns' cannot also match the 'My patterns'
+		// `exact` needed so 'Patterns' cannot also match the 'Site patterns'
 		// tab, which renders whenever the site has user patterns (for
 		// example ones left behind by an earlier spec in the same run).
 		return this.page.getByRole( 'tab', { name, exact: true } );

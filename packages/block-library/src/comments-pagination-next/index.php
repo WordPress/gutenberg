@@ -39,7 +39,7 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 
 	$next_comments_link = get_next_comments_link( $label, $max_page, $comment_vars['paged'] ?? null );
 
-	remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
+	remove_filter( 'next_comments_link_attributes', $filter_link_attributes );
 
 	if ( ! isset( $next_comments_link ) ) {
 		return '';
