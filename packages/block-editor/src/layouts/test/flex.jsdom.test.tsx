@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import flex from '../flex';
+import type { Layout } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -87,9 +88,93 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
+	it( 'should show icons and labels without descriptions', async () => {
+		const user = userEvent.setup();
+		renderInspectorControls();
+
+		const trigger = await screen.findByRole( 'combobox', {
+			name: 'Justification',
+		} );
+		expect( trigger ).toHaveTextContent( 'Left' );
+		// eslint-disable-next-line testing-library/no-node-access -- Decorative icons have no accessible role; includes the caret.
+		expect( trigger.querySelectorAll( 'svg' ) ).toHaveLength( 2 );
+
+		await user.click( trigger );
+
+		for ( const label of [
+			'Left',
+			'Center',
+			'Right',
+			'Space between',
+			'Space around',
+			'Space evenly',
+		] ) {
+			const option = await screen.findByRole( 'option', { name: label } );
+			expect( option ).toBeVisible();
+			expect( option ).not.toHaveAttribute( 'aria-describedby' );
+			// eslint-disable-next-line testing-library/no-node-access -- Decorative icons have no accessible role; includes the selection indicator.
+			expect( option.querySelectorAll( 'svg' ) ).toHaveLength( 2 );
+		}
+	} );
+
+	it( 'should update the justification from the select control', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		renderInspectorControls( { onChange } );
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Space around' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			justifyContent: 'space-around',
+		} );
+	} );
+
+	it( 'should not crash when the selected justification becomes unavailable', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const renderControls = ( layout: Layout ) => (
+			<ToolsPanel
+				label="Layout"
+				resetAll={ vi.fn() }
+				panelId={ PANEL_ID }
+			>
+				<FlexLayoutInspectorControls
+					clientId={ PANEL_ID }
+					layout={ layout }
+					onChange={ onChange }
+				/>
+			</ToolsPanel>
+		);
+		const { rerender } = render(
+			renderControls( { orientation: 'vertical' } )
+		);
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: /Stretch items/ } )
+		);
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			orientation: 'vertical',
+			justifyContent: 'stretch',
+		} );
+
+		rerender( renderControls( { justifyContent: 'stretch' } ) );
+
+		expect(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		).toHaveTextContent( 'Left' );
+	} );
+
 	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
-		await screen.findByRole( 'radio', { name: 'Justify items left' } );
+		await screen.findByRole( 'combobox', { name: 'Justification' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {

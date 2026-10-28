@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Flex layout: Add Space around and Space evenly justification options, using a select control with icons and labels in the Layout panel ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+-   `JustifyContentControl`: Include Space around and Space evenly in the default controls ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+
 ### Enhancements
 
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
