@@ -72,10 +72,11 @@ export default function SuggestionFormatEdit( {
 		useSelect( editorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const caretNoteId = innermostSuggestionId( value?.activeFormats );
 	const noteId = isActive
-		? ( innermostSuggestionId( value?.activeFormats ) ??
-			activeAttributes?.[ SUGGESTION_ID_ATTRIBUTE ] )
+		? ( caretNoteId ?? activeAttributes?.[ SUGGESTION_ID_ATTRIBUTE ] )
 		: undefined;
+	const isCaretInMarker = !! caretNoteId;
 	const previousNoteIdRef = useRef( noteId );
 
 	useEffect( () => {
@@ -106,11 +107,18 @@ export default function SuggestionFormatEdit( {
 		// its note, but only if it is still the selected one, so a note picked
 		// some other way stays selected. Leaving the block unmounts this
 		// component instead, and the block-level sync owns that transition.
-		if ( previousNoteId && selectedNote === String( previousNoteId ) ) {
+		// A caret that moved into another kind of marker is not in plain
+		// text: that kind's instance selects its note.
+		if (
+			previousNoteId &&
+			selectedNote === String( previousNoteId ) &&
+			! isCaretInMarker
+		) {
 			selectNote( undefined );
 		}
 	}, [
 		noteId,
+		isCaretInMarker,
 		getActiveComplementaryArea,
 		getSelectedNote,
 		isNoteFocused,

@@ -140,4 +140,58 @@ describe( 'SuggestionFormatEdit', () => {
 		view.rerender( edits( [ add, del ] ) );
 		expect( getSelectedNote() ).toBe( 3 );
 	} );
+
+	it( "keeps a replacement's note when the caret crosses from one half to the other", () => {
+		/*
+		 * Both halves of a replacement carry one id, and each kind's
+		 * instance tracks it. Leaving the deletion for the addition makes
+		 * the deletion's instance see the caret leave its marker; the caret
+		 * is still in a marker, so it must not deselect the note.
+		 */
+		const registry = createRegistry();
+		registry.register( preferencesStore );
+		registry.register( interfaceStore );
+		registry.register( editorStore );
+		( registry.dispatch( interfaceStore ) as any ).enableComplementaryArea(
+			'core',
+			ALL_NOTES_SIDEBAR
+		);
+		const add = {
+			type: 'core/suggestion-add',
+			attributes: { 'data-suggestion-id': '6' },
+		};
+		const del = {
+			type: 'core/suggestion-del',
+			attributes: { 'data-suggestion-id': '6' },
+		};
+		const edits = ( activeFormats: any[] ) => (
+			<RegistryProvider value={ registry }>
+				<SuggestionFormatEdit
+					isActive={ activeFormats.includes( add ) }
+					activeAttributes={
+						activeFormats.includes( add )
+							? add.attributes
+							: undefined
+					}
+					value={ { activeFormats } }
+				/>
+				<SuggestionFormatEdit
+					isActive={ activeFormats.includes( del ) }
+					activeAttributes={
+						activeFormats.includes( del )
+							? del.attributes
+							: undefined
+					}
+					value={ { activeFormats } }
+				/>
+			</RegistryProvider>
+		);
+		const getSelectedNote = () =>
+			unlock( registry.select( editorStore ) ).getSelectedNote();
+
+		const view = render( edits( [ del ] ) );
+		expect( getSelectedNote() ).toBe( 6 );
+		view.rerender( edits( [ add ] ) );
+		expect( getSelectedNote() ).toBe( 6 );
+	} );
 } );

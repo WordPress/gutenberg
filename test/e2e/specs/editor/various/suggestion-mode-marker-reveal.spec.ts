@@ -134,11 +134,7 @@ test.describe( 'Suggestion marker reveal', () => {
 
 		// …and gives the marker itself an active treatment, so a block
 		// holding several markers still points at the right one.
-		await expect( marker ).toHaveCSS( 'outline-style', 'solid' );
-		await expect( marker ).not.toHaveCSS(
-			'background-color',
-			'rgba(0, 0, 0, 0)'
-		);
+		await expect( marker ).toHaveCSS( 'text-decoration-thickness', '3px' );
 	} );
 
 	test( "the caret in a marker selects that marker's note", async ( {
@@ -192,15 +188,15 @@ test.describe( 'Suggestion marker reveal', () => {
 		await clickMark( page, delta );
 		await expect( deltaThread ).toHaveClass( /is-selected/ );
 		await expect( bravoThread ).not.toHaveClass( /is-selected/ );
-		await expect( delta ).toHaveCSS( 'outline-style', 'solid' );
+		await expect( delta ).toHaveCSS( 'text-decoration-thickness', '3px' );
 
 		// With the block already selected, the selection follows the caret:
 		// by click…
 		await clickMark( page, bravo );
 		await expect( bravoThread ).toHaveClass( /is-selected/ );
 		await expect( deltaThread ).not.toHaveClass( /is-selected/ );
-		await expect( bravo ).toHaveCSS( 'outline-style', 'solid' );
-		await expect( delta ).toHaveCSS( 'outline-style', 'none' );
+		await expect( bravo ).toHaveCSS( 'text-decoration-thickness', '3px' );
+		await expect( delta ).toHaveCSS( 'text-decoration-thickness', '1.5px' );
 
 		// …and by arrowing into the deleted half of the other replacement,
 		// which carries the same id as its added half.
