@@ -74,7 +74,7 @@ function getMenuEditorUrl( menuId: number ) {
 /**
  * Lists the Navigation Menus a page appears in once it is published: the
  * menus that already link to it, whose links go live with the page, and the
- * menus with "Auto add pages" switched on that add a link to it. A child page
+ * menus with "Auto add new pages" switched on that add a link to it. A child page
  * is only added to a menu that links to its parent.
  */
 export default function MaybeNavigationMenusPanel() {
