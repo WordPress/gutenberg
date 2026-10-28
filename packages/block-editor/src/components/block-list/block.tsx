@@ -727,7 +727,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				hasSelectedInnerBlock,
 				getBlocksByName,
 
-				getBlockIndex,
 				isBlockMultiSelected,
 				isBlockSubtreeDisabled,
 				isBlockHighlighted,
@@ -788,7 +787,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				attributes,
 				isValid,
 				themeSupportsLayout: supportsLayout,
-				index: getBlockIndex( clientId ),
 				isReusable: isReusableBlock( blockType ),
 				className: hasLightBlockWrapper
 					? attributes.className
@@ -965,7 +963,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		blockEditingMode,
 		mayDisplayControls,
 		mayDisplayParentControls,
-		index,
 		blockApiVersion,
 		blockType,
 		blockTitle,
@@ -1000,7 +997,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		rootClientId,
 		clientId,
 		className,
-		index,
 		mode,
 		name,
 		blockApiVersion,

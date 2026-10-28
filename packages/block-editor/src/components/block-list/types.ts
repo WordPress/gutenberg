@@ -34,7 +34,6 @@ export interface PrivateBlockContextValue {
 	rootClientId?: string | null;
 	clientId?: string;
 	className?: string;
-	index?: number;
 	mode?: string;
 	name?: string;
 	blockApiVersion?: number;

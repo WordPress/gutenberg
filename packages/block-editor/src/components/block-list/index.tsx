@@ -26,6 +26,7 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
+import { useBlockListMovingAnimation } from '../use-moving-animation';
 import { unlock } from '../../lock-unlock';
 import type { BlockListItemsProps, BlockListProps } from './types';
 
@@ -308,6 +309,8 @@ function Items( {
 		[ ghostBlockName, ghostBlockAttributes ]
 	);
 	const showGhost = !! ghostBlock;
+
+	useBlockListMovingAnimation( order, rootClientId );
 
 	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
 
