@@ -1,8 +1,21 @@
 import { type RefObject } from 'preact';
 import { directive, isNonDefaultDirectiveSuffix } from '../hooks';
-import { useInit } from '../utils';
+import { isBindingAllowed } from './utils/restricted-bindings';
+import { useInit, isReservedKey, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
-import { warnUniqueIdNotSupported } from './utils/warnings';
+import {
+	warnEventHandlerBindNotSupported,
+	warnUniqueIdNotSupported,
+	warnUnbindableProp,
+} from './utils/warnings';
+import { getSafeUrl, urlAttributes } from './utils/url';
+
+// Lowercase names of internal properties that are not binding candidates.
+const internalProps = new Set( [
+	'__directives',
+	'children',
+	'dangerouslysetinnerhtml',
+] );
 
 // data-wp-bind--[attribute] binding.
 directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
@@ -14,6 +27,53 @@ directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 			return;
 		}
 		const attribute = entry.suffix;
+		const name = attribute.toLowerCase();
+		if (
+			internalProps.has( name ) ||
+			// `toVdom()` stores a `<template>`'s markup in its `content` prop.
+			( name === 'content' && element.type === 'template' ) ||
+			isReservedKey( attribute )
+		) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnUnbindableProp( attribute );
+			}
+			return;
+		}
+
+		// Binding event handler attributes is not supported. Use the
+		// `data-wp-on` directive instead.
+		if ( /^on/i.test( attribute ) ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnEventHandlerBindNotSupported( attribute );
+			}
+			return;
+		}
+
+		/*
+		 * A binding that is not allowed leaves the attribute as it was rendered,
+		 * both during hydration and on elements created on the client.
+		 */
+		if ( ! isBindingAllowed( element.type, attribute ) ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The "${ attribute }" attribute cannot be bound on an "object" element. The directive data-wp-bind--${ attribute } was ignored.`
+				);
+			}
+			return;
+		}
+
+		if (
+			attribute === 'protocol' &&
+			( element.type === 'a' || element.type === 'area' )
+		) {
+			/*
+			 * The server renders the attribute, so it is removed from the props
+			 * too. Otherwise Preact sets it when the router updates the element.
+			 */
+			delete element.props[ attribute ];
+			return;
+		}
+
 		let result = evaluate( entry );
 		if ( result === PENDING_GETTER ) {
 			return;
@@ -21,6 +81,16 @@ directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 		if ( typeof result === 'function' ) {
 			result = result();
 		}
+
+		/*
+		 * URLs are checked before the value reaches the props, because Preact
+		 * writes the attribute itself on every render after the hydration, and
+		 * on elements mounted on the client.
+		 */
+		if ( urlAttributes.has( attribute.toLowerCase() ) ) {
+			result = getSafeUrl( result );
+		}
+
 		element.props[ attribute ] = result;
 
 		/*
