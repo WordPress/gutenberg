@@ -95,7 +95,7 @@ test.describe( 'Invalid blocks', () => {
 		page,
 	} ) => {
 		await editor.setContent( `<!-- wp:paragraph {"style":{"color":{"text":"#000000"}}} -->
-<p class="has-text-color" style="color:#000000;background-color:#fffbe6" data-note="tip" onclick="alert(1)">Hello</p>
+<p class="has-text-color" style="color:#000000;background-color:#fffbe6" data-note="tip" aria-label="Tip">Hello</p>
 <!-- /wp:paragraph -->` );
 
 		const paragraph = editor.canvas.getByRole( 'document', {
@@ -110,7 +110,7 @@ test.describe( 'Invalid blocks', () => {
 			htmlAttributes: {
 				style: 'background-color:#fffbe6',
 				'data-note': 'tip',
-				onclick: 'alert(1)',
+				'aria-label': 'Tip',
 			},
 		} );
 		await expect( paragraph ).toHaveAttribute( 'data-note', 'tip' );
@@ -118,7 +118,6 @@ test.describe( 'Invalid blocks', () => {
 			'background-color',
 			'rgb(255, 251, 230)'
 		);
-		await expect( paragraph ).not.toHaveAttribute( 'onclick' );
 
 		await paragraph.click();
 		await page.keyboard.press( 'End' );
@@ -126,9 +125,25 @@ test.describe( 'Invalid blocks', () => {
 
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph {"style":{"color":{"text":"#000000"}}} -->
-<p class="has-text-color" style="color:#000000;background-color:#fffbe6" data-note="tip" onclick="alert(1)">Hello world</p>
+<p class="has-text-color" style="color:#000000;background-color:#fffbe6" data-note="tip" aria-label="Tip">Hello world</p>
 <!-- /wp:paragraph -->`
 		);
+	} );
+
+	test( 'should not keep event handlers a block does not know', async ( {
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p data-note="tip" onclick="alert(1)">Hello</p>
+<!-- /wp:paragraph -->` );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.getByRole( 'button', { name: 'Attempt recovery' } )
+		).toBeVisible();
+		const [ block ] = await editor.getBlocks( { full: true } );
+		expect( block.isValid ).toBe( false );
 	} );
 
 	test( 'should not trigger malicious script tags when using a shortcode block', async ( {

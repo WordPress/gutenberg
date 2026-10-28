@@ -6,6 +6,23 @@ import type { BlockListBlockFeatureProps, BlockWrapperProps } from './types';
 
 type HtmlAttributes = Record< string, string >;
 
+// Global HTML attributes that describe content without changing how it
+// behaves. Others, like event handlers and links, leave the block invalid.
+const ALLOWED_ATTRIBUTES = new Set( [
+	'dir',
+	'id',
+	'itemid',
+	'itemprop',
+	'itemref',
+	'itemscope',
+	'itemtype',
+	'lang',
+	'role',
+	'style',
+	'title',
+	'translate',
+] );
+
 /**
  * Adds `htmlAttributes`: attributes of a block's element that the block
  * doesn't know, read from its HTML. They're kept out of the delimiter.
@@ -43,8 +60,8 @@ function getStyleObject( style: string ): Record< string, string > {
 }
 
 /**
- * Adds attributes to props without replacing the block's own, including its
- * style properties.
+ * Adds the allowed attributes to props without replacing the block's own,
+ * including its style properties.
  *
  * @param props          Props.
  * @param htmlAttributes Attributes to add.
@@ -53,7 +70,14 @@ function mergeHtmlAttributes(
 	props: BlockWrapperProps,
 	htmlAttributes: HtmlAttributes
 ): BlockWrapperProps {
-	const { style, ...attributes } = htmlAttributes;
+	const { style, ...attributes } = Object.fromEntries(
+		Object.entries( htmlAttributes ).filter(
+			( [ name ] ) =>
+				name.startsWith( 'data-' ) ||
+				name.startsWith( 'aria-' ) ||
+				ALLOWED_ATTRIBUTES.has( name )
+		)
+	);
 	// The block's own props go first and last: they keep their place and win.
 	const merged = { ...props, ...attributes, ...props };
 	if ( style ) {
@@ -77,8 +101,7 @@ export function addSaveProps(
 }
 
 /**
- * Shows `htmlAttributes` in the editor, leaving out event handlers, script
- * links, and anything that would change how the block is edited.
+ * Shows `htmlAttributes` in the editor.
  *
  * @param props                Block props.
  * @param props.htmlAttributes Attributes to show.
@@ -86,15 +109,7 @@ export function addSaveProps(
 function useBlockProps( {
 	htmlAttributes,
 }: BlockListBlockFeatureProps ): BlockWrapperProps {
-	const safeAttributes = Object.fromEntries(
-		Object.entries( htmlAttributes as HtmlAttributes ).filter(
-			( [ name, value ] ) =>
-				! name.startsWith( 'on' ) &&
-				name !== 'contenteditable' &&
-				! /^\s*javascript:/i.test( value )
-		)
-	);
-	return mergeHtmlAttributes( {}, safeAttributes );
+	return mergeHtmlAttributes( {}, htmlAttributes as HtmlAttributes );
 }
 
 export default {
