@@ -112,6 +112,30 @@ function proposalWouldHideMarkers(
 }
 
 /**
+ * The block's live attributes. `BlockListBlock` hands `BlockEdit` the
+ * proposal merged over them (see `withSuggestionBlockClassName`), so the
+ * baseline an edit is diffed against comes from the store.
+ *
+ * @param clientId Block client id.
+ * @param fallback Attributes from props, for a block missing from the store.
+ * @return Live attributes.
+ */
+function useLiveAttributes(
+	clientId: string,
+	fallback: Record< string, any >
+): Record< string, any > {
+	return (
+		useSelect(
+			( select ) =>
+				( select( blockEditorStore ) as any ).getBlockAttributes(
+					clientId
+				),
+			[ clientId ]
+		) ?? fallback
+	);
+}
+
+/**
  * Inner renderer that diverts edits into proposals. Only mounted when the
  * editor is in `suggest` intent, so the session lookup, refs, and the edit
  * handlers don't run on every `BlockEdit` render for every block across the
@@ -131,7 +155,8 @@ function SuggestingBlockEdit( {
 	BlockEdit: any;
 	props: any;
 } ) {
-	const { clientId, name, attributes, setAttributes } = props;
+	const { clientId, name, setAttributes } = props;
+	const attributes = useLiveAttributes( clientId, props.attributes );
 	const {
 		requestFormatSuggestion,
 		requestContentSuggestion,
@@ -445,7 +470,8 @@ function ProposedBlockEdit( {
 	BlockEdit: any;
 	props: any;
 } ) {
-	const { attributes, setAttributes } = props;
+	const { clientId, setAttributes } = props;
+	const attributes = useLiveAttributes( clientId, props.attributes );
 	const registry = useRegistry();
 	const marker = readSuggestionMarker( attributes );
 	// Every author's proposal on the block, later notes on top.
@@ -609,27 +635,42 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				( ghostsAfter && ghostsAfter.length > 0 ) ||
 				( ghostsBefore && ghostsBefore.length > 0 ) ||
 				( ghostsInside && ghostsInside.length > 0 );
-			const { structuralClass, showBracket, authorId } = useSelect(
-				( select ) => {
-					const blockEditor: any = select( blockEditorStore );
-					const attributes =
-						blockEditor?.getBlockAttributes?.( clientId );
-					const marker = readSuggestionMarker( attributes );
-					// A removal nested under another suggestion still strikes
-					// the block through.
-					const removal = readSuggestionMarkers( attributes ).find(
-						( entry ) => entry.type === 'pending-remove'
-					);
-					return {
-						structuralClass: structuralMarkerClass(
-							removal?.type ?? marker?.type
-						),
-						showBracket: !! displayedProposal( marker ),
-						authorId: ( removal ?? marker )?.authorId ?? null,
-					};
-				},
-				[ clientId ]
-			);
+			const { structuralClass, showBracket, authorId, attributes } =
+				useSelect(
+					( select ) => {
+						const blockEditor: any = select( blockEditorStore );
+						const live =
+							blockEditor?.getBlockAttributes?.( clientId );
+						const marker = readSuggestionMarker( live );
+						// A removal nested under another suggestion still strikes
+						// the block through.
+						const removal = readSuggestionMarkers( live ).find(
+							( entry ) => entry.type === 'pending-remove'
+						);
+						return {
+							structuralClass: structuralMarkerClass(
+								removal?.type ?? marker?.type
+							),
+							showBracket: !! displayedProposal( marker ),
+							authorId: ( removal ?? marker )?.authorId ?? null,
+							attributes: live,
+						};
+					},
+					[ clientId ]
+				);
+			/*
+			 * Block supports (font size, colors, duotone, alignment) build
+			 * the wrapper from these attributes, not from what `BlockEdit`
+			 * renders, so the proposal has to go in here to be previewed.
+			 */
+			const previewAttributes = useMemo( () => {
+				const proposal = showBracket
+					? displayedProposal( readSuggestionMarker( attributes ) )
+					: null;
+				return proposal
+					? mergeProposedAttributes( attributes, proposal )
+					: null;
+			}, [ showBracket, attributes ] );
 			const isPendingMove =
 				structuralClass === 'is-suggestion-pending-move';
 
@@ -680,6 +721,9 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 					) }
 					<BlockListBlock
 						{ ...props }
+						{ ...( previewAttributes && {
+							attributes: previewAttributes,
+						} ) }
 						className={ blockClassName }
 						wrapperProps={ {
 							...props.wrapperProps,

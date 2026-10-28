@@ -2029,7 +2029,7 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'href="https://example.com"' );
 	} );
 
-	test( 'an open settings sidebar switches to All notes when a suggestion is created', async ( {
+	test( 'an open settings sidebar stays open when a suggestion is created', async ( {
 		editor,
 		page,
 	} ) => {
@@ -2050,17 +2050,90 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.type( '!' );
 		await suggestionSaved;
 
-		// The open non-notes sidebar is switched to the notes sidebar so the
-		// fresh suggestion note is immediately visible.
+		// Like a regular note, the suggestion floats beside its block; the
+		// archive is only opened by hand.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Notes' } )
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+		).toContainText( 'Add:' );
 		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		await expect( sidebar ).toBeVisible();
 		await expect(
 			sidebar.getByRole( 'heading', { name: 'All notes' } )
-		).toBeVisible();
+		).toBeHidden();
+	} );
+
+	test( 'an inline suggestion marks only its text, not its block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
 		await expect(
-			sidebar.locator(
-				'.editor-collab-sidebar-panel__suggestion-summary'
+			paragraph.locator( 'mark.wp-suggestion-add' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await editor.canvas
+			.locator( 'body' )
+			.click( { position: { x: 5, y: 5 } } );
+
+		// The notes highlight covers a block-level note's block with a tinted
+		// `::after` overlay; a suggestion's note must not get one.
+		await expect
+			.poll( () =>
+				paragraph.evaluate( ( el ) => {
+					const after = window.getComputedStyle( el, '::after' );
+					return [ after.backgroundColor, after.borderTopStyle ];
+				} )
 			)
-		).toContainText( 'Add:' );
+			.toEqual( [ 'rgba(0, 0, 0, 0)', 'none' ] );
+	} );
+
+	test( 'a block-support attribute suggestion is previewed on the block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		const suggestionSaved = suggestionSavedPromise( page );
+		// The font size picker writes through `updateBlockAttributes` like
+		// this; the store interceptor turns it into a proposal.
+		await page.evaluate( () => {
+			const { getSelectedBlockClientId } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( getSelectedBlockClientId(), {
+					fontSize: 'x-large',
+				} );
+		} );
+		await suggestionSaved;
+
+		// The live block keeps its size until the suggestion is accepted...
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'has-x-large-font-size' );
+		expect( serialized ).toContain( '"after":{"fontSize":"x-large"}' );
+		// ...but the canvas previews it, the way an inline format does.
+		await expect( paragraph ).toHaveClass( /has-x-large-font-size/ );
+		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
 	test( 'a closed sidebar stays closed when a suggestion is created', async ( {
