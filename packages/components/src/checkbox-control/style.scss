@@ -77,8 +77,7 @@
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 	}
-	/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
-	background: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
+	background: var(--wpds-color-background-interactive-neutral);
 	color: $gray-900;
 	clear: none;
 	display: inline-block;
