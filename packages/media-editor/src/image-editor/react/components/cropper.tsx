@@ -11,7 +11,6 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type {
-	CropperState,
 	HandlePosition,
 	StencilProps,
 	Size,
@@ -101,17 +100,6 @@ export interface CropperProps {
 	disabled?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
-	/**
-	 * Callback fired on every state change. Fires at pointermove rate
-	 * during drags, so keep the handler light — no heavy work, no
-	 * expensive parent re-renders. For commit-style events (drag end,
-	 * settled crop), use `onGestureEnd` instead.
-	 *
-	 * Useful for lightweight syncing with external tools, analytics,
-	 * or AI agents. Receives the full state so consumers can derive
-	 * whatever they need.
-	 */
-	onStateChange?: ( state: CropperState ) => void;
 	/** Fires when a continuous gesture begins (pan drag, handle resize, pinch zoom). */
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointerup, resize settle). */
@@ -145,7 +133,6 @@ export interface CropperProps {
  * @param root0.focusOnMount      Focus the crop area on mount.
  * @param root0.disabled          Ignore all crop interaction.
  * @param root0.onImageLoaded     Image load callback.
- * @param root0.onStateChange     Every-frame state callback.
  * @param root0.onGestureStart    Gesture boundary start.
  * @param root0.onGestureEnd      Gesture boundary end.
  * @param root0.className         Additional CSS class.
@@ -167,7 +154,6 @@ function CropperInner(
 		focusOnMount = false,
 		disabled = false,
 		onImageLoaded,
-		onStateChange,
 		onGestureStart,
 		onGestureEnd,
 		className,
@@ -267,11 +253,6 @@ function CropperInner(
 			observer.disconnect();
 		};
 	}, [] );
-
-	// Notify consumer of state changes.
-	useEffect( () => {
-		onStateChange?.( state );
-	}, [ state, onStateChange ] );
 
 	// ARIA announcements: announce significant state changes for screen readers
 	// via the centralized @wordpress/a11y speak() API called inside the hook.
