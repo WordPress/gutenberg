@@ -313,6 +313,7 @@ test.describe( 'Cover', () => {
 		);
 
 		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
 
 		const focalPointLeft = page.getByRole( 'spinbutton', {
 			name: 'Focal point left position',
