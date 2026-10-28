@@ -40,6 +40,7 @@
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
+-   `DropdownMenu`: Focus the menu on pointer opening and enter its items with arrow keys ([#85486](https://github.com/WordPress/gutenberg/pull/85486)).
 
 ### Deprecations
 
