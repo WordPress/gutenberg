@@ -62,6 +62,17 @@
 		text-align: left;
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
+
+		// Offset the 1px border reserved by Button, since the height here
+		// is determined by the content rather than fixed.
+		padding-top: $grid-unit-05 - $border-width;
+		padding-bottom: $grid-unit-05 - $border-width;
+
+		&.has-icon {
+			// Matches the `.has-icon` padding of Button.
+			padding-top: 6px - $border-width;
+			padding-bottom: 6px - $border-width;
+		}
 	}
 
 }
