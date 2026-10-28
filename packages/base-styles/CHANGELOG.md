@@ -4,6 +4,12 @@
 
 ### Breaking Changes
 
+-   Remove the `checkbox-control` and `radio-control` Sass mixins. Use the `Checkbox` and `Radio` primitives from `@wordpress/ui` instead, with `Radio` inside a `RadioGroup` ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).
+
+## 14.0.0 (2026-10-20)
+
+### Breaking Changes
+
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Internal

@@ -1,5 +1,17 @@
-import type { ComponentProps } from 'react';
-import type { AlignmentMatrixControl } from '@wordpress/components';
+/**
+ * A position in the alignment matrix.
+ */
+export type BlockAlignmentMatrixValue =
+	| 'top left'
+	| 'top center'
+	| 'top right'
+	| 'center left'
+	| 'center'
+	| 'center center'
+	| 'center right'
+	| 'bottom left'
+	| 'bottom center'
+	| 'bottom right';
 
 /**
  * Props of `BlockAlignmentMatrixControl`.
@@ -12,11 +24,11 @@ export interface BlockAlignmentMatrixControlProps {
 	/**
 	 * Function to execute upon change of matrix state.
 	 */
-	onChange?: ComponentProps< typeof AlignmentMatrixControl >[ 'onChange' ];
+	onChange?: ( value: BlockAlignmentMatrixValue ) => void;
 	/**
 	 * Content alignment location.
 	 */
-	value?: ComponentProps< typeof AlignmentMatrixControl >[ 'value' ];
+	value?: BlockAlignmentMatrixValue;
 	/**
 	 * Whether the control should be disabled.
 	 */

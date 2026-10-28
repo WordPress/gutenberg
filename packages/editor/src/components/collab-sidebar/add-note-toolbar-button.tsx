@@ -3,7 +3,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
-	// @ts-expect-error `@wordpress/block-editor` has no type declarations.
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';

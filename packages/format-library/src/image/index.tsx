@@ -14,7 +14,6 @@ import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import type { FormatEditProps } from '../types';
 

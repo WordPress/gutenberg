@@ -35,7 +35,7 @@ describe( 'private actions', () => {
 		const experimentalSettings: Settings = {
 			// @ts-expect-error A placeholder, since the test only checks it is stripped.
 			inserterMediaCategories: 'foo',
-			blockInspectorAnimation: 'bar',
+			blockInspectorAnimation: { animationParent: 'bar' },
 		};
 
 		const stableSettings = {

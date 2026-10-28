@@ -23,6 +23,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @var array
+	 * @phpstan-var array{ version?: int, settings?: array<string, mixed>, styles?: array<string, mixed>, ...<string, mixed> }
 	 */
 	protected $theme_json = null;
 
@@ -620,10 +621,10 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Defines which pseudo selectors are enabled for which elements.
 	 *
-	 * The order of the selectors should be: link, any-link, visited, hover, focus, focus-visible, active.
-	 * This is to ensure the user action (hover, focus and active) styles have a higher
-	 * specificity than the visited styles, which in turn have a higher specificity than
-	 * the unvisited styles.
+	 * The selector order controls the cascade when multiple states match. Link and button
+	 * selectors follow the LVHA order, with focus-visible immediately after focus. Text input
+	 * validation states come before the focus states because an edited field can match both
+	 * at once, so user action styles must be output last to win.
 	 *
 	 * See https://core.trac.wordpress.org/ticket/56928.
 	 * Note: this will affect both top-level and block-level elements.
@@ -631,10 +632,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 * @since 6.2.0 Added support for `:link` and `:any-link`.
 	 * @since 6.8.0 Added support for `:focus-visible`.
+	 * @since 7.2.0 Added support for text input pseudo-selectors.
+	 * @since 7.2.0 Added `:hover`, `:focus`, `:focus-visible`, and `:active` support for the select element.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link'   => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-		'button' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		'link'      => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		'button'    => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		'textInput' => array( ':required', ':user-valid', ':user-invalid', ':focus', ':focus-visible', '::placeholder' ),
+		'select'    => array( ':hover', ':focus', ':focus-visible', ':active' ),
 	);
 
 	/**
@@ -1545,6 +1550,44 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Determines whether a pseudo selector is a pseudo-element, e.g. '::placeholder'.
+	 *
+	 * Pseudo-elements are not valid inside `:where()`, so rules that target them
+	 * cannot use the `:root :where()` specificity wrapper.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string|null $pseudo_selector Pseudo selector to check, e.g. ':hover' or '::placeholder'.
+	 * @return bool True if the pseudo selector is a pseudo-element.
+	 */
+	protected static function is_pseudo_element( $pseudo_selector ) {
+		return is_string( $pseudo_selector ) && str_starts_with( $pseudo_selector, '::' );
+	}
+
+	/**
+	 * Builds the specificity-capped selector for a pseudo selector rule.
+	 *
+	 * Pseudo-classes are appended to each part of the base selector inside the
+	 * `:root :where()` wrapper, e.g. `:root :where(a:hover)`. Pseudo-elements are
+	 * not valid inside `:where()`, so they are appended after the wrapper instead,
+	 * e.g. `:root :where(textarea, input)::placeholder`, which keeps the same
+	 * specificity regardless of where the element styles are defined.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $base_selector   Selector without the pseudo selector, e.g. 'textarea, input'.
+	 * @param string $pseudo_selector Pseudo selector to apply, e.g. ':hover' or '::placeholder'.
+	 * @return string The selector to use for the rule.
+	 */
+	protected static function get_pseudo_rule_selector( $base_selector, $pseudo_selector ) {
+		if ( static::is_pseudo_element( $pseudo_selector ) ) {
+			return ':root :where(' . $base_selector . ')' . $pseudo_selector;
+		}
+
+		return ':root :where(' . static::append_to_selector( $base_selector, $pseudo_selector ) . ')';
 	}
 
 	/**
@@ -3129,6 +3172,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string  $selector         The style block selector.
 	 * @param boolean $use_root_padding Whether to add custom properties at root level.
 	 * @return array Returns the modified $declarations.
+	 *
+	 * @phpstan-return list<array{ name: non-falsy-string, value: scalar }>
 	 */
 	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
 		if ( empty( $styles ) ) {
@@ -4061,7 +4106,7 @@ class WP_Theme_JSON_Gutenberg {
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$use_root_padding         = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector                 = $block_metadata['selector'];
-		$settings                 = $this->theme_json['settings'] ?? null;
+		$settings                 = $this->theme_json['settings'] ?? array();
 		$is_root_selector         = static::ROOT_BLOCK_SELECTOR === $selector;
 		$media_query              = $block_metadata['media_query'] ?? null;
 		$responsive_media_queries = static::get_viewport_media_queries( $settings['viewport'] ?? null );
@@ -4251,7 +4296,7 @@ class WP_Theme_JSON_Gutenberg {
 										continue;
 									}
 
-									$pseudo_selector_ruleset          = static::to_ruleset( ':root :where(' . static::append_to_selector( $variation_element_selector, $pseudo_selector ) . ')', $pseudo_declarations );
+									$pseudo_selector_ruleset          = static::to_ruleset( static::get_pseudo_rule_selector( $variation_element_selector, $pseudo_selector ), $pseudo_declarations );
 									$variation_responsive_pseudo_css .= $breakpoint_media . '{' . $pseudo_selector_ruleset . '}';
 								}
 							}
@@ -4307,7 +4352,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * element then compute the style properties for it.
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
-		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings ?? array() );
+		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings );
 
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
 			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
@@ -4397,6 +4442,9 @@ class WP_Theme_JSON_Gutenberg {
 		 * Pseudo classes, e.g. :hover, :focus etc., are a class-level selector so
 		 * still need to be wrapped in `:root :where` to cap specificity for nested
 		 * variations etc. Pseudo selectors won't match the ELEMENTS selector exactly.
+		 *
+		 * Pseudo-elements, e.g. ::placeholder, are not valid inside `:where()`, so
+		 * they are appended after the wrapper instead.
 		 */
 		$element_only_selector = $is_root_selector || (
 				$current_element &&
@@ -4406,9 +4454,13 @@ class WP_Theme_JSON_Gutenberg {
 				static::ELEMENTS[ $current_element ] === $selector
 			);
 
-		// 2. Generate and append the rules that use the general selector.
-		$general_selector = $element_only_selector ? $selector : ":root :where($selector)";
-		$block_rules     .= static::to_ruleset( $general_selector, $declarations );
+		if ( static::is_pseudo_element( $pseudo_selector ) ) {
+			// The node selector already carries the pseudo-element on each part, so strip it to get the base selector.
+			$general_selector = static::get_pseudo_rule_selector( str_replace( $pseudo_selector, '', $selector ), $pseudo_selector );
+		} else {
+			$general_selector = $element_only_selector ? $selector : ":root :where($selector)";
+		}
+		$block_rules .= static::to_ruleset( $general_selector, $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -5878,15 +5930,18 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Generates style declarations for a node's features e.g. color, border,
-	 * typography etc, that have custom selectors in their related block's
+	 * Generates style declarations for a node's features e.g., color, border,
+	 * typography etc. that have custom selectors in their related block's
 	 * metadata.
 	 *
-	 * @param object $metadata The related block metadata containing selectors.
-	 * @param object $node     A merged theme.json node for block or variation.
+	 * @param array<string, mixed> $metadata The related block metadata containing selectors.
+	 * @param array<string, mixed> $node     A merged theme.json node for block or variation. Features
+	 *                                       promoted to their own selector are removed from it.
+	 * @return array<string, array[]> The style declarations for the node's features with custom
+	 *                                selectors, keyed by selector.
 	 *
-	 * @return array The style declarations for the node's features with custom
-	 * selectors.
+	 * @phpstan-param array{ selectors?: array<string, string|array<string, string>> } $metadata
+	 * @phpstan-return array<string, list<array{ name: non-falsy-string, value: scalar }>>
 	 */
 	protected function get_feature_declarations_for_node( $metadata, &$node ) {
 		$declarations = array();
@@ -5895,26 +5950,31 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$settings = $this->theme_json['settings'] ?? null;
+		$settings = $this->theme_json['settings'] ?? array();
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
-			// Skip if this is the block's root selector, the custom CSS
-			// selector, or the block doesn't have any styles for the feature.
+			/*
+			 * Skip if this is the block's root selector, the custom CSS
+			 * selector, or the block doesn't have any styles for the feature.
+			 */
 			if ( 'root' === $feature || 'css' === $feature || empty( $node[ $feature ] ) ) {
 				continue;
 			}
 
-			if ( is_array( $feature_selectors ) ) {
+			if ( is_array( $feature_selectors ) && is_array( $node[ $feature ] ) ) {
+				$feature_styles = $node[ $feature ];
 				foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
-					if ( 'root' === $subfeature || empty( $node[ $feature ][ $subfeature ] ) ) {
+					if ( 'root' === $subfeature || empty( $feature_styles[ $subfeature ] ) ) {
 						continue;
 					}
 
-					// Create temporary node containing only the subfeature data
-					// to leverage existing `compute_style_properties` function.
+					/*
+					 * Create temporary node containing only the subfeature data
+					 * to leverage existing `compute_style_properties` function.
+					 */
 					$subfeature_node = array(
 						$feature => array(
-							$subfeature => $node[ $feature ][ $subfeature ],
+							$subfeature => $feature_styles[ $subfeature ],
 						),
 					);
 
@@ -5930,31 +5990,40 @@ class WP_Theme_JSON_Gutenberg {
 						$declarations[ $subfeature_selector ] = $new_declarations;
 					}
 
-					// Remove the subfeature from the block's node now its
-					// styles will be included under its own selector not the
-					// block's.
-					unset( $node[ $feature ][ $subfeature ] );
+					/*
+					 * Remove the subfeature from the block's node now its
+					 * styles will be included under its own selector not the
+					 * block's.
+					 */
+					unset( $feature_styles[ $subfeature ] );
 				}
+				$node[ $feature ] = $feature_styles;
 			}
 
-			// Now subfeatures have been processed and removed we can process
-			// feature root selector or simple string selector.
+			/*
+			 * Now subfeatures have been processed and removed we can process
+			 * feature root selector or simple string selector.
+			 */
 			if (
 				is_string( $feature_selectors ) ||
 				( isset( $feature_selectors['root'] ) && $feature_selectors['root'] )
 			) {
 				$feature_selector = is_string( $feature_selectors ) ? $feature_selectors : $feature_selectors['root'];
 
-				// Create temporary node containing only the feature data
-				// to leverage existing `compute_style_properties` function.
+				/*
+				 * Create temporary node containing only the feature data
+				 * to leverage existing `compute_style_properties` function.
+				 */
 				$feature_node = array( $feature => $node[ $feature ] );
 
 				// Generate the style declarations.
 				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $this->theme_json );
 
-				// Merge new declarations with any that already exist for
-				// the feature selector. This may occur when multiple block
-				// support features use the same custom selector.
+				/*
+				 * Merge new declarations with any that already exist for
+				 * the feature selector. This may occur when multiple block
+				 * support features use the same custom selector.
+				 */
 				if ( isset( $declarations[ $feature_selector ] ) ) {
 					foreach ( $new_declarations as $new_declaration ) {
 						$declarations[ $feature_selector ][] = $new_declaration;
@@ -5963,8 +6032,10 @@ class WP_Theme_JSON_Gutenberg {
 					$declarations[ $feature_selector ] = $new_declarations;
 				}
 
-				// Remove the feature from the block's node now its styles
-				// will be included under its own selector not the block's.
+				/*
+				 * Remove the feature from the block's node now its styles
+				 * will be included under its own selector not the block's.
+				 */
 				unset( $node[ $feature ] );
 			}
 		}
@@ -6058,7 +6129,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			if ( 0 <= strpos( $style, 'var(' ) ) {
+			if ( str_contains( $style, 'var(' ) ) {
 				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
 
 				$has_matches = preg_match_all( '/var\(([^),]+)?,?\s?(\S+)?\)/', $style, $var_parts );
