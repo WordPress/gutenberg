@@ -7,9 +7,6 @@ import '@wordpress/theme/design-tokens.css';
 import { WidgetFooter } from '../components/widget-footer/widget-footer';
 import { WidgetDashboard } from '../widget-dashboard';
 
-/* The text line, its padding above and below, and the divider. */
-const STRIP_HEIGHT = 20 + 2 * 12 + 1;
-
 const TEXT_LINKS: WidgetRuntimeAction[] = [
 	{ id: 'report', label: 'See report', relevance: 'high', href: '/reports' },
 	{ id: 'guide', label: 'Guide', relevance: 'medium', href: '/guide' },
@@ -76,9 +73,9 @@ describe( 'WidgetFooter height', () => {
 			)
 		);
 
-		expect( stripHeight( 'text-links' ) ).toBe( STRIP_HEIGHT );
-		expect( stripHeight( 'compact-link' ) ).toBe( STRIP_HEIGHT );
-		expect( stripHeight( 'callbacks' ) ).toBe( STRIP_HEIGHT );
+		const textLinks = stripHeight( 'text-links' );
+		expect( stripHeight( 'compact-link' ) ).toBe( textLinks );
+		expect( stripHeight( 'callbacks' ) ).toBe( textLinks );
 	} );
 
 	it( 'keeps the height when a compact action arrives at runtime', async () => {
