@@ -13,6 +13,8 @@
 		.components-menu-item__item:only-child {
 			// Ensure unchecked items have clearance for consistency
 			// with checked items containing an icon or shortcut.
+			// Match the right icon's margins below, including its -2px
+			// optical offset, so toggling an item keeps the menu width.
 			padding-right: $grid-unit-30 + $icon-size - 2px;
 			box-sizing: initial;
 		}
