@@ -44,13 +44,13 @@ add_action( 'init', 'gutenberg_register_navigation_auto_add_pages_meta' );
 
 /**
  * Builds a Navigation Link block (or a Navigation Submenu block, when it has
- * inner blocks) pointing at a page.
+ * inner blocks) pointing at a post.
  *
- * Matches the blocks the Page List block creates when it is detached into
- * links, including the URL binding that keeps the link in step with the
- * page's permalink.
+ * For a page, matches the blocks the Page List block creates when it is
+ * detached into links, including the URL binding that keeps the link in step
+ * with the post's permalink.
  *
- * @param WP_Post $page         The page to link to.
+ * @param WP_Post $page         The post to link to.
  * @param array[] $inner_blocks Optional. Parsed blocks nested under the link.
  * @return array A parsed block.
  */
@@ -59,7 +59,7 @@ function gutenberg_navigation_build_page_link_block( $page, $inner_blocks = arra
 		'blockName'    => empty( $inner_blocks ) ? 'core/navigation-link' : 'core/navigation-submenu',
 		'attrs'        => array(
 			'label'    => '' !== $page->post_title ? $page->post_title : __( '(no title)', 'gutenberg' ),
-			'type'     => 'page',
+			'type'     => $page->post_type,
 			'id'       => (int) $page->ID,
 			'url'      => get_permalink( $page ),
 			'kind'     => 'post-type',
@@ -146,14 +146,70 @@ function gutenberg_navigation_nest_block_under_page( &$blocks, $parent_id, $new_
 }
 
 /**
- * Adds a link to a newly published page to every Navigation Menu that has
- * "Auto add new pages" switched on.
+ * Adds a link to a post to a Navigation Menu.
  *
- * A top-level page is appended to the menu. A child page is nested under the
- * link to its parent, which becomes a submenu; a menu with no link to the
- * parent is left alone. Like `_wp_auto_add_pages_to_menu()` for classic
- * menus, only the transition into `publish` counts, and a page the menu
- * already links to is not added again.
+ * The link is nested under the link to the post's parent when the menu has
+ * one, which turns that link into a submenu, and appended to the menu
+ * otherwise. A menu that already links to the post is left unchanged.
+ *
+ * This is the way for a plugin to put a link to one of its pages into a menu
+ * it knows the ID of, such as a menu the "Auto add new pages" setting is on for,
+ * without parsing the menu itself.
+ *
+ * @param int         $menu_id The `wp_navigation` post ID.
+ * @param int|WP_Post $post    The post to link to.
+ * @return bool|WP_Error True when the link was added, false when the menu
+ *                       already links to the post, or a WP_Error when the
+ *                       menu or post does not exist or the menu cannot be
+ *                       saved.
+ */
+function gutenberg_navigation_add_post_link( $menu_id, $post ) {
+	$menu = get_post( $menu_id );
+	if ( ! $menu || 'wp_navigation' !== $menu->post_type ) {
+		return new WP_Error( 'navigation_menu_not_found', __( 'Navigation Menu not found.', 'gutenberg' ) );
+	}
+
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return new WP_Error( 'post_not_found', __( 'Post not found.', 'gutenberg' ) );
+	}
+
+	$blocks = parse_blocks( $menu->post_content );
+	if ( gutenberg_navigation_blocks_link_to_page( $blocks, $post->ID ) ) {
+		return false;
+	}
+
+	$link = gutenberg_navigation_build_page_link_block( $post );
+	if ( empty( $post->post_parent ) || ! gutenberg_navigation_nest_block_under_page( $blocks, $post->post_parent, $link ) ) {
+		$blocks[] = $link;
+	}
+
+	$result = wp_update_post(
+		array(
+			'ID'           => $menu->ID,
+			'post_content' => wp_slash( serialize_blocks( $blocks ) ),
+		),
+		true
+	);
+
+	return is_wp_error( $result ) ? $result : true;
+}
+
+/**
+ * Adds a link to a newly published page to the Navigation Menus chosen for
+ * it, or to every menu that has "Auto add new pages" switched on.
+ *
+ * With a choice (see `gutenberg_navigation_publish_menu_choice()`), the page
+ * is added to exactly the chosen menus the current user can edit, nested
+ * under the link to its parent when the menu has one and appended otherwise.
+ * The setting of the menus is not changed, so a menu left out of the choice
+ * still gets the next page.
+ *
+ * Without a choice, a top-level page is appended to each menu with the
+ * setting on. A child page is nested under the link to its parent, which
+ * becomes a submenu; a menu with no link to the parent is left alone. Like
+ * `_wp_auto_add_pages_to_menu()` for classic menus, only the transition into
+ * `publish` counts, and a page the menu already links to is not added again.
  *
  * @param string  $new_status New post status.
  * @param string  $old_status Old post status.
@@ -161,6 +217,17 @@ function gutenberg_navigation_nest_block_under_page( &$blocks, $parent_id, $new_
  */
 function gutenberg_navigation_auto_add_page_on_publish( $new_status, $old_status, $post ) {
 	if ( 'publish' !== $new_status || 'publish' === $old_status || 'page' !== $post->post_type ) {
+		return;
+	}
+
+	$choice = gutenberg_navigation_publish_menu_choice( $post->ID );
+	if ( null !== $choice ) {
+		foreach ( $choice as $menu_id ) {
+			if ( ! current_user_can( 'edit_post', $menu_id ) ) {
+				continue;
+			}
+			gutenberg_navigation_add_post_link( $menu_id, $post );
+		}
 		return;
 	}
 
@@ -177,24 +244,13 @@ function gutenberg_navigation_auto_add_page_on_publish( $new_status, $old_status
 	);
 
 	foreach ( $menus as $menu ) {
-		$blocks = parse_blocks( $menu->post_content );
-		if ( gutenberg_navigation_blocks_link_to_page( $blocks, $post->ID ) ) {
+		if (
+			! empty( $post->post_parent ) &&
+			! gutenberg_navigation_blocks_link_to_page( parse_blocks( $menu->post_content ), $post->post_parent )
+		) {
 			continue;
 		}
-
-		$link = gutenberg_navigation_build_page_link_block( $post );
-		if ( empty( $post->post_parent ) ) {
-			$blocks[] = $link;
-		} elseif ( ! gutenberg_navigation_nest_block_under_page( $blocks, $post->post_parent, $link ) ) {
-			continue;
-		}
-
-		wp_update_post(
-			array(
-				'ID'           => $menu->ID,
-				'post_content' => wp_slash( serialize_blocks( $blocks ) ),
-			)
-		);
+		gutenberg_navigation_add_post_link( $menu->ID, $post );
 	}
 }
 add_action( 'transition_post_status', 'gutenberg_navigation_auto_add_page_on_publish', 10, 3 );
