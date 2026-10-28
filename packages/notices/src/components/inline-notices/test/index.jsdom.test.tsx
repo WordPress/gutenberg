@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
 
 function getInlineNoticesWrapper( container: HTMLElement ) {
-	return container.firstChild as HTMLElement;
+	return container.querySelector< HTMLElement >(
+		'.notices-inline-notices-wrapper'
+	)!;
 }
 
 function renderInlineNotices( props = {} ) {
@@ -22,28 +24,30 @@ function renderInlineNotices( props = {} ) {
 }
 
 describe( 'InlineNotices', () => {
-	it( 'should return null when there are no notices and no children', () => {
+	it( 'keeps empty announcement regions without a visible wrapper when there are no notices', () => {
 		const { container } = renderInlineNotices();
 
-		expect( container ).toBeEmptyDOMElement();
+		expect( getInlineNoticesWrapper( container ) ).toBeNull();
+		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+		expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 	} );
 
-	it( 'should return null when children is false and there are no notices', () => {
+	it( 'omits the visible wrapper when children is false and there are no notices', () => {
 		const { container } = renderInlineNotices( {
 			children: false,
 		} );
 
-		expect( container ).toBeEmptyDOMElement();
+		expect( getInlineNoticesWrapper( container ) ).toBeNull();
 	} );
 
-	it( 'should return null when every one of several children renders nothing', () => {
+	it( 'omits the visible wrapper when every child renders nothing', () => {
 		// More than one child arrives as an array, which is itself neither
 		// `false` nor empty, so the array is what has to be looked through.
 		const { container } = renderInlineNotices( {
 			children: [ false, null, undefined, '' ],
 		} );
 
-		expect( container ).toBeEmptyDOMElement();
+		expect( getInlineNoticesWrapper( container ) ).toBeNull();
 	} );
 
 	it( 'should render when one of several children renders something', () => {
@@ -168,5 +172,98 @@ describe( 'InlineNotices', () => {
 		expect(
 			within( dismissible ).getByText( 'Extra notice' )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'announcements', () => {
+		it( 'announces new notices without details or action labels', async () => {
+			const { registry } = renderInlineNotices();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						details: 'Technical details.',
+						actions: [ { label: 'Try again', onClick() {} } ],
+					} );
+			} );
+
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Updating failed\.$/
+			);
+			for ( const status of screen.getAllByRole( 'status' ) ) {
+				expect( status ).toBeEmptyDOMElement();
+			}
+		} );
+
+		it( 'announces non-error notices politely', async () => {
+			const { registry } = renderInlineNotices();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'success', 'Draft saved.' );
+			} );
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+				'Draft saved.'
+			);
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+		} );
+
+		it( 'keeps speak:false notices silent', async () => {
+			const { registry } = renderInlineNotices();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						speak: false,
+					} );
+			} );
+
+			expect(
+				screen.getByText( 'Updating failed.' )
+			).toBeInTheDocument();
+			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+		} );
+
+		it( 'announces repeated notifications with the same ID', async () => {
+			const { registry } = renderInlineNotices();
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+					} );
+			} );
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Publishing failed.', {
+						id: 'editor-save',
+					} );
+			} );
+			const previousMessage = within(
+				screen.getByRole( 'alert' )
+			).getByText( 'Publishing failed.' );
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Publishing failed.', {
+						id: 'editor-save',
+					} );
+			} );
+
+			await waitFor( () => {
+				expect(
+					within( screen.getByRole( 'alert' ) ).getByText(
+						'Publishing failed.'
+					)
+				).not.toBe( previousMessage );
+			} );
+		} );
 	} );
 } );
