@@ -1169,9 +1169,6 @@
 	"packages/block-library/src/comment-template/hooks.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
-		},
-		"no-restricted-syntax": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/comment-template/index.js": {
@@ -1300,9 +1297,6 @@
 			"count": 1
 		},
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -3823,9 +3817,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3883,9 +3874,6 @@
 	},
 	"packages/block-library/src/post-comments-link/edit.jsx": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
