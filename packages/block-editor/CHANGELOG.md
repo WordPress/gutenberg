@@ -43,6 +43,7 @@
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
+-   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 
 
 ### Internal
