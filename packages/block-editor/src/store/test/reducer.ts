@@ -1024,6 +1024,51 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should append received blocks to the root order', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'RECEIVE_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'wings',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} ),
+				],
+			} );
+
+			expect( Object.fromEntries( state.order ) ).toEqual( {
+				'': [ 'chicken', 'ribs' ],
+				chicken: [],
+				ribs: [ 'wings' ],
+				wings: [],
+			} );
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
+			);
+			expect( state.tree.get( '' )!.innerBlocks![ 1 ] ).toBe(
+				state.tree.get( 'ribs' )
+			);
+		} );
+
 		it( 'should replace the block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
