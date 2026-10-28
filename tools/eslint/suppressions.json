@@ -2289,11 +2289,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/image/test/view.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/image/transforms.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
