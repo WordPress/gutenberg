@@ -1,0 +1,40 @@
+import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+import * as DisclosureStories from './disclosure.story';
+
+<Meta of={ DisclosureStories } tags={ [ '!docs-only' ] } />
+
+# Notice with disclosed details
+
+Keep a short error message visible and let users reveal supplementary details with native `<details>` and `<summary>` elements.
+
+Use native details for a disclosure whose summary and content belong together, as in this error notice. Use [Collapsible](?path=/docs/design-system-components-collapsible--docs) when the interface needs a custom button trigger or application-controlled open state, as in [CollapsibleCard](?path=/docs/design-system-components-collapsiblecard--docs).
+
+See [Error messages](?path=/docs/design-system-patterns-error-messages--docs) for guidance on writing actionable errors and deciding when to offer copying.
+
+The controls below configure the example. `message` and `details` supply the example content and are not `Notice.Root` props. The notice uses `intent="error"`.
+
+## With details
+
+The copy button follows the details. The browser supplies the disclosure marker and manages the open state.
+
+<Canvas of={ DisclosureStories.WithDetails } />
+
+<Controls of={ DisclosureStories.WithDetails } />
+
+`Notice.Description` uses `Stack` to space the message and disclosure while preserving the notice's typography, color, and grid alignment. The `<details>` element starts with a `<summary>` labeled "Details", followed by a `Text` component rendered as `<pre>` to preserve line breaks. `Notice.Actions` follows the disclosure and uses `Stack` to center the button and confirmation vertically.
+
+## Copying the message and details
+
+The example uses separate plain-text strings for the main error message and details. If an application's error message contains useful HTML, such as an actionable link, preserve that content in the displayed message using the application's sanitized HTML rendering. Prepare a separate plain-text equivalent for copying. Preserve the explanation, next steps, paragraph and list breaks, and useful link text and destinations. For example, convert `<a href="https://example.com/help">Read the help article</a>` to `Read the help article (https://example.com/help)`, so copying retains the resource needed to act on the error. Omit sensitive data, including credentials and URLs containing nonces. Do not discard a useful error message because it contains markup.
+
+Empty or whitespace-only details omit the disclosure and copy only the message, without a trailing blank line.
+
+The "Copy error" button copies the main message, a blank line, and the supplementary details, even while they are collapsed. The application supplies the exact text to `useCopyToClipboard`; `Notice` does not inspect its children or choose the clipboard contents.
+
+The example's local `CopyButton` helper uses `useCopyToClipboard` and shows a temporary "Copied" confirmation only after success. A separate `Notice.Description` provides the notice's typography and color and a persistent `role="status"` region for polite updates. The button keeps its label and accessible name. The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
+
+## Trying the example
+
+Use Enter or Space on the "Details" summary to expand the details. The disclosure control keeps focus. Tab to "Copy error", activate it, and paste into a text field to inspect the copied message and details. Copying also works while the details are collapsed.
+
+Use the controls below the example to try a longer message, multiline details, and empty details. Resize the canvas to check wrapping before and after copying. The "Copied" confirmation can wrap below the button in a narrow container.

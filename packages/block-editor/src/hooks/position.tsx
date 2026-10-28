@@ -35,8 +35,10 @@ const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 
+// The default position is stored as an empty string, but the select treats
+// an empty value as no selection and shows its placeholder.
 const DEFAULT_OPTION = {
-	value: '',
+	value: '__default',
 	label: __( 'Default' ),
 };
 
@@ -447,7 +449,11 @@ export function PositionPanelPure( {
 				value={ selectedOption }
 				onValueChange={ ( selectedItem ) => {
 					// The select has no empty choice.
-					onChangeType( selectedItem!.value );
+					onChangeType(
+						selectedItem!.value === DEFAULT_OPTION.value
+							? ''
+							: selectedItem!.value
+					);
 				} }
 			/>
 		</InspectorControls>

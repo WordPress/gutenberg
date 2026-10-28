@@ -877,6 +877,99 @@ test.describe( 'Navigation block - List view editing', () => {
 			listView.getByRole( 'link', { name: 'Test Page 1' } )
 		).toBeVisible();
 	} );
+
+	test( 'edits a Button from the List View popover in a contentOnly locked section', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content:
+				navMenuBlocksFixture.content +
+				`<!-- wp:buttons -->` +
+				`<div class="wp-block-buttons">` +
+				`<!-- wp:button {"linkTarget":"_blank","rel":"noopener"} -->` +
+				`<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://wordpress.org/" target="_blank" rel="noopener">Buy now</a></div>` +
+				`<!-- /wp:button -->` +
+				`</div>` +
+				`<!-- /wp:buttons -->`,
+		} );
+
+		await editor.setContent(
+			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+				`<div class="wp-block-group">` +
+				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
+				`</div>` +
+				`<!-- /wp:group -->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		// The popover offers the same fields as a navigation link.
+		await listView.getByRole( 'link', { name: 'Buy now' } ).click();
+
+		await expect(
+			page.getByRole( 'heading', { name: 'Settings' } )
+		).toBeVisible();
+		const textInput = page.getByRole( 'textbox', { name: 'Text' } );
+		await expect( textInput ).toHaveValue( 'Buy now' );
+		await expect(
+			page.getByRole( 'button', { name: /^Link to/ } )
+		).toHaveText( /wordpress\.org/ );
+		await expect(
+			page.getByRole( 'checkbox', { name: 'Open in new tab' } )
+		).toBeChecked();
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/' );
+
+		// Edits reach the block.
+		await textInput.fill( 'Shop now' );
+		await page
+			.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			.uncheck();
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Shop now' } )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Button text' } )
+		).toHaveText( 'Shop now' );
+		const buttonBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Button',
+			exact: true,
+		} );
+		const clientId = await buttonBlock.getAttribute( 'data-block' );
+		expect(
+			await page.evaluate(
+				( id ) =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getBlockAttributes( id ),
+				clientId
+			)
+		).toMatchObject( {
+			text: 'Shop now',
+			url: 'https://wordpress.org/',
+		} );
+		expect(
+			await page.evaluate( ( id ) => {
+				const { linkTarget, rel } = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlockAttributes( id );
+				return { linkTarget, rel };
+			}, clientId )
+		).toEqual( { linkTarget: undefined, rel: undefined } );
+	} );
 } );
 
 /**

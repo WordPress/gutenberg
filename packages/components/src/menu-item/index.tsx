@@ -19,6 +19,7 @@ function UnforwardedMenuItem(
 		iconPosition = 'right',
 		shortcut,
 		isSelected,
+		onMouseMove,
 		role = 'menuitem',
 		suffix,
 		...buttonProps
@@ -58,6 +59,19 @@ function UnforwardedMenuItem(
 			className={ className }
 			accessibleWhenDisabled
 			{ ...buttonProps }
+			onMouseMove={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
+				onMouseMove?.( event );
+				const menu = event.currentTarget.closest( '[role="menu"]' );
+				if (
+					! event.defaultPrevented &&
+					role.startsWith( 'menuitem' ) &&
+					menu?.contains(
+						event.currentTarget.ownerDocument.activeElement
+					)
+				) {
+					event.currentTarget.focus( { preventScroll: true } );
+				}
+			} }
 		>
 			<span className="components-menu-item__item">{ children }</span>
 			{ ! suffix && (
