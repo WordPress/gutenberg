@@ -74,3 +74,20 @@ Default.args = {
 	],
 	value: 'arbitrary-choice-1',
 };
+
+export const WithShortcuts = Template.bind( {} );
+WithShortcuts.args = {
+	choices: [
+		{
+			value: 'visual',
+			label: 'Visual editor',
+			shortcut: 'Ctrl+Shift+V',
+		},
+		{
+			value: 'code',
+			label: 'Code editor',
+			info: 'Edit the source of your content.',
+			shortcut: 'Ctrl+Shift+C',
+		},
+	],
+};
