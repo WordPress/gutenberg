@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { applyFormat, insert, useAnchor } from '@wordpress/rich-text';
+import { applyFormat, insert, remove, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
@@ -65,15 +65,47 @@ export const nonBreakingSpace = {
 				return;
 			}
 
-			const [ from, to ] = range;
+			let [ from, to ] = range;
 			const { text } = value;
-			onChange( {
+
+			// Spaces next to the range collapse with the replaced ones.
+			while ( text[ from - 1 ] === ' ' ) {
+				from--;
+			}
+			while ( text[ to ] === ' ' ) {
+				to++;
+			}
+
+			let newValue: RichTextValue = {
 				...value,
 				text:
 					text.slice( 0, from ) +
 					text.slice( from, to ).replaceAll( NBSP, ' ' ) +
 					text.slice( to ),
-			} );
+			};
+			const runs = [
+				...newValue.text.slice( from, to ).matchAll( / +/g ),
+			];
+
+			// HTML shows a run of spaces as one, and none at the start or end
+			// of a line, so remove the rest as reloading would.
+			for ( const { index, 0: spaces } of runs.reverse() ) {
+				const runStart = from + index;
+				const runEnd = runStart + spaces.length;
+				const isLineEdge = [
+					text[ runStart - 1 ],
+					text[ runEnd ],
+				].some(
+					( character ) =>
+						character === undefined || character === '\n'
+				);
+				const removeFrom = isLineEdge ? runStart : runStart + 1;
+				if ( removeFrom < runEnd ) {
+					newValue = remove( newValue, removeFrom, runEnd );
+				}
+			}
+
+			onChange( newValue );
 			onFocus();
 		}
 

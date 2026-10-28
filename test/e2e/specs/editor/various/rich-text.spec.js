@@ -1063,4 +1063,59 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			},
 		] );
 	} );
+
+	test( 'should remove non-breaking spaces that would collapse when replaced', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Replace non-breaking spaces' } );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one \u00a0 two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
+		// After the non-breaking space.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await editor.showBlockToolbar();
+		await button.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one two' },
+			},
+		] );
+
+		await page.keyboard.type( '!' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one !two' },
+			},
+		] );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '\u00a0one\u00a0\u00a0two\u00a0' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.last()
+			.click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await editor.showBlockToolbar();
+		await button.click();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { content: 'one !two' } },
+				{ attributes: { content: 'one two' } },
+			] );
+	} );
 } );
