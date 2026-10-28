@@ -2808,9 +2808,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 4
 		},
@@ -5663,9 +5660,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -6409,9 +6403,6 @@
 			"count": 5
 		},
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {

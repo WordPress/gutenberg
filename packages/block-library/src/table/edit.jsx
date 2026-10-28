@@ -1,11 +1,5 @@
 import clsx from 'clsx';
-import {
-	memo,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { memo, useCallback, useRef, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -29,6 +23,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useRefEffect } from '@wordpress/compose';
 import {
 	alignLeft,
 	alignRight,
@@ -111,8 +106,7 @@ function TableEdit( {
 	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
-	const tableRef = useRef();
-	const [ hasTableCreated, setHasTableCreated ] = useState( false );
+	const isNewTableRef = useRef( false );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -148,7 +142,7 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
-		setHasTableCreated( true );
+		isNewTableRef.current = true;
 	}
 
 	/**
@@ -355,14 +349,13 @@ function TableEdit( {
 		setSelectedCell();
 	}
 
-	useEffect( () => {
-		if ( hasTableCreated ) {
-			tableRef?.current
-				?.querySelector( 'td div[contentEditable="true"]' )
-				?.focus();
-			setHasTableCreated( false );
+	// Focus the first cell of a table created from the placeholder.
+	const tableRef = useRefEffect( ( node ) => {
+		if ( isNewTableRef.current ) {
+			isNewTableRef.current = false;
+			node.querySelector( 'td div[contentEditable="true"]' )?.focus();
 		}
-	}, [ hasTableCreated ] );
+	}, [] );
 
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
@@ -445,7 +438,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps( { ref: tableRef } ) }>
+		<figure { ...useBlockProps() }>
 			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">
@@ -529,6 +522,7 @@ function TableEdit( {
 			</InspectorControls>
 			{ ! isEmpty && (
 				<table
+					ref={ tableRef }
 					className={ clsx(
 						colorProps.className,
 						borderProps.className,
