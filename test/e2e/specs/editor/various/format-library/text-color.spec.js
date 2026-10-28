@@ -18,7 +18,7 @@ test.describe( 'Format Library - Text color', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await editor.clickBlockToolbarButton( 'More' );
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Highlight' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Text color' } )
 			.click();
 
 		// Use a color name with multiple words to ensure that it becomes
@@ -34,6 +34,48 @@ test.describe( 'Format Library - Text color', () => {
 				attributes: {
 					content:
 						'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark>',
+				},
+			},
+		] );
+
+		await color.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '1',
+				},
+			},
+		] );
+	} );
+
+	test( 'should set and remove a highlight color', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+
+		await page.keyboard.type( '1' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await editor.clickBlockToolbarButton( 'More' );
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Highlight color' } )
+			.click();
+
+		const color = page
+			.getByRole( 'listbox', { name: 'Custom color picker' } )
+			.getByRole( 'option', { name: 'Cyan bluish gray' } );
+
+		await color.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<mark style="background-color:#abb8c3" class="has-inline-color">1</mark>',
 				},
 			},
 		] );

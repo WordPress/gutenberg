@@ -14,8 +14,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { Tabs } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { textColor as settings, transparentValue } from './index';
 
@@ -28,8 +26,11 @@ export interface ColorObject {
 	name: string;
 }
 
+export type ColorProperty = 'color' | 'backgroundColor';
+
 interface InlineColorUIProps {
 	name: string;
+	property: ColorProperty;
 	isActive: boolean;
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
@@ -39,15 +40,10 @@ interface InlineColorUIProps {
 
 interface ColorPickerProps {
 	name: string;
-	property: 'color' | 'backgroundColor';
+	property: ColorProperty;
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 }
-
-const TABS = [
-	{ name: 'color', title: __( 'Text' ) },
-	{ name: 'backgroundColor', title: __( 'Background' ) },
-];
 
 function parseCSS( css = '' ): { color?: string; backgroundColor?: string } {
 	return css
@@ -118,7 +114,7 @@ export function getActiveColors(
 	};
 }
 
-function setColors(
+export function setColors(
 	value: RichTextValue,
 	name: string,
 	colorSettings: ColorObject[],
@@ -198,6 +194,7 @@ function ColorPicker( { name, property, value, onChange }: ColorPickerProps ) {
 
 export default function InlineColorUI( {
 	name,
+	property,
 	value,
 	onChange,
 	onClose,
@@ -222,29 +219,12 @@ export default function InlineColorUI( {
 			className="format-library__inline-color-popover"
 			anchor={ popoverAnchor }
 		>
-			<Tabs.Root defaultValue={ TABS[ 0 ].name }>
-				<Tabs.List>
-					{ TABS.map( ( tab ) => (
-						<Tabs.Tab value={ tab.name } key={ tab.name }>
-							{ tab.title }
-						</Tabs.Tab>
-					) ) }
-				</Tabs.List>
-				{ TABS.map( ( tab ) => (
-					<Tabs.Panel
-						value={ tab.name }
-						tabIndex={ -1 }
-						key={ tab.name }
-					>
-						<ColorPicker
-							name={ name }
-							property={ tab.name as 'color' | 'backgroundColor' }
-							value={ value }
-							onChange={ onChange }
-						/>
-					</Tabs.Panel>
-				) ) }
-			</Tabs.Root>
+			<ColorPicker
+				name={ name }
+				property={ property }
+				value={ value }
+				onChange={ onChange }
+			/>
 		</Popover>
 	);
 }

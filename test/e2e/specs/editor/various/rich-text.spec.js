@@ -706,11 +706,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+a' );
 		await editor.clickBlockToolbarButton( 'More' );
-		await page.locator( 'button:text("Highlight")' ).click();
+		await page.locator( 'button:text("Text color")' ).click();
 
-		// Initial focus is on the "Text" tab.
-		// Tab to the "Custom color picker".
-		await page.keyboard.press( 'Tab' );
+		// Initial focus is on the "Custom color picker".
 		// Tab to black.
 		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
