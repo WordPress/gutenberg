@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
-import { Menu } from '@base-ui/react/menu';
+import { Menu as BUMenu } from '@base-ui/react/menu';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -179,7 +179,7 @@ function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	return (
-		<Menu.Root
+		<BUMenu.Root
 			orientation="horizontal"
 			// Hover would move the highlight away from the item the keyboard
 			// is on.
@@ -187,7 +187,7 @@ function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
 			open={ isOpen }
 			onOpenChange={ setIsOpen }
 		>
-			<Menu.Trigger
+			<BUMenu.Trigger
 				render={
 					<IconButton
 						size="small"
@@ -199,14 +199,14 @@ function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
 					/>
 				}
 			/>
-			<Menu.Portal container={ getWpCompatOverlaySlot() }>
-				<Menu.Positioner
+			<BUMenu.Portal container={ getWpCompatOverlaySlot() }>
+				<BUMenu.Positioner
 					side="bottom"
 					align="end"
 					sideOffset={ 8 }
 					collisionPadding={ 12 }
 				>
-					<Menu.Popup
+					<BUMenu.Popup
 						aria-label={ __( 'Add reaction' ) }
 						className="editor-collab-sidebar-panel__reaction-picker"
 						onKeyDownCapture={ ( event ) => {
@@ -222,7 +222,7 @@ function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
 							<Tooltip.Root key={ hexKey }>
 								<Tooltip.Trigger
 									render={
-										<Menu.CheckboxItem
+										<BUMenu.CheckboxItem
 											nativeButton
 											checked={
 												!! reactions?.[ hexKey ]
@@ -252,10 +252,10 @@ function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
 								<Tooltip.Popup>{ label }</Tooltip.Popup>
 							</Tooltip.Root>
 						) ) }
-					</Menu.Popup>
-				</Menu.Positioner>
-			</Menu.Portal>
-		</Menu.Root>
+					</BUMenu.Popup>
+				</BUMenu.Positioner>
+			</BUMenu.Portal>
+		</BUMenu.Root>
 	);
 }
 
