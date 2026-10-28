@@ -40,7 +40,7 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route( $path, $content_mod
  * @param string $label       Display label.
  * @param string $to          Route path to navigate to.
  * @param string $parent_id   Optional. Parent menu item ID.
- * @param string $parent_type Optional. Parent type: 'drilldown' or 'dropdown'.
+ * @param string $parent_type Optional. Parent type: 'drilldown', 'dropdown' or 'section'.
  */
 function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_menu_item( $id, $label, $to, $parent_id = '', $parent_type = '' ) {
 	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
@@ -55,7 +55,7 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_menu_item( $id, $label, $t
 		$menu_item['parent'] = $parent_id;
 	}
 
-	if ( ! empty( $parent_type ) && in_array( $parent_type, array( 'drilldown', 'dropdown' ), true ) ) {
+	if ( ! empty( $parent_type ) && in_array( $parent_type, array( 'drilldown', 'dropdown', 'section' ), true ) ) {
 		$menu_item['parent_type'] = $parent_type;
 	}
 

@@ -2,6 +2,7 @@ import { createRoot, StrictMode, type ComponentType } from '@wordpress/element';
 import { dispatch, useSelect } from '@wordpress/data';
 import Router from './router';
 import RootSinglePage from '../root/single-page';
+import RootShell from '../root/shell';
 import { store } from '../../store';
 import type { MenuItem, Route } from '../../store/types';
 
@@ -10,9 +11,20 @@ interface AppProps {
 }
 
 function App( { rootComponent }: AppProps ) {
-	const routes = useSelect( ( select ) => select( store ).getRoutes(), [] );
+	const { routes, layout } = useSelect(
+		( select ) => ( {
+			routes: select( store ).getRoutes(),
+			layout: select( store ).getLayout(),
+		} ),
+		[]
+	);
 
-	return <Router routes={ routes } rootComponent={ rootComponent } />;
+	return (
+		<Router
+			routes={ routes }
+			rootComponent={ layout === 'shell' ? RootShell : rootComponent }
+		/>
+	);
 }
 
 /*

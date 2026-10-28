@@ -70,6 +70,16 @@ export type SitePreviewProps = {
 	queryArgs?: FrameArgs;
 	/** Replaces the server-rendered global styles when given. */
 	globalStyles?: SitePreviewGlobalStyles;
+	/**
+	 * Whether to show the address bar above the frame. The site shell hides
+	 * it, since its own bar takes that role.
+	 */
+	showAddressBar?: boolean;
+	/**
+	 * Called with what the preview shows whenever it changes, for callers
+	 * that show it somewhere other than the address bar.
+	 */
+	onContextChange?: ( context: SitePreviewContext | null ) => void;
 	/** Renders the actions at the end of the address bar. */
 	renderActions?: ( props: {
 		context: SitePreviewContext | null;
@@ -439,13 +449,15 @@ export function useSiteUrl(): string | undefined {
  * A navigable preview of the site's front end, with an address bar showing
  * the current URL and what renders it.
  *
- * @param props               Component props.
- * @param props.siteUrl       The site's home URL.
- * @param props.path          The previewed location.
- * @param props.onPathChange  Called when the preview navigates.
- * @param props.queryArgs     Query args carried on every loaded location.
- * @param props.globalStyles  Replaces the server-rendered global styles.
- * @param props.renderActions Renders the address bar actions.
+ * @param props                 Component props.
+ * @param props.siteUrl         The site's home URL.
+ * @param props.path            The previewed location.
+ * @param props.onPathChange    Called when the preview navigates.
+ * @param props.queryArgs       Query args carried on every loaded location.
+ * @param props.globalStyles    Replaces the server-rendered global styles.
+ * @param props.showAddressBar  Whether to show the address bar.
+ * @param props.onContextChange Called when what the preview shows changes.
+ * @param props.renderActions   Renders the address bar actions.
  */
 export function SitePreview( {
 	siteUrl,
@@ -453,6 +465,8 @@ export function SitePreview( {
 	onPathChange,
 	queryArgs,
 	globalStyles,
+	showAddressBar = true,
+	onContextChange,
 	renderActions,
 }: SitePreviewProps ) {
 	// Keyed on the contents so callers do not need to memoize the object.
@@ -540,55 +554,64 @@ export function SitePreview( {
 		[ onPathChange, siteUrl, targetUrl, frameArgs ]
 	);
 
+	useEffect( () => {
+		onContextChange?.( context );
+	}, [ context, onContextChange ] );
+
 	const publicUrl = getPublicUrl( context?.url || siteUrl, frameArgs );
 
 	return (
 		<div className={ styles.preview }>
-			<Stack
-				direction="row"
-				align="center"
-				gap="sm"
-				className={ styles.chrome }
-				render={
-					<div
-						role="region"
-						aria-label={ __( 'Preview address bar' ) }
-					/>
-				}
-			>
+			{ showAddressBar && (
 				<Stack
 					direction="row"
 					align="center"
-					gap="xs"
-					className={ styles.url }
-				>
-					{ context ? (
-						<Icon
-							className={ styles[ 'url-icon' ] }
-							icon={ getEntityIcon( context ) }
-							size={ 20 }
+					gap="sm"
+					className={ styles.chrome }
+					render={
+						<div
+							role="region"
+							aria-label={ __( 'Preview address bar' ) }
 						/>
-					) : null }
-					<Text className={ styles[ 'url-text' ] } variant="body-sm">
-						{ publicUrl }
-					</Text>
-					{ context ? (
-						<Badge className={ styles[ 'url-badge' ] }>
-							{ getEntityLabel( context ) }
-						</Badge>
-					) : null }
-				</Stack>
-				{ renderActions ? (
+					}
+				>
 					<Stack
 						direction="row"
 						align="center"
 						gap="xs"
-						className={ styles.actions }
+						className={ styles.url }
 					>
-						{ renderActions( { context, publicUrl } ) }
+						{ context ? (
+							<Icon
+								className={ styles[ 'url-icon' ] }
+								icon={ getEntityIcon( context ) }
+								size={ 20 }
+							/>
+						) : null }
+						<Text
+							className={ styles[ 'url-text' ] }
+							variant="body-sm"
+						>
+							{ publicUrl }
+						</Text>
+						{ context ? (
+							<Badge className={ styles[ 'url-badge' ] }>
+								{ getEntityLabel( context ) }
+							</Badge>
+						) : null }
 					</Stack>
-				) : null }
-			</Stack>
+					{ renderActions ? (
+						<Stack
+							direction="row"
+							align="center"
+							gap="xs"
+							className={ styles.actions }
+						>
+							{ renderActions( { context, publicUrl } ) }
+						</Stack>
+					) : null }
+				</Stack>
+			) }
 			<iframe
 				ref={ iframeRef }
 				className={ styles.iframe }

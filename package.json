@@ -72,6 +72,14 @@
 				"experimental": true
 			},
 			{
+				"id": "site-shell",
+				"init": [
+					"@wordpress/site-shell-init"
+				],
+				"capability": "manage_options",
+				"experimental": true
+			},
+			{
 				"id": "theme-preview",
 				"capability": "switch_themes",
 				"experimental": true

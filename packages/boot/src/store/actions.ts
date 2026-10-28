@@ -1,4 +1,4 @@
-import type { EntityLinks, MenuItem, Route } from './types';
+import type { EntityLinks, Layout, MenuItem, Route } from './types';
 
 export function registerMenuItem( id: string, menuItem: MenuItem ) {
 	return {
@@ -46,9 +46,25 @@ export function setDashboardLink( dashboardLink: string ) {
 	};
 }
 
+/**
+ * Sets the layout the app renders in. `shell` frames the site and opens
+ * admin workflows above it, for the experimental site shell page.
+ *
+ * Call it from an init module, so it is set before the app renders.
+ *
+ * @param layout The layout.
+ */
+export function setLayout( layout: Layout ) {
+	return {
+		type: 'SET_LAYOUT' as const,
+		layout,
+	};
+}
+
 export type Action =
 	| ReturnType< typeof registerMenuItem >
 	| ReturnType< typeof updateMenuItem >
 	| ReturnType< typeof registerRoute >
 	| ReturnType< typeof registerEntityLinks >
-	| ReturnType< typeof setDashboardLink >;
+	| ReturnType< typeof setDashboardLink >
+	| ReturnType< typeof setLayout >;

@@ -1,0 +1,243 @@
+@use "@wordpress/base-styles/mixins";
+@use "@wordpress/base-styles/variables";
+
+// The shell keeps the site and the admin screens in the same places in the
+// DOM and moves them only with CSS, so the site frame never reloads.
+.shell {
+	--site-shell-bar-height: #{variables.$grid-unit-60};
+	// Both match the values in `shell.tsx`, which places the site.
+	--site-shell-menu-width: 240px;
+	--site-shell-gap: 12px;
+	--site-shell-pip-scale: 1;
+	--site-shell-transition-duration: var(--wpds-motion-duration-md);
+	--site-shell-transition-easing: var(--wpds-motion-easing-balanced);
+
+	position: fixed;
+	inset: 0;
+	display: grid;
+	grid-template-rows: var(--site-shell-bar-height) 1fr;
+	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	isolation: isolate;
+
+	@media (prefers-reduced-motion: reduce) {
+		--site-shell-transition-duration: 0s;
+	}
+}
+
+.notices-snackbar {
+	@include mixins.snackbar-container();
+
+	// The mixin's descendant selector is local in this CSS Module.
+	:global(.components-snackbar) {
+		margin-inline: auto;
+	}
+}
+
+.bar {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	padding-inline: var(--wpds-dimension-padding-sm);
+	background: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	z-index: 4;
+}
+
+.bar-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	margin-inline-start: auto;
+}
+
+.body {
+	position: relative;
+	overflow: hidden;
+}
+
+// The menu is docked beside the site, or slid out of view. It never covers
+// the site, and the site never covers it.
+.menu {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	inset-inline-start: 0;
+	// Above the admin layer, whose box spans the space beside it.
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	width: var(--site-shell-menu-width);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	transition-property: transform, visibility;
+	transition-duration: var(--site-shell-transition-duration), 0s;
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Visible at once when it opens, so focus can move into it, and hidden
+	// only once it has slid out.
+	.shell:not(.is-menu-open) & {
+		visibility: hidden;
+		transform: translateX(-100%);
+		transition-delay: 0s, var(--site-shell-transition-duration);
+
+		[dir="rtl"] & {
+			transform: translateX(100%);
+		}
+	}
+}
+
+// The items scroll above the space the site's thumbnail takes.
+.menu-content {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	margin-block-end: var(--site-shell-thumbnail-space);
+	transition: margin var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+}
+
+// Admin screens sit behind the site, already laid out where they will be,
+// so the site shrinking away uncovers them rather than them arriving.
+.admin {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: flex;
+	gap: var(--site-shell-gap);
+	padding: var(--site-shell-gap);
+	transition-property: padding, visibility;
+	transition-duration: var(--site-shell-transition-duration), 0s;
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Hidden while covered, so nothing in it can be reached, but only once
+	// the site has grown back over it.
+	.shell:not(.is-admin) & {
+		visibility: hidden;
+		transition-delay: 0s, var(--site-shell-transition-duration);
+	}
+
+	// Room for the menu whenever it is open, on the site too, so entering an
+	// admin screen from the menu moves nothing but the site.
+	.is-menu-open & {
+		padding-inline-start: calc(var(--site-shell-menu-width) + var(--site-shell-gap));
+	}
+}
+
+// The site fills the area below the bar, sits beside the open menu, or
+// shrinks into the menu's footer on admin screens. `shell.tsx` sets its
+// height and transform for each.
+.site {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	// Above the menu, whose footer the thumbnail sits in.
+	z-index: 3;
+	width: 100%;
+	height: 100%;
+
+	// Behind the menu and the editor, which cover it.
+	.is-editing & {
+		z-index: 0;
+	}
+	overflow: hidden;
+	background: var(--wpds-color-background-surface-neutral);
+	transform-origin: top left;
+	transition-property: transform, translate, height, border-radius, box-shadow, visibility;
+	transition-duration: var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), 0s;
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Route changes crossfade the page. Named on its own, the site is left
+	// out of that crossfade, so it stays still between admin screens.
+	view-transition-name: site-shell--site;
+
+	[dir="rtl"] & {
+		transform-origin: top right;
+	}
+
+	&.is-thumbnail {
+		// The radius and outline are scaled down along with the frame.
+		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
+		box-shadow: 0 0 0 calc(1px / var(--site-shell-pip-scale)) var(--wpds-color-stroke-surface-neutral-weak);
+	}
+
+	// Leaves with the menu when it is hidden on an admin screen.
+	&.is-hidden {
+		visibility: hidden;
+		translate: calc(-1 * var(--site-shell-menu-width)) 0;
+		transition-delay: 0s, 0s, 0s, 0s, 0s, var(--site-shell-transition-duration);
+
+		[dir="rtl"] & {
+			translate: var(--site-shell-menu-width) 0;
+		}
+	}
+}
+
+// The editor opens above the site, which it crossfades from, and leaves room
+// for the menu when it is open.
+.editor {
+	position: absolute;
+	inset: 0;
+	z-index: 4;
+	background: var(--wpds-color-background-surface-neutral);
+	view-transition-name: site-shell--editor;
+	transition: inset-inline-start var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+
+	.is-menu-open & {
+		inset-inline-start: var(--site-shell-menu-width);
+	}
+
+	:global(.interface-interface-skeleton) {
+		position: relative;
+		height: 100%;
+		top: 0 !important;
+		inset-inline-start: 0 !important;
+	}
+}
+
+.site-frame {
+	height: 100%;
+
+	// The preview lays out a bar above the frame, which the shell hides.
+	> * {
+		height: 100%;
+	}
+}
+
+.site-return {
+	position: absolute;
+	inset: 0;
+	cursor: var(--wpds-cursor-control);
+
+	&:focus-visible {
+		// Drawn inside the frame and scaled down with it, so it is widened
+		// to read as a normal focus ring.
+		outline: calc(var(--wpds-border-width-focus) / var(--site-shell-pip-scale)) solid var(--wpds-color-stroke-focus);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus) / var(--site-shell-pip-scale));
+		border-radius: inherit;
+	}
+}
+
+// Shows the live site through the transition, without animating it.
+:global(:root)::view-transition-group(site-shell--site) {
+	z-index: 2;
+	animation: none;
+}
+
+:global(:root)::view-transition-old(site-shell--site) {
+	display: none;
+}
+
+:global(:root)::view-transition-new(site-shell--site) {
+	animation: none;
+}
+
+// The first admin screen was already behind the site, so it is not faded in.
+// Moving between admin screens, which has an old screen, still crossfades.
+:global(:root):has(.shell)::view-transition-new(boot--stage):only-child,
+:global(:root):has(.shell)::view-transition-new(boot--inspector):only-child {
+	animation: none;
+}
+
+// The editor crossfades in above the still site, and out again on leaving.
+:global(:root)::view-transition-group(site-shell--editor) {
+	z-index: 3;
+}

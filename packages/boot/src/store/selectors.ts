@@ -8,6 +8,10 @@ export function getRoutes( state: State ) {
 	return state.routes;
 }
 
+export function getLayout( state: State ) {
+	return state.layout;
+}
+
 export function getDashboardLink( state: State ) {
 	return state.dashboardLink;
 }

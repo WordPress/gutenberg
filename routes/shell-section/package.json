@@ -1,0 +1,19 @@
+{
+	"name": "@wordpress/shell-section-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/$section",
+		"page": "site-shell"
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0"
+	}
+}

@@ -15,7 +15,7 @@ export interface MenuItem {
 	to: string;
 	icon?: IconType;
 	parent?: string;
-	parent_type?: 'drilldown' | 'dropdown';
+	parent_type?: 'drilldown' | 'dropdown' | 'section';
 }
 
 /**
@@ -197,9 +197,15 @@ export interface Route {
 	route_module?: string;
 }
 
+/**
+ * The layout the app renders in.
+ */
+export type Layout = 'default' | 'shell';
+
 export interface State {
 	menuItems: Record< string, MenuItem >;
 	routes: Route[];
 	dashboardLink?: string;
 	entityLinks: Record< string, EntityLinks >;
+	layout: Layout;
 }
