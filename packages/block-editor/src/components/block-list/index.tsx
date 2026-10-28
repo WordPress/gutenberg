@@ -9,6 +9,7 @@ import {
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useContext,
 	useEffect,
 	useMemo,
 	useCallback,
