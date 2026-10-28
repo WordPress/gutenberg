@@ -19,6 +19,7 @@ import {
 	Popover,
 } from '@wordpress/components';
 import {
+	useEvent,
 	useMergeRefs,
 	useResizeObserver,
 	useViewportMatch,
@@ -45,7 +46,9 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
-import { getFilename } from '@wordpress/url';
+import { getFilename, isURL } from '@wordpress/url';
+import { isKeyboardEvent } from '@wordpress/keycodes';
+import { speak } from '@wordpress/a11y';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -68,6 +71,9 @@ import {
 	ALLOWED_MEDIA_TYPES,
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
@@ -277,6 +283,7 @@ export default function Image( {
 	blockEditingMode,
 	parentLayoutType,
 	maxContentWidth,
+	blockRef,
 } ) {
 	const {
 		url = '',
@@ -871,6 +878,82 @@ export default function Image( {
 		! lockUrlControls &&
 		! isDecorative;
 
+	const [ isLinkUIOpen, setIsLinkUIOpen ] = useState( false );
+	// Don't reopen the link popover the next time the block is selected.
+	if ( isLinkUIOpen && ! showUrlInput ) {
+		setIsLinkUIOpen( false );
+	}
+
+	// A link can be added to the image in the same ways as to text: with the
+	// toolbar button, the primary+K shortcut, or by pasting a URL. Only events
+	// on the block itself are handled, so the caption keeps its own behavior.
+	const onBlockKeyDown = useEvent( ( event ) => {
+		if ( event.target !== event.currentTarget || event.defaultPrevented ) {
+			return;
+		}
+
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			// Prevents the command palette from opening as well.
+			event.preventDefault();
+			setIsLinkUIOpen( true );
+		}
+	} );
+
+	const onBlockPaste = useEvent( ( event ) => {
+		if ( event.target !== event.currentTarget || event.defaultPrevented ) {
+			return;
+		}
+
+		const pastedText = event.clipboardData?.getData( 'text/plain' ).trim();
+
+		// Like pasting over text, only web addresses become links. Anything
+		// else is pasted as blocks, as before.
+		if (
+			! pastedText ||
+			! isURL( pastedText ) ||
+			! /^https?:/.test( pastedText )
+		) {
+			return;
+		}
+
+		// Prevents the image from being replaced with the pasted content.
+		event.preventDefault();
+
+		// Match the destination the link popover would pick for this URL.
+		let nextLinkDestination = LINK_DESTINATION_CUSTOM;
+		if ( pastedText === ( image?.source_url || url ) ) {
+			nextLinkDestination = LINK_DESTINATION_MEDIA;
+		} else if ( pastedText === image?.link ) {
+			nextLinkDestination = LINK_DESTINATION_ATTACHMENT;
+		}
+
+		setAttributes( {
+			href: pastedText,
+			linkDestination: nextLinkDestination,
+			lightbox: { enabled: false },
+		} );
+		speak(
+			href ? __( 'Link edited.' ) : __( 'Link inserted.' ),
+			'assertive'
+		);
+	} );
+
+	useEffect( () => {
+		const element = blockRef?.current;
+
+		if ( ! element || ! showUrlInput || ! url ) {
+			return;
+		}
+
+		element.addEventListener( 'keydown', onBlockKeyDown );
+		element.addEventListener( 'paste', onBlockPaste );
+
+		return () => {
+			element.removeEventListener( 'keydown', onBlockKeyDown );
+			element.removeEventListener( 'paste', onBlockPaste );
+		};
+	}, [ blockRef, showUrlInput, url, onBlockKeyDown, onBlockPaste ] );
+
 	const showCoverControls =
 		isSingleSelected && canInsertCover && ! isContentOnlyMode;
 
@@ -913,6 +996,8 @@ export default function Image( {
 							lightboxEnabled={ lightboxChecked }
 							onSetLightbox={ onSetLightbox }
 							resetLightbox={ resetLightbox }
+							open={ isLinkUIOpen }
+							onToggle={ setIsLinkUIOpen }
 						/>
 					) }
 					{ allowCrop && (

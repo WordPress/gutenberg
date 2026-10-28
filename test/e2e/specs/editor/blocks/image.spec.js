@@ -682,6 +682,103 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
 
+	test( 'opens the link popover with the keyboard shortcut', async ( {
+		editor,
+		page,
+		pageUtils,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		// Also wait for the is-transient class to be removed.
+		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
+			timeout: 30_000,
+		} );
+
+		await image.click();
+		await expect( imageBlock ).toBeFocused();
+		await pageUtils.pressKeys( 'primary+k' );
+
+		const urlInput = page.getByRole( 'combobox', { name: 'URL' } );
+		await expect( urlInput ).toBeFocused();
+		await expect(
+			page.getByRole( 'dialog', { name: 'Command palette' } ),
+			'Command palette should not have opened'
+		).toBeHidden();
+
+		await urlInput.fill( 'https://wordpress.org' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					href: 'https://wordpress.org',
+					linkDestination: 'custom',
+				},
+			},
+		] );
+	} );
+
+	test( 'adds a link when a URL is pasted on the selected image', async ( {
+		editor,
+		pageUtils,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		// Also wait for the is-transient class to be removed.
+		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
+			timeout: 30_000,
+		} );
+
+		await image.click();
+		await expect( imageBlock ).toBeFocused();
+		pageUtils.setClipboardData( { plainText: 'https://wordpress.org' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The image is linked instead of being replaced with an embed.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					href: 'https://wordpress.org',
+					linkDestination: 'custom',
+				},
+			},
+		] );
+	} );
+
 	test( 'appends https protocol to links added which are missing a protocol', async ( {
 		editor,
 		page,
