@@ -1,6 +1,7 @@
-import { useRefEffect } from '@wordpress/compose';
+import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 
 export function useScrollIntoView( { isSelected }: { isSelected?: boolean } ) {
+	const prefersReducedMotion = useReducedMotion();
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( isSelected ) {
@@ -15,12 +16,8 @@ export function useScrollIntoView( { isSelected }: { isSelected?: boolean } ) {
 						// Once observing starts, we always get an initial
 						// entry with the intersecting state.
 						if ( ! entries[ 0 ].isIntersecting ) {
-							// Read when scrolling: subscribing would cost
-							// every block a media query listener.
 							node.scrollIntoView( {
-								behavior: defaultView.matchMedia(
-									'(prefers-reduced-motion: reduce)'
-								).matches
+								behavior: prefersReducedMotion
 									? 'instant'
 									: 'smooth',
 							} );
