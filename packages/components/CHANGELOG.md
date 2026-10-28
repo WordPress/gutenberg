@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `DropdownMenu`, `MenuItem`, `Autocomplete`: Synchronize the active item with pointer movement and keyboard navigation ([#85487](https://github.com/WordPress/gutenberg/pull/85487)).
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85532](https://github.com/WordPress/gutenberg/pull/85532)).
 
 ## 43.0.0 (2026-10-20)
