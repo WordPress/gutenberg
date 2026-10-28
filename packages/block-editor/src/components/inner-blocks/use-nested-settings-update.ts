@@ -100,10 +100,15 @@ export default function useNestedSettingsUpdate(
 			templateLock: _templateLock,
 		};
 
+		const layoutType = getLayoutType( layout?.type );
+
 		// These values are not defined for RN, so only include them if they
-		// are defined.
+		// are defined. When the block doesn't say, its layout can capture the
+		// toolbars of the blocks in it.
 		if ( captureToolbars !== undefined ) {
 			newSettings.__experimentalCaptureToolbars = captureToolbars;
+		} else if ( layoutType?.capturesToolbars?.( layout ?? undefined ) ) {
+			newSettings.__experimentalCaptureToolbars = true;
 		}
 
 		// Orientation depends on layout,
@@ -111,7 +116,6 @@ export default function useNestedSettingsUpdate(
 		if ( orientation !== undefined ) {
 			newSettings.orientation = orientation;
 		} else {
-			const layoutType = getLayoutType( layout?.type );
 			// Layout types return `horizontal` or `vertical` for a valid layout.
 			newSettings.orientation =
 				// @ts-expect-error Bug: an unknown layout type has no `getOrientation`, so this throws.
