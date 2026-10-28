@@ -16,6 +16,7 @@
 -   `FormToggle`: Use the design system outline for the focus ring ([#85285](https://github.com/WordPress/gutenberg/pull/85285)).
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
+-   `AlignmentMatrixControl`: Use the design system outline for the keyboard focus ring ([#85528](https://github.com/WordPress/gutenberg/pull/85528)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
 ### Deprecations
@@ -31,6 +32,7 @@
 -   `ColorPicker`: Fire `onChange` immediately for hex and RGB input, so an edit is no longer lost when the picker closes right after it ([#85734](https://github.com/WordPress/gutenberg/pull/85734)).
 -   `Modal`: Keep an open modal exposed to screen readers when a modal opened before it closes ([#85720](https://github.com/WordPress/gutenberg/pull/85720)).
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
+-   `DropdownMenu`, `MenuItem`, `Autocomplete`: Synchronize the active item with pointer movement and keyboard navigation ([#85487](https://github.com/WordPress/gutenberg/pull/85487)).
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
