@@ -61,9 +61,13 @@ function UnforwardedMenuItem(
 			{ ...buttonProps }
 			onMouseMove={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
 				onMouseMove?.( event );
+				const menu = event.currentTarget.closest( '[role="menu"]' );
 				if (
 					! event.defaultPrevented &&
-					role.startsWith( 'menuitem' )
+					role.startsWith( 'menuitem' ) &&
+					menu?.contains(
+						event.currentTarget.ownerDocument.activeElement
+					)
 				) {
 					event.currentTarget.focus( { preventScroll: true } );
 				}

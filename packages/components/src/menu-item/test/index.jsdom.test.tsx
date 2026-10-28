@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { more } from '@wordpress/icons';
 import MenuItem from '../';
+import { NavigableMenu } from '../../navigable-container';
 
 const noop = () => {};
 
@@ -144,26 +145,69 @@ describe( 'MenuItem', () => {
 		expect( input ).toHaveFocus();
 	} );
 
-	it( 'lets an item hover handler own focus across repeated movement', () => {
+	it( 'keeps focus in a text field beside a menu', () => {
 		render(
 			<>
-				<button>Original</button>
-				<button>Destination</button>
+				<input aria-label="URL" />
+				<NavigableMenu>
+					<MenuItem>Link to image file</MenuItem>
+				</NavigableMenu>
+			</>
+		);
+		const input = screen.getByRole( 'textbox', { name: 'URL' } );
+		input.focus();
+		fireEvent.mouseMove(
+			screen.getByRole( 'menuitem', { name: 'Link to image file' } )
+		);
+		expect( input ).toHaveFocus();
+	} );
+
+	it( 'moves focus between menu items only while that menu contains focus', () => {
+		render(
+			<>
+				<NavigableMenu aria-label="First menu" tabIndex={ -1 }>
+					<MenuItem>First</MenuItem>
+					<MenuItem>Second</MenuItem>
+				</NavigableMenu>
+				<NavigableMenu>
+					<MenuItem>Other</MenuItem>
+				</NavigableMenu>
+			</>
+		);
+		const first = screen.getByRole( 'menuitem', { name: 'First' } );
+		const second = screen.getByRole( 'menuitem', { name: 'Second' } );
+		const other = screen.getByRole( 'menuitem', { name: 'Other' } );
+		other.focus();
+		fireEvent.mouseMove( first );
+		expect( other ).toHaveFocus();
+
+		screen.getByRole( 'menu', { name: 'First menu' } ).focus();
+		fireEvent.mouseMove( first );
+		expect( first ).toHaveFocus();
+		fireEvent.mouseMove( second );
+		expect( second ).toHaveFocus();
+	} );
+
+	it( 'lets an item hover handler own focus across repeated movement', () => {
+		render(
+			<NavigableMenu>
+				<MenuItem>Original</MenuItem>
+				<MenuItem>Destination</MenuItem>
 				<MenuItem
 					onMouseMove={ ( event ) => {
 						event.preventDefault();
 						screen
-							.getByRole( 'button', { name: 'Destination' } )
+							.getByRole( 'menuitem', { name: 'Destination' } )
 							.focus();
 					} }
 				>
 					Item
 				</MenuItem>
-			</>
+			</NavigableMenu>
 		);
-		const original = screen.getByRole( 'button', { name: 'Original' } );
+		const original = screen.getByRole( 'menuitem', { name: 'Original' } );
 		const item = screen.getByRole( 'menuitem', { name: 'Item' } );
-		const destination = screen.getByRole( 'button', {
+		const destination = screen.getByRole( 'menuitem', {
 			name: 'Destination',
 		} );
 		for ( const initialFocus of [ original, destination ] ) {

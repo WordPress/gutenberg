@@ -4,6 +4,7 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
+import { NavigableMenu } from '../../navigable-container';
 import '../../style.scss';
 
 describe( 'DropdownMenu hover navigation', () => {
@@ -114,6 +115,7 @@ describe( 'DropdownMenu hover navigation', () => {
 		await user.click(
 			screen.getByRole( 'button', { name: 'Open dropdown' } )
 		);
+		await user.keyboard( '[ArrowDown]' );
 		const first = screen.getByRole( 'menuitem', { name: 'First' } );
 		await expect.element( first ).toHaveFocus();
 		await user.hover( screen.getByRole( 'menuitem', { name: 'Second' } ) );
@@ -123,8 +125,9 @@ describe( 'DropdownMenu hover navigation', () => {
 	it( 'does not scroll a partially visible item into view on hover', async () => {
 		const user = userEvent.setup();
 		await render(
-			<div
+			<NavigableMenu
 				aria-label="Scrollable"
+				tabIndex={ -1 }
 				style={ { height: 40, overflow: 'auto' } }
 			>
 				<div style={ { height: 30 } } />
@@ -143,13 +146,14 @@ describe( 'DropdownMenu hover navigation', () => {
 					</span>
 				</MenuItem>
 				<div style={ { height: 100 } } />
-			</div>
+			</NavigableMenu>
 		);
 		const container = screen.getByLabelText( 'Scrollable' );
 		const item = screen.getByRole( 'menuitem', { name: 'Item' } );
 		expect( item.getBoundingClientRect().bottom ).toBeGreaterThan(
 			container.getBoundingClientRect().bottom
 		);
+		container.focus();
 		await user.hover( screen.getByText( 'Item' ) );
 		expect( item ).toHaveFocus();
 		expect( container.scrollTop ).toBe( 0 );
