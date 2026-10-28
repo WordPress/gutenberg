@@ -325,9 +325,8 @@ function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
 add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
 
 /**
- * Makes the `excerpt` panel row read as editable: it shows the field's
- * placeholder when the excerpt is empty, and its edit button at all times
- * rather than only on hover or focus.
+ * Shows the placeholder of the `excerpt` field in its panel row when the
+ * excerpt is empty.
  *
  * The field renders nothing for an empty value, so DataViews lists stay empty,
  * but the panel row then showed only its label. The patch merges into the
@@ -346,7 +345,6 @@ function _gutenberg_update_excerpt_layout_in_view_config( $data ) {
 						'layout' => array(
 							'type'                   => 'panel',
 							'showPlaceholderIfEmpty' => true,
-							'editVisibility'         => 'always',
 						),
 					),
 				),
