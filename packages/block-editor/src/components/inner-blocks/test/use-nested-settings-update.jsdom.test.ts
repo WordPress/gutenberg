@@ -79,20 +79,20 @@ describe( 'useNestedSettingsUpdate', () => {
 			originalExperiment;
 	} );
 
-	it( "captures toolbars when the layout does and the block doesn't say", async () => {
+	it( "captures toolbars when the layout does and the block doesn't", async () => {
 		const settings = await getSettings( {
-			captureToolbars: undefined,
+			captureToolbars: false,
 			layout: { type: 'grid', isManualPlacement: true },
 		} );
 		expect( settings.__experimentalCaptureToolbars ).toBe( true );
 	} );
 
-	it( "doesn't capture toolbars when the block says not to, whatever its layout", async () => {
+	it( 'leaves the setting out when the block passes none, as on React Native', async () => {
 		const settings = await getSettings( {
-			captureToolbars: false,
+			captureToolbars: undefined,
 			layout: { type: 'grid', isManualPlacement: true },
 		} );
-		expect( settings.__experimentalCaptureToolbars ).toBe( false );
+		expect( settings.__experimentalCaptureToolbars ).toBeUndefined();
 	} );
 
 	it( 'captures toolbars when the block does', async () => {

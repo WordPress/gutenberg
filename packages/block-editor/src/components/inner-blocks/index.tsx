@@ -281,14 +281,11 @@ export function useInnerBlocksProps<
 			}
 
 			return {
-				// Left unset unless the block opts in, so its layout can
-				// capture the toolbars instead.
-				__experimentalCaptureToolbars:
-					hasBlockSupport(
-						blockName,
-						'__experimentalExposeControlsToChildren',
-						false
-					) || undefined,
+				__experimentalCaptureToolbars: hasBlockSupport(
+					blockName,
+					'__experimentalExposeControlsToChildren',
+					false
+				),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
