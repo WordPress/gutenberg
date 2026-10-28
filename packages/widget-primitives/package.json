@@ -47,12 +47,12 @@
 		"@wordpress/element": "file:../element"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.6.1",
-		"@storybook/react-vite": "^10.6.1",
+		"@storybook/addon-docs": "^10.6.3",
+		"@storybook/react-vite": "^10.6.3",
 		"@testing-library/react": "^16.3.3",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
-		"storybook": "^10.6.2",
+		"storybook": "^10.6.3",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
