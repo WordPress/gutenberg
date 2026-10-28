@@ -35,7 +35,7 @@ npm run changelog:migrate -- <package-name>
 
 This performs three operations:
 
-1.  Extracts all past versions into `.changes/<package-name>/<version>.md`.
+1.  Consolidates all published historical versions into a single baseline file under `.changes/<package-name>/<latest-version>.md`, following [Changie's backup migration guide](https://changie.dev/guide/backup/). Future releases generate their own individual version files alongside this baseline.
 2.  Converts any entries currently under `## Unreleased` into individual fragment files under `.changes/unreleased/<PR>__<package-name>__<kind>__<timestamp>.yaml`.
 3.  Replaces `packages/<package-name>/CHANGELOG.md` with the standard Changie header and unreleased stub comment.
 
@@ -128,7 +128,7 @@ Use the migration script's `--rollback` flag:
 npm run changelog:migrate -- <package-name> --rollback
 ```
 
-This reconstructs `packages/<package-name>/CHANGELOG.md` by combining all historical version files and pending unreleased fragments, and removes `.changes/<package-name>/` and the package's unreleased fragment files.
+This reconstructs `packages/<package-name>/CHANGELOG.md` by combining the historical baseline version file, any subsequent version files, and pending unreleased fragments, and removes `.changes/<package-name>/` and the package's unreleased fragment files.
 
 ### 2. Remove package from `.changie.yaml`
 
