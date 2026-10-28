@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
@@ -11,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
