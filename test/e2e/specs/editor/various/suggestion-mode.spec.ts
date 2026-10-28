@@ -1109,9 +1109,9 @@ test.describe( 'Suggestion mode', () => {
 			'ro'
 		);
 		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByText( 'Inside a suggested addition by othertypeover' )
+			( await openNotesSidebar( page ) ).getByText(
+				'Inside a suggested addition by othertypeover'
+			)
 		).toBeVisible();
 		await expect(
 			page
