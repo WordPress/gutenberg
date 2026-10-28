@@ -3025,7 +3025,9 @@ async function main() {
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
-	const buildConcurrency = getDefaultBuildConcurrency();
+	const buildConcurrency =
+		Number( process.env.WP_BUILD_CONCURRENCY ) ||
+		getDefaultBuildConcurrency();
 	setBuildConcurrency( buildConcurrency );
 	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 

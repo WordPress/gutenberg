@@ -1,0 +1,79 @@
+name: Build concurrency benchmark
+
+# Temporary: measures wp-build phase times for several concurrency caps.
+on:
+    push:
+        branches:
+            - claude/gb-ci-build-speed-7c4fb7
+
+permissions: {}
+
+jobs:
+    benchmark:
+        name: ${{ matrix.cores }} cores, round ${{ matrix.round }}
+        runs-on: ubuntu-24.04
+        timeout-minutes: 90
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                cores: [2, 4]
+                round: [1, 2, 3]
+                include:
+                    # Rotate the order so warm caches don't favour one cap.
+                    - round: 1
+                      caps: '1 2 4 8 16 32'
+                    - round: 2
+                      caps: '32 16 8 4 2 1'
+                    - round: 3
+                      caps: '4 16 1 32 2 8'
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Warm-up build
+              run: taskset -c 0-$(( ${{ matrix.cores }} - 1 )) npm run build > /dev/null
+
+            - name: Measure caps
+              env:
+                  CORES: ${{ matrix.cores }}
+                  ROUND: ${{ matrix.round }}
+                  CAPS: ${{ matrix.caps }}
+              run: |
+                  cpus="0-$(( CORES - 1 ))"
+                  taskset -c "$cpus" node -e 'console.log( "availableParallelism:", require( "os" ).availableParallelism() )'
+                  echo "cores,cap,round,transpile,bundle,routes,widgets,wp_build,total,max_rss_mb" > results.csv
+                  for cap in $CAPS; do
+                    WP_BUILD_CONCURRENCY="$cap" /usr/bin/time -f '%M' -o rss.txt \
+                      taskset -c "$cpus" npm run build 2>&1 |
+                      while IFS= read -r line; do echo "$( date +%s.%N ) $line"; done > "build-$cap.log"
+                    grep -q 'Using build concurrency: '"$cap" "build-$cap.log"
+                    awk -v cores="$CORES" -v cap="$cap" -v round="$ROUND" -v rss="$( tail -1 rss.txt )" '
+                      NR == 1 { start = $1 }
+                      /Phase 1:/ { p1 = $1 }
+                      /Phase 2:/ { p2 = $1 }
+                      /Phase 3:/ { p3 = $1 }
+                      /Phase 4:/ { p4 = $1 }
+                      /All packages built successfully/ { p5 = $1 }
+                      /Build completed successfully/ { end = $1 }
+                      END {
+                        if ( ! end ) { exit 1 }
+                        printf "%s,%s,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d\n", cores, cap, round, p2 - p1, p3 - p2, p4 - p3, p5 - p4, p5 - p1, end - start, rss / 1024
+                      }' "build-$cap.log" >> results.csv
+                  done
+                  cat results.csv
+                  { echo '```'; cat results.csv; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Upload results
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: results-${{ matrix.cores }}-${{ matrix.round }}
+                  path: |
+                      results.csv
+                      build-*.log
