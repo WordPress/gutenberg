@@ -6382,9 +6382,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
