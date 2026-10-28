@@ -16,6 +16,7 @@
 -   `FormToggle`: Use the design system outline for the focus ring ([#85285](https://github.com/WordPress/gutenberg/pull/85285)).
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
+-   `AlignmentMatrixControl`: Use the design system outline for the keyboard focus ring ([#85528](https://github.com/WordPress/gutenberg/pull/85528)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
 ### Deprecations
