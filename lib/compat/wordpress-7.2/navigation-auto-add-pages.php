@@ -1,6 +1,6 @@
 <?php
 /**
- * Navigation menus: the "Auto add pages" setting.
+ * Navigation menus: the "Auto add new pages" setting.
  *
  * Replaces the Page List block as the default content of a Navigation Menu.
  * The fallback menu a site creates for itself starts as individual link
@@ -147,7 +147,7 @@ function gutenberg_navigation_nest_block_under_page( &$blocks, $parent_id, $new_
 
 /**
  * Adds a link to a newly published page to every Navigation Menu that has
- * "Auto add pages" switched on.
+ * "Auto add new pages" switched on.
  *
  * A top-level page is appended to the menu. A child page is nested under the
  * link to its parent, which becomes a submenu; a menu with no link to the
@@ -250,7 +250,7 @@ function gutenberg_navigation_get_page_link_blocks() {
  * `WP_Navigation_Fallback::get_fallback()` applies this filter before it
  * looks for an existing menu, converts a classic menu, or creates its Page
  * List default. When no menu exists and there is no classic menu to convert,
- * the menu is created here with "Auto add pages" switched on, and `false` is
+ * the menu is created here with "Auto add new pages" switched on, and `false` is
  * returned so core does not create a second one: core then finds this menu as
  * the most recently published one and returns it.
  *

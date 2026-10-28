@@ -15,7 +15,7 @@ type Props = {
 };
 
 /**
- * The menu's "Auto add pages" setting.
+ * The menu's "Auto add new pages" setting.
  *
  * It belongs to the Navigation Menu rather than to the block, so a change is
  * an edit to the menu record and is saved along with the block's other menu
@@ -59,9 +59,9 @@ export default function AutoAddPagesControl( { menuId }: Props ) {
 	return (
 		<div className="wp-block-navigation__auto-add-pages">
 			<SwitchControl
-				label={ __( 'Auto add pages' ) }
+				label={ __( 'Auto add new pages' ) }
 				description={ __(
-					'Automatically adds newly published pages to this navigation.'
+					'Adds pages to this navigation when they are published.'
 				) }
 				checked={ isEnabled }
 				onCheckedChange={ setEnabled }
