@@ -136,6 +136,48 @@ test.describe( 'Comments', () => {
 		).toBeHidden();
 	} );
 
+	test( 'shows the comment counts and the newest comments page in the editor', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost( { title: 'Commented post' } );
+		await editor.insertBlock( { name: 'core/post-comments-count' } );
+		await editor.insertBlock( { name: 'core/post-comments-link' } );
+		await editor.insertBlock( { name: 'core/comments' } );
+		const postId = await editor.publishPost();
+		for ( let i = 0; i < 3; i++ ) {
+			await requestUtils.createComment( {
+				content: `Comment number ${ i }`,
+				post: postId,
+			} );
+		}
+
+		await admin.editPost( postId );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Comments Count',
+			} )
+		).toHaveText( '3' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Comments Link',
+			} )
+		).toHaveText( '3 comments' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Comments Title',
+			} )
+		).toHaveText( '3 responses to "Commented post"' );
+
+		// With one comment per page, the newest page only has the last comment.
+		const commentTemplate = editor.canvas.getByRole( 'document', {
+			name: 'Block: Comment Template',
+		} );
+		await expect( commentTemplate ).toContainText( 'Comment number 2' );
+		await expect( commentTemplate ).not.toContainText( 'Comment number 1' );
+	} );
+
 	test( 'A button allows the block to switch from legacy mode to editable mode', async ( {
 		admin,
 		editor,
