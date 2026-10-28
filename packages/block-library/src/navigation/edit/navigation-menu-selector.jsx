@@ -35,8 +35,6 @@ function NavigationMenuSelector( {
 	onSelectClassicMenu,
 	onCreateNew,
 	actionLabel,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -122,13 +120,6 @@ function NavigationMenuSelector( {
 		selectorLabel = currentTitle;
 	}
 
-	if (
-		isUpdatingMenuRef &&
-		( createNavigationMenuIsSuccess || createNavigationMenuIsError )
-	) {
-		setIsUpdatingMenuRef( false );
-	}
-
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
 			label={ selectorLabel }
@@ -184,8 +175,12 @@ function NavigationMenuSelector( {
 							<MenuItem
 								onClick={ async () => {
 									setIsUpdatingMenuRef( true );
-									await onCreateNew();
-									setIsUpdatingMenuRef( false );
+									// Creating the menu rejects on error.
+									try {
+										await onCreateNew();
+									} finally {
+										setIsUpdatingMenuRef( false );
+									}
 									onClose();
 								} }
 								disabled={
