@@ -19,7 +19,7 @@ async function enableShowTemplate( page ) {
 	}
 }
 
-test.describe( 'Navigation block: Auto add pages', () => {
+test.describe( 'Navigation block: Auto add new pages', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
@@ -325,10 +325,13 @@ test.describe( 'Navigation block: Auto add pages', () => {
 			settings.locator(
 				'xpath=.//*[@role="treegrid"]/following::*[@role="switch"]'
 			)
-		).toHaveAccessibleName( 'Auto add pages' );
+		).toHaveAccessibleName( 'Auto add new pages' );
 		const toggle = settings.getByRole( 'switch', {
-			name: 'Auto add pages',
+			name: 'Auto add new pages',
 		} );
+		await expect( toggle ).toHaveAccessibleDescription(
+			'Adds pages to this navigation when they are published.'
+		);
 		await expect( toggle ).toBeChecked();
 		await toggle.click();
 		await expect( toggle ).not.toBeChecked();

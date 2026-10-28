@@ -11,7 +11,7 @@ type NavigationMenuRecord = {
 };
 
 /**
- * The menu's "Auto add pages" setting. A change is an edit to the menu record
+ * The menu's "Auto add new pages" setting. A change is an edit to the menu record
  * and is saved with the screen's other changes.
  *
  * @param props
@@ -39,9 +39,9 @@ export default function AutoAddPagesToggle( { id }: { id: number } ) {
 
 	return (
 		<SwitchControl
-			label={ __( 'Auto add pages' ) }
+			label={ __( 'Auto add new pages' ) }
 			description={ __(
-				'Automatically adds newly published pages to this navigation.'
+				'Adds pages to this navigation when they are published.'
 			) }
 			checked={ isEnabled }
 			onCheckedChange={ onCheckedChange }

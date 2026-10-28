@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the "Auto add pages" navigation menu setting.
+ * Tests for the "Auto add new pages" navigation menu setting.
  *
  * @package gutenberg
  */

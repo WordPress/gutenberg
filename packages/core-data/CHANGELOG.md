@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Invalidate the loaded `wp_navigation` records when a page publish is received, so a Navigation block picks up the link that "Auto add pages" appended on the server without a reload ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
+-   Invalidate the loaded `wp_navigation` records when a page publish is received, so a Navigation block picks up the link that "Auto add new pages" appended on the server without a reload ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
 
 ### Internal
 
