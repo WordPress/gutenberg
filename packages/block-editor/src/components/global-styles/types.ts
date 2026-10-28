@@ -306,7 +306,7 @@ export interface TypographyPanelProps {
 	defaultControls?: Record< string, boolean | undefined >;
 	/** Whether the panel edits global styles. */
 	isGlobalStyles?: boolean;
-	/** Whether controls show where their value is inherited from. */
+	/** Whether controls report their inherited values to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 	/** Warning about the contrast of the text color. */
 	contrastWarning?: ReactNode;
@@ -361,7 +361,7 @@ export interface ColorGradientDropdownItemProps {
 	isPlaceholder?: boolean;
 	/** Whether a value is inherited. */
 	hasInheritedValue?: boolean;
-	/** Whether the item shows where its value is inherited from. */
+	/** Whether the item reports its inherited value to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 }
 
@@ -395,7 +395,7 @@ export interface ColorPanelProps {
 	contrastWarning?: ReactNode;
 	/** Elements to edit besides the built in ones. */
 	additionalElements?: ColorPanelElement[];
-	/** Whether controls show where their value is inherited from. */
+	/** Whether controls report their inherited values to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 }
 
@@ -422,7 +422,7 @@ export interface BackgroundPanelProps {
 	headerLabel?: string;
 	/** Warning about the contrast of the background color. */
 	contrastWarning?: ReactNode;
-	/** Whether controls show where their value is inherited from. */
+	/** Whether controls report their inherited values to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 }
 
@@ -501,8 +501,6 @@ export interface ShadowPopoverProps extends ShadowPopoverContainerProps {
 	className?: string;
 	/** Whether the block sets its own shadow. */
 	hasLocalValue?: boolean;
-	/** Whether the block's shadow overrides an inherited one. */
-	hasLocalOverride?: boolean;
 	/** Resets the shadow. */
 	onReset?: () => void;
 }
@@ -522,7 +520,7 @@ export interface FiltersPanelProps {
 	panelId?: string | null;
 	/** Which controls are shown by default. */
 	defaultControls?: Record< string, boolean | undefined >;
-	/** Whether controls show where their value is inherited from. */
+	/** Whether controls report their inherited values to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 }
 
@@ -550,7 +548,7 @@ export interface BorderPanelProps {
 	panelId?: string | null;
 	/** Which controls are shown by default. */
 	defaultControls?: Record< string, boolean | undefined >;
-	/** Whether controls show where their value is inherited from. */
+	/** Whether controls report their inherited values to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 }
 
@@ -596,6 +594,6 @@ export interface DimensionsPanelProps {
 	allowAxialBlockGap?: boolean;
 	/** The selected style state. */
 	styleState?: BlockStyleState;
-	/** Whether controls show where their value is inherited from. */
+	/** Whether controls report their inherited values to the panel. */
 	showInheritanceLabelIndicators?: boolean;
 }

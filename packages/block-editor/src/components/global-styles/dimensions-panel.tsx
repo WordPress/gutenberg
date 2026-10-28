@@ -49,34 +49,6 @@ type SpacingSides = ComponentProps< typeof SpacingSizesControl >[ 'sides' ];
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
-/**
- * Determines whether a spacing control (`BoxControl` or `SpacingSizesControl`)
- * renders its linked/unlink toggle button, which the local-override reset dot
- * offsets itself against.
- *
- * @param sides            Configurable sides for the control.
- * @param isPresetsControl Whether the presets-based
- *                         `SpacingSizesControl` is used.
- *
- * @return Whether the toggle button is rendered.
- */
-function hasSpacingToggle(
-	sides: string[] | undefined,
-	isPresetsControl: boolean
-): boolean {
-	if ( sides?.length === 1 ) {
-		return false;
-	}
-	if ( isPresetsControl ) {
-		const hasOnlyAxialSides =
-			sides?.includes( 'horizontal' ) &&
-			sides?.includes( 'vertical' ) &&
-			sides?.length === 2;
-		return ! hasOnlyAxialSides;
-	}
-	return true;
-}
-
 export function useHasDimensionsPanel(
 	settings: StyleSettings | undefined,
 	styleState: BlockStyleState = DEFAULT_BLOCK_STYLE_STATE
@@ -462,7 +434,7 @@ export default function DimensionsPanel( {
 		);
 	};
 	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
+	// inheritance state is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = (
 		isInherited: unknown,
 		hasLocalOverride: unknown,
@@ -590,9 +562,9 @@ export default function DimensionsPanel( {
 	const isPaddingPlaceholder =
 		! hasValue( value?.spacing?.padding ) &&
 		inheritedPaddingPlaceholder !== undefined;
-	// Label/dot inheritance treatment is independent of whether the inherited
-	// sides share a common value — it only reflects the presence of an
-	// inherited value (the all-sides-equal constraint applies solely to the
+	// Whether the item counts as inherited is independent of whether the
+	// inherited sides share a common value — it only reflects the presence of
+	// an inherited value (the all-sides-equal constraint applies solely to the
 	// single-string BoxControl placeholder above).
 	const hasInheritedPadding = hasAnySideValue( inheritedPaddingValues );
 	const isPaddingInherited =
@@ -964,10 +936,6 @@ export default function DimensionsPanel( {
 					// A side count is truthy like `true`.
 					hasValue={ hasPaddingValue as () => boolean }
 					label={ __( 'Padding' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						paddingSides,
-						showSpacingPresetsControl
-					) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
@@ -1025,10 +993,6 @@ export default function DimensionsPanel( {
 					// A side count is truthy like `true`.
 					hasValue={ hasMarginValue as () => boolean }
 					label={ __( 'Margin' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						marginSides,
-						showSpacingPresetsControl
-					) }
 					onDeselect={ resetMarginValue }
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
@@ -1094,7 +1058,6 @@ export default function DimensionsPanel( {
 				<InheritanceToolsPanelItem
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
-					hasInlineEndToggle={ isAxialGap }
 					onDeselect={ resetGapValue }
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap

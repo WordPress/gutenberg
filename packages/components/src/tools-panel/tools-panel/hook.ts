@@ -10,7 +10,9 @@ import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type {
+	PrivateToolsPanelProps,
 	RegisteredToolsPanelItem,
+	ToolsPanelItemState,
 	ToolsPanelMenuItemKey,
 	ToolsPanelMenuItems,
 	ToolsPanelProps,
@@ -26,6 +28,11 @@ type PanelItemsState = {
 	 * here falls back to whether the item currently holds a value.
 	 */
 	menuItemValues: Record< string, boolean >;
+	/**
+	 * Whether each item holds a value or an inherited value, as last reported
+	 * by the item. Only tracked in `inheritanceMode`.
+	 */
+	itemStates: Record< string, ToolsPanelItemState >;
 };
 
 type PanelItemsAction =
@@ -36,11 +43,17 @@ type PanelItemsAction =
 			item?: RegisteredToolsPanelItem;
 	  }
 	| { type: 'UPDATE_VALUE'; label: string; value: boolean }
+	| { type: 'UPDATE_ITEM_STATE'; label: string; state: ToolsPanelItemState }
 	| { type: 'TOGGLE_VALUE'; label: string }
 	| { type: 'RESET_ALL' };
 
 function emptyState(): PanelItemsState {
-	return { panelItems: [], menuItemOrder: [], menuItemValues: {} };
+	return {
+		panelItems: [],
+		menuItemOrder: [],
+		menuItemValues: {},
+		itemStates: {},
+	};
 }
 
 // An item is always shown while it has a value. `defaultShown` only opts an
@@ -172,6 +185,23 @@ function menuItemValuesReducer(
 	}
 }
 
+function itemStatesReducer(
+	itemStates: PanelItemsState[ 'itemStates' ],
+	action: PanelItemsAction
+) {
+	if ( action.type !== 'UPDATE_ITEM_STATE' ) {
+		return itemStates;
+	}
+	const current = itemStates[ action.label ];
+	if (
+		current?.hasValue === action.state.hasValue &&
+		current?.isInherited === action.state.isInherited
+	) {
+		return itemStates;
+	}
+	return { ...itemStates, [ action.label ]: action.state };
+}
+
 function panelReducer( state: PanelItemsState, action: PanelItemsAction ) {
 	const panelItems = panelItemsReducer( state.panelItems, action );
 	const menuItemOrder = menuItemOrderReducer( state.menuItemOrder, action );
@@ -179,18 +209,20 @@ function panelReducer( state: PanelItemsState, action: PanelItemsAction ) {
 		{ ...state, panelItems },
 		action
 	);
+	const itemStates = itemStatesReducer( state.itemStates, action );
 
 	// Items dispatch far more often than they change anything. Holding onto
 	// the existing state lets React skip the render.
 	if (
 		panelItems === state.panelItems &&
 		menuItemOrder === state.menuItemOrder &&
-		menuItemValues === state.menuItemValues
+		menuItemValues === state.menuItemValues &&
+		itemStates === state.itemStates
 	) {
 		return state;
 	}
 
-	return { panelItems, menuItemOrder, menuItemValues };
+	return { panelItems, menuItemOrder, menuItemValues, itemStates };
 }
 
 function resetAllFiltersReducer(
@@ -212,7 +244,10 @@ const isMenuItemTypeEmpty = (
 ) => Object.keys( obj ).length === 0;
 
 export function useToolsPanel(
-	props: WordPressComponentProps< ToolsPanelProps, 'div' >
+	props: WordPressComponentProps<
+		ToolsPanelProps & PrivateToolsPanelProps,
+		'div'
+	>
 ) {
 	const {
 		className,
@@ -220,6 +255,7 @@ export function useToolsPanel(
 		resetAll,
 		panelId,
 		hasInnerWrapper = false,
+		inheritanceMode = false,
 		shouldRenderPlaceholderItems = false,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
@@ -239,8 +275,10 @@ export function useToolsPanel(
 		}
 	}, [ isResetting ] );
 
-	const [ { panelItems, menuItemOrder, menuItemValues }, panelDispatch ] =
-		useReducer( panelReducer, undefined, emptyState );
+	const [
+		{ panelItems, menuItemOrder, menuItemValues, itemStates },
+		panelDispatch,
+	] = useReducer( panelReducer, undefined, emptyState );
 
 	// Reset all filters registered against the context directly, by consumers
 	// that aren't themselves a panel item. Items supply theirs when they
@@ -284,6 +322,26 @@ export function useToolsPanel(
 		[]
 	);
 
+	const flagItemState = useCallback(
+		( label: string, state: ToolsPanelItemState ) => {
+			panelDispatch( { type: 'UPDATE_ITEM_STATE', label, state } );
+		},
+		[]
+	);
+
+	const inheritedItems = useMemo( () => {
+		const result: Record< string, boolean > = {};
+		if ( ! inheritanceMode ) {
+			return result;
+		}
+		Object.entries( itemStates ).forEach( ( [ label, state ] ) => {
+			if ( state.isInherited ) {
+				result[ label ] = true;
+			}
+		} );
+		return result;
+	}, [ inheritanceMode, itemStates ] );
+
 	// Derived during render so the panel can never paint a half-built menu.
 	// See: https://github.com/WordPress/gutenberg/pull/65564
 	const menuItems = useMemo( () => {
@@ -299,12 +357,28 @@ export function useToolsPanel(
 			if ( ! item ) {
 				return;
 			}
+			// An inherited item stays shown whatever the menu recorded, so it
+			// comes back once a reset clears the local value it overrode.
 			result[ getMenuGroup( item ) ][ label ] =
-				menuItemValues[ label ] ?? getSeedValue( item );
+				!! inheritedItems[ label ] ||
+				( menuItemValues[ label ] ?? getSeedValue( item ) );
 		} );
 
 		return result;
-	}, [ panelItems, menuItemOrder, menuItemValues ] );
+	}, [ panelItems, menuItemOrder, menuItemValues, inheritedItems ] );
+
+	const itemsWithValue = useMemo( () => {
+		if ( ! inheritanceMode ) {
+			return [];
+		}
+		const registeredLabels = new Set(
+			panelItems.map( ( item ) => item.label )
+		);
+		return menuItemOrder.filter(
+			( label ) =>
+				registeredLabels.has( label ) && itemStates[ label ]?.hasValue
+		);
+	}, [ inheritanceMode, panelItems, menuItemOrder, itemStates ] );
 
 	// Drives the plus icon and the empty panel styling.
 	const areAllOptionalControlsHidden = useMemo( () => {
@@ -334,7 +408,8 @@ export function useToolsPanel(
 				( item ) => item.label === label
 			);
 
-			if ( ! currentItem ) {
+			// An inherited item can't be removed from the panel.
+			if ( ! currentItem || inheritedItems[ label ] ) {
 				return;
 			}
 
@@ -349,7 +424,32 @@ export function useToolsPanel(
 
 			currentItem.onShownChange?.( ! menuItems.optional[ label ] );
 		},
-		[ menuItems, panelItems ]
+		[ inheritedItems, menuItems, panelItems ]
+	);
+
+	// Resets one item from the reset menu. Unlike toggling it off in the panel
+	// menu, the item stays registered as shown only while it is inherited:
+	// with neither a local nor an inherited value left, it hides.
+	const resetItem = useCallback(
+		( label: string ) => {
+			const currentItem = panelItems.find(
+				( item ) => item.label === label
+			);
+
+			if ( ! currentItem ) {
+				return;
+			}
+
+			// Stops the item resetting itself a second time when it sees its
+			// menu entry switch off while it still holds a value.
+			setIsResetting( true );
+			currentItem.onDeselect?.();
+
+			if ( ! currentItem.isShownByDefault ) {
+				panelDispatch( { type: 'UPDATE_VALUE', label, value: false } );
+			}
+		},
+		[ panelItems ]
 	);
 
 	const resetAllFilters = useMemo( () => {
@@ -394,8 +494,12 @@ export function useToolsPanel(
 			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
+			flagItemState,
 			hasMenuItems,
+			inheritanceMode,
+			inheritedItems,
 			isResetting,
+			itemsWithValue,
 			lastDisplayedItem,
 			menuItems,
 			panelId,
@@ -411,7 +515,11 @@ export function useToolsPanel(
 			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
+			flagItemState,
+			inheritanceMode,
+			inheritedItems,
 			isResetting,
+			itemsWithValue,
 			lastDisplayedItem,
 			menuItems,
 			panelId,
@@ -429,6 +537,7 @@ export function useToolsPanel(
 		headingLevel,
 		panelContext,
 		resetAllItems,
+		resetItem,
 		toggleItem,
 		className: classes,
 	};

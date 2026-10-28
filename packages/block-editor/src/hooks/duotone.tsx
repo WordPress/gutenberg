@@ -30,7 +30,10 @@ import {
 	usePrivateStyleOverride,
 } from './utils';
 import { unlock } from '../lock-unlock';
-import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import {
+	default as StylesFiltersPanel,
+	FiltersInspectorToolsPanel,
+} from '../components/global-styles/filters-panel';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
@@ -174,6 +177,7 @@ function DuotonePanelPure( {
 		<>
 			<InspectorControls group="filter">
 				<StylesFiltersPanel
+					as={ FiltersInspectorToolsPanel }
 					// The raw value, not the resolved colors. The panel
 					// decodes it for display, but needs the preset reference
 					// to know which preset is applied: two presets can hold

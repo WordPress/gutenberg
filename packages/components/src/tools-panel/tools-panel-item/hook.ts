@@ -10,18 +10,22 @@ import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import type { ToolsPanelItemProps } from '../types';
+import type { PrivateToolsPanelItemProps, ToolsPanelItemProps } from '../types';
 
 const noop = () => {};
 
 export function useToolsPanelItem(
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
+	props: WordPressComponentProps<
+		ToolsPanelItemProps & PrivateToolsPanelItemProps,
+		'div'
+	>
 ) {
 	const {
 		className,
 		defaultShown,
 		hasValue,
-		isShownByDefault = false,
+		isInherited = false,
+		isShownByDefault: isShownByDefaultProp = false,
 		label,
 		panelId,
 		resetAllFilter = noop,
@@ -43,7 +47,13 @@ export function useToolsPanelItem(
 		lastDisplayedItem,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
+		inheritanceMode,
+		flagItemState,
 	} = useToolsPanelContext();
+
+	// In `inheritanceMode` visibility follows the item's value, so no item is
+	// pinned in place by default.
+	const isShownByDefault = ! inheritanceMode && isShownByDefaultProp;
 
 	// `hasValue` is a new function every render. It can't use `useEvent`
 	// because the panel calls it while deriving the menu during render, which
@@ -73,6 +83,8 @@ export function useToolsPanelItem(
 	// `onShownChange` is a new function every render. `useEvent` gives the item
 	// a stable callback to register, while the panel still invokes the latest.
 	const onShownChangeCallback = useEvent( onShownChange );
+	// Lets the reset menu in `inheritanceMode` reset this item alone.
+	const onDeselectCallback = useEvent( () => onDeselect?.() );
 
 	// A panel spanning a multi-selection has no id of its own, so every item
 	// belongs to it.
@@ -96,6 +108,7 @@ export function useToolsPanelItem(
 			onShownChange: onShownChangeCallback,
 			panelId,
 			resetAllFilter: resetAllFilterCallback,
+			onDeselect: onDeselectCallback,
 		};
 		registerPanelItem( item );
 
@@ -111,6 +124,7 @@ export function useToolsPanelItem(
 		hasValueCallback,
 		isShownByDefault,
 		label,
+		onDeselectCallback,
 		onShownChangeCallback,
 		panelId,
 		registerPanelItem,
@@ -125,6 +139,21 @@ export function useToolsPanelItem(
 	const wasMenuItemCheckedRef = useRef< boolean | undefined >( undefined );
 
 	const isValueSet = hasValue();
+
+	useLayoutEffect( () => {
+		if ( ! hasMatchingPanel || ! inheritanceMode ) {
+			return;
+		}
+
+		flagItemState?.( label, { hasValue: isValueSet, isInherited } );
+	}, [
+		flagItemState,
+		hasMatchingPanel,
+		inheritanceMode,
+		isInherited,
+		isValueSet,
+		label,
+	] );
 
 	// An optional item losing its value must not hide itself, so only default
 	// items report a value going away. Items belonging to another panel stay

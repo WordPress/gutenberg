@@ -310,7 +310,7 @@ export default function TypographyPanel( {
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
 	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
+	// inheritance state is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = (
 		isInherited: boolean,
 		hasLocalOverride: boolean,
@@ -1083,7 +1083,6 @@ export default function TypographyPanel( {
 					) }
 					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
-					hasInlineEndToggle
 					onDeselect={ resetFontSize }
 					isShownByDefault={ defaultControls.fontSize }
 					panelId={ panelId }

@@ -1,13 +1,21 @@
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { isGlobalStylesInheritanceIndicatorUIEnabled } from '../global-styles/inheritance';
+import { unlock } from '../../lock-unlock';
 import type {
 	BlockSupportResetAllFilter,
 	BlockSupportToolsPanelProps,
 } from './types';
+
+const { ToolsPanel } = unlock( componentsPrivateApis );
+
+// Layout controls aren't resolved from Global Styles, so they keep showing by
+// default.
+const GROUPS_WITHOUT_INHERITANCE = [ 'layout' ];
 
 export default function BlockSupportToolsPanel( {
 	children,
@@ -86,6 +94,10 @@ export default function BlockSupportToolsPanel( {
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
 			dropdownMenuProps={ dropdownMenuProps }
+			inheritanceMode={
+				isGlobalStylesInheritanceIndicatorUIEnabled() &&
+				! GROUPS_WITHOUT_INHERITANCE.includes( group )
+			}
 		>
 			{ children }
 		</ToolsPanel>

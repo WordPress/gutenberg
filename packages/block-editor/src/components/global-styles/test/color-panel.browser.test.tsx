@@ -11,6 +11,10 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+import {
+	InheritanceToolsPanel,
+	RESET_MENU_NAME,
+} from './helpers/inheritance-tools-panel';
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -288,7 +292,7 @@ describe( 'ColorPanel — additional elements', () => {
 
 describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'Link color', () => {
-		it( 'exposes an accessible reset when local link.text overrides the inherited value', async () => {
+		it( 'surfaces the panel reset menu when local link.text overrides the inherited value', async () => {
 			const inheritedValue = {
 				elements: { link: { color: { text: '#0000ff' } } },
 			};
@@ -303,14 +307,13 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 					settings={ baseSettings }
 					onChange={ () => {} }
 					panelId="test-panel"
+					as={ InheritanceToolsPanel }
 				/>
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
+				screen.getByRole( 'button', { name: RESET_MENU_NAME } )
+			).toBeInTheDocument();
 		} );
 	} );
 

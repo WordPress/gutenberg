@@ -69,6 +69,24 @@ export type ToolsPanelProps = {
 	__experimentalLastVisibleItemClass?: string;
 };
 
+/**
+ * Props only available through the private `ToolsPanel` export.
+ */
+export type PrivateToolsPanelProps = {
+	/**
+	 * Lets item visibility follow where each control's value comes from.
+	 *
+	 * Items are shown while they hold a value, are inherited (see the private
+	 * `isInherited` item prop), or the user added them from the menu;
+	 * `isShownByDefault` is ignored. The panel menu then only adds and removes
+	 * items, and a separate reset menu, rendered beside it while any item has
+	 * a value, resets individual items or all of them.
+	 *
+	 * @default false
+	 */
+	inheritanceMode?: boolean;
+};
+
 export type ToolsPanelHeaderProps = {
 	/**
 	 * The dropdown menu props to configure the panel's `DropdownMenu`.
@@ -100,6 +118,11 @@ export type ToolsPanelHeaderProps = {
 	 * `onSelect` or `onDeselect` callbacks as appropriate.
 	 */
 	toggleItem: ( label: string ) => void;
+	/**
+	 * Resets a single item's value, used by the reset menu shown in
+	 * `inheritanceMode`.
+	 */
+	resetItem?: ( label: string ) => void;
 };
 
 export type ToolsPanelItem = {
@@ -165,6 +188,20 @@ export type ToolsPanelItem = {
 	panelId?: string | null;
 };
 
+/**
+ * Props only available through the private `ToolsPanelItem` export.
+ */
+export type PrivateToolsPanelItemProps = {
+	/**
+	 * Whether the item's control currently shows an inherited value. In a
+	 * panel using `inheritanceMode`, an inherited item is always shown and
+	 * left out of the panel menu.
+	 *
+	 * @default false
+	 */
+	isInherited?: boolean;
+};
+
 export type ToolsPanelItemProps = ToolsPanelItem & {
 	/**
 	 * The child elements.
@@ -202,6 +239,20 @@ export type RegisteredToolsPanelItem = ToolsPanelItem & {
 	 * doesn't need a second round of effects to gather them.
 	 */
 	resetAllFilter?: ResetAllFilter;
+	/**
+	 * The item's `onDeselect`, collected so the reset menu in
+	 * `inheritanceMode` can reset this item alone.
+	 */
+	onDeselect?: () => void;
+};
+
+/**
+ * Value and inheritance state reported by each item, used in
+ * `inheritanceMode`.
+ */
+export type ToolsPanelItemState = {
+	hasValue: boolean;
+	isInherited: boolean;
 };
 
 export type ToolsPanelMenuItemKey = 'default' | 'optional';
@@ -233,6 +284,18 @@ export type ToolsPanelContext = {
 	) => void;
 	isResetting: boolean;
 	shouldRenderPlaceholderItems: boolean;
+	inheritanceMode?: boolean;
+	/**
+	 * Labels of the items holding a value, in menu order. Only tracked in
+	 * `inheritanceMode`.
+	 */
+	itemsWithValue?: string[];
+	/**
+	 * Labels of the items holding an inherited value. Only tracked in
+	 * `inheritanceMode`.
+	 */
+	inheritedItems?: Record< string, boolean >;
+	flagItemState?: ( label: string, state: ToolsPanelItemState ) => void;
 	areAllOptionalControlsHidden: boolean;
 	firstDisplayedItem?: string;
 	lastDisplayedItem?: string;
@@ -244,4 +307,9 @@ export type ToolsPanelControlsGroupProps = {
 	itemClassName?: string;
 	items: [ string, boolean ][];
 	toggleItem: ( label: string ) => void;
+	/**
+	 * Whether the menu only adds and removes items, leaving resets to the
+	 * separate reset menu.
+	 */
+	isVisibilityOnly?: boolean;
 };

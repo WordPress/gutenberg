@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {
-	__experimentalToolsPanel as ToolsPanel,
+	privateApis as componentsPrivateApis,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,
 	ColorIndicator,
@@ -22,10 +22,10 @@ import {
 	getDuotoneSlugFromPreset,
 } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	InheritanceResetButton,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 import type {
@@ -35,6 +35,8 @@ import type {
 	StyleToolsPanelProps,
 	StyleValue,
 } from './types';
+
+const { ToolsPanel } = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY: never[] = [];
 function useMultiOriginColorPresets< K extends 'duotone' | 'palette' >(
@@ -86,7 +88,8 @@ function FiltersToolsPanel( {
 	value,
 	panelId,
 	children,
-}: StyleToolsPanelProps ) {
+	inheritanceMode = false,
+}: StyleToolsPanelProps & { inheritanceMode?: boolean } ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -99,9 +102,28 @@ function FiltersToolsPanel( {
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
+			inheritanceMode={ inheritanceMode }
 		>
 			{ children }
 		</ToolsPanel>
+	);
+}
+
+/**
+ * The Filters tools panel as the block inspector renders it. The inspector's
+ * `filter` slot has no label, so the panel isn't wrapped in the shared block
+ * support panel and opts into the inheritance mode itself, keeping it
+ * consistent with the other style panels.
+ *
+ * @param props Panel props.
+ * @return The panel.
+ */
+export function FiltersInspectorToolsPanel( props: StyleToolsPanelProps ) {
+	return (
+		<FiltersToolsPanel
+			{ ...props }
+			inheritanceMode={ isGlobalStylesInheritanceIndicatorUIEnabled() }
+		/>
 	);
 }
 
@@ -141,7 +163,6 @@ const renderToggle = (
 	duotone: string[] | 'unset' | undefined,
 	resetConfig: {
 		hasLocalValue: boolean;
-		hasLocalOverride: boolean;
 		onReset: () => void;
 	}
 ) =>
@@ -151,7 +172,7 @@ const renderToggle = (
 	}: Parameters<
 		ComponentProps< typeof Dropdown >[ 'renderToggle' ]
 	>[ 0 ] ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, onReset } = resetConfig;
 		const duotoneButtonRef = useRef< HTMLButtonElement >( undefined );
 
 		const toggleProps = {
@@ -181,21 +202,15 @@ const renderToggle = (
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							size="small"
-							icon={ resetIcon }
-							label={ __( 'Reset' ) }
-							className="block-editor-panel-duotone-settings__reset"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ hasLocalValue && (
+					<Button
+						size="small"
+						icon={ resetIcon }
+						label={ __( 'Reset' ) }
+						className="block-editor-panel-duotone-settings__reset"
+						onClick={ handleReset }
+					/>
+				) }
 			</>
 		);
 	};
@@ -219,7 +234,7 @@ export default function FiltersPanel( {
 		// A color array is returned as is.
 		getValueFromVariable( { settings }, '', rawValue as StyleValue );
 	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
+	// inheritance state is gated on `showInheritanceLabelIndicators`.
 	const inheritanceProps = (
 		isInherited: boolean,
 		hasLocalOverride: boolean,
@@ -289,11 +304,6 @@ export default function FiltersPanel( {
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
-	// Only a local value shadowing an inherited one shows the blue-dot reset.
-	const hasDuotoneLocalOverride =
-		showInheritanceLabelIndicators &&
-		hasDuotone() &&
-		inheritedDuotone !== undefined;
 
 	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
@@ -327,9 +337,6 @@ export default function FiltersPanel( {
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
-					// Toggle renders its own reset dot, so the item must not
-					// add a second.
-					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					<Dropdown
@@ -337,7 +344,6 @@ export default function FiltersPanel( {
 						className="block-editor-global-styles-filters-panel__dropdown"
 						renderToggle={ renderToggle( duotone, {
 							hasLocalValue: hasDuotone(),
-							hasLocalOverride: hasDuotoneLocalOverride,
 							onReset: resetDuotone,
 						} ) }
 						renderContent={ () => (

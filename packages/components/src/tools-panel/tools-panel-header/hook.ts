@@ -14,8 +14,14 @@ export function useToolsPanelHeader(
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelHeader' );
 
-	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
-		useToolsPanelContext();
+	const {
+		menuItems,
+		hasMenuItems,
+		areAllOptionalControlsHidden,
+		inheritanceMode,
+		inheritedItems,
+		itemsWithValue,
+	} = useToolsPanelContext();
 
 	return {
 		...otherProps,
@@ -23,6 +29,10 @@ export function useToolsPanelHeader(
 		defaultControlsItemClassName: styles[ 'default-controls-item' ],
 		dropdownMenuClassName: styles[ 'dropdown-menu' ],
 		hasMenuItems,
+		inheritanceMode: !! inheritanceMode,
+		inheritedItems,
+		itemsWithValue,
+		menuActionsClassName: styles[ 'tools-panel-header-actions' ],
 		headingClassName: styles[ 'tools-panel-heading' ],
 		headingLevel,
 		menuItems,

@@ -9,6 +9,10 @@ import BackgroundPanel, {
 	hasLegacyColorGradientValue,
 } from '../background-panel';
 import type { PanelStyle, StyleSettings } from '../types';
+import {
+	InheritanceToolsPanel,
+	RESET_MENU_NAME,
+} from './helpers/inheritance-tools-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -106,8 +110,8 @@ describe( 'hasBackgroundGradientValue', () => {
 /**
  * Tests for the inherited Global Styles treatment in `BackgroundPanel`.
  *
- * Override state is asserted through the accessible "Reset to inherited
- * value" button.
+ * Override state is asserted through the reset menu of a panel rendered in
+ * the inspector's inheritance mode.
  *
  * Slot inventory:
  *
@@ -229,7 +233,7 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 
 describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	describe( 'Background gradient slot', () => {
-		it( 'applies the local-override className when a local gradient is set', () => {
+		it( 'surfaces the panel reset menu when a local gradient is set', () => {
 			const inheritedValue = {
 				background: {
 					gradient:
@@ -250,14 +254,18 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 					settings={ baseSettings }
 					onChange={ () => {} }
 					panelId="test-panel"
+					as={ InheritanceToolsPanel }
 				/>
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
+				screen.getByRole( 'button', { name: RESET_MENU_NAME } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
 					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'does not commit on mount when at-rest (display-without-commit)', () => {
@@ -284,7 +292,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Background image slot', () => {
-		it( 'exposes an accessible reset-to-inherited button when size/position/repeat settings are enabled', () => {
+		it( 'surfaces the panel reset menu for a local image overriding an inherited one', () => {
 			const inheritedValue = {
 				background: {
 					backgroundImage: {
@@ -314,13 +322,12 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 					} }
 					onChange={ () => {} }
 					panelId="test-panel"
+					as={ InheritanceToolsPanel }
 				/>
 			);
 
 			expect(
-				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
+				screen.getByRole( 'button', { name: RESET_MENU_NAME } )
 			).toBeInTheDocument();
 		} );
 

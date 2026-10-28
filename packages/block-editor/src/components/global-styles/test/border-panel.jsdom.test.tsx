@@ -4,6 +4,10 @@ import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
 import BorderPanel from '../border-panel';
 import type { PresetsPerOrigin, ShadowPreset } from '../types';
+import {
+	InheritanceToolsPanel,
+	RESET_MENU_NAME,
+} from './helpers/inheritance-tools-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -19,12 +23,9 @@ afterEach( () => {
 } );
 
 /**
- * Tests for the inherited Global Styles label treatment in `BorderPanel`.
- * The visual treatment lands on the parent `ToolsPanelItem` via the
- * `.is-inherited-from-global-styles` / `.has-local-override-from-global-styles`
- * class hooks. The inner controls (`BorderBoxControl`,
- * `BorderRadiusControl`, `ShadowPopover`) carry no special className
- * for inheritance state.
+ * Tests for the inherited Global Styles values in `BorderPanel`. Local
+ * overrides are asserted through the reset menu of a panel rendered in the
+ * inspector's inheritance mode.
  *
  * For the input archetype (`BorderRadiusControl`) the inherited value
  * is forwarded as the displayed `values=` while local values are unset, so
@@ -211,6 +212,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 					settings={ settingsAll }
 					onChange={ () => {} }
 					panelId="test-panel"
+					as={ InheritanceToolsPanel }
 				/>
 			);
 
@@ -220,9 +222,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			expect( radiusInput ).toHaveValue( 12 );
 			expect( radiusInput ).not.toHaveAttribute( 'placeholder' );
 			expect(
-				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
+				screen.getByRole( 'button', { name: RESET_MENU_NAME } )
 			).toBeInTheDocument();
 		} );
 
@@ -310,7 +310,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Border box (compound archetype)', () => {
-		it( 'surfaces the accessible reset affordance when a local border is defined', () => {
+		it( 'surfaces the panel reset menu when a local border is defined', () => {
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -335,15 +335,13 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 					settings={ settingsAll }
 					onChange={ () => {} }
 					panelId="test-panel"
+					as={ InheritanceToolsPanel }
 				/>
 			);
 
-			// The local override surfaces the accessible reset affordance.
 			expect(
-				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
+				screen.getByRole( 'button', { name: RESET_MENU_NAME } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'does not bake the inherited radius into the local override when only color/style/width are customised (regression)', async () => {
@@ -351,10 +349,9 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			// border in `BorderBoxControl`, including the inherited
 			// `radius`. Customising color/style/width must not copy
 			// the inherited radius into `value.border.radius` —
-			// otherwise the radius `ToolsPanelItem` flips into the
-			// `has-local-override-from-global-styles` state (and
-			// renders the blue dot) even though the user never
-			// customised the radius.
+			// otherwise the radius `ToolsPanelItem` reads as a local
+			// override even though the user never customised the
+			// radius.
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 			const inheritedValue = {
@@ -418,7 +415,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Shadow (popover-trigger archetype)', () => {
-		it( 'surfaces the accessible reset affordance when a local shadow is set', () => {
+		it( 'surfaces the panel reset menu when a local shadow is set', () => {
 			const inheritedValue = {
 				shadow: 'var:preset|shadow|soft',
 			};
@@ -431,13 +428,12 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 					settings={ settingsAll }
 					onChange={ () => {} }
 					panelId="test-panel"
+					as={ InheritanceToolsPanel }
 				/>
 			);
 
 			expect(
-				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
+				screen.getByRole( 'button', { name: RESET_MENU_NAME } )
 			).toBeInTheDocument();
 		} );
 
@@ -485,7 +481,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders the blue-dot InheritanceResetButton for a local override', () => {
+		it( 'renders the plain remove button, not a reset dot, for a local override', () => {
 			const inheritedValue = { shadow: 'var:preset|shadow|soft' };
 			const value = { shadow: 'var:preset|shadow|hard' };
 
@@ -499,15 +495,13 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 				/>
 			);
 
-			// The local override renders the blue-dot reset (mirroring the
-			// color/gradient controls), not the plain remove button.
 			expect(
-				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
+				screen.getByRole( 'button', { name: /^remove$/i } )
 			).toBeInTheDocument();
 			expect(
-				screen.queryByRole( 'button', { name: /^remove$/i } )
+				screen.queryByRole( 'button', {
+					name: /reset to inherited value/i,
+				} )
 			).not.toBeInTheDocument();
 		} );
 

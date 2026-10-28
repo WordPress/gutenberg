@@ -36,6 +36,10 @@
 	}
 }
 
+.tools-panel-header-actions {
+	flex-shrink: 0;
+}
+
 // Preserve the established specificity so these styles continue to
 // override the DropdownMenu toggle defaults.
 .tools-panel-header.tools-panel-header.tools-panel-header.tools-panel-header {
