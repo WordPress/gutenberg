@@ -30,6 +30,7 @@
  * Writes to `build-php/`, which is never committed.
  */
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import glob from 'fast-glob';
@@ -95,6 +96,32 @@ function getCombinations( variants ) {
 }
 
 /**
+ * The prefix React's generated IDs get in build renders. PHP replaces it with
+ * a prefix per instance, and passes the same prefix to `hydrateRoot()`, so
+ * IDs stay unique on the page and match when React hydrates.
+ */
+const ID_PREFIX = '__wpuiid__';
+
+/**
+ * Turns PHP props into the props the React component takes: `class` becomes
+ * `className`, and the component's `rename` map applies (for example,
+ * `checked` becomes `defaultChecked`, since the page owns the value).
+ *
+ * @param {Object} react    The component's `react` section.
+ * @param {Object} phpProps PHP props.
+ * @return {Object} React props.
+ */
+function getReactProps( react, phpProps ) {
+	const reactProps = { ...react.props };
+	for ( const [ prop, value ] of Object.entries( phpProps ) ) {
+		const reactProp =
+			'class' === prop ? 'className' : ( react.rename?.[ prop ] ?? prop );
+		reactProps[ reactProp ] = value;
+	}
+	return reactProps;
+}
+
+/**
  * Renders a component with React, with placeholders for its content and
  * free-form props, and compacts the renders into a base render plus what
  * each variant value changes.
@@ -147,6 +174,105 @@ function compileMarkup( { props, variants, renderReact } ) {
 		defaults,
 		renders
 	);
+}
+
+/**
+ * Finds the built module of a component, like
+ * `build-module/form/searchable-select-control/index.mjs`.
+ *
+ * @param {string} name Component name, as exported by `@wordpress/ui`.
+ * @return {string} Path of the module.
+ */
+function findModule( name ) {
+	const folder = name.replace(
+		/[A-Z]/g,
+		( letter, index ) => ( index ? '-' : '' ) + letter.toLowerCase()
+	);
+	const [ file ] = glob
+		.sync( `build-module/**/${ folder }/index.mjs`, { cwd: PACKAGE_DIR } )
+		.sort( ( a, b ) => a.length - b.length );
+	if ( ! file ) {
+		throw new Error( `Can't find the module of "${ name }".` );
+	}
+	return path.join( PACKAGE_DIR, file );
+}
+
+/**
+ * Points React imports, including `require()` calls in bundled CommonJS
+ * modules, at the copies WordPress loads as `wp.element`'s dependencies.
+ *
+ * @return {Object} Rolldown plugin.
+ */
+function wordpressGlobals() {
+	const globals = {
+		react: 'React',
+		'react-dom': 'ReactDOM',
+		'react-dom/client': 'ReactDOM',
+		'react/jsx-runtime': 'ReactJSXRuntime',
+	};
+	return {
+		name: 'wordpress-globals',
+		resolveId: ( id ) => ( id in globals ? `\0global:${ id }` : null ),
+		load: ( id ) =>
+			id.startsWith( '\0global:' )
+				? `module.exports = window.${
+						globals[ id.slice( '\0global:'.length ) ]
+					};`
+				: null,
+	};
+}
+
+/**
+ * Bundles `php/interactive.mjs` with the components React mounts or hydrates
+ * in the browser.
+ * React and ReactDOM come from WordPress's own scripts, so they aren't bundled.
+ *
+ * @param {string[]} names Component names, as exported by `@wordpress/ui`.
+ */
+async function bundleInteractive( names ) {
+	const requireFromBuild = createRequire(
+		createRequire( import.meta.url ).resolve(
+			'@wordpress/build/package.json'
+		)
+	);
+	const { build } = await import(
+		pathToFileURL( requireFromBuild.resolve( 'rolldown' ) ).href
+	);
+	const entry = path.join( OUT_DIR, 'interactive-entry.mjs' );
+	await writeFile(
+		entry,
+		[
+			// Each from its own module, so only those components are bundled.
+			...names.map(
+				( name ) =>
+					`import { ${ name } } from ${ JSON.stringify(
+						findModule( name )
+					) };`
+			),
+			`import { startAll } from ${ JSON.stringify(
+				path.join( PACKAGE_DIR, 'php/interactive.mjs' )
+			) };`,
+			`const components = { ${ names.join( ', ' ) } };`,
+			'startAll( components );',
+		].join( '\n' )
+	);
+	await build( {
+		input: entry,
+		// Base UI marks its modules with "use client", which only matters to
+		// server-component bundlers.
+		onLog: ( level, log, handler ) =>
+			'MODULE_LEVEL_DIRECTIVE' === log.code
+				? undefined
+				: handler( level, log ),
+		plugins: [ wordpressGlobals() ],
+		transform: { define: { 'process.env.NODE_ENV': '"production"' } },
+		output: {
+			file: path.join( OUT_DIR, 'interactive.js' ),
+			format: 'iife',
+			minify: true,
+		},
+	} );
+	await rm( entry );
 }
 
 async function main() {
@@ -210,6 +336,7 @@ async function main() {
 	const manifest = { components: {} };
 	const fixtures = [];
 	const examples = [];
+	const interactive = new Set();
 	const usedStylesheets = new Set();
 
 	for ( const file of (
@@ -219,6 +346,39 @@ async function main() {
 			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
 		);
 		const { name, content, props, classes, react } = component;
+
+		// Components that React renders in the browser, over a native
+		// fallback PHP prints. Their markup isn't compared with React's,
+		// since the fallback is different on purpose.
+		if ( 'mount' === component.interactive ) {
+			manifest.components[ name ] = {
+				props,
+				interactive: { how: 'mount', component: react.component },
+			};
+			interactive.add( react.component );
+			const {
+				value,
+				class: className,
+				...rest
+			} = component.example.props;
+			examples.push( {
+				component: name,
+				name: 'example',
+				props: component.example.props,
+				content: null,
+				html: renderToStaticMarkup(
+					createElement( ui[ react.component ], {
+						...rest,
+						className,
+						defaultValue:
+							rest.items.find(
+								( item ) => item.value === value
+							) ?? null,
+					} )
+				),
+			} );
+			continue;
+		}
 		const resolve = ( references ) =>
 			references.map( ( reference ) => {
 				const qualified = reference.includes( ':' )
@@ -263,31 +423,64 @@ async function main() {
 				prop,
 				schema.enum ?? [ false, true ],
 			] );
+		// The example's props and content, for the fixtures and the preview.
+		// Button only needs its label; components with required props, like
+		// SwitchControl, list them in `example`.
+		const example = component.example ?? { content: 'Save changes' };
+		const exampleProps = example.props ?? {};
 		// Plus a custom class, and content that needs escaping, so the tests
 		// also check that PHP escapes it the way React does.
 		const cases = [
 			...getCombinations( variants ).map( ( values ) => ( {
-				props: values,
-				content: 'Save changes',
+				props: { ...exampleProps, ...values },
+				content: example.content,
 			} ) ),
-			{ props: { class: 'my-plugin-button' }, content: 'Save changes' },
-			{ props: {}, content: 'Save & <continue> "now"' },
+			{
+				props: { ...exampleProps, class: 'my-plugin-class' },
+				content: example.content,
+			},
+			...( example.content
+				? [
+						{
+							props: exampleProps,
+							content: 'Save & <continue> "now"',
+						},
+					]
+				: [] ),
 		];
-		const renderReact = ( phpProps, text ) => {
-			const reactProps = { ...react.props };
-			for ( const [ prop, value ] of Object.entries( phpProps ) ) {
-				reactProps[ 'class' === prop ? 'className' : prop ] = value;
-			}
-			return renderToStaticMarkup(
-				createElement( ui[ react.component ], reactProps, text )
+		const renderReact = ( phpProps, text ) =>
+			renderToStaticMarkup(
+				createElement(
+					ui[ react.component ],
+					getReactProps( react, phpProps ),
+					text
+				),
+				// Hydrated components keep React's generated IDs, which PHP
+				// makes unique per instance by replacing this prefix.
+				{ identifierPrefix: ID_PREFIX }
 			);
-		};
 		if ( ! classes ) {
 			manifest.components[ name ] = {
 				content,
 				props,
-				markup: compileMarkup( { props, variants, renderReact } ),
+				markup: compileMarkup( {
+					props,
+					variants,
+					renderReact: ( phpProps, text ) =>
+						renderReact( { ...exampleProps, ...phpProps }, text ),
+				} ),
+				...( 'hydrate' === component.interactive && {
+					interactive: {
+						how: 'hydrate',
+						component: react.component,
+						props: react.props ?? {},
+						rename: react.rename ?? {},
+					},
+				} ),
 			};
+			if ( component.interactive ) {
+				interactive.add( react.component );
+			}
 			for ( const [ key, { classNames } ] of stylesheets ) {
 				const markup = JSON.stringify(
 					manifest.components[ name ].markup
@@ -306,31 +499,31 @@ async function main() {
 			fixtures.push( {
 				component: name,
 				props: phpProps,
-				content: text,
+				content: text ?? null,
 				html: renderReact( phpProps, text ),
 			} );
 		}
 
-		// For the preview page: the default, then each value on its own.
-		const exampleContent = 'Save changes';
+		// For the preview page: the example, then each value on its own.
 		examples.push( {
 			component: name,
 			name: 'example',
-			props: {},
-			content: exampleContent,
-			html: renderReact( {}, exampleContent ),
+			props: exampleProps,
+			content: example.content ?? null,
+			html: renderReact( exampleProps, example.content ),
 		} );
 		for ( const [ prop, values ] of variants ) {
 			for ( const value of values ) {
 				if ( value === ( props[ prop ].default ?? false ) ) {
 					continue;
 				}
+				const valueProps = { ...exampleProps, [ prop ]: value };
 				examples.push( {
 					component: name,
 					name: `${ prop }: ${ value }`,
-					props: { [ prop ]: value },
-					content: exampleContent,
-					html: renderReact( { [ prop ]: value }, exampleContent ),
+					props: valueProps,
+					content: example.content ?? null,
+					html: renderReact( valueProps, example.content ),
 				} );
 			}
 		}
@@ -353,6 +546,9 @@ async function main() {
 		path.join( OUT_DIR, 'examples.json' ),
 		JSON.stringify( examples, null, '\t' ) + '\n'
 	);
+	if ( interactive.size ) {
+		await bundleInteractive( [ ...interactive ] );
+	}
 	await writeFile(
 		path.join( OUT_DIR, 'test/fixtures.json' ),
 		JSON.stringify( fixtures, null, '\t' ) + '\n'
