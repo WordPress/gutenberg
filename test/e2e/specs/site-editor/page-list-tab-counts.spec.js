@@ -67,20 +67,21 @@ async function trashTwoPages( page, requestUtils ) {
 	await failChangesToPage( page, failing.id );
 }
 
-// The bulk actions show in the table header, apart from each row's own actions.
+// The bulk actions show in a toolbar over the table header, outside the table
+// and apart from each row's own actions, such as Restore.
 const getBulkAction = ( page, name ) =>
 	page
-		.getByRole( 'table' )
-		.getByRole( 'rowgroup' )
-		.first()
+		.locator( '.dataviews-view-table__bulk-actions-overlay' )
 		.getByRole( 'button', { name, exact: true } );
 
 async function selectAllInTrash( page ) {
 	await getTab( page, 'Trash' ).click();
-	const table = page.getByRole( 'table' );
-	await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+	await page
+		.getByRole( 'table' )
+		.getByRole( 'checkbox', { name: 'Select all' } )
+		.click();
 	await expect(
-		table.getByRole( 'checkbox', { name: 'Deselect all' } )
+		page.getByRole( 'checkbox', { name: 'Deselect all', exact: true } )
 	).toBeChecked();
 }
 
@@ -260,7 +261,7 @@ test.describe( 'Page List status tab counts', () => {
 		await expectCounts( page, { 'All Pages': 2, Trash: 2 } );
 
 		await selectAllInTrash( page );
-		await getBulkAction( page, 'Permanently delete…' ).click();
+		await getBulkAction( page, 'Permanently delete' ).click();
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete permanently' } )
