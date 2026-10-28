@@ -223,6 +223,7 @@ type Message = {
 	description: string;
 	politeness?: 'polite' | 'assertive';
 	spokenMessage?: string;
+	announcementKey?: number;
 };
 
 export const DynamicNotices: StoryObj< typeof Notice.List > = {
@@ -268,12 +269,13 @@ export const DynamicNotices: StoryObj< typeof Notice.List > = {
 					</Button>
 					<Button
 						disabled={ ! messages.length }
-						onClick={ () =>
+						onClick={ () => {
 							setMessages( ( previous ) =>
 								previous.map( ( message, index ) =>
 									index === previous.length - 1
 										? {
 												...message,
+												announcementKey: nextId,
 												spokenMessage:
 													'The latest notice has been updated.',
 												description:
@@ -281,8 +283,9 @@ export const DynamicNotices: StoryObj< typeof Notice.List > = {
 											}
 										: message
 								)
-							)
-						}
+							);
+							setNextId( ( previous ) => previous + 1 );
+						} }
 					>
 						Update latest notice
 					</Button>
@@ -294,6 +297,7 @@ export const DynamicNotices: StoryObj< typeof Notice.List > = {
 							intent={ message.intent }
 							politeness={ message.politeness }
 							spokenMessage={ message.spokenMessage }
+							announcementKey={ message.announcementKey }
 						>
 							<Notice.Title>
 								{ message.intent === 'error'

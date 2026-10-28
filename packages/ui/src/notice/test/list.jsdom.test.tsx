@@ -220,6 +220,38 @@ describe( 'Notice.List', () => {
 		);
 	} );
 
+	it( 'announces an identical message when its announcementKey changes', async () => {
+		const renderNotice = ( announcementKey: number ) => (
+			<Notice.List>
+				<Message announcementKey={ announcementKey } />
+			</Notice.List>
+		);
+		const { rerender } = render( renderNotice( 0 ) );
+		const status = screen.getByRole( 'status' );
+		expect( status ).toBeEmptyDOMElement();
+		const action = screen.getByRole( 'button', { name: 'Undo' } );
+
+		rerender( renderNotice( 1 ) );
+		await waitFor( () =>
+			expect( status ).toHaveTextContent(
+				'Draft saved. Your draft has been saved.'
+			)
+		);
+		const previousMessage = within( status ).getByText(
+			'Draft saved. Your draft has been saved.'
+		);
+
+		rerender( renderNotice( 2 ) );
+		await waitFor( () =>
+			expect(
+				within( status ).getByText(
+					'Draft saved. Your draft has been saved.'
+				)
+			).not.toBe( previousMessage )
+		);
+		expect( screen.getByRole( 'button', { name: 'Undo' } ) ).toBe( action );
+	} );
+
 	it( 'does not repeat existing notices after a modal hides their ancestor', async () => {
 		const renderNotices = ( count: number ) => (
 			<div role="group" aria-label="Modal background">

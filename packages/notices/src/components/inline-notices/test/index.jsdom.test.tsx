@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
@@ -226,44 +226,6 @@ describe( 'InlineNotices', () => {
 			).toBeInTheDocument();
 			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
-		} );
-
-		it( 'announces repeated notifications with the same ID', async () => {
-			const { registry } = renderInlineNotices();
-			await act( async () => {
-				registry
-					.dispatch( noticesStore )
-					.createNotice( 'error', 'Updating failed.', {
-						id: 'editor-save',
-					} );
-			} );
-
-			await act( async () => {
-				registry
-					.dispatch( noticesStore )
-					.createNotice( 'error', 'Publishing failed.', {
-						id: 'editor-save',
-					} );
-			} );
-			const previousMessage = within(
-				screen.getByRole( 'alert' )
-			).getByText( 'Publishing failed.' );
-
-			await act( async () => {
-				registry
-					.dispatch( noticesStore )
-					.createNotice( 'error', 'Publishing failed.', {
-						id: 'editor-save',
-					} );
-			} );
-
-			await waitFor( () => {
-				expect(
-					within( screen.getByRole( 'alert' ) ).getByText(
-						'Publishing failed.'
-					)
-				).not.toBe( previousMessage );
-			} );
 		} );
 	} );
 } );
