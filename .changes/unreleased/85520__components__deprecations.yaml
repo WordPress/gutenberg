@@ -1,0 +1,6 @@
+project: components
+kind: Deprecations
+body: '`ProgressBar`: Deprecate in favor of `Progress` from `@wordpress/ui`'
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85520'

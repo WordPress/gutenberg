@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `DropdownMenu`: Keep the height of `MenuItem` consistent regardless of whether
+    it has an icon
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85503'

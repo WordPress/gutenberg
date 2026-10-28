@@ -1,0 +1,9 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls:
+    Use solid brand highlights for hovered and keyboard-highlighted popup items
+    and their supporting content
+time: '2026-10-28T06:38:07.091Z'
+custom:
+    PR: '84087'

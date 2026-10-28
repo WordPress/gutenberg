@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state
+    update after every render
+time: '2026-10-28T06:38:07.091Z'
+custom:
+    PR: '85479'

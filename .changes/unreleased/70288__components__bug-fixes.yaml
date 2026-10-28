@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `BoxControl`: Prevent the slider from saving values without a unit, such as
+    after a reset or when switching from a preset to a custom value
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '70288'
