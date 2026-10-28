@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `PostPublishPanel`: The pre-publish panel of a page lists the Navigation Menus the page appears in once it is published, the ones that already link to it and the ones that add a link to it, with a link to each menu.
+
 ### Enhancements
 
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).

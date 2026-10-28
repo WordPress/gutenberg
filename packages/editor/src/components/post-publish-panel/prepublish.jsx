@@ -14,6 +14,7 @@ import MaybePostFormatPanel from './maybe-post-format-panel';
 import { store as editorStore } from '../../store';
 import MaybeCategoryPanel from './maybe-category-panel';
 import MaybeUploadMedia from './maybe-upload-media';
+import MaybeNavigationMenusPanel from './maybe-navigation-menus-panel';
 
 function PostPublishPanelPrepublish( { children } ) {
 	const {
@@ -140,6 +141,7 @@ function PostPublishPanelPrepublish( { children } ) {
 			<MaybePostFormatPanel />
 			<MaybeTagsPanel />
 			<MaybeCategoryPanel />
+			<MaybeNavigationMenusPanel />
 			{ children }
 		</div>
 	);
