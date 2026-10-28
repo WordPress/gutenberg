@@ -23,7 +23,6 @@ import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
 import Spinner from '../spinner';
 import styles from './style.module.scss';
-import { useKeyboardNavigation } from '../utils/hooks/use-keyboard-navigation';
 
 const noop = () => {};
 
@@ -101,11 +100,6 @@ const getIndexOfMatchingSuggestion = (
  * ```
  */
 function ComboboxControl( props: ComboboxControlProps ) {
-	const {
-		isKeyboardNavigation,
-		onKeyDown: onNavigationKeyDown,
-		onPointer,
-	} = useKeyboardNavigation();
 	const {
 		value: valueProp,
 		label,
@@ -321,9 +315,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			>
 				<div
 					className="components-combobox-control__suggestions-container"
-					onKeyDownCapture={ onNavigationKeyDown }
-					onPointerMoveCapture={ onPointer }
-					onPointerDownCapture={ onPointer }
 					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
@@ -365,7 +356,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					</Flex>
 					{ isExpanded && ! isLoading && (
 						<SuggestionsList
-							isKeyboardNavigation={ isKeyboardNavigation }
 							instanceId={ instanceId }
 							// The empty string for `value` here is not actually used, but is
 							// just a quick way to satisfy the TypeScript requirements of SuggestionsList.

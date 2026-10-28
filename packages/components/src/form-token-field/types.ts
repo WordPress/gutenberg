@@ -213,7 +213,6 @@ export interface SuggestionsListProps<
 	T = string | ( Record< string, unknown > & { value: string } ),
 > {
 	selectedIndex: number;
-	isKeyboardNavigation?: boolean;
 	scrollIntoView: boolean;
 	match: T;
 	onHover: ( suggestion: T ) => void;
