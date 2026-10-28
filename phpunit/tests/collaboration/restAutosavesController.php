@@ -108,10 +108,11 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	 * @param string      $title         Autosaved post title.
 	 * @param string      $content       Autosaved post content.
 	 * @param array       $meta          Autosaved post meta.
-	 * @param string|null $crdt_snapshot CRDT snapshot describing the autosaved content.
+	 * @param string|null $crdt_snapshot  CRDT snapshot describing the autosaved content.
+	 * @param bool        $recovery_point Whether to store the content as a permanent revision.
 	 * @return WP_REST_Response Autosave response.
 	 */
-	private function dispatch_autosave( int $post_id, string $title, string $content, array $meta = array(), ?string $crdt_snapshot = null ): WP_REST_Response {
+	private function dispatch_autosave( int $post_id, string $title, string $content, array $meta = array(), ?string $crdt_snapshot = null, bool $recovery_point = false ): WP_REST_Response {
 		$request = new WP_REST_Request( 'POST', "/wp/v2/posts/{$post_id}/autosaves" );
 		$request->set_url_params( array( 'id' => $post_id ) );
 		$body_params = array(
@@ -125,6 +126,9 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$request->set_body_params( $body_params );
 		if ( null !== $crdt_snapshot ) {
 			$request->set_param( 'crdt_snapshot', $crdt_snapshot );
+		}
+		if ( $recovery_point ) {
+			$request->set_param( Gutenberg_REST_Autosaves_Controller::CRDT_RECOVERY_POINT_PARAM, true );
 		}
 
 		/*
@@ -142,6 +146,35 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		}
 
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Handles a recovery point request with the Gutenberg controller.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $title   Title of the content to store.
+	 * @param string $content Content to store.
+	 * @return WP_REST_Response Autosave response.
+	 */
+	private function dispatch_recovery_point( int $post_id, string $title, string $content ): WP_REST_Response {
+		return $this->dispatch_autosave( $post_id, $title, $content, array(), null, true );
+	}
+
+	/**
+	 * Returns the permanent revisions of a post, excluding autosaves, newest first.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return WP_Post[] Revisions.
+	 */
+	private function get_permanent_revisions( int $post_id ): array {
+		return array_values(
+			array_filter(
+				wp_get_post_revisions( $post_id ),
+				static function ( WP_Post $revision ) {
+					return ! wp_is_post_autosave( $revision );
+				}
+			)
+		);
 	}
 
 	/**
@@ -773,5 +806,76 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
 		$this->assertInstanceOf( WP_Post::class, $autosave );
 		$this->assertSame( '', get_post_meta( $autosave->ID, self::CRDT_SNAPSHOT_META_KEY, true ) );
+	}
+
+	public function test_recovery_point_stores_a_permanent_revision_without_touching_the_parent_or_autosave() {
+		$original_title   = 'Original recovery point draft title';
+		$original_content = '<!-- wp:paragraph --><p>Original recovery point draft content</p><!-- /wp:paragraph -->';
+		$post_id          = $this->create_draft( $original_title, $original_content );
+
+		// The peer has been editing, so it has an autosave already.
+		$autosaved_title   = 'Autosaved title before the recovery point';
+		$autosaved_content = '<!-- wp:paragraph --><p>Autosaved content before the recovery point</p><!-- /wp:paragraph -->';
+		$this->dispatch_autosave( $post_id, $autosaved_title, $autosaved_content );
+		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $autosave );
+		$this->assertSame( array(), $this->get_permanent_revisions( $post_id ) );
+
+		$lost_title   = 'Title replaced by another document';
+		$lost_content = '<!-- wp:paragraph --><p>Content replaced by another document</p><!-- /wp:paragraph -->';
+		$response     = $this->dispatch_recovery_point( $post_id, $lost_title, $lost_content );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$revisions = $this->get_permanent_revisions( $post_id );
+		$this->assertCount( 1, $revisions );
+		$revision = $revisions[0];
+		$this->assertSame( $revision->ID, $response->get_data()['id'] );
+		$this->assertSame( $post_id, $revision->post_parent );
+		$this->assertSame( $lost_title, $revision->post_title );
+		$this->assertSame( $lost_content, $revision->post_content );
+
+		$post = get_post( $post_id );
+		$this->assertSame( $original_title, $post->post_title );
+		$this->assertSame( $original_content, $post->post_content );
+
+		$autosave_after = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertSame( $autosave->ID, $autosave_after->ID );
+		$this->assertSame( $autosaved_title, $autosave_after->post_title );
+		$this->assertSame( $autosaved_content, $autosave_after->post_content );
+	}
+
+	public function test_recovery_point_does_not_store_a_crdt_snapshot() {
+		$post_id = $this->create_draft( 'Recovery point snapshot draft title', '<!-- wp:paragraph --><p>Recovery point snapshot draft content</p><!-- /wp:paragraph -->' );
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Recovery point with a snapshot title',
+			'<!-- wp:paragraph --><p>Recovery point with a snapshot content</p><!-- /wp:paragraph -->',
+			array(),
+			'snapshot',
+			true
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$revisions = $this->get_permanent_revisions( $post_id );
+		$this->assertCount( 1, $revisions );
+		$this->assertSame( '', get_post_meta( $revisions[0]->ID, self::CRDT_SNAPSHOT_META_KEY, true ) );
+	}
+
+	public function test_recovery_point_flag_is_ignored_when_collaboration_is_disabled() {
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+
+		$post_id = $this->create_draft( 'Original title without collaboration', 'Original content without collaboration' );
+		$title   = 'Updated title without collaboration';
+		$content = '<!-- wp:paragraph --><p>Updated content without collaboration</p><!-- /wp:paragraph -->';
+
+		$response = $this->dispatch_recovery_point( $post_id, $title, $content );
+
+		$this->assertSame( 200, $response->get_status() );
+		// Core updates the author's own draft directly.
+		$this->assertSame( $title, get_post( $post_id )->post_title );
+		$this->assertFalse( wp_get_post_autosave( $post_id, self::$author_id ) );
 	}
 }
