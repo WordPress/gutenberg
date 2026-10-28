@@ -676,6 +676,10 @@ describe( 'useHasTypographyPanel', () => {
 						// Only the slug and family are read.
 						theme: [
 							{
+								slug: 'serif',
+								fontFamily: 'serif',
+							} as FontFamilyPreset,
+							{
 								slug: 'sans',
 								fontFamily: 'sans-serif',
 							} as FontFamilyPreset,
