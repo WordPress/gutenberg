@@ -72,6 +72,7 @@
 -   `CustomGradientPicker`: Keep the color interpolation method of a gradient, such as `in oklch`, when editing it, instead of replacing the gradient with the default one ([#84383](https://github.com/WordPress/gutenberg/pull/84383)).
 -   `BaseControl`: Remove the unsupported `as` prop from the component types and documentation ([#70064](https://github.com/WordPress/gutenberg/pull/70064)).
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
+-   `DropdownMenu`, `MenuItem`, `Autocomplete`: Synchronize the active item with pointer movement and keyboard navigation ([#85487](https://github.com/WordPress/gutenberg/pull/85487)).
 
 ### Internal
 
