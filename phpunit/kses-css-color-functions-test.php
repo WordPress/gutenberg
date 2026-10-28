@@ -32,6 +32,7 @@ class Gutenberg_Kses_CSS_Color_Functions_Test extends WP_UnitTestCase {
 			'hex in color-mix()'          => array( 'color: color-mix(in srgb, #fff 50%, #000)' ),
 			'hex in light-dark()'         => array( 'color: light-dark(#fff, #000)' ),
 			'color() with a colour space' => array( 'color: color(display-p3 1 0 0)' ),
+			'four levels of nesting'      => array( 'color: light-dark(color-mix(in srgb, rgb(from hsl(200 50% 40%) r g b) 50%, #fff), #000)' ),
 		);
 	}
 
@@ -51,21 +52,40 @@ class Gutenberg_Kses_CSS_Color_Functions_Test extends WP_UnitTestCase {
 	 */
 	public function data_dropped_declarations() {
 		return array(
-			'non-colour function inside'    => array( 'color: rgb(foo(1) 0 0)' ),
-			'wrapped in unknown function'   => array( 'color: foo(rgb(0 0 0))' ),
-			'closing brace in contents'     => array( 'color: rgb(0 } 0)' ),
-			'comment in contents'           => array( 'color: rgb(0 /* x */ 0)' ),
-			'backslash in contents'         => array( 'color: rgb(0 \\30 0)' ),
-			'unclosed bracket'              => array( 'color: rgb(0 0 0' ),
-			'prefixed name'                 => array( 'color: x-rgb(0 0 0)' ),
-			'nesting beyond the pass limit' => array( 'color: ' . str_repeat( 'rgb(', 40 ) . '0' . str_repeat( ')', 40 ) ),
-			'comment after function'        => array( 'color: rgb(0 0 0) /* x */' ),
-			'backslash after function'      => array( 'color: rgb(0 0 0) \\30' ),
-			'bracket after function'        => array( 'color: rgb(0 0 0) (' ),
-			'ampersand after function'      => array( 'color: rgb(0 0 0) &' ),
-			'equals after function'         => array( 'color: rgb(0 0 0) =' ),
-			'closing brace after function'  => array( 'color: rgb(0 0 0) }' ),
+			'non-colour function inside'   => array( 'color: rgb(foo(1) 0 0)' ),
+			'wrapped in unknown function'  => array( 'color: foo(rgb(0 0 0))' ),
+			'closing brace in contents'    => array( 'color: rgb(0 } 0)' ),
+			'comment in contents'          => array( 'color: rgb(0 /* x */ 0)' ),
+			'backslash in contents'        => array( 'color: rgb(0 \\30 0)' ),
+			'unclosed bracket'             => array( 'color: rgb(0 0 0' ),
+			'prefixed name'                => array( 'color: x-rgb(0 0 0)' ),
+			'comment after function'       => array( 'color: rgb(0 0 0) /* x */' ),
+			'backslash after function'     => array( 'color: rgb(0 0 0) \\30' ),
+			'bracket after function'       => array( 'color: rgb(0 0 0) (' ),
+			'ampersand after function'     => array( 'color: rgb(0 0 0) &' ),
+			'equals after function'        => array( 'color: rgb(0 0 0) =' ),
+			'closing brace after function' => array( 'color: rgb(0 0 0) }' ),
 		);
+	}
+
+	public function test_nesting_up_to_the_pass_limit_is_kept() {
+		$css = 'color: ' . str_repeat( 'rgb(', 4 ) . '0' . str_repeat( ')', 4 );
+
+		$this->assertSame( $css, safecss_filter_attr( $css ) );
+	}
+
+	public function test_nesting_beyond_the_pass_limit_is_dropped() {
+		$removed = remove_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', PHP_INT_MIN );
+		$in_core = '' !== safecss_filter_attr( 'color: rgb(0 0 0)' );
+		if ( $removed ) {
+			add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', PHP_INT_MIN, 2 );
+		}
+		if ( $in_core ) {
+			// Core applies its own limit first, and then the shim gets the remainder. Core tests the limit itself.
+			$this->markTestSkipped( 'Core already allows color functions.' );
+		}
+
+		$this->assertSame( '', safecss_filter_attr( 'color: ' . str_repeat( 'rgb(', 5 ) . '0' . str_repeat( ')', 5 ) ) );
 	}
 
 	public function test_style_engine_keeps_box_shadow_with_rgba() {
@@ -80,14 +100,12 @@ class Gutenberg_Kses_CSS_Color_Functions_Test extends WP_UnitTestCase {
 	 * @param int $priority Priority of the rejecting filter.
 	 */
 	public function test_does_not_override_another_filters_rejection( $priority ) {
-		$reject = static function ( $allow_css, $css_test_string ) {
-			return 'color: rgb(0 0 0)' === $css_test_string ? false : $allow_css;
-		};
-		add_filter( 'safecss_filter_attr_allow_css', $reject, $priority, 2 );
+		// Core passes the filter the test string with color functions already replaced, so match on nothing in it.
+		add_filter( 'safecss_filter_attr_allow_css', '__return_false', $priority );
 
 		$result = safecss_filter_attr( 'color: rgb(0 0 0)' );
 
-		remove_filter( 'safecss_filter_attr_allow_css', $reject, $priority );
+		remove_filter( 'safecss_filter_attr_allow_css', '__return_false', $priority );
 
 		$this->assertSame( '', $result );
 	}

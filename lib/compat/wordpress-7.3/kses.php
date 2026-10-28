@@ -11,8 +11,8 @@
  * Replaces each color function whose contents are plain color syntax,
  * innermost first, then reruns Core's leftover check.
  *
- * Runs at the lowest priority so it acts like Core's own check, and a later
- * filter can still reject the declaration.
+ * Hooked at PHP_INT_MIN so it runs before any other filter, like Core's own
+ * check. A filter at any later priority can still reject the declaration.
  *
  * @param bool   $allow_css       Whether the CSS is allowed.
  * @param string $css_test_string The CSS declaration to test.
@@ -25,7 +25,12 @@ function gutenberg_allow_css_color_functions( $allow_css, $css_test_string ) {
 		return $allow_css;
 	}
 
-	for ( $pass = 0; $pass < 32; $pass++ ) {
+	/*
+	 * Each pass replaces the innermost color functions, so 4 passes allow 4 levels
+	 * of nesting. That is the deepest real combination, for example:
+	 * light-dark(color-mix(in srgb, rgb(from hsl(200 50% 40%) r g b) 50%, #fff), #000)
+	 */
+	for ( $pass = 0; $pass < 4; $pass++ ) {
 		$count = preg_match_all( $color_function, $css_test_string, $matches );
 
 		if ( false === $count ) {
@@ -33,7 +38,7 @@ function gutenberg_allow_css_color_functions( $allow_css, $css_test_string ) {
 		}
 
 		if ( 0 === $count ) {
-			return 0 === preg_match( '%[\\\(&=}]|/\*%', $css_test_string );
+			break;
 		}
 
 		foreach ( $matches[1] as $contents ) {
@@ -49,6 +54,6 @@ function gutenberg_allow_css_color_functions( $allow_css, $css_test_string ) {
 		}
 	}
 
-	return $allow_css;
+	return 0 === preg_match( '%[\\\(&=}]|/\*%', $css_test_string );
 }
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', PHP_INT_MIN, 2 );
