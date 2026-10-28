@@ -2,7 +2,6 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import { DirectionProvider } from '../utils/direction-provider';
 import { MenuContext, MenuGroupContext } from './context';
 import type { RootProps } from './types';
-import { useIframeDismissalBridge } from '../utils/use-iframe-dismissal-bridge';
 
 /**
  * Groups all parts of a menu.
@@ -62,22 +61,15 @@ function Root( props: RootProps ) {
 			trigger.focus();
 		}
 	};
-	const iframeDismissalProps = useIframeDismissalBridge<
-		_Menu.Root.Actions,
-		_Menu.Root.ChangeEventDetails
-	>( {
-		actionsRef: props.actionsRef,
-		defaultOpen: props.defaultOpen,
-		modal: props.modal,
-		onOpenChange: handleOpenChange,
-		open: props.open,
-	} );
 
 	return (
 		<DirectionProvider>
 			<MenuContext.Provider value={ { isSubmenu: false } }>
 				<MenuGroupContext.Provider value={ null }>
-					<_Menu.Root { ...props } { ...iframeDismissalProps } />
+					<_Menu.Root
+						{ ...props }
+						onOpenChange={ handleOpenChange }
+					/>
 				</MenuGroupContext.Provider>
 			</MenuContext.Provider>
 		</DirectionProvider>
