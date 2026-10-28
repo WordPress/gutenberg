@@ -15,6 +15,7 @@ import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import { mergeBlockAttributesKey } from '../private-keys';
 import type { BlockEditorThunkArgs, InserterMediaCategory } from '../types';
 
 const { editableRootKey } = unlock( blocksPrivateApis );
@@ -1319,6 +1320,7 @@ describe( 'actions', () => {
 					offset: 0,
 				} ),
 				getBlockEditingMode: () => 'default',
+				getSettings: () => ( {} ),
 			};
 			const dispatch = Object.assign( vi.fn(), {
 				replaceBlocks: vi.fn(),
@@ -1350,6 +1352,95 @@ describe( 'actions', () => {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: { content: 'chicken ribs' },
+					} ),
+				],
+				0
+			);
+		} );
+
+		it( 'should let the editor settings adjust the merged attributes', () => {
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content: {},
+						metadata: {},
+					},
+					merge( attributes, attributesToMerge ) {
+						return {
+							content: `${ attributes.content }${ attributesToMerge.content }`,
+						};
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken', metadata: { id: 'a' } },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs', metadata: { id: 'b' } },
+				innerBlocks: [],
+			} );
+			const mergeBlockAttributes = vi.fn(
+				( attributes, _blockA, { attributes: { metadata } } ) => ( {
+					...attributes,
+					metadata: {
+						id: [ attributes.metadata.id, metadata.id ],
+					},
+				} )
+			);
+
+			const select = {
+				getBlock: ( clientId: string ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getBlockEditingMode: () => 'default',
+				getSettings: () => ( {
+					[ mergeBlockAttributesKey ]: mergeBlockAttributes,
+				} ),
+			};
+			const dispatch = Object.assign( vi.fn(), {
+				replaceBlocks: vi.fn(),
+				selectionChange: vi.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
+
+			expect( mergeBlockAttributes ).toHaveBeenCalledWith(
+				{ content: 'chickenribs', metadata: { id: 'a' } },
+				blockA,
+				blockB
+			);
+			expect( dispatch.replaceBlocks ).toHaveBeenCalledWith(
+				[ 'chicken', 'ribs' ],
+				[
+					expect.objectContaining( {
+						clientId: 'chicken',
+						attributes: {
+							content: 'chickenribs',
+							metadata: { id: [ 'a', 'b' ] },
+						},
 					} ),
 				],
 				0
@@ -1492,6 +1583,7 @@ describe( 'actions', () => {
 					offset: 0,
 				} ),
 				getBlockEditingMode: () => 'default',
+				getSettings: () => ( {} ),
 			};
 			const dispatch = Object.assign( vi.fn(), {
 				replaceBlocks: vi.fn(),

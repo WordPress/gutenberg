@@ -32,6 +32,7 @@ import {
 	editContentOnlySection,
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
+import { mergeBlockAttributesKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockEditingMode,
@@ -1584,15 +1585,35 @@ export const mergeBlocks =
 			);
 		}
 
+		// The block type's `merge` only knows about its own attributes, so the
+		// editor can carry over what it attaches to blocks, such as notes.
+		const mergeBlockAttributes = (
+			select.getSettings() as Record< symbol, unknown >
+		 )[ mergeBlockAttributesKey ] as
+			| ( (
+					attributes: Record< string, unknown >,
+					blockA: Block,
+					blockB: Block
+			  ) => Record< string, unknown > )
+			| undefined;
+		let mergedAttributes = {
+			...blockA.attributes,
+			...updatedAttributes,
+		};
+		if ( mergeBlockAttributes ) {
+			mergedAttributes = mergeBlockAttributes(
+				mergedAttributes,
+				blockA,
+				blockB
+			);
+		}
+
 		dispatch.replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],
 			[
 				{
 					...blockA,
-					attributes: {
-						...blockA.attributes,
-						...updatedAttributes,
-					},
+					attributes: mergedAttributes,
 				},
 				...blocksWithTheSameType.slice( 1 ),
 			],
