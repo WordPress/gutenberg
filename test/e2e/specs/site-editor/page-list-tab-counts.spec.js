@@ -1,17 +1,22 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-// Whether the run targets the extensible site editor (v2). Only its Pages
-// screen renders the view list as tabs, which is where the counts show.
+// Whether the run targets the extensible site editor (v2). Its Pages screen
+// renders the view list as tabs, the classic editor's as sidebar buttons.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
-// Each tab trails its label with the item count, as in "Drafts 3".
+// Each view trails its label with the item count, as in "Drafts 3".
+const getCountName = ( label, count = '[\\d,]+' ) =>
+	new RegExp( `^${ label } ?${ count }$` );
+
 const getTab = ( page, label ) =>
-	page.getByRole( 'tab', { name: new RegExp( `^${ label } [\\d,]+$` ) } );
+	page.getByRole( isSiteEditorV2 ? 'tab' : 'button', {
+		name: getCountName( label ),
+	} );
 
 async function expectCounts( page, counts ) {
 	for ( const [ label, count ] of Object.entries( counts ) ) {
 		await expect( getTab( page, label ) ).toHaveAccessibleName(
-			`${ label } ${ count }`
+			getCountName( label, count )
 		);
 	}
 }
@@ -85,9 +90,7 @@ async function selectAllInTrash( page ) {
 	).toBeChecked();
 }
 
-test.describe( 'Page List status tab counts', () => {
-	test.skip( ! isSiteEditorV2, 'Only the v2 Pages screen renders tabs.' );
-
+test.describe( 'Page List status counts', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
@@ -212,13 +215,16 @@ test.describe( 'Page List status tab counts', () => {
 	test( 'updates the counts after publishing a draft in the editor', async ( {
 		page,
 	} ) => {
-		// The row links both the thumbnail and the title to the editor.
+		// The row opens the editor from both the thumbnail and the title: as
+		// links in v2, as buttons in the classic editor.
 		await page
 			.getByRole( 'row', { name: /Draft Page/ } )
-			.getByRole( 'link', { name: 'Draft Page' } )
+			.getByRole( isSiteEditorV2 ? 'link' : 'button', {
+				name: 'Draft Page',
+			} )
 			.last()
 			.click();
-		// The v2 editor publishes from the header, without a pre-publish panel.
+		// The site editor publishes from the header, without a pre-publish panel.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Publish', exact: true } )

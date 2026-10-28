@@ -62,13 +62,13 @@ test.describe( 'Pages View Persistence', () => {
 		);
 		await expect( modifiedIndicator ).toBeVisible();
 
-		// Navigate to Drafts view. The v2 tab trails its label with the item
+		// Navigate to Drafts view. The view trails its label with the item
 		// count, as in "Drafts 1".
-		await (
-			isSiteEditorV2
-				? page.getByRole( 'tab', { name: /^Drafts(?: [\d,]+)?$/ } )
-				: page.getByRole( 'button', { name: 'Drafts', exact: true } )
-		).click();
+		await page
+			.getByRole( isSiteEditorV2 ? 'tab' : 'button', {
+				name: /^Drafts ?[\d,]*$/,
+			} )
+			.click();
 
 		// With unified persistence, Drafts tab should also show the changed
 		// layout since all tabs share the same persisted view
