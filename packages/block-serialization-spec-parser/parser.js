@@ -255,8 +255,8 @@
             /** <?php return json_decode( $attrs, true ); ?> **/
             return maybeJSON( attrs );
           },
-        peg$c32 = /^[ \t\r\n]/,
-        peg$c33 = peg$classExpectation([" ", "\t", "\r", "\n"], false, false),
+        peg$c32 = /^[ \t\f\r\n]/,
+        peg$c33 = peg$classExpectation([" ", "\t", "\f", "\r", "\n"], false, false),
 
         peg$currPos          = 0,
         peg$savedPos         = 0,
