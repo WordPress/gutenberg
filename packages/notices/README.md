@@ -33,6 +33,8 @@ Renders notice lists for notices with type `default`:
 
 `children` are rendered inside the dismissible list.
 
+Keep `InlineNotices` mounted when there are no notices. It uses `Notice.List` from `@wordpress/ui` to announce added or replaced notices. Notices present when the component first mounts stay silent. Error notices are assertive; other notices are polite. Notices created with `speak: false` stay silent. Child notices built with `@wordpress/ui` also use the list's announcements, so do not announce them separately.
+
 _Props_
 
 - `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
