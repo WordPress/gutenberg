@@ -5,7 +5,7 @@ import { h, type ComponentChild, type JSX } from 'preact';
 /**
  * Internal dependencies
  */
-import { warn } from './utils';
+import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
 
 const directivePrefix = `data-wp-`;
@@ -15,7 +15,40 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 const invalidCharsRegex = /[^a-z0-9-_]/i;
 
+/**
+ * Checks whether a directive name part is reserved after trimming hyphens and
+ * lowercasing it, as `kebabToCamelCase()` does: `data-wp-each--constructor-`
+ * names the item `constructor`.
+ *
+ * Directive names, suffixes, unique IDs and namespaces become property keys:
+ * `data-wp-bind--[attribute]`, for example, assigns to the element's props.
+ *
+ * @param part Part of a directive name.
+ * @return Whether the part is reserved.
+ */
+const isReservedNamePart = ( part: string ): boolean =>
+	isReservedKey( part.replace( /^-+|-+$/g, '' ).toLowerCase() );
+
 function parseDirectiveName( directiveName: string ): {
+	prefix: string;
+	suffix: string | null;
+	uniqueId: string | null;
+} | null {
+	const parsed = splitDirectiveName( directiveName );
+	if (
+		parsed &&
+		( isReservedNamePart( parsed.prefix ) ||
+			( parsed.suffix !== null &&
+				parsed.suffix.split( '--' ).some( isReservedNamePart ) ) ||
+			( parsed.uniqueId !== null &&
+				isReservedNamePart( parsed.uniqueId ) ) )
+	) {
+		return null;
+	}
+	return parsed;
+}
+
+function splitDirectiveName( directiveName: string ): {
 	prefix: string;
 	suffix: string | null;
 	uniqueId: string | null;
@@ -77,6 +110,17 @@ function parseDirectiveName( directiveName: string ): {
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
+
+const directiveMaps = new WeakSet< object >();
+
+/**
+ * Checks whether the passed value is a directive map created by `toVdom()`.
+ *
+ * @param value The value to check.
+ * @return Whether the value is a directive map created by `toVdom()`.
+ */
+export const isDirectiveMap = ( value: unknown ): boolean =>
+	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
@@ -140,7 +184,7 @@ export function toVdom( root: Node ): ComponentChild {
 					const namespace = regexResult?.[ 1 ] ?? null;
 					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
-						const parsedValue = JSON.parse( value );
+						const parsedValue = JSON.parse( value, jsonReviver );
 						value = isObject( parsedValue ) ? parsedValue : value;
 					} catch {}
 					if ( attributeName === 'data-wp-interactive' ) {
@@ -152,7 +196,17 @@ export function toVdom( root: Node ): ComponentChild {
 								: typeof value?.namespace === 'string'
 								? value.namespace
 								: null;
-						namespaces.push( islandNamespace );
+						namespaces.push(
+							isReservedKey( islandNamespace )
+								? null
+								: islandNamespace
+						);
+					} else if ( isReservedKey( namespace ) ) {
+						if ( globalThis.SCRIPT_DEBUG ) {
+							warn(
+								`Found reserved namespace "${ namespace }" in directive: ${ attributeName }.`
+							);
+						}
 					} else {
 						directives.push( [ attributeName, namespace, value ] );
 					}
@@ -164,11 +218,16 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		if ( ignore && ! island ) {
+			// Keyed by directive names, so it has no prototype.
+			const ignoreDirectives = Object.assign( Object.create( null ), {
+				ignore: true,
+			} );
+			directiveMaps.add( ignoreDirectives );
 			return [
 				h< any, any >( localName, {
 					...props,
 					innerHTML: elementNode.innerHTML,
-					__directives: { ignore: true },
+					__directives: ignoreDirectives,
 				} ),
 			];
 		}
@@ -177,6 +236,7 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		if ( directives.length ) {
+			// Keyed by directive names from the markup, so it has no prototype.
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
 			>( ( obj, [ name, ns, value ] ) => {
@@ -197,7 +257,8 @@ export function toVdom( root: Node ): ComponentChild {
 					uniqueId,
 				} );
 				return obj;
-			}, {} );
+			}, Object.create( null ) );
+			directiveMaps.add( props.__directives );
 
 			// Sort directive arrays to ensure stable ordering across browsers.
 			// Put nulls first, then sort by suffix and finally by uniqueIds.
