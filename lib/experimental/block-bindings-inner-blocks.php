@@ -125,8 +125,11 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ), $source_name );
 
 	// The blocks go where the block's own inner blocks were.
-	$inner_content = $block_instance->parsed_block['innerContent'];
-	$slots         = array_keys( $inner_content, null, true );
+	$inner_content = $block_instance->parsed_block['innerContent'] ?? array();
+	if ( ! is_array( $inner_content ) ) {
+		return null;
+	}
+	$slots = array_keys( $inner_content, null, true );
 	if ( $slots ) {
 		$opener = implode( '', array_slice( $inner_content, 0, $slots[0] ) );
 		$closer = implode( '', array_slice( $inner_content, end( $slots ) + 1 ) );
@@ -136,7 +139,11 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		$html   = implode( '', $inner_content );
 		$offset = strrpos( $html, '</' );
 		if ( false !== $offset && str_contains( $html, 'wp-block-group__inner-container' ) ) {
-			$offset = strrpos( substr( $html, 0, $offset ), '</' );
+			// The class name may also appear without an inner container.
+			$inner_offset = strrpos( substr( $html, 0, $offset ), '</' );
+			if ( false !== $inner_offset ) {
+				$offset = $inner_offset;
+			}
 		}
 		if ( false === $offset ) {
 			return null;
