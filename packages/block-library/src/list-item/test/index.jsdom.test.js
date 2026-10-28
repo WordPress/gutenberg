@@ -11,7 +11,7 @@ import save from '../save';
 
 describe( 'List Item value', () => {
 	beforeAll( () => {
-		registerBlockType( metadata as never, { save } );
+		registerBlockType( metadata, { save } );
 	} );
 
 	afterAll( () => {

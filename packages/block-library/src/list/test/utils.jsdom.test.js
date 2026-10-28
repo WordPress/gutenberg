@@ -6,16 +6,16 @@ import listItemMetadata from '../../list-item/block.json';
 import listItemSave from '../../list-item/save';
 import { createListBlockFromDOMElement } from '../utils';
 
-function parseList( html: string ) {
+function parseList( html ) {
 	const container = document.createElement( 'div' );
 	container.innerHTML = html;
-	return container.firstElementChild as HTMLElement;
+	return container.firstElementChild;
 }
 
 describe( 'createListBlockFromDOMElement', () => {
 	beforeAll( () => {
-		registerBlockType( listItemMetadata as never, { save: listItemSave } );
-		registerBlockType( listMetadata as never, { save: listSave } );
+		registerBlockType( listItemMetadata, { save: listItemSave } );
+		registerBlockType( listMetadata, { save: listSave } );
 	} );
 
 	afterAll( () => {
@@ -29,10 +29,7 @@ describe( 'createListBlockFromDOMElement', () => {
 		);
 
 		expect(
-			block.innerBlocks.map(
-				( { attributes }: { attributes: { value?: string } } ) =>
-					attributes.value
-			)
+			block.innerBlocks.map( ( { attributes } ) => attributes.value )
 		).toEqual( [ '5', undefined ] );
 	} );
 

@@ -2438,6 +2438,16 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/list-item/test/edit.jsdom.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list-item/test/index.jsdom.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/list-item/transforms.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -2498,6 +2508,11 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list/test/utils.jsdom.test.js": {
+		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

@@ -1,29 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { createElement } from '@wordpress/element';
 import ListItemEdit from '../edit';
 
-let mockIsOrdered: boolean;
+let mockIsOrdered;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { createElement: h } = await import( '@wordpress/element' );
-	const passthrough = ( { children }: { children?: ReactNode } ) =>
-		h( 'div', null, children );
+	const passthrough = ( { children } ) => h( 'div', null, children );
 
 	return {
 		BlockControls: passthrough,
 		InspectorControls: passthrough,
 		RichText: () => h( 'div' ),
-		useBlockProps: ( props: Record< string, unknown > ) => ( {
+		useBlockProps: ( props ) => ( {
 			...props,
 		} ),
-		useInnerBlocksProps: ( props: Record< string, unknown > ) => ( {
+		useInnerBlocksProps: ( props ) => ( {
 			...props,
 			children: null,
 		} ),
 		store: 'core/block-editor',
-	} as never;
+	};
 } );
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
@@ -32,7 +30,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useSelect' ) {
-				return ( callback: ( select: () => unknown ) => unknown ) =>
+				return ( callback ) =>
 					callback( () => ( {
 						getBlockRootClientId: () => 'list',
 						getBlockAttributes: () => ( {
@@ -43,7 +41,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 			if ( property === 'useRegistry' ) {
 				return () => ( {} );
 			}
-			return target[ property as keyof typeof target ];
+			return target[ property ];
 		},
 	} );
 } );
@@ -66,7 +64,7 @@ vi.mock( import( '../../utils/hooks' ), () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
-function renderEdit( attributes: Record< string, unknown > = {} ) {
+function renderEdit( attributes = {} ) {
 	const setAttributes = vi.fn();
 
 	render(
@@ -75,14 +73,14 @@ function renderEdit( attributes: Record< string, unknown > = {} ) {
 			setAttributes,
 			clientId: 'item',
 			mergeBlocks: vi.fn(),
-		} as Parameters< typeof ListItemEdit >[ 0 ] )
+		} )
 	);
 
 	return { setAttributes };
 }
 
 function getField() {
-	return screen.getByRole< HTMLInputElement >( 'spinbutton', {
+	return screen.getByRole( 'spinbutton', {
 		name: 'Custom number',
 	} );
 }
@@ -185,17 +183,13 @@ describe( 'ListItemEdit item value', () => {
 	it( 'puts the value on the list item in the editor', () => {
 		renderEdit( { value: '5' } );
 
-		expect( screen.getByRole< HTMLLIElement >( 'listitem' ).value ).toBe(
-			5
-		);
+		expect( screen.getByRole( 'listitem' ).value ).toBe( 5 );
 	} );
 
 	it( 'adds no value to the list item when there is none', () => {
 		renderEdit();
 
 		// An `li` without a `value` attribute reports 0.
-		expect( screen.getByRole< HTMLLIElement >( 'listitem' ).value ).toBe(
-			0
-		);
+		expect( screen.getByRole( 'listitem' ).value ).toBe( 0 );
 	} );
 } );
