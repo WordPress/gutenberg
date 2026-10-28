@@ -92,6 +92,63 @@ test.describe( 'Image', () => {
 		).toBe( '12' );
 	} );
 
+	test( 'should keep a caption typed while the image uploads', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		// Hold the upload until the caption is typed.
+		let releaseUpload;
+		const uploadReleased = new Promise( ( resolve ) => {
+			releaseUpload = resolve;
+		} );
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if ( route.request().method() === 'POST' ) {
+				await uploadReleased;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		await expect( image ).toHaveAttribute( 'src', /^blob:/ );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await page.keyboard.type( 'Typed while uploading' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: { caption: 'Typed while uploading' },
+			},
+		] );
+		const [ uploadingImage ] = await editor.getBlocks();
+		expect( uploadingImage.attributes.id ).toBeUndefined();
+		releaseUpload();
+
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: expect.any( Number ),
+					url: expect.stringMatching( /^https?:\/\// ),
+					caption: 'Typed while uploading',
+				},
+			},
+		] );
+	} );
+
 	test( 'should allow soft line breaks in caption', async ( {
 		editor,
 		page,
