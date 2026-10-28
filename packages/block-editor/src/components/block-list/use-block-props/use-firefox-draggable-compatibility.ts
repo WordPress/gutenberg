@@ -1,4 +1,5 @@
 import { useRefEffect } from '@wordpress/compose';
+import { setContentEditableWrapper } from '../../writing-flow/utils';
 
 const nodesByDocument = new Map< Document, Set< HTMLElement > >();
 
@@ -44,8 +45,12 @@ function down( event: PointerEvent ) {
 
 	// The listener only runs on documents with registered nodes.
 	const nodes = nodesByDocument.get( ownerDocument )!;
+	// A block's own element, such as a list item around its bullet, is only
+	// editable inside an editing host. A press on it is not in a field.
+	const isBlockElement =
+		nodes.has( target ) && target.contentEditable === 'inherit';
 
-	if ( isContentEditable || isInputOrTextArea ) {
+	if ( ( isContentEditable && ! isBlockElement ) || isInputOrTextArea ) {
 		// Whenever an editable element or an input or textarea is clicked,
 		// check which draggable blocks contain this element, and temporarily
 		// disable draggability.
@@ -64,6 +69,19 @@ function down( event: PointerEvent ) {
 		for ( const node of nodes ) {
 			restore( node );
 		}
+	}
+
+	// Inside an editing host the browser places a caret on press instead of
+	// dragging the block. The press selects the block as a whole, which
+	// needs no editing host, so the host stops editing.
+	if ( isBlockElement && isContentEditable && target.draggable ) {
+		setContentEditableWrapper(
+			// An element inside an editing host has an editable ancestor.
+			target.parentElement!.closest< HTMLElement >(
+				'[contenteditable="true"]'
+			)!,
+			false
+		);
 	}
 }
 
