@@ -153,7 +153,7 @@ function gutenberg_navigation_nest_block_under_page( &$blocks, $parent_id, $new_
  * otherwise. A menu that already links to the post is left unchanged.
  *
  * This is the way for a plugin to put a link to one of its pages into a menu
- * it knows the ID of, such as a menu the "Auto add pages" setting is on for,
+ * it knows the ID of, such as a menu the "Auto add new pages" setting is on for,
  * without parsing the menu itself.
  *
  * @param int         $menu_id The `wp_navigation` post ID.
@@ -197,7 +197,7 @@ function gutenberg_navigation_add_post_link( $menu_id, $post ) {
 
 /**
  * Adds a link to a newly published page to the Navigation Menus chosen for
- * it, or to every menu that has "Auto add pages" switched on.
+ * it, or to every menu that has "Auto add new pages" switched on.
  *
  * With a choice (see `gutenberg_navigation_publish_menu_choice()`), the page
  * is added to exactly the chosen menus the current user can edit, nested

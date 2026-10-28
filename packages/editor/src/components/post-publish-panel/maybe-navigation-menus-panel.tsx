@@ -27,7 +27,7 @@ type MenuRow = {
 	title: string;
 	/** The menu already links to the page; the link goes live with it. */
 	isLinked: boolean;
-	/** The "Auto add pages" setting would add the page to this menu. */
+	/** The "Auto add new pages" setting would add the page to this menu. */
 	isAddedByDefault: boolean;
 	/** The label of the parent page's link the new link goes under. */
 	parentLabel?: string;
@@ -80,7 +80,7 @@ function getMenuEditorUrl( menuId: number ) {
 
 /**
  * Lets the author choose the Navigation Menus a page is added to when it is
- * published. The menus with "Auto add pages" switched on that would add the
+ * published. The menus with "Auto add new pages" switched on that would add the
  * page start checked, a menu that already links to the page is checked and
  * cannot be unchecked, and any other menu can be checked to add the page to
  * it. A change is sent with the page as its `navigation_menus` field, which

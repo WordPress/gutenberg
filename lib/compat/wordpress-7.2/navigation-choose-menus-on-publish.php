@@ -4,7 +4,7 @@
  *
  * A page's publish request can carry a `navigation_menus` field, the IDs of
  * the Navigation Menus to add a link to the page to. It replaces, for that
- * page only, the set of menus the "Auto add pages" setting would add it to.
+ * page only, the set of menus the "Auto add new pages" setting would add it to.
  * The editor's pre-publish panel sends it when the author changes a menu's
  * checkbox; a request without the field gets the setting's behavior.
  *
@@ -26,7 +26,7 @@ function gutenberg_register_navigation_menus_page_field() {
 			'get_callback'    => null,
 			'update_callback' => null,
 			'schema'          => array(
-				'description' => __( 'The IDs of the Navigation Menus to add a link to the page to when it is published. Replaces the menus the "Auto add pages" setting would add it to.', 'gutenberg' ),
+				'description' => __( 'The IDs of the Navigation Menus to add a link to the page to when it is published. Replaces the menus the "Auto add new pages" setting would add it to.', 'gutenberg' ),
 				'type'        => 'array',
 				'items'       => array( 'type' => 'integer' ),
 				'context'     => array(),
