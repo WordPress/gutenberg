@@ -129,11 +129,14 @@ describe( 'useRecentlyTyped', () => {
 		pressKey( document );
 		expect( result.current ).toBe( true );
 
+		const removeSpy = vi.spyOn( document, 'removeEventListener' );
+
 		unmount();
 
-		// Would throw on an update to an unmounted component if the listener
-		// or the pending debounce outlived the hook.
-		pressKey( document );
-		advance( DELAY_MS );
+		expect( removeSpy ).toHaveBeenCalledWith(
+			'keydown',
+			expect.any( Function ),
+			true
+		);
 	} );
 } );
