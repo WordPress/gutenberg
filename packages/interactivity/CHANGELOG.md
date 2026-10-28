@@ -2,9 +2,20 @@
 
 ## Unreleased
 
+### Internal
+
+-   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+
+## 8.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `data-wp-html` keeps the element's server-rendered content when its value is `{ "wpServerHtml": true }`, the stand-in for an `asDangerousHTML()` value in the page's data, whether it comes from `state`, `context` or a `data-wp-each` item ([#84889](https://github.com/WordPress/gutenberg/pull/84889)).
+-   Speed up hydration by only parsing object-like directive values as JSON and reading attributes with `getAttributeNames()` ([#81699](https://github.com/WordPress/gutenberg/pull/81699)).
 
 ### Bug Fixes
 
@@ -17,7 +28,6 @@
 ### Internal
 
 -   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo` and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
--   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 
 ## 7.0.0 (2026-10-07)
 

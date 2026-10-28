@@ -1,11 +1,8 @@
 import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
-import type { Action } from '@wordpress/dataviews';
-import type { Post } from '../../shared/types';
+import type { Post, ActionScriptParts } from '../../shared/types';
 
-const viewPostRevisions: Action< Post > = {
-	id: 'view-post-revisions',
-	context: 'list',
+const viewPostRevisions: ActionScriptParts< Post > = {
 	label( items ) {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
@@ -38,6 +35,7 @@ const viewPostRevisions: Action< Post > = {
 };
 
 /**
- * View post revisions action for Post.
+ * The JavaScript parts of the view post revisions action for Post; its data is
+ * in `action.php`.
  */
 export default viewPostRevisions;

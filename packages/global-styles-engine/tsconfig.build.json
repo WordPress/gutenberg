@@ -5,10 +5,10 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../blocks" },
-		{ "path": "../data" },
+		{ "path": "../blocks/tsconfig.build.json" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../private-apis" },
-		{ "path": "../style-engine" }
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../style-engine/tsconfig.build.json" }
 	]
 }

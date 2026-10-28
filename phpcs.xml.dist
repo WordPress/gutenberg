@@ -33,6 +33,8 @@
 	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
 		<exclude-pattern>/lib/compat/*</exclude-pattern>
 		<exclude-pattern>/packages/block-library/src/*</exclude-pattern>
+		<exclude-pattern>/packages/core-actions/src/*</exclude-pattern>
+		<exclude-pattern>/packages/core-fields/src/*</exclude-pattern>
 		<exclude-pattern>/build/block-library/*</exclude-pattern>
 	</rule>
 
