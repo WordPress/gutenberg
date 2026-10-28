@@ -1,22 +1,29 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { createElement } from '@wordpress/element';
 import ListItemEdit from '../edit';
 
-let mockIsOrdered;
+let mockIsOrdered: boolean;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { createElement: h } = await import( '@wordpress/element' );
-	const passthrough = ( { children } ) => h( 'div', null, children );
+	const passthrough = ( { children }: { children?: ReactNode } ) =>
+		h( 'div', null, children );
 
 	return {
 		BlockControls: passthrough,
 		InspectorControls: passthrough,
 		RichText: () => h( 'div' ),
-		useBlockProps: ( props ) => ( { ...props } ),
-		useInnerBlocksProps: ( props ) => ( { ...props, children: null } ),
+		useBlockProps: ( props: Record< string, unknown > ) => ( {
+			...props,
+		} ),
+		useInnerBlocksProps: ( props: Record< string, unknown > ) => ( {
+			...props,
+			children: null,
+		} ),
 		store: 'core/block-editor',
-	};
+	} as never;
 } );
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
@@ -25,7 +32,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useSelect' ) {
-				return ( callback ) =>
+				return ( callback: ( select: () => unknown ) => unknown ) =>
 					callback( () => ( {
 						getBlockRootClientId: () => 'list',
 						getBlockAttributes: () => ( {
@@ -36,30 +43,30 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 			if ( property === 'useRegistry' ) {
 				return () => ( {} );
 			}
-			return target[ property ];
+			return target[ property as keyof typeof target ];
 		},
 	} );
 } );
 
 vi.mock( import( '../hooks' ), () => ( {
-	useEnter: () => null,
-	useTab: () => null,
-	useMultiSelectTab: () => null,
+	useEnter: vi.fn(),
+	useTab: vi.fn(),
+	useMultiSelectTab: vi.fn(),
 	useMerge: () => vi.fn(),
 } ) );
 
 vi.mock( import( '../utils' ), () => ( {
 	indentListItems: vi.fn(),
 	outdentListItems: vi.fn(),
-	getIndentTarget: () => null,
-	getOutdentTarget: () => null,
+	getIndentTarget: () => undefined,
+	getOutdentTarget: () => undefined,
 } ) );
 
 vi.mock( import( '../../utils/hooks' ), () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
-function renderEdit( attributes = {} ) {
+function renderEdit( attributes: Record< string, unknown > = {} ) {
 	const setAttributes = vi.fn();
 
 	render(
@@ -68,10 +75,16 @@ function renderEdit( attributes = {} ) {
 			setAttributes,
 			clientId: 'item',
 			mergeBlocks: vi.fn(),
-		} )
+		} as Parameters< typeof ListItemEdit >[ 0 ] )
 	);
 
 	return { setAttributes };
+}
+
+function getField() {
+	return screen.getByRole< HTMLInputElement >( 'spinbutton', {
+		name: 'Custom number',
+	} );
 }
 
 describe( 'ListItemEdit item value', () => {
@@ -82,9 +95,7 @@ describe( 'ListItemEdit item value', () => {
 	it( 'shows the Custom number field in an ordered list', () => {
 		renderEdit();
 
-		expect(
-			screen.getByRole( 'spinbutton', { name: 'Custom number' } )
-		).toBeVisible();
+		expect( getField() ).toBeVisible();
 	} );
 
 	it( 'hides the Custom number field in an unordered list', () => {
@@ -99,10 +110,7 @@ describe( 'ListItemEdit item value', () => {
 	it( 'stores the value as a string', () => {
 		const { setAttributes } = renderEdit();
 
-		fireEvent.change(
-			screen.getByRole( 'spinbutton', { name: 'Custom number' } ),
-			{ target: { value: '7' } }
-		);
+		fireEvent.change( getField(), { target: { value: '7' } } );
 
 		expect( setAttributes ).toHaveBeenCalledWith( { value: '7' } );
 	} );
@@ -110,21 +118,27 @@ describe( 'ListItemEdit item value', () => {
 	it( 'unsets the value when the field is cleared', () => {
 		const { setAttributes } = renderEdit( { value: '7' } );
 
-		fireEvent.change(
-			screen.getByRole( 'spinbutton', { name: 'Custom number' } ),
-			{ target: { value: '' } }
-		);
+		fireEvent.change( getField(), { target: { value: '' } } );
 
 		expect( setAttributes ).toHaveBeenCalledWith( { value: undefined } );
 	} );
 
-	it( 'ignores values that are not positive whole numbers', () => {
+	it( 'accepts zero and negative whole numbers', () => {
 		const { setAttributes } = renderEdit();
-		const input = screen.getByRole( 'spinbutton', {
-			name: 'Custom number',
-		} );
+		const input = getField();
 
-		[ '2.5', '-3', '1e3', '0', '05' ].forEach( ( value ) => {
+		fireEvent.change( input, { target: { value: '0' } } );
+		fireEvent.change( input, { target: { value: '-3' } } );
+
+		expect( setAttributes ).toHaveBeenNthCalledWith( 1, { value: '0' } );
+		expect( setAttributes ).toHaveBeenNthCalledWith( 2, { value: '-3' } );
+	} );
+
+	it( 'ignores values that are not whole numbers', () => {
+		const { setAttributes } = renderEdit();
+		const input = getField();
+
+		[ '2.5', '1e3', '05', '-0' ].forEach( ( value ) => {
 			fireEvent.change( input, { target: { value } } );
 		} );
 
@@ -133,27 +147,55 @@ describe( 'ListItemEdit item value', () => {
 
 	it( 'blocks the characters that are not part of a whole number', () => {
 		renderEdit();
-		const input = screen.getByRole( 'spinbutton', {
-			name: 'Custom number',
-		} );
+		const input = getField();
 
 		// `fireEvent` returns false when the default action was prevented.
-		[ 'e', 'E', '+', '-', '.', ',' ].forEach( ( key ) => {
+		[ 'e', 'E', '+', '.', ',' ].forEach( ( key ) => {
 			expect( fireEvent.keyDown( input, { key } ) ).toBe( false );
 		} );
 		expect( fireEvent.keyDown( input, { key: '5' } ) ).toBe( true );
+		expect( fireEvent.keyDown( input, { key: '-' } ) ).toBe( true );
+	} );
+
+	it( 'clears the field on blur when its text is not a number', () => {
+		renderEdit();
+		const input = getField();
+
+		// jsdom cannot hold a lone "-" in a number input, so stand in for the
+		// browser by flagging the current text as bad input.
+		input.value = '5';
+		Object.defineProperty( input, 'validity', {
+			value: { badInput: true },
+			configurable: true,
+		} );
+		fireEvent.blur( input );
+
+		expect( input.value ).toBe( '' );
+	} );
+
+	it( 'keeps a valid number on blur', () => {
+		renderEdit( { value: '5' } );
+		const input = getField();
+
+		fireEvent.blur( input );
+
+		expect( input.value ).toBe( '5' );
 	} );
 
 	it( 'puts the value on the list item in the editor', () => {
 		renderEdit( { value: '5' } );
 
-		expect( screen.getByRole( 'listitem' ).value ).toBe( 5 );
+		expect( screen.getByRole< HTMLLIElement >( 'listitem' ).value ).toBe(
+			5
+		);
 	} );
 
 	it( 'adds no value to the list item when there is none', () => {
 		renderEdit();
 
 		// An `li` without a `value` attribute reports 0.
-		expect( screen.getByRole( 'listitem' ).value ).toBe( 0 );
+		expect( screen.getByRole< HTMLLIElement >( 'listitem' ).value ).toBe(
+			0
+		);
 	} );
 } );

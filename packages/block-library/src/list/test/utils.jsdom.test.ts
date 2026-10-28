@@ -1,24 +1,26 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { unregisterBlockType } from '@wordpress/blocks';
-import * as list from '../index';
-import * as listItem from '../../list-item';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import listMetadata from '../block.json';
+import listSave from '../save';
+import listItemMetadata from '../../list-item/block.json';
+import listItemSave from '../../list-item/save';
 import { createListBlockFromDOMElement } from '../utils';
 
-function parseList( html ) {
+function parseList( html: string ) {
 	const container = document.createElement( 'div' );
 	container.innerHTML = html;
-	return container.firstElementChild;
+	return container.firstElementChild as HTMLElement;
 }
 
 describe( 'createListBlockFromDOMElement', () => {
 	beforeAll( () => {
-		listItem.init();
-		list.init();
+		registerBlockType( listItemMetadata as never, { save: listItemSave } );
+		registerBlockType( listMetadata as never, { save: listSave } );
 	} );
 
 	afterAll( () => {
-		unregisterBlockType( list.name );
-		unregisterBlockType( listItem.name );
+		unregisterBlockType( listMetadata.name );
+		unregisterBlockType( listItemMetadata.name );
 	} );
 
 	it( 'keeps the value of a list item', () => {
@@ -27,7 +29,10 @@ describe( 'createListBlockFromDOMElement', () => {
 		);
 
 		expect(
-			block.innerBlocks.map( ( { attributes } ) => attributes.value )
+			block.innerBlocks.map(
+				( { attributes }: { attributes: { value?: string } } ) =>
+					attributes.value
+			)
 		).toEqual( [ '5', undefined ] );
 	} );
 

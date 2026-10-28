@@ -2,18 +2,20 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	createBlock,
 	getBlockAttributesNamesByRole,
+	registerBlockType,
 	serialize,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import * as listItem from '../index';
+import metadata from '../block.json';
+import save from '../save';
 
 describe( 'List Item value', () => {
 	beforeAll( () => {
-		listItem.init();
+		registerBlockType( metadata as never, { save } );
 	} );
 
 	afterAll( () => {
-		unregisterBlockType( listItem.name );
+		unregisterBlockType( metadata.name );
 	} );
 
 	it( 'saves the value on the list item', () => {

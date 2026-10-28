@@ -32,8 +32,8 @@ import {
 } from './utils';
 
 // A number input also accepts these characters, none of which belong in a
-// positive whole number.
-const BLOCKED_KEYS = [ 'e', 'E', '+', '-', '.', ',' ];
+// whole number.
+const BLOCKED_KEYS = [ 'e', 'E', '+', '.', ',' ];
 
 export function IndentUI( { clientId } ) {
 	const registry = useRegistry();
@@ -141,12 +141,16 @@ export default function ListItemEdit( {
 									'The following items continue counting from here.'
 								) }
 								type="number"
-								min={ 1 }
 								step={ 1 }
 								value={ value ?? '' }
 								onKeyDown={ ( event ) => {
 									if ( BLOCKED_KEYS.includes( event.key ) ) {
 										event.preventDefault();
+									}
+								} }
+								onBlur={ ( event ) => {
+									if ( event.target.validity.badInput ) {
+										event.target.value = '';
 									}
 								} }
 								onValueChange={ ( nextValue ) => {
@@ -155,14 +159,13 @@ export default function ListItemEdit( {
 										setAttributes( { value: undefined } );
 										return;
 									}
-									// Ignore anything that is not a positive whole number.
+									// Ignore anything that is not a whole number.
 									// Comparing with the number's own string form also
 									// rejects input like "1e3" and "05" that would
 									// otherwise parse as whole numbers.
 									const number = Number( nextValue );
 									if (
 										Number.isInteger( number ) &&
-										number > 0 &&
 										String( number ) === nextValue
 									) {
 										setAttributes( { value: nextValue } );
