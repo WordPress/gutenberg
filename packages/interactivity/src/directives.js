@@ -13,6 +13,9 @@ import { deepSignal, peek } from 'deepsignal';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
+import { warn } from './utils/warn';
+import { isReservedKey } from './utils/prototype-chain';
+import { getSafeUrl, urlAttributes } from './url';
 
 // Assigned objects should be ignore during proxification.
 const contextAssignedObjects = new WeakMap();
@@ -62,7 +65,15 @@ const proxifyContext = ( current, inherited = {} ) => {
 					! contextAssignedObjects.get( target )?.has( k ) &&
 					isPlainObject( peek( target, k ) )
 				) {
-					return proxifyContext( currentProp, fallback[ k ] );
+					// Only use an inherited context that the fallback owns. It is
+					// read first so that the context still subscribes to it.
+					const inheritedProp = fallback[ k ];
+					return proxifyContext(
+						currentProp,
+						Object.prototype.hasOwnProperty.call( fallback, k )
+							? inheritedProp
+							: undefined
+					);
 				}
 
 				// Return the stored proxy for `currentProp` when it exists.
@@ -131,6 +142,11 @@ const proxifyContext = ( current, inherited = {} ) => {
  */
 const updateSignals = ( target, source ) => {
 	for ( const k in source ) {
+		// Assigning `__proto__` would replace the prototype of `target`.
+		if ( isReservedKey( k ) ) {
+			continue;
+		}
+
 		if (
 			isPlainObject( peek( target, k ) ) &&
 			isPlainObject( peek( source, k ) )
@@ -161,6 +177,29 @@ const deepClone = ( source ) => {
 		return source.map( ( i ) => deepClone( i ) );
 	}
 	return source;
+};
+
+// Lowercase names of internal properties that are not binding candidates.
+const internalProps = new Set( [
+	'__directives',
+	'children',
+	'dangerouslysetinnerhtml',
+] );
+
+// Warns that event handler attributes cannot be bound.
+const warnEventHandlerBindNotSupported = ( attribute ) => {
+	warn(
+		`Binding event handler attributes is not supported. Please use "data-wp-on--${ attribute.slice(
+			2
+		) }" instead.`
+	);
+};
+
+// Warns that the data-wp-bind directive doesn't set a given prop.
+const warnUnbindableProp = ( suffix ) => {
+	warn(
+		`The data-wp-bind directive can't set the "${ suffix }" prop. Ignoring data-wp-bind--${ suffix }.`
+	);
 };
 
 const newRule =
@@ -196,6 +235,40 @@ const cssStringToObject = ( val ) => {
 	}
 
 	return tree[ 0 ];
+};
+
+/**
+ * Checks whether a value is an object that inherits from `Object.prototype` or
+ * has no prototype.
+ *
+ * @param {unknown} value The value to check.
+ * @return {boolean} Whether the value is such an object.
+ */
+const isStyleObject = ( value ) => {
+	if ( typeof value !== 'object' || value === null ) {
+		return false;
+	}
+	const prototype = Object.getPrototypeOf( value );
+	return prototype === Object.prototype || prototype === null;
+};
+
+/**
+ * Copies the own enumerable data properties of an object into an object
+ * without a prototype. Accessor properties are skipped, so no getter runs.
+ *
+ * @param {Object} object The object to copy.
+ * @return {Object} The copy.
+ */
+const copyDataProperties = ( object ) => {
+	const copy = Object.create( null );
+	for ( const [ key, desc ] of Object.entries(
+		Object.getOwnPropertyDescriptors( object )
+	) ) {
+		if ( desc.enumerable && 'value' in desc ) {
+			copy[ key ] = desc.value;
+		}
+	}
+	return copy;
 };
 
 /**
@@ -302,7 +375,11 @@ export default () => {
 				.forEach( ( entry ) => {
 					const className = entry.suffix;
 					const result = evaluate( entry );
-					const currentClass = element.props.class || '';
+					// `data-wp-bind--class` can set a value that isn't a string.
+					const currentClass =
+						typeof element.props.class === 'string'
+							? element.props.class
+							: '';
 					const classFinder = new RegExp(
 						`(^|\\s)${ className }(\\s|$)`,
 						'g'
@@ -339,11 +416,19 @@ export default () => {
 			.forEach( ( entry ) => {
 				const styleProp = entry.suffix;
 				const result = evaluate( entry );
-				element.props.style = element.props.style || {};
-				if ( typeof element.props.style === 'string' )
+				if ( typeof element.props.style === 'string' ) {
 					element.props.style = cssStringToObject(
 						element.props.style
 					);
+				} else if ( isStyleObject( element.props.style ) ) {
+					// Only write into a style object that `data-wp-style` created.
+					element.props.style = copyDataProperties(
+						element.props.style
+					);
+				} else {
+					// `data-wp-bind--style` can set a value that isn't a style.
+					element.props.style = Object.create( null );
+				}
 				if ( ! result ) delete element.props.style[ styleProp ];
 				else element.props.style[ styleProp ] = result;
 
@@ -367,7 +452,47 @@ export default () => {
 		bind.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
 				const attribute = entry.suffix;
-				const result = evaluate( entry );
+				const name = attribute.toLowerCase();
+				if (
+					internalProps.has( name ) ||
+					// `toVdom()` stores a `<template>`'s markup in its `content` prop.
+					( name === 'content' && element.type === 'template' ) ||
+					isReservedKey( attribute )
+				) {
+					warnUnbindableProp( attribute );
+					return;
+				}
+
+				// Binding event handler attributes is not supported. Use the
+				// `data-wp-on` directive instead.
+				if ( /^on/i.test( attribute ) ) {
+					warnEventHandlerBindNotSupported( attribute );
+					return;
+				}
+
+				if (
+					attribute === 'protocol' &&
+					( element.type === 'a' || element.type === 'area' )
+				) {
+					/*
+					 * The server renders the attribute, so it is removed from the props
+					 * too. Otherwise Preact sets it when the router updates the element.
+					 */
+					delete element.props[ attribute ];
+					return;
+				}
+
+				let result = evaluate( entry );
+
+				/*
+				 * URLs are checked before the value reaches the props, because Preact
+				 * writes the attribute itself on every render after the hydration, and
+				 * on elements mounted on the client.
+				 */
+				if ( urlAttributes.has( attribute.toLowerCase() ) ) {
+					result = getSafeUrl( result );
+				}
+
 				element.props[ attribute ] = result;
 
 				/*

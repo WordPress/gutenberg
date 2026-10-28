@@ -14,7 +14,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 	>
 		<pre
 			data-testid="parent context"
-			data-wp-bind--children="state.renderContext"
+			data-wp-text="state.renderContext"
 		>
 			<!-- rendered during hydration -->
 		</pre>
@@ -64,7 +64,7 @@ wp_enqueue_script_module( 'directive-context-view' );
 		>
 			<pre
 				data-testid="child context"
-				data-wp-bind--children="state.renderContext"
+				data-wp-text="state.renderContext"
 			>
 				<!-- rendered during hydration -->
 			</pre>

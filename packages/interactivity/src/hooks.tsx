@@ -15,7 +15,10 @@ import type { VNode, Context, RefObject } from 'preact';
 /**
  * Internal dependencies
  */
-import { store, stores, universalUnlock } from './store';
+import { store, stores, universalUnlock, getObjectFromProxy } from './store';
+import { warn } from './utils/warn';
+import { isReservedKey, getOwnProperty } from './utils/prototype-chain';
+import { isDirectiveMap } from './vdom';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -173,8 +176,10 @@ export const resetNamespace = () => {
 };
 
 // WordPress Directives.
-const directiveCallbacks: Record< string, DirectiveCallback > = {};
-const directivePriorities: Record< string, number > = {};
+// Looked up by directive names from the markup, so they have no prototype.
+const directiveCallbacks: Record< string, DirectiveCallback > =
+	Object.create( null );
+const directivePriorities: Record< string, number > = Object.create( null );
 
 /**
  * Register a new directive type in the Interactivity API runtime.
@@ -257,20 +262,74 @@ export const directive = (
 	directivePriorities[ name ] = priority;
 };
 
+/*
+ * Checks whether `value`, read as `parent[ key ]`, is a method that `parent`
+ * inherits, such as `Array.prototype.push`. Store proxies return wrapped
+ * functions, so for a registered proxy the check reads its target.
+ */
+const isInheritedMethod = ( parent: any, key: string, value: unknown ) => {
+	if (
+		typeof value !== 'function' ||
+		parent === null ||
+		parent === undefined
+	) {
+		return false;
+	}
+	const obj = Object( parent );
+	const target = getObjectFromProxy( obj );
+	if ( target && Object.prototype.hasOwnProperty.call( target, key ) ) {
+		return false;
+	}
+	for (
+		let proto = Object.getPrototypeOf( target ?? obj );
+		proto !== null;
+		proto = Object.getPrototypeOf( proto )
+	) {
+		const descriptor = Object.getOwnPropertyDescriptor( proto, key );
+		if ( descriptor ) {
+			return target
+				? typeof descriptor.value === 'function'
+				: descriptor.value === value;
+		}
+	}
+	return false;
+};
+
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	const pathParts = path.split( '.' );
+	// Paths and namespaces come from the markup.
+	if ( isReservedKey( namespace ) || pathParts.some( isReservedKey ) ) {
+		warn(
+			`The path "${ path }" in the "${ namespace }" namespace contains a reserved property name. The value for that path won't be resolved.`
+		);
+		return;
+	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
 		resolvedStore = store( namespace, undefined, {
 			lock: universalUnlock,
 		} );
 	}
-	let current = {
+	const current = {
 		...resolvedStore,
-		context: getScope().context[ namespace ],
+		context: getOwnProperty( getScope().context, namespace ),
 	};
-	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
-	return current;
+	let parent: any;
+	let value: any = current;
+	for ( const key of pathParts ) {
+		parent = value;
+		value = value[ key ];
+	}
+	if (
+		isInheritedMethod( parent, pathParts[ pathParts.length - 1 ], value )
+	) {
+		warn(
+			`The path "${ path }" in the "${ namespace }" namespace ends in an inherited method. The value for that path won't be resolved.`
+		);
+		return;
+	}
+	return value;
 };
 
 // Generate the evaluate function.
@@ -370,6 +429,14 @@ const Directives = ( {
 // Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
 options.vnode = ( vnode: VNode< any > ) => {
+	// Only maps built by `toVdom()` passed its directive name checks. Delete any
+	// other `__directives` value so Preact doesn't set it on the element.
+	if (
+		vnode.props.__directives &&
+		! isDirectiveMap( vnode.props.__directives )
+	) {
+		delete vnode.props.__directives;
+	}
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;

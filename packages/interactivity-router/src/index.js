@@ -44,7 +44,9 @@ const fetchPage = async ( url, { html } ) => {
 // Return an object with VDOM trees of those HTML regions marked with a
 // `router-region` directive.
 const regionsToVdom = ( dom, { vdom } = {} ) => {
-	const regions = {};
+	// Keyed by router region IDs found in the markup, so it doesn't inherit
+	// from `Object.prototype`.
+	const regions = Object.create( null );
 	const attrName = `data-${ directivePrefix }-router-region`;
 	dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
 		const id = region.getAttribute( attrName );
@@ -140,6 +142,9 @@ export const { state, actions } = store( 'core/router', {
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href, options = {} ) {
+			// Only read the options passed as own properties.
+			options = Object.assign( Object.create( null ), options );
+
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) {
 				yield forcePageReload( href );
@@ -236,6 +241,9 @@ export const { state, actions } = store( 'core/router', {
 		 *                                  fetching the requested URL.
 		 */
 		prefetch( url, options = {} ) {
+			// Only read the options passed as own properties.
+			options = Object.assign( Object.create( null ), options );
+
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) return;
 

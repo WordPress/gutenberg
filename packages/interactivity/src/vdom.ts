@@ -6,6 +6,8 @@ import { h } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
+import { warn } from './utils/warn';
+import { isReservedKey, jsonReviver } from './utils/prototype-chain';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -33,7 +35,32 @@ const directiveParser = new RegExp(
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
 
+/**
+ * Checks whether a directive name part is reserved after trimming hyphens and
+ * lowercasing it, as `kebabToCamelCase()` does: `data-wp-each--constructor-`
+ * names the item `constructor`.
+ *
+ * Directive names and suffixes become property keys: `data-wp-bind--[attribute]`,
+ * for example, assigns to the element's props.
+ *
+ * @param part Part of a directive name.
+ * @return Whether the part is reserved.
+ */
+const isReservedNamePart = ( part: string ): boolean =>
+	isReservedKey( part.replace( /^-+|-+$/g, '' ).toLowerCase() );
+
 export const hydratedIslands = new WeakSet();
+
+const directiveMaps = new WeakSet< object >();
+
+/**
+ * Checks whether the passed value is a directive map created by `toVdom()`.
+ *
+ * @param value The value to check.
+ * @return Whether the value is a directive map created by `toVdom()`.
+ */
+export const isDirectiveMap = ( value: unknown ): boolean =>
+	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
@@ -81,14 +108,25 @@ export function toVdom( root ) {
 						.exec( attributes[ i ].value )
 						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
 					try {
-						value = JSON.parse( value );
+						value = JSON.parse( value, jsonReviver );
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
-						namespaces.push(
+						const islandNamespace =
+							// eslint-disable-next-line no-nested-ternary
 							typeof value === 'string'
 								? value
-								: value?.namespace ?? null
+								: typeof value?.namespace === 'string'
+								? value.namespace
+								: null;
+						namespaces.push(
+							isReservedKey( islandNamespace )
+								? null
+								: islandNamespace
+						);
+					} else if ( isReservedKey( ns ) ) {
+						warn(
+							`Found reserved namespace "${ ns }" in directive: ${ n }.`
 						);
 					} else {
 						directives.push( [ n, ns, value ] );
@@ -100,21 +138,35 @@ export function toVdom( root ) {
 			props[ n ] = attributes[ i ].value;
 		}
 
-		if ( ignore && ! island )
+		if ( ignore && ! island ) {
+			// Keyed by directive names, so it has no prototype.
+			const ignoreDirectives = Object.assign( Object.create( null ), {
+				ignore: true,
+			} );
+			directiveMaps.add( ignoreDirectives );
 			return [
 				h( localName, {
 					...props,
 					innerHTML: node.innerHTML,
-					__directives: { ignore: true },
+					__directives: ignoreDirectives,
 				} ),
 			];
+		}
 		if ( island ) hydratedIslands.add( node );
 
 		if ( directives.length ) {
+			// Keyed by directive names from the markup, so it has no prototype.
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
 					const [ , prefix, suffix = 'default' ] =
 						directiveParser.exec( name );
+					if (
+						isReservedNamePart( prefix ) ||
+						suffix.split( '--' ).some( isReservedNamePart )
+					) {
+						warn( `Found malformed directive name: ${ name }.` );
+						return obj;
+					}
 					if ( ! obj[ prefix ] ) obj[ prefix ] = [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
@@ -123,8 +175,9 @@ export function toVdom( root ) {
 					} );
 					return obj;
 				},
-				{}
+				Object.create( null )
 			);
+			directiveMaps.add( props.__directives );
 		}
 
 		if ( localName === 'template' ) {
