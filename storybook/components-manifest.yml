@@ -178,20 +178,6 @@
       - intent
       - render
       - style
-- name: BaseControl
-  props:
-      - __nextHasNoMarginBottom
-      - children
-      - className
-      - help
-      - hideLabelFromVision
-      - id
-      - label
-  subcomponents:
-      - name: BaseControl.VisualLabel
-        props:
-            - as
-            - children
 - name: Button
   props:
       - __experimentalIsFocusable
@@ -875,6 +861,7 @@
       - accessibleWhenDisabled
       - children
       - className
+      - href
       - icon
       - iconPosition
       - info
@@ -976,7 +963,9 @@
       - className
       - icon
       - intent
+      - politeness
       - render
+      - spokenMessage
       - style
   subcomponents:
       - name: Notice.ActionButton
@@ -1020,6 +1009,12 @@
             - shortcut
             - style
       - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.List
         props:
             - children
             - className
