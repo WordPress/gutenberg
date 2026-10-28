@@ -583,6 +583,20 @@ test.describe( 'Draggable block', () => {
 				firstItemBox.x - 16,
 				firstItemBox.y + firstItemBox.height / 2
 			);
+			// Hovering the bullet shows the outline, as for a press there.
+			await expect
+				.poll( () =>
+					items
+						.nth( 0 )
+						.evaluate(
+							( item ) =>
+								item.ownerDocument.defaultView.getComputedStyle(
+									item,
+									'::after'
+								).outlineStyle
+						)
+				)
+				.toBe( 'solid' );
 			await page.mouse.down();
 			// The press leaves the item draggable.
 			await expect( items.nth( 0 ) ).toHaveAttribute(
