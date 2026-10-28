@@ -6,7 +6,7 @@ import { h, type ComponentChild, type JSX } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
-import { warn } from './utils';
+import { warn, isReservedKey, jsonReviver } from './utils';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -36,7 +36,32 @@ const directiveParser = new RegExp(
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
+/**
+ * Checks whether a directive name part is reserved after trimming hyphens and
+ * lowercasing it, as `kebabToCamelCase()` does: `data-wp-each--constructor-`
+ * names the item `constructor`.
+ *
+ * Directive names and suffixes become property keys: `data-wp-bind--[attribute]`,
+ * for example, assigns to the element's props.
+ *
+ * @param part Part of a directive name.
+ * @return Whether the part is reserved.
+ */
+const isReservedNamePart = ( part: string ): boolean =>
+	isReservedKey( part.replace( /^-+|-+$/g, '' ).toLowerCase() );
+
 export const hydratedIslands = new WeakSet();
+
+const directiveMaps = new WeakSet< object >();
+
+/**
+ * Checks whether the passed value is a directive map created by `toVdom()`.
+ *
+ * @param value The value to check.
+ * @return Whether the value is a directive map created by `toVdom()`.
+ */
+export const isDirectiveMap = ( value: unknown ): boolean =>
+	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
@@ -102,7 +127,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					const namespace = regexResult?.[ 1 ] ?? null;
 					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
-						const parsedValue = JSON.parse( value );
+						const parsedValue = JSON.parse( value, jsonReviver );
 						value = isObject( parsedValue ) ? parsedValue : value;
 					} catch {}
 					if ( attributeName === islandAttr ) {
@@ -114,7 +139,17 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 								: typeof value?.namespace === 'string'
 								? value.namespace
 								: null;
-						namespaces.push( islandNamespace );
+						namespaces.push(
+							isReservedKey( islandNamespace )
+								? null
+								: islandNamespace
+						);
+					} else if ( isReservedKey( namespace ) ) {
+						if ( globalThis.SCRIPT_DEBUG ) {
+							warn(
+								`Found reserved namespace "${ namespace }" in directive: ${ attributeName }.`
+							);
+						}
 					} else {
 						directives.push( [ attributeName, namespace, value ] );
 					}
@@ -126,11 +161,16 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 		}
 
 		if ( ignore && ! island ) {
+			// Keyed by directive names, so it has no prototype.
+			const ignoreDirectives = Object.assign( Object.create( null ), {
+				ignore: true,
+			} );
+			directiveMaps.add( ignoreDirectives );
 			return [
 				h< any, any >( localName, {
 					...props,
 					innerHTML: elementNode.innerHTML,
-					__directives: { ignore: true },
+					__directives: ignoreDirectives,
 				} ),
 			];
 		}
@@ -139,15 +179,20 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 		}
 
 		if ( directives.length ) {
+			// Keyed by directive names from the markup, so it has no prototype.
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
 					const directiveMatch = directiveParser.exec( name );
-					if ( directiveMatch === null ) {
+					const prefix = directiveMatch?.[ 1 ] || '';
+					const suffix = directiveMatch?.[ 2 ] || 'default';
+					if (
+						directiveMatch === null ||
+						isReservedNamePart( prefix ) ||
+						suffix.split( '--' ).some( isReservedNamePart )
+					) {
 						warn( `Found malformed directive name: ${ name }.` );
 						return obj;
 					}
-					const prefix = directiveMatch[ 1 ] || '';
-					const suffix = directiveMatch[ 2 ] || 'default';
 
 					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
@@ -157,8 +202,9 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					} );
 					return obj;
 				},
-				{}
+				Object.create( null )
 			);
+			directiveMaps.add( props.__directives );
 		}
 
 		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334

@@ -15,12 +15,18 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
+import { isReservedKey, jsonReviver } from './utils';
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
 		for ( const key in source ) {
+			// Assigning `__proto__` would replace the prototype of `target`.
+			if ( isReservedKey( key ) ) {
+				continue;
+			}
+
 			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
@@ -47,13 +53,23 @@ const storeLocks = new Map();
 const storeConfigs = new Map();
 
 const objToProxy = new WeakMap();
+const proxyToObj = new WeakMap();
 const proxyToNs = new WeakMap();
 const scopeToGetters = new WeakMap();
+
+/**
+ * Returns the object that a store proxy wraps.
+ *
+ * @param proxy The value to check.
+ * @return The wrapped object, or `undefined` if the value isn't a store proxy.
+ */
+export const getObjectFromProxy = ( proxy: object ) => proxyToObj.get( proxy );
 
 const proxify = ( obj: any, ns: string ) => {
 	if ( ! objToProxy.has( obj ) ) {
 		const proxy = new Proxy( obj, handlers );
 		objToProxy.set( obj, proxy );
+		proxyToObj.set( proxy, obj );
 		proxyToNs.set( proxy, ns );
 	}
 	return objToProxy.get( obj );
@@ -286,6 +302,7 @@ export function store(
 		const proxiedStore = new Proxy( rawStore, handlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
+		proxyToObj.set( proxiedStore, rawStore );
 		proxyToNs.set( proxiedStore, namespace );
 	} else {
 		// Lock the store if it wasn't locked yet and the passed lock is
@@ -321,14 +338,14 @@ export function store(
 export const parseInitialData = ( dom = document ) => {
 	const jsonDataScriptTag =
 		// Preferred Script Module data passing form
-		dom.getElementById(
-			'wp-script-module-data-@wordpress/interactivity'
+		dom.querySelector(
+			'script[id="wp-script-module-data-@wordpress/interactivity"]'
 		) ??
 		// Legacy form
-		dom.getElementById( 'wp-interactivity-data' );
-	if ( jsonDataScriptTag?.textContent ) {
+		dom.querySelector( 'script[id="wp-interactivity-data"]' );
+	if ( jsonDataScriptTag instanceof HTMLScriptElement ) {
 		try {
-			return JSON.parse( jsonDataScriptTag.textContent );
+			return JSON.parse( jsonDataScriptTag.text, jsonReviver );
 		} catch {}
 	}
 	return {};

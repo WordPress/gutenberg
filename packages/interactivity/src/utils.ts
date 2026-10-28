@@ -318,7 +318,7 @@ export function kebabToCamelCase( str: string ): string {
 		} );
 }
 
-const logged: Set< string > = new Set();
+export const logged: Set< string > = new Set();
 
 /**
  * Shows a warning with `message` if environment is not `production`.
@@ -346,3 +346,47 @@ export const warn = ( message: string ): void => {
 		logged.add( message );
 	}
 };
+
+/**
+ * Checks whether a property key leads out of an object's own data:
+ * `__proto__` to its prototype, `constructor` to its constructor, and
+ * `prototype` to a function's prototype.
+ *
+ * @param key The property key.
+ * @return Whether the key is reserved.
+ */
+export function isReservedKey( key: unknown ): boolean {
+	return key === '__proto__' || key === 'constructor' || key === 'prototype';
+}
+
+/**
+ * Reads a property that an object owns, ignoring inherited properties such
+ * as `Object.prototype.valueOf`.
+ *
+ * @param object The object to read.
+ * @param key    The property key.
+ * @return The value, or `undefined` if the object doesn't own the property.
+ */
+export function getOwnProperty(
+	object: Record< string, any >,
+	key: string
+): any {
+	return Object.prototype.hasOwnProperty.call( object, key )
+		? object[ key ]
+		: undefined;
+}
+
+/**
+ * `JSON.parse()` reviver that removes keys named `__proto__`.
+ *
+ * `JSON.parse()` creates `__proto__` as an own property. Copying it by
+ * assignment, as in a `for...in` loop or `Object.assign()`, replaces the
+ * target's prototype instead.
+ *
+ * @param key   The property key.
+ * @param value The parsed value.
+ * @return The value, or `undefined` to remove the key.
+ */
+export function jsonReviver( key: string, value: unknown ): unknown {
+	return key === '__proto__' ? undefined : value;
+}
