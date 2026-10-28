@@ -258,7 +258,7 @@ export const matcherFromSource = memoize(
  *
  * @return Parsed DOM node.
  */
-function parseHtml( innerHTML: string | Node | undefined ): Element {
+export function parseHtml( innerHTML: string | Node | undefined ): Element {
 	return hpqParse(
 		( innerHTML ?? '' ) as string | Element,
 		( h: Element ) => h

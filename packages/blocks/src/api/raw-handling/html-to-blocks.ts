@@ -1,5 +1,6 @@
 import { createBlock, findTransform } from '../factory';
 import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
+import { applyHtmlAttributes } from '../parser/fix-html-attributes';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getBlockType } from '../registration';
 import { getRawTransforms } from './get-raw-transforms';
@@ -60,10 +61,14 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 		// A block support usually declares its attribute without a source, so
 		// `getBlockAttributes` cannot read it out of the markup. Recover
 		// those with the fixes the parser applies to an invalid block.
-		const { originalContent, ...fixedBlock } = applyBuiltInValidationFixes(
+		const blockType = getBlockType( block.name )!;
+		const fixedBlock = applyBuiltInValidationFixes(
 			{ ...block, originalContent: node.outerHTML },
-			getBlockType( block.name )!
+			blockType
 		);
-		return fixedBlock;
+		// Keep attributes the block doesn't know, as the parser does.
+		const { originalContent, ...convertedBlock } =
+			applyHtmlAttributes( fixedBlock, blockType ) ?? fixedBlock;
+		return convertedBlock;
 	} );
 }

@@ -451,9 +451,18 @@ const deprecated = [
 				source: 'html',
 				default: '',
 			},
+			wrapper: {
+				type: 'string',
+				source: 'tag',
+				selector: 'p',
+			},
 		},
+		// Paragraphs saved without their `<p>`. Saving nothing for content
+		// with a `<p>` stops it being nested in another.
 		save( { attributes } ) {
-			return <RawHTML>{ attributes.content }</RawHTML>;
+			return attributes.wrapper ? null : (
+				<RawHTML>{ attributes.content }</RawHTML>
+			);
 		},
 		migrate: ( attributes ) => attributes,
 	},

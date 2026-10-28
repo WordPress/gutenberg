@@ -13,6 +13,7 @@ import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import { applyHtmlAttributes } from './fix-html-attributes';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
 
 /**
@@ -228,11 +229,24 @@ export function parseRawBlock(
 	// This is performed on both invalid and valid blocks because
 	// migration using the `migrate` functions should run even
 	// if the output is deemed valid.
-	const updatedBlock = applyBlockDeprecatedVersions(
+	let updatedBlock = applyBlockDeprecatedVersions(
 		validatedBlock,
 		normalizedBlock,
 		blockType
 	);
+
+	// Keep attributes the block doesn't know, once its deprecations had the
+	// chance to read them.
+	if ( ! updatedBlock.isValid ) {
+		const fixedBlock = applyHtmlAttributes( updatedBlock, blockType );
+		if ( fixedBlock ) {
+			updatedBlock = {
+				...fixedBlock,
+				isValid: true,
+				validationIssues: [],
+			};
+		}
+	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block

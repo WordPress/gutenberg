@@ -140,6 +140,36 @@ test.describe( 'Classic', () => {
 		expect( errors ).toHaveLength( 0 );
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
+
+	test( 'should keep attributes a block does not know when converted to blocks', async ( {
+		editor,
+	} ) => {
+		await editor.setContent( '<p data-note="tip">Hello</p>' );
+		const classicBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Classic',
+		} );
+		await expect( classicBlock ).toBeVisible();
+
+		await editor.selectBlocks( classicBlock );
+		await editor.clickBlockToolbarButton( 'Convert to blocks' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Hello',
+					dropCap: false,
+					htmlAttributes: { 'data-note': 'tip' },
+				},
+				innerBlocks: [],
+			},
+		] );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p data-note="tip">Hello</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
 } );
 
 class MediaUtils {
