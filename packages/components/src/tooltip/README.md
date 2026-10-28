@@ -1,5 +1,7 @@
 # ToolTip
 
+<p class="callout callout-alert">This component is deprecated. Use <a href="https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs"><code>Tooltip</code> from <code>@wordpress/ui</code></a> instead.</p>
+
 Tooltip is a React component to render floating help text relative to a node when it receives focus or it is hovered upon by a mouse. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
 
 ## Usage

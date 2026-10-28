@@ -93,8 +93,8 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.6.1",
-		"@storybook/react-vite": "^10.6.1",
+		"@storybook/addon-docs": "^10.6.3",
+		"@storybook/react-vite": "^10.6.3",
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
@@ -102,7 +102,7 @@
 		"@types/react-dom": "^19.3.0",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
 		"@wordpress/theme": "file:../theme",
-		"storybook": "^10.6.2",
+		"storybook": "^10.6.3",
 		"timezone-mock": "^1.3.6",
 		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
