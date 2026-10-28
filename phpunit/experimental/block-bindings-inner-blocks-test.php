@@ -173,7 +173,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 
 	public function test_value_goes_before_the_closer_of_a_wrapper_with_unclosed_elements() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$this->assertMatchesRegularExpression( '#<p>Tail<p[^>]*>One</p>\s*</div>#', $this->render_group( null, '<p>Tail' ) );
+		$this->assertMatchesRegularExpression( '#<p>Tail</p><p[^>]*>One</p>\s*</div>#', $this->render_group( null, '<p>Tail' ) );
 	}
 
 	public function test_value_goes_where_the_own_inner_blocks_were() {
