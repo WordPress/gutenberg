@@ -1,8 +1,10 @@
+import clsx from 'clsx';
 import {
 	InspectorControls,
 	useBlockProps,
 	useBlockDisplayInformation,
 	RichText,
+	useBlockEditContext,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner as WCSpinner, TextControl } from '@wordpress/components';
@@ -32,6 +34,8 @@ export default function PostTermsEdit( {
 } ) {
 	const { term, separator, prefix, suffix, layout } = attributes;
 	const hasItems = [ 'flex', 'grid' ].includes( layout?.type );
+	const { __unstableLayoutClassNames: layoutClassNames } =
+		useBlockEditContext();
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
@@ -52,7 +56,7 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: term && `taxonomy-${ term }`,
+		className: clsx( term && `taxonomy-${ term }`, layoutClassNames ),
 	} );
 
 	return (
