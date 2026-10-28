@@ -6,6 +6,10 @@
 
 -   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
 
+### Bug Fixes
+
+-   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
+
 ### Internal
 
 -   Type the `spacing.spacingSizes` and `border.radiusSizes` settings ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
@@ -25,10 +29,6 @@
 ### Enhancements
 
 -   `__unstableGeneratePreviewStateStyles` accepts an element name, such as `link`, as well as a block name ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
-
-### Bug Fixes
-
--   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 
 ## 1.24.0 (2026-10-07)
 
