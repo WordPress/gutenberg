@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Enhancements
--   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. Layout types can capture their children's toolbars with an optional `capturesToolbars( layout )` method ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
+-   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
