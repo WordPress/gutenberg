@@ -25,9 +25,7 @@ export default function enhanceVariations( settings, name ) {
 	};
 }
 
-// The layout support adds its flow classes to every block that supports layout.
-// Post Terms blocks without a saved layout must look as they did before, so
-// drop the classes for them.
+// The layout support adds its flow classes to every block that supports layout. Post Terms blocks without a saved layout must have the original markup if no layout is set for backwards compat.
 export const withoutUnusedLayoutClasses = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		if ( props.name !== 'core/post-terms' || props.attributes.layout ) {
