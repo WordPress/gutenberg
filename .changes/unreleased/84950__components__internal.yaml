@@ -1,0 +1,8 @@
+project: components
+kind: Internal
+body: >-
+    `ColorIndicator`: Make `colorValue` optional, and `MenuItem`: Accept
+    `isPressed` in the props types
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '84950'

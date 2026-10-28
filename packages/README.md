@@ -267,7 +267,16 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries are optional for trivial changes or work with no consumer impact, such as tests and behavior-preserving refactors. Put new entries under `## Unreleased` at the top of the file, creating the heading if needed.
+Each package tracks consumer-impacting changes so the release process can calculate version increments and publish release notes.
+
+Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or internal changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
+
+To check which authoring workflow a package uses, inspect `projects` in `.changie.yaml` at the repository root:
+
+-   If the package is listed under `projects` (for example, `@wordpress/components` or `@wordpress/ui`), follow [Automated authoring (via Changie)](#automated-authoring-via-changie).
+-   Otherwise, follow [Manual authoring](#manual-authoring).
+
+Package maintainers who want to onboard another package to Changie can refer to the migration guide in [`tools/changelogs/README.md`](../tools/changelogs/README.md).
 
 ### Writing concise entries
 
@@ -275,7 +284,25 @@ Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries a
 -   Omit descriptions of behavior that remains unchanged and internal implementation details. Avoid repeating the same change across subsections.
 -   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
 
-### Changelog Entry Format
+### Automated authoring (via Changie)
+
+Packages configured in `.changie.yaml` use independent changelog fragment files rather than editing `CHANGELOG.md` directly. This avoids git merge conflicts during rebases.
+
+1.  `npm run changelog:add` - Run the interactive changelog tool to create a changelog entry.
+2.  Follow the interactive prompts to select the package project, category (kind), your pull request number, and a consumer-facing summary. This creates an independent YAML fragment file under `.changes/unreleased/`.
+3.  `npm run lint:changelogs` - Verify formatting with the project validator (optional).
+
+#### Additional commands
+
+-   **Preview unreleased notes**: preview the compiled unreleased notes for a package: `npm run changelog:preview -- <package-name>`.
+-   **Write using your text editor**: use `-e` to write the description in your `$EDITOR`: `npm run changelog:add -- -e`.
+-   **Direct non-interactive creation**: pass flags directly to skip interactive prompts: `npm run changelog:add -- -j <package-name> -k "<Kind>" -m "PR=<number>" -b "<Description>"`.
+
+### Manual authoring
+
+For packages not yet using Changie, add entries directly under `## Unreleased` at the top of the package's `CHANGELOG.md` file.
+
+#### Changelog Entry Format
 
 Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period. Do not leave blank lines between bullets in a subsection, including before nested bullets.
 
@@ -293,11 +320,14 @@ Example:
 
 You can verify the structure locally by running `npm run lint:changelogs`.
 
-### Promoting a Pre-Release Package to Stable (1.0.0)
+#### Promoting a Pre-Release Package to Stable (1.0.0)
 
 The automated package publishing workflow will at most bump the minor version of a pre-release package (those having a version like `0.x.x`), even if it includes breaking changes. This is consistent with semantic versioning, where `0.x` versions are intended for initial development where the API may change frequently.
 
-A `0.x` package is promoted to `1.0.0` by adding a **Stable Release** section.
+A `0.x` package is promoted to `1.0.0` by adding a **Stable Release** entry:
+
+-   **For packages using Changie**: run `npm run changelog:promote-stable -- <package-name> --pr <PR#>` (or follow the interactive prompt). This creates the promotion fragment under `.changes/unreleased/`.
+-   **For manual packages**: add a `### Stable Release` subsection directly under `## Unreleased` in `CHANGELOG.md`:
 
 ```md
 ## Unreleased

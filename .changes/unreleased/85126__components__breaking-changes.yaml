@@ -1,0 +1,8 @@
+project: components
+kind: Breaking Changes
+body: >-
+    `RadioControl`: Remove the `components-base-control__help` class from group
+    help text
+time: '2026-10-28T06:38:01.535Z'
+custom:
+    PR: '85126'

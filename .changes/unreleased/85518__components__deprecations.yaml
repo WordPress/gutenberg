@@ -1,0 +1,8 @@
+project: components
+kind: Deprecations
+body: >-
+    `Tooltip`: Deprecate the component in favor of `Tooltip` from `@wordpress/ui`,
+    planned for removal in WordPress 7.5
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85518'

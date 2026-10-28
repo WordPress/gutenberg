@@ -1,0 +1,6 @@
+project: components
+kind: Enhancements
+body: "`BorderControl`: Remove double outline & use design system's focus ring"
+time: '2026-10-28T06:38:01.537Z'
+custom:
+    PR: '85173'
