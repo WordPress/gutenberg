@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Recommend `Button`, `ButtonLink`, and `IconButton` from `@wordpress/ui` ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   `use-recommended-components`: Recommend `getWpCompatOverlaySlot` from `@wordpress/ui` ([#85835](https://github.com/WordPress/gutenberg/pull/85835)).
 -   `use-recommended-components`: Link directly to Storybook migration guides in lint messages ([#85752](https://github.com/WordPress/gutenberg/pull/85752)).
 -   `use-recommended-components`: Link to the `ProgressBar` migration guide in lint messages and rule documentation ([#85520](https://github.com/WordPress/gutenberg/pull/85520)).
@@ -17,7 +18,6 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Recommend `Button`, `ButtonLink`, and `IconButton` from `@wordpress/ui` ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   `use-recommended-components`: Recommend `useEnableWpCompatOverlaySlot` from `@wordpress/ui` ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 -   `use-recommended-components`: Recommend `Notice` from `@wordpress/ui` instead of `Tip` from `@wordpress/components` ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   `use-recommended-components`: Recognize `Avatar` from `@wordpress/ui` as use-with-caution. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))

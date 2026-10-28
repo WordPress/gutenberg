@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `ThemeProvider`: Map Button colors to semantic tokens while preserving legacy accent aliases for other components ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
-
 ### Breaking Changes
 
 -   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
@@ -14,6 +10,10 @@
 ### Enhancements
 
 -   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+
+### Bug Fixes
+
+-   `ThemeProvider`: Map Button colors to semantic tokens while preserving legacy accent aliases for other components ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 
 ### Internal
 
