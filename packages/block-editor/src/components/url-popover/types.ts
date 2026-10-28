@@ -103,4 +103,13 @@ export interface ImageURLInputUIProps {
 	lightboxEnabled?: boolean;
 	onSetLightbox?: ( enabled: boolean ) => void;
 	resetLightbox?: () => void;
+	/**
+	 * Whether the link popover is open. When set, the popover is controlled
+	 * and `onToggle` reports the requested changes.
+	 */
+	open?: boolean;
+	/**
+	 * Called when the link popover requests to open or close.
+	 */
+	onToggle?: ( willOpen: boolean ) => void;
 }
