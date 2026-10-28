@@ -9482,6 +9482,48 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that a block's element styles are output before its pseudo-states,
+	 * so a state is never overridden by an element rule of equal specificity.
+	 */
+	public function test_block_elements_are_output_before_block_pseudo_states() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation-link' => array(
+							'color'    => array(
+								'text' => 'red',
+							),
+							'elements' => array(
+								'link' => array(
+									'color' => array(
+										'text' => 'red',
+									),
+								),
+							),
+							':hover'   => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$element_position = strpos( $stylesheet, 'a:where(:not(.wp-element-button))' );
+		$hover_position   = strpos( $stylesheet, ':hover' );
+
+		$this->assertNotFalse( $element_position, 'The link element rule should be output.' );
+		$this->assertNotFalse( $hover_position, 'The :hover rule should be output.' );
+		$this->assertLessThan( $hover_position, $element_position, 'The element rule should come before the :hover rule.' );
+	}
+
+	/**
 	 * Test that block custom states (e.g. -current) are processed correctly.
 	 */
 	public function test_block_custom_states_are_processed() {
