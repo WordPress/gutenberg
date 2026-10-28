@@ -1,5 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect, Metrics } from '@wordpress/e2e-test-utils-playwright';
 import { PerfUtils } from '../fixtures';
 import { sum } from '../utils.js';
 
@@ -22,6 +22,7 @@ const results = {
 	focus: [],
 	firstFocus: [],
 	selectAll: [],
+	undo: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -392,6 +393,130 @@ test.describe( 'Post Editor Performance', () => {
 				// Save the results.
 				if ( i > throwaway ) {
 					results.selectAll.push( sum( keyDownEvents ) );
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Undoing and redoing block changes', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			// Focus the canvas so the undo shortcuts reach the editor.
+			await canvas
+				.getByRole( 'document', { name: /Block: Paragraph/i } )
+				.first()
+				.click();
+
+			// Undo re-renders off-screen blocks in later tasks, after the key
+			// events, so this measures all main thread work until idle.
+			const session = await page.context().newCDPSession( page );
+			await session.send( 'Performance.enable' );
+			const getTaskDuration = async () => {
+				const { metrics } = await session.send(
+					'Performance.getMetrics'
+				);
+				return (
+					metrics.find( ( { name } ) => name === 'TaskDuration' )
+						.value * 1000
+				);
+			};
+
+			// Idle once three idle periods in a row have time left, so no work
+			// is left, such as blocks updating in idle time. With the caret in
+			// the canvas, the browser draws every frame, so periods are short.
+			const waitForIdle = () =>
+				page.evaluate(
+					() =>
+						new Promise( ( resolve ) => {
+							let idlePeriods = 0;
+							const check = ( deadline ) => {
+								idlePeriods =
+									deadline.timeRemaining() > 10
+										? idlePeriods + 1
+										: 0;
+								if ( idlePeriods === 3 ) {
+									resolve();
+								} else {
+									window.requestIdleCallback( check );
+								}
+							};
+							window.requestIdleCallback( check );
+						} )
+				);
+
+			// Which of the two edited paragraphs have a drop cap.
+			const getDropCaps = ( clientIds ) =>
+				page.evaluate(
+					( ids ) =>
+						ids.map(
+							( id ) =>
+								!! window.wp.data
+									.select( 'core/block-editor' )
+									.getBlockAttributes( id ).dropCap
+						),
+					clientIds
+				);
+
+			// Each step and which paragraphs have a drop cap after it.
+			const steps = [
+				[ 'ControlOrMeta+z', [ true, false ] ],
+				[ 'ControlOrMeta+z', [ false, false ] ],
+				[ 'ControlOrMeta+Shift+z', [ true, false ] ],
+			];
+			const throwaway = 1;
+			const iterations = 4 + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Two undo levels: a drop cap on one paragraph, then another.
+				const clientIds = await page.evaluate( ( index ) => {
+					const { select, dispatch } = window.wp.data;
+					const ids = select( 'core/block-editor' )
+						.getBlockOrder()
+						.slice( index, index + 2 );
+					for ( const id of ids ) {
+						dispatch( 'core/block-editor' ).updateBlockAttributes(
+							id,
+							{ dropCap: true }
+						);
+					}
+					return ids;
+				}, i * 2 );
+				expect( await getDropCaps( clientIds ) ).toEqual( [
+					true,
+					true,
+				] );
+				expect(
+					await page.evaluate( () =>
+						window.wp.data.select( 'core' ).hasUndo()
+					)
+				).toBe( true );
+
+				for ( const [ key, dropCaps ] of steps ) {
+					await waitForIdle();
+					const start = await getTaskDuration();
+
+					await page.keyboard.press( key );
+					await waitForIdle();
+
+					const duration = ( await getTaskDuration() ) - start;
+					expect( await getDropCaps( clientIds ) ).toEqual(
+						dropCaps
+					);
+
+					// Save the results.
+					if ( i > throwaway ) {
+						results.undo.push( duration );
+					}
 				}
 			}
 		} );
