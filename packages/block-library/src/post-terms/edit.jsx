@@ -30,7 +30,8 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, separator, prefix, suffix } = attributes;
+	const { term, separator, prefix, suffix, layout } = attributes;
+	const hasItems = [ 'flex', 'grid' ].includes( layout?.type );
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
@@ -103,9 +104,11 @@ export default function PostTermsEdit( {
 						.reduce( ( prev, curr ) => (
 							<>
 								{ prev }
-								<span className="wp-block-post-terms__separator">
-									{ separator || ' ' }
-								</span>
+								{ ! hasItems && (
+									<span className="wp-block-post-terms__separator">
+										{ separator || ' ' }
+									</span>
+								) }
 								{ curr }
 							</>
 						) ) }

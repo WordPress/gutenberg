@@ -5,4 +5,14 @@
 	.wp-block-post-terms__separator {
 		white-space: pre-wrap;
 	}
+
+	&.is-layout-flex {
+		&.has-text-align-center {
+			justify-content: center;
+		}
+
+		&.has-text-align-right {
+			justify-content: flex-end;
+		}
+	}
 }
