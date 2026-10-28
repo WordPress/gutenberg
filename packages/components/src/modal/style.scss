@@ -40,13 +40,13 @@ body.modal-open {
 	margin: 0;
 	width: 100%;
 	max-height: calc(100% - #{$grid-unit-50});
-	background: $white;
+	background: var(--wpds-color-background-surface-neutral-strong);
 	box-shadow: $elevation-large;
-	border-radius: $radius-large $radius-large 0 0;
+	border-radius: var(--wpds-border-radius-lg) var(--wpds-border-radius-lg) 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-content-neutral);
 	// Animate the modal frame/contents appearing on the page.
 	animation-name: components-modal__appear-animation;
 	animation-fill-mode: forwards;
@@ -56,7 +56,7 @@ body.modal-open {
 	h1,
 	h2,
 	h3 {
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@media not (prefers-reduced-motion) {
@@ -71,7 +71,7 @@ body.modal-open {
 	// Show a centered modal on bigger screens.
 	@include break-small() {
 		align-self: auto;
-		border-radius: $radius-large;
+		border-radius: var(--wpds-border-radius-lg);
 		margin: auto;
 		width: auto;
 		min-width: var(--wpds-dimension-surface-width-sm);
@@ -125,7 +125,7 @@ body.modal-open {
 			// Reset the mobile bottom-sheet overrides so the desktop
 			// full-screen modal is centered with rounded corners.
 			margin: auto;
-			border-radius: $radius-large;
+			border-radius: var(--wpds-border-radius-lg);
 			width: calc(100% - #{ $grid-unit-20 * 2 });
 			height: calc(100% - #{ $grid-unit-20 * 2 });
 		}

@@ -58,8 +58,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^components-/,
-		ltr: [ componentsLtr ],
-		rtl: [ componentsRtl ],
+		ltr: [ designTokens, componentsLtr ],
+		rtl: [ designTokens, componentsRtl ],
 	},
 	{
 		componentIdMatcher: /^editor-/,
