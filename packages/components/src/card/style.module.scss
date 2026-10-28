@@ -3,7 +3,7 @@
 
 // The outer 1px box shadow supplies the remaining pixel of the 8px radius.
 $border-radius: $radius-large - 1px;
-$border-color: rgba(0, 0, 0, 0.1);
+$border-color: var(--wpds-color-stroke-surface-neutral);
 
 .card {
 	box-shadow: 0 0 0 1px $border-color;
