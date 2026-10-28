@@ -13,6 +13,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { Stack, Text } from '@wordpress/ui';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -409,42 +410,47 @@ function GridLayoutMinimumWidthControl( {
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Min. column width' ) }
 			</BaseControl.VisualLabel>
-			<Flex gap={ 4 }>
-				<FlexItem isBlock>
-					<UnitControl
-						onChange={ ( newValue ) => {
-							onChange( {
-								...layout,
-								minimumColumnWidth:
-									newValue === '' ? undefined : newValue,
-							} );
-						} }
-						onUnitChange={ handleUnitChange }
-						// A `null` value shows an empty field.
-						value={ value as string | undefined }
-						units={ units }
-						min={ 0 }
-						label={ __( 'Minimum column width' ) }
-						hideLabelFromVision
-					/>
-				</FlexItem>
-				<FlexItem isBlock>
-					<RangeControl
-						onChange={ handleSliderChange }
-						value={ quantity || 0 }
-						min={ 0 }
-						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
-						withInputField={ false }
-						label={ __( 'Minimum column width' ) }
-						hideLabelFromVision
-					/>
-				</FlexItem>
-			</Flex>
-			<p className="components-base-control__help">
-				{ __(
-					'Columns will wrap to fewer per row when they can no longer maintain the minimum width.'
-				) }
-			</p>
+			<Stack direction="column" gap="md">
+				<Flex gap={ 4 }>
+					<FlexItem isBlock>
+						<UnitControl
+							onChange={ ( newValue ) => {
+								onChange( {
+									...layout,
+									minimumColumnWidth:
+										newValue === '' ? undefined : newValue,
+								} );
+							} }
+							onUnitChange={ handleUnitChange }
+							// A `null` value shows an empty field.
+							value={ value as string | undefined }
+							units={ units }
+							min={ 0 }
+							label={ __( 'Minimum column width' ) }
+							hideLabelFromVision
+						/>
+					</FlexItem>
+					<FlexItem isBlock>
+						<RangeControl
+							onChange={ handleSliderChange }
+							value={ quantity || 0 }
+							min={ 0 }
+							max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
+							withInputField={ false }
+							label={ __( 'Minimum column width' ) }
+							hideLabelFromVision
+						/>
+					</FlexItem>
+				</Flex>
+				<Text
+					render={ <p /> }
+					className="components-base-control__help"
+				>
+					{ __(
+						'Columns will wrap to fewer per row when they can no longer maintain the minimum width.'
+					) }
+				</Text>
+			</Stack>
 		</fieldset>
 	);
 }

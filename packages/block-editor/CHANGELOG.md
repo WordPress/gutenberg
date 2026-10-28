@@ -24,6 +24,7 @@
 
 ### Internal
 
+-   Grid layout: Use `Text` from `@wordpress/ui` for the minimum column width help text ([#85280](https://github.com/WordPress/gutenberg/pull/85280)).
 -   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 -   Convert the block toolbar, switcher, mover, preview and settings menu to TypeScript ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
 -   Convert the grid item tools, ChildLayoutControl and the layout hooks to TypeScript ([#84985](https://github.com/WordPress/gutenberg/pull/84985)).
