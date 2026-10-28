@@ -1,0 +1,54 @@
+@use "@wordpress/base-styles/variables";
+
+// Centred in the bar, at the same size on the site and in the editor, so it
+// does not move between the two.
+.document-bar {
+	position: absolute;
+	inset-block: 0;
+	inset-inline: 0;
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	width: min(400px, 40%);
+	height: variables.$button-size;
+	margin: auto;
+	padding-inline: var(--wpds-dimension-padding-sm) 2px;
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral-weak);
+}
+
+.title-button {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	min-width: 0;
+	height: 100%;
+	padding-inline: var(--wpds-dimension-padding-sm);
+	margin-inline-start: calc(-1 * var(--wpds-dimension-padding-sm));
+	border-radius: var(--wpds-border-radius-sm);
+	color: inherit;
+	cursor: var(--wpds-cursor-control);
+
+	&:hover {
+		background: var(--wpds-color-background-surface-neutral);
+	}
+
+	&:focus-visible {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+}
+
+.icon {
+	flex: none;
+	fill: currentColor;
+}
+
+.title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

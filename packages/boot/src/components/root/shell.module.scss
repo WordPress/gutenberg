@@ -4,20 +4,28 @@
 // The shell keeps the site and the admin screens in the same places in the
 // DOM and moves them only with CSS, so the site frame never reloads.
 .shell {
-	--site-shell-bar-height: #{variables.$grid-unit-60};
+	// The height of the editor header, so the two can share a row.
+	--site-shell-bar-height: #{variables.$header-height};
 	// Both match the values in `shell.tsx`, which places the site.
 	--site-shell-menu-width: 240px;
 	--site-shell-gap: 12px;
+	--site-shell-inset: 8px;
 	--site-shell-pip-scale: 1;
 	--site-shell-transition-duration: var(--wpds-motion-duration-md);
 	--site-shell-transition-easing: var(--wpds-motion-easing-balanced);
+	// The bar's color, which the editor header takes on too.
+	--site-shell-bar-background: #1e1e1e;
 
 	position: fixed;
 	inset: 0;
 	display: grid;
 	grid-template-rows: var(--site-shell-bar-height) 1fr;
 	color: var(--wpds-color-foreground-content-neutral);
-	background: var(--wpds-color-background-surface-neutral-weak);
+	// The bar's row is dark wherever the bar shows through, such as beside
+	// the editor when the menu is open.
+	background:
+		linear-gradient(var(--site-shell-bar-background), var(--site-shell-bar-background)) top / 100% var(--site-shell-bar-height) no-repeat,
+		var(--wpds-color-background-surface-neutral-weak);
 	isolation: isolate;
 
 	@media (prefers-reduced-motion: reduce) {
@@ -38,22 +46,58 @@
 	display: flex;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
-	padding-inline: var(--wpds-dimension-padding-sm);
-	background: var(--wpds-color-background-surface-neutral);
 	color: var(--wpds-color-foreground-content-neutral);
-	z-index: 4;
+	position: relative;
+	// Above the editor, whose header fills the middle of the row.
+	z-index: 6;
+	view-transition-name: site-shell--bar;
+
+	// In the editor, its header shows through the middle of the bar.
+	.is-editing & {
+		pointer-events: none;
+
+		> :not(.bar-context) {
+			pointer-events: auto;
+		}
+	}
 }
 
-.bar-actions {
+.bar-start,
+.bar-end {
 	display: flex;
+	flex: none;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
-	margin-inline-start: auto;
+}
+
+.bar-end {
+	padding-inline: var(--wpds-dimension-padding-sm);
+}
+
+.bar-context {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	justify-content: flex-end;
+	gap: var(--wpds-dimension-gap-xs);
+	min-width: 0;
+}
+
+// As wide as the bar is tall, like the site icon in the editor header.
+.bar-menu-toggle {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: var(--site-shell-bar-height);
 }
 
 .body {
 	position: relative;
 	overflow: hidden;
+	// Whatever the site, the editor or an admin screen leaves uncovered
+	// around it matches the bar and the menu.
+	background: var(--site-shell-bar-background);
 }
 
 // The menu is docked beside the site, or slid out of view. It never covers
@@ -102,8 +146,9 @@
 	inset: 0;
 	z-index: 1;
 	display: flex;
-	gap: var(--site-shell-gap);
-	padding: var(--site-shell-gap);
+	gap: var(--site-shell-inset);
+	// Flush with the bar above, inset from the window's other edges.
+	padding: 0 var(--site-shell-inset) var(--site-shell-inset);
 	transition-property: padding, visibility;
 	transition-duration: var(--site-shell-transition-duration), 0s;
 	transition-timing-function: var(--site-shell-transition-easing);
@@ -116,9 +161,10 @@
 	}
 
 	// Room for the menu whenever it is open, on the site too, so entering an
-	// admin screen from the menu moves nothing but the site.
+	// admin screen from the menu moves nothing but the site. The screen sits
+	// right against the menu, like the site and the editor do.
 	.is-menu-open & {
-		padding-inline-start: calc(var(--site-shell-menu-width) + var(--site-shell-gap));
+		padding-inline-start: var(--site-shell-menu-width);
 	}
 }
 
@@ -134,9 +180,14 @@
 	width: 100%;
 	height: 100%;
 
-	// Behind the menu and the editor, which cover it.
+	// Behind the menu and the editor, which cover it. It stays visible long
+	// enough for the editor to crossfade from it, 250ms, then is hidden, so
+	// it does not show through the space around the editor when the menu
+	// opens. Leaving the editor shows it again at once.
 	.is-editing & {
 		z-index: 0;
+		visibility: hidden;
+		transition-delay: 0s, 0s, 0s, 0s, 0s, 300ms;
 	}
 	overflow: hidden;
 	background: var(--wpds-color-background-surface-neutral);
@@ -151,6 +202,11 @@
 
 	[dir="rtl"] & {
 		transform-origin: top right;
+	}
+
+	// Inset beside the open menu, against the bar's dark background.
+	&.is-beside-menu {
+		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
 	}
 
 	&.is-thumbnail {
@@ -173,16 +229,42 @@
 
 // The editor opens above the site, which it crossfades from, and leaves room
 // for the menu when it is open.
+// The editor fills the shell, including the bar's row, which its header
+// shares with the menu toggle.
 .editor {
 	position: absolute;
 	inset: 0;
-	z-index: 4;
+	z-index: 5;
 	background: var(--wpds-color-background-surface-neutral);
 	view-transition-name: site-shell--editor;
-	transition: inset-inline-start var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+	transition-property: inset, background-color;
+	transition-duration: var(--site-shell-transition-duration);
+	transition-timing-function: var(--site-shell-transition-easing);
 
+	// Beside the open menu, the editor is inset like the site, with the
+	// bar's dark background around it. Its header stays in the bar's row.
 	.is-menu-open & {
-		inset-inline-start: var(--site-shell-menu-width);
+		inset-inline: var(--site-shell-menu-width) var(--site-shell-inset);
+		inset-block-end: var(--site-shell-inset);
+		background: var(--site-shell-bar-background);
+	}
+
+	:global(.interface-interface-skeleton__body) {
+		transition: margin var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+	}
+
+	// The canvas and the footer below it read as one rounded card.
+	.is-menu-open & :global(.interface-interface-skeleton__body) {
+		margin-block-start: var(--site-shell-inset);
+		border-start-start-radius: var(--wpds-border-radius-md);
+		border-start-end-radius: var(--wpds-border-radius-md);
+		overflow: hidden;
+	}
+
+	.is-menu-open & :global(.interface-interface-skeleton__footer) {
+		border-end-start-radius: var(--wpds-border-radius-md);
+		border-end-end-radius: var(--wpds-border-radius-md);
+		overflow: hidden;
 	}
 
 	:global(.interface-interface-skeleton) {
@@ -190,6 +272,128 @@
 		height: 100%;
 		top: 0 !important;
 		inset-inline-start: 0 !important;
+	}
+
+	// The header sits between the bar's two ends, and takes its color. These
+	// override the editor's own styles, so they are tied to its class names:
+	// fine for a prototype, but a real version would render the editor's
+	// tools inside the bar instead.
+	:global(.editor-header) {
+		padding-inline: var(--site-shell-editor-header-start) var(--site-shell-editor-header-end);
+		background: var(--site-shell-bar-background);
+		color: #fff;
+		transition: padding var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+		// Read by `@wordpress/components`, for buttons and their states.
+		--wp-components-color-foreground: #fff;
+		--wp-components-color-background: var(--site-shell-bar-background);
+		--wp-components-color-gray-100: #2f2f2f;
+		--wp-components-color-gray-200: #3c3c3c;
+		--wp-components-color-gray-300: #4a4a4a;
+		--wp-components-color-gray-400: #757575;
+		--wp-components-color-gray-600: #949494;
+		--wp-components-color-gray-700: #ccc;
+		--wp-components-color-gray-800: #e0e0e0;
+
+		:global(.components-button):not(.is-primary):not(:disabled):not([aria-disabled="true"]) {
+			color: #fff;
+		}
+
+		:global(.components-button):disabled,
+		:global(.components-button)[aria-disabled="true"] {
+			color: #757575;
+		}
+
+		:global(.components-button.is-pressed):not(.is-primary) {
+			background: #fff;
+			color: var(--site-shell-bar-background);
+		}
+
+		:global(.editor-document-bar) {
+			background: #2f2f2f;
+
+			&:hover,
+			:global(.components-button):hover {
+				background: #3c3c3c;
+			}
+		}
+
+		:global(.editor-document-bar__title),
+		:global(.editor-document-bar__post-type-label) {
+			color: #fff;
+		}
+
+		:global(.editor-document-bar__icon-layout svg) {
+			fill: #ccc;
+		}
+	}
+
+	// The bar shows its own document bar in the same place.
+	:global(.editor-header__center) {
+		visibility: hidden;
+	}
+
+	// The document bar's View button returns to the page on the site, so the
+	// editor's own link to view it in a new tab is left out. It has no class
+	// of its own, so it is picked out by where and what it is.
+	:global(.editor-header__settings > a.components-button[target="_blank"]) {
+		display: none;
+	}
+
+	:global(.interface-interface-skeleton__header) {
+		border-block-end-color: var(--site-shell-bar-background);
+	}
+
+	// The editor's chrome comes in from the edges of the window, as though
+	// it had been waiting just out of view. The canvas between them
+	// crossfades from the site.
+	@media not (prefers-reduced-motion: reduce) {
+		:global(.interface-interface-skeleton__header) {
+			animation: site-shell-from-top var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		:global(.interface-interface-skeleton__sidebar) {
+			animation: site-shell-from-end var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		:global(.interface-interface-skeleton__secondary-sidebar) {
+			animation: site-shell-from-start var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		:global(.interface-interface-skeleton__footer) {
+			animation: site-shell-from-bottom var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		[dir="rtl"] & :global(.interface-interface-skeleton__sidebar) {
+			animation-name: site-shell-from-start;
+		}
+
+		[dir="rtl"] & :global(.interface-interface-skeleton__secondary-sidebar) {
+			animation-name: site-shell-from-end;
+		}
+	}
+}
+
+@keyframes site-shell-from-top {
+	from {
+		transform: translateY(-100%);
+	}
+}
+
+@keyframes site-shell-from-bottom {
+	from {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes site-shell-from-end {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes site-shell-from-start {
+	from {
+		transform: translateX(-100%);
 	}
 }
 
@@ -240,4 +444,9 @@
 // The editor crossfades in above the still site, and out again on leaving.
 :global(:root)::view-transition-group(site-shell--editor) {
 	z-index: 3;
+}
+
+// The bar stays above the editor through the crossfade.
+:global(:root)::view-transition-group(site-shell--bar) {
+	z-index: 4;
 }

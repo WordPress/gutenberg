@@ -8,14 +8,11 @@
 	},
 	"dependencies": {
 		"@wordpress/boot": "file:../../packages/boot",
-		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/route": "file:../../packages/route",
-		"@wordpress/routes-site-preview": "file:../site-preview",
-		"@wordpress/ui": "file:../../packages/ui"
+		"@wordpress/routes-site-preview": "file:../site-preview"
 	},
 	"devDependencies": {
 		"@types/react": "^19.3.0"

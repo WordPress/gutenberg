@@ -5,7 +5,6 @@ import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider, Slot } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	useEffect,
 	useId,
@@ -14,7 +13,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import { wordpress } from '@wordpress/icons';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
@@ -32,6 +30,9 @@ import Navigation from '../navigation';
 import SavePanel from '../save-panel';
 import ErrorBoundary from '../error-boundary';
 import CanvasRenderer from '../canvas-renderer';
+import ShellAccountMenu from './shell-account-menu';
+import ShellDocumentBar from './shell-document-bar';
+import ShellSiteIdentity from './shell-site-identity';
 import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
@@ -39,7 +40,7 @@ import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import styles from './shell.module.scss';
 
-const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
+const { useMatches, Outlet } = unlock( routePrivateApis );
 
 // Where the site route puts what it offers for the page it shows, such as
 // editing it.
@@ -84,10 +85,12 @@ function SiteCanvas( { isActive }: { isActive: boolean } ) {
 	return <CustomCanvas isActive={ isActive } />;
 }
 
-// Matches `--site-shell-menu-width` and `--site-shell-gap` in the styles,
-// which size the menu the site is placed beside and inside.
+// Matches `--site-shell-menu-width`, `--site-shell-gap` and
+// `--site-shell-inset` in the styles, which size the menu the site is placed
+// beside and inside, and the space left around it beside the menu.
 const MENU_WIDTH = 240;
 const GAP = 12;
+const INSET = 8;
 
 type SiteLayout = 'full' | 'beside-menu' | 'thumbnail';
 
@@ -112,16 +115,18 @@ function getSiteStyle(
 		return { style: {}, thumbnailHeight: 0 };
 	}
 
-	// Beside the menu, the site is scaled to the width left over. It is made
-	// taller by as much, so that once scaled it still fills the height.
+	// Beside the menu, the site is scaled to the width left over, less a
+	// small inset on its other sides. It is made taller by as much, so that
+	// once scaled it still fills the height.
 	if ( layout === 'beside-menu' ) {
-		const scale = ( width - MENU_WIDTH ) / width;
+		const scale = ( width - MENU_WIDTH - INSET ) / width;
 		return {
 			style: {
-				height: height / scale,
-				transform: `translateX(${
+				height: ( height - INSET * 2 ) / scale,
+				transform: `translate(${
 					direction * MENU_WIDTH
-				}px) scale(${ scale })`,
+				}px, ${ INSET }px) scale(${ scale })`,
+				[ '--site-shell-pip-scale' as string ]: scale,
 			},
 			thumbnailHeight: 0,
 		};
@@ -150,17 +155,21 @@ function getSiteStyle(
  * make room, and opening an admin screen shrinks it into the menu's footer.
  */
 export default function RootShell() {
-	const location = useLocation();
 	const navigate = useNavigate();
+	// Everything is read from the loaded route, not the location, which
+	// changes as soon as a route starts loading. Mixing the two puts the shell
+	// briefly in the wrong state, such as shrinking the site on the way into
+	// the editor because the editor's canvas has not arrived yet.
 	const matches = useMatches();
+	const currentMatch = matches[ matches.length - 1 ];
+	const pathname = currentMatch?.pathname;
 	const routeCanvas = (
-		matches[ matches.length - 1 ]?.loaderData as
-			{ canvas?: CanvasData | null } | undefined
+		currentMatch?.loaderData as { canvas?: CanvasData | null } | undefined
 	 )?.canvas;
 	// A route with an editor canvas, such as editing a page or a template.
 	const editorCanvas =
 		routeCanvas && ! routeCanvas.isPreview ? routeCanvas : undefined;
-	const isSiteActive = location.pathname === '/';
+	const isSiteActive = pathname === '/';
 	const isEditing = !! editorCanvas;
 	const isAdminActive = ! isSiteActive && ! isEditing;
 	const menuId = useId();
@@ -176,7 +185,7 @@ export default function RootShell() {
 	// The site and the editor start with the menu closed.
 	useEffect( () => {
 		setIsSiteMenuOpen( false );
-	}, [ location.pathname ] );
+	}, [ pathname ] );
 
 	// Opening the menu moves focus into it.
 	useEffect( () => {
@@ -187,6 +196,22 @@ export default function RootShell() {
 				?.focus();
 		}
 	}, [ isMenuOpen ] );
+
+	// The editor header is laid out between the bar's two ends, so it needs
+	// their widths.
+	const [ barEnds, setBarEnds ] = useState( { start: 0, end: 0 } );
+	const barStartRef = useResizeObserver( ( [ entry ] ) =>
+		setBarEnds( ( ends ) => ( {
+			...ends,
+			start: entry.borderBoxSize[ 0 ].inlineSize,
+		} ) )
+	);
+	const barEndRef = useResizeObserver( ( [ entry ] ) =>
+		setBarEnds( ( ends ) => ( {
+			...ends,
+			end: entry.borderBoxSize[ 0 ].inlineSize,
+		} ) )
+	);
 
 	const [ size, setSize ] = useState( { width: 0, height: 0 } );
 	const bodyRef = useResizeObserver( ( [ entry ] ) =>
@@ -213,19 +238,6 @@ export default function RootShell() {
 		size.height
 	);
 
-	const siteTitle = useSelect(
-		( select ) =>
-			decodeEntities(
-				(
-					select( coreStore ).getEntityRecord(
-						'root',
-						'__unstableBase'
-					) as { name?: string } | undefined
-				 )?.name ?? ''
-			),
-		[]
-	);
-
 	useRouteTitle();
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
@@ -247,6 +259,22 @@ export default function RootShell() {
 						} ) }
 						style={
 							{
+								// The open menu already moves the editor past
+								// part of the bar's start.
+								'--site-shell-editor-header-start': `${
+									isMenuOpen
+										? Math.max(
+												0,
+												barEnds.start - MENU_WIDTH
+											)
+										: barEnds.start
+								}px`,
+								// So does the inset beside the open menu.
+								'--site-shell-editor-header-end': `${
+									isMenuOpen
+										? Math.max( 0, barEnds.end - INSET )
+										: barEnds.end
+								}px`,
 								'--site-shell-thumbnail-space': `${
 									thumbnailHeight
 										? thumbnailHeight + GAP * 2
@@ -263,45 +291,59 @@ export default function RootShell() {
 						<ThemeProvider
 							color={ { ...themeColors, background: '#1e1e1e' } }
 						>
+							{ /*
+							 * Global items sit at either end of the bar, and
+							 * the current workflow fills the middle. In the
+							 * editor, that is the editor's own header, laid
+							 * out to fit between the two ends.
+							 */ }
 							<header className={ styles.bar }>
-								<IconButton
-									variant="minimal"
-									tone="neutral"
-									icon={ wordpress }
-									label={ __( 'Menu' ) }
-									aria-expanded={ isMenuOpen }
-									aria-controls={ menuId }
-									onClick={ () => {
-										shouldFocusMenuRef.current =
-											! isMenuOpen;
-										if ( isAdminActive ) {
-											setIsAdminMenuHidden(
-												! isAdminMenuHidden
-											);
-										} else {
-											setIsSiteMenuOpen(
-												! isSiteMenuOpen
-											);
-										}
-									} }
-								/>
-								<Button
-									variant="minimal"
-									tone="neutral"
-									size="compact"
-									aria-current={
-										isSiteActive ? 'page' : undefined
-									}
-									onClick={ () => {
-										if ( ! isSiteActive ) {
-											navigate( { to: '/' } );
-										}
-									} }
+								<div
+									ref={ barStartRef }
+									className={ styles[ 'bar-start' ] }
 								>
-									{ siteTitle || __( 'Site' ) }
-								</Button>
-								<div className={ styles[ 'bar-actions' ] }>
+									<div
+										className={
+											styles[ 'bar-menu-toggle' ]
+										}
+									>
+										<IconButton
+											variant="minimal"
+											tone="neutral"
+											icon={ wordpress }
+											label={ __( 'Menu' ) }
+											aria-expanded={ isMenuOpen }
+											aria-controls={ menuId }
+											onClick={ () => {
+												shouldFocusMenuRef.current =
+													! isMenuOpen;
+												if ( isAdminActive ) {
+													setIsAdminMenuHidden(
+														! isAdminMenuHidden
+													);
+												} else {
+													setIsSiteMenuOpen(
+														! isSiteMenuOpen
+													);
+												}
+											} }
+										/>
+									</div>
+									{ ! isEditing && <ShellSiteIdentity /> }
+								</div>
+								<div className={ styles[ 'bar-context' ] }>
 									<Slot name={ BAR_SLOT } bubblesVirtually />
+								</div>
+								{ ( isSiteActive || isEditing ) && (
+									<ShellDocumentBar
+										editorCanvas={ editorCanvas }
+									/>
+								) }
+								<div
+									ref={ barEndRef }
+									className={ styles[ 'bar-end' ] }
+								>
+									<ShellAccountMenu />
 								</div>
 							</header>
 						</ThemeProvider>
@@ -337,6 +379,8 @@ export default function RootShell() {
 								className={ clsx( styles.site, {
 									[ styles[ 'is-thumbnail' ] ]:
 										siteLayout === 'thumbnail',
+									[ styles[ 'is-beside-menu' ] ]:
+										siteLayout === 'beside-menu',
 									[ styles[ 'is-hidden' ] ]: isSiteHidden,
 								} ) }
 								style={ siteStyle }
@@ -361,16 +405,18 @@ export default function RootShell() {
 									/>
 								) }
 							</div>
-							{ editorCanvas && (
-								<div className={ styles.editor }>
-									<ErrorBoundary>
-										<CanvasRenderer
-											canvas={ editorCanvas }
-										/>
-									</ErrorBoundary>
-								</div>
-							) }
 						</div>
+						{ editorCanvas && (
+							<div className={ styles.editor }>
+								<ErrorBoundary>
+									<CanvasRenderer
+										canvas={ editorCanvas }
+										// The bar is the way back to the site.
+										showBackButton={ false }
+									/>
+								</ErrorBoundary>
+							</div>
+						) }
 					</div>
 				</ThemeProvider>
 			</Tooltip.Provider>

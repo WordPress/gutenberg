@@ -8,6 +8,10 @@ export function getRoutes( state: State ) {
 	return state.routes;
 }
 
+export function getShownEntity( state: State ) {
+	return state.shownEntity;
+}
+
 export function getLayout( state: State ) {
 	return state.layout;
 }

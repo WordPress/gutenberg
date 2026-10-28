@@ -1,4 +1,10 @@
-import type { EntityLinks, Layout, MenuItem, Route } from './types';
+import type {
+	EntityLinks,
+	Layout,
+	MenuItem,
+	Route,
+	ShownEntity,
+} from './types';
 
 export function registerMenuItem( id: string, menuItem: MenuItem ) {
 	return {
@@ -61,10 +67,24 @@ export function setLayout( layout: Layout ) {
 	};
 }
 
+/**
+ * Sets what the site shell's site frame shows, so the shell's bar can name
+ * it and offer to edit it.
+ *
+ * @param shownEntity What the site shows, or null when it is not known.
+ */
+export function setShownEntity( shownEntity: ShownEntity | null ) {
+	return {
+		type: 'SET_SHOWN_ENTITY' as const,
+		shownEntity,
+	};
+}
+
 export type Action =
 	| ReturnType< typeof registerMenuItem >
 	| ReturnType< typeof updateMenuItem >
 	| ReturnType< typeof registerRoute >
 	| ReturnType< typeof registerEntityLinks >
 	| ReturnType< typeof setDashboardLink >
-	| ReturnType< typeof setLayout >;
+	| ReturnType< typeof setLayout >
+	| ReturnType< typeof setShownEntity >;

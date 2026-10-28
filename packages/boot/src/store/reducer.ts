@@ -7,6 +7,7 @@ const initialState: State = {
 	dashboardLink: undefined,
 	entityLinks: {},
 	layout: 'default',
+	shownEntity: null,
 };
 
 export function reducer( state: State = initialState, action: Action ): State {
@@ -54,6 +55,12 @@ export function reducer( state: State = initialState, action: Action ): State {
 						...action.links,
 					},
 				},
+			};
+
+		case 'SET_SHOWN_ENTITY':
+			return {
+				...state,
+				shownEntity: action.shownEntity,
 			};
 
 		case 'SET_LAYOUT':

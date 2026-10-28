@@ -198,6 +198,19 @@ export interface Route {
 }
 
 /**
+ * What the site shell's site frame shows: the content, when the location has
+ * any, and the template that renders it.
+ */
+export interface ShownEntity {
+	url: string;
+	postType: string;
+	postId: string;
+	postTitle: string;
+	templateId: string;
+	templateTitle: string;
+}
+
+/**
  * The layout the app renders in.
  */
 export type Layout = 'default' | 'shell';
@@ -208,4 +221,5 @@ export interface State {
 	dashboardLink?: string;
 	entityLinks: Record< string, EntityLinks >;
 	layout: Layout;
+	shownEntity: ShownEntity | null;
 }

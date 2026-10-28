@@ -1,0 +1,19 @@
+.identity {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	padding-inline: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+}
+
+.name {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	white-space: nowrap;
+}
+
+.icon {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	border-radius: var(--wpds-border-radius-xs);
+	object-fit: cover;
+}

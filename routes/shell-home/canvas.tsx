@@ -1,15 +1,12 @@
 import { useCallback, useEffect, useState } from '@wordpress/element';
-import { Fill } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import { store as bootStore } from '@wordpress/boot';
 import { useNavigate, useSearch } from '@wordpress/route';
 import {
 	SitePreview,
 	useSiteUrl,
 	type SitePreviewContext,
 } from '@wordpress/routes-site-preview';
-import EditActions from './edit-actions';
-
-// The slot the site shell keeps in its bar for what the site shows.
-const BAR_SLOT = 'SiteShellBarActions';
 
 type ShellSiteProps = {
 	/** Whether the site is the current route, rather than behind another. */
@@ -38,14 +35,24 @@ function ShellSite( { isActive = true }: ShellSiteProps ) {
 	}, [ preview ] );
 
 	// Returning to the site restores the param for the location it shows.
+	// Keeping the param in step changes nothing on screen, so it starts no
+	// transition, which would otherwise cut short the one already running.
 	useEffect( () => {
 		if ( isActive && path && preview !== path ) {
-			navigate( { to: '/', search: { preview: path }, replace: true } );
+			navigate( {
+				to: '/',
+				search: { preview: path },
+				replace: true,
+				viewTransition: false,
+			} );
 		}
 	}, [ isActive, path, preview, navigate ] );
 
-	const [ context, setContext ] = useState< SitePreviewContext | null >(
-		null
+	// The shell's bar names what the site shows and offers to edit it.
+	const { setShownEntity } = useDispatch( bootStore );
+	const onContextChange = useCallback(
+		( context: SitePreviewContext | null ) => setShownEntity( context ),
+		[ setShownEntity ]
 	);
 
 	const onPathChange = useCallback(
@@ -56,6 +63,7 @@ function ShellSite( { isActive = true }: ShellSiteProps ) {
 					to: '/',
 					search: nextPath ? { preview: nextPath } : {},
 					replace: true,
+					viewTransition: false,
 				} );
 			}
 		},
@@ -67,23 +75,13 @@ function ShellSite( { isActive = true }: ShellSiteProps ) {
 	}
 
 	return (
-		<>
-			<SitePreview
-				siteUrl={ siteUrl }
-				path={ path }
-				onPathChange={ onPathChange }
-				onContextChange={ setContext }
-				showAddressBar={ false }
-			/>
-			{ isActive && (
-				<Fill name={ BAR_SLOT }>
-					<EditActions
-						context={ context }
-						publicUrl={ context?.url || siteUrl }
-					/>
-				</Fill>
-			) }
-		</>
+		<SitePreview
+			siteUrl={ siteUrl }
+			path={ path }
+			onPathChange={ onPathChange }
+			onContextChange={ onContextChange }
+			showAddressBar={ false }
+		/>
 	);
 }
 
