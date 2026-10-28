@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
+
 ### Bug Fixes
 
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
@@ -9,6 +13,7 @@
 -   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor, and pasting one keeps it again, as before WordPress 7.0 ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Raw HTML conversion no longer copies the classes a block adds itself into `className`. `<ul class="wp-block-list fancy">` now converts to a List block with `className: "fancy"`, where before it got `"wp-block-list fancy"` ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   `rawHandler`, `pasteHandler`: Keep shortcodes in text inline unless they're on their own line, or aligned at the start or end of a line ([#85795](https://github.com/WordPress/gutenberg/pull/85795)).
 
 ### Internal
 

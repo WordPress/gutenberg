@@ -132,3 +132,29 @@ WithHints.args = {
 		},
 	],
 };
+
+export const WithCustomColors = Template.bind( {} );
+WithCustomColors.args = {
+	label: 'Custom colors',
+	options: [
+		{ key: 'default', name: 'Default' },
+		{
+			key: 'aquamarine',
+			name: 'Aquamarine',
+			style: {
+				backgroundColor: '#7fffd4',
+				color: '#16352b',
+				fontWeight: 600,
+			},
+		},
+		{
+			key: 'rose',
+			name: 'Rose',
+			style: {
+				backgroundColor: '#fff3f6',
+				color: '#6b2345',
+				fontStyle: 'italic',
+			},
+		},
+	],
+};

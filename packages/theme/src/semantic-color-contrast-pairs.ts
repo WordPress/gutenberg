@@ -109,8 +109,31 @@ export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 	},
 ] as const;
 
+export const MINIMUM_NON_TEXT_CONTRAST = 3;
+
+// These colors identify focus through a ring or a solid item highlight. Check
+// every supported neutral surface and the public brand surface using the final
+// colors after seed adjustment.
+export const SEMANTIC_FOCUS_CONTRAST_PAIRS = (
+	[
+		'background.surface.neutral',
+		'background.surface.neutral-strong',
+		'background.surface.neutral-weak',
+		'background.surface.brand',
+	] as const
+ ).flatMap( ( background ) =>
+	(
+		[
+			'stroke.focus',
+			'background.interactive.brand-strong',
+			'background.interactive.brand-strong-active',
+		] as const
+	 ).map( ( foreground ) => ( { background, foreground } ) )
+);
+
 type SemanticColorContrastPair =
-	( typeof SEMANTIC_COLOR_CONTRAST_PAIRS )[ number ];
+	| ( typeof SEMANTIC_COLOR_CONTRAST_PAIRS )[ number ]
+	| ( typeof SEMANTIC_FOCUS_CONTRAST_PAIRS )[ number ];
 
 export type SemanticColorToken =
 	| SemanticColorContrastPair[ 'background' ]

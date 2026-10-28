@@ -2070,6 +2070,62 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Resolve this note.' );
 		} );
 
+		test( 'adds, resolves and deletes inline notes in merged text', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			// Each note action writes rich text data back, so each step merges
+			// again to get an HTML string.
+			async function appendAndMerge( content ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+				await paragraph.last().click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+				await expect( paragraph ).toHaveCount( 1 );
+			}
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'One' },
+			} );
+
+			await test.step( 'Add a note', async () => {
+				await appendAndMerge( ' two' );
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First note' );
+				await expect( marker ).toHaveText( 'One two' );
+			} );
+
+			await test.step( 'Resolve the note', async () => {
+				await appendAndMerge( ' three' );
+				await blockNoteUtils.getThread( 'First note' ).click();
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'Delete a note', async () => {
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second note' );
+				await appendAndMerge( ' four' );
+				await blockNoteUtils.getThread( 'Second note' ).click();
+				await blockNoteUtils.deleteNote();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await expect( paragraph ).toHaveText( 'One two three four' );
+		} );
+
 		test( 'anchors the marker to only the selected text', async ( {
 			editor,
 			page,

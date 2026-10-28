@@ -228,18 +228,53 @@ function getNumericPlaceholder(
 	return quantity;
 }
 
+/**
+ * Expands a CSS spacing shorthand without splitting values inside CSS functions.
+ *
+ * @param value The padding or margin shorthand.
+ * @return The values for each side.
+ */
+function unpackBoxShorthand( value: string ): SpacingSidesValue {
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+
+	for ( const char of value.trim() ) {
+		if ( char === '(' ) {
+			depth++;
+			current += char;
+		} else if ( char === ')' ) {
+			depth = Math.max( 0, depth - 1 );
+			current += char;
+		} else if ( /\s/.test( char ) && depth === 0 ) {
+			if ( current ) {
+				parts.push( current );
+				current = '';
+			}
+		} else {
+			current += char;
+		}
+	}
+
+	if ( current ) {
+		parts.push( current );
+	}
+
+	if ( parts.length >= 2 && parts.length <= 4 ) {
+		const [ top, right = top, bottom = top, left = right ] = parts;
+		return { top, right, bottom, left };
+	}
+
+	return { top: value, right: value, bottom: value, left: value };
+}
+
 function splitStyleValue(
 	value: StyleValue | SpacingSidesValue
 ): StyleValue | SpacingSidesValue {
 	// Check for shorthand value (a string value).
 	if ( hasValue( value ) && typeof value === 'string' ) {
 		// Convert to value for individual sides for BoxControl.
-		return {
-			top: value,
-			right: value,
-			bottom: value,
-			left: value,
-		};
+		return unpackBoxShorthand( value );
 	}
 
 	return value;
