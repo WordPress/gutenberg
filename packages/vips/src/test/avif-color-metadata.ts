@@ -8,8 +8,9 @@ import Vips from 'wasm-vips';
  *
  * These tests document known upstream bugs and are expected to fail until
  * a `wasm-vips` release built on libvips 8.19 is adopted:
- * - The `colr` (nclx/CICP) box is not written, so decoders fall back to
- *   sRGB/BT.709 and wide gamut and HDR images render desaturated.
+ * - The `colr` (nclx/CICP) box is not written, so decoders fall back to the
+ *   AV1 sequence header's BT.709 primaries and sRGB transfer. Wide gamut and
+ *   HDR images render desaturated.
  * - The `clli` (content light level) box is dropped from HDR images.
  *
  * See https://core.trac.wordpress.org/ticket/60889
@@ -217,8 +218,8 @@ describe( 'AVIF sub-size color metadata', () => {
 	describe.each( [
 		// Display P3 primaries, sRGB transfer, BT.601 matrix.
 		[ 'Display P3 SDR', 'display-p3-10bit.avif', [ 12, 13, 6 ] ],
-		// BT.2020 primaries, PQ transfer, BT.2020 matrix.
-		[ 'BT.2100 PQ HDR', 'hdr-pq-10bit.avif', [ 9, 16, 9 ] ],
+		// Display P3 primaries, PQ transfer, BT.601 matrix.
+		[ 'Display P3 PQ HDR', 'display-p3-pq-10bit.avif', [ 12, 16, 6 ] ],
 	] )( '%s', ( _label, file, [ primaries, transfer, matrix ] ) => {
 		it( 'keeps the source CICP color signaling', () => {
 			const { source, subSize } = createSubSize( file );
@@ -241,7 +242,7 @@ describe( 'AVIF sub-size color metadata', () => {
 	} );
 
 	it( 'keeps the HDR content light level', () => {
-		const { source, subSize } = createSubSize( 'hdr-pq-10bit.avif' );
+		const { source, subSize } = createSubSize( 'display-p3-pq-10bit.avif' );
 
 		expect( getContentLightLevel( source ) ).toEqual( {
 			maxContentLightLevel: 1000,
