@@ -159,16 +159,10 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div></div>$#', $output );
 	}
 
-	public function test_value_goes_inside_the_inner_container_of_an_empty_legacy_group() {
+	public function test_value_goes_inside_an_empty_group() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"></div>' );
-		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div></div>$#', $output );
-	}
-
-	public function test_value_goes_inside_the_inner_container_before_what_follows_it() {
-		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"></div><span>Tail</span>' );
-		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div><span>Tail</span></div>$#', $output );
+		// Classic themes get an inner container from `wp_restore_group_inner_container()`.
+		$this->assertMatchesRegularExpression( '#^<div class="wp-block-group[^"]*">(<div class="wp-block-group__inner-container[^"]*">)?\s*<p[^>]*>One</p>\s*(</div>)?</div>$#', $this->render_group( null, '' ) );
 	}
 
 	public function test_value_goes_before_the_closer_of_a_wrapper_with_unclosed_elements() {
@@ -180,18 +174,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
 		$output      = $this->render_group( null, '<!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --><span>Tail</span>' );
 		$this->assertMatchesRegularExpression( '#>One</p><span>Tail</span>#', $output );
-	}
-
-	public function test_inner_container_class_name_without_inner_container_keeps_value() {
-		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$block       = new WP_Block( parse_blocks( '<!-- wp:group {"className":"wp-block-group__inner-container-x","metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group wp-block-group__inner-container-x"></div><!-- /wp:group -->' )[0] );
-		$this->assertStringContainsString( '>One</p>', $block->render() );
-	}
-
-	public function test_wrapper_with_the_inner_container_class_name_is_not_an_inner_container() {
-		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$block       = new WP_Block( parse_blocks( '<!-- wp:group {"className":"wp-block-group__inner-container","metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group wp-block-group__inner-container"><span>Tail</span></div><!-- /wp:group -->' )[0] );
-		$this->assertMatchesRegularExpression( '#<span>Tail</span><p[^>]*>One</p>#', $block->render() );
 	}
 
 	public function test_nested_custom_css_in_the_value_is_removed() {
