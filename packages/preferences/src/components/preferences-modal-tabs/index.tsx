@@ -17,7 +17,7 @@ import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 import { isRTL, __ } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 const PREFERENCES_MENU = 'preferences-menu';
 
@@ -63,35 +63,35 @@ export default function PreferencesModalTabs( {
 	if ( isLargeViewport ) {
 		modalContent = (
 			<div className="preferences__tabs">
-				<Tabs
+				<WCTabs
 					defaultTabId={
 						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
 					}
 					onSelect={ setActiveMenu }
 					orientation="vertical"
 				>
-					<Tabs.TabList className="preferences__tabs-tablist">
+					<WCTabs.TabList className="preferences__tabs-tablist">
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab
+							<WCTabs.Tab
 								tabId={ tab.name }
 								key={ tab.name }
 								className="preferences__tabs-tab"
 							>
 								{ tab.title }
-							</Tabs.Tab>
+							</WCTabs.Tab>
 						) ) }
-					</Tabs.TabList>
+					</WCTabs.TabList>
 					{ tabs.map( ( tab ) => (
-						<Tabs.TabPanel
+						<WCTabs.TabPanel
 							tabId={ tab.name }
 							key={ tab.name }
 							className="preferences__tabs-tabpanel"
 							focusable={ false }
 						>
 							{ sectionsContentMap[ tab.name ] || null }
-						</Tabs.TabPanel>
+						</WCTabs.TabPanel>
 					) ) }
-				</Tabs>
+				</WCTabs>
 			</div>
 		);
 	} else {

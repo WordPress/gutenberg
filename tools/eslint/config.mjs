@@ -432,6 +432,7 @@ export default dedupePlugins( [
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
+						Tabs: 'WCTabs',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},

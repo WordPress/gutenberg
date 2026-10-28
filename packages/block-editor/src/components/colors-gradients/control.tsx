@@ -15,7 +15,7 @@ import type { ColorGradientControlProps, ColorGradientOptions } from './types';
 
 export type NoticeProps = ComponentProps< typeof Notice >;
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
 	'colors',
 	'disableCustomColors',
@@ -144,36 +144,36 @@ function ColorGradientControlInner( {
 					) }
 					{ canChooseAColor && canChooseAGradient && (
 						<div>
-							<Tabs
+							<WCTabs
 								defaultTabId={
 									gradientValue
 										? TAB_IDS.gradient
 										: !! canChooseAColor && TAB_IDS.color
 								}
 							>
-								<Tabs.TabList>
-									<Tabs.Tab tabId={ TAB_IDS.color }>
+								<WCTabs.TabList>
+									<WCTabs.Tab tabId={ TAB_IDS.color }>
 										{ __( 'Color' ) }
-									</Tabs.Tab>
-									<Tabs.Tab tabId={ TAB_IDS.gradient }>
+									</WCTabs.Tab>
+									<WCTabs.Tab tabId={ TAB_IDS.gradient }>
 										{ __( 'Gradient' ) }
-									</Tabs.Tab>
-								</Tabs.TabList>
-								<Tabs.TabPanel
+									</WCTabs.Tab>
+								</WCTabs.TabList>
+								<WCTabs.TabPanel
 									tabId={ TAB_IDS.color }
 									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.color }
-								</Tabs.TabPanel>
-								<Tabs.TabPanel
+								</WCTabs.TabPanel>
+								<WCTabs.TabPanel
 									tabId={ TAB_IDS.gradient }
 									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.gradient }
-								</Tabs.TabPanel>
-							</Tabs>
+								</WCTabs.TabPanel>
+							</WCTabs>
 						</div>
 					) }
 
