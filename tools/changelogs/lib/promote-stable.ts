@@ -3,6 +3,7 @@ import path from 'node:path';
 import semver from 'semver';
 import yaml from 'js-yaml';
 import { isChangiePackage, loadChangieConfig } from './config.ts';
+import { validateFragment } from './validate.ts';
 
 export interface PromoteStableOptions {
 	packageName: string;
@@ -58,7 +59,7 @@ export function promotePackageToStable(
 		);
 	}
 
-	const prNumber = parseInt( String( options.pr ), 10 );
+	const prNumber = Number( options.pr );
 	if ( ! prNumber || isNaN( prNumber ) || prNumber <= 0 ) {
 		throw new Error(
 			`A valid positive pull request number is required (received '${ options.pr }').`
@@ -96,6 +97,15 @@ export function promotePackageToStable(
 	};
 
 	const fragmentContent = yaml.safeDump( fragmentData );
+	const errors = validateFragment(
+		fragmentPath,
+		fragmentContent,
+		{},
+		repoRoot
+	);
+	if ( errors.length ) {
+		throw new Error( errors.join( '\n' ) );
+	}
 
 	if ( ! options.dryRun ) {
 		fs.mkdirSync( unreleasedDir, { recursive: true } );

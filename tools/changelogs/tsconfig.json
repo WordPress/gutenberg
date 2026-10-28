@@ -1,8 +1,7 @@
 {
-	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/node.base.json",
 	"compilerOptions": {
-		"rootDir": "./",
-		"outDir": "./build"
+		"types": [ "node", "gutenberg-vitest-test-env" ]
 	},
-	"include": [ "./**/*.ts" ]
+	"include": [ "./**/*.ts", "./**/*.mts" ]
 }
