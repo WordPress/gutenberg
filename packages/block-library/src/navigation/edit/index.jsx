@@ -1002,10 +1002,6 @@ function Navigation( {
 			<>
 				<MenuInspectorControls
 					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
@@ -1073,8 +1069,6 @@ function Navigation( {
 		<>
 			<MenuInspectorControls
 				clientId={ clientId }
-				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-				createNavigationMenuIsError={ createNavigationMenuIsError }
 				currentMenuId={ ref }
 				isNavigationMenuMissing={ isNavigationMenuMissing }
 				isManageMenusButtonDisabled={ isManageMenusButtonDisabled }

@@ -64,9 +64,6 @@ export default function NavigationInnerBlocks( {
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
 	const hasMenuItems = !! ( uncontrolledBlocks || blocks )?.length;
-	const appender = uncontrolledBlocks
-		? undefined
-		: InnerBlocks.ButtonBlockAppender;
 
 	// If there is a `ref` attribute pointing to a `wp_navigation` but
 	// that menu has no **items** (i.e. empty) then show a placeholder.
@@ -74,6 +71,18 @@ export default function NavigationInnerBlocks( {
 	// alongside the appender.
 	const showPlaceholder =
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
+
+	// When the block is selected but has no items yet, show the button
+	// appender. Otherwise, show the dropdown appender.
+	// As an exception to other blocks which feature nesting, the appender stays
+	// visible even when a child block (or a submenu item) is selected.
+	// See https://github.com/WordPress/gutenberg/issues/37572.
+	let renderAppender = false;
+	if ( isSelected && ! hasMenuItems ) {
+		renderAppender = InnerBlocks.ButtonBlockAppender;
+	} else if ( parentOrChildHasSelection || hasSelectedDescendant ) {
+		renderAppender = InnerBlocks.DefaultBlockAppender;
+	}
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -90,21 +99,11 @@ export default function NavigationInnerBlocks( {
 			directInsert: true,
 			orientation: uncontrolledBlocks ? undefined : orientation,
 			templateLock: uncontrolledBlocks ? undefined : templateLock,
-
-			// As an exception to other blocks which feature nesting, show
-			// the block appender even when a child block is selected.
-			// This should be a temporary fix, to be replaced by improvements to
-			// the sibling inserter.
-			// See https://github.com/WordPress/gutenberg/issues/37572.
+			// Inline blocks keep their default appender until the menu is saved.
 			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				hasSelectedDescendant ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				parentOrChildHasSelection
-					? appender
-					: false,
+				uncontrolledBlocks && renderAppender
+					? undefined
+					: renderAppender,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: ! uncontrolledBlocks,
 			__unstableDisableLayoutClassNames: ! uncontrolledBlocks,
