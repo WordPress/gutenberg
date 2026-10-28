@@ -546,11 +546,9 @@ export default function LogoEdit( {
 	}
 
 	// Reset temporary url when logoUrl is available.
-	useEffect( () => {
-		if ( logoUrl && temporaryURL ) {
-			setTemporaryURL();
-		}
-	}, [ logoUrl, temporaryURL ] );
+	if ( logoUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (
