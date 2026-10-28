@@ -23,7 +23,8 @@ test.describe( 'Comments Count in the page preview', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'keeps the count of the previewed page when an earlier page answers late', async ( {
+	// The extensible site editor's Pages list has no preview.
+	test( 'keeps the count of the previewed page when an earlier page answers late @site-editor-v1-only', async ( {
 		admin,
 		editor,
 		page,
