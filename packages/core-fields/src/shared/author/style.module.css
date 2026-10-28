@@ -6,6 +6,8 @@
 	overflow: hidden;
 	inline-size: 24px;
 	block-size: 24px;
+	/* Centre the avatar on the first line of a name that wraps. */
+	margin-block: calc((1lh - 24px) / 2);
 	align-items: center;
 	justify-content: start;
 	display: flex;
@@ -34,6 +36,8 @@
 	flex-shrink: 0;
 	inline-size: 24px;
 	block-size: 24px;
+	/* Centre the icon on the first line of a name that wraps. */
+	margin-block: calc((1lh - 24px) / 2);
 }
 
 .icon svg {
