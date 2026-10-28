@@ -9,7 +9,7 @@
 ### Enhancements
 
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
--   `MenuItemsChoice`, `ToolsPanel`: Align selection marks before menu labels, with space reserved for unchecked items.
+-   `MenuItemsChoice`, `ToolsPanel`: Align selection marks before menu labels, with space reserved for unchecked items ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
 -   `FontSizePicker`: Use the WordPress UI select for choosing preset sizes ([#86661](https://github.com/WordPress/gutenberg/pull/86661)).
