@@ -102,64 +102,67 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 }
 
 /**
- * Returns where the inner blocks go in the markup of a block that has none.
+ * Returns the inner content of a block with slots for the given number of
+ * inner blocks, where its own inner blocks were.
  *
- * Group and Column wrap them in one element, so they go before its closer, or
- * before the closer of the inner container of a legacy Group.
- *
- * @param string $html The markup of the block.
- * @return int|null The byte offset, or null if there's no element to put them in.
+ * @param array $inner_content The inner content of the block.
+ * @param int   $count         The number of inner blocks.
+ * @return array|null The inner content, or null if there's no element to put
+ *                    the inner blocks in.
  */
-function gutenberg_block_bindings_get_inner_blocks_offset( $html ) {
-	// Exposes the byte offset of a tag, which the HTML API doesn't do publicly.
-	// The redeclaration-guard sniff can't tell the method from a global function.
-	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
-	$processor = new class( $html ) extends WP_HTML_Tag_Processor {
-		/**
-		 * Returns the byte offset where the current tag starts.
-		 *
-		 * @return int The byte offset.
-		 */
-		public function get_tag_start(): int {
-			$this->set_bookmark( 'here' );
-			return $this->bookmarks['here']->start;
-		}
-	};
-	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
-
-	if ( ! $processor->next_tag() ) {
+function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
+	if ( ! is_array( $inner_content ) ) {
 		return null;
 	}
-	$processor->set_bookmark( 'wrapper' );
 
-	// As in `wp_restore_group_inner_container()`, the inner container comes first
-	// in the wrapper, after any whitespace.
+	// Keeps the HTML around the block's own inner blocks as it is, and drops the
+	// HTML between them.
+	$slots = array_keys( $inner_content, null, true );
+	if ( $slots ) {
+		return array_merge(
+			array_slice( $inner_content, 0, $slots[0] ),
+			array_fill( 0, $count, null ),
+			array_slice( $inner_content, end( $slots ) + 1 )
+		);
+	}
+
+	// Without any, Group and Column wrap them in one element, so they go before
+	// its closer, or before the closer of the inner container of a legacy Group.
+	// Serializes the HTML token by token, as `WP_HTML_Processor::serialize()`
+	// does, and starts the second part at that closer.
+	$processor = WP_HTML_Processor::create_fragment( implode( '', $inner_content ) );
+	if ( null === $processor ) {
+		return null;
+	}
+	$parts           = array( '', '' );
+	$part            = 0;
+	$closer_depth    = null;
+	$is_after_opener = false;
 	while ( $processor->next_token() ) {
-		if ( '#text' !== $processor->get_token_type() || '' !== trim( $processor->get_modifiable_text(), " \t\n\f\r" ) ) {
-			break;
+		$is_opener = '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer();
+		if ( null === $closer_depth ) {
+			if ( $is_opener ) {
+				$closer_depth    = $processor->get_current_depth() - 1;
+				$is_after_opener = true;
+			}
+		} elseif ( $is_after_opener && ( '#text' !== $processor->get_token_type() || '' !== trim( $processor->get_modifiable_text(), " \t\n\f\r" ) ) ) {
+			// As in `wp_restore_group_inner_container()`, the inner container comes
+			// first in the wrapper, after any whitespace.
+			$is_after_opener = false;
+			if ( $is_opener && 'DIV' === $processor->get_tag() && $processor->has_class( 'wp-block-group__inner-container' ) ) {
+				$closer_depth = $processor->get_current_depth() - 1;
+			}
 		}
-	}
-	if ( 'DIV' !== $processor->get_tag() || $processor->is_tag_closer() || ! $processor->has_class( 'wp-block-group__inner-container' ) ) {
-		$processor->seek( 'wrapper' );
-	}
-
-	// Finds the matching closer as `WP_Interactivity_API_Directives_Processor`
-	// does: counting only tags with the same name, as other tags may omit theirs.
-	$query = array(
-		'tag_name'    => $processor->get_tag(),
-		'tag_closers' => 'visit',
-	);
-	$depth = 0;
-	while ( $processor->next_tag( $query ) ) {
-		if ( ! $processor->is_tag_closer() ) {
-			++$depth;
-		} elseif ( $depth > 0 ) {
-			--$depth;
-		} else {
-			return $processor->get_tag_start();
+		// A closer is visited at the depth of the element that contains it.
+		if ( 0 === $part && null !== $closer_depth && $processor->is_tag_closer() && $processor->get_current_depth() === $closer_depth ) {
+			$part = 1;
 		}
+		$parts[ $part ] .= $processor->serialize_token();
 	}
-	return null;
+	if ( 1 !== $part || null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
+		return null;
+	}
+	return array_merge( array( $parts[0] ), array_fill( 0, $count, null ), array( $parts[1] ) );
 }
 
 /**
@@ -197,32 +200,18 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	// `pre_kses` filter.
 	$markup = wp_kses_post( $value );
 	if ( $wp_embed instanceof WP_Embed ) {
-		$markup = $wp_embed->autoembed( $wp_embed->run_shortcode( $markup ) );
+		$markup = $wp_embed->autoembed( $markup );
 	}
 	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ) );
 
-	// The blocks go where the block's own inner blocks were.
-	$inner_content = $block_instance->parsed_block['innerContent'] ?? array();
-	if ( ! is_array( $inner_content ) ) {
+	$inner_content = gutenberg_block_bindings_get_inner_content( $block_instance->parsed_block['innerContent'] ?? null, count( $blocks ) );
+	if ( null === $inner_content ) {
 		return null;
-	}
-	$slots = array_keys( $inner_content, null, true );
-	if ( $slots ) {
-		$opener = implode( '', array_slice( $inner_content, 0, $slots[0] ) );
-		$closer = implode( '', array_slice( $inner_content, end( $slots ) + 1 ) );
-	} else {
-		$html   = implode( '', $inner_content );
-		$offset = gutenberg_block_bindings_get_inner_blocks_offset( $html );
-		if ( null === $offset ) {
-			return null;
-		}
-		$opener = substr( $html, 0, $offset );
-		$closer = substr( $html, $offset );
 	}
 
 	$block_instance->parsed_block['innerBlocks']  = $blocks;
-	$block_instance->parsed_block['innerContent'] = array_merge( array( $opener ), array_fill( 0, count( $blocks ), null ), array( $closer ) );
-	$block_instance->parsed_block['innerHTML']    = $opener . $closer;
+	$block_instance->parsed_block['innerContent'] = $inner_content;
+	$block_instance->parsed_block['innerHTML']    = implode( '', array_filter( $inner_content, 'is_string' ) );
 	$block_instance->refresh_parsed_block_dependents();
 	// The refresh keeps the previous inner blocks when there are none.
 	if ( empty( $blocks ) ) {
