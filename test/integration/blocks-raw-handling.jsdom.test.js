@@ -608,6 +608,19 @@ describe( 'Blocks raw handling', () => {
 			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
+
+		it( 'should preserve anchors on headings and paragraphs', () => {
+			const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+			const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+
+			expect( blocks ).toHaveLength( 2 );
+			expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+			expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+			expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+			expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 
@@ -650,6 +663,59 @@ describe( 'rawHandler', () => {
 			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a shortcode that is the whole content', () => {
+		const HTML = '[gallery ids="1,2"]';
+		expect( rawHandler( { HTML } ) ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{ name: 'core/image', attributes: { id: 1 } },
+					{ name: 'core/image', attributes: { id: 2 } },
+				],
+			},
+		] );
+	} );
+
+	it( 'should keep a caption shortcode in the middle of text', () => {
+		const HTML =
+			'<p>Look: [caption align="alignright"]<img src="a.png" /> A cat[/caption] nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>Look: [caption align="alignright"]<img src="a.png"> A cat[/caption] nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should move an aligned caption shortcode out of the start of a paragraph', () => {
+		const HTML =
+			'<p>[caption align="alignright"]<img src="a.png" /> A cat[/caption]Look: nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:image {"align":"right"} -->\n<figure class="wp-block-image alignright"><img src="a.png" alt=""/><figcaption class="wp-element-caption">A cat</figcaption></figure>\n<!-- /wp:image -->\n\n<!-- wp:paragraph -->\n<p>Look: nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should move an aligned caption shortcode out of the end of a paragraph', () => {
+		const HTML =
+			'<p>Look: nice.[caption align="alignright"]<img src="a.png" /> A cat[/caption]</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>Look: nice.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {"align":"right"} -->\n<figure class="wp-block-image alignright"><img src="a.png" alt=""/><figcaption class="wp-element-caption">A cat</figcaption></figure>\n<!-- /wp:image -->'
+		);
+	} );
+
+	it( 'should keep an unaligned caption shortcode at the start of a paragraph', () => {
+		const HTML =
+			'<p>[caption align="alignnone"]<img src="a.png" /> A cat[/caption]Look: nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>[caption align="alignnone"]<img src="a.png"> A cat[/caption]Look: nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should keep a shortcode with HTML in a list item', () => {
+		const HTML =
+			'<ul><li>First[note]A <a href="https://example.com">link</a>.[/note]</li><li>Second</li></ul>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:list -->\n<ul class="wp-block-list"><!-- wp:list-item -->\n<li>First[note]A <a href="https://example.com">link</a>.[/note]</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Second</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->'
+		);
 	} );
 
 	it( 'should convert a list with attributes', () => {
@@ -710,5 +776,36 @@ describe( 'rawHandler', () => {
 			// Image blocks don't have a default sizeSlug, so when not provided it should be undefined
 			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
 		} );
+	} );
+
+	it( 'should preserve anchors on headings and paragraphs', () => {
+		const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+		expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+	} );
+
+	it( 'should preserve the anchor and class of a raw transform without a transform function', () => {
+		const HTML = '<hr id="divider" class="is-fancy">';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/separator' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'divider' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'is-fancy' );
+	} );
+
+	it( 'should not copy the class a block adds itself into className', () => {
+		const HTML = '<ul class="wp-block-list fancy"><li>One</li></ul>';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/list' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'fancy' );
 	} );
 } );
