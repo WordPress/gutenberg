@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, useCallback, useRef, useState } from '@wordpress/element';
+import { memo, useCallback, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -11,7 +11,9 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	useBackgroundProps,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
@@ -23,7 +25,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useRefEffect } from '@wordpress/compose';
 import {
 	alignLeft,
 	alignRight,
@@ -87,6 +88,7 @@ function TSection( { name, ...props } ) {
 
 function TableEdit( {
 	attributes,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	isSelected: isSingleSelected,
@@ -106,7 +108,7 @@ function TableEdit( {
 	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
-	const isNewTableRef = useRef( false );
+	const { selectionChange } = useDispatch( blockEditorStore );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -142,7 +144,8 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
-		isNewTableRef.current = true;
+		// Put the caret in the first cell.
+		selectionChange( clientId, 'body.0.cells.0.content', 0, 0 );
 	}
 
 	/**
@@ -349,14 +352,6 @@ function TableEdit( {
 		setSelectedCell();
 	}
 
-	// Focus the first cell of a table created from the placeholder.
-	const tableRef = useRefEffect( ( node ) => {
-		if ( isNewTableRef.current ) {
-			isNewTableRef.current = false;
-			node.querySelector( 'td div[contentEditable="true"]' )?.focus();
-		}
-	}, [] );
-
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
 	);
@@ -522,7 +517,6 @@ function TableEdit( {
 			</InspectorControls>
 			{ ! isEmpty && (
 				<table
-					ref={ tableRef }
 					className={ clsx(
 						colorProps.className,
 						borderProps.className,
