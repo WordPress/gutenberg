@@ -179,8 +179,6 @@
 }
 
 .editor-collab-sidebar-panel__user-avatar {
-	// The editor sets `height: auto` on images, so an avatar that fails to
-	// load would grow to fit its alt text.
 	aspect-ratio: 1;
 	overflow: hidden;
 	border-radius: $radius-round;
