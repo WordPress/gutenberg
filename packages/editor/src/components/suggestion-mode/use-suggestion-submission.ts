@@ -12,7 +12,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
@@ -21,7 +20,6 @@ import {
 	getNoteIdsFromMetadata,
 	removeNoteIdFromMetadata,
 } from '../collab-sidebar/utils';
-import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
 import { unlock } from '../../lock-unlock';
 import { buildSuggestionPayload } from './operations';
 import type { SuggestionOperation } from './operations';
@@ -55,8 +53,6 @@ export function useSuggestionSubmission() {
 
 	const store = useSuggestionStore();
 	const { createNotice } = useDispatch( noticesStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const {
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
@@ -118,17 +114,6 @@ export function useSuggestionSubmission() {
 					} );
 				}
 
-				if ( savedRecord?.id ) {
-					// Surface the new note: when a non-notes sidebar (e.g.
-					// post or block settings) is open, switch it to the
-					// notes sidebar so the suggestion is immediately
-					// visible. A closed sidebar stays closed.
-					const activeArea = getActiveComplementaryArea( 'core' );
-					if ( activeArea && activeArea !== ALL_NOTES_SIDEBAR ) {
-						enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-					}
-				}
-
 				return savedRecord;
 			} catch ( error: any ) {
 				createNotice(
@@ -147,8 +132,6 @@ export function useSuggestionSubmission() {
 			markNextChangeAsNotPersistent,
 			selectBlockAttributes,
 			createNotice,
-			getActiveComplementaryArea,
-			enableComplementaryArea,
 		]
 	);
 

@@ -5,7 +5,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { getSuggestionMarkerSelector } from '../inline-suggestions';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { parseSuggestionPayload } from './operations';
 import { store as editorStore } from '../../store';
@@ -13,38 +12,29 @@ import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-// Hex alpha suffix for the active marker's tint. Deliberately lighter than the
-// `NoteHighlightStyles` active state (0x80): a suggestion marker already
-// carries a strikethrough or underline in the author's color, so a heavy wash
-// behind it competes with the decoration instead of pointing at it.
-// (0x33 = 20%.)
-const ACTIVE_ALPHA = '33';
+// The selected note marker's rule thickness in `NoteHighlightStyles`.
+const RULE_THICKNESS_EMPHASIZED = '3px';
 
 /**
  * Build the CSS that gives the selected suggestion's in-content marker an
- * active treatment: a tint and a ring in the suggester's color, so a reviewer
- * can tell at a glance *which* run a note is about. Block selection alone is
- * the wrong granularity, because one block can hold several markers.
+ * active treatment, so a reviewer can tell at a glance *which* run a note is
+ * about. Block selection alone is the wrong granularity, because one block
+ * can hold several markers. Like a selected note, its rule thickens.
  *
  * Pure so it can be unit-tested without React.
  *
  * @param selectedId Suggestion (note) id to reveal, if any.
- * @param author     Author id the marker's color derives from.
  * @return Serialized CSS, or '' when nothing is selected.
  */
 export function buildSelectedSuggestionCss(
-	selectedId?: number | string | null,
-	author?: number | null
+	selectedId?: number | string | null
 ): string {
 	if ( ! selectedId ) {
 		return '';
 	}
-	const color = getAvatarBorderColor( author ?? 0 );
-	const selector = getSuggestionMarkerSelector( selectedId );
-	return (
-		`${ selector }{background-color:${ color }${ ACTIVE_ALPHA };` +
-		`border-radius:2px;outline:2px solid ${ color };outline-offset:1px;}`
-	);
+	return `${ getSuggestionMarkerSelector(
+		selectedId
+	) }{text-decoration-thickness:${ RULE_THICKNESS_EMPHASIZED };}`;
 }
 
 /**
@@ -93,8 +83,8 @@ export default function RevealSelectedSuggestion() {
 	}, [ unresolvedNotes, selectedNoteId ] );
 
 	const css = useMemo(
-		() => buildSelectedSuggestionCss( thread?.id, thread?.author ),
-		[ thread?.id, thread?.author ]
+		() => buildSelectedSuggestionCss( thread?.id ),
+		[ thread?.id ]
 	);
 	useStyleOverride( { id: 'core-suggestion-selected', css } );
 
