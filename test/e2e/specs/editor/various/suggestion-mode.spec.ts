@@ -41,6 +41,26 @@ function suggestionSavedPromise( page: any ) {
 	);
 }
 
+/**
+ * Opens the "All notes" sidebar (if not already open) and returns the
+ * settings-region locator the note threads render into. A new suggestion
+ * floats beside its block, like a new note, and leaves the sidebar alone.
+ *
+ * @param {import('@playwright/test').Page} page Playwright page.
+ * @return {Promise<import('@playwright/test').Locator>} Sidebar region.
+ */
+async function openNotesSidebar( page: any ) {
+	const allNotesToggle = page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'All notes', exact: true } );
+	if (
+		( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+	) {
+		await allNotesToggle.click();
+	}
+	return page.getByRole( 'region', { name: 'Editor settings' } );
+}
+
 test.describe( 'Suggestion mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -1747,9 +1767,9 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.type( 'Last' );
 		await saved;
 
-		const summaries = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		const summaries = ( await openNotesSidebar( page ) ).locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
 		await expect( summaries ).toHaveCount( 3 );
 		const before = await editor.getEditedPostContent();
 
@@ -1763,6 +1783,8 @@ test.describe( 'Suggestion mode', () => {
 			}
 		} );
 
+		// Opening the sidebar moved focus into it.
+		await paragraph.click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 
