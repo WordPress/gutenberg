@@ -1,7 +1,6 @@
 import { useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
-import { useWidgetIdentity } from '@wordpress/widget-primitives';
 import styles from './style.module.css';
 
 // These are the lyrics to Hello Dolly
@@ -36,8 +35,6 @@ const DOLLY_LYRICS = [
 ];
 
 export default function HelloDolly() {
-	const { title } = useWidgetIdentity();
-
 	// Randomly choose a line.
 	const quote = useMemo( () => {
 		return DOLLY_LYRICS[
@@ -45,20 +42,14 @@ export default function HelloDolly() {
 		];
 	}, [] );
 
-	const attribution = title
-		? sprintf(
-				/* translators: %s: widget title (the song name). */
-				__( 'Quote from %s song, by Jerry Herman:' ),
-				title
-			)
-		: __( 'Quote from Hello Dolly song, by Jerry Herman:' );
-
 	// Echoes and positions the chosen line of lyrics.
 	return (
 		<Stack align="center" justify="center" className={ styles.root }>
 			<Text variant="body-xl" render={ <p /> } className={ styles.quote }>
 				<VisuallyHidden render={ <span /> }>
-					{ attribution }{ ' ' }
+					{ __(
+						'Quote from Hello Dolly song, by Jerry Herman:'
+					) }{ ' ' }
 				</VisuallyHidden>
 				<span dir="ltr" lang="en">
 					{ quote }
