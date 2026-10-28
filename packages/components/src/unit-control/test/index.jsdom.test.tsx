@@ -329,6 +329,75 @@ describe( 'UnitControl', () => {
 
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
+
+		it( 'should preserve fractional pixel values on blur and not round to step', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = vi.fn();
+			render( <UnitControl value="10px" onChange={ onChangeSpy } /> );
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '14.8' );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'14.8px',
+				expect.anything()
+			);
+
+			// Blur the input
+			await user.click( document.body );
+
+			expect( input ).toHaveValue( 14.8 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'14.8px',
+				expect.anything()
+			);
+		} );
+
+		it( 'should increment and decrement fractional values accurately without floating-point errors', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = vi.fn();
+			render( <UnitControl value="3.57vw" onChange={ onChangeSpy } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowDown]' );
+
+			expect( input ).toHaveValue( 3.47 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'3.47vw',
+				expect.anything()
+			);
+
+			await user.keyboard( '[ArrowUp]' );
+			expect( input ).toHaveValue( 3.57 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'3.57vw',
+				expect.anything()
+			);
+		} );
+
+		it( 'should honor explicit step prop override when provided', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = vi.fn();
+			render(
+				<UnitControl value="10px" step={ 5 } onChange={ onChangeSpy } />
+			);
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '14' );
+			await user.keyboard( '[Enter]' );
+
+			expect( input ).toHaveValue( 15 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'15px',
+				expect.anything()
+			);
+		} );
 	} );
 
 	describe( 'Unit', () => {
