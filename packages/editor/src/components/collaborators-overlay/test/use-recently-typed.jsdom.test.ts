@@ -4,11 +4,11 @@ import { useRecentlyTyped } from '../use-recently-typed';
 
 const DELAY_MS = 1000;
 
-function pressKey( target: Document ) {
+function pressKey( target: Document, key = 'a' ) {
 	act( () => {
 		target.dispatchEvent(
 			new window.KeyboardEvent( 'keydown', {
-				key: 'a',
+				key,
 				bubbles: true,
 			} )
 		);
@@ -67,6 +67,18 @@ describe( 'useRecentlyTyped', () => {
 		}
 
 		advance( 100 );
+		expect( result.current ).toBe( false );
+	} );
+
+	it( 'ignores modifier keys pressed on their own', () => {
+		const { result } = renderHook( () =>
+			useRecentlyTyped( document, DELAY_MS )
+		);
+
+		for ( const key of [ 'Shift', 'Control', 'Alt', 'Meta' ] ) {
+			pressKey( document, key );
+		}
+
 		expect( result.current ).toBe( false );
 	} );
 

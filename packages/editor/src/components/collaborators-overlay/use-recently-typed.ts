@@ -1,5 +1,4 @@
-import { useDebounce } from '@wordpress/compose';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Tracks whether a key was pressed in the given document within the last
@@ -21,23 +20,24 @@ export function useRecentlyTyped(
 ): boolean {
 	const [ recentlyTyped, setRecentlyTyped ] = useState( false );
 
-	// Stable, so `useDebounce` doesn't discard the pending call every render.
-	const endTypingPause = useCallback(
-		() => setRecentlyTyped( false ),
-		[ setRecentlyTyped ]
-	);
-	const scheduleEndOfTypingPause = useDebounce( endTypingPause, delayMs );
-
 	useEffect( () => {
 		if ( ! ownerDocument ) {
 			return;
 		}
 
-		function handleKeyDown() {
+		let timeoutId: ReturnType< typeof setTimeout > | undefined;
+
+		function handleKeyDown( event: KeyboardEvent ) {
+			// Pressed on their own, these write nothing, so they shouldn't
+			// hide anything.
+			if ( [ 'Shift', 'Control', 'Alt', 'Meta' ].includes( event.key ) ) {
+				return;
+			}
 			// React bails out when the value is unchanged, so setting this on
 			// every keystroke does not re-render once it is already true.
 			setRecentlyTyped( true );
-			scheduleEndOfTypingPause();
+			clearTimeout( timeoutId );
+			timeoutId = setTimeout( () => setRecentlyTyped( false ), delayMs );
 		}
 
 		// Capture phase: rich text stops propagation for some keys, and a
@@ -47,13 +47,13 @@ export function useRecentlyTyped(
 
 		return () => {
 			ownerDocument.removeEventListener( 'keydown', handleKeyDown, true );
-			scheduleEndOfTypingPause.cancel();
+			clearTimeout( timeoutId );
 			// The canvas document is replaced when the device preview changes.
 			// Start the next one clean rather than inheriting a stale "still
 			// typing" from the document that just went away.
 			setRecentlyTyped( false );
 		};
-	}, [ ownerDocument, scheduleEndOfTypingPause ] );
+	}, [ ownerDocument, delayMs ] );
 
 	return recentlyTyped;
 }
