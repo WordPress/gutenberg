@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/image.png",
+			"alt": "",
+			"caption": "",
+			"width": "300px",
+			"isDecorative": false,
+			"align": "wide"
+		},
+		"innerBlocks": []
+	}
+]

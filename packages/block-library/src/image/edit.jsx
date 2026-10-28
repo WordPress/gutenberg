@@ -12,7 +12,7 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -92,7 +92,6 @@ export function ImageEdit( {
 		sizeSlug,
 		aspectRatio,
 		scale,
-		align,
 		metadata,
 	} = attributes;
 
@@ -112,18 +111,7 @@ export function ImageEdit( {
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
-		useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( [ 'wide', 'full' ].includes( align ) ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				width: undefined,
-				height: undefined,
-			} );
-		}
-	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const {
 		getSettings,

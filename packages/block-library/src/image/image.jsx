@@ -288,8 +288,6 @@ export default function Image( {
 		linkClass,
 		linkDestination,
 		title,
-		width,
-		height,
 		aspectRatio,
 		scale,
 		focalPoint,
@@ -415,6 +413,8 @@ export default function Image( {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
+	// Wide and full images fill the available width, so their size doesn't apply.
+	const { width, height } = isWideAligned ? {} : attributes;
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,

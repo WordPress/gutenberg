@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/image",
+		"attrs": {
+			"width": "300px",
+			"align": "wide"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-image alignwide is-resized\"><img src=\"https://example.com/image.png\" alt=\"\" style=\"width:300px;height:auto\"/></figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-image alignwide is-resized\"><img src=\"https://example.com/image.png\" alt=\"\" style=\"width:300px;height:auto\"/></figure>\n"
+		]
+	}
+]

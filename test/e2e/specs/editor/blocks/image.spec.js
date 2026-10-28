@@ -1081,6 +1081,69 @@ test.describe( 'Image', () => {
 		} );
 		expect( await target ).toBe( true );
 	} );
+
+	test( 'keeps the width of a wide image without applying it', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://example.com/image.png',
+				width: '300px',
+			},
+		} );
+		const resizedImage = `<!-- wp:image {"width":"300px"} -->
+<figure class="wp-block-image is-resized"><img src="https://example.com/image.png" alt="" style="width:300px;height:auto"/></figure>
+<!-- /wp:image -->`;
+		expect( await editor.getEditedPostContent() ).toBe( resizedImage );
+
+		const alignButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Align' } );
+		const chooseAlignment = async ( name ) => {
+			await alignButton.focus();
+			await page.keyboard.press( 'Enter' );
+			await page.getByRole( 'menuitemradio', { name } ).focus();
+			await page.keyboard.press( 'Enter' );
+		};
+
+		await chooseAlignment( 'Wide width' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { align: 'wide', width: '300px' } },
+			] );
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"width":"300px","align":"wide"} -->
+<figure class="wp-block-image alignwide"><img src="https://example.com/image.png" alt=""/></figure>
+<!-- /wp:image -->` );
+
+		// Choosing the alignment is one undo step.
+		await pageUtils.pressKeys( 'primary+z' );
+		expect( await editor.getEditedPostContent() ).toBe( resizedImage );
+
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await chooseAlignment( 'None' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { align: undefined, width: '300px' } },
+			] );
+		expect( await editor.getEditedPostContent() ).toBe( resizedImage );
+	} );
+
+	test( 'opens a wide image saved with a width', async ( { editor } ) => {
+		await editor.setContent( `<!-- wp:image {"width":"300px","align":"wide"} -->
+<figure class="wp-block-image alignwide is-resized"><img src="https://example.com/image.png" alt="" style="width:300px;height:auto"/></figure>
+<!-- /wp:image -->` );
+
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:image {"width":"300px","align":"wide"} -->
+<figure class="wp-block-image alignwide"><img src="https://example.com/image.png" alt=""/></figure>
+<!-- /wp:image -->` );
+	} );
 } );
 
 test.describe( 'Image - lightbox', () => {

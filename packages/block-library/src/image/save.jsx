@@ -17,8 +17,6 @@ export default function save( { attributes } ) {
 		href,
 		rel,
 		linkClass,
-		width,
-		height,
 		aspectRatio,
 		scale,
 		focalPoint,
@@ -29,6 +27,10 @@ export default function save( { attributes } ) {
 		isDecorative,
 		metadata: { bindings = {} } = {},
 	} = attributes;
+	// Wide and full images fill the available width, so their size doesn't apply.
+	const { width, height } = [ 'wide', 'full' ].includes( align )
+		? {}
+		: attributes;
 
 	const newRel = ! rel ? undefined : rel;
 	const borderProps = getBorderClassesAndStyles( attributes );

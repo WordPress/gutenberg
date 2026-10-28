@@ -7,6 +7,7 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { mediaPosition } from './utils';
+import metadata from './block.json';
 
 /**
  * Deprecation for adding the `wp-image-${id}` class to the image block for
@@ -1387,4 +1388,141 @@ const v9 = {
 	},
 };
 
-export default [ v9, v8, v7, v6, v5, v4, v3, v2, v1 ];
+/**
+ * Deprecation for skipping the width and height of wide and full images, which
+ * fill the available width.
+ */
+const v10 = {
+	attributes: metadata.attributes,
+	supports: metadata.supports,
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			focalPoint,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+			isDecorative,
+			metadata: { bindings = {} } = {},
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+		const shadowProps = getShadowClassesAndStyles( attributes );
+
+		const classes = clsx( {
+			// All other align classes are handled by block supports.
+			// `{ align: 'none' }` is unique to transforms for the image block.
+			alignnone: 'none' === align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = clsx( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ ( () => {
+					const style = {
+						...borderProps.style,
+						...shadowProps.style,
+						aspectRatio,
+						objectFit: scale,
+						objectPosition:
+							focalPoint && scale
+								? mediaPosition( focalPoint )
+								: undefined,
+					};
+					// Only apply dimension styles when a width or height is provided.
+					if ( width !== undefined || height !== undefined ) {
+						// Only apply width when explicitly provided.
+						if ( width === 'auto' ) {
+							style.width = 'auto';
+						} else if ( width !== undefined && width !== null ) {
+							style.width =
+								typeof width === 'number'
+									? `${ width }px`
+									: width;
+						}
+						// Force height to auto when unspecified to prevent
+						// theme CSS from squishing the image.
+						if (
+							height === 'auto' ||
+							height === undefined ||
+							height === null
+						) {
+							style.height = 'auto';
+						} else {
+							style.height =
+								typeof height === 'number'
+									? `${ height }px`
+									: height;
+						}
+					}
+					return style;
+				} )() }
+				title={ title }
+				role={ isDecorative ? 'none' : undefined }
+			/>
+		);
+
+		const displayCaption =
+			! RichText.isEmpty( caption ) ||
+			bindings.caption ||
+			bindings?.__default?.source === 'core/pattern-overrides';
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ displayCaption && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v10, v9, v8, v7, v6, v5, v4, v3, v2, v1 ];
