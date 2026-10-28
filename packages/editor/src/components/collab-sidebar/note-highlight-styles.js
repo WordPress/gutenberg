@@ -74,6 +74,7 @@ export function buildHighlightCss( threads, selectedId = null ) {
  *
  * A thread is block-level when its block contains no `core/note` marker with
  * its id. When a block has several, the first one supplies the color.
+ * Suggestions are skipped: their own markers already show what they change.
  *
  * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientId`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
@@ -88,6 +89,7 @@ export function buildBlockHighlightCss( threads, getBlockAttributes ) {
 			! thread?.id ||
 			! clientId ||
 			highlightedBlocks.has( clientId ) ||
+			thread.meta?._wp_suggestion ||
 			findNoteInBlock( getBlockAttributes( clientId ), thread.id )
 		) {
 			continue;

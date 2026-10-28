@@ -748,10 +748,15 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 	} );
 
-	function FakeBlockListBlock( { className, wrapperProps }: any ) {
+	function FakeBlockListBlock( {
+		className,
+		wrapperProps,
+		attributes,
+	}: any ) {
 		return (
 			<div
 				data-testid="block-list-block"
+				data-content={ attributes?.content }
 				className={ className }
 				{ ...wrapperProps }
 			/>
@@ -875,6 +880,27 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 		expect( node.className ).toContain( 'is-suggestion-pending' );
 		expect( node.className ).not.toMatch( /is-suggestion-pending-/ );
+	} );
+
+	it( 'hands the block the proposal so block supports preview it', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { content: 'Proposed' },
+				},
+			},
+		} );
+		expect( node ).toHaveAttribute( 'data-content', 'Proposed' );
+	} );
+
+	it( 'leaves the attributes alone when the block has no proposal', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-remove' } },
+		} );
+		expect( node ).not.toHaveAttribute( 'data-content' );
 	} );
 
 	it( 'applies the bracket next to the structural class when a proposal rides on a move', () => {
