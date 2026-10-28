@@ -164,14 +164,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * The `excerpt` row shows the field's placeholder when the excerpt is
-	 * empty and always shows its edit button, for every post type whose form
-	 * lists the field.
+	 * empty, for every post type whose form lists the field.
 	 *
 	 * @dataProvider data_post_types_with_excerpt_in_form
 	 *
 	 * @param string $post_type The post type.
 	 */
-	public function test_excerpt_layout_reads_as_editable( $post_type ) {
+	public function test_excerpt_layout_shows_placeholder_if_empty( $post_type ) {
 		if ( ! post_type_exists( $post_type ) ) {
 			register_post_type( $post_type );
 		}
@@ -183,7 +182,6 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 				'type'                   => 'panel',
 				'labelPosition'          => 'top',
 				'showPlaceholderIfEmpty' => true,
-				'editVisibility'         => 'always',
 			),
 			$this->get_form_field( $config, 'excerpt' )['layout']
 		);
