@@ -109,7 +109,7 @@
 	&.is-tertiary {
 		&:disabled,
 		&[aria-disabled="true"],
-		&[aria-disabled="true"]:hover {
+		&[aria-disabled="true"]:hover:where(:not(.is-pressed)) {
 			color: $gray-600;
 			background: transparent;
 			transform: none;
