@@ -4,6 +4,25 @@ const require = createRequire( import.meta.url );
 const { calculateVersionBumpFromChangelog } = require( '../common' );
 
 describe( 'calculateVersionBumpFromChangelog', () => {
+	it( 'promotes to 1.0.0 when breaking changes precede Stable Release', () => {
+		expect(
+			calculateVersionBumpFromChangelog(
+				[
+					'## Unreleased',
+					'### Breaking Changes',
+					'- Update the API.',
+					'### Documentation',
+					'- Document the API.',
+					'### Stable Release',
+					'- Mark package as stable.',
+					'## 0.24.0',
+				],
+				'patch',
+				'0.24.0'
+			)
+		).toBe( 'major' );
+	} );
+
 	it( 'should return null when no lines provided', () => {
 		expect( calculateVersionBumpFromChangelog( [] ) ).toBe( null );
 	} );

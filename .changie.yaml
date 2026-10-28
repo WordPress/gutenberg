@@ -2,7 +2,7 @@ changesDir: .changes
 unreleasedDir: unreleased
 headerPath: header.tpl.md
 versionExt: md
-versionFormat: '{{if eq .Version "0-unreleased"}}## Unreleased{{else}}## {{.Version}} ({{.Time.Format "2006-01-02"}}){{end}}'
+versionFormat: '{{if eq .Version "0-unreleased"}}## Unreleased{{else}}## {{.Version}} ({{.Time.Format "2006-01-02"}}){{end}}{{$stable := false}}{{range .Changes}}{{if eq .Kind "Stable Release"}}{{$stable = true}}{{end}}{{end}}{{if $stable}}{{printf "\n\nNote: This package is now a stable release."}}{{end}}'
 kindFormat: '### {{.Kind}}'
 changeFormat: '-   {{.Body}} ([#{{.Custom.PR}}](https://github.com/WordPress/gutenberg/pull/{{.Custom.PR}})).'
 fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind}}__{{.Time.Format "20060102150405"}}'
@@ -32,8 +32,8 @@ custom:
 # 'auto' specifies the semver increment level.
 # Pre-1.0 packages (signaled via GUTENBERG_PRE_1="true"): breaking changes bump minor,
 # while stable packages (>=1.0) bump major as usual.
-# Note: 'Stable Release' (for promoting 0.x packages to 1.0.0) is handled via
-# `npm run changelog:promote-stable` so it does not clutter everyday PR choices.
+# 'Stable Release' promotes 0.x packages to 1.0.0 and is last so it is not the
+# default choice. `npm run changelog:promote-stable` provides a dedicated shortcut.
 kinds:
     - label: Breaking Changes
       auto: '{{if eq .Env.PRE_1 "true"}}minor{{else}}major{{end}}'
@@ -49,6 +49,8 @@ kinds:
       auto: patch
     - label: Documentation
       auto: patch
+    - label: Stable Release
+      auto: major
 
 projects:
     - label: Components

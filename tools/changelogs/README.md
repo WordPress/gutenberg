@@ -83,7 +83,9 @@ npm run changelog:promote-stable -- <package-name> --pr <PR#>
 
 This creates a `Stable Release` fragment under `.changes/unreleased/`. During the next automated package release, the presence of the `Stable Release` fragment directs the release bumper to issue a major bump to `1.0.0`.
 
-The command validates that the target package version is strictly `< 1.0.0` before creating the fragment.
+`Stable Release` is the last kind in the regular `npm run changelog:add` prompt; the dedicated command is a shortcut. Shared fragment validation rejects this kind unless the target package has a `0.x` version, covering both authoring commands and CI. The regular authoring command validates after writing the fragment and leaves rejected content available to correct.
+
+Promotion takes precedence over other change kinds, including breaking changes. The generated changelog includes a note below the version heading and retains the `Stable Release` section as the last kind. The note also appears in unreleased previews and prerelease notes containing the promotion fragment.
 
 ### Aborting a migration during development
 
