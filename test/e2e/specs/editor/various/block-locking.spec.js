@@ -349,6 +349,72 @@ test.describe( 'Block Locking', () => {
 		expect( unlockedGroup.attributes.templateLock ).toBeUndefined();
 	} );
 
+	test( 'disables "Apply to all blocks inside" when a block would only lock movement', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { lock: { move: true, remove: true } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside a fully locked group' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { lock: { move: true } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside a movement locked group' },
+				},
+			],
+		} );
+		const groups = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		await editor.selectBlocks( groups.first(), groups.last() );
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
+		const applyToInnerBlocks = modal.getByRole( 'checkbox', {
+			name: 'Apply to all blocks inside',
+			exact: true,
+		} );
+		await expect(
+			modal.getByRole( 'checkbox', { name: 'Lock removal', exact: true } )
+		).toBeChecked( { indeterminate: true } );
+		await expect( applyToInnerBlocks ).toBeDisabled();
+
+		await modal
+			.getByRole( 'checkbox', { name: 'Lock removal', exact: true } )
+			.click();
+		await expect( applyToInnerBlocks ).toBeEnabled();
+		await applyToInnerBlocks.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				attributes: {
+					lock: { move: true, remove: true },
+					templateLock: 'all',
+				},
+			},
+			{
+				attributes: {
+					lock: { move: true, remove: true },
+					templateLock: 'all',
+				},
+			},
+		] );
+	} );
+
 	test( 'keeps a contentOnly template lock', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/group',

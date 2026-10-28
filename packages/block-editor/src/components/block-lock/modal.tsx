@@ -40,6 +40,19 @@ function hasTemplateLockSupport( blockName: string ) {
 }
 
 /**
+ * Returns the lock options that aren't mixed.
+ *
+ * @param lock The lock options chosen in the modal.
+ *
+ * @return The chosen lock options.
+ */
+function getChosenLock( lock: BlockLockSelection ): BlockLock {
+	return Object.fromEntries(
+		Object.entries( lock ).filter( ( [ , value ] ) => value !== null )
+	);
+}
+
+/**
  * Returns the attributes that apply the chosen lock options to a block. Options
  * left mixed keep the block's saved values.
  *
@@ -123,6 +136,31 @@ export default function BlockLockModal( {
 	const [ lock, setLock ] = useState( initialLock );
 	const [ applyTemplateLock, setApplyTemplateLock ] =
 		useState( appliesTemplateLock );
+	// A template lock can't prevent moving inner blocks while allowing their
+	// removal, so it isn't offered when any block would end up with that lock.
+	const isTemplateLockDisabled = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const chosenLock = getChosenLock( lock );
+
+			return clientIds.some( ( clientId ) => {
+				if (
+					! hasTemplateLockSupport(
+						getBlockName( clientId ) as string
+					)
+				) {
+					return false;
+				}
+				const newLock = {
+					...getBlockAttributes( clientId )?.lock,
+					...chosenLock,
+				};
+				return !! newLock.move && ! newLock.remove;
+			} );
+		},
+		[ clientIds, lock ]
+	);
 	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientIds[ 0 ] );
@@ -169,11 +207,7 @@ export default function BlockLockModal( {
 					}
 					const { getBlockName, getBlockAttributes } =
 						registry.select( blockEditorStore );
-					const chosenLock = Object.fromEntries(
-						Object.entries( lock ).filter(
-							( [ , value ] ) => value !== null
-						)
-					);
+					const chosenLock = getChosenLock( lock );
 					updateBlockAttributes(
 						clientIds,
 						Object.fromEntries(
@@ -311,9 +345,7 @@ export default function BlockLockModal( {
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock === true }
 							indeterminate={ applyTemplateLock === null }
-							disabled={
-								lock.move === true && lock.remove === false
-							}
+							disabled={ isTemplateLockDisabled }
 							onChange={ setApplyTemplateLock }
 						/>
 					) }
