@@ -59,6 +59,10 @@ describe( 'ToolsPanel styles', () => {
 		const shownIcon = shown.querySelector( 'svg' )!;
 
 		expect( hiddenLabel.getBoundingClientRect().left ).toBe( labelLeft );
+		expect(
+			shownIcon.getBoundingClientRect().left -
+				menu.getBoundingClientRect().left
+		).toBe( 7 );
 		expect( shownIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
 			labelLeft
 		);

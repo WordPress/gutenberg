@@ -4,6 +4,7 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { check } from '@wordpress/icons';
+import '@wordpress/theme/design-tokens.css';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
@@ -266,8 +267,15 @@ it( 'keeps choice labels and menu width stable when the selection changes', asyn
 	const visualIcon = visual.querySelector( 'svg' )!;
 	// eslint-disable-next-line testing-library/no-node-access
 	const codeIcon = code.querySelector( 'svg' )!;
+	// The popup owns the inset outside the menu's items.
+	// eslint-disable-next-line testing-library/no-node-access
+	const popup = menu.closest( '.components-popover__content' )!;
 
 	expect( codeLabel.getBoundingClientRect().left ).toBe( labelLeft );
+	expect(
+		visualIcon.getBoundingClientRect().left -
+			popup.getBoundingClientRect().left
+	).toBe( 7 );
 	expect( visualIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
 		labelLeft
 	);
