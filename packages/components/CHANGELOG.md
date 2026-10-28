@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `DropdownMenu`: Focus the menu on pointer opening and enter its items with arrow keys ([#85486](https://github.com/WordPress/gutenberg/pull/85486)).
 -   `RangeControl`: Use the design system outline for the slider thumb focus ring ([#85536](https://github.com/WordPress/gutenberg/pull/85536)).
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
 -   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
@@ -19,6 +20,8 @@
 
 ### Deprecations
 
+-   `FormToggle`: Deprecate in favor of `Switch` from `@wordpress/ui`, with removal planned for WordPress 7.5 ([#85517](https://github.com/WordPress/gutenberg/pull/85517)).
+-   `Tooltip`: Deprecate the component in favor of `Tooltip` from `@wordpress/ui`, planned for removal in WordPress 7.5 ([#85518](https://github.com/WordPress/gutenberg/pull/85518)).
 -   `ProgressBar`: Deprecate in favor of `Progress` from `@wordpress/ui` ([#85520](https://github.com/WordPress/gutenberg/pull/85520)).
 -   `TabbableContainer`: Deprecate the component, planned for removal in WordPress 7.5. For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
 
