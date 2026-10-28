@@ -75,13 +75,13 @@ export function Overlay( {
 		TYPING_PAUSE_MS
 	);
 
-	// True when an avatar would be sitting over the text the local user is
-	// writing right now, which is the only case worth hiding it for. Both
-	// signals matter: `isTyping` brings the avatar back as soon as the pointer
-	// moves, and `recentlyTyped` brings it back after a pause in writing even
-	// if the pointer never moves at all.
-	const coversTextBeingWritten = ( blockClientId?: string ) =>
-		isTyping && recentlyTyped && blockClientId === selectedBlockClientId;
+	// The block whose avatars would be sitting over the text the local user
+	// is writing right now, which is the only case worth hiding them for.
+	// Both signals matter: `isTyping` brings the avatar back as soon as the
+	// pointer moves, and `recentlyTyped` brings it back after a pause in
+	// writing even if the pointer never moves at all.
+	const blockClientIdBeingWritten =
+		isTyping && recentlyTyped ? selectedBlockClientId : null;
 
 	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
 		useRenderCursors(
@@ -222,9 +222,8 @@ export function Overlay( {
 									} }
 								/>
 							) }
-							{ ! coversTextBeingWritten(
-								cursor.blockClientId
-							) && (
+							{ cursor.blockClientId !==
+								blockClientIdBeingWritten && (
 								<Avatar
 									className="collaborators-overlay-user-label"
 									variant="badge"
