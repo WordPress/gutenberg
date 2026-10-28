@@ -1,6 +1,5 @@
 import type { ComponentProps } from 'react';
 import { Slot } from '@wordpress/components';
-import { __unstableStripHTML } from '@wordpress/dom';
 import { RawHTML, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
@@ -26,6 +25,7 @@ type NoticeAction = NoticeActionType & {
 
 type InlineNoticeProps = {
 	notice: NoticeType;
+	announcementKey: number;
 	onRemove: () => void;
 };
 
@@ -75,6 +75,7 @@ function NoticeActionControl( {
 
 export default function InlineNotice( {
 	notice,
+	announcementKey,
 	onRemove,
 }: InlineNoticeProps ) {
 	const {
@@ -162,10 +163,8 @@ export default function InlineNotice( {
 	const politeness = status === 'error' ? 'assertive' : 'polite';
 	const rootProps = {
 		intent: status,
-		spokenMessage:
-			__unstableHTML && notice.spokenMessage
-				? __unstableStripHTML( notice.spokenMessage )
-				: ( notice.spokenMessage ?? '' ),
+		announcementKey,
+		spokenMessage: notice.spokenMessage ?? '',
 		politeness: notice.spokenMessage ? politeness : 'off',
 		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
 	} satisfies ComponentProps< typeof Notice.Root >;

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
@@ -44,6 +44,51 @@ describe( 'InlineNotices', () => {
 				screen.getByText( 'Before notices' ).getBoundingClientRect()
 					.bottom
 		).toBe( 20 );
+	} );
+
+	it( 'announces repeated notifications with the same ID', async () => {
+		const registry = await renderWithNotice( 'error', {
+			id: 'editor-save',
+			details: DETAILS,
+		} );
+		const user = userEvent.setup();
+		const trigger = screen.getByRole( 'button', { name: 'Show details' } );
+		await user.click( trigger );
+		expect( trigger ).toHaveFocus();
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		registry
+			.dispatch( noticesStore )
+			.createNotice( 'error', 'Publishing failed.', {
+				id: 'editor-save',
+				details: DETAILS,
+			} );
+		await waitFor( () =>
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				'Publishing failed.'
+			)
+		);
+		const previousMessage = within( screen.getByRole( 'alert' ) ).getByText(
+			'Publishing failed.'
+		);
+		expect( trigger ).toHaveFocus();
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		registry
+			.dispatch( noticesStore )
+			.createNotice( 'error', 'Publishing failed.', {
+				id: 'editor-save',
+				details: DETAILS,
+			} );
+		await waitFor( () =>
+			expect(
+				within( screen.getByRole( 'alert' ) ).getByText(
+					'Publishing failed.'
+				)
+			).not.toBe( previousMessage )
+		);
+		expect( trigger ).toHaveFocus();
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
 	} );
 
 	describe( 'details', () => {

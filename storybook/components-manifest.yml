@@ -973,6 +973,7 @@
             - path
 - name: Notice.Root
   props:
+      - announcementKey
       - children
       - className
       - icon

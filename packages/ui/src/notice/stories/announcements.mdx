@@ -29,6 +29,7 @@ Announcements are `polite` by default, including error notices. Set `politeness=
 	{ notices.map( ( notice ) => (
 		<Notice.Root
 			key={ notice.id }
+			announcementKey={ notice.announcementKey }
 			intent={ notice.intent }
 			politeness={ notice.isUrgent ? 'assertive' : 'polite' }
 		>
@@ -39,7 +40,7 @@ Announcements are `polite` by default, including error notices. Set `politeness=
 </Notice.List>
 ```
 
-The list does not move focus, and notices continue to announce while focus is inside the list. If your application moves focus to a new notice, set `politeness="off"` on that notice when adding it to avoid announcing the same content twice. This leaves announcements for other notices enabled. Removing a notice does not announce it or repeat the remaining notices. Give each notice a stable key. Use a new key for a new notification, including a repeated message.
+The list does not move focus, and notices continue to announce while focus is inside the list. If your application moves focus to a new notice, set `politeness="off"` on that notice when adding it to avoid announcing the same content twice. This leaves announcements for other notices enabled. Removing a notice does not announce it or repeat the remaining notices. Give each visible notice a stable React key. Change `announcementKey` when a new notification repeats the same message. This repeats the announcement without resetting the notice's controls or open details. In the example above, `notice.announcementKey` is a string or number that changes for each notification. In the dynamic example, select **Update latest notice** more than once to repeat its message.
 
 The list renders separate, visually hidden live regions for polite and assertive messages. Keep live-region roles off the visible notices and do not also call `speak()` for the same update.
 

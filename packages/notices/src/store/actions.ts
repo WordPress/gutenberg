@@ -1,4 +1,5 @@
 import deprecated from '@wordpress/deprecated';
+import { __unstableStripHTML } from '@wordpress/dom';
 import { DEFAULT_CONTEXT, DEFAULT_STATUS, NOTICE_SLOT } from './constants';
 import type { NoticeOptions, ReducerAction } from './types';
 
@@ -55,12 +56,17 @@ export function createNotice(
 	// strings. To avoid setting expectation that e.g. a React Element could be
 	// supported, cast to a string.
 	content = String( content );
+	let spokenMessage = speak ? content : null;
 
 	if ( __unstableHTML ) {
 		deprecated( 'The `__unstableHTML` option of `createNotice`', {
 			since: '7.2',
 			hint: 'Pass the message as plain text, and any longer account of what happened as `details`.',
 		} );
+		// Server-created notices stay silent when the list first mounts.
+		if ( spokenMessage && typeof document !== 'undefined' ) {
+			spokenMessage = __unstableStripHTML( spokenMessage );
+		}
 	}
 
 	const slot = ( options as Record< symbol, symbol | undefined > )[
@@ -74,7 +80,7 @@ export function createNotice(
 			id,
 			status,
 			content,
-			spokenMessage: speak ? content : null,
+			spokenMessage,
 			// Details with nothing to read would open an empty panel.
 			details:
 				details && String( details ).trim()
