@@ -51,14 +51,14 @@ interface ConnectorScriptModuleData {
 
 function getConnectorScriptModuleData(): ConnectorScriptModuleData {
 	try {
-		return JSON.parse(
-			document.getElementById(
-				'wp-script-module-data-options-connectors-wp-admin'
-			)?.textContent ?? '{}'
+		const script = document.querySelector(
+			'script[id="wp-script-module-data-options-connectors-wp-admin"]'
 		);
-	} catch {
-		return {};
-	}
+		if ( script instanceof HTMLScriptElement ) {
+			return JSON.parse( script.text );
+		}
+	} catch {}
+	return {};
 }
 
 /**

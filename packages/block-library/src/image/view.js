@@ -65,6 +65,20 @@ function getImageSrcset( { lightboxSrcset } ) {
 	return lightboxSrcset || '';
 }
 
+/**
+ * Returns the metadata of the image with the passed ID. The ID comes from the
+ * context, so only own properties of `state.metadata` are returned, never an
+ * inherited one.
+ *
+ * @param {string} imageId Image ID.
+ * @return {Object|undefined} The image metadata, if it exists.
+ */
+function getImageMetadata( imageId ) {
+	// Reads the property before the check so that the caller subscribes to it.
+	const metadata = state.metadata[ imageId ];
+	return Object.hasOwn( state.metadata, imageId ) ? metadata : undefined;
+}
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -97,7 +111,7 @@ const { state, actions, callbacks } = store(
 				);
 			},
 			get selectedImage() {
-				return state.metadata[ state.selectedImageId ];
+				return getImageMetadata( state.selectedImageId );
 			},
 			get hasNavigationIcon() {
 				const { navigationButtonType } = state.selectedImage;
@@ -115,7 +129,7 @@ const { state, actions, callbacks } = store(
 			},
 			get thisImage() {
 				const { imageId } = getContext();
-				return state.metadata[ imageId ];
+				return getImageMetadata( imageId );
 			},
 			get hasNavigation() {
 				return state.galleryImages.length > 1;
@@ -202,7 +216,7 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 
 				// Bails out if the image has not loaded yet.
-				if ( ! state.metadata[ imageId ].imageRef?.complete ) {
+				if ( ! getImageMetadata( imageId )?.imageRef?.complete ) {
 					return;
 				}
 
@@ -379,8 +393,12 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				const imageMetadata = getImageMetadata( imageId );
+				if ( ! imageMetadata ) {
+					return;
+				}
+
 				// Link element to preload the image.
-				const imageMetadata = state.metadata[ imageId ];
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'preload';
 				imageLink.as = 'image';
@@ -608,9 +626,13 @@ const { state, actions, callbacks } = store(
 				}
 
 				const { imageId } = getContext();
+				const imageMetadata = getImageMetadata( imageId );
+				if ( ! imageMetadata ) {
+					return;
+				}
 
-				state.metadata[ imageId ].imageRef = ref;
-				state.metadata[ imageId ].currentSrc = ref.currentSrc;
+				imageMetadata.imageRef = ref;
+				imageMetadata.currentSrc = ref.currentSrc;
 
 				const {
 					naturalWidth,
@@ -659,7 +681,7 @@ const { state, actions, callbacks } = store(
 				// In the case of an image with object-fit: contain, the size of the
 				// <img> element can be larger than the image itself, so it needs to
 				// calculate where to place the button.
-				if ( state.metadata[ imageId ].scaleAttr === 'contain' ) {
+				if ( imageMetadata.scaleAttr === 'contain' ) {
 					// Natural ratio of the image.
 					const naturalRatio = naturalWidth / naturalHeight;
 					// Offset ratio of the image.
@@ -686,8 +708,8 @@ const { state, actions, callbacks } = store(
 					}
 				}
 
-				state.metadata[ imageId ].buttonTop = buttonTop;
-				state.metadata[ imageId ].buttonRight = buttonRight;
+				imageMetadata.buttonTop = buttonTop;
+				imageMetadata.buttonRight = buttonRight;
 			},
 			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
@@ -711,7 +733,10 @@ const { state, actions, callbacks } = store(
 			initTriggerButton() {
 				const { imageId } = getContext();
 				const { ref } = getElement();
-				state.metadata[ imageId ].buttonRef = ref;
+				const imageMetadata = getImageMetadata( imageId );
+				if ( imageMetadata ) {
+					imageMetadata.buttonRef = ref;
+				}
 			},
 		},
 	},
