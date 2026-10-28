@@ -122,12 +122,11 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'From other', $output );
 	}
 
-	public function test_attribute_bindings_inside_the_value_to_other_sources_are_kept() {
+	public function test_attribute_bindings_inside_the_value_are_kept() {
 		$blocks = gutenberg_block_bindings_prepare_inner_blocks(
-			parse_blocks( '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/other"}}}} --><p>One</p><!-- /wp:paragraph -->' ),
-			'test/source'
+			parse_blocks( '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/inner-blocks"}}}} --><p>One</p><!-- /wp:paragraph -->' )
 		);
-		$this->assertSame( 'test/other', $blocks[0]['attrs']['metadata']['bindings']['content']['source'] );
+		$this->assertSame( self::SOURCE, $blocks[0]['attrs']['metadata']['bindings']['content']['source'] );
 	}
 
 	public function test_block_attributes_in_the_value_are_sanitized() {
@@ -139,8 +138,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 
 	public function test_removed_bindings_leave_no_empty_metadata() {
 		$blocks = gutenberg_block_bindings_prepare_inner_blocks(
-			parse_blocks( '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source"}}}} --><p>One</p><!-- /wp:paragraph -->' ),
-			'test/source'
+			parse_blocks( '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/source"}}}} --><div class="wp-block-group"></div><!-- /wp:group -->' )
 		);
 		$this->assertArrayNotHasKey( 'metadata', $blocks[0]['attrs'] );
 	}
@@ -151,7 +149,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'wp-custom-css-', $output );
 		$this->assertStringContainsString( '>Styled</p>', $output );
 
-		$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $this->value ), self::SOURCE );
+		$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $this->value ) );
 		$this->assertSame( array( 'color' => array( 'text' => '#00f' ) ), $blocks[0]['attrs']['style'] );
 	}
 
@@ -186,7 +184,19 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Styled</p>', $output );
 	}
 
-	public function test_block_without_inner_content_renders() {
+	public function test_editor_does_not_offer_inner_blocks_bindings() {
+		$settings = gutenberg_block_bindings_remove_inner_blocks_from_editor(
+			array(
+				'__experimentalBlockBindingsSupportedAttributes' => array(
+					'core/group'     => array( 'innerBlocks' ),
+					'core/paragraph' => array( 'content' ),
+				),
+			)
+		);
+		$this->assertSame( array( 'core/paragraph' => array( 'content' ) ), $settings['__experimentalBlockBindingsSupportedAttributes'] );
+	}
+
+	public function test_value_is_skipped_without_markup_to_place_it_in() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
 		$output      = render_block(
 			array(
@@ -195,6 +205,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 				'innerBlocks' => array(),
 			)
 		);
-		$this->assertIsString( $output );
+		$this->assertSame( '', $output );
 	}
 }

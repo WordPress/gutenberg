@@ -27,6 +27,29 @@ function gutenberg_block_bindings_add_inner_blocks_support( $supported_attribute
 add_filter( 'block_bindings_supported_attributes', 'gutenberg_block_bindings_add_inner_blocks_support', 10, 2 );
 
 /**
+ * Keeps `innerBlocks` out of the attributes the editor offers to bind: the
+ * editor doesn't render inner blocks bindings yet.
+ *
+ * @param array $settings The block editor settings.
+ * @return array The block editor settings.
+ */
+function gutenberg_block_bindings_remove_inner_blocks_from_editor( $settings ) {
+	if ( ! isset( $settings['__experimentalBlockBindingsSupportedAttributes'] ) || ! is_array( $settings['__experimentalBlockBindingsSupportedAttributes'] ) ) {
+		return $settings;
+	}
+	foreach ( $settings['__experimentalBlockBindingsSupportedAttributes'] as $block_type => $attributes ) {
+		$attributes = array_values( array_diff( (array) $attributes, array( 'innerBlocks' ) ) );
+		if ( $attributes ) {
+			$settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ] = $attributes;
+		} else {
+			unset( $settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ] );
+		}
+	}
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_block_bindings_remove_inner_blocks_from_editor' );
+
+/**
  * Returns whether a value supplies inner blocks: block markup, or an empty
  * string for no inner blocks. Anything else, like the plain text of a field,
  * leaves the block with its own inner blocks.
@@ -44,19 +67,17 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 /**
  * Prepares the blocks a source supplies, and their inner blocks, to render.
  *
- * Removes the bindings to that source and every `innerBlocks` binding. The
- * blocks a source supplies are its value as a whole, so none of them is bound
- * to it on its own. And none of them gets its inner blocks from a source, so
- * that two sources whose values bind each other's can't render forever.
+ * Removes their `innerBlocks` bindings: none of them gets its inner blocks from
+ * a source, so that two sources whose values bind each other's can't render
+ * forever.
  *
  * Also removes their custom CSS, which only users who can edit CSS may add:
  * whoever supplied the value is unknown.
  *
- * @param array[] $blocks      The parsed blocks.
- * @param string  $source_name The name of the source.
+ * @param array[] $blocks The parsed blocks.
  * @return array[] The parsed blocks.
  */
-function gutenberg_block_bindings_prepare_inner_blocks( $blocks, $source_name ) {
+function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 	foreach ( $blocks as &$block ) {
 		if ( isset( $block['attrs']['style'] ) ) {
 			$block['attrs']['style'] = gutenberg_strip_custom_css_from_style_array( $block['attrs']['style'] );
@@ -65,13 +86,8 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks, $source_name ) 
 			}
 		}
 
-		$bindings = $block['attrs']['metadata']['bindings'] ?? null;
-		if ( is_array( $bindings ) ) {
-			foreach ( $bindings as $name => $binding ) {
-				if ( 'innerBlocks' === $name || ( isset( $binding['source'] ) && $binding['source'] === $source_name ) ) {
-					unset( $block['attrs']['metadata']['bindings'][ $name ] );
-				}
-			}
+		if ( isset( $block['attrs']['metadata']['bindings']['innerBlocks'] ) ) {
+			unset( $block['attrs']['metadata']['bindings']['innerBlocks'] );
 			// Drop what's left empty, as the editor does.
 			if ( empty( $block['attrs']['metadata']['bindings'] ) ) {
 				unset( $block['attrs']['metadata']['bindings'] );
@@ -80,7 +96,7 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks, $source_name ) 
 				unset( $block['attrs']['metadata'] );
 			}
 		}
-		$block['innerBlocks'] = gutenberg_block_bindings_prepare_inner_blocks( $block['innerBlocks'], $source_name );
+		$block['innerBlocks'] = gutenberg_block_bindings_prepare_inner_blocks( $block['innerBlocks'] );
 	}
 	return $blocks;
 }
@@ -122,7 +138,7 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	if ( $wp_embed instanceof WP_Embed ) {
 		$markup = $wp_embed->autoembed( $wp_embed->run_shortcode( $markup ) );
 	}
-	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ), $source_name );
+	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ) );
 
 	// The blocks go where the block's own inner blocks were.
 	$inner_content = $block_instance->parsed_block['innerContent'] ?? array();
