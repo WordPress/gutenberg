@@ -2,6 +2,7 @@ import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
+import AspectRatioIcon from './aspect-ratio-icon';
 import { findAspectRatioOption } from './utils';
 import type {
 	AspectRatioPreset,
@@ -62,6 +63,7 @@ export default function AspectRatioTool( {
 	];
 
 	const resolvedOptions = options ?? aspectRatioOptions;
+	const visibleOptions = resolvedOptions.filter( ( item ) => ! item.hidden );
 
 	// The value is free-form CSS, so it doesn't necessarily match an option as
 	// written, e.g. '1/1' and '1' describe the same ratio. Resolve it to the
@@ -97,9 +99,35 @@ export default function AspectRatioTool( {
 					resolvedOptions.find( ( item ) => ! item.disabled ) ??
 					null
 				}
-				items={ resolvedOptions.filter( ( item ) => ! item.hidden ) }
+				items={ visibleOptions }
 				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
-			/>
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => (
+							<span className="block-editor-dimensions-tool__aspect-ratio-option">
+								<AspectRatioIcon ratio={ item.value ?? '' } />
+								{ item.label }
+							</span>
+						) }
+					</SelectControl.Trigger>
+				}
+			>
+				{ visibleOptions.map( ( item ) => (
+					<SelectControl.Item
+						key={ item.value }
+						value={ item }
+						label={ item.label }
+						disabled={ item.disabled }
+					>
+						<SelectControl.ItemLabel>
+							<span className="block-editor-dimensions-tool__aspect-ratio-option">
+								<AspectRatioIcon ratio={ item.value } />
+								{ item.label }
+							</span>
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+			</SelectControl>
 		</InheritanceToolsPanelItem>
 	);
 }
