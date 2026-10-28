@@ -35,9 +35,31 @@ export default function useEditableRoot() {
 				isMultiSelecting,
 			} = registry.select( blockEditorStore );
 
+			const { activeElement } = node.ownerDocument;
+			// A mounted element's window has a selection.
+			const selection = node.ownerDocument.defaultView!.getSelection()!;
+			const isFieldFocused =
+				activeElement !== node &&
+				( activeElement as HTMLElement | null )?.isContentEditable &&
+				node.contains( activeElement ) &&
+				getBlockClientId( activeElement ) ===
+					getSelectedBlockClientId();
+			// A tap focused the field and has not placed the caret yet. As
+			// the editing host, the wrapper would hold the old caret too, so
+			// iOS would leave it there. The selection observer takes over.
+			const isWaitingForCaret =
+				isFieldFocused &&
+				! (
+					selection.anchorNode &&
+					activeElement!.contains( selection.anchorNode )
+				);
+
 			// Focus is moved separately below, only when an editable
 			// element belonging to the selected block holds it.
-			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
+			if (
+				! isWaitingForCaret &&
+				! setContentEditableWrapper( node, true, { focus: false } )
+			) {
 				return;
 			}
 
@@ -51,18 +73,7 @@ export default function useEditableRoot() {
 			// placed the caret yet; moving focus now would cancel the
 			// pending caret placement. The selection observer moves focus
 			// once the selection lands.
-			const { activeElement } = node.ownerDocument;
-			// A mounted element's window has a selection.
-			const selection = node.ownerDocument.defaultView!.getSelection()!;
-			if (
-				activeElement !== node &&
-				( activeElement as HTMLElement | null )?.isContentEditable &&
-				node.contains( activeElement ) &&
-				getBlockClientId( activeElement ) ===
-					getSelectedBlockClientId() &&
-				selection.anchorNode &&
-				activeElement!.contains( selection.anchorNode )
-			) {
+			if ( isFieldFocused && ! isWaitingForCaret ) {
 				node.focus();
 			}
 

@@ -148,27 +148,10 @@ export default function useClickSelection() {
 			}
 
 			function onClick( event: MouseEvent ) {
-				let clientId = clickCollapseClientId;
+				const clientId = clickCollapseClientId;
 				clickCollapseClientId = undefined;
 
-				// A tap can focus a field and leave the caret in another
-				// block (iOS 27, after focus moved there from the wrapper
-				// without a click), so typing goes to that block.
-				const { activeElement } = node.ownerDocument;
-				const focusedClientId = getBlockClientId( activeElement );
-				if (
-					! clientId &&
-					pointerType === 'touch' &&
-					focusedClientId &&
-					( activeElement as HTMLElement ).isContentEditable &&
-					activeElement!.contains( event.target as Node ) &&
-					! activeElement!.contains(
-						node.ownerDocument.defaultView!.getSelection()!
-							.anchorNode
-					)
-				) {
-					clientId = focusedClientId;
-				} else if ( ! clientId || ! hasMultiSelection() ) {
+				if ( ! clientId || ! hasMultiSelection() ) {
 					return;
 				}
 
