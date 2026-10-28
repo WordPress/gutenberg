@@ -431,6 +431,7 @@ export default dedupePlugins( [
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
+						Popover: 'WCPopover',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
 						TextareaControl: 'WCTextareaControl',

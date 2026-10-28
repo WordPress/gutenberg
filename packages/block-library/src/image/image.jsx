@@ -16,7 +16,7 @@ import {
 	MenuItem,
 	ToolbarItem,
 	DropdownMenu,
-	Popover,
+	Popover as WCPopover,
 } from '@wordpress/components';
 import {
 	useMergeRefs,
@@ -176,7 +176,7 @@ function ContentOnlyControls( {
 				) }
 			</ToolbarItem>
 			{ isAltDialogOpen && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					anchor={ popoverAnchor }
 					onClose={ () => setIsAltDialogOpen( false ) }
@@ -216,10 +216,10 @@ function ContentOnlyControls( {
 							}
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 			{ isTitleDialogOpen && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					anchor={ popoverAnchor }
 					onClose={ () => setIsTitleDialogOpen( false ) }
@@ -255,7 +255,7 @@ function ContentOnlyControls( {
 							}
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 		</>
 	);

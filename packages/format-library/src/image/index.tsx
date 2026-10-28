@@ -1,5 +1,5 @@
 import {
-	Popover,
+	Popover as WCPopover,
 	Button,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl as WCTextareaControl,
@@ -94,7 +94,7 @@ function InlineUI( {
 	} );
 
 	return (
-		<Popover
+		<WCPopover
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -175,7 +175,7 @@ function InlineUI( {
 					</Stack>
 				</Stack>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 

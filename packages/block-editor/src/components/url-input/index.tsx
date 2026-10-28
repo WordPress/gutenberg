@@ -9,7 +9,7 @@ import {
 	Button,
 	__experimentalInputControl as WCInputControl,
 	Spinner as WCSpinner,
-	Popover,
+	Popover as WCPopover,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
@@ -534,7 +534,7 @@ function Suggestions( {
 	}
 
 	return (
-		<Popover placement="bottom" focusOnMount={ false }>
+		<WCPopover placement="bottom" focusOnMount={ false }>
 			<div
 				{ ...suggestionsListProps }
 				className={ clsx( 'block-editor-url-input__suggestions', {
@@ -558,6 +558,6 @@ function Suggestions( {
 					</Button>
 				) ) }
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

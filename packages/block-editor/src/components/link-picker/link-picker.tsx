@@ -1,7 +1,7 @@
 import {
 	BaseControl,
 	Button,
-	Popover,
+	Popover as WCPopover,
 	useBaseControlProps,
 } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -80,7 +80,7 @@ export function LinkPicker( {
 				/>
 			</Button>
 			{ isOpen && (
-				<Popover
+				<WCPopover
 					anchor={ anchorRef.current }
 					onClose={ () => setIsOpen( false ) }
 					placement="left-start"
@@ -112,7 +112,7 @@ export function LinkPicker( {
 							settings={ [] }
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 		</BaseControl>
 	);

@@ -13,7 +13,7 @@ import {
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { RichTextValue } from '@wordpress/rich-text';
@@ -217,7 +217,7 @@ export default function InlineColorUI( {
 	} );
 
 	return (
-		<Popover
+		<WCPopover
 			onClose={ onClose }
 			className="format-library__inline-color-popover"
 			anchor={ popoverAnchor }
@@ -245,6 +245,6 @@ export default function InlineColorUI( {
 					</Tabs.Panel>
 				) ) }
 			</Tabs.Root>
-		</Popover>
+		</WCPopover>
 	);
 }
