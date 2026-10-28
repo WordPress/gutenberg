@@ -449,7 +449,7 @@ function CalendarDateControl< Item >( {
 
 					{ /* Calendar widget */ }
 					<Calendar
-						style={ { width: '100%' } }
+						style={ { alignSelf: 'center' } }
 						value={ value ? parseDate( value ) : null }
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
@@ -726,7 +726,7 @@ function CalendarDateRangeControl< Item >( {
 					</Stack>
 
 					<RangeCalendar
-						style={ { width: '100%' } }
+						style={ { alignSelf: 'center' } }
 						value={ selectedRange }
 						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
