@@ -11249,16 +11249,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-utils/src/components/media-upload/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/media-utils/src/components/media-upload/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/nux/src/components/dot-tip/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
