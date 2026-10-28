@@ -26,6 +26,7 @@ import {
 import useBlockColorContrastWarning from './contrast-checker';
 import type { PanelStyle } from '../components/global-styles/types';
 import type {
+	ResetAllContext,
 	ResetAllFilter,
 	StyleInspectorControlProps,
 	TypographyAttributes,
@@ -161,8 +162,13 @@ function TypographyInspectorControl( {
 	resetAllFilter,
 }: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes: TypographyAttributes ) => {
-			const existingStyle = attributesToStyle( attributes );
+		( attributes: TypographyAttributes, context?: ResetAllContext ) => {
+			// The panel passes only `style`; a palette text color is in
+			// `textColor`, which the link color reset compares against.
+			const existingStyle = attributesToStyle( {
+				textColor: context?.attributes?.textColor as string | undefined,
+				...attributes,
+			} );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
 				...attributes,
