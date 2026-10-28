@@ -9,7 +9,6 @@
 }
 
 .edit-site-save-hub__button {
-	color: inherit;
 	width: 100%;
 	justify-content: center;
 
@@ -17,8 +16,8 @@
 		opacity: 1;
 	}
 
-	&[aria-disabled="true"],
-	&[aria-disabled="true"]:hover {
+	&[aria-disabled="true"]:not(.is-busy),
+	&[aria-disabled="true"]:hover:not(.is-busy) {
 		color: inherit;
 	}
 }

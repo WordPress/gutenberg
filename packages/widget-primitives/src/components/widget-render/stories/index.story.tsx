@@ -12,14 +12,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { globe, starFilled } from '@wordpress/icons';
-import {
-	Button,
-	Card,
-	Icon,
-	IconButton,
-	Link,
-	Stack,
-} from '@wordpress/ui';
+import { Button, Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';

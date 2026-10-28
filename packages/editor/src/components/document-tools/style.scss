@@ -53,17 +53,8 @@
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed {
-			background: $gray-900;
-
-			@media (forced-colors: active) {
-				background: SelectedItem !important;
-
-				&:disabled,
-				&[aria-disabled="true"] {
-					background: GrayText !important;
-				}
-			}
+		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
 		&:focus:not(:active) {

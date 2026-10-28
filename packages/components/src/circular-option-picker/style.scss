@@ -72,6 +72,7 @@ $color-palette-circle-spacing: 12px;
 	display: inline-block;
 	vertical-align: top;
 	height: 100% !important;
+	min-height: 100% !important;
 	aspect-ratio: 1;
 	border: none;
 	border-radius: $radius-round;

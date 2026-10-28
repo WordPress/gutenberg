@@ -87,6 +87,7 @@
 	// Preserve the original specificity over Button and wp-admin styles.
 	border-radius: $radius-round;
 	height: 28px;
+	min-height: 28px;
 	width: 28px;
 	font-weight: 400;
 

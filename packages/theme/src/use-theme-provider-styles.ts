@@ -57,6 +57,38 @@ function getAccentRamp(
 }
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
+	[
+		'--wp-components-color-button-brand-weak-active',
+		'var(--wpds-color-background-interactive-brand-weak-active)',
+	],
+	[
+		'--wp-components-color-button-brand-strong',
+		'var(--wpds-color-background-interactive-brand-strong)',
+	],
+	[
+		'--wp-components-color-button-brand-strong-active',
+		'var(--wpds-color-background-interactive-brand-strong-active)',
+	],
+	[
+		'--wp-components-color-button-brand-strong-foreground-active',
+		'var(--wpds-color-foreground-interactive-brand-strong-active)',
+	],
+	[
+		'--wp-components-color-button-brand',
+		'var(--wpds-color-foreground-interactive-brand)',
+	],
+	[
+		'--wp-components-color-button-brand-active',
+		'var(--wpds-color-foreground-interactive-brand-active)',
+	],
+	[
+		'--wp-components-color-button-brand-stroke',
+		'var(--wpds-color-stroke-interactive-brand)',
+	],
+	[
+		'--wp-components-color-button-brand-stroke-active',
+		'var(--wpds-color-stroke-interactive-brand-active)',
+	],
 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
 	[
 		'--wp-components-color-accent-darker-10',
