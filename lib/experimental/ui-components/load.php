@@ -15,6 +15,7 @@
  * @package gutenberg
  */
 
+require_once __DIR__ . '/class-gutenberg-ui-safe-html.php';
 require_once __DIR__ . '/markup.php';
 require_once __DIR__ . '/preview-page.php';
 
@@ -67,18 +68,44 @@ function gutenberg_ui_components_enqueue_assets() {
  * still renders. Missing required content, or a missing or invalid required
  * prop, renders nothing.
  *
- * @param string      $name    Component name, such as `button`.
- * @param array       $props   Component props.
- * @param string|null $content Component content, such as a button's label.
- * @return string HTML, or an empty string when the component can't render.
+ * Components that accept other components as content take them as returned
+ * by this function, so nesting reads like nested calls:
+ *
+ *     echo gutenberg_get_ui_component(
+ *         'card',
+ *         array( 'title' => __( 'Site health' ) ),
+ *         gutenberg_get_ui_component( 'button', array(), __( 'View details' ) )
+ *     );
+ *
+ * @param string $name    Component name, such as `button`.
+ * @param array  $props   Component props.
+ * @param mixed  $content Component content: text, or for components that accept
+ *                        it, other components, a closure that prints content, or
+ *                        a list of those.
+ * @return Gutenberg_UI_Safe_HTML Component HTML, which prints like a string.
+ *                                Empty when the component can't render.
  */
 function gutenberg_get_ui_component( $name, $props = array(), $content = null ) {
+	return gutenberg_ui_components_safe_html( gutenberg_ui_components_render( $name, $props, $content ) );
+}
+
+/**
+ * Renders a component to an HTML string.
+ *
+ * @access private
+ *
+ * @param string $name    Component name.
+ * @param array  $props   Component props.
+ * @param mixed  $content Component content.
+ * @return string HTML, or an empty string when the component can't render.
+ */
+function gutenberg_ui_components_render( $name, $props, $content ) {
 	$components = gutenberg_ui_components_get_manifest();
 	$render     = 'gutenberg_ui_render_' . str_replace( '-', '_', $name );
 
 	if ( ! isset( $components[ $name ] ) || ( ! isset( $components[ $name ]['markup'] ) && ! function_exists( $render ) ) ) {
 		_doing_it_wrong(
-			__FUNCTION__,
+			'gutenberg_get_ui_component',
 			/* translators: %s: Component name. */
 			esc_html( sprintf( __( 'There is no "%s" UI component.', 'gutenberg' ), $name ) ),
 			'24.4.0'
@@ -96,7 +123,7 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	$content           = gutenberg_ui_components_render_content( $content, $allows_components );
 	if ( null === $content || ( ! empty( $component['content']['required'] ) && '' === $content ) ) {
 		_doing_it_wrong(
-			__FUNCTION__,
+			'gutenberg_get_ui_component',
 			esc_html(
 				$allows_components
 					/* translators: %s: Component name. */
@@ -128,11 +155,12 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 /**
  * Turns the content passed to `gutenberg_get_ui_component()` into a string.
  *
- * Content is plain text. Components that accept other components as content
- * also take a component as `array( 'component' => 'button', 'props' => …,
- * 'content' => … )`, or a list of text and components. Those are rendered here,
- * and text is escaped, so the result is HTML that only ever comes from
- * components and escaped text, never from the caller.
+ * Plain strings are text, and get escaped. Components that accept other
+ * components as content also take `Gutenberg_UI_Safe_HTML`, such as another
+ * component's output, which is inserted as HTML, a closure, whose output is
+ * inserted as HTML (so it's only as safe as what it prints), and lists of those.
+ *
+ * @access private
  *
  * @param mixed $content           Content.
  * @param bool  $allows_components Whether the content can include components.
@@ -146,15 +174,21 @@ function gutenberg_ui_components_render_content( $content, $allows_components ) 
 	if ( is_string( $content ) ) {
 		return $allows_components ? htmlspecialchars( $content, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ) : $content;
 	}
-	if ( ! $allows_components || ! is_array( $content ) ) {
+	if ( ! $allows_components ) {
 		return null;
 	}
-	if ( isset( $content['component'] ) ) {
-		return gutenberg_get_ui_component(
-			(string) $content['component'],
-			isset( $content['props'] ) ? (array) $content['props'] : array(),
-			$content['content'] ?? null
-		);
+	if ( $content instanceof Gutenberg_UI_Safe_HTML ) {
+		return (string) $content;
+	}
+	if ( $content instanceof Closure ) {
+		ob_start();
+		$returned = $content();
+		$output   = ob_get_clean();
+		$rest     = gutenberg_ui_components_render_content( $returned, true );
+		return null === $rest ? null : $output . $rest;
+	}
+	if ( ! is_array( $content ) ) {
+		return null;
 	}
 
 	$html = '';
@@ -166,6 +200,29 @@ function gutenberg_ui_components_render_content( $content, $allows_components ) 
 		$html .= $item_html;
 	}
 	return $html;
+}
+
+/**
+ * Marks a component's own output as safe HTML.
+ *
+ * @access private
+ *
+ * @param string $html HTML rendered by a component.
+ * @return Gutenberg_UI_Safe_HTML Safe HTML.
+ */
+function gutenberg_ui_components_safe_html( $html ) {
+	static $create = null;
+	if ( null === $create ) {
+		// The constructor is private, so only this function can create it as is.
+		$create = Closure::bind(
+			static function ( $html ) {
+				return new Gutenberg_UI_Safe_HTML( $html );
+			},
+			null,
+			Gutenberg_UI_Safe_HTML::class
+		);
+	}
+	return $create( $html );
 }
 
 /**
