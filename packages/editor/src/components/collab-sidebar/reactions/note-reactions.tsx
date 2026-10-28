@@ -13,7 +13,6 @@ import {
 	IconButton,
 	Stack,
 	Tooltip,
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
 	getWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
