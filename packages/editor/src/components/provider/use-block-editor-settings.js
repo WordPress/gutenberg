@@ -14,7 +14,6 @@ import {
 	privateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -25,8 +24,6 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
-
-const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
@@ -130,15 +127,8 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	getPendingMediaPreviewKey,
 } = unlock( privateApis );
-
-// Post types saved as their own entity rather than through `savePost`.
-const NON_POST_ENTITY_TYPES = [
-	'wp_template',
-	'wp_template_part',
-	'wp_block',
-	'wp_navigation',
-];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -330,7 +320,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { openMediaEditorForBlock } = unlock( useDispatch( editorStore ) );
 
 	/**
 	 * Creates a Post entity.
@@ -411,27 +401,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: ( {
-				id,
-				deferCrop,
-				pendingCrop,
-				onUpdate,
-				onUndo,
-				onClose,
-			} ) =>
-				openMediaEditorModal( {
-					id,
-					// Deferred crops are committed by `savePost`, so only defer
-					// when the host opts in and the entity saves that way.
-					deferCrop:
-						!! deferCrop &&
-						!! settings.deferMediaEditorCrops &&
-						! NON_POST_ENTITY_TYPES.includes( postType ),
-					pendingCrop,
-					onUpdate,
-					onUndo,
-					onClose,
-				} ),
+			[ openMediaEditorModalKey ]: openMediaEditorForBlock,
+			[ getPendingMediaPreviewKey ]: ( select, clientId ) =>
+				unlock( select( editorStore ) ).getPendingMediaEditForBlock(
+					clientId
+				)?.previewUrl,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
@@ -530,7 +504,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
-		openMediaEditorModal,
+		openMediaEditorForBlock,
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,

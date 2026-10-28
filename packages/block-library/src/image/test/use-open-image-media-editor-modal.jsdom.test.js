@@ -33,7 +33,6 @@ vi.mock( import( '../../lock-unlock' ), () => ( {
 function createRegistry( {
 	getEditedEntityRecord = () => false,
 	resolveGetEntityRecord = () => undefined,
-	parentBlocks = [],
 } = {} ) {
 	const actions = {
 		invalidateResolution: vi.fn(),
@@ -41,7 +40,6 @@ function createRegistry( {
 	return {
 		select: vi.fn( () => ( {
 			getEditedEntityRecord,
-			getBlockParentsByBlockName: () => parentBlocks,
 		} ) ),
 		dispatch: vi.fn( () => actions ),
 		resolveSelect: vi.fn( () => ( {
@@ -319,8 +317,6 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		);
 		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
 			id: 1,
-			deferCrop: true,
-			pendingCrop: undefined,
 			onUpdate: expect.any( Function ),
 			onUndo: expect.any( Function ),
 			onClose: undefined,
@@ -364,8 +360,6 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		);
 		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
 			id: 1,
-			deferCrop: true,
-			pendingCrop: undefined,
 			onUpdate: expect.any( Function ),
 			onUndo: expect.any( Function ),
 			onClose: undefined,
@@ -1448,100 +1442,39 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 } );
 
 describe( 'useOpenImageMediaEditorModal pending crops', () => {
-	const PENDING_CROP = {
-		modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
-		cropperState: { rotation: 90 },
-		aspectRatioValue: '0',
-		previewUrl: 'blob:cropped',
-	};
-	const ATTRIBUTES = { id: 1, url: 'original.jpg', alt: '', caption: '' };
-
 	beforeEach( () => {
 		vi.clearAllMocks();
 	} );
 
-	it( 'asks for crops to be deferred', async () => {
+	it( 'passes the block client ID, so the editor can defer crops', async () => {
 		const { openMediaEditorModal } = await runModalUpdate( {
-			attributes: ATTRIBUTES,
+			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
+			hookOptions: { clientId: 'image-1' },
 		} );
 
 		expect( openMediaEditorModal ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				deferCrop: true,
-				pendingCrop: undefined,
-			} )
+			expect.objectContaining( { id: 1, clientId: 'image-1' } )
 		);
 	} );
 
-	it( 'does not defer crops inside a synced pattern', async () => {
-		const { openMediaEditorModal } = await runModalUpdate( {
-			attributes: ATTRIBUTES,
-			registryOptions: { parentBlocks: [ 'pattern-client-id' ] },
-		} );
-
-		expect( openMediaEditorModal ).toHaveBeenCalledWith(
-			expect.objectContaining( { deferCrop: false } )
-		);
-	} );
-
-	it( 'holds a deferred crop on the block, keeping the original image', async () => {
+	it( 'repoints to a restored original without waiting for its file', async () => {
+		const onUrlChange = vi.fn();
 		const { setAttributes } = await runModalUpdate( {
-			attributes: ATTRIBUTES,
+			attributes: { id: 2, url: 'cropped.jpg', alt: '', caption: '' },
 			updatePayload: {
 				id: 1,
-				url: 'original-full.jpg',
-				pendingCrop: PENDING_CROP,
+				url: 'original.jpg',
+				isPending: true,
+				previewUrl: 'blob:preview',
 			},
+			hookOptions: { onUrlChange },
 		} );
 
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			pendingMediaEdit: {
-				...PENDING_CROP,
-				sourceId: 1,
-				sourceUrl: 'original-full.jpg',
-			},
-		} );
-	} );
-
-	it( 'resumes a held crop when reopened', async () => {
-		const pendingMediaEdit = {
-			...PENDING_CROP,
-			sourceId: 1,
-			sourceUrl: 'original.jpg',
-		};
-		const { openMediaEditorModal } = await runModalUpdate( {
-			attributes: { ...ATTRIBUTES, pendingMediaEdit },
-		} );
-
-		expect( openMediaEditorModal ).toHaveBeenCalledWith(
-			expect.objectContaining( { pendingCrop: pendingMediaEdit } )
+		// The block shows the preview, so no load event would clear a
+		// loading state.
+		expect( onUrlChange ).not.toHaveBeenCalled();
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( { id: 1, url: 'original.jpg' } )
 		);
-	} );
-
-	it( 'does not resume a crop held for a different image', async () => {
-		const { openMediaEditorModal } = await runModalUpdate( {
-			attributes: {
-				...ATTRIBUTES,
-				pendingMediaEdit: { ...PENDING_CROP, sourceId: 99 },
-			},
-		} );
-
-		expect( openMediaEditorModal ).toHaveBeenCalledWith(
-			expect.objectContaining( { pendingCrop: undefined } )
-		);
-	} );
-
-	it( 'drops a held crop when the editor saves without one', async () => {
-		const { setAttributes } = await runModalUpdate( {
-			attributes: {
-				...ATTRIBUTES,
-				pendingMediaEdit: { ...PENDING_CROP, sourceId: 1 },
-			},
-			updatePayload: { id: 1, url: 'original.jpg' },
-		} );
-
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			pendingMediaEdit: undefined,
-		} );
 	} );
 } );

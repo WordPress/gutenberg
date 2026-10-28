@@ -76,6 +76,7 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
+	getPendingMediaPreviewKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -298,7 +299,6 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
-		pendingMediaEdit,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -365,6 +365,7 @@ export default function Image( {
 		imageSizes,
 		maxWidth,
 		editMediaEntity,
+		pendingPreviewUrl,
 	} = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType, getSettings } =
@@ -378,6 +379,11 @@ export default function Image( {
 				imageSizes: settings.imageSizes,
 				maxWidth: settings.maxWidth,
 				editMediaEntity: settings?.[ mediaEditKey ],
+				// A crop from the media editor that is saved with the post.
+				pendingPreviewUrl: settings[ getPendingMediaPreviewKey ]?.(
+					select,
+					clientId
+				),
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
@@ -433,13 +439,6 @@ export default function Image( {
 	// An image is uploading if it has a temporary blob URL, or if it is
 	// being processed client-side (e.g. transcoded or generating sub-sizes).
 	const isUploading = !! temporaryURL || isSideloading;
-	// A crop made in the media editor that is only saved with the post. It
-	// belongs to the image it was made on, so it's ignored once the block
-	// points at a different one.
-	const pendingPreviewUrl =
-		pendingMediaEdit && pendingMediaEdit.sourceId === id
-			? pendingMediaEdit.previewUrl
-			: undefined;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url

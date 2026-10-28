@@ -24,6 +24,7 @@ import {
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __, sprintf } from '@wordpress/i18n';
+import { revokeBlobURL } from '@wordpress/blob';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -31,9 +32,7 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import attachMediaInPost from './utils/attach-media-in-post';
-import commitPendingMediaEdits, {
-	hasPendingMediaEdits,
-} from './utils/commit-pending-media-edits';
+import commitPendingMediaEdits from './utils/commit-pending-media-edits';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -246,8 +245,8 @@ export const editPost =
 const PENDING_MEDIA_EDITS_LOCK = 'pending-media-edits';
 
 /**
- * Saves the media edits held on the post's blocks, such as crops made in the
- * media editor, and points the blocks at the new images.
+ * Saves the media edits waiting for the post to be saved, such as crops made
+ * in the media editor, and points their blocks at the new images.
  *
  * @param {Object} thunkArgs          Thunk arguments.
  * @param {Object} thunkArgs.select   Editor store selectors.
@@ -258,16 +257,19 @@ const PENDING_MEDIA_EDITS_LOCK = 'pending-media-edits';
 async function savePendingMediaEdits( { select, dispatch, registry } ) {
 	dispatch.lockPostSaving( PENDING_MEDIA_EDITS_LOCK );
 	try {
-		const { applyTo, error } = await commitPendingMediaEdits(
+		const pendingEdits = select.getPendingMediaEdits();
+		const { done, error } = await commitPendingMediaEdits(
 			registry,
-			select.getEditorBlocks()
+			pendingEdits
 		);
-		// Applied to the blocks as they are now, not as they were when the
-		// requests went out, so nothing typed meanwhile is lost.
-		const blocks = select.getEditorBlocks();
-		const nextBlocks = applyTo( blocks );
-		if ( nextBlocks !== blocks ) {
-			dispatch.resetEditorBlocks( nextBlocks );
+		// Not undoable: undoing the block changes is enough to go back to
+		// the original image.
+		dispatch.clearPendingMediaEdits( done, { undoIgnore: true } );
+		for ( const clientId of done ) {
+			const { previewUrl } = pendingEdits[ clientId ];
+			if ( previewUrl ) {
+				revokeBlobURL( previewUrl );
+			}
 		}
 		if ( ! error ) {
 			return false;
@@ -276,6 +278,8 @@ async function savePendingMediaEdits( { select, dispatch, registry } ) {
 		const reason = typeof error?.message === 'string' ? error.message : '';
 		return {
 			code: error?.code,
+			// Keeps the HTTP status, which the save failure notice shows.
+			data: error?.data,
 			message: reason
 				? sprintf(
 						/* translators: %s: Error message. */
@@ -308,7 +312,7 @@ export const savePost =
 		if (
 			! options.isAutosave &&
 			! options.isPreview &&
-			hasPendingMediaEdits( select.getEditorBlocks() )
+			select.hasPendingMediaEdits()
 		) {
 			error = await savePendingMediaEdits( {
 				select,

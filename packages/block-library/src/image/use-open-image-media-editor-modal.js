@@ -204,10 +204,6 @@ export function getNewAttachmentImageBlockAttributes(
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
-// These blocks are saved as their own entities, not with the post, so a crop
-// held on an image inside them would not be committed.
-const SEPARATELY_SAVED_PARENT_BLOCKS = [ 'core/block', 'core/template-part' ];
-
 function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
 	const attachment = {};
 
@@ -248,16 +244,8 @@ export function useOpenImageMediaEditorModal( {
 	// the update needs to read — those synced from the attachment's metadata,
 	// and those derived from which attachment the block points at; add more
 	// here if the sync policy grows.
-	const {
-		id,
-		url,
-		alt,
-		caption,
-		sizeSlug,
-		linkDestination,
-		href,
-		pendingMediaEdit,
-	} = attributes;
+	const { id, url, alt, caption, sizeSlug, linkDestination, href } =
+		attributes;
 	const registry = useRegistry();
 	const openMediaEditorModal = useSelect(
 		( select ) =>
@@ -276,7 +264,6 @@ export function useOpenImageMediaEditorModal( {
 		sizeSlug,
 		linkDestination,
 		href,
-		pendingMediaEdit,
 	} );
 	// Snapshot of the attachment's metadata taken just before the modal opens,
 	// used as the baseline for detecting what changed during the editing session.
@@ -294,18 +281,8 @@ export function useOpenImageMediaEditorModal( {
 			sizeSlug,
 			linkDestination,
 			href,
-			pendingMediaEdit,
 		};
-	}, [
-		alt,
-		caption,
-		href,
-		id,
-		linkDestination,
-		pendingMediaEdit,
-		sizeSlug,
-		url,
-	] );
+	}, [ alt, caption, href, id, linkDestination, sizeSlug, url ] );
 
 	// Reads the cached attachment record. The `attachment` postType entity
 	// fetches with `context: 'edit'` by default, so `getEditedEntityRecord`
@@ -362,7 +339,7 @@ export function useOpenImageMediaEditorModal( {
 	);
 
 	const handleMediaUpdate = useCallback(
-		async ( { id: newId, url: newUrl, pendingCrop }, undoState ) => {
+		async ( { id: newId, url: newUrl, isPending }, undoState ) => {
 			if ( typeof newId !== 'number' ) {
 				return;
 			}
@@ -377,18 +354,6 @@ export function useOpenImageMediaEditorModal( {
 			const currentBlockAttributes = blockAttributesRef.current;
 			const isNewAttachment = newId !== currentBlockAttributes.id;
 
-			// A pending crop is kept on the block and committed when the post
-			// is saved. Any other update replaces an earlier pending crop.
-			if ( pendingCrop ) {
-				nextAttributes.pendingMediaEdit = {
-					...pendingCrop,
-					sourceId: newId,
-					sourceUrl: newUrl,
-				};
-			} else if ( currentBlockAttributes.pendingMediaEdit ) {
-				nextAttributes.pendingMediaEdit = undefined;
-			}
-
 			if ( isNewAttachment ) {
 				// Capture the block's selected-size URL, not the attachment's
 				// full-size URL supplied by the modal's fallback Undo.
@@ -399,7 +364,7 @@ export function useOpenImageMediaEditorModal( {
 				// With a pending crop the block shows the crop preview, not
 				// the new URL, so there's no file to wait for.
 				if (
-					! pendingCrop &&
+					! isPending &&
 					nextAttributes.url !== currentBlockAttributes.url
 				) {
 					// The block is about to point at a freshly generated file
@@ -484,7 +449,7 @@ export function useOpenImageMediaEditorModal( {
 						// block then clears its loading state by matching
 						// the pending URL against the rendered one.
 						if (
-							! pendingCrop &&
+							! isPending &&
 							derivedAttributes.url &&
 							derivedAttributes.url !== latestBlockAttributes.url
 						) {
@@ -549,19 +514,9 @@ export function useOpenImageMediaEditorModal( {
 		// Each opening owns its Undo snapshot, so a later opening cannot
 		// replace the values captured by an earlier snackbar.
 		const undoState = { undoAttributes: {}, isUndone: false };
-		const isSavedWithPost = ! registry
-			.select( blockEditorStore )
-			.getBlockParentsByBlockName(
-				clientId,
-				SEPARATELY_SAVED_PARENT_BLOCKS
-			).length;
 		openMediaEditorModal( {
 			id,
-			deferCrop: isSavedWithPost,
-			pendingCrop:
-				pendingMediaEdit && pendingMediaEdit.sourceId === id
-					? pendingMediaEdit
-					: undefined,
+			clientId,
 			onUpdate: ( updated ) => handleMediaUpdate( updated, undoState ),
 			onUndo: () => {
 				undoState.isUndone = true;
@@ -585,8 +540,6 @@ export function useOpenImageMediaEditorModal( {
 		onClose,
 		onUrlChange,
 		openMediaEditorModal,
-		pendingMediaEdit,
-		registry,
 		resolveAttachmentRecord,
 		setAttributes,
 	] );

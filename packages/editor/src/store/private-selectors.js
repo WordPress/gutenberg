@@ -1,4 +1,5 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	layout,
@@ -693,5 +694,72 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 					currentPostId
 				)
 		);
+	}
+);
+
+const EMPTY_PENDING_MEDIA_EDITS = {};
+
+/**
+ * Returns the media edits waiting for the current post to be saved, keyed by
+ * block client ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Pending media edits.
+ */
+export const getPendingMediaEdits = createRegistrySelector(
+	( select ) => ( state ) =>
+		select( coreStore ).getEditedEntityRecord(
+			'postType',
+			getCurrentPostType( state ),
+			getCurrentPostId( state )
+		)?.pendingMediaEdits ?? EMPTY_PENDING_MEDIA_EDITS
+);
+
+/**
+ * Returns the media edit waiting for the current post to be saved for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object|undefined} The pending media edit.
+ */
+export function getPendingMediaEdit( state, clientId ) {
+	return getPendingMediaEdits( state )[ clientId ];
+}
+
+/**
+ * Returns whether any media edits are waiting for the current post to be
+ * saved.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there are pending media edits.
+ */
+export function hasPendingMediaEdits( state ) {
+	return Object.keys( getPendingMediaEdits( state ) ).length > 0;
+}
+
+/**
+ * Returns the pending media edit for a block, if it was made on the
+ * attachment the block shows now.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object|undefined} The pending media edit.
+ */
+export const getPendingMediaEditForBlock = createRegistrySelector(
+	( select ) => ( state, clientId ) => {
+		const edit = getPendingMediaEdit( state, clientId );
+		if ( ! edit ) {
+			return undefined;
+		}
+		const block = select( blockEditorStore ).getBlock( clientId );
+		const mediaEditor = block && getBlockType( block.name )?.mediaEditor;
+		if ( mediaEditor?.getMedia( block.attributes ).id !== edit.sourceId ) {
+			return undefined;
+		}
+		return edit;
 	}
 );

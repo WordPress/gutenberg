@@ -5,8 +5,13 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import {
+	parse,
+	__unstableSerializeAndClean,
+	getBlockType,
+} from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
@@ -1103,3 +1108,175 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Sets or clears the media edit for a block, held until the post is saved.
+ *
+ * The edits are stored as a transient edit on the post, so they take part in
+ * undo but aren't sent with the post.
+ *
+ * @param {string}  clientId Block client ID.
+ * @param {?Object} edit     The pending edit, or `undefined` to clear it.
+ */
+export const setPendingMediaEdit =
+	( clientId, edit ) =>
+	( { select, registry } ) => {
+		const { [ clientId ]: previous, ...others } =
+			select.getPendingMediaEdits();
+		if ( previous === edit ) {
+			return;
+		}
+		const next = edit ? { ...others, [ clientId ]: edit } : others;
+		registry
+			.dispatch( coreStore )
+			.editEntityRecord(
+				'postType',
+				select.getCurrentPostType(),
+				select.getCurrentPostId(),
+				{
+					pendingMediaEdits: Object.keys( next ).length
+						? next
+						: undefined,
+				}
+			);
+	};
+
+/**
+ * Clears the media edits for the given blocks.
+ *
+ * @param {string[]} clientIds Block client IDs.
+ * @param {Object}   options   Options passed to `editEntityRecord`.
+ */
+export const clearPendingMediaEdits =
+	( clientIds, options ) =>
+	( { select, registry } ) => {
+		const current = select.getPendingMediaEdits();
+		const next = { ...current };
+		for ( const clientId of clientIds ) {
+			delete next[ clientId ];
+		}
+		if ( Object.keys( next ).length === Object.keys( current ).length ) {
+			return;
+		}
+		registry.dispatch( coreStore ).editEntityRecord(
+			'postType',
+			select.getCurrentPostType(),
+			select.getCurrentPostId(),
+			{
+				pendingMediaEdits: Object.keys( next ).length
+					? next
+					: undefined,
+			},
+			options
+		);
+	};
+
+// Post types saved as their own entity rather than through `savePost`.
+const NON_POST_ENTITY_TYPES = [
+	'wp_template',
+	'wp_template_part',
+	'wp_block',
+	'wp_navigation',
+];
+
+// Blocks whose contents are saved as their own entity, not with the post.
+const SEPARATELY_SAVED_PARENT_BLOCKS = [ 'core/block', 'core/template-part' ];
+
+/**
+ * Whether a media edit made on the block can wait for the post to be saved.
+ *
+ * @param {Object} select   Editor store selectors.
+ * @param {Object} registry The data registry.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether the edit can be deferred.
+ */
+function canDeferMediaEdit( select, registry, clientId ) {
+	if (
+		! clientId ||
+		! select.getEditorSettings().deferMediaEditorCrops ||
+		NON_POST_ENTITY_TYPES.includes( select.getCurrentPostType() )
+	) {
+		return false;
+	}
+	const { getBlockName, getBlockParentsByBlockName } =
+		registry.select( blockEditorStore );
+	const blockName = getBlockName( clientId );
+	if ( ! blockName || ! getBlockType( blockName )?.mediaEditor ) {
+		return false;
+	}
+	if (
+		getBlockParentsByBlockName( clientId, SEPARATELY_SAVED_PARENT_BLOCKS )
+			.length
+	) {
+		return false;
+	}
+	// With the template shown, only the post content is saved with the post.
+	if (
+		select.getRenderingMode() !== 'post-only' &&
+		! getBlockParentsByBlockName( clientId, 'core/post-content' ).length
+	) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Opens the media editor for an attachment shown by a block.
+ *
+ * When the block's type declares `mediaEditor` and the block is saved with
+ * the post, a crop is held as a pending media edit and saved by `savePost`.
+ * `onUpdate` is still called, with `isPending` and `previewUrl` set, so the
+ * block can apply changes that don't wait, such as alt text.
+ *
+ * @param {Object}   options
+ * @param {number}   options.id         Attachment ID.
+ * @param {string}   [options.clientId] Block client ID.
+ * @param {Function} [options.onUpdate] Called when the media editor saves.
+ * @param {Function} [options.onUndo]   Called when an immediate save is undone.
+ * @param {Function} [options.onClose]  Called when the media editor closes.
+ */
+export const openMediaEditorForBlock =
+	( { id, clientId, onUpdate, onUndo, onClose } ) =>
+	( { select, dispatch, registry } ) => {
+		const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
+		const deferCrop = canDeferMediaEdit( select, registry, clientId );
+		const pendingEdit = deferCrop
+			? select.getPendingMediaEditForBlock( clientId )
+			: undefined;
+
+		registry.dispatch( mediaEditorStore ).openMediaEditorModal( {
+			id,
+			deferCrop,
+			pendingCrop: pendingEdit,
+			onUpdate: ( update ) => {
+				if ( ! deferCrop ) {
+					onUpdate?.( update );
+					return;
+				}
+				const { pendingCrop, ...rest } = update;
+				// Any save without a pending crop replaces the earlier one.
+				dispatch.setPendingMediaEdit(
+					clientId,
+					pendingCrop
+						? {
+								...pendingCrop,
+								sourceId: update.id,
+								sourceUrl: update.url,
+							}
+						: undefined
+				);
+				onUpdate?.(
+					pendingCrop
+						? {
+								...rest,
+								isPending: true,
+								previewUrl: pendingCrop.previewUrl,
+							}
+						: rest
+				);
+			},
+			onUndo,
+			onClose,
+		} );
+	};

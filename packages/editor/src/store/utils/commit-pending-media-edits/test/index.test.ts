@@ -1,13 +1,30 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-import type { Block } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { DataRegistry } from '@wordpress/data';
-import commitPendingMediaEdits, { hasPendingMediaEdits } from '..';
+import commitPendingMediaEdits from '..';
 
 vi.mock(
 	import( '@wordpress/core-data' ),
 	() =>
-		( { store: {} } ) as unknown as typeof import( '@wordpress/core-data' )
+		( {
+			store: 'core',
+		} ) as unknown as typeof import( '@wordpress/core-data' )
+);
+vi.mock(
+	import( '@wordpress/block-editor' ),
+	() =>
+		( {
+			store: 'core/block-editor',
+		} ) as unknown as typeof import( '@wordpress/block-editor' )
+);
+vi.mock(
+	import( '@wordpress/blocks' ),
+	() =>
+		( {
+			getBlockType: ( name: string ) =>
+				name === 'test/image' ? { mediaEditor } : {},
+		} ) as unknown as typeof import( '@wordpress/blocks' )
 );
 vi.mock(
 	import( '@wordpress/api-fetch' ),
@@ -21,7 +38,7 @@ const mockApiFetch = apiFetch as unknown as Mock;
 
 const MODIFIERS = [ { type: 'rotate', args: { angle: 90 } } ];
 
-const pendingMediaEdit = (
+const pendingEdit = (
 	sourceId: number,
 	modifiers: unknown[] = MODIFIERS
 ) => ( {
@@ -31,43 +48,59 @@ const pendingMediaEdit = (
 	previewUrl: 'blob:preview',
 } );
 
-const imageBlock = (
-	attributes: Record< string, unknown >,
-	innerBlocks: Block[] = []
-) =>
-	( {
-		name: 'core/image',
-		attributes,
-		innerBlocks,
-	} ) as Block;
+const CROPPED = { id: 20, source_url: 'cropped.jpg' };
 
-const CROPPED = {
-	id: 20,
-	source_url: 'cropped.jpg',
-	link: 'https://example.com/cropped/',
-	media_details: {
-		sizes: { medium: { source_url: 'cropped-300x200.jpg' } },
-	},
+const mediaEditor = {
+	getMedia: ( { id }: Record< string, unknown > ) => ( {
+		id: id as number,
+	} ),
+	applyMedia: vi.fn(
+		( attributes: Record< string, unknown >, media: { id: number } ) => ( {
+			id: media.id,
+		} )
+	),
 };
 
-function createRegistry() {
+/**
+ * A registry with the given blocks, keyed by client ID.
+ *
+ * @param blocks Blocks by client ID.
+ */
+function createRegistry(
+	blocks: Record< string, { name: string; attributes: object } >
+) {
 	const receiveEntityRecords = vi.fn();
-	return {
-		registry: {
-			resolveSelect: () => ( {
-				getEntityRecord: vi.fn(
-					async ( kind: string, name: string, id: number ) => ( {
-						id,
-						post: 7,
-						source_url: `image-${ id }.jpg`,
-					} )
-				),
+	const updateBlockAttributes = vi.fn();
+	const registry = {
+		select: ( store: unknown ) => {
+			if ( store === blockEditorStore ) {
+				return {
+					getBlock: ( clientId: string ) =>
+						blocks[ clientId ] ?? null,
+				};
+			}
+			return {};
+		},
+		resolveSelect: () => ( {
+			getEntityRecord: async (
+				kind: string,
+				name: string,
+				id: number
+			) => ( {
+				id,
+				post: 7,
+				source_url: `image-${ id }.jpg`,
 			} ),
-			dispatch: () => ( { receiveEntityRecords } ),
-		} as unknown as DataRegistry,
-		receiveEntityRecords,
-	};
+		} ),
+		dispatch: ( store: unknown ) =>
+			store === blockEditorStore
+				? { updateBlockAttributes }
+				: { receiveEntityRecords },
+	} as unknown as DataRegistry;
+	return { registry, receiveEntityRecords, updateBlockAttributes };
 }
+
+const image = ( id: number ) => ( { name: 'test/image', attributes: { id } } );
 
 describe( 'commitPendingMediaEdits', () => {
 	beforeEach( () => {
@@ -76,168 +109,83 @@ describe( 'commitPendingMediaEdits', () => {
 	} );
 
 	it( 'saves the edit and points the block at the new image', async () => {
-		const { registry, receiveEntityRecords } = createRegistry();
-		const blocks = [
-			imageBlock( {
-				id: 10,
-				url: 'image-10.jpg',
-				pendingMediaEdit: pendingMediaEdit( 10 ),
-			} ),
-		];
+		const { registry, receiveEntityRecords, updateBlockAttributes } =
+			createRegistry( { a: image( 10 ) } );
 
-		const { applyTo, error } = await commitPendingMediaEdits(
-			registry,
-			blocks
-		);
+		const { done, error } = await commitPendingMediaEdits( registry, {
+			a: pendingEdit( 10 ),
+		} );
 
 		expect( error ).toBeUndefined();
+		expect( done ).toEqual( [ 'a' ] );
 		expect( mockApiFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media/10/edit',
 			method: 'POST',
 			data: { src: 'image-10.jpg', modifiers: MODIFIERS, post: 7 },
 		} );
 		expect( receiveEntityRecords ).toHaveBeenCalled();
-		expect( applyTo( blocks )[ 0 ].attributes ).toEqual( {
-			id: 20,
-			url: 'cropped.jpg',
-			pendingMediaEdit: undefined,
-		} );
+		expect( mediaEditor.applyMedia ).toHaveBeenCalledWith(
+			{ id: 10 },
+			CROPPED
+		);
+		expect( updateBlockAttributes ).toHaveBeenCalledWith(
+			[ 'a' ],
+			{ a: { id: 20 } },
+			{ uniqueByBlock: true }
+		);
 	} );
 
 	it( 'saves an edit held by several blocks once', async () => {
-		const { registry } = createRegistry();
-		const blocks = [
-			imageBlock( { id: 10, pendingMediaEdit: pendingMediaEdit( 10 ) } ),
-			imageBlock( { id: 10, pendingMediaEdit: pendingMediaEdit( 10 ) } ),
-		];
+		const { registry, updateBlockAttributes } = createRegistry( {
+			a: image( 10 ),
+			b: image( 10 ),
+		} );
 
-		const { applyTo } = await commitPendingMediaEdits( registry, blocks );
+		await commitPendingMediaEdits( registry, {
+			a: pendingEdit( 10 ),
+			b: pendingEdit( 10 ),
+		} );
 
 		expect( mockApiFetch ).toHaveBeenCalledTimes( 1 );
-		expect(
-			applyTo( blocks ).map( ( block ) => block.attributes.id )
-		).toEqual( [ 20, 20 ] );
+		expect( updateBlockAttributes ).toHaveBeenCalledWith(
+			[ 'a', 'b' ],
+			{ a: { id: 20 }, b: { id: 20 } },
+			{ uniqueByBlock: true }
+		);
 	} );
 
 	it( 'saves different edits to the same image separately', async () => {
-		const { registry } = createRegistry();
-		const blocks = [
-			imageBlock( { id: 10, pendingMediaEdit: pendingMediaEdit( 10 ) } ),
-			imageBlock( {
-				id: 10,
-				pendingMediaEdit: pendingMediaEdit( 10, [
-					{ type: 'rotate', args: { angle: 180 } },
-				] ),
-			} ),
-		];
+		const { registry } = createRegistry( {
+			a: image( 10 ),
+			b: image( 10 ),
+		} );
 
-		await commitPendingMediaEdits( registry, blocks );
+		await commitPendingMediaEdits( registry, {
+			a: pendingEdit( 10 ),
+			b: pendingEdit( 10, [ { type: 'rotate', args: { angle: 180 } } ] ),
+		} );
 
 		expect( mockApiFetch ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'keeps the selected size, or falls back to full', async () => {
-		const { registry } = createRegistry();
-		const blocks = [
-			imageBlock( {
-				id: 10,
-				sizeSlug: 'medium',
-				pendingMediaEdit: pendingMediaEdit( 10 ),
-			} ),
-			imageBlock( {
-				id: 10,
-				sizeSlug: 'large',
-				pendingMediaEdit: pendingMediaEdit( 10 ),
-			} ),
-		];
-
-		const { applyTo } = await commitPendingMediaEdits( registry, blocks );
-		const [ medium, large ] = applyTo( blocks );
-
-		expect( medium.attributes ).toMatchObject( {
-			url: 'cropped-300x200.jpg',
-			sizeSlug: 'medium',
+	it( 'drops edits that are stale', async () => {
+		const { registry, updateBlockAttributes } = createRegistry( {
+			replaced: image( 11 ),
+			unsupported: { name: 'test/other', attributes: { id: 10 } },
 		} );
-		expect( large.attributes ).toMatchObject( {
-			url: 'cropped.jpg',
-			sizeSlug: 'full',
+
+		const { done } = await commitPendingMediaEdits( registry, {
+			replaced: pendingEdit( 10 ),
+			unsupported: pendingEdit( 10 ),
+			removed: pendingEdit( 10 ),
 		} );
-	} );
-
-	it( 'points media file and attachment page links at the new image', async () => {
-		const { registry } = createRegistry();
-		const blocks = [
-			imageBlock( {
-				id: 10,
-				linkDestination: 'media',
-				pendingMediaEdit: pendingMediaEdit( 10 ),
-			} ),
-			imageBlock( {
-				id: 10,
-				linkDestination: 'attachment',
-				pendingMediaEdit: pendingMediaEdit( 10 ),
-			} ),
-		];
-
-		const { applyTo } = await commitPendingMediaEdits( registry, blocks );
-		const [ media, attachment ] = applyTo( blocks );
-
-		expect( media.attributes.href ).toBe( 'cropped.jpg' );
-		expect( attachment.attributes.href ).toBe(
-			'https://example.com/cropped/'
-		);
-	} );
-
-	it( 'drops an edit made on an image the block no longer shows', async () => {
-		const { registry } = createRegistry();
-		const blocks = [
-			imageBlock( { id: 11, pendingMediaEdit: pendingMediaEdit( 10 ) } ),
-		];
-
-		const { applyTo } = await commitPendingMediaEdits( registry, blocks );
 
 		expect( mockApiFetch ).not.toHaveBeenCalled();
-		expect( applyTo( blocks )[ 0 ].attributes ).toEqual( {
-			id: 11,
-			pendingMediaEdit: undefined,
-		} );
-	} );
-
-	it( 'finds edits in nested blocks, but not in synced patterns', async () => {
-		const { registry } = createRegistry();
-		const blocks = [
-			{
-				name: 'core/group',
-				attributes: {},
-				innerBlocks: [
-					imageBlock( {
-						id: 10,
-						pendingMediaEdit: pendingMediaEdit( 10 ),
-					} ),
-				],
-			},
-			{
-				name: 'core/block',
-				attributes: {},
-				innerBlocks: [
-					imageBlock( {
-						id: 30,
-						pendingMediaEdit: pendingMediaEdit( 30 ),
-					} ),
-				],
-			},
-		] as Block[];
-
-		const { applyTo } = await commitPendingMediaEdits( registry, blocks );
-		const [ group, pattern ] = applyTo( blocks );
-
-		expect( mockApiFetch ).toHaveBeenCalledTimes( 1 );
-		expect( group.innerBlocks[ 0 ].attributes.id ).toBe( 20 );
-		expect( pattern ).toBe( blocks[ 1 ] );
+		expect( updateBlockAttributes ).not.toHaveBeenCalled();
+		expect( done ).toEqual( [ 'replaced', 'unsupported', 'removed' ] );
 	} );
 
 	it( 'applies what was saved and reports what failed', async () => {
-		const { registry } = createRegistry();
 		const failure = { code: 'rest_error', message: 'Nope' };
 		mockApiFetch.mockImplementation(
 			async ( { path }: { path: string } ) => {
@@ -247,52 +195,22 @@ describe( 'commitPendingMediaEdits', () => {
 				return CROPPED;
 			}
 		);
-		const blocks = [
-			imageBlock( { id: 10, pendingMediaEdit: pendingMediaEdit( 10 ) } ),
-			imageBlock( { id: 11, pendingMediaEdit: pendingMediaEdit( 11 ) } ),
-		];
+		const { registry, updateBlockAttributes } = createRegistry( {
+			a: image( 10 ),
+			b: image( 11 ),
+		} );
 
-		const { applyTo, error } = await commitPendingMediaEdits(
-			registry,
-			blocks
-		);
-		const [ saved, failed ] = applyTo( blocks );
+		const { done, error } = await commitPendingMediaEdits( registry, {
+			a: pendingEdit( 10 ),
+			b: pendingEdit( 11 ),
+		} );
 
 		expect( error ).toBe( failure );
-		expect( saved.attributes.id ).toBe( 20 );
-		expect( failed ).toBe( blocks[ 1 ] );
-	} );
-
-	it( 'returns the same blocks when there is nothing to do', async () => {
-		const { registry } = createRegistry();
-		const blocks = [ imageBlock( { id: 10 } ) ];
-
-		const { applyTo } = await commitPendingMediaEdits( registry, blocks );
-
-		expect( applyTo( blocks ) ).toBe( blocks );
-	} );
-} );
-
-describe( 'hasPendingMediaEdits', () => {
-	it( 'is true only for an edit to the image the block shows', () => {
-		expect(
-			hasPendingMediaEdits( [
-				imageBlock( {
-					id: 10,
-					pendingMediaEdit: pendingMediaEdit( 10 ),
-				} ),
-			] )
-		).toBe( true );
-		expect(
-			hasPendingMediaEdits( [
-				imageBlock( {
-					id: 11,
-					pendingMediaEdit: pendingMediaEdit( 10 ),
-				} ),
-			] )
-		).toBe( false );
-		expect( hasPendingMediaEdits( [ imageBlock( { id: 10 } ) ] ) ).toBe(
-			false
+		expect( done ).toEqual( [ 'a' ] );
+		expect( updateBlockAttributes ).toHaveBeenCalledWith(
+			[ 'a' ],
+			{ a: { id: 20 } },
+			{ uniqueByBlock: true }
 		);
 	} );
 } );
