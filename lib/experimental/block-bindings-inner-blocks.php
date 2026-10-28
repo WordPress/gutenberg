@@ -102,6 +102,67 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 }
 
 /**
+ * Returns where the inner blocks go in the markup of a block that has none.
+ *
+ * Group and Column wrap them in one element, so they go before its closer, or
+ * before the closer of the inner container of a legacy Group.
+ *
+ * @param string $html The markup of the block.
+ * @return int|null The byte offset, or null if there's no element to put them in.
+ */
+function gutenberg_block_bindings_get_inner_blocks_offset( $html ) {
+	// Exposes the byte offset of a tag, which the HTML API doesn't do publicly.
+	// The redeclaration-guard sniff can't tell the method from a global function.
+	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+	$processor = new class( $html ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Returns the byte offset where the current tag starts.
+		 *
+		 * @return int The byte offset.
+		 */
+		public function get_tag_start(): int {
+			$this->set_bookmark( 'here' );
+			return $this->bookmarks['here']->start;
+		}
+	};
+	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+
+	if ( ! $processor->next_tag() ) {
+		return null;
+	}
+	$processor->set_bookmark( 'wrapper' );
+
+	// As in `wp_restore_group_inner_container()`, the inner container comes first
+	// in the wrapper, after any whitespace.
+	while ( $processor->next_token() ) {
+		if ( '#text' !== $processor->get_token_type() || '' !== trim( $processor->get_modifiable_text(), " \t\n\f\r" ) ) {
+			break;
+		}
+	}
+	if ( 'DIV' !== $processor->get_tag() || $processor->is_tag_closer() || ! $processor->has_class( 'wp-block-group__inner-container' ) ) {
+		$processor->seek( 'wrapper' );
+	}
+
+	// Finds the matching closer as `WP_Interactivity_API_Directives_Processor`
+	// does: counting only tags with the same name, as other tags may omit theirs.
+	$query = array(
+		'tag_name'    => $processor->get_tag(),
+		'tag_closers' => 'visit',
+	);
+	$depth = 0;
+	while ( $processor->next_tag( $query ) ) {
+		if ( ! $processor->is_tag_closer() ) {
+			++$depth;
+		} elseif ( $depth > 0 ) {
+			--$depth;
+		} else {
+			return $processor->get_tag_start();
+		}
+	}
+	return null;
+}
+
+/**
  * Replaces the inner blocks of a block with the ones its source supplies,
  * before the block renders them.
  *
@@ -150,18 +211,9 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		$opener = implode( '', array_slice( $inner_content, 0, $slots[0] ) );
 		$closer = implode( '', array_slice( $inner_content, end( $slots ) + 1 ) );
 	} else {
-		// Without any, Group and Column wrap them in one element: they go before
-		// its closer, or before the closer of the inner container of a legacy Group.
 		$html   = implode( '', $inner_content );
-		$offset = strrpos( $html, '</' );
-		if ( false !== $offset && str_contains( $html, 'wp-block-group__inner-container' ) ) {
-			// The class name may also appear without an inner container.
-			$inner_offset = strrpos( substr( $html, 0, $offset ), '</' );
-			if ( false !== $inner_offset ) {
-				$offset = $inner_offset;
-			}
-		}
-		if ( false === $offset ) {
+		$offset = gutenberg_block_bindings_get_inner_blocks_offset( $html );
+		if ( null === $offset ) {
 			return null;
 		}
 		$opener = substr( $html, 0, $offset );
