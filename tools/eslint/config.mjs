@@ -432,6 +432,7 @@ export default dedupePlugins( [
 						Icon: 'WCIcon',
 						IconButton: 'WCIconButton',
 						__experimentalInputControl: 'WCInputControl',
+						Menu: 'WCMenu',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
 						TextareaControl: 'WCTextareaControl',
