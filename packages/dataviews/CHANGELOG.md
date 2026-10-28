@@ -15,6 +15,7 @@
 -   Use the design system outline for keyboard focus on list items ([#85358](https://github.com/WordPress/gutenberg/pull/85358)).
 -   Use the design system outline for keyboard focus on grid cards ([#85364](https://github.com/WordPress/gutenberg/pull/85364)).
 -   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
+-   DataForm: Mute the placeholder that the `panel` layout shows for an empty value, so it no longer looks like a value.
 
 ### Bug Fixes
 

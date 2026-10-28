@@ -32,7 +32,8 @@
 			opacity: 1;
 		}
 
-		.dataforms-layouts-panel__field-label {
+		.dataforms-layouts-panel__field-label,
+		.dataforms-layouts-panel__field-placeholder {
 			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
@@ -153,6 +154,13 @@
 	> * {
 		min-width: 0;
 	}
+}
+
+// A placeholder stands in for an empty value, so it is muted rather than
+// emphasized like the values it stands in for.
+.dataforms-layouts-panel__field-placeholder {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-weight: var(--wpds-typography-font-weight-default);
 }
 
 .dataforms-layouts-panel__field-trigger--label-top
