@@ -263,12 +263,17 @@ export function migratePackageToChangie(
 		content?: string;
 	} > = [];
 
-	// 1. Create project version files
-	for ( const v of parsed.versions ) {
+	// 1. Create a single baseline version file containing all historical versions
+	// named after the latest release, matching Changie's backup migration guide.
+	if ( parsed.versions.length > 0 ) {
+		const latestVersion = parsed.versions[ 0 ];
+		const combinedHistory = parsed.versions
+			.map( ( v ) => v.content.trim() )
+			.join( '\n\n' );
 		operations.push( {
 			type: 'write-version',
-			path: path.join( projectChangesDir, v.filename ),
-			content: v.content,
+			path: path.join( projectChangesDir, latestVersion.filename ),
+			content: combinedHistory + '\n',
 		} );
 	}
 
@@ -327,7 +332,7 @@ export function migratePackageToChangie(
 
 	return {
 		packageName: normalized,
-		versionsCreated: parsed.versions.length,
+		versionsCreated: parsed.versions.length > 0 ? 1 : 0,
 		fragmentsCreated: parsed.unreleasedEntries.length,
 		operations,
 	};
