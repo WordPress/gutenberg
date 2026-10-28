@@ -1360,7 +1360,7 @@ describe( 'decision failures leave the block tree untouched', () => {
 	} );
 } );
 
-describe( 'createSuggestion (notes sidebar switch)', () => {
+describe( 'createSuggestion (sidebar)', () => {
 	const PARAGRAPH = 'core/test-sidebar-paragraph';
 	const ALL_NOTES_SIDEBAR = 'edit-post/collab-history-sidebar';
 
@@ -1462,7 +1462,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 		} );
 	}
 
-	it( 'switches an open non-notes sidebar to the All notes sidebar', async () => {
+	it( 'leaves an open non-notes sidebar in place', async () => {
 		const { registry, block, getProvider } = setup( {
 			activeArea: 'edit-post/document',
 		} );
@@ -1473,7 +1473,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 			registry
 				.select( 'core/interface' )
 				.getActiveComplementaryArea( 'core' )
-		).toBe( ALL_NOTES_SIDEBAR );
+		).toBe( 'edit-post/document' );
 	} );
 
 	it( 'leaves a closed sidebar closed', async () => {
