@@ -6,7 +6,7 @@ const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 const META_KEY = 'wp_navigation_auto_add_pages';
 
-test.describe( 'Navigation sidebar: Auto add pages', () => {
+test.describe( 'Navigation sidebar: Auto add new pages', () => {
 	test.skip(
 		isSiteEditorV2,
 		'The extensible site editor has no navigation sidebar.'
@@ -61,10 +61,13 @@ test.describe( 'Navigation sidebar: Auto add pages', () => {
 			sidebar.locator(
 				'xpath=.//*[@role="treegrid"]/following::*[@role="switch"]'
 			)
-		).toHaveAccessibleName( 'Auto add pages' );
+		).toHaveAccessibleName( 'Auto add new pages' );
 		const toggle = sidebar.getByRole( 'switch', {
-			name: 'Auto add pages',
+			name: 'Auto add new pages',
 		} );
+		await expect( toggle ).toHaveAccessibleDescription(
+			'Adds pages to this navigation when they are published.'
+		);
 		await expect( toggle ).not.toBeChecked();
 		await toggle.click();
 		await expect( toggle ).toBeChecked();
@@ -87,7 +90,7 @@ test.describe( 'Navigation sidebar: Auto add pages', () => {
 	} );
 } );
 
-test.describe( 'Navigation menu screen: Auto add pages', () => {
+test.describe( 'Navigation menu screen: Auto add new pages', () => {
 	test.skip(
 		! isSiteEditorV2,
 		'Only the extensible site editor has a navigation menu screen.'
@@ -135,8 +138,13 @@ test.describe( 'Navigation menu screen: Auto add pages', () => {
 			page.locator(
 				'xpath=//*[@role="treegrid"]/following::*[@role="switch"]'
 			)
-		).toHaveAccessibleName( 'Auto add pages' );
-		const toggle = page.getByRole( 'switch', { name: 'Auto add pages' } );
+		).toHaveAccessibleName( 'Auto add new pages' );
+		const toggle = page.getByRole( 'switch', {
+			name: 'Auto add new pages',
+		} );
+		await expect( toggle ).toHaveAccessibleDescription(
+			'Adds pages to this navigation when they are published.'
+		);
 		await expect( toggle ).not.toBeChecked();
 		await toggle.click();
 		await expect( toggle ).toBeChecked();
