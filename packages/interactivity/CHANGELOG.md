@@ -10,6 +10,12 @@
 -   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
 -   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
 
+## 6.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.33.0 (2025-10-17)
 
 ### Enhancements
