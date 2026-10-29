@@ -51,6 +51,7 @@ describe( 'useDropZone', () => {
 			'data-is-drop-zone'
 		);
 	} );
+
 	const ComponentWithDragCallbacks = ( {
 		onDragStart,
 		onDragEnd,
