@@ -6,14 +6,14 @@ import {
 	__experimentalVStack as VStack,
 	ColorPalette,
 	GradientPicker,
-	Notice,
+	Notice as WCNotice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 import type { ColorGradientControlProps, ColorGradientOptions } from './types';
 
-export type NoticeProps = ComponentProps< typeof Notice >;
+export type NoticeProps = ComponentProps< typeof WCNotice >;
 
 const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
@@ -91,7 +91,7 @@ function ColorGradientControlInner( {
 			<>
 				{ colorPalette }
 				{ noticeProps && (
-					<Notice isDismissible={ false } { ...noticeProps } />
+					<WCNotice isDismissible={ false } { ...noticeProps } />
 				) }
 			</>
 		),
