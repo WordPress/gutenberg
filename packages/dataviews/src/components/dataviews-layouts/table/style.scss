@@ -45,6 +45,21 @@
 				width: 1px;
 				background-color: var(--wpds-color-stroke-surface-neutral-weak);
 			}
+
+			// Fades the columns scrolling under the sticky actions column, in
+			// the cell's own background so selected rows keep their color.
+			&::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				right: 100%;
+				width: var(--wpds-dimension-size-lg);
+				pointer-events: none;
+				background-color: inherit;
+				// RTL styles don't flip `mask-image`, so flip it explicitly.
+				mask-image: linear-gradient(to left, #000, transparent) #{"/*rtl:linear-gradient(to right, #000, transparent);*/"};
+			}
 		}
 
 		&.dataviews-view-table__checkbox-column {
@@ -347,6 +362,30 @@
 
 .dataviews-view-table.is-refreshing {
 	@include dataviews-refreshing();
+}
+
+// Fades the trailing edge of the visible area while there are more columns to
+// scroll to, for tables without actions (their rows share one background).
+// Sticky and zero height like the bulk actions toolbar, so it stays over the
+// visible area without taking up space.
+.dataviews-view-table__scroll-fade {
+	position: sticky;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	z-index: 1;
+	height: 0;
+	flex-shrink: 0;
+	pointer-events: none;
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: var(--wpds-dimension-size-lg);
+		height: var(--wp-dataviews-table-scroll-fade-height, 0);
+		background: linear-gradient(to left, var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong)), transparent);
+	}
 }
 
 .dataviews-view-table__bulk-actions-overlay {

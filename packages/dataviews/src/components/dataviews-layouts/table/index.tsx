@@ -366,10 +366,21 @@ function ViewTable< Item >( {
 		hadSelectionRef.current = showBulkActions;
 	}, [ showBulkActions ] );
 
-	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
-		scrollContainerRef: containerRef,
-		enabledHorizontal: !! actions?.length,
-	} );
+	const scrollFadeRef = useRef< HTMLDivElement >( null );
+	// Size the scroll fade to the visible area. Written to the DOM directly,
+	// like the bulk actions toolbar position.
+	const syncScrollFadeHeight = () => {
+		const container = containerRef.current;
+		scrollFadeRef.current?.style.setProperty(
+			'--wp-dataviews-table-scroll-fade-height',
+			`${ container?.clientHeight ?? 0 }px`
+		);
+	};
+	const { isHorizontalScrollEnd, isVerticallyScrolled, scrollContentRef } =
+		useScrollState( {
+			scrollContainerRef: containerRef,
+			onResize: syncScrollFadeHeight,
+		} );
 
 	const disableHeaderControls = showBulkActions;
 
@@ -477,6 +488,15 @@ function ViewTable< Item >( {
 
 	return (
 		<>
+			{ /* With actions, the sticky actions column carries the fade. */ }
+			{ ! actions?.length && (
+				<div
+					className="dataviews-view-table__scroll-fade"
+					ref={ scrollFadeRef }
+					hidden={ isHorizontalScrollEnd }
+					aria-hidden="true"
+				/>
+			) }
 			{ ( hasBulkActions || isActionInProgress ) && (
 				<div
 					className={ clsx(
@@ -508,6 +528,7 @@ function ViewTable< Item >( {
 					'has-media-aspect-ratio': !! mediaAspectRatio,
 				} ) }
 				style={ tableStyle }
+				ref={ scrollContentRef }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
