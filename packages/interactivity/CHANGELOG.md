@@ -25,6 +25,12 @@
 
 ## 6.9.0 (2024-10-03)
 
+## 6.8.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements
