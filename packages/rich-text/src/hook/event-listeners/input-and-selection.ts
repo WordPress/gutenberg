@@ -22,25 +22,20 @@ const EMPTY_ACTIVE_FORMATS: RichTextFormatList = [];
 
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 
-// Only one composition and one pointer press happen at a time, so the field
-// they belong to is kept once rather than per field.
-let composingField: RichTextField | undefined;
-let pressedField: RichTextField | undefined;
-
-// Listen for the release only during a press in a field, so fields don't
-// each keep window listeners.
+// Listen for the release only during a press in this element, so fields
+// don't each keep window listeners.
 export function onPointerDown( field: RichTextField ) {
 	const { defaultView } = field.element.ownerDocument;
-	pressedField = field;
+	field.isPointerDown = true;
+
+	function onPointerUp() {
+		field.isPointerDown = false;
+		defaultView!.removeEventListener( 'pointerup', onPointerUp );
+		defaultView!.removeEventListener( 'pointercancel', onPointerUp );
+	}
+
 	defaultView!.addEventListener( 'pointerup', onPointerUp );
 	defaultView!.addEventListener( 'pointercancel', onPointerUp );
-}
-
-function onPointerUp( event: Event ) {
-	const defaultView = event.currentTarget as Window;
-	pressedField = undefined;
-	defaultView.removeEventListener( 'pointerup', onPointerUp );
-	defaultView.removeEventListener( 'pointercancel', onPointerUp );
 }
 
 export function onInput(
@@ -51,7 +46,7 @@ export function onInput(
 	// will usually emit a final `input` event when the characters are
 	// composed. As of December 2019, Safari doesn't support
 	// nativeEvent.isComposing.
-	if ( composingField === field ) {
+	if ( field.isComposing ) {
 		return;
 	}
 
@@ -138,7 +133,7 @@ export function handleSelectionChange( field: RichTextField ) {
 
 	// In case of a keyboard event, ignore selection changes during
 	// composition.
-	if ( composingField === field ) {
+	if ( field.isComposing ) {
 		return;
 	}
 
@@ -226,7 +221,7 @@ export function handleSelectionChange( field: RichTextField ) {
 }
 
 export function onCompositionStart( field: RichTextField ) {
-	composingField = field;
+	field.isComposing = true;
 	// `handleSelectionChange` returns early while composing, so the
 	// selection is not updated as characters are composed (which rerenders
 	// the component and might destroy internal browser editing state).
@@ -238,7 +233,7 @@ export function onCompositionStart( field: RichTextField ) {
 }
 
 export function onCompositionEnd( field: RichTextField ) {
-	composingField = undefined;
+	field.isComposing = false;
 	// Ensure the value is up-to-date for browsers that don't emit a final
 	// input event after composition.
 	onInput( field, { inputType: 'insertText' } );
@@ -305,7 +300,7 @@ export function onFocus( field: RichTextField, event: FocusEvent ) {
 		// The record no longer reflects the selection, so a matching
 		// snapshot must not skip synchronization.
 		field.selectionSnapshot = undefined;
-	} else if ( pressedField !== field ) {
+	} else if ( ! field.isPointerDown ) {
 		// The document's selection may have moved elsewhere while the
 		// element was blurred, so restore it from the record. A pointer
 		// press places the caret itself; a selection set during the

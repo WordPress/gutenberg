@@ -95,6 +95,8 @@ export type EventListenerProps = {
 export type RichTextField = {
 	element: HTMLElement;
 	props: RefObject< EventListenerProps >;
+	isComposing?: boolean;
+	isPointerDown?: boolean;
 	selectionSnapshot?: {
 		anchorNode: Node | null;
 		anchorOffset: number;
