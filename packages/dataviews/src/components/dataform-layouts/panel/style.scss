@@ -127,8 +127,12 @@
 .dataforms-layouts-panel__field-control {
 	flex-grow: 1;
 	min-width: 0;
+	box-sizing: border-box;
 	min-height: var(--wpds-dimension-size-sm);
-	line-height: var(--wpds-typography-line-height-md);
+	line-height: var(--wpds-typography-line-height-sm);
+	// Pad a single line up to the row height, so that the first line of a
+	// value that wraps stays level with the first line of its label.
+	padding-block: calc((var(--wpds-dimension-size-sm) - 1lh) / 2);
 	display: flex;
 	align-items: center;
 	overflow: clip;
