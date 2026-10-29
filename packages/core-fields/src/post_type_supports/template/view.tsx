@@ -61,6 +61,11 @@ function BlockThemeTemplateView( { item, field }: TemplateViewProps ) {
 		[ postType, templateSlug ]
 	);
 
+	// Several posts edited at once show nothing until a template is picked.
+	if ( ! postId && templateSlug === undefined ) {
+		return null;
+	}
+
 	return <>{ templateLabel ?? defaultTemplateLabel }</>;
 }
 
