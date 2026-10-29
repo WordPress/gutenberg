@@ -190,6 +190,13 @@ function Iframe( {
 		// inside `contenteditable` are already disabled by the browser, so
 		// this is for links in blocks outside of `contenteditable`.
 		function interceptLinkClicks( event: MouseEvent ) {
+			// A block that cancelled the click wants the link left alone, as
+			// the browser would. Rich text cancels the click on a footnote
+			// marker to select it, which works only because this listener
+			// is added on load, before rich text's delegated listener.
+			if ( event.defaultPrevented ) {
+				return;
+			}
 			// Clicks reach the listener from elements.
 			if (
 				( event.target as Element ).tagName === 'A' &&
