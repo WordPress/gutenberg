@@ -3,7 +3,6 @@ import { useRefEffect } from '@wordpress/compose';
 import copyHandler from './copy-handler';
 import selectObject from './select-object';
 import formatBoundaries from './format-boundaries';
-import deleteHandler from './delete';
 import inputAndSelection from './input-and-selection';
 import selectionChangeCompat from './selection-change-compat';
 import type { EventListenerEffect, EventListenerProps } from '../types';
@@ -16,7 +15,6 @@ const allEventListeners: EventListenerEffect[] = [
 	copyHandler,
 	selectObject,
 	formatBoundaries,
-	deleteHandler,
 	selectionChangeCompat,
 ];
 

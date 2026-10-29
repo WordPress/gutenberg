@@ -1,6 +1,7 @@
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
+import { remove } from '../../remove';
 import { updateFormats } from '../../update-formats';
 import { ownsSelection } from '../../owns-selection';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
@@ -321,6 +322,26 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		window.queueMicrotask( handleSelectionChange );
 	}
 
+	function onBeforeInput( event: InputEvent ) {
+		handleSelectionChange();
+
+		if ( isComposing || ! event.inputType.startsWith( 'delete' ) ) {
+			return;
+		}
+
+		const { createRecord, handleChange } = props.current;
+		const currentValue = createRecord();
+		const { start, end, text } = currentValue;
+
+		// Delete all content ourselves. In WebKit, deleting all content of a
+		// `position: relative` element inside a larger editing host removes
+		// the element itself (https://bugs.webkit.org/show_bug.cgi?id=186377).
+		if ( start === 0 && end !== 0 && end === text.length ) {
+			handleChange( remove( currentValue ) );
+			event.preventDefault();
+		}
+	}
+
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
@@ -381,9 +402,14 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 	// the store selection, or a value rendered from them, before any other
 	// handler runs. The snapshot comparison in `handleSelectionChange` skips
 	// selections that have already been processed.
+	const unsubscribeBeforeInput = subscribeOwnedListener(
+		element,
+		'beforeinput',
+		onBeforeInput as EventListener,
+		true
+	);
 	const unsubscribeEnsureSelectionSync = [
 		'keydown',
-		'beforeinput',
 		'copy',
 		'cut',
 		'paste',
@@ -405,6 +431,7 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		unsubscribePointerUp();
 		unsubscribePointerCancel();
 		unsubscribeSelectionChange();
+		unsubscribeBeforeInput();
 		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
 			unsubscribe()
 		);
