@@ -35,8 +35,10 @@
 	min-height: $button-size-small;
 }
 
-.block-editor-style-changes__heading {
+// Nested to outrank the `Text` heading's own color and weight.
+.block-editor-style-changes .block-editor-style-changes__heading {
 	margin: 0;
+	font-weight: 500;
 	color: $gray-700;
 }
 
@@ -72,6 +74,8 @@
 // room around it.
 .block-editor-style-changes__action.components-button {
 	flex: none;
+	font-size: $default-font-size;
+	font-weight: 500;
 	margin-inline-end: -$grid-unit-05;
 	padding: 0 $grid-unit-05;
 }
