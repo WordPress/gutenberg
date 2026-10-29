@@ -36,9 +36,8 @@ document.addEventListener(
 		if ( ( event.target as Element )?.nodeName === 'A' ) {
 			const ref = ( event.target as Element ).closest( 'a' );
 			if ( isValidLink( ref ) && isValidEvent( event ) ) {
-				const { actions } = await import(
-					'@wordpress/interactivity-router'
-				);
+				const { actions } =
+					await import( '@wordpress/interactivity-router' );
 				actions.prefetch( ref.href );
 			}
 		}

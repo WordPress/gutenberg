@@ -4,7 +4,119 @@
 
 ### Bug Fixes
 
+-   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.57.0 (2026-10-07)
+
+### New Features
+
+-   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Bug Fixes
+
+-   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+## 2.56.0 (2026-09-23)
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81517](https://github.com/WordPress/gutenberg/pull/81517))
+
+## 2.53.0 (2026-08-12)
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fix race condition where router evaluates before `hydrateRegions()` completes on Safari and Firefox, causing interactive regions to be permanently non-functional (dead DOM). ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+## 2.41.0 (2026-03-04)
+
+## 2.40.0 (2026-02-18)
+
+### Deprecations
+
+-   Move `state.navigation.hasStarted` and `state.navigation.hasFinished` to a private store and deprecate direct access from the public `core/router` store. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))
+
+### Bug Fixes
+
+-   Update cached styles for re-fetched pages. ([#75097](https://github.com/WordPress/gutenberg/pull/75097))
+
+## 2.39.0 (2026-01-29)
+
+### Bug Fixes
+
+-   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
+-   Fix initial router regions with `attachTo` being duplicated after `navigate()`. ([#74857](https://github.com/WordPress/gutenberg/pull/74857))
+
+## 2.38.0 (2026-01-16)
+
+## 2.36.0 (2025-11-26)
+
+## 2.35.0 (2025-11-12)
+
+## 2.34.0 (2025-10-29)
+
+## 2.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
+## 2.33.0 (2025-10-17)
+
+## 2.32.0 (2025-10-01)
+
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+
+## 2.31.0 (2025-09-17)
+
+## 2.30.0 (2025-09-03)
+
+## 2.29.0 (2025-08-20)
+
+## 2.28.0 (2025-08-07)
+
+## 2.27.0 (2025-07-23)
+
+### Bug Fixes
+
 -   Preserve `media` attribute on intial style sheets after client-side navigation. ([70668](https://github.com/WordPress/gutenberg/pull/70668))
+
+-   Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
 
 ## 2.26.0 (2025-06-25)
 
@@ -34,6 +146,12 @@
 ## 2.21.0 (2025-03-27)
 
 ## 2.20.0 (2025-03-13)
+
+## 2.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 2.19.0 (2025-02-28)
 
@@ -75,6 +193,12 @@
 
 ## 2.9.0 (2024-10-03)
 
+## 2.8.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)
@@ -90,6 +214,12 @@
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)
+
+## 2.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 2.0.0 (2024-05-31)
 
@@ -115,6 +245,12 @@
 -   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 
 ## 1.2.0 (2024-02-21)
+
+## 1.1.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 1.1.0 (2024-02-09)
 

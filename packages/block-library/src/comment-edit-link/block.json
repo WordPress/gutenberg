@@ -12,13 +12,14 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
-		},
-		"textAlign": {
-			"type": "string"
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"html": false,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"link": true,
 			"gradients": true,
@@ -39,6 +40,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

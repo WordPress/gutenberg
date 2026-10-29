@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Details', () => {
@@ -123,6 +120,7 @@ test.describe( 'Details', () => {
 		await expect(
 			listView.getByRole( 'link', {
 				name: 'Paragraph',
+				exact: true,
 			} )
 		).toBeVisible();
 
@@ -131,13 +129,70 @@ test.describe( 'Details', () => {
 		await expect(
 			listView.getByRole( 'link', {
 				name: 'Paragraph',
+				exact: true,
 			} )
 		).toBeFocused();
 
-		// Verify the first inner block in the editor canvas is focused.
+		// Verify the first inner block in the editor canvas holds the
+		// selection.
 		await page.keyboard.press( 'Enter' );
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+				)
+			)
+			.toBe( true );
+	} );
+
+	test( 'should select the parent when clicking its summary from an inner paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Parent summary', showContent: true },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner paragraph' },
+				},
+			],
+		} );
+
+		// Select the inner paragraph.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientId, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getBlockName( getSelectedBlockClientId() );
+				} )
+			)
+			.toBe( 'core/paragraph' );
+
+		// Click the summary, a rich text owned by the parent Details block:
+		// the parent must become the selected block and own the caret, even
+		// though it is an ancestor of the previously selected paragraph.
+		const summary = editor.canvas.getByRole( 'textbox', {
+			name: 'Write summary. Press Enter to expand or collapse the details.',
+		} );
+		await summary.click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientId, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getBlockName( getSelectedBlockClientId() );
+				} )
+			)
+			.toBe( 'core/details' );
+		await expect.poll( () => editor.ownsSelection( summary ) ).toBe( true );
 	} );
 } );

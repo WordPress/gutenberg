@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';

@@ -1,16 +1,10 @@
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
-import { WP_BASE_URL } from '../config';
-
-const THEMES_URL = new URL( 'wp-admin/themes.php', WP_BASE_URL ).href;
-
 async function activateTheme(
 	this: RequestUtils,
 	themeSlug: string
 ): Promise< void > {
-	let response = await this.request.get( THEMES_URL );
+	const themesURL = new URL( 'wp-admin/themes.php', this.baseURL ).href;
+	let response = await this.request.get( themesURL );
 	const html = await response.text();
 	const optionalFolder = '([a-z0-9-]+%2F)?';
 
@@ -43,7 +37,7 @@ async function activateTheme(
 
 	const [ activateQuery ] = matchGroup;
 	const activateLink =
-		THEMES_URL + `?${ activateQuery }`.replace( /&amp;/g, '&' );
+		themesURL + `?${ activateQuery }`.replace( /&amp;/g, '&' );
 
 	response = await this.request.get( activateLink );
 
@@ -69,12 +63,46 @@ async function getCurrentThemeGlobalStylesPostId( this: RequestUtils ) {
 		const globalStylesURL =
 			currentTheme?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]?.href;
 		if ( globalStylesURL ) {
-			themeGlobalStylesId = globalStylesURL?.split(
-				'rest_route=/wp/v2/global-styles/'
-			)[ 1 ];
+			// Extract the ID from the URL. The URL format depends on
+			// the permalink structure:
+			// - Plain: ?rest_route=/wp/v2/global-styles/123
+			// - Pretty: /wp-json/wp/v2/global-styles/123
+			const idMatch = globalStylesURL.match(
+				/\/wp\/v2\/global-styles\/(\d+)/
+			);
+			if ( idMatch ) {
+				themeGlobalStylesId = idMatch[ 1 ];
+			}
 		}
 	}
 	return themeGlobalStylesId;
+}
+
+/**
+ * Resets the current theme's user global styles to an empty config.
+ *
+ * Useful for ensuring test isolation when a prior spec has saved global
+ * styles for the same theme, which would otherwise leak into later specs
+ * sharing the database.
+ *
+ * @param this Request utils.
+ */
+async function resetThemeGlobalStyles( this: RequestUtils ) {
+	const stylesPostId = await getCurrentThemeGlobalStylesPostId.call( this );
+
+	if ( ! stylesPostId ) {
+		return;
+	}
+
+	await this.rest( {
+		method: 'POST',
+		path: `/wp/v2/global-styles/${ stylesPostId }`,
+		data: {
+			id: stylesPostId,
+			settings: {},
+			styles: {},
+		},
+	} );
 }
 
 /**
@@ -100,4 +128,5 @@ export {
 	activateTheme,
 	getCurrentThemeGlobalStylesPostId,
 	getThemeGlobalStylesRevisions,
+	resetThemeGlobalStyles,
 };

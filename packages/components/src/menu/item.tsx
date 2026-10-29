@@ -1,21 +1,18 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
+import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { ItemProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import { Context } from './context';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 export const Item = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< ItemProps, 'div', false >
->( function Item(
+>( function UnforwardedItem(
 	{
+		className,
 		prefix,
 		suffix,
 		children,
@@ -27,8 +24,13 @@ export const Item = forwardRef<
 	ref
 ) {
 	const menuContext = useContext( Context );
+	const computedStore = store ?? menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick(
+		computedStore,
+		hideOnClick
+	);
 
-	if ( ! menuContext?.store ) {
+	if ( ! menuContext?.store || ! computedStore ) {
 		throw new Error(
 			'Menu.Item can only be rendered inside a Menu component'
 		);
@@ -38,30 +40,31 @@ export const Item = forwardRef<
 	// created by the top-level menu component). But in rare cases (ie.
 	// `Menu.SubmenuTriggerItem`), the context store wouldn't be correct. This is
 	// why the component accepts a `store` prop to override the context store.
-	const computedStore = store ?? menuContext.store;
-
 	return (
-		<Styled.Item
+		<Ariakit.MenuItem
 			ref={ ref }
 			{ ...props }
+			className={ clsx( styles.item, className ) }
 			accessibleWhenDisabled
 			disabled={ disabled }
-			hideOnClick={ hideOnClick }
 			store={ computedStore }
+			hideOnClick={ computedHideOnClick }
 		>
-			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
+			<span className={ styles[ 'item-prefix-wrapper' ] }>
+				{ prefix }
+			</span>
 
-			<Styled.ItemContentWrapper>
-				<Styled.ItemChildrenWrapper>
+			<div className={ styles[ 'item-content-wrapper' ] }>
+				<div className={ styles[ 'item-children-wrapper' ] }>
 					{ children }
-				</Styled.ItemChildrenWrapper>
+				</div>
 
 				{ suffix && (
-					<Styled.ItemSuffixWrapper>
+					<span className={ styles[ 'item-suffix-wrapper' ] }>
 						{ suffix }
-					</Styled.ItemSuffixWrapper>
+					</span>
 				) }
-			</Styled.ItemContentWrapper>
-		</Styled.Item>
+			</div>
+		</Ariakit.MenuItem>
 	);
 } );

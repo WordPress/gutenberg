@@ -2,9 +2,10 @@
 	{
 		"name": "core/html",
 		"isValid": true,
-		"attributes": {
-			"content": "<h1>Some HTML code</h1>\n<div>This is a div</div>"
-		},
-		"innerBlocks": []
+		"attributes": {},
+		"innerBlocks": [],
+		"innerContent": [
+			"\n<h1>Some HTML code</h1>\n<div>This is a div</div>\n"
+		]
 	}
 ]

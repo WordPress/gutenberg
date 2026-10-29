@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { batch, signal, type Signal } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import {
 	createProxy,
 	getProxyFromObject,
@@ -15,7 +8,7 @@ import {
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
-import { isPlainObject } from '../utils';
+import { isPlainObject, isReservedKey } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -45,8 +38,6 @@ const proxyToProps: WeakMap<
  */
 export const hasPropSignal = ( proxy: object, key: string ) =>
 	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
-
-const readOnlyProxies = new WeakSet();
 
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
@@ -79,11 +70,8 @@ const getPropSignal = (
 			if ( get ) {
 				prop.setGetter( get );
 			} else {
-				const readOnly = readOnlyProxies.has( proxy );
 				prop.setValue(
-					shouldProxy( value )
-						? proxifyState( ns, value, { readOnly } )
-						: value
+					shouldProxy( value ) ? proxifyState( ns, value ) : value
 				);
 			}
 		}
@@ -103,6 +91,8 @@ const objToIterable = new WeakMap< object, Signal< number > >();
  */
 let peeking = false;
 
+export const PENDING_GETTER = Symbol( 'PENDING_GETTER' );
+
 /**
  * Handlers for reactive objects and arrays in the state.
  */
@@ -116,7 +106,8 @@ const stateHandlers: ProxyHandler< object > = {
 		 */
 		if (
 			peeking ||
-			( ! target.hasOwnProperty( key ) && key in target ) ||
+			( ! Object.prototype.hasOwnProperty.call( target, key ) &&
+				key in target ) ||
 			( typeof key === 'symbol' && wellKnownSymbols.has( key ) )
 		) {
 			return Reflect.get( target, key, receiver );
@@ -126,6 +117,10 @@ const stateHandlers: ProxyHandler< object > = {
 		const desc = Object.getOwnPropertyDescriptor( target, key );
 		const prop = getPropSignal( receiver, key, desc );
 		const result = prop.getComputed().value;
+
+		if ( result === PENDING_GETTER ) {
+			throw PENDING_GETTER;
+		}
 
 		/*
 		 * Check if the property is a synchronous function. If it is, set the
@@ -153,9 +148,6 @@ const stateHandlers: ProxyHandler< object > = {
 		value: unknown,
 		receiver: object
 	): boolean {
-		if ( readOnlyProxies.has( receiver ) ) {
-			return false;
-		}
 		setNamespace( getNamespaceFromProxy( receiver ) );
 		try {
 			return Reflect.set( target, key, value, receiver );
@@ -169,10 +161,6 @@ const stateHandlers: ProxyHandler< object > = {
 		key: string,
 		desc: PropertyDescriptor
 	): boolean {
-		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
-			return false;
-		}
-
 		const isNew = ! ( key in target );
 		const result = Reflect.defineProperty( target, key, desc );
 
@@ -211,10 +199,6 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 
 	deleteProperty( target: object, key: string ): boolean {
-		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
-			return false;
-		}
-
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
@@ -246,10 +230,8 @@ const stateHandlers: ProxyHandler< object > = {
  * Returns the proxy associated with the given state object, creating it if it
  * does not exist.
  *
- * @param namespace        The namespace that will be associated to this proxy.
- * @param obj              The object to proxify.
- * @param options          Options.
- * @param options.readOnly Read-only.
+ * @param namespace The namespace that will be associated to this proxy.
+ * @param obj       The object to proxify.
  *
  * @throws Error if the object cannot be proxified. Use {@link shouldProxy} to
  *         check if a proxy can be created for a specific object.
@@ -258,14 +240,9 @@ const stateHandlers: ProxyHandler< object > = {
  */
 export const proxifyState = < T extends object >(
 	namespace: string,
-	obj: T,
-	options?: { readOnly?: boolean }
+	obj: T
 ): T => {
-	const proxy = createProxy( namespace, obj, stateHandlers ) as T;
-	if ( options?.readOnly ) {
-		readOnlyProxies.add( proxy );
-	}
-	return proxy;
+	return createProxy( namespace, obj, stateHandlers ) as T;
 };
 
 /**
@@ -309,6 +286,11 @@ const deepMergeRecursive = (
 	let hasNewKeys = false;
 
 	for ( const key in source ) {
+		// Assigning `__proto__` would replace the prototype of `target`.
+		if ( isReservedKey( key ) ) {
+			continue;
+		}
+
 		const isNew = ! ( key in target );
 		hasNewKeys = hasNewKeys || isNew;
 
@@ -334,14 +316,16 @@ const deepMergeRecursive = (
 				} );
 				// Update the getter in the property signal if it exists
 				if ( desc.get && propSignal ) {
-					propSignal.setGetter( desc.get );
+					propSignal.setPendingGetter( desc.get );
 				}
 			}
 
 			// Handle nested objects
 		} else if ( isPlainObject( source[ key ] ) ) {
-			const targetValue = Object.getOwnPropertyDescriptor( target, key )
-				?.value;
+			const targetValue = Object.getOwnPropertyDescriptor(
+				target,
+				key
+			)?.value;
 			if ( isNew || ( override && ! isPlainObject( targetValue ) ) ) {
 				// Create a new object if the property is new or needs to be overridden
 				target[ key ] = {};

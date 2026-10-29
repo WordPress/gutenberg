@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	useMemo as _useMemo,
 	useCallback as _useCallback,
@@ -9,11 +6,7 @@ import {
 	type EffectCallback,
 	type Inputs,
 } from 'preact/hooks';
-import { effect } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
+import { effect, signal } from '@preact/signals';
 import { getScope, setScope, resetScope } from './scopes';
 import { getNamespace, setNamespace, resetNamespace } from './namespaces';
 
@@ -24,23 +17,39 @@ interface Flusher {
 
 declare global {
 	interface Window {
-		scheduler?: {
-			readonly yield?: () => Promise< void >;
+		scheduler: {
+			postTask: (
+				callback: () => unknown,
+				options?: object
+			) => Promise< unknown >;
+			yield: () => Promise< void >;
 		};
 	}
 }
 
-interface SyncAwareFunction extends Function {
+export interface SyncAwareFunction extends Function {
 	sync?: boolean;
 }
 
 /**
  * Executes a callback function after the next frame is rendered.
  *
+ * Both arms below — the `requestAnimationFrame` call and the 100 ms
+ * `setTimeout` fallback — funnel through the same inner `setTimeout`, so the
+ * callback always runs *one macrotask after* whichever arm wins, not inside
+ * that arm's own turn. That deferral, not registration order, is the
+ * property this function is relied on for: it is what makes a callback
+ * registered inside a `requestAnimationFrame` callback wait for the next
+ * task instead of running in the same one, and it is why consumers that
+ * need a settled frame (rather than a settled microtask) schedule through
+ * this function. This is *not* a FIFO guarantee — when two registrations'
+ * arms race, the funnel does not preserve the order they were registered
+ * in; it reproduces whatever order the races themselves produce.
+ *
  * @param callback The callback function to be executed.
  * @return A promise that resolves after the callback function is executed.
  */
-const afterNextFrame = ( callback: () => void ) => {
+export const afterNextFrame = ( callback: () => void ) => {
 	return new Promise< void >( ( resolve ) => {
 		const done = () => {
 			clearTimeout( timeout );
@@ -67,7 +76,56 @@ export const splitTask =
 				return new Promise( ( resolve ) => {
 					setTimeout( resolve, 0 );
 				} );
-		  };
+			};
+/**
+ * Executes the passed callback on `DOMContentLoaded`, or immediately if that
+ * event has already been triggered.
+ *
+ * This function depends on `PerformanceNavigationTiming` (see
+ * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) to
+ * detect whether the event has been dispatched.
+ *
+ * @param callback Function to execute on `DOMContentLoaded`.
+ */
+export const onDOMReady = ( callback: () => void ) => {
+	const [ navigation ] = performance.getEntriesByType( 'navigation' );
+	if (
+		( navigation as PerformanceNavigationTiming )
+			.domContentLoadedEventStart > 0
+	) {
+		callback();
+	} else {
+		document.addEventListener( 'DOMContentLoaded', callback );
+	}
+};
+
+/**
+ * Subscribes to changes in any signal accessed inside the callback, re-running
+ * the callback whenever those signals change. The callback runs without an
+ * ambient directive scope and the previous scope is restored afterwards.
+ *
+ * @example
+ * ```js
+ * const unwatch = watch( () => {
+ *   console.log( state.counter );
+ * } );
+ *
+ * // Later, to stop watching:
+ * unwatch();
+ * ```
+ *
+ * @param callback The callback to execute when a dependency changes.
+ * @return A cleanup function to stop watching.
+ */
+export const watch: typeof effect = ( callback ) =>
+	effect( () => {
+		setScope();
+		try {
+			return callback();
+		} finally {
+			resetScope();
+		}
+	} );
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
@@ -333,6 +391,9 @@ export const createRootFragment = (
 		removeChild( c: Node ) {
 			parent.removeChild( c );
 		},
+		contains( c: Node ) {
+			parent.contains( c );
+		},
 	} );
 };
 
@@ -351,7 +412,7 @@ export function kebabToCamelCase( str: string ): string {
 		} );
 }
 
-const logged: Set< string > = new Set();
+export const logged: Set< string > = new Set();
 
 /**
  * Shows a warning with `message` if environment is not `production`.
@@ -373,12 +434,53 @@ export const warn = ( message: string ): void => {
 		// A consumer can use 'pause on caught exceptions'
 		try {
 			throw Error( message );
-		} catch ( e ) {
+		} catch {
 			// Do nothing.
 		}
 		logged.add( message );
 	}
 };
+
+/**
+ * Checks whether a property key leads out of an object's own data:
+ * `__proto__` to its prototype, `constructor` to its constructor, and
+ * `prototype` to a function's prototype.
+ *
+ * @param key The property key.
+ * @return Whether the key is reserved.
+ */
+export const isReservedKey = ( key: unknown ): boolean =>
+	key === '__proto__' || key === 'constructor' || key === 'prototype';
+
+/**
+ * Reads a property that an object owns, ignoring inherited properties such
+ * as `Object.prototype.valueOf`.
+ *
+ * @param object The object to read.
+ * @param key    The property key.
+ * @return The value, or `undefined` if the object doesn't own the property.
+ */
+export const getOwnProperty = (
+	object: Record< string, any >,
+	key: string
+): any =>
+	Object.prototype.hasOwnProperty.call( object, key )
+		? object[ key ]
+		: undefined;
+
+/**
+ * `JSON.parse()` reviver that removes keys named `__proto__`.
+ *
+ * `JSON.parse()` creates `__proto__` as an own property. Copying it by
+ * assignment, as in a `for...in` loop or `Object.assign()`, replaces the
+ * target's prototype instead.
+ *
+ * @param key   The property key.
+ * @param value The parsed value.
+ * @return The value, or `undefined` to remove the key.
+ */
+export const jsonReviver = ( key: string, value: unknown ): unknown =>
+	key === '__proto__' ? undefined : value;
 
 /**
  * Checks if the passed `candidate` is a plain object with just the `Object`
@@ -392,8 +494,8 @@ export const isPlainObject = (
 ): candidate is Record< string, unknown > =>
 	Boolean(
 		candidate &&
-			typeof candidate === 'object' &&
-			candidate.constructor === Object
+		typeof candidate === 'object' &&
+		candidate.constructor === Object
 	);
 
 /**
@@ -406,4 +508,109 @@ export function withSyncEvent( callback: Function ): SyncAwareFunction {
 	const syncAware = callback as SyncAwareFunction;
 	syncAware.sync = true;
 	return syncAware;
+}
+
+export type DeepReadonly< T > = T extends ( ...args: any[] ) => any
+	? T
+	: T extends object
+		? { readonly [ K in keyof T ]: DeepReadonly< T[ K ] > }
+		: T;
+
+// WeakMap cache to reuse proxies for the same read-only objects.
+const readOnlyMap = new WeakMap< object, object >();
+
+/**
+ * Creates a proxy handler that prevents any modifications to the target object.
+ *
+ * @param errorMessage Custom error message to display when modification is attempted.
+ * @return Proxy handler for read-only behavior.
+ */
+const createDeepReadOnlyHandlers = (
+	errorMessage: string
+): ProxyHandler< object > => {
+	const handleError = () => {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn( errorMessage );
+		}
+		return false;
+	};
+
+	return {
+		get( target, prop ) {
+			const value = target[ prop ];
+			if ( value && typeof value === 'object' ) {
+				return deepReadOnly( value, { errorMessage } );
+			}
+			return value;
+		},
+		set: handleError,
+		deleteProperty: handleError,
+		defineProperty: handleError,
+	};
+};
+
+/**
+ * Creates a deeply read-only proxy of an object.
+ *
+ * This function recursively wraps an object and all its nested objects in
+ * proxies that prevent any modifications. All mutation operations (`set`,
+ * `deleteProperty`, and `defineProperty`) will silently fail in production and
+ * emit warnings in development (when `globalThis.SCRIPT_DEBUG` is true).
+ *
+ * The wrapping is lazy: nested objects are only wrapped when accessed, making
+ * this efficient for large or deeply nested structures.
+ *
+ * Proxies are cached using a WeakMap, so calling this function multiple times
+ * with the same object will return the same proxy instance.
+ *
+ * @param obj                  The object to make read-only.
+ * @param options              Optional configuration.
+ * @param options.errorMessage Custom error message to display when modification is attempted.
+ * @return A read-only proxy of the object.
+ */
+export function deepReadOnly< T extends object >(
+	obj: T,
+	options?: { errorMessage?: string }
+): T {
+	const errorMessage =
+		options?.errorMessage ?? 'Cannot modify read-only object';
+
+	if ( ! readOnlyMap.has( obj ) ) {
+		const handlers = createDeepReadOnlyHandlers( errorMessage );
+		readOnlyMap.set( obj, new Proxy( obj, handlers ) );
+	}
+
+	return readOnlyMap.get( obj ) as T;
+}
+
+export const navigationSignal = signal( 0 );
+
+/**
+ * Unique identifier for the current browser session of the interactivity
+ * runtime. Generated once when the module is first evaluated. Used by the
+ * router to tag history entries so that, after a full page reload, popstate
+ * events for entries created in a previous session trigger a full reload
+ * instead of a client-side navigation that would leave stale content.
+ */
+export const sessionId = Math.random().toString( 36 ).slice( 2 );
+
+/**
+ * Recursively clones the passed object.
+ *
+ * @param source Source object.
+ * @return Cloned object.
+ */
+export function deepClone< T >( source: T ): T {
+	if ( isPlainObject( source ) ) {
+		return Object.fromEntries(
+			Object.entries( source as object ).map( ( [ key, value ] ) => [
+				key,
+				deepClone( value ),
+			] )
+		) as T;
+	}
+	if ( Array.isArray( source ) ) {
+		return source.map( ( i ) => deepClone( i ) ) as T;
+	}
+	return source;
 }

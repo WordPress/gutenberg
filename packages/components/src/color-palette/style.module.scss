@@ -1,0 +1,11 @@
+.color-heading {
+	text-transform: uppercase;
+
+	// Triple specificity overrides the base Heading styles. Repeat the selector
+	// via interpolation because Dart Sass disallows `&&&`.
+	&#{&}#{&} {
+		font-size: 11px;
+		line-height: 24px;
+		margin-bottom: 0;
+	}
+}

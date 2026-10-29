@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ToolbarButtonContainerProps } from './types';
 
 const ToolbarButtonContainer = ( {

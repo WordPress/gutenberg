@@ -1,0 +1,16 @@
+.inline-controls {
+	flex-shrink: 0;
+}
+
+.persistent-controls {
+	display: inline-flex;
+}
+
+/* Focus-tracking wrapper for the dropdown trigger; the popup portals out. */
+.dropdown-area {
+	display: contents;
+}
+
+.dropdown-popup {
+	max-width: 300px;
+}

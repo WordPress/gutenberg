@@ -1,0 +1,642 @@
+import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
+import { getBlockType, isUnmodifiedBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
+import type {
+	BlockEditorThunkArgs,
+	BlockRemovalRule,
+	InsertionPoint,
+	LastFocus,
+	RemovalPromptMessage,
+	Settings,
+	State,
+	StyleOverride,
+	TreeBlock,
+} from './types';
+
+const castArray = < T >( maybeArray: T | T[] ): T[] =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
+
+/**
+ * A list of private/experimental block editor settings that
+ * should not become a part of the WordPress public API.
+ * BlockEditorProvider will remove these settings from the
+ * settings object it receives.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/46131
+ */
+const privateSettings = [
+	'inserterMediaCategories',
+	'blockInspectorAnimation',
+	'mediaSideload',
+];
+
+/**
+ * Action that updates the block editor settings and
+ * conditionally preserves the experimental ones.
+ *
+ * @param settings                          Updated settings
+ * @param options                           Options object.
+ * @param options.stripExperimentalSettings Whether to strip experimental settings.
+ * @param options.reset                     Whether to reset the settings.
+ * @return Action object
+ */
+export function __experimentalUpdateSettings(
+	settings: Settings,
+	{
+		stripExperimentalSettings = false,
+		reset = false,
+	}: { stripExperimentalSettings?: boolean; reset?: boolean } = {}
+) {
+	let incomingSettings = settings;
+
+	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
+		deprecated(
+			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
+			{
+				since: '6.8',
+				alternative: 'isPreviewMode',
+			}
+		);
+
+		incomingSettings = { ...incomingSettings };
+		incomingSettings.isPreviewMode =
+			incomingSettings.__unstableIsPreviewMode as boolean | undefined;
+		delete incomingSettings.__unstableIsPreviewMode;
+	}
+
+	let cleanSettings = incomingSettings;
+
+	if ( stripExperimentalSettings ) {
+		cleanSettings = {};
+		for ( const key in incomingSettings ) {
+			if ( ! privateSettings.includes( key ) ) {
+				cleanSettings[ key ] = incomingSettings[ key ];
+			}
+		}
+	}
+	return {
+		type: 'UPDATE_SETTINGS',
+		settings: cleanSettings,
+		reset,
+	};
+}
+
+/**
+ * Hides the block interface (eg. toolbar, outline, etc.)
+ *
+ * @return Action object.
+ */
+export function hideBlockInterface() {
+	return {
+		type: 'HIDE_BLOCK_INTERFACE',
+	};
+}
+
+/**
+ * Shows the block interface (eg. toolbar, outline, etc.)
+ *
+ * @return Action object.
+ */
+export function showBlockInterface() {
+	return {
+		type: 'SHOW_BLOCK_INTERFACE',
+	};
+}
+
+/**
+ * Yields action objects used in signalling that the blocks corresponding to
+ * the set of specified client IDs are to be removed.
+ *
+ * Compared to `removeBlocks`, this private interface exposes an additional
+ * parameter; see `forceRemove`.
+ *
+ * @param clientIds      Client IDs of blocks to remove.
+ * @param selectPrevious True if the previous block
+ *                       or the immediate parent
+ *                       (if no previous block exists)
+ *                       should be selected
+ *                       when a block is removed.
+ * @param forceRemove    Whether to force the operation,
+ *                       bypassing any checks for certain
+ *                       block types.
+ */
+export const privateRemoveBlocks =
+	(
+		clientIds: string | string[],
+		selectPrevious: boolean = true,
+		forceRemove: boolean = false
+	) =>
+	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		if ( ! clientIds || ! clientIds.length ) {
+			return;
+		}
+
+		clientIds = castArray( clientIds );
+		const canRemoveBlocks = select.canRemoveBlocks( clientIds );
+
+		if ( ! canRemoveBlocks ) {
+			return;
+		}
+
+		// In certain editing contexts, we'd like to prevent accidental removal
+		// of important blocks. For example, in the site editor, the Query Loop
+		// block is deemed important. In such cases, we'll ask the user for
+		// confirmation that they intended to remove such block(s). However,
+		// the editor instance is responsible for presenting those confirmation
+		// prompts to the user. Any instance opting into removal prompts must
+		// register using `setBlockRemovalRules()`.
+		//
+		// @see https://github.com/WordPress/gutenberg/pull/51145
+		const rules = ! forceRemove && select.getBlockRemovalRules();
+
+		if ( rules ) {
+			function flattenBlocks( blocks: TreeBlock[] ) {
+				const result: Omit< TreeBlock, 'innerBlocks' >[] = [];
+				const stack = [ ...blocks ];
+				while ( stack.length ) {
+					const { innerBlocks, ...block } = stack.shift()!;
+					stack.push( ...innerBlocks );
+					result.push( block );
+				}
+				return result;
+			}
+
+			// Removal only runs for existing blocks.
+			const blockList = clientIds.map( select.getBlock ) as TreeBlock[];
+			const flattenedBlocks = flattenBlocks( blockList );
+
+			// Find the first message and use it.
+			let message;
+			for ( const rule of rules ) {
+				message = rule.callback( flattenedBlocks );
+				if ( message ) {
+					dispatch(
+						displayBlockRemovalPrompt(
+							clientIds,
+							selectPrevious,
+							message
+						)
+					);
+					return;
+				}
+			}
+		}
+
+		// When the removal covers all the inner blocks of an otherwise
+		// unmodified container, remove the container as well: an empty
+		// husk requiring a second removal is never the intention.
+		let removeRoot = false;
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		// A wrapper that only exists as a slot of a larger block (a column
+		// in columns) keeps its place: emptying it must not reshape the
+		// parent layout.
+		if (
+			rootClientId &&
+			! getBlockType( select.getBlockName( rootClientId )! )?.parent
+				?.length
+		) {
+			const blockOrder = select.getBlockOrder( rootClientId );
+			removeRoot =
+				blockOrder.length === clientIds.length &&
+				blockOrder.every( ( clientId ) =>
+					clientIds.includes( clientId )
+				) &&
+				isUnmodifiedBlock(
+					// The check reads the attributes, not the inner blocks.
+					select.__unstableGetBlockWithoutInnerBlocks(
+						rootClientId
+					) as Block
+				);
+		}
+
+		if ( selectPrevious ) {
+			dispatch.selectPreviousBlock(
+				removeRoot ? rootClientId! : clientIds[ 0 ],
+				selectPrevious
+			);
+		}
+
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: removeRoot ? [ rootClientId ] : clientIds,
+			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch( ensureDefaultBlock() );
+		} );
+	};
+
+/**
+ * Action which will insert a default block insert action if there
+ * are no other blocks at the root of the editor. This action should be used
+ * in actions which may result in no blocks remaining in the editor (removal,
+ * replacement, etc).
+ */
+export const ensureDefaultBlock =
+	() =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		// To avoid a focus loss when removing the last block, assure there is
+		// always a default block if the last of the blocks have been removed.
+		const count = select.getBlockCount();
+		if ( count > 0 ) {
+			return;
+		}
+
+		// If there's an custom appender, don't insert default block.
+		// We have to remember to manually move the focus elsewhere to
+		// prevent it from being lost though.
+		const { __unstableHasCustomAppender } = select.getSettings();
+		if ( __unstableHasCustomAppender ) {
+			return;
+		}
+
+		dispatch.insertDefaultBlock();
+	};
+
+/**
+ * Returns an action object used in signalling that a block removal prompt must
+ * be displayed.
+ *
+ * Contrast with `setBlockRemovalRules`.
+ *
+ * @param clientIds      Client IDs of blocks to remove.
+ * @param selectPrevious True if the previous block or the
+ *                       immediate parent (if no previous
+ *                       block exists) should be selected
+ *                       when a block is removed.
+ * @param message        Message to display in the prompt.
+ *
+ * @return Action object.
+ */
+function displayBlockRemovalPrompt(
+	clientIds: string | string[],
+	selectPrevious: boolean,
+	message: RemovalPromptMessage
+) {
+	return {
+		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
+		clientIds,
+		selectPrevious,
+		message,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a block removal prompt must
+ * be cleared, either be cause the user has confirmed or canceled the request
+ * for removal.
+ *
+ * @return Action object.
+ */
+export function clearBlockRemovalPrompt() {
+	return {
+		type: 'CLEAR_BLOCK_REMOVAL_PROMPT',
+	};
+}
+
+/**
+ * Returns an action object used to set up any rules that a block editor may
+ * provide in order to prevent a user from accidentally removing certain
+ * blocks. These rules are then used to display a confirmation prompt to the
+ * user. For instance, in the Site Editor, the Query Loop block is important
+ * enough to warrant such confirmation.
+ *
+ * IMPORTANT: Registering rules implicitly signals to the `privateRemoveBlocks`
+ * action that the editor will be responsible for displaying block removal
+ * prompts and confirming deletions. This action is meant to be used by
+ * component `BlockRemovalWarningModal` only.
+ *
+ * The data is a record whose keys are block types (e.g. 'core/query') and
+ * whose values are the explanation to be shown to users (e.g. 'Query Loop
+ * displays a list of posts or pages.').
+ *
+ * Contrast with `displayBlockRemovalPrompt`.
+ *
+ * @param rules Block removal rules.
+ * @return Action object.
+ */
+export function setBlockRemovalRules(
+	rules: BlockRemovalRule[] | false = false
+) {
+	return {
+		type: 'SET_BLOCK_REMOVAL_RULES',
+		rules,
+	};
+}
+
+export function setStyleOverride( id: unknown, style: StyleOverride ) {
+	return {
+		type: 'SET_STYLE_OVERRIDE',
+		id,
+		style,
+	};
+}
+
+export function deleteStyleOverride( id: unknown ) {
+	return {
+		type: 'DELETE_STYLE_OVERRIDE',
+		id,
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param lastFocus The last focused element.
+ *
+ *
+ * @return Action object.
+ */
+export function setLastFocus( lastFocus: LastFocus | null | false = null ) {
+	return {
+		type: 'LAST_FOCUS',
+		lastFocus,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has begun to drag.
+ *
+ * @return Action object.
+ */
+export function startDragging() {
+	return {
+		type: 'START_DRAGGING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped dragging.
+ *
+ * @return Action object.
+ */
+export function stopDragging() {
+	return {
+		type: 'STOP_DRAGGING',
+	};
+}
+
+/**
+ * @param clientId The block's clientId, or `null` to clear.
+ *
+ * @return  Action object.
+ */
+export function expandBlock( clientId: string | null ) {
+	return {
+		type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+		clientId,
+	};
+}
+
+/**
+ * @param value
+ * @param value.rootClientId The root client ID to insert at.
+ * @param value.index        The index to insert at.
+ *
+ * @return Action object.
+ */
+export function setInsertionPoint( value: InsertionPoint | null ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		value,
+	};
+}
+
+/**
+ * Mark a contentOnly section as being edited.
+ *
+ * @param clientId The client id of the block.
+ */
+export function editContentOnlySection( clientId?: string | null ) {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+		clientId,
+	};
+}
+
+/**
+ * Action that stops editing a contentOnly section.
+ */
+export function stopEditingContentOnlySection() {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
+
+/**
+ * Sets the zoom level.
+ *
+ * @param zoom the new zoom level
+ * @return Action object.
+ */
+export const setZoomLevel =
+	( zoom: State[ 'zoomLevel' ] = 100 ) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		// When switching to zoom-out mode, we need to select the parent section
+		if ( zoom !== 100 ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			const sectionRootClientId = select.getSectionRootClientId();
+
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
+				}
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
+
+				speak( __( 'You are currently in zoom-out mode.' ) );
+			}
+		}
+
+		dispatch( {
+			type: 'SET_ZOOM_LEVEL',
+			zoom,
+		} );
+	};
+
+/**
+ * Resets the Zoom state.
+ * @return Action object.
+ */
+export function resetZoomLevel() {
+	return {
+		type: 'RESET_ZOOM_LEVEL',
+	};
+}
+
+/**
+ * Opens the list view content panel popover.
+ *
+ * @return Action object.
+ */
+export function openListViewContentPanel() {
+	return {
+		type: 'OPEN_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Closes the list view content panel popover.
+ *
+ * @return Action object.
+ */
+export function closeListViewContentPanel() {
+	return {
+		type: 'CLOSE_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Returns an action object used to open the viewport modal
+ * for the given client IDs.
+ *
+ * @param clientIds Client IDs of blocks to configure viewport settings for.
+ * @return Action object.
+ */
+export function showViewportModal( clientIds: string[] ) {
+	return {
+		type: 'SHOW_VIEWPORT_MODAL',
+		clientIds,
+	};
+}
+
+/**
+ * Returns an action object used to close the viewport modal.
+ *
+ * @return Action object.
+ */
+export function hideViewportModal() {
+	return {
+		type: 'HIDE_VIEWPORT_MODAL',
+	};
+}
+
+/**
+ * Requests to open a specific inspector tab, optionally with additional options.
+ * This action signals intent to switch to a particular tab in the block inspector.
+ *
+ * @param tabName             The name of the tab to open (e.g., 'list-view', 'settings', 'styles').
+ * @param [options]           Optional configuration.
+ * @param [options.openPanel] Client ID of a specific panel to open (for tabs that support panels).
+ *
+ * @return Action object.
+ */
+export function requestInspectorTab(
+	tabName: string,
+	options: { openPanel?: string } = {}
+) {
+	return {
+		type: 'REQUEST_INSPECTOR_TAB',
+		tabName,
+		options,
+	};
+}
+
+/**
+ * Clears the requested inspector tab state after it has been handled.
+ *
+ * @return Action object.
+ */
+export function clearRequestedInspectorTab() {
+	return {
+		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
+	};
+}
+
+/**
+ * Sets the selected style state for a block's style controls.
+ *
+ * @param clientId The block client ID.
+ * @param value    The selected state value.
+ *
+ * @return Action object.
+ */
+export function setSelectedBlockStyleState(
+	clientId: string,
+	value: Record< string, unknown >
+) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets whether the selected style state is shown on the canvas.
+ *
+ * @param clientId The block client ID.
+ * @param value    Whether to show the selected state on the canvas.
+ *
+ * @return Action object.
+ */
+export function setSelectedBlockStyleStateCanvasPreview(
+	clientId: string,
+	value: boolean
+) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets the globally selected viewport style state. When set to a value other
+ * than 'default', block style edits in the inspector apply to that viewport.
+ * Driven by the editor's device preview while Responsive editing is enabled.
+ *
+ * @param viewport The selected viewport state (e.g. 'default', 'tablet', 'mobile').
+ *
+ * @return Action object.
+ */
+export function setStyleStateViewport( viewport: string ) {
+	return {
+		type: 'SET_STYLE_STATE_VIEWPORT',
+		viewport,
+	};
+}
+
+/**
+ * Sets whether Responsive editing is enabled. When enabled, the device preview
+ * also drives which viewport block style edits are applied to. Session-only.
+ *
+ * @param enabled Whether Responsive editing is enabled.
+ *
+ * @return Action object.
+ */
+export function setResponsiveEditing( enabled: boolean ) {
+	return {
+		type: 'SET_RESPONSIVE_EDITING',
+		enabled,
+	};
+}

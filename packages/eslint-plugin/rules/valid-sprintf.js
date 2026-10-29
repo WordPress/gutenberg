@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	REGEXP_SPRINTF_PLACEHOLDER,
 	REGEXP_SPRINTF_PLACEHOLDER_UNORDERED,
