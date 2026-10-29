@@ -111,4 +111,33 @@ final class SelectionTests: XCTestCase {
 		XCTAssertTrue( editor.block( title: "Paragraph", content: "Paragraph here" ).exists )
 		XCTAssertEqual( editor.getBlocks().count, 4 )
 	}
+
+	func testTapAfterHidingKeyboardPlacesCaret() throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem(
+			name: "content",
+			value: "<!-- wp:paragraph --><p>First here</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Second here</p><!-- /wp:paragraph -->"
+		) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		let second = editor.block( title: "Paragraph", content: "Second here" )
+		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
+
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		let keyboard = app.keyboards.firstMatch
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+		app.toolbars[ "Toolbar" ].buttons[ "Done" ].tap()
+		XCTAssertTrue( keyboard.waitForNonExistence( timeout: 5 ), "Done did not hide the keyboard" )
+
+		// The block is still selected, but nothing has focus.
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard again" )
+		app.typeText( "X" )
+
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "XSecond here" ).waitForExistence( timeout: 5 ), "The paragraph did not get the X at its start" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "First here" ).exists )
+		XCTAssertEqual( editor.getBlocks().count, 2 )
+	}
 }
