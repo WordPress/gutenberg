@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getGrabPoint,
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from '../get-grid-drop-target';
@@ -173,5 +174,37 @@ describe( 'getPixelRectFromGridRect()', () => {
 				rowTracks
 			)
 		).toBeNull();
+	} );
+} );
+
+describe( 'getGrabPoint()', () => {
+	const pixelRect = { left: 100, top: 50, right: 300, bottom: 150 };
+
+	it( 'keeps the point a block was grabbed at by its body', () => {
+		expect( getGrabPoint( { x: 120, y: 60, pixelRect } ) ).toEqual( {
+			grabX: 20,
+			grabY: 10,
+		} );
+	} );
+
+	it( 'centers a block when the pointer is outside it', () => {
+		expect( getGrabPoint( { x: 320, y: 170, pixelRect } ) ).toEqual( {} );
+	} );
+
+	it( 'keeps the offset of a drag handle outside the block', () => {
+		expect(
+			getGrabPoint( { x: 320, y: 170, pixelRect, isHandleDrag: true } )
+		).toEqual( { grabX: 220, grabY: 120 } );
+	} );
+
+	it( 'centers a block that is not in the grid', () => {
+		expect(
+			getGrabPoint( {
+				x: 120,
+				y: 60,
+				pixelRect: null,
+				isHandleDrag: true,
+			} )
+		).toEqual( {} );
 	} );
 } );

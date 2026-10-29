@@ -635,6 +635,16 @@ export default {
 	getOrientation(): string {
 		return 'horizontal';
 	},
+	// The blocks of a manual placement grid sit side by side and on top of
+	// each other, so a toolbar floating over each one would cover its
+	// neighbors and move with every selection. Their toolbars show over the
+	// grid instead.
+	capturesToolbars( layout?: Layout ): boolean {
+		return (
+			!! layout?.isManualPlacement &&
+			!! window.__experimentalEnableGridInteractivity
+		);
+	},
 	getAlignments(): LayoutAlignment[] {
 		return [];
 	},

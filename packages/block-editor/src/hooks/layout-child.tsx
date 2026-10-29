@@ -18,6 +18,7 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 	GridItemRotator,
+	GridItemDragHandle,
 	useUpdateGridChildLayout,
 } from '../components/grid';
 import type { GridBlockStyle } from '../components/grid/mobile-stacking';
@@ -449,6 +450,7 @@ function GridTools( {
 		selectedState,
 		parentStyle,
 		blockEditingMode,
+		canMove,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -458,6 +460,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				canMoveBlock,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -492,6 +495,7 @@ function GridTools( {
 				selectedState: getSelectedBlockStyleState( clientId ),
 				parentStyle: parentAttributes?.style,
 				blockEditingMode: getBlockEditingMode( clientId ),
+				canMove: canMoveBlock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -542,13 +546,12 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
-	// Whether the angle previewed while the rotate handle is being dragged
-	// rotates the block, or null when nothing is previewed. Only this is kept
-	// here, not the angle, so that rotating doesn't re-render the grid tools,
-	// including the visualizer, for every degree.
-	const [ isPreviewRotated, setIsPreviewRotated ] = useState<
-		boolean | null
-	>( null );
+	// The angle shown while the rotate handle is being dragged. The drag
+	// handle turns with it. The grid visualizer is memoized, so it doesn't
+	// re-render for every degree.
+	const [ previewRotate, setPreviewRotate ] = useState< number | null >(
+		null
+	);
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
@@ -602,13 +605,18 @@ function GridTools( {
 	// `:hover`, since rotation is stored per viewport.
 	// The resizer sizes the block from pointer movement along the screen's
 	// axes, not the block's, so it is hidden while the block is rotated.
-	const isRotated = isPreviewRotated ?? !! rotate;
+	const isRotated = !! ( previewRotate ?? rotate );
 	const showRotator =
 		isManualGrid &&
 		! isBlockItselfCurrentlyHidden &&
 		blockEditingMode === 'default' &&
 		! hasPseudoBlockStyleState( selectedState ) &&
 		hasRotateSupport( name );
+
+	// Text blocks can't be dragged by their body, so every block that can be
+	// moved gets a handle that drags it the way a body drag does.
+	const showDragHandle =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && canMove;
 
 	function updateLayout( layout: ChildLayout ) {
 		updateGridChildLayout( clientId, layout );
@@ -656,10 +664,15 @@ function GridTools( {
 				<GridItemRotator
 					clientId={ clientId }
 					angle={ rotate }
-					onPreview={ ( angle ) =>
-						setIsPreviewRotated( angle === null ? null : !! angle )
-					}
+					onPreview={ setPreviewRotate }
 					onChange={ updateRotate }
+				/>
+			) }
+			{ showDragHandle && (
+				<GridItemDragHandle
+					clientId={ clientId }
+					gridClientId={ rootClientId }
+					angle={ previewRotate ?? rotate }
 				/>
 			) }
 			{ isManualGrid && (
