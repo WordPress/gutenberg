@@ -194,6 +194,22 @@ Router regions can be placed anywhere on the page. Their behavior depends on whe
     </div>
     ```
 
+-   **Inside `data-wp-html` content** — The router ignores a router region inside the content of a [`data-wp-html`](/docs/reference-guides/interactivity-api/directives-and-store.md#wp-html) element, whether that's the server-rendered fallback or HTML the directive inserted, because the Interactivity API treats that content as [inert](/docs/reference-guides/interactivity-api/directives-and-store.md#inert-content). Navigation behaves as if the region's `data-wp-router-region` attribute were absent, on the initial page and on every page the router fetches or restores from history: the region never supplies content for a region with the same ID, and its `attachTo` never attaches anything.
+
+    ```html
+    <div data-wp-interactive="myPlugin">
+    	<div data-wp-html="state.description">
+    		<!-- Fallback content: this region is ignored during navigation -->
+    		<div
+    			data-wp-interactive="myPlugin"
+    			data-wp-router-region="myPlugin/sidebar"
+    		></div>
+    	</div>
+    </div>
+    ```
+
+    In this guide, a `data-wp-html` element is one whose content is inert: it's inside an interactive region and doesn't also have `data-wp-text`, `data-wp-each` or `data-wp-router-region` (see [Conflicts with other directives](/docs/reference-guides/interactivity-api/directives-and-store.md#conflicts-with-other-directives)). `data-wp-html` on a router region itself doesn't make the region's content inert, because `data-wp-router-region` takes precedence.
+
 ### Implementing navigation
 
 To trigger client-side navigation, you define an **action** in your store and connect it to a DOM event using an Interactivity API directive. Actions are functions defined inside `store()` that handle user interactions. When connected to an element through a directive like `data-wp-on--click`, the action runs whenever that event fires.
@@ -387,7 +403,7 @@ The pattern above only runs for navigations this action started. To also cover n
 
 ### Adding new regions on navigation
 
-Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page.
+Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page. The region itself doesn't have to be on the current page, but the element it attaches to does.
 
 **Defining a region with `attachTo`:**
 
@@ -405,7 +421,9 @@ Sometimes you need UI elements — like modals, sidebars, or notification panels
 </div>
 ```
 
-The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the region will be created and appended to the element matching the selector.
+The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the router creates the region and appends it to the first element on the current page that matches the selector and is neither a [`data-wp-html`](/docs/reference-guides/interactivity-api/directives-and-store.md#wp-html) element nor inside its [inert content](/docs/reference-guides/interactivity-api/directives-and-store.md#inert-content).
+
+If there is no such element, the region is not attached and the rest of the navigation completes as if the destination page didn't have the region: the other regions update, the title and URL change, and no error is thrown. This happens when the selector matches nothing, when every match is a `data-wp-html` element or inside one, or when the value isn't a valid CSS selector. The router resolves the selector every time it renders the page, so restoring the page from history tries again against the document as it is then.
 
 **Example: Modal that appears on navigation**
 
@@ -1152,7 +1170,7 @@ When the router fetches a new page (either through `prefetch()` or as part of `n
 
 First, the router parses the fetched HTML into a document structure using the browser's built-in HTML parser. This gives it a complete DOM tree to work with, just as if the page had been loaded normally.
 
-Next, the router scans this document for all elements that have both `data-wp-interactive` and `data-wp-router-region` attributes. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content.
+Next, the router scans this document for all elements that have both `data-wp-interactive` and `data-wp-router-region` attributes. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content. The scan skips router regions inside `data-wp-html` content, as described in [Where to place router regions](#where-to-place-router-regions), so they never supply a region's content or get attached. The router filters the initial page the same way.
 
 For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently by the Interactivity API. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
 
@@ -1178,16 +1196,18 @@ The reconciliation algorithm relies on heuristics that can fail when elements sh
 
 **Scenario 2: Region exists only on the target page with `attachTo` (create)**
 
-Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router will dynamically create it.
+Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router dynamically creates it, provided the current page has an element to attach it to.
 
 The `attachTo` property contains a CSS selector that identifies where in the current page the new region should be appended. When the router encounters such a region, it:
 
-1. Finds the element matching the `attachTo` selector in the current page
+1. Finds the first element in the current page that matches the `attachTo` selector and is neither a `data-wp-html` element nor inside its content
 2. Creates new DOM elements for the region
 3. Appends these elements to the matched parent
 4. Renders the region's virtual DOM into the newly created elements
 
-This allows content that exists on one page but not another to appear smoothly during navigation, without requiring the target element to exist in advance.
+When step 1 finds no element, the router skips the region, as described in [Adding new regions on navigation](#adding-new-regions-on-navigation). Skipping a region doesn't change the cached page, so a later render can attach it if the selector then matches a usable element. A region that an earlier navigation attached also shows nothing on a page whose `attachTo` has no usable element, as it would on a page without the region.
+
+This allows content that exists on one page but not another to appear smoothly during navigation, without the region having to exist on the current page in advance.
 
 **Scenario 3: Region exists only on the current page (remove)**
 
@@ -1508,7 +1528,7 @@ When `navigate()` is called (for example, on link click):
     - In a batch for efficiency:
         - Server state is merged with client state.
         - Each router region is updated with its new virtual DOM.
-        - Regions with `attachTo` that don't exist are created and appended.
+        - Regions with `attachTo` that don't exist are created and appended to the first usable element matching their selector. A region with no such element in the current page is skipped, as described in [Adding new regions on navigation](#adding-new-regions-on-navigation).
     - The document title is updated.
 7. Browser history is updated (pushState or replaceState).
 8. Screen reader announcement is made for accessibility.
