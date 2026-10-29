@@ -19,6 +19,7 @@ import {
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
+	rebaseCrdtBlocks,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
@@ -131,14 +132,21 @@ function applyTaxonomyChangesToCRDTDoc(
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
  * @param {Set<string>} syncedProperties
+ * @param {Object}      options
+ * @param {PostChanges} options.baseline The record values the changes were
+ *                                       computed against, where known. With
+ *                                       `baseline.blocks`, only the editor's own
+ *                                       block changes are applied.
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	syncedProperties: Set< string >
+	syncedProperties: Set< string >,
+	options: { baseline?: Partial< PostChanges > } = {}
 ): void {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+	const baselineBlocks = options.baseline?.blocks;
 
 	Object.keys( changes ).forEach( ( key ) => {
 		if ( ! syncedProperties.has( key ) ) {
@@ -194,9 +202,25 @@ export function applyPostChangesToCRDTDoc(
 					ymap.set( key, currentBlocks );
 				}
 
-				// Merge blocks does not need `setValue` because it is operating on a
+				// Neither merge needs `setValue` because both operate on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newValue, newCursorPosition );
+				if ( Array.isArray( baselineBlocks ) ) {
+					// The caller told us which blocks its change was made
+					// against. Apply only that change, so a remote update the
+					// editor has not rendered yet survives the keystroke.
+					rebaseCrdtBlocks(
+						currentBlocks,
+						baselineBlocks,
+						newValue,
+						newCursorPosition
+					);
+				} else {
+					mergeCrdtBlocks(
+						currentBlocks,
+						newValue,
+						newCursorPosition
+					);
+				}
 				break;
 			}
 
