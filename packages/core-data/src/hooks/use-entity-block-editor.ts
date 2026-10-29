@@ -127,6 +127,12 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: false,
 				...rest,
+				// The block editor computed `newBlocks` from the blocks this
+				// render gave it, so those are the baseline of the change.
+				// A remote change that reached the store since is not in
+				// `newBlocks`, and the sync layer must not treat its absence
+				// as a deletion.
+				baseline: { blocks },
 			} );
 		},
 		[
@@ -154,9 +160,11 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,
 				...rest,
+				// See `onChange`.
+				baseline: { blocks },
 			} );
 		},
-		[ kind, name, id, meta, editEntityRecord ]
+		[ kind, name, id, blocks, meta, editEntityRecord ]
 	);
 
 	return [ blocks, onInput, onChange ];

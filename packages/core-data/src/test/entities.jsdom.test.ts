@@ -201,7 +201,8 @@ describe( 'loadPostTypeEntities', () => {
 		expect( applyPostChangesToCRDTDoc ).toHaveBeenCalledWith(
 			{},
 			{},
-			expect.any( Set )
+			expect.any( Set ),
+			undefined
 		);
 
 		const syncedProperties = vi.mocked( applyPostChangesToCRDTDoc ).mock
