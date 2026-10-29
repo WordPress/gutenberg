@@ -27,6 +27,16 @@ const { state } = store( 'directive-html', {
 		lazyItems: [],
 		/** Items whose fallback contains an inert script fixture. */
 		scriptItems: [],
+		/** Items covering null, invalid, and explicitly trusted values. */
+		valueItems: [],
+		/** Items bound to an element with no fallback content. */
+		emptyItems: [],
+		/** Values matching the server-rendered items and one new item. */
+		hydrationList: [
+			{ html: serverHTML },
+			{ html: serverHTML },
+			{ html: serverHTML },
+		],
 	},
 	actions: {
 		/** Adds one item whose pending representation should show its fallback. */
@@ -66,6 +76,42 @@ const { state } = store( 'directive-html', {
 				{ id: ++itemId, html: serverHTML },
 				{ id: ++itemId, html: serverHTML }
 			);
+		},
+		/** Adds null, invalid-string, and trusted-token values for enforcement. */
+		addValueItems() {
+			state.valueItems = [
+				{ html: null },
+				{ html: '<b>x</b>' },
+				{
+					html: asDangerousHTML( policy.createHTML( '<b>t</b>' ) ),
+				},
+			];
+		},
+		/** Adds a representation to the list with an empty template fallback. */
+		addEmptyItem() {
+			state.emptyItems.push( { html: serverHTML } );
+		},
+		/** Replaces the first displayed fallback with a rejected plain-string token. */
+		rejectFirstItem() {
+			state.fallbackItems[ 0 ].html = asDangerousHTML( '<b>x</b>' );
+		},
+		/** Adds a token that enforcement rejects at element creation. */
+		addRejectedItem() {
+			state.fallbackItems.push( {
+				id: ++itemId,
+				html: asDangerousHTML( '<b>y</b>' ),
+			} );
+		},
+		/** Resolves the list whose server value stayed pending through hydration. */
+		resolvePendingList() {
+			store( 'directive-html', {
+				state: {
+					/** Supplies two server-representation items after hydration. */
+					get pendingHydrationList() {
+						return [ { html: serverHTML }, { html: serverHTML } ];
+					},
+				},
+			} );
 		},
 		setHtml() {
 			state.html = asDangerousHTML(
