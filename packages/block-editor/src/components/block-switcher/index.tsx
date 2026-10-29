@@ -12,9 +12,15 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import {
+	canConvertToCanvas,
+	useConvertToCanvas,
+} from '../grid/convert-to-canvas';
+import type { Layout } from '../../layouts/types';
+import type { GridItemAttributes } from '../grid/types';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
@@ -82,6 +88,8 @@ function BlockSwitcherDropdownMenuContents( {
 		clientIds,
 		blocks,
 	} );
+	const registry = useRegistry();
+	const convertToCanvas = useConvertToCanvas();
 	function selectForMultipleBlocks( insertedBlocks: Block[] ) {
 		if ( insertedBlocks.length > 1 ) {
 			multiSelect(
@@ -98,12 +106,34 @@ function BlockSwitcherDropdownMenuContents( {
 		selectForMultipleBlocks( newBlocks );
 	}
 	function onBlockVariationTransform( name: string ) {
-		updateBlockAttributes( blocks[ 0 ].clientId, {
-			// The selected variation is one of the transformations.
-			...blockVariationTransformations!.find(
-				( { name: variationName } ) => variationName === name
-			)!.attributes,
-		} );
+		// The selected variation is one of the transformations.
+		const { attributes } = blockVariationTransformations!.find(
+			( { name: variationName } ) => variationName === name
+		)!;
+		// A container switched to a manual placement grid keeps where its
+		// blocks are, unless they already have places in the grid.
+		const { clientId, innerBlocks } = blocks[ 0 ];
+		// Variation attributes are untyped; `layout` is a block's layout.
+		const layout = attributes?.layout as Layout | undefined;
+		const isManualGrid =
+			layout?.type === 'grid' && layout?.isManualPlacement;
+		const hasPlacedBlocks = innerBlocks.some(
+			( { attributes: { style } } ) => {
+				// Block attributes are untyped; `style` is a grid item's style.
+				const itemLayout = ( style as GridItemAttributes[ 'style' ] )
+					?.layout;
+				return itemLayout?.columnStart || itemLayout?.rowStart;
+			}
+		);
+		if (
+			isManualGrid &&
+			! hasPlacedBlocks &&
+			canConvertToCanvas( registry.select, clientId ) &&
+			convertToCanvas( clientId, { attributes } )
+		) {
+			return;
+		}
+		updateBlockAttributes( clientId, { ...attributes } );
 	}
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks: Block[] ) {
