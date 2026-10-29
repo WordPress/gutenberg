@@ -15,7 +15,7 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
 import { unlock } from '../lock-unlock';
-import { BROWSER_BACKUP_NOTICE_ID } from './constants';
+import { BROWSER_BACKUP_NOTICE_ID, STORE_NAME } from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -728,20 +728,16 @@ export const restoreBrowserBackup =
 		}
 
 		// A save that is already in progress would make the save below a
-		// no-op, so the current content could not be kept.
+		// no-op, so wait for it to finish.
 		if ( select.isSavingPost() ) {
-			registry.dispatch( noticesStore ).createErrorNotice(
-				__(
-					'The backup could not be restored while the post is saving. Wait for the save to finish, then try again.'
-				),
-				// Revisions mode does not show inline notices, so use a snackbar.
-				{
-					type: 'snackbar',
-					explicitDismiss: true,
-					id: 'editor-revision-restore-failed',
-				}
-			);
-			return;
+			await new Promise( ( resolve ) => {
+				const unsubscribe = registry.subscribe( () => {
+					if ( ! select.isSavingPost() ) {
+						unsubscribe();
+						resolve();
+					}
+				}, STORE_NAME );
+			} );
 		}
 
 		// Save the current content first so that it is stored as a revision.

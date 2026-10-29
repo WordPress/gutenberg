@@ -194,6 +194,95 @@ test.describe( 'Autosave', () => {
 		);
 	} );
 
+	test( 'should wait for a running autosave before restoring the backup', async ( {
+		context,
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin( 'gutenberg-test-autosave-failures' );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const backupKey = `wp-autosave-block-editor-post-${ postId }`;
+
+		// Make a backup, then save past it.
+		await page.keyboard.type( ' backup' );
+		const backup = await page.evaluate( ( key ) => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.autosave( { local: true } );
+			return window.sessionStorage.getItem( key );
+		}, backupKey );
+		await page.keyboard.type( ' saved' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page.waitForFunction(
+			() => ! window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+		);
+		await page.evaluate(
+			( [ key, value ] ) => window.sessionStorage.setItem( key, value ),
+			[ backupKey, backup ]
+		);
+		await page.reload();
+
+		// Start a slow autosave of newer text, and restore while it runs.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' newest' );
+		await context.addCookies( [
+			{
+				name: 'gutenberg_test_autosave_failure',
+				value: 'slow',
+				url: new URL( page.url() ).origin,
+			},
+		] );
+		const autosaveRequest = page.waitForRequest( ( request ) =>
+			decodeURIComponent( request.url() ).includes( '/autosaves' )
+		);
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/editor' ).autosave();
+		} );
+		await autosaveRequest;
+		await page.getByRole( 'button', { name: 'View the backup' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'button', { name: 'Restore' } ).focus();
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toHaveText( [ 'Backup restored.' ] );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save backup', dropCap: false },
+				innerBlocks: [],
+			},
+		] );
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }/revisions`,
+			params: { context: 'edit' },
+		} );
+		expect( revisions[ 0 ].content.raw ).toBe(
+			'<!-- wp:paragraph -->\n<p>before save backup saved newest</p>\n<!-- /wp:paragraph -->'
+		);
+
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-autosave-failures'
+		);
+	} );
+
 	test( 'should keep the backup when its view is closed', async ( {
 		editor,
 		page,
