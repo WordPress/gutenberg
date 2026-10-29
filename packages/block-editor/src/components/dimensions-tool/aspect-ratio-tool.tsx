@@ -105,8 +105,16 @@ export default function AspectRatioTool( {
 					<SelectControl.Trigger>
 						{ ( item ) => (
 							<span className="block-editor-dimensions-tool__aspect-ratio-option">
-								<AspectRatioIcon ratio={ item.value ?? '' } />
-								{ item.label }
+								<AspectRatioIcon
+									ratio={
+										item.value === 'custom'
+											? ( value ?? '' )
+											: ( item.value ?? '' )
+									}
+								/>
+								<span className="block-editor-dimensions-tool__aspect-ratio-label">
+									{ item.label }
+								</span>
 							</span>
 						) }
 					</SelectControl.Trigger>
