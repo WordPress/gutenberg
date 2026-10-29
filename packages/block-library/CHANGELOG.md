@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 7.14.17 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+
 ## 7.14.16 (2026-08-06)
 
 ### Bug Fixes
