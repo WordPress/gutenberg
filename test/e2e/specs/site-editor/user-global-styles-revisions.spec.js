@@ -645,6 +645,74 @@ test.describe( 'Style Revisions', () => {
 		).toHaveCSS( 'background-color', 'rgb(255, 0, 0)' );
 	} );
 
+	test( 'should scroll the selected revision and the current version together', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		// Different padding makes the two previews scroll by different
+		// lengths, so following by position alone would fall out of step.
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			spacing: { padding: { top: '2000px' } },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			spacing: { padding: { top: '3000px' } },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the
+		// smaller padding saved before the current one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'padding-top', '2000px' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'padding-top', '3000px' );
+
+		const selected = await (
+			await page.locator( 'iframe[name="revisions"]' ).elementHandle()
+		).contentFrame();
+		const current = await (
+			await page
+				.locator( 'iframe[name="revisions-current"]' )
+				.elementHandle()
+		).contentFrame();
+		const scrollTo = ( frame, fraction ) =>
+			frame.evaluate( ( _fraction ) => {
+				const scroller = document.scrollingElement;
+				scroller.scrollTo( {
+					top:
+						_fraction *
+						( scroller.scrollHeight - scroller.clientHeight ),
+					behavior: 'instant',
+				} );
+			}, fraction );
+		const getScrollFraction = ( frame ) =>
+			frame.evaluate( () => {
+				const scroller = document.scrollingElement;
+				return (
+					scroller.scrollTop /
+					( scroller.scrollHeight - scroller.clientHeight )
+				);
+			} );
+
+		// Halfway down the selected revision is halfway down the current
+		// version, though the current version is the longer of the two.
+		await scrollTo( selected, 0.5 );
+		await expect
+			.poll( () => getScrollFraction( current ) )
+			.toBeCloseTo( 0.5, 1 );
+
+		// Either one can lead.
+		await scrollTo( current, 0 );
+		await expect.poll( () => getScrollFraction( selected ) ).toBe( 0 );
+	} );
+
 	test( 'should show a single preview when the current version is selected', async ( {
 		page,
 		userGlobalStylesRevisions,
