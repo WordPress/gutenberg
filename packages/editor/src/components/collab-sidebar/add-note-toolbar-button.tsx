@@ -9,35 +9,50 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
+import { isCrossBlockTextSelection } from './utils';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
 type NoteToolbarButtonProps = {
 	clientId: string;
+	isMultiple: boolean;
 	count: number;
 	onClick: () => void;
 };
 
 function NoteToolbarButton( {
 	clientId,
+	isMultiple,
 	count,
 	onClick,
 }: NoteToolbarButtonProps ) {
 	const { canAddNote, shortcut } = useSelect(
 		( select ) => {
-			const { getBlockName, isBlockValid } = select( blockEditorStore );
+			const {
+				getBlockName,
+				getSelectionEnd,
+				getSelectionStart,
+				isBlockValid,
+			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
 			return {
 				canAddNote:
 					isBlockValid( clientId ) &&
 					blockName !== 'core/freeform' &&
-					blockName !== getUnregisteredTypeHandlerName(),
+					blockName !== getUnregisteredTypeHandlerName() &&
+					// Several blocks share a note only through text selected
+					// across them.
+					( ! isMultiple ||
+						isCrossBlockTextSelection(
+							getSelectionStart(),
+							getSelectionEnd()
+						) ),
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
 			};
 		},
-		[ clientId ]
+		[ clientId, isMultiple ]
 	);
 
 	if ( ! canAddNote ) {
@@ -85,9 +100,10 @@ export function AddNoteToolbarButton( {
 	return (
 		<NoteIconToolbarSlotFill.Fill>
 			{ ( { clientIds }: { clientIds: string[] } ) =>
-				clientIds.length === 1 && (
+				clientIds.length > 0 && (
 					<NoteToolbarButton
 						clientId={ clientIds[ 0 ] }
+						isMultiple={ clientIds.length > 1 }
 						count={ count }
 						onClick={ () => onClick( clientIds[ 0 ] ) }
 					/>
