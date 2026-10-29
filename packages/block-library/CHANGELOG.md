@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   File: Open the block on a Content tab with the file, its name, its link, and the download button, and replace the file from a Media control there. The inline PDF embed settings stay on the Settings tab ([#85973](https://github.com/WordPress/gutenberg/pull/85973)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
