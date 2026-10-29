@@ -4,22 +4,22 @@
 
 ### Bug Fixes
 
--   Limit the attributes that `data-wp-bind` can set on `object` elements.
--   Improve the handling of values bound with `data-wp-bind` to URL attributes, such as `href` and `src`.
--   Harden the runtime's handling of property names used as object keys in directive paths, namespaces and merged state.
--   Ignore directives whose name, suffix, unique ID or namespace is a reserved property name.
--   `data-wp-bind`: Don't bind the `__directives` prop, and only read a `__directives` prop that the runtime created.
--   `data-wp-bind`: Don't bind `children` or `dangerouslySetInnerHTML`, or `content` on a `<template>`.
--   `data-wp-class` and `data-wp-style`: Ignore a `class` that `data-wp-bind` set to a value other than a string, and a `style` it set to a value other than a string or plain object, instead of throwing.
--   `data-wp-style`: Write into a copy of a style object that `data-wp-bind` set, not into the object itself.
--   Don't resolve a directive path that ends in a method inherited from a prototype, such as `context.list.push`. The runtime calls a resolved function without its object, so these methods threw and stopped hydration.
--   Only read a namespace's context from an own property of the context map, so a namespace named after an `Object.prototype` method does not resolve to that method.
--   `data-wp-each`: Render items when the item name is `has-own-property`.
--   Remove `__proto__` keys when parsing JSON from markup or server data.
--   `data-wp-style`: Only read top-level declarations when converting a style string.
--   `data-wp-context`: Fix context for namespaces named after a built-in object property, such as `toString`.
--   Skip `data-wp-bind--on*` directives instead of binding event handler attributes. Bind an event handler with `data-wp-on--*` instead.
--   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag and pollute the store.
+-   Limit the attributes that `data-wp-bind` can set on `object` elements. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Improve the handling of values bound with `data-wp-bind` to URL attributes, such as `href` and `src`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Harden the runtime's handling of property names used as object keys in directive paths, namespaces and merged state. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Ignore directives whose name, suffix, unique ID or namespace is a reserved property name. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-bind`: Don't bind the `__directives` prop, and only read a `__directives` prop that the runtime created. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-bind`: Don't bind `children` or `dangerouslySetInnerHTML`, or `content` on a `<template>`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-class` and `data-wp-style`: Ignore a `class` that `data-wp-bind` set to a value other than a string, and a `style` it set to a value other than a string or plain object, instead of throwing. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-style`: Write into a copy of a style object that `data-wp-bind` set, not into the object itself. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Don't resolve a directive path that ends in a method inherited from a prototype, such as `context.list.push`. The runtime calls a resolved function without its object, so these methods threw and stopped hydration. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only read a namespace's context from an own property of the context map, so a namespace named after an `Object.prototype` method does not resolve to that method. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-each`: Render items when the item name is `has-own-property`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Remove `__proto__` keys when parsing JSON from markup or server data. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-style`: Only read top-level declarations when converting a style string. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-context`: Fix context for namespaces named after a built-in object property, such as `toString`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Skip `data-wp-bind--on*` directives instead of binding event handler attributes. Bind an event handler with `data-wp-on--*` instead. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag and pollute the store. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 
 ## 8.0.0 (2026-10-20)
 

@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Only accept HTML whitespace in block delimiters.
+-   Only accept HTML whitespace in block delimiters. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 
 ## 6.0.0 (2026-10-20)
 

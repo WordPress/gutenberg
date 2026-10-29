@@ -4,9 +4,9 @@
 
 ### Bug Fixes
 
--   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object.
--   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag.
--   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response.
+-   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 
 ## 3.0.0 (2026-10-20)
 
