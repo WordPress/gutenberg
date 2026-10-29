@@ -1,0 +1,101 @@
+// The title box, centred in the bar and as wide in every mode, so it carries
+// over between them. Its ends are as wide as each other, so the trail sits in
+// the middle of the bar whatever is at either end.
+.document {
+	position: absolute;
+	inset-block: 0;
+	inset-inline: 0;
+	display: grid;
+	grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr);
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	box-sizing: border-box;
+	width: min(480px, 40vw);
+	height: var(--wpds-dimension-size-lg);
+	margin: auto;
+	padding-inline: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-lg);
+	// Covers the editor header's tools where a narrow window brings them
+	// beneath it.
+	background: var(--site-shell-bar-background);
+}
+
+.start,
+.end {
+	display: flex;
+	align-items: center;
+}
+
+.end {
+	justify-content: flex-end;
+}
+
+.icon {
+	flex: none;
+	width: var(--wpds-dimension-size-sm);
+	height: var(--wpds-dimension-size-sm);
+	border-radius: var(--wpds-border-radius-sm);
+	object-fit: cover;
+}
+
+// A screen's actions: its main one, and any others in a menu after it.
+.actions {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+// A long title is cut short at its end. Its text is set down to the bar's
+// size, from the page header size it has elsewhere.
+.document > nav {
+	min-width: 0;
+
+	> ul {
+		flex-wrap: nowrap;
+		justify-content: center;
+	}
+
+	// Without wp-admin's heading spacing.
+	h1 {
+		margin: 0;
+		padding: 0;
+	}
+
+	:is(a, h1, span) {
+		font-size: var(--wpds-typography-font-size-md);
+		font-weight: var(--wpds-typography-font-weight-default);
+		line-height: var(--wpds-typography-line-height-sm);
+	}
+
+	// The separator, in a tone that reads on the dark bar.
+	span[aria-hidden="true"] {
+		margin-inline: var(--wpds-dimension-gap-sm);
+		color: var(--wpds-color-foreground-content-neutral-weak);
+	}
+}
+
+// `@wordpress/components` reads these, so the control takes the bar's dark
+// colors. It has no compact size, so it is set to the compact button's height,
+// to match a screen's actions in the same place.
+.modes {
+	flex: none;
+	height: var(--wpds-dimension-size-md);
+
+	// Square, at the control's height inside its border.
+	button {
+		width: calc(var(--wpds-dimension-size-md) - 2px);
+		height: 100%;
+	}
+
+	--wp-components-color-foreground: #fff;
+	--wp-components-color-background: var(--site-shell-bar-background, #1e1e1e);
+	--wp-components-color-gray-100: #2f2f2f;
+	--wp-components-color-gray-200: #3c3c3c;
+	--wp-components-color-gray-300: #4a4a4a;
+	--wp-components-color-gray-400: #757575;
+	--wp-components-color-gray-600: #949494;
+	--wp-components-color-gray-700: #ccc;
+	--wp-components-color-gray-800: #e0e0e0;
+	--wp-components-color-gray-900: #fff;
+}

@@ -4,6 +4,7 @@ import { STORE_NAME } from '../../store';
 import NavigationItem from './navigation-item';
 import DrilldownItem from './drilldown-item';
 import DropdownItem from './dropdown-item';
+import SectionItem from './section-item';
 import NavigationScreen from './navigation-screen';
 import { useSidebarParent } from './use-sidebar-parent';
 import type { MenuItem } from '../../store/types';
@@ -81,6 +82,18 @@ function Navigation() {
 								>
 									{ item.label }
 								</DropdownItem>
+							);
+						}
+
+						if ( item.parent_type === 'section' ) {
+							return (
+								<SectionItem
+									key={ item.id }
+									id={ item.id }
+									shouldShowPlaceholder={ hasRealIcons }
+								>
+									{ item.label }
+								</SectionItem>
 							);
 						}
 

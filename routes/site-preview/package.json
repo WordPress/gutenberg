@@ -4,14 +4,19 @@
 	"private": true,
 	"exports": {
 		".": "./index.ts",
+		"./global-styles": "./use-preview-global-styles.ts",
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
+		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/editor": "file:../../packages/editor",
 		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/global-styles-engine": "file:../../packages/global-styles-engine",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/url": "file:../../packages/url"
 	},

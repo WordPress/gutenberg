@@ -8,6 +8,18 @@ export function getRoutes( state: State ) {
 	return state.routes;
 }
 
+export function getShownEntity( state: State ) {
+	return state.shownEntity;
+}
+
+export function getSitePathRequest( state: State ) {
+	return state.sitePathRequest;
+}
+
+export function getLayout( state: State ) {
+	return state.layout;
+}
+
 export function getDashboardLink( state: State ) {
 	return state.dashboardLink;
 }

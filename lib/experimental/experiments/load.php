@@ -89,6 +89,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-site-shell',
+					'label'       => __( 'Site shell', 'gutenberg' ),
+					'description' => __( 'Adds an exploratory shell where you browse your site and reach admin workflows from a bar above it. Requires the Extensible Site Editor experiment.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),

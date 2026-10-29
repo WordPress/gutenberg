@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Accept `section` as a menu item parent type in generated pages.
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
 ### Internal

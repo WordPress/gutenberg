@@ -1,0 +1,24 @@
+// In line with the menu's items below it.
+.identity {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-xs);
+	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
+}
+
+.name {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.name,
+.url {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.url {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}

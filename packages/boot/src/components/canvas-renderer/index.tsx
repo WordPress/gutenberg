@@ -5,6 +5,7 @@ import type { CanvasData } from '../../store/types';
 interface CanvasRendererProps {
 	canvas: CanvasData | null | undefined;
 	routeContentModule?: string;
+	showBackButton?: boolean;
 }
 
 /**
@@ -24,11 +25,13 @@ interface CanvasRendererProps {
  * @param props                    Component props
  * @param props.canvas             Canvas data from route loader
  * @param props.routeContentModule Path to content module for custom canvas
+ * @param props.showBackButton     Whether the editor shows its back button
  * @return Canvas renderer
  */
 export default function CanvasRenderer( {
 	canvas,
 	routeContentModule,
+	showBackButton,
 }: CanvasRendererProps ) {
 	const [ CustomCanvas, setCustomCanvas ] = useState< any >( null );
 
@@ -61,5 +64,5 @@ export default function CanvasRenderer( {
 	}
 
 	// Default canvas
-	return <Canvas canvas={ canvas } />;
+	return <Canvas canvas={ canvas } showBackButton={ showBackButton } />;
 }

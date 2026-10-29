@@ -11,8 +11,8 @@ import { __ } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
 import { SitePreview, useSiteUrl } from '@wordpress/routes-site-preview';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { usePreviewGlobalStyles } from '@wordpress/routes-site-preview/global-styles';
 import { getPreviewedStylesheet } from './previewed-theme';
-import { usePreviewGlobalStyles } from './use-preview-global-styles';
 
 const { StyleBookPreview } = unlock( editorPrivateApis );
 

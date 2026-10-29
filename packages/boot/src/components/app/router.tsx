@@ -75,21 +75,25 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				search: opts.deps || {},
 			};
 
-			const [ , loaderData, canvasData, titleData ] = await Promise.all( [
-				resolveSelect( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				),
-				routeConfig.loader
-					? routeConfig.loader( context )
-					: Promise.resolve( undefined ),
-				routeConfig.canvas
-					? routeConfig.canvas( context )
-					: Promise.resolve( undefined ),
-				routeConfig.title
-					? routeConfig.title( context )
-					: Promise.resolve( undefined ),
-			] );
+			const [ , loaderData, canvasData, titleData, breadcrumbsData ] =
+				await Promise.all( [
+					resolveSelect( coreStore ).getEntityRecord(
+						'root',
+						'__unstableBase'
+					),
+					routeConfig.loader
+						? routeConfig.loader( context )
+						: Promise.resolve( undefined ),
+					routeConfig.canvas
+						? routeConfig.canvas( context )
+						: Promise.resolve( undefined ),
+					routeConfig.title
+						? routeConfig.title( context )
+						: Promise.resolve( undefined ),
+					routeConfig.breadcrumbs
+						? routeConfig.breadcrumbs( context )
+						: Promise.resolve( undefined ),
+				] );
 
 			let inspector = true;
 			if ( routeConfig.inspector ) {
@@ -114,6 +118,7 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				inspector,
 				stage,
 				title: titleData,
+				breadcrumbs: breadcrumbsData,
 				routeContentModule: route.content_module,
 			};
 		},

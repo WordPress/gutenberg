@@ -1,0 +1,536 @@
+@use "@wordpress/base-styles/mixins";
+@use "@wordpress/base-styles/variables";
+
+// The shell keeps the site and the admin screens in the same places in the
+// DOM and moves them only with CSS, so the site frame never reloads.
+.shell {
+	// The height of the editor header, so the two can share a row.
+	--site-shell-bar-height: #{variables.$header-height};
+	// How far the bar's end buttons sit from each separator and window edge,
+	// as the menu toggle does centred in its square.
+	--site-shell-slot-inset: calc((var(--site-shell-bar-height) - var(--wpds-dimension-size-lg)) / 2);
+	// Both match the values in `shell.tsx`, which places the site.
+	--site-shell-menu-width: 240px;
+	--site-shell-gap: 12px;
+	--site-shell-inset: 8px;
+	--site-shell-styles-width: 360px;
+	// How far the menu shifts as it is uncovered.
+	--site-shell-menu-shift: 24px;
+	--site-shell-pip-scale: 1;
+	--site-shell-transition-duration: var(--wpds-motion-duration-md);
+	--site-shell-transition-easing: var(--wpds-motion-easing-balanced);
+	// The bar's color, which the editor header takes on too.
+	--site-shell-bar-background: #1e1e1e;
+
+	position: fixed;
+	inset: 0;
+	display: grid;
+	grid-template-rows: var(--site-shell-bar-height) 1fr;
+	color: var(--wpds-color-foreground-content-neutral);
+	// The bar's row is dark wherever the bar shows through, such as beside
+	// the editor when the menu is open.
+	background:
+		linear-gradient(var(--site-shell-bar-background), var(--site-shell-bar-background)) top / 100% var(--site-shell-bar-height) no-repeat,
+		var(--wpds-color-background-surface-neutral-weak);
+	isolation: isolate;
+
+	@media (prefers-reduced-motion: reduce) {
+		--site-shell-transition-duration: 0s;
+	}
+}
+
+.notices-snackbar {
+	@include mixins.snackbar-container();
+
+	// The mixin's descendant selector is local in this CSS Module.
+	:global(.components-snackbar) {
+		margin-inline: auto;
+	}
+}
+
+.bar {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	color: var(--wpds-color-foreground-content-neutral);
+	position: relative;
+	// Above the editor, whose header fills the middle of the row.
+	z-index: 6;
+	view-transition-name: site-shell--bar;
+
+	// In the editor, its header shows through the middle of the bar.
+	.is-editing & {
+		pointer-events: none;
+
+		> :not(.bar-context) {
+			pointer-events: auto;
+		}
+	}
+}
+
+.bar-start,
+.bar-end {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+// Space between the middle of the bar and the end's own items.
+.bar-end {
+	padding-inline-start: var(--site-shell-slot-inset);
+}
+
+.bar-context {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	justify-content: flex-end;
+	gap: var(--wpds-dimension-gap-xs);
+	min-width: 0;
+}
+
+// As wide as the bar is tall, like the site icon in the editor header.
+.bar-menu-toggle,
+.bar-account {
+	position: relative;
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	gap: var(--wpds-dimension-gap-xs);
+
+	// A hairline between each end's own slot and the next, to show where
+	// the bar's slots meet.
+	&::after {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		width: 1px;
+		height: var(--wpds-dimension-size-md);
+		margin-block: auto;
+		background: var(--wpds-color-stroke-surface-neutral);
+	}
+}
+
+// The menu toggle sits in a square as wide as the bar is tall.
+.bar-menu-toggle {
+	width: var(--site-shell-bar-height);
+	// So what follows starts as far from the separator as the toggle sits
+	// from it.
+	margin-inline-end: calc(var(--site-shell-slot-inset) - var(--wpds-dimension-gap-xs) - var(--wpds-dimension-padding-xs));
+}
+
+.bar-menu-toggle::after {
+	inset-inline-end: 0;
+}
+
+// A separator only shows where a screen's own tools meet the global ones.
+// Nothing follows the menu toggle but the editor's tools.
+.shell:not(.is-editing) .bar-menu-toggle::after {
+	display: none;
+}
+
+// The global items at the end, inset as far from the separator and the edge
+// as the menu toggle is in its square.
+.bar-account {
+	padding-inline: var(--site-shell-slot-inset);
+	// So the button before it ends as far from the separator.
+	margin-inline-start: calc(var(--site-shell-slot-inset) - var(--wpds-dimension-gap-xs));
+}
+
+.bar-account::after {
+	inset-inline-start: 0;
+}
+
+// Before the global items at the end, there may be the editor's tools, a
+// screen's own items at the end, such as Styles, or what the middle of the
+// bar puts at its end, such as saving edited styles.
+.shell:not(.is-editing) .bar:not(:has(.bar-context > :not(:empty))) .bar-end:not(:has(> :not(.bar-account))) .bar-account::after {
+	display: none;
+}
+
+.body {
+	position: relative;
+	overflow: hidden;
+	// Whatever the site, the editor or an admin screen leaves uncovered
+	// around it matches the bar and the menu.
+	background: var(--site-shell-bar-background);
+}
+
+// The menu sits beneath everything else. Opening it moves the site, the
+// editor or the admin screen aside to uncover it, and closing it moves them
+// back over it, while the menu itself only shifts a little.
+.menu {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	inset-inline-start: 0;
+	z-index: 0;
+	display: flex;
+	flex-direction: column;
+	width: var(--site-shell-menu-width);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	transition-property: transform, visibility, opacity;
+	// Shown in full at once, since it is still covered when it opens.
+	transition-duration: var(--site-shell-transition-duration), 0s, 0s;
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Visible at once when it opens, so focus can move into it, and hidden
+	// only once it has been covered again. It fades out mostly towards the
+	// end, so it does not linger in a gutter the covering screen leaves.
+	.shell:not(.is-menu-open) & {
+		visibility: hidden;
+		opacity: 0;
+		transform: translateX(calc(-1 * var(--site-shell-menu-shift)));
+		transition-duration: var(--site-shell-transition-duration), 0s, var(--site-shell-transition-duration);
+		transition-delay: 0s, var(--site-shell-transition-duration), 0s;
+		transition-timing-function: var(--site-shell-transition-easing), linear, cubic-bezier(0.55, 0, 1, 0.45);
+
+		[dir="rtl"] & {
+			transform: translateX(var(--site-shell-menu-shift));
+		}
+	}
+}
+
+// The items scroll above the space the site's thumbnail takes.
+.menu-content {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	margin-block-end: var(--site-shell-thumbnail-space);
+	transition: margin var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+}
+
+// Admin screens sit behind the site, already laid out where they will be,
+// so the site shrinking away uncovers them rather than them arriving.
+.admin {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: flex;
+	gap: var(--site-shell-inset);
+	// Flush with the bar above, inset from the window's other edges.
+	padding: 0 var(--site-shell-inset) var(--site-shell-inset);
+	transition-property: inset, padding, visibility;
+	transition-duration: var(--site-shell-transition-duration), var(--site-shell-transition-duration), 0s;
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Hidden while covered, so nothing in it can be reached, but only once
+	// the site has grown back over it.
+	.shell:not(.is-admin):not(.is-styling) & {
+		visibility: hidden;
+		transition-delay: 0s, 0s, var(--site-shell-transition-duration);
+	}
+
+	// Beside the menu whenever it is open, on the site too, so entering an
+	// admin screen from the menu moves nothing but the site. Offset rather
+	// than padded, so it does not cover the menu beneath it. The screen sits
+	// right against the menu, like the site and the editor do.
+	.is-menu-open & {
+		inset-inline-start: var(--site-shell-menu-width);
+		padding-inline-start: 0;
+	}
+
+	// While styling, the route's styles panel is docked at the end, beside
+	// the site.
+	.is-styling & {
+		inset-inline-start: auto;
+		box-sizing: border-box;
+		width: calc(var(--site-shell-styles-width) + var(--site-shell-inset));
+		padding-inline-start: 0;
+	}
+}
+
+// The site fills the area below the bar, sits beside the open menu, or
+// shrinks into the menu's footer on admin screens. `shell.tsx` sets its
+// height and transform for each.
+.site {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	// Above the menu, whose footer the thumbnail sits in.
+	z-index: 3;
+	width: 100%;
+	height: 100%;
+
+	// Behind the menu and the editor, which cover it. It stays visible long
+	// enough for the editor to crossfade from it, 250ms, then is hidden, so
+	// it does not show through the space around the editor when the menu
+	// opens. Leaving the editor shows it again at once.
+	.is-editing & {
+		z-index: 0;
+		visibility: hidden;
+		transition-delay: 0s, 0s, 0s, 0s, 300ms;
+	}
+
+	// Opened from an admin screen, the editor fades in only once it has
+	// rendered, so the site stays in view until then.
+	.is-editing.is-editor-pending & {
+		visibility: visible;
+	}
+	overflow: hidden;
+	background: var(--wpds-color-background-surface-neutral);
+	transform-origin: top left;
+	transition-property: transform, height, border-radius, box-shadow, visibility;
+	transition-duration: var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), var(--site-shell-transition-duration), 0s;
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Route changes crossfade the page. Named on its own, the site is left
+	// out of that crossfade, so it stays still between admin screens.
+	view-transition-name: site-shell--site;
+
+	[dir="rtl"] & {
+		transform-origin: top right;
+	}
+
+	// Inset beside the open menu, against the bar's dark background.
+	&.is-beside-menu {
+		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
+	}
+
+	&.is-thumbnail {
+		// The radius and outline are scaled down along with the frame.
+		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
+		box-shadow: 0 0 0 calc(1px / var(--site-shell-pip-scale)) var(--wpds-color-stroke-surface-neutral-weak);
+
+		// The transform is set inline, so the grown one, worked out alongside
+		// it in `shell.tsx`, has to override it.
+		&:hover,
+		&:has(.site-return:focus-visible) {
+			transform: var(--site-shell-thumbnail-hover-transform) !important;
+		}
+	}
+}
+
+// The editor opens above the site, which it crossfades from, and leaves room
+// for the menu when it is open.
+// The editor fills the shell, including the bar's row, which its header
+// shares with the menu toggle.
+.editor {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	background: var(--wpds-color-background-surface-neutral);
+	view-transition-name: site-shell--editor;
+	transition-property: inset, background-color;
+	transition-duration: var(--site-shell-transition-duration);
+	transition-timing-function: var(--site-shell-transition-easing);
+
+	// Beside the open menu, the editor is inset like the site, with the
+	// bar's dark background around it. Its header stays in the bar's row.
+	.is-menu-open & {
+		inset-inline: var(--site-shell-menu-width) var(--site-shell-inset);
+		inset-block-end: var(--site-shell-inset);
+		background: var(--site-shell-bar-background);
+	}
+
+	:global(.interface-interface-skeleton__body) {
+		transition: margin var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+	}
+
+	// The canvas and the footer below it read as one rounded card.
+	.is-menu-open & :global(.interface-interface-skeleton__body) {
+		margin-block-start: var(--site-shell-inset);
+		border-start-start-radius: var(--wpds-border-radius-md);
+		border-start-end-radius: var(--wpds-border-radius-md);
+		overflow: hidden;
+	}
+
+	.is-menu-open & :global(.interface-interface-skeleton__footer) {
+		border-end-start-radius: var(--wpds-border-radius-md);
+		border-end-end-radius: var(--wpds-border-radius-md);
+		overflow: hidden;
+	}
+
+	:global(.interface-interface-skeleton) {
+		position: relative;
+		height: 100%;
+		top: 0 !important;
+		inset-inline-start: 0 !important;
+	}
+
+	// The header sits between the bar's two ends, and takes its color. These
+	// override the editor's own styles, so they are tied to its class names:
+	// fine for a prototype, but a real version would render the editor's
+	// tools inside the bar instead.
+	:global(.editor-header) {
+		padding-inline: var(--site-shell-editor-header-start) var(--site-shell-editor-header-end);
+		background: var(--site-shell-bar-background);
+		color: #fff;
+		transition: padding var(--site-shell-transition-duration) var(--site-shell-transition-easing);
+		// Read by `@wordpress/components`, for buttons and their states.
+		--wp-components-color-foreground: #fff;
+		--wp-components-color-background: var(--site-shell-bar-background);
+		--wp-components-color-gray-100: #2f2f2f;
+		--wp-components-color-gray-200: #3c3c3c;
+		--wp-components-color-gray-300: #4a4a4a;
+		--wp-components-color-gray-400: #757575;
+		--wp-components-color-gray-600: #949494;
+		--wp-components-color-gray-700: #ccc;
+		--wp-components-color-gray-800: #e0e0e0;
+
+		:global(.components-button):not(.is-primary):not(:disabled):not([aria-disabled="true"]) {
+			color: #fff;
+		}
+
+		:global(.components-button):disabled,
+		:global(.components-button)[aria-disabled="true"] {
+			color: #757575;
+		}
+
+		:global(.components-button.is-pressed):not(.is-primary) {
+			background: #fff;
+			color: var(--site-shell-bar-background);
+		}
+
+		:global(.editor-document-bar) {
+			background: #2f2f2f;
+
+			&:hover,
+			:global(.components-button):hover {
+				background: #3c3c3c;
+			}
+		}
+
+		:global(.editor-document-bar__title),
+		:global(.editor-document-bar__post-type-label) {
+			color: #fff;
+		}
+
+		:global(.editor-document-bar__icon-layout svg) {
+			fill: #ccc;
+		}
+	}
+
+	// The bar shows its own document bar in the same place.
+	:global(.editor-header__center) {
+		visibility: hidden;
+	}
+
+	// The document bar's View button returns to the page on the site, so the
+	// editor's own link to view it in a new tab is left out. It has no class
+	// of its own, so it is picked out by where and what it is.
+	:global(.editor-header__settings > a.components-button[target="_blank"]) {
+		display: none;
+	}
+
+	// Styles are edited in the Style mode instead, so the editor's toggle
+	// for its own styles panel is left out.
+	:global(.editor-header [aria-controls="edit-site:global-styles"]) {
+		display: none;
+	}
+
+	:global(.interface-interface-skeleton__header) {
+		border-block-end-color: var(--site-shell-bar-background);
+	}
+
+	// The editor's header is the bar's tools for editing, so they fade in, as
+	// the tools for each screen do. The header itself stays, so the bar it
+	// fills is never see-through. The rest of the editor's chrome comes in
+	// from the edges of the window, as though it had been waiting just out of
+	// view. The canvas between them crossfades from the site.
+	@media not (prefers-reduced-motion: reduce) {
+		:global(.editor-header) > * {
+			animation: site-shell-fade-in var(--site-shell-transition-duration) var(--site-shell-transition-easing) both;
+		}
+
+		:global(.interface-interface-skeleton__sidebar) {
+			animation: site-shell-from-end var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		:global(.interface-interface-skeleton__secondary-sidebar) {
+			animation: site-shell-from-start var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		:global(.interface-interface-skeleton__footer) {
+			animation: site-shell-from-bottom var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		}
+
+		[dir="rtl"] & :global(.interface-interface-skeleton__sidebar) {
+			animation-name: site-shell-from-start;
+		}
+
+		[dir="rtl"] & :global(.interface-interface-skeleton__secondary-sidebar) {
+			animation-name: site-shell-from-end;
+		}
+	}
+}
+
+@keyframes site-shell-fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes site-shell-from-bottom {
+	from {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes site-shell-from-end {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes site-shell-from-start {
+	from {
+		transform: translateX(-100%);
+	}
+}
+
+.site-frame {
+	height: 100%;
+
+	// The preview lays out a bar above the frame, which the shell hides.
+	> * {
+		height: 100%;
+	}
+}
+
+.site-return {
+	position: absolute;
+	inset: 0;
+	cursor: var(--wpds-cursor-control);
+
+	&:focus-visible {
+		// Drawn inside the frame and scaled down with it, so it is widened
+		// to read as a normal focus ring.
+		outline: calc(var(--wpds-border-width-focus) / var(--site-shell-pip-scale)) solid var(--wpds-color-stroke-focus);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus) / var(--site-shell-pip-scale));
+		border-radius: inherit;
+	}
+}
+
+// Shows the live site through the transition, without animating it.
+:global(:root)::view-transition-group(site-shell--site) {
+	z-index: 2;
+	animation: none;
+}
+
+:global(:root)::view-transition-old(site-shell--site) {
+	display: none;
+}
+
+:global(:root)::view-transition-new(site-shell--site) {
+	animation: none;
+}
+
+// The first admin screen was already behind the site, so it is not faded in.
+// Moving between admin screens, which has an old screen, still crossfades.
+:global(:root):has(.shell)::view-transition-new(boot--stage):only-child,
+:global(:root):has(.shell)::view-transition-new(boot--inspector):only-child {
+	animation: none;
+}
+
+// The editor crossfades in above the still site, and out again on leaving.
+:global(:root)::view-transition-group(site-shell--editor) {
+	z-index: 3;
+}
+
+// The bar stays above the editor through the crossfade.
+:global(:root)::view-transition-group(site-shell--bar) {
+	z-index: 4;
+}

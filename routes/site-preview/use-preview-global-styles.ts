@@ -8,8 +8,8 @@ import {
 	mergeGlobalStyles,
 	type GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
-import type { SitePreviewGlobalStyles } from '@wordpress/routes-site-preview';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import type { SitePreviewGlobalStyles } from './site-preview';
 
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
