@@ -185,6 +185,26 @@
 				--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-neutral-weak-active);
 				--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-neutral-weak-disabled);
 			}
+
+			/* Forced colors discard the strong background, so fill pressed buttons
+			   with the system selection colors instead. Opting out of color
+			   adjustment removes the text backplate, so the focus ring needs an
+			   explicit system color too. */
+			&.is-minimal[aria-pressed="true"] {
+				@media ( forced-colors: active ) {
+					forced-color-adjust: none;
+					outline-color: CanvasText;
+					background-color: SelectedItem;
+					color: SelectedItemText;
+					border-color: SelectedItem;
+
+					&[data-disabled] {
+						background-color: GrayText;
+						color: Canvas;
+						border-color: GrayText;
+					}
+				}
+			}
 		}
 
 		.is-unstyled {
