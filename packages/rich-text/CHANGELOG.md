@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `toHTMLString`: Close non-void inline objects and preserve their children.
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
