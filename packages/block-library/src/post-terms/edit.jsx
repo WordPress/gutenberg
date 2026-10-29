@@ -14,7 +14,8 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -44,8 +45,22 @@ export default function PostTermsEdit( {
 		useBlockEditContext();
 	const [ isAddingPrefix, setIsAddingPrefix ] = useState( false );
 	const [ isAddingSuffix, setIsAddingSuffix ] = useState( false );
-	const prefixRef = useRef();
-	const suffixRef = useRef();
+	const prefixRef = useRefEffect(
+		( node ) => {
+			if ( isAddingPrefix ) {
+				node.focus();
+			}
+		},
+		[ isAddingPrefix ]
+	);
+	const suffixRef = useRefEffect(
+		( node ) => {
+			if ( isAddingSuffix ) {
+				node.focus();
+			}
+		},
+		[ isAddingSuffix ]
+	);
 	/**
 	 * In a flex or grid layout an empty editor would become a layout item, so
 	 * it only shows once it has text or the user added it from the toolbar.
@@ -57,25 +72,6 @@ export default function PostTermsEdit( {
 		? suffix || isAddingSuffix
 		: isSelected || suffix;
 	const { postId, postType } = context;
-
-	useEffect( () => {
-		if ( isAddingPrefix ) {
-			prefixRef.current?.focus();
-		}
-	}, [ isAddingPrefix ] );
-
-	useEffect( () => {
-		if ( isAddingSuffix ) {
-			suffixRef.current?.focus();
-		}
-	}, [ isAddingSuffix ] );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsAddingPrefix( false );
-			setIsAddingSuffix( false );
-		}
-	}, [ isSelected ] );
 
 	const selectedTerm = useSelect(
 		( select ) => {
@@ -104,6 +100,8 @@ export default function PostTermsEdit( {
 				<BlockControls>
 					{ ! prefix && ! isAddingPrefix && (
 						<ToolbarButton
+							key="prefix"
+							onMouseDown={ ( event ) => event.preventDefault() }
 							onClick={ () => setIsAddingPrefix( true ) }
 						>
 							{ __( 'Add prefix' ) }
@@ -111,6 +109,8 @@ export default function PostTermsEdit( {
 					) }
 					{ ! suffix && ! isAddingSuffix && (
 						<ToolbarButton
+							key="suffix"
+							onMouseDown={ ( event ) => event.preventDefault() }
 							onClick={ () => setIsAddingSuffix( true ) }
 						>
 							{ __( 'Add suffix' ) }
@@ -134,6 +134,7 @@ export default function PostTermsEdit( {
 				{ ! isLoading && showPrefix && (
 					<RichText
 						ref={ prefixRef }
+						onBlur={ () => ! prefix && setIsAddingPrefix( false ) }
 						identifier="prefix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
@@ -182,6 +183,7 @@ export default function PostTermsEdit( {
 				{ ! isLoading && showSuffix && (
 					<RichText
 						ref={ suffixRef }
+						onBlur={ () => ! suffix && setIsAddingSuffix( false ) }
 						identifier="suffix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
