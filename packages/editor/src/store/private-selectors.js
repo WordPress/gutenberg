@@ -699,6 +699,18 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 
 const EMPTY_PENDING_MEDIA_EDITS = {};
 
+// Shared by the selectors below. Private selectors are bound to the registry
+// lazily, so they read core-data through this instead of calling each other.
+function selectPendingMediaEdits( select, state ) {
+	return (
+		select( coreStore ).getEditedEntityRecord(
+			'postType',
+			getCurrentPostType( state ),
+			getCurrentPostId( state )
+		)?.pendingMediaEdits ?? EMPTY_PENDING_MEDIA_EDITS
+	);
+}
+
 /**
  * Returns the media edits waiting for the current post to be saved, keyed by
  * block client ID.
@@ -708,12 +720,7 @@ const EMPTY_PENDING_MEDIA_EDITS = {};
  * @return {Object} Pending media edits.
  */
 export const getPendingMediaEdits = createRegistrySelector(
-	( select ) => ( state ) =>
-		select( coreStore ).getEditedEntityRecord(
-			'postType',
-			getCurrentPostType( state ),
-			getCurrentPostId( state )
-		)?.pendingMediaEdits ?? EMPTY_PENDING_MEDIA_EDITS
+	( select ) => ( state ) => selectPendingMediaEdits( select, state )
 );
 
 /**
@@ -724,9 +731,10 @@ export const getPendingMediaEdits = createRegistrySelector(
  *
  * @return {Object|undefined} The pending media edit.
  */
-export function getPendingMediaEdit( state, clientId ) {
-	return getPendingMediaEdits( state )[ clientId ];
-}
+export const getPendingMediaEdit = createRegistrySelector(
+	( select ) => ( state, clientId ) =>
+		selectPendingMediaEdits( select, state )[ clientId ]
+);
 
 /**
  * Returns whether any media edits are waiting for the current post to be
@@ -736,9 +744,10 @@ export function getPendingMediaEdit( state, clientId ) {
  *
  * @return {boolean} Whether there are pending media edits.
  */
-export function hasPendingMediaEdits( state ) {
-	return Object.keys( getPendingMediaEdits( state ) ).length > 0;
-}
+export const hasPendingMediaEdits = createRegistrySelector(
+	( select ) => ( state ) =>
+		Object.keys( selectPendingMediaEdits( select, state ) ).length > 0
+);
 
 /**
  * Returns the pending media edit for a block, if it was made on the
@@ -751,7 +760,7 @@ export function hasPendingMediaEdits( state ) {
  */
 export const getPendingMediaEditForBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
-		const edit = getPendingMediaEdit( state, clientId );
+		const edit = selectPendingMediaEdits( select, state )[ clientId ];
 		if ( ! edit ) {
 			return undefined;
 		}
