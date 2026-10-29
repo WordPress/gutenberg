@@ -7,7 +7,8 @@
 		margin-right: $grid-unit-10;
 	}
 
-	&[aria-selected="true"] .block-editor-block-icon {
+	&:is([aria-selected="true"], :focus) .block-editor-block-icon {
 		color: inherit !important;
+		background-color: transparent !important;
 	}
 }

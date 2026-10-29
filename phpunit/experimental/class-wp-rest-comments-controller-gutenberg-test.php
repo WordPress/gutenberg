@@ -804,7 +804,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'no parent'                     => array( 'none', '2764', true, 'rest_comment_invalid_parent', 400 ),
 			'parent is a regular comment'   => array( 'comment', '2764', true, 'rest_comment_invalid_parent', 400 ),
 			'content is not in emoji list'  => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
-			'emoji outside the curated set' => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
+			'emoji outside the curated set' => array( 'note', '1f525', true, 'rest_comment_invalid_reaction', 400 ),
 			'uppercase hex key'             => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
 			'emoji name instead of hex'     => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'                => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
@@ -941,8 +941,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public function data_valid_reaction_emojis() {
-		// The five quick reactions: heart, celebration, smile, eyes, rocket.
+		// The seven quick reactions: thumbs up, plus, heart, celebration, smile, eyes, rocket.
 		return array(
+			'thumbs up'   => array( '1f44d' ),
+			'plus'        => array( '2795' ),
 			'heart'       => array( '2764' ),
 			'celebration' => array( '1f389' ),
 			'smile'       => array( '1f604' ),
