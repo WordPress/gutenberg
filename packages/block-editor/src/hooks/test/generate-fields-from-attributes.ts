@@ -212,4 +212,49 @@ describe( 'generateFieldsFromAttributes', () => {
 		} );
 		expect( result.form.fields ).toEqual( [ 'sizes' ] );
 	} );
+
+	it( 'should map numeric schema constraints to validation rules', () => {
+		const attributes = markForAutoInspectorControl( {
+			count: {
+				type: 'integer',
+				minimum: 1,
+				maximum: 10,
+			},
+		} );
+
+		const result = generateFieldsFromAttributes( attributes );
+
+		expect( result.fields[ 0 ].isValid ).toEqual( { min: 1, max: 10 } );
+	} );
+
+	it( 'should map string schema constraints to validation rules', () => {
+		const attributes = markForAutoInspectorControl( {
+			code: {
+				type: 'string',
+				minLength: 2,
+				maxLength: 5,
+				pattern: '^[A-Z]+$',
+			},
+		} );
+
+		const result = generateFieldsFromAttributes( attributes );
+
+		expect( result.fields[ 0 ].isValid ).toEqual( {
+			minLength: 2,
+			maxLength: 5,
+			pattern: '^[A-Z]+$',
+		} );
+	} );
+
+	it( 'should not add validation rules when the schema has no constraints', () => {
+		const attributes = markForAutoInspectorControl( {
+			count: {
+				type: 'integer',
+			},
+		} );
+
+		const result = generateFieldsFromAttributes( attributes );
+
+		expect( result.fields[ 0 ] ).not.toHaveProperty( 'isValid' );
+	} );
 } );

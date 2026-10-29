@@ -8,6 +8,8 @@ import {
 } from '@wordpress/blocks';
 import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { Notice } from '@wordpress/ui';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
@@ -341,22 +343,46 @@ export const registerCoreBlocks = (
 						urlQueryArgs: { post_id: context?.postId },
 					} );
 
+					// Keep the last successful render, so that an invalid
+					// attribute doesn't replace the whole block with an error.
+					const [ prevContent, setPrevContent ] = useState( '' );
+					if ( content && content !== prevContent ) {
+						setPrevContent( content );
+					}
+
 					if ( status === 'loading' ) {
+						if ( prevContent ) {
+							return (
+								<HtmlRenderer
+									wrapperProps={ blockProps }
+									html={ prevContent }
+								/>
+							);
+						}
 						return (
 							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
 						);
 					}
 
 					if ( status === 'error' ) {
-						return (
-							<div { ...blockProps }>
-								{ sprintf(
-									/* translators: %s: error message describing the problem */
-									__( 'Error loading block: %s' ),
-									error
-								) }
-							</div>
+						const errorMessage = sprintf(
+							/* translators: %s: error message describing the problem */
+							__( 'Error loading block: %s' ),
+							error
 						);
+						if ( prevContent ) {
+							return (
+								<div { ...blockProps }>
+									<Notice.Root intent="warning">
+										<Notice.Description>
+											{ errorMessage }
+										</Notice.Description>
+									</Notice.Root>
+									<HtmlRenderer html={ prevContent } />
+								</div>
+							);
+						}
+						return <div { ...blockProps }>{ errorMessage }</div>;
 					}
 
 					return (
