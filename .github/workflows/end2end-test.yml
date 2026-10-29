@@ -107,7 +107,7 @@ jobs:
                   overwrite: true
 
     e2e-playwright:
-        name: Playwright - ${{ matrix.part }}
+        name: Playwright - ${{ matrix.part }} (${{ matrix.attempt }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: build
         timeout-minutes: 45
@@ -123,8 +123,9 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                part: [1, 2]
-                totalParts: [2]
+                part: [8]
+                totalParts: [8]
+                attempt: [1, 2, 3]
 
         steps:
             # Bail out before checkout and `npm ci` rather than after.
@@ -160,13 +161,13 @@ jobs:
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }} --fully-parallel --project=webkit --retries=0 --repeat-each=40 --trace=retain-on-failure specs/editor/various/multi-block-selection.spec.js -g "should select by dragging"
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }} --fully-parallel --retries=0 --trace=retain-on-failure
 
             - name: Archive blob reports (HTML)
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
-                  name: blob-reports--${{ matrix.part }}
+                  name: blob-reports--${{ matrix.part }}-${{ matrix.attempt }}
                   path: test/e2e/blob-report
                   if-no-files-found: ignore
 
@@ -174,7 +175,7 @@ jobs:
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
-                  name: flaky-tests-report--${{ matrix.part }}
+                  name: flaky-tests-report--${{ matrix.part }}-${{ matrix.attempt }}
                   path: test/e2e/flaky-tests
                   if-no-files-found: ignore
 
