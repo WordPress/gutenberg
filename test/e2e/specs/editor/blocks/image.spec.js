@@ -1150,6 +1150,34 @@ test.describe( 'Image', () => {
 			},
 		] );
 	} );
+
+	test( 'treats the original of a scaled image as its attachment', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// WordPress scales down big uploads and keeps the original file.
+		const media = await requestUtils.uploadMedia(
+			'./assets/3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+		);
+		const { original_image: originalImage } = media.media_details;
+		expect( originalImage ).toBeTruthy();
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				id: media.id,
+				url: media.source_url.replace( /[^/]+$/, originalImage ),
+			},
+		} );
+
+		await editor.showBlockToolbar();
+		await expect(
+			page.getByRole( 'button', { name: 'Edit image' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Upload to Media Library' } )
+		).toBeHidden();
+	} );
 } );
 
 test.describe( 'Image - lightbox', () => {

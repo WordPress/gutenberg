@@ -358,16 +358,29 @@ export default function Image( {
 		[ id, isSingleSelected ]
 	);
 	// An id copied from another site can belong to a different file here, so the
-	// attachment only counts when it holds this image.
+	// attachment only counts when it holds this image, by the same rule as
+	// WordPress's `wp_image_file_matches_image_meta()`.
+	const {
+		file = '',
+		original_image: originalImage,
+		sizes = {},
+	} = attachment?.media_details ?? {};
+	const folder = file
+		.slice( 0, file.lastIndexOf( '/' ) + 1 )
+		.replace( /^.*?wp-content\/uploads\/?/, '' );
 	const isOtherFile =
 		!! attachment &&
-		! [
-			attachment.source_url,
-			...Object.values( attachment.media_details?.sizes ?? {} ).map(
-				( size ) => size.source_url
-			),
-		].some( ( fileUrl ) =>
-			url?.split( '?' )[ 0 ].endsWith( new URL( fileUrl ).pathname )
+		! (
+			file.length > 4 &&
+			[
+				file,
+				...[
+					originalImage,
+					...Object.values( sizes ).map( ( size ) => size.file ),
+				]
+					.filter( Boolean )
+					.map( ( name ) => folder + name ),
+			].some( ( path ) => url?.split( '?' )[ 0 ].endsWith( path ) )
 		);
 	const image = isOtherFile ? undefined : attachment;
 
