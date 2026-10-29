@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
+import type { ColumnSteps } from '@wordpress/grid';
 import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
@@ -1109,28 +1110,41 @@ const GRID_SETTINGS_LAYOUT: DashboardWidget[] = [
 
 type GridSettingsStoryProps = {
 	columns: number;
+	steps: ColumnSteps;
+	minColumnWidth: number;
 	model: WidgetGridModel;
 	rowHeight: RowHeightPreset;
 	flowTolerance: number;
 };
 
-// The ladder in words, so the caption tracks the count the story asked for
-// rather than describing the four-column default.
-function describeColumnSteps( columns: number ): string {
-	if ( columns === 1 ) {
-		return 'one column at every width';
-	}
-
-	const middle = Math.min( 2, columns );
-	if ( middle === columns ) {
-		return `${ columns } columns until the container narrows to one`;
-	}
-
-	return `${ columns } columns on a wide container, ${ middle } as it narrows, then one`;
+// The policy in words, so the caption tracks what the story asked for.
+function describeColumnPolicy(
+	columns: number,
+	steps: ColumnSteps,
+	minColumnWidth: number
+): string {
+	const entries = Object.entries( steps )
+		.map( ( [ width, count ] ) => [ Number( width ), count ] as const )
+		.sort( ( a, b ) => a[ 0 ] - b[ 0 ] );
+	const count =
+		entries.length > 0
+			? entries
+					.map( ( [ width, n ] ) =>
+						n === 'auto'
+							? `the floor decides from ${ width }px`
+							: `${ n } from ${ width }px`
+					)
+					.join( ', ' )
+			: `${ columns } columns at every width`;
+	return minColumnWidth > 0
+		? `${ count }, none narrower than ${ minColumnWidth }px`
+		: count;
 }
 
 function GridSettingsStory( {
 	columns,
+	steps,
+	minColumnWidth,
 	model,
 	rowHeight,
 	flowTolerance,
@@ -1141,17 +1155,22 @@ function GridSettingsStory( {
 
 	// The settings union is per model: `rowHeight` belongs to the grid and
 	// `flowTolerance` to masonry, so only the active model's field travels.
-	const gridSettings = useMemo< WidgetGridSettings >(
-		() =>
-			model === 'masonry'
-				? { model, columns, flowTolerance }
-				: {
-						model,
-						columns,
-						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
-					},
-		[ model, columns, flowTolerance, rowHeight ]
-	);
+	// An empty map leaves the count to `columns`; a zero floor is the
+	// control's "off": the field stays out.
+	const gridSettings = useMemo< WidgetGridSettings >( () => {
+		const policy = Object.keys( steps ).length > 0 ? steps : columns;
+		const shared =
+			minColumnWidth > 0
+				? { columns: policy, minColumnWidth }
+				: { columns: policy };
+		return model === 'masonry'
+			? { model, ...shared, flowTolerance }
+			: {
+					model,
+					...shared,
+					rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
+				};
+	}, [ model, columns, steps, minColumnWidth, flowTolerance, rowHeight ] );
 
 	return (
 		<WidgetDashboard
@@ -1170,7 +1189,7 @@ function GridSettingsStory( {
 				title="Dashboard"
 				subTitle={ `${
 					model === 'masonry' ? 'Masonry' : 'Standard grid'
-				}: ${ describeColumnSteps( columns ) }.` }
+				}: ${ describeColumnPolicy( columns, steps, minColumnWidth ) }.` }
 				actions={ <WidgetDashboard.Actions /> }
 				showSidebarToggle={ false }
 				hasPadding
@@ -1185,6 +1204,8 @@ export const GridSettings: StoryObj< GridSettingsStoryProps > = {
 	render: ( args ) => <GridSettingsStory { ...args } />,
 	args: {
 		columns: 4,
+		steps: { 0: 1, 600: 2, 960: 4 },
+		minColumnWidth: 0,
 		model: 'grid',
 		rowHeight: 'medium',
 		flowTolerance: 16,
@@ -1193,7 +1214,17 @@ export const GridSettings: StoryObj< GridSettingsStoryProps > = {
 		columns: {
 			control: { type: 'range', min: 1, max: 12, step: 1 },
 			description:
-				'Wide-container column count. The host decides; the package only floors it at one.',
+				'Column count at every width. The host decides; the package only floors it at one.',
+		},
+		steps: {
+			control: 'object',
+			description:
+				"Count per container width, applied from that width up: `{ 0: 1, 600: 2, 960: 4 }`; a step can be 'auto'. Replaces `columns` while set; an empty object leaves it to `columns`.",
+		},
+		minColumnWidth: {
+			control: { type: 'range', min: 0, max: 480, step: 20 },
+			description:
+				'Per-column floor in pixels, composed with either form. Zero leaves it unset.',
 		},
 		model: {
 			control: 'radio',
@@ -1216,12 +1247,21 @@ export const GridSettings: StoryObj< GridSettingsStoryProps > = {
 	},
 	parameters: {
 		controls: {
-			include: [ 'columns', 'model', 'rowHeight', 'flowTolerance' ],
+			include: [
+				'columns',
+				'steps',
+				'minColumnWidth',
+				'model',
+				'rowHeight',
+				'flowTolerance',
+			],
 		},
 		docs: {
 			description: {
 				story: `
-The \`gridSettings\` prop carries the host's layout decisions. \`columns\` sets the wide-container count (\`WIDGET_DASHBOARD_COLUMN_COUNT\` is only the default when the host sets nothing), and container width steps the effective count down to \`min( 2, count )\` and then one as it narrows. Drag the columns control; resize the canvas to watch the steps.
+The \`gridSettings\` prop carries the host's layout decisions, and the column policy travels to the surface untouched. \`columns\` is a count at every width. \`steps\` is the same field as a map from container width to count, the form a host uses to step the count as the surface narrows, and a step can be \`'auto'\` to leave that band to the floor, or to the count below it when no floor is set. One, two and four columns (\`DEFAULT_GRID.columns\`) is the default when the host sets nothing; the package applies no steps of its own. Resize the canvas to watch the count change at each step; clear \`steps\` to hold \`columns\` at every width.
+
+\`minColumnWidth\` is a per-column floor that composes with either form: the surface fits as many columns as the container allows at that width, capped by the count, down to one. Raise it and narrow the canvas to watch the count fall one column at a time.
 
 \`model\` picks the surface, and the per-model field follows it: \`rowHeight\` belongs to \`grid\`, \`flowTolerance\` to \`masonry\`. Only the active one is passed in \`gridSettings\`, and only its control is shown.
 
