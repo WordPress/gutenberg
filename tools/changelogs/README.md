@@ -133,7 +133,7 @@ Use the migration script's `--rollback` flag:
 npm run changelog:migrate -- <package-name> --rollback
 ```
 
-This reconstructs `packages/<package-name>/CHANGELOG.md` by combining the historical baseline version file, any subsequent version files, and pending unreleased fragments, and removes `.changes/<package-name>/` and the package's unreleased fragment files.
+This reconstructs `packages/<package-name>/CHANGELOG.md` by combining the historical baseline version file, any subsequent version files, and pending unreleased fragments rendered through the same native compilation as `npm run changelog:preview`. Shared validation and compilation must succeed before the command writes the changelog and removes `.changes/<package-name>/` and the package's unreleased fragment files. Published history is preserved without re-rendering. The `Stable Release` subsection may appear last; ordinary subsections retain the configured order. Release version calculation recognizes either the promotion note or the `Stable Release` heading within `Unreleased`.
 
 ### 2. Remove package from `.changie.yaml`
 

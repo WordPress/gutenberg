@@ -8,6 +8,8 @@ import {
 	rollbackPackageFromChangie,
 } from '../lib/migrate.ts';
 import { execChangie } from '../lib/release.ts';
+import { loadChangieConfig } from '../lib/config.ts';
+import { previewUnreleasedFragments } from '../lib/preview.ts';
 
 const SAMPLE_CHANGELOG = `<!-- Preamble comment -->
 
@@ -66,6 +68,121 @@ describe( 'parseChangelogContent', () => {
 } );
 
 describe( 'migratePackageToChangie with cleanFirst / update', () => {
+	it.each( [ false, true ] )(
+		'rolls back mixed kinds using native preview and preserves inputs on validation failure: %s',
+		( invalid ) => {
+			const root = fs.mkdtempSync(
+				path.join( os.tmpdir(), 'rollback-native-' )
+			);
+			try {
+				const pkgDir = path.join( root, 'packages', 'ui' );
+				const unreleased = path.join( root, '.changes', 'unreleased' );
+				const versions = path.join( root, '.changes', 'ui' );
+				fs.mkdirSync( pkgDir, { recursive: true } );
+				fs.mkdirSync( unreleased, { recursive: true } );
+				fs.mkdirSync( versions );
+				const config = loadChangieConfig(
+					path.resolve( import.meta.dirname, '../../..' )
+				);
+				fs.writeFileSync(
+					path.join( root, '.changie.yaml' ),
+					JSON.stringify( {
+						...config,
+						projects: config.projects.filter(
+							( project ) => project.key === 'ui'
+						),
+					} )
+				);
+				fs.writeFileSync(
+					path.join( pkgDir, 'package.json' ),
+					'{"version":"0.25.0"}'
+				);
+				const changelogPath = path.join( pkgDir, 'CHANGELOG.md' );
+				const history =
+					'## 0.25.0 (2026-10-01)\n\n### Bug Fixes\n\n-   Published fix.\n';
+				fs.writeFileSync( changelogPath, history );
+				fs.writeFileSync( path.join( versions, '0.25.0.md' ), history );
+				const fragmentPaths = [];
+				for ( const [ index, kind ] of [
+					'Bug Fixes',
+					'Stable Release',
+					'Enhancements',
+				].entries() ) {
+					const file = path.join( unreleased, `${ index }.yaml` );
+					fs.writeFileSync(
+						file,
+						JSON.stringify( {
+							project: 'ui',
+							kind,
+							body: `Change for ${ kind }`,
+							time: invalid ? 'garbage' : '2026-10-29T00:00:00Z',
+							custom: { PR: '85369' },
+						} )
+					);
+					fragmentPaths.push( file );
+				}
+				const files = [
+					changelogPath,
+					path.join( versions, '0.25.0.md' ),
+					...fragmentPaths,
+				];
+				const before = files.map( ( file ) =>
+					fs.readFileSync( file, 'utf8' )
+				);
+				const preview = invalid
+					? ''
+					: previewUnreleasedFragments( 'ui', root );
+				let failure;
+				let result;
+				try {
+					rollbackPackageFromChangie( 'ui', root, true );
+					result = rollbackPackageFromChangie( 'ui', root );
+				} catch ( error ) {
+					failure = error;
+				}
+				const expectedFailure =
+					expect.stringContaining( 'Failed to preview' );
+				expect(
+					failure instanceof Error ? failure.message : undefined
+				).toEqual( invalid ? expectedFailure : undefined );
+				const restored = fs.readFileSync( changelogPath, 'utf8' );
+				expect( restored ).toContain(
+					invalid ? history : preview + '\n' + history
+				);
+				expect( result?.fragmentsRestored ).toBe(
+					invalid ? undefined : 3
+				);
+				expect( fs.existsSync( versions ) ).toBe( invalid );
+				expect( fs.readdirSync( unreleased ) ).toEqual(
+					invalid ? [ '0.yaml', '1.yaml', '2.yaml' ] : []
+				);
+				for ( const [ index, file ] of ( invalid
+					? files
+					: []
+				).entries() ) {
+					expect( fs.readFileSync( file, 'utf8' ) ).toBe(
+						before[ index ]
+					);
+				}
+				expect(
+					preview.includes(
+						'Note: This package is now a stable release.'
+					)
+				).toBe( ! invalid );
+				expect(
+					preview.indexOf( '### Enhancements' ) <=
+						preview.indexOf( '### Bug Fixes' )
+				).toBe( true );
+				expect(
+					preview.indexOf( '### Bug Fixes' ) <=
+						preview.indexOf( '### Stable Release' )
+				).toBe( true );
+			} finally {
+				fs.rmSync( root, { recursive: true, force: true } );
+			}
+		}
+	);
+
 	it( 'uses the same UUID filename format for migrated and authored fragments', () => {
 		const tmpDir = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'changie-migration-names-' )
@@ -292,7 +409,18 @@ describe( 'migratePackageToChangie with cleanFirst / update', () => {
 		fs.mkdirSync( pkgDir, { recursive: true } );
 		fs.writeFileSync(
 			path.join( tmpDir, '.changie.yaml' ),
-			'changes_dir: .changes\nunreleased_dir: unreleased\n'
+			JSON.stringify( {
+				...loadChangieConfig(
+					path.resolve( import.meta.dirname, '../../..' )
+				),
+				projects: [
+					{
+						key: 'test-pkg',
+						label: 'Test',
+						changelog: 'packages/test-pkg/CHANGELOG.md',
+					},
+				],
+			} )
 		);
 
 		fs.writeFileSync(
@@ -302,6 +430,17 @@ describe( 'migratePackageToChangie with cleanFirst / update', () => {
 
 		// Migrate
 		migratePackageToChangie( 'test-pkg', tmpDir, false, false );
+		const expectedPreview = previewUnreleasedFragments(
+			'test-pkg',
+			tmpDir
+		);
+		const baselinePath = path.join(
+			tmpDir,
+			'.changes',
+			'test-pkg',
+			'2.1.0.md'
+		);
+		const baseline = fs.readFileSync( baselinePath, 'utf8' );
 
 		// Rollback
 		const rollbackRes = rollbackPackageFromChangie(
@@ -317,6 +456,11 @@ describe( 'migratePackageToChangie with cleanFirst / update', () => {
 			'utf8'
 		);
 		expect( restoredChangelog ).toContain( '## Unreleased' );
+		expect( restoredChangelog ).toContain( expectedPreview );
+		expect( restoredChangelog ).toContain( baseline );
+		expect( restoredChangelog.indexOf( '### Enhancements' ) ).toBeLessThan(
+			restoredChangelog.indexOf( '### Bug Fixes' )
+		);
 		expect( restoredChangelog ).toContain( 'Fixed bug A' );
 		expect( restoredChangelog ).toContain( '## 2.1.0 (2026-10-01)' );
 		expect( restoredChangelog ).toContain( '## 2.0.0 (2026-09-01)' );

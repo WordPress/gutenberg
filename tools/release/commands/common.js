@@ -60,7 +60,9 @@ function calculateVersionBumpFromChangelog(
 
 		// Promote a pre-1.0 package to stable 1.0.0 release. Stop processing.
 		if (
-			lineNormalized.startsWith( '### stable release' ) &&
+			( lineNormalized.trimEnd() === '### stable release' ||
+				lineNormalized.trimEnd() ===
+					'note: this package is now a stable release.' ) &&
 			semver.lt( currentVersion, '1.0.0' )
 		) {
 			versionBump = 'major';

@@ -111,6 +111,27 @@ function changelog( unreleasedBody: string ): string {
 }
 
 describe( 'validateChangelog', () => {
+	test.each( [
+		'### Stable Release\n\n-   Mark stable ([#85369](https://github.com/WordPress/gutenberg/pull/85369)).\n\n### Bug Fixes\n\n-   Fix API ([#85369](https://github.com/WordPress/gutenberg/pull/85369)).\n',
+		'### Bug Fixes\n\n-   Fix API ([#85369](https://github.com/WordPress/gutenberg/pull/85369)).\n\n### Stable Release\n\n-   Mark stable ([#85369](https://github.com/WordPress/gutenberg/pull/85369)).\n',
+		'Note: This package is now a stable release.\n\n### Bug Fixes\n\n-   Fix API ([#85369](https://github.com/WordPress/gutenberg/pull/85369)).\n',
+	] )(
+		'accepts promotion markers independently of subsection order: %s',
+		( body ) => {
+			expect( validateChangelog( changelog( body ) ) ).toEqual( [] );
+		}
+	);
+
+	test( 'rejects out-of-order ordinary sections around Stable Release', () => {
+		const errors = validateChangelog(
+			changelog(
+				'### Bug Fixes\n\n### Stable Release\n\n### Enhancements\n'
+			)
+		);
+		expect( errors ).toEqual( [
+			expect.stringContaining( '"Enhancements" is out of order' ),
+		] );
+	} );
 	test( 'accepts a well-formed Unreleased section', () => {
 		const errors = validateChangelog(
 			changelog( `### Enhancements
