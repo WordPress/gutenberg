@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Keep the scrollable Preferences area’s focus outline visible on narrow screens. <!-- Add the PR link after creating the PR. -->
+-   Keep the scrollable Preferences area’s focus outline visible on narrow screens.
 
 ## 5.0.0 (2026-10-20)
 

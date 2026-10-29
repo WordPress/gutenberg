@@ -16,9 +16,13 @@
 		height: 70%;
 	}
 
-	// Reserve space for the inset focus outline without scrolling it away.
-	@media (max-width: #{ (breakpoints.$break-medium - 1) }) {
-		.components-modal__content {
+	.components-modal__content {
+		// Follow the frame where it clips the inset focus outline.
+		border-bottom-left-radius: inherit;
+		border-bottom-right-radius: inherit;
+
+		// Reserve space for the inset focus outline without scrolling it away.
+		@media (max-width: #{ (breakpoints.$break-medium - 1) }) {
 			padding: 0;
 			border: var(--wpds-border-width-focus) solid transparent;
 
