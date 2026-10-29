@@ -195,13 +195,11 @@ test.describe( 'Autosave', () => {
 	} );
 
 	test( 'should wait for a running autosave before restoring the backup', async ( {
-		context,
 		editor,
 		page,
 		pageUtils,
 		requestUtils,
 	} ) => {
-		await requestUtils.activatePlugin( 'gutenberg-test-autosave-failures' );
 		await editor.canvas
 			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
@@ -235,19 +233,23 @@ test.describe( 'Autosave', () => {
 		);
 		await page.reload();
 
-		// Start a slow autosave of newer text, and restore while it runs.
+		// Hold an autosave of newer text until Restore is pressed.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' newest' );
-		await context.addCookies( [
-			{
-				name: 'gutenberg_test_autosave_failure',
-				value: 'slow',
-				url: new URL( page.url() ).origin,
-			},
-		] );
+		let releaseAutosave;
+		const autosaveReleased = new Promise( ( resolve ) => {
+			releaseAutosave = resolve;
+		} );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/autosaves' ),
+			async ( route ) => {
+				await autosaveReleased;
+				await route.continue();
+			}
+		);
 		const autosaveRequest = page.waitForRequest( ( request ) =>
 			decodeURIComponent( request.url() ).includes( '/autosaves' )
 		);
@@ -259,6 +261,7 @@ test.describe( 'Autosave', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.getByRole( 'button', { name: 'Restore' } ).focus();
 		await page.keyboard.press( 'Enter' );
+		releaseAutosave();
 
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -276,10 +279,6 @@ test.describe( 'Autosave', () => {
 		} );
 		expect( revisions[ 0 ].content.raw ).toBe(
 			'<!-- wp:paragraph -->\n<p>before save backup saved newest</p>\n<!-- /wp:paragraph -->'
-		);
-
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-autosave-failures'
 		);
 	} );
 
