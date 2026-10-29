@@ -128,51 +128,65 @@ test.describe( 'Autosave', () => {
 			.filter( { hasText: 'Draft saved' } )
 			.waitFor();
 
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const backupKey = `wp-autosave-block-editor-post-${ postId }`;
+		const getLatestRevision = async () => {
+			const revisions = await requestUtils.rest( {
+				path: `/wp/v2/posts/${ postId }/revisions`,
+				params: { context: 'edit' },
+			} );
+			return revisions[ 0 ].content.raw;
+		};
+
 		// Make a backup, then edit further and autosave. A draft's autosave
 		// updates the post without adding a revision.
 		await page.keyboard.type( ' backup' );
-		const backup = await page.evaluate( () => {
+		const backup = await page.evaluate( ( key ) => {
 			window.wp.data
 				.dispatch( 'core/editor' )
 				.autosave( { local: true } );
-			const key = Object.keys( window.sessionStorage )[ 0 ];
-			return [ key, window.sessionStorage.getItem( key ) ];
-		} );
+			return window.sessionStorage.getItem( key );
+		}, backupKey );
 		await page.keyboard.type( ' newer' );
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave()
-		);
-		const postId = await page.evaluate( () =>
-			window.wp.data.select( 'core/editor' ).getCurrentPostId()
 		);
 
 		// The older backup is left behind, as by another tab.
 		await page.evaluate(
 			( [ key, value ] ) => window.sessionStorage.setItem( key, value ),
-			backup
+			[ backupKey, backup ]
 		);
 		await page.reload();
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toEqual( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'before save backup newer' },
+				attributes: {
+					content: 'before save backup newer',
+					dropCap: false,
+				},
+				innerBlocks: [],
+			},
+		] );
+		expect( await getLatestRevision() ).toBe(
+			'<!-- wp:paragraph -->\n<p>before save</p>\n<!-- /wp:paragraph -->'
+		);
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'button', { name: 'Restore' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save backup', dropCap: false },
+				innerBlocks: [],
 			},
 		] );
 
-		await page.getByRole( 'button', { name: 'View the backup' } ).click();
-		await page.getByRole( 'button', { name: 'Restore' } ).click();
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'before save backup' },
-			},
-		] );
-
-		const revisions = await requestUtils.rest( {
-			path: `/wp/v2/posts/${ postId }/revisions`,
-			params: { context: 'edit' },
-		} );
-		expect( revisions[ 0 ].content.raw ).toBe(
+		expect( await getLatestRevision() ).toBe(
 			'<!-- wp:paragraph -->\n<p>before save backup newer</p>\n<!-- /wp:paragraph -->'
 		);
 	} );
