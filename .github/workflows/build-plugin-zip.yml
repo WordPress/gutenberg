@@ -272,14 +272,11 @@ jobs:
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
-            # Pull request zips also carry the Storybook build, linked from the admin, so that
-            # the Playground preview of a pull request can show its Storybook. Release zips never do.
             - name: Build Storybook for Playground preview
               if: ${{ github.event_name == 'pull_request' && matrix.IS_GUTENBERG_PLUGIN }}
               env:
                   NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: production
-              # The plugin was built in the previous step, so skip the `prestorybook:build` rebuild.
               run: npm run --workspace @wordpress/storybook storybook:build
 
             - name: Add Storybook to Playground preview zip
