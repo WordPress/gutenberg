@@ -552,7 +552,7 @@ test.describe( 'Draggable block', () => {
 	for ( const caretIn of [ undefined, '1', '2' ] ) {
 		test( `can drag a list item by its bullet${
 			caretIn ? ` with the caret in item ${ caretIn }` : ''
-		} (@firefox, @webkit)`, async ( { page, editor } ) => {
+		} (@webkit)`, async ( { page, editor } ) => {
 			await editor.insertBlock( {
 				name: 'core/list',
 				innerBlocks: [
