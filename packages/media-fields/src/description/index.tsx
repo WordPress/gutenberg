@@ -9,7 +9,9 @@ const descriptionField: Partial< Field< Updatable< Attachment > > > = {
 	label: __( 'Description' ),
 	getValue: ( { item } ) => getRawContent( item?.description ),
 	render: ( { item } ) => (
-		<div>{ getRawContent( item?.description ) || '-' }</div>
+		<div className="dataviews-media-field__truncated-text">
+			{ getRawContent( item?.description ) || '-' }
+		</div>
 	),
 	Edit: {
 		control: 'textarea',
