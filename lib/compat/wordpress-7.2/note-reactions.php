@@ -223,10 +223,6 @@ function gutenberg_get_note_reaction_ids( WP_Comment $note, string $status = 'an
  *
  * Runs on `delete_comment`, which fires before the reparenting query.
  *
- * Plugins fire this action too: Akismet's spam purge passes whatever
- * `get_comment()` returned, which is null once the row is gone, so the
- * comment cannot be type hinted.
- *
  * @since 7.2.0
  *
  * @param string          $comment_id The comment ID as a numeric string.
