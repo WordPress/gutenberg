@@ -185,12 +185,14 @@ function isFrontEndUrl( href: string, siteUrl: string ): boolean {
 		return false;
 	}
 
-	if ( target.origin !== site.origin ) {
+	const protocol = getProtocol( target.href );
+	if ( protocol && protocol !== 'http:' && protocol !== 'https:' ) {
 		return false;
 	}
 
-	const protocol = getProtocol( target.href );
-	if ( protocol && protocol !== 'http:' && protocol !== 'https:' ) {
+	// The site is the same over HTTP and HTTPS, so compare hosts rather
+	// than origins: an admin loaded over HTTPS still links to an HTTP home.
+	if ( target.host !== site.host ) {
 		return false;
 	}
 
@@ -348,8 +350,13 @@ function bindPreviewNavigation(
 				return;
 			}
 
-			const resolvedHref = new URL( href, iframeWindow.location.href )
-				.href;
+			const resolvedUrl = new URL( href, iframeWindow.location.href );
+			// Keep the frame on the protocol it is shown over, so a link to
+			// the HTTP home never loads HTTP inside an HTTPS admin.
+			if ( resolvedUrl.host === iframeWindow.location.host ) {
+				resolvedUrl.protocol = iframeWindow.location.protocol;
+			}
+			const resolvedHref = resolvedUrl.href;
 
 			if (
 				isInPageHashNavigation(
