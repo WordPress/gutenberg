@@ -32,7 +32,10 @@ function toFieldText( value: RichTextValue ): {
 } {
 	let text = '';
 	const offsets: number[] = [];
-	for ( const character of value.text ) {
+	// Step by UTF-16 index, not code point, as the formats and the offsets
+	// passed to insert do.
+	for ( let index = 0; index < value.text.length; index++ ) {
+		const character = value.text[ index ];
 		offsets.push( text.length );
 		text += FIELD_SYMBOLS[ character ] ?? character;
 	}
@@ -106,7 +109,10 @@ export function applyPlainTextEdit(
 	const formats: RichTextFormatList | undefined =
 		start > 0 ? value.formats[ start - 1 ] : value.formats[ 0 ];
 	if ( formats ) {
-		inserted.formats = Array.from( inserted.text, () => formats );
+		inserted.formats = Array.from(
+			{ length: inserted.text.length },
+			() => formats
+		);
 	}
 
 	return toHTMLString( { value: insert( value, inserted, start, end ) } );

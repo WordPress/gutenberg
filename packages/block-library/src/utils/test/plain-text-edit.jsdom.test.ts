@@ -126,6 +126,22 @@ describe( 'applyPlainTextEdit', () => {
 		expect( applyPlainTextEdit( 'Shop', 'Shop 🖼️' ) ).toBe( 'Shop 🖼️' );
 	} );
 
+	test( 'edits after an emoji in the text land where they were made', () => {
+		expect( applyPlainTextEdit( '😀 Shop', '😀 Shop!' ) ).toBe(
+			'😀 Shop!'
+		);
+		expect( applyPlainTextEdit( '😀 Shop', '😀 Sho' ) ).toBe( '😀 Sho' );
+		expect(
+			applyPlainTextEdit( '😀 <strong>Shop</strong> now', '😀 Shop now!' )
+		).toBe( '😀 <strong>Shop</strong> now!' );
+	} );
+
+	test( 'a typed emoji takes the format of the character before it', () => {
+		expect( applyPlainTextEdit( '<strong>Shop</strong>', 'Shop😀' ) ).toBe(
+			'<strong>Shop😀</strong>'
+		);
+	} );
+
 	test( 'keeps an entity in the untouched text', () => {
 		expect( applyPlainTextEdit( 'Shop &amp; go', 'Shop & go now' ) ).toBe(
 			'Shop &amp; go now'
