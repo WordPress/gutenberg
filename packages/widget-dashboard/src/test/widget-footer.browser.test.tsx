@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import type { ReactNode } from 'react';
 import type { WidgetRuntimeAction } from '@wordpress/widget-primitives';
+import { Card } from '@wordpress/ui';
 import '@wordpress/theme/design-tokens.css';
 import { WidgetFooter } from '../components/widget-footer/widget-footer';
 import { WidgetDashboard } from '../widget-dashboard';
@@ -50,6 +51,14 @@ function inDashboard( ui: ReactNode ) {
 	);
 }
 
+/*
+ * The real tile wraps the footer in Card.Root, which inherits
+ * box-sizing: border-box onto the strip. Measure inside that tree.
+ */
+function inTile( ui: ReactNode ) {
+	return <Card.Root>{ ui }</Card.Root>;
+}
+
 /* Each strip sits alone in its wrapper, which takes the strip's height. */
 function stripHeight( testId: string ) {
 	return screen.getByTestId( testId ).getBoundingClientRect().height;
@@ -59,17 +68,19 @@ describe( 'WidgetFooter height', () => {
 	it( 'gives every strip one height, whatever affordances it holds', async () => {
 		await render(
 			inDashboard(
-				<>
-					<div data-testid="text-links">
-						<WidgetFooter uuid="w1" actions={ TEXT_LINKS } />
-					</div>
-					<div data-testid="compact-link">
-						<WidgetFooter uuid="w2" actions={ COMPACT_LINK } />
-					</div>
-					<div data-testid="callbacks">
-						<WidgetFooter uuid="w3" actions={ CALLBACKS } />
-					</div>
-				</>
+				inTile(
+					<>
+						<div data-testid="text-links">
+							<WidgetFooter uuid="w1" actions={ TEXT_LINKS } />
+						</div>
+						<div data-testid="compact-link">
+							<WidgetFooter uuid="w2" actions={ COMPACT_LINK } />
+						</div>
+						<div data-testid="callbacks">
+							<WidgetFooter uuid="w3" actions={ CALLBACKS } />
+						</div>
+					</>
+				)
 			)
 		);
 
@@ -81,18 +92,25 @@ describe( 'WidgetFooter height', () => {
 	it( 'keeps the height when a compact action arrives at runtime', async () => {
 		const view = await render(
 			inDashboard(
-				<div data-testid="strip">
-					<WidgetFooter uuid="w1" actions={ [ TEXT_LINKS[ 0 ] ] } />
-				</div>
+				inTile(
+					<div data-testid="strip">
+						<WidgetFooter
+							uuid="w1"
+							actions={ [ TEXT_LINKS[ 0 ] ] }
+						/>
+					</div>
+				)
 			)
 		);
 		const before = stripHeight( 'strip' );
 
 		await view.rerender(
 			inDashboard(
-				<div data-testid="strip">
-					<WidgetFooter uuid="w1" actions={ COMPACT_LINK } />
-				</div>
+				inTile(
+					<div data-testid="strip">
+						<WidgetFooter uuid="w1" actions={ COMPACT_LINK } />
+					</div>
+				)
 			)
 		);
 
