@@ -376,6 +376,7 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 				// `setPendingMediaEdit`.
 				pendingMediaEdits: true,
 			},
+			dirtyTransientEdits: { pendingMediaEdits: true },
 			mergedEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>

@@ -962,6 +962,42 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 		] );
 	} );
 
+	it( 'includes records whose only edits are dirty transient edits', () => {
+		const record = ( edits: Record< string, unknown > ) => ( {
+			queriedData: {
+				items: { default: { someKey: { id: 'someKey' } } },
+				itemIsComplete: { default: { someKey: true } },
+			},
+			edits: { someKey: edits },
+		} );
+		const state = frozenState( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'dirty',
+						transientEdits: { pending: true },
+						dirtyTransientEdits: { pending: true },
+					},
+					{
+						kind: 'someKind',
+						name: 'clean',
+						transientEdits: { pending: true },
+					},
+				],
+				records: {
+					someKind: {
+						dirty: record( { pending: { a: 1 } } ),
+						clean: record( { pending: { a: 1 } } ),
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'dirty', key: 'someKey', title: '' },
+		] );
+	} );
+
 	it( 'excludes entity records that no longer exist', () => {
 		const state = frozenState( {
 			entities: {
