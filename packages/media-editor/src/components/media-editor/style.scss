@@ -128,12 +128,6 @@
 		}
 	}
 
-	// Settings panel. Below `small` it takes the whole body: there is no room
-	// to put a 320px column beside a canvas worth looking at, and that is
-	// also where the transform controls fall back to a row under the canvas.
-	// From `small` up it docks as a column, so cropping and previewing happen
-	// together — the canvas is tight at the bottom of that range but present,
-	// where a full-screen panel would have hidden it completely.
 	// Animates its width when the sidebar opens or closes. The sidebar keeps
 	// its own width inside, so its contents are clipped rather than reflowed.
 	.media-editor__sidebar-container {
@@ -148,6 +142,12 @@
 		}
 	}
 
+	// Settings panel. Below `small` it takes the whole body: there is no room
+	// to put a 320px column beside a canvas worth looking at, and that is
+	// also where the transform controls fall back to a row under the canvas.
+	// From `small` up it docks as a column, so cropping and previewing happen
+	// together — the canvas is tight at the bottom of that range but present,
+	// where a full-screen panel would have hidden it completely.
 	.media-editor__sidebar {
 		display: flex;
 		flex: 1;
