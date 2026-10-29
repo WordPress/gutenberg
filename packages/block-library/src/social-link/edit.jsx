@@ -9,6 +9,7 @@ import {
 	useBlockEditingMode,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import {
@@ -25,17 +26,14 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
-import { isURL } from '@wordpress/url';
 import { store as blocksStore } from '@wordpress/blocks';
-import {
-	// `ValidatedInputControl` is marked "use with caution" while its API settles,
-	// as the Math format already accepts; the inline URL error is worth it here.
-	// eslint-disable-next-line @wordpress/use-recommended-components
-	ValidatedInputControl,
-} from '@wordpress/ui';
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import ViewLinkButton from '../utils/view-link-button';
+import { useLinkPreview } from '../utils/link-picker';
+import { unlock } from '../lock-unlock';
+
+const { LinkPicker } = unlock( blockEditorPrivateApis );
 
 const SocialLinkURLPopover = ( {
 	url,
@@ -119,6 +117,7 @@ const SocialLinkEdit = ( {
 		iconBackgroundColorValue,
 	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
+	const linkPreview = useLinkPreview( { url } );
 	const wrapperClasses = clsx(
 		'wp-social-link',
 		// Manually adding this class for backwards compatibility of CSS when moving the
@@ -233,22 +232,23 @@ const SocialLinkEdit = ( {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						isShownByDefault
-						label={ __( 'Social profile link' ) }
+						label={ __( 'Link' ) }
 						hasValue={ () => !! url }
 						onDeselect={ () => {
 							setAttributes( { url: undefined } );
 						} }
 					>
-						<ValidatedInputControl
-							type="url"
-							label={ __( 'Social profile link' ) }
-							value={ url || '' }
-							onValueChange={ ( value ) =>
-								setAttributes( { url: value || undefined } )
+						<LinkPicker
+							preview={ linkPreview }
+							onSelect={ ( { url: newUrl } ) =>
+								setAttributes( { url: newUrl || undefined } )
 							}
+							label={ __( 'Link' ) }
+							// A social profile is outside the site, so there are no pages to suggest.
+							showSuggestions={ false }
 						/>
 					</ToolsPanelItem>
-					{ !! url && isURL( url ) && <ViewLinkButton url={ url } /> }
+					<ViewLinkButton url={ url } />
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
