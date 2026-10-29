@@ -701,7 +701,9 @@ function MediaEditorContent( {
 	// dragging the window narrow should still hand the canvas the full width.
 	const selectPanel = useCallback( ( panel: string ) => {
 		setChosenTab( panel );
-		setChosenPanel( ( open ) => ( open === undefined ? open : panel ) );
+		setChosenPanel( ( chosen ) =>
+			chosen === undefined ? chosen : panel
+		);
 	}, [] );
 	const togglePanel = useCallback( () => {
 		setChosenPanel( activePanel ? null : currentTab );
