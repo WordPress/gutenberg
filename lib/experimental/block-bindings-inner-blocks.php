@@ -201,7 +201,7 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->refresh_parsed_block_dependents();
 	// The refresh keeps the previous inner blocks when there are none.
 	if ( empty( $blocks ) ) {
-		$block_instance->inner_blocks = array();
+		$block_instance->inner_blocks = new WP_Block_List( array() );
 	}
 
 	return null;
