@@ -1,8 +1,6 @@
 import { isRangeEqual } from '../../is-range-equal';
 import type { RichTextField } from '../types';
 
-let range: Range | null;
-
 /**
  * Sometimes some browsers are not firing a `selectionchange` event when
  * changing the selection by mouse or keyboard. This hook makes sure that, if we
@@ -22,6 +20,8 @@ export function onDown( field: RichTextField, event: Event ) {
 		return selection!.rangeCount ? selection!.getRangeAt( 0 ) : null;
 	}
 
+	const range = getRange();
+
 	function onCancel() {
 		ownerDocument.removeEventListener( type, onUp );
 		ownerDocument.removeEventListener( 'selectionchange', onCancel );
@@ -39,6 +39,4 @@ export function onDown( field: RichTextField, event: Event ) {
 	ownerDocument.addEventListener( type, onUp );
 	ownerDocument.addEventListener( 'selectionchange', onCancel );
 	ownerDocument.addEventListener( 'input', onCancel );
-
-	range = getRange();
 }
