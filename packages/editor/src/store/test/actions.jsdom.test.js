@@ -1703,6 +1703,68 @@ describe( 'Editor actions', () => {
 	} );
 
 	describe( 'setIsInserterOpened', () => {
+		it( 'keeps the requested insertion point while the inserter is open', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsInserterOpened( {
+				rootClientId: 'section-root',
+				insertionIndex: 0,
+			} );
+
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				true
+			);
+			expect(
+				unlock(
+					registry.select( blockEditorStore )
+				).getInsertionPoint()
+			).toEqual( { rootClientId: 'section-root', index: 0 } );
+		} );
+
+		it( 'clears the insertion point when the inserter is closed', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsInserterOpened( {
+				rootClientId: 'section-root',
+				insertionIndex: 1,
+			} );
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				unlock(
+					registry.select( blockEditorStore )
+				).getInsertionPoint()
+			).toBeNull();
+		} );
+
+		it( 'hides the insertion cue when the inserter is closed', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsInserterOpened( {
+				rootClientId: 'section-root',
+				insertionIndex: 1,
+			} );
+			registry
+				.dispatch( blockEditorStore )
+				.showInsertionPoint( 'section-root', 1 );
+			expect(
+				registry
+					.select( blockEditorStore )
+					.isBlockInsertionPointVisible()
+			).toBe( true );
+
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+
+			expect(
+				registry
+					.select( blockEditorStore )
+					.isBlockInsertionPointVisible()
+			).toBe( false );
+		} );
+
 		it( 'should open and close the inserter', () => {
 			const registry = createRegistryWithStores();
 
