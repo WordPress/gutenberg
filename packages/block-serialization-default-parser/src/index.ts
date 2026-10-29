@@ -406,13 +406,10 @@ function nextToken(): Token {
 	const hasAttrs = !! attrsMatch;
 	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
 
-	// This state isn't allowed
-	// This is an error.
-	if ( isCloser && ( isVoid || hasAttrs ) ) {
-		// We can ignore them since they don't hurt anything
-		// we may warn against this at some point or reject it.
-	}
-
+	// A closer can't be void or have attributes, but existing content may
+	// contain one, so it's accepted rather than rejected: a void closer such
+	// as `<!-- /wp:image /-->` is parsed as a void block, and attributes on
+	// a closer that isn't void are ignored.
 	if ( isVoid ) {
 		return [ 'void-block', name, attrs, startedAt, length ];
 	}
