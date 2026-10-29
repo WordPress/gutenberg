@@ -8,11 +8,7 @@ const captionField: Partial< Field< Updatable< Attachment > > > = {
 	type: 'text',
 	label: __( 'Caption' ),
 	getValue: ( { item } ) => getRawContent( item?.caption ),
-	render: ( { item } ) => (
-		<div className="dataviews-media-field__truncated-text">
-			{ getRawContent( item?.caption ) || '-' }
-		</div>
-	),
+	render: ( { item } ) => getRawContent( item?.caption ) || '-',
 	Edit: {
 		control: 'textarea',
 		rows: 2,

@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   Truncate long descriptions and captions in the DataViews table so they no longer overlap the next column ([#85949](https://github.com/WordPress/gutenberg/pull/85949)).
-
 ## 0.23.0 (2026-10-20)
 
 ### Breaking Changes
