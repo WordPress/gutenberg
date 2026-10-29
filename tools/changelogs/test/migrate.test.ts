@@ -66,6 +66,33 @@ describe( 'parseChangelogContent', () => {
 } );
 
 describe( 'migratePackageToChangie with cleanFirst / update', () => {
+	it( 'uses the same UUID filename format for migrated and authored fragments', () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join( os.tmpdir(), 'changie-migration-names-' )
+		);
+		try {
+			const pkgDir = path.join( tmpDir, 'packages', 'test-pkg' );
+			fs.mkdirSync( pkgDir, { recursive: true } );
+			fs.writeFileSync(
+				path.join( pkgDir, 'CHANGELOG.md' ),
+				SAMPLE_CHANGELOG
+			);
+			const result = migratePackageToChangie( 'test-pkg', tmpDir );
+			const files = fs.readdirSync(
+				path.join( tmpDir, '.changes', 'unreleased' )
+			);
+			expect( files ).toHaveLength( 3 );
+			for ( const file of files ) {
+				expect( file ).toMatch(
+					/^1234[567]__test-pkg__(bug-fixes|enhancements)__[a-f0-9]{12}\.yaml$/
+				);
+			}
+			expect( result.fragmentsCreated ).toBe( 3 );
+		} finally {
+			fs.rmSync( tmpDir, { recursive: true, force: true } );
+		}
+	} );
+
 	it.each( [ false, true ] )(
 		'preserves migration artifacts when update finds no unreleased entries (dry-run: %s)',
 		( dryRun ) => {

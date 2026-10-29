@@ -38,7 +38,7 @@ npm run changelog:migrate -- <package-name>
 This performs three operations:
 
 1.  Consolidates all published historical versions into a single baseline file under `.changes/<package-name>/<latest-version>.md`, following [Changie's backup migration guide](https://changie.dev/guide/backup/). Future releases generate their own individual version files alongside this baseline.
-2.  Converts any entries currently under `## Unreleased` into individual fragment files under `.changes/unreleased/<PR>__<package-name>__<kind>__<timestamp>.yaml`.
+2.  Converts any entries currently under `## Unreleased` into individual fragment files under `.changes/unreleased/<PR>__<package-name>__<kind>__<random>.yaml`. Both migration and `npm run changelog:add` use lowercase hyphenated kinds and a 12-character random hexadecimal suffix derived from a UUID. Updating a migration regenerates these suffixes.
 3.  Replaces `packages/<package-name>/CHANGELOG.md` with the standard Changie header and unreleased stub comment.
 
 ### 3. Register the package in `.changie.yaml`

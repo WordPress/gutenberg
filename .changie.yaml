@@ -5,7 +5,7 @@ versionExt: md
 versionFormat: '{{if eq .Version "0-unreleased"}}## Unreleased{{else}}## {{.Version}} ({{.Time.Format "2006-01-02"}}){{end}}{{$stable := false}}{{range .Changes}}{{if eq .Kind "Stable Release"}}{{$stable = true}}{{end}}{{end}}{{if $stable}}{{printf "\n\nNote: This package is now a stable release."}}{{end}}'
 kindFormat: '### {{.Kind}}'
 changeFormat: '-   {{.Body}} ([#{{.Custom.PR}}](https://github.com/WordPress/gutenberg/pull/{{.Custom.PR}})).'
-fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind}}__{{.Time.Format "20060102150405"}}'
+fragmentFileFormat: '{{.Custom.PR}}__{{.Project}}__{{.Kind | kebabcase}}__{{uuidv4 | replace "-" "" | trunc 12}}'
 envPrefix: 'GUTENBERG_'
 
 newlines:

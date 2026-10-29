@@ -106,6 +106,49 @@ custom:
 } );
 
 describe( 'shared fragment validation entry points', () => {
+	it( 'preserves multiple fragments created for the same PR, package, and kind', () => {
+		const root = fs.mkdtempSync(
+			path.join( os.tmpdir(), 'fragment-random-suffix-' )
+		);
+		directories.push( root );
+		fs.copyFileSync(
+			path.resolve( import.meta.dirname, '../../../.changie.yaml' ),
+			path.join( root, '.changie.yaml' )
+		);
+		const bodies = [ 'First fix', 'Second fix', 'Third fix' ];
+		for ( const body of bodies ) {
+			expect(
+				addFragment(
+					[
+						'-j',
+						'ui',
+						'-k',
+						'Bug Fixes',
+						'-m',
+						'PR=85369',
+						'-b',
+						body,
+						'--interactive=false',
+					],
+					root
+				)
+			).toBe( 0 );
+		}
+		const unreleased = path.join( root, '.changes', 'unreleased' );
+		const files = fs.readdirSync( unreleased );
+		expect( files ).toHaveLength( bodies.length );
+		for ( const file of files ) {
+			expect( file ).toMatch(
+				/^85369__ui__bug-fixes__[a-f0-9]{12}\.yaml$/
+			);
+		}
+		expect(
+			loadUnreleasedFragments( root )
+				.map( ( fragment ) => fragment.body )
+				.sort()
+		).toEqual( bodies.sort() );
+	} );
+
 	it.each( [ '1.0.0', '2.1.0', '1.0.0-next.0' ] )(
 		'rejects Stable Release fragments for already-stable packages at %s',
 		( version ) => {
