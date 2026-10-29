@@ -7,7 +7,12 @@ it( 'leaves code unchanged and skips token validation without @wordpress/theme',
 	// `@wordpress/theme` peer dependency from the plugins.
 	const output = execFileSync(
 		process.execPath,
-		[ join( __dirname, 'fixtures/without-theme/run-plugins.mjs' ) ],
+		[
+			join(
+				import.meta.dirname,
+				'fixtures/without-theme/run-plugins.mjs'
+			),
+		],
 		{ encoding: 'utf8' }
 	);
 	const result = JSON.parse( output );

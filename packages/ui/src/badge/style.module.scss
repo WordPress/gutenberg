@@ -1,3 +1,5 @@
+@use "../utils/css/mixins";
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -6,6 +8,34 @@
 			padding-inline: var(--wpds-dimension-padding-sm);
 			padding-block: var(--wpds-dimension-padding-xs);
 			border-radius: var(--wpds-border-radius-lg);
+		}
+
+		.infotip-trigger {
+			--_gcd-button-font-family: var(--wpds-typography-font-family-body);
+			--_gcd-button-font-size: var(--wpds-typography-font-size-sm);
+			--_gcd-button-font-weight: var(--wpds-typography-font-weight-default);
+
+			display: inline-flex;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-xs);
+			border: 0;
+			cursor: var(--wpds-cursor-control);
+			vertical-align: middle;
+			text-align: start;
+
+			&:focus {
+				outline: none;
+			}
+
+			&:focus:not(:active) {
+				@include mixins.focus-ring();
+			}
+		}
+
+		.infotip-icon {
+			flex-shrink: 0;
+			/* Offset the icon's internal whitespace for optical balance. */
+			margin-inline-end: -3px;
 		}
 
 		.is-high-intent {
