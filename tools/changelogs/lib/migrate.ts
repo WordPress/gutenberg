@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import semver from 'semver';
@@ -285,19 +286,12 @@ export function migratePackageToChangie(
 		} );
 	}
 
-	// 2. Create unreleased YAML fragments with unique filenames: PR__PACKAGE__KIND(__INDEX).yaml
-	const usedFilenames = new Map< string, number >();
-
+	// 2. Match Changie's PR__PACKAGE__KIND__RANDOM.yaml authoring format.
 	for ( const entry of parsed.unreleasedEntries ) {
 		const pr = entry.pr || 0;
 		const safeKind = entry.kind.toLowerCase().replace( /\s+/g, '-' );
-		const baseKey = `${ pr }__${ normalized }__${ safeKind }`;
-
-		const count = ( usedFilenames.get( baseKey ) || 0 ) + 1;
-		usedFilenames.set( baseKey, count );
-
-		const filename =
-			count === 1 ? `${ baseKey }.yaml` : `${ baseKey }__${ count }.yaml`;
+		const suffix = randomUUID().replaceAll( '-', '' ).slice( 0, 12 );
+		const filename = `${ pr }__${ normalized }__${ safeKind }__${ suffix }.yaml`;
 		const fragmentData = {
 			project: normalized,
 			kind: entry.kind,

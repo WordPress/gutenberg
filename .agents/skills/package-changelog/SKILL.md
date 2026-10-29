@@ -42,7 +42,7 @@ Create a fragment using non-interactive flags:
 npm run changelog:add -- -j <package> -k "<Kind>" -m "PR=<PR>" -b "<Description>"
 ```
 
-Or write a fragment file directly at `.changes/unreleased/<PR>__<package>__<kind>.yaml`:
+Or write a fragment file directly at `.changes/unreleased/<PR>__<package>__<kind>__<random>.yaml`, using a lowercase hyphenated kind and a fresh 12-character random hexadecimal suffix (`crypto.randomUUID().replaceAll( '-', '' ).slice( 0, 12 )` in Node.js):
 ```yaml
 project: <package>
 kind: <Kind>
@@ -52,7 +52,7 @@ custom:
   PR: '<PR>'
 ```
 
-If multiple entries exist for the same PR, package, and kind, append a numeric suffix: `__2.yaml`, `__3.yaml`, etc.
+Use a fresh random suffix for each entry, including entries sharing the same PR, package, and kind. Existing fragments with older filename formats remain valid.
 
 ### For packages using traditional CHANGELOG.md
 
