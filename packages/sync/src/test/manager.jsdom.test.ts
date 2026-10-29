@@ -827,6 +827,37 @@ describe( 'SyncManager', () => {
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
+		it( 'passes a baseline to applyChangesToCRDTDoc only when one is given', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			vi.clearAllMocks();
+
+			manager.update( 'post', '123', { title: 'a' }, 'local-editor' );
+			manager.update( 'post', '123', { title: 'b' }, 'local-editor', {
+				baseline: { title: 'a' },
+			} );
+
+			// Wait a tick for the deferred updates to apply.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockSyncConfig.applyChangesToCRDTDoc.mock.calls ).toEqual( [
+				[ expect.any( Y.Doc ), { title: 'a' } ],
+				[
+					expect.any( Y.Doc ),
+					{ title: 'b' },
+					{ baseline: { title: 'a' } },
+				],
+			] );
+		} );
+
 		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {

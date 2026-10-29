@@ -396,6 +396,43 @@ describe( 'crdt', () => {
 			);
 		} );
 
+		it( 'applies only the editor’s own change when a baseline is given', () => {
+			const p1 = {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello' },
+				innerBlocks: [],
+				clientId: 'p1',
+			};
+			const p2 = {
+				name: 'core/paragraph',
+				attributes: { content: 'World' },
+				innerBlocks: [],
+				clientId: 'p2',
+			};
+
+			// The document holds two blocks; the editor rendered only the
+			// first, then changed it.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ p1, p2 ] },
+				defaultSyncedProperties
+			);
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: [ { ...p1, attributes: { content: 'Hello!' } } ],
+				},
+				defaultSyncedProperties,
+				{ baseline: { blocks: [ p1 ] } }
+			);
+
+			expect(
+				( map.get( 'blocks' ) as YBlocks )
+					.toJSON()
+					.map( ( block: Block ) => block.attributes.content )
+			).toEqual( [ 'Hello!', 'World' ] );
+		} );
+
 		it( 'initializes blocks as Y.Array when not present', () => {
 			const changes = {
 				blocks: [],

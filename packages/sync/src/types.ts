@@ -119,6 +119,21 @@ export interface SyncManagerUpdateOptions {
 	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
+	// The record values the change was computed against, for the fields
+	// where the caller knows them. See `ApplyChangesOptions.baseline`.
+	baseline?: Partial< ObjectData >;
+}
+
+export interface ApplyChangesOptions {
+	/**
+	 * The record values the change was computed against, for the fields where
+	 * the caller knows them. An editor renders remote changes asynchronously,
+	 * so a change it emits can derive from a value the document has since
+	 * moved past. With the baseline, the sync config can apply only the
+	 * caller's own change instead of reconciling its whole value against the
+	 * document, which would undo what peers changed in between.
+	 */
+	baseline?: Partial< ObjectData >;
 }
 
 export interface RecordHandlers {
@@ -139,7 +154,8 @@ export interface RecordHandlers {
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >
+		changes: Partial< ObjectData >,
+		options?: ApplyChangesOptions
 	) => void;
 	createAwareness?: (
 		ydoc: Y.Doc,
