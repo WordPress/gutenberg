@@ -22,6 +22,11 @@ function BlockEditAllowedBlocksControlPure( { clientId } ) {
 export default {
 	edit: BlockEditAllowedBlocksControlPure,
 	attributeKeys: [ 'allowedBlocks' ],
+	// The control fills its own private slot rather than going through
+	// InspectorControls, so it isn't hidden from section (pattern) blocks by
+	// InspectorControlsFill. Opt out of rendering during pattern editing so a
+	// section doesn't gain a Settings tab holding only Manage allowed blocks.
+	supportsPatternEditing: false,
 	hasSupport( name ) {
 		return hasBlockSupport( name, 'allowedBlocks' );
 	},

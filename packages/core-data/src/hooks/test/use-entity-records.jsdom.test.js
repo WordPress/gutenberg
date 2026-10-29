@@ -8,7 +8,7 @@ import useEntityRecords, {
 	useEntityRecordsWithPermissions,
 } from '../use-entity-records';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'useEntityRecords', () => {
 	let registry;

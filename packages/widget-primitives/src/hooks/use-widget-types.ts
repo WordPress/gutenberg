@@ -201,7 +201,7 @@ export function useWidgetTypes(
 
 				try {
 					const module = await import(
-						/* webpackIgnore: true */ record.widget_module
+						/* webpackIgnore: true */ /* @vite-ignore */ record.widget_module
 					);
 
 					if ( ! module?.default ) {

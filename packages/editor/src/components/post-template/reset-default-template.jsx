@@ -1,4 +1,5 @@
-import { MenuItem } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -8,7 +9,7 @@ import {
 	useEditedPostContext,
 } from './hooks';
 
-export default function ResetDefaultTemplate( { onClick } ) {
+export default function ResetDefaultTemplate() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const { postType, postId } = useEditedPostContext();
@@ -18,7 +19,7 @@ export default function ResetDefaultTemplate( { onClick } ) {
 		return null;
 	}
 	return (
-		<MenuItem
+		<Menu.Item
 			onClick={ () => {
 				editEntityRecord(
 					'postType',
@@ -27,10 +28,9 @@ export default function ResetDefaultTemplate( { onClick } ) {
 					{ template: '' },
 					{ undoIgnore: true }
 				);
-				onClick();
 			} }
 		>
-			{ __( 'Use default template' ) }
-		</MenuItem>
+			<Menu.ItemLabel>{ __( 'Use default template' ) }</Menu.ItemLabel>
+		</Menu.Item>
 	);
 }

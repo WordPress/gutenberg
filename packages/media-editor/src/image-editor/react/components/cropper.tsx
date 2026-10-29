@@ -571,14 +571,17 @@ function CropperInner(
 			return;
 		}
 
-		setCropRect( snappedCropRect );
+		// The display scale crossing the threshold is not an edit, so the
+		// snap must not record an undo entry. Recording it here would also
+		// clear the redo stack whenever an undo or redo crosses it.
+		adjustCropRectForViewport( snappedCropRect );
 	}, [
+		adjustCropRectForViewport,
 		aspectRatio,
 		displayScale,
 		freeformCrop,
 		naturalWidth,
 		naturalHeight,
-		setCropRect,
 		state,
 	] );
 
@@ -760,7 +763,9 @@ function CropperInner(
 
 	// Settling animation: brief transition after resize end.
 	const [ settling, setSettling ] = useState( false );
-	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const settleTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 	const finishSettling = useCallback( () => {
 		clearTimeout( settleTimerRef.current );
 		isSettlingRef.current = false;
@@ -962,23 +967,9 @@ function CropperInner(
 		};
 	}
 
-	// Forward the root element to the consumer's ref.
-	const setContainerRef = useCallback(
-		( element: HTMLDivElement | null ) => {
-			if ( typeof ref === 'function' ) {
-				ref( element );
-			} else if ( ref ) {
-				(
-					ref as React.MutableRefObject< HTMLDivElement | null >
-				 ).current = element;
-			}
-		},
-		[ ref ]
-	);
-
 	return (
 		<div
-			ref={ setContainerRef }
+			ref={ ref }
 			className={ clsx(
 				'wp-media-editor-image-editor',
 				isDragging && 'wp-media-editor-image-editor--dragging',

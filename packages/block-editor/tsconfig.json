@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"types": []
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
@@ -10,6 +10,7 @@
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../blocks" },
+		{ "path": "../commands/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
@@ -40,14 +41,5 @@
 		{ "path": "../url" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../warning" }
-	],
-	/*
-	 * The package has no TypeScript tests, and its two stories import
-	 * components the build allowlist does not type yet, so nothing is checked.
-	 */
-	"exclude": [
-		"**/benchmark",
-		"src/components/block-icon/stories/index.story.ts",
-		"src/components/contrast-checker/stories/index.story.ts"
 	]
 }

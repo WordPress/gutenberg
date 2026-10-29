@@ -11,6 +11,13 @@ import type { ControlPoint } from './types';
 
 extend( [ namesPlugin ] );
 
+const ANGLE_UNIT_TO_DEGREES: Record< gradientParser.AngleUnit, number > = {
+	deg: 1,
+	rad: 180 / Math.PI,
+	grad: 0.9,
+	turn: 360,
+};
+
 export function getLinearGradientRepresentation(
 	gradientAST: gradientParser.GradientNode
 ) {
@@ -41,7 +48,16 @@ export function getGradientAstWithDefault( value?: string | null ) {
 			'wp.components.CustomGradientPicker failed to parse the gradient with error',
 			error
 		);
+	}
 
+	// The picker cannot preserve conic orientations or a second position per stop.
+	// Keep these newly parsed forms on the existing unselected fallback path.
+	if (
+		! gradientAST ||
+		gradientAST.type === 'conic-gradient' ||
+		gradientAST.type === 'repeating-conic-gradient' ||
+		gradientAST.colorStops.some( ( stop ) => stop.length2 !== undefined )
+	) {
 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
 		hasGradient = false;
 	}
@@ -50,11 +66,25 @@ export function getGradientAstWithDefault( value?: string | null ) {
 		! Array.isArray( gradientAST.orientation ) &&
 		gradientAST.orientation?.type === 'directional'
 	) {
+		const direction =
+			gradientAST.orientation.value.toLowerCase() as keyof typeof DIRECTIONAL_ORIENTATION_ANGLE_MAP;
 		gradientAST.orientation = {
 			type: 'angular',
-			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[
-				gradientAST.orientation.value
-			].toString(),
+			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[ direction ].toString(),
+			unit: 'deg',
+		};
+	}
+
+	if (
+		! Array.isArray( gradientAST.orientation ) &&
+		gradientAST.orientation?.type === 'angular' &&
+		gradientAST.orientation.unit !== 'deg'
+	) {
+		const { value: angle, unit } = gradientAST.orientation;
+		gradientAST.orientation = {
+			type: 'angular',
+			value: `${ Number( angle ) * ANGLE_UNIT_TO_DEGREES[ unit ] }`,
+			unit: 'deg',
 		};
 	}
 
@@ -111,7 +141,7 @@ export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
 			return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
 		}
 		case 'hsla': {
-			const [ hue, saturation, lightness, alpha ] = colorStop.value;
+			const [ hue, saturation, lightness, alpha = '1' ] = colorStop.value;
 			return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
 		}
 		default:

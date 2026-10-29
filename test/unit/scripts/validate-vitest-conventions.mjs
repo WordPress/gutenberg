@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import {
 	existsSync,
 	mkdtempSync,
@@ -16,7 +15,6 @@ import {
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
-import { resolvePackageBin } from './resolve-package-bin.mjs';
 import { resolveTypeRoots } from './resolve-type-roots.mjs';
 import {
 	findVitestIsolationOptOuts,
@@ -221,6 +219,41 @@ function getTypecheckConfigPath( testFile ) {
 	return path.join( ROOT_DIR, 'tools/monorepo/tsconfig/tsconfig.base.json' );
 }
 
+const diagnosticsHost = {
+	getCanonicalFileName: ( fileName ) => fileName,
+	getCurrentDirectory: () => ROOT_DIR,
+	getNewLine: () => '\n',
+};
+
+function runTypecheck( configPath ) {
+	const config = typescript.getParsedCommandLineOfConfigFile(
+		configPath,
+		{},
+		{
+			...typescript.sys,
+			onUnRecoverableConfigFileDiagnostic: ( diagnostic ) => {
+				throw new Error(
+					typescript.formatDiagnostics(
+						[ diagnostic ],
+						diagnosticsHost
+					)
+				);
+			},
+		}
+	);
+	const host = typescript.createCompilerHost( config.options );
+	// Match the CLI's parsing mode for a typecheck without editor tooling.
+	host.jsDocParsingMode = typescript.JSDocParsingMode.ParseForTypeErrors;
+	const program = typescript.createProgram( {
+		rootNames: config.fileNames,
+		options: config.options,
+		projectReferences: config.projectReferences,
+		configFileParsingDiagnostics: config.errors,
+		host,
+	} );
+	return typescript.getPreEmitDiagnostics( program );
+}
+
 let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
@@ -339,38 +372,27 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 					"declare module 'deep-freeze' { export default function deepFreeze<T>(value: T): T; }",
 				].join( '\n' )
 			);
-			const typecheckArguments = [
-				resolvePackageBin( 'typescript', 'tsc6' ),
-				'--project',
-				configPath,
-				'--pretty',
-				'false',
-			];
-			const runTypecheck = () =>
-				spawnSync( process.execPath, typecheckArguments, {
-					cwd: ROOT_DIR,
-					encoding: 'utf8',
-				} );
 			writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
-			let result = runTypecheck();
+			let diagnostics = runTypecheck( configPath );
 
-			const output = `${ result.stdout ?? '' }${ result.stderr ?? '' }`;
-			if ( result.status !== 0 && /TS63(?:05|10)/.test( output ) ) {
+			if (
+				diagnostics.some(
+					( { code } ) => code === 6305 || code === 6310
+				)
+			) {
 				// A dependency cycle can make TypeScript treat routed tests as
 				// source files owned by a referenced package project. The package
 				// declarations were built before this check, so fall back to normal
 				// module resolution when that project-ownership check fails.
 				typecheckConfig.references = [];
 				writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
-				result = runTypecheck();
+				diagnostics = runTypecheck( configPath );
 			}
 
-			if ( result.error ) {
-				throw result.error;
-			}
-			if ( result.status !== 0 ) {
-				process.stderr.write( result.stdout ?? '' );
-				process.stderr.write( result.stderr ?? '' );
+			if ( diagnostics.length ) {
+				process.stderr.write(
+					typescript.formatDiagnostics( diagnostics, diagnosticsHost )
+				);
 				throw new Error( 'TypeScript test graph validation failed.' );
 			}
 		} finally {

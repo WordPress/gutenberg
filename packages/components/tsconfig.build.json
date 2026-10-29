@@ -25,6 +25,7 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },

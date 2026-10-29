@@ -6,7 +6,7 @@
 	"category": "theme",
 	"description": "Displays the post count of a taxonomy term.",
 	"textdomain": "default",
-	"usesContext": [ "termId", "taxonomy" ],
+	"usesContext": [ "termId", "taxonomy", "termData" ],
 	"attributes": {
 		"bracketType": {
 			"type": "string",
@@ -31,7 +31,12 @@
 		},
 		"shadow": true,
 		"spacing": {
+			"margin": true,
 			"padding": true
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"typography": {
 			"fontSize": true,

@@ -13,6 +13,7 @@
 
 .components-tab-panel__tabs-item {
 	position: relative;
+	isolation: isolate;
 	border-radius: 0;
 	height: $grid-unit-60 !important; // https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
 	background: transparent;
@@ -21,15 +22,30 @@
 	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: var(--wpds-typography-font-weight-default);
-	color: var(--wpds-color-foreground-interactive-neutral);
+
+	&[aria-selected="true"] {
+		cursor: default;
+
+	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
-	&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+	// Keep Button's hover color from overriding the resting tab color.
+	.components-tab-panel__tabs &:not(:disabled, [aria-disabled="true"]) {
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&:is(:hover, :active):not([aria-selected="true"]),
+		&:focus-visible {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+
+			&::before,
+			& .components-tab-panel__tabs-item-label::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+			}
+		}
 	}
 
 	&:focus:not(:disabled) {
@@ -47,7 +63,7 @@
 		pointer-events: none;
 
 		// Draw the indicator.
-		background: var(--wpds-color-stroke-interactive-neutral-strong);
+		background: currentColor;
 		height: calc(0 * var(--wpds-border-width-focus));
 		border-radius: 0;
 
@@ -66,29 +82,89 @@
 		outline-offset: -1px;
 	}
 
-	// Focus.
+	// Interaction background and focus ring.
 	&::before {
 		content: "";
+	}
+
+	&::before,
+	& .components-tab-panel__tabs-item-label::before {
 		position: absolute;
+		z-index: -1;
 		inset: var(--wpds-dimension-padding-md);
 		pointer-events: none;
 		border-radius: var(--wpds-border-radius-sm);
 	}
 
-	&:focus-visible::before {
+	&:focus-visible::before,
+	&:focus-visible .components-tab-panel__tabs-item-label::before {
 		@include outset-ring__focus();
 		outline-offset: 0;
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
-		border-radius: var(--wpds-border-radius-sm);
-
-		&::after {
-			display: none;
+		&::before {
+			content: none;
 		}
 
-		&.is-active {
-			background: var(--wpds-color-background-interactive-neutral-weak-active);
+		&.has-icon::before {
+			content: "";
+			inset-block: var(--wpds-dimension-padding-sm);
+			inset-inline-start:
+				calc(50% - var(--wpds-dimension-size-sm) /
+				2 - var(--wpds-dimension-padding-xs));
+			inset-inline-end: auto;
+			width:
+				calc(var(--wpds-dimension-size-sm) + 2 *
+				var(--wpds-dimension-padding-xs));
+		}
+
+		& .components-tab-panel__tabs-item-label {
+			position: relative;
+			display: inline-flex;
+
+			&::before {
+				content: "";
+				inset: calc(-1 * var(--wpds-dimension-padding-xs));
+			}
+		}
+
+		&::after {
+			inset-block-start: 50%;
+			inset-block-end: auto;
+			inset-inline: 0 auto;
+			width: 0;
+			height: var(--wpds-dimension-size-sm);
+			transform: translateY(-50%);
+
+			@media not (prefers-reduced-motion) {
+				transition-property: width;
+			}
+		}
+
+		&:not(.has-icon)::after {
+			content: none;
+		}
+
+		& .components-tab-panel__tabs-item-label::after {
+			content: "";
+			position: absolute;
+			inset-block: 0;
+			inset-inline-start: calc(-1 * var(--wpds-dimension-padding-lg));
+			width: 0;
+			background: currentColor;
+			pointer-events: none;
+
+			@media not (prefers-reduced-motion) {
+				transition: width 0.1s linear;
+			}
+		}
+
+		&.is-active::after,
+		&.is-active .components-tab-panel__tabs-item-label::after {
+			width: var(--wpds-border-width-focus);
+			outline: 2px solid transparent;
+			outline-offset: -1px;
 		}
 	}
 }

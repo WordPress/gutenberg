@@ -30,7 +30,7 @@ export function CollaboratorsOverlay( {
 			{ ( {
 				containerRef,
 			}: {
-				containerRef: React.MutableRefObject< HTMLElement | null >;
+				containerRef: React.RefObject< HTMLElement | null >;
 			} ) => (
 				<Overlay
 					blockEditorDocument={ containerRef.current?.ownerDocument }

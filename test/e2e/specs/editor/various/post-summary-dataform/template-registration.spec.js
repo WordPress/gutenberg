@@ -54,9 +54,10 @@ test.describe( 'Block template registration (DataForm inspector)', () => {
 		// Change template.
 		const summary = await openPostSummary( { editor, page, tab: 'Post' } );
 		await summary.getByRole( 'button', { name: 'Edit Template' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
 		await page
-			.getByRole( 'combobox', { name: 'Template' } )
-			.selectOption( { label: 'Plugin Template' } );
+			.getByRole( 'option', { name: 'Plugin Template', exact: true } )
+			.click();
 		await page.keyboard.press( 'Escape' );
 
 		// Verify the template is applied.
@@ -83,9 +84,10 @@ test.describe( 'Block template registration (DataForm inspector)', () => {
 		// Change template.
 		const summary = await openPostSummary( { editor, page, tab: 'Post' } );
 		await summary.getByRole( 'button', { name: 'Edit Template' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
 		await page
-			.getByRole( 'combobox', { name: 'Template' } )
-			.selectOption( { label: 'Custom' } );
+			.getByRole( 'option', { name: 'Custom', exact: true } )
+			.click();
 		await page.keyboard.press( 'Escape' );
 
 		// Verify the theme template is applied.

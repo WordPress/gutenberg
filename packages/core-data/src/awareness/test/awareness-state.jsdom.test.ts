@@ -325,8 +325,7 @@ describe( 'AwarenessState', () => {
 	describe( 'updateSubscribers', () => {
 		test( 'should not call subscribers when no subscriptions exist', () => {
 			awareness.setUp();
-			// This should not throw
-			awareness.testUpdateSubscribers();
+			expect( () => awareness.testUpdateSubscribers() ).not.toThrow();
 		} );
 
 		test( 'should include enhanced state properties', () => {

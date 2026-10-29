@@ -12,3 +12,9 @@ Consolidated ESLint configuration for the Gutenberg monorepo. This is a **privat
 ## Why a workspace package?
 
 Moving all ESLint plugins and config into a single package keeps the root `package.json` clean and makes future ESLint upgrades easier — all plugin dependencies live in one place rather than being scattered across root `devDependencies`.
+
+## Unit-test lint baseline
+
+Unit tests and shared helpers use the public `@wordpress/eslint-plugin` `test-unit` configuration. Internal overrides and their reasons are documented in `config.mjs`; [#83089](https://github.com/WordPress/gutenberg/issues/83089) tracks the remaining rule decisions.
+
+`npm run lint:js` first runs `validate-test-config.mjs` to check the Node, jsdom, Browser, shared-helper and legacy E2E configurations, including repository-specific exceptions.

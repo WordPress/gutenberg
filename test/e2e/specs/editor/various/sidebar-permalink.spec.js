@@ -10,6 +10,7 @@ test.describe( 'Sidebar Permalink', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-custom-post-types'
 		);
@@ -74,5 +75,29 @@ test.describe( 'Sidebar Permalink', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Change link' } )
 		).toBeVisible();
+	} );
+
+	test( 'should not save the placeholder slug of a new post when the slug field loses focus', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		await page.getByRole( 'button', { name: /^Change link/ } ).click();
+		await page.getByRole( 'textbox', { name: 'Slug' } ).click();
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Escape' );
+
+		const postId = await editor.publishPost();
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.slug ).toBe( 'hello-slug' );
 	} );
 } );

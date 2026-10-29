@@ -1,12 +1,11 @@
-import { MenuItem } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
-import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
 
-export default function CreateNewTemplate() {
+export default function CreateNewTemplate( { onClick } ) {
 	const { canCreateTemplates } = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
 		return {
@@ -16,7 +15,6 @@ export default function CreateNewTemplate() {
 			} ),
 		};
 	}, [] );
-	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 
 	// The default template in a post is indicated by an empty string.
@@ -24,22 +22,8 @@ export default function CreateNewTemplate() {
 		return null;
 	}
 	return (
-		<>
-			<MenuItem
-				onClick={ () => {
-					setIsCreateModalOpen( true );
-				} }
-			>
-				{ __( 'Create new template' ) }
-			</MenuItem>
-
-			{ isCreateModalOpen && (
-				<CreateNewTemplateModal
-					onClose={ () => {
-						setIsCreateModalOpen( false );
-					} }
-				/>
-			) }
-		</>
+		<Menu.Item onClick={ onClick }>
+			<Menu.ItemLabel>{ __( 'Create new template' ) }</Menu.ItemLabel>
+		</Menu.Item>
 	);
 }

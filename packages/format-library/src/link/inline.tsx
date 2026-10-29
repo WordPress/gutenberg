@@ -23,13 +23,31 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
+import type { LinkFormatAttributes } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
-import type {
-	InlineLinkUIProps,
-	LinkValue,
-	CSSClassesSettingProps,
-} from '../types';
+import type { CSSClassesSettingProps } from './css-classes-setting';
+
+interface LinkValue {
+	url?: string;
+	type?: string;
+	id?: string | number;
+	opensInNewTab?: boolean;
+	nofollow?: boolean;
+	title?: string;
+	cssClasses?: string;
+}
+
+interface InlineLinkUIProps {
+	isActive: boolean;
+	activeAttributes: LinkFormatAttributes;
+	value: RichTextValue;
+	onChange: ( newValue: RichTextValue ) => void;
+	onFocusOutside: () => void;
+	stopAddingLink: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+	focusOnMount?: 'firstElement' | false;
+}
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -141,7 +159,7 @@ function InlineLinkUI( {
 
 		// Scenario: we have any active text selection or an active format.
 		let newValue: RichTextValue;
-		if ( isCollapsed( value ) && ! isActive ) {
+		if ( isCollapsed( value ) && value.start !== undefined && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const inserted = insert( value, newText );
 
@@ -266,7 +284,7 @@ function InlineLinkUI( {
 	}
 
 	/*
-	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * `isActive` is not part of `FormatType`, but `useAnchor` reads it
 	 * dynamically. Hoisting the object out of the call avoids excess property
 	 * checking, which only applies to object literals passed inline.
 	 */

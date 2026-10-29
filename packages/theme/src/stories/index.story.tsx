@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useId } from '@wordpress/element';
 import { ThemeProvider } from '../theme-provider';
-import wpdsTokens from '../../prebuilt/js/design-tokens.mjs';
+import { tokens as wpdsTokens } from '../../prebuilt/js/design-tokens.mjs';
 
-const wpdsColorTokens = wpdsTokens.filter( ( name ) =>
+const wpdsColorTokens = Object.keys( wpdsTokens ).filter( ( name ) =>
 	name.startsWith( '--wpds-color' )
 );
 

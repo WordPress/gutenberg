@@ -135,7 +135,9 @@ describe( 'SearchableSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelect.ItemLabel>
+										{ item.label }
+									</SearchableSelect.ItemLabel>
 								</SearchableSelect.Item>
 							) }
 						</SearchableSelect.Collection>

@@ -7,7 +7,7 @@ import styles from './style.module.css';
 import type { FieldsetLegendProps } from './types';
 
 export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
-	function FieldsetLegend(
+	function UnforwardedFieldsetLegend(
 		{ className, hideFromVision, ...restProps },
 		ref
 	) {

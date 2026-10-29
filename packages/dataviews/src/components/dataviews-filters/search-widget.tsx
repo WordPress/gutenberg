@@ -5,7 +5,11 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import { Icon as WCIcon, Composite, Spinner } from '@wordpress/components';
+import {
+	Icon as WCIcon,
+	Composite,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
 import { getCurrentValue } from './utils';
@@ -323,7 +327,7 @@ export default function SearchWidget( props: SearchWidgetProps ) {
 	if ( isLoading ) {
 		return (
 			<div className="dataviews-filters__search-widget-no-elements">
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

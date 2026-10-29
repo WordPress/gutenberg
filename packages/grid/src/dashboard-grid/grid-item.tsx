@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import { inertValue } from '@wordpress/react-inert-value';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
@@ -157,7 +158,7 @@ export function GridItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( dragging ? { inert: '' } : {} ) }
+						inert={ inertValue( dragging ) }
 					>
 						{ actionableArea }
 					</div>

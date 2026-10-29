@@ -1,5 +1,5 @@
 import { useRef, useLayoutEffect } from '@wordpress/element';
-import type { MutableRefObject, RefCallback } from 'react';
+import type { RefObject, RefCallback } from 'react';
 import useRefEffect from '../use-ref-effect';
 
 /**
@@ -60,7 +60,7 @@ export function restoreFocus( trigger: Element ): void {
  * @param    value
  * @return   A ref to assign to the target element.
  */
-function useUpdatedRef< T >( value: T ): MutableRefObject< T > {
+function useUpdatedRef< T >( value: T ): RefObject< T > {
 	const ref = useRef< T >( value );
 	useLayoutEffect( () => {
 		ref.current = value;

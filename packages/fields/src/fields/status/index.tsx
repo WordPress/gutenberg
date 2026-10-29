@@ -1,6 +1,7 @@
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import type { BasePost } from '../../types';
+import { hasActionLink } from '../utils';
 import StatusView from './status-view';
 import STATUSES from './status-elements';
 
@@ -17,6 +18,8 @@ const statusField: Field< BasePost > = {
 		item.status === 'auto-draft' ? 'draft' : item.status,
 	render: StatusView,
 	Edit: 'radio',
+	// A user who can't publish can't change the status either.
+	isDisabled: ( { item } ) => ! hasActionLink( item, 'wp:action-publish' ),
 	enableSorting: false,
 	filterBy: {
 		operators: [ OPERATOR_IS_ANY ],

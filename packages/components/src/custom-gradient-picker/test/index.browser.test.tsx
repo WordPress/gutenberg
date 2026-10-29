@@ -3,13 +3,9 @@ import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '../style.scss';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../button/style.scss';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '../style.scss';
 import '../../dropdown/style.scss';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../popover/style.scss';
 import CustomGradientPicker from '../';
 import CustomGradientBar from '../gradient-bar';
@@ -175,6 +171,50 @@ describe( 'CustomGradientBar', () => {
 		{ position: 100, color: 'rgb(255,255,255)' },
 	];
 
+	it.each( [ 'top', 'bottom' ] )(
+		'adds a control point from the %s of the gradient bar',
+		async ( edge ) => {
+			const onChange = vi.fn();
+			const { container } = await render(
+				<CustomGradientBar
+					background="linear-gradient(90deg, black, white)"
+					hasGradient
+					value={ POINTS }
+					onChange={ onChange }
+				/>
+			);
+			// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+			const bar = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__gradient-bar'
+			)!;
+			const bounds = bar.getBoundingClientRect();
+			const position = {
+				x: bounds.width / 2,
+				y: edge === 'top' ? 1 : bounds.height - 1,
+			};
+
+			await userEvent.hover( bar, { position } );
+			// eslint-disable-next-line testing-library/no-node-access -- The inserter has no accessible name.
+			const inserter = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__insert-point-dropdown'
+			)!;
+			expect( inserter ).toBeVisible();
+			await userEvent.click( bar, { position } );
+			expect( inserter ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await userEvent.click(
+				screen.getByRole( 'slider', { name: 'Color' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					...POINTS,
+					{ position: 50, color: expect.any( String ) },
+				] )
+			);
+			await userEvent.keyboard( '{Escape}' );
+		}
+	);
+
 	// The counterpart to the duotone bar's tests: positioning is on unless a
 	// consumer opts out, so arrow keys must still move a control point.
 	it( 'moves a control point with the arrow keys', async () => {
@@ -209,7 +249,7 @@ describe( 'CustomGradientBar', () => {
 		] );
 	} );
 
-	it( 'moves a control point when dragged', async () => {
+	it( 'moves a control point when dragged from above its handle', async () => {
 		const onChange = vi.fn();
 
 		const { container } = await render(
@@ -236,7 +276,12 @@ describe( 'CustomGradientBar', () => {
 			name: /Gradient control point/,
 		} );
 
-		await userEvent.dragAndDrop( firstPoint, bar, {
+		const pointBounds = firstPoint.getBoundingClientRect();
+		await userEvent.dragAndDrop( bar, bar, {
+			sourcePosition: {
+				x: pointBounds.x - bounds.x + pointBounds.width / 2,
+				y: 1,
+			},
 			targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
 		} );
 

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect } from '@wordpress/element';
@@ -289,7 +289,7 @@ export default function RevisionsCanvas() {
 		</>
 	) : (
 		<div className="editor-revisions-canvas__loading">
-			<Spinner />
+			<WCSpinner />
 		</div>
 	);
 }

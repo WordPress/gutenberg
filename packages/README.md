@@ -60,7 +60,7 @@ When creating a new package, you need to provide at least the following. Package
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
     	"engines": {
-    		"node": ">=18.12.0"
+    		"node": ">=22.13.0"
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",

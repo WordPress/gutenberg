@@ -4,6 +4,14 @@
 
 ### Breaking Changes
 
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 26.1.0 (2026-10-07)
+
+## 26.0.0 (2026-09-23)
+
+### Breaking Changes
+
 -   Fix the `font-weight-notation` rule to only accept numeric values and disallow relative weights. ([#82778](https://github.com/WordPress/gutenberg/pull/82778)).
 
 ### Enhancements

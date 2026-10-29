@@ -1,55 +1,23 @@
 ---
 name: design-system-code-review
-description: Use when reviewing a Gutenberg change to a WordPress Design System package or its public contract, including `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme`; do not use to implement the change or review a consumer-only application.
+description: Use when reviewing changes to @wordpress/components, @wordpress/ui, or @wordpress/theme and their public contracts. For application code that only consumes these packages, use design-system-ui-review.
 ---
 
 # Review a WordPress Design System contribution
 
-## Establish the review boundary
+In a Gutenberg checkout, read the relative links below from the checked-out revision. Outside a checkout, resolve them from `.agents/skills/design-system-code-review/` in [Gutenberg on GitHub](https://github.com/WordPress/gutenberg/tree/trunk).
 
-1. Define the changed public surface and observable behaviour.
-2. Scan the complete diff once, then classify it as:
-   - **Internal:** no public contract or observable behaviour changes.
-   - **Public:** adds, removes, renames, or changes supported behaviour.
-3. Read [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md)
-   and the applicable package source guidance.
-4. Apply the public guide's evidence precedence: the diff is the proposed
-   post-change state, target source is its baseline, and MCP is supplementary
-   current-design context.
+Read the affected package's `AGENTS.md` and [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely). Review the proposed source and the consumers it affects. For a mixed package-and-consumer change, also use [design-system-ui-review](../design-system-ui-review/SKILL.md) on the application code.
 
-## Review proportionally
+## What to look for
 
-For an internal change, verify contract preservation and focused coverage, then
-skip the public-only work below. For a public change:
+1. **Behavior in the wrong package or duplicated implementation.** Keep product-specific behavior in the consumer. Check whether existing components, helpers, or tokens already meet the need before adding another API or implementation. Use the MCP server's `get_components` and `get_component_details`, or the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component), when component selection matters; verify the result against the reviewed source.
+2. **Broken component composition.** Check changes to prop and ref forwarding, rendered elements, controlled and uncontrolled state, callback arguments, and default behavior. Inspect affected wrappers and compound components. Test our changed integration where it introduces a meaningful risk; do not duplicate the underlying dependency's behavior tests.
+3. **Incompatible public changes.** Use the guide's [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api) for removed or changed props, exports, tokens, styling hooks, and extension points. Include external consumers; migrated Gutenberg callers do not prove plugin compatibility. Check that published types resolve through declared dependencies.
+4. **Styles that break composition or theming.** Look for inappropriate hard-coded values, tokens selected by value rather than purpose, lost consumer overrides, and declarations that depend on stylesheet order. Use the Design System MCP server's `get_design_tokens` when available. Without MCP, use the [token reference](../../../packages/theme/docs/tokens.md) for semantic choices. Follow the package's styling guidance for its CSS conventions. Check portal destinations and affected theme modes when the change can alter them.
+5. **Interaction or accessibility regressions.** Check the semantics, accessible names, keyboard paths, focus, and disabled states the change can affect. Use the guide's [verification guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior) for standards and browser evidence. Passing types or class assertions do not prove interaction or visual parity.
+6. **Public documentation or generated output left behind.** Check affected prop documentation, stories, component status and recommendation metadata, generated token assets, and required changelogs. Do not request new stories or documentation for an unchanged capability.
 
-- assess Gutenberg and external package consumers separately;
-- verify compatibility and migration rather than treating repository migration
-  as sufficient;
-- before drafting findings for a removal, replacement, or rename, compare the
-  old and new accepted values, semantics, states, interaction, and styling in
-  a compact contract table; complete the comparison even after finding one
-  valid defect;
+Apply [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) only when the changed contract crosses independently updated package and WordPress versions. For an Emotion migration, use the [migration guide](../../../packages/components/emotion-to-scss-modules.md) to check cascade and consumer compatibility.
 
-For either classification, use the public guide's
-[package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
-and inspect only the surfaces applicable to the change.
-
-If a published package can run with a dependency supplied separately by WordPress, apply the [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md) skill before concluding the review.
-
-Use browser evidence when source or class assertions cannot establish visual,
-focus, motion, or layout parity.
-
-## Finding evidence gate
-
-Before reporting a finding, identify the exact changed line, affected public
-contract or behaviour, target-source or consumer evidence, and concrete impact.
-Treat incomplete diff context as a verification gap unless the complete patch
-proves the defect. Apply the same evidence and precision standard even when
-another valid defect already exists.
-
-## Output contract
-
-Recheck every finding against the complete diff and source. Separate defects,
-verification gaps, and optional follow-ups. Report material findings with
-proportional severity and the smallest coherent direction; report no findings
-when the evidence exposes none.
+Keep findings tied to the change, including downstream effects. Missing tests alone are not a finding. Reuse existing coverage and request a new check only for a concrete, meaningful risk introduced by our code or integration. Combine concerns that have one coherent fix.

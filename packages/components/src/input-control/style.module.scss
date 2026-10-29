@@ -1,0 +1,21 @@
+.border {
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+
+	&:not(.is-disabled, .is-borderless) {
+		.container:hover & {
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		}
+	}
+}
+
+.border.is-disabled:not(.is-borderless) {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+	@media (forced-colors: active) {
+		border-color: GrayText;
+	}
+}
+
+.border.is-borderless {
+	border-color: transparent;
+}

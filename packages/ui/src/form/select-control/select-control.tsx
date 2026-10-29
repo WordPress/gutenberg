@@ -9,7 +9,7 @@ import type { SelectControlProps } from './types';
 export const SelectControl = forwardRef<
 	HTMLButtonElement,
 	SelectControlProps
->( function SelectControl(
+>( function UnforwardedSelectControl(
 	{
 		className,
 		children,

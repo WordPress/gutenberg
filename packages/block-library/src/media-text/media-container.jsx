@@ -1,5 +1,9 @@
 import clsx from 'clsx';
-import { ResizableBox, Spinner, Placeholder } from '@wordpress/components';
+import {
+	ResizableBox,
+	Spinner as WCSpinner,
+	Placeholder,
+} from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -202,7 +206,7 @@ function MediaContainer( props, ref ) {
 			>
 				{ toolbarEditButton }
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
-				{ isTemporaryMedia && <Spinner /> }
+				{ isTemporaryMedia && <WCSpinner /> }
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder

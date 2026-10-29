@@ -217,7 +217,7 @@ function sleep( ms: number ) {
  * reopens.
  */
 export const AsyncConfirm: Story = {
-	render: function AsyncConfirm( args ) {
+	render: function AsyncConfirmRender( args ) {
 		const [ shouldFail, setShouldFail ] = useState( false );
 		const successId = useId();
 		const failureId = useId();
@@ -374,7 +374,7 @@ export const Scrollable: Story = {
  * from code or from a non-standard trigger element.
  */
 export const Controlled: Story = {
-	render: function Controlled( args ) {
+	render: function ControlledRender( args ) {
 		const [ isOpen, setIsOpen ] = useState( false );
 
 		return (

@@ -1,5 +1,5 @@
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -62,7 +62,7 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 				) }
 				backPath={ backPath }
 			>
-				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+				<WCSpinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
 		);
 	}

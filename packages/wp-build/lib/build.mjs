@@ -185,7 +185,7 @@ function styleRuntimeAliasPlugin() {
  * Get SASS options for the given working directory.
  *
  * Uses NodePackageImporter from sass-embedded for resolving package imports
- * (like @wordpress/base-styles) which works with any package manager (npm, pnpm, yarn).
+ * (like `@wordpress/base-styles`) which works with any package manager (npm, pnpm, yarn).
  *
  * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
  * @return {Object} SASS options object with importers and loadPaths.
@@ -916,7 +916,7 @@ async function bundlePackage( packageName, options = {} ) {
 /**
  * Infer style dependencies from script dependencies.
  * Only includes dependencies that:
- * 1. Are @wordpress packages (start with 'wp-')
+ * 1. Are `@wordpress` packages (start with 'wp-')
  * 2. Have wpScript: true in their package.json
  * 3. Actually have a built style.css file
  *

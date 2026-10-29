@@ -46,14 +46,14 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 
 	return (
 		<>
-			<Menu.Root disabled={ ! actions.length }>
+			<Menu.Root>
 				<Menu.Trigger
+					disabled={ ! actions.length }
 					render={
 						<Button
 							size="small"
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
-							disabled={ ! actions.length }
 							accessibleWhenDisabled
 							className="editor-all-actions-button"
 						/>

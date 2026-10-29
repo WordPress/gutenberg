@@ -258,6 +258,7 @@ export default function Filter( {
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
+			className="dataviews-filters__summary-chip-dropdown"
 			contentClassName="dataviews-filters__summary-popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
 			onClose={ () => {

@@ -6,46 +6,6 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 import { store as blockEditorStore } from '../../store';
 
-function IsolatedEditButton( {
-	attributes = {},
-	onNavigateToEntityRecord,
-	isTemplatePartBlock,
-} ) {
-	const { ref, theme, slug } = attributes;
-	const entityId = isTemplatePartBlock
-		? theme && slug && `${ theme }//${ slug }`
-		: ref;
-
-	const handleClick = () => {
-		if ( ! entityId ) {
-			return;
-		}
-
-		onNavigateToEntityRecord( {
-			postId: entityId,
-			postType: isTemplatePartBlock ? 'wp_template_part' : 'wp_block',
-		} );
-	};
-
-	return (
-		<Stack
-			direction="column"
-			className="block-editor-block-inspector-edit-contents"
-		>
-			<Button
-				className="block-editor-block-inspector-edit-contents__button"
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ handleClick }
-				accessibleWhenDisabled
-				disabled={ ! entityId }
-			>
-				{ __( 'Edit original' ) }
-			</Button>
-		</Stack>
-	);
-}
-
 function InlineEditButton( {
 	clientId,
 	editedContentOnlySection,
@@ -94,14 +54,11 @@ export default function EditContents( { clientId } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { block, onNavigateToEntityRecord, canEdit } = useSelect(
+	const { block, canEdit } = useSelect(
 		( select ) => {
-			const { getBlock, getSettings, canEditBlock } =
-				select( blockEditorStore );
+			const { getBlock, canEditBlock } = select( blockEditorStore );
 			return {
 				block: getBlock( clientId ),
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
 				canEdit: canEditBlock( clientId ),
 			};
 		},
@@ -112,19 +69,11 @@ export default function EditContents( { clientId } ) {
 		return null;
 	}
 
-	const isSyncedPattern = isReusableBlock( block );
-	const isTemplatePartBlock = isTemplatePart( block );
-	const shouldUseIsolatedEditor =
-		( isSyncedPattern || isTemplatePartBlock ) && onNavigateToEntityRecord;
-
-	if ( shouldUseIsolatedEditor ) {
-		return (
-			<IsolatedEditButton
-				attributes={ block?.attributes }
-				onNavigateToEntityRecord={ onNavigateToEntityRecord }
-				isTemplatePartBlock={ isTemplatePartBlock }
-			/>
-		);
+	// Synced patterns and template parts are never edited inline. They're
+	// edited through the entity they render, whose "Edit original" button the
+	// blocks fill into PrivateBlockInspectorEditOriginal.
+	if ( isReusableBlock( block ) || isTemplatePart( block ) ) {
+		return null;
 	}
 
 	return (

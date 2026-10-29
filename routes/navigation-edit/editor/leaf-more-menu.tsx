@@ -9,7 +9,7 @@ import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
-};
+} as const;
 
 export default function LeafMoreMenu( {
 	clientId,

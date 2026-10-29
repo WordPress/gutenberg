@@ -624,8 +624,14 @@ export function renderElement(
 			return renderChildren( props.children, props.value, legacyContext );
 
 		case Consumer.$$typeof:
+			// In React 18 the `Consumer` is the `_context` itself and `Provider`
+			// has `_context` as a property. In React 19 it's the other way around.
+			const contextValue =
+				context !== undefined
+					? context
+					: ( type._context || type )._currentValue;
 			return renderElement(
-				props.children( context || type._currentValue ),
+				props.children( contextValue ),
 				context,
 				legacyContext
 			);

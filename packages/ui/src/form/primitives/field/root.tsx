@@ -18,16 +18,18 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * Simply wrapping a control with this component does not guarantee
  * accessible labeling. See examples for how to associate the label in different cases.
  */
-export const Root = forwardRef< HTMLDivElement, FieldRootProps >( function Root(
-	{ className, render = DEFAULT_RENDER, ...restProps },
-	ref
-) {
-	return (
-		<_Field.Root
-			ref={ ref }
-			className={ clsx( resetStyles[ 'box-sizing' ], className ) }
-			render={ render }
-			{ ...restProps }
-		/>
-	);
-} );
+export const Root = forwardRef< HTMLDivElement, FieldRootProps >(
+	function UnforwardedRoot(
+		{ className, render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
+		return (
+			<_Field.Root
+				ref={ ref }
+				className={ clsx( resetStyles[ 'box-sizing' ], className ) }
+				render={ render }
+				{ ...restProps }
+			/>
+		);
+	}
+);

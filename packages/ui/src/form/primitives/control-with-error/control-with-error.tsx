@@ -58,7 +58,7 @@ const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
 export const ControlWithError = forwardRef<
 	HTMLDivElement,
 	ControlWithErrorProps
->( function ControlWithError(
+>( function UnforwardedControlWithError(
 	{
 		required,
 		markWhenOptional,

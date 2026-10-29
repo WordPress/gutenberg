@@ -255,6 +255,15 @@ export function FocalPointPicker( {
 				<MediaContainer
 					className="components-focal-point-picker"
 					onKeyDown={ arrowKeyStep }
+					onPointerDown={ ( event ) => {
+						if ( event.button !== 0 ) {
+							return;
+						}
+						// Keep the gesture when the pointer crosses into the editor canvas iframe.
+						event.currentTarget.setPointerCapture(
+							event.pointerId
+						);
+					} }
 					onMouseDown={ startDrag }
 					onBlur={ () => {
 						if ( isDragging ) {

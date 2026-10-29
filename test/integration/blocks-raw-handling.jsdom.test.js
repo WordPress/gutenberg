@@ -1,14 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	createBlock,
+	getBlockTypes,
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
 	registerBlockType,
 	serialize,
+	unregisterBlockType,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '../../packages/editor/src/hooks';
@@ -23,99 +25,99 @@ function readFile( filePath ) {
 		: '';
 }
 
-describe( 'Blocks raw handling', () => {
-	beforeAll( () => {
-		registerCoreBlocks();
-		registerBlockType( 'test/gallery', {
-			apiVersion: 3,
-			title: 'Test Gallery',
-			category: 'text',
-			attributes: {
-				ids: {
-					type: 'array',
-					default: [],
+beforeAll( () => {
+	registerCoreBlocks();
+	registerBlockType( 'test/gallery', {
+		apiVersion: 3,
+		title: 'Test Gallery',
+		category: 'text',
+		attributes: {
+			ids: {
+				type: 'array',
+				default: [],
+			},
+		},
+		transforms: {
+			from: [
+				{
+					type: 'shortcode',
+					tag: 'gallery',
+					isMatch( { named: { ids } } ) {
+						return ids.indexOf( 42 ) > -1;
+					},
+					attributes: {
+						ids: {
+							type: 'array',
+							shortcode: ( { named: { ids } } ) =>
+								ids
+									.split( ',' )
+									.map( ( id ) => parseInt( id, 10 ) ),
+						},
+					},
+					priority: 9,
 				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'shortcode',
-						tag: 'gallery',
-						isMatch( { named: { ids } } ) {
-							return ids.indexOf( 42 ) > -1;
-						},
-						attributes: {
-							ids: {
-								type: 'array',
-								shortcode: ( { named: { ids } } ) =>
-									ids
-										.split( ',' )
-										.map( ( id ) => parseInt( id, 10 ) ),
-							},
-						},
-						priority: 9,
-					},
-				],
-			},
-			save: () => null,
-		} );
-
-		registerBlockType( 'test/non-inline-block', {
-			apiVersion: 3,
-			title: 'Test Non Inline Block',
-			category: 'text',
-			supports: {
-				pasteTextInline: false,
-			},
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => {
-							return (
-								'words to live by' === node.textContent.trim()
-							);
-						},
-						transform: () => {
-							return createBlock( 'core/embed', {
-								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-							} );
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
-
-		registerBlockType( 'test/transform-to-multiple-blocks', {
-			apiVersion: 3,
-			title: 'Test Transform to Multiple Blocks',
-			category: 'text',
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => {
-							return node.textContent
-								.split( ' ' )
-								.every( ( chunk ) => /^P\S+?/.test( chunk ) );
-						},
-						transform: ( node ) => {
-							return node.textContent
-								.split( ' ' )
-								.map( ( chunk ) =>
-									createBlock( 'core/paragraph', {
-										content: chunk.substring( 1 ),
-									} )
-								);
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
+			],
+		},
+		save: () => null,
 	} );
 
+	registerBlockType( 'test/non-inline-block', {
+		apiVersion: 3,
+		title: 'Test Non Inline Block',
+		category: 'text',
+		supports: {
+			pasteTextInline: false,
+		},
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => {
+						return 'words to live by' === node.textContent.trim();
+					},
+					transform: () => {
+						return createBlock( 'core/embed', {
+							url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+						} );
+					},
+				},
+			],
+		},
+		save: () => null,
+	} );
+
+	registerBlockType( 'test/transform-to-multiple-blocks', {
+		apiVersion: 3,
+		title: 'Test Transform to Multiple Blocks',
+		category: 'text',
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => {
+						return node.textContent
+							.split( ' ' )
+							.every( ( chunk ) => /^P\S+?/.test( chunk ) );
+					},
+					transform: ( node ) => {
+						return node.textContent.split( ' ' ).map( ( chunk ) =>
+							createBlock( 'core/paragraph', {
+								content: chunk.substring( 1 ),
+							} )
+						);
+					},
+				},
+			],
+		},
+		save: () => null,
+	} );
+} );
+
+afterAll( () => {
+	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
+} );
+
+describe( 'Blocks raw handling', () => {
 	it( 'should filter inline content', () => {
 		const filtered = pasteHandler( {
 			HTML: '<h2><em>test</em></h2>',
@@ -283,6 +285,74 @@ describe( 'Blocks raw handling', () => {
 
 		expect( filtered ).toBe( 'test<br>test' );
 		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should replace non-breaking spaces at the edges of pasted text', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>a&nbsp;<a href="#">b</a>&nbsp;c&nbsp;d</p>',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a <a href="#">b</a> c&nbsp;d</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should remove non-breaking spaces at the end of pasted lines', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>a&nbsp;</p><p>b&nbsp;<br>c</p>',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a</p><p>b<br>c</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should replace non-breaking spaces at the edges of inline pasted text', () => {
+		const filtered = pasteHandler( {
+			HTML: 'a&nbsp;<strong>b</strong>&nbsp;',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'a <strong>b</strong>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should paste a lone non-breaking space', () => {
+		const filtered = pasteHandler( {
+			HTML: '&nbsp;',
+			plainText: '\u00a0',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( '&nbsp;' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should remove non-breaking spaces at the end of pasted plain text lines', () => {
+		const filtered = pasteHandler( {
+			HTML: '',
+			plainText: 'a\u00a0\nb\u00a0',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a<br>b</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should keep non-breaking spaces in raw handling', () => {
+		const filtered = rawHandler( {
+			HTML: '<p>a&nbsp;<a href="#">b</a>&nbsp;</p>',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a&nbsp;<a href="#">b</a>&nbsp;</p>' );
 	} );
 
 	it( 'should normalize decomposed characters', () => {

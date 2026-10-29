@@ -276,36 +276,6 @@ function PostListView( {
 		const _actions = [
 			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
 				switch ( action.id ) {
-					case 'permanently-delete':
-						return [
-							{
-								...action,
-								isEligible( item ) {
-									if ( item.type === 'attachment' ) {
-										return true;
-									}
-									return action.isEligible?.( item ) ?? false;
-								},
-							},
-						];
-
-					// Media can in some circumstances need a trash option, but
-					// we need to extend the REST API to support it. See
-					// https://github.com/WordPress/wordpress-develop/pull/9210.
-					// Once that is merged we should fix this.
-					case 'move-to-trash':
-						return [
-							{
-								...action,
-								isEligible( item ) {
-									if ( item.type === 'attachment' ) {
-										return false;
-									}
-									return action.isEligible?.( item ) ?? false;
-								},
-							},
-						];
-
 					// Skip revisions as the admin does not support it
 					case 'view-post-revisions':
 						return [];

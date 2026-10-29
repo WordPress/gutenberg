@@ -7,7 +7,7 @@ import {
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatItalic } from '@wordpress/icons';
-import type { FormatEditWithVisibilityProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/italic';
 const title = __( 'Italic' );
@@ -23,7 +23,7 @@ export const italic = {
 		onChange,
 		onFocus,
 		isVisible = true,
-	}: FormatEditWithVisibilityProps ) {
+	}: FormatEditProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}

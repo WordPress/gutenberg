@@ -180,10 +180,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/keycodes/**'
 
-'[Package] Lazy import':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/lazy-import/**'
-
 '[Package] Media Utils':
     - changed-files:
           - any-glob-to-any-file: 'packages/media-utils/**'

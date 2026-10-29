@@ -100,7 +100,7 @@ const NO_SORT_STRATEGY = () => null;
  * @param ref   Forwarded to the surface's root `<div>`.
  */
 export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
-	function DashboardLanes( props, ref ) {
+	function UnforwardedDashboardLanes( props, ref ) {
 		const {
 			layout,
 			columns,
@@ -131,7 +131,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		} | null >( null );
 		const latestLayoutRef = useRef<
 			DashboardLanesLayoutItem[] | undefined
-		>();
+		>( undefined );
 		const lastReorderCursorRef = useRef< {
 			x: number;
 			y: number;

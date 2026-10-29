@@ -20,6 +20,11 @@ export const code = {
 	__unstableInputRule( value: RichTextValue ): RichTextValue {
 		const BACKTICK = '`';
 		const { start, text } = value;
+
+		if ( start === undefined ) {
+			return value;
+		}
+
 		const characterBefore = text[ start - 1 ];
 
 		// Quick check the text for the necessary character.

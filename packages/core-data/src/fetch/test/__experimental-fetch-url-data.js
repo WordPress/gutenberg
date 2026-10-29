@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import fetchUrlData from '../__experimental-fetch-url-data';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'fetchUrlData', () => {
 	afterEach( () => {

@@ -13,7 +13,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * instead.
  */
 export const Status = forwardRef< HTMLDivElement, AutocompleteStatusProps >(
-	function Status( { className, ...restProps }, ref ) {
+	function UnforwardedStatus( { className, ...restProps }, ref ) {
 		return (
 			<_Autocomplete.Status
 				className={ clsx( itemPopupStyles.status, className ) }

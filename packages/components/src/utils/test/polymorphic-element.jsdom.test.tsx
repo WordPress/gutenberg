@@ -150,7 +150,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		function CustomComponent( {
 			variant,
 			...props
-		}: JSX.IntrinsicElements[ 'section' ] & {
+		}: React.JSX.IntrinsicElements[ 'section' ] & {
 			variant: string;
 		} ) {
 			return <section data-variant={ variant } { ...props } />;

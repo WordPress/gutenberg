@@ -23,7 +23,7 @@ const TextContainer = ( {
  * A complete switch field with integrated label and description.
  */
 export const SwitchControl = forwardRef< HTMLSpanElement, SwitchControlProps >(
-	function SwitchControl(
+	function UnforwardedSwitchControl(
 		{
 			label,
 			description,

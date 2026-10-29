@@ -499,6 +499,14 @@ function Layout( {
 						} );
 					}
 					break;
+				case 'permanently-delete':
+					{
+						document.location.href = addQueryArgs( 'edit.php', {
+							deleted: 1,
+							post_type: items[ 0 ].type,
+						} );
+					}
+					break;
 				case 'duplicate-post':
 					{
 						const newItem = items[ 0 ];

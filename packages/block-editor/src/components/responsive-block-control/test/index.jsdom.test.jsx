@@ -69,7 +69,8 @@ describe( 'Basic rendering', () => {
 		} );
 
 		const defaultControl = screen.getByRole( 'combobox', {
-			name: 'All Controls the padding property for All viewports.',
+			// TODO: jsdom-only name; browsers separate label and help text with a space.
+			name: 'AllControls the padding property for All viewports.',
 		} );
 
 		const toggleState = screen.getByRole( 'checkbox', {
@@ -156,7 +157,8 @@ describe( 'Basic rendering', () => {
 		);
 
 		const defaultControlLabel = screen.getByRole( 'combobox', {
-			name: 'Everything Controls the padding property for Everything viewports.',
+			// TODO: jsdom-only name; browsers separate label and help text with a space.
+			name: 'EverythingControls the padding property for Everything viewports.',
 		} );
 
 		expect( defaultControlLabel ).toBeVisible();
@@ -222,7 +224,8 @@ describe( 'Default and Responsive modes', () => {
 		customViewportSet.forEach( ( { label } ) => {
 			responsiveViewportsLabels.push(
 				screen.getByRole( 'combobox', {
-					name: `${ label } Controls the padding property for ${ label } viewports.`,
+					// TODO: jsdom-only name; browsers separate label and help text with a space.
+					name: `${ label }Controls the padding property for ${ label } viewports.`,
 				} )
 			);
 		} );

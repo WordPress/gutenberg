@@ -63,6 +63,7 @@ describe( 'useCopyToClipboard', () => {
 	} );
 
 	it( 'should call onSuccess after the node unmounts', async () => {
+		const user = userEvent.setup();
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
@@ -71,7 +72,6 @@ describe( 'useCopyToClipboard', () => {
 			delayedPromise
 		);
 
-		const user = userEvent.setup();
 		const onSuccess = vi.fn();
 		const { unmount } = render(
 			<TestComponent text="test" onSuccess={ onSuccess } />
@@ -89,6 +89,7 @@ describe( 'useCopyToClipboard', () => {
 	} );
 
 	it( 'should not restore focus after the node unmounts', async () => {
+		const user = userEvent.setup();
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
@@ -97,7 +98,6 @@ describe( 'useCopyToClipboard', () => {
 			delayedPromise
 		);
 
-		const user = userEvent.setup();
 		const { unmount } = render( <TestComponent text="test" /> );
 
 		const button = screen.getByRole( 'button' );

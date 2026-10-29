@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	COMMENT_MARKER,
+	demoteHeadings,
 	isParseable,
 	isPrMetaComment,
 	mergeSection,
@@ -333,8 +334,10 @@ describe( 'budgets', () => {
 		);
 		const section = parseSections( merged )[ 0 ].body;
 
-		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
-		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+		// Parity alone would pass with no fence at all.
+		expect( section.match( /^```/gm ) ).toHaveLength( 2 );
+		expect( section ).toContain( 'Error: socket hang up' );
 		expect( ( section.match( /<details>/g ) ?? [] ).length ).toBe(
 			( section.match( /<\/details>/g ) ?? [] ).length
 		);
@@ -382,6 +385,10 @@ describe( 'budgets', () => {
 		}
 
 		expect( comment!.length ).toBeLessThan( COMMENT_LIMIT );
+		// Fitting by dropping sections would pass the length check too.
+		expect( parseSections( comment! ).map( ( s ) => s.id ) ).toEqual(
+			SECTIONS.map( ( s ) => s.id )
+		);
 	} );
 } );
 
@@ -411,17 +418,38 @@ describe( 'isParseable', () => {
 } );
 
 describe( 'unknown sections', () => {
-	it( 'holds a section it does not know to a budget', () => {
-		const legacy = `${ COMMENT_MARKER }\n### PR meta\n\n<!-- pr-meta:section:from-the-future -->\n${ 'x'.repeat(
-			10000
-		) }\n<!-- /pr-meta:section:from-the-future -->\n`;
+	/*
+	 * A writer only truncates what it wrote. Cutting a body it read back would
+	 * let an older revision of this action shorten a section it cannot render.
+	 */
+	it( 'leaves a section it does not know as it found it', () => {
+		const long = 'x'.repeat( 10000 );
+		const legacy = `${ COMMENT_MARKER }\n### PR meta\n\n<!-- pr-meta:section:from-the-future -->\n${ long }\n<!-- /pr-meta:section:from-the-future -->\n`;
 
 		const merged = bodyOf(
 			mergeSection( legacy, { id: 'props', body: 'Props.' } )
 		);
 
-		expect( merged ).toContain( 'Truncated.' );
-		expect( merged.length ).toBeLessThan( 10000 );
+		expect( merged ).toContain( long );
+		expect( merged ).not.toContain( 'Truncated.' );
+	} );
+
+	/* The same holds for a section this revision does know. */
+	it( 'leaves a known section it did not write as it found it', () => {
+		const long = `\`\`\`
+${ 'Co-authored-by: someone\n'.repeat( 900 ) }\`\`\``;
+		const comment = bodyOf(
+			mergeSection( undefined, { id: 'props', body: long } )
+		);
+		const stored = parseSections( comment )[ 0 ].body;
+
+		const merged = bodyOf(
+			mergeSection( comment, { id: 'labels', body: 'Warning.' } )
+		);
+
+		expect(
+			parseSections( merged ).find( ( s ) => s.id === 'props' )?.body
+		).toBe( stored );
 	} );
 } );
 
@@ -492,6 +520,13 @@ describe( 'comment limit', () => {
 
 		expect( merged.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
 		expect( merged ).toContain( 'Props.' );
+		/*
+		 * Trimming drops from the end, so the first of them has to survive:
+		 * asserting only that props remains would pass if all were discarded.
+		 */
+		expect( parseSections( merged ).map( ( s ) => s.id ) ).toContain(
+			'future-0'
+		);
 	} );
 } );
 
@@ -523,7 +558,7 @@ describe( 'collapsing', () => {
 		let comment = bodyOf(
 			mergeSection(
 				undefined,
-				{ id: 'flaky-tests', body: 'Traces.', sha: HEAD },
+				{ id: 'performance', body: 'Tables.', sha: HEAD },
 				HEAD
 			)
 		);
@@ -536,9 +571,27 @@ describe( 'collapsing', () => {
 
 		expect( comment.match( /<details>/g ) ).toHaveLength( 1 );
 		expect(
-			parseSections( comment ).find( ( s ) => s.id === 'flaky-tests' )
+			parseSections( comment ).find( ( s ) => s.id === 'performance' )
 				?.body
-		).toBe( 'Traces.' );
+		).toBe( 'Tables.' );
+	} );
+
+	/* Its body folds each test already, and a fold in a fold renders badly. */
+	it( 'leaves a section that folds its own items open', () => {
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'flaky-tests',
+					body: '<details>\n<summary>A test</summary>\n\nTrace.\n\n</details>',
+					sha: HEAD,
+				},
+				HEAD
+			)
+		);
+
+		expect( merged.match( /<details>/g ) ).toHaveLength( 1 );
+		expect( merged ).not.toContain( '<summary>Show' );
 	} );
 } );
 
@@ -561,5 +614,369 @@ describe( 'rendering other sections', () => {
 		);
 
 		expect( merged ).toContain( 'not the current head' );
+	} );
+} );
+
+describe( 'demoteHeadings', () => {
+	it( 'pushes a props body below its own section heading', () => {
+		const props =
+			'## Unlinked Accounts\n\nSome text.\n\n## Core SVN\n\nMore text.';
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body: props } )
+		);
+
+		expect( merged ).toContain( '##### Unlinked Accounts' );
+		expect( merged ).toContain( '##### Core SVN' );
+		expect( merged ).not.toMatch( /^## Unlinked/m );
+	} );
+
+	it( 'keeps the hierarchy between headings', () => {
+		const body = '## Title\n\nText.\n\n### Deep\n\nText.';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Title\n\nText.\n\n###### Deep\n\nText.'
+		);
+	} );
+
+	/*
+	 * Markdown has no seventh level, so a body deep enough to need one loses
+	 * the distinction rather than the demotion.
+	 */
+	it( 'flattens levels a demotion pushes past the sixth', () => {
+		const body = '# One\n\n## Two\n\n### Three';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### One\n\n###### Two\n\n###### Three'
+		);
+	} );
+
+	it( 'leaves a body that has no headings alone', () => {
+		const body = 'Just text, and a # that is not a heading.';
+
+		expect( demoteHeadings( body ) ).toBe( body );
+	} );
+
+	/* A stack trace can hold anything, including lines that look like headings. */
+	it.each( [
+		[ 'a plain fence', '```', '```' ],
+		[ 'a fence with a language', '```js', '```' ],
+		[ 'a tilde fence', '~~~', '~~~' ],
+	] )( 'ignores what looks like a heading inside %s', ( _, open, close ) => {
+		const body = `## Real\n\n${ open }\n# Not a heading\n${ close }`;
+
+		expect( demoteHeadings( body ) ).toBe(
+			`##### Real\n\n${ open }\n# Not a heading\n${ close }`
+		);
+	} );
+
+	/* Reading the level by hunting for a space loses the first word. */
+	it( 'keeps the text of a heading separated by a tab', () => {
+		expect( demoteHeadings( '#\tTabbed' ) ).toBe( '#####\tTabbed' );
+	} );
+
+	/*
+	 * A `.` stops at a carriage return, so a CRLF body would match on its last
+	 * line only, demoting that one and leaving every fence untracked.
+	 */
+	it( 'handles a body with carriage returns', () => {
+		const body = '## Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n## After';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n##### After'
+		);
+	} );
+
+	it( 'demotes a heading with no text among carriage returns', () => {
+		expect( demoteHeadings( '#\r\n\r\n## After' ) ).toBe(
+			'#####\r\n\r\n###### After'
+		);
+	} );
+
+	it( 'demotes a heading indented up to three spaces, keeping the indent', () => {
+		expect( demoteHeadings( '   ## Indented' ) ).toBe(
+			'   ##### Indented'
+		);
+	} );
+
+	/* Four spaces makes it indented code rather than a heading. */
+	it( 'leaves a heading indented four spaces alone', () => {
+		expect( demoteHeadings( '    ## Code\n\n## Plain' ) ).toBe(
+			'    ## Code\n\n##### Plain'
+		);
+	} );
+
+	it( 'demotes a heading with no text', () => {
+		expect( demoteHeadings( '#\n\n## Plain' ) ).toBe(
+			'#####\n\n###### Plain'
+		);
+	} );
+
+	it( 'leaves a hash that opens no heading alone', () => {
+		expect( demoteHeadings( '## Real\n\n#hashtag' ) ).toBe(
+			'##### Real\n\n#hashtag'
+		);
+	} );
+
+	it( 'caps the demotion at the deepest heading level', () => {
+		expect( demoteHeadings( '# One\n\n###### Six' ) ).toBe(
+			'##### One\n\n###### Six'
+		);
+	} );
+} );
+
+describe( 'keeping the end when truncating', () => {
+	/* The trailer a committer copies is the last thing in a props body. */
+	it( 'keeps the trailer of an overlong props list', () => {
+		const definition = getSection( 'props' )!;
+		const body = `${ 'Contributor line.\n\n'.repeat(
+			2000
+		) }\`\`\`\nCo-authored-by: someone <someone@git.wordpress.org>\n\`\`\``;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section ).toContain( 'Co-authored-by: someone' );
+		expect( section.startsWith( '<sub>Truncated.' ) ).toBe( true );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+	} );
+
+	/* A trailer's lines are single spaced, so its first blank line is past it. */
+	it( 'keeps a trailer longer than the budget allows around it', () => {
+		const definition = getSection( 'props' )!;
+		const trailer = `\`\`\`\n${ 'Co-authored-by: someone <someone@git.wordpress.org>\n'.repeat(
+			400
+		) }\`\`\``;
+		const body = `${ 'Filler.\n\n'.repeat( 2000 ) }${ trailer }`;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section ).toContain( 'Co-authored-by: someone' );
+		expect( section.length ).toBeLessThanOrEqual( definition.budget );
+	} );
+
+	it( 'keeps every truncated section inside its budget', () => {
+		for ( const definition of SECTIONS ) {
+			const merged = bodyOf(
+				mergeSection(
+					undefined,
+					{
+						id: definition.id,
+						body: 'Line.\n'.repeat( definition.budget ),
+						sha: HEAD,
+						runUrl: 'https://example.com/run',
+					},
+					HEAD
+				)
+			);
+			const section = parseSections( merged ).find(
+				( s ) => s.id === definition.id
+			)!;
+
+			expect( section.body.length ).toBeLessThanOrEqual(
+				definition.budget
+			);
+		}
+	} );
+
+	/* With no line break to cut at, the end cannot be kept safely. */
+	it( 'does not start the kept part inside a fence opener', () => {
+		const definition = getSection( 'props' )!;
+		// No newline in the last budget characters, and the cut bisects the opener.
+		const body = `pad\n\`\`\`${ 'x'.repeat( definition.budget - 2 ) }`;
+
+		expect( body.slice( -definition.budget ).startsWith( '``' ) ).toBe(
+			true
+		);
+		expect( body.slice( -definition.budget ) ).not.toContain( '\n' );
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section ).not.toMatch( /^``[^`]/m );
+		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+	} );
+
+	/* Its closing line would otherwise fence everything after it. */
+	it( 'reopens a fence the dropped start left open', () => {
+		const body = `\`\`\`\n${ 'noise\n'.repeat( 20000 ) }done\n\`\`\``;
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+	} );
+} );
+
+describe( 'truncation repairs both edges', () => {
+	/* An open fence would swallow every section rendered after it. */
+	it.each( [
+		[ 'backtick', '```' ],
+		[ 'four backticks', '````' ],
+		[ 'tilde', '~~~' ],
+	] )( 'closes an unterminated %s fence it kept', ( _, marker ) => {
+		const body = `${ marker }\n${ 'noise\n'.repeat( 20000 ) }tail`;
+
+		let comment = bodyOf(
+			mergeSection( undefined, { id: 'props', body } )
+		);
+		comment = bodyOf(
+			mergeSection( comment, { id: 'labels', body: 'Warning.' } )
+		);
+
+		const props = parseSections( comment ).find(
+			( s ) => s.id === 'props'
+		)!.body;
+		const escaped = marker.replace( /[`~]/g, '\\$&' );
+		const opens = props.match( new RegExp( `^${ escaped }`, 'gm' ) ) ?? [];
+
+		expect( opens.length % 2 ).toBe( 0 );
+		expect( comment ).toContain( '#### 🏷️ Labels' );
+	} );
+
+	it( 'keeps every section inside its budget and the comment inside the limit', () => {
+		const shapes = [
+			'x'.repeat( 40000 ),
+			`\`\`\`\n${ 'y\n'.repeat( 20000 ) }`,
+			// Longer than any fixed allowance a repair might have reserved.
+			`${ '`'.repeat( 24 ) }\n${ 'y\n'.repeat( 20000 ) }`,
+			`<details>\n<summary>s</summary>\n\n${ 'z\n'.repeat( 20000 ) }`,
+			`${ '<details>\n'.repeat( 50 ) }${ 'z\n'.repeat( 20000 ) }`,
+			'a\r\n'.repeat( 20000 ),
+		];
+
+		for ( const definition of SECTIONS ) {
+			for ( const shape of shapes ) {
+				const comment = bodyOf(
+					mergeSection(
+						undefined,
+						{
+							id: definition.id,
+							body: shape,
+							sha: HEAD,
+							runUrl: 'https://example.com/run',
+						},
+						HEAD
+					)
+				);
+				const section = parseSections( comment )[ 0 ].body;
+
+				expect( section.length ).toBeLessThanOrEqual(
+					definition.budget
+				);
+				expect( comment.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
+				/* A budget met by keeping nothing would be no use. */
+				expect( section.length ).toBeGreaterThan(
+					definition.budget / 2
+				);
+			}
+		}
+	} );
+
+	/*
+	 * A commit-scoped section keeps the run URL in its marker and its footer as
+	 * well as the note, so nothing else bounds what a caller passes.
+	 */
+	it( 'ignores a run link too long to be one', () => {
+		const definition = getSection( 'bundle-size' )!;
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'bundle-size',
+					body: 'Size.\n'.repeat( 5000 ),
+					sha: HEAD,
+					runUrl: `https://example.com/${ 'u'.repeat( 70000 ) }`,
+				},
+				HEAD
+			)
+		);
+		const section = parseSections( merged )[ 0 ];
+
+		expect( section.body.length ).toBeLessThanOrEqual( definition.budget );
+		expect( merged.length ).toBeLessThanOrEqual( COMMENT_LIMIT );
+		expect( section.runUrl ).toBeUndefined();
+	} );
+
+	it( 'keeps a run link of a plausible length', () => {
+		const runUrl =
+			'https://github.com/WordPress/gutenberg/actions/runs/36418586763';
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
+	} );
+} );
+
+describe( 'marker attributes', () => {
+	/* A space or a `>` in one stops the whole section parsing. */
+	it.each( [
+		[ 'a space', 'a a' ],
+		[ 'a closing bracket', 'a>a' ],
+		[ 'something that is not a commit', 'not-a-sha' ],
+	] )( 'rejects a commit containing %s', ( _, sha ) => {
+		const result = mergeSection(
+			undefined,
+			{ id: 'bundle-size', body: 'Size.', sha },
+			HEAD
+		);
+
+		expect( result.body ).toBeUndefined();
+		expect( result.rejected ).toMatch( /needs both/ );
+	} );
+
+	/* Enterprise Server serves Actions over http when TLS is off. */
+	it( 'keeps a run link from an enterprise host without TLS', () => {
+		const runUrl = 'http://ghes.example/actions/runs/1';
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
+	} );
+
+	it.each( [
+		[ 'a space', 'https://example.com/a b' ],
+		[ 'a closing bracket', 'https://example.com/a>b' ],
+		[ 'no scheme', 'example.com/run' ],
+	] )( 'drops a run link containing %s', ( _, runUrl ) => {
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( isParseable( merged ) ).toBe( true );
+		expect( parseSections( merged )[ 0 ].runUrl ).toBeUndefined();
+	} );
+
+	/* A comment an earlier revision wrote is read back, so it is checked too. */
+	it( 'ignores an unparseable attribute read back from a comment', () => {
+		const legacy = `${ COMMENT_MARKER }\n### PR meta\n\n<!-- pr-meta:section:bundle-size sha=nonsense run=ftp://x -->\nSize.\n<!-- /pr-meta:section:bundle-size -->\n`;
+
+		const parsed = parseSections( legacy )[ 0 ];
+
+		expect( parsed.sha ).toBeUndefined();
+		expect( parsed.runUrl ).toBeUndefined();
 	} );
 } );

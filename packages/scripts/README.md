@@ -472,7 +472,7 @@ The default environment is Node. Vitest APIs must be imported explicitly. Vitest
 
 Vitest discovers `vitest.config.*`, then `vite.config.*`, in the current working directory. A Vitest config takes precedence over a Vite config; it does not merge the two automatically. Use `--config path/to/config.mjs` to select another file. ESM and TypeScript configs use Vite's config loader. Jest config files and the `jest` field in `package.json` do not configure this command.
 
-`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment, React transform, aliases, console assertions, or CSS mocks. See the [consumer migration guide](./docs/vitest-migration.md) for tested Node, jsdom, and Browser Mode examples, dependencies, and support ranges.
+`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment, React transform, aliases, console assertions, or CSS mocks. See the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md) for tested Node, jsdom, and Browser Mode examples, dependencies, and support ranges.
 
 ### `test-unit-jest`
 
@@ -486,7 +486,7 @@ Use `wp-scripts test-unit-jest` in your npm test command. Jest discovers your pr
 
 Existing suites can keep using the published WordPress Jest packages. Maintenance covers this adapter and the documented legacy setup. New testing features target Vitest.
 
-The default `wp-scripts lint-js` config also switches to Vitest. The [Jest upgrade checklist](./docs/vitest-migration.md#keep-an-existing-jest-suite) covers test commands, dependencies, Jest configuration, and a complete ESLint configuration. You can keep your Jest tests without installing Vitest or Vite.
+The default `wp-scripts lint-js` config also switches to Vitest. The [Jest upgrade checklist](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite) covers test commands, dependencies, Jest configuration, and a complete ESLint configuration. You can keep your Jest tests without installing Vitest or Vite.
 
 ### `test-e2e`
 
@@ -545,7 +545,7 @@ For Vitest tests, pass `--inspect-brk --no-file-parallelism` after `test-unit-js
 
 Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 
-For unit tests, keep the inspector flags after `test-unit-js` so they reach the Vitest worker. See the [consumer migration guide](./docs/vitest-migration.md) for the complete command setup.
+For unit tests, keep the inspector flags after `test-unit-js` so they reach the Vitest worker. See the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md) for the complete command setup.
 
 Google Chrome and Visual Studio Code are used as examples below.
 

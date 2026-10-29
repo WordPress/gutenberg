@@ -86,6 +86,10 @@ function gutenberg_register_default_icons() {
 			'file_path' => $icons_directory . $icon_data['filePath'],
 		);
 
+		if ( isset( $icon_data['keywords'] ) ) {
+			$icon_args['keywords'] = $icon_data['keywords'];
+		}
+
 		foreach ( $icon_data['collections'] as $collection_slug ) {
 			wp_register_icon( $collection_slug . '/' . $icon_name, $icon_args );
 		}

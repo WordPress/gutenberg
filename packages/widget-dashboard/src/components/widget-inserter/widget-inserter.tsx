@@ -51,7 +51,7 @@ export function WidgetInserter() {
 			>
 				<Dialog.Header>
 					<Dialog.Title>{ __( 'Add widget' ) }</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 
 				<Dialog.Content>

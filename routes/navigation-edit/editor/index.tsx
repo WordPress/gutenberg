@@ -2,7 +2,7 @@ import { useMemo } from '@wordpress/element';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import { useEditorAssets } from '@wordpress/lazy-editor';
 import './style.scss';
@@ -43,7 +43,7 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 					height: '100vh',
 				} }
 			>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

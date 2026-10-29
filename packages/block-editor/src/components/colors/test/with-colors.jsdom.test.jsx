@@ -30,7 +30,7 @@ describe( 'createCustomColorsHOC', () => {
 				} ),
 				setBackgroundColor: expect.any( Function ),
 			} ),
-			expect.anything()
+			undefined
 		);
 	} );
 

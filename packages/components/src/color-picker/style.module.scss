@@ -1,0 +1,101 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.number-control {
+	width: 96px;
+}
+
+.select {
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Keep the existing physical offset in both LTR and RTL. */
+	margin-left: -$grid-unit-10;
+}
+
+.range {
+	flex: 1;
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Keep the existing physical gap in both LTR and RTL. */
+	margin-right: $grid-unit-10;
+}
+
+.auxiliary {
+	padding: $grid-unit-10 0 0;
+}
+
+.header {
+	padding-inline: $grid-unit-20;
+}
+
+.color-input {
+	padding-block: $grid-unit-20 20px;
+	/* stylelint-disable logical-css/require-logical-properties -- Preserve the asymmetric physical padding in both directions. */
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-15;
+	/* stylelint-enable logical-css/require-logical-properties */
+}
+
+.colorful {
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+
+	width: 216px;
+
+	:global(.react-colorful) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 216px;
+		height: auto;
+	}
+
+	:global(.react-colorful__saturation) {
+		width: 100%;
+		border-radius: 0;
+		height: 216px;
+		margin-bottom: $grid-unit-20;
+		border-bottom: none;
+	}
+
+	:global(.react-colorful__hue),
+	:global(.react-colorful__alpha) {
+		width: 184px;
+		height: $grid-unit-20;
+		border-radius: $radius-full;
+		margin-bottom: $grid-unit-10;
+	}
+
+	:global(.react-colorful__pointer) {
+		height: $grid-unit-20;
+		width: $grid-unit-20;
+		border: none;
+		box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.25);
+
+		// Shown instead of box-shadow to Windows high contrast mode.
+		outline: 2px solid transparent;
+
+		@media not (prefers-reduced-motion) {
+			transition: transform 160ms ease-in-out;
+		}
+	}
+
+	:global(.react-colorful__interactive):focus {
+		:global(.react-colorful__pointer) {
+			box-shadow: 0 0 0 1.5px #fff;
+			border: 1.5px solid #000;
+			transform: translate(-50%, -50%) scale(1.5);
+		}
+	}
+
+	:global(.react-colorful__pointer-fill) {
+		box-shadow: inset 0 0 0 1.5px #fff;
+	}
+
+	// Make the hue circle picker stay inside the bar.
+	:global(.react-colorful__interactive) {
+		width: calc(100% - #{ $grid-unit-10 });
+		/* stylelint-disable-next-line logical-css/require-logical-properties -- Keep the physical inset paired with the picker's physical positioning. */
+		margin-left: $grid-unit-05;
+	}
+}

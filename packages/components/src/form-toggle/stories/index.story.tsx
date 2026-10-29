@@ -3,7 +3,6 @@ import { useState } from '@wordpress/element';
 import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
-	tags: [ 'manifest' ],
 	component: FormToggle,
 	id: 'components-formtoggle',
 	title: 'Components/@wordpress-components/FormToggle',
@@ -18,9 +17,9 @@ const meta: Meta< typeof FormToggle > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'For standard toggles with labels, use `ToggleControl` instead.',
+			notes: 'Use [`Switch`](?path=/docs/design-system-components-form-primitives-switch--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-togglecontrol--migration-guide).',
 		},
 		// FIXME: Story shows FormToggle without a visible label (label).
 		// See: https://github.com/WordPress/gutenberg/issues/81596

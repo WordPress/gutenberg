@@ -3,6 +3,7 @@ import { Group } from '../primitives/select/group';
 import { GroupLabel } from '../primitives/select/group-label';
 import { ItemDescription } from '../primitives/select/item-description';
 import { ItemLabel } from '../primitives/select/item-label';
+import { Separator } from '../primitives/select/separator';
 import { Item } from './item';
 
 Group.displayName = 'SelectControl.Group';
@@ -37,4 +38,8 @@ export const SelectControl = Object.assign( _SelectControl, {
 	 * `aria-describedby`.
 	 */
 	ItemDescription,
+	/**
+	 * Renders a visual separator between items or groups.
+	 */
+	Separator,
 } );

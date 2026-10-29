@@ -8,7 +8,7 @@ import type { InputControlProps } from './types';
  * A complete input field with integrated label and description.
  */
 export const InputControl = forwardRef< HTMLInputElement, InputControlProps >(
-	function InputControl(
+	function UnforwardedInputControl(
 		{
 			className,
 			label,

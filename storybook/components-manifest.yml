@@ -92,6 +92,18 @@
             - render
             - style
             - value
+      - name: Autocomplete.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.List
         props:
             - children
@@ -142,6 +154,11 @@
       - name: Autocomplete.Row
         props:
             - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Separator
+        props:
             - className
             - render
             - style
@@ -262,16 +279,73 @@
             - className
             - render
             - style
+- name: Checkbox
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - indeterminate
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: CheckboxControl
   props:
-      - __nextHasNoMarginBottom
       - checked
+      - className
+      - defaultChecked
+      - description
+      - details
       - disabled
-      - heading
-      - help
+      - form
+      - hideLabelFromVision
+      - id
       - indeterminate
+      - inputRef
       - label
-      - onChange
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: CheckboxGroup
+  props:
+      - allValues
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: CheckboxGroup.NestedItems
+        props:
+            - align
+            - children
+            - className
+            - direction
+            - gap
+            - justify
+            - render
+            - style
+            - wrap
 - name: Collapsible.Root
   props:
       - children
@@ -355,7 +429,6 @@
       - value
 - name: ColorPicker
   props:
-      - as
       - color
       - copyFormat
       - defaultValue
@@ -399,7 +472,9 @@
       - virtualFocus
   subcomponents:
       - name: Composite.Context
-        props: []
+        props:
+            - children
+            - value
       - name: Composite.Group
         props:
             - children
@@ -513,7 +588,6 @@
       - isDisabled
 - name: Dropdown
   props:
-      - as
       - className
       - contentClassName
       - defaultOpen
@@ -525,6 +599,7 @@
       - open
       - popoverProps
       - position
+      - ref
       - renderContent
       - renderToggle
       - style
@@ -668,11 +743,6 @@
       - onChange
       - onClick
       - render
-- name: FormToggle
-  props:
-      - checked
-      - disabled
-      - onChange
 - name: FormTokenField
   props:
       - __experimentalAutoSelectFirstMatch
@@ -899,24 +969,67 @@
         props:
             - children
             - path
-- name: Notice
+- name: Notice.Root
   props:
-      - __unstableHTML
-      - actions
       - children
       - className
-      - isDismissible
-      - onDismiss
-      - onRemove
-      - politeness
-      - spokenMessage
-      - status
+      - icon
+      - intent
+      - render
+      - style
   subcomponents:
-      - name: NoticeList
+      - name: Notice.ActionButton
+        props:
+            - aria-pressed
+            - children
+            - className
+            - disabled
+            - focusableWhenDisabled
+            - loading
+            - loadingAnnouncement
+            - nativeButton
+            - render
+            - style
+            - variant
+      - name: Notice.ActionLink
         props:
             - children
-            - notices
-            - onRemove
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+      - name: Notice.Actions
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.CloseIconButton
+        props:
+            - aria-pressed
+            - className
+            - disabled
+            - focusableWhenDisabled
+            - icon
+            - label
+            - nativeButton
+            - positioner
+            - render
+            - shortcut
+            - style
+      - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.Title
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: Popover
   props:
       - __unstableForcePosition
@@ -925,7 +1038,6 @@
       - anchorRect
       - anchorRef
       - animate
-      - as
       - children
       - constrainTabbing
       - expandOnMobile
@@ -950,19 +1062,89 @@
             - key
             - name
             - ref
-- name: ProgressBar
+- name: Progress.Root
+  props:
+      - aria-valuetext
+      - children
+      - className
+      - format
+      - getAriaValueText
+      - locale
+      - max
+      - min
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: Progress.Indicator
+        props:
+            - className
+            - color
+            - render
+            - style
+      - name: Progress.Label
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Track
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Value
+        props:
+            - children
+            - className
+            - render
+            - style
+- name: Radio
   props:
       - className
-      - value
-- name: RadioControl
-  props:
       - disabled
-      - help
+      - inputRef
+      - nativeButton
+      - readOnly
+      - render
+      - required
+      - style
+      - value
+- name: RadioGroup
+  props:
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - form
+      - inputRef
+      - name
+      - onValueChange
+      - readOnly
+      - render
+      - required
+      - style
+      - value
+- name: RadioGroupControl
+  props:
+      - className
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - form
       - hideLabelFromVision
+      - inputRef
+      - items
       - label
-      - onChange
-      - options
-      - selected
+      - name
+      - onValueChange
+      - readOnly
+      - render
+      - required
+      - style
+      - value
 - name: RangeCalendar
   props:
       - autoFocus
@@ -1038,6 +1220,7 @@
       - defaultSize
       - enable
       - grid
+      - gridGap
       - handleClasses
       - handleComponent
       - handleStyles
@@ -1119,7 +1302,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1164,6 +1346,23 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelect.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchableChipSelectControl
   props:
       - actionsRef
@@ -1212,7 +1411,6 @@
       - open
       - openOnInputClick
       - popupWidth
-      - readOnly
       - ref
       - required
       - searchPlaceholder
@@ -1257,6 +1455,123 @@
             - style
             - value
             - variant
+      - name: SearchableChipSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.Separator
+        props:
+            - className
+            - render
+            - style
+- name: SearchableSelectControl
+  props:
+      - actionsRef
+      - aria-describedby
+      - aria-label
+      - aria-labelledby
+      - autoComplete
+      - autoHighlight
+      - children
+      - className
+      - defaultInputValue
+      - defaultOpen
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - emptyContent
+      - filter
+      - filteredItems
+      - form
+      - hideLabelFromVision
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - inputValue
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
+      - label
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - name
+      - onInputValueChange
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - placeholder
+      - popupWidth
+      - readOnly
+      - ref
+      - required
+      - searchPlaceholder
+      - statusContent
+      - triggerContent
+      - value
+      - virtualized
+  subcomponents:
+      - name: SearchableSelectControl.Collection
+        props:
+            - children
+      - name: SearchableSelectControl.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: SearchableSelectControl.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+            - variant
+      - name: SearchableSelectControl.ItemDescription
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: SearchControl
   props:
       - __next40pxDefaultSize
@@ -1367,6 +1682,11 @@
             - sideOffset
             - sticky
             - style
+      - name: Select.Separator
+        props:
+            - className
+            - render
+            - style
       - name: Select.Trigger
         props:
             - children
@@ -1448,6 +1768,11 @@
             - className
             - render
             - style
+      - name: SelectControl.Separator
+        props:
+            - className
+            - render
+            - style
 - name: Shortcut
   props:
       - className
@@ -1489,7 +1814,8 @@
       - politeness
       - spokenMessage
 - name: Spinner
-  props: []
+  props:
+      - color
 - name: Stack
   props:
       - align
@@ -1501,6 +1827,46 @@
       - render
       - style
       - wrap
+- name: Switch
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: SwitchControl
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - description
+      - details
+      - disabled
+      - form
+      - hideLabelFromVision
+      - id
+      - inputRef
+      - label
+      - name
+      - nativeButton
+      - onCheckedChange
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: Tabs.Root
   props:
       - children
@@ -1573,15 +1939,6 @@
   props:
       - highlight
       - text
-- name: ToggleControl
-  props:
-      - __nextHasNoMarginBottom
-      - checked
-      - className
-      - disabled
-      - help
-      - label
-      - onChange
 - name: ToggleGroupControl
   props:
       - __next40pxDefaultSize

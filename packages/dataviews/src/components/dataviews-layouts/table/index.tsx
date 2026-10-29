@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { Spinner, Popover } from '@wordpress/components';
+import { Spinner as WCSpinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -10,6 +10,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
+import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
@@ -429,8 +430,7 @@ function ViewTable< Item >( {
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
+				inert={ inertValue( ! isInfiniteScroll && isLoading ) }
 			>
 				<colgroup>
 					{ hasBulkActions && (
@@ -701,7 +701,7 @@ function ViewTable< Item >( {
 			{ isInfiniteScroll && isLoading && (
 				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">
-						<Spinner />
+						<WCSpinner />
 					</p>
 				</div>
 			) }

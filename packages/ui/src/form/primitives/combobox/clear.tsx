@@ -26,7 +26,10 @@ const DEFAULT_RENDER = (
  * A button that clears the selected value(s).
  */
 export const Clear = forwardRef< HTMLButtonElement, ComboboxClearProps >(
-	function Clear( { render = DEFAULT_RENDER, ...restProps }, ref ) {
+	function UnforwardedClear(
+		{ render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
 		return (
 			<_Combobox.Clear ref={ ref } render={ render } { ...restProps } />
 		);

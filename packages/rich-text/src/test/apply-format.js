@@ -262,4 +262,18 @@ describe( 'applyFormat', () => {
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 	} );
+
+	it( 'should only revise active formats without a selection', () => {
+		const record = {
+			formats: [ , , , , ],
+			text: 'test',
+		};
+		const expected = {
+			...record,
+			activeFormats: [ em ],
+		};
+		const result = applyFormat( deepFreeze( record ), em );
+
+		expect( result ).toEqual( expected );
+	} );
 } );

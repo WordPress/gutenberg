@@ -121,7 +121,11 @@ exports.resolve = function ( source, file, config ) {
 				// wp-build emits a CSS file for each SCSS file in src. This is
 				// controlled by wpStyleEntryPoints which we don't fully
 				// recreate here (yet), but generally we don't override this.
-				.replace( /(^|\/)build-style\/(.+?)\.css/, '$1src/$2.scss' )
+				// The `-rtl.css` variant is generated from the same SCSS file.
+				.replace(
+					/(^|\/)build-style\/(.+?)(?:-rtl)?\.css/,
+					'$1src/$2.scss'
+				)
 				.replace( BUILD_DIRECTORY_PATTERN, '$1src/' );
 
 			if ( mapsBuiltJavaScriptToSource ) {

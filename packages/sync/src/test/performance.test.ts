@@ -1,28 +1,8 @@
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-	type MockInstance,
-} from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { logPerformanceTiming, passThru } from '../performance';
 
 describe( 'performance utilities', () => {
 	describe( 'logPerformanceTiming', () => {
-		let consoleSpy: MockInstance< typeof console.log >;
-
-		beforeEach( () => {
-			consoleSpy = vi
-				.spyOn( console, 'log' )
-				.mockImplementation( () => {} );
-		} );
-
-		afterEach( () => {
-			consoleSpy.mockRestore();
-		} );
-
 		it( 'calls the wrapped function and returns its result', () => {
 			function add( a: number, b: number ): number {
 				return a + b;
@@ -32,6 +12,11 @@ describe( 'performance utilities', () => {
 			const result = wrapped( 2, 3 );
 
 			expect( result ).toBe( 5 );
+			expect( console ).toHaveLoggedWith(
+				expect.stringMatching(
+					/^\[SyncManager\]\[performance\]: add took \d+\.\d{2} ms$/
+				)
+			);
 		} );
 
 		it( 'logs the function name and execution time', () => {
@@ -40,9 +25,12 @@ describe( 'performance utilities', () => {
 			const wrapped = logPerformanceTiming( myFunction );
 			wrapped();
 
-			expect( consoleSpy ).toHaveBeenCalledTimes( 1 );
-			expect( consoleSpy.mock.calls[ 0 ][ 0 ] ).toMatch(
-				/myFunction took \d+\.\d{2} ms$/
+			// eslint-disable-next-line no-console
+			expect( console.log ).toHaveBeenCalledTimes( 1 );
+			expect( console ).toHaveLoggedWith(
+				expect.stringMatching(
+					/^\[SyncManager\]\[performance\]: myFunction took \d+\.\d{2} ms$/
+				)
 			);
 		} );
 
@@ -56,6 +44,11 @@ describe( 'performance utilities', () => {
 
 			expect( fn ).toHaveBeenCalledWith( 42, 'test', true );
 			expect( result ).toBe( '42-test-true' );
+			expect( console ).toHaveLoggedWith(
+				expect.stringMatching(
+					/^\[SyncManager\]\[performance\]: Mock took \d+\.\d{2} ms$/
+				)
+			);
 		} );
 
 		it( 'preserves the this context', () => {
@@ -70,6 +63,11 @@ describe( 'performance utilities', () => {
 			const result = wrapped.call( obj );
 
 			expect( result ).toBe( 10 );
+			expect( console ).toHaveLoggedWith(
+				expect.stringMatching(
+					/^\[SyncManager\]\[performance\]: getValue took \d+\.\d{2} ms$/
+				)
+			);
 		} );
 
 		it( 'handles functions that throw errors', () => {
@@ -93,6 +91,11 @@ describe( 'performance utilities', () => {
 
 			expect( result ).toBeUndefined();
 			expect( sideEffect ).toBe( 1 );
+			expect( console ).toHaveLoggedWith(
+				expect.stringMatching(
+					/^\[SyncManager\]\[performance\]: incrementSideEffect took \d+\.\d{2} ms$/
+				)
+			);
 		} );
 
 		it( 'handles anonymous functions', () => {
@@ -100,7 +103,13 @@ describe( 'performance utilities', () => {
 			const result = wrapped();
 
 			expect( result ).toBe( 'result' );
-			expect( consoleSpy ).toHaveBeenCalledTimes( 1 );
+			// eslint-disable-next-line no-console
+			expect( console.log ).toHaveBeenCalledTimes( 1 );
+			expect( console ).toHaveLoggedWith(
+				expect.stringMatching(
+					/^\[SyncManager\]\[performance\]:  took \d+\.\d{2} ms$/
+				)
+			);
 		} );
 	} );
 

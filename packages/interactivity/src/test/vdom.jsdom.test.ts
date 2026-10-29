@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import type { ComponentChild } from 'preact';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { toVdom, hydratedIslands } from '../vdom';
+import { parseDirectiveValue, toVdom, hydratedIslands } from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
@@ -38,6 +38,28 @@ describe( 'toVdom', () => {
 	beforeEach( () => {
 		// @ts-expect-error `_values` is an internal property, accessed here for testing.
 		hydratedIslands._values = new WeakMap();
+	} );
+
+	describe( 'parseDirectiveValue', () => {
+		it( 'should separate a namespace from a plain directive value', () => {
+			expect( parseDirectiveValue( 'myplugin::sidebar' ) ).toEqual( {
+				namespace: 'myplugin',
+				value: 'sidebar',
+			} );
+		} );
+
+		it( 'should keep plain objects and preserve JSON scalar values as strings', () => {
+			expect(
+				parseDirectiveValue( 'myplugin::{"id":"sidebar"}' )
+			).toEqual( {
+				namespace: 'myplugin',
+				value: { id: 'sidebar' },
+			} );
+			expect( parseDirectiveValue( '123' ) ).toEqual( {
+				namespace: null,
+				value: '123',
+			} );
+		} );
 	} );
 
 	describe( 'Basic node types', () => {
@@ -276,6 +298,63 @@ describe( 'toVdom', () => {
 	} );
 
 	describe( 'Directive processing', () => {
+		it.each( [ 'data-wp--bind', 'data-wp---foo', 'data-wp----foo' ] )(
+			'should reject malformed directive name %s',
+			( attributeName ) => {
+				const element = createElementFromHTML(
+					`<div ${ attributeName }></div>`
+				);
+
+				expect( toVdom( element ) ).toMatchVNode(
+					h(
+						'div' as any,
+						{
+							[ attributeName ]: '',
+							__directives: {},
+						},
+						[]
+					)
+				);
+				expect( global.console.warn ).toHaveBeenCalledTimes( 1 );
+				expect( global.console ).toHaveWarnedWith(
+					`Found malformed directive name: ${ attributeName }.`
+				);
+			}
+		);
+
+		it.each( [
+			[ 'data-wp-bind', 'bind', null ],
+			[ 'data-wp-style--var', 'style', 'var' ],
+			[ 'data-wp-style----var', 'style', '--var' ],
+		] )(
+			'should parse valid directive name %s',
+			( attributeName, prefix, suffix ) => {
+				const element = createElementFromHTML(
+					`<div ${ attributeName }></div>`
+				);
+
+				expect( toVdom( element ) ).toMatchVNode(
+					h(
+						'div' as any,
+						{
+							[ attributeName ]: '',
+							__directives: {
+								[ prefix ]: [
+									{
+										namespace: null,
+										value: '',
+										suffix,
+										uniqueId: null,
+									},
+								],
+							},
+						},
+						[]
+					)
+				);
+			}
+		);
+
 		it( 'should process simple directives', () => {
 			const element = createElementFromHTML(
 				`<div data-wp-test-one data-wp-test-two="test value"></div>`

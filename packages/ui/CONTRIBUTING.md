@@ -53,6 +53,16 @@ The package follows [semantic versioning](https://semver.org/), and the followin
 -   Component props (e.g. renaming, removing, or changing a props supported types such that existing usage would break in an update)
 -   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience). This surface is frozen: do not add new `--wp-ui-*` custom properties. See [Custom property names](#custom-property-names).
 
+### Component naming
+
+Name components for what they are. In a name with a modifier, put the component's kind last and its appearance or purpose first. For example, `IconButton` is a button that displays an icon, while `ButtonLink` is a link styled as a button.
+
+Apply the same pattern to compound components. `Dialog.CloseIconButton`, `Drawer.CloseIconButton`, and `Notice.CloseIconButton` are icon buttons with a close or dismiss purpose. `ButtonLink.Icon` is the icon inside a link, not an interactive control of its own.
+
+Use the compound component's context when naming its parts. `Menu.LinkItem`, `Menu.CheckboxItem`, and `Menu.RadioItem` describe kinds of menu items; `Breadcrumb.LinkItem` describes a breadcrumb item. Names that describe a composition, such as `ControlWithError` and `ChipWithRemove`, can retain that structure.
+
+Keep filenames, prop types, display names, and Storybook names consistent with the public component name. Follow the [compound component conventions](#compound-components) when deciding whether to expose a standalone component or a `.Root` with required parts.
+
 ### Controlled and uncontrolled props
 
 When designing props for a new component:
@@ -80,6 +90,12 @@ When designing props for a new component:
     ```
 
 -   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
+
+### Component status
+
+When you change a component's Storybook `parameters.componentStatus.status` or its public export, check the `@wordpress/ui` entry in the [`use-recommended-components`](../eslint-plugin/docs/rules/use-recommended-components.md) ESLint rule. `recommended` components belong in `allowed`, `use-with-caution` components in `caution`, and other statuses in neither.
+
+The Design System MCP catalog uses a curated Storybook manifest. Add `tags: [ 'manifest' ]` to a recommended component's story metadata, and remove the tag from the component it replaces. The tag is independent of `componentStatus`, so update both when changing the recommendation. Update the ESLint rule's replacement guidance and any migration documentation as needed. Run `npm run storybook:build` and `npm run storybook:manifest-snapshot`, then review and commit the generated snapshot and any allowlist reductions. See [Manifest snapshot regression testing](../../storybook/README.md#manifest-snapshot-regression-testing).
 
 ## Compound Components
 
@@ -304,9 +320,9 @@ High-level wrappers that hide `Popup` (for example `IconButton`, which renders a
 
 ### CSS Layers
 
-We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
+We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. Component stylesheets follow this layering approach to maintain consistency and prevent specificity conflicts. `VisuallyHidden` is an exception: its styles are unlayered so global element styles cannot override its hiding behavior solely through cascade layer precedence.
 
-Every component stylesheet must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
+Layered component stylesheets must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
 
 ```css
 @layer wp-ui {

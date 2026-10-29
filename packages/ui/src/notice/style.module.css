@@ -125,7 +125,7 @@
 			margin-block: auto;
 		}
 
-		/* Add partial transparency to CloseIcon and outline/minimal ActionButton
+		/* Add partial transparency to CloseIconButton and outline/minimal ActionButton
 		 * for a better look over tinted backgrounds */
 		.close-icon,
 		.action-button:is(.is-action-button-outline, .is-action-button-minimal) {

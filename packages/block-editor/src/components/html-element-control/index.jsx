@@ -1,9 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	SelectControl as WCSelectControl,
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { htmlElementMessages } from './messages';
@@ -12,11 +9,11 @@ import { htmlElementMessages } from './messages';
  * Renders a SelectControl for choosing HTML elements with validation
  * to prevent duplicate <main> elements.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.tagName  The current HTML tag name.
- * @param {Function} props.onChange Function to call when the tag is changed.
- * @param {string}   props.clientId Optional. The client ID of the block. Used to check for existing <main> elements.
- * @param {Array}    props.options  SelectControl options (optional).
+ * @param {Object}                    props          Component props.
+ * @param {string}                    props.tagName  The current HTML tag name.
+ * @param {(tagName: string) => void} props.onChange Function to call when the tag is changed.
+ * @param {string}                    props.clientId Optional. The client ID of the block. Used to check for existing <main> elements.
+ * @param {Array}                     props.options  SelectControl options (optional).
  *
  * @return {Component} The HTML element select control with validation.
  */
@@ -80,12 +77,18 @@ export default function HTMLElementControl( {
 
 	return (
 		<VStack spacing={ 2 } className="block-editor-html-element-control">
-			<WCSelectControl
+			<SelectControl
 				label={ __( 'HTML element' ) }
-				options={ modifiedOptions }
-				value={ tagName }
-				onChange={ onChange }
-				help={ htmlElementMessages[ tagName ] }
+				items={ modifiedOptions }
+				value={
+					modifiedOptions.find(
+						( item ) => item.value === tagName
+					) ??
+					modifiedOptions.find( ( item ) => ! item.disabled ) ??
+					null
+				}
+				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+				description={ htmlElementMessages[ tagName ] }
 			/>
 
 			{ tagName === 'main' && hasMainElementElsewhere && (

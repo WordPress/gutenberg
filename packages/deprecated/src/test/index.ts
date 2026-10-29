@@ -1,14 +1,8 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { didAction } from '@wordpress/hooks';
-import deprecated, { logged } from '..';
+import deprecated from '..';
 
 describe( 'deprecated', () => {
-	afterEach( () => {
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
-	} );
-
 	it( 'should show a deprecation warning', () => {
 		deprecated( 'Eating meat' );
 

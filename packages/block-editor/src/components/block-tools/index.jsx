@@ -22,6 +22,7 @@ import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
+import MultiBlockFormatEdit from '../rich-text/multi-block-format-edit';
 
 function selector( select ) {
 	const {
@@ -134,7 +135,7 @@ export default function BlockTools( {
 					? clientIds.length
 					: 1;
 				const message = sprintf(
-					// translators: %d: the name of the block that has been moved
+					// translators: %d: Number of blocks moved.
 					_n(
 						'%d block moved.',
 						'%d blocks moved.',
@@ -318,7 +319,9 @@ export default function BlockTools( {
 						ref={ blockToolbarRef }
 					/>
 				) }
-				{ children }
+				<MultiBlockFormatEdit contentRef={ __unstableContentRef }>
+					{ children }
+				</MultiBlockFormatEdit>
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
 					name="__unstable-block-tools-after"

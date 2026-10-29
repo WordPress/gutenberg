@@ -11,12 +11,19 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * A low-level primitive that groups radio buttons so they share one selected
  * value.
  *
+ * Prefer `RadioGroupControl` for standard labeled radio groups.
+ *
  * Must wrap `Radio` items. For one labeled group, pass `RadioGroup` to
  * `Fieldset.Root`'s `render` prop. When a `Fieldset` contains multiple groups,
  * give each `RadioGroup` its own accessible name.
  */
-export const RadioGroup = forwardRef< HTMLDivElement, RadioGroupProps >(
-	function RadioGroup( { render = DEFAULT_RENDER, ...restProps }, ref ) {
-		return <_RadioGroup ref={ ref } render={ render } { ...restProps } />;
-	}
-);
+export const RadioGroup = forwardRef( function UnforwardedRadioGroup< Value >(
+	{ render = DEFAULT_RENDER, ...restProps }: RadioGroupProps< Value >,
+	ref: React.ForwardedRef< HTMLDivElement >
+) {
+	return (
+		<_RadioGroup< Value > ref={ ref } render={ render } { ...restProps } />
+	);
+} ) as < Value = unknown >(
+	props: RadioGroupProps< Value > & React.RefAttributes< HTMLDivElement >
+) => React.JSX.Element;

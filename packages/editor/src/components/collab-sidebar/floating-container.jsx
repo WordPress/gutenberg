@@ -14,7 +14,17 @@ export function FloatingContainer( {
 			direction="column"
 			className={ clsx( className, { 'is-floating': isFloating } ) }
 			ref={ isFloating ? floating.ref : undefined }
-			style={ isFloating ? { top: floating.y, ...style } : style }
+			style={
+				isFloating
+					? {
+							top: floating.y,
+							// Threads mount before the first measurement. Not
+							// `visibility`, which would block focusing the new note form.
+							opacity: floating.y === undefined ? 0 : undefined,
+							...style,
+						}
+					: style
+			}
 			{ ...props }
 		>
 			{ children }

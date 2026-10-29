@@ -18,6 +18,7 @@ const meta: Meta< typeof SelectControl > = {
 		'SelectControl.Item': SelectControl.Item,
 		'SelectControl.ItemLabel': SelectControl.ItemLabel,
 		'SelectControl.ItemDescription': SelectControl.ItemDescription,
+		'SelectControl.Separator': SelectControl.Separator,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
@@ -52,6 +53,12 @@ export const Default: Story = {
 		description: 'This is the description.',
 	},
 };
+
+const separatorItems = [
+	{ value: 'apple', label: 'Apple' },
+	{ value: 'banana', label: 'Banana' },
+	{ value: 'other', label: 'Other' },
+];
 
 /**
  * When no value is selected, the trigger shows the default placeholder text.
@@ -193,6 +200,37 @@ export const Grouped: Story = {
 					) ) }
 				</SelectControl.Group>
 			) ),
+		],
+	},
+};
+
+/**
+ * Use `SelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		label: 'Fruit',
+		items: separatorItems,
+		children: [
+			...separatorItems.slice( 0, 2 ).map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<SelectControl.ItemLabel>
+						{ item.label }
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ),
+			<SelectControl.Separator key="separator" />,
+			<SelectControl.Item
+				key="other"
+				value={ separatorItems[ 2 ] }
+				label="Other"
+			>
+				<SelectControl.ItemLabel>Other</SelectControl.ItemLabel>
+			</SelectControl.Item>,
 		],
 	},
 };

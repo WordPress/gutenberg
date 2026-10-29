@@ -2,7 +2,7 @@ export {
 	useMediaEditorState,
 	resolveAspectRatio,
 } from './use-media-editor-state';
-export type { MediaEditorController } from './use-media-editor-state';
+export type { MediaEditorSession } from './use-media-editor-state';
 export {
 	MediaEditorStateProvider,
 	useMediaEditor,
@@ -15,6 +15,8 @@ export {
 export { DEFAULT_CROP_OPTIONS } from './types';
 export type {
 	CropOptionsSlice,
+	EditsSlice,
+	EditValue,
 	MediaEditorState,
 	MediaEditorAction,
 } from './types';

@@ -330,7 +330,10 @@ describe( 'ControlWithError', () => {
 					value: string;
 					onChange: ( value: string ) => void;
 				}
-			>( function ClampedNumberInput( { label, value, onChange }, ref ) {
+			>( function UnforwardedClampedNumberInput(
+				{ label, value, onChange },
+				ref
+			) {
 				const [ innerValue, setInnerValue ] = useState( value );
 				useIsomorphicLayoutEffect( () => {
 					setInnerValue( value );

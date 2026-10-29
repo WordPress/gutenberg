@@ -1,5 +1,5 @@
 import stylelint from 'stylelint';
-import tokenList from '../prebuilt/js/design-tokens.mjs';
+import { tokens } from '../prebuilt/js/design-tokens.mjs';
 
 const DS_TOKEN_PREFIX = 'wpds-';
 
@@ -36,7 +36,7 @@ function extractCSSVariables( value, prefix = '' ) {
 	return variables;
 }
 
-const knownTokens = new Set( tokenList );
+const knownTokens = new Set( Object.keys( tokens ) );
 const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
 
 const {
