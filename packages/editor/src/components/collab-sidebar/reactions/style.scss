@@ -92,6 +92,12 @@
 
 		@media (forced-colors: active) {
 			background-color: SelectedItem;
+			color: SelectedItemText;
+
+			// Otherwise the emoji sits on a `Canvas` backplate.
+			> * {
+				forced-color-adjust: none;
+			}
 		}
 	}
 }
