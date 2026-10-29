@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
+
 ### Enhancements
 
+-   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
@@ -14,6 +19,8 @@
 
 ### Bug Fixes
 
+-   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
+-   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
