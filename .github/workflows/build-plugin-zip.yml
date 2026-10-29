@@ -272,19 +272,6 @@ jobs:
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
-            - name: Build Storybook for Playground preview
-              if: ${{ github.event_name == 'pull_request' && matrix.IS_GUTENBERG_PLUGIN }}
-              env:
-                  NODE_OPTIONS: --max-old-space-size=8192
-                  NODE_ENV: production
-              run: npm run --workspace @wordpress/storybook storybook:build
-
-            - name: Add Storybook to Playground preview zip
-              if: ${{ github.event_name == 'pull_request' && matrix.IS_GUTENBERG_PLUGIN }}
-              run: |
-                  cp -R storybook/build "$RUNNER_TEMP/storybook"
-                  ( cd "$RUNNER_TEMP" && zip --recurse-paths --no-dir-entries --quiet "$GITHUB_WORKSPACE/gutenberg.zip" storybook )
-
             # When using archive: false to upload an artifact, the file name is used and the name input is ignored.
             # This ensures unique artifiact names for `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE`.
             - name: Rename Zip file for wordpress-develop
@@ -298,6 +285,27 @@ jobs:
                   archive: false
                   # Pull request builds only need to outlive Playground previews of active pull requests.
                   retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
+
+            - name: Build Storybook for Playground preview
+              id: storybook
+              if: ${{ github.event_name == 'pull_request' && matrix.IS_GUTENBERG_PLUGIN }}
+              continue-on-error: true
+              env:
+                  NODE_OPTIONS: --max-old-space-size=8192
+                  NODE_ENV: production
+              run: |
+                  npm run --workspace @wordpress/storybook storybook:build
+                  cp -R storybook/build "$RUNNER_TEMP/storybook"
+                  ( cd "$RUNNER_TEMP" && zip --recurse-paths --no-dir-entries --quiet "$GITHUB_WORKSPACE/gutenberg.zip" storybook )
+
+            - name: Upload artifact with Storybook
+              if: ${{ steps.storybook.outcome == 'success' }}
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  path: ./gutenberg.zip
+                  archive: false
+                  overwrite: true
+                  retention-days: 14
 
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
