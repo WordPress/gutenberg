@@ -1,0 +1,82 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Same footprint as the small toggle button, so the card never shifts.
+.block-editor-style-changes-indicator {
+	display: flex;
+	flex: none;
+	width: $button-size-small;
+	height: $button-size-small;
+}
+
+.block-editor-style-changes-indicator__content .components-popover__content {
+	width: 280px;
+	padding: $grid-unit-20;
+}
+
+.block-editor-style-changes:focus {
+	outline: none;
+}
+
+.block-editor-style-changes__title {
+	margin: 0;
+}
+
+.block-editor-style-changes__group {
+	margin-top: $grid-unit-20;
+}
+
+.block-editor-style-changes__group + .block-editor-style-changes__group {
+	padding-top: $grid-unit-20;
+	border-top: $border-width solid $gray-300;
+}
+
+.block-editor-style-changes__group-header {
+	min-height: $button-size-small;
+}
+
+.block-editor-style-changes__heading {
+	margin: 0;
+	color: $gray-700;
+}
+
+.block-editor-style-changes__items {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-05;
+	margin: $grid-unit-05 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.block-editor-style-changes__item {
+	min-height: $button-size-small;
+	margin: 0;
+}
+
+.block-editor-style-changes__label {
+	flex: none;
+	color: $gray-900;
+}
+
+.block-editor-style-changes__source {
+	min-width: 0;
+	overflow: hidden;
+	color: $gray-700;
+	text-align: end;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+// Keeps the text in line with the right edge while leaving the focus ring
+// room around it.
+.block-editor-style-changes__action.components-button {
+	flex: none;
+	margin-inline-end: -$grid-unit-05;
+	padding: 0 $grid-unit-05;
+}
+
+.block-editor-style-changes__empty {
+	margin: $grid-unit-15 0 0;
+	color: $gray-700;
+}

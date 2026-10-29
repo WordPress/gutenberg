@@ -1,29 +1,22 @@
 import { Button, Dropdown, Path, SVG } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { store as blockEditorStore } from '../../../store';
 import { BlockEditContextProvider } from '../../block-edit/context';
-import InspectorPopoverHeader from '../../inspector-popover-header';
-import { isGlobalStylesInheritanceIndicatorUIEnabled } from '.';
 import { useStyleChangeRows } from './style-changes';
 import { getResetAttributes } from './style-change-rows';
 import type { StyleChangeRow } from './style-change-rows';
 
-// `pathLength` gives each side six units, so the dashed state's
-// `stroke-dasharray` lands a dash on every corner and every side's middle.
 const diamond = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
-			className="block-editor-style-changes-indicator__diamond"
 			d="M12 7 17 12 12 17 7 12 12 7Z"
 			fill="none"
 			stroke="currentColor"
 			strokeWidth="1.5"
-			pathLength="24"
 		/>
 	</SVG>
 );
@@ -36,75 +29,80 @@ function StyleChangeItem( {
 	onReset?: ( rows: StyleChangeRow[] ) => void;
 } ) {
 	return (
-		<li className="block-editor-style-changes__item">
-			<Stack
-				direction="row"
-				gap="md"
-				align="center"
-				justify="space-between"
-			>
-				<span className="block-editor-style-changes__label">
-					{ row.label }
-				</span>
-				{ onReset && (
-					<Button
-						__next40pxDefaultSize={ false }
-						size="small"
-						variant="tertiary"
-						className="block-editor-style-changes__action"
-						label={ sprintf(
-							/* translators: %s: Style name, e.g. "Text color". */
-							__( 'Reset %s' ),
-							row.label
-						) }
-						showTooltip={ false }
-						onClick={ () => onReset( [ row ] ) }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				) }
-			</Stack>
-			{ row.status === 'inherited' && (
-				<span className="block-editor-style-changes__source">
+		<Stack
+			render={ <li /> }
+			className="block-editor-style-changes__item"
+			direction="row"
+			gap="md"
+			align="center"
+			justify="space-between"
+		>
+			<Text className="block-editor-style-changes__label">
+				{ row.label }
+			</Text>
+			{ onReset ? (
+				<Button
+					__next40pxDefaultSize={ false }
+					size="small"
+					variant="tertiary"
+					className="block-editor-style-changes__action"
+					label={ sprintf(
+						/* translators: %s: Style name, e.g. "Text color". */
+						__( 'Reset %s' ),
+						row.label
+					) }
+					showTooltip={ false }
+					onClick={ () => onReset( [ row ] ) }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			) : (
+				<Text className="block-editor-style-changes__source">
 					{ row.sourceLabel }
-				</span>
+				</Text>
 			) }
-		</li>
+		</Stack>
 	);
 }
 
 function StyleChangesGroup( {
 	title,
 	rows,
-	emptyText,
 	onReset,
-	children,
+	action,
 }: {
 	title: string;
 	rows: StyleChangeRow[];
-	emptyText: string;
 	onReset?: ( rows: StyleChangeRow[] ) => void;
-	children?: ReactNode;
+	action?: ReactNode;
 } ) {
 	return (
 		<section className="block-editor-style-changes__group">
-			<h3 className="block-editor-style-changes__heading">{ title }</h3>
-			{ rows.length ? (
-				<ul className="block-editor-style-changes__items">
-					{ rows.map( ( row ) => (
-						<StyleChangeItem
-							key={ row.key }
-							row={ row }
-							onReset={ onReset }
-						/>
-					) ) }
-				</ul>
-			) : (
-				<p className="block-editor-style-changes__empty">
-					{ emptyText }
-				</p>
-			) }
-			{ children }
+			<Stack
+				className="block-editor-style-changes__group-header"
+				direction="row"
+				gap="md"
+				align="center"
+				justify="space-between"
+			>
+				<Text
+					variant="heading-sm"
+					render={ <h3 /> }
+					className="block-editor-style-changes__heading"
+				>
+					{ title }
+				</Text>
+				{ action }
+			</Stack>
+			<ul className="block-editor-style-changes__items">
+				{ rows.map( ( row ) => (
+					<StyleChangeItem
+						key={ row.key }
+						row={ row }
+						onReset={ onReset }
+					/>
+				) ) }
+			</ul>
 		</section>
 	);
 }
@@ -112,11 +110,9 @@ function StyleChangesGroup( {
 function StyleChangesList( {
 	clientId,
 	rows,
-	onClose,
 }: {
 	clientId: string;
 	rows: StyleChangeRow[];
-	onClose: () => void;
 } ) {
 	const ref = useRef< HTMLDivElement >( null );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -141,19 +137,19 @@ function StyleChangesList( {
 	};
 	return (
 		<div className="block-editor-style-changes" ref={ ref } tabIndex={ -1 }>
-			<InspectorPopoverHeader
-				title={ __( 'Style origins' ) }
-				help={ undefined }
-				onClose={ onClose }
-			/>
-			<StyleChangesGroup
-				title={ __( 'On this block' ) }
-				rows={ localRows }
-				emptyText={ __( 'No styles are set on this block.' ) }
-				onReset={ onReset }
+			<Text
+				variant="heading-md"
+				render={ <h2 /> }
+				className="block-editor-style-changes__title"
 			>
-				{ localRows.length > 0 && (
-					<div className="block-editor-style-changes__reset-all">
+				{ __( 'Style origins' ) }
+			</Text>
+			{ localRows.length > 0 && (
+				<StyleChangesGroup
+					title={ __( 'On this block' ) }
+					rows={ localRows }
+					onReset={ onReset }
+					action={
 						<Button
 							__next40pxDefaultSize={ false }
 							size="small"
@@ -163,14 +159,23 @@ function StyleChangesList( {
 						>
 							{ __( 'Reset all' ) }
 						</Button>
-					</div>
-				) }
-			</StyleChangesGroup>
-			<StyleChangesGroup
-				title={ __( 'Inherited' ) }
-				rows={ inheritedRows }
-				emptyText={ __( 'This block inherits no styles.' ) }
-			/>
+					}
+				/>
+			) }
+			{ inheritedRows.length > 0 && (
+				<StyleChangesGroup
+					title={ __( 'Inherited' ) }
+					rows={ inheritedRows }
+				/>
+			) }
+			{ ! rows.length && (
+				<Text
+					render={ <p /> }
+					className="block-editor-style-changes__empty"
+				>
+					{ __( 'No styles are set on or inherited by this block.' ) }
+				</Text>
+			) }
 		</div>
 	);
 }
@@ -183,7 +188,6 @@ function StyleChangesDropdown( {
 	popoverAnchor?: HTMLElement | null;
 } ) {
 	const rows = useStyleChangeRows( clientId );
-	const hasLocalStyles = rows.some( ( row ) => row.status !== 'inherited' );
 	// Mirrors the inspector's other popovers: beside the sidebar, not over it.
 	const popoverProps = useMemo(
 		() => ( {
@@ -191,6 +195,9 @@ function StyleChangesDropdown( {
 			placement: 'left-start' as const,
 			offset: 36,
 			shift: true,
+			// An inherited-only list has nothing focusable, so focus the
+			// popover itself or Escape and outside clicks can't close it.
+			focusOnMount: true,
 		} ),
 		[ popoverAnchor ]
 	);
@@ -203,43 +210,29 @@ function StyleChangesDropdown( {
 				<Button
 					size="small"
 					icon={ diamond }
-					className={ clsx(
-						'block-editor-style-changes-indicator__toggle',
-						{ 'is-inherited-only': ! hasLocalStyles }
-					) }
+					className="block-editor-style-changes-indicator__toggle"
 					label={ __( 'Style origins' ) }
-					description={
-						hasLocalStyles
-							? __(
-									'This block has styles set on it. Show where each of its styles comes from.'
-								)
-							: __(
-									'This block only inherits its styles. Show where each comes from.'
-								)
-					}
+					description={ __(
+						'Show where each style on this block comes from.'
+					) }
 					onClick={ onToggle }
 					aria-expanded={ isOpen }
 				/>
 			) }
-			renderContent={ ( { onClose } ) => (
-				<StyleChangesList
-					clientId={ clientId }
-					rows={ rows }
-					onClose={ onClose }
-				/>
+			renderContent={ () => (
+				<StyleChangesList clientId={ clientId } rows={ rows } />
 			) }
 		/>
 	);
 }
 
 /**
- * The block card's indicator of where a block's styles come from. The diamond
- * is solid when the block sets some of its own styles and dashed when it only
- * inherits them. It opens a popover listing the styles set on the block, each
- * with a reset, and the ones it inherits with where each comes from.
+ * The block card's indicator of where a block's styles come from. It opens a
+ * popover listing the styles set on the block, each with a reset, and the ones
+ * it inherits with where each comes from.
  *
- * Shown only behind the `gutenberg-global-styles-inheritance-ui` experiment,
- * for a block theme, since the sources it names live in the Styles screen.
+ * Shown only for a block theme, since the sources it names live in the Styles
+ * screen.
  *
  * @param props
  * @param props.clientId      Block client ID.
@@ -267,11 +260,7 @@ export default function StyleChangesIndicator( {
 		() => ( { name: blockName ?? '', clientId, isSelected: true } ),
 		[ blockName, clientId ]
 	);
-	if (
-		! isGlobalStylesInheritanceIndicatorUIEnabled() ||
-		! isBlockBasedTheme ||
-		! blockName
-	) {
+	if ( ! isBlockBasedTheme || ! blockName ) {
 		return null;
 	}
 	return (

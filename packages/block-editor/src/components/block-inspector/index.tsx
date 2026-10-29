@@ -38,7 +38,7 @@ import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
-import StyleChangesIndicator from '../global-styles/inheritance/style-changes-indicator';
+import StyleChangesIndicator from '../global-styles/style-origins/style-changes-indicator';
 import {
 	BlockStyleStateProvider,
 	hasPseudoBlockStyleState,

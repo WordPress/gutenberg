@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -131,21 +131,9 @@ describe( 'StyleChangesIndicator', () => {
 	const updateBlockAttributes = vi.fn();
 
 	beforeEach( () => {
-		window.__experimentalGlobalStylesInheritanceUI = true;
 		mockedUseSelect.mockReset();
 		updateBlockAttributes.mockReset();
 		mockedUseDispatch.mockReturnValue( { updateBlockAttributes } );
-	} );
-
-	afterEach( () => {
-		delete window.__experimentalGlobalStylesInheritanceUI;
-	} );
-
-	test( 'renders nothing with the experiment off', () => {
-		delete window.__experimentalGlobalStylesInheritanceUI;
-		mockStores( { attributes: LOCAL_ATTRIBUTES } );
-		const { container } = render( <StyleChangesIndicator clientId="a" /> );
-		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	test( 'renders nothing for a classic theme', () => {
@@ -157,18 +145,18 @@ describe( 'StyleChangesIndicator', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
-	test( 'shows a dashed diamond when the block only inherits styles', async () => {
+	test( 'lists only inherited styles when the block sets none', async () => {
 		const user = userEvent.setup();
 		mockStores();
 		render( <StyleChangesIndicator clientId="a" /> );
 
-		const toggle = screen.getByRole( 'button', { name: 'Style origins' } );
-		expect( toggle ).toHaveClass( 'is-inherited-only' );
-		await user.click( toggle );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Style origins' } )
+		);
 
 		expect(
-			screen.getByText( 'No styles are set on this block.' )
-		).toBeInTheDocument();
+			screen.queryByRole( 'heading', { name: 'On this block' } )
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'heading', { name: 'Inherited' } )
 		).toBeInTheDocument();
@@ -186,9 +174,9 @@ describe( 'StyleChangesIndicator', () => {
 		mockStores( { attributes: LOCAL_ATTRIBUTES } );
 		render( <StyleChangesIndicator clientId="a" /> );
 
-		const toggle = screen.getByRole( 'button', { name: 'Style origins' } );
-		expect( toggle ).not.toHaveClass( 'is-inherited-only' );
-		await user.click( toggle );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Style origins' } )
+		);
 
 		expect(
 			screen.getByRole( 'heading', { name: 'On this block' } )
@@ -219,5 +207,42 @@ describe( 'StyleChangesIndicator', () => {
 		expect( updateBlockAttributes ).toHaveBeenCalledWith( 'a', {
 			style: undefined,
 		} );
+	} );
+
+	test( 'says so when the block has no styles to list', async () => {
+		const user = userEvent.setup();
+		mockStores( { globalStyles: {} } );
+		render( <StyleChangesIndicator clientId="a" /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Style origins' } )
+		);
+
+		expect(
+			screen.getByText(
+				'No styles are set on or inherited by this block.'
+			)
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'heading', { level: 3 } )
+		).not.toBeInTheDocument();
+	} );
+
+	test( 'closes on Escape when the block only inherits styles', async () => {
+		const user = userEvent.setup();
+		mockStores();
+		render( <StyleChangesIndicator clientId="a" /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Style origins' } )
+		);
+		expect(
+			screen.getByRole( 'heading', { name: 'Inherited' } )
+		).toBeInTheDocument();
+
+		await user.keyboard( '{Escape}' );
+		expect(
+			screen.queryByRole( 'heading', { name: 'Inherited' } )
+		).not.toBeInTheDocument();
 	} );
 } );
