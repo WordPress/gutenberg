@@ -26,6 +26,8 @@ import {
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 	getNoteAnchorRect,
+	isCrossBlockTextSelection,
+	readMultiBlockSelection,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -1340,5 +1342,116 @@ describe( 'getNoteAnchorRect', () => {
 
 		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 120 );
 		expect( getNoteAnchorRect( 34, blockEl ).top ).toBe( 180 );
+	} );
+} );
+
+describe( 'isCrossBlockTextSelection', () => {
+	it( 'is true for text selected across blocks', () => {
+		expect(
+			isCrossBlockTextSelection(
+				{ clientId: 'a', attributeKey: 'content', offset: 2 },
+				{ clientId: 'b', attributeKey: 'content', offset: 3 }
+			)
+		).toBe( true );
+	} );
+
+	it( 'is false within one block', () => {
+		expect(
+			isCrossBlockTextSelection(
+				{ clientId: 'a', attributeKey: 'content', offset: 2 },
+				{ clientId: 'a', attributeKey: 'content', offset: 3 }
+			)
+		).toBe( false );
+	} );
+
+	it( 'is false for whole blocks', () => {
+		expect(
+			isCrossBlockTextSelection( { clientId: 'a' }, { clientId: 'b' } )
+		).toBe( false );
+	} );
+} );
+
+describe( 'readMultiBlockSelection', () => {
+	const blocks = {
+		a: { content: RichTextData.fromHTMLString( 'First block' ) },
+		b: { content: RichTextData.fromHTMLString( 'Second' ) },
+		c: { content: RichTextData.fromHTMLString( 'Third block' ) },
+		image: { url: 'image.jpg' },
+	};
+	const read = ( start, end, clientIds ) =>
+		readMultiBlockSelection( {
+			getSelectionStart: () => start,
+			getSelectionEnd: () => end,
+			getSelectedBlockClientIds: () => clientIds,
+			getBlockAttributes: ( clientId ) => blocks[ clientId ],
+		} );
+
+	it( 'marks the first block from the caret, the middle whole, and the last up to the caret', () => {
+		expect(
+			read(
+				{ clientId: 'a', attributeKey: 'content', offset: 6 },
+				{ clientId: 'c', attributeKey: 'content', offset: 5 },
+				[ 'a', 'b', 'c' ]
+			)
+		).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 6 },
+			{ clientId: 'c', attributeKey: 'content', start: 0, end: 5 },
+		] );
+	} );
+
+	it( 'reads a backward selection in document order', () => {
+		expect(
+			read(
+				{ clientId: 'b', attributeKey: 'content', offset: 3 },
+				{ clientId: 'a', attributeKey: 'content', offset: 6 },
+				[ 'a', 'b' ]
+			)
+		).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
+	} );
+
+	it( 'leaves out blocks without selected text', () => {
+		expect(
+			read(
+				{ clientId: 'a', attributeKey: 'content', offset: 11 },
+				{ clientId: 'c', attributeKey: 'content', offset: 5 },
+				[ 'a', 'image', 'c' ]
+			)
+		).toEqual( [
+			{ clientId: 'c', attributeKey: 'content', start: 0, end: 5 },
+		] );
+	} );
+
+	it( 'returns null within one block', () => {
+		expect(
+			read(
+				{ clientId: 'a', attributeKey: 'content', offset: 1 },
+				{ clientId: 'a', attributeKey: 'content', offset: 5 },
+				[ 'a' ]
+			)
+		).toBeNull();
+	} );
+
+	it( 'returns null across parents', () => {
+		expect(
+			read(
+				{ clientId: 'a', attributeKey: 'content', offset: 1 },
+				{ clientId: 'c', attributeKey: 'content', offset: 5 },
+				[]
+			)
+		).toBeNull();
+	} );
+
+	it( 'returns null when no text is selected', () => {
+		expect(
+			read(
+				{ clientId: 'a', attributeKey: 'content', offset: 11 },
+				{ clientId: 'image' },
+				[ 'a', 'image' ]
+			)
+		).toBeNull();
 	} );
 } );
