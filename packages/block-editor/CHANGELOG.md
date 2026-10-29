@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
@@ -12,6 +13,8 @@
 
 ### Bug Fixes
 
+-   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
@@ -37,6 +40,7 @@
 -   Convert the inserter hooks, patterns tab and media tab to TypeScript ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 -   Convert the inserter components, the block autocompleter, the change design control and the block parent selector to TypeScript ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 -   Convert the grid visualizer, the entry points and the remaining stories and tests to TypeScript ([#85035](https://github.com/WordPress/gutenberg/pull/85035)).
+-   Remove the `gutenberg-global-styles-inheritance-ui` experiment and its block inspector indicators ([#85884](https://github.com/WordPress/gutenberg/pull/85884)).
 
 ## 19.0.0 (2026-10-20)
 

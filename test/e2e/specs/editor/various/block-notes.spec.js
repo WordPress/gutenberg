@@ -1353,26 +1353,39 @@ test.describe( 'Block Notes', () => {
 			// The arrow keys move through the emoji, and Enter picks one.
 			await page.keyboard.press( 'Enter' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
 			).toBeFocused();
-			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
 			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
-				page.getByRole( 'button', { name: /Celebration/ } )
+				page.getByRole( 'button', { name: /Plus/ } )
 			).toContainText( '1' );
 
 			// The menu marks the emoji the user has already reacted with.
 			await trigger.click();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
 			).toBeChecked();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
 			).not.toBeChecked();
+
+			// The emoji name shows in a tooltip, and one Escape closes both.
+			await menu
+				.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				.hover();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeHidden();
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1502,7 +1515,9 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				// The pointer can rest on the pill, which then names the
+				// reactors: "admin reacted with heart".
+				name: /heart/i,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
