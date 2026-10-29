@@ -413,10 +413,23 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * which fails under cross-origin isolation. The sub-size and scaling
 		 * filters applied above still govern whether derivatives are generated.
 		 */
-		if ( ! empty( $request['url'] ) ) {
-			$response = $this->create_item_from_url( $request );
-		} else {
-			$response = parent::create_item( $request );
+		/*
+		 * Take the URL out of the request so the parent does not use its own
+		 * sideload branch, which returns before the post-insert handling runs.
+		 * The download happens in insert_attachment() instead, so a sideloaded
+		 * attachment follows exactly the same path as an uploaded one.
+		 */
+		$this->sideload_url = ! empty( $request['url'] ) ? $request['url'] : null;
+
+		if ( null !== $this->sideload_url ) {
+			$request->set_param( 'url', null );
+		}
+
+		$response = parent::create_item( $request );
+
+		if ( null !== $this->sideload_url ) {
+			$request->set_param( 'url', $this->sideload_url );
+			$this->sideload_url = null;
 		}
 
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
@@ -458,6 +471,31 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
+	 * URL to sideload for the request being handled, or null for a file upload.
+	 *
+	 * @var string|null
+	 */
+	private $sideload_url = null;
+
+	/**
+	 * Inserts the attachment, sideloading a remote URL when one was supplied.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return array|WP_Error Array with 'attachment_id' and 'file' on success.
+	 */
+	protected function insert_attachment( $request ) {
+		if ( null === $this->sideload_url ) {
+			return parent::insert_attachment( $request );
+		}
+
+		// The parent's own sideload branch is behind us, so put the URL back:
+		// every hook from here on still sees the request it was sent.
+		$request->set_param( 'url', $this->sideload_url );
+
+		return $this->create_item_from_url( $request );
+	}
+
+	/**
 	 * Sideloads an external image from a URL into the media library.
 	 *
 	 * Downloads the remote file on the server, avoiding a cross-origin browser
@@ -465,7 +503,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * generated is governed by the filters applied in create_item().
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
+	 * @return array|WP_Error Array with 'attachment_id' and 'file' on success, WP_Error on failure.
 	 */
 	protected function create_item_from_url( $request ) {
 		// Sideloading downloads and stores a file, so require the upload capability.
@@ -533,36 +571,86 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return $size_check;
 		}
 
-		$attachment_id = media_handle_sideload( $file_array, $post_id );
+		/*
+		 * media_handle_sideload() composes the attachment from the file alone,
+		 * so the request fields are lost and rest_insert_attachment never fires.
+		 * Mirror WP_REST_Attachments_Controller::insert_attachment() instead.
+		 */
 
-		if ( is_wp_error( $attachment_id ) ) {
-			/*
-			 * media_handle_sideload() deletes the temp file on success; remove
-			 * it explicitly when the sideload fails.
-			 */
+		// Use the parent post's month folder, as media_handle_sideload() does.
+		$parent_post = get_post( $post_id );
+		$time        = ( $parent_post && substr( $parent_post->post_date, 0, 4 ) > 0 ) ? $parent_post->post_date : current_time( 'mysql' );
+
+		$sideloaded = wp_handle_sideload( $file_array, array( 'test_form' => false ), $time );
+
+		if ( isset( $sideloaded['error'] ) ) {
 			if ( file_exists( $tmp_file ) ) {
 				wp_delete_file( $tmp_file );
 			}
+			return new WP_Error( 'rest_upload_sideload_error', $sideloaded['error'], array( 'status' => 500 ) );
+		}
+
+		$file     = $sideloaded['file'];
+		$file_url = $sideloaded['url'];
+		$type     = $sideloaded['type'];
+		$alt      = '';
+
+		// Use image exif/iptc data for title and caption defaults if possible.
+		$image_meta = wp_read_image_metadata( $file );
+
+		if ( ! empty( $image_meta ) ) {
+			if ( empty( $request['title'] ) && trim( $image_meta['title'] ) && ! is_numeric( sanitize_title( $image_meta['title'] ) ) ) {
+				$request['title'] = $image_meta['title'];
+			}
+
+			if ( empty( $request['caption'] ) && trim( $image_meta['caption'] ) ) {
+				$request['caption'] = $image_meta['caption'];
+			}
+
+			if ( empty( $request['alt'] ) && trim( $image_meta['alt'] ) ) {
+				$alt = $image_meta['alt'];
+			}
+		}
+
+		$attachment                 = $this->prepare_item_for_database( $request );
+		$attachment->post_mime_type = $type;
+		$attachment->guid           = $file_url;
+
+		// If the title was not supplied or read from the file, use the filename.
+		if ( empty( $attachment->post_title ) ) {
+			$attachment->post_title = preg_replace( '/\.[^.]+$/', '', wp_basename( $file ) );
+		}
+
+		// $post_parent is inherited from $attachment['post_parent'].
+		$attachment_id = wp_insert_attachment( wp_slash( (array) $attachment ), $file, 0, true, false );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			if ( file_exists( $file ) ) {
+				wp_delete_file( $file );
+			}
+
+			if ( 'db_update_error' === $attachment_id->get_error_code() ) {
+				$attachment_id->add_data( array( 'status' => 500 ) );
+			} else {
+				$attachment_id->add_data( array( 'status' => 400 ) );
+			}
+
 			return $attachment_id;
+		}
+
+		if ( trim( $alt ) ) {
+			update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $alt ) );
 		}
 
 		$attachment = get_post( $attachment_id );
 
-		$request->set_param( 'context', 'edit' );
-
-		/*
-		 * media_handle_sideload() fires the standard insert hooks (including
-		 * wp_after_insert_post), but not the REST-specific action, so fire it
-		 * here for parity with the uploaded-file path in create_item().
-		 */
 		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php */
-		do_action( 'rest_after_insert_attachment', $attachment, $request, true );
+		do_action( 'rest_insert_attachment', $attachment, $request, true );
 
-		$response = $this->prepare_item_for_response( $attachment, $request );
-		$response->set_status( 201 );
-		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
-
-		return $response;
+		return array(
+			'attachment_id' => $attachment_id,
+			'file'          => $file,
+		);
 	}
 
 	/**

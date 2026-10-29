@@ -2927,6 +2927,358 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Builds a single IPTC APP13 record.
+	 *
+	 * @param int    $record IPTC dataset number within record 2.
+	 * @param string $value  Value to store.
+	 * @return string The binary record.
+	 */
+	private function iptc_record( int $record, string $value ): string {
+		$length = strlen( $value );
+		return chr( 0x1c ) . chr( 2 ) . chr( $record ) . chr( $length >> 8 ) . chr( $length & 0xff ) . $value;
+	}
+
+	/**
+	 * Short-circuits download_url() with a fixture carrying IPTC headline and
+	 * caption records, so the sideload path has metadata to read.
+	 *
+	 * @param false|mixed[]|WP_Error     $response A preempted response, or false to continue.
+	 * @param array{ filename?: string } $args     HTTP request arguments.
+	 * @param string                     $url      The request URL.
+	 * @return array<string, mixed> A faked 200 response.
+	 */
+	public function mock_iptc_image_download( $response, array $args, string $url ): array {
+		$this->last_download_url = $url;
+
+		if ( ! empty( $args['filename'] ) ) {
+			$iptc = $this->iptc_record( 5, 'FIXTURE IPTC HEADLINE' ) . $this->iptc_record( 120, 'FIXTURE IPTC CAPTION' );
+			file_put_contents( $args['filename'], iptcembed( $iptc, DIR_TESTDATA . '/images/canola.jpg' ) );
+		}
+
+		return array(
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'headers'  => array(),
+			'cookies'  => array(),
+			'body'     => '',
+		);
+	}
+
+	/**
+	 * Verifies that title, caption and description supplied with a `url` request
+	 * are written to the attachment, as they are for an uploaded file.
+	 *
+	 * @covers ::create_item
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_applies_request_fields(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'title', 'Requested title' );
+		$request->set_param( 'caption', 'Requested caption' );
+		$request->set_param( 'description', 'Requested description' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$attachment = get_post( $response->get_data()['id'] );
+		$this->assertSame( 'Requested title', $attachment->post_title );
+		$this->assertSame( 'Requested caption', $attachment->post_excerpt );
+		$this->assertSame( 'Requested description', $attachment->post_content );
+	}
+
+	/**
+	 * Verifies that a sideloaded attachment honors the requested post status,
+	 * which prepare_item_for_database() applies on the uploaded-file path.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_applies_request_status(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'status', 'private' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'private', get_post( $response->get_data()['id'] )->post_status );
+	}
+
+	/**
+	 * Verifies that `rest_insert_attachment` fires once for a sideloaded attachment.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_fires_rest_insert_attachment(): void {
+		wp_set_current_user( self::$admin_id );
+
+		$fired = array();
+		$track = static function ( $attachment, $request, $creating ) use ( &$fired ) {
+			$fired[] = array(
+				'id'       => $attachment->ID,
+				'creating' => $creating,
+			);
+		};
+		add_action( 'rest_insert_attachment', $track, 10, 3 );
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/hooked.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+		remove_action( 'rest_insert_attachment', $track, 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertCount( 1, $fired, 'rest_insert_attachment should fire once for a sideloaded attachment.' );
+		$this->assertSame( $response->get_data()['id'], $fired[0]['id'] );
+		$this->assertTrue( $fired[0]['creating'] );
+	}
+
+	/**
+	 * Verifies that an IPTC caption lands in the caption field rather than the
+	 * description, as it does for an uploaded file.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_puts_iptc_caption_in_the_caption(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_iptc_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/iptc.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_iptc_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$attachment = get_post( $response->get_data()['id'] );
+		$this->assertSame( 'FIXTURE IPTC HEADLINE', $attachment->post_title );
+		$this->assertSame( 'FIXTURE IPTC CAPTION', $attachment->post_excerpt, 'The IPTC caption belongs in the caption field.' );
+		$this->assertSame( '', $attachment->post_content, 'The IPTC caption should not be written to the description.' );
+	}
+
+	/**
+	 * Verifies that a request title still wins over the IPTC headline, matching
+	 * the precedence the uploaded-file path applies.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_request_title_wins_over_iptc(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_iptc_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/iptc.jpg' );
+		$request->set_param( 'title', 'Requested title' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_iptc_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'Requested title', get_post( $response->get_data()['id'] )->post_title );
+	}
+
+	/**
+	 * Verifies that an image with neither a request title nor IPTC metadata
+	 * falls back to the filename.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_falls_back_to_the_filename(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'photo', get_post( $response->get_data()['id'] )->post_title );
+	}
+
+	/**
+	 * Verifies that a failed sideload reports the error code and status the
+	 * uploaded-file path reports.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_reports_sideload_failure(): void {
+		wp_set_current_user( self::$admin_id );
+
+		$fail = static function ( $file ) {
+			$file['error'] = 'Simulated sideload failure.';
+			return $file;
+		};
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+		add_filter( 'wp_handle_sideload_prefilter', $fail );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_handle_sideload_prefilter', $fail );
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 500, $response->get_status() );
+		$this->assertSame( 'rest_upload_sideload_error', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Verifies that a request `alt_text` is stored, and takes precedence over an
+	 * alt read from the file's own metadata.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_applies_alt_text(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'alt_text', 'Requested alt text' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame(
+			'Requested alt text',
+			get_post_meta( $response->get_data()['id'], '_wp_attachment_image_alt', true )
+		);
+	}
+
+	/**
+	 * Verifies that registered post meta supplied with the request is written.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_applies_registered_meta(): void {
+		wp_set_current_user( self::$admin_id );
+
+		register_post_meta(
+			'attachment',
+			'probe_sideload_meta',
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'string',
+			)
+		);
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'meta', array( 'probe_sideload_meta' => 'probe value' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+		unregister_post_meta( 'attachment', 'probe_sideload_meta' );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'probe value', get_post_meta( $response->get_data()['id'], 'probe_sideload_meta', true ) );
+	}
+
+	/**
+	 * Verifies that terms supplied with the request are assigned to the
+	 * sideloaded attachment.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_applies_terms(): void {
+		wp_set_current_user( self::$admin_id );
+
+		register_taxonomy( 'probe_media_type', 'attachment', array( 'show_in_rest' => true ) );
+		$term_id = self::factory()->term->create( array( 'taxonomy' => 'probe_media_type' ) );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'probe_media_type', array( $term_id ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$assigned = wp_get_object_terms( $response->get_data()['id'], 'probe_media_type', array( 'fields' => 'ids' ) );
+
+		unregister_taxonomy( 'probe_media_type' );
+
+		$this->assertSame( array( $term_id ), $assigned );
+	}
+
+	/**
+	 * Verifies that a field registered with register_rest_field() has its
+	 * update callback run for a sideloaded attachment.
+	 *
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_updates_additional_fields(): void {
+		wp_set_current_user( self::$admin_id );
+
+		$received = null;
+		register_rest_field(
+			'attachment',
+			'probe_extra_field',
+			array(
+				'get_callback'    => static function () {
+					return '';
+				},
+				'update_callback' => static function ( $value ) use ( &$received ) {
+					$received = $value;
+				},
+				'schema'          => array( 'type' => 'string' ),
+			)
+		);
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_param( 'probe_extra_field', 'probe field value' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'probe field value', $received, 'The registered field update callback should run.' );
+	}
+
+	/**
 	 * Verifies that image_quality is present in the schema.
 	 *
 	 * @covers ::get_item_schema
