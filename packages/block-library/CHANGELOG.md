@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 9.33.12 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.33.11 (2026-08-06)
 
 ### Bug Fixes
