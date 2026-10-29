@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Match the caret of the bulk "Actions" menu button at mobile widths to the `Select` caret, and show a spinner on the button while a bulk action is in progress ([#85955](https://github.com/WordPress/gutenberg/pull/85955)).
+-   Match the caret of the bulk "Actions" menu button at mobile widths to the `Select` caret, and show a spinner on the button and announce the loading state while a bulk action is in progress ([#85955](https://github.com/WordPress/gutenberg/pull/85955)).
 -   Use the design system outline for keyboard focus on list items ([#85358](https://github.com/WordPress/gutenberg/pull/85358)).
 -   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
 

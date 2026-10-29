@@ -26,6 +26,7 @@
 			--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
 			/* Icons are rendered as 24px but need to occupy a 16px footprint */
 			--wp-ui-button-icon-margin: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
+			--_wp-ui-button-gap: var(--wpds-dimension-gap-sm);
 
 			/* by default, borders have the same color as the background */
 			--wp-ui-button-border-color: var(--wp-ui-button-background-color);
@@ -41,7 +42,7 @@
 			display: inline-flex;
 			justify-content: center;
 			align-items: center;
-			gap: var(--wpds-dimension-gap-sm);
+			gap: var(--_wp-ui-button-gap);
 			aspect-ratio: var(--wp-ui-button-aspect-ratio);
 			min-width: var(--wp-ui-button-min-width);
 			max-width: 100%;
@@ -122,7 +123,7 @@
 		}
 
 		.caret {
-			--_wp-ui-caret-container-gap: var(--wpds-dimension-gap-sm);
+			--_wp-ui-caret-container-gap: var(--_wp-ui-button-gap);
 		}
 
 		/* Variants (`tone` + `variant`) overrides compared to default styles */

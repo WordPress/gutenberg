@@ -205,8 +205,6 @@ export const WithCaret: Story = {
 
 /**
  * Compares a `Button` with `Button.Caret` to a `Select` trigger at each size.
- * The caret has the same size, stroke, and distance from the label, and it is
- * pulled into the inline-end padding by the same amount.
  */
 export const CaretComparedWithSelect: Story = {
 	args: {

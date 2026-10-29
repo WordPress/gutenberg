@@ -18,8 +18,8 @@ export const Button = Object.assign( _Button, {
 	 */
 	Icon: ButtonIcon,
 	/**
-	 * A caret placed after the label of a `Button` that opens a menu, popover,
-	 * or listbox. It matches the caret in the `Select` trigger.
+	 * A caret placed after the label of a `Button` that opens a menu or
+	 * popover. It matches the caret in the `Select` trigger.
 	 */
 	Caret: ButtonCaret,
 } );
