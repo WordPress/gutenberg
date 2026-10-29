@@ -231,4 +231,31 @@ describe( 'GradientPicker', () => {
 			expect( onChange ).toHaveBeenCalledWith( GRADIENT_B, 0, 'blush' );
 		} );
 	} );
+
+	it( 'should render only the custom gradient editor without presets or a Clear button', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		await render(
+			<GradientPicker
+				gradients={ [] }
+				clearable={ false }
+				value={ GRADIENT_B }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Clear' } )
+		).not.toBeInTheDocument();
+
+		await user.selectOptions(
+			screen.getByRole( 'combobox', { name: 'Type' } ),
+			'radial-gradient'
+		);
+
+		expect( onChange ).toHaveBeenCalledWith(
+			'radial-gradient(rgb(122,220,180) 0%,rgb(0,208,130) 100%)'
+		);
+	} );
 } );

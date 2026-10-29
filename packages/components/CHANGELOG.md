@@ -16,6 +16,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Deprecations
+
+-   `CustomGradientPicker`: Deprecate in favor of `GradientPicker` with `gradients={ [] }` and `clearable={ false }`.
+
 ### Bug Fixes
 
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
