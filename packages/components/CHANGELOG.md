@@ -8,6 +8,8 @@
 
 ### Enhancements
 
+-   Popup menu and option items: Use solid WPDS brand highlights for the active item and keep inactive items neutral ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   `DropdownMenu`: Focus the menu on pointer opening and enter its items with arrow keys ([#85486](https://github.com/WordPress/gutenberg/pull/85486)).
 -   `RangeControl`: Use the design system outline for the slider thumb focus ring ([#85536](https://github.com/WordPress/gutenberg/pull/85536)).
 -   `UnitControl`: Use the design system outline for the unit select focus ring ([#85444](https://github.com/WordPress/gutenberg/pull/85444)).
 -   `CheckboxControl`, `RadioControl`: Use the design system outline for focus rings ([#85379](https://github.com/WordPress/gutenberg/pull/85379)).
@@ -15,6 +17,7 @@
 -   `FormToggle`: Use the design system outline for the focus ring ([#85285](https://github.com/WordPress/gutenberg/pull/85285)).
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
+-   `AlignmentMatrixControl`: Use the design system outline for the keyboard focus ring ([#85528](https://github.com/WordPress/gutenberg/pull/85528)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
 ### Deprecations
@@ -26,10 +29,12 @@
 
 ### Bug Fixes
 
+-   `MenuItem`: Keep the menu width stable when a checkbox or radio item is checked or unchecked ([#85831](https://github.com/WordPress/gutenberg/pull/85831)).
 -   `DropdownMenu`: Keep the height of `MenuItem` consistent regardless of whether it has an icon ([#85503](https://github.com/WordPress/gutenberg/pull/85503)).
 -   `ColorPicker`: Fire `onChange` immediately for hex and RGB input, so an edit is no longer lost when the picker closes right after it ([#85734](https://github.com/WordPress/gutenberg/pull/85734)).
 -   `Modal`: Keep an open modal exposed to screen readers when a modal opened before it closes ([#85720](https://github.com/WordPress/gutenberg/pull/85720)).
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85456](https://github.com/WordPress/gutenberg/pull/85456)).
+-   `DropdownMenu`, `MenuItem`, `Autocomplete`: Synchronize the active item with pointer movement and keyboard navigation ([#85487](https://github.com/WordPress/gutenberg/pull/85487)).
 -   `ToggleGroupControl`: Keep the width stable when the pressed option changes ([#85454](https://github.com/WordPress/gutenberg/pull/85454)).
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).

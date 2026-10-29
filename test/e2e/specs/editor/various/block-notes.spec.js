@@ -1355,7 +1355,7 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
 			).toBeFocused();
-			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
 				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
 			).toBeFocused();
@@ -1373,6 +1373,19 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
 			).not.toBeChecked();
+
+			// The emoji name shows in a tooltip, and one Escape closes both.
+			await menu
+				.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				.hover();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeHidden();
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1502,7 +1515,9 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				// The pointer can rest on the pill, which then names the
+				// reactors: "admin reacted with heart".
+				name: /heart/i,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
@@ -2068,6 +2083,62 @@ test.describe( 'Block Notes', () => {
 				0
 			);
 			await expect( paragraph ).toHaveText( 'Resolve this note.' );
+		} );
+
+		test( 'adds, resolves and deletes inline notes in merged text', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			// Each note action writes rich text data back, so each step merges
+			// again to get an HTML string.
+			async function appendAndMerge( content ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+				await paragraph.last().click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+				await expect( paragraph ).toHaveCount( 1 );
+			}
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'One' },
+			} );
+
+			await test.step( 'Add a note', async () => {
+				await appendAndMerge( ' two' );
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First note' );
+				await expect( marker ).toHaveText( 'One two' );
+			} );
+
+			await test.step( 'Resolve the note', async () => {
+				await appendAndMerge( ' three' );
+				await blockNoteUtils.getThread( 'First note' ).click();
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'Delete a note', async () => {
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second note' );
+				await appendAndMerge( ' four' );
+				await blockNoteUtils.getThread( 'Second note' ).click();
+				await blockNoteUtils.deleteNote();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
 		test( 'anchors the marker to only the selected text', async ( {

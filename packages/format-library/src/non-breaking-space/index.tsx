@@ -59,6 +59,10 @@ export const nonBreakingSpace = {
 		}
 
 		const range = getNonBreakingSpaceRange( value );
+		const rangeText = range
+			? value.text.slice( range[ 0 ], range[ 1 ] )
+			: '';
+		const nonBreakingSpaceCount = rangeText.split( NBSP ).length - 1;
 
 		function replaceNonBreakingSpaces() {
 			if ( ! range ) {
@@ -110,9 +114,7 @@ export const nonBreakingSpace = {
 						name="non-breaking-space"
 						icon={ icon }
 						title={
-							value.text
-								.slice( range[ 0 ], range[ 1 ] )
-								.split( NBSP ).length === 2
+							nonBreakingSpaceCount === 1
 								? __( 'Replace non-breaking space' )
 								: __( 'Replace non-breaking spaces' )
 						}

@@ -1067,6 +1067,38 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should replace the non-breaking spaces on both sides of the caret', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one\u00a0\u00a0two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
+		// Between the two non-breaking spaces.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await editor.showBlockToolbar();
+		await toolbar
+			.getByRole( 'button', {
+				name: 'Replace non-breaking spaces',
+				exact: true,
+			} )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one two' },
+			},
+		] );
+	} );
+
 	test( 'should remove non-breaking spaces that would collapse when replaced', async ( {
 		page,
 		editor,
