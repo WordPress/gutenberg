@@ -99,7 +99,9 @@ describe( 'compileInlineStyle', () => {
 				path.join( dir, 'style.module.css' )
 			);
 
-			expect( classNames.tab ).toMatch( /^[a-z_][0-9a-f]*__tab$/ );
+			expect( classNames.tab ).toMatch(
+				/^(?:_\d|[a-f])[0-9a-f]{15}__tab$/
+			);
 		} );
 
 		test( 'change when the CSS of their file changes', async () => {
