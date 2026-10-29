@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Center the calendar of the `date` and `datetime` controls in panel popovers, so it no longer leaves uneven space on its right ([#85830](https://github.com/WordPress/gutenberg/pull/85830)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 
 ## 21.0.0 (2026-10-20)

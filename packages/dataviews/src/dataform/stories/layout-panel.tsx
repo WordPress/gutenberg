@@ -396,6 +396,7 @@ const LayoutPanelComponent = ( {
 				},
 				'order',
 				'author',
+				'date',
 				'filesize',
 				'dimensions',
 				'file_type',

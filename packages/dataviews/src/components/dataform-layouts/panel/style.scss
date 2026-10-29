@@ -168,6 +168,12 @@
 	padding: var(--wpds-dimension-padding-lg);
 }
 
+// The calendar has a fixed size, narrower than the popover: center it so the
+// spare space is even on both sides.
+.dataforms-layouts-panel__field-dropdown .dataviews-controls__calendar {
+	align-self: center;
+}
+
 .dataforms-layouts-panel__dropdown-header {
 	margin-bottom: var(--wpds-dimension-gap-lg);
 }
