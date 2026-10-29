@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add an experimental `php` runtime that serves WordPress with the installed PHP's built-in web server and a SQLite database, without Docker ([#85512](https://github.com/WordPress/gutenberg/pull/85512)).
+-   Add an experimental `php` runtime that serves WordPress with the installed PHP's built-in web server and a SQLite database, without Docker ([#85512](https://github.com/WordPress/gutenberg/pull/85512), [#85574](https://github.com/WordPress/gutenberg/pull/85574)).
 
 ### Bug Fixes
 

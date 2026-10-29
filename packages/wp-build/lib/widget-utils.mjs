@@ -53,6 +53,11 @@ export function getAllWidgets( rootDir ) {
  */
 
 /**
+ * @typedef {Object} WidgetExampleMetadata
+ * @property {Record<string, unknown>} [attributes] Attribute values hosts preview the widget with, and apply to a new instance.
+ */
+
+/**
  * @typedef {Object} WidgetMetadata
  * @property {string}                                    name           Widget namespaced identifier.
  * @property {string}                                    [title]        Human-readable title.
@@ -61,6 +66,7 @@ export function getAllWidgets( rootDir ) {
  * @property {string}                                    [icon]         Registered icon name (`collection/icon-name`).
  * @property {WidgetActionMetadata[]}                    [actions]      Declarative actions the widget exposes.
  * @property {WidgetAttributeMetadata[]}                 [attributes]   Attribute schema, the JSON-expressible subset of a DataViews `Field`.
+ * @property {WidgetExampleMetadata}                     [example]      Structured example: `attributes` as plain JSON values.
  * @property {string}                                    [category]     Grouping category.
  * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
  * @property {string[]}                                  [keywords]     Search aliases used to match the widget.
@@ -104,7 +110,7 @@ export function getWidgetMetadata( rootDir, widgetName ) {
 
 /**
  * Supported source extensions for widget entry files, in priority order.
- * Must stay aligned with SOURCE_EXTENSIONS in build.mjs.
+ * Must stay aligned with SOURCE_EXTENSIONS in source-files.mjs.
  */
 const WIDGET_EXTENSIONS = [
 	'tsx',
