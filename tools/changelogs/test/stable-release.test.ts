@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import yaml from 'js-yaml';
 import { run as addFragment } from '../bin/add.mts';
 import { validateFragment } from '../lib/validate.ts';
@@ -10,6 +10,72 @@ import { previewUnreleasedFragments } from '../lib/preview.ts';
 import { loadChangieConfig } from '../lib/config.ts';
 
 describe( 'Stable Release fragments', () => {
+	it.each( [
+		{ pre1: 'true', bugFix: false, version: '1.0.0' },
+		{ pre1: undefined, bugFix: false, version: null },
+		{ pre1: 'false', bugFix: false, version: null },
+		{ pre1: 'true', bugFix: true, version: '1.0.0' },
+		{ pre1: undefined, bugFix: true, version: '0.25.1' },
+	] )(
+		'guards native auto-promotion with PRE_1=$pre1 and bug-fix entry=$bugFix',
+		( { pre1, bugFix, version } ) => {
+			const root = fs.mkdtempSync(
+				path.join( os.tmpdir(), 'stable-auto-' )
+			);
+			try {
+				vi.stubEnv( 'GUTENBERG_PRE_1', pre1 );
+				const config = loadChangieConfig(
+					path.resolve( import.meta.dirname, '../../..' )
+				);
+				fs.writeFileSync(
+					path.join( root, '.changie.yaml' ),
+					yaml.safeDump( {
+						...config,
+						projects: config.projects.filter(
+							( project ) => project.key === 'ui'
+						),
+					} )
+				);
+				const released = path.join( root, '.changes', 'ui' );
+				const unreleased = path.join( root, '.changes', 'unreleased' );
+				fs.mkdirSync( released, { recursive: true } );
+				fs.mkdirSync( unreleased );
+				fs.writeFileSync(
+					path.join( released, '0.25.0.md' ),
+					'## 0.25.0\n'
+				);
+				for ( const kind of bugFix
+					? [ 'Bug Fixes', 'Stable Release' ]
+					: [ 'Stable Release' ] ) {
+					fs.writeFileSync(
+						path.join( unreleased, `${ kind }.yaml` ),
+						yaml.safeDump( {
+							project: 'ui',
+							kind,
+							body: 'Prepare release.',
+							time: new Date().toISOString(),
+							custom: { PR: '85369' },
+						} )
+					);
+				}
+				const result = execChangie(
+					[ 'batch', 'auto', '--dry-run', '--project', 'ui' ],
+					root
+				);
+				expect( result.status ).toBe( version ? 0 : 1 );
+				const expectedOutput = version
+					? `## ${ version } (`
+					: 'no unreleased changes found for automatic bumping';
+				expect( result.stdout + result.stderr ).toContain(
+					expectedOutput
+				);
+			} finally {
+				vi.unstubAllEnvs();
+				fs.rmSync( root, { recursive: true, force: true } );
+			}
+		}
+	);
+
 	it( 'renders the promotion note and lists Stable Release last', () => {
 		const tmpDir = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'promote-test-' )
