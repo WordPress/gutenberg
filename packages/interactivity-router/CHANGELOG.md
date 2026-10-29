@@ -90,6 +90,12 @@
 
 ## 2.34.0 (2025-10-29)
 
+## 2.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.33.0 (2025-10-17)
 
 ## 2.32.0 (2025-10-01)
@@ -141,6 +147,12 @@
 
 ## 2.20.0 (2025-03-13)
 
+## 2.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.19.0 (2025-02-28)
 
 ### Bug Fixes
@@ -181,6 +193,12 @@
 
 ## 2.9.0 (2024-10-03)
 
+## 2.8.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)
@@ -196,6 +214,12 @@
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)
+
+## 2.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 2.0.0 (2024-05-31)
 
@@ -221,6 +245,12 @@
 -   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 
 ## 1.2.0 (2024-02-21)
+
+## 1.1.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 1.1.0 (2024-02-09)
 

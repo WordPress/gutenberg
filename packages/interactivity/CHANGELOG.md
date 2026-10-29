@@ -144,6 +144,12 @@
 
 -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
 
+## 6.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.33.0 (2025-10-17)
 
 ### Enhancements
@@ -199,6 +205,12 @@
 
 ## 6.20.0 (2025-03-13)
 
+## 6.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.19.0 (2025-02-28)
 
 ## 6.18.0 (2025-02-12)
@@ -250,6 +262,12 @@
 
 ## 6.9.0 (2024-10-03)
 
+## 6.8.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements
@@ -299,6 +317,12 @@
 -   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/directives-and-store.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
 
 ## 6.1.0 (2024-06-15)
+
+## 6.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
 
 ## 6.0.0 (2024-05-31)
 
@@ -362,6 +386,12 @@
 
 -   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
 -   Improve context merges using proxies. ([59187](https://github.com/WordPress/gutenberg/pull/59187))
+
+## 5.0.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
 
 ## 5.0.0 (2024-02-09)
 
@@ -444,6 +474,12 @@
 ## 2.5.0 (2023-10-18)
 
 ## 2.4.0 (2023-10-05)
+
+## 2.3.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
 
 ## 2.3.0 (2023-09-20)
 
