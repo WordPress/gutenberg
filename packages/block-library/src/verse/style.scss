@@ -16,3 +16,8 @@ pre.wp-block-verse {
 :where(pre.wp-block-verse) {
 	font-family: inherit;
 }
+
+// Fit text sets `white-space: nowrap`, which collapses the spacing poetry relies on.
+pre.wp-block-verse.has-fit-text {
+	white-space: pre !important;
+}

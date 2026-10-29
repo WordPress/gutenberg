@@ -194,7 +194,7 @@ Block hydration and initialization code should not depend on DOM ready events su
 </div>
 ```
 
-For code that needs to run on every navigation — such as analytics page-view tracking — use `data-wp-watch` with a reactive value that changes on each navigation, like the current URL from the global state:
+For code that needs to re-run whenever the URL changes — such as analytics page-view tracking — use `data-wp-watch` with a reactive value from the global state, like the current URL:
 
 ```js
 import { store } from '@wordpress/interactivity';
@@ -202,7 +202,7 @@ import { store } from '@wordpress/interactivity';
 store( 'myPlugin', {
 	callbacks: {
 		logPageView() {
-			// Re-runs on every navigation because state.url changes.
+			// Re-runs whenever state.url changes.
 			const { url } = store( 'core/router' ).state;
 			// Send analytics event for the new URL.
 			sendPageView( url );
@@ -217,7 +217,7 @@ store( 'myPlugin', {
 </div>
 ```
 
-From WordPress 7.0, you can also use the `watch` util to reexecute code on every navigation.
+From WordPress 7.0, you can also use the `watch` util to reexecute code when the URL changes.
 
 ```js
 import { store, watch } from '@wordpress/interactivity';
@@ -228,6 +228,10 @@ watch( () => {
 	sendPageView( url );
 } );
 ```
+
+Note that `state.url` does not change on a navigation to the page you are already on, such as the `navigate( window.location.href, { force: true } )` pattern used to [show fresh content after a form submission](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#overriding-routers-internal-in-memory-cached-pages), so neither example above runs in that case. Code that must run on every navigation should watch the router's `state.navigating` property instead. See [Reacting to the navigation lifecycle](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#reacting-to-the-navigation-lifecycle) in the Client-Side Navigation guide, and [Region-scoped focus after navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#region-scoped-focus-after-navigation) for a callback that runs exactly once at the end of each navigation.
+
+Also note that the two examples above do not see the same DOM. The `data-wp-watch` callback is deferred by a frame and runs after the new content has been rendered, while the `watch()` callback runs synchronously as soon as `state.url` changes, before the regions have re-rendered, so it still sees the previous page. This makes no difference to page-view tracking, but any callback that reads or measures the new content should run at the end of the navigation instead. See [Choosing where to read the keys](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#choosing-where-to-read-the-keys). Such a callback should also look the elements up itself and check that they exist, because a navigation that throws while rendering, or one that falls back to a full page load, ends without new content; see [When a navigation ends without new content](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#when-a-navigation-ends-without-new-content).
 
 #### Use `getServerState()` and `getServerContext()` to sync server data
 
@@ -316,6 +320,7 @@ Before marking your block as compatible with client-side navigation, verify the 
 -   The block uses script modules, not regular `<script>` tags.
 -   The block does not import from `window.wp.*` globals — it uses ES module imports instead.
 -   The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
+-   If the block has code that must run on every navigation, including a refresh of the current URL, it watches `state.navigating` rather than `state.url`.
 -   If the block needs to sync state or context from the server on each navigation, it uses `getServerState()` or `getServerContext()`.
 -   Lists of sibling elements that can change between navigations use `data-wp-key`.
 -   The block does not manipulate the DOM using APIs outside the Interactivity API (e.g., `document.createElement`, jQuery).

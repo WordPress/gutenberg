@@ -107,29 +107,20 @@ export function WaveformPlayer( {
 	// throughout its lifetime.
 	const hasSrc = !! src;
 
-	// Combined props ref for `initWaveformPlayer`, which is called
+	// Combined props getter for `initWaveformPlayer`, which is called
 	// asynchronously after this component mounts.
-	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
-	const stylesRef = useRef( {
+	const getLatestProps = useEvent( () => ( {
+		src,
+		title,
+		artist,
+		image,
+		imageAlt,
 		color,
 		gradient,
 		backgroundColor,
 		backgroundGradient,
 		textColor,
-	} );
-	useEffect( () => {
-		metadataRef.current = { src, title, artist, image, imageAlt };
-	}, [ src, title, artist, image, imageAlt ] );
-
-	useEffect( () => {
-		stylesRef.current = {
-			color,
-			gradient,
-			backgroundColor,
-			backgroundGradient,
-			textColor,
-		};
-	}, [ color, gradient, backgroundColor, backgroundGradient, textColor ] );
+	} ) );
 
 	useEffect( () => {
 		if ( playerRef.current?.container ) {
@@ -165,17 +156,18 @@ export function WaveformPlayer( {
 				if ( cancelled ) {
 					return;
 				}
+				const latest = getLatestProps();
 				const player = initWaveformPlayer( element, {
-					src: metadataRef.current.src,
-					title: metadataRef.current.title,
-					artist: metadataRef.current.artist,
-					image: metadataRef.current.image,
-					imageAlt: metadataRef.current.imageAlt,
-					waveformColor: stylesRef.current.color,
-					waveformGradient: stylesRef.current.gradient,
-					backgroundColor: stylesRef.current.backgroundColor,
-					backgroundGradient: stylesRef.current.backgroundGradient,
-					textColor: stylesRef.current.textColor,
+					src: latest.src,
+					title: latest.title,
+					artist: latest.artist,
+					image: latest.image,
+					imageAlt: latest.imageAlt,
+					waveformColor: latest.color,
+					waveformGradient: latest.gradient,
+					backgroundColor: latest.backgroundColor,
+					backgroundGradient: latest.backgroundGradient,
+					textColor: latest.textColor,
 					waveformStyle,
 					labels: {
 						seek: __( 'Seek' ),
@@ -241,24 +233,21 @@ export function WaveformPlayer( {
 	useEffect( () => {
 		if ( src && playerRef.current?.instance ) {
 			const wasPlaying = playerRef.current.instance.isPlaying;
+			const latest = getLatestProps();
 			const promise = playerRef.current.instance.loadTrack(
 				src,
-				metadataRef.current.title,
-				metadataRef.current.artist,
+				latest.title,
+				latest.artist,
 				{
-					artwork: showPlayButtonArtwork
-						? undefined
-						: metadataRef.current.image,
-					artworkAlt: showPlayButtonArtwork
-						? ''
-						: metadataRef.current.imageAlt,
+					artwork: showPlayButtonArtwork ? undefined : latest.image,
+					artworkAlt: showPlayButtonArtwork ? '' : latest.imageAlt,
 				}
 			);
 			promise.then( () => {
 				if ( showPlayButtonArtwork && playerRef.current?.container ) {
 					setupPlayButtonArtwork(
 						playerRef.current.container,
-						metadataRef.current.image
+						getLatestProps().image
 					);
 				}
 				if ( ! wasPlaying ) {
@@ -266,7 +255,7 @@ export function WaveformPlayer( {
 				}
 			} );
 		}
-	}, [ src, showPlayButtonArtwork ] );
+	}, [ src, showPlayButtonArtwork, getLatestProps ] );
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
 }

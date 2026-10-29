@@ -30,7 +30,7 @@ yarn.lock
 
 # The /.cache folder is needed for phpcs to cache results between runs, while other .cache folders must be ignored
 # It is not possible to re-include a file if a parent directory of that file is excluded
-# So, both /.cache and /.cache./.gitkeep must be re-included
+# So, both /.cache and /.cache/.gitkeep must be re-included
 .cache
 !/.cache/
 /.cache/**
@@ -59,6 +59,8 @@ phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
 .tool-versions
+/.vscode/settings.json
+/.zed/settings.json
 test/storybook-playwright/test-results
 test/storybook-playwright/specs/__snapshots__
 test/storybook-playwright/specs/*-snapshots/**

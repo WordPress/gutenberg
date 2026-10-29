@@ -757,7 +757,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	public function test_layout_support_flag_renders_classnames_on_wrapper( $args, $expected_output ) {
 		switch_theme( 'default' );
 		$actual_output = gutenberg_render_layout_support_flag( $args['block_content'], $args['block'] );
-		$this->assertEquals( $expected_output, $actual_output );
+		$this->assertSame( $expected_output, $actual_output );
 	}
 
 	/**
@@ -955,7 +955,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function test_restore_group_inner_container( $args, $expected_output ) {
 		$actual_output = gutenberg_restore_group_inner_container( $args['block_content'], $args['block'] );
-		$this->assertEquals( $expected_output, $actual_output );
+		$this->assertSame( $expected_output, $actual_output );
 	}
 
 	/**

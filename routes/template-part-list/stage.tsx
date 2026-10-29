@@ -21,7 +21,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-import { CreateTemplatePartModal } from '@wordpress/fields';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	getAreaFromViewOverrides,
@@ -34,6 +34,7 @@ import { previewField } from './fields/preview';
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
+const { CreateTemplatePartModal } = unlock( patternsPrivateApis );
 /**
  * Style dependencies
  */
@@ -229,7 +230,7 @@ function TemplatePartListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
-	const postTypeActions: Action< WpTemplatePart >[] = usePostActions( {
+	const actions: Action< WpTemplatePart >[] = usePostActions( {
 		postType: TEMPLATE_PART_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: WpTemplatePart[] ) => {
@@ -242,21 +243,6 @@ function TemplatePartListView( {
 			}
 		},
 	} );
-
-	const actions = useMemo( () => {
-		return [
-			...postTypeActions?.flatMap< Action< WpTemplatePart > >(
-				( action ) => {
-					// Skip revisions as the admin does not support it
-					if ( action.id === 'view-post-revisions' ) {
-						return [];
-					}
-
-					return [ action ];
-				}
-			),
-		];
-	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
 		( viewSlug: string ) => {
@@ -369,7 +355,7 @@ function TemplatePartListView( {
 				<CreateTemplatePartModal
 					closeModal={ () => setShowTemplatePartModal( false ) }
 					blocks={ [] }
-					onCreate={ ( templatePart ) => {
+					onCreate={ ( templatePart: WpTemplatePart ) => {
 						setShowTemplatePartModal( false );
 						navigate( {
 							to: `/types/wp_template_part/edit/${ encodeURIComponent(

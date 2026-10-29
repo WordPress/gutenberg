@@ -15,8 +15,8 @@ import { getUndoManager } from '../private-selectors';
 import { getEntityRecord, getEntityRecords } from '../resolvers';
 import { hasRedo, hasUndo } from '../selectors';
 
-vi.mock( '@wordpress/api-fetch' );
-vi.mock( '@wordpress/warning' );
+vi.mock( import( '@wordpress/api-fetch' ) );
+vi.mock( import( '@wordpress/warning' ) );
 
 /**
  * A fake manager that records every interface call.
@@ -33,7 +33,7 @@ function createFakeManager() {
 		afterSave: vi.fn(),
 		unload: vi.fn(),
 		unloadAll: vi.fn(),
-		undoManager: undefined,
+		undoHistory: undefined,
 	};
 }
 
@@ -119,7 +119,7 @@ describe( 'the entity sync interface', () => {
 			finishResolutions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
-			__unstableNotifySyncUndoManagerChange: vi.fn(),
+			recordSyncUndoLevel: vi.fn(),
 		} );
 		apiFetch.mockReset();
 	} );
@@ -166,7 +166,7 @@ describe( 'the entity sync interface', () => {
 					editRecord: expect.any( Function ),
 					getEditedRecord: expect.any( Function ),
 					refetchRecord: expect.any( Function ),
-					onUndoStackChange: expect.any( Function ),
+					onUndoLevelOpened: expect.any( Function ),
 				}
 			);
 		} );
@@ -219,10 +219,8 @@ describe( 'the entity sync interface', () => {
 				title: 'Edited',
 			} );
 
-			handlers.onUndoStackChange( { hasUndo: true, hasRedo: false } );
-			expect(
-				dispatch.__unstableNotifySyncUndoManagerChange
-			).toHaveBeenCalledWith( { hasUndo: true, hasRedo: false } );
+			handlers.onUndoLevelOpened();
+			expect( dispatch.recordSyncUndoLevel ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'refetches the record on request', async () => {
@@ -309,7 +307,10 @@ describe( 'the entity sync interface', () => {
 			getEntityConfig: () => POST_ENTITY,
 			getRawEntityRecord: () => ( { id: 1, title: 'Initial' } ),
 			getEditedEntityRecord: () => ( { id: 1, title: 'Initial' } ),
-			getUndoManager: () => ( { addRecord: vi.fn() } ),
+			getUndoManager: () => ( {
+				addRecord: vi.fn(),
+				hasRedo: vi.fn( () => false ),
+			} ),
 		};
 
 		it( 'forwards the edit and its intent before the store edit lands', () => {
@@ -529,35 +530,31 @@ describe( 'the entity sync interface', () => {
 	} );
 
 	describe( 'undo', () => {
-		it( 'substitutes the manager undo manager and reads its stack state', () => {
-			const fallback = {
-				hasUndo: vi.fn( () => false ),
+		it( 'keeps core-data in charge of the undo manager', () => {
+			const undoManager = {
+				hasUndo: vi.fn( () => true ),
 				hasRedo: vi.fn( () => false ),
 			};
-			const state = {
-				undoManager: fallback,
-				syncUndoManagerState: { hasUndo: true, hasRedo: true },
+			const state = { undoManager };
+
+			manager.undoHistory = {
+				undo: vi.fn(),
+				redo: vi.fn(),
+				stopCapturing: vi.fn(),
+				clearRedo: vi.fn(),
 			};
 
-			expect( getUndoManager( state ) ).toBe( fallback );
-			expect( hasUndo( state ) ).toBe( false );
-
-			manager.undoManager = { undo: vi.fn(), redo: vi.fn() };
-
-			expect( getUndoManager( state ) ).toBe( manager.undoManager );
+			expect( getUndoManager( state ) ).toBe( undoManager );
 			expect( hasUndo( state ) ).toBe( true );
-			expect( hasRedo( state ) ).toBe( true );
+			expect( hasRedo( state ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'setCollaborationSupported', () => {
-		it( 'unloads everything and resets the undo state when support is withdrawn', () => {
+		it( 'unloads everything when support is withdrawn', () => {
 			setCollaborationSupported( false )( { dispatch } );
 
 			expect( manager.unloadAll ).toHaveBeenCalledTimes( 1 );
-			expect(
-				dispatch.__unstableNotifySyncUndoManagerChange
-			).toHaveBeenCalledWith( { hasUndo: false, hasRedo: false } );
 		} );
 	} );
 } );

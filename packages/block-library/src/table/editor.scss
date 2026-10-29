@@ -15,8 +15,8 @@
 
 		td,
 		th {
-			// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-			word-break: break-word;
+			word-break: normal;
+			overflow-wrap: anywhere;
 		}
 	}
 
@@ -32,6 +32,12 @@
 	th {
 		border: $border-width solid;
 		padding: 0.5em;
+
+		// The UA stylesheet sets `overflow-wrap: break-word` on editable
+		// elements, which would otherwise win over the cell's value.
+		[contenteditable="true"] {
+			overflow-wrap: inherit;
+		}
 	}
 
 	td.is-selected,

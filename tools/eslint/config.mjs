@@ -9,6 +9,8 @@ import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import useTypeScript from './rules/use-typescript.mjs';
+import noBroadComponentSuppression from './rules/no-broad-component-suppression.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -16,6 +18,12 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergPlugin = {
+	rules: {
+		'use-typescript': useTypeScript,
+		'no-broad-component-suppression': noBroadComponentSuppression,
+	},
+};
 const gutenbergStorybookPlugin = {
 	rules: {
 		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
@@ -35,7 +43,7 @@ try {
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
- * reference is strictly identical. Because the @wordpress/eslint-plugin
+ * reference is strictly identical. Because the `@wordpress/eslint-plugin`
  * configs are assembled from separate sub-configs that each carry their own
  * copy of the plugin object, we normalise them here so that every occurrence
  * of the same plugin name resolves to a single shared reference.
@@ -70,6 +78,22 @@ function dedupePlugins( configs ) {
 const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+const JS_EXT = '@([cm]js|js|jsx)';
+
+const vitestLintFiles = [
+	...vitestTestPatterns,
+	`**/test/**/*.${ SCRIPT_EXT }`,
+	`**/__tests__/**/*.${ SCRIPT_EXT }`,
+	`test/unit/config/**/*.${ SCRIPT_EXT }`,
+	'packages/block-serialization-spec-parser/shared-tests.js',
+];
+const vitestLintIgnores = [
+	'test/e2e/**',
+	'test/performance/**',
+	'test/storybook-playwright/**',
+	'test/ai-development/**',
+	'**/fixtures/**',
+];
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -93,6 +117,20 @@ const typedFiles = globSync( 'packages/*/package.json', {
 	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
+
+/*
+ * Source and test trees of the packages wired into the TypeScript program,
+ * plus routes and tools, which keep their sources at the workspace root.
+ */
+const typeScriptOnlyFiles = [
+	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
+		.sort()
+		.map( ( fileName ) =>
+			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
+		),
+	`routes/**/*.${ JS_EXT }`,
+	`tools/**/*.${ JS_EXT }`,
+];
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -131,7 +169,7 @@ const restrictedImports = [
 	{
 		name: '@emotion/css',
 		message:
-			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+			'Please use SCSS Modules for styles and `clsx` to compose class names.',
 	},
 	{
 		name: '@wordpress/edit-post',
@@ -316,8 +354,12 @@ export default dedupePlugins( [
 	{
 		plugins: {
 			'@eslint-community/eslint-comments': eslintCommentsPlugin,
+			gutenberg: gutenbergPlugin,
 		},
-		rules: eslintCommentsPlugin.configs.recommended.rules,
+		rules: {
+			...eslintCommentsPlugin.configs.recommended.rules,
+			'gutenberg/no-broad-component-suppression': 'error',
+		},
 	},
 
 	// Storybook recommended (array of 3).
@@ -358,6 +400,7 @@ export default dedupePlugins( [
 					'ts-check': false,
 				},
 			],
+			'jsdoc/escape-inline-tags': 'error',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -384,12 +427,18 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Card: 'WCCard',
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
+						IconButton: 'WCIconButton',
 						__experimentalInputControl: 'WCInputControl',
+						Menu: 'WCMenu',
+						Notice: 'WCNotice',
 						SelectControl: 'WCSelectControl',
+						Spinner: 'WCSpinner',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
+						VisuallyHidden: 'WCVisuallyHidden',
 					},
 				},
 			],
@@ -513,6 +562,24 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: TypeScript-only packages. Existing JavaScript files are
+	// suppressed, so only new ones fail.
+	{
+		files: typeScriptOnlyFiles,
+		ignores: [
+			'**/fixtures/**',
+			// Editors load the ESLint config with their own Node, which
+			// may not strip types.
+			'tools/eslint/**',
+			// Published as plain modules through package.json exports.
+			'tools/react-18/**',
+			'tools/react-19/**',
+		],
+		rules: {
+			'gutenberg/use-typescript': 'error',
+		},
+	},
+
 	// Override: React src + storybook — component rules.
 	{
 		files: [
@@ -534,6 +601,8 @@ export default dedupePlugins( [
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 		],
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
 		rules: {
 			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
@@ -587,25 +656,10 @@ export default dedupePlugins( [
 	// Use the public Vitest baseline for suites and shared unit-test helpers.
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [
-			...vitestTestPatterns,
-			`**/test/**/*.${ SCRIPT_EXT }`,
-			`**/__tests__/**/*.${ SCRIPT_EXT }`,
-			`test/unit/config/**/*.${ SCRIPT_EXT }`,
-			'packages/block-serialization-spec-parser/shared-tests.js',
-		],
-		ignores: [
-			'test/e2e/**',
-			'test/performance/**',
-			'test/storybook-playwright/**',
-			'test/ai-development/**',
-			'**/fixtures/**',
-		],
+		files: vitestLintFiles,
+		ignores: vitestLintIgnores,
 		rules: {
 			...config.rules,
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': [ 'error', { allowArguments: true } ],
 			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
@@ -640,6 +694,18 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
+	{
+		// Dynamic imports let import/no-unresolved check JavaScript mock paths.
+		// TypeScript mock imports remain owned by validateVitestPolicy.
+		files: vitestLintFiles.map( ( pattern ) => [
+			pattern,
+			'**/*.{js,jsx,mjs,cjs}',
+		] ),
+		ignores: vitestLintIgnores,
+		rules: {
+			'vitest/prefer-import-in-mock': 'error',
+		},
+	},
 	// Recognize only the assertion helpers used by these files. Avoid a global
 	// expect* wildcard, which would also accept unrelated function calls.
 	...[
@@ -661,7 +727,7 @@ export default dedupePlugins( [
 			],
 		],
 		[
-			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.tsx',
 			[ 'expectPlaceholderState' ],
 		],
 		[
@@ -837,7 +903,6 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/utils/colors-values.js' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
@@ -846,14 +911,32 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-admin-theme-* variables do not support component theming. Use semantic WPDS design tokens directly. Keep required admin color-scheme fallbacks in SCSS.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-components-color-* variables are internal. Use semantic WPDS design tokens directly.',
+				},
+			],
+		},
+	},
+
+	// Override: Block library src — no effects. Existing ones are recorded in
+	// the suppressions file until they are replaced.
+	{
+		files: [ 'packages/block-library/src/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax,
+				{
+					selector:
+						'CallExpression[callee.name=/^use(Layout|Insertion)?Effect$/]',
+					message:
+						'Avoid effects in blocks. Compute the value during render, handle it in the event that causes it, read it with a store selector, or use `useRefEffect` to subscribe to a DOM node.',
 				},
 			],
 		},
@@ -916,15 +999,6 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components src (non-test, non-stories) — no DS tokens.
-	{
-		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/**/@(test|stories)/**' ],
-		rules: {
-			'@wordpress/no-ds-tokens': 'error',
-		},
-	},
-
 	// Override: block-editor, components, dataviews, ui src — enforce display names.
 	{
 		files: [
@@ -940,7 +1014,7 @@ export default dedupePlugins( [
 	},
 
 	// Override: Components src — allow ariakit/framer-motion imports and
-	// prevent new Emotion usage while existing styles are migrated.
+	// prevent Emotion imports from returning after the migration.
 	{
 		files: [ 'packages/components/src/**' ],
 		rules: {
@@ -953,7 +1027,13 @@ export default dedupePlugins( [
 								name
 							) && ! name.startsWith( '@emotion/' )
 					),
-					patterns: [ '@emotion/**' ],
+					patterns: [
+						{
+							group: [ '@emotion/**' ],
+							message:
+								'Please use SCSS Modules for styles and `clsx` to compose class names.',
+						},
+					],
 				},
 			],
 		},
@@ -1025,6 +1105,37 @@ export default dedupePlugins( [
 							name: '@wordpress/core-data',
 							message:
 								"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+						},
+					],
+				},
+			],
+		},
+	},
+
+	// Override: block-library — the waveform player's default entry initializes
+	// every `[data-waveform-player]` element on the page when it is imported.
+	{
+		files: [ 'packages/block-library/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@arraypress/waveform-player',
+							message:
+								'This entry initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `@arraypress/waveform-player/no-autoinit` instead.',
+						},
+					],
+					patterns: [
+						{
+							group: [
+								'@arraypress/waveform-player/*',
+								'!@arraypress/waveform-player/no-autoinit',
+							],
+							message:
+								'Only `@arraypress/waveform-player/no-autoinit` skips the scan that initializes every `[data-waveform-player]` element on the page.',
 						},
 					],
 				},
@@ -1108,7 +1219,11 @@ export default dedupePlugins( [
 
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
-		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+		files: [
+			'packages/eslint-plugin/**',
+			'packages/theme/**',
+			'packages/theme-build-tools/**',
+		],
 		rules: {
 			'@wordpress/no-setting-ds-tokens': 'off',
 			'@wordpress/no-unknown-ds-tokens': 'off',

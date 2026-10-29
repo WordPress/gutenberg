@@ -6,7 +6,7 @@ import {
 	type DirectiveEntry,
 } from '../hooks';
 import {
-	warnUniqueIdWithTwoHyphens,
+	warnEventNameWithTwoHyphens,
 	warnWithSyncEvent,
 } from './utils/warnings';
 
@@ -64,9 +64,10 @@ function wrapEventAsync( event: Event ) {
 
 /**
  * Creates a directive that adds an event listener to the global window or
- * document object.
+ * document object using the full directive suffix as its event name.
  *
  * @param type 'window' or 'document'
+ * @return Directive callback that manages the global event listener.
  */
 const getGlobalEventDirective = (
 	type: 'window' | 'document'
@@ -75,14 +76,12 @@ const getGlobalEventDirective = (
 		directives[ `on-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
-				const suffixParts = entry.suffix.split( '--', 2 );
-				const eventName = suffixParts[ 0 ];
+				const eventName = entry.suffix;
 				if ( globalThis.SCRIPT_DEBUG ) {
-					if ( suffixParts[ 1 ] ) {
-						warnUniqueIdWithTwoHyphens(
+					if ( eventName.includes( '--' ) ) {
+						warnEventNameWithTwoHyphens(
 							`on-${ type }`,
-							suffixParts[ 0 ],
-							suffixParts[ 1 ]
+							eventName
 						);
 					}
 				}
@@ -107,6 +106,11 @@ const getGlobalEventDirective = (
 /**
  * Creates a directive that adds an async event listener to the global window or
  * document object.
+ *
+ * Unlike the synchronous directives, the deprecated async directives still cut
+ * the event name at `--`, so the legacy two-hyphen unique ID syntax keeps
+ * working until they are removed.
+ *
  * @param type 'window' or 'document'
  */
 const getGlobalAsyncEventDirective = (
@@ -142,20 +146,16 @@ const getGlobalAsyncEventDirective = (
 directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 	const events = new Map< string, Set< DirectiveEntry > >();
 	on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
-		const suffixParts = entry.suffix.split( '--', 2 );
+		const eventType = entry.suffix;
 		if ( globalThis.SCRIPT_DEBUG ) {
-			if ( suffixParts[ 1 ] ) {
-				warnUniqueIdWithTwoHyphens(
-					'on',
-					suffixParts[ 0 ],
-					suffixParts[ 1 ]
-				);
+			if ( eventType.includes( '--' ) ) {
+				warnEventNameWithTwoHyphens( 'on', eventType );
 			}
 		}
-		if ( ! events.has( suffixParts[ 0 ] ) ) {
-			events.set( suffixParts[ 0 ], new Set< DirectiveEntry >() );
+		if ( ! events.has( eventType ) ) {
+			events.set( eventType, new Set< DirectiveEntry >() );
 		}
-		events.get( suffixParts[ 0 ] )!.add( entry );
+		events.get( eventType )!.add( entry );
 	} );
 
 	events.forEach( ( entries, eventType ) => {
@@ -199,7 +199,8 @@ directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 	} );
 } );
 
-// data-wp-on-async--[event] (deprecated)
+// data-wp-on-async--[event] (deprecated). The event name is still cut at `--`
+// to keep the legacy two-hyphen unique ID syntax working until removal.
 directive(
 	'on-async',
 	( { directives: { 'on-async': onAsync }, element, evaluate } ) => {

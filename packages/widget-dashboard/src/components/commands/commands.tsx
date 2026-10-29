@@ -4,6 +4,7 @@ import {
 	useCommands,
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
+import type { CommandConfig } from '@wordpress/commands';
 import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
@@ -69,7 +70,7 @@ export function Commands() {
 		[ onEditChange ]
 	);
 
-	const commands = useMemo(
+	const commands = useMemo< CommandConfig[] >(
 		() => [
 			{
 				name: 'core/dashboard/customize',

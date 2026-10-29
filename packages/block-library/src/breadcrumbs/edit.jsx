@@ -6,7 +6,7 @@ import {
 	CheckboxControl as WCCheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -127,7 +127,7 @@ export default function BreadcrumbEdit( {
 	if ( isLoading ) {
 		return (
 			<div { ...blockProps }>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}
@@ -311,7 +311,7 @@ export default function BreadcrumbEdit( {
 					/>
 				) : (
 					<div { ...blockProps }>
-						<Spinner />
+						<WCSpinner />
 					</div>
 				) ) }
 			{ status === 'error' && (

@@ -8,6 +8,8 @@ const getPageRow = ( page, title ) =>
 	} );
 
 test.describe( 'Homepage Settings via Editor', () => {
+	let aboutId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [ requestUtils.activateTheme( 'emptytheme' ) ] );
 		await requestUtils.createPage( {
@@ -21,6 +23,15 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await requestUtils.createPage( {
 			title: 'Draft page',
 			status: 'draft',
+		} );
+		const about = await requestUtils.createPage( {
+			title: 'About',
+			status: 'publish',
+		} );
+		aboutId = about.id;
+		await requestUtils.createPage( {
+			title: 'Contact',
+			status: 'publish',
 		} );
 	} );
 
@@ -113,5 +124,37 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await expect(
 			page.getByRole( 'menu', { name: 'Actions' } )
 		).toBeHidden();
+	} );
+
+	test( 'should show the homepage actions again on the previous homepage', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: aboutId,
+			page_for_posts: 0,
+		} );
+		await admin.visitSiteEditor( { postType: 'page' } );
+
+		const contactPageRow = getPageRow( page, 'Contact' );
+		await contactPageRow.click();
+		await contactPageRow.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Set as homepage' } ).click();
+		await page.getByRole( 'button', { name: 'Set homepage' } ).click();
+		await expect( page.getByRole( 'dialog' ) ).toBeHidden();
+
+		// Without reloading, the previous homepage can be set as the homepage
+		// or as the posts page again.
+		const aboutPageRow = getPageRow( page, 'About' );
+		await aboutPageRow.click();
+		await aboutPageRow.getByRole( 'button', { name: 'Actions' } ).click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
+		).toBeVisible();
 	} );
 } );

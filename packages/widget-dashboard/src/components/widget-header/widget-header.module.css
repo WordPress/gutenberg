@@ -56,6 +56,11 @@
 	margin-inline-start: auto;
 }
 
+/* Controls that render nothing leave the row to the identity. */
+.toolbar:empty {
+	display: none;
+}
+
 /* Floats over the tile; re-declares card padding outside Card.Root. */
 .overlay {
 	position: absolute;

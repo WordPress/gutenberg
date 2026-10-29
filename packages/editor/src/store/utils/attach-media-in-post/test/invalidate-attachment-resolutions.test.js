@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import invalidateAttachmentResolutions from '../invalidate-attachment-resolutions';
 
-vi.mock( '@wordpress/core-data', () => ( { store: {} } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( { store: {} } ) );
 
 /**
  * Builds a registry stub whose `getCachedResolvers().getEntityRecords` returns

@@ -7,8 +7,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -34,6 +33,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import usePageClamp from '../hooks/use-page-clamp';
@@ -249,6 +249,7 @@ function DataViewsPicker< Item >( {
 	empty,
 	onReset,
 }: DataViewsPickerProps< Item > ) {
+	useEnableWpCompatOverlaySlot();
 	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
 	const { data: displayData, setVisibleEntries } = useData( {
 		view,
@@ -261,15 +262,7 @@ function DataViewsPicker< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
-	const [ containerWidth, setContainerWidth ] = useState( 0 );
-	const resizeObserverRef = useResizeObserver(
-		( resizeObserverEntries: any ) => {
-			setContainerWidth(
-				resizeObserverEntries[ 0 ].borderBoxSize[ 0 ].inlineSize
-			);
-		},
-		{ box: 'border-box' }
-	);
+	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =

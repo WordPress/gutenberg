@@ -13,20 +13,21 @@ type ObjectPath = ObjectPathKey | ObjectPathKey[];
  * @param value  New value to set.
  * @return Cloned object with the new value set.
  */
-export function setImmutably(
-	object: ObjectOrArray | null | undefined,
+export function setImmutably< T extends ObjectOrArray = ObjectOrArray >(
+	object: T | null | undefined,
 	path: ObjectPath,
 	value: unknown
-): ObjectOrArray {
+): T {
 	// Normalize path
 	const pathArray: ObjectPathKey[] = Array.isArray( path )
 		? [ ...path ]
 		: [ path ];
 
 	// Shallowly clone the base of the object
-	const result: ObjectOrArray = Array.isArray( object )
-		? [ ...object ]
-		: { ...object };
+	// The clone keeps the shape of the object.
+	const result = (
+		Array.isArray( object ) ? [ ...object ] : { ...object }
+	) as T;
 
 	const leaf = pathArray.pop() as ObjectPathKey;
 
@@ -68,25 +69,6 @@ export const getValueFromObjectPath = (
 	} );
 	return value ?? defaultValue;
 };
-
-/**
- * Helper util to filter out objects with duplicate values for a given property.
- *
- * @param array    Array of objects to filter.
- * @param property Property to filter unique values by.
- *
- * @return Array of objects with unique values for the specified property.
- */
-export function uniqByProperty< T extends AnyObject >(
-	array: T[],
-	property: string
-) {
-	const seen = new Set();
-	return array.filter( ( item ) => {
-		const value = item[ property ];
-		return seen.has( value ) ? false : seen.add( value );
-	} );
-}
 
 /**
  * Whether a value is a plain object, meaning a non-null object that is not an

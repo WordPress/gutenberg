@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `checkbox-control` and `radio-control` Sass mixins. Use the `Checkbox` and `Radio` primitives from `@wordpress/ui` instead, with `Radio` inside a `RadioGroup` ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).
+
+## 14.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Rename the `.fields-create-template-part-modal` z-index entry to `.patterns-create-template-part-modal`, since the modal moved to `@wordpress/patterns` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+
+## 13.3.0 (2026-10-07)
+
+### Enhancements
+
+-   Default `--wp-admin-theme-color` to `#3858e9`, the WordPress 7.0 default admin color scheme, instead of the legacy `#007cba`. To keep the old color, include `admin-scheme(#007cba)` on `:root` in your own stylesheet. `wordpress-admin-schemes()` and the default custom properties now set `#007cba` for the Fresh scheme, which had used the `:root` default ([#83749](https://github.com/WordPress/gutenberg/pull/83749)).
+-   `radio-control`: Use the design system color tokens ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
+
+### Bug Fixes
+
+-   `radio-control`: Keep radio circles and checked dots visually 16px and 8px on narrow screens while providing a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+
 ## 13.2.0 (2026-09-23)
 
 ### Enhancements

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
@@ -5,7 +6,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { RadioItemProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 const radioCheck = (
@@ -18,7 +19,14 @@ export const RadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< RadioItemProps, 'div', false >
 >( function UnforwardedRadioItem(
-	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+	{
+		className,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = false,
+		...props
+	},
 	ref
 ) {
 	const menuContext = useContext( Context );
@@ -31,9 +39,10 @@ export const RadioItem = forwardRef<
 		);
 	}
 	return (
-		<Styled.RadioItem
+		<Ariakit.MenuItemRadio
 			ref={ ref }
 			{ ...props }
+			className={ clsx( styles.item, styles[ 'radio-item' ], className ) }
 			accessibleWhenDisabled
 			disabled={ disabled }
 			store={ store }
@@ -41,24 +50,26 @@ export const RadioItem = forwardRef<
 		>
 			<Ariakit.MenuItemCheck
 				store={ store }
-				render={ <Styled.ItemPrefixWrapper /> }
+				render={
+					<span className={ styles[ 'item-prefix-wrapper' ] } />
+				}
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.ItemContentWrapper>
-				<Styled.ItemChildrenWrapper>
+			<div className={ styles[ 'item-content-wrapper' ] }>
+				<div className={ styles[ 'item-children-wrapper' ] }>
 					{ children }
-				</Styled.ItemChildrenWrapper>
+				</div>
 
 				{ suffix && (
-					<Styled.ItemSuffixWrapper>
+					<span className={ styles[ 'item-suffix-wrapper' ] }>
 						{ suffix }
-					</Styled.ItemSuffixWrapper>
+					</span>
 				) }
-			</Styled.ItemContentWrapper>
-		</Styled.RadioItem>
+			</div>
+		</Ariakit.MenuItemRadio>
 	);
 } );

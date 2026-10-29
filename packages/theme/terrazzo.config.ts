@@ -1,9 +1,8 @@
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index.ts';
+import pluginTokenData from './bin/terrazzo-plugin-token-data/index.ts';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index.ts';
-import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index.ts';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index.ts';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index.ts';
 import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs.ts';
@@ -71,11 +70,9 @@ const config: Config = {
 			],
 			legacyHex: true,
 		} ),
-		pluginKnownWpdsCssVariables( {
+		pluginTokenData( {
 			filename: 'prebuilt/js/design-tokens.mjs',
-		} ),
-		pluginDsTokenFallbacks( {
-			filename: 'prebuilt/js/design-token-fallbacks.mjs',
+			fallbacksFilename: 'prebuilt/js/design-token-fallbacks.mjs',
 			scssFilename: false,
 			additionalScssFilenames: [
 				'../base-styles/internal/_wpds-token-fallbacks.scss',

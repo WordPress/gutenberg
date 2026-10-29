@@ -28,6 +28,11 @@ function gutenberg_test_block_bindings_registration() {
 			'value' => $testing_url,
 			'type'  => 'string',
 		),
+		'icon_field'          => array(
+			'label' => 'Icon Field Label',
+			'value' => 'core/arrow-right',
+			'type'  => 'string',
+		),
 		'empty_field'         => array(
 			'label' => 'Empty Field Label',
 			'value' => '',

@@ -65,6 +65,7 @@ describe( 'Autocomplete', () => {
 		const popupRef = createRef< HTMLDivElement >();
 		const listRef = createRef< HTMLDivElement >();
 		const listBodyRef = createRef< HTMLDivElement >();
+		const separatorRef = createRef< HTMLDivElement >();
 		const itemRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
@@ -103,6 +104,7 @@ describe( 'Autocomplete', () => {
 							</Autocomplete.Collection>
 						</Autocomplete.ListBody>
 					</Autocomplete.List>
+					<Autocomplete.Separator ref={ separatorRef } />
 					<Autocomplete.Clear ref={ clearRef } />
 				</Autocomplete.Popup>
 			</Autocomplete.Root>
@@ -118,6 +120,7 @@ describe( 'Autocomplete', () => {
 		} );
 		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( separatorRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );

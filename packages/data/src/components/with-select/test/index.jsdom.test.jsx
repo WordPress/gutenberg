@@ -453,6 +453,7 @@ describe( 'withSelect', () => {
 
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 			JSON.stringify( {
+				ref: null,
 				propName: 'foo',
 				foo: 'OK',
 			} )
@@ -468,6 +469,7 @@ describe( 'withSelect', () => {
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 			JSON.stringify( {
+				ref: null,
 				propName: 'bar',
 				bar: 'OK',
 			} )

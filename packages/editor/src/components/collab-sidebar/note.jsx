@@ -4,12 +4,17 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Button as UIButton, Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button.
+	Button as UIButton,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import { NoteReactions } from './reactions/note-reactions';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -17,16 +22,15 @@ function NoteActionsMenu( { items, buttonRef } ) {
 			// Let outside interactions reach the note thread's focus-out
 			// handling so it can clear the selection.
 			modal={ false }
-			disabled={ ! items.length }
 		>
 			<Menu.Trigger
+				disabled={ ! items.length }
 				render={
 					<Button
 						ref={ buttonRef }
 						size="small"
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
-						disabled={ ! items.length }
 						accessibleWhenDisabled
 					/>
 				}
@@ -51,6 +55,7 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
+	isThreadResolved = false,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -100,7 +105,7 @@ export function Note( {
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
 			isEligible: ( { status } ) => canResolve && hasResolved( status ),
-			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
+			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
 			id: 'delete',
@@ -131,8 +136,7 @@ export function Note( {
 		body = (
 			<NoteForm
 				onSubmit={ async ( value ) => {
-					const saved = await onEditNote( {
-						id: note.id,
+					const saved = await onEditNote( note, {
 						content: value,
 					} );
 					// Keep the form open on failure so the edit isn't lost.
@@ -211,9 +215,23 @@ export function Note( {
 		<NoteCard
 			note={ note }
 			actions={ actions }
+			className="editor-collab-sidebar-panel__note"
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
-			{ body }
+			<div className="editor-collab-sidebar-panel__note-body">
+				{ body }
+				<NoteReactions
+					noteId={ note.id }
+					// Not while editing: the trigger floats over the form's
+					// text field.
+					canReact={
+						isSelected &&
+						actionState !== 'edit' &&
+						! isThreadResolved
+					}
+					disabled={ isThreadResolved }
+				/>
+			</div>
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

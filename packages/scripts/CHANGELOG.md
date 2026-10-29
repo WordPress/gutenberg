@@ -2,9 +2,31 @@
 
 ## Unreleased
 
+## 37.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Update the bundled `webpack-dev-server` from `^5.2.1` to `^6.0.0` and `@pmmmwh/react-refresh-webpack-plugin` from `^0.5.11` to `^0.6.3`. Custom `devServer` configs need migrating: SockJS is removed, so drop `webSocketServer: 'sockjs'` and `client.webSocketTransport: 'sockjs'` to use the default `ws`; the proxy `bypass` option is removed in favor of `http-proxy-middleware`'s `context` or `router`; custom middleware runs on Express 5; and `getFilenameFromUrl()` is now asynchronous. See the [webpack-dev-server 6.0.0 release notes](https://github.com/webpack/webpack-dev-server/releases/tag/v6.0.0) ([#84674](https://github.com/WordPress/gutenberg/pull/84674)).
+
+### Enhancements
+
+-   `test-e2e` and `test-playwright`: Add a `--wp-env-config` option for the custom config file that the environment for the tests is started from with `wp-env --config`, such as `.wp-env.test.json`. When `WP_BASE_URL` is not set, the tests run on the port from that file merged with its override file, such as `.wp-env.test.override.json`, and any `WP_ENV_*` environment variables ([#84654](https://github.com/WordPress/gutenberg/pull/84654)).
+
+### Bug Fixes
+
+-   `test-e2e` and `test-playwright`: When `WP_BASE_URL` is not set and the `wp-env` config disables the tests environment with `"testsEnvironment": false`, run the tests on the port of the development environment instead of falling back to `http://localhost:8889`, which may belong to another project's environment ([#84654](https://github.com/WordPress/gutenberg/pull/84654)).
+
+## 36.1.0 (2026-10-07)
+
+### Enhancements
+
+-   `lint-js`: Allow unit-test titles passed through variables ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
+
 ### Bug Fixes
 
 -   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   `build`, `start` and `lint-pkg-json`: Resolve the default browserslist and npm-package-json-lint configs when dependencies are not hoisted to the project root (npm `install-strategy=linked`, pnpm). `lint-pkg-json` now defaults to `config/npmpackagejsonlint.js`; `config/npmpackagejsonlint.json` stays for projects that reference it ([#83902](https://github.com/WordPress/gutenberg/pull/83902)).
+-   `lint-js`, `lint-style` and `lint-md-docs`: a file passed right after `--fix` is now treated as a file instead of that flag's value, so only the listed files get processed. Same for `--require-pragma` in `format` ([#83521](https://github.com/WordPress/gutenberg/pull/83521)).
 
 ## 36.0.0 (2026-09-23)
 
