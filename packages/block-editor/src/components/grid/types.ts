@@ -156,12 +156,69 @@ export interface GridVisualizerCellPosition {
 }
 
 /**
+ * The inserter of a cell of a manual grid, or of cells selected by drawing
+ * across the grid.
+ */
+export interface GridVisualizerAppenderProps extends GridVisualizerCellPosition {
+	/** Number of columns the inserted block covers. */
+	columnSpan?: number;
+	/** Number of rows the inserted block covers. */
+	rowSpan?: number;
+	/** The grid element in the canvas. */
+	gridElement: Element;
+	/** Whether the inserter opens as soon as it renders. */
+	isInitiallyOpen?: boolean;
+	/** Called when the inserter closes, with or without a block inserted. */
+	onClose?: () => void;
+}
+
+export interface GridVisualizerMarqueeProps {
+	/** Client ID of the grid block. */
+	gridClientId: string;
+	/** The grid element in the canvas. */
+	gridElement: Element;
+	/** Grid info, from `getGridInfo`. */
+	gridInfo: GridInfo;
+}
+
+/**
+ * Cells selected by drawing across a manual grid.
+ */
+export interface GridMarquee {
+	/** The selected cells. */
+	rect: GridRect;
+	/** Whether the press is over and the inserter for the cells is open. */
+	isInserting: boolean;
+}
+
+/**
+ * A press that draws across the cells of a manual grid.
+ */
+export interface GridMarqueeDrag {
+	pointerId: number;
+	/** The cell the press started on. */
+	start: GridRect;
+	/** Whether the pointer has left the cell it was pressed on. */
+	isMoving: boolean;
+	/** Whether Escape was pressed during the press. */
+	isCancelled?: boolean;
+}
+
+/**
+ * The selectors that tell whether a grid can take blocks dragged from an
+ * inserter.
+ */
+export interface InserterBlockSelectors {
+	canInsertBlockType: ( blockName: string, rootClientId: string ) => boolean;
+}
+
+/**
  * Where a dragged block was grabbed, in pixels from its top-left corner. Empty
  * when it wasn't grabbed by its body, so it is centered on the pointer.
  */
 export interface GridDragGrab {
-	/** Client ID of the dragged block. */
-	srcClientId: string;
+	/** Client ID of the dragged block, or null for blocks from an inserter. */
+	srcClientId: string | null;
 	grab: { grabX?: number; grabY?: number };
 }
 
@@ -194,8 +251,10 @@ export interface GridItemMeasurements {
  * The cells a block dragged over a manual grid would land in.
  */
 export interface GridDropTarget {
-	/** Client ID of the dragged block. */
-	srcClientId: string;
+	/** Client ID of the dragged block, or null for blocks from an inserter. */
+	srcClientId: string | null;
+	/** Whether the blocks are dragged from an inserter, not in the canvas. */
+	isInserterDrag: boolean;
 	/** Number of columns and rows the block spans. */
 	span: { columnSpan: number; rowSpan: number };
 	/** The cells the block would land in. */

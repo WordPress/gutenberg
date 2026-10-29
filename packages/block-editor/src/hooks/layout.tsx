@@ -665,10 +665,28 @@ function LayoutPanelPure( {
 	);
 }
 
+// The gaps between the cells of a manual placement grid are part of the grid
+// block, so a press there would start dragging the whole grid instead of
+// drawing across its cells. The grid still moves with its drag handle and
+// movers.
+const MANUAL_GRID_BLOCK_PROPS = { draggable: false };
+
+function useBlockPropsManualGrid() {
+	return MANUAL_GRID_BLOCK_PROPS;
+}
+
 export default {
 	shareWithChildBlocks: true,
 	edit: LayoutPanelPure,
+	useBlockProps: useBlockPropsManualGrid,
 	attributeKeys: [ 'layout', 'style' ],
+	isMatch( { layout }: { layout?: Layout; [ attribute: string ]: unknown } ) {
+		return (
+			layout?.type === 'grid' &&
+			!! layout.isManualPlacement &&
+			!! window.__experimentalEnableGridInteractivity
+		);
+	},
 	hasSupport( name: string | BlockType ) {
 		return hasLayoutBlockSupport( name );
 	},
