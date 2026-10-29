@@ -178,20 +178,6 @@
       - intent
       - render
       - style
-- name: BaseControl
-  props:
-      - __nextHasNoMarginBottom
-      - children
-      - className
-      - help
-      - hideLabelFromVision
-      - id
-      - label
-  subcomponents:
-      - name: BaseControl.VisualLabel
-        props:
-            - as
-            - children
 - name: Button
   props:
       - __experimentalIsFocusable
@@ -872,12 +858,15 @@
       - label
 - name: MenuItem
   props:
+      - accessibleWhenDisabled
       - children
       - className
+      - href
       - icon
       - iconPosition
       - info
       - isDestructive
+      - isPressed
       - isSelected
       - label
       - role
@@ -974,7 +963,9 @@
       - className
       - icon
       - intent
+      - politeness
       - render
+      - spokenMessage
       - style
   subcomponents:
       - name: Notice.ActionButton
@@ -1018,6 +1009,12 @@
             - shortcut
             - style
       - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.List
         props:
             - children
             - className
@@ -1202,6 +1199,7 @@
       - separatorType
       - shiftStep
       - showTooltip
+      - size
       - step
       - trackColor
       - type
@@ -1522,7 +1520,7 @@
       - required
       - searchPlaceholder
       - statusContent
-      - triggerContent
+      - trigger
       - value
       - virtualized
   subcomponents:
@@ -1570,6 +1568,16 @@
         props:
             - className
             - render
+            - style
+      - name: SearchableSelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: SearchControl
   props:

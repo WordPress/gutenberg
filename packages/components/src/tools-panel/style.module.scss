@@ -12,8 +12,8 @@
 	> div:not(:first-of-type) {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		column-gap: $grid-unit-20;
-		row-gap: $grid-unit-20;
+		column-gap: var(--wpds-dimension-gap-lg);
+		row-gap: var(--wpds-dimension-gap-lg);
 		grid-column: 1 / -1;
 	}
 }
@@ -36,7 +36,7 @@
 	}
 }
 
-// Match the previous Emotion `&&&&` specificity so these styles continue to
+// Preserve the established specificity so these styles continue to
 // override the DropdownMenu toggle defaults.
 .tools-panel-header.tools-panel-header.tools-panel-header.tools-panel-header {
 	:global(.components-dropdown-menu__toggle) {
@@ -65,8 +65,7 @@
 	}
 }
 
-// Match the previous Emotion `&&` specificity and target BaseControl's
-// preserved public class names instead of its generated Emotion classes.
+// Preserve the established specificity and target BaseControl's public classes.
 .tools-panel-item.tools-panel-item :global(.components-base-control) {
 	margin-bottom: 0;
 
@@ -101,7 +100,7 @@
 	color: $gray-900;
 }
 
-// Match the previous Emotion `&&` specificity so disabled MenuItem styles
+// Preserve the established specificity so disabled MenuItem styles
 // continue to override its defaults.
 .default-controls-item.default-controls-item[aria-disabled="true"] {
 	color: $gray-700;

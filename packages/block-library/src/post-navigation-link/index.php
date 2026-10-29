@@ -53,7 +53,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	// `$label` is used to prepend the provided label, if we want to show the page title as well.
 	if ( isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ) {
 		$label = "{$attributes['label']}";
-		$link  = $label;
+		$link  = wp_kses_post( $label );
 	}
 
 	// If we want to also show the page title, make the page title a link and prepend the label.
@@ -209,7 +209,7 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 
 	// Mirrors the background image defaults of the background block support.
 	if ( ! empty( $background_styles['backgroundImage'] ) ) {
-		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+		$background_styles['backgroundSize'] ??= 'cover';
 		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
 			$background_styles['backgroundPosition'] = '50% 50%';
 		}

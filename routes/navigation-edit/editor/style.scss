@@ -1,3 +1,7 @@
 .navigation-edit-editor__hidden-blocks {
 	display: none;
 }
+
+.navigation-edit-editor__empty-message {
+	margin: 0 0 var(--wpds-dimension-gap-md);
+}

@@ -17,7 +17,7 @@ This set of guidelines should apply especially to newly introduced components. I
 -   [Unit tests](#unit-tests)
 -   [Storybook](#storybook)
 -   [Documentation](#documentation)
--   [README example](#README-example)
+-   [README example](#readme-example)
 -   [Folder structure](#folder-structure)
 -   [Component versioning](#component-versioning)
 
@@ -94,6 +94,8 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 1. Removing traces of the API from the docs, while still supporting it in code.
 2. Updating all places in Gutenberg that use that API.
 3. Adding deprecation warnings (only after the previous point is completed, otherwise the Browser Console will be polluted by all those warnings and some e2e tests may fail).
+
+When a component from `@wordpress/ui` replaces a component in this package, follow [Replace a legacy component](../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component) for the order of the alias, recommendation, migration, and deprecation steps.
 
 When adding new components or new props to existing components, it's recommended to create a [private version](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/) of the component until the changes are stable enough to be exposed as part of the public API.
 
@@ -422,9 +424,9 @@ Place component-local styles in a `style.module.scss` file next to the component
 
 Use `--_wp-components-*` for new private custom properties. These are implementation details, not public theming APIs. Keep supported customization in component props and existing public styles.
 
-Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
+Components no longer use Emotion. Do not add new Emotion imports.
 
-Before migrating existing styles, read [Migrating components from Emotion to SCSS Modules](./emotion-to-scss-modules.md) for compatibility checks, cascade and custom-property pitfalls, verification, and examples from merged migrations.
+For styling compatibility and verification, follow [Change a package safely](/docs/contributors/design/design-system-packages.md#change-a-package-safely) and the [cross-document setup guidance](/packages/theme/README.md#across-documents-iframes-and-other-portals).
 
 ### Deprecating styles
 
@@ -619,7 +621,7 @@ Primary.args = {
 
 A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) ([source code](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 

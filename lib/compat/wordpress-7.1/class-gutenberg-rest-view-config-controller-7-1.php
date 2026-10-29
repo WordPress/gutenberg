@@ -142,10 +142,10 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'kind'            => $kind,
 			'name'            => $name,
 			'version'         => Gutenberg_View_Config_Data::LATEST_VERSION,
-			'default_view'    => gutenberg_rest_cast_empty_objects_from_schema( $config['default_view'], $schema['properties']['default_view'] ),
-			'default_layouts' => gutenberg_rest_cast_empty_objects_from_schema( $config['default_layouts'], $schema['properties']['default_layouts'] ),
-			'view_list'       => gutenberg_rest_cast_empty_objects_from_schema( $config['view_list'], $schema['properties']['view_list'] ),
-			'form'            => gutenberg_rest_cast_empty_objects_from_schema( $config['form'], $schema['properties']['form'] ),
+			'default_view'    => gutenberg_prepare_json_value_for_client( $config['default_view'], $schema['properties']['default_view'] ),
+			'default_layouts' => gutenberg_prepare_json_value_for_client( $config['default_layouts'], $schema['properties']['default_layouts'] ),
+			'view_list'       => gutenberg_prepare_json_value_for_client( $config['view_list'], $schema['properties']['view_list'] ),
+			'form'            => gutenberg_prepare_json_value_for_client( $config['form'], $schema['properties']['form'] ),
 		);
 
 		return rest_ensure_response( $response );

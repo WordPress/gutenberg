@@ -1,4 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( '../editor/various/post-summary/utils' );
 
 // Whether the run targets the extensible site editor (v2).
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
@@ -117,11 +118,13 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
-		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
-		await page.getByRole( 'button', { name: 'Template options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
-		await page.getByText( 'Plugin Template' ).click();
+		const summary = await openPostSummary( { editor, page, tab: 'Post' } );
+		await summary.getByRole( 'button', { name: 'Edit Template' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Plugin Template', exact: true } )
+			.click();
+		await page.keyboard.press( 'Escape' );
 
 		// Verify the template is applied.
 		const postId = await editor.publishPost();
@@ -145,11 +148,13 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
-		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
-		await page.getByRole( 'button', { name: 'Template options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
-		await page.getByText( 'Custom', { exact: true } ).click();
+		const summary = await openPostSummary( { editor, page, tab: 'Post' } );
+		await summary.getByRole( 'button', { name: 'Edit Template' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Custom', exact: true } )
+			.click();
+		await page.keyboard.press( 'Escape' );
 
 		// Verify the theme template is applied.
 		const postId = await editor.publishPost();

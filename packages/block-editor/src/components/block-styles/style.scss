@@ -32,9 +32,10 @@
 	}
 
 	.block-editor-block-styles__item-text {
-		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
-		text-align: start;
-		text-align-last: center;
+		text-align: center;
+		// Without this, the ellipsis of a centered line is partially clipped.
+		padding-inline: $grid-unit-05;
+		margin-inline: -$grid-unit-05;
 	}
 }
 

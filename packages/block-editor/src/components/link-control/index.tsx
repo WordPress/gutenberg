@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import {
 	Button,
 	Spinner as WCSpinner,
-	Notice,
+	Notice as WCNotice,
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
@@ -663,13 +663,13 @@ function LinkControl( {
 						) }
 					</div>
 					{ errorMessage && (
-						<Notice
+						<WCNotice
 							className="block-editor-link-control__search-error"
 							status="error"
 							isDismissible={ false }
 						>
 							{ errorMessage }
-						</Notice>
+						</WCNotice>
 					) }
 				</>
 			) }
@@ -780,7 +780,7 @@ function SearchSuffixControl( {
 		<InputControlSuffixWrapper variant="control">
 			<Button
 				onClick={ isDisabled ? noop : onSubmit }
-				label={ __( 'Submit' ) }
+				label={ __( 'Apply' ) }
 				icon={ keyboardReturn }
 				className="block-editor-link-control__search-submit"
 				aria-disabled={ isDisabled }

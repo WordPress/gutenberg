@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "6.57.0",
+	"version": "7.0.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -47,6 +47,7 @@
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
+		"@types/deep-freeze": "^0.1.5",
 		"deep-freeze": "^0.0.1",
 		"vitest": "^5.0.3"
 	},

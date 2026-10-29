@@ -30,7 +30,7 @@ import {
 } from '@wordpress/icons';
 import TableOfContentsList from './list';
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
-import { useObserveHeadings } from './hooks';
+import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
@@ -117,16 +117,31 @@ function TableOfContentsToolbar( {
 }
 
 export default function TableOfContentsEdit( {
-	attributes: {
-		headings = [],
-		onlyIncludeCurrentPage,
-		maxLevel,
-		ordered = true,
-	},
+	attributes: { onlyIncludeCurrentPage, maxLevel, ordered = true },
 	clientId,
+	context: { postId, postType },
 	setAttributes,
 } ) {
-	useObserveHeadings( clientId );
+	const postHeadings = useHeadings( {
+		clientId,
+		postId,
+		postType,
+		onlyIncludeCurrentPage,
+		maxLevel,
+	} );
+	// Without a post in context, e.g. in a template or a block preview, show
+	// sample entries standing in for the headings of the post being viewed.
+	const headings = postId
+		? postHeadings
+		: [
+				{
+					content: __(
+						'Headings from the post being viewed appear here'
+					),
+					level: 2,
+				},
+				{ content: __( 'Subheading' ), level: 3 },
+			];
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
@@ -245,7 +260,7 @@ export default function TableOfContentsEdit( {
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
 						instructions={ __(
-							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+							'Start adding Heading blocks to create a table of contents automatically.'
 						) }
 					/>
 				</div>
@@ -268,7 +283,7 @@ export default function TableOfContentsEdit( {
 					/>
 				</ListTag>
 			</nav>
-			{ toolbarControls }
+			{ !! postId && toolbarControls }
 			{ inspectorControls }
 		</>
 	);

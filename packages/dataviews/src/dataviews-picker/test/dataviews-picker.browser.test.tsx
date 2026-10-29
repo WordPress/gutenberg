@@ -61,7 +61,7 @@ const singleSelectCallback = vi.fn();
 const singleSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
-		label: 'Confirm',
+		label: 'Confirm…',
 		supportsBulk: false,
 		isPrimary: true,
 		callback: singleSelectCallback,
@@ -406,7 +406,7 @@ describe( 'DataViews Picker', () => {
 				const actions: ActionButton< Data >[] = [
 					{
 						id: 'confirm',
-						label: ( items ) => `Confirm ${ items.length }`,
+						label: ( items ) => `Confirm ${ items.length }…`,
 						supportsBulk: true,
 						isPrimary: true,
 						isEligible: ( item ) => item.id !== 1,
@@ -745,12 +745,12 @@ describe( 'DataViews Picker', () => {
 			const pageSelect = screen.getByRole( 'combobox', {
 				name: 'Current page',
 			} );
-			expect( pageSelect ).toHaveValue( '1' );
+			expect( pageSelect ).toHaveTextContent( '1' );
 			expect(
 				screen.getByRole( 'button', { name: 'Confirm' } )
 			).toBeInTheDocument();
 			expect(
-				screen.queryByText( '2 of 3 Items' )
+				screen.queryByText( '2 of 3 items' )
 			).not.toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', { name: 'Next page' } )
@@ -758,8 +758,11 @@ describe( 'DataViews Picker', () => {
 
 			// The page select paginates on its own.
 			const user = userEvent.setup();
-			await user.selectOptions( pageSelect, '2' );
-			expect( pageSelect ).toHaveValue( '2' );
+			await user.click( pageSelect );
+			await user.click(
+				await screen.findByRole( 'option', { name: '2' } )
+			);
+			expect( pageSelect ).toHaveTextContent( '2' );
 			expect(
 				within( screen.getByRole( 'listbox' ) ).getAllByRole( 'option' )
 			).toHaveLength( 1 );

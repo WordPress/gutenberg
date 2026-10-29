@@ -57,7 +57,7 @@ export interface DimensionsToolProps {
 	/**
 	 * ID of the panel that contains the controls.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current dimensions values.
 	 */
@@ -99,7 +99,7 @@ export interface AspectRatioToolProps {
 	/**
 	 * ID of the panel this tool is associated with.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current aspect ratio value.
 	 */
@@ -128,14 +128,6 @@ export interface AspectRatioToolProps {
 	 * Additional CSS class on the wrapping panel item.
 	 */
 	className?: string;
-	/**
-	 * Whether the control is displaying an inherited Global Styles value.
-	 */
-	isInherited?: boolean;
-	/**
-	 * Whether a local value is overriding an inherited Global Styles value.
-	 */
-	hasLocalOverride?: boolean;
 }
 
 /**
@@ -145,7 +137,7 @@ export interface ScaleToolProps {
 	/**
 	 * ID of the panel that contains the controls.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current scale value.
 	 */
@@ -189,7 +181,7 @@ export interface WidthHeightToolProps {
 	/**
 	 * ID of the panel that contains the controls.
 	 */
-	panelId?: string;
+	panelId?: string | null;
 	/**
 	 * Current dimensions values.
 	 */

@@ -1,19 +1,17 @@
-const babel = require( '@babel/core' );
+const { parse } = require( '@babel/parser' );
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
 const getAST = ( source, filename ) => {
-	const config = babel.loadPartialConfig( { filename } );
 	const isTypeScript = /\.[cm]?tsx?$/.test( filename );
 	const supportsJSX = ! isTypeScript || filename.endsWith( '.tsx' );
-	const parserOpts = config?.hasFilesystemConfig()
-		? config.options.parserOpts
-		: {
-				plugins: [
-					...( isTypeScript ? [ 'typescript' ] : [] ),
-					...( supportsJSX ? [ 'jsx' ] : [] ),
-				],
-			};
-	return babel.parse( source, { filename, parserOpts } ).program;
+	return parse( source, {
+		sourceType: 'module',
+		sourceFilename: filename,
+		plugins: [
+			...( isTypeScript ? [ 'typescript' ] : [] ),
+			...( supportsJSX ? [ 'jsx' ] : [] ),
+		],
+	} ).program;
 };
 
 const getExportTokens = ( ast ) =>
