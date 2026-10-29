@@ -34,13 +34,21 @@ function usePopoverScroll( contentRef?: RefObject< HTMLElement | null > ) {
 				// in front of it. This is to avoid scrolling both containers simultaneously.
 				// `contains` treats `undefined` as `null`.
 				if ( ! node.contains( eventScrollContainer as Node | null ) ) {
+					// Prevent the browser from starting a mousewheel
+					// transaction against this popover's own scroll chain. The
+					// popover renders outside the canvas iframe, in a document
+					// that has no room to scroll, so the browser would latch
+					// onto a target it can never scroll and drop subsequent
+					// wheel events until the pointer moves or the transaction
+					// times out. See https://github.com/WordPress/gutenberg/issues/80712
+					event.preventDefault();
 					// The canvas content always sits in a scroll container.
 					scrollContainer!.scrollBy( deltaX, deltaY );
 				}
 			}
-			// Tell the browser that we do not call event.preventDefault
-			// See https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#improving_scrolling_performance_with_passive_listeners
-			const options: AddEventListenerOptions = { passive: true };
+			// Not passive: the handler calls preventDefault to stop the
+			// browser latching a wheel transaction onto an unscrollable target.
+			const options: AddEventListenerOptions = { passive: false };
 			node.addEventListener( 'wheel', onWheel, options );
 			return () => {
 				node.removeEventListener( 'wheel', onWheel, options );
