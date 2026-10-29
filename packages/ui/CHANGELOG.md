@@ -8,6 +8,7 @@
 
 ### New Features
 
+-   `Button`: Add `Button.Caret`, a dropdown caret for buttons that open a menu or popover. It matches the `Select` caret in size, stroke, and spacing from the label.
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 
 ### Enhancements

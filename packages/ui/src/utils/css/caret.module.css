@@ -1,0 +1,19 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer utilities {
+		/*
+		 * The dropdown caret shared by `Button.Caret` and the `Select` and
+		 * `Combobox` triggers. A container that sets its own `gap` declares it
+		 * in `--_wp-ui-caret-container-gap`, so the caret keeps the same
+		 * distance from the preceding content.
+		 */
+		.caret {
+			flex: 0 0 auto;
+			margin-inline-start: calc(var(--wpds-dimension-gap-xs) - var(--_wp-ui-caret-container-gap, 0px));
+
+			/* Optically adjust the caret to a more balanced position. */
+			margin-inline-end: -4px;
+		}
+	}
+}

@@ -84,3 +84,5 @@ export interface ButtonIconProps extends IconProps {
 	 */
 	icon: IconProps[ 'icon' ];
 }
+
+export type ButtonCaretProps = Omit< IconProps, 'icon' | 'size' >;

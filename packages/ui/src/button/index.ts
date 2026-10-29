@@ -1,7 +1,9 @@
 import { Button as _Button } from './button';
+import { ButtonCaret } from './caret';
 import { ButtonIcon } from './icon';
 
 ButtonIcon.displayName = 'Button.Icon';
+ButtonCaret.displayName = 'Button.Caret';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
@@ -15,4 +17,9 @@ export const Button = Object.assign( _Button, {
 	 * a `Button` component.
 	 */
 	Icon: ButtonIcon,
+	/**
+	 * A caret placed after the label of a `Button` that opens a menu, popover,
+	 * or listbox. It matches the caret in the `Select` trigger.
+	 */
+	Caret: ButtonCaret,
 } );

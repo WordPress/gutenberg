@@ -2,10 +2,9 @@ import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { chevronDown } from '@wordpress/icons';
-import { Icon } from '../../../icon';
 import focusStyles from '../../../utils/css/focus.module.scss';
 import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
+import { Caret } from '../../../utils/caret';
 import { InputLayout } from '../input-layout';
 import type { ComboboxTriggerProps } from './types';
 
@@ -45,11 +44,7 @@ export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 							{ children }
 						</_Combobox.Value>
 					</div>
-					<Icon
-						className={ selectTriggerStyles[ 'trigger-caret' ] }
-						icon={ chevronDown }
-						size={ 18 }
-					/>
+					<Caret />
 				</_Combobox.Trigger>
 			</InputLayout>
 		);

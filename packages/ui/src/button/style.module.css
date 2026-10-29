@@ -121,6 +121,10 @@
 			margin: var(--wp-ui-button-icon-margin);
 		}
 
+		.caret {
+			--_wp-ui-caret-container-gap: var(--wpds-dimension-gap-sm);
+		}
+
 		/* Variants (`tone` + `variant`) overrides compared to default styles */
 
 		/* All outline buttons have a border */

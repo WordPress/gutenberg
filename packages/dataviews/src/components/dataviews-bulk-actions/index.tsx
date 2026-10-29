@@ -2,9 +2,11 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall, chevronDown } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button.Caret, pending WordPress/gutenberg#76135.
+	Button as UIButton,
 	Checkbox,
 	Field,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
@@ -290,19 +292,17 @@ function renderBulkActionsContent< Item >(
 								<Menu.Trigger
 									disabled={ !! actionInProgress }
 									render={
-										<Button
-											variant="secondary"
+										<UIButton
+											variant="outline"
+											tone="neutral"
 											size="compact"
-											icon={ chevronDown }
-											iconPosition="right"
-											className="dataviews-bulk-actions__action"
-											isBusy={ !! actionInProgress }
-											accessibleWhenDisabled
-										>
-											{ __( 'Actions' ) }
-										</Button>
+											loading={ !! actionInProgress }
+										/>
 									}
-								/>
+								>
+									{ __( 'Actions' ) }
+									<UIButton.Caret />
+								</Menu.Trigger>
 								<Menu.Popup>
 									<Menu.Group>
 										{ renderActions( true ) }

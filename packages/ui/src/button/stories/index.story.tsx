@@ -12,6 +12,8 @@ import {
 	useKeyboardShortcutProps,
 } from '@wordpress/ui';
 import { Button } from '../index';
+import * as Menu from '../../menu';
+import * as Select from '../../form/primitives/select';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Button > = {
@@ -20,6 +22,7 @@ const meta: Meta< typeof Button > = {
 	component: Button,
 	subcomponents: {
 		'Button.Icon': Button.Icon,
+		'Button.Caret': Button.Caret,
 	},
 	argTypes: {
 		'aria-pressed': {
@@ -170,6 +173,83 @@ export const WithIcon: Story = {
 		...Default.args,
 		children: [ <Button.Icon icon={ wordpress } key="icon" />, 'Button' ],
 	},
+};
+
+/**
+ * Place `Button.Caret` after the label of a button that opens a menu or
+ * popover. It matches the caret in the `Select` trigger in size, stroke, and
+ * spacing, which a `Button.Icon` with `chevronDown` does not.
+ */
+export const WithCaret: Story = {
+	args: {
+		tone: 'neutral',
+		variant: 'outline',
+	},
+	render: ( args ) => (
+		<Menu.Root>
+			<Menu.Trigger render={ <Button { ...args } /> }>
+				Actions
+				<Button.Caret />
+			</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Item>
+					<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.Item>
+					<Menu.ItemLabel>Move to trash</Menu.ItemLabel>
+				</Menu.Item>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
+/**
+ * Compares a `Button` with `Button.Caret` to a `Select` trigger at each size.
+ * The caret has the same size, stroke, and distance from the label, and it is
+ * pulled into the inline-end padding by the same amount.
+ */
+export const CaretComparedWithSelect: Story = {
+	args: {
+		tone: 'neutral',
+		variant: 'outline',
+	},
+	render: ( args ) => (
+		<div
+			style={ {
+				display: 'grid',
+				gridTemplateColumns: 'repeat(3, max-content)',
+				gap: '1rem',
+				alignItems: 'center',
+				justifyItems: 'start',
+				width: 'max-content',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<div></div>
+			<div>Select</div>
+			<div>Button with caret</div>
+			{ ( [ 'default', 'compact', 'small' ] as const ).map( ( size ) => (
+				<Fragment key={ size }>
+					<div>{ size }</div>
+					<Select.Root
+						items={ [ { value: 'actions', label: 'Actions' } ] }
+						defaultValue="actions"
+					>
+						<Select.Trigger size={ size } aria-label="Actions" />
+						<Select.Popup>
+							<Select.Item value="actions">
+								<Select.ItemLabel>Actions</Select.ItemLabel>
+							</Select.Item>
+						</Select.Popup>
+					</Select.Root>
+					<Button { ...args } size={ size }>
+						Actions
+						<Button.Caret />
+					</Button>
+				</Fragment>
+			) ) }
+		</div>
+	),
 };
 
 export const Loading: Story = {
