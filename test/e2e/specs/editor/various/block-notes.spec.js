@@ -3675,4 +3675,102 @@ test.describe( 'Block Notes', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Notes on text across blocks', () => {
+		test.beforeEach( async ( { editor } ) => {
+			for ( const content of [
+				'First paragraph',
+				'Second paragraph',
+				'Third paragraph',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+		} );
+
+		// From "First |paragraph" to the end of "Third paragraph".
+		async function selectTextAcrossBlocks( {
+			editor,
+			pageUtils,
+			blockNoteUtils,
+		} ) {
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.first().click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 0 } );
+			await paragraphs.last().click( { modifiers: [ 'Shift' ] } );
+			await pageUtils.pressKeys( 'Shift+End' );
+		}
+
+		test( 'adds one note to every block the text spans', async ( {
+			editor,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await selectTextAcrossBlocks( {
+				editor,
+				pageUtils,
+				blockNoteUtils,
+			} );
+			await blockNoteUtils.addNote( 'Across blocks' );
+
+			await expect(
+				blockNoteUtils.getThread( 'Across blocks' )
+			).toHaveCount( 1 );
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marks ).toHaveCount( 3 );
+			await expect( marks.first() ).toHaveText( 'paragraph' );
+			await expect( marks.nth( 1 ) ).toHaveText( 'Second paragraph' );
+			await expect( marks.nth( 2 ) ).toHaveText( 'Third paragraph' );
+			const noteId = await marks.first().getAttribute( 'data-id' );
+			expect( noteId ).toMatch( /^\d+$/ );
+			await expect( marks.nth( 1 ) ).toHaveAttribute( 'data-id', noteId );
+			await expect( marks.nth( 2 ) ).toHaveAttribute( 'data-id', noteId );
+
+			const blocks = await editor.getBlocks();
+			expect(
+				blocks.map( ( block ) => block.attributes.metadata?.noteId )
+			).toEqual( [
+				[ Number( noteId ) ],
+				[ Number( noteId ) ],
+				[ Number( noteId ) ],
+			] );
+
+			await test.step( 'Deletes the note from every block', async () => {
+				await blockNoteUtils.getThread( 'Across blocks' ).click();
+				await blockNoteUtils.deleteNote();
+				await expect( marks ).toHaveCount( 0 );
+				const remaining = await editor.getBlocks();
+				expect(
+					remaining.map(
+						( block ) => block.attributes.metadata?.noteId
+					)
+				).toEqual( [ undefined, undefined, undefined ] );
+			} );
+		} );
+
+		test( 'drops the draft from every block on cancel', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await selectTextAcrossBlocks( {
+				editor,
+				pageUtils,
+				blockNoteUtils,
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			const marks = editor.canvas.locator(
+				'mark.wp-note[data-id="new"]'
+			);
+			await expect( marks ).toHaveCount( 3 );
+
+			await page.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect( marks ).toHaveCount( 0 );
+		} );
+	} );
 } );
