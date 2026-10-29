@@ -66,7 +66,7 @@ const first: Handlers = {
 // Run after all other handlers (window bubble), like the browser's default
 // action, so any other handler can prevent them.
 const defaults: Handlers = {
-	keydown: { selection: [ deleteHandler.onKeyDown ] },
+	beforeinput: { selection: [ deleteHandler.onBeforeInput ] },
 	copy: { selection: [ copyHandler.onCopy ] },
 	cut: { selection: [ copyHandler.onCopy ] },
 	click: { target: [ selectObject.onClick ] },
