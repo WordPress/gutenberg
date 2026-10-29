@@ -6,13 +6,11 @@
 		white-space: pre-wrap;
 	}
 
-	&.is-layout-flex {
-		&.has-text-align-center {
-			justify-content: center;
-		}
+	:where(&.is-layout-flex:not(.is-vertical).has-text-align-center) {
+		justify-content: center;
+	}
 
-		&.has-text-align-right {
-			justify-content: flex-end;
-		}
+	:where(&.is-layout-flex:not(.is-vertical).has-text-align-right) {
+		justify-content: flex-end;
 	}
 }
