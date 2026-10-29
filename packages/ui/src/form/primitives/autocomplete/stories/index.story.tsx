@@ -4,8 +4,6 @@ import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
@@ -29,6 +27,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	id: 'design-system-components-form-primitives-autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
+		'Autocomplete.LoadingIndicator': Autocomplete.LoadingIndicator,
 		'Autocomplete.Portal': Autocomplete.Portal,
 		'Autocomplete.Positioner': Autocomplete.Positioner,
 		'Autocomplete.Popup': Autocomplete.Popup,
@@ -201,8 +200,10 @@ function HiddenResultCount() {
 }
 
 /**
- * Fetches matching items asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Autocomplete.LoadingIndicator` inside `Autocomplete.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
@@ -232,7 +233,7 @@ export const AsyncItems: Story = {
 							)
 						);
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 			>
@@ -243,10 +244,7 @@ export const AsyncItems: Story = {
 				<Autocomplete.Popup>
 					<Autocomplete.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Autocomplete.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useEffect, useState } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -19,6 +19,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
+		'SearchableChipSelect.LoadingIndicator':
+			SearchableChipSelect.LoadingIndicator,
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
@@ -50,6 +52,90 @@ export const Default: Story = {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
 		'aria-label': 'Fruit',
+	},
+};
+
+// TODO: Remove this temporary story before merge.
+/**
+ * Pass `SearchableChipSelect.LoadingIndicator` as `statusContent` while loading.
+ * Pass `children` to customize its message.
+ */
+export const AsyncItemsPermanentLoading: Story = {
+	args: {
+		'aria-label': 'Fruit',
+		items: [],
+		statusContent: <SearchableChipSelect.LoadingIndicator />,
+		emptyContent: null,
+	},
+};
+
+// TODO: Remove this temporary story before merge.
+/**
+ * Pass `SearchableChipSelect.LoadingIndicator` as `statusContent` while fetching
+ * items. Pass `children` to customize its message. Offer a creatable item when
+ * the query has no matches.
+ */
+export const AsyncItemsWithCreatable: Story = {
+	args: {
+		'aria-label': 'Fruit',
+	},
+	render: function Template( args ) {
+		const [ open, setOpen ] = useState( false );
+		const [ loading, setLoading ] = useState( true );
+		const [ inputValue, setInputValue ] = useState( '' );
+		const [ matches, setMatches ] = useState< typeof ITEMS >( [] );
+		const creatableItem = {
+			value: 'create',
+			label: `Create new fruit: ${ inputValue.trim() }`,
+			creatable: true,
+		};
+		const resolvedItems =
+			matches.length > 0 || ! inputValue.trim()
+				? matches
+				: [ creatableItem ];
+
+		useEffect( () => {
+			if ( ! open ) {
+				return;
+			}
+			const timeout = setTimeout( () => {
+				setMatches(
+					ITEMS.filter( ( item ) =>
+						item.label
+							.toLowerCase()
+							.includes( inputValue.trim().toLowerCase() )
+					)
+				);
+				setLoading( false );
+			}, 2000 );
+			return () => clearTimeout( timeout );
+		}, [ open, inputValue ] );
+
+		return (
+			<SearchableChipSelect
+				{ ...args }
+				open={ open }
+				inputValue={ inputValue }
+				filter={ null }
+				items={ loading ? [] : resolvedItems }
+				onInputValueChange={ ( nextInputValue, eventDetails ) => {
+					setInputValue( nextInputValue );
+					setLoading( true );
+					args.onInputValueChange?.( nextInputValue, eventDetails );
+				} }
+				statusContent={
+					loading ? <SearchableChipSelect.LoadingIndicator /> : null
+				}
+				emptyContent={ loading ? null : undefined }
+				onOpenChange={ ( nextOpen, eventDetails ) => {
+					setOpen( nextOpen );
+					if ( nextOpen ) {
+						setLoading( true );
+					}
+					args.onOpenChange?.( nextOpen, eventDetails );
+				} }
+			/>
+		);
 	},
 };
 
