@@ -1029,14 +1029,12 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
-		const button = toolbar.getByRole( 'button', {
-			name: 'Replace non-breaking space',
-			exact: true,
-		} );
-		const anyButton = toolbar.getByRole( 'button', {
-			name: /^Replace non-breaking spaces?$/,
-		} );
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', {
+				name: 'Replace non-breaking space',
+				exact: true,
+			} );
 
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'one' );
@@ -1048,7 +1046,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primaryShift+Space' );
 		await page.keyboard.type( 'three' );
 		await editor.showBlockToolbar();
-		await expect( anyButton ).toHaveCount( 0 );
+		await expect( button ).toHaveCount( 0 );
 
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
 		await button.click();
@@ -1058,7 +1056,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				attributes: { content: 'one\u00a0two three' },
 			},
 		] );
-		await expect( anyButton ).toHaveCount( 0 );
+		await expect( button ).toHaveCount( 0 );
 
 		await page.keyboard.type( '!' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
