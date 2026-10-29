@@ -2,7 +2,11 @@ import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Spinner as WCSpinner, Popover } from '@wordpress/components';
-import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	useResizeObserver,
+} from '@wordpress/compose';
 import {
 	useContext,
 	useEffect,
@@ -366,21 +370,26 @@ function ViewTable< Item >( {
 		hadSelectionRef.current = showBulkActions;
 	}, [ showBulkActions ] );
 
-	const scrollFadeRef = useRef< HTMLDivElement >( null );
-	// Size the scroll fade to the visible area. Written to the DOM directly,
-	// like the bulk actions toolbar position.
-	const syncScrollFadeHeight = () => {
-		const container = containerRef.current;
-		scrollFadeRef.current?.style.setProperty(
-			'--wp-dataviews-table-scroll-fade-height',
-			`${ container?.clientHeight ?? 0 }px`
-		);
-	};
 	const { isHorizontalScrollEnd, isVerticallyScrolled, scrollContentRef } =
-		useScrollState( {
-			scrollContainerRef: containerRef,
-			onResize: syncScrollFadeHeight,
-		} );
+		useScrollState( { scrollContainerRef: containerRef } );
+	// Size the scroll fade to the visible area of the scroll container it is
+	// stuck in. Written to the DOM directly, like the bulk actions toolbar
+	// position, and measured whenever the fade mounts.
+	const scrollFadeRef = useRefEffect( ( fade: HTMLDivElement ) => {
+		const container = fade.parentElement;
+		if ( ! container ) {
+			return;
+		}
+		const syncScrollFadeHeight = () =>
+			fade.style.setProperty(
+				'--wp-dataviews-table-scroll-fade-height',
+				`${ container.clientHeight }px`
+			);
+		syncScrollFadeHeight();
+		const resizeObserver = new ResizeObserver( syncScrollFadeHeight );
+		resizeObserver.observe( container );
+		return () => resizeObserver.disconnect();
+	}, [] );
 
 	const disableHeaderControls = showBulkActions;
 

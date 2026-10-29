@@ -376,15 +376,19 @@
 	height: 0;
 	flex-shrink: 0;
 	pointer-events: none;
+	// Inherit the surface behind the table, like the sticky actions column.
+	background-color: inherit;
 
 	&::after {
 		content: "";
 		position: absolute;
-		top: 0;
-		right: 0;
+		inset-block-start: 0;
+		inset-inline-end: 0;
 		width: var(--wpds-dimension-size-lg);
 		height: var(--wp-dataviews-table-scroll-fade-height, 0);
-		background: linear-gradient(to left, var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong)), transparent);
+		background-color: inherit;
+		// RTL styles don't flip `mask-image`, so flip it explicitly.
+		mask-image: linear-gradient(to left, #000, transparent) #{"/*rtl:linear-gradient(to right, #000, transparent);*/"};
 	}
 }
 

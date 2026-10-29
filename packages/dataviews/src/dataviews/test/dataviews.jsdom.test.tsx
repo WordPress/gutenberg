@@ -15,6 +15,7 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
 type Data = {
 	id: number;
 	title: string;

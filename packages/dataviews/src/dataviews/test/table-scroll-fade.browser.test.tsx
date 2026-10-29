@@ -88,7 +88,7 @@ const getFade = () =>
 		'.dataviews-view-table__scroll-fade'
 	)!;
 
-async function scrollToEnd( container: HTMLElement ) {
+function scrollToEnd( container: HTMLElement ) {
 	const distance = container.scrollWidth - container.clientWidth;
 	container.scrollLeft =
 		getComputedStyle( container ).direction === 'rtl'
@@ -97,18 +97,29 @@ async function scrollToEnd( container: HTMLElement ) {
 	container.dispatchEvent( new Event( 'scroll' ) );
 }
 
+const getFadeStyle = () => getComputedStyle( getFade(), '::after' );
+
+// The fade sits on the inline-end edge of the visible area when its offset
+// from that edge is zero and the sticky element spans the container.
+function expectFadeAtInlineEnd( dir: 'ltr' | 'rtl' ) {
+	const container = getScrollContainer().getBoundingClientRect();
+	const fade = getFade().getBoundingClientRect();
+	expect( fade.left ).toBe( container.left );
+	expect( fade.width ).toBe( getScrollContainer().clientWidth );
+	expect( getFadeStyle()[ dir === 'rtl' ? 'left' : 'right' ] ).toBe( '0px' );
+}
+
 describe( 'DataViews table scroll fade', () => {
 	it( 'shows the fade while there are more columns to scroll to', async () => {
 		await render( <PostsTable /> );
 
 		await expect.element( getFade() ).not.toHaveAttribute( 'hidden' );
-		expect(
-			getFade().style.getPropertyValue(
-				'--wp-dataviews-table-scroll-fade-height'
-			)
-		).toBe( `${ getScrollContainer().clientHeight }px` );
+		expect( getFadeStyle().height ).toBe(
+			`${ getScrollContainer().clientHeight }px`
+		);
+		expectFadeAtInlineEnd( 'ltr' );
 
-		await scrollToEnd( getScrollContainer() );
+		scrollToEnd( getScrollContainer() );
 		await expect.element( getFade() ).toHaveAttribute( 'hidden' );
 	} );
 
@@ -128,12 +139,39 @@ describe( 'DataViews table scroll fade', () => {
 		await expect.element( getFade() ).not.toHaveAttribute( 'hidden' );
 	} );
 
+	it( 'sizes the fade when the actions are removed', async () => {
+		const { rerender } = await render( <PostsTable withActions /> );
+		expect( getFade() ).toBeNull();
+
+		await rerender( <PostsTable /> );
+		await expect.element( getFade() ).not.toHaveAttribute( 'hidden' );
+		expect( getFadeStyle().height ).toBe(
+			`${ getScrollContainer().clientHeight }px`
+		);
+	} );
+
+	it( 'fades into the surface the consumer gives the wrapper', async () => {
+		const style = document.createElement( 'style' );
+		style.textContent =
+			'.dataviews-wrapper.dataviews-wrapper { background-color: rgb(1, 2, 3); }';
+		document.head.append( style );
+		try {
+			await render( <PostsTable /> );
+
+			await expect.element( getFade() ).not.toHaveAttribute( 'hidden' );
+			expect( getFadeStyle().backgroundColor ).toBe( 'rgb(1, 2, 3)' );
+		} finally {
+			style.remove();
+		}
+	} );
+
 	it( 'shows the fade at the start of the scroll range in RTL', async () => {
 		await render( <PostsTable dir="rtl" /> );
 
 		await expect.element( getFade() ).not.toHaveAttribute( 'hidden' );
+		expectFadeAtInlineEnd( 'rtl' );
 
-		await scrollToEnd( getScrollContainer() );
+		scrollToEnd( getScrollContainer() );
 		await expect.element( getFade() ).toHaveAttribute( 'hidden' );
 	} );
 
@@ -151,7 +189,7 @@ describe( 'DataViews table scroll fade', () => {
 			getComputedStyle( actionsHeader, '::before' ).maskImage
 		).toContain( 'linear-gradient' );
 
-		await scrollToEnd( getScrollContainer() );
+		scrollToEnd( getScrollContainer() );
 		await expect
 			.element( actionsHeader )
 			.not.toHaveClass( 'dataviews-view-table__actions-column--stuck' );

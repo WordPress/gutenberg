@@ -1,11 +1,5 @@
 import type { RefObject } from 'react';
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useState,
-} from '@wordpress/element';
-import { useEvent, useResizeObserver } from '@wordpress/compose';
+import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 
 // `scrollLeft` is negative in RTL, so its absolute value is the distance
 // scrolled from the start in both directions.
@@ -31,19 +25,16 @@ const isScrolledToEnd = ( element: Element ) =>
  *
  * @param params                    The parameters for the hook.
  * @param params.scrollContainerRef The ref to the scroll container element.
- * @param [params.onResize]         Called after the container or the scrolled content resizes.
  * @return  The scroll state, and the ref to attach to the scrolled content.
  */
 export function useScrollState( {
 	scrollContainerRef,
-	onResize,
 }: {
 	scrollContainerRef: RefObject< HTMLDivElement | null >;
-	onResize?: () => void;
 } ): {
 	isHorizontalScrollEnd: boolean;
 	isVerticallyScrolled: boolean;
-	scrollContentRef: ( element?: Element | null ) => void;
+	scrollContentRef: ( element: Element | null ) => void;
 } {
 	const [ isHorizontalScrollEnd, setIsHorizontalScrollEnd ] =
 		useState( false );
@@ -59,30 +50,31 @@ export function useScrollState( {
 		setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
 	}, [ scrollContainerRef ] );
 
-	const handleResize = useEvent( () => {
-		handleScroll();
-		onResize?.();
-	} );
-	const scrollContentRef = useResizeObserver( handleResize );
-	const scrollContainerResizeRef = useResizeObserver( handleResize );
+	const [ scrollContent, scrollContentRef ] = useState< Element | null >(
+		null
+	);
 
-	// Measure before the first paint, so the scroll cues don't flash.
-	useLayoutEffect( handleResize, [ handleResize ] );
-
-	useEffect( () => {
+	// A layout effect measures before the first paint, so the scroll cues
+	// don't flash.
+	useLayoutEffect( () => {
 		const scrollContainer = scrollContainerRef.current;
 		if ( ! scrollContainer ) {
 			return () => {};
 		}
 
+		handleScroll();
 		scrollContainer.addEventListener( 'scroll', handleScroll );
-		scrollContainerResizeRef( scrollContainer );
+		const resizeObserver = new ResizeObserver( handleScroll );
+		resizeObserver.observe( scrollContainer );
+		if ( scrollContent ) {
+			resizeObserver.observe( scrollContent );
+		}
 
 		return () => {
 			scrollContainer.removeEventListener( 'scroll', handleScroll );
-			scrollContainerResizeRef( null );
+			resizeObserver.disconnect();
 		};
-	}, [ scrollContainerRef, handleScroll, scrollContainerResizeRef ] );
+	}, [ scrollContainerRef, handleScroll, scrollContent ] );
 
 	return { isHorizontalScrollEnd, isVerticallyScrolled, scrollContentRef };
 }
