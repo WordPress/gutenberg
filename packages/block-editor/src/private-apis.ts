@@ -56,6 +56,7 @@ import {
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 	getPendingMediaPreviewKey,
+	isMediaEditorLockedKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateBlockPopover } from './components/block-popover';
@@ -149,6 +150,7 @@ lock( privateApis, {
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 	getPendingMediaPreviewKey,
+	isMediaEditorLockedKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

@@ -77,6 +77,7 @@ const {
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
 	getPendingMediaPreviewKey,
+	isMediaEditorLockedKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -366,6 +367,7 @@ export default function Image( {
 		maxWidth,
 		editMediaEntity,
 		pendingPreviewUrl,
+		isMediaEditorLocked,
 	} = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType, getSettings } =
@@ -384,6 +386,8 @@ export default function Image( {
 					select,
 					clientId
 				),
+				isMediaEditorLocked:
+					!! settings[ isMediaEditorLockedKey ]?.( select ),
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
@@ -933,7 +937,7 @@ export default function Image( {
 							// Disable rather than hide while the edited image
 							// loads, so the button keeps focus when the modal
 							// closes instead of dropping it to the canvas.
-							disabled={ isSwappingMedia }
+							disabled={ isSwappingMedia || isMediaEditorLocked }
 						/>
 					) }
 					{ showCoverControls && (

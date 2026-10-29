@@ -58,9 +58,11 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const { openMediaEditorModalKey, getPendingMediaPreviewKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	openMediaEditorModalKey,
+	getPendingMediaPreviewKey,
+	isMediaEditorLockedKey,
+} = unlock( blockEditorPrivateApis );
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -141,6 +143,13 @@ function CoverEdit( {
 				.getSettings()
 				[ getPendingMediaPreviewKey ]?.( select, clientId ),
 		[ clientId ]
+	);
+	const isMediaEditorLocked = useSelect(
+		( select ) =>
+			!! select( blockEditorStore )
+				.getSettings()
+				[ isMediaEditorLockedKey ]?.( select ),
+		[]
 	);
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
@@ -747,7 +756,7 @@ function CoverEdit( {
 			onEditMedia={ openCoverMediaEditorModal }
 			editMediaButtonRef={ editMediaButtonRef }
 			showEditMediaButton={ showEditMediaButton }
-			isEditMediaDisabled={ isSwappingMedia }
+			isEditMediaDisabled={ isSwappingMedia || isMediaEditorLocked }
 		/>
 	);
 
