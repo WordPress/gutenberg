@@ -39,6 +39,37 @@ export function loadChangieConfig(
 }
 
 /**
+ * Checks all project destinations before compiling or modifying release files.
+ *
+ * @param repoRoot Repository containing the project changelogs.
+ */
+export function validateChangieProjects( repoRoot = process.cwd() ): void {
+	const config = loadChangieConfig( repoRoot );
+	for ( const project of config.projects ) {
+		const expected = `packages/${ project.key }/CHANGELOG.md`;
+		if (
+			typeof project.changelog !== 'string' ||
+			! project.changelog.trim() ||
+			path.resolve( repoRoot, project.changelog ) !==
+				path.resolve( repoRoot, expected )
+		) {
+			throw new Error(
+				`.changie.yaml: project '${ project.key }' must set 'changelog' to '${ expected }'.`
+			);
+		}
+		const destination = path.resolve( repoRoot, project.changelog );
+		if (
+			! fs.existsSync( destination ) ||
+			! fs.statSync( destination ).isFile()
+		) {
+			throw new Error(
+				`.changie.yaml: changelog destination '${ project.changelog }' for project '${ project.key }' is not an existing file. Create the package changelog before releasing.`
+			);
+		}
+	}
+}
+
+/**
  * Returns the list of package names opted into Changie based on `.changie.yaml`.
  *
  * @param repoRoot Path to Gutenberg repository root.

@@ -50,13 +50,16 @@ Add the package entry to the `projects` list in the root `.changie.yaml`:
 projects:
   - label: Components
     key: components
+    changelog: packages/components/CHANGELOG.md
   - label: UI
     key: ui
+    changelog: packages/ui/CHANGELOG.md
   - label: <Package Title>
     key: <package-name>
+    changelog: packages/<package-name>/CHANGELOG.md
 ```
 
-The `key` must match the package directory name under `packages/`.
+The `key` must match the package directory name under `packages/`. The `changelog` destination is required and must resolve to that package's existing `packages/<package-name>/CHANGELOG.md`. Changelog lint and release preparation check every project's destination before compilation or release-file changes; native `changie merge --dry-run` alone does not check whether the destination can be written.
 
 ### 4. Verify the migration
 

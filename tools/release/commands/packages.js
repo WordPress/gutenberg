@@ -17,7 +17,10 @@ const {
 	calculateVersionBumpFromChangelog,
 	findPluginReleaseBranchName,
 } = require( './common' );
-const { isChangiePackage } = require( '../../changelogs/lib/config.ts' );
+const {
+	isChangiePackage,
+	validateChangieProjects,
+} = require( '../../changelogs/lib/config.ts' );
 const {
 	batchChangiePackage,
 	mergeChangieChangelogs,
@@ -194,6 +197,7 @@ async function updatePackages( config ) {
 		return;
 	}
 
+	validateChangieProjects( gitWorkingDirectoryPath );
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
