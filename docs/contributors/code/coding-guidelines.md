@@ -529,7 +529,7 @@ alert( `My name is ${ name }.` );
 
 Format displayed counts and quantities with [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) so separators and decimal marks follow the user's locale (for example **17,810.25** vs. **17 810,25** vs. **17.810,25**). Do not rely on the browser's default locale, which can differ from the language WordPress is set to.
 
--   Pass the locale from `getSettings().l10n.locale` in `@wordpress/date`. WordPress locales use underscores (`de_DE`), while `Intl` expects BCP 47 tags (`de-DE`), so replace `_` with `-`.
+-   Pass the locale from `getSettings().l10n.locale` in `@wordpress/date`. WordPress locales use underscores (`de_DE`), while `Intl` expects BCP 47 tags (`de-DE`). Some locales carry a qualifier after the region, such as `de_DE_formal`, `de_CH_informal`, or `pt_PT_ao90`, which `Intl` can reject. Keep only the language and the region: split on `_`, keep the first two parts, and join them with `-`.
 -   Prefer full counts. Use `notation: 'compact'` only when the available space needs an abbreviation and an approximate value is sufficient.
 -   `Intl.NumberFormat` rounds to three fraction digits by default. Set `minimumFractionDigits` or `maximumFractionDigits` explicitly when displaying fractional measurements or rates.
 -   Keep the underlying values numeric for calculations, sorting, filtering, and plural selection: pass the original count to `_n()` and format only the displayed value. In `sprintf()`, use `%s` placeholders for formatted numbers, since `%d` would discard their separators.
@@ -541,7 +541,9 @@ import { getSettings } from '@wordpress/date';
 import { _n, sprintf } from '@wordpress/i18n';
 
 function formatNumber( value, options ) {
-	const locale = getSettings().l10n.locale.replace( '_', '-' );
+	// `de_DE_formal` becomes `de-DE`: `Intl` knows nothing about the qualifier.
+	const [ language, region ] = getSettings().l10n.locale.split( '_' );
+	const locale = region ? `${ language }-${ region }` : language;
 	return new Intl.NumberFormat( locale, options ).format( value );
 }
 
