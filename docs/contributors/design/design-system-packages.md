@@ -201,9 +201,11 @@ To deprecate, follow the [soft-deprecation steps](/packages/components/CONTRIBUT
 The deprecation pull request:
 
 - Calls `deprecated()` from `@wordpress/deprecated` with `since`, the planned removal `version`, and the `alternative`.
+- Sets the removal `version` according to how widely plugins and themes use the component. It is usually at least two major WordPress versions after `since`, such as `since: '7.3'` with removal in `7.5`.
 - Adds a deprecation notice to the component's README.
 - Moves the story under `Deprecated`, with a stable story `id` so that existing links continue to work.
 - Adds a `@wordpress/components` changelog entry.
+- Has the **Needs Dev Note** label, so that the deprecation is announced in the WordPress release's developer notes. See the [dev note workflow](/docs/contributors/code/backward-compatibility.md#dev-note-workflow).
 
 A reviewer should check that no Gutenberg screen logs the warning, including through other components that render the legacy one.
 
