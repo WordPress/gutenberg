@@ -9,7 +9,9 @@ import {
 	Stack,
 } from '@wordpress/ui';
 
-type NoteStatusFilter = 'all' | 'hold' | 'approved';
+const NOTE_STATUS_FILTERS = [ 'all', 'hold', 'approved' ] as const;
+
+type NoteStatusFilter = ( typeof NOTE_STATUS_FILTERS )[ number ];
 
 type NotesFilterValues = {
 	search: string;
@@ -118,21 +120,13 @@ export function NotesFilters( { filters, onChange }: NotesFiltersProps ) {
 						}
 					>
 						<Menu.GroupLabel>{ __( 'Status' ) }</Menu.GroupLabel>
-						<Menu.RadioItem value="all">
-							<Menu.ItemLabel>
-								{ statusLabels.all }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
-						<Menu.RadioItem value="hold">
-							<Menu.ItemLabel>
-								{ statusLabels.hold }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
-						<Menu.RadioItem value="approved">
-							<Menu.ItemLabel>
-								{ statusLabels.approved }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
+						{ NOTE_STATUS_FILTERS.map( ( status ) => (
+							<Menu.RadioItem key={ status } value={ status }>
+								<Menu.ItemLabel>
+									{ statusLabels[ status ] }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						) ) }
 					</Menu.RadioGroup>
 				</Menu.Popup>
 			</Menu.Root>

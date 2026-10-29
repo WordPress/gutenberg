@@ -483,6 +483,9 @@ test.describe( 'Block Notes', () => {
 		await page.getByRole( 'menuitemradio', { name: 'Resolved' } ).click();
 		await expect( headingThread ).toBeVisible();
 		await expect( imageThread ).toBeHidden();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeHidden();
 
 		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
 		await expect( imageThread ).toBeVisible();

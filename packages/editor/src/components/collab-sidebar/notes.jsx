@@ -199,13 +199,15 @@ export function Notes( {
 	// "Resolved" divider can be rendered above them. Resolved notes (status
 	// 'approved' with a still-present block) always sort after the active
 	// ones, so the first match marks the boundary. The floating view only
-	// lists unresolved notes, so it needs no divider.
-	const firstResolvedIndex = isFloating
-		? -1
-		: threads.findIndex(
-				( thread ) =>
-					thread.status === 'approved' && !! thread.blockClientId
-			);
+	// lists unresolved notes, so it needs no divider. Neither does a list
+	// filtered by status, where orphaned notes would land above it.
+	const firstResolvedIndex =
+		isFloating || filters.status !== 'all'
+			? -1
+			: threads.findIndex(
+					( thread ) =>
+						thread.status === 'approved' && !! thread.blockClientId
+				);
 	const isAddingNote =
 		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 

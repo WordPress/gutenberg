@@ -332,7 +332,7 @@ mark.wp-note {
 		right: $grid-unit-05;
 		width: $grid-unit-10;
 		height: $grid-unit-10;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		background: var(--wp-admin-theme-color);
 	}
 }
