@@ -95,6 +95,24 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		return $page_id;
 	}
 
+	private function page_link_markup( $page_id ) {
+		return sprintf(
+			'<!-- wp:navigation-link {"label":"%s","type":"page","kind":"post-type","id":%d,"url":"%s"} /-->',
+			get_the_title( $page_id ),
+			$page_id,
+			get_permalink( $page_id )
+		);
+	}
+
+	private function get_labels( $blocks ) {
+		return array_map(
+			static function ( $block ) {
+				return $block['attrs']['label'];
+			},
+			$blocks
+		);
+	}
+
 	private function assert_page_link_block( $block, $page_id ) {
 		$page = get_post( $page_id );
 		$this->assertSame( 'core/navigation-link', $block['blockName'] );
@@ -403,6 +421,136 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 	 * Fallback menu.
 	 */
 
+	public function test_a_page_is_inserted_in_page_order_among_the_page_links() {
+		$about_id = $this->publish_new_page(
+			array(
+				'post_title' => 'About',
+				'menu_order' => 1,
+			)
+		);
+		$team_id  = $this->publish_new_page(
+			array(
+				'post_title' => 'Team',
+				'menu_order' => 5,
+			)
+		);
+		$menu_id  = $this->create_menu(
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->' .
+			$this->page_link_markup( $about_id ) .
+			'<!-- wp:navigation-link {"label":"Shop","url":"https://example.com/shop","kind":"custom"} /-->' .
+			$this->page_link_markup( $team_id ),
+			true
+		);
+
+		$this->publish_new_page(
+			array(
+				'post_title' => 'Pricing',
+				'menu_order' => 3,
+			)
+		);
+
+		$this->assertSame(
+			array( 'Home', 'About', 'Shop', 'Pricing', 'Team' ),
+			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
+		);
+	}
+
+	public function test_a_page_that_sorts_last_goes_after_the_last_page_link() {
+		$about_id = $this->publish_new_page(
+			array(
+				'post_title' => 'About',
+				'menu_order' => 1,
+			)
+		);
+		$menu_id  = $this->create_menu(
+			$this->page_link_markup( $about_id ) .
+			'<!-- wp:navigation-link {"label":"Contact","url":"https://example.com/contact","kind":"custom"} /-->',
+			true
+		);
+
+		$this->publish_new_page(
+			array(
+				'post_title' => 'Team',
+				'menu_order' => 5,
+			)
+		);
+
+		$this->assertSame(
+			array( 'About', 'Team', 'Contact' ),
+			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
+		);
+	}
+
+	public function test_pages_with_the_same_order_are_sorted_by_title() {
+		$alpha_id   = $this->publish_new_page( array( 'post_title' => 'Alpha' ) );
+		$charlie_id = $this->publish_new_page( array( 'post_title' => 'Charlie' ) );
+		$menu_id    = $this->create_menu(
+			$this->page_link_markup( $alpha_id ) . $this->page_link_markup( $charlie_id ),
+			true
+		);
+
+		$this->publish_new_page( array( 'post_title' => 'Bravo' ) );
+
+		$this->assertSame(
+			array( 'Alpha', 'Bravo', 'Charlie' ),
+			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
+		);
+	}
+
+	public function test_a_child_page_is_inserted_in_page_order_within_its_parent_submenu() {
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$first_id  = $this->publish_new_page(
+			array(
+				'post_title'  => 'First',
+				'post_parent' => $parent_id,
+				'menu_order'  => 1,
+			)
+		);
+		$third_id  = $this->publish_new_page(
+			array(
+				'post_title'  => 'Third',
+				'post_parent' => $parent_id,
+				'menu_order'  => 3,
+			)
+		);
+		$menu_id   = $this->create_menu(
+			sprintf(
+				'<!-- wp:navigation-submenu {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s"} -->%s%s<!-- /wp:navigation-submenu -->',
+				$parent_id,
+				get_permalink( $parent_id ),
+				$this->page_link_markup( $first_id ),
+				$this->page_link_markup( $third_id )
+			),
+			true
+		);
+
+		$this->publish_new_page(
+			array(
+				'post_title'  => 'Second',
+				'post_parent' => $parent_id,
+				'menu_order'  => 2,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertSame(
+			array( 'First', 'Second', 'Third' ),
+			$this->get_labels( $blocks[0]['innerBlocks'] )
+		);
+	}
+
+	public function test_a_menu_with_a_page_list_is_untouched() {
+		$top_level = '<!-- wp:page-list /-->';
+		$nested    = '<!-- wp:navigation-submenu {"label":"More","url":"https://example.com/more","kind":"custom"} --><!-- wp:page-list /--><!-- /wp:navigation-submenu -->';
+		$top_id    = $this->create_menu( $top_level, true );
+		$nested_id = $this->create_menu( $nested, true );
+
+		$this->publish_new_page();
+
+		$this->assertSame( $top_level, get_post( $top_id )->post_content );
+		$this->assertSame( $nested, get_post( $nested_id )->post_content );
+	}
+
 	public function test_fallback_menu_is_built_from_page_links_with_the_setting_on() {
 		$about_id   = self::factory()->post->create(
 			array(
@@ -500,6 +648,24 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		$this->assertStringContainsString( 'Classic Link', $fallback->post_content );
 		$this->assertEmpty( get_post_meta( $fallback->ID, self::META_KEY, true ) );
 		wp_delete_nav_menu( $menu_id );
+	}
+
+	public function test_fallback_is_not_created_when_a_theme_opts_out() {
+		self::factory()->post->create( array( 'post_type' => 'page' ) );
+		// Added after the plugin's callback, as a theme's `functions.php` would.
+		add_filter( 'wp_navigation_should_create_fallback', '__return_false' );
+
+		$this->assertNull( WP_Navigation_Fallback::get_fallback() );
+		$this->assertCount(
+			0,
+			get_posts(
+				array(
+					'post_type'      => 'wp_navigation',
+					'post_status'    => 'any',
+					'posts_per_page' => -1,
+				)
+			)
+		);
 	}
 
 	public function test_fallback_rest_route_returns_the_page_link_menu() {
