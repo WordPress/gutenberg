@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Image: Add Link to and Open in new tab to the Content tab, so an image's link can be set from the sidebar, including for an image selected in a Gallery's List View ([#85971](https://github.com/WordPress/gutenberg/pull/85971)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
