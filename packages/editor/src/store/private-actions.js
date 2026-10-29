@@ -715,6 +715,9 @@ export function viewBrowserBackup( { title, content, excerpt, time } ) {
 /**
  * Replaces the editor's content with the browser backup shown in the
  * revisions view. Like any edit, it is saved by the next save or autosave.
+ *
+ * For unpublished posts, the current content is saved first so that it is kept
+ * as a revision.
  */
 export const restoreBrowserBackup =
 	() =>
