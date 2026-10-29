@@ -187,7 +187,7 @@ sequenceDiagram
     K->>Q: Enqueue marker write
     Q->>Q: Rebase run anchor onto current content
     Q->>S: updateBlockAttributes with mark id 42 (interceptor bypassed)
-    S-->>R: Text shown underlined in the author color
+    S-->>R: Text shown with a green underline
     Note over S: Later keystrokes in the same run grow the same marker and note
 ```
 
