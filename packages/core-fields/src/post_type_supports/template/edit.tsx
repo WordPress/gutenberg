@@ -36,6 +36,28 @@ function fromItemValue( itemValue: string | null | undefined ) {
 }
 
 /**
+ * The selected item of the select. A post without a template value, as
+ * several posts edited at once before one is picked, selects nothing.
+ *
+ * @param items The items of the select.
+ * @param value The template of the post.
+ * @return The selected item, or null.
+ */
+function getSelectedItem< T extends { value: string } >(
+	items: T[],
+	value: string | undefined
+): T | null {
+	if ( value === undefined ) {
+		return null;
+	}
+	return (
+		items.find( ( item ) => item.value === toItemValue( value ) ) ??
+		items[ 0 ] ??
+		null
+	);
+}
+
+/**
  * Whether the post is the front page or the posts page, which are assigned
  * a template by the reading settings rather than by this field.
  *
@@ -45,10 +67,15 @@ function fromItemValue( itemValue: string | null | undefined ) {
  */
 function useCanSwitchTemplate(
 	postType: string,
-	postId: number | string
+	postId: number | string | undefined
 ): boolean {
 	return useSelect(
 		( select ) => {
+			// Without an id, as for several posts edited at once, the caller
+			// decides which of the posts take the template.
+			if ( ! postId ) {
+				return true;
+			}
 			const { getHomePage, getPostsPageId } = unlock(
 				select( coreStore )
 			);
@@ -84,11 +111,7 @@ function ClassicTemplateEdit( {
 		<SelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={
-				items.find( ( item ) => item.value === toItemValue( value ) ) ??
-				items[ 0 ] ??
-				null
-			}
+			value={ getSelectedItem( items, value ) }
 			items={ items }
 			onValueChange={ ( item ) =>
 				onChange( fromItemValue( item?.value ) )
@@ -139,11 +162,7 @@ function BlockThemeTemplateEdit( {
 		<SelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={
-				items.find( ( item ) => item.value === toItemValue( value ) ) ??
-				items[ 0 ] ??
-				null
-			}
+			value={ getSelectedItem( items, value ) }
 			items={ items }
 			onValueChange={ ( item ) =>
 				onChange( fromItemValue( item?.value ) )
