@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 9.0.10 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+
 ## 9.0.9 (2026-08-06)
 
 ### Bug Fixes
