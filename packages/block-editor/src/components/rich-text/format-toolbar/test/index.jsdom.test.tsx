@@ -19,15 +19,12 @@ describe( 'FormatToolbar', () => {
 					name="acme/badge"
 					title="Also added by a plugin"
 				/>
-				<RichTextToolbarButton name="core/code" title="Inline code" />
+				<RichTextToolbarButton name="code" title="Inline code" />
 				<RichTextToolbarButton
-					name="core/strikethrough"
+					name="strikethrough"
 					title="Strikethrough"
 				/>
-				<RichTextToolbarButton
-					name="core/text-color"
-					title="Highlight"
-				/>
+				<RichTextToolbarButton name="text-color" title="Highlight" />
 			</SlotFillProvider>
 		);
 
