@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Navigation Link: Show the chosen link in the Link UI while the record of a newly linked post, page, category or tag loads, and keep focus in the link preview so the popover closes when focus leaves it ([#84006](https://github.com/WordPress/gutenberg/pull/84006)).
 -   Playlist: Keep `&` intact in track audio and image URLs on the front end, so URLs with several query parameters, such as signed CDN or S3 links, load instead of being cut off at the first `&` ([#85931](https://github.com/WordPress/gutenberg/pull/85931)).
 -   Paragraph: Don't show an empty group in the block toolbar when the theme offers neither text alignment nor wide alignment ([#85796](https://github.com/WordPress/gutenberg/pull/85796)).
 -   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
