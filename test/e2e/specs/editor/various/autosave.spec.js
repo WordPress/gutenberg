@@ -178,6 +178,9 @@ test.describe( 'Autosave', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.getByRole( 'button', { name: 'Restore' } ).focus();
 		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toHaveText( [ 'Backup restored.' ] );
 		await expect.poll( editor.getBlocks ).toEqual( [
 			{
 				name: 'core/paragraph',

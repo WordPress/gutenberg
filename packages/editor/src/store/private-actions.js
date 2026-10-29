@@ -779,6 +779,15 @@ export const restoreBrowserBackup =
 		registry
 			.dispatch( noticesStore )
 			.removeNotice( BROWSER_BACKUP_NOTICE_ID );
+
+		// Replaces the "Draft saved" notice of the save above, which is about
+		// the previous content, not the restored backup.
+		registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Backup restored.' ), {
+				type: 'snackbar',
+				id: 'editor-save',
+			} );
 	};
 
 /**
