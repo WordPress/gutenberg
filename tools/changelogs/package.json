@@ -24,6 +24,7 @@
 	"exports": {
 		".": "./index.js",
 		"./config": "./lib/config.ts",
+		"./exec-changie": "./lib/exec-changie.ts",
 		"./validate": "./lib/validate.ts",
 		"./projects": "./lib/projects.js",
 		"./migrate": "./lib/migrate.js",

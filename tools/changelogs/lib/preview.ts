@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loadChangieConfig } from './config.ts';
 import { parseFragment } from './validate.ts';
-import { execChangie } from './release.ts';
+import { execChangie } from './exec-changie.ts';
 
 export interface Fragment {
 	filePath: string;

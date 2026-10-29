@@ -7,6 +7,7 @@ Tools for managing package changelogs and fragments using [Changie](https://chan
 -   The root `.changie.yaml` defines repo-wide kinds, formatting templates, and opted-in projects.
 -   `lib/config.ts`: loads configuration and detects whether a package is configured for Changie.
 -   `lib/validate.ts`: validates fragments for authoring, preview, and CI. Every fragment requires a positive integer `custom.PR`; `--require-pr` additionally requires a matching fragment for the target package.
+-   `lib/exec-changie.ts`: runs the bundled Changie binary. `npm run lint:changelogs` combines Gutenberg policy checks with native batch dry-run compilation for each selected fragment-managed package, catching incompatible timestamps, custom values, and templates without consuming fragments or writing release files. Changie can create a missing project directory during a dry-run.
 -   `lib/migrate.js`: bi-directional migration between traditional `CHANGELOG.md` files and Changie version/fragment files.
 -   `lib/preview.js`: preview unreleased notes across packages.
 -   `lib/release.js`: version bump calculation and batch/merge operations used during automated package publishing.
