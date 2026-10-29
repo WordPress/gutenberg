@@ -52,6 +52,18 @@ export const ELEMENTS = {
 		description: __( 'Manage the appearance of citations.' ),
 		title: __( 'Citation' ),
 	},
+	strong: {
+		description: __(
+			'Manage the appearance of bold text. The strong and b tags share these styles.'
+		),
+		title: __( 'Bold' ),
+	},
+	em: {
+		description: __(
+			'Manage the appearance of italic text. The em and i tags share these styles.'
+		),
+		title: __( 'Italic' ),
+	},
 	heading: {
 		description: __( 'Manage the appearance of all headings.' ),
 		title: __( 'All headings' ),

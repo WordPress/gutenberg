@@ -2519,6 +2519,40 @@
 						}
 					]
 				},
+				"strong": {
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									}
+								]
+							}
+						}
+					]
+				},
+				"em": {
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									}
+								]
+							}
+						}
+					]
+				},
 				"label": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},

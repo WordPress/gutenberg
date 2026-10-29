@@ -33,6 +33,8 @@ import { speak } from '@wordpress/a11y';
 import {
 	button,
 	caption,
+	formatBold,
+	formatItalic,
 	formInput,
 	formSelect,
 	funnel,
@@ -76,7 +78,7 @@ type ListedElementName = Exclude< ElementName, 'text' >;
 const ELEMENT_GROUPS: { title: string; elements: ListedElementName[] }[] = [
 	{
 		title: __( 'Elements' ),
-		elements: [ 'link', 'caption', 'cite' ],
+		elements: [ 'link', 'strong', 'em', 'caption', 'cite' ],
 	},
 	{
 		title: __( 'Headings' ),
@@ -94,6 +96,8 @@ const ELEMENT_GROUPS: { title: string; elements: ListedElementName[] }[] = [
 // the Heading block's icon for all headings and the Button block's for buttons.
 const ELEMENT_ICONS: Record< ListedElementName, React.ReactElement > = {
 	link,
+	strong: formatBold,
+	em: formatItalic,
 	caption,
 	cite: caption,
 	heading,
