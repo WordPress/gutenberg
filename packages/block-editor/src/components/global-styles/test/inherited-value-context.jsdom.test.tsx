@@ -220,16 +220,6 @@ describe( 'useResolvedStyle hook', () => {
 		expect( parsed.value.typography.fontSize ).toBe( '24px' );
 	} );
 
-	test( 'getBlockElementLayers takes the Accordion Heading level from block context', () => {
-		expect(
-			getBlockElementLayers(
-				'core/accordion-heading',
-				{},
-				{ 'core/accordion-heading-level': 2 }
-			)
-		).toEqual( [ 'heading', 'h2' ] );
-	} );
-
 	// A title block at level 0 renders a paragraph, so no heading element styles
 	// reach it. `0` is the one falsy level, and an `||` anywhere on the path
 	// from the `level` attribute to `getElementLayers` would silently turn it
@@ -318,6 +308,18 @@ describe( 'useResolvedStyle hook', () => {
 		expect(
 			parsed.sources[ 'elements.h2.typography.fontSize' ].layer
 		).toBe( 'root' );
+	} );
+} );
+
+describe( 'getBlockElementLayers', () => {
+	test( 'takes the Accordion Heading level from block context', () => {
+		expect(
+			getBlockElementLayers(
+				'core/accordion-heading',
+				{},
+				{ 'core/accordion-heading-level': 2 }
+			)
+		).toEqual( [ 'heading', 'h2' ] );
 	} );
 } );
 

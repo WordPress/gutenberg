@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useReviewRows } from '../use-review-rows';
+import { EMPTY_VALUE_LABEL } from '../format-style-value';
 
 const fontSizeRow = {
 	id: 'typography.fontSize',
@@ -21,6 +22,15 @@ const lineHeightRow = {
 	paths: [ { path: [ 'typography', 'lineHeight' ], value: '2' } ],
 	presetAttributes: [],
 	newValue: '2',
+};
+
+const paddingRow = {
+	id: 'spacing.padding',
+	primaryPath: [ 'spacing', 'padding' ],
+	paths: [ { path: [ 'spacing', 'padding' ], value: '2rem' } ],
+	presetAttributes: [],
+	newValue: '2rem',
+	format: 'spacing',
 };
 
 function getReviewRows(
@@ -63,5 +73,31 @@ describe( 'useReviewRows', () => {
 		);
 
 		expect( row.formattedCurrentValue ).toBe( '1.4' );
+	} );
+
+	it( 'leaves out a root value that does not cascade', () => {
+		const [ row ] = getReviewRows(
+			[ paddingRow ],
+			{ spacing: { padding: '1rem' } },
+			[],
+			'core/group'
+		);
+
+		expect( row.formattedCurrentValue ).toBe( EMPTY_VALUE_LABEL );
+	} );
+
+	it( 'shows a block value over its element layer value', () => {
+		const [ row ] = getReviewRows(
+			[ lineHeightRow ],
+			{
+				elements: { button: { typography: { lineHeight: '1.2' } } },
+				blocks: {
+					'core/button': { typography: { lineHeight: '1.6' } },
+				},
+			},
+			[ 'button' ]
+		);
+
+		expect( row.formattedCurrentValue ).toBe( '1.6' );
 	} );
 } );
