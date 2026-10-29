@@ -7,14 +7,15 @@ import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
 /**
- * In a manual grid, grows the row span of items whose content overflows their
- * grid area, so that rows can stay square. Spans only ever grow, and may
- * overlap other items.
+ * In a manual grid, grows the column and row spans of items whose content
+ * overflows their grid area, so that rows can stay square. Spans only ever
+ * grow, and may overlap other items. Column spans are capped at the column
+ * count, while growing past the last row adds rows.
  *
  * @param options
  * @param options.clientId The grid block's client ID.
  */
-export function useGridAutoRowSpan( { clientId }: { clientId: string } ) {
+export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 	const isManualPlacement = useSelect(
 		( select ) =>
 			!! (
@@ -46,22 +47,29 @@ export function useGridAutoRowSpan( { clientId }: { clientId: string } ) {
 			);
 
 		const growOverflowingItems = () => {
-			const rowCount = Number(
+			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
 				( getBlockAttributes( clientId ) as { layout?: Layout } | null )
-					?.layout?.rowCount
-			);
+					?.layout ?? {};
+			const rowCount = Number( rawRowCount );
+			const columnCount = Number( rawColumnCount );
 			const gridHeight = gridElement.clientHeight;
-			if ( ! rowCount || ! gridHeight ) {
+			const gridWidth = gridElement.clientWidth;
+			if ( ! rowCount || ! columnCount || ! gridHeight || ! gridWidth ) {
 				return;
 			}
 			const rowGap =
 				parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0;
+			const columnGap =
+				parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0;
 			const rowHeight =
 				( gridHeight - rowGap * ( rowCount - 1 ) ) / rowCount;
-			const rowPitch = rowHeight + rowGap;
-			if ( rowHeight <= 0 ) {
+			const columnWidth =
+				( gridWidth - columnGap * ( columnCount - 1 ) ) / columnCount;
+			if ( rowHeight <= 0 || columnWidth <= 0 ) {
 				return;
 			}
+			const rowPitch = rowHeight + rowGap;
+			const columnPitch = columnWidth + columnGap;
 
 			const rects = new Map< string, GridRect >();
 			for ( const childId of getBlockOrder( clientId ) ) {
@@ -85,18 +93,36 @@ export function useGridAutoRowSpan( { clientId }: { clientId: string } ) {
 			for ( const element of getItemElements() ) {
 				const childId = element.getAttribute( 'data-block' )!;
 				const rect = rects.get( childId );
-				// Allow for sub-pixel rounding.
-				if (
-					! rect ||
-					element.scrollHeight <= element.clientHeight + 1
-				) {
+				if ( ! rect ) {
 					continue;
 				}
-				const neededSpan = Math.ceil(
-					( element.scrollHeight + rowGap ) / rowPitch
-				);
-				const newSpan = Math.max( rect.rowSpan, neededSpan );
-				if ( newSpan === rect.rowSpan ) {
+				// Allow for sub-pixel rounding.
+				const overflowsWidth =
+					element.scrollWidth > element.clientWidth + 1;
+				// A wider item may stop overflowing vertically, so wait for
+				// the next check to measure its height.
+				const overflowsHeight =
+					! overflowsWidth &&
+					element.scrollHeight > element.clientHeight + 1;
+				let { columnSpan, rowSpan } = rect;
+				if ( overflowsWidth ) {
+					const neededSpan = Math.ceil(
+						( element.scrollWidth + columnGap ) / columnPitch
+					);
+					columnSpan = Math.min(
+						Math.max( columnSpan, neededSpan ),
+						columnCount - rect.columnStart + 1
+					);
+				} else if ( overflowsHeight ) {
+					const neededSpan = Math.ceil(
+						( element.scrollHeight + rowGap ) / rowPitch
+					);
+					rowSpan = Math.max( rowSpan, neededSpan );
+				}
+				if (
+					columnSpan === rect.columnSpan &&
+					rowSpan === rect.rowSpan
+				) {
 					continue;
 				}
 				rects.set(
@@ -104,8 +130,8 @@ export function useGridAutoRowSpan( { clientId }: { clientId: string } ) {
 					new GridRect( {
 						columnStart: rect.columnStart,
 						rowStart: rect.rowStart,
-						columnSpan: rect.columnSpan,
-						rowSpan: newSpan,
+						columnSpan,
+						rowSpan,
 					} )
 				);
 				const attributes = getBlockAttributes(
@@ -116,7 +142,8 @@ export function useGridAutoRowSpan( { clientId }: { clientId: string } ) {
 						...attributes.style,
 						layout: {
 							...attributes.style?.layout,
-							rowSpan: newSpan,
+							columnSpan,
+							rowSpan,
 						},
 					},
 				};
