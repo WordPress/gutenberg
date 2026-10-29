@@ -26,6 +26,7 @@
 		}
 	},
 	"supports": {
+		"rotation": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"className": true,

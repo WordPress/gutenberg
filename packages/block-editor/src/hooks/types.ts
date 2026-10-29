@@ -539,6 +539,8 @@ export type ChildLayoutBlockStyle = BlockStyle & { layout?: ChildLayout };
 
 export interface ChildLayoutControlsPureProps {
 	clientId: string;
+	/** Block name. */
+	name: string;
 	style?: ChildLayoutBlockStyle;
 }
 
