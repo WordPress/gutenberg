@@ -44,6 +44,21 @@
 	gap: var(--wpds-dimension-gap-xs);
 	// The Button's four-character minimum pads out a short count.
 	min-width: 0;
+
+	// Forced colors draw the outline and minimal variants alike, so the
+	// pressed pill needs its own fill. Disabled pills keep `GrayText`, which
+	// lacks contrast on `SelectedItem`.
+	&[aria-pressed="true"]:not([data-disabled]) {
+		@media (forced-colors: active) {
+			background-color: SelectedItem;
+			color: SelectedItemText;
+
+			// Otherwise the text sits on a `Canvas` backplate.
+			> * {
+				forced-color-adjust: none;
+			}
+		}
+	}
 }
 
 // Closing the picker after a pointer open leaves focus on the trigger.
