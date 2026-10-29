@@ -1245,8 +1245,9 @@ describe( 'Post actions', () => {
 		 *
 		 * @param {string[]} requests    Collects `METHOD path` for every call.
 		 * @param {Object}   [editError] Rejects the `/edit` request with this.
+		 * @param {Function} [onEdit]    Called when the `/edit` request is made.
 		 */
-		function setFetchHandler( requests, editError ) {
+		function setFetchHandler( requests, editError, onEdit ) {
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
 				const { path, data } = options;
@@ -1256,6 +1257,7 @@ describe( 'Post actions', () => {
 					method === 'POST' &&
 					path.startsWith( '/wp/v2/media/12/edit' )
 				) {
+					onEdit?.();
 					if ( editError ) {
 						throw editError;
 					}
@@ -1379,6 +1381,24 @@ describe( 'Post actions', () => {
 				false
 			);
 			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+		} );
+
+		it( 'shows the post as saving while the crop is saved', async () => {
+			const registry = createRegistryWithStores();
+			let isSavingDuringEdit;
+			setFetchHandler( [], undefined, () => {
+				isSavingDuringEdit = registry
+					.select( editorStore )
+					.isSavingPost();
+			} );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			expect( isSavingDuringEdit ).toBe( true );
+			expect( registry.select( editorStore ).isSavingPost() ).toBe(
 				false
 			);
 		} );

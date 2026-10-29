@@ -306,6 +306,9 @@ export const savePost =
 		}
 
 		let error = false;
+		// Before committing pending media edits, so the editor shows the post
+		// as saving while they're committed.
+		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
 		// Before the content is read, so the post is saved pointing at the
 		// edited images. Autosaves and previews keep the originals.
@@ -340,7 +343,6 @@ export const savePost =
 				),
 			content,
 		};
-		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
 		if ( ! error ) {
 			try {
