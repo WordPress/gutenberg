@@ -100,6 +100,8 @@ export interface CropperProps {
 	disabled?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
+	/** Callback fired when the image fails to load. */
+	onImageError?: () => void;
 	/** Fires when a continuous gesture begins (pan drag, handle resize, pinch zoom). */
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointerup, resize settle). */
@@ -133,6 +135,7 @@ export interface CropperProps {
  * @param root0.focusOnMount      Focus the crop area on mount.
  * @param root0.disabled          Ignore all crop interaction.
  * @param root0.onImageLoaded     Image load callback.
+ * @param root0.onImageError      Image error callback.
  * @param root0.onGestureStart    Gesture boundary start.
  * @param root0.onGestureEnd      Gesture boundary end.
  * @param root0.className         Additional CSS class.
@@ -154,6 +157,7 @@ function CropperInner(
 		focusOnMount = false,
 		disabled = false,
 		onImageLoaded,
+		onImageError,
 		onGestureStart,
 		onGestureEnd,
 		className,
@@ -1025,6 +1029,7 @@ function CropperInner(
 						src={ src }
 						alt=""
 						onLoad={ handleImageLoad }
+						onError={ onImageError }
 						style={ imageStyle }
 						draggable={ false }
 					/>
