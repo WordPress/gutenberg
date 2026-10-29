@@ -7,7 +7,7 @@ import {
 import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
 
@@ -35,8 +35,6 @@ function NavigationMenuSelector( {
 	onSelectClassicMenu,
 	onCreateNew,
 	actionLabel,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -122,24 +120,6 @@ function NavigationMenuSelector( {
 		selectorLabel = currentTitle;
 	}
 
-	useEffect( () => {
-		if (
-			isUpdatingMenuRef &&
-			( createNavigationMenuIsSuccess || createNavigationMenuIsError )
-		) {
-			setIsUpdatingMenuRef( false );
-		}
-	}, [
-		hasResolvedNavigationMenus,
-		createNavigationMenuIsSuccess,
-		canUserCreateNavigationMenus,
-		createNavigationMenuIsError,
-		isUpdatingMenuRef,
-		menuUnavailable,
-		noBlockMenus,
-		noMenuSelected,
-	] );
-
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
 			label={ selectorLabel }
@@ -195,8 +175,12 @@ function NavigationMenuSelector( {
 							<MenuItem
 								onClick={ async () => {
 									setIsUpdatingMenuRef( true );
-									await onCreateNew();
-									setIsUpdatingMenuRef( false );
+									// Creating the menu rejects on error.
+									try {
+										await onCreateNew();
+									} finally {
+										setIsUpdatingMenuRef( false );
+									}
 									onClose();
 								} }
 								disabled={
