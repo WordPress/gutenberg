@@ -1337,6 +1337,30 @@ describe( 'toVdom', () => {
 } );
 
 describe( 'HTML fallback snapshots', () => {
+	it( 'copies non-HTML template elements with their child nodes', () => {
+		const fallback = createElementFromHTML(
+			'<div data-wp-html="state.html"><svg><template><text>Static</text></template></svg></div>'
+		);
+		const snapshot = getHtmlFallback( toVdom( fallback ) as VNode< any > )!;
+		const svg = snapshot.firstChild as SVGElement;
+		const template = svg.firstChild as SVGElement;
+
+		expect( svg.namespaceURI ).toBe( 'http://www.w3.org/2000/svg' );
+		expect( template.localName ).toBe( 'template' );
+		expect( template.namespaceURI ).toBe( 'http://www.w3.org/2000/svg' );
+		expect( template.childNodes ).toHaveLength( 1 );
+		expect( template.firstChild ).toMatchObject( {
+			localName: 'text',
+			namespaceURI: 'http://www.w3.org/2000/svg',
+		} );
+		expect(
+			( template.firstChild as SVGElement ).firstChild
+		).toMatchObject( {
+			nodeType: Node.TEXT_NODE,
+			nodeValue: 'Static',
+		} );
+	} );
+
 	it( 'uses the live document template-contents owner for every copied node', () => {
 		const fallbackMarkup = `<div data-wp-html="state.html">fallback<template><section>nested<template><b>deep</b></template></section></template></div>`;
 		const templateContentsDocument =

@@ -112,8 +112,9 @@ const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 /**
  * Copies a node tree into the target's owner document, omitting script
- * elements recursively. Template contents are traversed separately because
- * they are not ordinary child nodes of their template element.
+ * elements recursively. HTML-namespace template contents are traversed
+ * separately because they are not ordinary child nodes of their template
+ * element; elements named `template` in other namespaces use their child nodes.
  *
  * @param source The node whose child nodes are copied.
  * @param target The fragment or cloned node that receives those children.
@@ -133,6 +134,8 @@ function copyFallbackChildren( source: Node, target: Node ): void {
 		target.appendChild( clone );
 		if (
 			child.nodeType === 1 &&
+			( child as Element ).namespaceURI ===
+				'http://www.w3.org/1999/xhtml' &&
 			( child as Element ).localName === 'template'
 		) {
 			copyFallbackChildren(
