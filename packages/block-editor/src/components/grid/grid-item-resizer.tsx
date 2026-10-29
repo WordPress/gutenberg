@@ -3,7 +3,13 @@ import { useState, useEffect } from '@wordpress/element';
 import type { CSSProperties, PointerEvent } from 'react';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
+import {
+	getComputedCSS,
+	getGridTracks,
+	getClosestTrack,
+	getRowEndForResize,
+	getGridItemPixelRect,
+} from './utils';
 import type {
 	GridItemResizerInnerProps,
 	GridItemResizerProps,
@@ -59,6 +65,20 @@ function GridItemResizerInner( {
 	} );
 
 	useEffect( () => {
+		// In a manual grid every side is always available: a side on the
+		// grid's edge can still shrink the block, sizes snap to the grid's
+		// tracks when the resize stops, and dragging the bottom edge past
+		// the last row adds rows. Checking the edges here would also go stale
+		// when the block moves without changing size.
+		if ( isManualGrid ) {
+			setEnableSide( {
+				top: true,
+				bottom: true,
+				left: true,
+				right: true,
+			} );
+			return;
+		}
 		const observer = new window.ResizeObserver( () => {
 			const blockClientRect = blockElement.getBoundingClientRect();
 			const rootBlockClientRect =
@@ -73,13 +93,9 @@ function GridItemResizerInner( {
 				blockClientRect.right < rootBlockClientRect.right;
 
 			setEnableSide( {
-				top: !! isManualGrid
-					? topAvailable
-					: ! bottomAvailable && topAvailable,
+				top: ! bottomAvailable && topAvailable,
 				bottom: bottomAvailable,
-				left: !! isManualGrid
-					? leftAvailable
-					: ! rightAvailable && leftAvailable,
+				left: ! rightAvailable && leftAvailable,
 				right: rightAvailable,
 			} );
 		} );
@@ -133,7 +149,10 @@ function GridItemResizerInner( {
 					topLeft: false,
 					topRight: false,
 				} }
-				bounds={ bounds }
+				// Manual grids grow when a block is resized past the last row,
+				// so they aren't limited to the grid's current size. Sizes are
+				// snapped to the grid's tracks when the resize stops.
+				bounds={ isManualGrid ? undefined : bounds }
 				boundsByDirection
 				// @ts-expect-error ResizableBox passes DOM event props to its element without typing them.
 				onPointerDown={ ( { target, pointerId }: PointerEvent ) => {
@@ -175,9 +194,17 @@ function GridItemResizerInner( {
 						),
 						rowGap
 					);
+					// Grid tracks start at the grid's content box, so manual
+					// grids measure the resized box from there.
+					const itemRect = isManualGrid
+						? getGridItemPixelRect( blockElement )
+						: {
+								left: blockElement.offsetLeft,
+								top: blockElement.offsetTop,
+							};
 					const rect = new window.DOMRect(
-						blockElement.offsetLeft + boxElement.offsetLeft,
-						blockElement.offsetTop + boxElement.offsetTop,
+						itemRect.left + boxElement.offsetLeft,
+						itemRect.top + boxElement.offsetTop,
 						boxElement.offsetWidth,
 						boxElement.offsetHeight
 					);
@@ -188,9 +215,14 @@ function GridItemResizerInner( {
 					const columnEnd =
 						getClosestTrack( gridColumnTracks, rect.right, 'end' ) +
 						1;
-					const rowEnd =
-						getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
-						1;
+					const rowEnd = isManualGrid
+						? getRowEndForResize(
+								gridRowTracks,
+								rect.bottom,
+								rowGap
+							)
+						: getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
+							1;
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
