@@ -143,13 +143,10 @@ export function buildSuggestionAuthorAnnouncementCss(
 }
 
 /**
- * Build CSS that tints each inline suggestion marker with its author's color by
- * matching the marker's `data-author` attribute. The marker rules in
- * `content-suggestion.scss` already consume `--suggestion-author-color` (with
- * the semantic red/green as the fallback when no author is known), so setting
- * the custom property per author is all that is needed: the strikethrough /
- * underline decoration still conveys delete vs add, while the color conveys who
- * — the Google-Docs model.
+ * Build CSS that sets each inline suggestion marker's author color by matching
+ * the marker's `data-author` attribute. In `content-suggestion.scss` a format
+ * marker's tint and rule read `--suggestion-author-color`; additions and
+ * deletions are green and red whoever suggested them.
  *
  * Pure so it can be unit-tested without React. One rule per distinct author
  * that actually has an inline-suggestion thread.
