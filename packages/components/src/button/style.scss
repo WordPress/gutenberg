@@ -97,16 +97,6 @@
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
 			color: var(--_wp-components-button-foreground-strong);
-			background-size: 100px 100%;
-			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
-			background-image: linear-gradient(
-				-45deg,
-				var(--_wp-components-button-background-strong) 33%,
-				var(--_wp-components-button-background-strong-active) 33%,
-				var(--_wp-components-button-background-strong-active) 70%,
-				var(--_wp-components-button-background-strong) 70%
-			);
-			/* stylelint-enable */
 		}
 	}
 
@@ -292,21 +282,8 @@
 		&:not(.is-primary, .is-pressed) {
 			color: var(--_wp-components-button-foreground-busy);
 		}
-
-		@media not (prefers-reduced-motion) {
-			animation: components-button__busy-animation 2500ms infinite linear;
-		}
-		background-size: 100px 100%;
-		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
-		background-image: linear-gradient(
-			-45deg,
-			var(--_wp-components-button-background-weak) 33%,
-			var(--_wp-components-button-background-weak-active) 33%,
-			var(--_wp-components-button-background-weak-active) 70%,
-			var(--_wp-components-button-background-weak) 70%
-		);
-		/* stylelint-enable */
 	}
+
 
 	&.is-compact {
 		height: $button-size-compact;
@@ -362,7 +339,7 @@
 		// Offset the reserved 1px border so it doesn't widen the square
 		// icon button.
 		&:not(.has-text) {
-			svg,
+			svg:where(:not(.components-button__busy-spinner)),
 			.dashicon {
 				margin-inline: -$border-width;
 			}
@@ -393,12 +370,6 @@
 				color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
 				background: var(--_wp-components-button-pressed-background);
 			}
-
-			&.is-busy {
-				--_wp-components-button-pressed-background:
-					linear-gradient(-45deg, transparent 33%, var(--wpds-color-background-interactive-neutral-disabled) 33% 70%, transparent 70%)
-					0 0 / 100px 100% var(--wpds-color-background-interactive-neutral-strong-disabled);
-			}
 		}
 
 		// Forced colors discard the pressed colors, so fill the button with the
@@ -427,10 +398,42 @@
 		outline: none;
 		flex-shrink: 0;
 	}
+
+	// Hide glyphs while leaving currentColor available to the spinner.
+	&.is-busy {
+		-webkit-text-fill-color: transparent;
+		text-decoration-color: transparent;
+		text-shadow: none;
+	}
+
+	&.is-busy > :not(.components-button__busy-spinner) {
+		opacity: 0;
+	}
+
+	.components-button__busy-spinner {
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		width: 1em;
+		height: 1em;
+		color: inherit;
+		pointer-events: none;
+
+		@media (prefers-reduced-motion) {
+			> * {
+				animation: none;
+			}
+		}
+
+		@media (forced-colors: active) {
+			> * {
+				stroke: currentColor;
+			}
+		}
+	}
 }
 
-@keyframes components-button__busy-animation {
-	0% {
-		background-position: 200px 0;
-	}
+// Establish a local positioning context without overriding consumer layouts.
+:where(.components-button.is-busy) {
+	position: relative;
 }
