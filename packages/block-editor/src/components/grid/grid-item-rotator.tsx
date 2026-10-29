@@ -1,12 +1,10 @@
 import type { PointerEvent } from 'react';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { rotateRight, Icon } from '@wordpress/icons';
+import { rotateRight } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockPopoverCover from '../block-popover/cover';
 import { GridItemHandle } from './grid-item-handle';
 import { getPointerAngle, getRotationFromPointer } from '../../utils/rotation';
-import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 import { setInlineStyle } from './utils';
 
 interface GridItemRotatorProps {
@@ -49,8 +47,8 @@ function removeKeyListeners( rotation: Rotation ) {
 }
 
 /**
- * A handle outside the bottom corner of a selected grid item, for rotating it
- * on the canvas.
+ * A handle for rotating a selected grid item on the canvas, in its toolbar of
+ * handles.
  *
  * While dragging, the rotation is previewed with an inline `rotate` style on
  * the block element, which wins over the rotate support's class rules, and
@@ -66,17 +64,12 @@ export function GridItemRotator( {
 	onChange,
 }: GridItemRotatorProps ) {
 	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
-	const boxRef = useRef< HTMLDivElement >( null );
 	const rotationRef = useRef< Rotation | null >( null );
 	const onPreviewRef = useRef( onPreview );
 	useEffect( () => {
 		onPreviewRef.current = onPreview;
 	}, [ onPreview ] );
 	const [ previewAngle, setPreviewAngle ] = useState< number | null >( null );
-	const overlayStyle = useRotatedOverlayStyle(
-		blockElement,
-		previewAngle ?? angle
-	);
 
 	// Don't leave a preview behind if the handle goes away mid-rotation, for
 	// example when the block is deselected.
@@ -125,11 +118,14 @@ export function GridItemRotator( {
 		}
 	}
 
-	function startRotation( event: PointerEvent< HTMLDivElement > ) {
+	function startRotation( event: PointerEvent< HTMLButtonElement > ) {
+		const box = event.currentTarget.closest(
+			'.block-editor-grid-item-handles__box'
+		);
 		if (
 			event.button !== 0 ||
 			! blockElement ||
-			! boxRef.current ||
+			! box ||
 			rotationRef.current
 		) {
 			return;
@@ -139,7 +135,7 @@ export function GridItemRotator( {
 		const handle = event.currentTarget;
 		// The box turns around its center, so the center of
 		// its bounding box is the block's center.
-		const rect = boxRef.current.getBoundingClientRect();
+		const rect = box.getBoundingClientRect();
 		const onKeyDown = ( keyEvent: KeyboardEvent ) => {
 			if ( keyEvent.key === 'Escape' ) {
 				// Claim the key, so that the canvas doesn't
@@ -181,84 +177,71 @@ export function GridItemRotator( {
 	}
 
 	return (
-		<BlockPopoverCover
-			className="block-editor-grid-item-handles"
-			clientId={ clientId }
-			__unstablePopoverSlot="__unstable-block-tools-after"
-			additionalStyles={ overlayStyle }
+		// Keyboard users rotate blocks with the Rotation control in the block
+		// settings.
+		<GridItemHandle
+			className="block-editor-grid-item-handles__rotate"
+			label={ __( 'Rotate' ) }
+			// While rotating, the handle shows the angle instead.
+			icon={ previewAngle === null ? rotateRight : undefined }
+			onPointerDown={ startRotation }
+			onPointerMove={ ( event ) => {
+				// When a pointer is pressed while the browser thinks
+				// one of its buttons is already down, the press comes
+				// as a move with the button that changed, and not as a
+				// `pointerdown`. WebKit does that for the first press
+				// after a drag that started outside the canvas, such
+				// as from a drag handle.
+				if (
+					! rotationRef.current &&
+					event.button === 0 &&
+					event.buttons === 1
+				) {
+					startRotation( event );
+					return;
+				}
+				const rotation = rotationRef.current;
+				if ( ! rotation ) {
+					return;
+				}
+				rotation.value = getRotationFromPointer( {
+					centerX: rotation.centerX,
+					centerY: rotation.centerY,
+					pointerX: event.clientX,
+					pointerY: event.clientY,
+					offset: rotation.offset,
+					snap: ! event.shiftKey,
+				} );
+				setPreview( rotation.value );
+			} }
+			onPointerUp={ () => {
+				const rotation = rotationRef.current;
+				if ( ! rotation ) {
+					return;
+				}
+				endRotation();
+				setPreview( null );
+				if ( rotation.value !== angle ) {
+					onChange( rotation.value );
+				}
+			} }
+			onPointerCancel={ () => {
+				if ( ! rotationRef.current ) {
+					return;
+				}
+				endRotation();
+				setPreview( null );
+			} }
 		>
-			<div ref={ boxRef } className="block-editor-grid-item-handles__box">
-				{ /*
-				 * Keyboard users rotate blocks with the Rotation control in
-				 * the block settings.
-				 */ }
-				<GridItemHandle
-					className="block-editor-grid-item-handles__rotate"
-					label={ __( 'Rotate' ) }
-					angle={ previewAngle ?? angle }
-					onPointerDown={ startRotation }
-					onPointerMove={ ( event ) => {
-						// When a pointer is pressed while the browser thinks
-						// one of its buttons is already down, the press comes
-						// as a move with the button that changed, and not as a
-						// `pointerdown`. WebKit does that for the first press
-						// after a drag that started outside the canvas, such
-						// as from a drag handle.
-						if (
-							! rotationRef.current &&
-							event.button === 0 &&
-							event.buttons === 1
-						) {
-							startRotation( event );
-							return;
-						}
-						const rotation = rotationRef.current;
-						if ( ! rotation ) {
-							return;
-						}
-						rotation.value = getRotationFromPointer( {
-							centerX: rotation.centerX,
-							centerY: rotation.centerY,
-							pointerX: event.clientX,
-							pointerY: event.clientY,
-							offset: rotation.offset,
-							snap: ! event.shiftKey,
-						} );
-						setPreview( rotation.value );
-					} }
-					onPointerUp={ () => {
-						const rotation = rotationRef.current;
-						if ( ! rotation ) {
-							return;
-						}
-						endRotation();
-						setPreview( null );
-						if ( rotation.value !== angle ) {
-							onChange( rotation.value );
-						}
-					} }
-					onPointerCancel={ () => {
-						if ( ! rotationRef.current ) {
-							return;
-						}
-						endRotation();
-						setPreview( null );
-					} }
-				>
-					{ /* While rotating, the handle shows the angle instead. */ }
-					{ previewAngle === null ? (
-						<Icon icon={ rotateRight } />
-					) : (
-						<span className="block-editor-grid-item-handles__angle">
-							{ sprintf(
-								/* translators: %d: Rotation angle in degrees. */
-								__( '%d°' ),
-								previewAngle
-							) }
-						</span>
+			{ previewAngle !== null && (
+				<span className="block-editor-grid-item-handles__angle">
+					{ sprintf(
+						/* translators: %d: Rotation angle in degrees. */
+						__( '%d°' ),
+						previewAngle
 					) }
-				</GridItemHandle>
-			</div>
-		</BlockPopoverCover>
+				</span>
+			) }
+		</GridItemHandle>
 	);
 }

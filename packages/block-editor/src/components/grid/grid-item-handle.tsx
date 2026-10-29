@@ -1,45 +1,42 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
+import { Button } from '@wordpress/components';
 
 interface GridItemHandleProps extends Omit<
-	ComponentPropsWithoutRef< 'div' >,
-	'title'
+	ComponentPropsWithoutRef< 'button' >,
+	'title' | 'type'
 > {
-	/** Rotation of the grid item in degrees. */
-	angle: number;
-	/** Shown when hovering the handle. */
+	/** The handle's accessible name, also shown when hovering it. */
 	label: string;
+	/** The handle's icon, when it shows no other content. */
+	icon?: ComponentProps< typeof Button >[ 'icon' ];
 }
 
 /**
- * A handle on the canvas around a selected grid item.
+ * A handle in the toolbar of handles around a selected grid item, which drags
+ * or turns the block with a pointer.
  *
- * It looks like a block toolbar with a single button, because it does what a
- * toolbar button does, closer to the block. It sits inside the overlay that
- * turns with the block, and turns the other way so that it stays upright like
- * the toolbar.
- *
- * Handles only work with a pointer, so they are hidden from assistive
- * technology. Each action they start is also available from the keyboard
- * elsewhere.
+ * Like the drag handle in the block toolbar, it can't be reached with Tab or
+ * the arrow keys, because it only works with a pointer. Each action it starts
+ * is also available from the keyboard elsewhere.
  */
 export function GridItemHandle( {
-	angle,
 	label,
+	icon,
 	className,
-	style,
 	children,
 	...props
 }: GridItemHandleProps ) {
 	return (
-		<div
+		<Button
 			{ ...props }
+			size="small"
+			icon={ icon }
+			label={ label }
 			className={ clsx( 'block-editor-grid-item-handle', className ) }
-			title={ label }
-			aria-hidden="true"
-			style={ { ...style, rotate: `${ -angle }deg` } }
+			tabIndex={ -1 }
 		>
 			{ children }
-		</div>
+		</Button>
 	);
 }
