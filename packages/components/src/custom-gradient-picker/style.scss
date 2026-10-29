@@ -50,7 +50,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // Center 16px handl
 	.components-custom-gradient-picker__insert-point-dropdown {
 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
 		height: inherit;
-		min-height: 0;
 		width: inherit;
 		min-width: $grid-unit-20 !important;
 		border-radius: $radius-round;
@@ -69,7 +68,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // Center 16px handl
 	.components-custom-gradient-picker__control-point-button {
 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
 		height: inherit;
-		min-height: 0;
 		width: inherit;
 		border-radius: $radius-round;
 		padding: 0;

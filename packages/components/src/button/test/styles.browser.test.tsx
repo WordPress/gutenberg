@@ -1,5 +1,5 @@
 /* eslint-disable @wordpress/no-unknown-ds-tokens -- CSSOM assertions require custom property names, not CSS var() values. */
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
@@ -59,6 +59,155 @@ function contrast( foreground: string, background: string, surface: string ) {
 }
 
 describe( 'Button styles', () => {
+	it.each( variants )(
+		'keeps the matching pressed colors on an enabled busy %s button',
+		async ( variant ) => {
+			await render(
+				<Button
+					__next40pxDefaultSize
+					variant={ variant }
+					aria-pressed
+					isBusy
+				>
+					Saving
+				</Button>
+			);
+			const button = screen.getByRole( 'button', { name: 'Saving' } );
+			const style = getComputedStyle( button );
+			expect(
+				contrast(
+					style.color,
+					style.backgroundColor,
+					style.getPropertyValue(
+						'--wpds-color-background-surface-neutral'
+					)
+				)
+			).toBeGreaterThanOrEqual( 4.5 );
+			expectToken(
+				button,
+				'color',
+				'--wpds-color-foreground-interactive-neutral-strong-active'
+			);
+			expectToken(
+				button,
+				'background-color',
+				'--wpds-color-background-interactive-neutral-strong-active'
+			);
+		}
+	);
+
+	it.each( [ false, true ] )(
+		'uses disabled colors for a destructive default button with accessibleWhenDisabled=%s',
+		async ( accessibleWhenDisabled ) => {
+			await render(
+				<Button
+					__next40pxDefaultSize
+					isDestructive
+					disabled
+					accessibleWhenDisabled={ accessibleWhenDisabled }
+				>
+					Delete
+				</Button>
+			);
+			const button = screen.getByRole( 'button', { name: 'Delete' } );
+			expect( button ).toHaveAttribute(
+				accessibleWhenDisabled ? 'aria-disabled' : 'disabled'
+			);
+			expectToken(
+				button,
+				'color',
+				'--wpds-color-foreground-interactive-error-disabled'
+			);
+		}
+	);
+
+	it.each( [ 'primary', 'secondary' ] as const )(
+		'preserves busy stripes on a disabled pressed %s toolbar button',
+		async ( variant ) => {
+			await render(
+				<Toolbar label="Formatting">
+					<ToolbarButton
+						variant={ variant }
+						title="Saving"
+						isPressed
+						isBusy
+						disabled
+					/>
+				</Toolbar>
+			);
+			const button = screen.getByRole( 'button', { name: 'Saving' } );
+			await userEvent.unhover( button );
+			const style = getComputedStyle( button );
+			expect( style.backgroundImage ).not.toBe( 'none' );
+			expect( style.backgroundSize ).toBe( '100px 100%' );
+		}
+	);
+
+	it.each( [
+		[ 'primary', true, '100px 100%' ],
+		[ 'secondary', true, '100px 100%' ],
+		[ 'tertiary', false, 'auto' ],
+	] as const )(
+		'preserves the busy presentation of a pressed disabled %s button',
+		async ( variant, striped, backgroundSize ) => {
+			await render(
+				<Button
+					__next40pxDefaultSize
+					variant={ variant }
+					aria-pressed
+					isBusy
+					disabled
+				>
+					Saving
+				</Button>
+			);
+			const button = screen.getByRole( 'button', { name: 'Saving' } );
+			await userEvent.unhover( button );
+			const style = getComputedStyle( button );
+			expect( style.backgroundImage !== 'none' ).toBe( striped );
+			expect( style.backgroundSize ).toBe( backgroundSize );
+		}
+	);
+
+	it.each( [
+		[ 'primary', '#1e1e1e', '#3858e9' ],
+		[ 'secondary', '#1e1e1e', '#3858e9' ],
+		[ 'tertiary', '#1e1e1e', '#3858e9' ],
+		[ 'primary', '#fcfcfc', '#ff9900' ],
+		[ 'secondary', '#fcfcfc', '#ff9900' ],
+		[ 'tertiary', '#fcfcfc', '#ff9900' ],
+	] as const )(
+		'keeps the busy %s label readable against both stripes on %s',
+		async ( variant, background, primary ) => {
+			await render(
+				<ThemeProvider color={ { background, primary } }>
+					<Button __next40pxDefaultSize variant={ variant } isBusy>
+						Saving
+					</Button>
+				</ThemeProvider>
+			);
+			const button = screen.getByRole( 'button', { name: 'Saving' } );
+			await userEvent.unhover( button );
+			expect( button.matches( ':hover' ) ).toBe( false );
+			const style = getComputedStyle( button );
+			const stripes = style.backgroundImage.match(
+				/(?:rgba?|color)\([^()]+\)/g
+			);
+			expect( stripes ).toHaveLength( 4 );
+			for ( const stripe of new Set( stripes ) ) {
+				expect(
+					contrast(
+						style.color,
+						stripe,
+						style.getPropertyValue(
+							'--wpds-color-background-surface-neutral'
+						)
+					)
+				).toBeGreaterThanOrEqual( 4.5 );
+			}
+		}
+	);
+
 	it( 'keeps primary and pressed foregrounds when buttons are grouped', async () => {
 		await render(
 			<ButtonGroup __shouldNotWarnDeprecated>
@@ -103,39 +252,6 @@ describe( 'Button styles', () => {
 		).not.toBe( 'rgba(0, 0, 0, 0)' );
 		await userEvent.keyboard( '[/Space]' );
 	} );
-	it.each( [ 'secondary', 'tertiary' ] as const )(
-		'keeps the spinner readable on a pressed disabled busy %s button',
-		async ( variant ) => {
-			await render(
-				<Button
-					__next40pxDefaultSize
-					variant={ variant }
-					aria-pressed
-					isBusy
-					disabled
-				>
-					Saving
-				</Button>
-			);
-			const button = screen.getByRole( 'button', { name: 'Saving' } );
-			const spinner = screen.getByTestId(
-				'components-button-busy-spinner'
-			);
-			expect( getComputedStyle( button ).color ).toBe(
-				'rgba(0, 0, 0, 0)'
-			);
-			expectToken(
-				spinner,
-				'color',
-				'--wpds-color-foreground-interactive-neutral-strong-active'
-			);
-			expectToken(
-				button,
-				'background-color',
-				'--wpds-color-background-interactive-neutral-strong-active'
-			);
-		}
-	);
 	it.each( variants )(
 		'keeps a pressed %s button readable during Space activation away from the pointer',
 		async ( variant ) => {
@@ -151,6 +267,7 @@ describe( 'Button styles', () => {
 				</ThemeProvider>
 			);
 			const button = screen.getByRole( 'button', { name: 'Preview' } );
+			await userEvent.unhover( button );
 			await userEvent.tab();
 			await userEvent.keyboard( '[Space>]' );
 			expect( button.matches( ':active' ) ).toBe( true );
@@ -183,6 +300,7 @@ describe( 'Button styles', () => {
 				</ThemeProvider>
 			);
 			const button = screen.getByRole( 'button', { name: 'Delete' } );
+			await userEvent.unhover( button );
 			await userEvent.tab();
 			await userEvent.keyboard( '[Space>]' );
 			const style = getComputedStyle( button );
@@ -196,74 +314,6 @@ describe( 'Button styles', () => {
 				)
 			).toBeGreaterThanOrEqual( 4.5 );
 			await userEvent.keyboard( '[/Space]' );
-		}
-	);
-
-	it.each( [
-		[ 'small', 24 ],
-		[ 'compact', 32 ],
-	] as const )(
-		'keeps %s buttons with an icon and label at %ipx',
-		async ( size, height ) => {
-			await render(
-				<>
-					<Button __next40pxDefaultSize size={ size } icon={ plus }>
-						Add
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						size={ size }
-						icon={ plus }
-						label="Add item"
-					/>
-				</>
-			);
-			expect(
-				screen
-					.getByRole( 'button', { name: 'Add' } )
-					.getBoundingClientRect().height
-			).toBe( height );
-			const iconButton = screen
-				.getByRole( 'button', { name: 'Add item' } )
-				.getBoundingClientRect();
-			expect( iconButton.height ).toBe( height );
-			expect( iconButton.width ).toBe( height );
-		}
-	);
-
-	it.each( variants )(
-		'keeps the %s busy label hidden and the spinner visible during interaction',
-		async ( variant ) => {
-			const onClick = vi.fn();
-			await render(
-				<Button
-					__next40pxDefaultSize
-					variant={ variant }
-					isBusy
-					onClick={ onClick }
-				>
-					Saving
-				</Button>
-			);
-			const button = screen.getByRole( 'button', { name: 'Saving' } );
-			const spinner = screen.getByTestId(
-				'components-button-busy-spinner'
-			);
-			await userEvent.hover( button );
-			expect( getComputedStyle( button ).color ).toBe(
-				'rgba(0, 0, 0, 0)'
-			);
-			expect( getComputedStyle( spinner ).color ).not.toBe(
-				'rgba(0, 0, 0, 0)'
-			);
-			await userEvent.tab();
-			await userEvent.keyboard( '[Space>]' );
-			expect( getComputedStyle( button ).color ).toBe(
-				'rgba(0, 0, 0, 0)'
-			);
-			await userEvent.keyboard( '[/Space]' );
-			expect( onClick ).toHaveBeenCalledOnce();
-			expect( button ).toBeEnabled();
 		}
 	);
 

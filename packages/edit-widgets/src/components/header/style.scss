@@ -36,7 +36,6 @@
 
 			// Match the height of other buttons in the header toolbar.
 			.components-button:not(.block-editor-block-mover-button) {
-				min-height: $button-size-compact;
 				height: $button-size-compact;
 			}
 		}
@@ -65,14 +64,14 @@
 		.block-editor-block-mover {
 			// Match the height of other buttons in the header toolbar.
 			&.is-horizontal .block-editor-block-mover-button {
-				min-height: $button-size-compact;
 				height: $button-size-compact;
 				overflow: visible;
 			}
 
 			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
 			@include break-small() {
-				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+				&:not(.is-horizontal)
+				.block-editor-block-mover__move-button-container {
 					position: relative;
 					top: -10px;
 				}
@@ -121,13 +120,16 @@
 	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
 	> .components-button.has-icon.has-icon.has-icon,
 	> .components-dropdown > .components-button.has-icon.has-icon {
-		min-height: $button-size-compact;
 		height: $button-size-compact;
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+		&.is-pressed {
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
+
+			&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+			}
 		}
 
 		&:focus:not(:active) {

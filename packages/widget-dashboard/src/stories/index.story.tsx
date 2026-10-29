@@ -15,7 +15,10 @@ import {
 } from '@wordpress/element';
 import type { ColumnSteps } from '@wordpress/grid';
 import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
-import { Button } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+} from '@wordpress/ui';
 import {
 	WidgetHostProvider,
 	useWidgetActions,

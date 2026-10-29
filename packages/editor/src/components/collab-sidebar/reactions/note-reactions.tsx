@@ -7,7 +7,9 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Comment } from '@wordpress/core-data';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
 	Button,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
 	IconButton,
 	Stack,
 	Tooltip,

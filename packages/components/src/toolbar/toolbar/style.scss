@@ -32,7 +32,6 @@
 
 	.components-button {
 		position: relative;
-		min-height: $block-toolbar-height;
 		height: $block-toolbar-height;
 		z-index: 1;
 
@@ -60,13 +59,13 @@
 			z-index: -1;
 
 			// Animate in.
-			@media not ( prefers-reduced-motion ) {
+			@media not (prefers-reduced-motion) {
 				animation: components-button__appear-animation 0.1s ease;
 				animation-fill-mode: forwards;
 			}
 		}
 
-		svg:not(.components-button__busy-spinner) {
+		svg {
 			position: relative;
 
 			// Center the icon inside.
@@ -78,7 +77,7 @@
 		&.is-pressed {
 			background: transparent;
 
-			&:is(:hover, :active, :focus, :disabled, [aria-disabled="true"]) {
+			&:hover {
 				background: transparent;
 			}
 
