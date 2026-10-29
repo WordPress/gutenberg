@@ -1641,7 +1641,7 @@ describe( 'DataViews component', () => {
 			mockUseViewportMatch.mockImplementation( () => false );
 		} );
 
-		it( 'keeps the bulk actions menu trigger focused while an action runs', async () => {
+		it( 'keeps the bulk actions menu trigger focusable while an action runs', async () => {
 			let finishAction: () => void;
 			const pending = new Promise< void >( ( resolve ) => {
 				finishAction = resolve;
