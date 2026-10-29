@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.0.33 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link: Escape the link label before rendering.
+
 ## 6.0.32 (2026-08-06)
 
 ### Bug Fixes
