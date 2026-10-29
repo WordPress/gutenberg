@@ -5,6 +5,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button.
 	Button as UIButton,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,

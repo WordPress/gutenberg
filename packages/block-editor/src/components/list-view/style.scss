@@ -353,12 +353,10 @@
 		align-items: center;
 	}
 
-	// Keep the tap target large. The button's own min-height would
-	// otherwise ignore the shorter height.
-	.components-button.block-editor-block-mover-button {
+	// Keep the tap target large.
+	.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
-		min-height: $button-size-small;
 		height: $button-size-small;
 
 		// Position the icon.
@@ -613,11 +611,9 @@ svg {
 	padding: 0;
 
 	// TODO: Consider passing size="small" to the Inserter toggle instead.
-	// Special dimensions for this button. The default button min-height is
-	// taller than this control, so match it here to keep the appender square.
+	// Special dimensions for this button.
 	&.has-icon.is-next-40px-default-size {
 		min-width: $button-size-small;
-		min-height: $button-size-small;
 	}
 
 	&:hover,

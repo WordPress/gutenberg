@@ -4,7 +4,9 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Dashboard is still experimental.
 	Button,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Dashboard is still experimental.
 	IconButton,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Dashboard is still experimental.
 	Popover,

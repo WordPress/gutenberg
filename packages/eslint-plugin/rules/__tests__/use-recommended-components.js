@@ -23,11 +23,10 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
-		"import { Button, ButtonLink, IconButton } from '@wordpress/ui';",
 
 		// "Use with caution" components are allowed when opted in.
 		{
-			code: "import { Dialog } from '@wordpress/ui';",
+			code: "import { Button, Dialog } from '@wordpress/ui';",
 			options: [ { allowUseWithCaution: true } ],
 		},
 
@@ -75,27 +74,27 @@ ruleTester.run( 'use-recommended-components', rule, {
 		},
 		// "Use with caution" components are flagged unless opted in.
 		{
-			code: "import { Dialog } from '@wordpress/ui';",
+			code: "import { Button } from '@wordpress/ui';",
 			errors: [
 				{
 					message:
-						'`Dialog` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+						'`Button` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
 				},
 			],
 		},
 		{
-			code: "import { Dialog } from '@wordpress/ui';",
+			code: "import { Button } from '@wordpress/ui';",
 			options: [ { allowUseWithCaution: false } ],
 			errors: [
 				{
 					message:
-						'`Dialog` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+						'`Button` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
 				},
 			],
 		},
 		// Opting in to "Use with caution" does not allow other components.
 		{
-			code: "import { Dialog, SomeComponent } from '@wordpress/ui';",
+			code: "import { Button, SomeComponent } from '@wordpress/ui';",
 			options: [ { allowUseWithCaution: true } ],
 			errors: [
 				{

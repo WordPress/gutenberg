@@ -25,7 +25,6 @@
 
 		// Match the height of other buttons in the header toolbar.
 		.components-button:not(.block-editor-block-mover-button) {
-			min-height: $button-size-compact;
 			height: $button-size-compact;
 		}
 	}
@@ -64,7 +63,6 @@
 	.block-editor-block-mover {
 		// Match the height of other buttons in the header toolbar.
 		&.is-horizontal .block-editor-block-mover-button {
-			min-height: $button-size-compact;
 			height: $button-size-compact;
 			overflow: visible;
 		}

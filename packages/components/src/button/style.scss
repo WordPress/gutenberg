@@ -11,7 +11,6 @@
  */
 
 .components-button {
-	color: var(--_wp-components-button-foreground);
 	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
 	&:focus:is(a) {
 		box-shadow: none;
@@ -30,26 +29,22 @@
 	font-family: inherit;
 	font-size: $default-font-size;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	line-height: var(--wpds-typography-line-height-sm);
 	margin: 0;
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
-	// Labels wrap instead of overflowing, so the height is a minimum.
-	min-height: $button-size;
-	max-width: 100%;
-	overflow-wrap: anywhere;
+	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
-	--_wp-components-button-foreground: #{$components-color-foreground};
+	color: $components-color-foreground;
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
 
 	&.is-next-40px-default-size {
-		min-height: $button-size-next-default-40px;
+		height: $button-size-next-default-40px;
 	}
 
 	&[aria-expanded="true"],
@@ -59,7 +54,7 @@
 			[role^="menuitem"],
 			[role="option"]
 		) {
-		--_wp-components-button-foreground: #{$components-color-accent};
+		color: $components-color-accent;
 	}
 
 	/**
@@ -67,20 +62,37 @@
 	 */
 
 	&.is-primary {
+		white-space: nowrap;
 		background: $components-color-button-brand-strong;
-		--_wp-components-button-foreground: #{$components-color-accent-inverted};
+		color: $components-color-accent-inverted;
 		text-decoration: none;
 		text-shadow: none;
 
-		&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
+		&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
 			background: $components-color-button-brand-strong-active;
-			--_wp-components-button-foreground: #{$components-color-button-brand-strong-foreground-active};
+			color: $components-color-button-brand-strong-foreground-active;
 		}
 
 		// A busy button keeps its regular appearance, even when disabled.
-		&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
-			--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+		&:is(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
 			background: var(--wpds-color-background-interactive-brand-strong-disabled);
+		}
+
+		&.is-busy,
+		&.is-busy:disabled,
+		&.is-busy[aria-disabled="true"] {
+			color: $components-color-accent-inverted;
+			background-size: 100px 100%;
+			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
+			background-image: linear-gradient(
+				-45deg,
+				$components-color-button-brand-strong 33%,
+				$components-color-button-brand-strong-active 33%,
+				$components-color-button-brand-strong-active 70%,
+				$components-color-button-brand-strong 70%
+			);
+			/* stylelint-enable */
 		}
 	}
 
@@ -90,8 +102,11 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
-			--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand-disabled);
+		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-brand-weak);
+		--_wp-components-button-background-weak-active: #{$components-color-button-brand-weak-active};
+
+		&:is(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 			background: var(--wpds-color-background-interactive-brand-weak-disabled);
 			transform: none;
 		}
@@ -102,12 +117,13 @@
 	 */
 
 	&.is-secondary {
+		white-space: nowrap;
 		@media not (prefers-reduced-motion) {
 			transition: border-color 0.1s linear;
 		}
 
 		border-color: $components-color-button-brand-stroke;
-		--_wp-components-button-foreground: #{$components-color-button-brand};
+		color: $components-color-button-brand;
 		background: var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-brand-weak));
 
 		&:is(:hover, :active):not(
@@ -116,7 +132,7 @@
 			.is-pressed
 		) {
 			border-color: $components-color-button-brand-stroke-active;
-			--_wp-components-button-foreground: #{$components-color-button-brand-active};
+			color: $components-color-button-brand-active;
 			background: var(--_wp-components-button-background-weak-active, #{$components-color-button-brand-weak-active});
 		}
 
@@ -124,7 +140,7 @@
 			border-color: $components-color-button-brand-stroke;
 		}
 
-		&:is(:disabled, [aria-disabled="true"]):not(.is-busy, :focus) {
+		&:is(:disabled, [aria-disabled="true"]):not(:focus) {
 			border-color: var(--wpds-color-stroke-interactive-brand-disabled);
 		}
 	}
@@ -134,7 +150,8 @@
 	 */
 
 	&.is-tertiary {
-		--_wp-components-button-foreground: #{$components-color-button-brand};
+		white-space: nowrap;
+		color: $components-color-button-brand;
 		background: var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-brand-weak));
 
 		&:is(:hover, :active):not(
@@ -143,7 +160,7 @@
 			.is-pressed
 		) {
 			background: var(--_wp-components-button-background-weak-active, #{$components-color-button-brand-weak-active});
-			--_wp-components-button-foreground: #{$components-color-button-brand-active};
+			color: $components-color-button-brand-active;
 		}
 
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
@@ -170,14 +187,18 @@
 		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
 
 		&:not(.is-primary, .is-secondary, .is-tertiary, .is-pressed) {
-			--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-error);
+			color: var(--wpds-color-foreground-interactive-error);
 
 			&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
-				--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-error-active);
+				color: var(--wpds-color-foreground-interactive-error-active);
 			}
 
 			&:active:not(:disabled, [aria-disabled="true"], .is-link) {
 				background: var(--wpds-color-background-interactive-error-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-disabled);
 			}
 		}
 	}
@@ -195,7 +216,7 @@
 		outline: none;
 		text-align: left;
 		font-weight: var(--wpds-typography-font-weight-default);
-		--_wp-components-button-foreground: #{$components-color-accent};
+		color: $components-color-accent;
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
 		text-decoration-thickness: from-font;
@@ -206,7 +227,7 @@
 			transition-timing-function: ease-in-out;
 		}
 
-		min-height: auto;
+		height: auto;
 
 		&:focus:not(:active) {
 			border-radius: $radius-small;
@@ -215,7 +236,7 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			--_wp-components-button-foreground: #{$gray-600};
+			color: $gray-600;
 		}
 	}
 
@@ -228,26 +249,62 @@
 		.is-destructive,
 		.is-pressed
 	):active {
-		--_wp-components-button-foreground: #{$components-color-foreground};
+		color: $components-color-foreground;
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
+		color: $gray-600;
 	}
 
-	&:is(:disabled, [aria-disabled="true"]):not(
-		.is-busy,
-		.is-primary,
-		.is-secondary,
-		.is-tertiary,
-		.is-pressed
-	) {
-		--_wp-components-button-foreground: #{$gray-600};
+	&.is-busy,
+	&.is-secondary.is-busy,
+	&.is-secondary.is-busy:disabled,
+	&.is-secondary.is-busy[aria-disabled="true"] {
+		&.is-secondary:not(.is-pressed),
+		&.is-tertiary:not(:disabled, [aria-disabled="true"], .is-pressed) {
+			color: $components-color-button-brand-active;
+		}
+
+		@media not (prefers-reduced-motion) {
+			animation: components-button__busy-animation 2500ms infinite linear;
+		}
+		background-size: 100px 100%;
+		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
+		background-image: linear-gradient(
+			-45deg,
+			var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-neutral-weak)) 33%,
+			var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-neutral-weak-active)) 33%,
+			var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-neutral-weak-active)) 70%,
+			var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-neutral-weak)) 70%
+		);
+		/* stylelint-enable */
+	}
+
+	&.is-compact {
+		height: $button-size-compact;
+
+		&.has-icon:not(.has-text) {
+			padding: 0;
+			min-width: $button-size-compact;
+		}
+	}
+
+	&.is-small {
+		height: var(--wpds-dimension-size-sm);
+		line-height: 22px;
+		padding: 0 8px;
+		font-size: 11px;
+
+		&.has-icon:not(.has-text) {
+			padding: 0;
+			min-width: var(--wpds-dimension-size-sm);
+		}
 	}
 
 	&.has-icon {
-		padding: 5px; // Works for 24px icons and the reserved border. Smaller icons are vertically centered by flex alignments.
+		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
 
 		// Icon buttons are square.
 		min-width: $button-size;
@@ -279,65 +336,40 @@
 		// Offset the reserved 1px border so it doesn't widen the square
 		// icon button.
 		&:not(.has-text) {
-			svg:not(.components-button__busy-spinner),
+			svg,
 			.dashicon {
 				margin-inline: -$border-width;
 			}
 		}
 	}
 
-	&.is-compact {
-		min-height: $button-size-compact;
-
-		&.has-icon {
-			padding-block: 3px;
-			min-width: $button-size-compact;
-
-			&:not(.has-text) {
-				padding-inline: 0;
-			}
-		}
-	}
-
-	&.is-small {
-		min-height: var(--wpds-dimension-size-sm);
-		padding: 0 var(--wpds-dimension-padding-sm);
-
-		&.has-icon {
-			padding-block: 0;
-			min-width: var(--wpds-dimension-size-sm);
-
-			&:not(.has-text) {
-				padding-inline: 0;
-			}
-
-			> svg:not(.components-button__busy-spinner),
-			> .dashicon {
-				margin-block: -4px;
-			}
-		}
-	}
-
-	// Keep the pressed foreground and background together in every state.
+	// Keep the pressed foreground and background together during interaction.
 	&.is-pressed {
-		&:not(:disabled, [aria-disabled="true"]),
-		&.is-busy {
-			--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-neutral-strong-active);
+		&,
+		&:hover,
+		&.is-primary.is-busy:not(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
+		}
+
+		&:not(:disabled, [aria-disabled="true"]) {
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
 
 			&.is-secondary {
 				border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			}
 
-			&:is(:hover, :active, :focus) {
-				--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-neutral-strong-active);
+			&:hover {
 				background: var(--wpds-color-background-interactive-neutral-strong-active);
 			}
 		}
 
-		&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
-			--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
-			background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+		&:is(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
+
+			&:not(.is-busy),
+			&:not(.is-primary, .is-secondary, .is-tertiary) {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+			}
 		}
 	}
 
@@ -346,44 +378,10 @@
 		outline: none;
 		flex-shrink: 0;
 	}
+}
 
-	// The label stays in place to preserve the button's size, but is hidden
-	// behind a centered spinner. Only a busy button is a positioning parent:
-	// a positioned button would trap a descendant hit area that is meant to
-	// stretch to an ancestor, such as a dataform field row.
-	&.is-busy,
-	&.is-busy:is(:hover, :active, :focus) {
-		position: relative;
-		color: transparent;
-
-		@media (forced-colors: active) {
-			color: ButtonFace;
-		}
-	}
-
-	&.is-busy > :not(.components-button__busy-spinner) {
-		opacity: 0;
-	}
-
-	.components-button__busy-spinner {
-		position: absolute;
-		inset: 0;
-		margin: auto;
-		width: 1em;
-		height: 1em;
-		color: var(--_wp-components-button-foreground);
-		pointer-events: none;
-
-		@media (prefers-reduced-motion) {
-			> * {
-				animation: none;
-			}
-		}
-
-		@media (forced-colors: active) {
-			> * {
-				stroke: ButtonText;
-			}
-		}
+@keyframes components-button__busy-animation {
+	0% {
+		background-position: 200px 0;
 	}
 }

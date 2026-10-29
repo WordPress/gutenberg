@@ -10,6 +10,7 @@ import {
 import Button from '..';
 
 const meta: Meta< typeof Button > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-components/Actions/Button',
 	id: 'components-button',
 	component: Button,
@@ -43,7 +44,7 @@ const meta: Meta< typeof Button > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Point new code at [`Button`](?path=/docs/design-system-components-button--docs) in `@wordpress/ui`. See the [migration guide](?path=/docs/components-button--migration-guide).',
+			notes: 'Will be superseded by [`Button`](?path=/docs/design-system-components-button--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

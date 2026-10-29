@@ -4,10 +4,6 @@ import { type ButtonIconProps } from './types';
 import { Icon } from '../icon';
 import styles from './style.module.css';
 
-/**
- * An icon component specifically designed to work well when rendered inside
- * a `Button` component.
- */
 export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
 	function UnforwardedButtonIcon( { className, icon, ...props }, ref ) {
 		return (

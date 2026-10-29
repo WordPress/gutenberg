@@ -4,8 +4,10 @@ import { mapMarker } from '@wordpress/icons';
 // The dashboard is still experimental.
 import {
 	Autocomplete,
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	IconButton,
 	Input,
 	InputLayout,

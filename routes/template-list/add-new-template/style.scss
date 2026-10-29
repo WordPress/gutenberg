@@ -15,7 +15,6 @@
 	&__contents {
 		> .components-button {
 			height: auto;
-			min-height: auto;
 			justify-content: center;
 		}
 	}
@@ -44,7 +43,6 @@
 			white-space: pre-wrap;
 			overflow-wrap: break-word;
 			height: auto;
-			min-height: auto;
 			padding: $grid-unit-10 $grid-unit-15;
 
 			mark {
@@ -166,7 +164,6 @@
 
 .template-list-add-new-template__template-list__contents {
 	> .components-button {
-		min-height: 100%;
 		height: 100%;
 		padding: $grid-unit-20;
 		text-align: start;

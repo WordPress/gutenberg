@@ -27,7 +27,6 @@ Examples of **correct** code for this rule:
 import { Button } from '@wordpress/components';
 // Default and namespace imports are not checked.
 import UI from '@wordpress/ui';
-import { Button, ButtonLink, IconButton } from '@wordpress/ui';
 import { Tabs } from '@wordpress/ui';
 import { Radio, RadioGroup, RadioGroupControl } from '@wordpress/ui';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';

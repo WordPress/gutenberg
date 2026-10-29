@@ -48,13 +48,16 @@
 		// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 		// This is best fixed by making the mover control area a proper single toolbar group.
 		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
-		min-height: $button-size-compact;
 		height: $button-size-compact;
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+		&.is-pressed {
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
+
+			&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+			}
 		}
 
 		&:focus:not(:active) {
@@ -78,7 +81,8 @@
 	}
 }
 
-.editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
+.editor-document-tools
+.editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
 	.show-icon-labels & {
 		width: auto;
 		padding: 0 $grid-unit-10;

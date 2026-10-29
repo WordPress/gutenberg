@@ -19,7 +19,7 @@
 
 	// Offset the customizer's sidebar padding.
 	// Zero bottom margin so that the fixed toolbar is right under the header.
-	margin: -15px ( -$grid-unit-15 ) ( 0 ) ( -$grid-unit-15 );
+	margin: -15px (-$grid-unit-15) (0) (-$grid-unit-15);
 
 	// Match the customizer grey background.
 	background: #f0f0f1;
@@ -44,13 +44,16 @@
 	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
 	> .components-button.has-icon.has-icon.has-icon,
 	> .components-dropdown > .components-button.has-icon.has-icon {
-		min-height: $button-size-compact;
 		height: $button-size-compact;
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+		&.is-pressed {
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
+
+			&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+			}
 		}
 
 		&:focus:not(:active) {

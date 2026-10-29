@@ -12,7 +12,17 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { globe, starFilled } from '@wordpress/icons';
-import { Button, Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
+// `IconButton` is not on the recommended list yet.
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Card,
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	IconButton,
+	Link,
+	Stack,
+} from '@wordpress/ui';
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
