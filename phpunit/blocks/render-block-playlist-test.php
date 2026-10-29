@@ -254,8 +254,8 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'title'  => 'Song One',
 					'artist' => 'Artist One',
 					'album'  => 'Album One',
-					'src'    => 'http://example.com/song1.mp3',
-					'image'  => 'http://example.com/image1.jpg',
+					'src'    => 'http://example.com/song1.mp3?token=abc&expires=123',
+					'image'  => 'http://example.com/image1.jpg?token=abc&expires=123',
 				),
 				array(
 					'id'     => 2,
@@ -279,11 +279,11 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'track-0', $tracks );
 		$this->assertArrayHasKey( 'track-1', $tracks );
 
-		$this->assertSame( 'http://example.com/song1.mp3', $tracks['track-0']['url'] );
+		$this->assertSame( 'http://example.com/song1.mp3?token=abc&expires=123', $tracks['track-0']['url'] );
 		$this->assertSame( 'Song One', $tracks['track-0']['title'] );
 		$this->assertSame( 'Artist One', $tracks['track-0']['artist'] );
 		$this->assertSame( 'Album One', $tracks['track-0']['album'] );
-		$this->assertSame( 'http://example.com/image1.jpg', $tracks['track-0']['image'] );
+		$this->assertSame( 'http://example.com/image1.jpg?token=abc&expires=123', $tracks['track-0']['image'] );
 
 		$this->assertSame( 'http://example.com/song2.mp3', $tracks['track-1']['url'] );
 		$this->assertSame( 'Song Two', $tracks['track-1']['title'] );
