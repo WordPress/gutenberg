@@ -1,32 +1,26 @@
-@use "../utils/theme-variables" as *;
-
 .spinner {
-	width: 16px;
-	height: 16px;
+	width: var(--wpds-dimension-size-2xs);
+	height: var(--wpds-dimension-size-2xs);
 	display: inline-block;
 	margin: 5px 11px 0;
 	position: relative;
-	color: $components-color-accent;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	overflow: visible;
 	opacity: 1;
 	background-color: transparent;
 }
 
-.track,
 .indicator {
 	fill: transparent;
-	stroke-width: 1.5px;
-}
-
-.track {
-	stroke: $components-color-gray-300;
-}
-
-.indicator {
 	stroke: currentColor;
+	stroke-width: 1.5;
 	stroke-linecap: round;
 	transform-origin: 50% 50%;
 	animation: spin 1.4s linear infinite both;
+
+	@media ( forced-colors: active ) {
+		stroke: CanvasText;
+	}
 }
 
 @keyframes spin {
