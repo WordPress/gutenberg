@@ -203,6 +203,8 @@ export const WithCaret: Story = {
 	),
 };
 
+// TODO: This story is a visual check for reviewing this PR, not a usage
+// example. Remove it and the `Select` import before merging.
 /**
  * Compares a `Button` with `Button.Caret` to a `Select` trigger at each size.
  */
