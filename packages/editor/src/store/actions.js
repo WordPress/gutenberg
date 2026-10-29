@@ -996,6 +996,11 @@ export const setIsInserterOpened =
 				rootClientId: value.rootClientId,
 				index: value.insertionIndex,
 			} );
+		} else if ( ! value ) {
+			unlock( registry.dispatch( blockEditorStore ) ).setInsertionPoint(
+				null
+			);
+			registry.dispatch( blockEditorStore ).hideInsertionPoint();
 		}
 
 		dispatch( {
