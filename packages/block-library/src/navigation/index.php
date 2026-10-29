@@ -1724,7 +1724,11 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 		);
 	}
 
-	if ( null === $state_class && null === $layout_class && null === $custom_css_class ) {
+	// The inner lists are built with `get_block_wrapper_attributes()`, so they also
+	// receive the padding set on the block. Remove it, so it is not applied twice.
+	$has_padding = ! empty( $style['spacing']['padding'] );
+
+	if ( null === $state_class && null === $layout_class && null === $custom_css_class && ! $has_padding ) {
 		return $block_content;
 	}
 
@@ -1745,6 +1749,19 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 
 		if ( null !== $layout_class ) {
 			$processor->add_class( $layout_class );
+		}
+
+		if ( $has_padding ) {
+			$inline_style = $processor->get_attribute( 'style' );
+			if ( is_string( $inline_style ) ) {
+				$inline_style = preg_replace( '/(?:^|;)\s*padding(?:-(?:top|right|bottom|left))?\s*:[^;]*/i', '', $inline_style );
+				$inline_style = trim( (string) $inline_style, "; \t\n\r" );
+				if ( '' === $inline_style ) {
+					$processor->remove_attribute( 'style' );
+				} else {
+					$processor->set_attribute( 'style', $inline_style . ';' );
+				}
+			}
 		}
 
 		if ( null === $state_class ) {

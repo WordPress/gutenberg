@@ -19,6 +19,13 @@ describe( 'Navigation color support', () => {
 		);
 	} );
 
+	// The items only get their own padding when the block has a background set
+	// on the block itself, so Global Styles needs a padding control to space
+	// the items from the container.
+	it( 'supports padding', () => {
+		expect( metadata.supports.spacing.padding ).toBe( true );
+	} );
+
 	it( 'keeps the attributes of the existing color controls', () => {
 		for ( const attribute of [
 			'textColor',

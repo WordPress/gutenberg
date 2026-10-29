@@ -5,10 +5,11 @@
 ### Enhancements
 
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
--   Navigation: Add the color block support, so text and background colors can be set for all Navigation blocks under Styles > Blocks in Global Styles.
+-   Navigation: Add the color and padding block supports, so text and background colors and padding can be set for all Navigation blocks under Styles > Blocks in Global Styles.
 
 ### Bug Fixes
 
+-   Navigation: Apply padding set on the block only to its outer wrapper, so it is not applied a second time on the inner list.
 -   Paragraph: Don't show an empty group in the block toolbar when the theme offers neither text alignment nor wide alignment ([#85796](https://github.com/WordPress/gutenberg/pull/85796)).
 -   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
 -   Page List: Keep page items visible in the Navigation sidebar during content-only editing ([#85357](https://github.com/WordPress/gutenberg/pull/85357)).

@@ -136,6 +136,7 @@
 		},
 		"spacing": {
 			"blockGap": true,
+			"padding": true,
 			"units": [ "px", "em", "rem", "vh", "vw" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true

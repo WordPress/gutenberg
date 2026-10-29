@@ -29,6 +29,12 @@ $navigation-icon-size: 24px;
 		list-style: none;
 	}
 
+	// The inner list also has the `wp-block-navigation` class, so padding set on
+	// the block, for example in Global Styles, would apply to it a second time.
+	&.wp-block-navigation__container {
+		padding: 0;
+	}
+
 	// Menu item container.
 	.wp-block-navigation-item {
 		background-color: inherit;
