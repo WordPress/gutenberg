@@ -15,7 +15,7 @@ import type { FormatType } from './types';
 export function registerFormatType(
 	name: string,
 	settings: Omit< FormatType, 'name' >
-) {
+): FormatType | undefined {
 	const formatType: FormatType = {
 		name,
 		...settings,
@@ -100,7 +100,7 @@ export function registerFormatType(
 		return;
 	}
 
-	if ( 'keywords' in formatType && formatType.keywords!.length > 3 ) {
+	if ( ( formatType.keywords?.length ?? 0 ) > 3 ) {
 		window.console.error(
 			'The format "' +
 				formatType.name +

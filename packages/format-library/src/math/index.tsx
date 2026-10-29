@@ -8,7 +8,6 @@ import {
 	useAnchor,
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import {
@@ -73,6 +72,10 @@ function InlineUI( {
 			}
 		} else {
 			setError( null );
+		}
+
+		if ( value.start === undefined ) {
+			return;
 		}
 
 		const newReplacements = value.replacements.slice();

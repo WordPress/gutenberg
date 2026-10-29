@@ -10,6 +10,8 @@ import {
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
+import { getBlockType } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
@@ -183,6 +185,7 @@ export function useNoteActions() {
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
+		getBlockName,
 		getSelectedBlockClientId,
 		getSelectionStart,
 		getSelectionEnd,
@@ -192,6 +195,25 @@ export function useNoteActions() {
 		__unstableMarkNextChangeAsNotPersistent,
 		__unstableMarkLastChangeAsPersistent,
 	} = useDispatch( blockEditorStore );
+
+	// Splitting and merging store rich text as an HTML string, but the
+	// marker helpers only write rich text data.
+	const getNoteAttributes = ( clientId ) => {
+		const attributes = getBlockAttributes( clientId );
+		if ( ! attributes ) {
+			return attributes;
+		}
+		const schema = getBlockType( getBlockName( clientId ) )?.attributes;
+		return Object.fromEntries(
+			Object.entries( attributes ).map( ( [ key, value ] ) => [
+				key,
+				typeof value === 'string' &&
+				schema?.[ key ]?.type === 'rich-text'
+					? RichTextData.fromHTMLString( value )
+					: value,
+			] )
+		);
+	};
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -217,7 +239,7 @@ export function useNoteActions() {
 
 	const removeNoteMarker = ( clientId, noteId ) => {
 		const removed = removeInlineNote(
-			getBlockAttributes( clientId ),
+			getNoteAttributes( clientId ),
 			noteId
 		);
 		if ( removed ) {
@@ -243,7 +265,7 @@ export function useNoteActions() {
 		}
 		onDiscard( clientId );
 		const wrapped = wrapInlineNote(
-			getBlockAttributes( clientId )?.[ selection.attributeKey ],
+			getNoteAttributes( clientId )?.[ selection.attributeKey ],
 			'new',
 			selection.start,
 			selection.end
@@ -283,7 +305,7 @@ export function useNoteActions() {
 			 * https://github.com/WordPress/gutenberg/issues/74751.
 			 */
 			if ( ! parent && savedRecord?.id && clientId ) {
-				const attributes = getBlockAttributes( clientId );
+				const attributes = getNoteAttributes( clientId );
 				const metadata = attributes?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
@@ -417,7 +439,7 @@ export function useNoteActions() {
 			// No anchor (a reply or an orphan), or its block is gone: the
 			// note comes back on its own.
 			const attributes = anchor
-				? getBlockAttributes( anchor.clientId )
+				? getNoteAttributes( anchor.clientId )
 				: null;
 			if ( attributes ) {
 				const newAttributes = {};
@@ -486,7 +508,7 @@ export function useNoteActions() {
 
 			// What Undo needs to re-attach the note to its block.
 			let anchor = null;
-			const attributes = clientId ? getBlockAttributes( clientId ) : null;
+			const attributes = clientId ? getNoteAttributes( clientId ) : null;
 			if (
 				getNoteIdsFromMetadata( attributes?.metadata ).includes(
 					note.id
@@ -664,7 +686,7 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
 export function usePickNote( { drafts, onDiscard } ) {
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { selectBlock, toggleBlockSpotlight } = unlock(
+	const { selectBlock, toggleBlockHighlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -672,7 +694,7 @@ export function usePickNote( { drafts, onDiscard } ) {
 		if ( clientId ) {
 			// `null`: don't move focus to the block.
 			selectBlock( clientId, null );
-			toggleBlockSpotlight( clientId, true );
+			toggleBlockHighlight( clientId, true );
 		}
 
 		// No caret event strips the marker here, and the form unmounts before its focus-out runs.
@@ -692,10 +714,11 @@ export function usePickNote( { drafts, onDiscard } ) {
  * Focuses the selected note's thread when the selection asks for it. Lives
  * with the threads' DOM: the sidebar ref is only set once they render.
  *
- * @param {Object} props
- * @param {Object} props.sidebarRef Ref to the sidebar element.
+ * @param {Object}  props
+ * @param {Object}  props.sidebarRef Ref to the sidebar element.
+ * @param {boolean} props.isPlaced   Whether the selected thread is positioned; focusing it earlier scrolls the canvas to the top.
  */
-export function useNoteFocus( { sidebarRef } ) {
+export function useNoteFocus( { sidebarRef, isPlaced } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectedNote, noteFocused } = useSelect( ( select ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
@@ -708,7 +731,7 @@ export function useNoteFocus( { sidebarRef } ) {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! noteFocused || ! selectedNote ) {
+		if ( ! noteFocused || ! selectedNote || ! isPlaced ) {
 			return;
 		}
 		focusNoteThread(
@@ -718,7 +741,7 @@ export function useNoteFocus( { sidebarRef } ) {
 		);
 		// Re-select without the flag so the focus happens once.
 		selectNote( selectedNote );
-	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
+	}, [ noteFocused, selectedNote, isPlaced, selectNote, sidebarRef ] );
 }
 
 const subscribeNoop = () => () => {};

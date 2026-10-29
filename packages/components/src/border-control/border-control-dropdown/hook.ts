@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { COLORS } from '../../utils';
 import styles from '../style.module.scss';
 import type { Border, DropdownProps } from '../types';
 
@@ -78,7 +77,7 @@ export function useBorderControlDropdown(
 		// Applied inline so CSS-wide values (e.g. `inherit`) and the `||` color
 		// fallback pass straight through to `border-style`/`border-color`. Style
 		// `none` previews as `solid`; a style without a color falls back to
-		// gray-300.
+		// the neutral surface stroke token.
 		indicatorWrapperStyle: indicatorStyle
 			? {
 					borderStyle:
@@ -86,7 +85,7 @@ export function useBorderControlDropdown(
 					borderColor:
 						indicatorColor ||
 						( indicatorStyle !== 'none'
-							? COLORS.gray[ 300 ]
+							? 'var(--wpds-color-stroke-surface-neutral)'
 							: undefined ),
 				}
 			: undefined,

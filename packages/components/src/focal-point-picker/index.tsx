@@ -10,11 +10,8 @@ import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
 import Media from './media';
-import {
-	Container,
-	MediaWrapper,
-	MediaContainer,
-} from './styles/focal-point-picker-style';
+import { View } from '../view';
+import styles from './style.module.scss';
 import { INITIAL_BOUNDS } from './utils';
 import { useUpdateEffect } from '../utils/hooks';
 import type { WordPressComponentProps } from '../context/wordpress-component';
@@ -232,7 +229,11 @@ export function FocalPointPicker( {
 		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
-	const classes = clsx( 'components-focal-point-picker-control', className );
+	const classes = clsx(
+		styles.root,
+		'components-focal-point-picker-control',
+		className
+	);
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -244,16 +245,24 @@ export function FocalPointPicker( {
 	}, [ x, y ] );
 
 	return (
-		<Container { ...restProps } as="fieldset" className={ classes }>
+		<View { ...restProps } as="fieldset" className={ classes }>
 			{ !! label &&
 				( hideLabelFromVision ? (
 					<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 				) : (
 					<StyledLabel as="legend">{ label }</StyledLabel>
 				) ) }
-			<MediaWrapper className="components-focal-point-picker-wrapper">
-				<MediaContainer
-					className="components-focal-point-picker"
+			<div
+				className={ clsx(
+					styles[ 'media-wrapper' ],
+					'components-focal-point-picker-wrapper'
+				) }
+			>
+				<div
+					className={ clsx(
+						styles[ 'media-container' ],
+						'components-focal-point-picker'
+					) }
 					onKeyDown={ arrowKeyStep }
 					onPointerDown={ ( event ) => {
 						if ( event.button !== 0 ) {
@@ -285,8 +294,8 @@ export function FocalPointPicker( {
 						{ ...focalPointPosition }
 						isDragging={ isDragging }
 					/>
-				</MediaContainer>
-			</MediaWrapper>
+				</div>
+			</div>
 			<Controls
 				hasHelpText={ !! help }
 				point={ { x, y } }
@@ -295,7 +304,7 @@ export function FocalPointPicker( {
 				} }
 			/>
 			{ !! help && <StyledHelp>{ help }</StyledHelp> }
-		</Container>
+		</View>
 	);
 }
 

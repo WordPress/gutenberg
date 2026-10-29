@@ -1,3 +1,11 @@
+@use "sass:meta";
+
+// The stage renders `MediaEdit` of `@wordpress/fields`, whose stylesheet
+// WordPress doesn't register, so load it here with its class names kept.
+:global {
+	@include meta.load-css("@wordpress/fields/build-style/style.css");
+}
+
 .form {
 	flex-grow: 1;
 	min-height: 0;

@@ -101,7 +101,11 @@ function TableEdit( {
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
-	const colorProps = useColorProps( attributes );
+	// Mirror of save: `has-link-color` belongs on the figure only.
+	const colorProps = useColorProps( {
+		...attributes,
+		style: { ...attributes.style, elements: undefined },
+	} );
 	const borderProps = useBorderProps( attributes );
 	const backgroundProps = useBackgroundProps( attributes );
 	const textAlign = attributes?.style?.typography?.textAlign;
@@ -346,11 +350,10 @@ function TableEdit( {
 		);
 	}
 
-	useEffect( () => {
-		if ( ! isSingleSelected ) {
-			setSelectedCell();
-		}
-	}, [ isSingleSelected ] );
+	// Clear the selected cell when the block is deselected.
+	if ( ! isSingleSelected && selectedCell ) {
+		setSelectedCell();
+	}
 
 	useEffect( () => {
 		if ( hasTableCreated ) {

@@ -1,6 +1,6 @@
 import type { Field } from '@wordpress/dataviews';
-import type { BasePost } from '@wordpress/fields';
 import { __ } from '@wordpress/i18n';
+import type { BasePost } from '../../types';
 import ReadingSettingsLink from '../../../components/reading-settings-link';
 
 const readingSettingsField: Field< BasePost > = {

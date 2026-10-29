@@ -5,7 +5,20 @@ import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 # Badge usage guidelines
 
-## Choosing intent
+## Badges should not be interactive
+
+Badges communicate status or metadata. They should not perform actions or navigate to another page.
+
+### ❌ Don't
+
+-   **Use badges as links or buttons.** Do not add click handlers or make badges focusable to trigger actions or navigation.
+
+### ✅ Do
+
+-   **Use badges to communicate status or metadata.** Keep any related action separate from the badge.
+-   **Use the appropriate interactive component.** Use [Button](?path=/docs/design-system-components-button--docs) for actions and [Link](?path=/docs/design-system-components-link--docs) for navigation.
+
+## Choose badge intent based on the attention a status needs
 
 <Canvas of={ UsageGuidelinesStories.AllIntents } />
 
@@ -110,7 +123,7 @@ Use the least attention‑grabbing intent that still:
 -   Marks what isn't final, or
 -   Confirms a key success state in that context.
 
-## Using with icons
+## Keep icons outside badges
 
 `Badge` is text-only. Intent is communicated through color and label — not through icons inside the badge.
 

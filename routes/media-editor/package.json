@@ -19,7 +19,8 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/media-editor": "file:../../packages/media-editor",
-		"@wordpress/route": "file:../../packages/route"
+		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/views": "file:../../packages/views"
 	},
 	"devDependencies": {
 		"@types/react": "^19.3.0"

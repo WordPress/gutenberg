@@ -1,11 +1,7 @@
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
-import convertPreferencesPackageData from './migrations/preferences-package-data';
-import type {
-	PersistenceLayer,
-	PreferencesData,
-	ScopedPreferences,
-} from './types';
+import getNewestData from './get-newest-data';
+import type { PersistenceLayer } from './types';
 
 export { create };
 
@@ -26,39 +22,19 @@ export type * from './types';
  * @return The persistence layer initialized with the preloaded data.
  */
 export function __unstableCreatePersistenceLayer(
-	serverData: PreferencesData | [] | '' | false,
+	serverData: unknown,
 	userId: string | number
 ): PersistenceLayer {
 	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
-	const localData: PreferencesData | null = JSON.parse(
-		window.localStorage.getItem( localStorageRestoreKey ) as string
-	);
-
-	// Date parse returns NaN for invalid input. Coerce anything invalid
-	// into a conveniently comparable zero.
-	const serverModified =
-		Date.parse(
-			( serverData &&
-				( serverData as PreferencesData )._modified ) as string
-		) || 0;
-	const localModified = Date.parse( localData?._modified ?? '' ) || 0;
-
-	let preloadedData;
-	if ( serverData && serverModified >= localModified ) {
-		preloadedData = convertPreferencesPackageData(
-			serverData as ScopedPreferences
-		);
-	} else if ( localData ) {
-		preloadedData = convertPreferencesPackageData(
-			localData as ScopedPreferences
-		);
-	} else {
-		// Check if there is data in the legacy format from the old persistence system.
-		preloadedData = convertLegacyLocalStorageData( userId );
-	}
-
 	return create( {
-		preloadedData,
+		/*
+		 * Fall back to data in the legacy format from the old persistence system.
+		 * The server data is already preloaded, so fetching it again is redundant.
+		 */
+		preloadedData:
+			getNewestData( serverData, localStorageRestoreKey ) ??
+			convertLegacyLocalStorageData( userId ) ??
+			{},
 		localStorageRestoreKey,
 	} );
 }

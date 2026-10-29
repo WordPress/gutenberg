@@ -1,6 +1,7 @@
 ( function () {
 	const { registerBlockType } = wp.blocks;
 	const { useBlockProps } = wp.blockEditor;
+	const { createElement, memo } = wp.element;
 
 	// The externalized React JSX runtime (the `react-jsx-runtime` script
 	// handle). When the React 19 experiment is enabled this is React 19's
@@ -89,6 +90,23 @@
 		label: 'Hello from defaultProps',
 	};
 
+	// The same, wrapped in `memo()`. React 18 resolved the inner component's
+	// `defaultProps` in `updateMemoComponent`, not at element creation, so no
+	// runtime ever wrote them into the element. All three ways of creating the
+	// element are exercised — the classic `createElement`, the externalized JSX
+	// runtime, and the bundled React 18 one — because the fix has to live in
+	// the reconciler to cover the last of them.
+	function MemoGreetingBase( props ) {
+		return jsx( 'span', {
+			className: props.className,
+			children: props.label,
+		} );
+	}
+	MemoGreetingBase.defaultProps = {
+		label: 'Hello from memo defaultProps',
+	};
+	const MemoGreeting = memo( MemoGreetingBase );
+
 	registerBlockType( 'test/react-18-compat-block', {
 		apiVersion: 3,
 		edit: function Edit() {
@@ -122,6 +140,26 @@
 					// The `defaultProps` component, created with the
 					// externalized React runtime.
 					jsx( Greeting, {}, 'greeting' ),
+					createElement( MemoGreeting, {
+						key: 'memo-greeting',
+						className: 'react-18-compat-block__memo-greeting',
+					} ),
+					jsx(
+						MemoGreeting,
+						{
+							className:
+								'react-18-compat-block__memo-greeting-jsx',
+						},
+						'memo-greeting-jsx'
+					),
+					jsxDEV(
+						MemoGreeting,
+						{
+							className:
+								'react-18-compat-block__memo-greeting-legacy',
+						},
+						'memo-greeting-legacy'
+					),
 				],
 			} );
 		},

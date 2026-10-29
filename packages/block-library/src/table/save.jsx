@@ -16,7 +16,11 @@ export default function save( { attributes } ) {
 		return null;
 	}
 
-	const colorProps = getColorClassesAndStyles( attributes );
+	// The colour block support puts `has-link-color` on the figure.
+	const colorProps = getColorClassesAndStyles( {
+		...attributes,
+		style: { ...style, elements: undefined },
+	} );
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const backgroundProps = getBackgroundClassesAndStyles( attributes );
 

@@ -92,6 +92,132 @@ test.describe( 'Image', () => {
 		).toBe( '12' );
 	} );
 
+	test( 'should keep a caption typed while the image uploads', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		// Hold the upload until the caption is typed.
+		let releaseUpload;
+		const uploadReleased = new Promise( ( resolve ) => {
+			releaseUpload = resolve;
+		} );
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if ( route.request().method() === 'POST' ) {
+				await uploadReleased;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		await expect( image ).toHaveAttribute( 'src', /^blob:/ );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await page.keyboard.type( 'Typed while uploading' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: { caption: 'Typed while uploading' },
+			},
+		] );
+		const [ uploadingImage ] = await editor.getBlocks();
+		expect( uploadingImage.attributes.id ).toBeUndefined();
+		releaseUpload();
+
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: expect.any( Number ),
+					url: expect.stringMatching( /^https?:\/\// ),
+					caption: 'Typed while uploading',
+				},
+			},
+		] );
+	} );
+
+	test( 'should hide an empty caption when the image is deselected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+		} );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const caption = imageBlock.getByRole( 'textbox', {
+			name: 'Image caption text',
+		} );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await expect( caption ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( caption ).toBeHidden();
+
+		await editor.selectBlocks( imageBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add caption' } )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect( caption ).toBeHidden();
+	} );
+
+	test( 'should show the caption again when removing it is undone', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+				caption: 'Caption',
+			},
+		} );
+		const caption = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'textbox', { name: 'Image caption text' } );
+		await expect( caption ).toHaveText( 'Caption' );
+
+		await editor.clickBlockToolbarButton( 'Remove caption' );
+		await expect( caption ).toBeHidden();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: undefined } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( caption ).toHaveText( 'Caption' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: 'Caption' } },
+			] );
+	} );
+
 	test( 'should allow soft line breaks in caption', async ( {
 		editor,
 		page,
@@ -365,18 +491,25 @@ test.describe( 'Image', () => {
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
-			await blockLibrary
-				.getByRole( 'tabpanel', { name: 'Media' } )
-				.getByRole( 'tab', { name: 'Openverse' } )
+			// The tab browses one source at a time, chosen from the menu
+			// beside the search field.
+			const mediaTab = blockLibrary.getByRole( 'tabpanel', {
+				name: 'Media',
+			} );
+			await mediaTab
+				.getByRole( 'button', { name: 'Media source' } )
+				.click();
+			await page
+				.getByRole( 'menuitemradio', { name: 'Openverse' } )
 				.click();
 		}
 
 		await openMediaTab();
 
-		// Drag the first image from the media library into the image block.
+		// Drag the first image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.first()
 			.dragTo( imageBlock, { steps: 3 } );
 
@@ -406,10 +539,10 @@ test.describe( 'Image', () => {
 
 		await openMediaTab();
 
-		// Drag the second image from the media library into the image block.
+		// Drag the second image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.nth( 1 )
 			.dragTo( imageBlock, { steps: 3 } );
 
@@ -1068,6 +1201,74 @@ test.describe( 'Image - lightbox', () => {
 					.getPropertyValue( 'margin' );
 			} );
 			expect( margin ).toBe( '0px' );
+		} );
+
+		// Regression test for https://github.com/WordPress/gutenberg/issues/82283.
+		test.describe( 'when a plugin wraps the image', () => {
+			let largeMedia;
+
+			test.beforeAll( async ( { requestUtils } ) => {
+				largeMedia = await requestUtils.uploadMedia(
+					'./assets/1024x768_e2e_test_image_size.jpeg'
+				);
+				await requestUtils.activatePlugin(
+					'gutenberg-test-image-picture-wrapper'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-image-picture-wrapper'
+				);
+			} );
+
+			test( 'Trigger button should still be placed inside the figure', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ largeMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ largeMedia.source_url }" alt="" class="wp-image-${ largeMedia.id }"/><figcaption class="wp-element-caption">A caption.</figcaption></figure>
+				<!-- /wp:image -->` );
+
+				const postId = await editor.publishPost();
+				await page.setViewportSize( { width: 500, height: 800 } );
+				await page.goto( `/?p=${ postId }` );
+
+				const image = page.locator( '.wp-lightbox-container img' );
+				await expect( image ).toBeVisible();
+				// The button is only positioned once the image has loaded.
+				await expect
+					.poll( () =>
+						page.evaluate(
+							() =>
+								document.querySelector(
+									'button.lightbox-trigger'
+								).style.top
+						)
+					)
+					.not.toBe( '' );
+
+				const figureBox = await page
+					.locator( '.wp-lightbox-container' )
+					.boundingBox();
+				const buttonBox = await page
+					.locator( 'button.lightbox-trigger' )
+					.boundingBox();
+
+				expect( buttonBox.y ).toBeGreaterThanOrEqual( figureBox.y );
+				expect( buttonBox.x + buttonBox.width ).toBeLessThanOrEqual(
+					figureBox.x + figureBox.width
+				);
+
+				// A mispositioned button pushes the page sideways.
+				const { scrollWidth, clientWidth } = await page.evaluate(
+					() => ( {
+						scrollWidth: document.documentElement.scrollWidth,
+						clientWidth: document.documentElement.clientWidth,
+					} )
+				);
+				expect( scrollWidth ).toBe( clientWidth );
+			} );
 		} );
 
 		test.describe( 'Overlay not a direct child of body', () => {

@@ -61,7 +61,20 @@ const itemToTermId = ( item ) => Number( item.value );
 const isSameTerm = ( termA, termB ) => termA.value === termB.value;
 const isSameTermName = ( nameA, nameB ) =>
 	nameA.toLowerCase() === nameB.toLowerCase();
+const hasTermName = ( terms, name ) =>
+	terms.some( ( term ) => isSameTermName( term.label, name ) );
 const isPendingTerm = ( item ) => item.value.startsWith( PENDING_TERM_PREFIX );
+
+function parseTermNames( input ) {
+	const names = [];
+	for ( const part of input.split( ',' ) ) {
+		const name = part.trim();
+		if ( name && ! names.some( ( n ) => isSameTermName( n, name ) ) ) {
+			names.push( name );
+		}
+	}
+	return names;
+}
 
 /**
  * Renders a flat term selector component.
@@ -176,28 +189,30 @@ export function FlatTermSelector( { slug } ) {
 	);
 	const debouncedSearch = useDebounce( searchTerms, 500 );
 
-	// The typed term can be created when it doesn't match a suggestion or an
-	// already selected term.
-	const newTermName = inputValue.trim();
-	const hasExactMatch = [ ...suggestions, ...values ].some( ( term ) =>
-		isSameTermName( term.label, newTermName )
+	// The typed terms can be created when they aren't selected already. The
+	// create item is left out when they can all be picked from the suggestions.
+	const newTermNames = parseTermNames( inputValue ).filter(
+		( name ) => ! hasTermName( values, name )
 	);
 	const showCreatableItem =
-		hasCreateAction && !! newTermName && ! hasExactMatch && ! isSearching;
+		hasCreateAction &&
+		! isSearching &&
+		newTermNames.some( ( name ) => ! hasTermName( suggestions, name ) );
+	const newTermNamesLabel = newTermNames.join( ', ' );
 	const creatableItem = useMemo(
 		() =>
 			showCreatableItem
 				? {
 						value: CREATE_TERM_VALUE,
 						label: sprintf(
-							/* translators: %s: term name. */
+							/* translators: %s: term name, or a comma-separated list of term names. */
 							_x( 'Create: %s', 'term' ),
-							newTermName
+							newTermNamesLabel
 						),
 						creatable: true,
 					}
 				: undefined,
-		[ newTermName, showCreatableItem ]
+		[ newTermNamesLabel, showCreatableItem ]
 	);
 	const items = useMemo(
 		() =>
@@ -269,12 +284,12 @@ export function FlatTermSelector( { slug } ) {
 					( item ) => ! isSameTerm( item, pendingTerm )
 				)
 			);
-			return;
+			return false;
 		}
 
 		// The term was removed while it was being created.
 		if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
-			return;
+			return false;
 		}
 
 		pendingTermsRef.current.delete( pendingTerm.value );
@@ -292,7 +307,39 @@ export function FlatTermSelector( { slug } ) {
 				)
 		);
 		assignTerm( itemToTermId( savedTerm ) );
-		speak( termAddedLabel, 'assertive' );
+		return true;
+	}
+
+	async function createTerms( names ) {
+		const results = await Promise.all(
+			names.map( ( name ) => createTerm( name ) )
+		);
+		// A single announcement, so that the ones for terms added together
+		// don't cut each other off.
+		if ( results.includes( true ) ) {
+			speak( termAddedLabel, 'assertive' );
+		}
+	}
+
+	function onKeyDownCapture( event ) {
+		const { target } = event;
+		if (
+			event.key !== 'Enter' ||
+			// Enter confirms the composed text.
+			event.nativeEvent.isComposing ||
+			event.keyCode === 229 ||
+			! hasCreateAction ||
+			! inputValue.trim() ||
+			target.getAttribute( 'role' ) !== 'combobox' ||
+			// The select picks a highlighted option.
+			target.getAttribute( 'aria-activedescendant' )
+		) {
+			return;
+		}
+
+		event.preventDefault();
+		onInputValueChange( '' );
+		createTerms( newTermNames );
 	}
 
 	async function onChange( newValues ) {
@@ -301,8 +348,8 @@ export function FlatTermSelector( { slug } ) {
 		);
 		if ( isCreatingTerm ) {
 			// Picking the create item leaves the assigned terms untouched, and
-			// the term is only announced once it exists.
-			await createTerm( newTermName );
+			// the terms are only announced once they exist.
+			await createTerms( newTermNames );
 			return;
 		}
 
@@ -381,12 +428,17 @@ export function FlatTermSelector( { slug } ) {
 	}
 
 	return (
-		<Stack direction="column" gap="lg">
+		<Stack
+			direction="column"
+			gap="lg"
+			onKeyDownCapture={ onKeyDownCapture }
+		>
 			<SearchableChipSelectControl
 				openOnInputClick={ false }
 				// Terms are searched through the REST API.
 				filter={ null }
 				label={ newTermLabel }
+				description={ __( 'Separate with commas or the Enter key.' ) }
 				items={ items }
 				value={ values }
 				onValueChange={ onChange }
