@@ -18,7 +18,10 @@
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
 -   Heading: Generate anchors with `cleanForSlug`, so headings in scripts like Devanagari, Tamil and Bengali keep their vowel signs, and anchors follow the same rules as post slugs ([#85096](https://github.com/WordPress/gutenberg/pull/85096)).
 -   Media & Text: Restore the content area's default padding in classic themes whose CSS reset sets `padding: 0` on `div`, which overrode it on the front end since the padding's specificity was lowered. Theme overrides keep working ([#85200](https://github.com/WordPress/gutenberg/pull/85200)).
--   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Image: Only use own properties when looking up view script state by an ID from the context. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 
 ## 12.0.0 (2026-10-20)
 
@@ -299,6 +302,15 @@
 
 ## 9.34.0 (2025-10-29)
 
+## 9.33.12 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.33.11 (2026-08-06)
 
 ### Bug Fixes
@@ -342,6 +354,15 @@
 
 -   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
 
+## 9.19.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.19.7 (2026-08-06)
 
 ### Bug Fixes
@@ -370,6 +391,15 @@
 
 ## 9.9.0 (2024-10-03)
 
+## 9.8.19 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.8.18 (2026-08-06)
 
 ### Bug Fixes
@@ -395,6 +425,13 @@
 ## 9.2.0 (2024-06-26)
 
 ## 9.1.0 (2024-06-15)
+
+## 9.0.10 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
 
 ## 9.0.9 (2026-08-06)
 
@@ -427,6 +464,13 @@
 
 ## 8.29.0 (2024-02-21)
 
+## 8.28.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+
 ## 8.28.13 (2026-08-06)
 
 ### Bug Fixes
@@ -455,6 +499,13 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.20 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+
 ## 8.19.19 (2026-08-06)
 
 ### Bug Fixes
@@ -474,6 +525,12 @@
 ## 8.14.0 (2023-07-05)
 
 ## 8.13.0 (2023-06-23)
+
+## 8.12.22 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
 
 ## 8.12.21 (2026-08-06)
 
@@ -498,6 +555,12 @@
 ## 8.5.0 (2023-03-01)
 
 ## 8.4.0 (2023-02-15)
+
+## 8.3.18 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
 
 ## 8.3.17 (2026-08-06)
 
@@ -526,6 +589,12 @@
 ## 7.16.0 (2022-10-05)
 
 ## 7.15.0 (2022-09-21)
+
+## 7.14.17 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
 
 ## 7.14.16 (2026-08-06)
 
@@ -567,6 +636,12 @@
 
 ## 7.4.0 (2022-04-21)
 
+## 7.3.21 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+
 ## 7.3.20 (2026-08-06)
 
 ### Bug Fixes
@@ -601,6 +676,12 @@
 ## 6.1.0 (2022-01-27)
 
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
+
+## 6.0.33 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link: Escape the link label before rendering.
 
 ## 6.0.32 (2026-08-06)
 
