@@ -294,14 +294,10 @@ function Navigation( {
 		currentTheme,
 		editorDisabledResponsive,
 		hasSelectedStyleState,
-		hasSelectedInnerBlock,
 	} = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				hasSelectedBlockStyleState,
-				hasSelectedInnerBlock: hasSelectedInnerBlockFn,
-			} = select( blockEditorStore );
+			const { getSettings, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
 			const settings = getSettings();
 
 			return {
@@ -315,10 +311,6 @@ function Navigation( {
 				editorDisabledResponsive:
 					!! settings?.[ isNavigationPostEditorKey ],
 				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
-				hasSelectedInnerBlock: hasSelectedInnerBlockFn(
-					clientId,
-					true
-				),
 			};
 		},
 		[ clientId ]
@@ -463,7 +455,6 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
-		navigationMenu,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
@@ -1178,24 +1169,14 @@ function Navigation( {
 									}
 								>
 									{ isEntityAvailable && (
-										<>
-											<NavigationInnerBlocks
-												clientId={ clientId }
-												hasCustomPlaceholder={
-													!! CustomPlaceholder
-												}
-												templateLock={ templateLock }
-												orientation={ orientation }
-											/>
-											{ ( isSelected ||
-												hasSelectedInnerBlock ) &&
-												navigationMenu?.status ===
-													'draft' && (
-													<span className="wp-block-navigation__draft-inline-label">
-														{ __( '(Draft)' ) }
-													</span>
-												) }
-										</>
+										<NavigationInnerBlocks
+											clientId={ clientId }
+											hasCustomPlaceholder={
+												!! CustomPlaceholder
+											}
+											templateLock={ templateLock }
+											orientation={ orientation }
+										/>
 									) }
 								</ResponsiveWrapper>
 							</>

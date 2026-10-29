@@ -3,12 +3,8 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	Spinner as WCSpinner,
-	Notice,
-	Button,
-} from '@wordpress/components';
+import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -16,7 +12,6 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
-import usePublishNavigationMenu from './use-publish-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
@@ -119,39 +114,16 @@ const MenuInspectorControls = ( props ) => {
 	const { isOpened, expandRevision, handleToggle } =
 		useListViewPanelState( clientId );
 
-	const {
-		navigationMenu,
-		canUserUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu,
-	} = useNavigationMenu( currentMenuId );
-	const { publish, isPublishing } = usePublishNavigationMenu( currentMenuId );
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
-	const draftMessage = __(
-		'This navigation menu is a draft. It will not be visible on your live site until published.'
-	);
 	const draftNotice = navigationMenu?.status === 'draft' && (
-		<Notice
-			status="warning"
-			isDismissible={ false }
-			spokenMessage={ draftMessage }
-		>
-			{ draftMessage }
-			{ hasResolvedCanUserUpdateNavigationMenu &&
-				canUserUpdateNavigationMenu && (
-					<>
-						{ ' ' }
-						<Button
-							variant="link"
-							onClick={ publish }
-							isBusy={ isPublishing }
-							disabled={ isPublishing }
-							accessibleWhenDisabled
-						>
-							{ __( 'Publish' ) }
-						</Button>
-					</>
+		<Notice.Root intent="warning">
+			<Notice.Description>
+				{ __(
+					"This menu is a draft. It will not be visible on your site until it's published."
 				) }
-		</Notice>
+			</Notice.Description>
+		</Notice.Root>
 	);
 
 	if ( ! showBlockTitle ) {
