@@ -23,6 +23,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @var array
+	 * @phpstan-var array{ version?: int, settings?: array<string, mixed>, styles?: array<string, mixed>, ...<string, mixed> }
 	 */
 	protected $theme_json = null;
 
@@ -3171,6 +3172,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string  $selector         The style block selector.
 	 * @param boolean $use_root_padding Whether to add custom properties at root level.
 	 * @return array Returns the modified $declarations.
+	 *
+	 * @phpstan-return list<array{ name: non-falsy-string, value: scalar }>
 	 */
 	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
 		if ( empty( $styles ) ) {
@@ -4103,7 +4106,7 @@ class WP_Theme_JSON_Gutenberg {
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$use_root_padding         = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector                 = $block_metadata['selector'];
-		$settings                 = $this->theme_json['settings'] ?? null;
+		$settings                 = $this->theme_json['settings'] ?? array();
 		$is_root_selector         = static::ROOT_BLOCK_SELECTOR === $selector;
 		$media_query              = $block_metadata['media_query'] ?? null;
 		$responsive_media_queries = static::get_viewport_media_queries( $settings['viewport'] ?? null );
@@ -4349,7 +4352,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * element then compute the style properties for it.
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
-		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings ?? array() );
+		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings );
 
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
 			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
@@ -5927,15 +5930,18 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Generates style declarations for a node's features e.g. color, border,
-	 * typography etc, that have custom selectors in their related block's
+	 * Generates style declarations for a node's features e.g., color, border,
+	 * typography etc. that have custom selectors in their related block's
 	 * metadata.
 	 *
-	 * @param object $metadata The related block metadata containing selectors.
-	 * @param object $node     A merged theme.json node for block or variation.
+	 * @param array<string, mixed> $metadata The related block metadata containing selectors.
+	 * @param array<string, mixed> $node     A merged theme.json node for block or variation. Features
+	 *                                       promoted to their own selector are removed from it.
+	 * @return array<string, array[]> The style declarations for the node's features with custom
+	 *                                selectors, keyed by selector.
 	 *
-	 * @return array The style declarations for the node's features with custom
-	 * selectors.
+	 * @phpstan-param array{ selectors?: array<string, string|array<string, string>> } $metadata
+	 * @phpstan-return array<string, list<array{ name: non-falsy-string, value: scalar }>>
 	 */
 	protected function get_feature_declarations_for_node( $metadata, &$node ) {
 		$declarations = array();
@@ -5944,26 +5950,31 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$settings = $this->theme_json['settings'] ?? null;
+		$settings = $this->theme_json['settings'] ?? array();
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
-			// Skip if this is the block's root selector, the custom CSS
-			// selector, or the block doesn't have any styles for the feature.
+			/*
+			 * Skip if this is the block's root selector, the custom CSS
+			 * selector, or the block doesn't have any styles for the feature.
+			 */
 			if ( 'root' === $feature || 'css' === $feature || empty( $node[ $feature ] ) ) {
 				continue;
 			}
 
-			if ( is_array( $feature_selectors ) ) {
+			if ( is_array( $feature_selectors ) && is_array( $node[ $feature ] ) ) {
+				$feature_styles = $node[ $feature ];
 				foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
-					if ( 'root' === $subfeature || empty( $node[ $feature ][ $subfeature ] ) ) {
+					if ( 'root' === $subfeature || empty( $feature_styles[ $subfeature ] ) ) {
 						continue;
 					}
 
-					// Create temporary node containing only the subfeature data
-					// to leverage existing `compute_style_properties` function.
+					/*
+					 * Create temporary node containing only the subfeature data
+					 * to leverage existing `compute_style_properties` function.
+					 */
 					$subfeature_node = array(
 						$feature => array(
-							$subfeature => $node[ $feature ][ $subfeature ],
+							$subfeature => $feature_styles[ $subfeature ],
 						),
 					);
 
@@ -5979,31 +5990,40 @@ class WP_Theme_JSON_Gutenberg {
 						$declarations[ $subfeature_selector ] = $new_declarations;
 					}
 
-					// Remove the subfeature from the block's node now its
-					// styles will be included under its own selector not the
-					// block's.
-					unset( $node[ $feature ][ $subfeature ] );
+					/*
+					 * Remove the subfeature from the block's node now its
+					 * styles will be included under its own selector not the
+					 * block's.
+					 */
+					unset( $feature_styles[ $subfeature ] );
 				}
+				$node[ $feature ] = $feature_styles;
 			}
 
-			// Now subfeatures have been processed and removed we can process
-			// feature root selector or simple string selector.
+			/*
+			 * Now subfeatures have been processed and removed we can process
+			 * feature root selector or simple string selector.
+			 */
 			if (
 				is_string( $feature_selectors ) ||
 				( isset( $feature_selectors['root'] ) && $feature_selectors['root'] )
 			) {
 				$feature_selector = is_string( $feature_selectors ) ? $feature_selectors : $feature_selectors['root'];
 
-				// Create temporary node containing only the feature data
-				// to leverage existing `compute_style_properties` function.
+				/*
+				 * Create temporary node containing only the feature data
+				 * to leverage existing `compute_style_properties` function.
+				 */
 				$feature_node = array( $feature => $node[ $feature ] );
 
 				// Generate the style declarations.
 				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $this->theme_json );
 
-				// Merge new declarations with any that already exist for
-				// the feature selector. This may occur when multiple block
-				// support features use the same custom selector.
+				/*
+				 * Merge new declarations with any that already exist for
+				 * the feature selector. This may occur when multiple block
+				 * support features use the same custom selector.
+				 */
 				if ( isset( $declarations[ $feature_selector ] ) ) {
 					foreach ( $new_declarations as $new_declaration ) {
 						$declarations[ $feature_selector ][] = $new_declaration;
@@ -6012,8 +6032,10 @@ class WP_Theme_JSON_Gutenberg {
 					$declarations[ $feature_selector ] = $new_declarations;
 				}
 
-				// Remove the feature from the block's node now its styles
-				// will be included under its own selector not the block's.
+				/*
+				 * Remove the feature from the block's node now its styles
+				 * will be included under its own selector not the block's.
+				 */
 				unset( $node[ $feature ] );
 			}
 		}

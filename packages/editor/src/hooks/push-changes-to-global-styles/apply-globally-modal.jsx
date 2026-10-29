@@ -21,18 +21,20 @@ const getItemId = ( row ) => row.id;
  *
  * @param {Object}   props                Component props.
  * @param {string}   props.name           Block name.
+ * @param {string[]} props.elements       Root-level element layers that paint the block.
  * @param {Array}    props.rows           The block's changed styles, grouped into rows.
  * @param {Function} props.onApply        Called with the selected rows to apply.
  * @param {Function} props.onRequestClose Called to close the modal.
  */
 export default function ApplyGloballyModal( {
 	name,
+	elements,
 	rows,
 	onApply,
 	onRequestClose,
 } ) {
 	const { merged } = useGlobalStyles();
-	const reviewRows = useReviewRows( rows, merged, name );
+	const reviewRows = useReviewRows( rows, merged, name, elements );
 
 	const [ selection, setSelection ] = useState( () =>
 		reviewRows.map( ( row ) => row.id )

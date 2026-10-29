@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Non-breaking space: Label the replace button "Replace non-breaking space" when it replaces only one ([#85777](https://github.com/WordPress/gutenberg/pull/85777)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
