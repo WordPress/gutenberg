@@ -282,13 +282,8 @@ jobs:
             - name: Add Storybook to Playground preview zip
               if: ${{ github.event_name == 'pull_request' && matrix.IS_GUTENBERG_PLUGIN }}
               run: |
-                  STAGING="$RUNNER_TEMP/storybook-preview"
-                  mkdir -p "$STAGING"
-                  cp -R storybook/build "$STAGING/storybook"
-                  cp .github/scripts/storybook-playground-preview.php "$STAGING/storybook-preview.php"
-                  cp gutenberg.php "$STAGING/gutenberg.php"
-                  printf "\nrequire_once __DIR__ . '/storybook-preview.php';\n" >> "$STAGING/gutenberg.php"
-                  ( cd "$STAGING" && zip --recurse-paths --no-dir-entries --quiet "$GITHUB_WORKSPACE/gutenberg.zip" . )
+                  cp -R storybook/build "$RUNNER_TEMP/storybook"
+                  ( cd "$RUNNER_TEMP" && zip --recurse-paths --no-dir-entries --quiet "$GITHUB_WORKSPACE/gutenberg.zip" storybook )
 
             # When using archive: false to upload an artifact, the file name is used and the name input is ignored.
             # This ensures unique artifiact names for `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE`.
