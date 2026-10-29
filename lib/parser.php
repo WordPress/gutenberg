@@ -1564,8 +1564,8 @@ class Gutenberg_PEG_Parser {
     $this->peg_c20 = "}";
     $this->peg_c21 = array( "type" => "literal", "value" => "}", "description" => "\"}\"" );
     $this->peg_c22 = "";
-    $this->peg_c23 = array(array(32,32), array(9,9), array(13,13), array(10,10));
-    $this->peg_c24 = array( "type" => "class", "value" => "[ \t\r\n]", "description" => "[ \t\r\n]" );
+    $this->peg_c23 = array(array(32,32), array(9,9), array(12,12), array(13,13), array(10,10));
+    $this->peg_c24 = array( "type" => "class", "value" => "[ \t\f\r\n]", "description" => "[ \t\f\r\n]" );
 
     $peg_startRuleFunctions = array( 'Block_List' => array($this, "peg_parseBlock_List") );
     $peg_startRuleFunction  = array($this, "peg_parseBlock_List");
