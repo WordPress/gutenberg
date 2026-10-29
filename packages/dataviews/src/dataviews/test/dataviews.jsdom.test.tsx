@@ -538,7 +538,7 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.getByRole( 'spinbutton', { name: 'Current page' } )
 			).toHaveValue( 1 );
-			expect( screen.getByText( 'of 72652' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'of 72,652' ) ).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'combobox', { name: 'Current page' } )
 			).not.toBeInTheDocument();

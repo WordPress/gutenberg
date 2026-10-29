@@ -22,6 +22,7 @@
 -   Post Navigation Link, Comments Pagination: Escape the link labels before rendering. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Query Loop: Format the number of terms in the taxonomy filter with the separators of the user's locale ([#85594](https://github.com/WordPress/gutenberg/pull/85594)).
 
 ## 12.0.0 (2026-10-20)
 

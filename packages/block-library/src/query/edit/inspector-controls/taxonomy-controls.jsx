@@ -13,6 +13,7 @@ import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 import { sprintf, _n, _x, __ } from '@wordpress/i18n';
 import { useTaxonomies } from '../../utils';
+import formatNumber from '../../../utils/format-number';
 
 const EMPTY_ARRAY = [];
 const EMPTY_MAP = new Map();
@@ -70,20 +71,20 @@ function ListedTermCount() {
 function LimitedTermCount( { isSearch, shown, total } ) {
 	if ( ! isSearch ) {
 		return sprintf(
-			/* translators: %d: number of terms shown. */
-			__( 'Showing the first %d. Search to find more.' ),
-			shown
+			/* translators: %s: formatted number of terms shown. */
+			__( 'Showing the first %s. Search to find more.' ),
+			formatNumber( shown )
 		);
 	}
 	return sprintf(
-		/* translators: 1: number of terms shown. 2: number of matching terms. */
+		/* translators: 1: formatted number of terms shown. 2: formatted number of matching terms. */
 		_n(
-			'Showing %1$d of %2$d result. Refine your search to see more.',
-			'Showing %1$d of %2$d results. Refine your search to see more.',
+			'Showing %1$s of %2$s result. Refine your search to see more.',
+			'Showing %1$s of %2$s results. Refine your search to see more.',
 			total
 		),
-		shown,
-		total
+		formatNumber( shown ),
+		formatNumber( total )
 	);
 }
 

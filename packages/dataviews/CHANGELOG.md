@@ -18,6 +18,7 @@
 ### Bug Fixes
 
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
+-   Pagination: Format the page numbers with the separators of the user's locale ([#85594](https://github.com/WordPress/gutenberg/pull/85594)).
 
 ## 21.0.0 (2026-10-20)
 
