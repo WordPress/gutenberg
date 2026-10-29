@@ -11,6 +11,29 @@ export async function clickBlockToolbarButton( buttonAriaLabel ) {
 		await page.mouse.move( 0, 0 );
 		await page.mouse.move( 10, 10 );
 	}
-	await page.waitForSelector( BUTTON_SELECTOR );
-	await page.click( BUTTON_SELECTOR );
+	const button = await page.waitForSelector( BUTTON_SELECTOR, {
+		visible: true,
+	} );
+	// Clicks may fail if the button is out of view. Assure it is before click.
+	await button.evaluate( ( element ) => element.scrollIntoView() );
+	/*
+	 * The block toolbar can still be shown or repositioned after the button is
+	 * visible, which makes the click fail. Wait until the button has a size and
+	 * stops moving.
+	 */
+	await page.waitForFunction(
+		( element ) => {
+			const { x, y, width, height } = element.getBoundingClientRect();
+			const position = `${ x },${ y },${ width },${ height }`;
+			const isStable =
+				width > 0 &&
+				height > 0 &&
+				element.dataset.e2ePosition === position;
+			element.dataset.e2ePosition = position;
+			return isStable;
+		},
+		{ polling: 'raf' },
+		button
+	);
+	await button.click();
 }
