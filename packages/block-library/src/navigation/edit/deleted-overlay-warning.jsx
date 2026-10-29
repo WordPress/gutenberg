@@ -1,4 +1,4 @@
-import { Notice, Button } from '@wordpress/components';
+import { Notice as WCNotice, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 
@@ -40,13 +40,13 @@ function DeletedOverlayWarning( { onClear, onCreate, isCreating = false } ) {
 	);
 
 	return (
-		<Notice
+		<WCNotice
 			status="warning"
 			isDismissible={ false }
 			className="wp-block-navigation__deleted-overlay-warning"
 		>
 			{ message }
-		</Notice>
+		</WCNotice>
 	);
 }
 
