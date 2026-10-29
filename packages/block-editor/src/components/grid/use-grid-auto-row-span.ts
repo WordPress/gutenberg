@@ -8,8 +8,8 @@ import type { GridItemAttributes } from './types';
 
 /**
  * In a manual grid, grows the row span of items whose content overflows their
- * grid area, so that rows can stay square. Spans only ever grow, and never
- * into the area of another item.
+ * grid area, so that rows can stay square. Spans only ever grow, and may
+ * overlap other items.
  *
  * @param options
  * @param options.clientId The grid block's client ID.
@@ -95,24 +95,7 @@ export function useGridAutoRowSpan( { clientId }: { clientId: string } ) {
 				const neededSpan = Math.ceil(
 					( element.scrollHeight + rowGap ) / rowPitch
 				);
-				let newSpan = rect.rowSpan;
-				while ( newSpan < neededSpan ) {
-					const candidate = new GridRect( {
-						columnStart: rect.columnStart,
-						rowStart: rect.rowStart,
-						columnSpan: rect.columnSpan,
-						rowSpan: newSpan + 1,
-					} );
-					const collides = [ ...rects ].some(
-						( [ otherId, otherRect ] ) =>
-							otherId !== childId &&
-							otherRect.intersectsRect( candidate )
-					);
-					if ( collides ) {
-						break;
-					}
-					newSpan++;
-				}
+				const newSpan = Math.max( rect.rowSpan, neededSpan );
 				if ( newSpan === rect.rowSpan ) {
 					continue;
 				}
