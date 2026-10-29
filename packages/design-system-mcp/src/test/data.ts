@@ -3,14 +3,19 @@ import {
 	getComponents,
 	getComponentDetail,
 	getDesignTokens,
+	getPatternDetail,
+	getPatterns,
 	resetCache,
 } from '../data';
 import manifestFixture from './fixtures/manifest.json';
+import docsManifestFixture from './fixtures/docs-manifest.json';
 
 const MANIFEST_URL =
 	'https://wordpress.github.io/gutenberg/manifests/components.json';
 const TOKENS_URL =
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
+const DOCS_MANIFEST_URL =
+	'https://wordpress.github.io/gutenberg/manifests/docs.json';
 
 const originalFetch = globalThis.fetch;
 
@@ -171,6 +176,82 @@ describe( 'data', () => {
 			await expect( getDesignTokens() ).rejects.toThrow(
 				'Failed to fetch design tokens'
 			);
+		} );
+	} );
+
+	describe( 'getPatterns', () => {
+		it( 'should return every pattern in the docs manifest', async () => {
+			mockFetchResponses( {
+				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
+			} );
+
+			expect( await getPatterns() ).toMatchObject( [
+				{
+					slug: 'destructive-actions',
+					title: 'Destructive Actions',
+					description:
+						'How to present actions that remove or delete content.',
+				},
+				{
+					slug: 'error-messages',
+					title: 'Error Messages',
+					description: 'How to write an error message.',
+				},
+			] );
+		} );
+
+		it( 'should cache the manifest across calls', async () => {
+			mockFetchResponses( {
+				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
+			} );
+
+			await getPatterns();
+			await getPatternDetail( 'error-messages' );
+
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should throw on fetch failure', async () => {
+			mockFetchResponses( {
+				[ DOCS_MANIFEST_URL ]: { ok: false, body: null },
+			} );
+
+			await expect( getPatterns() ).rejects.toThrow(
+				'Failed to fetch docs manifest'
+			);
+		} );
+	} );
+
+	describe( 'getPatternDetail', () => {
+		it( 'should return the document for a slug', async () => {
+			mockFetchResponses( {
+				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
+			} );
+
+			expect( await getPatternDetail( 'error-messages' ) ).toEqual( {
+				slug: 'error-messages',
+				title: 'Error Messages',
+				description: 'How to write an error message.',
+				content: '# Error Messages\n\nHow to write an error message.',
+			} );
+		} );
+
+		it( 'should ignore casing and surrounding space in the slug', async () => {
+			mockFetchResponses( {
+				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
+			} );
+
+			expect(
+				await getPatternDetail( '  Error-Messages ' )
+			).toMatchObject( { slug: 'error-messages' } );
+		} );
+
+		it( 'should return null for an unknown pattern', async () => {
+			mockFetchResponses( {
+				[ DOCS_MANIFEST_URL ]: { ok: true, body: docsManifestFixture },
+			} );
+
+			expect( await getPatternDetail( 'nope' ) ).toBeNull();
 		} );
 	} );
 } );

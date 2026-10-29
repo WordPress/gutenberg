@@ -32,6 +32,11 @@ import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
  */
 const CONFIG = [
 	{
+		componentIdMatcher: /.*/,
+		ltr: [ designTokens ],
+		rtl: [ designTokens ],
+	},
+	{
 		componentIdMatcher: /^playground-/,
 		ltr: [
 			componentsLtr,
@@ -73,8 +78,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^dataviews-/,
-		ltr: [ designTokens, componentsLtr, dataviewsLtr ],
-		rtl: [ designTokens, componentsRtl, dataviewsRtl ],
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
 	},
 	{
 		componentIdMatcher: /^fields-/,
@@ -83,13 +88,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^admin-ui-/,
-		ltr: [ designTokens, componentsLtr ],
-		rtl: [ designTokens, componentsRtl ],
-	},
-	{
-		componentIdMatcher: /^grid-/,
-		ltr: [ designTokens ],
-		rtl: [ designTokens ],
+		ltr: [ componentsLtr ],
+		rtl: [ componentsRtl ],
 	},
 	{
 		// Dashboard stories include form controls and the command palette.
@@ -98,19 +98,9 @@ const CONFIG = [
 		rtl: [ componentsRtl, commandsRtl, dataviewsRtl ],
 	},
 	{
-		componentIdMatcher: /^tokens-/,
-		ltr: [ designTokens ],
-		rtl: [ designTokens ],
-	},
-	{
 		componentIdMatcher: /^mediaeditor-/,
 		ltr: [ componentsLtr, mediaEditorLtr ],
 		rtl: [ componentsRtl, mediaEditorRtl ],
-	},
-	{
-		componentIdMatcher: /^design-system-/,
-		ltr: [ designTokens ],
-		rtl: [ designTokens ],
 	},
 	{
 		componentIdMatcher: /^design-system-patterns-/,

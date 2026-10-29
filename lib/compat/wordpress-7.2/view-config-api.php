@@ -87,6 +87,43 @@ function _gutenberg_remove_stale_fields_from_wp_template_view_config( $data ) {
 }
 
 /**
+ * Updates the `wp_block` view configuration for the pattern author.
+ *
+ * Patterns support `author` since 7.2, so the "My patterns" view, which lists
+ * every user pattern regardless of its author, is renamed to "Site patterns".
+ * Its `my-patterns` slug is kept so existing links still work. The author
+ * column of the table layout is aligned to the start, like on pages, because
+ * the integer field would otherwise align its header to the end.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_wp_block_view_config_for_author( $data ) {
+	return $data->merge(
+		array(
+			'default_layouts' => array(
+				'table' => array(
+					'layout' => array(
+						'styles' => array(
+							'author' => array(
+								'align' => 'start',
+							),
+						),
+					),
+				),
+			),
+			'view_list'       => array(
+				array(
+					'title' => __( 'Site patterns', 'gutenberg' ),
+					'slug'  => 'my-patterns',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
  * Provides the view configuration for the `wp_navigation` post type.
  *
  * Core has no callback for this post type, so this is a base definition
@@ -321,6 +358,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
 		'_gutenberg_remove_stale_fields_from_wp_template_view_config',
+		6,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_block' ),
+		'_gutenberg_update_wp_block_view_config_for_author',
 		6,
 		1
 	);

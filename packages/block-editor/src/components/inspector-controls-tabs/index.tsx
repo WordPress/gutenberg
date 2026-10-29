@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import type { InspectorControlsTabsProps } from './types';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 export default function InspectorControlsTabs( {
 	blockName,
@@ -157,47 +157,53 @@ export default function InspectorControlsTabs( {
 
 	return (
 		<div className="block-editor-block-inspector__tabs">
-			<Tabs
+			<WCTabs
 				selectedTabId={ selectedTabId }
 				onSelect={ handleTabSelect }
 				key={ clientId }
 			>
-				<Tabs.TabList>
+				<WCTabs.TabList>
 					{ tabs.map( ( tab ) =>
 						showIconLabels ? (
-							<Tabs.Tab key={ tab.name } tabId={ tab.name }>
+							<WCTabs.Tab key={ tab.name } tabId={ tab.name }>
 								{ tab.title }
-							</Tabs.Tab>
+							</WCTabs.Tab>
 						) : (
 							<Tooltip.Root key={ tab.name }>
-								<Tabs.Tab
+								<WCTabs.Tab
 									tabId={ tab.name }
 									aria-label={ tab.title }
 									render={ <Tooltip.Trigger /> }
 								>
 									<WCIcon icon={ tab.icon } />
-								</Tabs.Tab>
+								</WCTabs.Tab>
 								<Tooltip.Popup>{ tab.title }</Tooltip.Popup>
 							</Tooltip.Root>
 						)
 					) }
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+				</WCTabs.TabList>
+				<WCTabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
 					<ContentTab
 						contentClientIds={ contentClientIds }
 						onSwitchToListView={ switchToListView }
 						hasListViewTab={ hasListViewTab }
 					/>
 					<InspectorControls.Slot group="content" />
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
+				</WCTabs.TabPanel>
+				<WCTabs.TabPanel
+					tabId={ TAB_LIST_VIEW.name }
+					focusable={ false }
+				>
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
+				</WCTabs.TabPanel>
+				<WCTabs.TabPanel
+					tabId={ TAB_SETTINGS.name }
+					focusable={ false }
+				>
 					<SettingsTab showAdvancedControls={ !! blockName } />
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
+				</WCTabs.TabPanel>
+				<WCTabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
 					<StylesTab
 						blockName={ blockName }
 						clientId={ clientId }
@@ -205,8 +211,8 @@ export default function InspectorControlsTabs( {
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
 					/>
-				</Tabs.TabPanel>
-			</Tabs>
+				</WCTabs.TabPanel>
+			</WCTabs>
 		</div>
 	);
 }
