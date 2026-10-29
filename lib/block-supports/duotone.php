@@ -72,6 +72,7 @@ add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migr
 function gutenberg_tinycolor_bound01( $n, $max ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
 
+	// @phpstan-ignore identical.alwaysFalse, booleanAnd.alwaysFalse (An int is never identical to a float, so '1.0' is not treated as 100% as in TinyColor. Not fixed since the function is deprecated.)
 	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
 		$n = '100%';
 	}
@@ -79,6 +80,7 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
 	$n = min( $max, max( 0, (float) $n ) );
 
 	// Automatically convert percentage into number.
+	// @phpstan-ignore identical.alwaysFalse, booleanAnd.alwaysFalse ($n was already cast to a number, so percentages are never converted as in TinyColor. Not fixed since the function is deprecated.)
 	if ( 'string' === gettype( $n ) && str_contains( $n, '%' ) ) {
 		$n = (int) ( $n * $max ) / 100;
 	}
@@ -185,6 +187,7 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 	$s = gutenberg_tinycolor_bound01( $hsl_color['s'], 100 );
 	$l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
 
+	// @phpstan-ignore identical.alwaysFalse (The saturation is a float, so this is never true, but the formula below yields the same gray when it is 0. Not fixed since the function is deprecated.)
 	if ( 0 === $s ) {
 		// Achromatic.
 		$r = $l;
@@ -356,6 +359,7 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 
 	// The JS color picker considers the string "transparent" to be a hex value,
 	// so we need to handle it here as a special case.
+	// @phpstan-ignore return.missing (An unrecognized color string falls through and returns null. Not fixed since the function is deprecated.)
 	if ( 'transparent' === $color_str ) {
 		return array(
 			'r' => 0,
@@ -428,5 +432,6 @@ function gutenberg_register_duotone_support( $block_type ) {
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );
-	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block );
+	$wp_block = new WP_Block( $block );
+	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block );
 }

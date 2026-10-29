@@ -27,12 +27,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 *
 	 * @since 7.2.0
 	 *
-	 * @return string[] Hex keys for heart, celebration, smile, eyes and rocket.
+	 * @return string[] Hex keys for thumbs up, plus, heart, celebration, smile, eyes and rocket.
 	 *
 	 * @phpstan-return non-empty-list<lowercase-string&non-falsy-string>
 	 */
 	private static function get_note_reaction_keys(): array {
-		return array( '2764', '1f389', '1f604', '1f440', '1f680' );
+		return array( '1f44d', '2795', '2764', '1f389', '1f604', '1f440', '1f680' );
 	}
 	// END CHANGE.
 
