@@ -18,7 +18,7 @@
 
 ### Deprecations
 
--   `CustomGradientPicker`: Deprecate in favor of `GradientPicker` with `gradients={ [] }` and `clearable={ false }`.
+-   `CustomGradientPicker`: Deprecate in favor of `GradientPicker` with `gradients={ [] }` and `clearable={ false }` ([#85953](https://github.com/WordPress/gutenberg/pull/85953)).
 
 ### Bug Fixes
 
