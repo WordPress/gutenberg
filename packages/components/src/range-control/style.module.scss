@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
@@ -191,16 +192,8 @@
 		0 4px 4px rgba(0, 0, 0, 0.01);
 	@include thumb-color;
 
-	&:where(.is-focused)::before {
-		content: " ";
-		position: absolute;
-		background-color: $components-color-accent;
-		opacity: 0.4;
-		border-radius: $radius-round;
-		height: 20px;
-		width: 20px;
-		top: -4px;
-		left: -4px; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	&:where(.is-focused) {
+		@include outset-ring__focus();
 	}
 }
 
@@ -309,8 +302,5 @@
 		&:where(.is-disabled) {
 			background: GrayText;
 		}
-	}
-	.thumb:where(.is-focused)::before {
-		background: GrayText;
 	}
 }
