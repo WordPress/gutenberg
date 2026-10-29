@@ -77,7 +77,9 @@ test.describe( 'Comments Count in the page preview', () => {
 			name: 'Block: Comments Count',
 		} );
 		await expect( commentsCount ).toHaveText( '0' );
-		expect( heldRequests ).toBe( 1 );
+		// The block shows 0 before its resolver, started in a timeout, sends
+		// the request.
+		await expect.poll( () => heldRequests ).toBe( 1 );
 
 		await page
 			.getByRole( 'button', { name: 'Page B', exact: true } )
