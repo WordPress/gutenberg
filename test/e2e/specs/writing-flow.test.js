@@ -148,8 +148,33 @@ describe( 'adding blocks', () => {
 		await pressWithModifier( 'primary', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Backspace to remove the content in this block, resetting it.
+		/*
+		 * Backspace to remove the content in this block, resetting it. This
+		 * replaces the block with a new default block, whose RichText only
+		 * learns where the caret is from the next `selectionchange` event.
+		 * Wait for that event in the new block, or the bold shortcut below
+		 * can run before RichText knows the caret position, and the text
+		 * typed after it is not formatted.
+		 */
+		await page.evaluate( () => {
+			const previousActiveElement = document.activeElement;
+			window.hasSelectionChangedInNewBlock = false;
+			document.addEventListener( 'selectionchange', function onSelectionChange() {
+				const { activeElement } = document;
+				const { anchorNode } = window.getSelection();
+
+				if (
+					activeElement !== previousActiveElement &&
+					activeElement.isContentEditable &&
+					activeElement.contains( anchorNode )
+				) {
+					window.hasSelectionChangedInNewBlock = true;
+					document.removeEventListener( 'selectionchange', onSelectionChange );
+				}
+			} );
+		} );
 		await page.keyboard.press( 'Backspace' );
+		await page.waitForFunction( () => window.hasSelectionChangedInNewBlock );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
