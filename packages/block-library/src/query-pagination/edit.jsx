@@ -5,12 +5,11 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
 import { QueryPaginationLabelControl } from './query-pagination-label-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -37,24 +36,9 @@ export default function QueryPaginationEdit( {
 		},
 		[ clientId ]
 	);
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps );
-
-	// Always show label text if paginationArrow is set to 'none'.
-	useEffect( () => {
-		if ( paginationArrow === 'none' && ! showLabel ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { showLabel: true } );
-		}
-	}, [
-		paginationArrow,
-		setAttributes,
-		showLabel,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
 
 	return (
 		<>
@@ -74,14 +58,23 @@ export default function QueryPaginationEdit( {
 							hasValue={ () => paginationArrow !== 'none' }
 							label={ __( 'Pagination arrow' ) }
 							onDeselect={ () =>
-								setAttributes( { paginationArrow: 'none' } )
+								setAttributes( {
+									paginationArrow: 'none',
+									showLabel: true,
+								} )
 							}
 							isShownByDefault
 						>
 							<QueryPaginationArrowControls
 								value={ paginationArrow }
 								onChange={ ( value ) => {
-									setAttributes( { paginationArrow: value } );
+									// Without an arrow, the label is all the links show.
+									setAttributes( {
+										paginationArrow: value,
+										...( value === 'none' && {
+											showLabel: true,
+										} ),
+									} );
 								} }
 							/>
 						</ToolsPanelItem>
