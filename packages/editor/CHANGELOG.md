@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+-   Add a keyboard shortcut, `access + v`, that cycles the preview through Desktop, Tablet, and Mobile ([#85908](https://github.com/WordPress/gutenberg/pull/85908)).
 
 ### Bug Fixes
 
