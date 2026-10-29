@@ -355,6 +355,39 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Updates a comment.
+	 *
+	 * Extends core to reject changes to a deleted note, other than restoring it.
+	 * Another session can delete a note while it is still open here. Changing
+	 * its status would bring it back without the replies trashed along with
+	 * it, as reopening it with a reply does, and an edited note stays hidden.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
+	 */
+	public function update_item( $request ) {
+		// START CHANGE: Only allow restoring a deleted note.
+		$comment = $this->get_comment( $request['id'] );
+		if (
+			! is_wp_error( $comment ) &&
+			'note' === $comment->comment_type &&
+			in_array( $comment->comment_approved, array( 'trash', 'spam' ), true ) &&
+			! in_array( $request['status'], array( 'untrash', 'unspam' ), true )
+		) {
+			return new WP_Error(
+				'rest_comment_invalid_status',
+				__( 'This note was deleted, so it could not be updated.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+		// END CHANGE.
+
+		return parent::update_item( $request );
+	}
+
+	/**
 	 * Checks if a given request has access to create a comment.
 	 *
 	 * Copied from core, extended to the 'reaction' type. A reaction can only
@@ -521,7 +554,8 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * Creates a comment.
 	 *
 	 * Copied from core, extended to support the 'reaction' comment type
-	 * with validation for parent note, valid emoji hex keys, and uniqueness.
+	 * with validation for parent note, valid emoji hex keys, and uniqueness,
+	 * and to reject a note reply to a deleted note.
 	 *
 	 * @since 7.2.0
 	 *
@@ -686,6 +720,24 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 
 			$reaction_key = $emoji_key;
+		}
+		// END CHANGE.
+
+		// START CHANGE: Reject a note reply to a deleted note.
+		/*
+		 * Another session can delete a note while a reply to it is being
+		 * written. Stored under the deleted note, the reply would be lost:
+		 * the editor no longer shows its thread. See also update_item().
+		 */
+		if ( 'note' === $request['type'] && ! empty( $request['parent'] ) ) {
+			$parent_note = get_comment( $request['parent'] );
+			if ( ! $parent_note || in_array( $parent_note->comment_approved, array( 'trash', 'spam' ), true ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'This note was deleted, so your reply could not be added.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 		// END CHANGE.
 
