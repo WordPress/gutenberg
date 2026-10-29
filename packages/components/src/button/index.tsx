@@ -16,6 +16,7 @@ import {
 	isValidElement,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
+import { Spinner } from '@wordpress/ui';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
@@ -264,6 +265,12 @@ export const Button = forwardRef( function UnforwardedButton(
 			{ children }
 			{ icon && iconPosition === 'right' && (
 				<Icon icon={ icon } size={ iconSize } />
+			) }
+			{ isBusy && (
+				<Spinner
+					className="components-button__busy-spinner"
+					data-testid="components-button-busy-spinner"
+				/>
 			) }
 		</>
 	);

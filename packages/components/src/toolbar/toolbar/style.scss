@@ -64,7 +64,7 @@
 			}
 		}
 
-		svg {
+		svg:where(:not(.components-button__busy-spinner)) {
 			position: relative;
 
 			// Center the icon inside.
