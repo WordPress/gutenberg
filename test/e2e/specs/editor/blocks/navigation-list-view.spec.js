@@ -655,6 +655,50 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeFocused();
 	} );
 
+	test( 'can create a new menu again after creating one fails', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		// Start from one menu, so the menu list ends in "Create new Menu".
+		await requestUtils.deleteAllMenus();
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		// Fail the first request that creates a menu.
+		let failedRequests = 0;
+		await page.route( '**/wp/v2/navigation**', async ( route ) => {
+			if ( route.request().method() === 'POST' && failedRequests === 0 ) {
+				failedRequests++;
+				await route.fulfill( {
+					status: 500,
+					json: { code: 'test_error', message: 'Test error' },
+				} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'tabpanel' )
+			.getByRole( 'button', { name: 'Test Menu' } )
+			.click();
+		await page.keyboard.press( 'ArrowUp' );
+		const createNewMenu = page.getByRole( 'menuitem', {
+			name: 'Create new Menu',
+		} );
+		await expect( createNewMenu ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+		await expect( page.getByTestId( 'snackbar' ) ).toHaveText(
+			'Failed to create Navigation Menu.'
+		);
+		expect( failedRequests ).toBe( 1 );
+
+		await expect( createNewMenu ).toBeEnabled();
+	} );
+
 	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
 		page,
 		editor,

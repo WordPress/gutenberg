@@ -125,7 +125,7 @@ const PlaylistEdit = ( {
 		},
 		[ createErrorNotice ]
 	);
-	const [ currentTrackClientId, setCurrentTrackClientId ] = useState( null );
+	const [ selectedTrackClientId, setCurrentTrackClientId ] = useState( null );
 
 	const { innerBlockTracks } = useSelect(
 		( select ) => {
@@ -156,21 +156,12 @@ const PlaylistEdit = ( {
 		[ validTracks ]
 	);
 
-	useEffect( () => {
-		if ( validTracks.length === 0 ) {
-			if ( currentTrackClientId !== null ) {
-				setCurrentTrackClientId( null );
-			}
-			return;
-		}
-
-		const currentTrackExists = validTracks.some(
-			( block ) => block.clientId === currentTrackClientId
-		);
-		if ( ! currentTrackExists ) {
-			setCurrentTrackClientId( validTracks[ 0 ].clientId );
-		}
-	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+	// Fall back to the first track, or none, when the selected one is gone.
+	const currentTrackClientId = validTracks.some(
+		( block ) => block.clientId === selectedTrackClientId
+	)
+		? selectedTrackClientId
+		: ( validTracks[ 0 ]?.clientId ?? null );
 
 	// Clean up placeholder tracks when reverting back to playlist placeholder state
 	useEffect( () => {

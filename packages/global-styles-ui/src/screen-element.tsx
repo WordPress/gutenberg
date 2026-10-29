@@ -161,7 +161,6 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -171,7 +170,6 @@ function ElementStylePanels( {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -180,7 +178,6 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -189,7 +186,6 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ canEditCSS && ! isRoot && (
