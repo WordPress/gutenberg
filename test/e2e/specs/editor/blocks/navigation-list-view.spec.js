@@ -1058,10 +1058,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			popover.getByRole( 'heading', { name: 'Settings' } )
 		).toBeVisible();
-		const linkInput = popover.getByRole( 'textbox', {
-			name: 'Social profile link',
-		} );
-		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
+		const linkButton = popover.getByRole( 'button', { name: /^Link/ } );
+		await expect( linkButton ).toHaveText( /wordpress\.org/ );
 		const textInput = popover.getByRole( 'textbox', { name: 'Text' } );
 		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
 		await expect(
@@ -1070,7 +1068,11 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		// Edits reach the block.
 		await textInput.fill( 'WP' );
-		await linkInput.fill( 'https://wordpress.org/news/' );
+		await linkButton.click();
+		await page
+			.getByRole( 'combobox', { name: 'Paste or type URL' } )
+			.fill( 'https://wordpress.org/news/' );
+		await page.keyboard.press( 'Enter' );
 
 		await expect(
 			page.getByRole( 'link', { name: 'View' } )
