@@ -46,12 +46,17 @@
 	min-width: 0;
 
 	// Forced colors draw the outline and minimal variants alike, so the
-	// pressed pill needs its own fill. Disabled pills keep `GrayText`, which
-	// lacks contrast on `SelectedItem`.
-	&[aria-pressed="true"]:not([data-disabled]) {
+	// pressed pill needs its own fill.
+	&[aria-pressed="true"] {
 		@media (forced-colors: active) {
 			background-color: SelectedItem;
 			color: SelectedItemText;
+
+			// A resolved note's pills stay in the disabled `GrayText`.
+			&[data-disabled] {
+				background-color: GrayText;
+				color: Canvas;
+			}
 
 			// Otherwise the text sits on a `Canvas` backplate.
 			> * {
