@@ -65,7 +65,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		version: '3.7',
 		services: {
 			mysql: {
-				image: 'mariadb',
+				image: 'mariadb:${WP_ENV_MARIADB_VERSION:-latest}',
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 				},
