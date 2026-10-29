@@ -1,8 +1,9 @@
 import { useMemo } from '@wordpress/element';
 import {
-	getStyle,
 	getValueFromVariable,
+	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
+import { unlock } from '../../lock-unlock';
 import { getStyleLabel } from './style-labels';
 import {
 	formatStyleValue,
@@ -11,6 +12,8 @@ import {
 	formatSpacingShorthand,
 	formatBlockGap,
 } from './format-style-value';
+
+const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Turns a raw style value into readable text, using the row's `format` hint so
@@ -44,28 +47,33 @@ function formatReviewValue( format, value, resolve ) {
  * current Global Styles value, and readable versions of the current and new
  * values.
  *
- * @param {Array}  rows   Grouped rows from `useChangesToPush`.
- * @param {Object} merged Merged Global Styles config.
- * @param {string} name   Block name.
+ * @param {Array}    rows       Grouped rows from `useChangesToPush`.
+ * @param {Object}   merged     Merged Global Styles config.
+ * @param {string}   name       Block name.
+ * @param {string[]} [elements] Root-level element layers that paint the block,
+ *                              low to high precedence (e.g. `[ 'button' ]`).
  *
  * @return {Array} Rows with `label`, `currentValue`, `formattedCurrentValue`
  *                 and `formattedNewValue` added.
  */
-export function useReviewRows( rows, merged, name ) {
+export function useReviewRows( rows, merged, name, elements ) {
 	return useMemo( () => {
 		// Swaps preset values (e.g. `var:preset|spacing|40`) for their real
 		// size so spacing reads as a size rather than a preset name.
 		const resolve = ( value ) =>
 			getValueFromVariable( merged, name, value );
 
+		// Includes values the block type inherits from root and element styles.
+		// Presets stay encoded so they show by name, like the new value.
+		const { value: resolvedStyle } = resolveStyle( merged, {
+			blockName: name,
+			elements,
+		} );
+
 		return rows.map( ( row ) => {
-			const currentValue = getStyle(
-				merged,
-				row.primaryPath.join( '.' ),
-				name,
-				// Keep preset values encoded (e.g. `var:preset|color|vivid-red`)
-				// so they show by name, matching the new value.
-				false
+			const currentValue = row.primaryPath.reduce(
+				( value, key ) => value?.[ key ],
+				resolvedStyle
 			);
 			return {
 				...row,
@@ -83,5 +91,5 @@ export function useReviewRows( rows, merged, name ) {
 				),
 			};
 		} );
-	}, [ rows, merged, name ] );
+	}, [ rows, merged, name, elements ] );
 }

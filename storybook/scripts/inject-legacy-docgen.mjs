@@ -23,10 +23,24 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import assert from 'node:assert';
 
+/**
+ * A manifest component with engine-specific prop data and recursive
+ * subcomponents, which Storybook's `ComponentManifest` does not type.
+ *
+ * @typedef {Omit<import('storybook/internal/types').ComponentManifest, 'subcomponents'> & {
+ *   reactComponentMeta?: { props?: Record<string,{ type?: unknown }> },
+ *   reactDocgen?: { props?: Record<string,unknown> },
+ *   subcomponents?: Record<string,WPManifestNode>,
+ * }} WPManifestNode
+ */
+
 const manifestPath = process.argv[ 2 ];
 
 assert( manifestPath, 'Manifest path is required' );
 
+/**
+ * @param {WPManifestNode} component A component or subcomponent to adapt.
+ */
 function addLegacyShape( component ) {
 	if ( component.reactComponentMeta && ! component.reactDocgen ) {
 		component.reactDocgen = {
@@ -50,6 +64,7 @@ function addLegacyShape( component ) {
 }
 
 const raw = await readFile( manifestPath, 'utf8' );
+/** @type {{ components?: Record<string,WPManifestNode> }} */
 const manifest = JSON.parse( raw );
 for ( const component of Object.values( manifest.components ?? {} ) ) {
 	addLegacyShape( component );
