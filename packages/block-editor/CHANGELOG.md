@@ -2,17 +2,26 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
+
 ### Enhancements
 
+-   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   DimensionsTool: Show an icon in the shape of each ratio next to the aspect ratio options and the selected value ([#85812](https://github.com/WordPress/gutenberg/pull/85812)).
 
 ### Bug Fixes
 
 -   InnerBlocks: Keep the block list mounted and preserve block identities when adopting a controlled data source ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
+-   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
+-   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
@@ -40,6 +49,7 @@
 -   Convert the inserter hooks, patterns tab and media tab to TypeScript ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 -   Convert the inserter components, the block autocompleter, the change design control and the block parent selector to TypeScript ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 -   Convert the grid visualizer, the entry points and the remaining stories and tests to TypeScript ([#85035](https://github.com/WordPress/gutenberg/pull/85035)).
+-   Remove the `gutenberg-global-styles-inheritance-ui` experiment and its block inspector indicators ([#85884](https://github.com/WordPress/gutenberg/pull/85884)).
 
 ## 19.0.0 (2026-10-20)
 

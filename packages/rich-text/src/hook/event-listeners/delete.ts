@@ -1,36 +1,25 @@
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { remove } from '../../remove';
-import { subscribeOwnedListener } from '../../subscribe-owned-listener';
-import type { EventListenerEffect } from '../types';
+import type { RichTextField } from '../types';
 
-const deleteHandler: EventListenerEffect = ( props ) => ( element ) => {
-	function onKeyDown( event: KeyboardEvent ) {
-		const { keyCode } = event;
+export function onKeyDown( field: RichTextField, event: KeyboardEvent ) {
+	const { keyCode } = event;
 
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
-			return;
-		}
-
-		const { createRecord, handleChange } = props.current;
-		const currentValue = createRecord();
-		const { start, end, text } = currentValue;
-
-		// Always handle full content deletion ourselves.
-		if ( start === 0 && end !== 0 && end === text.length ) {
-			handleChange( remove( currentValue ) );
-			event.preventDefault();
-		}
+	if ( event.defaultPrevented ) {
+		return;
 	}
 
-	return subscribeOwnedListener(
-		element,
-		'keydown',
-		onKeyDown as EventListener
-	);
-};
+	if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+		return;
+	}
 
-export default deleteHandler;
+	const { createRecord, handleChange } = field.props.current;
+	const currentValue = createRecord();
+	const { start, end, text } = currentValue;
+
+	// Always handle full content deletion ourselves.
+	if ( start === 0 && end !== 0 && end === text.length ) {
+		handleChange( remove( currentValue ) );
+		event.preventDefault();
+	}
+}
