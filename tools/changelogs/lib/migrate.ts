@@ -4,6 +4,10 @@ import path from 'node:path';
 import yaml from 'js-yaml';
 import semver from 'semver';
 import { loadChangieConfig } from './config.ts';
+import {
+	loadUnreleasedFragments,
+	previewUnreleasedFragments,
+} from './preview.ts';
 
 export interface UnreleasedEntry {
 	kind: string;
@@ -362,10 +366,6 @@ export function rollbackPackageFromChangie(
 		changieConfig.changesDir || '.changes'
 	);
 	const projectChangesDir = path.resolve( changesDir, normalized );
-	const unreleasedDir = path.resolve(
-		changesDir,
-		changieConfig.unreleasedDir || 'unreleased'
-	);
 
 	if ( ! fs.existsSync( projectChangesDir ) ) {
 		throw new Error(
@@ -387,54 +387,18 @@ export function rollbackPackageFromChangie(
 		fs.readFileSync( path.join( projectChangesDir, f ), 'utf8' ).trim()
 	);
 
-	// 2. Read any unreleased fragments for this project
-	const fragments: UnreleasedEntry[] = [];
-	if ( fs.existsSync( unreleasedDir ) ) {
-		const fragmentFiles = fs
-			.readdirSync( unreleasedDir )
-			.filter( ( f ) => f.endsWith( '.yaml' ) );
-		for ( const f of fragmentFiles ) {
-			const filePath = path.join( unreleasedDir, f );
-			const parsed = yaml.safeLoad(
-				fs.readFileSync( filePath, 'utf8' )
-			) as any;
-			if ( parsed && parsed.project === normalized ) {
-				fragments.push( {
-					kind: parsed.kind,
-					body: parsed.body,
-					pr: parsed.custom?.PR
-						? parseInt( parsed.custom.PR, 10 )
-						: 0,
-				} );
-			}
-		}
-	}
+	// 2. Validate and compile pending entries before writing or removing files.
+	const fragments = loadUnreleasedFragments( repoRoot ).filter(
+		( fragment ) => fragment.project === normalized
+	);
+	const unreleased = fragments.length
+		? previewUnreleasedFragments( normalized, repoRoot )
+		: '## Unreleased\n';
 
-	// 3. Assemble standard CHANGELOG.md
+	// 3. Append published history without re-rendering its contents.
 	let output =
-		'<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->\n\n## Unreleased\n';
-	if ( fragments.length > 0 ) {
-		const groupedByKind = new Map< string, UnreleasedEntry[] >();
-		for ( const frag of fragments ) {
-			const kind = frag.kind || 'Enhancements';
-			if ( ! groupedByKind.has( kind ) ) {
-				groupedByKind.set( kind, [] );
-			}
-			groupedByKind.get( kind )!.push( frag );
-		}
-
-		for ( const [ kind, items ] of groupedByKind.entries() ) {
-			output += `\n### ${ kind }\n\n`;
-			for ( const item of items ) {
-				const prLink = item.pr
-					? ` ([#${ item.pr }](https://github.com/WordPress/gutenberg/pull/${ item.pr })).`
-					: '.';
-				output += `-   ${ item.body }${ prLink }\n`;
-			}
-		}
-	} else {
-		output += '\n';
-	}
+		'<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->\n\n' +
+		unreleased;
 
 	for ( const vContent of versionContents ) {
 		output += `\n${ vContent }\n`;

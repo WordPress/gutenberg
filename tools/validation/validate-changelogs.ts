@@ -155,7 +155,7 @@ function validateSubsectionHeadings(
 
 /**
  * Requires Unreleased `###` titles to be from the known list, appear once, and
- * follow `ALLOWED_SECTIONS` order.
+ * follow `ALLOWED_SECTIONS` order, except Stable Release may appear anywhere.
  *
  * @param unreleased Unreleased section.
  * @param filePath   Path for error messages.
@@ -193,7 +193,7 @@ function validateSectionTitles(
 		}
 		seenSections.add( title );
 
-		if ( index !== -1 ) {
+		if ( index !== -1 && title !== 'Stable Release' ) {
 			if ( index < previousIndex ) {
 				errors.push(
 					`${ filePath }:${ lineNo }: Unreleased section "${ title }" is out of order. Expected order: ${ ALLOWED_SECTIONS.join(

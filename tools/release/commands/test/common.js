@@ -4,6 +4,53 @@ const require = createRequire( import.meta.url );
 const { calculateVersionBumpFromChangelog } = require( '../common' );
 
 describe( 'calculateVersionBumpFromChangelog', () => {
+	it.each( [
+		'### Stable Release',
+		'Note: This package is now a stable release.',
+	] )(
+		'promotes a pre-1.0 package using the Unreleased marker %s',
+		( marker ) => {
+			expect(
+				calculateVersionBumpFromChangelog(
+					[
+						'## Unreleased',
+						'### Breaking Changes',
+						'- Update API.',
+						marker,
+						'## 0.25.0',
+					],
+					'patch',
+					'0.25.0'
+				)
+			).toBe( 'major' );
+		}
+	);
+
+	it( 'ignores promotion notes in published history and for stable packages', () => {
+		expect(
+			calculateVersionBumpFromChangelog(
+				[
+					'## Unreleased',
+					'### Bug Fixes',
+					'- Fix API.',
+					'## 1.0.0',
+					'Note: This package is now a stable release.',
+				],
+				'patch',
+				'0.25.0'
+			)
+		).toBe( 'patch' );
+		expect(
+			calculateVersionBumpFromChangelog(
+				[
+					'## Unreleased',
+					'Note: This package is now a stable release.',
+				],
+				'patch',
+				'1.0.0'
+			)
+		).toBeNull();
+	} );
 	it( 'promotes to 1.0.0 when breaking changes precede Stable Release', () => {
 		expect(
 			calculateVersionBumpFromChangelog(
