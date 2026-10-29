@@ -8,6 +8,12 @@
 
 ## 1.2.0 (2024-02-21)
 
+## 1.1.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 1.1.0 (2024-02-09)
 
 ### New Features
