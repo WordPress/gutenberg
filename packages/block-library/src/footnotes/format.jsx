@@ -190,7 +190,7 @@ export const format = {
 
 		return (
 			<RichTextToolbarButton
-				name={ formatName }
+				name="footnote"
 				icon={ icon }
 				title={ __( 'Footnote' ) }
 				onClick={ onClick }
