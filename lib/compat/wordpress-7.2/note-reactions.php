@@ -230,8 +230,8 @@ function gutenberg_get_note_reaction_ids( WP_Comment $note, string $status = 'an
  *
  * @phpstan-param numeric-string $comment_id
  */
-function gutenberg_delete_note_reactions( $comment_id, $comment ): void {
-	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+function gutenberg_delete_note_reactions( $comment_id, ?WP_Comment $comment ): void {
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
 		return;
 	}
 
@@ -264,8 +264,8 @@ add_action( 'delete_comment', 'gutenberg_delete_note_reactions', 10, 2 );
  *
  * @phpstan-param numeric-string $comment_id
  */
-function gutenberg_trash_note_reactions( $comment_id, $comment ): void {
-	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+function gutenberg_trash_note_reactions( $comment_id, ?WP_Comment $comment ): void {
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
 		return;
 	}
 
