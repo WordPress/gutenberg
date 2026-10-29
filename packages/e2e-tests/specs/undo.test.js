@@ -43,6 +43,8 @@ describe( 'undo', () => {
 
 	it( 'Should undo to expected level intervals', async () => {
 		await clickBlockAppender();
+		// Wait for the inserted block to be recorded as its own undo level before typing.
+		await page.waitForFunction( () => window.wp.data.select( 'core/editor' ).hasEditorUndo() );
 
 		await page.keyboard.type( 'This' );
 		await page.keyboard.press( 'Enter' );
