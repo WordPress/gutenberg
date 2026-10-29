@@ -404,11 +404,7 @@ export default function Image( {
 		onUrlChange: setPendingSwapUrl,
 	} );
 
-	const {
-		replaceBlocks,
-		toggleSelection,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -438,32 +434,17 @@ export default function Image( {
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	// If the image has an id but the attachment doesn't exist on this site,
-	// clear the id so Gutenberg treats the image as external.
+	// ignore the id so Gutenberg treats the image as external.
 	// This handles content copied between WordPress sites.
 	//
 	// Known limitation: if a different attachment with the same id happens to
 	// exist on the destination site, the lookup will succeed and the wrong
 	// local image will be used. URL matching could address this in a follow-up.
 	// See: https://github.com/WordPress/gutenberg/issues/74156
-	useEffect( () => {
-		if ( ! id || ! isSingleSelected ) {
-			return;
-		}
-		// Only clear for confirmed 404s. apiFetch throws the Response object
-		// for HTTP errors, so checking .status === 404 avoids incorrectly
-		// clearing the id on 403, 500, or network failures, which would
-		// cause data loss for valid local attachments.
-		if ( attachmentResolutionError?.status === 404 ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { id: undefined } );
-		}
-	}, [
-		id,
-		isSingleSelected,
-		attachmentResolutionError,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	// Only a confirmed 404 counts: 403, 500 or network failures don't mean the
+	// attachment is missing.
+	const attachmentId =
+		attachmentResolutionError?.status === 404 ? undefined : id;
 
 	/*
 	 * Externally hosted images can be uploaded to the media library. The
@@ -473,7 +454,7 @@ export default function Image( {
 	 */
 	const canUploadExternalImage =
 		isSingleSelected &&
-		isExternalImage( id, url ) &&
+		isExternalImage( attachmentId, url ) &&
 		!! getSettings()[ mediaSideloadFromUrlKey ];
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
@@ -626,7 +607,7 @@ export default function Image( {
 	}
 
 	const canEditImage =
-		id &&
+		attachmentId &&
 		naturalWidth &&
 		naturalHeight &&
 		imageEditing &&
@@ -881,7 +862,7 @@ export default function Image( {
 			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
 				<MediaReplaceFlow
-					mediaId={ id }
+					mediaId={ attachmentId }
 					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectImage }
@@ -981,7 +962,7 @@ export default function Image( {
 								isShownByDefault
 							>
 								<MediaControl
-									mediaId={ id }
+									mediaId={ attachmentId }
 									mediaUrl={ url }
 									alt={ alt }
 									filename={
@@ -1399,7 +1380,7 @@ export default function Image( {
 	 */
 	const setPostFeatureImage = () => {
 		editEntityRecord( 'postType', postType, postId, {
-			featured_media: id,
+			featured_media: attachmentId,
 		} );
 		createSuccessNotice( __( 'Post featured image updated.' ), {
 			type: 'snackbar',
@@ -1407,7 +1388,7 @@ export default function Image( {
 	};
 
 	const featuredImageControl =
-		! isDescendentOfQueryLoop && postId && id ? (
+		! isDescendentOfQueryLoop && postId && attachmentId ? (
 			<BlockSettingsMenuControls>
 				{ ( { canEdit, selectedClientIds } ) =>
 					canEdit &&

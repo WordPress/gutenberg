@@ -1,11 +1,6 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
-import {
-	createInterpolateElement,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { createInterpolateElement, useRef, useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	RangeControl,
@@ -46,14 +41,14 @@ const { mediaEditKey, openMediaEditorModalKey } = unlock(
 
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
+	attributes: { align, width, height, isLink, linkTarget },
 	isSelected,
 	setAttributes,
 	setLogo,
 	logoUrl,
 	siteUrl,
 	logoId,
-	iconId,
+	isIconSynced,
 	setIcon,
 	canUserEdit,
 } ) => {
@@ -62,8 +57,7 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const cropButtonRef = useRef();
-	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Check if we're in contentOnly mode
@@ -89,16 +83,6 @@ const SiteLogo = ( {
 			editMediaEntity: settings?.[ mediaEditKey ],
 			openMediaEditorModal: settings?.[ openMediaEditorModalKey ],
 		};
-	}, [] );
-
-	useEffect( () => {
-		// Turn the `Use as site icon` toggle off if it is on but the logo and icon have
-		// fallen out of sync. This can happen if the toggle is saved in the `on` position,
-		// but changes are later made to the site icon in the Customizer.
-		if ( shouldSyncIcon && logoId !== iconId ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { shouldSyncIcon: false } );
-		}
 	}, [] );
 
 	// Always apply modal updates as snackbar Undo may restore the original id.
@@ -308,7 +292,7 @@ const SiteLogo = ( {
 					{ canUserEdit && (
 						<ToolsPanelItem
 							isShownByDefault
-							hasValue={ () => !! shouldSyncIcon }
+							hasValue={ () => isIconSynced }
 							label={ __( 'Use as Site Icon' ) }
 							onDeselect={ () => {
 								setAttributes( { shouldSyncIcon: false } );
@@ -321,7 +305,7 @@ const SiteLogo = ( {
 									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
 								} }
-								checked={ !! shouldSyncIcon }
+								checked={ isIconSynced }
 								help={ syncSiteIconHelpText }
 							/>
 						</ToolsPanelItem>
@@ -438,6 +422,9 @@ export default function LogoEdit( {
 			siteIconId: _siteIconId,
 		};
 	}, [] );
+	// The site icon can be changed elsewhere, so the logo only syncs to it while
+	// they still match.
+	const isIconSynced = !! shouldSyncIcon && siteLogoId === siteIconId;
 	const { getSettings } = useSelect( blockEditorStore );
 	const [ temporaryURL, setTemporaryURL ] = useState();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -447,7 +434,7 @@ export default function LogoEdit( {
 	const setLogo = ( newValue, shouldForceSync = false ) => {
 		// `shouldForceSync` is used to force syncing when the attribute
 		// may not have updated yet.
-		if ( shouldSyncIcon || shouldForceSync ) {
+		if ( isIconSynced || shouldForceSync ) {
 			setIcon( newValue );
 		}
 
@@ -564,7 +551,7 @@ export default function LogoEdit( {
 					logoId={ mediaItemData?.id || siteLogoId }
 					siteUrl={ url }
 					setIcon={ setIcon }
-					iconId={ siteIconId }
+					isIconSynced={ isIconSynced }
 					canUserEdit={ canUserEdit }
 				/>
 				{ canUserEdit && <DropZone onFilesDrop={ onFilesDrop } /> }
