@@ -391,3 +391,13 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 		}
 	}
 }
+
+// In a grid whose cells have a fixed size, the cover fills its cell. The cell
+// decides its size, so it wins over the cover's minimum height and aspect ratio.
+@container style(--wp--style--grid-cells: fixed) {
+	.is-layout-grid > .wp-block-cover,
+	.is-layout-grid > .wp-block-cover-image {
+		min-height: 0 !important;
+		aspect-ratio: auto !important;
+	}
+}

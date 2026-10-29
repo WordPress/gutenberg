@@ -76,6 +76,7 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
+	useIsInFixedGridCell,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -422,6 +423,9 @@ export default function Image( {
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	// In a grid cell with a fixed size, the image fills the cell, cropped as
+	// needed, so only its scale and focal point have an effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
 	const showDimensionsControls = allowResize && hasNonContentControls;
 	const isResizable =
 		allowResize &&
@@ -720,9 +724,23 @@ export default function Image( {
 		);
 	};
 
-	const dimensionsControl =
-		showDimensionsControls &&
-		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
+	let dimensionsControl = null;
+	if ( showDimensionsControls && isInFixedGridCell ) {
+		dimensionsControl = (
+			<DimensionsTool
+				key={ selectedStyleStateKey }
+				panelId={ clientId }
+				value={ { scale: activeScale } }
+				onChange={ ( { scale: newScale } ) => {
+					setDimensionAttributes( { scale: newScale } );
+				} }
+				defaultScale="cover"
+				scaleOptions={ scaleOptions }
+				tools={ [ 'scale' ] }
+			/>
+		);
+	} else if ( showDimensionsControls ) {
+		dimensionsControl = SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				key={ selectedStyleStateKey }
 				panelId={ clientId }
@@ -773,7 +791,8 @@ export default function Image( {
 						: [ 'aspectRatio', 'widthHeight', 'scale' ]
 				}
 			/>
-		) );
+		);
+	}
 
 	const resetSettings = () => {
 		setAttributes( {
@@ -1077,32 +1096,39 @@ export default function Image( {
 				} }
 			>
 				{ dimensionsControl }
-				{ ! hasSelectedStyleState && url && scale && (
-					<ToolsPanelItem
-						label={ __( 'Focal point' ) }
-						isShownByDefault
-						hasValue={ () => !! focalPoint }
-						onDeselect={ () =>
-							setAttributes( {
-								focalPoint: undefined,
-							} )
-						}
-						panelId={ clientId }
-					>
-						<FocalPointPicker
+				{ ! hasSelectedStyleState &&
+					url &&
+					( scale || isInFixedGridCell ) && (
+						<ToolsPanelItem
 							label={ __( 'Focal point' ) }
-							url={ url }
-							value={ focalPoint }
-							onDragStart={ imperativeFocalPointPreview }
-							onDrag={ imperativeFocalPointPreview }
-							onChange={ ( newFocalPoint ) =>
+							isShownByDefault
+							hasValue={ () => !! focalPoint }
+							onDeselect={ () =>
 								setAttributes( {
-									focalPoint: newFocalPoint,
+									focalPoint: undefined,
 								} )
 							}
-						/>
-					</ToolsPanelItem>
-				) }
+							panelId={ clientId }
+						>
+							<FocalPointPicker
+								label={ __( 'Focal point' ) }
+								url={ url }
+								value={ focalPoint }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+										// The focal point only applies to a
+										// scaled image. In a grid cell with a
+										// fixed size, the image already covers
+										// the cell.
+										...( ! scale && { scale: 'cover' } ),
+									} )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 			</InspectorControls>
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
