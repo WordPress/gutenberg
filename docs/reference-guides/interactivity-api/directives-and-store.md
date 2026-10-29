@@ -198,6 +198,8 @@ The `wp-bind` will do different things when the DOM element is applied, dependin
 -   If the value is a string, the attribute is added with its value assigned: `<div attribute="value">`
 -   If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`
 
+Event handler attributes cannot be bound: a directive whose suffix starts with `on`, like `data-wp-bind--onclick`, is ignored. Use the [`wp-on`](#wp-on) directive to attach an event handler.
+
 ### `wp-class`
 
 This directive adds or removes a class to an HTML element, depending on a boolean value. It follows the syntax `data-wp-class--classname`.

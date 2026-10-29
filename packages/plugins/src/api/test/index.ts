@@ -45,6 +45,7 @@ describe( 'registerPlugin', () => {
 	} );
 
 	it( 'fails to register a plugin without a settings object', () => {
+		// @ts-expect-error `registerPlugin` expects a name and settings; a call without them is invalid.
 		registerPlugin();
 		expect( console ).toHaveErroredWith( 'No settings object provided!' );
 	} );
@@ -60,6 +61,7 @@ describe( 'registerPlugin', () => {
 
 	it( 'fails to register a plugin with a non-string name', () => {
 		registerPlugin(
+			// @ts-expect-error `registerPlugin` expects a string name; an object name is invalid.
 			{},
 			{
 				render: () => {},
@@ -69,7 +71,11 @@ describe( 'registerPlugin', () => {
 	} );
 
 	it( 'fails to register a plugin without a render function', () => {
-		registerPlugin( 'another-plugin', {} );
+		registerPlugin(
+			'another-plugin',
+			// @ts-expect-error `PluginSettings` requires `render`; settings without it are invalid.
+			{}
+		);
 		expect( console ).toHaveErroredWith(
 			'The "render" property must be specified and must be a valid component.'
 		);
@@ -78,6 +84,7 @@ describe( 'registerPlugin', () => {
 	it( 'fails to register a plugin with a non-string scope', () => {
 		registerPlugin( 'my-plugin', {
 			render: () => {},
+			// @ts-expect-error `scope` expects a string; an object scope is invalid.
 			scope: {},
 		} );
 		expect( console ).toHaveErroredWith( 'Plugin scope must be string.' );
