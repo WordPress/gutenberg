@@ -6,6 +6,7 @@ import {
 	GridVisualizer,
 	GridRowResizer,
 	useGridLayoutSync,
+	isGridStackedOnMobile,
 } from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -46,6 +47,7 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 				getBlockRootClientId,
 				getBlockName,
 				getSettings,
+				getSelectedBlockStyleState,
 			} = unlock( select( blockEditorStore ) );
 			// Blocks dragged from the canvas can be dropped in any grid, and
 			// with grid interactivity, so can blocks dragged from an inserter,
@@ -104,7 +106,13 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 					!! layout?.isManualPlacement &&
 					! isDragging &&
 					isBlockSelected( clientId ) &&
-					! isSizedByParentGrid,
+					! isSizedByParentGrid &&
+					// A grid stacked on mobile has no rows to change there.
+					! (
+						getSelectedBlockStyleState( clientId )?.viewport ===
+							'@mobile' &&
+						isGridStackedOnMobile( layout, attributes?.style )
+					),
 				blockVisibility: attributes?.metadata?.blockVisibility,
 				deviceType: currentDeviceType,
 				viewportSettings: settings?.__experimentalFeatures?.viewport,

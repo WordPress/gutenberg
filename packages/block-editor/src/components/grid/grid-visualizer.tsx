@@ -35,6 +35,7 @@ import {
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
 import { getAlignmentGuides } from './get-alignment-guides';
+import type { GridBlockStyle, GridStyleLayout } from './mobile-stacking';
 import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
 import { getMinimumInsertionRect } from './get-minimum-insertion-rect';
 import {
@@ -45,9 +46,8 @@ import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
-import type { BlockStyle, ChildLayoutBlockStyle } from '../../hooks/types';
-import type { Layout } from '../../layouts/types';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import { useUpdateGridChildLayout } from './use-update-grid-child-layout';
 import type {
 	AutoGridVisualizerProps,
 	GridDragGrab,
@@ -272,26 +272,51 @@ function ManualGridVisualizer( {
 		null
 	);
 
-	const gridItemStyles = useSelect(
+	const { gridItemStyles, viewport, stackedLayouts } = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockStyles } = unlock(
-				select( blockEditorStore )
-			);
-			const blockOrder = getBlockOrder( gridClientId );
-			return getBlockStyles( blockOrder );
+			const {
+				getBlockOrder,
+				getBlockStyles,
+				getSelectedBlockStyleState,
+				getStackedGridLayouts,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				gridItemStyles: getBlockStyles( getBlockOrder( gridClientId ) ),
+				// The viewport is the same for every block.
+				viewport: getSelectedBlockStyleState( gridClientId )?.viewport,
+				stackedLayouts: getStackedGridLayouts( gridClientId ),
+			};
 		},
 		[ gridClientId ]
 	);
 	const occupiedRects = useMemo( () => {
+		// Use the placement shown in the selected viewport: the stack when
+		// the grid is stacked on mobile, otherwise any viewport overrides.
+		let layouts: GridStyleLayout[];
+		if ( stackedLayouts ) {
+			layouts = Object.values( stackedLayouts.children );
+		} else {
+			// The style attribute, and the viewport states in it, are objects
+			// when set.
+			const styles = Object.values( gridItemStyles ) as Array<
+				GridBlockStyle | undefined
+			>;
+			layouts = styles.map( ( style ) => ( {
+				...style?.layout,
+				...( hasViewportBlockStyleState( { viewport } )
+					? ( style?.[ viewport ] as GridBlockStyle | undefined )
+							?.layout
+					: undefined ),
+			} ) );
+		}
 		const rects: GridRect[] = [];
-		for ( const style of Object.values( gridItemStyles ) ) {
+		for ( const layout of layouts ) {
 			const {
 				columnStart,
 				rowStart,
 				columnSpan = 1,
 				rowSpan = 1,
-				// The style attribute is an object when set.
-			} = ( style as GridItemAttributes[ 'style' ] )?.layout ?? {};
+			} = layout;
 			if ( ! columnStart || ! rowStart ) {
 				continue;
 			}
@@ -305,7 +330,7 @@ function ManualGridVisualizer( {
 			);
 		}
 		return rects;
-	}, [ gridItemStyles ] );
+	}, [ gridItemStyles, viewport, stackedLayouts ] );
 
 	return (
 		<>
@@ -510,18 +535,14 @@ function GridVisualizerDropLayer( {
 		}
 	}, [ isDragging ] );
 	const blockEditorSelectors = useSelect( blockEditorStore );
+	const { getBlockAttributes, getBlockOrder, getBlockRootClientId } =
+		blockEditorSelectors;
 	const {
-		getBlockAttributes,
-		getBlockOrder,
-		getBlockRootClientId,
-		getSelectedBlockStyleState,
-	} = blockEditorSelectors;
-	const {
-		updateBlockAttributes,
 		moveBlocksToPosition,
 		insertBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
+	const updateGridChildLayout = useUpdateGridChildLayout();
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
 		gridInfo.numColumns
@@ -725,10 +746,6 @@ function GridVisualizerDropLayer( {
 	 * @param landing The cells the first block lands in.
 	 */
 	function insertInserterBlocks( blocks: Block[], landing: GridRect ) {
-		// The grid block exists, with its layout attribute.
-		const gridLayout =
-			( getBlockAttributes( gridClientId ) as { layout?: Layout } | null )
-				?.layout ?? {};
 		const occupiedRects = getBlockOrder( gridClientId ).flatMap(
 			( clientId ) => {
 				const {
@@ -751,11 +768,8 @@ function GridVisualizerDropLayer( {
 					: [];
 			}
 		);
-		// The blocks aren't selected yet. Inserting only reads the state's
-		// viewport, which is the same for every block.
-		const selectedState = getSelectedBlockStyleState( gridClientId );
 		let reference: GridRect | null = null;
-		const blocksToInsert = blocks.map( ( block ) => {
+		const rects = blocks.map( () => {
 			const rect: GridRect = reference
 				? getInsertedBlockRect( {
 						placement: 'after',
@@ -771,23 +785,9 @@ function GridVisualizerDropLayer( {
 				: landing;
 			occupiedRects.push( rect );
 			reference = rect;
-			const clone = cloneBlock( block );
-			return {
-				...clone,
-				attributes: {
-					...clone.attributes,
-					// Rows are added for blocks below the grid, instead
-					// of moving them into it.
-					style: getInsertedChildLayoutStyle(
-						// Style attributes are not validated against a schema.
-						clone.attributes.style as BlockStyle | undefined,
-						rect,
-						selectedState,
-						{ ...gridLayout, rowCount: undefined }
-					),
-				},
-			};
+			return rect;
 		} );
+		const blocksToInsert = blocks.map( ( block ) => cloneBlock( block ) );
 		insertBlocks(
 			blocksToInsert,
 			getNumberOfBlocksBeforeCell(
@@ -796,6 +796,24 @@ function GridVisualizerDropLayer( {
 			),
 			gridClientId
 		);
+		blocksToInsert.forEach( ( block, index ) => {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateGridChildLayout(
+				block.clientId,
+				( style, selectedState, gridAttributes ) =>
+					// The style places the block, so it is set, with the
+					// placement in its layout.
+					getInsertedChildLayoutStyle(
+						style,
+						rects[ index ],
+						selectedState,
+						// Rows are added for blocks below the grid, instead
+						// of moving them into it.
+						{ ...gridAttributes?.layout, rowCount: undefined }
+					) as GridBlockStyle,
+				gridClientId
+			);
+		} );
 	}
 
 	const dropZoneRef = useDropZone( {
@@ -843,18 +861,9 @@ function GridVisualizerDropLayer( {
 					rowSpan: landing.rowSpan,
 				} ),
 			};
-			// The dragged block exists, and its style attribute is an object
-			// when set.
-			const { style } = getBlockAttributes( srcClientId ) as {
-				style?: ChildLayoutBlockStyle;
-			};
-			updateBlockAttributes( srcClientId, {
-				style: getUpdatedChildLayoutStyle(
-					style,
-					layout,
-					getSelectedBlockStyleState( srcClientId )
-				),
-			} );
+			// The grid is given to the updater because a block dropped in
+			// from elsewhere isn't in it yet.
+			updateGridChildLayout( srcClientId, layout, gridClientId );
 			__unstableMarkNextChangeAsNotPersistent();
 			moveBlocksToPosition(
 				[ srcClientId ],
@@ -965,13 +974,9 @@ function GridVisualizerAppender( {
 	onClose,
 }: GridVisualizerAppenderProps ) {
 	const appenderRef = useRef< HTMLButtonElement >( null );
-	const { getBlockAttributes, getSelectedBlockStyleState } =
-		useSelect( blockEditorStore );
-	const {
-		updateBlockAttributes,
-		moveBlocksToPosition,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const updateGridChildLayout = useUpdateGridChildLayout();
 
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
@@ -1015,26 +1020,19 @@ function GridVisualizerAppender( {
 				// The block was inserted.
 				const insertedBlock = block;
 				function placeBlock( rect: GridRect ) {
-					updateBlockAttributes( insertedBlock.clientId, {
-						style: getInsertedChildLayoutStyle(
-							// The inserted block exists.
-							(
-								getBlockAttributes(
-									insertedBlock.clientId
-								) as GridItemAttributes | null
-							 )?.style,
-							rect,
-							getSelectedBlockStyleState(
-								insertedBlock.clientId
-							),
-							// The grid block exists, with its layout attribute.
-							(
-								getBlockAttributes( gridClientId ) as {
-									layout?: Layout;
-								} | null
-							 )?.layout
-						),
-					} );
+					updateGridChildLayout(
+						insertedBlock.clientId,
+						( style, selectedState, gridAttributes ) =>
+							// The style places the block, so it is set, with
+							// the placement in its layout.
+							getInsertedChildLayoutStyle(
+								style,
+								rect,
+								selectedState,
+								gridAttributes?.layout
+							) as GridBlockStyle,
+						gridClientId
+					);
 					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ insertedBlock.clientId ],
