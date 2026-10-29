@@ -2,12 +2,27 @@
 
 ## Unreleased
 
+-   Widget footer: keep one strip height (text line plus padding) whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
+
+### Breaking Changes
+
+-   The package no longer steps a host-provided column count down at `960px` and `600px` of container width. `gridSettings.columns` travels to the `@wordpress/grid` surface untouched, as a number or as a map from container width to count, so a host that passed a count and relied on the steps now states them: `columns: { 0: 1, 600: 2, 960: <count> }`. A host that sets neither `columns` nor `minColumnWidth` gets the same three steps as before, now `DEFAULT_GRID.columns` ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+-   Honor any positive `gridSettings.rowHeight` as-is. `normalizeGridSettings` no longer snaps the value to `ROW_HEIGHT_PRESETS`; it only fills an absent or invalid value with the default ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+
+### Enhancements
+
+-   Honor `gridSettings.minColumnWidth` as a per-column floor: the surface fits as many columns as the container allows at that width, capped by `columns` when set ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+-   `WidgetHeader`: Use the help icon for infotips ([#85309](https://github.com/WordPress/gutenberg/pull/85309)).
+
+## 0.10.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for Widget Dashboard tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Type the dashboard commands with `CommandConfig` from `@wordpress/commands` ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
 -   Reference the `@wordpress/commands` build project in the TypeScript configs ([#84377](https://github.com/WordPress/gutenberg/pull/84377)).
 

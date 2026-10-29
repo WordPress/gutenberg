@@ -1,5 +1,5 @@
 import { h, type ComponentChild, type JSX, type VNode } from 'preact';
-import { warn } from './utils';
+import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
 
 /** Associates opaque HTML props with detached, script-free fallback snapshots. */
@@ -12,7 +12,40 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 const invalidCharsRegex = /[^a-z0-9-_]/i;
 
+/**
+ * Checks whether a directive name part is reserved after trimming hyphens and
+ * lowercasing it, as `kebabToCamelCase()` does: `data-wp-each--constructor-`
+ * names the item `constructor`.
+ *
+ * Directive names, suffixes, unique IDs and namespaces become property keys:
+ * `data-wp-bind--[attribute]`, for example, assigns to the element's props.
+ *
+ * @param part Part of a directive name.
+ * @return Whether the part is reserved.
+ */
+const isReservedNamePart = ( part: string ): boolean =>
+	isReservedKey( part.replace( /^-+|-+$/g, '' ).toLowerCase() );
+
 function parseDirectiveName( directiveName: string ): {
+	prefix: string;
+	suffix: string | null;
+	uniqueId: string | null;
+} | null {
+	const parsed = splitDirectiveName( directiveName );
+	if (
+		parsed &&
+		( isReservedNamePart( parsed.prefix ) ||
+			( parsed.suffix !== null &&
+				parsed.suffix.split( '--' ).some( isReservedNamePart ) ) ||
+			( parsed.uniqueId !== null &&
+				isReservedNamePart( parsed.uniqueId ) ) )
+	) {
+		return null;
+	}
+	return parsed;
+}
+
+function splitDirectiveName( directiveName: string ): {
 	prefix: string;
 	suffix: string | null;
 	uniqueId: string | null;
@@ -128,7 +161,8 @@ export function getHtmlFallback(
  * Parses the namespace and value from a directive attribute value.
  *
  * JSON is retained only when it produces a plain object. All other values use
- * the raw value after any namespace prefix has been removed.
+ * the raw value after any namespace prefix has been removed. Keys named
+ * `__proto__` are removed from the parsed JSON.
  *
  * @param rawValue The raw directive attribute value.
  * @return An object with the optional `namespace` and interpreted `value`.
@@ -142,15 +176,37 @@ export function parseDirectiveValue( rawValue: string ): {
 	const rawDirectiveValue = regexResult?.[ 2 ] ?? rawValue;
 	let value: string | Record< string, unknown > = rawDirectiveValue;
 
-	try {
-		const parsedValue: unknown = JSON.parse( rawDirectiveValue );
-		if ( isObject( parsedValue ) ) {
-			value = parsedValue;
-		}
-	} catch {}
+	// The parsed value is only ever used if it is a plain object, so a value
+	// can only be worth parsing if it starts with `{` (allowing leading
+	// whitespace, which JSON.parse tolerates for values set via setAttribute).
+	// This gates the common case of plain string values (e.g.
+	// `data-wp-interactive="myplugin"`), avoiding the relatively expensive
+	// SyntaxError that JSON.parse throws for every non-JSON value.
+	if ( /^\s*\{/.test( rawDirectiveValue ) ) {
+		try {
+			const parsedValue: unknown = JSON.parse(
+				rawDirectiveValue,
+				jsonReviver
+			);
+			if ( isObject( parsedValue ) ) {
+				value = parsedValue;
+			}
+		} catch {}
+	}
 
 	return { namespace, value };
 }
+
+const directiveMaps = new WeakSet< object >();
+
+/**
+ * Checks whether the passed value is a directive map created by `toVdom()`.
+ *
+ * @param value The value to check.
+ * @return Whether the value is a directive map created by `toVdom()`.
+ */
+export const isDirectiveMap = ( value: unknown ): boolean =>
+	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
@@ -179,7 +235,7 @@ export function toVdom( root: Node ): ComponentChild {
 		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			nodesToReplace.add( node );
-			return node.nodeValue;
+			return ( node as CDATASection ).data;
 		}
 
 		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
@@ -189,7 +245,6 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		const elementNode = node as HTMLElement;
-		const { attributes } = elementNode;
 		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
 
 		const props: Record< string, any > = {};
@@ -199,9 +254,16 @@ export function toVdom( root: Node ): ComponentChild {
 		> = [];
 		let island = false;
 
-		for ( let i = 0; i < attributes.length; i++ ) {
-			const attributeName = attributes[ i ].name;
-			const attributeValue = attributes[ i ].value;
+		// `getAttributeNames()` copies the attribute names into a plain JS
+		// array, which is much faster than per-attribute access to the live
+		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
+		// and property read crosses the JS/DOM boundary and may allocate an
+		// `Attr` wrapper object.
+		const attributeNames = elementNode.getAttributeNames();
+		for ( let i = 0; i < attributeNames.length; i++ ) {
+			const attributeName = attributeNames[ i ];
+			const attributeValue =
+				elementNode.getAttribute( attributeName ) ?? '';
 			if (
 				attributeName[ directivePrefix.length ] &&
 				attributeName.slice( 0, directivePrefix.length ) ===
@@ -225,10 +287,24 @@ export function toVdom( root: Node ): ComponentChild {
 							: typeof value?.namespace === 'string'
 								? value.namespace
 								: null;
-					namespaces.push( islandNamespace );
+					namespaces.push(
+						isReservedKey( islandNamespace )
+							? null
+							: islandNamespace
+					);
+				} else if ( isReservedKey( namespace ) ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn(
+							`Found reserved namespace "${ namespace }" in directive: ${ attributeName }.`
+						);
+					}
 				} else {
 					directives.push( [ attributeName, namespace, value ] );
 				}
+				// Directive attributes are never boolean properties, so skip
+				// the boolean check below and assign the value directly.
+				props[ attributeName ] = attributeValue;
+				continue;
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
@@ -248,6 +324,7 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		if ( directives.length ) {
+			// Keyed by directive names from the markup, so it has no prototype.
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
 			>( ( obj, [ name, ns, value ] ) => {
@@ -268,7 +345,8 @@ export function toVdom( root: Node ): ComponentChild {
 					uniqueId,
 				} );
 				return obj;
-			}, {} );
+			}, Object.create( null ) );
+			directiveMaps.add( props.__directives );
 
 			// Sort directive arrays to ensure stable ordering across browsers.
 			// Put nulls first, then sort by suffix and finally by uniqueIds.
@@ -359,7 +437,7 @@ export function toVdom( root: Node ): ComponentChild {
 	);
 	nodesToReplace.forEach( ( node: Node ) =>
 		( node as CDATASection ).replaceWith(
-			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			new window.Text( ( node as CDATASection ).data )
 		)
 	);
 

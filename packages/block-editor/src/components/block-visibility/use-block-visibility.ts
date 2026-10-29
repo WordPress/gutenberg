@@ -7,7 +7,9 @@ import { unlock } from '../../lock-unlock';
  * Viewport breakpoints keyed by viewport. Desktop has no breakpoint: it
  * applies above the largest configured one.
  */
-type ViewportBreakpoints = Partial< Record< 'mobile' | 'tablet', string > >;
+export type ViewportBreakpoints = Partial<
+	Record< 'mobile' | 'tablet', string >
+>;
 
 /**
  * Block visibility metadata: `false` hides the block on all viewports,

@@ -94,12 +94,9 @@ export function useRulerDrag(
 		onPointerDownStart,
 	} = options;
 
-	// Mutable mirror of the latest committed value plus per-drag state.
-	// Pointermove handlers fire far faster than React commits, so we
-	// cannot read `value` from closure. The `value` write happens in an
-	// effect (not at render time) to satisfy `react-hooks/refs`; the
-	// effect flushes after commit, so by the time any pointer handler
-	// runs, the ref reflects the latest committed `value`.
+	// Per-drag state, including the last emitted value. Pointermove
+	// handlers fire far faster than React commits, so they cannot read
+	// `value` from closure. Pointerdown seeds it from the committed `value`.
 	const latestRef = useRef< {
 		value: number;
 		startX: number;
@@ -119,9 +116,6 @@ export function useRulerDrag(
 		capturePointerId: 0,
 		windowPointerUp: null,
 	} );
-	useEffect( () => {
-		latestRef.current.value = value;
-	}, [ value ] );
 
 	const endDrag = useCallback( () => {
 		const state = latestRef.current;
@@ -170,7 +164,8 @@ export function useRulerDrag(
 			state.captureElement = event.currentTarget;
 			state.capturePointerId = event.pointerId;
 			state.startX = event.clientX;
-			state.startValue = state.value;
+			state.value = value;
+			state.startValue = value;
 			state.activeStep = event.shiftKey ? step / 2 : step;
 			state.dragging = true;
 			onPointerDownStart?.();
@@ -186,7 +181,7 @@ export function useRulerDrag(
 			window.addEventListener( 'pointerup', onWindowUp );
 			window.addEventListener( 'pointercancel', onWindowUp );
 		},
-		[ disabled, onPointerDownStart, endDrag, step ]
+		[ disabled, onPointerDownStart, endDrag, step, value ]
 	);
 
 	const onPointerMove = useCallback(

@@ -96,9 +96,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-templates-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/note-reactions.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-utils.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/entity-fields-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/preload.php';
@@ -143,12 +146,12 @@ require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
 require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
-require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // WordPress 7.2 compat.
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
 require __DIR__ . '/compat/wordpress-7.2/media.php';
+require __DIR__ . '/compat/wordpress-7.2/post.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -165,10 +168,6 @@ require __DIR__ . '/experimental/experiments/react-19.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/extensible-site-editor.php';
 	require __DIR__ . '/experimental/theme-preview/load.php';
-}
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
-	require __DIR__ . '/experimental/dataform-inspector-preload.php';
 }
 
 if (
@@ -200,7 +199,6 @@ require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
-require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experimental/experiments/load.php';
 require __DIR__ . '/block-template-utils.php';

@@ -9,6 +9,7 @@ WordPress registers them on the server through the entity actions API, like a pl
 The actions of this package live in folders of `src`, one per collection:
 
 -   `post_type_supports`: the default actions of every post type (`delete-post`, `duplicate-post`, `move-to-trash`, `order-pages`, `permanently-delete`, `rename-post`, `reset-post`, `restore`, `view-post`, and `view-post-revisions`).
+-   `page`: the actions pages have on top of the defaults (`set-as-homepage` and `set-as-posts-page`).
 -   `wp_block`: the actions patterns have on top of the defaults (`duplicate-pattern` and `export-pattern`).
 -   `wp_template_part`: the actions template parts have on top of the defaults (`duplicate-template-part`).
 
@@ -25,6 +26,7 @@ Each action has a folder named after its id, with the data of the action in `act
 -   `order-pages`, for the post types supporting `page-attributes`.
 -   `export-pattern`, for patterns.
 -   `restore`, `reset-post`, `delete-post`, `move-to-trash`, and `permanently-delete`, for every post type. Each one checks which posts it applies to.
+-   `set-as-homepage` and `set-as-posts-page`, for pages, when the user can manage the site options and the theme has no `front-page` template. Each one applies to the pages whose REST response has its link, `wp:action-set-homepage` or `wp:action-set-posts-page`, which the server adds to the published pages that are neither the homepage nor the posts page.
 
 The actions are registered in that order, which is the order they are shown in, for the current user: the actions depending on what the user can do are only registered for the users who can. The Gutenberg plugin copies the PHP files into its build, with its `gutenberg_` prefix.
 
@@ -34,7 +36,7 @@ The modules use the `wp.*` globals the `wp-editor` script loads, such as `wp.dat
 
 ## Usage
 
-The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
+The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/page`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
 
 ```js
 const { default: actions } = await import(
@@ -58,7 +60,7 @@ add_action( 'wp_entity_actions_api_init', function () {
 		array(
 			array_merge(
 				$removed[0],
-				array( 'label' => __( 'Move to the bin…', 'acme' ) )
+				array( 'label' => __( 'Move to the bin', 'acme' ) )
 			),
 		),
 		'@wordpress/core-actions/post_type_supports'

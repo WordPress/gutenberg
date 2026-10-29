@@ -14,6 +14,11 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	const POST_TYPE_SUPPORTS = '@wordpress/core-actions/post_type_supports';
 
 	/**
+	 * The script module of the actions of pages.
+	 */
+	const PAGE = '@wordpress/core-actions/page';
+
+	/**
 	 * The script module of the actions of patterns.
 	 */
 	const WP_BLOCK = '@wordpress/core-actions/wp_block';
@@ -28,6 +33,12 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	 * to, in the order they are shown.
 	 */
 	const EVERY_POST_TYPE = array( 'restore', 'reset-post', 'delete-post', 'move-to-trash', 'permanently-delete' );
+
+	/**
+	 * The actions of the `page` module, for the users who can manage the
+	 * site options, shown after the others.
+	 */
+	const PAGE_ACTIONS = array( 'set-as-homepage', 'set-as-posts-page' );
 
 	/**
 	 * Administrator user id.
@@ -143,15 +154,22 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * Pages are viewable and support revisions, titles, and page attributes,
-	 * and the user can create them: they have every action of the
-	 * `post_type_supports` module, in the order the actions are shown.
+	 * and the user can create them and manage the site options: they have
+	 * every action of the `post_type_supports` module, then the actions of
+	 * the `page` module, in the order the actions are shown.
 	 */
 	public function test_the_actions_of_pages() {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array_merge( array( 'view-post', 'view-post-revisions', 'duplicate-post', 'rename-post', 'order-pages' ), self::EVERY_POST_TYPE );
-		$this->assertSame( $ids, $this->get_action_ids( 'page' ) );
-		$this->assertSame( array( self::POST_TYPE_SUPPORTS => $ids ), wp_get_registered_entity_action_modules( 'postType', 'page' ) );
+		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
+		$this->assertSame(
+			array(
+				self::POST_TYPE_SUPPORTS => $ids,
+				self::PAGE               => self::PAGE_ACTIONS,
+			),
+			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
+		);
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( wp_get_registered_entity_actions( 'postType', 'page' ), 'origin' ), 'registeredBy' ) ), 'Every action is registered by core.' );
 	}
 
@@ -184,7 +202,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 				self::POST_TYPE_SUPPORTS => array_merge( array( 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
 				self::WP_BLOCK           => array( 'duplicate-pattern', 'export-pattern' ),
 			),
-			wp_get_registered_entity_action_modules( 'postType', 'wp_block' )
+			array_column( wp_get_registered_entity_action_modules( 'postType', 'wp_block' ), 'actions', 'id' )
 		);
 	}
 
@@ -214,7 +232,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 			$this->get_action_ids( 'wp_template_part' ),
 			'A block theme can duplicate template parts.'
 		);
-		$this->assertSame( array( 'duplicate-template-part' ), wp_get_registered_entity_action_modules( 'postType', 'wp_template_part' )[ self::WP_TEMPLATE_PART ] );
+		$this->assertSame( array( 'duplicate-template-part' ), array_column( wp_get_registered_entity_action_modules( 'postType', 'wp_template_part' ), 'actions', 'id' )[ self::WP_TEMPLATE_PART ] );
 
 		switch_theme( 'default' );
 		$this->assertNotContains( 'duplicate-template-part', $this->get_action_ids( 'wp_template_part' ), 'A classic theme cannot.' );
@@ -288,6 +306,42 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Setting the homepage or the posts page changes the site settings, so
+	 * the actions of the `page` module are only registered for the users who
+	 * can manage the site options.
+	 */
+	public function test_the_homepage_actions_depend_on_the_current_user() {
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame( self::PAGE_ACTIONS, array_values( array_intersect( $this->get_action_ids( 'page' ), self::PAGE_ACTIONS ) ) );
+
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame( array(), array_intersect( $this->get_action_ids( 'page' ), self::PAGE_ACTIONS ), 'Editors cannot manage the site options.' );
+	}
+
+	/**
+	 * A `front-page` template shows on the front page whatever the site
+	 * settings say, so the actions of the `page` module are not registered
+	 * when the theme has one.
+	 */
+	public function test_the_homepage_actions_are_not_registered_with_a_front_page_template() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+		$this->assertContains( 'set-as-homepage', $this->get_action_ids( 'page' ), 'The theme has no `front-page` template.' );
+
+		$template_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => 'front-page',
+				'post_title'   => 'Front Page',
+				'post_content' => '<!-- wp:paragraph --><p>Front page</p><!-- /wp:paragraph -->',
+			)
+		);
+		wp_set_post_terms( $template_id, get_stylesheet(), 'wp_theme' );
+
+		$this->assertSame( array(), array_intersect( $this->get_action_ids( 'page' ), self::PAGE_ACTIONS ) );
+	}
+
+	/**
 	 * The definitions are the ones of the `action.php` files, with the id
 	 * first.
 	 */
@@ -299,7 +353,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				'id'                => 'move-to-trash',
-				'label'             => 'Trash…',
+				'label'             => 'Trash',
 				'isPrimary'         => true,
 				'supportsBulk'      => true,
 				'hideModalHeader'   => true,
@@ -329,7 +383,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$schema = ( new Gutenberg_REST_Entity_Actions_Controller_7_2() )->get_item_schema();
 
 		$modules = array(
-			'page'             => array( self::POST_TYPE_SUPPORTS ),
+			'page'             => array( self::POST_TYPE_SUPPORTS, self::PAGE ),
 			'wp_block'         => array( self::POST_TYPE_SUPPORTS, self::WP_BLOCK ),
 			'wp_template_part' => array( self::POST_TYPE_SUPPORTS, self::WP_TEMPLATE_PART ),
 		);
@@ -371,9 +425,15 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		add_action( 'wp_entity_actions_api_init', $callback );
 		wp_set_current_user( self::$admin_id );
 
-		$ids = array( 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete', 'move-to-trash' );
-		$this->assertSame( $ids, $this->get_action_ids( 'page' ) );
-		$this->assertSame( array( self::POST_TYPE_SUPPORTS => $ids ), wp_get_registered_entity_action_modules( 'postType', 'page' ) );
+		$ids = array( 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete' );
+		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
+		$this->assertSame(
+			array(
+				self::POST_TYPE_SUPPORTS => array_merge( $ids, array( 'move-to-trash' ) ),
+				self::PAGE               => self::PAGE_ACTIONS,
+			),
+			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
+		);
 
 		$actions = array_column( wp_get_registered_entity_actions( 'postType', 'page' ), null, 'id' );
 		$this->assertSame( 'Bin…', $actions['move-to-trash']['label'] );

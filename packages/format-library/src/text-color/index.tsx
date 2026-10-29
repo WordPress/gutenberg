@@ -1,10 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import {
-	RichTextToolbarButton,
-	useSettings,
-	// @ts-expect-error Block Editor not fully typed yet.
-} from '@wordpress/block-editor';
+import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
 import {
 	Icon,
 	color as colorIcon,
@@ -65,10 +61,11 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 }: FormatEditProps ) {
+	// The settings hold the custom color flag and the palette.
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
 		'color.palette'
-	);
+	) as [ boolean | undefined, ColorObject[] | undefined ];
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const colorIndicatorStyle = useMemo(
 		() =>

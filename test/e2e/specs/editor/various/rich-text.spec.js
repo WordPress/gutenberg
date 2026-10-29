@@ -1023,4 +1023,79 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'Outside' } },
 		] );
 	} );
+
+	test( 'should replace selected non-breaking spaces from the toolbar', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', {
+				name: 'Replace non-breaking space',
+				exact: true,
+			} );
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'one' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await editor.showBlockToolbar();
+		await expect( button ).toBeVisible();
+
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await page.keyboard.type( 'three' );
+		await editor.showBlockToolbar();
+		await expect( button ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await button.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two three' },
+			},
+		] );
+		await expect( button ).toHaveCount( 0 );
+
+		await page.keyboard.type( '!' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two!' },
+			},
+		] );
+	} );
+
+	test( 'should replace the non-breaking spaces on both sides of the caret', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one\u00a0\u00a0two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
+		// Between the two non-breaking spaces.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await editor.showBlockToolbar();
+		await toolbar
+			.getByRole( 'button', {
+				name: 'Replace non-breaking spaces',
+				exact: true,
+			} )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one  two' },
+			},
+		] );
+	} );
 } );

@@ -10,7 +10,7 @@
 
 return array(
 	'type'          => 'datetime',
-	'label'         => __( 'Scheduled Date', 'gutenberg' ),
+	'label'         => __( 'Scheduled Date' ),
 	'Edit'          => array(
 		'control' => 'datetime',
 		'compact' => true,

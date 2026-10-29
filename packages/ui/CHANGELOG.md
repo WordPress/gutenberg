@@ -4,6 +4,35 @@
 
 ### Breaking Changes
 
+-   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
+
+### New Features
+
+-   `Badge`: Add an optional `infotip` popup with a trailing help icon ([#85309](https://github.com/WordPress/gutenberg/pull/85309)).
+-   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
+-   `Notice.List`: Add announcements for added and changed notices, excluding hidden content, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
+
+### Enhancements
+
+-   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. Spinners at the default size are now thinner, and large spinners are thicker ([#85378](https://github.com/WordPress/gutenberg/pull/85378)).
+-   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use solid brand highlights for hovered and keyboard-highlighted popup items and their supporting content ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
+-   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+
+### Bug Fixes
+
+-   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
+-   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
+
+### Documentation
+
+-   `Notice`: Add a Storybook example with native details and a text button to copy the error message and details ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).
+
+## 0.25.0 (2026-10-20)
+
+### Breaking Changes
+
+-   `SearchableSelect` and `SearchableSelectControl`: Remove `triggerContent`. Pass custom content as children of a `.Trigger` element through the `trigger` prop instead ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
+-   `Link`: Styled links with a new-tab indicator now wrap their content in a span. Update flex/grid compositions and direct-child selectors that rely on the content being a direct child of the anchor, and review anchor-level underline overrides ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `SelectControl`: Remove the `triggerContent` prop. Pass custom content as children of a `SelectControl.Trigger` element through the `trigger` prop instead ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Select`, `Autocomplete`, `Combobox`, and the select controls: `actionsRef` no longer keeps closed popups mounted. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then `actionsRef.current?.unmount()` when the animation ends. Close through `actionsRef.current?.close()` to run that handler. Automatic CSS exit animations need no migration. See [Base UI's migration guide](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   The `actionsRef` types for these components now require `close()`. Add it to manually constructed action objects and ref stubs. See [Base UI #5734](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
@@ -18,6 +47,9 @@
 
 ### Enhancements
 
+-   `SearchableSelect` and `SearchableSelectControl`: Add a `trigger` slot and `.Trigger` subcomponents for customizing trigger props ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
+-   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
+-   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
@@ -30,6 +62,9 @@
 
 ### Bug Fixes
 
+-   `Avatar`: Use the strong neutral stroke color for the person fallback to provide sufficient non-text contrast ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
+-   `Tabs`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
+-   Keep the `Link` new-tab indicator with the preceding text when wrapping ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
 -   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, preserve custom fallback rendering, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
@@ -43,6 +78,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for UI tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ### Documentation

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+
+## 3.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -82,6 +90,12 @@
 
 ## 2.34.0 (2025-10-29)
 
+## 2.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.33.0 (2025-10-17)
 
 ## 2.32.0 (2025-10-01)
@@ -133,6 +147,12 @@
 
 ## 2.20.0 (2025-03-13)
 
+## 2.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.19.0 (2025-02-28)
 
 ### Bug Fixes
@@ -173,6 +193,12 @@
 
 ## 2.9.0 (2024-10-03)
 
+## 2.8.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)
@@ -188,6 +214,12 @@
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)
+
+## 2.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 2.0.0 (2024-05-31)
 
@@ -213,6 +245,12 @@
 -   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 
 ## 1.2.0 (2024-02-21)
+
+## 1.1.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 1.1.0 (2024-02-09)
 
