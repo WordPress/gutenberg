@@ -70,6 +70,10 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	border-radius: 1px;
 	transform: translateX(-50%);
 	pointer-events: none;
+
+	@media (forced-colors: active) {
+		background: CanvasText;
+	}
 }
 
 .rotation-ruler__strip {
