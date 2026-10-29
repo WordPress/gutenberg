@@ -9,6 +9,9 @@
  * the stylesheet the build compiles from the package's CSS modules. Parity
  * tests check every combination of variants against React's own render.
  *
+ * Components that opt in are interactive: React mounts the real component over
+ * what PHP printed (see `interactive.php`).
+ *
  * Only the component name and its props are a contract. The markup and class
  * names follow React, and may change between releases.
  *
@@ -16,6 +19,9 @@
  */
 
 require_once __DIR__ . '/components/button.php';
+require_once __DIR__ . '/components/searchable-select-control.php';
+require_once __DIR__ . '/components/switch-control.php';
+require_once __DIR__ . '/interactive.php';
 require_once __DIR__ . '/preview-page.php';
 
 /**
@@ -111,7 +117,9 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 
 	gutenberg_ui_components_enqueue_assets();
 
-	return $render( $props, $classes, (string) $content );
+	$html = $render( $props, $classes, (string) $content, $component['classes']['parts'] );
+
+	return isset( $component['interactive'] ) ? gutenberg_ui_components_wrap_interactive( $component, $props, $html ) : $html;
 }
 
 /**

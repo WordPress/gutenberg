@@ -1,0 +1,40 @@
+{
+	"name": "switch-control",
+	"props": {
+		"label": { "type": "string", "required": true },
+		"name": { "type": "string", "required": true },
+		"checked": { "type": "boolean", "default": false },
+		"disabled": { "type": "boolean", "default": false },
+		"class": { "type": "string", "default": "" }
+	},
+	"classes": {
+		"base": [
+			"utils/css/resets:box-sizing",
+			"stack/style:stack",
+			"form/switch-control/style:root"
+		],
+		"variants": {},
+		"parts": {
+			"wrapper": [ "form/switch-control/style:switch-wrapper" ],
+			"switch": [
+				"utils/css/resets:box-sizing",
+				"form/primitives/switch/style:root",
+				"form/switch-control/style:switch"
+			],
+			"thumb": [ "form/primitives/switch/style:thumb" ],
+			"label": [
+				"utils/css/field:label",
+				"utils/css/field:is-plain",
+				"form/switch-control/style:label"
+			]
+		}
+	},
+	"example": {
+		"props": { "label": "Enable taxes", "name": "enable_taxes" }
+	},
+	"interactive": true,
+	"react": {
+		"component": "SwitchControl",
+		"rename": { "checked": "defaultChecked" }
+	}
+}
