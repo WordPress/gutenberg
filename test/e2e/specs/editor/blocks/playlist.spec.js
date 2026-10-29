@@ -277,6 +277,9 @@ test.describe( 'Playlist block', () => {
 			listView.getByRole( 'gridcell', { name: /First Track/ } )
 		).toBeVisible();
 		await expect(
+			listView.getByRole( 'gridcell', { name: /Second Track/ } )
+		).toBeVisible();
+		await expect(
 			listView.getByRole( 'button', { name: 'Add Playlist track' } )
 		).toBeVisible();
 
@@ -285,6 +288,16 @@ test.describe( 'Playlist block', () => {
 			.getByRole( 'link' )
 			.click();
 
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const block = window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlock();
+					return block && [ block.name, block.attributes.title ];
+				} )
+			)
+			.toEqual( [ 'core/playlist-track', 'Second Track' ] );
 		await expect(
 			page.getByRole( 'textbox', { name: 'Title' } )
 		).toHaveValue( 'Second Track' );
