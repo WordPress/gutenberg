@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Generate CSS module class names from each stylesheet's CSS, including its design token fallbacks and the files it reaches through `composes`, instead of from its path alone. Two builds of a package now share class names only where their CSS is identical, so an older bundled copy of a package no longer applies its styles to the newer copy's elements, or the other way around. All CSS module class names change once with this release.
+-   Generate CSS module class names from each stylesheet's CSS, including its design token fallbacks and the files it reaches through `composes`, instead of from its path alone. Two builds of a package now share class names only where their CSS is identical, so an older bundled copy of a package no longer applies its styles to the newer copy's elements, or the other way around. All CSS module class names change once with this release ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 
 ### Internal
 
