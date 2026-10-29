@@ -20,6 +20,7 @@ const CLASSNAMES = {
 	nav: styles.nav,
 	month_caption: styles[ 'month-caption' ],
 	months: styles.months,
+	month: styles.month,
 	month_grid: styles[ 'month-grid' ],
 	weekday: styles.weekday,
 	today: styles.today,

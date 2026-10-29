@@ -5,9 +5,11 @@
 		.root {
 			/* Internal variables */
 			--wp-ui-calendar-cell-size: var(--wpds-dimension-size-md);
+			/* Day columns grow to fill the container, up to this width. */
+			--wp-ui-calendar-max-cell-inline-size: calc(var(--wp-ui-calendar-cell-size) * 1.5);
 
 			position: relative; /* Required to position the navigation toolbar. */
-			display: inline flow-root;
+			display: flow-root;
 			color: var(--wpds-color-foreground-content-neutral);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			font-family: var(--wpds-typography-font-family-body);
@@ -47,7 +49,7 @@
 			display: flex;
 			position: relative;
 
-			width: var(--wp-ui-calendar-cell-size);
+			width: 100%;
 			height: var(--wp-ui-calendar-cell-size);
 
 			border: none;
@@ -137,10 +139,29 @@
 			justify-content: center;
 			flex-wrap: wrap;
 			gap: var(--wpds-dimension-gap-lg);
-			max-width: fit-content;
+			max-width: calc(var(--wp-ui-calendar-max-cell-inline-size) * 7);
+
+			/* Leave room for every month shown side by side (up to three). */
+			&:has(.month + .month) {
+				max-width: calc(var(--wp-ui-calendar-max-cell-inline-size) * 14 + var(--wpds-dimension-gap-lg));
+			}
+
+			&:has(.month + .month + .month) {
+				max-width: calc(var(--wp-ui-calendar-max-cell-inline-size) * 21 + var(--wpds-dimension-gap-lg) * 2);
+			}
+		}
+
+		.month {
+			/* Months share the width equally and wrap once they reach their minimum size. */
+			flex: 1;
+			max-width: calc(var(--wp-ui-calendar-max-cell-inline-size) * 7);
 		}
 
 		.month-grid {
+			/* Equal columns that share the available width. */
+			width: 100%;
+			min-width: calc(var(--wp-ui-calendar-cell-size) * 7);
+			table-layout: fixed;
 			border-collapse: separate;
 			border-spacing: 0 var(--wpds-dimension-gap-xs);
 		}
@@ -159,7 +180,6 @@
 		}
 
 		.weekday {
-			width: var(--wp-ui-calendar-cell-size);
 			height: var(--wp-ui-calendar-cell-size);
 			padding: 0;
 
