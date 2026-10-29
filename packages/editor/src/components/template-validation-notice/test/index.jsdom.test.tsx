@@ -1,29 +1,30 @@
-import { describe, expect, it, vi } from 'vitest';
-import { act, render } from '@testing-library/react';
-import { speak } from '@wordpress/a11y';
+import { describe, expect, it } from 'vitest';
+import { act, render, screen } from '@testing-library/react';
+import { InlineNotices, store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import TemplateValidationNotice from '../index';
 
-vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
-
 describe( 'TemplateValidationNotice', () => {
-	it( 'announces the notice when the template becomes invalid', () => {
+	it( 'announces the notice when the template becomes invalid', async () => {
 		const registry = createRegistry();
 		registry.register( blockEditorStore );
+		registry.register( noticesStore );
 
 		render(
 			<RegistryProvider value={ registry }>
-				<TemplateValidationNotice />
+				<InlineNotices>
+					<TemplateValidationNotice />
+				</InlineNotices>
 			</RegistryProvider>
 		);
-		expect( speak ).not.toHaveBeenCalled();
+		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 
-		act( () => {
+		await act( async () => {
 			registry.dispatch( blockEditorStore ).setTemplateValidity( false );
 		} );
 
-		expect( speak ).toHaveBeenCalledExactlyOnceWith(
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 			'The content of your post doesn’t match the template assigned to your post type.'
 		);
 	} );

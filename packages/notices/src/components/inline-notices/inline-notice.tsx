@@ -1,6 +1,6 @@
-import { speak } from '@wordpress/a11y';
+import type { ComponentProps } from 'react';
 import { Slot } from '@wordpress/components';
-import { RawHTML, useEffect, useState } from '@wordpress/element';
+import { RawHTML, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
@@ -25,6 +25,7 @@ type NoticeAction = NoticeActionType & {
 
 type InlineNoticeProps = {
 	notice: NoticeType;
+	announcementKey: number;
 	onRemove: () => void;
 };
 
@@ -40,24 +41,6 @@ function getStatusLabel( status: NoticeType[ 'status' ] ) {
 		default:
 			return __( 'Notice' );
 	}
-}
-
-/**
- * Announces a notice when it is created, including when a new notice replaces
- * one with the same ID. Only the message is announced: details are read when
- * the user opens them, and action labels are not part of the message.
- *
- * @param notice The notice to announce.
- */
-function useAnnouncement( notice: NoticeType ) {
-	const { spokenMessage, status } = notice;
-	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, status === 'error' ? 'assertive' : 'polite' );
-		}
-		// Each `createNotice` call stores a new notice object, so depending
-		// on it announces every new notice, even one with the same message.
-	}, [ notice, spokenMessage, status ] );
 }
 
 function NoticeActionControl( {
@@ -92,6 +75,7 @@ function NoticeActionControl( {
 
 export default function InlineNotice( {
 	notice,
+	announcementKey,
 	onRemove,
 }: InlineNoticeProps ) {
 	const {
@@ -106,8 +90,6 @@ export default function InlineNotice( {
 	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
 		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
-
-	useAnnouncement( notice );
 
 	// Copying HTML content would put its tags on the clipboard.
 	const canCopy = !! details && ! __unstableHTML;
@@ -178,10 +160,14 @@ export default function InlineNotice( {
 		</>
 	);
 
+	const politeness = status === 'error' ? 'assertive' : 'polite';
 	const rootProps = {
 		intent: status,
+		announcementKey,
+		spokenMessage: notice.spokenMessage ?? '',
+		politeness: notice.spokenMessage ? politeness : 'off',
 		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
-	};
+	} satisfies ComponentProps< typeof Notice.Root >;
 
 	if ( ! details ) {
 		return <Notice.Root { ...rootProps }>{ children }</Notice.Root>;

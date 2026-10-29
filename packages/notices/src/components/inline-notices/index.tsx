@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Children } from '@wordpress/element';
+import { Children, useState } from '@wordpress/element';
+import { Notice } from '@wordpress/ui';
 import { store as noticesStore } from '../../store';
-import type { Notice } from '../../store/types';
+import type { Notice as NoticeType } from '../../store/types';
 import InlineNotice from './inline-notice';
 
 type InlineNoticesProps = {
@@ -15,15 +16,30 @@ type InlineNoticesProps = {
 };
 
 type NoticeListProps = {
-	notices: Notice[];
+	notices: NoticeType[];
 	className: string;
+	getAnnouncementKey: ( notice: NoticeType ) => number;
 	onRemove?: ( id: string ) => void;
 	children?: ReactNode;
 };
 
+function createAnnouncementKeyGenerator() {
+	const announcementKeys = new WeakMap< NoticeType, number >();
+	let nextAnnouncementKey = 0;
+	return ( notice: NoticeType ) => {
+		let key = announcementKeys.get( notice );
+		if ( key === undefined ) {
+			key = nextAnnouncementKey++;
+			announcementKeys.set( notice, key );
+		}
+		return key;
+	};
+}
+
 function NoticeList( {
 	notices,
 	className,
+	getAnnouncementKey,
 	onRemove,
 	children,
 }: NoticeListProps ) {
@@ -33,6 +49,7 @@ function NoticeList( {
 			{ [ ...notices ].reverse().map( ( notice ) => (
 				<InlineNotice
 					key={ notice.id }
+					announcementKey={ getAnnouncementKey( notice ) }
 					notice={ notice }
 					onRemove={ () => onRemove?.( notice.id ) }
 				/>
@@ -52,6 +69,7 @@ export default function InlineNotices( {
 	dismissibleNoticesClassName,
 	context,
 }: InlineNoticesProps ) {
+	const [ getAnnouncementKey ] = useState( createAnnouncementKeyGenerator );
 	const notices = useSelect(
 		( select ) => select( noticesStore ).getNotices( context ),
 		[ context ]
@@ -68,33 +86,41 @@ export default function InlineNotices( {
 	const hasDismissibleNotices =
 		dismissibleNotices.length > 0 || hasRenderableChildren( children );
 
-	if ( ! hasPinnedNotices && ! hasDismissibleNotices ) {
-		return null;
-	}
-
 	return (
-		<div className={ clsx( 'notices-inline-notices-wrapper', className ) }>
-			{ hasPinnedNotices && (
-				<NoticeList
-					notices={ nonDismissibleNotices }
+		// Keep live regions mounted without adding a box to the notice layout.
+		<Notice.List style={ { display: 'contents' } }>
+			{ ( hasPinnedNotices || hasDismissibleNotices ) && (
+				<div
 					className={ clsx(
-						'components-notices__pinned',
-						pinnedNoticesClassName
+						'notices-inline-notices-wrapper',
+						className
 					) }
-				/>
-			) }
-			{ hasDismissibleNotices && (
-				<NoticeList
-					notices={ dismissibleNotices }
-					className={ clsx(
-						'components-notices__dismissible',
-						dismissibleNoticesClassName
-					) }
-					onRemove={ ( id ) => removeNotice( id, context ) }
 				>
-					{ children }
-				</NoticeList>
+					{ hasPinnedNotices && (
+						<NoticeList
+							notices={ nonDismissibleNotices }
+							getAnnouncementKey={ getAnnouncementKey }
+							className={ clsx(
+								'components-notices__pinned',
+								pinnedNoticesClassName
+							) }
+						/>
+					) }
+					{ hasDismissibleNotices && (
+						<NoticeList
+							notices={ dismissibleNotices }
+							getAnnouncementKey={ getAnnouncementKey }
+							className={ clsx(
+								'components-notices__dismissible',
+								dismissibleNoticesClassName
+							) }
+							onRemove={ ( id ) => removeNotice( id, context ) }
+						>
+							{ children }
+						</NoticeList>
+					) }
+				</div>
 			) }
-		</div>
+		</Notice.List>
 	);
 }
