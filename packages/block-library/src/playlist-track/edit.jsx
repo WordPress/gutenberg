@@ -1,10 +1,8 @@
 import { isBlobURL } from '@wordpress/blob';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useState } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	MediaUpload,
-	MediaUploadCheck,
 	BlockIcon,
 	useBlockProps,
 	BlockControls,
@@ -12,7 +10,6 @@ import {
 	PlainText,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	PanelBody,
 	TextControl,
 	TextareaControl as WCTextareaControl,
@@ -46,7 +43,6 @@ const PlaylistTrackEdit = ( {
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
 	const showImages = context?.showImages ?? true;
-	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
@@ -137,9 +133,10 @@ const PlaylistTrackEdit = ( {
 
 	function onRemoveTrackImage() {
 		setAttributes( { image: undefined, imageAlt: undefined } );
+	}
 
-		// Move focus back to the Media Upload button.
-		imageButton.current.focus();
+	function onTrackImageUploadError( message ) {
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	if ( ! hasTrackSource ) {
@@ -180,7 +177,7 @@ const PlaylistTrackEdit = ( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls group="content">
 				<PanelBody title={ __( 'Settings' ) }>
 					{ /* Only show if this is a single selection (not multiselect) */ }
 					{ isSelected && (
@@ -199,74 +196,22 @@ const PlaylistTrackEdit = ( {
 							/>
 						</BaseControl>
 					) }
-					{ isSelected && (
-						<TextControl
-							label={ __( 'Title' ) }
-							value={ title ? stripHTML( title ) : '' }
-							onChange={ ( titleValue ) => {
-								setAttributes( { title: titleValue } );
-							} }
+					<BaseControl>
+						<BaseControl.VisualLabel>
+							{ __( 'Track image' ) }
+						</BaseControl.VisualLabel>
+						<MediaControl
+							mediaUrl={ image }
+							filename={
+								image ? getFilename( image ) : undefined
+							}
+							allowedTypes={ TRACK_IMAGE_ALLOWED_MEDIA_TYPES }
+							onSelect={ onSelectTrackImage }
+							onError={ onTrackImageUploadError }
+							onReset={ onRemoveTrackImage }
+							emptyLabel={ __( 'Add image' ) }
 						/>
-					) }
-					<TextControl
-						label={ __( 'Artist' ) }
-						value={ artist ? stripHTML( artist ) : '' }
-						onChange={ ( artistValue ) => {
-							setAttributes( { artist: artistValue } );
-						} }
-					/>
-					<TextControl
-						label={ __( 'Album' ) }
-						value={ album ? stripHTML( album ) : '' }
-						onChange={ ( albumValue ) => {
-							setAttributes( { album: albumValue } );
-						} }
-					/>
-					<MediaUploadCheck>
-						<BaseControl>
-							<BaseControl.VisualLabel>
-								{ __( 'Track image' ) }
-							</BaseControl.VisualLabel>
-							<div className="editor-video-poster-control">
-								{ !! image && (
-									<img
-										src={ image }
-										alt={ __(
-											'Preview of the track image'
-										) }
-									/>
-								) }
-								<MediaUpload
-									title={ __( 'Select image' ) }
-									onSelect={ onSelectTrackImage }
-									allowedTypes={
-										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
-									}
-									render={ ( { open } ) => (
-										<Button
-											__next40pxDefaultSize
-											variant="primary"
-											onClick={ open }
-											ref={ imageButton }
-										>
-											{ ! image
-												? __( 'Select' )
-												: __( 'Replace' ) }
-										</Button>
-									) }
-								/>
-								{ !! image && (
-									<Button
-										__next40pxDefaultSize
-										onClick={ onRemoveTrackImage }
-										variant="tertiary"
-									>
-										{ __( 'Remove' ) }
-									</Button>
-								) }
-							</div>
-						</BaseControl>
-					</MediaUploadCheck>
+					</BaseControl>
 					{ !! image && (
 						<WCTextareaControl
 							label={ __( 'Alternative text' ) }
@@ -291,6 +236,29 @@ const PlaylistTrackEdit = ( {
 							}
 						/>
 					) }
+					{ isSelected && (
+						<TextControl
+							label={ __( 'Title' ) }
+							value={ title ? stripHTML( title ) : '' }
+							onChange={ ( titleValue ) => {
+								setAttributes( { title: titleValue } );
+							} }
+						/>
+					) }
+					<TextControl
+						label={ __( 'Artist' ) }
+						value={ artist ? stripHTML( artist ) : '' }
+						onChange={ ( artistValue ) => {
+							setAttributes( { artist: artistValue } );
+						} }
+					/>
+					<TextControl
+						label={ __( 'Album' ) }
+						value={ album ? stripHTML( album ) : '' }
+						onChange={ ( albumValue ) => {
+							setAttributes( { album: albumValue } );
+						} }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
