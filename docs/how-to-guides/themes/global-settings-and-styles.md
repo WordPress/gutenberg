@@ -1046,6 +1046,7 @@ Pseudo selectors are supported for these elements:
 
 - `link` and `button`: `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link`.
 - `textInput`: `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and the `::placeholder` pseudo-element.
+- `select`: `:hover`, `:focus`, `:focus-visible`, `:active`.
 
 ```json
 "elements": {

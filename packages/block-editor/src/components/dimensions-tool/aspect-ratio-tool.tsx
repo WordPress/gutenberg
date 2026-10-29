@@ -1,7 +1,7 @@
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
-import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
 import { findAspectRatioOption } from './utils';
 import type {
 	AspectRatioPreset,
@@ -18,8 +18,6 @@ export default function AspectRatioTool( {
 	hasValue,
 	isShownByDefault = true,
 	className,
-	isInherited,
-	hasLocalOverride,
 }: AspectRatioToolProps ) {
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
@@ -76,10 +74,8 @@ export default function AspectRatioTool( {
 				'custom' );
 
 	return (
-		<InheritanceToolsPanelItem
+		<ToolsPanelItem
 			className={ className }
-			isInherited={ isInherited }
-			hasLocalOverride={ hasLocalOverride }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}
@@ -100,6 +96,6 @@ export default function AspectRatioTool( {
 				items={ resolvedOptions.filter( ( item ) => ! item.hidden ) }
 				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 			/>
-		</InheritanceToolsPanelItem>
+		</ToolsPanelItem>
 	);
 }

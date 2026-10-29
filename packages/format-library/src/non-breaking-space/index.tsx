@@ -4,7 +4,6 @@ import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
 	RichTextToolbarButton,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { Popover, SVG, Path } from '@wordpress/components';
 import type { FormatEditProps } from '../types';
@@ -60,6 +59,10 @@ export const nonBreakingSpace = {
 		}
 
 		const range = getNonBreakingSpaceRange( value );
+		const rangeText = range
+			? value.text.slice( range[ 0 ], range[ 1 ] )
+			: '';
+		const nonBreakingSpaceCount = rangeText.split( NBSP ).length - 1;
 
 		function replaceNonBreakingSpaces() {
 			if ( ! range ) {
@@ -94,7 +97,11 @@ export const nonBreakingSpace = {
 					<RichTextToolbarButton
 						name="non-breaking-space"
 						icon={ icon }
-						title={ __( 'Replace non-breaking spaces' ) }
+						title={
+							nonBreakingSpaceCount === 1
+								? __( 'Replace non-breaking space' )
+								: __( 'Replace non-breaking spaces' )
+						}
 						onClick={ replaceNonBreakingSpaces }
 						isActive
 					/>

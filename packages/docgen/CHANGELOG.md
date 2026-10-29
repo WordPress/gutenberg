@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Stop loading project Babel configuration. JavaScript, JSX, and TypeScript remain supported; custom parser plugins are no longer supported ([#85183](https://github.com/WordPress/gutenberg/pull/85183)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

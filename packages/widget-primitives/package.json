@@ -47,13 +47,13 @@
 		"@wordpress/element": "file:../element"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.6.1",
-		"@storybook/react-vite": "^10.6.1",
+		"@storybook/addon-docs": "^10.6.3",
+		"@storybook/react-vite": "^10.6.3",
 		"@testing-library/react": "^16.3.3",
-		"@wordpress/components": "file:../components",
+		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
-		"storybook": "^10.6.1",
+		"storybook": "^10.6.3",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {

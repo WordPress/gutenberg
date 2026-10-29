@@ -56,7 +56,6 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",

@@ -327,7 +327,7 @@ _Parameters_
 
 - _HTML_ `string`: The HTML to clean up.
 - _schema_ `Schema`: Schema for the HTML.
-- _inline_ `boolean`: Whether to clean for inline mode.
+- _inline_ `[boolean]`: Whether to clean for inline mode.
 
 _Returns_
 

@@ -1,0 +1,47 @@
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as CopyFromMenuStories from './copy-from-menu.story';
+import * as CopyToClipboardStories from './copy-to-clipboard.story';
+
+<Meta of={ CopyToClipboardStories } tags={ [ '!docs-only' ] } />
+
+# Copy to Clipboard
+
+Choose the feedback from where the action remains after it runs. A control that stays on the page can confirm the copy itself. An action inside a menu cannot, because the menu closes.
+
+## Standalone button
+
+Put the confirmation on the button so it stays with the control that produced the result. Use `variant="minimal"`, `tone="neutral"`, and `size="compact"`: a copy action is rarely the primary button on the page. Don't use a snackbar here: the button is still visible. Don't use a tooltip: touch users and many keyboard users never see it.
+
+<Canvas of={ CopyToClipboardStories.CopyExample } />
+
+The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure, so the control is not renamed while it has focus. Copy with `useCopyToClipboard` from `@wordpress/compose`, and use its `onError` callback when the write fails. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails, to announce the outcome politely. Focus stays on the button.
+
+For an icon-only control, use `IconButton` with the same variant, tone, and size, and keep `label="Copy"`. That label is the accessible name and the tooltip. Swap the icon for a check on success or an error icon on failure, and announce the result with `speak()`. The success and error messages belong in that announcement rather than only in the tooltip.
+
+Copying is a one-time action. `aria-pressed` describes a toggle that stays on or off, so this button does not use it.
+
+## Copying from a menu
+
+When a copy action appears inside a menu, the menu typically closes immediately after the action is activated. This means the inline feedback used by a standalone copy button isn't appropriate, because the user won't see the updated state.
+
+In these situations, a temporary snackbar can provide useful visual confirmation that the action succeeded, without interrupting the user's workflow or requiring another interaction.
+
+A snackbar isn't strictly necessary for accessibility. The essential requirement is that the outcome is communicated to assistive technology through an appropriate status announcement. However, because the originating control is no longer visible, a snackbar provides an equivalent confirmation for sighted users.
+
+<Canvas of={ CopyFromMenuStories.CopyFromMenu } />
+
+This example uses `useCopyToClipboard` for the write and `SnackbarList` for the message. The list animates the snackbar in and out, and `Snackbar` announces "Link copied to clipboard", or "Couldn't copy link to clipboard." if copying fails, through its own polite live region. That region stays on the page after the menu closes, so the example does not add a second one. The item label stays "Copy link".
+
+## Guidance
+
+<Markdown>{ `
+| Context | Recommended feedback | Rationale |
+| --- | --- | --- |
+| Standalone copy button | Temporary check or error icon; the label stays "Copy" | The control remains visible. The name stays the action, and the icon shows success or failure. |
+| Copy action in a menu | Temporary snackbar | The menu closes after activation, so inline feedback would disappear before it could be perceived. |
+` }</Markdown>
+
+- **Prefer local feedback when possible.** A snackbar shouldn't be the default for every copy operation.
+- **Use snackbars when the originating surface disappears.** This makes the feedback visible independently of the action's original location.
+- **Always announce the outcome accessibly.** Visual feedback alone isn't sufficient.
+- **Avoid redundant feedback.** Don't show both inline confirmation and a snackbar for the same action unless there's a compelling reason.

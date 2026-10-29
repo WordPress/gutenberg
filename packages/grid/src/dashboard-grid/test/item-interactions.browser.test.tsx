@@ -36,7 +36,7 @@ describe( 'DashboardGrid item interactions', () => {
 		const { activator, resizeHandle } = await renderItem( {
 			draggable: false,
 		} );
-		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( activator ).toBeNull();
 		expect( resizeHandle ).not.toBeNull();
 	} );
 

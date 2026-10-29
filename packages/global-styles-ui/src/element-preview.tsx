@@ -7,7 +7,6 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	store as blockEditorStore,
 	transformStyles,
-	// @ts-expect-error: Not typed yet.
 } from '@wordpress/block-editor';
 import { __unstableGeneratePreviewStateStyles as generatePreviewStateStyles } from '@wordpress/global-styles-engine';
 import type { GlobalStylesStyles } from '@wordpress/global-styles-engine';
