@@ -1,6 +1,8 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/z-index" as *;
 @use "../utils/theme-variables" as *;
+@use "../utils/composite-item";
 
 .menu {
 	position: relative;
@@ -107,7 +109,7 @@
 	font-weight: 400;
 	line-height: 20px;
 
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	border-radius: $radius-small;
 
 	padding-block: $grid-unit-05;
@@ -124,28 +126,24 @@
 
 	&[aria-disabled="true"] {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		&:is(:focus, [data-focus]) {
+			@include outset-ring__focus;
+			outline-offset: 0;
+		}
 	}
 
-	/* Active item (including hover) */
-	&[data-active-item]:not([data-focus-visible]):not(
-		[aria-disabled="true"]
-	) {
-		background-color: $components-color-accent;
-		color: $components-color-accent-inverted;
+	&:is(:focus, [data-focus]):not([aria-disabled="true"]) {
+		@include composite-item.highlight;
 	}
 
-	/* Keyboard focus (focus-visible) */
-	&[data-focus-visible] {
-		box-shadow: 0 0 0 1.5px $components-color-accent;
+	&[aria-expanded="true"]:not(:focus, [data-focus], [aria-disabled="true"]) {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 
-		/* Only visible in Windows High Contrast mode */
-		outline: 2px solid transparent;
-	}
-
-	/* When the item is the trigger of an open submenu */
-	.menu:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		background-color: $components-color-gray-100;
-		color: $components-color-foreground;
+		@media ( forced-colors: active ) {
+			outline: var(--wpds-border-width-xs) solid GrayText;
+			outline-offset: 0;
+		}
 	}
 
 	svg {
@@ -177,13 +175,11 @@
 	align-items: center;
 	justify-content: center;
 
-	color: $components-color-gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 
-	/*
-	* When the parent menu item is active, except when it's a non-focused/hovered
-	* submenu trigger (in that case, color should not be inherited)
-	*/
-	[data-active-item]:not([data-focus-visible]) > &,
+	/* Inherit the active, open-parent, or disabled foreground. */
+	[data-active-item] > &,
+	[aria-expanded="true"] > &,
 	[aria-disabled="true"] > & {
 		color: inherit;
 	}
@@ -222,13 +218,11 @@
 	justify-content: center;
 	gap: $grid-unit-15;
 
-	color: $components-color-gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 
-	/*
-	 * When the parent menu item is active, except when it's a non-focused/hovered
-	 * submenu trigger (in that case, color should not be inherited)
-	 */
-	[data-active-item]:not([data-focus-visible]) *:not(.menu) &,
+	/* Inherit the active, open-parent, or disabled foreground. */
+	[data-active-item] *:not(.menu) &,
+	[aria-expanded="true"] *:not(.menu) &,
 	[aria-disabled="true"] *:not(.menu) & {
 		color: inherit;
 	}
@@ -285,10 +279,11 @@
 .item-help-text {
 	font-size: $helptext-font-size;
 	line-height: 16px;
-	color: $components-color-gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	overflow-wrap: anywhere;
 
-	[data-active-item]:not([data-focus-visible]) *:not(.menu) &,
+	[data-active-item] *:not(.menu) &,
+	[aria-expanded="true"] *:not(.menu) &,
 	[aria-disabled="true"] *:not(.menu) & {
 		color: inherit;
 	}
