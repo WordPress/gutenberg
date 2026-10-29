@@ -3,11 +3,23 @@ import {
 	parseComponents,
 	parseComponentDetail,
 } from './parse-components.ts';
-import type { Component, ComponentDetail, ManifestComponent } from './types.ts';
+import { parseGuidanceDocs, parseGuidanceList } from './parse-guidance.ts';
+import type {
+	Component,
+	ComponentDetail,
+	GuidanceDoc,
+	GuidanceSummary,
+	ManifestComponent,
+	ManifestDoc,
+} from './types.ts';
 
 const COMPONENTS_MANIFEST_URL =
 	process.env.COMPONENTS_MANIFEST_URL ||
 	'https://wordpress.github.io/gutenberg/manifests/components.json';
+
+const DOCS_MANIFEST_URL =
+	process.env.DOCS_MANIFEST_URL ||
+	'https://wordpress.github.io/gutenberg/manifests/docs.json';
 
 const DESIGN_TOKENS_URL =
 	process.env.DESIGN_TOKENS_URL ||
@@ -15,6 +27,7 @@ const DESIGN_TOKENS_URL =
 
 let cachedComponents: Record< string, ManifestComponent > | null = null;
 let cachedTokens: string | null = null;
+let cachedDocs: Record< string, ManifestDoc > | null = null;
 
 /**
  * Clear cached data. Intended for testing.
@@ -22,6 +35,7 @@ let cachedTokens: string | null = null;
 export function resetCache(): void {
 	cachedComponents = null;
 	cachedTokens = null;
+	cachedDocs = null;
 }
 
 /**
@@ -101,4 +115,57 @@ export async function getDesignTokens(): Promise< { content: string } > {
 	}
 
 	return { content: cachedTokens };
+}
+
+/**
+ * Fetch and cache the standalone docs manifest. It is optional (older
+ * Storybook builds don't publish it), and its content is only a supplement to
+ * the docs attached to components, so a failure yields an empty record.
+ *
+ * @return The standalone docs record.
+ */
+async function fetchStandaloneDocs(): Promise< Record< string, ManifestDoc > > {
+	if ( cachedDocs ) {
+		return cachedDocs;
+	}
+
+	try {
+		const response = await fetch( DOCS_MANIFEST_URL );
+		if ( response.ok ) {
+			const manifest: { docs?: Record< string, ManifestDoc > } =
+				await response.json();
+			cachedDocs = manifest.docs ?? {};
+			return cachedDocs;
+		}
+	} catch {
+		// Fall through to attached docs only.
+	}
+	return {};
+}
+
+/**
+ * List guidance pages: usage guidelines, best practices, migration guides.
+ *
+ * @return Guidance summaries.
+ */
+export async function getGuidanceList(): Promise< GuidanceSummary[] > {
+	const [ components, docs ] = await Promise.all( [
+		fetchComponents(),
+		fetchStandaloneDocs(),
+	] );
+	return parseGuidanceList( components, docs );
+}
+
+/**
+ * Get guidance pages matching a page id, title, or component name.
+ *
+ * @param topic - A page id or title, or a component name.
+ * @return Matching pages; empty when none match.
+ */
+export async function getGuidance( topic: string ): Promise< GuidanceDoc[] > {
+	const [ components, docs ] = await Promise.all( [
+		fetchComponents(),
+		fetchStandaloneDocs(),
+	] );
+	return parseGuidanceDocs( components, docs, topic );
 }

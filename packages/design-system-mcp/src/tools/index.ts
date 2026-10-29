@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { register as getComponents } from './get-components.ts';
 import { register as getComponentDetails } from './get-component-details.ts';
+import { register as getGuidance } from './get-guidance.ts';
 import { register as getDesignTokens } from './get-design-tokens.ts';
 
 /**
@@ -11,5 +12,6 @@ import { register as getDesignTokens } from './get-design-tokens.ts';
 export function registerTools( server: McpServer ): void {
 	getComponents( server );
 	getComponentDetails( server );
+	getGuidance( server );
 	getDesignTokens( server );
 }

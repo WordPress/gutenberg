@@ -4,7 +4,7 @@
 The Design System MCP server is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </p>
 
-An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI agents with component documentation, usage examples, and design tokens.
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI agents with component documentation, usage examples, design guidance (usage guidelines, best practices, migration guides), and design tokens.
 
 By using the MCP server, you can be confident that your AI agents are correctly following the latest design system guidance when asking questions like:
 

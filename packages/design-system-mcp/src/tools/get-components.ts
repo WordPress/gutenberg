@@ -13,7 +13,7 @@ export function register( server: McpServer ): void {
 		{
 			title: 'Get Components',
 			description:
-				'Get a list of all available WordPress Design System components with their package names and descriptions.',
+				'Get a list of all available WordPress Design System components with their package names and descriptions. Start here to map a generic request ("dropdown", "modal") to canonical names; for choosing between similar components, also call get_guidance.',
 			annotations: {
 				readOnlyHint: true,
 			},
