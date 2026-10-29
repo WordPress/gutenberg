@@ -59,7 +59,9 @@ try {
 			isUpdate
 		);
 		const actionWord = isUpdate ? 'Update' : 'Migration';
-		if ( dryRun ) {
+		if ( res.operations.length === 0 ) {
+			console.log( 'Nothing to migrate.' );
+		} else if ( dryRun ) {
 			console.log(
 				`Dry-run ${ actionWord.toLowerCase() } complete for ${ res.packageName }: would create ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
 			);

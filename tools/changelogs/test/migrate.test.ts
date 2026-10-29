@@ -66,6 +66,74 @@ describe( 'parseChangelogContent', () => {
 } );
 
 describe( 'migratePackageToChangie with cleanFirst / update', () => {
+	it.each( [ false, true ] )(
+		'preserves migration artifacts when update finds no unreleased entries (dry-run: %s)',
+		( dryRun ) => {
+			const tmpDir = fs.mkdtempSync(
+				path.join( os.tmpdir(), 'changie-update-guard-' )
+			);
+			try {
+				const pkgDir = path.join( tmpDir, 'packages', 'test-pkg' );
+				fs.mkdirSync( pkgDir, { recursive: true } );
+				const changelogPath = path.join( pkgDir, 'CHANGELOG.md' );
+				fs.writeFileSync( changelogPath, SAMPLE_CHANGELOG );
+				const initial = migratePackageToChangie( 'test-pkg', tmpDir );
+				const files = initial.operations.map( ( operation ) => ( {
+					path: operation.path,
+					content: fs.readFileSync( operation.path, 'utf8' ),
+				} ) );
+
+				const result = migratePackageToChangie(
+					'test-pkg',
+					tmpDir,
+					dryRun,
+					true
+				);
+
+				expect( result ).toEqual( {
+					packageName: 'test-pkg',
+					versionsCreated: 0,
+					fragmentsCreated: 0,
+					operations: [],
+				} );
+				for ( const file of files ) {
+					expect( fs.readFileSync( file.path, 'utf8' ) ).toBe(
+						file.content
+					);
+				}
+			} finally {
+				fs.rmSync( tmpDir, { recursive: true, force: true } );
+			}
+		}
+	);
+
+	it( 'migrates published history without unreleased entries on an initial run', () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join( os.tmpdir(), 'changie-history-only-' )
+		);
+		try {
+			const pkgDir = path.join( tmpDir, 'packages', 'test-pkg' );
+			fs.mkdirSync( pkgDir, { recursive: true } );
+			const history = SAMPLE_CHANGELOG.slice(
+				SAMPLE_CHANGELOG.indexOf( '## 2.1.0' )
+			);
+			fs.writeFileSync( path.join( pkgDir, 'CHANGELOG.md' ), history );
+
+			const result = migratePackageToChangie( 'test-pkg', tmpDir );
+
+			expect( result.versionsCreated ).toBe( 1 );
+			expect( result.fragmentsCreated ).toBe( 0 );
+			expect(
+				fs.readFileSync(
+					path.join( tmpDir, '.changes', 'test-pkg', '2.1.0.md' ),
+					'utf8'
+				)
+			).toBe( history );
+		} finally {
+			fs.rmSync( tmpDir, { recursive: true, force: true } );
+		}
+	} );
+
 	it( 'cleans up previous fragments and version files when cleanFirst is true', () => {
 		const tmpDir = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'changie-test-' )
