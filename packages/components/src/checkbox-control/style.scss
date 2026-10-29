@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 .components-checkbox-control {
 	--checkbox-input-size: 16px;
@@ -29,7 +28,7 @@
 	&:checked::before,
 	&[aria-checked="mixed"]::before {
 		margin: -3px -5px;
-		color: $components-color-accent-inverted;
+		color: var(--wpds-color-foreground-interactive-brand-strong);
 
 		@include break-medium() {
 			margin: -4px 0 0 -5px;
@@ -37,8 +36,8 @@
 	}
 
 	&[aria-checked="mixed"] {
-		background: $components-color-accent;
-		border-color: $components-color-accent;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
 
 		&::before {
 			// Inherited from `forms.css`.
@@ -97,8 +96,8 @@
 	}
 
 	&:not(:disabled):is(:checked, :indeterminate) {
-		background: $components-color-accent;
-		border-color: $components-color-accent;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
 	}
 
 	&:not(:disabled) {
@@ -133,7 +132,7 @@
 
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
-	color: $components-color-accent-inverted;
+	color: var(--wpds-color-foreground-interactive-brand-strong);
 	cursor: var(--wpds-cursor-control);
 	position: absolute;
 	left: 50%;
