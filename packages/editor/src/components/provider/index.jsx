@@ -29,6 +29,7 @@ import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
+import useCommitPendingMediaEdits from './use-commit-pending-media-edits';
 import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
@@ -421,6 +422,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
+
+		// Commit pending media edits whenever their entity is saved.
+		useCommitPendingMediaEdits();
 
 		// Pause/resume media upload queue on network disconnect/reconnect.
 		useNetworkReconnect();

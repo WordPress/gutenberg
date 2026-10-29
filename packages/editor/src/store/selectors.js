@@ -98,21 +98,11 @@ export const isEditedPostDirty = createRegistrySelector(
 		// inferred to contain unsaved values.
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		if (
-			select( coreStore ).hasEditsForEntityRecord(
-				'postType',
-				postType,
-				postId
-			)
-		) {
-			return true;
-		}
-		// Pending media edits are transient, so they aren't counted above.
-		return !! select( coreStore ).getEntityRecordEdits(
+		return select( coreStore ).hasEditsForEntityRecord(
 			'postType',
 			postType,
 			postId
-		)?.pendingMediaEdits;
+		);
 	}
 );
 

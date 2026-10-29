@@ -2,8 +2,6 @@ import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Warns the user if there are unsaved changes before leaving the editor.
@@ -13,7 +11,6 @@ import { unlock } from '../../lock-unlock';
  */
 export default function UnsavedChangesWarning() {
 	const { __experimentalGetDirtyEntityRecords } = useSelect( coreStore );
-	const { hasPendingMediaEdits } = unlock( useSelect( editorStore ) );
 
 	useEffect( () => {
 		/**
@@ -29,8 +26,7 @@ export default function UnsavedChangesWarning() {
 			// new value of `isEditedPostDirty` before this component does,
 			// causing this component to incorrectly think a trashed post is still dirty.
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-			// Pending media edits are transient, so the entity isn't dirty.
-			if ( dirtyEntityRecords.length > 0 || hasPendingMediaEdits() ) {
+			if ( dirtyEntityRecords.length > 0 ) {
 				event.returnValue = __(
 					'You have unsaved changes. If you proceed, they will be lost.'
 				);
@@ -43,7 +39,7 @@ export default function UnsavedChangesWarning() {
 		return () => {
 			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
 		};
-	}, [ __experimentalGetDirtyEntityRecords, hasPendingMediaEdits ] );
+	}, [ __experimentalGetDirtyEntityRecords ] );
 
 	return null;
 }

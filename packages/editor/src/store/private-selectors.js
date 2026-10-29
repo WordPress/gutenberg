@@ -701,58 +701,77 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 
 const EMPTY_PENDING_MEDIA_EDITS = {};
 
-// Shared by the selectors below. Private selectors are bound to the registry
-// lazily, so they read core-data through this instead of calling each other.
-function selectPendingMediaEdits( select, state ) {
+/**
+ * Returns the entity whose save commits a block's pending media edits: the
+ * nearest template part, the post for blocks in its content, or the edited
+ * entity for top level blocks. Returns undefined for blocks whose edits
+ * aren't saved with an entity, such as those in a synced pattern, whose
+ * content overrides are saved with the post that uses it.
+ *
+ * Private selectors are bound to the registry lazily, so the selectors below
+ * share plain functions like this one instead of calling each other.
+ *
+ * @param {(store: Object) => Object} select   Registry `select`.
+ * @param {Object}                    state    Global application state.
+ * @param {string}                    clientId Block client ID.
+ *
+ * @return {{kind: string, name: string, id: string|number}|undefined} The entity.
+ */
+function selectMediaEditOwner( select, state, clientId ) {
+	const { getBlockName, getBlockParents, getBlockAttributes } =
+		select( blockEditorStore );
+	if ( ! clientId || ! getBlockName( clientId ) ) {
+		return undefined;
+	}
+	for ( const parentId of getBlockParents( clientId, true ) ) {
+		const parentName = getBlockName( parentId );
+		if ( parentName === 'core/block' ) {
+			return undefined;
+		}
+		if ( parentName === 'core/template-part' ) {
+			const { slug, theme } = getBlockAttributes( parentId );
+			const stylesheet =
+				theme ?? select( coreStore ).getCurrentTheme()?.stylesheet;
+			return slug && stylesheet
+				? {
+						kind: 'postType',
+						name: 'wp_template_part',
+						id: `${ stylesheet }//${ slug }`,
+					}
+				: undefined;
+		}
+		if ( parentName === 'core/post-content' ) {
+			break;
+		}
+	}
+	// Top level blocks belong to the template when it's shown, and those
+	// aren't editable in the post editor.
+	if (
+		getRenderingMode( state ) !== 'post-only' &&
+		! getBlockParents( clientId ).some(
+			( parentId ) => getBlockName( parentId ) === 'core/post-content'
+		)
+	) {
+		return undefined;
+	}
+	return {
+		kind: 'postType',
+		name: getCurrentPostType( state ),
+		id: getCurrentPostId( state ),
+	};
+}
+
+function selectPendingMediaEditsForEntity( select, { kind, name, id } ) {
 	return (
-		select( coreStore ).getEditedEntityRecord(
-			'postType',
-			getCurrentPostType( state ),
-			getCurrentPostId( state )
-		)?.pendingMediaEdits ?? EMPTY_PENDING_MEDIA_EDITS
+		select( coreStore ).getEntityRecordEdits( kind, name, id )
+			?.pendingMediaEdits ?? EMPTY_PENDING_MEDIA_EDITS
 	);
 }
 
-/**
- * Returns the media edits waiting for the current post to be saved, keyed by
- * block client ID.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} Pending media edits.
- */
-export const getPendingMediaEdits = createRegistrySelector(
-	( select ) => ( state ) => selectPendingMediaEdits( select, state )
-);
-
-/**
- * Returns the media edit waiting for the current post to be saved for a block.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId Block client ID.
- *
- * @return {Object|undefined} The pending media edit.
- */
-export const getPendingMediaEdit = createRegistrySelector(
-	( select ) => ( state, clientId ) =>
-		selectPendingMediaEdits( select, state )[ clientId ]
-);
-
-/**
- * Returns whether any media edits are waiting for the current post to be
- * saved.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether there are pending media edits.
- */
-export const hasPendingMediaEdits = createRegistrySelector(
-	( select ) => ( state ) =>
-		Object.keys( selectPendingMediaEdits( select, state ) ).length > 0
-);
-
 function selectPendingMediaEditForBlock( select, state, clientId ) {
-	const edit = selectPendingMediaEdits( select, state )[ clientId ];
+	const owner = selectMediaEditOwner( select, state, clientId );
+	const edit =
+		owner && selectPendingMediaEditsForEntity( select, owner )[ clientId ];
 	if ( ! edit ) {
 		return undefined;
 	}
@@ -763,6 +782,30 @@ function selectPendingMediaEditForBlock( select, state, clientId ) {
 	}
 	return edit;
 }
+
+/**
+ * Returns the media edits waiting for an entity to be saved, keyed by block
+ * client ID.
+ *
+ * @param {Object} state       Global application state.
+ * @param {Object} [entity]    The entity. Defaults to the current post.
+ * @param {string} entity.kind Entity kind.
+ * @param {string} entity.name Entity name.
+ * @param {string} entity.id   Entity ID.
+ *
+ * @return {Object} Pending media edits.
+ */
+export const getPendingMediaEdits = createRegistrySelector(
+	( select ) => ( state, entity ) =>
+		selectPendingMediaEditsForEntity(
+			select,
+			entity ?? {
+				kind: 'postType',
+				name: getCurrentPostType( state ),
+				id: getCurrentPostId( state ),
+			}
+		)
+);
 
 /**
  * Returns the pending media edit for a block, if it was made on the
@@ -779,9 +822,39 @@ export const getPendingMediaEditForBlock = createRegistrySelector(
 );
 
 /**
+ * Returns the entity whose save commits a block's pending media edits. See
+ * `selectMediaEditOwner`.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object|undefined} The entity.
+ */
+export const getMediaEditOwnerForBlock = createRegistrySelector(
+	( select ) => ( state, clientId ) =>
+		selectMediaEditOwner( select, state, clientId )
+);
+
+function selectIsMediaEditorLocked( select, state, clientId ) {
+	if ( isSavingPost( state ) && ! isAutosavingPost( state ) ) {
+		return true;
+	}
+	const owner = selectMediaEditOwner( select, state, clientId );
+	return (
+		!! owner &&
+		select( coreStore ).isSavingEntityRecord(
+			owner.kind,
+			owner.name,
+			owner.id
+		)
+	);
+}
+
+/**
  * Returns what a block needs to show the media editor's state: the preview of
  * a pending edit, and whether the media editor can be opened. Pending edits
- * are committed while the post saves, so it's locked until the save finishes.
+ * are committed while their entity saves, so it's locked until the save
+ * finishes.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Block client ID.
@@ -796,11 +869,11 @@ export const getMediaEditorStateForBlock = createRegistrySelector( ( select ) =>
 				state,
 				clientId
 			)?.previewUrl,
-			isLocked: isSavingPost( state ) && ! isAutosavingPost( state ),
+			isLocked: selectIsMediaEditorLocked( select, state, clientId ),
 		} ),
 		( state, clientId ) => [
 			selectPendingMediaEditForBlock( select, state, clientId ),
-			state.saving,
+			selectIsMediaEditorLocked( select, state, clientId ),
 		]
 	)
 );

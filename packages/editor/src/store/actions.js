@@ -24,7 +24,6 @@ import {
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __, sprintf } from '@wordpress/i18n';
-import { revokeBlobURL } from '@wordpress/blob';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -32,7 +31,6 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import attachMediaInPost from './utils/attach-media-in-post';
-import commitPendingMediaEdits from './utils/commit-pending-media-edits';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -251,43 +249,17 @@ const PENDING_MEDIA_EDITS_LOCK = 'pending-media-edits';
  * @param {Object} thunkArgs          Thunk arguments.
  * @param {Object} thunkArgs.select   Editor store selectors.
  * @param {Object} thunkArgs.dispatch Editor store actions.
- * @param {Object} thunkArgs.registry A `@wordpress/data` registry.
  * @return {Promise<Object|false>} A save error, or `false` on success.
  */
-async function savePendingMediaEdits( { select, dispatch, registry } ) {
+async function savePendingMediaEdits( { select, dispatch } ) {
 	dispatch.lockPostSaving( PENDING_MEDIA_EDITS_LOCK );
 	try {
-		const pendingEdits = select.getPendingMediaEdits();
-		const { done, error } = await commitPendingMediaEdits(
-			registry,
-			pendingEdits
-		);
-		// Not undoable: undoing the block changes is enough to go back to
-		// the original image.
-		dispatch.clearPendingMediaEdits( done, { undoIgnore: true } );
-		for ( const clientId of done ) {
-			const { previewUrl } = pendingEdits[ clientId ];
-			if ( previewUrl ) {
-				revokeBlobURL( previewUrl );
-			}
-		}
-		if ( ! error ) {
-			return false;
-		}
-		// A failed request is usually a plain object rather than an `Error`.
-		const reason = typeof error?.message === 'string' ? error.message : '';
-		return {
-			code: error?.code,
-			// Keeps the HTTP status, which the save failure notice shows.
-			data: error?.data,
-			message: reason
-				? sprintf(
-						/* translators: %s: Error message. */
-						__( 'An edited image could not be saved. %s' ),
-						reason
-					)
-				: __( 'An edited image could not be saved.' ),
-		};
+		const error = await dispatch.commitPendingMediaEdits( {
+			kind: 'postType',
+			name: select.getCurrentPostType(),
+			id: select.getCurrentPostId(),
+		} );
+		return error ?? false;
 	} finally {
 		dispatch.unlockPostSaving( PENDING_MEDIA_EDITS_LOCK );
 	}
@@ -315,13 +287,9 @@ export const savePost =
 		if (
 			! options.isAutosave &&
 			! options.isPreview &&
-			select.hasPendingMediaEdits()
+			Object.keys( select.getPendingMediaEdits() ).length
 		) {
-			error = await savePendingMediaEdits( {
-				select,
-				dispatch,
-				registry,
-			} );
+			error = await savePendingMediaEdits( { select, dispatch } );
 		}
 
 		const content = select.getEditedPostContent();

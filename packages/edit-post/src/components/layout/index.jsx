@@ -448,9 +448,6 @@ function Layout( {
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
-			// The post editor saves through `savePost`, which commits crops
-			// held on image blocks.
-			deferMediaEditorCrops: true,
 			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,

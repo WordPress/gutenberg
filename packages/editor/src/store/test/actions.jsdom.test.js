@@ -28,6 +28,7 @@ const postTypeConfig = {
 	name: 'post',
 	baseURL: '/wp/v2/posts',
 	transientEdits: { blocks: true, selection: true, pendingMediaEdits: true },
+	dirtyTransientEdits: { pendingMediaEdits: true },
 	mergedEdits: { meta: true },
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
 	getRevisionsUrl: ( parentId, revisionId ) =>
@@ -961,6 +962,7 @@ describe( 'Post actions', () => {
 	} );
 
 	describe( 'pending media edits', () => {
+		const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 		const post = {
 			id: postId,
 			type: 'post',
@@ -968,23 +970,135 @@ describe( 'Post actions', () => {
 			content: '',
 			status: 'draft',
 		};
+		const templatePart = {
+			id: 'theme//header',
+			slug: 'header',
+			theme: 'theme',
+			type: 'wp_template_part',
+		};
+		const templatePartEntity = {
+			kind: 'postType',
+			name: 'wp_template_part',
+			id: templatePart.id,
+		};
 		const edit = {
 			sourceId: 12,
 			sourceUrl: 'original.jpg',
 			modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
 			previewUrl: 'blob:preview',
 		};
+		const pendingCrop = {
+			modifiers: edit.modifiers,
+			cropperState: { rotation: 90 },
+			aspectRatioValue: '0',
+			previewUrl: 'blob:preview',
+		};
+		const BLOCK_TYPES = [
+			[ 'test/image', { mediaEditor: true } ],
+			[ 'test/plain-image', {} ],
+			[ 'core/block', {} ],
+			[ 'core/template-part', {} ],
+			[ 'core/post-content', {} ],
+		];
+
+		beforeEach( () => {
+			for ( const [ name, { mediaEditor } ] of BLOCK_TYPES ) {
+				registerBlockType( name, {
+					title: name,
+					category: 'media',
+					apiVersion: 3,
+					attributes: {
+						id: { type: 'number' },
+						slug: { type: 'string' },
+						theme: { type: 'string' },
+					},
+					...( mediaEditor && {
+						mediaEditor: {
+							getMedia: ( { id } ) => ( { id } ),
+							applyMedia: ( attributes, media ) => ( {
+								id: media.id,
+							} ),
+						},
+					} ),
+					save: () => null,
+				} );
+			}
+		} );
+
+		afterEach( () => {
+			for ( const [ name ] of BLOCK_TYPES ) {
+				unregisterBlockType( name );
+			}
+		} );
+
+		const block = (
+			clientId,
+			name = 'test/image',
+			innerBlocks = [],
+			attributes = { id: 12 }
+		) => ( {
+			clientId,
+			name,
+			isValid: true,
+			attributes,
+			innerBlocks,
+		} );
 
 		function setUp() {
 			const registry = createRegistryWithStores();
+			registry.register( mediaEditorStore );
+			registry.dispatch( coreStore ).addEntities( [
+				{
+					...postTypeConfig,
+					name: 'wp_template_part',
+					baseURL: '/wp/v2/template-parts',
+				},
+			] );
 			registry
 				.dispatch( coreStore )
 				.receiveEntityRecords( 'postType', 'post', post );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords(
+					'postType',
+					'wp_template_part',
+					templatePart
+				);
 			registry.dispatch( editorStore ).setupEditor( post );
+			registry
+				.dispatch( blockEditorStore )
+				.resetBlocks( [
+					block( 'image-1' ),
+					block( 'plain-1', 'test/plain-image' ),
+					block( 'pattern', 'core/block', [ block( 'image-2' ) ] ),
+					block(
+						'part',
+						'core/template-part',
+						[ block( 'image-3' ) ],
+						{ slug: 'header', theme: 'theme' }
+					),
+					block( 'content', 'core/post-content', [
+						block( 'image-4' ),
+					] ),
+				] );
+			const editor = unlock( registry.dispatch( editorStore ) );
+			const open = ( clientId, onUpdate = vi.fn() ) => {
+				editor.openMediaEditorForBlock( {
+					id: 12,
+					clientId,
+					onUpdate,
+				} );
+				return registry.select( mediaEditorStore );
+			};
 			return {
 				registry,
-				editor: unlock( registry.dispatch( editorStore ) ),
+				editor,
+				open,
 				select: () => unlock( registry.select( editorStore ) ),
+				isDirty: ( { kind, name, id } ) =>
+					registry
+						.select( coreStore )
+						.hasEditsForEntityRecord( kind, name, id ),
 			};
 		}
 
@@ -994,9 +1108,12 @@ describe( 'Post actions', () => {
 
 			editor.setPendingMediaEdit( 'image-1', edit );
 
-			expect( select().getPendingMediaEdit( 'image-1' ) ).toBe( edit );
-			expect( select().getPendingMediaEdit( 'image-2' ) ).toBeUndefined();
-			expect( select().hasPendingMediaEdits() ).toBe( true );
+			expect( select().getPendingMediaEdits() ).toEqual( {
+				'image-1': edit,
+			} );
+			expect( select().getPendingMediaEditForBlock( 'image-1' ) ).toBe(
+				edit
+			);
 			expect( select().isEditedPostDirty() ).toBe( true );
 			// Transient, so it isn't sent with the post.
 			expect(
@@ -1010,129 +1127,80 @@ describe( 'Post actions', () => {
 			).toEqual( {} );
 		} );
 
-		it( 'clears edits', () => {
-			const { editor, select } = setUp();
-			editor.setPendingMediaEdit( 'image-1', edit );
-			editor.setPendingMediaEdit( 'image-2', edit );
+		it( 'stores an edit on the template part that owns the block', () => {
+			const { editor, select, isDirty } = setUp();
 
-			editor.setPendingMediaEdit( 'image-1', undefined );
-			expect( select().getPendingMediaEdits() ).toEqual( {
-				'image-2': edit,
-			} );
+			editor.setPendingMediaEdit( 'image-3', edit );
 
-			editor.clearPendingMediaEdits( [ 'image-2' ] );
-			expect( select().hasPendingMediaEdits() ).toBe( false );
+			expect(
+				select().getPendingMediaEdits( templatePartEntity )
+			).toEqual( { 'image-3': edit } );
+			expect( select().getPendingMediaEdits() ).toEqual( {} );
+			expect( isDirty( templatePartEntity ) ).toBe( true );
 			expect( select().isEditedPostDirty() ).toBe( false );
 		} );
 
-		describe( 'openMediaEditorForBlock()', () => {
-			const { store: mediaEditorStore } = unlock(
-				mediaEditorPrivateApis
+		it( 'clears edits', () => {
+			const { editor, select } = setUp();
+			editor.setPendingMediaEdit( 'image-1', edit );
+			editor.setPendingMediaEdit( 'image-4', edit );
+
+			editor.setPendingMediaEdit( 'image-1', undefined );
+			expect( select().getPendingMediaEdits() ).toEqual( {
+				'image-4': edit,
+			} );
+
+			editor.clearPendingMediaEdits(
+				{ kind: 'postType', name: 'post', id: postId },
+				[ 'image-4' ]
 			);
-			const pendingCrop = {
-				modifiers: edit.modifiers,
-				cropperState: { rotation: 90 },
-				aspectRatioValue: '0',
-				previewUrl: 'blob:preview',
-			};
+			expect( select().getPendingMediaEdits() ).toEqual( {} );
+			expect( select().isEditedPostDirty() ).toBe( false );
+		} );
 
-			beforeEach( () => {
-				registerBlockType( 'test/image', {
-					title: 'Image',
-					category: 'media',
-					apiVersion: 3,
-					attributes: { id: { type: 'number' } },
-					mediaEditor: {
-						getMedia: ( { id } ) => ( { id } ),
-						applyMedia: ( attributes, media ) => ( {
-							id: media.id,
-						} ),
-					},
-					save: () => null,
-				} );
-				registerBlockType( 'test/plain-image', {
-					title: 'Plain image',
-					category: 'media',
-					apiVersion: 3,
-					attributes: { id: { type: 'number' } },
-					save: () => null,
-				} );
-				registerBlockType( 'core/block', {
-					title: 'Pattern',
-					category: 'reusable',
-					apiVersion: 3,
-					save: () => null,
-				} );
-			} );
+		it( 'undoes an edit', () => {
+			const { registry, editor, select } = setUp();
+			editor.setPendingMediaEdit( 'image-1', edit );
 
-			afterEach( () => {
-				unregisterBlockType( 'test/image' );
-				unregisterBlockType( 'test/plain-image' );
-				unregisterBlockType( 'core/block' );
-			} );
+			registry.dispatch( coreStore ).undo();
 
-			function setUpBlocks( { deferMediaEditorCrops = true } = {} ) {
-				const context = setUp();
-				const { registry } = context;
-				registry.register( mediaEditorStore );
-				registry
-					.dispatch( editorStore )
-					.updateEditorSettings( { deferMediaEditorCrops } );
-				const block = (
-					clientId,
-					name = 'test/image',
-					innerBlocks = []
-				) => ( {
-					clientId,
-					name,
-					isValid: true,
-					attributes: { id: 12 },
-					innerBlocks,
-				} );
-				registry
-					.dispatch( blockEditorStore )
-					.resetBlocks( [
-						block( 'image-1' ),
-						block( 'plain-1', 'test/plain-image' ),
-						block( 'pattern', 'core/block', [
-							block( 'image-2' ),
-						] ),
-					] );
-				const open = ( clientId, onUpdate = vi.fn() ) => {
-					context.editor.openMediaEditorForBlock( {
-						id: 12,
-						clientId,
-						onUpdate,
-					} );
-					return registry.select( mediaEditorStore );
-				};
-				return { ...context, open };
-			}
+			expect( select().getPendingMediaEdits() ).toEqual( {} );
 
-			it( 'defers crops for a block that declares mediaEditor', () => {
-				const { open } = setUpBlocks();
+			registry.dispatch( coreStore ).redo();
+
+			expect( select().getPendingMediaEditForBlock( 'image-1' ) ).toBe(
+				edit
+			);
+		} );
+
+		describe( 'openMediaEditorForBlock()', () => {
+			it( 'defers crops for blocks whose entity saves them', () => {
+				const { open } = setUp();
 
 				expect( open( 'image-1' ).getDeferCrop() ).toBe( true );
+				expect( open( 'image-3' ).getDeferCrop() ).toBe( true );
+				expect( open( 'image-4' ).getDeferCrop() ).toBe( true );
 			} );
 
-			it( 'does not defer crops when they cannot be saved with the post', () => {
-				const { open } = setUpBlocks();
+			it( 'does not defer crops when they cannot be held', () => {
+				const { open } = setUp();
 
 				expect( open( undefined ).getDeferCrop() ).toBe( false );
 				expect( open( 'plain-1' ).getDeferCrop() ).toBe( false );
+				// Synced pattern content is saved with the posts using it.
 				expect( open( 'image-2' ).getDeferCrop() ).toBe( false );
 			} );
 
-			it( 'does not defer crops unless the editor allows it', () => {
-				const { open } = setUpBlocks( {
-					deferMediaEditorCrops: false,
-				} );
+			it( 'only defers crops in the post content with the template shown', () => {
+				const { editor, open } = setUp();
+				editor.setRenderingMode( 'template-locked' );
 
 				expect( open( 'image-1' ).getDeferCrop() ).toBe( false );
+				expect( open( 'image-4' ).getDeferCrop() ).toBe( true );
 			} );
 
 			it( 'stores a deferred crop and tells the block it is pending', () => {
-				const { open, select } = setUpBlocks();
+				const { open, select } = setUp();
 				const onUpdate = vi.fn();
 
 				open( 'image-1', onUpdate ).getOnUpdate()( {
@@ -1141,7 +1209,9 @@ describe( 'Post actions', () => {
 					pendingCrop,
 				} );
 
-				expect( select().getPendingMediaEdit( 'image-1' ) ).toEqual( {
+				expect(
+					select().getPendingMediaEditForBlock( 'image-1' )
+				).toEqual( {
 					...pendingCrop,
 					sourceId: 12,
 					sourceUrl: 'original.jpg',
@@ -1155,24 +1225,26 @@ describe( 'Post actions', () => {
 			} );
 
 			it( 'resumes a stored crop, and clears it on a save without one', () => {
-				const { open, select } = setUpBlocks();
-				open( 'image-1' ).getOnUpdate()( {
+				const { open, select } = setUp();
+				open( 'image-3' ).getOnUpdate()( {
 					id: 12,
 					url: 'original.jpg',
 					pendingCrop,
 				} );
 
-				const mediaEditor = open( 'image-1' );
+				const mediaEditor = open( 'image-3' );
 				expect( mediaEditor.getPendingCrop() ).toMatchObject(
 					pendingCrop
 				);
 
 				mediaEditor.getOnUpdate()( { id: 12, url: 'original.jpg' } );
-				expect( select().hasPendingMediaEdits() ).toBe( false );
+				expect(
+					select().getPendingMediaEdits( templatePartEntity )
+				).toEqual( {} );
 			} );
 
 			it( 'ignores a stored crop made on a different image', () => {
-				const { registry, editor, open, select } = setUpBlocks();
+				const { registry, editor, open, select } = setUp();
 				editor.setPendingMediaEdit( 'image-1', edit );
 				registry
 					.dispatch( blockEditorStore )
@@ -1183,19 +1255,6 @@ describe( 'Post actions', () => {
 				).toBe( undefined );
 				expect( open( 'image-1' ).getPendingCrop() ).toBe( null );
 			} );
-		} );
-
-		it( 'undoes an edit', () => {
-			const { registry, editor, select } = setUp();
-			editor.setPendingMediaEdit( 'image-1', edit );
-
-			registry.dispatch( coreStore ).undo();
-
-			expect( select().hasPendingMediaEdits() ).toBe( false );
-
-			registry.dispatch( coreStore ).redo();
-
-			expect( select().getPendingMediaEdit( 'image-1' ) ).toBe( edit );
 		} );
 	} );
 
@@ -1243,9 +1302,9 @@ describe( 'Post actions', () => {
 		/**
 		 * Answers everything `savePost` and the crop need.
 		 *
-		 * @param {string[]} requests    Collects `METHOD path` for every call.
-		 * @param {Object}   [editError] Rejects the `/edit` request with this.
-		 * @param {Function} [onEdit]    Called when the `/edit` request is made.
+		 * @param {string[]}   requests    Collects `METHOD path` for every call.
+		 * @param {Object}     [editError] Rejects the `/edit` request with this.
+		 * @param {() => void} [onEdit]    Called when the `/edit` request is made.
 		 */
 		function setFetchHandler( requests, editError, onEdit ) {
 			apiFetch.setFetchHandler( async ( options ) => {
@@ -1375,8 +1434,8 @@ describe( 'Post actions', () => {
 				{ id: 13, url: 'cropped.jpg' },
 			] );
 			expect(
-				unlock( registry.select( editorStore ) ).hasPendingMediaEdits()
-			).toBe( false );
+				unlock( registry.select( editorStore ) ).getPendingMediaEdits()
+			).toEqual( {} );
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
@@ -1438,9 +1497,9 @@ describe( 'Post actions', () => {
 				registry.select( editorStore ).getEditorBlocks()[ 0 ].attributes
 			).toEqual( { id: 12, url: 'original.jpg' } );
 			expect(
-				unlock( registry.select( editorStore ) ).getPendingMediaEdit(
+				unlock( registry.select( editorStore ) ).getPendingMediaEdits()[
 					'image-1'
-				)
+				]
 			).toBe( pendingMediaEdit );
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				true
