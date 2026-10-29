@@ -13,12 +13,3 @@
 .dataviews-bulk-actions__clear {
 	margin-inline-start: auto;
 }
-
-.dataviews-bulk-actions__action {
-	--wp-components-color-accent: var(--wpds-color-foreground-interactive-neutral);
-	--wp-components-color-accent-darker-20: var(--wpds-color-foreground-interactive-neutral-active);
-
-	&.is-secondary:not(:hover, :active, :focus, :disabled, [aria-disabled="true"]) {
-		border-color: var(--wpds-color-stroke-interactive-neutral);
-	}
-}
