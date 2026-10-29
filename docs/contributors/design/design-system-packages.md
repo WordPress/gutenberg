@@ -154,25 +154,25 @@ Before removing or changing a public API, use [Veloria](https://veloria.dev/) to
 
 For tokens, compare semantic purpose and affected modes as well as default values. Follow the [token source guide](/packages/theme/tokens/README.md) and [build procedure](/packages/theme/README.md#building), then inspect the generated assets and consumers affected by the change. Two tokens with equal values in one theme are not necessarily interchangeable.
 
-### Replace a legacy component
+## Replace a legacy component
 
 When `@wordpress/ui` provides a replacement for a `@wordpress/components` component, the replacement happens in the stages below. Each stage lists the condition to meet before it starts, the changes that belong together, and what a reviewer should check. A small replacement can combine adjacent stages in one pull request. `@wordpress/components` remains supported, so a legacy component can stay supported and not recommended indefinitely.
 
 A new component with a similar name is not necessarily a replacement. Use [Compare contracts before replacing an API](#compare-contracts-before-replacing-an-api) to decide whether it covers the legacy component's use cases, and which differences a migration guide must explain.
 
-#### 1. Alias the legacy import
+### 1. Alias the legacy import
 
 Add a `WC*` alias as soon as a public `@wordpress/ui` export has the same name as a `@wordpress/components` export, including a private API of `@wordpress/components`. The alias depends only on the name collision. It does not depend on the new component's status, or on whether the new component replaces the legacy one.
 
 Add the mapping to the `@wordpress/use-import-as` configuration in [`tools/eslint/config.mjs`](/tools/eslint/config.mjs), and rename every existing import, including destructuring from `unlock( privateApis )`. The alias is a convention of this repository, so it needs no changes to the `@wordpress/components` documentation or changelog.
 
-#### 2. Try the replacement in Gutenberg
+### 2. Try the replacement in Gutenberg
 
 Before recommending the new component, migrate a handful of Gutenberg consumers that represent different uses of the legacy component. Readiness judged without real consumers has tended to be optimistic. These migrations find gaps in the new API while it can still change, and they provide the material for the migration guide.
 
 Mark each of these imports as intentional early adoption with an `eslint-disable-next-line` directive on the import specifier, as described in the rule's [inline exceptions](/packages/eslint-plugin/docs/rules/use-recommended-components.md#inline-exceptions). Fix gaps in `@wordpress/ui` itself rather than working around them in the consumer. When the APIs differ, start a `migration-guide.mdx` story in the legacy component's `stories` directory. A reviewer should check behavioral and visual parity with the legacy component in each migrated consumer.
 
-#### 3. Recommend the replacement
+### 3. Recommend the replacement
 
 Recommend the new component when its API is stable, known blockers such as overlay compatibility or accessibility issues are resolved, it looks and behaves consistently next to `@wordpress/components` in the same interface, and the trial migrations left no unresolved gaps.
 
@@ -186,13 +186,13 @@ Make these changes in one pull request, so that the recommendation sources stay 
 
 A reviewer should check that the Storybook statuses, `manifest` tags, allowlist, and denylist agree, that the denylist message names a public alternative, and that the migration guide covers behavioral differences such as defaults and submitted form values, not only renamed props.
 
-#### 4. Migrate other consumers selectively
+### 4. Migrate other consumers selectively
 
 Do not migrate the remaining Gutenberg consumers only because a replacement is recommended. Each migration takes time to review and risks regressions. Migrate a consumer when you are already changing its file, when the new component brings a tangible benefit to that consumer, or when the legacy component is headed toward deprecation, which requires migrating every direct consumer first.
 
 When a migration is its own pull request, keep it focused, such as on one area of the editor. After each migration, run `npm run lint:js:prune-suppressions` and commit the reduced counts. A reviewer should check parity against the migration guide, including overlays that render next to `@wordpress/components` overlays.
 
-#### 5. Decide whether to deprecate
+### 5. Decide whether to deprecate
 
 Whether to deprecate a legacy component is a separate decision for each component. Recommending a replacement does not by itself require a deprecation.
 
