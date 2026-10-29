@@ -206,4 +206,20 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		);
 		$this->assertSame( '', $output );
 	}
+
+	public function test_embeds_in_the_value_are_rendered() {
+		wp_embed_register_handler(
+			'test-inner-blocks',
+			'#https://example\.org/video/(\w+)#',
+			static function ( $matches ) {
+				return '<span class="test-embed">' . $matches[1] . '</span>';
+			}
+		);
+		$this->value = '<!-- wp:paragraph --><p>[embed]https://example.org/video/one[/embed]</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>https://example.org/video/two</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group();
+		wp_embed_unregister_handler( 'test-inner-blocks' );
+
+		$this->assertStringContainsString( '<span class="test-embed">one</span>', $output );
+		$this->assertStringContainsString( '<span class="test-embed">two</span>', $output );
+	}
 }
