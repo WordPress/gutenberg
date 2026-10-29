@@ -1014,4 +1014,92 @@ test.describe( 'Buttons', () => {
 			).toHaveText( 'Changed' );
 		} );
 	} );
+
+	test( 'edits a Button from the Content tab after picking it in the List View tab', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'First',
+						url: 'https://wordpress.org/',
+					},
+				},
+				{ name: 'core/button', attributes: { text: 'Second' } },
+			],
+		} );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Buttons',
+				exact: true,
+			} )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings.getByRole( 'tab', { name: 'List View' } ).click();
+		await settings
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } )
+			.getByRole( 'link', { name: 'First' } )
+			.click();
+
+		// The Button opens on its Content tab with its text and link.
+		await expect(
+			settings.getByRole( 'tab', { name: 'Content' } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+		const textInput = settings.getByRole( 'textbox', { name: 'Text' } );
+		await expect( textInput ).toHaveValue( 'First' );
+		const linkButton = settings.getByRole( 'button', { name: /^Link to/ } );
+		await expect( linkButton ).toHaveText( /wordpress\.org/ );
+		await expect(
+			settings.getByRole( 'checkbox', { name: 'Open in new tab' } )
+		).toBeVisible();
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/' );
+
+		// Edits from the sidebar reach the block.
+		await textInput.fill( 'Changed' );
+		await linkButton.click();
+		const linkInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect( linkInput ).toBeFocused();
+		await linkInput.fill( 'https://example.com/' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			settings.getByRole( 'button', { name: /^Link to/ } )
+		).toHaveText( /example\.com/ );
+		await expect(
+			editor.canvas
+				.getByRole( 'textbox', { name: 'Button text' } )
+				.first()
+		).toHaveText( 'Changed' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Changed',
+							url: 'https://example.com/',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: { text: 'Second' },
+					},
+				],
+			},
+		] );
+	} );
 } );
