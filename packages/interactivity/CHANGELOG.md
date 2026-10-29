@@ -10,6 +10,12 @@
 
 ## 2.4.0 (2023-10-05)
 
+## 2.3.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 2.3.0 (2023-09-20)
 
 ### Enhancements

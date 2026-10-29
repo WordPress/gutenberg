@@ -4,6 +4,13 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.20 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+
 ## 8.19.19 (2026-08-06)
 
 ### Bug Fixes
