@@ -355,6 +355,39 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Checks if a comment can be edited or deleted.
+	 *
+	 * Copied from core, extended to the 'reaction' type. A reaction requires
+	 * the same edit access to the note's post as the note it belongs to.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $comment Comment object.
+	 * @return bool Whether the comment can be edited or deleted.
+	 */
+	protected function check_edit_permission( $comment ) {
+		if ( 0 === (int) get_current_user_id() ) {
+			return false;
+		}
+
+		// START CHANGE: Check notes and reactions against the note's post.
+		/*
+		 * Notes and their reactions are editorial content, so require edit access
+		 * to the note's post rather than the moderate_comments capability.
+		 */
+		if ( in_array( strtolower( $comment->comment_type ), array( 'note', 'reaction' ), true ) ) {
+			return current_user_can( 'edit_comment', $comment->comment_ID );
+		}
+		// END CHANGE.
+
+		if ( current_user_can( 'moderate_comments' ) ) {
+			return true;
+		}
+
+		return current_user_can( 'edit_comment', $comment->comment_ID );
+	}
+
+	/**
 	 * Checks if a given request has access to create a comment.
 	 *
 	 * Copied from core, extended to the 'reaction' type. A reaction can only
