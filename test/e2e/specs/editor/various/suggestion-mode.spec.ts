@@ -2095,6 +2095,73 @@ test.describe( 'Suggestion mode', () => {
 			.toEqual( [ 'rgba(0, 0, 0, 0)', 'none' ] );
 	} );
 
+	test( 'additions and deletions are tinted green and red, not by author', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Alpha' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Beta gamma' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const alpha = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha' } );
+		const beta = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Beta' } );
+
+		await editor.selectBlocks( alpha );
+		await alpha.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' one' );
+		const addition = alpha.locator( 'mark.wp-suggestion-add' );
+		await expect( addition ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await beta.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Backspace' );
+		const deletion = beta.locator( 'mark.wp-suggestion-del' );
+		await expect( deletion ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 4 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		const format = beta.locator( 'mark.wp-suggestion-format' );
+		await expect( format ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// The fill with the marker's own author color, then with another
+		// author's color forced onto it.
+		const fills = ( locator: any ) =>
+			locator.evaluate( ( el: HTMLElement ) => {
+				const before = window.getComputedStyle( el ).backgroundColor;
+				el.style.setProperty(
+					'--suggestion-author-color',
+					'rgb(0, 0, 255)'
+				);
+				const after = window.getComputedStyle( el ).backgroundColor;
+				el.style.removeProperty( '--suggestion-author-color' );
+				return { before, after };
+			} );
+
+		const additionFills = await fills( addition );
+		const deletionFills = await fills( deletion );
+		expect( additionFills.after ).toBe( additionFills.before );
+		expect( deletionFills.after ).toBe( deletionFills.before );
+		expect( additionFills.before ).not.toBe( deletionFills.before );
+
+		// A formatting change keeps its author's tint.
+		const formatFills = await fills( format );
+		expect( formatFills.after ).not.toBe( formatFills.before );
+	} );
+
 	test( 'a block-support attribute suggestion is previewed on the block', async ( {
 		editor,
 		page,
