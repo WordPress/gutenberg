@@ -3,6 +3,7 @@ import {
 	FontSizePicker,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	ToggleControl,
 } from '@wordpress/components';
@@ -40,11 +41,6 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
 import type {
 	PanelResetAllFilter,
 	PanelStyle,
@@ -296,7 +292,6 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
 }: TypographyPanelProps ) {
 	const {
@@ -309,19 +304,6 @@ export default function TypographyPanel( {
 		decodeValue,
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
-	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = (
-		isInherited: boolean,
-		hasLocalOverride: boolean,
-		className?: string
-	) =>
-		getInheritanceProps(
-			showInheritanceLabelIndicators && isInherited,
-			showInheritanceLabelIndicators && hasLocalOverride,
-			className
-		);
-
 	// Text color. Writes to `color.text` (unchanged storage path). The
 	// control is rendered here instead of the Color panel because text
 	// color is a typographic concern.
@@ -430,9 +412,6 @@ export default function TypographyPanel( {
 	);
 	const fontFamily =
 		decodeValue( value?.typography?.fontFamily ) ?? inheritedFontFamily;
-	const isFontFamilyPlaceholder =
-		! hasValue( value?.typography?.fontFamily ) &&
-		hasValue( inheritedFontFamily );
 	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
 		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
 	}, [ settings, fontFamily ] );
@@ -919,9 +898,6 @@ export default function TypographyPanel( {
 	const hasTextShadowControl = useHasTextShadowControl( settings );
 	const inheritedTextShadow = inheritedValue?.typography?.textShadow;
 	const textShadow = value?.typography?.textShadow ?? inheritedTextShadow;
-	const isTextShadowPlaceholder =
-		! hasValue( value?.typography?.textShadow ) &&
-		hasValue( inheritedTextShadow );
 	const setTextShadow = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
@@ -984,13 +960,6 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
 					contrastWarning={ contrastWarning }
-					showInheritanceLabelIndicators={
-						showInheritanceLabelIndicators
-					}
-					isPlaceholder={
-						userTextColor === undefined && textColor !== undefined
-					}
-					hasInheritedValue={ textColor !== undefined }
 					tabs={ [
 						{
 							key: 'text',
@@ -1025,11 +994,6 @@ export default function TypographyPanel( {
 					resetValue={ resetTextGradient }
 					isShownByDefault={ defaultControls.textGradient }
 					indicators={ [ userTextGradient ?? inheritedTextGradient ] }
-					showInheritanceLabelIndicators={
-						showInheritanceLabelIndicators
-					}
-					isPlaceholder={ isTextGradientPlaceholder }
-					hasInheritedValue={ inheritedTextGradient !== undefined }
 					tabs={ [
 						{
 							key: 'text-gradient',
@@ -1057,11 +1021,7 @@ export default function TypographyPanel( {
 				/>
 			) }
 			{ hasFontFamilyEnabled && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isFontFamilyPlaceholder,
-						hasFontFamily() && inheritedFontFamily !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Font' ) }
 					hasValue={ hasFontFamily }
 					onDeselect={ resetFontFamily }
@@ -1073,17 +1033,12 @@ export default function TypographyPanel( {
 						value={ fontFamily }
 						onChange={ setFontFamily }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasFontSizeEnabled && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isFontSizePlaceholder,
-						hasFontSize() && rawInheritedFontSize !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
-					hasInlineEndToggle
 					onDeselect={ resetFontSize }
 					isShownByDefault={ defaultControls.fontSize }
 					panelId={ panelId }
@@ -1102,16 +1057,10 @@ export default function TypographyPanel( {
 						withReset={ false }
 						withSlider
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasAppearanceControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isFontAppearancePlaceholder,
-						hasFontAppearance() &&
-							( inheritedFontStyle !== undefined ||
-								inheritedFontWeight !== undefined )
-					) }
+				<ToolsPanelItem
 					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
@@ -1128,15 +1077,11 @@ export default function TypographyPanel( {
 						hasFontWeights={ hasFontWeights }
 						fontFamilyFaces={ fontFamilyFaces }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasLineHeightEnabled && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isLineHeightPlaceholder,
-						hasLineHeight() && inheritedLineHeight !== undefined,
-						'single-column'
-					) }
+				<ToolsPanelItem
+					className="single-column"
 					label={ __( 'Line height' ) }
 					hasValue={ hasLineHeight }
 					onDeselect={ resetLineHeight }
@@ -1160,16 +1105,11 @@ export default function TypographyPanel( {
 								}
 							: {} ) }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasLetterSpacingControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isLetterSpacingPlaceholder,
-						hasLetterSpacing() &&
-							inheritedLetterSpacing !== undefined,
-						'single-column'
-					) }
+				<ToolsPanelItem
+					className="single-column"
 					label={ __( 'Letter spacing' ) }
 					hasValue={ hasLetterSpacing }
 					onDeselect={ resetLetterSpacing }
@@ -1196,14 +1136,10 @@ export default function TypographyPanel( {
 								: undefined
 						}
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextIndentControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isTextIndentPlaceholder,
-						hasTextIndent() && inheritedTextIndent !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Line indent' ) }
 					hasValue={ hasTextIndent }
 					onDeselect={ resetTextIndent }
@@ -1239,15 +1175,11 @@ export default function TypographyPanel( {
 							help={ textIndentHelp }
 						/>
 					) }
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextColumnsControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isTextColumnsPlaceholder,
-						hasTextColumns() && inheritedTextColumns !== undefined,
-						'single-column'
-					) }
+				<ToolsPanelItem
+					className="single-column"
 					label={ __( 'Columns' ) }
 					hasValue={ hasTextColumns }
 					onDeselect={ resetTextColumns }
@@ -1269,16 +1201,11 @@ export default function TypographyPanel( {
 						// @ts-expect-error NumberControl takes no initial position.
 						initialPosition={ 1 }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextDecorationControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isTextDecorationPlaceholder,
-						hasTextDecoration() &&
-							inheritedTextDecoration !== undefined,
-						'single-column'
-					) }
+				<ToolsPanelItem
+					className="single-column"
 					label={ __( 'Decoration' ) }
 					hasValue={ hasTextDecoration }
 					onDeselect={ resetTextDecoration }
@@ -1291,15 +1218,11 @@ export default function TypographyPanel( {
 						// @ts-expect-error TextDecorationControl takes no input width.
 						__unstableInputWidth="auto"
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasWritingModeControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isWritingModePlaceholder,
-						hasWritingMode() && inheritedWritingMode !== undefined,
-						'single-column'
-					) }
+				<ToolsPanelItem
+					className="single-column"
 					label={ __( 'Orientation' ) }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
@@ -1310,15 +1233,10 @@ export default function TypographyPanel( {
 						value={ writingMode }
 						onChange={ setWritingModeWithInheritedCommit }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextTransformControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isTextTransformPlaceholder,
-						hasTextTransform() &&
-							inheritedTextTransform !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Letter case' ) }
 					hasValue={ hasTextTransform }
 					onDeselect={ resetTextTransform }
@@ -1332,14 +1250,10 @@ export default function TypographyPanel( {
 						showNone
 						isBlock
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextShadowControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isTextShadowPlaceholder,
-						hasTextShadow() && inheritedTextShadow !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Text shadow' ) }
 					hasValue={ hasTextShadow }
 					onDeselect={ resetTextShadow }
@@ -1351,14 +1265,10 @@ export default function TypographyPanel( {
 						textShadow={ textShadow as string | undefined }
 						onChange={ setTextShadow }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextAlignmentControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isTextAlignPlaceholder,
-						hasTextAlign() && inheritedTextAlign !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Text alignment' ) }
 					hasValue={ hasTextAlign }
 					onDeselect={ resetTextAlign }
@@ -1382,7 +1292,7 @@ export default function TypographyPanel( {
 							</Notice.Root>
 						</div>
 					) }
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasTextColorEnabled && showsTextGradientNotice && (
 				<NoticeForControl

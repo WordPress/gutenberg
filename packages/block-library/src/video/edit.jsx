@@ -16,8 +16,8 @@ import {
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState } from '@wordpress/element';
-import { useReducedMotion } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
+import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
@@ -45,7 +45,6 @@ function VideoEdit( {
 	insertBlocksAfter,
 	onReplace,
 } ) {
-	const videoPlayer = useRef();
 	const {
 		id,
 		controls,
@@ -86,20 +85,15 @@ function VideoEdit( {
 		onError: onUploadError,
 	} );
 
-	useEffect( () => {
-		// Placeholder may be rendered.
-		if ( videoPlayer.current ) {
-			videoPlayer.current.load();
-		}
-	}, [ poster ] );
+	// `autoPlay` only applies when the video loads, so reload it when reduced
+	// motion changes.
+	const videoRef = useRefEffect(
+		( node ) => {
+			node.load();
+		},
+		[ poster, prefersReducedMotion ]
+	);
 
-	// `autoPlay` only applies when the video loads, so pause a video that is
-	// already playing when the user turns on reduced motion.
-	useEffect( () => {
-		if ( prefersReducedMotion ) {
-			videoPlayer.current?.pause();
-		}
-	}, [ prefersReducedMotion ] );
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -266,7 +260,7 @@ function VideoEdit( {
 					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
-					ref={ videoPlayer }
+					ref={ videoRef }
 					autoPlay={ autoplay && ! prefersReducedMotion }
 					loop={ loop }
 					muted={ muted }
