@@ -109,7 +109,13 @@ export const nonBreakingSpace = {
 					<RichTextToolbarButton
 						name="non-breaking-space"
 						icon={ icon }
-						title={ __( 'Replace non-breaking spaces' ) }
+						title={
+							value.text
+								.slice( range[ 0 ], range[ 1 ] )
+								.split( NBSP ).length === 2
+								? __( 'Replace non-breaking space' )
+								: __( 'Replace non-breaking spaces' )
+						}
 						onClick={ replaceNonBreakingSpaces }
 						isActive
 					/>
