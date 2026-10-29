@@ -1195,9 +1195,8 @@ test.describe( 'Navigation block', () => {
 		requestUtils,
 		navigation,
 	} ) => {
-		await requestUtils.deleteAllPosts();
 		await requestUtils.createPost( {
-			title: 'Alignment post',
+			title: 'What I learned from my cat',
 			status: 'publish',
 		} );
 		await admin.createNewPost();
@@ -1219,14 +1218,15 @@ test.describe( 'Navigation block', () => {
 		await navigation.getSubmenuBlockInserter().click();
 
 		await expect( navigation.getLinkControlSearch() ).toBeFocused();
-		await page.keyboard.type( 'Alignment' );
+		await page.keyboard.type( 'What I learned from my cat' );
 		await page
 			.getByRole( 'listbox', { name: /Search results/ } )
-			.getByRole( 'option', { name: /Alignment post/ } )
+			.getByRole( 'option', { name: /What I learned from my cat/ } )
 			.click();
 
-		const linkControlLink =
-			navigation.getLinkControlLink( 'Alignment post' );
+		const linkControlLink = navigation.getLinkControlLink(
+			'What I learned from my cat'
+		);
 		await expect( linkControlLink ).toBeVisible();
 		await expect( linkControlLink ).toBeFocused();
 
