@@ -3,7 +3,7 @@ import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import {
 	GridVisualizer,
-	useGridAutoRowSpan,
+	useGridAutoSpan,
 	useGridLayoutSync,
 } from '../components/grid';
 import { store as blockEditorStore } from '../store';
@@ -22,7 +22,7 @@ import type {
 
 function GridLayoutSync( props: GridLayoutSyncProps ) {
 	useGridLayoutSync( props );
-	useGridAutoRowSpan( props );
+	useGridAutoSpan( props );
 	return undefined;
 }
 
