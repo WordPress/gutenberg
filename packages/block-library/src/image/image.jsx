@@ -321,7 +321,7 @@ export default function Image( {
 	// `height: auto` so a theme can't squish them.
 	const isCroppedGalleryImage = imageCrop && parentLayoutType === 'flex';
 
-	const { image: attachment, attachmentResolutionError } = useSelect(
+	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
 			const imageRecord =
 				id && isSingleSelected
@@ -357,32 +357,6 @@ export default function Image( {
 		},
 		[ id, isSingleSelected ]
 	);
-	// An id copied from another site can belong to a different file here, so the
-	// attachment only counts when it holds this image, by the same rule as
-	// WordPress's `wp_image_file_matches_image_meta()`.
-	const {
-		file = '',
-		original_image: originalImage,
-		sizes = {},
-	} = attachment?.media_details ?? {};
-	const folder = file
-		.slice( 0, file.lastIndexOf( '/' ) + 1 )
-		.replace( /^.*?wp-content\/uploads\/?/, '' );
-	const isOtherFile =
-		!! attachment &&
-		! (
-			file.length > 4 &&
-			[
-				file,
-				...[
-					originalImage,
-					...Object.values( sizes ).map( ( size ) => size.file ),
-				]
-					.filter( Boolean )
-					.map( ( name ) => folder + name ),
-			].some( ( path ) => url?.split( '?' )[ 0 ].endsWith( path ) )
-		);
-	const image = isOtherFile ? undefined : attachment;
 
 	const {
 		canInsertCover,
@@ -460,15 +434,13 @@ export default function Image( {
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	// If the image has an id but the attachment doesn't exist on this site (a 404),
-	// or is a different file, ignore the id so Gutenberg treats the image as
-	// external. This handles content copied between WordPress sites.
+	// ignore the id so Gutenberg treats the image as external. This handles
+	// content copied between WordPress sites.
 	// See: https://github.com/WordPress/gutenberg/issues/74156
 	// Only a confirmed 404 counts: 403, 500 or network failures don't mean the
 	// attachment is missing.
 	const attachmentId =
-		attachmentResolutionError?.status === 404 || isOtherFile
-			? undefined
-			: id;
+		attachmentResolutionError?.status === 404 ? undefined : id;
 
 	/*
 	 * Externally hosted images can be uploaded to the media library. The
