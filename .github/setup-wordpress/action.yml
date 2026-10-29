@@ -46,6 +46,18 @@ runs:
         -e "s|%PLUGIN_INSTALL_DIR%|gutenberg|g" \
         bin/docker-compose.override.yml.template > wordpress/docker-compose.override.yml
 
+  # The `mysql` healthcheck in `wordpress-develop` pings `localhost`, which connects through the Unix socket. While a new
+  # database is initialized, a temporary server listens on that socket only, so the container can report healthy before
+  # it accepts TCP connections. Ping over TCP instead, as `wordpress-develop` does since r63871.
+  - name: Check database readiness over TCP
+    shell: bash
+    run: |
+      cat >> wordpress/docker-compose.override.yml << 'EOF'
+        mysql:
+          healthcheck:
+            test: [ 'CMD-SHELL', 'if [ "$LOCAL_DB_TYPE" = "mariadb" ]; then mariadb-admin ping -h 127.0.0.1 --protocol=tcp; else mysqladmin ping -h 127.0.0.1 --protocol=tcp; fi' ]
+      EOF
+
   - name: Docker debug information
     shell: bash
     run: |
