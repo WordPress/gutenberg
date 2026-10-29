@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.8.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)
