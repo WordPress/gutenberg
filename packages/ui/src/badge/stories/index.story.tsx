@@ -120,7 +120,8 @@ export const InfotipWithButton: Story = {
 						<Stack direction="row" justify="flex-end">
 							<Button
 								variant="minimal"
-								tone="brand"
+								tone="neutral"
+								size="compact"
 								onClick={ action( 'Retry upload' ) }
 							>
 								Retry upload
