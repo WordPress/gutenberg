@@ -55,7 +55,7 @@ function createScopedNameGenerator( plugins ) {
  * @param {Object}  options
  * @param {boolean} [options.cssModules=false] Whether to emit CSS Module exports.
  * @param {boolean} [options.minify=true]      Whether to minify the CSS.
- * @return {Function} esbuild-sass-plugin transform callback.
+ * @return {Function} Transform of compiled CSS into a JavaScript module.
  */
 export function compileInlineStyle( {
 	cssModules = false,

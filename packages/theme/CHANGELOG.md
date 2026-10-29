@@ -7,6 +7,14 @@
 -   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 
+### Enhancements
+
+-   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+
+### Internal
+
+-   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

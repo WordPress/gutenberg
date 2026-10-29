@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
 ### Bug Fixes
@@ -12,7 +13,9 @@
 
 ### Internal
 
--   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency, so fallbacks no longer require installing `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the `@wordpress/theme` entry points ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Declare `@wordpress/theme` as an optional peer dependency again, so the fallback plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).
 -   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
 
 ## 0.26.0 (2026-10-20)
