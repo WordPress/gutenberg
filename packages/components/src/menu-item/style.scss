@@ -10,6 +10,19 @@
 	width: 100%;
 	font-weight: var(--wpds-typography-font-weight-default);
 
+	&:has(.components-menu-item__info-wrapper) {
+		align-items: flex-start;
+
+		> .components-menu-items__item-icon {
+			// Center each icon on the title line without changing its size.
+			translate: 0 calc((1lh - 100%) / 2);
+		}
+
+		.components-menu-item__shortcut {
+			align-self: flex-start;
+		}
+	}
+
 	&[role="menuitemradio"],
 	&[role="menuitemcheckbox"] {
 		.components-menu-item__item:only-child {
