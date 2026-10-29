@@ -5,6 +5,7 @@
 ### New Features
 
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
+-   Notes: Add a note to text selected across several blocks ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
 
 ### Enhancements
 

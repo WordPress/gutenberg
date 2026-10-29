@@ -63,6 +63,8 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
 
 Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill. The text a new note is started from is wrapped with a `core/note` marker whose id is `new`, the same sentinel `selectNote` uses for the form, until the note is sent, so the anchor follows edits like a saved note's does; `onCreate` swaps in the saved id, and each exit from an empty form strips it with `onDiscard` at the point of exit: Cancel, the form's focus-out, and `useNoteSelection` when the caret moves the selection away from `new`.
 
+A note started on text selected across blocks (from the block options menu, the block toolbar or the shortcut) gets a `new` marker in every block with selected text: `onStart` reads the range in each block with `readMultiBlockSelection`, then narrows the selection to the first block's part, which becomes the block the form shows at. `onCreate` and `onDiscard` act on every sibling block that holds a `new` marker, so the note is saved to, or dropped from, all of them. From then on it is a note shared by several blocks, like one on a split or duplicated block.
+
 ## Note selection
 
 The selected note is a small state machine driven by the caret. `useCaretChange` reports caret moves from a block-editor store subscription, and `useNoteSelection` applies `pickNoteForCaret`, which holds the transitions. Three caret events change the selected note, and everything else leaves it alone:
