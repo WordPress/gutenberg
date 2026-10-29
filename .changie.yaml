@@ -33,7 +33,7 @@ custom:
 # Pre-1.0 packages (signaled via GUTENBERG_PRE_1="true"): breaking changes bump minor,
 # while stable packages (>=1.0) bump major as usual.
 # 'Stable Release' promotes 0.x packages to 1.0.0 and is last so it is not the
-# default choice.
+# default choice. Native auto-bumping requires GUTENBERG_PRE_1="true" to promote.
 kinds:
     - label: Breaking Changes
       auto: '{{if eq .Env.PRE_1 "true"}}minor{{else}}major{{end}}'
@@ -50,7 +50,7 @@ kinds:
     - label: Documentation
       auto: patch
     - label: Stable Release
-      auto: major
+      auto: '{{if eq .Env.PRE_1 "true"}}major{{else}}none{{end}}'
 
 projects:
     - label: Components
