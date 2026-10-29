@@ -21,6 +21,18 @@ describe( 'formatNumber', () => {
 		expect( formatNumber( 1234567.5 ) ).toBe( '1.234.567,5' );
 	} );
 
+	it.each( [
+		[ 'de_DE_formal', 'de-DE' ],
+		[ 'de_CH_informal', 'de-CH' ],
+		[ 'pt_PT_ao90', 'pt-PT' ],
+		[ 'nl_NL_formal', 'nl-NL' ],
+	] )( 'ignores the qualifier of the locale %s', ( lang, locale ) => {
+		setLocaleData( { '': { lang } } );
+		expect( formatNumber( 1234567.5 ) ).toBe(
+			new Intl.NumberFormat( locale ).format( 1234567.5 )
+		);
+	} );
+
 	it( 'follows changes of the locale data', () => {
 		setLocaleData( { '': { lang: 'de_DE' } } );
 		setLocaleData( { '': { lang: 'fr_FR' } } );

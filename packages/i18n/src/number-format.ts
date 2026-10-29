@@ -35,8 +35,11 @@ export function formatNumber(
 	value: number,
 	options?: Intl.NumberFormatOptions
 ): string {
-	// WordPress locales use underscores (`de_DE`), `Intl` expects hyphens.
-	const locale = getLocale().replace( /_/g, '-' );
+	// WordPress locales use underscores (`de_DE`), `Intl` expects hyphens. Keep
+	// the language and the region: `Intl` knows nothing about a qualifier such as
+	// `de_DE_formal` or `pt_PT_ao90`.
+	const [ language, region ] = getLocale().split( /[_-]/ );
+	const locale = region ? `${ language }-${ region }` : language;
 	try {
 		return new Intl.NumberFormat( locale, options ).format( value );
 	} catch ( error ) {
