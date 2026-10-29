@@ -1081,6 +1081,75 @@ test.describe( 'Image', () => {
 		} );
 		expect( await target ).toBe( true );
 	} );
+
+	test( 'offers to upload an image whose attachment is missing, without changing it', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// An id copied from another site, which has no attachment here.
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { id: media.id + 1000, url: media.source_url },
+		} );
+
+		await editor.showBlockToolbar();
+		await expect(
+			page.getByRole( 'button', { name: 'Upload to Media Library' } )
+		).toBeVisible();
+		expect( await editor.getBlocks() ).toEqual( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: media.id + 1000,
+					url: media.source_url,
+					alt: '',
+					caption: '',
+					isDecorative: false,
+				},
+				innerBlocks: [],
+			},
+		] );
+	} );
+
+	test( 'offers to upload an image whose id is a different file, without changing it', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// An id copied from another site, which is a different file here.
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		const otherMedia = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_green.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { id: otherMedia.id, url: media.source_url },
+		} );
+
+		await editor.showBlockToolbar();
+		await expect(
+			page.getByRole( 'button', { name: 'Upload to Media Library' } )
+		).toBeVisible();
+		expect( await editor.getBlocks() ).toEqual( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: otherMedia.id,
+					url: media.source_url,
+					alt: '',
+					caption: '',
+					isDecorative: false,
+				},
+				innerBlocks: [],
+			},
+		] );
+	} );
 } );
 
 test.describe( 'Image - lightbox', () => {
