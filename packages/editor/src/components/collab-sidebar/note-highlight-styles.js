@@ -75,18 +75,23 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * A thread is block-level when its block contains no `core/note` marker with
  * its id. When a block has several, the first one supplies the color.
  *
- * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientId`).
+ * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientIds`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
  */
 export function buildBlockHighlightCss( threads, getBlockAttributes ) {
 	const rules = [];
 	const highlightedBlocks = new Set();
-	for ( const thread of threads ?? [] ) {
-		const clientId = thread?.blockClientId;
+	const anchors = ( threads ?? [] ).flatMap( ( thread ) =>
+		thread?.id
+			? thread.blockClientIds.map( ( clientId ) => ( {
+					thread,
+					clientId,
+				} ) )
+			: []
+	);
+	for ( const { thread, clientId } of anchors ) {
 		if (
-			! thread?.id ||
-			! clientId ||
 			highlightedBlocks.has( clientId ) ||
 			findNoteInBlock( getBlockAttributes( clientId ), thread.id )
 		) {

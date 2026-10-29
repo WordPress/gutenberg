@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import { focusNoteThread, getAnchorClientId } from './utils';
 import {
 	NoteDraftsContext,
 	useFloatingBoard,
@@ -139,13 +139,19 @@ export function Notes( {
 			threads[ currentIndex + 1 ] ?? threads[ currentIndex - 1 ];
 		if ( ! adjacentThread ) {
 			selectNote( undefined );
-			toggleBlockHighlight( thread.blockClientId, false );
+			toggleBlockHighlight(
+				getAnchorClientId( thread, selectedBlockClientId ),
+				false
+			);
 			relatedBlockElement?.focus();
 			return;
 		}
 
 		if ( getSelectedNote() === thread.id ) {
-			pickNote( adjacentThread.id, adjacentThread.blockClientId );
+			pickNote(
+				adjacentThread.id,
+				getAnchorClientId( adjacentThread, selectedBlockClientId )
+			);
 		}
 		focusNoteThread( adjacentThread.id, sidebarRef.current );
 	}
@@ -157,6 +163,10 @@ export function Notes( {
 
 		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
 		const isSelfTarget = event.currentTarget === event.target;
+		const anchorClientId = getAnchorClientId(
+			thread,
+			selectedBlockClientId
+		);
 
 		if (
 			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
@@ -164,7 +174,7 @@ export function Notes( {
 			! isSelected
 		) {
 			// Expand thread.
-			pickNote( thread.id, thread.blockClientId );
+			pickNote( thread.id, anchorClientId );
 		} else if (
 			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
 				isSelfTarget &&
@@ -173,8 +183,8 @@ export function Notes( {
 		) {
 			// Collapse thread.
 			selectNote( undefined );
-			if ( thread.blockClientId ) {
-				toggleBlockHighlight( thread.blockClientId, false );
+			if ( anchorClientId ) {
+				toggleBlockHighlight( anchorClientId, false );
 			}
 			focusThreadOrAdjacent( thread, thread );
 		} else if ( isSelfTarget ) {
@@ -265,6 +275,10 @@ export function Notes( {
 						) }
 						<NoteThread
 							note={ thread }
+							anchorClientId={ getAnchorClientId(
+								thread,
+								selectedBlockClientId
+							) }
 							focusThreadOrAdjacent={ focusThreadOrAdjacent }
 							isSelected={ selectedNote === thread.id }
 							expandReplies={ expandReplies }
