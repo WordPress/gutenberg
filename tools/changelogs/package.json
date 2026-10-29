@@ -22,13 +22,13 @@
 	},
 	"type": "module",
 	"exports": {
-		".": "./index.js",
+		".": "./index.ts",
 		"./config": "./lib/config.ts",
 		"./exec-changie": "./lib/exec-changie.ts",
 		"./validate": "./lib/validate.ts",
-		"./projects": "./lib/projects.js",
-		"./migrate": "./lib/migrate.js",
-		"./preview": "./lib/preview.js"
+		"./migrate": "./lib/migrate.ts",
+		"./preview": "./lib/preview.ts",
+		"./release": "./lib/release.ts"
 	},
 	"devDependencies": {
 		"@types/js-yaml": "^3.12.10",

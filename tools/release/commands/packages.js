@@ -6,6 +6,15 @@ const glob = require( 'fast-glob' );
 const { inc: semverInc, parse: semverParse } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
 const { simpleGit } = require( 'simple-git' );
+const {
+	isChangiePackage,
+	validateChangieProjects,
+} = require( '@wordpress/changelog-tools/config' );
+const {
+	batchChangiePackage,
+	mergeChangieChangelogs,
+	getChangieUnreleasedLines,
+} = require( '@wordpress/changelog-tools/release' );
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,
@@ -17,15 +26,6 @@ const {
 	calculateVersionBumpFromChangelog,
 	findPluginReleaseBranchName,
 } = require( './common' );
-const {
-	isChangiePackage,
-	validateChangieProjects,
-} = require( '../../changelogs/lib/config.ts' );
-const {
-	batchChangiePackage,
-	mergeChangieChangelogs,
-	getChangieUnreleasedLines,
-} = require( '../../changelogs/lib/release.ts' );
 const pluginConfig = require( '../config' );
 
 const NPM_RELEASE_PHASE_ATTEMPTS = 3;

@@ -8,11 +8,11 @@ Tools for managing package changelogs and fragments using [Changie](https://chan
 -   `lib/config.ts`: loads configuration and detects whether a package is configured for Changie.
 -   `lib/validate.ts`: validates fragments for authoring, preview, and CI. Every fragment requires a positive integer `custom.PR`; `--require-pr` additionally requires a matching fragment for the target package.
 -   `lib/exec-changie.ts`: runs the bundled Changie binary. `npm run lint:changelogs` combines Gutenberg policy checks with native batch dry-run compilation for each selected fragment-managed package, catching incompatible timestamps, custom values, and templates without consuming fragments or writing release files. Changie can create a missing project directory during a dry-run.
--   `lib/migrate.js`: bi-directional migration between traditional `CHANGELOG.md` files and Changie version/fragment files.
--   `lib/preview.js`: preview unreleased notes across packages.
--   `lib/release.js`: version bump calculation and batch/merge operations used during automated package publishing.
+-   `lib/migrate.ts`: bi-directional migration between traditional `CHANGELOG.md` files and Changie version/fragment files.
+-   `lib/preview.ts`: preview unreleased notes across packages.
+-   `lib/release.ts`: pending-note rendering and batch/merge operations used during automated package publishing. Version policy stays in the release workspace.
 
-The private workspace exports its shared configuration and validator as TypeScript source. Consumers declare a workspace dependency and import `@wordpress/changelog-tools/config` or `@wordpress/changelog-tools/validate`, rather than using relative imports into another workspace. Node runs these modules with type stripping, so changelog commands need no build step. The workspace uses the repository's Node TypeScript preset for type checking.
+The private workspace exports TypeScript source through its root entrypoint (configuration helpers) and the `/config`, `/exec-changie`, `/validate`, `/migrate`, `/preview`, and `/release` entrypoints. Consumers declare a workspace dependency and import these package-name entrypoints rather than using relative imports into another workspace. The release workspace uses `@wordpress/changelog-tools/config` and `@wordpress/changelog-tools/release`; project helpers live in `/config`, with no separate `/projects` entrypoint. Node runs these modules with type stripping, so changelog commands need no build step. The workspace uses the repository's Node TypeScript preset for type checking.
 
 ## Migrating a package to Changie
 
