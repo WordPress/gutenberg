@@ -1293,9 +1293,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 *
 	 * @dataProvider data_reaction_cascade_hooks
 	 *
-	 * @param string $hook The comment lifecycle action to fire.
+	 * @param non-falsy-string $hook The comment lifecycle action to fire.
 	 */
-	public function test_reaction_cascade_tolerates_missing_comment( $hook ) {
+	public function test_reaction_cascade_tolerates_missing_comment( string $hook ) {
 		wp_set_current_user( self::$editor_id );
 		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
 		$note_id     = $this->create_note( $post_id, self::$editor_id );
@@ -1307,9 +1307,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * @return array<string, array{string}>
+	 * Data provider for {@see self::test_reaction_cascade_tolerates_missing_comment()}.
+	 *
+	 * @return array<non-falsy-string, array{ non-falsy-string }>
 	 */
-	public function data_reaction_cascade_hooks() {
+	public function data_reaction_cascade_hooks(): array {
 		return array(
 			'delete_comment'  => array( 'delete_comment' ),
 			'trashed_comment' => array( 'trashed_comment' ),
