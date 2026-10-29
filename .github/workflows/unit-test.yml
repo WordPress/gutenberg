@@ -57,17 +57,24 @@ jobs:
               run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     unit-php:
-        name: PHP${{ matrix.multisite && ' multisite' || '' }}
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
         runs-on: 'ubuntu-24.04'
+        env:
+            # The `php`, `cli` and `phpunit` images in the `wordpress-develop` local
+            # environment are all selected through this variable.
+            LOCAL_PHP: ${{ matrix.php }}-fpm
         permissions:
             contents: read
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
-            # Don't let one leg's failure cancel the other -- each leg is
+            # Don't let one PHP version's failure cancel the others -- each leg is
             # independently useful signal.
             fail-fast: false
             matrix:
+                # The oldest and newest PHP versions supported by the WordPress version
+                # this branch was shipped with, plus the first PHP 7 release.
+                php: ['5.6', '7.0', '7.4']
                 multisite: [false, true]
 
         steps:
@@ -101,7 +108,13 @@ jobs:
             # The WordPress test suite requires the PHPUnit Polyfills, and expects to find them in the
             # `vendor` directory of `wordpress-develop`. This mirrors how `wordpress-develop` installs its
             # Composer dependencies when testing this branch.
+            - name: Install the PHPUnit Polyfills (PHP 5.6 and 7.0)
+              if: ${{ matrix.php == '5.6' || matrix.php == '7.0' }}
+              working-directory: wordpress
+              run: docker compose run --rm php composer require --dev phpunit/phpunit:"^5.7" --update-with-dependencies
+
             - name: Install the PHPUnit Polyfills
+              if: ${{ matrix.php != '5.6' && matrix.php != '7.0' }}
               working-directory: wordpress
               run: docker compose run --rm php composer install
 
