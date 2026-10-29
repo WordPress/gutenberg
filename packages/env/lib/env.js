@@ -123,19 +123,6 @@ module.exports = {
 			] );
 		}
 
-		try {
-			await checkDatabaseConnection( config );
-		} catch ( error ) {
-			// Wait 30 seconds for MySQL to accept connections.
-			await retry( () => checkDatabaseConnection( config ), {
-				times: 30,
-				delay: 1000,
-			} );
-
-			// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-			await sleep( 4000 );
-		}
-
 		// Retry WordPress installation in case MySQL *still* wasn't ready.
 		await Promise.all( [
 			retry( () => configureWordPress( 'development', config ), {
@@ -413,20 +400,6 @@ async function retry( action, { times, delay = 5000 } ) {
 			await sleep( delay );
 		}
 	}
-}
-
-/**
- * Checks a WordPress database connection. An error is thrown if the test is
- * unsuccessful.
- *
- * @param {Config} config The wp-env config object.
- */
-async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
-	await dockerCompose.run( 'cli', 'wp db check', {
-		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: debug,
-	} );
 }
 
 /**
