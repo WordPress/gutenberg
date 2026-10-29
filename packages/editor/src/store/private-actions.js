@@ -1181,6 +1181,10 @@ export const clearPendingMediaEdits =
 		writePendingMediaEdits( registry, entity, next, options );
 	};
 
+// Commits in progress, keyed by registry and then entity, so an entity saved
+// twice at once (e.g. by `savePost` and the save panel) commits its edits once.
+const inFlightMediaCommits = new WeakMap();
+
 /**
  * Saves the media edits waiting for an entity to be saved, such as crops made
  * in the media editor, and points their blocks at the new images.
@@ -1191,42 +1195,64 @@ export const clearPendingMediaEdits =
  */
 export const commitPendingMediaEdits =
 	( entity ) =>
-	async ( { select, dispatch, registry } ) => {
-		const pendingEdits = select.getPendingMediaEdits( entity );
-		if ( ! Object.keys( pendingEdits ).length ) {
-			return undefined;
+	( { select, dispatch, registry } ) => {
+		if ( ! inFlightMediaCommits.has( registry ) ) {
+			inFlightMediaCommits.set( registry, new Map() );
 		}
-		const { done, error } = await commitPendingMediaEditsToBlocks(
-			registry,
-			pendingEdits
-		);
-		// Not undoable: undoing the block changes is enough to go back to the
-		// original image.
-		dispatch.clearPendingMediaEdits( entity, done, { undoIgnore: true } );
-		for ( const clientId of done ) {
-			const { previewUrl } = pendingEdits[ clientId ];
-			if ( previewUrl ) {
-				revokeBlobURL( previewUrl );
-			}
+		const commits = inFlightMediaCommits.get( registry );
+		const key = `${ entity.kind }:${ entity.name }:${ entity.id }`;
+		if ( ! commits.has( key ) ) {
+			commits.set(
+				key,
+				commitEntityMediaEdits( entity, {
+					select,
+					dispatch,
+					registry,
+				} ).finally( () => commits.delete( key ) )
+			);
 		}
-		if ( ! error ) {
-			return undefined;
-		}
-		// A failed request is usually a plain object rather than an `Error`.
-		const reason = typeof error?.message === 'string' ? error.message : '';
-		return {
-			code: error?.code,
-			// Keeps the HTTP status, which the save failure notice shows.
-			data: error?.data,
-			message: reason
-				? sprintf(
-						/* translators: %s: Error message. */
-						__( 'An edited image could not be saved. %s' ),
-						reason
-					)
-				: __( 'An edited image could not be saved.' ),
-		};
+		return commits.get( key );
 	};
+
+async function commitEntityMediaEdits(
+	entity,
+	{ select, dispatch, registry }
+) {
+	const pendingEdits = select.getPendingMediaEdits( entity );
+	if ( ! Object.keys( pendingEdits ).length ) {
+		return undefined;
+	}
+	const { done, error } = await commitPendingMediaEditsToBlocks(
+		registry,
+		pendingEdits
+	);
+	// Not undoable: undoing the block changes is enough to go back to the
+	// original image.
+	dispatch.clearPendingMediaEdits( entity, done, { undoIgnore: true } );
+	for ( const clientId of done ) {
+		const { previewUrl } = pendingEdits[ clientId ];
+		if ( previewUrl ) {
+			revokeBlobURL( previewUrl );
+		}
+	}
+	if ( ! error ) {
+		return undefined;
+	}
+	// A failed request is usually a plain object rather than an `Error`.
+	const reason = typeof error?.message === 'string' ? error.message : '';
+	return {
+		code: error?.code,
+		// Keeps the HTTP status, which the save failure notice shows.
+		data: error?.data,
+		message: reason
+			? sprintf(
+					/* translators: %s: Error message. */
+					__( 'An edited image could not be saved. %s' ),
+					reason
+				)
+			: __( 'An edited image could not be saved.' ),
+	};
+}
 
 /**
  * Whether a media edit made on the block can wait for its entity to be saved.

@@ -1444,6 +1444,29 @@ describe( 'Post actions', () => {
 			);
 		} );
 
+		it( 'commits once when the post is saved twice at once', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+			const editor = unlock( registry.dispatch( editorStore ) );
+			const entity = { kind: 'postType', name: 'post', id: postId };
+
+			await Promise.all( [
+				editor.commitPendingMediaEdits( entity ),
+				editor.commitPendingMediaEdits( entity ),
+			] );
+
+			expect(
+				requests.filter( ( request ) =>
+					request.startsWith( 'POST /wp/v2/media/12/edit' )
+				)
+			).toHaveLength( 1 );
+			expect(
+				unlock( registry.select( editorStore ) ).getPendingMediaEdits()
+			).toEqual( {} );
+		} );
+
 		it( 'locks the media editor while the crop is saved', async () => {
 			const { store: mediaEditorStore } = unlock(
 				mediaEditorPrivateApis
