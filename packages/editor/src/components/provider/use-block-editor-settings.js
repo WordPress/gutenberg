@@ -127,8 +127,7 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
-	getPendingMediaPreviewKey,
-	isMediaEditorLockedKey,
+	getMediaEditorStateKey,
 } = unlock( privateApis );
 
 /**
@@ -403,17 +402,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? editMediaEntity
 				: undefined,
 			[ openMediaEditorModalKey ]: openMediaEditorForBlock,
-			[ getPendingMediaPreviewKey ]: ( select, clientId ) =>
-				unlock( select( editorStore ) ).getPendingMediaEditForBlock(
+			[ getMediaEditorStateKey ]: ( select, clientId ) =>
+				unlock( select( editorStore ) ).getMediaEditorStateForBlock(
 					clientId
-				)?.previewUrl,
-			// Pending edits are committed while the post saves, so the media
-			// editor shouldn't be opened until the save finishes.
-			[ isMediaEditorLockedKey ]: ( select ) => {
-				const { isSavingPost, isAutosavingPost } =
-					select( editorStore );
-				return isSavingPost() && ! isAutosavingPost();
-			},
+				),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess

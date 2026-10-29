@@ -58,11 +58,11 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const {
-	openMediaEditorModalKey,
-	getPendingMediaPreviewKey,
-	isMediaEditorLockedKey,
-} = unlock( blockEditorPrivateApis );
+const { openMediaEditorModalKey, getMediaEditorStateKey } = unlock(
+	blockEditorPrivateApis
+);
+
+const EMPTY_MEDIA_EDITOR_STATE = {};
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -136,21 +136,16 @@ function CoverEdit( {
 			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
 		[]
 	);
-	// A crop from the media editor that is saved with the post.
-	const pendingPreviewUrl = useSelect(
-		( select ) =>
-			select( blockEditorStore )
-				.getSettings()
-				[ getPendingMediaPreviewKey ]?.( select, clientId ),
-		[ clientId ]
-	);
-	const isMediaEditorLocked = useSelect(
-		( select ) =>
-			!! select( blockEditorStore )
-				.getSettings()
-				[ isMediaEditorLockedKey ]?.( select ),
-		[]
-	);
+	// `previewUrl` is a crop from the media editor that is saved with the post.
+	const { previewUrl: pendingPreviewUrl, isLocked: isMediaEditorLocked } =
+		useSelect(
+			( select ) =>
+				select( blockEditorStore )
+					.getSettings()
+					[ getMediaEditorStateKey ]?.( select, clientId ) ??
+				EMPTY_MEDIA_EDITOR_STATE,
+			[ clientId ]
+		);
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );

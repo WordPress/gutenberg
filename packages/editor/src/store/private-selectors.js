@@ -20,6 +20,8 @@ import {
 	getCurrentPostId,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
+	isSavingPost,
+	isAutosavingPost,
 } from './selectors';
 import {
 	getEntityFields as _getEntityFields,
@@ -749,6 +751,19 @@ export const hasPendingMediaEdits = createRegistrySelector(
 		Object.keys( selectPendingMediaEdits( select, state ) ).length > 0
 );
 
+function selectPendingMediaEditForBlock( select, state, clientId ) {
+	const edit = selectPendingMediaEdits( select, state )[ clientId ];
+	if ( ! edit ) {
+		return undefined;
+	}
+	const block = select( blockEditorStore ).getBlock( clientId );
+	const mediaEditor = block && getBlockType( block.name )?.mediaEditor;
+	if ( mediaEditor?.getMedia( block.attributes ).id !== edit.sourceId ) {
+		return undefined;
+	}
+	return edit;
+}
+
 /**
  * Returns the pending media edit for a block, if it was made on the
  * attachment the block shows now.
@@ -759,16 +774,33 @@ export const hasPendingMediaEdits = createRegistrySelector(
  * @return {Object|undefined} The pending media edit.
  */
 export const getPendingMediaEditForBlock = createRegistrySelector(
-	( select ) => ( state, clientId ) => {
-		const edit = selectPendingMediaEdits( select, state )[ clientId ];
-		if ( ! edit ) {
-			return undefined;
-		}
-		const block = select( blockEditorStore ).getBlock( clientId );
-		const mediaEditor = block && getBlockType( block.name )?.mediaEditor;
-		if ( mediaEditor?.getMedia( block.attributes ).id !== edit.sourceId ) {
-			return undefined;
-		}
-		return edit;
-	}
+	( select ) => ( state, clientId ) =>
+		selectPendingMediaEditForBlock( select, state, clientId )
+);
+
+/**
+ * Returns what a block needs to show the media editor's state: the preview of
+ * a pending edit, and whether the media editor can be opened. Pending edits
+ * are committed while the post saves, so it's locked until the save finishes.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {{previewUrl?: string, isLocked: boolean}} The media editor state.
+ */
+export const getMediaEditorStateForBlock = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, clientId ) => ( {
+			previewUrl: selectPendingMediaEditForBlock(
+				select,
+				state,
+				clientId
+			)?.previewUrl,
+			isLocked: isSavingPost( state ) && ! isAutosavingPost( state ),
+		} ),
+		( state, clientId ) => [
+			selectPendingMediaEditForBlock( select, state, clientId ),
+			state.saving,
+		]
+	)
 );

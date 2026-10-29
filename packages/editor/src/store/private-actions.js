@@ -1239,6 +1239,9 @@ function canDeferMediaEdit( select, registry, clientId ) {
 export const openMediaEditorForBlock =
 	( { id, clientId, onUpdate, onUndo, onClose } ) =>
 	( { select, dispatch, registry } ) => {
+		if ( select.getMediaEditorStateForBlock( clientId ).isLocked ) {
+			return;
+		}
 		const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 		const deferCrop = canDeferMediaEdit( select, registry, clientId );
 		const pendingEdit = deferCrop

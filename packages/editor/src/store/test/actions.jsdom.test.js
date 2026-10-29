@@ -1385,21 +1385,40 @@ describe( 'Post actions', () => {
 			);
 		} );
 
-		it( 'shows the post as saving while the crop is saved', async () => {
+		it( 'locks the media editor while the crop is saved', async () => {
+			const { store: mediaEditorStore } = unlock(
+				mediaEditorPrivateApis
+			);
 			const registry = createRegistryWithStores();
-			let isSavingDuringEdit;
+			registry.register( mediaEditorStore );
+			const editor = () => unlock( registry.select( editorStore ) );
+			let duringEdit;
 			setFetchHandler( [], undefined, () => {
-				isSavingDuringEdit = registry
-					.select( editorStore )
-					.isSavingPost();
+				unlock(
+					registry.dispatch( editorStore )
+				).openMediaEditorForBlock( { id: 12, clientId: 'image-1' } );
+				duringEdit = {
+					isSavingPost: editor().isSavingPost(),
+					state: editor().getMediaEditorStateForBlock( 'image-1' ),
+					isStable:
+						editor().getMediaEditorStateForBlock( 'image-1' ) ===
+						editor().getMediaEditorStateForBlock( 'image-1' ),
+					isModalOpen: registry.select( mediaEditorStore ).isOpen(),
+				};
 			} );
 			setUpEditor( registry );
 
 			await registry.dispatch( editorStore ).savePost();
 
-			expect( isSavingDuringEdit ).toBe( true );
-			expect( registry.select( editorStore ).isSavingPost() ).toBe(
-				false
+			expect( duringEdit ).toEqual( {
+				isSavingPost: true,
+				state: { previewUrl: 'blob:preview', isLocked: true },
+				isStable: true,
+				isModalOpen: false,
+			} );
+			expect( editor().isSavingPost() ).toBe( false );
+			expect( editor().getMediaEditorStateForBlock( 'image-1' ) ).toEqual(
+				{ previewUrl: undefined, isLocked: false }
 			);
 		} );
 

@@ -18,5 +18,4 @@ export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
 export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
 export const mediaSideloadFromUrlKey = Symbol( 'mediaSideloadFromUrl' );
 export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );
-export const getPendingMediaPreviewKey = Symbol( 'getPendingMediaPreview' );
-export const isMediaEditorLockedKey = Symbol( 'isMediaEditorLocked' );
+export const getMediaEditorStateKey = Symbol( 'getMediaEditorState' );

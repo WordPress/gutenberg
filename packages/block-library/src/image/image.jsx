@@ -76,8 +76,7 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
-	getPendingMediaPreviewKey,
-	isMediaEditorLockedKey,
+	getMediaEditorStateKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -375,6 +374,10 @@ export default function Image( {
 
 			const rootClientId = getBlockRootClientId( clientId );
 			const settings = getSettings();
+			const mediaEditorState = settings[ getMediaEditorStateKey ]?.(
+				select,
+				clientId
+			);
 
 			return {
 				imageEditing: settings.imageEditing,
@@ -382,12 +385,8 @@ export default function Image( {
 				maxWidth: settings.maxWidth,
 				editMediaEntity: settings?.[ mediaEditKey ],
 				// A crop from the media editor that is saved with the post.
-				pendingPreviewUrl: settings[ getPendingMediaPreviewKey ]?.(
-					select,
-					clientId
-				),
-				isMediaEditorLocked:
-					!! settings[ isMediaEditorLockedKey ]?.( select ),
+				pendingPreviewUrl: mediaEditorState?.previewUrl,
+				isMediaEditorLocked: !! mediaEditorState?.isLocked,
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
