@@ -218,6 +218,7 @@ describe( 'buildBlockHighlightCss', () => {
 	};
 	const getBlockAttributes = ( clientId ) =>
 		attributesByClientId[ clientId ] ?? { content: 'no markers here' };
+	const isTextBlock = ( clientId ) => ! clientId.startsWith( 'image' );
 
 	const overlaySelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"]:not(.is-multi-selected)::after`;
@@ -238,7 +239,8 @@ describe( 'buildBlockHighlightCss', () => {
 				{ id: 7, author: 1, blockClientIds: [ 'abc-1' ] },
 				{ id: 12, author: 3, blockClientIds: [ 'abc-2' ] },
 			],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		for ( const [ clientId, author ] of [
 			[ 'abc-1', 1 ],
@@ -258,7 +260,8 @@ describe( 'buildBlockHighlightCss', () => {
 		expect(
 			buildBlockHighlightCss(
 				[ { id: 7, author: 1, blockClientIds: [ 'block-inline' ] } ],
-				getBlockAttributes
+				getBlockAttributes,
+				isTextBlock
 			)
 		).toBe( '' );
 	} );
@@ -273,15 +276,33 @@ describe( 'buildBlockHighlightCss', () => {
 						blockClientIds: [ 'block-inline', 'abc-1' ],
 					},
 				],
-				getBlockAttributes
+				getBlockAttributes,
+				isTextBlock
 			)
 		).toBe( '' );
+	} );
+
+	it( 'tints a block without a text field in a shared inline note', () => {
+		const css = buildBlockHighlightCss(
+			[
+				{
+					id: 7,
+					author: 1,
+					blockClientIds: [ 'block-inline', 'image-1' ],
+				},
+			],
+			getBlockAttributes,
+			isTextBlock
+		);
+		expect( css ).toContain( overlaySelectorFor( 'image-1' ) );
+		expect( css ).not.toContain( overlaySelectorFor( 'block-inline' ) );
 	} );
 
 	it( 'tints every block of a shared note', () => {
 		const css = buildBlockHighlightCss(
 			[ { id: 7, author: 1, blockClientIds: [ 'abc-1', 'abc-2' ] } ],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		expect( css ).toContain( overlaySelectorFor( 'abc-1' ) );
 		expect( css ).toContain( overlaySelectorFor( 'abc-2' ) );
@@ -293,7 +314,8 @@ describe( 'buildBlockHighlightCss', () => {
 				{ id: 9, author: 2, blockClientIds: [ 'abc-1' ] },
 				{ id: 11, author: 4, blockClientIds: [ 'abc-1' ] },
 			],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		expect( css.match( /content:""/g ) ).toHaveLength( 1 );
 		expect( css ).toContain(
@@ -306,7 +328,8 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'does not underline the text of an annotated block', () => {
 		const css = buildBlockHighlightCss(
 			[ { id: 7, author: 1, blockClientIds: [ 'abc-1' ] } ],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		expect( css ).not.toContain( 'text-decoration' );
 		expect( css ).not.toContain( 'block-editor-rich-text__editable' );
@@ -321,7 +344,8 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'falls back to a dashed outline under forced colors', () => {
 		const css = buildBlockHighlightCss(
 			[ { id: 7, author: 1, blockClientIds: [ 'abc-1' ] } ],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		expect( css ).toContain(
 			'@media (forced-colors: active){[data-block="abc-1"]{outline:1.5px dashed;outline-offset:2px;}' +
@@ -341,7 +365,8 @@ describe( 'buildBlockHighlightCss', () => {
 				{ id: 7, author: 1, blockClientIds: [ 'abc-1' ] },
 				{ id: 12, author: 3, blockClientIds: [ 'abc-2' ] },
 			],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		expect( css ).not.toContain( ':hover' );
 		expect( css ).not.toContain( ':focus' );
@@ -361,7 +386,8 @@ describe( 'buildBlockHighlightCss', () => {
 					{ author: 2, blockClientIds: [ 'abc-1' ] },
 					{ id: 9, author: 2, blockClientIds: [] },
 				],
-				getBlockAttributes
+				getBlockAttributes,
+				isTextBlock
 			)
 		).toBe( '' );
 	} );
@@ -369,7 +395,8 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'falls back to author 0 when the field is missing', () => {
 		const css = buildBlockHighlightCss(
 			[ { id: 7, blockClientIds: [ 'abc-1' ] } ],
-			getBlockAttributes
+			getBlockAttributes,
+			isTextBlock
 		);
 		expect( css ).toContain(
 			`background-color:${ getAvatarBorderColor( 0 ) }40;`

@@ -41,17 +41,19 @@ export function Notes( {
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
-	const { selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { selectedBlockClientIds, orderedBlockIds } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getClientIdsWithDescendants } =
+			const { getSelectedBlockClientIds, getClientIdsWithDescendants } =
 				select( blockEditorStore );
 			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
 		[]
 	);
+	// A note added to several blocks shows at the first.
+	const [ selectedBlockClientId ] = selectedBlockClientIds;
 	const selectedNote = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
@@ -68,6 +70,7 @@ export function Notes( {
 		}
 		const newNoteThread = {
 			id: 'new',
+			blockClientIds: selectedBlockClientIds,
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
@@ -90,6 +93,7 @@ export function Notes( {
 		filters,
 		isFloating,
 		selectedNote,
+		selectedBlockClientIds,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
@@ -140,7 +144,7 @@ export function Notes( {
 		if ( ! adjacentThread ) {
 			selectNote( undefined );
 			toggleBlockHighlight(
-				getAnchorClientId( thread, selectedBlockClientId ),
+				getAnchorClientId( thread, selectedBlockClientIds ),
 				false
 			);
 			relatedBlockElement?.focus();
@@ -150,7 +154,7 @@ export function Notes( {
 		if ( getSelectedNote() === thread.id ) {
 			pickNote(
 				adjacentThread.id,
-				getAnchorClientId( adjacentThread, selectedBlockClientId )
+				getAnchorClientId( adjacentThread, selectedBlockClientIds )
 			);
 		}
 		focusNoteThread( adjacentThread.id, sidebarRef.current );
@@ -165,7 +169,7 @@ export function Notes( {
 		const isSelfTarget = event.currentTarget === event.target;
 		const anchorClientId = getAnchorClientId(
 			thread,
-			selectedBlockClientId
+			selectedBlockClientIds
 		);
 
 		if (
@@ -254,7 +258,7 @@ export function Notes( {
 				{ isAddingNote && (
 					<AddNote
 						key={ selectedBlockClientId }
-						clientId={ selectedBlockClientId }
+						clientIds={ selectedBlockClientIds }
 						sidebarRef={ sidebarRef }
 					/>
 				) }
@@ -277,7 +281,7 @@ export function Notes( {
 							note={ thread }
 							anchorClientId={ getAnchorClientId(
 								thread,
-								selectedBlockClientId
+								selectedBlockClientIds
 							) }
 							focusThreadOrAdjacent={ focusThreadOrAdjacent }
 							isSelected={ selectedNote === thread.id }
