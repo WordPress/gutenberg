@@ -14,6 +14,39 @@ import {
 	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
+/**
+ * Clicks an item in the open alignment dropdown.
+ *
+ * @param {string} label The text of the item to click.
+ */
+async function clickAlignmentMenuItem( label ) {
+	const button = await page.waitForXPath(
+		`//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), '${ label }')]`,
+		{ visible: true }
+	);
+	await button.evaluate( ( element ) => element.scrollIntoView() );
+	/*
+	 * The dropdown can still be repositioning itself after the item is
+	 * visible, which makes the click miss. Wait until the item has a size and
+	 * its position is unchanged between two animation frames.
+	 */
+	await page.waitForFunction(
+		( element ) => {
+			const { x, y, width, height } = element.getBoundingClientRect();
+			const position = `${ x },${ y },${ width },${ height }`;
+			const isStable =
+				width > 0 &&
+				height > 0 &&
+				element.dataset.e2ePosition === position;
+			element.dataset.e2ePosition = position;
+			return isStable;
+		},
+		{ polling: 'raf' },
+		button
+	);
+	await button.click();
+}
+
 async function insertBlocksOfSameType() {
 	await insertBlock( 'Paragraph' );
 	await page.keyboard.type( 'First Paragraph' );
@@ -171,14 +204,12 @@ describe( 'Block Grouping', () => {
 			// Full width image.
 			await insertBlock( 'Image' );
 			await clickBlockToolbarButton( 'Change alignment' );
-			const FULL_WIDTH_BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Full width')]`;
-			await ( await page.$x( FULL_WIDTH_BUTTON_XPATH ) )[ 0 ].click();
+			await clickAlignmentMenuItem( 'Full width' );
 
 			// Wide width image.
 			await insertBlock( 'Image' );
 			await clickBlockToolbarButton( 'Change alignment' );
-			const WIDE_BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Wide width')]`;
-			await ( await page.$x( WIDE_BUTTON_XPATH ) )[ 0 ].click();
+			await clickAlignmentMenuItem( 'Wide width' );
 
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Some paragraph' );
