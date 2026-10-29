@@ -4,14 +4,16 @@
  *
  * The strip reserves one height: the text line plus its padding
  * (#85231). Card.Root inherits box-sizing: border-box onto the strip, so
- * the min is the full strip — padding-block stays 0 or a compact control
- * would still grow past a text-only one. The row centers what it holds;
- * a runtime action never resizes the body.
+ * the min is the full strip. Only xs padding-block fits: md would leave
+ * less than a compact control and grow the strip. The row centers what
+ * it holds; a runtime action never resizes the body.
  */
 .widget-footer {
 	box-sizing: border-box;
 	min-block-size: calc(var(--wpds-typography-line-height-sm) + 2 * var(--wpds-dimension-padding-md));
 	padding-inline: var(--wp-ui-card-padding);
+	padding-block-start: var(--wpds-dimension-padding-xs);
+	padding-block-end: var(--wpds-dimension-padding-xs);
 	border-block-start-style: solid;
 	border-block-start-width: var(--wpds-border-width-xs);
 	border-block-start-color: var(--wpds-color-stroke-surface-neutral-weak);
