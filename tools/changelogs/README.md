@@ -9,7 +9,6 @@ Tools for managing package changelogs and fragments using [Changie](https://chan
 -   `lib/validate.ts`: validates fragments for authoring, preview, and CI. Every fragment requires a positive integer `custom.PR`; `--require-pr` additionally requires a matching fragment for the target package.
 -   `lib/migrate.js`: bi-directional migration between traditional `CHANGELOG.md` files and Changie version/fragment files.
 -   `lib/preview.js`: preview unreleased notes across packages.
--   `lib/promote-stable.js`: generate `Stable Release` fragments promoting 0.x packages to 1.0.0.
 -   `lib/release.js`: version bump calculation and batch/merge operations used during automated package publishing.
 
 The private workspace exports its shared configuration and validator as TypeScript source. Consumers declare a workspace dependency and import `@wordpress/changelog-tools/config` or `@wordpress/changelog-tools/validate`, rather than using relative imports into another workspace. Node runs these modules with type stripping, so changelog commands need no build step. The workspace uses the repository's Node TypeScript preset for type checking.
@@ -78,12 +77,12 @@ npm run lint:changelogs
 For packages published as `0.x.y` pre-releases, promote the package to stable `1.0.0` using:
 
 ```bash
-npm run changelog:promote-stable -- <package-name> --pr <PR#>
+npm run changelog:add -- -j <package-name> -k "Stable Release" -m "PR=<PR#>" -b "Mark package as stable and production-ready."
 ```
 
 This creates a `Stable Release` fragment under `.changes/unreleased/`. During the next automated package release, the presence of the `Stable Release` fragment directs the release bumper to issue a major bump to `1.0.0`.
 
-`Stable Release` is the last kind in the regular `npm run changelog:add` prompt; the dedicated command is a shortcut. Shared fragment validation rejects this kind unless the target package has a `0.x` version, covering both authoring commands and CI. The regular authoring command validates after writing the fragment and leaves rejected content available to correct.
+`Stable Release` is the last kind in the regular `npm run changelog:add` prompt. Shared fragment validation rejects this kind unless the target package has a `0.x` version, covering the authoring command and CI. The authoring command validates after writing the fragment and leaves rejected content available to correct.
 
 Promotion takes precedence over other change kinds, including breaking changes. The generated changelog includes a note below the version heading and retains the `Stable Release` section as the last kind. The note also appears in unreleased previews and prerelease notes containing the promotion fragment.
 
