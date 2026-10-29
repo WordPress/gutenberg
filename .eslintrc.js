@@ -192,5 +192,23 @@ module.exports = {
 				wp: true,
 			},
 		},
+		{
+			files: [ 'packages/rich-text/src/to-tree.js' ],
+			rules: {
+				'no-mixed-spaces-and-tabs': 'off',
+			},
+		},
+		{
+			files: [ 'packages/rich-text/src/test/insert-line-separator.js' ],
+			rules: {
+				'func-call-spacing': 'off',
+			},
+		},
+		{
+			files: [ 'packages/rich-text/src/test/split.js' ],
+			rules: {
+				'space-in-parens': 'off',
+			},
+		},
 	],
 };
