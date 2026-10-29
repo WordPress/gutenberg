@@ -37,7 +37,7 @@ import type { CustomGradientPickerProps } from './types';
  */
 export function CustomGradientPicker( props: CustomGradientPickerProps ) {
 	deprecated( 'wp.components.CustomGradientPicker', {
-		since: '7.2',
+		since: '7.3',
 		alternative: 'wp.components.GradientPicker',
 		hint: 'Set `gradients={ [] }` and `clearable={ false }` to render only the custom gradient editor.',
 	} );

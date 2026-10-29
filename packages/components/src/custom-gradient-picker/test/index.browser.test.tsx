@@ -476,7 +476,7 @@ describe( 'CustomGradientPicker public export', () => {
 			'radial-gradient(rgb(0,0,0) 0%,rgb(255,255,255) 100%)'
 		);
 		expect( console ).toHaveWarnedWith(
-			'wp.components.CustomGradientPicker is deprecated since version 7.2. Please use wp.components.GradientPicker instead. Note: Set `gradients={ [] }` and `clearable={ false }` to render only the custom gradient editor.'
+			'wp.components.CustomGradientPicker is deprecated since version 7.3. Please use wp.components.GradientPicker instead. Note: Set `gradients={ [] }` and `clearable={ false }` to render only the custom gradient editor.'
 		);
 	} );
 } );
