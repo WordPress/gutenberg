@@ -43,6 +43,9 @@ const noop = () => {};
 const PREFERENCE_SCOPE = 'core/block-editor';
 const PREFERENCE_KEY = 'linkControlSettingsDrawer';
 
+const isEntityKind = ( kind?: string ) =>
+	kind === 'post-type' || kind === 'taxonomy';
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -155,12 +158,13 @@ function LinkControl( {
 	const wrapperRef = useMergeRefs( [ wrapperNode, useNativeUndo() ] );
 	const textInputRef = useRef< HTMLInputElement >( null );
 	const searchInputRef = useRef< HTMLInputElement >( null );
-	// TODO: Remove entityUrlFallbackRef and previewValue in favor of value prop after taxonomy entity binding
+	// TODO: Remove entityUrlFallbackRef and previewValue in favor of value prop after entity binding
 	// is stable and returns the correct URL instead of null while resolving when creating the entity.
 	//
 	// Preserve the URL from entity suggestions before binding overrides it
 	// This is due to entity binding not being available immediately after the suggestion is selected.
-	// The URL can return null, especially for taxonomy entities, while entity binding is being resolved.
+	// The URL can return null while entity binding is being resolved, for taxonomy entities and for
+	// any post whose record has not been loaded yet.
 	// To avoid unnecessary rerenders and focus loss, we preserve the URL from the suggestion and use it
 	// as a fallback until the entity binding is available.
 	const entityUrlFallbackRef = useRef< string >( undefined );
@@ -364,8 +368,8 @@ function LinkControl( {
 			};
 		}
 
-		// Preserve the URL for taxonomy entities before binding overrides it
-		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
+		// Preserve the URL for entities before binding overrides it
+		if ( isEntityKind( updatedValue?.kind ) && updatedValue?.url ) {
 			entityUrlFallbackRef.current = updatedValue.url;
 		}
 
@@ -565,7 +569,7 @@ function LinkControl( {
 	const previewValue = useMemo( () => {
 		// There is a chance that the value is not yet set from the entity binding, so we use the preserved URL.
 		if (
-			value?.kind === 'taxonomy' &&
+			isEntityKind( value?.kind ) &&
 			! value?.url &&
 			entityUrlFallbackRef.current
 		) {
