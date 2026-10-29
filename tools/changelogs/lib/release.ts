@@ -1,5 +1,6 @@
 import { execChangie } from './exec-changie.ts';
 import { previewUnreleasedFragments } from './preview.ts';
+import { validateChangieProjects } from './config.ts';
 
 export { execChangie };
 
@@ -15,6 +16,7 @@ export function batchChangiePackage(
 	version: string,
 	repoRoot: string = process.cwd()
 ) {
+	validateChangieProjects( repoRoot );
 	const normalized = packageName
 		.replace( /^@wordpress\//, '' )
 		.replace( /^packages\//, '' );
@@ -35,6 +37,7 @@ export function batchChangiePackage(
  * @param repoRoot Path to the Gutenberg repo root.
  */
 export function mergeChangieChangelogs( repoRoot: string = process.cwd() ) {
+	validateChangieProjects( repoRoot );
 	const res = execChangie( [ 'merge' ], repoRoot );
 	if ( res.status !== 0 ) {
 		throw new Error(

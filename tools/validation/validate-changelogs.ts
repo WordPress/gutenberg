@@ -15,7 +15,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs as parseNodeArgs } from 'node:util';
-import { isChangiePackage } from '@wordpress/changelog-tools/config';
+import {
+	isChangiePackage,
+	validateChangieProjects,
+} from '@wordpress/changelog-tools/config';
 import { validateAllFragments } from '@wordpress/changelog-tools/validate';
 import { execChangie } from '@wordpress/changelog-tools/exec-changie';
 
@@ -433,6 +436,7 @@ export function run( argv: string[], repoRoot = REPO_ROOT ): number {
 	let paths: string[];
 	try {
 		( { pr, requirePr, paths } = parseArgs( argv ) );
+		validateChangieProjects( repoRoot );
 	} catch ( error ) {
 		const message =
 			error instanceof Error ? error.message : String( error );
