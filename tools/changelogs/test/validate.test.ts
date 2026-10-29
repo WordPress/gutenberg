@@ -41,6 +41,48 @@ custom:
 		expect( errors ).toEqual( [] );
 	} );
 
+	it.each( [
+		'## Details',
+		'### Breaking Changes',
+		'### Stable Release',
+		'  ## Details',
+		'\t### New Features',
+		'```md\n## Details\n```',
+		'# Details',
+		'###### Details',
+	] )(
+		'rejects fragment bodies containing version or subsection headings: %s',
+		( heading ) => {
+			expect(
+				validateFragment(
+					'sample.yaml',
+					yaml.safeDump( {
+						...validFragment,
+						body: `Fix alignment.\n${ heading }`,
+					} ),
+					{},
+					repoRoot
+				)
+			).toContain(
+				'sample.yaml: body must not contain Markdown headings. Use paragraphs or nested lists; changelog sections are generated from the fragment kind.'
+			);
+		}
+	);
+
+	it( 'accepts multiline descriptions and nested lists', () => {
+		expect(
+			validateFragment(
+				'sample.yaml',
+				yaml.safeDump( {
+					...validFragment,
+					body: 'Fix alignment.\n\nDetails for consumers:\n    - Preserve spacing.\n    - Support the #123 selector.',
+				} ),
+				{},
+				repoRoot
+			)
+		).toEqual( [] );
+	} );
+
 	it( 'rejects fragment missing required fields', () => {
 		const yamlContent = `kind: Bug Fixes
 body: Fixed a button alignment issue
@@ -106,6 +148,63 @@ custom:
 } );
 
 describe( 'shared fragment validation entry points', () => {
+	it.each( [ 'authored', 'manual' ] )(
+		'rejects Markdown headings in %s fragments through authoring and CI validation',
+		( source ) => {
+			const root = fs.mkdtempSync(
+				path.join( os.tmpdir(), 'fragment-headings-' )
+			);
+			directories.push( root );
+			fs.copyFileSync(
+				path.resolve( import.meta.dirname, '../../../.changie.yaml' ),
+				path.join( root, '.changie.yaml' )
+			);
+			const body = 'Fix alignment.\n## Details\nMore information.';
+			const unreleased = path.join( root, '.changes', 'unreleased' );
+			let authoringStatus = 1;
+			if ( source === 'manual' ) {
+				fs.mkdirSync( unreleased, { recursive: true } );
+				fs.writeFileSync(
+					path.join( unreleased, 'manual.yaml' ),
+					yaml.safeDump( { ...validFragment, body } )
+				);
+			} else {
+				authoringStatus = addFragment(
+					[
+						'-j',
+						'components',
+						'-k',
+						'Bug Fixes',
+						'-m',
+						'PR=12345',
+						'-b',
+						body,
+						'--interactive=false',
+					],
+					root
+				);
+			}
+			expect( authoringStatus ).toBe( 1 );
+			const files = fs.readdirSync( unreleased );
+			expect( files ).toHaveLength( 1 );
+			const errors = validateAllFragments( {}, root );
+			expect( errors ).toEqual( [
+				expect.stringContaining(
+					'body must not contain Markdown headings'
+				),
+			] );
+			expect( () => loadUnreleasedFragments( root ) ).toThrow(
+				errors[ 0 ]
+			);
+			for ( const file of source === 'authored' ? files : [] ) {
+				expect( console ).toHaveErroredWith(
+					expect.stringContaining(
+						file + ': body must not contain Markdown headings'
+					)
+				);
+			}
+		}
+	);
 	it( 'preserves multiple fragments created for the same PR, package, and kind', () => {
 		const root = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'fragment-random-suffix-' )

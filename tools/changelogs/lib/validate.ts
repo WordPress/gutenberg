@@ -94,6 +94,15 @@ export function parseFragment(
 	}
 	if ( typeof body !== 'string' || ! body.trim() ) {
 		errors.push( `${ filePath }: missing or empty 'body' description.` );
+	} else if (
+		body
+			.split( /\r?\n/ )
+			.some( ( line ) => /^#{1,6}(?:\s|$)/.test( line.trimStart() ) )
+	) {
+		// Release version calculation scans rendered lines, including code examples.
+		errors.push(
+			`${ filePath }: body must not contain Markdown headings. Use paragraphs or nested lists; changelog sections are generated from the fragment kind.`
+		);
 	}
 	const pr =
 		custom && typeof custom === 'object' && ! Array.isArray( custom )

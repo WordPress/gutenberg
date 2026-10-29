@@ -292,6 +292,8 @@ Packages configured in `.changie.yaml` use independent changelog fragment files 
 2.  Follow the interactive prompts to select the package project, category (kind), your pull request number, and a consumer-facing summary. This creates an independent YAML fragment file under `.changes/unreleased/`.
 3.  `npm run lint:changelogs` - Verify formatting with the project validator (optional).
 
+Fragment descriptions can contain multiline paragraphs and nested lists, but must not contain Markdown heading lines, including indented headings or headings inside code examples. Changelog sections are generated from the selected kind, and heading lines inside descriptions can interfere with release version calculation. The shared validator checks this rule during authoring and CI, including for manually written YAML fragments.
+
 #### Additional commands
 
 -   **Preview unreleased notes**: preview the compiled unreleased notes for a package: `npm run changelog:preview -- <package-name>`.
