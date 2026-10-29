@@ -558,14 +558,82 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
+		// DEBUG (temporary): log mouse, focus and selection events.
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			window.dbg = [];
+			const t0 = performance.now();
+			const d = ( n ) => {
+				if ( ! n ) {
+					return 'null';
+				}
+				if ( n.nodeType === 3 ) {
+					return '#text(' + n.data + ')';
+				}
+				return (
+					n.closest?.( '[data-type]' )?.dataset.type ??
+					n.getAttribute?.( 'aria-label' ) ??
+					n.tagName
+				);
+			};
+			const st = () => {
+				const sel = document.getSelection();
+				const be = window.parent.wp.data.select( 'core/block-editor' );
+				return `active=${ d( document.activeElement ) } bodyce=${ document.body.contentEditable } sel=${ d( sel.anchorNode ) }@${ sel.anchorOffset }..${ d( sel.focusNode ) }@${ sel.focusOffset } multiSelecting=${ be.isMultiSelecting() } store=${ be
+					.getSelectedBlockClientIds()
+					.map( ( c ) => be.getBlockName( c ) )
+					.join( ',' ) }`;
+			};
+			for ( const type of [
+				'mousedown',
+				'mouseout',
+				'mouseover',
+				'mouseup',
+				'focusin',
+				'selectionchange',
+			] ) {
+				document.addEventListener(
+					type,
+					( e ) => {
+						window.dbg.push(
+							`${ Math.round( performance.now() - t0 ) } ${ type } target=${ d( e.target ) } related=${ d( e.relatedTarget ) } buttons=${ e.buttons } targetce=${ e.target?.getAttribute?.( 'contenteditable' ) } ${ st() }`
+						);
+					},
+					true
+				);
+			}
+			new MutationObserver( ( records ) => {
+				for ( const r of records ) {
+					window.dbg.push(
+						`${ Math.round( performance.now() - t0 ) }   contenteditable ${ d( r.target ) } ${ r.oldValue } -> ${ r.target.getAttribute( 'contenteditable' ) }`
+					);
+				}
+			} ).observe( document.body, {
+				attributes: true,
+				attributeOldValue: true,
+				subtree: true,
+				attributeFilter: [ 'contenteditable' ],
+			} );
+		} );
+
 		await paragraph1.hover();
 		await page.mouse.down();
 		await paragraph2.hover();
 		await page.mouse.up();
 
-		await expect
-			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-			.toEqual( [ 1, 2 ] );
+		try {
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+				.toEqual( [ 1, 2 ] );
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.log(
+				'DEBUG\n' +
+					( await editor.canvas
+						.locator( ':root' )
+						.evaluate( () => window.dbg.join( '\n' ) ) )
+			);
+			throw error;
+		}
 	} );
 
 	test( 'should cut and paste', async ( { editor, pageUtils } ) => {
