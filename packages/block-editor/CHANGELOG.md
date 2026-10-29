@@ -10,6 +10,10 @@
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
+### Experimental
+
+-   Block toolbar: Add a redesign of the block toolbar behind the "Block toolbar redesign" experiment. It shows the block name as the entry point for transforms and style presets, groups block tools in one searchable options menu, moves text formatting to a toolbar that appears with a text selection, adds full-size movers, a Delete button, a Layout menu and inserter for container blocks, and moves the parent selector outside the block with a menu of every ancestor ([#85567](https://github.com/WordPress/gutenberg/pull/85567)).
+
 ### Bug Fixes
 
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).

@@ -1,0 +1,360 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+// The block toolbar redesign experiment.
+// See https://github.com/WordPress/gutenberg/issues/85204
+
+// The toolbar uses the Menu surface: one surface for all groups, 32px
+// buttons with a 4px inset, and short hairlines between groups.
+$toolbar-button-size: 32px;
+$toolbar-padding: 3px; // With the 1px border, buttons sit 4px from the edge.
+$toolbar-group-gap: $grid-unit-10; // Space on each side of a hairline.
+
+@mixin redesign-toolbar-surface() {
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: $elevation-medium;
+	padding: $toolbar-padding;
+}
+
+// Buttons share one look: 32px squares, or text buttons, with a 2px radius.
+// The hover, open and pressed states paint the button itself.
+@mixin redesign-toolbar-buttons() {
+	.components-toolbar-group,
+	.components-toolbar {
+		min-height: 0;
+		padding: 0;
+		margin: 0;
+		border: 0;
+		background: none;
+		gap: 0;
+		flex-wrap: nowrap;
+	}
+
+	.components-button,
+	.components-button.components-button,
+	.components-button.has-icon.has-icon {
+		height: $toolbar-button-size;
+		min-width: $toolbar-button-size;
+		padding: $grid-unit-05;
+		border-radius: var(--wpds-border-radius-sm);
+		justify-content: center;
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&::before {
+			// The state layer covers the whole button.
+			inset: 0;
+			height: auto;
+			left: 0;
+			right: 0;
+			border-radius: var(--wpds-border-radius-sm);
+		}
+
+		&:hover:not(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-neutral);
+
+			&::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+			}
+		}
+
+		// A menu or popover the button opened.
+		&[data-popup-open],
+		&[aria-expanded="true"] {
+			&::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+			}
+		}
+
+		&.is-pressed,
+		&.is-pressed:hover {
+			color: var(--wpds-color-foreground-interactive-neutral-strong);
+
+			&::before {
+				background-color: var(--wpds-color-background-interactive-neutral-strong);
+			}
+		}
+
+		&:focus-visible::before {
+			@include block-toolbar-button-style__focus();
+		}
+
+		svg {
+			min-width: 0;
+		}
+	}
+}
+
+// The hairline between two groups, sized to the icons rather than the
+// buttons, like a Menu separator.
+@mixin redesign-hairline() {
+	content: "";
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: calc(-#{$toolbar-group-gap} - var(--wpds-border-width-xs));
+	margin-block: auto;
+	width: var(--wpds-border-width-xs);
+	height: var(--wpds-dimension-size-sm);
+	background-color: var(--wpds-color-stroke-surface-neutral-weak);
+	pointer-events: none;
+
+	@media ( forced-colors: active ) {
+		background-color: CanvasText;
+	}
+}
+
+.block-editor-block-contextual-toolbar.is-redesign {
+	.block-editor-block-toolbar {
+		align-items: center;
+		gap: calc(#{$toolbar-group-gap} * 2 + var(--wpds-border-width-xs));
+
+		// Groups sit in wrappers (slots, the block name), so the hairlines are
+		// drawn after every group but the last.
+		.block-editor-block-toolbar__slot {
+			gap: calc(#{$toolbar-group-gap} * 2 + var(--wpds-border-width-xs));
+			align-items: center;
+		}
+
+		// Fills can render nothing, which would leave a group with only a
+		// hairline.
+		.block-editor-block-toolbar__slot:empty,
+		.components-toolbar-group:empty,
+		.components-toolbar-group:has(> .block-editor-block-toolbar__slot:empty) {
+			display: none;
+		}
+
+		.components-toolbar-group,
+		.components-toolbar {
+			position: relative;
+
+			&::after {
+				@include redesign-hairline();
+			}
+
+			// Nested groups belong to their parent group.
+			.components-toolbar-group::after,
+			.components-toolbar::after {
+				content: none;
+			}
+		}
+
+		> .block-editor-block-toolbar__options::after,
+		> :last-child .components-toolbar-group::after,
+		> :last-child.components-toolbar-group::after {
+			content: none;
+		}
+
+		@include redesign-toolbar-buttons();
+	}
+
+	// The parent selector draws its own surface outside the toolbar.
+	.block-editor-block-toolbar__parent-selector .components-toolbar-group::after {
+		content: none;
+	}
+
+	// The block name opens the transform menu, like the text style picker in
+	// word processors.
+	.block-editor-block-toolbar__block-name-button.components-button,
+	.block-editor-block-toolbar__text-menu-button.components-button {
+		gap: $grid-unit-05;
+		width: auto;
+		padding-inline: $grid-unit-05;
+		font-size: var(--wpds-typography-font-size-md);
+		white-space: nowrap;
+
+		.block-editor-block-icon {
+			flex-shrink: 0;
+		}
+
+		&[aria-disabled="true"] {
+			color: var(--wpds-color-foreground-interactive-neutral);
+			opacity: 1;
+		}
+	}
+
+	.block-editor-block-toolbar__text-menu-button.components-button {
+		padding-inline: $grid-unit-15 $grid-unit-05;
+	}
+
+	.block-editor-block-toolbar__block-name-label {
+		max-width: 20ch;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.block-editor-block-toolbar__block-name-chevron {
+		flex-shrink: 0;
+		margin-inline: -$grid-unit-05 0;
+	}
+
+	.block-editor-block-toolbar__block-name-button.is-synced .block-editor-block-icon,
+	.block-editor-block-toolbar.is-synced .block-editor-block-toolbar__block-name-button .block-editor-block-icon,
+	.block-editor-block-toolbar.is-connected .block-editor-block-toolbar__block-name-button .block-editor-block-icon {
+		color: var(--wp-block-synced-color);
+	}
+
+	.block-editor-block-toolbar__block-name-wrapper {
+		display: flex;
+	}
+}
+
+// The floating toolbar, above the block.
+.components-popover.block-editor-block-list__block-popover {
+	.block-editor-block-contextual-toolbar.is-redesign {
+		@include redesign-toolbar-surface();
+		margin-left: 0;
+
+		.block-editor-block-toolbar {
+			overflow: visible;
+		}
+	}
+
+	// The parent selector sits outside the block's footprint, to the left of
+	// the block toolbar, on its own surface.
+	.block-editor-block-contextual-toolbar.is-redesign .block-editor-block-toolbar__parent-selector {
+		@include redesign-toolbar-surface();
+		position: absolute;
+		top: calc(-#{$toolbar-padding} - var(--wpds-border-width-xs));
+		inset-inline-end: calc(100% + #{$toolbar-padding} + var(--wpds-border-width-xs) + #{$grid-unit-10});
+		display: flex;
+
+		@include redesign-toolbar-buttons();
+	}
+}
+
+// In the top toolbar, the parent selector stays in line.
+.block-editor-block-contextual-toolbar.is-redesign:not(.block-editor-block-list__block-popover *) {
+	.block-editor-block-toolbar__parent-selector {
+		position: relative;
+		display: flex;
+	}
+}
+
+// The selection toolbar, for formatting selected text.
+.components-popover.block-editor-rich-text__selection-format-toolbar {
+	z-index: z-index(".components-popover.block-editor-rich-text__inline-format-toolbar");
+
+	.components-popover__content {
+		box-shadow: none;
+		border: none;
+		background: none;
+		outline: none;
+		overflow: visible;
+	}
+
+	.block-editor-rich-text__inline-format-toolbar-group {
+		@include redesign-toolbar-surface();
+		gap: calc(#{$toolbar-group-gap} * 2 + var(--wpds-border-width-xs));
+		align-items: center;
+		margin: $grid-unit-10 0;
+
+		.components-toolbar-group {
+			position: relative;
+			gap: $grid-unit-05;
+
+			&:not(:last-child)::after {
+				@include redesign-hairline();
+			}
+		}
+
+		@include redesign-toolbar-buttons();
+	}
+}
+
+// The menus opened from the toolbar.
+.block-editor-block-toolbar__menu-positioner {
+	z-index: z-index(".components-popover");
+}
+
+// Flyouts stack above the menu they open from, which they overlap.
+.block-editor-block-toolbar__submenu-positioner {
+	z-index: z-index(".components-popover") + 1;
+}
+
+.block-editor-block-toolbar__options-search {
+	grid-column: 1 / -1;
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-05;
+	height: $toolbar-button-size;
+	margin-block-end: $grid-unit-05;
+	padding-inline: $grid-unit-05;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+
+	&:focus-within {
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wpds-border-width-xs) var(--wp-admin-theme-color);
+	}
+
+	svg {
+		flex-shrink: 0;
+		fill: currentColor;
+	}
+
+	input[type="search"],
+	input[type="search"]:focus {
+		flex: 1;
+		min-width: 0;
+		height: 100%;
+		padding: 0;
+		border: none;
+		background: none;
+		box-shadow: none;
+		outline: none;
+		font-size: var(--wpds-typography-font-size-md);
+		color: inherit;
+
+		&::-webkit-search-cancel-button {
+			cursor: var(--wpds-cursor-control);
+		}
+	}
+}
+
+.block-editor-block-toolbar__options-no-results {
+	grid-column: 1 / -1;
+	margin: 0;
+	padding: $grid-unit-10 $grid-unit-10;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-md);
+}
+
+// Menu items from plugins, which render `MenuItem` from the components package.
+.block-editor-block-toolbar__legacy-menu-items {
+	grid-column: 1 / -1;
+
+	.components-menu-group > div {
+		padding: 0;
+	}
+
+	.components-menu-item__button {
+		width: 100%;
+		min-height: var(--wpds-dimension-size-md);
+		padding-inline: var(--wpds-dimension-padding-sm);
+		border-radius: var(--wpds-border-radius-sm);
+	}
+}
+
+// Block icons in the menus, at the size of the other menu icons.
+.block-editor-block-toolbar__menu-block-icon {
+	display: flex;
+
+	.block-editor-block-icon {
+		width: $icon-size;
+		height: $icon-size;
+	}
+}
+
+// The lineage menu indents each level with a line, to show nesting.
+.block-editor-block-toolbar__lineage-line {
+	display: inline-block;
+	vertical-align: middle;
+	height: var(--wpds-border-width-xs);
+	margin-inline-end: $grid-unit-05;
+	background-color: currentColor;
+}

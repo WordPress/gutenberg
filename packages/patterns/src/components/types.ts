@@ -144,6 +144,11 @@ export interface PatternConvertButtonProps {
 	 * Callback to close the block settings menu dropdown.
 	 */
 	closeBlockSettingsMenu: () => void;
+	/**
+	 * Whether to add the item to the options menu of the redesigned block
+	 * toolbar, instead of rendering a block settings menu item.
+	 */
+	isOptionsMenuItem?: boolean;
 }
 
 export interface PatternsManageButtonProps {

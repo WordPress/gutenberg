@@ -100,6 +100,11 @@ export type RichTextToolbarButtonProps = {
 export type FormatToolbarContainerProps = {
 	inline?: boolean;
 	editableContentElement?: HTMLElement | null;
+	/**
+	 * Whether the text selection is collapsed. With the block toolbar
+	 * redesign, the format toolbar only shows for a text selection.
+	 */
+	isCollapsed?: boolean;
 };
 
 /**

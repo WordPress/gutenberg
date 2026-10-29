@@ -30,6 +30,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Marks which block inspector controls show a value inherited from Global Styles, and adds a shortcut to clear a value you set back to the inherited one. Inherited values show in the inspector whether or not this is on.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-block-toolbar-redesign',
+					'label'       => __( 'Block toolbar redesign', 'gutenberg' ),
+					'description' => __( 'Shows the block name in the block toolbar, groups block tools in one searchable options menu, moves text formatting to a toolbar that appears when text is selected, and moves the parent selector outside the block.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),

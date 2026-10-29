@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   The Highlight, Inline image and Math toolbar buttons fill their own named `RichText.ToolbarControls.*` slots, so the block toolbar redesign experiment can place them. The format toolbar still lists them in its More menu. ([#85567](https://github.com/WordPress/gutenberg/pull/85567))
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
