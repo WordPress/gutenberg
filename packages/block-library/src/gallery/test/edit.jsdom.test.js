@@ -119,6 +119,79 @@ describe( 'Gallery block', () => {
 		} );
 	} );
 
+	describe( 'Image link', () => {
+		const setupImage = ( attributes = {}, settings ) =>
+			setup(
+				createBlock( 'core/gallery', {}, [
+					createBlock( 'core/image', {
+						...IMAGE_ATTRIBUTES,
+						...attributes,
+					} ),
+				] ),
+				settings
+			);
+
+		test( "offers the link in an image's Content tab", async () => {
+			await setupImage();
+			await selectBlock( 'Block: Image' );
+
+			expect(
+				screen.getByRole( 'tab', { name: 'Content' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			expect(
+				await screen.findByRole( 'combobox', { name: 'Link to' } )
+			).toHaveValue( 'none' );
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).not.toBeChecked();
+		} );
+
+		test( 'does not offer a link for a decorative image', async () => {
+			await setupImage( { isDecorative: true } );
+			await selectBlock( 'Block: Image' );
+
+			expect(
+				await screen.findByRole( 'checkbox', {
+					name: 'Mark as decorative',
+				} )
+			).toBeChecked();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Link to' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'checkbox', { name: 'Open in new tab' } )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'turns off the lightbox when the image is linked', async () => {
+			await setupImage(
+				{},
+				{
+					__experimentalFeatures: {
+						lightbox: { enabled: true, allowEditing: true },
+					},
+				}
+			);
+			await selectBlock( 'Block: Image' );
+
+			const linkTo = await screen.findByRole( 'combobox', {
+				name: 'Link to',
+			} );
+			// An image that opens in a lightbox can't be marked as
+			// decorative, so the checkbox shows whether the lightbox is on.
+			expect(
+				screen.queryByRole( 'checkbox', { name: 'Mark as decorative' } )
+			).not.toBeInTheDocument();
+
+			await userEvent.selectOptions( linkTo, 'Media file' );
+
+			expect( linkTo ).toHaveValue( 'media' );
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Mark as decorative' } )
+			).toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'Order by', () => {
 		test( 'offers a sort control in Settings for a static gallery that reads as a custom order until the media resolves', async () => {
 			await setup( createGallery() );
