@@ -21,6 +21,7 @@ import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-o
 import { unlock } from '../../lock-unlock';
 import StylesRevisionsCodeDiff from './revisions-code-diff';
 import RevisionDetails from './revision-details';
+import useSyncedScroll from './use-synced-scroll';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -34,13 +35,14 @@ function isObjectEmpty( object ) {
 /**
  * Previews the editor's blocks with a global styles config.
  *
- * @param {Object}        props            Component props.
- * @param {Object}        props.config     The global styles config to preview.
- * @param {Object}        props.baseConfig The theme's base global styles.
- * @param {Array<Object>} props.blocks     The blocks to preview.
- * @param {Object}        props.settings   Block editor settings.
- * @param {string}        props.name       The iframe name.
- * @param {string}        [props.title]    The iframe's accessible name.
+ * @param {Object}                       props            Component props.
+ * @param {Object}                       props.config     The global styles config to preview.
+ * @param {Object}                       props.baseConfig The theme's base global styles.
+ * @param {Array<Object>}                props.blocks     The blocks to preview.
+ * @param {Object}                       props.settings   Block editor settings.
+ * @param {string}                       props.name       The iframe name.
+ * @param {string}                       [props.title]    The iframe's accessible name.
+ * @param {React.Ref<HTMLIFrameElement>} [props.frameRef] Receives the iframe element.
  * @return {React.JSX.Element} The preview.
  */
 function RevisionPreview( {
@@ -50,6 +52,7 @@ function RevisionPreview( {
 	settings,
 	name,
 	title,
+	frameRef,
 } ) {
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( config ) && ! isObjectEmpty( baseConfig ) ) {
@@ -67,6 +70,7 @@ function RevisionPreview( {
 
 	return (
 		<Iframe
+			ref={ frameRef }
 			className="editor-revisions__iframe"
 			name={ name }
 			title={ title }
@@ -156,6 +160,12 @@ function StylesCanvasRevisions( { path }, ref ) {
 
 	const [ view, setView ] = useState( 'visual' );
 
+	// The selected revision's preview is only there when comparing in the
+	// visual view, so the previews scroll together only then.
+	const [ selectedFrame, setSelectedFrame ] = useState( null );
+	const [ currentFrame, setCurrentFrame ] = useState( null );
+	useSyncedScroll( selectedFrame, currentFrame );
+
 	if ( isLoading ) {
 		return null;
 	}
@@ -242,6 +252,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 						<RevisionPreview
 							{ ...previewProps }
 							config={ selectedRevision }
+							frameRef={ setSelectedFrame }
 							name="revisions"
 							title={ __( 'Selected revision' ) }
 						/>
@@ -256,6 +267,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 									? userConfig
 									: selectedRevision || userConfig
 							}
+							frameRef={ setCurrentFrame }
 							name={
 								isComparingRevision
 									? 'revisions-current'
