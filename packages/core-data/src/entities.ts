@@ -372,7 +372,7 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 			transientEdits: {
 				...blocksTransientEdits,
 				selection: true,
-				// Media edits held until the post is saved. See the editor's
+				// Media edits held until the record is saved. See the editor's
 				// `setPendingMediaEdit`.
 				pendingMediaEdits: true,
 			},

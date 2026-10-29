@@ -6,7 +6,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { DataRegistry } from '@wordpress/data';
 
 /**
- * A media edit held for a block until the post is saved. See the editor's
+ * A media edit held for a block until its entity is saved. See the editor's
  * `setPendingMediaEdit`.
  */
 export interface PendingMediaEdit {
