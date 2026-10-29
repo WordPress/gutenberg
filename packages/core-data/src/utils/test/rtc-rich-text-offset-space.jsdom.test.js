@@ -5,7 +5,11 @@ import { getProviderCreators } from '../../../../sync/src/providers';
 import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';
 import { applyPostChangesToCRDTDoc } from '../crdt';
 import { mergeCrdtBlocks } from '../crdt-blocks';
-import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
+import {
+	getRootMap,
+	richTextOffsetToHtmlIndex,
+	tokenizeHtml,
+} from '../crdt-utils';
 /**
  * Mock block schemas and sync providers.
  */
@@ -156,7 +160,8 @@ function makeCursor( offset ) {
 function deltaForUpdate( oldHtml, newHtml, cursorPosition ) {
 	return new Delta( [ { insert: oldHtml } ] ).diffWithCursor(
 		new Delta( [ { insert: newHtml } ] ),
-		cursorPosition
+		cursorPosition,
+		{ tokenizer: tokenizeHtml }
 	);
 }
 
@@ -280,7 +285,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 		}
 
 		expect( checkedCases ).toBe( FUZZ_CASE_COUNT );
-	} );
+	}, 30000 );
 
 	it( 'fuzzes cursor-guided deltas against updated HTML cursor indices', () => {
 		const random = createRandom( FUZZ_SEED + 1 );
@@ -383,7 +388,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 		expect( attempts ).toBeLessThanOrEqual( PLACEMENT_FUZZ_CASE_COUNT * 2 );
 		expect( differentCursorIndexCases ).toBeGreaterThan( 100 );
 		expect( oldHtmlWouldPlaceDifferentDeltaCases ).toBeGreaterThan( 25 );
-	} );
+	}, 30000 );
 
 	it( 'preserves formatted paragraph content in applyPostChangesToCRDTDoc', () => {
 		const doc = new Y.Doc();

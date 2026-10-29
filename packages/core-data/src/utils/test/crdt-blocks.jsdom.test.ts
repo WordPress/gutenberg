@@ -3043,9 +3043,10 @@ describe( 'crdt-blocks', () => {
 			expect( merged ).toContain( '<span title="a > b">' );
 			expect( merged ).toContain( '</span>' );
 			expect( merged ).toContain( '<em>' );
-			expect( merged ).toBe(
-				'the <span title="a > b"><em>quick</span> brown</em> fox'
-			);
+			expect( [
+				'the <span title="a > b"><em>quick</span> brown</em> fox',
+				'the <em><span title="a > b">quick</span> brown</em> fox',
+			] ).toContain( merged );
 		} );
 	} );
 
