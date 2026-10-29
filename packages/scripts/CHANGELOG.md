@@ -1,3 +1,9 @@
+## Master
+
+### Breaking Changes
+
+- The bundled `npm-package-json-lint` dependency has been updated from requiring `^3.3.1` to requiring `^4.0.3` ([#18054](https://github.com/WordPress/gutenberg/pull/18054)). Please see the [migration guide](https://npmpackagejsonlint.org/docs/en/v3-to-v4). Note: `npmPackageJsonLintConfig` prop in the `package.json` file needs to be renamed to `npmpackagejsonlint`.
+
 ## 2.5.0 (2019-01-09)
 
 ### New Features

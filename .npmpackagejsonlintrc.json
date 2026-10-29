@@ -1,0 +1,27 @@
+{
+	"extends": "@wordpress/npm-package-json-lint-config",
+	"rules": {
+		"description-format": [
+			"error",
+			{
+				"requireCapitalFirstLetter": true,
+				"requireEndingPeriod": true
+			}
+		],
+		"require-publishConfig": "error",
+		"valid-values-author": [
+			"error",
+			[
+				"The WordPress Contributors"
+			]
+		],
+		"valid-values-publishConfig": [
+			"error",
+			[
+				{
+					"access": "public"
+				}
+			]
+		]
+	}
+}
