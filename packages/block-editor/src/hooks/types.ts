@@ -516,6 +516,8 @@ export interface ChildLayoutStyleRulesOptions {
 	parentLayout?: Layout;
 	/** Whether to add a container query to responsive grids. */
 	includeContainerQuery?: boolean;
+	/** Whether the block has a free box in a manual grid in any state. */
+	hasBox?: boolean;
 }
 
 /**

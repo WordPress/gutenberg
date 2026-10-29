@@ -254,7 +254,7 @@ function gutenberg_get_layout_child_values( $layout ) {
 	return array_intersect_key(
 		$layout,
 		array_flip(
-			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan', 'box' )
 		)
 	);
 }
@@ -273,7 +273,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 	return array_diff_key(
 		$layout,
 		array_flip(
-			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan', 'box' )
 		)
 	);
 }
@@ -319,15 +319,76 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 }
 
 /**
+ * Returns the box of a manual grid item in a state: where it is inside its cells when it
+ * doesn't fill them. The box belongs to the placement, so a viewport override that sets any
+ * part of the placement also sets the box, and has none if it doesn't include one.
+ *
+ * Box values are fractions of the cells' area: `left` and `top` of its width, as CSS resolves
+ * margin percentages, `width` of its width and `height` of its height. Values that aren't
+ * numbers in range mean there is no box, as in the editor's `getGridItemBox()`.
+ *
+ * @param array      $child_layout       The base child layout.
+ * @param array|null $viewport_overrides Optional. The child layout of a viewport.
+ * @return array|null The box, with `left`, `top`, `width` and `height`, or null.
+ */
+function gutenberg_get_grid_item_box( $child_layout, $viewport_overrides = null ) {
+	$owns_placement = is_array( $viewport_overrides ) && (
+		array_key_exists( 'columnStart', $viewport_overrides ) ||
+		array_key_exists( 'columnSpan', $viewport_overrides ) ||
+		array_key_exists( 'rowStart', $viewport_overrides ) ||
+		array_key_exists( 'rowSpan', $viewport_overrides )
+	);
+	$layout         = $owns_placement ? $viewport_overrides : $child_layout;
+	$box            = is_array( $layout ) ? ( $layout['box'] ?? null ) : null;
+	if ( ! is_array( $box ) ) {
+		return null;
+	}
+
+	$sanitized_box = array();
+	foreach ( array( 'left', 'top', 'width', 'height' ) as $key ) {
+		$value = $box[ $key ] ?? null;
+		if ( ! is_int( $value ) && ! is_float( $value ) ) {
+			return null;
+		}
+		$sanitized_box[ $key ] = (float) $value;
+	}
+	// The values are rounded, so the box can end a little past its cells, but no more.
+	if (
+		$sanitized_box['left'] < 0 || $sanitized_box['left'] > 1 ||
+		$sanitized_box['left'] + $sanitized_box['width'] > 1.001 ||
+		$sanitized_box['top'] < 0 || $sanitized_box['top'] > 100 ||
+		$sanitized_box['width'] <= 0 || $sanitized_box['width'] > 1 ||
+		$sanitized_box['height'] <= 0 || $sanitized_box['height'] > 1
+	) {
+		return null;
+	}
+	return $sanitized_box;
+}
+
+/**
+ * Returns a box fraction as a CSS percentage, with up to three decimals.
+ *
+ * @param float $fraction The fraction.
+ * @return string The percentage.
+ */
+function gutenberg_get_grid_item_box_percent( $fraction ) {
+	return round( $fraction * 100, 3 ) . '%';
+}
+
+/**
  * Returns child layout styles for a block affected by its parent's layout.
  *
  * @param string     $selector           CSS selector.
  * @param array      $child_layout       Child layout values.
  * @param array      $parent_layout      Parent layout values.
  * @param array|null $viewport_overrides Optional. Child viewport layout overrides to emit.
+ * @param bool       $has_box            Optional. Whether the block has a box in its manual grid's cells in any state. Default false.
  * @return array Child layout style rules.
  */
-function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array(), $viewport_overrides = null ) {
+function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array(), $viewport_overrides = null, $has_box = false ) {
+	/** This filter is documented in lib/block-supports/layout.php */
+	$has_grid_interactivity = (bool) apply_filters( 'gutenberg_layout_has_grid_interactivity', false );
+
 	$base_child_layout              = is_array( $child_layout ) ? $child_layout : array();
 	$viewport_overrides             = is_array( $viewport_overrides ) ? $viewport_overrides : null;
 	$child_layout                   = null === $viewport_overrides ? $base_child_layout : array_replace( $base_child_layout, $viewport_overrides );
@@ -425,16 +486,58 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	if (
 		null === $viewport_overrides &&
 		! empty( $parent_layout['isManualPlacement'] ) &&
-		/** This filter is documented in lib/block-supports/layout.php */
-		apply_filters( 'gutenberg_layout_has_grid_interactivity', false )
+		$has_grid_interactivity
 	) {
 		$child_layout_declarations['--wp--grid-item--row-span'] = (string) ( $row_span ? $row_span : 1 );
+	}
+
+	/*
+	 * A block placed freely in a manual grid sits inside its cells, with margins and a size
+	 * that are percentages of them. They are custom properties, so that a viewport can change
+	 * them, and they only apply where the cells have a fixed size: grids whose rows are sized
+	 * by their content, and stacked grids, leave blocks to fill their cells.
+	 */
+	$has_grid_item_box = $has_box &&
+		! empty( $parent_layout['isManualPlacement'] ) &&
+		$has_grid_interactivity;
+	if (
+		$has_grid_item_box &&
+		(
+			null === $viewport_overrides ||
+			$has_viewport_property_override( 'columnStart' ) ||
+			$has_viewport_property_override( 'columnSpan' ) ||
+			$has_viewport_property_override( 'rowStart' ) ||
+			$has_viewport_property_override( 'rowSpan' )
+		)
+	) {
+		$box = gutenberg_get_grid_item_box( $base_child_layout, $viewport_overrides );
+		$child_layout_declarations['--wp--grid-item--box-left']   = gutenberg_get_grid_item_box_percent( $box ? $box['left'] : 0 );
+		$child_layout_declarations['--wp--grid-item--box-top']    = gutenberg_get_grid_item_box_percent( $box ? $box['top'] : 0 );
+		$child_layout_declarations['--wp--grid-item--box-width']  = gutenberg_get_grid_item_box_percent( $box ? $box['width'] : 1 );
+		$child_layout_declarations['--wp--grid-item--box-height'] = gutenberg_get_grid_item_box_percent( $box ? $box['height'] : 1 );
 	}
 
 	if ( ! empty( $child_layout_declarations ) ) {
 		$child_layout_styles[] = array(
 			'selector'     => $selector,
 			'declarations' => $child_layout_declarations,
+		);
+	}
+
+	// The box's margins are `!important` because a block's own margin is an inline style.
+	if ( $has_grid_item_box && null === $viewport_overrides ) {
+		$child_layout_styles[] = array(
+			'rules_group'  => '@container style(--wp--style--grid-cells: fixed)',
+			'selector'     => $selector,
+			'declarations' => array(
+				'justify-self' => 'start',
+				'align-self'   => 'start',
+				'box-sizing'   => 'border-box',
+				'margin-left'  => 'var(--wp--grid-item--box-left) !important',
+				'margin-top'   => 'var(--wp--grid-item--box-top) !important',
+				'width'        => 'var(--wp--grid-item--box-width)',
+				'height'       => 'var(--wp--grid-item--box-height)',
+			),
 		);
 	}
 
@@ -1181,10 +1284,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			'wp-container-content-'
 		);
 
+		$has_grid_item_box = null !== gutenberg_get_grid_item_box( $base_child_layout );
+		foreach ( $viewport_child_layouts as $viewport_data ) {
+			$has_grid_item_box = $has_grid_item_box || null !== gutenberg_get_grid_item_box( $base_child_layout, $viewport_data['child_layout'] );
+		}
+
 		$child_layout_styles = gutenberg_get_child_layout_style_rules(
 			".$container_content_class",
 			$base_child_layout,
-			$parent_layout
+			$parent_layout,
+			null,
+			$has_grid_item_box
 		);
 
 		// Emit responsive child layout CSS using the same container-content class
@@ -1194,7 +1304,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 				".$container_content_class",
 				$base_child_layout,
 				$parent_layout,
-				$viewport_data['child_layout']
+				$viewport_data['child_layout'],
+				$has_grid_item_box
 			);
 			foreach ( $viewport_child_styles as $index => $rule ) {
 				$viewport_child_styles[ $index ]['rules_group'] = $viewport_data['media_query'];

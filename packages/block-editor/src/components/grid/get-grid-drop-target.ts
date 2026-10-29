@@ -1,4 +1,10 @@
 import { GridRect, getClosestTrack } from './utils';
+import {
+	clampPixelRect,
+	getGridPlacementFromPixelRect,
+	snapPixelRectPosition,
+} from './free-placement';
+import type { GridPlacement } from './free-placement';
 
 /**
  * The start and end position in pixels of a grid track.
@@ -93,6 +99,78 @@ export function getGridDropTarget( {
 		columnSpan: fittedColumnSpan,
 		rowSpan: fittedRowSpan,
 	} );
+}
+
+/**
+ * Works out where a block being dragged over a grid with cells of a fixed
+ * size would land when it is placed freely: exactly where it is let go, kept
+ * inside the grid by its outline with its rotation. With `snap`, its top-left
+ * corner snaps to the closest grid lines and it keeps its size.
+ *
+ * @param options
+ * @param options.x            Pointer position in pixels, relative to the start of the first column track.
+ * @param options.y            Pointer position in pixels, relative to the start of the first row track.
+ * @param options.columnTracks Column tracks, as returned by `getGridTracks`.
+ * @param options.rowTracks    Row tracks, as returned by `getGridTracks`.
+ * @param options.columnSpan   Number of columns the block spans, for its default width.
+ * @param options.rowSpan      Number of rows the block spans, for its default height.
+ * @param options.width        Width of the block in pixels, without its rotation. Defaults to the width of the columns it spans.
+ * @param options.height       Height of the block in pixels, without its rotation. Defaults to the height of the rows it spans.
+ * @param options.grabX        Where the block was grabbed, in pixels from its left edge. Defaults to its center.
+ * @param options.grabY        Where the block was grabbed, in pixels from its top edge. Defaults to its center.
+ * @param options.angle        The block's rotation in degrees.
+ * @param options.snap         Whether to snap the block's corner to the grid lines.
+ *
+ * @return Where the block would land, as a place in the grid and in pixels.
+ */
+export function getFreeGridDropTarget( {
+	x,
+	y,
+	columnTracks,
+	rowTracks,
+	columnSpan = 1,
+	rowSpan = 1,
+	width = getSpanSize( columnTracks, columnSpan ),
+	height = getSpanSize( rowTracks, rowSpan ),
+	grabX = width / 2,
+	grabY = height / 2,
+	angle = 0,
+	snap = false,
+}: GridDropTargetOptions & { angle?: number; snap?: boolean } ): {
+	placement: GridPlacement;
+	pixelRect: PixelRect;
+} {
+	const bounds = {
+		left: 0,
+		top: 0,
+		right: columnTracks[ columnTracks.length - 1 ].end,
+		bottom: rowTracks[ rowTracks.length - 1 ].end,
+	};
+	const left = x - grabX;
+	const top = y - grabY;
+	let pixelRect = clampPixelRect(
+		{ left, top, right: left + width, bottom: top + height },
+		bounds,
+		angle
+	);
+	if ( snap ) {
+		pixelRect = clampPixelRect(
+			snapPixelRectPosition( pixelRect, columnTracks, rowTracks ),
+			bounds,
+			angle
+		);
+	}
+	// The block's place is stored without its rotation, so that has to be
+	// inside the grid too, even if its rotated outline then reaches out.
+	pixelRect = clampPixelRect( pixelRect, bounds );
+	return {
+		placement: getGridPlacementFromPixelRect(
+			pixelRect,
+			columnTracks,
+			rowTracks
+		),
+		pixelRect,
+	};
 }
 
 /**

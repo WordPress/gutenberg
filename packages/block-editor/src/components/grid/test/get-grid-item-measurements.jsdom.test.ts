@@ -19,6 +19,7 @@ const GRID_CSS: Record< string, string > = {
 	'row-gap': '10px',
 	'padding-left': '0px',
 	'padding-top': '0px',
+	'--wp--style--grid-cells': 'fixed',
 };
 
 function setUpGrid( children: ChildBox[] ) {
@@ -161,5 +162,13 @@ describe( 'getGridItemMeasurements()', () => {
 			right: 320,
 			bottom: 210,
 		} );
+	} );
+
+	it( 'reads whether the cells are fixed once', () => {
+		const { grid } = setUpGrid( children );
+
+		expect( getGridItemMeasurements( grid, 'dragged' ).hasFixedCells ).toBe(
+			true
+		);
 	} );
 } );
