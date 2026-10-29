@@ -123,11 +123,7 @@ function block_core_post_terms_build_variations() {
 				$taxonomy->label
 			),
 			'attributes'  => array(
-				'term'   => $taxonomy->name,
-				'layout' => array(
-					'type'     => 'flex',
-					'flexWrap' => 'wrap',
-				),
+				'term' => $taxonomy->name,
 			),
 			'isActive'    => array( 'term' ),
 			'scope'       => array( 'inserter', 'transform' ),

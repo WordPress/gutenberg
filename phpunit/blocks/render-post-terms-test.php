@@ -72,10 +72,9 @@ class Tests_Blocks_RenderPostTermsBlock extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wp-block-post-terms__separator', $html );
 	}
 
-	public function test_variations_start_with_a_flex_layout() {
-		$variations = gutenberg_block_core_post_terms_build_variations();
-		$category   = wp_list_filter( $variations, array( 'name' => 'category' ) );
-
-		$this->assertSame( 'flex', reset( $category )['attributes']['layout']['type'] );
+	public function test_variations_only_set_the_term() {
+		foreach ( gutenberg_block_core_post_terms_build_variations() as $variation ) {
+			$this->assertSame( array( 'term' ), array_keys( $variation['attributes'] ) );
+		}
 	}
 }
