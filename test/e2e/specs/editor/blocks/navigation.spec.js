@@ -1185,6 +1185,60 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	// The "Add page" appender inserts a page link, so choosing a post changes
+	// the link's type to one whose record is not loaded yet, and the link's
+	// bound URL is empty until it loads.
+	test( 'closes the Link UI after a post is added from the page appender', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+		navigation,
+	} ) => {
+		await requestUtils.createPost( {
+			title: 'What I learned from my cat',
+			status: 'publish',
+		} );
+		await admin.createNewPost();
+		const { id: menuId } = await requestUtils.createNavigationMenu( {
+			title: 'Post link',
+			content:
+				'<!-- wp:navigation-submenu {"label":"Parent","url":"https://example.com/parent"} --><!-- wp:navigation-link {"label":"Child","url":"https://example.com"} /--><!-- /wp:navigation-submenu -->',
+		} );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menuId },
+		} );
+
+		await navigation
+			.getNavBlock()
+			.getByRole( 'document', { name: 'Block: Submenu' } )
+			.getByText( 'Parent' )
+			.click();
+		await navigation.getSubmenuBlockInserter().click();
+
+		await expect( navigation.getLinkControlSearch() ).toBeFocused();
+		await page.keyboard.type( 'What I learned from my cat' );
+		await page
+			.getByRole( 'listbox', { name: /Search results/ } )
+			.getByRole( 'option', { name: /What I learned from my cat/ } )
+			.click();
+
+		const linkControlLink = navigation.getLinkControlLink(
+			'What I learned from my cat'
+		);
+		await expect( linkControlLink ).toBeVisible();
+		await expect( linkControlLink ).toBeFocused();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		await expect( navigation.getLinkPopover() ).toBeHidden();
+
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
 		admin,
 		page,

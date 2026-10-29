@@ -6,6 +6,10 @@
  * `skipped` passes: a job skipped because an upstream `needs` failed is joined
  * in the same run by that upstream job's own `failure`, which this script sees.
  *
+ * The run's job list can report a job as `in_progress` for many minutes after
+ * it completed, so every job it lists as unfinished is read again from that
+ * job's own endpoint, which reports the completion and its conclusion sooner.
+ *
  * Usage:
  *
  *     node ci-status-check.js --ignore '<job name>[,<job name>]...'
@@ -14,13 +18,18 @@
  * job still running alongside it; repeat the flag for a name containing a
  * comma. Anything else left unfinished fails the status check rather than
  * pass unevaluated.
+ *
+ * Tests live in `tools/monorepo/test/ci-status-check.ts`, since this directory
+ * is not a workspace that can depend on Vitest.
  */
 
 const { parseArgs } = require( 'node:util' );
 
 const PASSING_CONCLUSIONS = [ 'success', 'skipped' ];
+const COMPLETED = 'completed';
 
-// A job that just finished can still read as running, so let the API settle.
+// A job that just finished can still read as running even on its own
+// endpoint, so let the API settle.
 const ATTEMPTS = 5;
 const RETRY_BASE_DELAY_MS = 3000;
 
@@ -35,16 +44,19 @@ function retryDelay( attempt ) {
 }
 
 const { GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
+const ACTIONS_API_URL = `https://api.github.com/repos/${ GITHUB_REPOSITORY }/actions`;
 
 let ignoredJobs = [];
 
 /**
  * Reads the exempt job names off the command line.
  *
+ * @param {string[]} args The command-line arguments, without `node` and the script path.
  * @return {string[]} The job names.
  */
-function parseIgnoredJobs() {
+function parseIgnoredJobs( args ) {
 	const { values } = parseArgs( {
+		args,
 		options: {
 			ignore: { type: 'string', multiple: true, default: [] },
 		},
@@ -69,6 +81,33 @@ function sleep( ms ) {
 }
 
 /**
+ * Fetches a GitHub REST API URL as JSON.
+ *
+ * @param {string} url         The URL.
+ * @param {string} description What the request does, e.g. `read job 123`.
+ * @return {Promise<Object>} The response body.
+ */
+async function fetchApi( url, description ) {
+	const response = await fetch( url, {
+		headers: {
+			accept: 'application/vnd.github+json',
+			authorization: `Bearer ${ GITHUB_TOKEN }`,
+			'x-github-api-version': '2022-11-28',
+		},
+	} );
+
+	if ( ! response.ok ) {
+		const error = new Error(
+			`Could not ${ description }: ${ response.status } ${ response.statusText }.`
+		);
+		error.retryable = response.status >= 500 || response.status === 429;
+		throw error;
+	}
+
+	return response.json();
+}
+
+/**
  * Fetches every job of the current run, following pagination.
  *
  * @return {Promise<Array<{name: string, status: string, conclusion: string, html_url: string}>>} The jobs.
@@ -77,24 +116,10 @@ async function fetchJobs() {
 	const jobs = [];
 
 	for ( let page = 1; ; page++ ) {
-		const url = `https://api.github.com/repos/${ GITHUB_REPOSITORY }/actions/runs/${ GITHUB_RUN_ID }/jobs?per_page=100&page=${ page }`;
-		const response = await fetch( url, {
-			headers: {
-				accept: 'application/vnd.github+json',
-				authorization: `Bearer ${ GITHUB_TOKEN }`,
-				'x-github-api-version': '2022-11-28',
-			},
-		} );
-
-		if ( ! response.ok ) {
-			const error = new Error(
-				`Could not list the jobs of run ${ GITHUB_RUN_ID }: ${ response.status } ${ response.statusText }.`
-			);
-			error.retryable = response.status >= 500 || response.status === 429;
-			throw error;
-		}
-
-		const body = await response.json();
+		const body = await fetchApi(
+			`${ ACTIONS_API_URL }/runs/${ GITHUB_RUN_ID }/jobs?per_page=100&page=${ page }`,
+			`list the jobs of run ${ GITHUB_RUN_ID }`
+		);
 		jobs.push( ...body.jobs );
 
 		if ( jobs.length >= body.total_count ) {
@@ -111,6 +136,28 @@ async function fetchJobs() {
 }
 
 /**
+ * Reads again, from each job's own endpoint, every job the run's job list
+ * reports as unfinished, since that list lags behind.
+ *
+ * @param {Array<{id: number, name: string, status: string, conclusion: string, html_url: string}>} jobs The listed jobs.
+ * @return {Promise<Array<{name: string, status: string, conclusion: string, html_url: string}>>} The jobs, the unfinished ones re-read.
+ */
+function refreshJobs( jobs ) {
+	return Promise.all(
+		jobs.map( ( job ) => {
+			if ( job.status === COMPLETED ) {
+				return job;
+			}
+
+			return fetchApi(
+				`${ ACTIONS_API_URL }/jobs/${ job.id }`,
+				`read job ${ job.id }`
+			);
+		} )
+	);
+}
+
+/**
  * Fetches the jobs this run is evaluated on, once none of them is still
  * running.
  *
@@ -122,9 +169,10 @@ async function fetchEvaluatedJobs() {
 		let jobs;
 
 		try {
-			jobs = ( await fetchJobs() ).filter(
+			const listed = ( await fetchJobs() ).filter(
 				( job ) => ! ignoredJobs.includes( job.name )
 			);
+			jobs = await refreshJobs( listed );
 		} catch ( error ) {
 			if ( lastAttempt || error.retryable === false ) {
 				throw error;
@@ -134,7 +182,7 @@ async function fetchEvaluatedJobs() {
 			continue;
 		}
 
-		const running = jobs.filter( ( job ) => job.status !== 'completed' );
+		const running = jobs.filter( ( job ) => job.status !== COMPLETED );
 
 		if ( jobs.length > 0 && running.length === 0 ) {
 			return jobs;
@@ -150,7 +198,7 @@ async function fetchEvaluatedJobs() {
 
 			for ( const job of running ) {
 				console.log(
-					`::error::${ job.name } is still ${ job.status }, so it was never evaluated. Add it to this job's \`needs\`, or pass it as \`--ignore\`.`
+					`::error::${ job.name } still reads as ${ job.status } after re-checking it, so it was never evaluated. Either it is missing from this job's \`needs\` (add it there, or pass it as \`--ignore\`), or the GitHub API is still lagging, and re-running this status check will clear it: ${ job.html_url }`
 				);
 			}
 			throw new Error( `${ running.length } job(s) had not finished.` );
@@ -160,14 +208,19 @@ async function fetchEvaluatedJobs() {
 	}
 }
 
-async function main() {
+/**
+ * Evaluates every job of the current run, throwing if any did not pass.
+ *
+ * @param {string[]} args The command-line arguments, without `node` and the script path.
+ */
+async function main( args ) {
 	if ( ! GITHUB_REPOSITORY || ! GITHUB_RUN_ID || ! GITHUB_TOKEN ) {
 		throw new Error(
 			'GITHUB_REPOSITORY, GITHUB_RUN_ID and GITHUB_TOKEN must all be set.'
 		);
 	}
 
-	ignoredJobs = parseIgnoredJobs();
+	ignoredJobs = parseIgnoredJobs( args );
 
 	if ( ignoredJobs.length === 0 ) {
 		throw new Error(
@@ -194,7 +247,11 @@ async function main() {
 	);
 }
 
-main().catch( ( error ) => {
-	console.log( `::error::${ error.message }` );
-	process.exitCode = 1;
-} );
+if ( require.main === module ) {
+	main( process.argv.slice( 2 ) ).catch( ( error ) => {
+		console.log( `::error::${ error.message }` );
+		process.exitCode = 1;
+	} );
+}
+
+module.exports = { main };

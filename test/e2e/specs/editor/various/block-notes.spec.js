@@ -424,6 +424,174 @@ test.describe( 'Block Notes', () => {
 		] );
 	} );
 
+	test( 'can search and filter notes in the "All notes" sidebar', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		await headingThread.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeVisible();
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'HEADING' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+
+		await editor.canvas.getByText( 'Second block.' ).click();
+		await expect( imageThread ).toBeVisible();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await expect( imageThread ).toBeHidden();
+
+		await search.fill( 'admin' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeVisible();
+
+		await search.fill( 'nothing matches' );
+		await expect( sidebar.getByText( 'No notes found.' ) ).toBeVisible();
+
+		await search.fill( '' );
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Resolved' } ).click();
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeHidden();
+
+		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
+		await expect( imageThread ).toBeVisible();
+		await expect( headingThread ).toBeHidden();
+
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter: Open' } )
+		).toBeVisible();
+		await sidebar.getByRole( 'button', { name: 'Filter: Open' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'All' } ).click();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter', exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'moves focus to the next note when resolving one hides it', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await headingThread.click();
+		await sidebar.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( headingThread ).toBeHidden();
+		await expect( imageThread ).toBeFocused();
+	} );
+
+	test( 'expands collapsed replies while searching notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment',
+		} );
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
+		const replyButton = sidebar.getByRole( 'button', {
+			name: 'Reply',
+			exact: true,
+		} );
+		for ( const reply of [ 'Check the table.', 'Last reply' ] ) {
+			await replyForm.click();
+			await replyForm.pressSequentially( reply );
+			await replyButton.click();
+		}
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added.' } )
+		).toHaveCount( 2 );
+
+		// Deselect the note so its middle reply collapses.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		const thread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Test comment',
+		} );
+		const moreReplies = thread.getByRole( 'button', {
+			name: '1 more reply',
+		} );
+		await expect( moreReplies ).toBeVisible();
+		await expect( thread.getByText( 'Check the table.' ) ).toBeHidden();
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'table' );
+		await expect( thread.getByText( 'Check the table.' ) ).toBeVisible();
+		await expect( moreReplies ).toBeHidden();
+
+		await search.fill( '' );
+		await expect( moreReplies ).toBeVisible();
+	} );
+
 	test( 'clearing the block selection does not select an orphaned note', async ( {
 		editor,
 		page,
@@ -1353,26 +1521,39 @@ test.describe( 'Block Notes', () => {
 			// The arrow keys move through the emoji, and Enter picks one.
 			await page.keyboard.press( 'Enter' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
 			).toBeFocused();
-			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
 			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
-				page.getByRole( 'button', { name: /Celebration/ } )
+				page.getByRole( 'button', { name: /Plus/ } )
 			).toContainText( '1' );
 
 			// The menu marks the emoji the user has already reacted with.
 			await trigger.click();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
 			).toBeChecked();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
 			).not.toBeChecked();
+
+			// The emoji name shows in a tooltip, and one Escape closes both.
+			await menu
+				.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				.hover();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeHidden();
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1502,7 +1683,9 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				// The pointer can rest on the pill, which then names the
+				// reactors: "admin reacted with heart".
+				name: /heart/i,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
@@ -2068,6 +2251,62 @@ test.describe( 'Block Notes', () => {
 				0
 			);
 			await expect( paragraph ).toHaveText( 'Resolve this note.' );
+		} );
+
+		test( 'adds, resolves and deletes inline notes in merged text', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			// Each note action writes rich text data back, so each step merges
+			// again to get an HTML string.
+			async function appendAndMerge( content ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+				await paragraph.last().click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+				await expect( paragraph ).toHaveCount( 1 );
+			}
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'One' },
+			} );
+
+			await test.step( 'Add a note', async () => {
+				await appendAndMerge( ' two' );
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First note' );
+				await expect( marker ).toHaveText( 'One two' );
+			} );
+
+			await test.step( 'Resolve the note', async () => {
+				await appendAndMerge( ' three' );
+				await blockNoteUtils.getThread( 'First note' ).click();
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'Delete a note', async () => {
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second note' );
+				await appendAndMerge( ' four' );
+				await blockNoteUtils.getThread( 'Second note' ).click();
+				await blockNoteUtils.deleteNote();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
 		test( 'anchors the marker to only the selected text', async ( {

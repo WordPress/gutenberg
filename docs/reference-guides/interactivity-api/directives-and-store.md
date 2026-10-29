@@ -198,6 +198,8 @@ The `wp-bind` will do different things when the DOM element is applied, dependin
 -   If the value is a string, the attribute is added with its value assigned: `<div attribute="value">`
 -   If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`
 
+Event handler attributes cannot be bound: a directive whose suffix starts with `on`, like `data-wp-bind--onclick`, is ignored. Use the [`wp-on`](#wp-on) directive to attach an event handler.
+
 ### `wp-class`
 
 This directive adds or removes a class to an HTML element, depending on a boolean value. It follows the syntax `data-wp-class--classname`.
@@ -387,7 +389,7 @@ To keep showing the fallback, return a pending value, not `null`. After [client-
 
 #### Inert content
 
-Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup. Client-side navigation ignores router regions in this content too; see [Where to place router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#where-to-place-router-regions).
 
 #### Conflicts with other directives
 
