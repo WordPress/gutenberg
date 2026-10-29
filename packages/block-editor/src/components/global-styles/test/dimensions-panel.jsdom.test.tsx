@@ -66,8 +66,7 @@ vi.mock( import( '../../use-settings' ), async ( importOriginal ) => {
  *
  * The control's `value` prop reads from local `value` only; inherited values
  * are surfaced through placeholders or at-rest selected options when local
- * paths are empty. The wrapping `ToolsPanelItem` carries the inherited or
- * local-override class hooks for label-level treatment.
+ * paths are empty.
  */
 
 const baseSettings = {

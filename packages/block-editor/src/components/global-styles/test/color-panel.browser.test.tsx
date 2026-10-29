@@ -184,11 +184,9 @@ describe( 'element color hooks', () => {
 	} );
 } );
 
-// Inherited Global Styles label treatment for the controls the Color
-// ("Elements") panel still owns after relocation — i.e. link and
-// element-scoped colors. Top-level text and background color label
-// treatment is covered by the Typography and Background panel tests, which
-// now own those controls.
+// Inherited values for the link and element colors the Color ("Elements")
+// panel owns. Text and background colors are covered by the Typography and
+// Background panel tests.
 const baseSettings = {
 	color: {
 		link: true,

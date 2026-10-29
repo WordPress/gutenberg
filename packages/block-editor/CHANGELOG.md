@@ -39,6 +39,7 @@
 -   Convert the inserter hooks, patterns tab and media tab to TypeScript ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 -   Convert the inserter components, the block autocompleter, the change design control and the block parent selector to TypeScript ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 -   Convert the grid visualizer, the entry points and the remaining stories and tests to TypeScript ([#85035](https://github.com/WordPress/gutenberg/pull/85035)).
+-   Remove the `gutenberg-global-styles-inheritance-ui` experiment and its block inspector indicators ([#85884](https://github.com/WordPress/gutenberg/pull/85884)).
 
 ## 19.0.0 (2026-10-20)
 
