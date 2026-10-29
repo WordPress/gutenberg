@@ -8,6 +8,7 @@ import {
 	useLayoutEffect,
 	useId,
 	forwardRef,
+	flushSync,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type {
@@ -244,11 +245,16 @@ function CropperInner(
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setCanvasSize( ( prev ) => {
-					if ( prev.width === width && prev.height === height ) {
-						return prev;
-					}
-					return { width, height };
+				// Render before the next paint, so the image keeps up with
+				// a container that is resizing every frame (such as while
+				// the sidebar animates) instead of trailing it by a frame.
+				flushSync( () => {
+					setCanvasSize( ( prev ) => {
+						if ( prev.width === width && prev.height === height ) {
+							return prev;
+						}
+						return { width, height };
+					} );
 				} );
 			}
 		} );
