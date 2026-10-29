@@ -58,6 +58,12 @@ jobs:
             - name: Install WordPress
               uses: ./.github/setup-wordpress
 
+            # WordPress turns on pretty permalinks during the install, because this environment supports
+            # them. The tests' request mocks only match the `?rest_route=` REST API URLs that plain
+            # permalinks produce, which is what the tests were written against.
+            - name: Use plain permalinks
+              run: npm run env cli option delete permalink_structure
+
             - name: List the tests
               run: ./node_modules/.bin/wp-scripts test-e2e --config=packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
 
