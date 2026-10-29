@@ -112,8 +112,23 @@ export default function PostTemplateEdit( {
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords, getTaxonomies } = select( coreStore );
+			const { getEntityRecord, getEntityRecords, getTaxonomies } =
+				select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
+			// With a static homepage, the front page template shows that page,
+			// not the latest posts.
+			const site =
+				inherit &&
+				templateSlug === 'front-page' &&
+				getEntityRecord( 'root', '__unstableBase' );
+			if ( site?.show_on_front === 'page' && site.page_on_front ) {
+				return {
+					posts: getEntityRecords( 'postType', 'page', {
+						include: [ site.page_on_front ],
+					} ),
+					blocks: getBlocks( clientId ),
+				};
+			}
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
