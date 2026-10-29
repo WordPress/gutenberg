@@ -46,8 +46,7 @@ body.modal-open {
 
 	// Keep the window boundary visible when forced-colors mode removes its shadow.
 	@media (forced-colors: active) {
-		outline: var(--wpds-border-width-xs) solid transparent;
-		outline-offset: calc(-1 * var(--wpds-border-width-xs));
+		outline: var(--wpds-border-width-xs) solid CanvasText;
 	}
 
 	border-radius: var(--wpds-border-radius-lg) var(--wpds-border-radius-lg) 0 0;
