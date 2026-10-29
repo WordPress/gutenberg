@@ -1,12 +1,13 @@
 @use "../utils/theme-variables" as *;
-@use "@wordpress/base-styles/variables" as *;
 
-// The outer 1px box shadow supplies the remaining pixel of the 8px radius.
-$border-radius: $radius-large - 1px;
-$border-color: var(--wpds-color-stroke-surface-neutral);
+// The outer shadow supplies the remaining stroke width of the corner radius.
+// Clamp the inner radius to zero for themes with square corners.
+$border-radius: max(0px, calc(var(--wpds-border-radius-lg) - var(--wpds-border-width-xs)));
 
 .card {
-	box-shadow: 0 0 0 1px $border-color;
+	box-shadow:
+		0 0 0 var(--wpds-border-width-xs)
+		var(--wpds-color-stroke-surface-neutral);
 	outline: none;
 }
 
@@ -23,8 +24,10 @@ $border-color: var(--wpds-color-stroke-surface-neutral);
 }
 
 .header {
-	border-bottom: 1px solid $border-color;
-	border-color: $border-color;
+	border-bottom:
+		var(--wpds-border-width-xs) solid
+		var(--wpds-color-stroke-surface-neutral);
+	border-color: var(--wpds-color-stroke-surface-neutral);
 	box-sizing: border-box;
 
 	&:last-child {
@@ -33,8 +36,10 @@ $border-color: var(--wpds-color-stroke-surface-neutral);
 }
 
 .footer {
-	border-top: 1px solid $border-color;
-	border-color: $border-color;
+	border-top:
+		var(--wpds-border-width-xs) solid
+		var(--wpds-color-stroke-surface-neutral);
+	border-color: var(--wpds-color-stroke-surface-neutral);
 	box-sizing: border-box;
 
 	&:first-of-type {
@@ -86,7 +91,8 @@ $border-color: var(--wpds-color-stroke-surface-neutral);
 	box-sizing: border-box;
 	display: block;
 	width: 100%;
-	border-color: $border-color;
+	border-width: var(--wpds-border-width-xs);
+	border-color: var(--wpds-color-stroke-surface-neutral);
 }
 
 .section-borderless {
@@ -99,10 +105,10 @@ $border-color: var(--wpds-color-stroke-surface-neutral);
 
 @each $size, $padding in (
 	none: 0,
-	x-small: $grid-unit-10,
-	small: $grid-unit-20,
-	medium: $grid-unit-20 $grid-unit-30,
-	large: $grid-unit-30 $grid-unit-40
+	x-small: var(--wpds-dimension-padding-sm),
+	small: var(--wpds-dimension-padding-lg),
+	medium: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl),
+	large: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-3xl)
 ) {
 	.padding-#{$size} {
 		padding: $padding;
@@ -112,10 +118,10 @@ $border-color: var(--wpds-color-stroke-surface-neutral);
 @each $side in block-start, block-end, inline-start, inline-end {
 	@each $size, $padding in (
 		none: 0,
-		x-small: $grid-unit-10,
-		small: $grid-unit-20,
-		medium: $grid-unit-30,
-		large: $grid-unit-40
+		x-small: var(--wpds-dimension-padding-sm),
+		small: var(--wpds-dimension-padding-lg),
+		medium: var(--wpds-dimension-padding-2xl),
+		large: var(--wpds-dimension-padding-3xl)
 	) {
 		.padding-#{$side}-#{$size} {
 			padding-#{$side}: $padding;
