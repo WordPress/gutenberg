@@ -302,6 +302,8 @@ jobs:
               if: ${{ steps.storybook.outcome == 'success' }}
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
+                  # `overwrite` deletes the artifact named by `name`, so it has to match the file name.
+                  name: gutenberg.zip
                   path: ./gutenberg.zip
                   archive: false
                   overwrite: true
