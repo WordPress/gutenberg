@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.19.0 (2025-02-28)
 
 ### Bug Fixes

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.19.0 (2025-02-28)
 
 ## 6.18.0 (2025-02-12)
