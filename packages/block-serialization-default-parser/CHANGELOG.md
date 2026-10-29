@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 5.0.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 5.0.0 (2024-05-31)
 
 ### Breaking Changes

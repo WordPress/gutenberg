@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.0.0 (2024-05-31)
 
 ### Breaking Changes
