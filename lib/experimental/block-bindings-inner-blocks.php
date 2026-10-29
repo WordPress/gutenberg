@@ -186,6 +186,7 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	// `pre_kses` filter.
 	$markup = wp_kses_post( $value );
 	if ( $wp_embed instanceof WP_Embed ) {
+		$markup = $wp_embed->run_shortcode( $markup );
 		$markup = $wp_embed->autoembed( $markup );
 	}
 	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ) );
