@@ -100,7 +100,7 @@ describe( '@wordpress/use-import-as aliases for @wordpress/components', () => {
 
 		expect(
 			missing,
-			`These @wordpress/components exports have the same name as a @wordpress/ui export. Add a \`WC*\` alias for each to ${ ALIAS_FILE }, then run \`npm run lint:js:fix\` to rename the existing imports`
+			`These @wordpress/components exports have the same name as a @wordpress/ui export. Add a \`WC*\` alias for each to ${ ALIAS_FILE }, then rename the existing imports and their uses. \`npm run lint:js\` lists the imports to rename`
 		).toEqual( [] );
 	} );
 
@@ -112,6 +112,17 @@ describe( '@wordpress/use-import-as aliases for @wordpress/components', () => {
 		expect(
 			stale,
 			`These aliases in ${ ALIAS_FILE } no longer match a colliding export. Remove them, or update them if the export was renamed`
+		).toEqual( [] );
+	} );
+
+	it( 'only exempts colliding names that have no alias', () => {
+		const stale = [ ...PENDING_ALIASES ].filter(
+			( name ) => aliases[ name ] || ! collisions.includes( name )
+		);
+
+		expect(
+			stale,
+			'Remove these names from `PENDING_ALIASES` in this test'
 		).toEqual( [] );
 	} );
 } );
