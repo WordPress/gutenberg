@@ -14,7 +14,6 @@ import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
 import clsx from 'clsx';
 import { Tooltip } from '@wordpress/ui';
 import type { ComponentProps } from 'react';
-import { InheritanceResetButton } from './inheritance';
 import { useToolsPanelItemPopoverProps } from './utils';
 import type {
 	ShadowIndicatorProps,
@@ -154,7 +153,6 @@ export function ShadowPopover( {
 	settings,
 	className,
 	hasLocalValue = !! shadow,
-	hasLocalOverride = false,
 	onReset,
 }: ShadowPopoverProps ) {
 	const popoverProps = useToolsPanelItemPopoverProps();
@@ -168,7 +166,6 @@ export function ShadowPopover( {
 			) }
 			renderToggle={ renderShadowToggle( shadow, onShadowChange, {
 				hasLocalValue,
-				hasLocalOverride,
 				onReset: onReset ?? ( () => onShadowChange( undefined ) ),
 			} ) }
 			renderContent={ () => (
@@ -189,11 +186,10 @@ function renderShadowToggle(
 	onShadowChange: ( shadow?: string ) => void,
 	resetConfig: {
 		hasLocalValue: boolean;
-		hasLocalOverride: boolean;
 		onReset: () => void;
 	}
 ) {
-	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+	const { hasLocalValue, onReset } = resetConfig;
 	return function ShadowToggle( {
 		onToggle,
 		isOpen,
@@ -233,22 +229,16 @@ function renderShadowToggle(
 						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
 					</HStack>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							__next40pxDefaultSize
-							size="small"
-							icon={ reset }
-							label={ __( 'Remove' ) }
-							className="block-editor-global-styles__shadow-editor__remove-button"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ hasLocalValue && (
+					<Button
+						__next40pxDefaultSize
+						size="small"
+						icon={ reset }
+						label={ __( 'Remove' ) }
+						className="block-editor-global-styles__shadow-editor__remove-button"
+						onClick={ handleReset }
+					/>
+				) }
 			</>
 		);
 	};
