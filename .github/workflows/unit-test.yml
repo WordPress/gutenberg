@@ -1,0 +1,116 @@
+name: Unit Tests
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    unit-js:
+        name: JavaScript
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            # It's not necessary to run the full build, since Jest can interpret
+            # source files with `babel-jest`. Some packages have their own custom
+            # build tasks, however. These must be run.
+            - name: Run build scripts
+              run: ./node_modules/.bin/lerna run build
+
+            - name: Running the tests
+              run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+    unit-php:
+        name: PHP${{ matrix.multisite && ' multisite' || '' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            # Don't let one leg's failure cancel the other -- each leg is
+            # independently useful signal.
+            fail-fast: false
+            matrix:
+                multisite: [false, true]
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            # The plugin reads the built files when it loads, so it must be built
+            # before the tests can run.
+            - name: Build
+              run: npm run build
+
+            - name: Install WordPress
+              uses: ./.github/setup-wordpress
+
+            - name: Composer debug information
+              working-directory: wordpress
+              run: docker compose run --rm php composer --version
+
+            # The WordPress test suite requires the PHPUnit Polyfills, and expects to find them in the
+            # `vendor` directory of `wordpress-develop`. This mirrors how `wordpress-develop` installs its
+            # Composer dependencies when testing this branch.
+            - name: Install the PHPUnit Polyfills
+              working-directory: wordpress
+              run: docker compose run --rm php composer install
+
+            # `npm run test-php` is not used because it also runs `npm run lint-php`. The versions of
+            # `composer/installers` and `dealerdirect/phpcodesniffer-composer-installer` locked in
+            # `composer.lock` only support Composer 1, so the PHPCS dependencies cannot be installed.
+            - name: Running the tests (single site)
+              if: ${{ ! matrix.multisite }}
+              run: npm run test-unit-php
+
+            - name: Running the tests (multisite)
+              if: ${{ matrix.multisite }}
+              run: npm run test-unit-php-multisite
