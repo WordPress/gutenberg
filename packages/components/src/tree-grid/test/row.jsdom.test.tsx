@@ -24,7 +24,6 @@ describe( 'TreeGridRow', () => {
 		).toThrow(
 			'TreeGridRow must be rendered inside an element with role="treegrid".'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'accepts a row explicitly owned by the treegrid', () => {

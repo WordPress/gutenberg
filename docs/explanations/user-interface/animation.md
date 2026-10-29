@@ -34,6 +34,7 @@ Reuse animations if one already exists for your task.
 -   Don't animate elements that are currently reporting content to adaptive technology (e.g., an `aria-live` region that's receiving updates). This can cause confusion wherein the technology tries to parse a region that's actively changing.
 -   Avoid animations that aren't directly triggered by user behaviors.
 -   Whenever possible, ensure that animations respect the OS-level "Reduce Motion" settings. This can be done by utilizing the [`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) media query. In stylesheets, place `animation` and `transition` rules inside `@media not (prefers-reduced-motion)`, or use the `useReducedMotion` hook from `@wordpress/compose` when working with React.
+-   Autoplaying media counts as motion. Don't start playback for a visitor who prefers reduced motion: use the `useReducedMotion` hook in editor components, or [`prefersReducedMotion()`](/packages/block-library/src/utils/reduced-motion.js) in a block view script, which runs outside React. Respecting the preference doesn't replace a control, so anything that plays for more than a few seconds still needs a visible way to pause or stop it.
 
 ## Inventory of Reused Animations
 

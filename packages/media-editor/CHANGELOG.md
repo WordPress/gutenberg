@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the design system focus ring for the rotation ruler ([#85535](https://github.com/WordPress/gutenberg/pull/85535)).
+-   Animate the details/crop sidebar when it opens or closes beside the canvas ([#85889](https://github.com/WordPress/gutenberg/pull/85889)).
+
+### Bug Fixes
+
+-   Keep the rotation ruler's center marker visible in forced colors mode ([#85546](https://github.com/WordPress/gutenberg/pull/85546)).
+
+## 0.21.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `MediaEditorProvider` accepts a `settings.form` to lay out the fields with, which `MediaForm` uses when it gets no `form` prop. `MediaEditor` and the private `MediaEditorModal` pass a `form` prop through to it ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Lay out the default form of `MediaForm` in a fixed order of the core attachment fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass a `form` to show them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Migrate crop and story selectors to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo`, `global.d.ts` and the test and story files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 0.20.0 (2026-10-07)
+
+### Enhancements
+
+-   Restore an image's original attachment and editable details from the media editor's More options menu ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
+-   Allow consumers to restore their own state with snackbar Undo after saving an image edit ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
+
 ### Bug Fixes
 
 -   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).

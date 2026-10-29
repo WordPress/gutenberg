@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "11.1.0",
+	"version": "12.0.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,15 +19,14 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
 		"build-style",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -50,7 +49,8 @@
 		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
 		"./search/view": "./build-module/search/view.mjs",
-		"./tabs/view": "./build-module/tabs/view.mjs"
+		"./tabs/view": "./build-module/tabs/view.mjs",
+		"./video/view": "./build-module/video/view.mjs"
 	},
 	"wpStyleEntryPoints": [
 		"src/*.scss",
@@ -134,21 +134,20 @@
 		"clsx": "^2.1.1",
 		"colord": "^2.9.4",
 		"fast-average-color": "^9.1.1",
-		"fast-deep-equal": "^3.1.3",
 		"html-react-parser": "^5.2.11",
 		"memize": "^2.1.1",
-		"remove-accents": "^0.5.0",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
-		"@testing-library/user-event": "^14.6.1",
+		"@testing-library/user-event": "^14.6.8",
 		"@wordpress/integration-tests": "file:../../test/integration",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

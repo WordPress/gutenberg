@@ -91,19 +91,35 @@ describe( 'It should serialize a gradient', () => {
 
 	test( 'serializeGradientOrientation', () => {
 		expect(
-			serializeGradientOrientation( { type: 'angular', value: '40' } )
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '40',
+				unit: 'deg',
+			} )
 		).toBe( '40deg' );
 
 		expect(
-			serializeGradientOrientation( { type: 'angular', value: '0' } )
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '0',
+				unit: 'deg',
+			} )
 		).toBe( '0deg' );
+
+		expect(
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '0.25',
+				unit: 'turn',
+			} )
+		).toBe( '0.25turn' );
 	} );
 
 	test( 'serializeGradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
-				orientation: { type: 'angular', value: '40' },
+				orientation: { type: 'angular', value: '40', unit: 'deg' },
 				colorStops: [
 					{
 						type: 'rgba',
@@ -160,7 +176,7 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
-				orientation: { type: 'angular', value: '0' },
+				orientation: { type: 'angular', value: '0', unit: 'deg' },
 				colorStops: [
 					{
 						type: 'rgba',
@@ -187,5 +203,37 @@ describe( 'It should serialize a gradient', () => {
 		).toBe(
 			'linear-gradient(0deg,rgba(1,2,3,0.5) 0%,rgba(10,20,30,0.5) 20%,rgba(255,1,1,0.9) 40%,rgba(1,2,3,0.5) 100%)'
 		);
+	} );
+
+	test( 'serializeGradient writes the interpolation method before the angle', () => {
+		const colorStops = [
+			{
+				type: 'hex' as const,
+				value: '000',
+				length: { type: '%' as const, value: '0' },
+			},
+			{
+				type: 'hex' as const,
+				value: 'fff',
+				length: { type: '%' as const, value: '100' },
+			},
+		];
+
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
+				colorInterpolation: 'in oklch',
+				orientation: { type: 'angular', value: '160', unit: 'deg' },
+				colorStops,
+			} )
+		).toBe( 'linear-gradient(in oklch 160deg,#000 0%,#fff 100%)' );
+
+		expect(
+			serializeGradient( {
+				type: 'radial-gradient',
+				colorInterpolation: 'in oklab',
+				colorStops,
+			} )
+		).toBe( 'radial-gradient(in oklab,#000 0%,#fff 100%)' );
 	} );
 } );

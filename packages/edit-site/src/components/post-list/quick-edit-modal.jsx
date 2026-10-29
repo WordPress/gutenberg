@@ -5,9 +5,10 @@ import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
+	Popover,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
@@ -23,6 +24,7 @@ export function QuickEditModal( {
 } ) {
 	const isBulk = postId.length > 1;
 
+	const [ modalElement, setModalElement ] = useState( null );
 	const [ localEdits, setLocalEdits ] = useState( {} );
 	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
@@ -151,6 +153,8 @@ export function QuickEditModal( {
 
 	return (
 		<Modal
+			ref={ setModalElement }
+			size="small"
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
 			onRequestClose={ closeModal }
@@ -189,6 +193,9 @@ export function QuickEditModal( {
 					{ __( 'Done' ) }
 				</Button>
 			</HStack>
+			{ modalElement &&
+				// Keep popovers inside modal isolation but outside the clipped frame.
+				createPortal( <Popover.Slot />, modalElement ) }
 		</Modal>
 	);
 }

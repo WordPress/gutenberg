@@ -8,6 +8,7 @@ import {
 } from '@wordpress/element';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { ThemeProvider } from '@wordpress/theme';
+import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import ErrorBoundary from '../error-boundary';
 import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
@@ -26,6 +27,8 @@ export default function CustomizeWidgets( {
 	const popoverRef = useRef();
 	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
 
+	// `useClearSelectedBlock` relies on the slot marker to spot overlays.
+	useEnableWpCompatOverlaySlot();
 	useClearSelectedBlock( activeSidebarControl, popoverRef );
 
 	useEffect( () => {

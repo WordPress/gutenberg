@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	__experimentalItemGroup as ItemGroup,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
@@ -77,7 +77,7 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper backPath={ backPath }>
-				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+				<WCSpinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
 		);
 	}

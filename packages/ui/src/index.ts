@@ -1,3 +1,4 @@
+export * as Avatar from './avatar';
 export * from './badge';
 export * as Breadcrumb from './breadcrumb';
 export * from './button';
@@ -15,8 +16,10 @@ export * from './icon';
 export * from './icon-button';
 export * from './link';
 export * as Menu from './menu';
+export * as Meter from './meter';
 export * as Notice from './notice';
 export * as Popover from './popover';
+export * as Progress from './progress';
 export * from './skeleton';
 export * from './spinner';
 export * from './stack';

@@ -3,6 +3,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
@@ -197,7 +198,7 @@ const AvatarLinkWrapper = ( { children, isLink } ) =>
  *
  * @param {Object}   props               React props.
  * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {Object}   props.attributes    Block attributes: `size` and `isLink`, plus the border support values read by `useBorderProps`.
+ * @param {Object}   props.attributes    Block attributes: `size` and `isLink`, plus the border and shadow support values applied to the image.
  * @param {Object}   props.avatar        Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the image `src` and `alt` and the `minSize` and `maxSize` resize bounds.
  * @param {Object}   props.blockProps    Props returned by `useBlockProps`, applied to the wrapper element.
  * @param {boolean}  props.isSelected    Whether the block is selected. Resize handles are only shown when it is.
@@ -212,6 +213,7 @@ const ResizableAvatar = ( {
 	isSelected,
 } ) => {
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const doubledSizedSrc = addQueryArgs(
 		removeQueryArgs( avatar?.src, [ 's' ] ),
 		{
@@ -256,7 +258,10 @@ const ResizableAvatar = ( {
 							'wp-block-avatar__image',
 							borderProps.className
 						) }
-						style={ borderProps.style }
+						style={ {
+							...borderProps.style,
+							...shadowProps.style,
+						} }
 					/>
 				</ResizableBox>
 			</AvatarLinkWrapper>

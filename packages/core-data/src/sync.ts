@@ -1,7 +1,14 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { dispatch, resolveSelect, select } from '@wordpress/data';
 import {
-	privateApis as syncPrivateApis,
+	ConnectionErrorCode,
+	createSyncManager,
+	Delta,
+	CRDT_DOC_META_PERSISTENCE_KEY,
+	CRDT_RECORD_MAP_KEY,
+	LOCAL_EDITOR_ORIGIN,
+	LOCAL_UNDO_IGNORED_ORIGIN,
+	retrySyncConnection,
 	type ConnectionStatus,
 	type ObjectID,
 	type SyncConfig,
@@ -28,17 +35,6 @@ import {
 } from './utils/crdt';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 import { saveCRDTDoc } from './utils/save-crdt-doc';
-
-const {
-	ConnectionErrorCode,
-	createSyncManager,
-	Delta,
-	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_RECORD_MAP_KEY,
-	LOCAL_EDITOR_ORIGIN,
-	LOCAL_UNDO_IGNORED_ORIGIN,
-	retrySyncConnection,
-} = unlock( syncPrivateApis );
 
 export {
 	ConnectionErrorCode,

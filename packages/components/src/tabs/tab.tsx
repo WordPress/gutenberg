@@ -1,20 +1,17 @@
+import clsx from 'clsx';
+import { Tab as AriakitTab } from '@ariakit/react';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
-import { chevronRight } from '@wordpress/icons';
 import type { TabProps } from './types';
 import { useTabsContext } from './context';
-import {
-	Tab as StyledTab,
-	TabChildren as StyledTabChildren,
-	TabChevron as StyledTabChevron,
-} from './styles';
+import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 
 export const Tab = forwardRef<
 	HTMLButtonElement,
 	Omit< WordPressComponentProps< TabProps, 'button', false >, 'id' >
 >( function UnforwardedTab(
-	{ children, tabId, disabled, render, ...otherProps },
+	{ children, tabId, disabled, render, className, ...otherProps },
 	ref
 ) {
 	const { store, instanceId } = useTabsContext() ?? {};
@@ -27,16 +24,16 @@ export const Tab = forwardRef<
 	const instancedTabId = `${ instanceId }-${ tabId }`;
 
 	return (
-		<StyledTab
+		<AriakitTab
 			ref={ ref }
 			store={ store }
 			id={ instancedTabId }
 			disabled={ disabled }
 			render={ render }
 			{ ...otherProps }
+			className={ clsx( styles.tab, className ) }
 		>
-			<StyledTabChildren>{ children }</StyledTabChildren>
-			<StyledTabChevron icon={ chevronRight } />
-		</StyledTab>
+			<span className={ styles[ 'tab-children' ] }>{ children }</span>
+		</AriakitTab>
 	);
 } );

@@ -1,5 +1,5 @@
 /**
- * Default ESLint flat config for @wordpress/scripts.
+ * Default ESLint flat config for `@wordpress/scripts`.
  *
  * Projects using `wp-scripts lint-js` that do not provide their own
  * eslint.config.* will use this config automatically.

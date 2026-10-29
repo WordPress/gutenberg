@@ -561,8 +561,10 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
--   `DataViews.BulkActionToolbar`
+-   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
+
+Bulk actions are now rendered within the built-in table and grid layouts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)). `DataViews.BulkActionToolbar` remains available for compatibility but renders nothing, so you can remove it from custom compositions.
 
 #### example
 
@@ -1084,6 +1086,10 @@ The unique identifier of the action.
 
 The user facing description of the action.
 
+Provide a translated label without an ellipsis. DataViews adds a translated ellipsis when an action with `RenderModal` is displayed in a menu. Buttons and default modal headings use the label without this added punctuation. Callback actions use the label unchanged in menus.
+
+For compatibility, DataViews recognizes common trailing ellipses in existing labels: `…`, `⋯`, and runs of three or more periods, ideographic full stops, or fullwidth full stops, including repeated ellipses and surrounding whitespace. It preserves these labels in menus without adding another ellipsis and removes the recognized suffix from buttons. This is a best-effort fallback, not a complete parser for every language. Migrate existing labels to text without an ellipsis rather than relying on this detection. Default modal headings still use the supplied label unchanged.
+
 -   Type: `string | function`
 -   Required
 -   Example:
@@ -1148,11 +1154,11 @@ Whether the action is disabled.
 
 ### `context`
 
-Where this action would be visible.
+The context the action is limited to: `list` for the lists of items. Without it, the action shows everywhere. DataViews does not filter the actions by context: the consumer does, before passing them.
 
 -   Type: `string`
 -   Optional
--   One of: `list`, `single`
+-   One of: `list`
 
 ### `callback`
 
@@ -1602,10 +1608,13 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 	Edit: {
 		control: 'text',
 		prefix: ReactComponent,
-		suffix: ReactComponent,
+		prefixPadding: 'minimal',
+		suffix: 'USD',
 	}
 }
 ```
+
+`prefix` and `suffix` are a string or a React component, rendered inside the input's prefix and suffix slots, which handle padding and vertical alignment, so a component should contain only the content. `prefixPadding` and `suffixPadding` are `default` (the default) or `minimal`; use `minimal` when the slot contains an icon or a button.
 
 -   `datetime` configuration:
 
@@ -1631,8 +1640,10 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 -   `operator`: the currently selected filter operator for this field. Used by DataViews filters to determine which control to render based on the operator type
 -   `validity`: object representing the validity of the field's value (see validity section)
 -   `config`: object representing extra config for the component:
-    -   `prefix`: a React component to be rendered as a prefix
-    -   `suffix`: a React component to be rendered as a suffix
+    -   `prefix`: a string or a React component to be rendered as a prefix
+    -   `prefixPadding`: the padding of the prefix slot, `default` (the default) or `minimal` (text control)
+    -   `suffix`: a string or a React component to be rendered as a suffix
+    -   `suffixPadding`: the padding of the suffix slot, `default` (the default) or `minimal` (text control)
     -   `rows`: the number of rows to display (e.g., in the text area component)
     -   `compact`: whether to render a compact version without the calendar widget (datetime control)
 

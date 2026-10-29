@@ -215,7 +215,6 @@ export function LanesItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inertValue( dragging ) }
 					>
 						{ actionableArea }
@@ -225,7 +224,7 @@ export function LanesItem( {
 
 			<div
 				ref={ setActivatorNodeRef }
-				{ ...attributes }
+				{ ...( dragDisabled ? {} : attributes ) }
 				{ ...listeners }
 				style={ {
 					height: '100%',

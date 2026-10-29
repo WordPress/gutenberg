@@ -90,7 +90,10 @@ function Interface( { blockEditorSettings } ) {
 				hasBlockBreadCrumbsEnabled &&
 				! isMobileViewport && (
 					<div className="edit-widgets-layout__footer">
-						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
+						<BlockBreadcrumb
+							className="edit-widgets-layout__breadcrumbs"
+							rootLabelText={ __( 'Widgets' ) }
+						/>
 					</div>
 				)
 			}

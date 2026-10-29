@@ -18,6 +18,10 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	tags: [ 'manifest' ],
@@ -205,7 +209,7 @@ export const AsyncItems: Story = {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Autocomplete.Root
@@ -216,7 +220,9 @@ export const AsyncItems: Story = {
 					setQuery( newValue );
 					setLoading( true );
 					setResults( [] );
-					clearTimeout( timeoutRef.current );
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>
@@ -759,4 +765,34 @@ export const Grid: Story = {
 			</Autocomplete.Root>
 		);
 	},
+};
+
+/**
+ * Use `width` on `Autocomplete.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems.map( ( item ) => item.label ),
+	},
+	render: ( args ) => (
+		<Autocomplete.Root { ...args }>
+			<Autocomplete.Input aria-label="Label" />
+			<Autocomplete.Popup width="sm">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: string ) => (
+								<Autocomplete.Item key={ item } value={ item }>
+									<Autocomplete.ItemLabel>
+										{ item }
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };

@@ -2,8 +2,41 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
+-   Convert the entities saved states components to TypeScript ([#85075](https://github.com/WordPress/gutenberg/pull/85075)).
+-   Convert the selectors test to TypeScript ([#85074](https://github.com/WordPress/gutenberg/pull/85074)).
+-   Convert the hook and store tests to TypeScript ([#85071](https://github.com/WordPress/gutenberg/pull/85071)).
+-   Convert the actions and the store entry point to TypeScript ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+-   Convert the resolvers to TypeScript and add the store thunk arguments type ([#85069](https://github.com/WordPress/gutenberg/pull/85069)).
+-   Convert the entities config and the store reducer to TypeScript, and add the store `Action` type ([#85065](https://github.com/WordPress/gutenberg/pull/85065)).
+-   Convert the entity hooks, the entity providers and the parsed blocks cache to TypeScript ([#85063](https://github.com/WordPress/gutenberg/pull/85063)).
+-   Convert the batch and fetch helpers to TypeScript ([#85062](https://github.com/WordPress/gutenberg/pull/85062)).
+-   Convert the queried data to TypeScript ([#85061](https://github.com/WordPress/gutenberg/pull/85061)).
+-   Convert the store locks to TypeScript ([#85059](https://github.com/WordPress/gutenberg/pull/85059)).
+-   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
+
+## 9.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
+
+### Internal
+
+-   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Add the private `getEntityActionsConfig( kind, name )` selector, which fetches the actions registered on the server for an entity from the `/wp/v2/entity-actions` route ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+
+## 8.2.0 (2026-10-07)
+
 ### Enhancements
 
+-   Add the root-level `edit_root` field to the `Attachment` entity type — the edit root attachment's id, or `0` when the attachment was not created by editing another one; embeddable via the `wp:edit-root` link, exposed in the `edit` context ([#81803](https://github.com/WordPress/gutenberg/pull/81803)).
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option to rank matches from one or more search types above the usual order ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
 
@@ -15,6 +48,7 @@
 ### Internal
 
 -   Added an internal entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store. The interface is not exposed outside the package yet ([#83410](https://github.com/WordPress/gutenberg/pull/83410)).
+-   Import the sync manager, `Delta`, and the CRDT constants from `@wordpress/sync` directly instead of unlocking them from its removed `privateApis` export ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
 
 ## 8.1.0 (2026-09-23)
 

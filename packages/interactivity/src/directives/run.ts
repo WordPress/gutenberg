@@ -1,13 +1,14 @@
 import { directive } from '../hooks';
-import { warnUniqueIdWithTwoHyphens } from './utils/warnings';
+import { warnSuffixNotSupported } from './utils/warnings';
 
-// data-wp-run---[unique-id] — Run expression on render.
+// data-wp-run---[unique-id] — Run on render; suffixes are unsupported.
 directive( 'run', ( { directives: { run }, evaluate } ) => {
 	run.forEach( ( entry ) => {
-		if ( globalThis.SCRIPT_DEBUG ) {
-			if ( entry.suffix ) {
-				warnUniqueIdWithTwoHyphens( 'run', entry.suffix );
+		if ( entry.suffix !== null ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnSuffixNotSupported( 'run', entry.suffix );
 			}
+			return;
 		}
 		let result = evaluate( entry );
 		if ( typeof result === 'function' ) {

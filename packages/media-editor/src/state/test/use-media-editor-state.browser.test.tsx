@@ -9,7 +9,6 @@ import {
 	type MediaEditorSession,
 } from '../use-media-editor-state';
 // Browser Mode needs the package's real styles for layout and transitions.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../image-editor/style.scss';
 
 // Shown below 1:1 in the fixture, so pixel snapping stays off until a crop
