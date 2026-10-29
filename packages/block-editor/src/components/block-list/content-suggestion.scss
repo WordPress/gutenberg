@@ -16,9 +16,10 @@
 //   inside someone else's addition), always add outermost, then format, then
 //   del.
 //
-// Both consume `--suggestion-author-color`, which the suggestion system writes
-// from the suggester's avatar color — so individual suggestions tint to their
-// author the same way live cursors do.
+// Blocks and formatting markers consume `--suggestion-author-color`, which the
+// suggestion system writes from the suggester's avatar color — so those
+// suggestions tint to their author the same way live cursors do. Additions and
+// deletions use green and red instead.
 
 // Author color with the default that applies when the suggester's avatar
 // color can't be resolved (e.g., anonymous edits or pre-collab sessions).
@@ -42,15 +43,19 @@ $suggestion-text-color: color-mix(in srgb, #{$suggestion-color} $suggestion-mix,
 // author's color behind the run, and a 1.5px rule mixed with 30%
 // `currentColor`, which keeps every palette color above 3:1 on light and dark
 // canvases. Blocks get the same rule, all the way around, with no offset or
-// radius. The tint says who; the rule's tone and style say what: green
-// underline for an addition, red line-through for a deletion, the author's
-// dotted underline for formatting.
+// radius. An addition is green and a deletion red, tint and rule alike,
+// whoever suggested it, so they read apart from notes at a glance; the line
+// style (underline, line-through) carries the same meaning without color.
+// Formatting keeps the author's tint, with a dotted underline.
 $suggestion-rule-width: 1.5px;
 $suggestion-rule-offset: 0.15em;
 $suggestion-tint: color-mix(in srgb, var(--suggestion-author-color, transparent) 25%, transparent);
 $suggestion-rule-color: color-mix(in srgb, currentColor 30%, #{$suggestion-color});
 $suggestion-addition-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds-color-stroke-surface-success-strong));
 $suggestion-deletion-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds-color-stroke-surface-error-strong));
+$suggestion-addition-tint: color-mix(in srgb, var(--wpds-color-stroke-surface-success-strong) 25%, transparent);
+$suggestion-deletion-tint: color-mix(in srgb, var(--wpds-color-stroke-surface-error-strong) 25%, transparent);
+$suggestion-deletion-text-color: color-mix(in srgb, var(--wpds-color-stroke-surface-error-strong) $suggestion-mix, currentColor);
 
 // A block with a pending attribute proposal (font size, alignment, heading
 // level), which the block already renders. A solid rule in the author's
@@ -68,7 +73,7 @@ $suggestion-deletion-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds
 // Docs' suggesting-mode strike-through. The decoration is applied to
 // the wrapper and propagates to inline rich-text descendants.
 .block-editor-block-list__block.is-suggestion-pending-remove {
-	color: $suggestion-text-color;
+	color: $suggestion-deletion-text-color;
 	text-decoration: line-through $suggestion-rule-width $suggestion-deletion-rule-color;
 }
 
@@ -129,8 +134,8 @@ $suggestion-deletion-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds
 // authoritative kind (`data-suggestion-type` is written alongside it); the
 // marker is also decorated at runtime through the annotations API
 // (`.annotation-text-core-suggestion`). The default `<mark>` highlight is
-// neutralized so the deletion/addition treatment reads cleanly. Per-author
-// tinting comes from `--suggestion-author-color`, set per `data-author`.
+// neutralized so the deletion/addition treatment reads cleanly. A formatting
+// marker's tint comes from `--suggestion-author-color`, set per `data-author`.
 :is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format) {
 	// The marker is a `<mark>`, which browsers paint black on yellow by
 	// default. Inherit the text color so the run follows the theme (and the
@@ -157,11 +162,13 @@ $suggestion-deletion-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds
 	// Text decorations propagate to nested markers, so a deletion inside an
 	// addition shows both the addition's underline and its own line-through.
 	&.wp-suggestion-del {
+		background-color: $suggestion-deletion-tint;
 		text-decoration-line: line-through;
 		text-decoration-color: $suggestion-deletion-rule-color;
 	}
 
 	&.wp-suggestion-add {
+		background-color: $suggestion-addition-tint;
 		text-decoration-line: underline;
 		text-decoration-color: $suggestion-addition-rule-color;
 	}
@@ -186,8 +193,8 @@ $suggestion-deletion-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds
 	}
 
 	// An addition typed inside someone's addition. Both underlines would
-	// sit on one line, so the inner one drops lower, and its author's tint
-	// stacks on the outer one's. Two deletions of the same text keep the one
+	// sit on one line, so the inner one drops lower, and its tint stacks on
+	// the outer one's. Two deletions of the same text keep the one
 	// line-through.
 	&.wp-suggestion-add .wp-suggestion-add {
 		text-underline-offset: 0.35em;
