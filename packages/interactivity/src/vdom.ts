@@ -209,6 +209,7 @@ export function toVdom( root: Node ): ComponentChild {
 		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
 		// and property read crosses the JS/DOM boundary and may allocate an
 		// `Attr` wrapper object.
+		const isInput = elementNode.localName === 'input';
 		const attributeNames = elementNode.getAttributeNames();
 		for ( let i = 0; i < attributeNames.length; i++ ) {
 			const attributeName = attributeNames[ i ];
@@ -263,13 +264,30 @@ export function toVdom( root: Node ): ComponentChild {
 			// mismatches (readonly→readOnly) are `undefined`, not `true`,
 			// falling through to Preact's setAttribute path, which handles them
 			// correctly: https://github.com/preactjs/preact/blob/bf7a195ac4b1706468e876e41b27428e3d8a08f3/src/diff/props.js#L114
-			if (
-				attributeValue === '' &&
-				elementNode[ attributeName ] === true
-			) {
-				props[ attributeName ] = true;
+			const attributePropValue =
+				attributeValue === '' && elementNode[ attributeName ] === true
+					? true
+					: attributeValue;
+
+			/*
+			 * A server-rendered `value` or `checked` on an input is the HTML
+			 * default, not the live value: the browser shows it until the
+			 * visitor edits the control, and a later re-render must not write it
+			 * back over the edit.
+			 *
+			 * Preact writes `value`/`checked` to the DOM whenever they differ
+			 * from the live property, so map them to `defaultValue` and
+			 * `defaultChecked`. Preact assigns those as DOM properties, which
+			 * reflect to the content attribute without overwriting an edit. A
+			 * `data-wp-bind--value` or `data-wp-bind--checked` directive still
+			 * sets the live property.
+			 */
+			if ( isInput && attributeName === 'value' ) {
+				props.defaultValue = attributePropValue;
+			} else if ( isInput && attributeName === 'checked' ) {
+				props.defaultChecked = attributePropValue;
 			} else {
-				props[ attributeName ] = attributeValue;
+				props[ attributeName ] = attributePropValue;
 			}
 		}
 

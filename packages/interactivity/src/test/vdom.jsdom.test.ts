@@ -278,12 +278,12 @@ describe( 'toVdom', () => {
 			);
 		} );
 
-		it( 'should convert boolean attribute "checked" to true', () => {
+		it( 'should map the "checked" attribute to defaultChecked', () => {
 			const element = createElementFromHTML(
 				'<input type="checkbox" checked />'
 			);
 			expect( toVdom( element ) ).toMatchVNode(
-				h( 'input', { type: 'checkbox', checked: true }, [] )
+				h( 'input', { type: 'checkbox', defaultChecked: true }, [] )
 			);
 		} );
 
@@ -296,20 +296,59 @@ describe( 'toVdom', () => {
 			);
 		} );
 
-		it( 'should preserve non-boolean empty string attributes', () => {
+		it( 'should map an empty "value" attribute to defaultValue, not true', () => {
 			const element = createElementFromHTML( '<input value="" />' );
 			expect( toVdom( element ) ).toMatchVNode(
-				h( 'input', { value: '' }, [] )
+				h( 'input', { defaultValue: '' }, [] )
 			);
 		} );
 
-		it( 'should preserve non-empty attribute values unchanged', () => {
+		it( 'should map a non-empty "value" attribute to defaultValue', () => {
 			const element = createElementFromHTML(
 				'<input type="text" value="hello" />'
 			);
 			expect( toVdom( element ) ).toMatchVNode(
-				h( 'input', { type: 'text', value: 'hello' }, [] )
+				h( 'input', { type: 'text', defaultValue: 'hello' }, [] )
 			);
+		} );
+
+		it( 'should map "value" and "checked" to their defaults on an input', () => {
+			const element = createElementFromHTML(
+				'<input type="radio" name="r" value="1" checked />'
+			);
+			const vnode = toVdom( element ) as any;
+
+			expect( vnode.props.defaultValue ).toBe( '1' );
+			expect( vnode.props.defaultChecked ).toBe( true );
+			expect( vnode.props.value ).toBeUndefined();
+			expect( vnode.props.checked ).toBeUndefined();
+		} );
+
+		it( 'should not treat "value" as a default outside inputs', () => {
+			const button = createElementFromHTML(
+				'<button value="go"></button>'
+			);
+			expect( toVdom( button ) ).toMatchVNode(
+				h( 'button', { value: 'go' }, [] )
+			);
+
+			const option = createElementFromHTML(
+				'<option value="a"></option>'
+			);
+			expect( toVdom( option ) ).toMatchVNode(
+				h( 'option', { value: 'a' }, [] )
+			);
+		} );
+
+		it( 'should not set a "value" prop alongside a data-wp-bind--value directive', () => {
+			const element = createElementFromHTML(
+				'<input value="from server" data-wp-bind--value="state.value" />'
+			);
+			const vnode = toVdom( element ) as any;
+
+			expect( vnode.props.defaultValue ).toBe( 'from server' );
+			expect( vnode.props.value ).toBeUndefined();
+			expect( vnode.props.__directives.bind ).toHaveLength( 1 );
 		} );
 
 		it( 'should preserve the case of SVG attribute names', () => {
