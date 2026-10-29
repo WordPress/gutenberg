@@ -26,6 +26,43 @@ async function changeCellAlignment( align ) {
 	await clickButton( `Align Column ${ capitalize( align ) }` );
 }
 
+/**
+ * Clicks an item in the open "Edit table" dropdown.
+ *
+ * @param {string} label The text of the item to click.
+ */
+async function clickTableMenuItem( label ) {
+	/*
+	 * The table only enables its row and column items once a cell has been
+	 * focused, so wait for the item to be enabled as well as visible.
+	 */
+	const button = await page.waitForXPath(
+		`//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), '${ label }') and not(@disabled)]`,
+		{ visible: true }
+	);
+	await button.evaluate( ( element ) => element.scrollIntoView() );
+	/*
+	 * The dropdown can still be repositioning itself after the item is
+	 * visible, which makes the click miss. Wait until the item has a size and
+	 * its position is unchanged between two animation frames.
+	 */
+	await page.waitForFunction(
+		( element ) => {
+			const { x, y, width, height } = element.getBoundingClientRect();
+			const position = `${ x },${ y },${ width },${ height }`;
+			const isStable =
+				width > 0 &&
+				height > 0 &&
+				element.dataset.e2ePosition === position;
+			element.dataset.e2ePosition = position;
+			return isStable;
+		},
+		{ polling: 'raf' },
+		button
+	);
+	await button.click();
+}
+
 describe( 'Table', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -162,7 +199,7 @@ describe( 'Table', () => {
 
 		// Add a column.
 		await clickBlockToolbarButton( 'Edit table' );
-		await clickButton( 'Add Column After' );
+		await clickTableMenuItem( 'Add Column After' );
 
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -171,7 +208,7 @@ describe( 'Table', () => {
 
 		// Delete a column.
 		await clickBlockToolbarButton( 'Edit table' );
-		await clickButton( 'Delete Column' );
+		await clickTableMenuItem( 'Delete Column' );
 
 		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
