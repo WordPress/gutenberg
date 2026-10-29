@@ -1,0 +1,75 @@
+name: 'Set up WordPress'
+description: 'Installs WordPress in the `wordpress-develop` local Docker environment and activates the Gutenberg plugin.'
+
+# This branch predates `wp-env` being able to run the tests. The test suites rely on the legacy
+# `wp-scripts env` commands instead, which expect a `wordpress-develop` checkout (its Docker-based
+# local environment, plus the PHPUnit test suite) to be available in `WP_DEVELOP_DIR`.
+
+inputs:
+  wordpress-branch:
+    description: 'The WordPress branch to install, in `X.Y` format.'
+    required: false
+    default: '5.4'
+
+runs:
+  using: 'composite'
+  steps:
+  - name: Configure environment variables
+    shell: bash
+    run: |
+      echo "WP_DEVELOP_DIR=${GITHUB_WORKSPACE}/wordpress" >> "$GITHUB_ENV"
+      # Run PHP inside the containers as the current user, so files are readable/writable on both sides.
+      echo "PHP_FPM_UID=$(id -u)" >> "$GITHUB_ENV"
+      echo "PHP_FPM_GID=$(id -g)" >> "$GITHUB_ENV"
+
+  - name: Download WordPress
+    shell: bash
+    env:
+      WORDPRESS_BRANCH: ${{ inputs.wordpress-branch }}
+    run: |
+      # Grab the local environment tooling and the PHPUnit test suite from `wordpress-develop`.
+      mkdir -p wordpress
+      curl -sSL "https://github.com/WordPress/wordpress-develop/archive/refs/heads/${WORDPRESS_BRANCH}.tar.gz" | tar -xz --strip-components=1 -C wordpress
+
+      # `wordpress-develop` needs to be built before it can be used. Use the built version of WordPress instead.
+      rm -rf wordpress/src
+      mkdir -p wordpress/src
+      curl -sSL "https://github.com/WordPress/WordPress/archive/refs/heads/${WORDPRESS_BRANCH}-branch.tar.gz" | tar -xz --strip-components=1 -C wordpress/src
+
+  # `npm run env connect` cannot be used here. It copies the `version` property over from
+  # `docker-compose.yml`, which the Compose file in `wordpress-develop` no longer declares.
+  - name: Connect Gutenberg to WordPress
+    shell: bash
+    run: |
+      sed \
+        -e "s|%PLUGIN_MOUNT_DIR%|${GITHUB_WORKSPACE}|g" \
+        -e "s|%PLUGIN_INSTALL_DIR%|gutenberg|g" \
+        bin/docker-compose.override.yml.template > wordpress/docker-compose.override.yml
+
+  - name: Docker debug information
+    shell: bash
+    run: |
+      docker -v
+      docker compose version
+
+  # The scripts in `wordpress-develop` require `dotenv`, `dotenv-expand` and `wait-on`. They are
+  # resolved from this project's `node_modules` directory, so no additional install is needed.
+  - name: Start Docker environment
+    shell: bash
+    working-directory: wordpress
+    run: npm run env:start
+
+  - name: Log running Docker containers
+    shell: bash
+    run: docker ps -a
+
+  - name: Install WordPress
+    shell: bash
+    working-directory: wordpress
+    env:
+      LOCAL_SCRIPT_DEBUG: false
+    run: npm run env:install
+
+  - name: Activate Gutenberg
+    shell: bash
+    run: npm run env cli plugin activate gutenberg
