@@ -1169,9 +1169,6 @@
 	"packages/block-library/src/comment-template/hooks.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
-		},
-		"no-restricted-syntax": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/comment-template/index.js": {
@@ -1300,9 +1297,6 @@
 			"count": 1
 		},
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -3823,9 +3817,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3883,9 +3874,6 @@
 	},
 	"packages/block-library/src/post-comments-link/edit.jsx": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -6381,9 +6369,6 @@
 	"packages/block-library/src/video/edit.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
-		},
-		"no-restricted-syntax": {
-			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -10937,43 +10922,6 @@
 			"count": 1
 		}
 	},
-	"packages/element/src/test/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/element/src/test/platform.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/element/src/test/raw-html.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/element/src/test/serialize.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/element/src/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/fields/src/components/media-edit/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
@@ -11450,19 +11398,6 @@
 	},
 	"packages/patterns/src/components/rename-pattern-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/plugins/src/api/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/plugins/src/components/test/plugin-area.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},

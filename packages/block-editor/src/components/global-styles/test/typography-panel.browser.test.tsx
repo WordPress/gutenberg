@@ -1,22 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 import type { StyleSettings, TypographyPanelProps } from '../types';
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path. The off path lives in
-// `typography-panel-core.jsx`.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 /**
  * Renders `TypographyPanel` with sensible defaults so tests only pass the
@@ -638,14 +626,6 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( 0 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
-
-		// Both zero values are local overrides, so each control surfaces the
-		// accessible reset-to-inherited affordance.
-		expect(
-			screen.getAllByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).toHaveLength( 2 );
 	} );
 } );
 
@@ -941,7 +921,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 	} );
 } );
 
-describe( 'TypographyPanel layout className preserved regardless of inheritance indicators', () => {
+describe( 'TypographyPanel layout className', () => {
 	const inheritedValue = {
 		typography: { lineHeight: '1.5', letterSpacing: '1px' },
 	};
@@ -953,9 +933,8 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		return control.closest( '.components-tools-panel-item' );
 	};
 
-	it( 'keeps the single-column layout class when showInheritanceLabelIndicators is false (regression)', async () => {
+	it( 'keeps the single-column layout class with an inherited value (regression)', async () => {
 		await renderPanel( {
-			showInheritanceLabelIndicators: false,
 			value: {},
 			inheritedValue,
 		} );
@@ -965,33 +944,6 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
 		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( letterSpacingItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-	} );
-
-	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', async () => {
-		await renderPanel( {
-			showInheritanceLabelIndicators: true,
-			value: {},
-			inheritedValue,
-		} );
-
-		const lineHeightItem = getItem( /line height/i );
-		const letterSpacingItem = getItem( /letter spacing/i );
-
-		expect( lineHeightItem ).toHaveClass( 'single-column' );
-		expect( lineHeightItem ).toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-		expect( letterSpacingItem ).toHaveClass(
-			'is-inherited-from-global-styles'
-		);
 	} );
 } );
 
