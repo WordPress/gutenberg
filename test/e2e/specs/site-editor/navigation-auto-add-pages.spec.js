@@ -88,6 +88,45 @@ test.describe( 'Navigation sidebar: Auto add new pages', () => {
 			} )
 			.toBe( true );
 	} );
+
+	test( 'a duplicated menu keeps the setting', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Main menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/navigation/${ menu.id }`,
+			data: { meta: { [ META_KEY ]: true } },
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: menu.id,
+			postType: 'wp_navigation',
+		} );
+		await page
+			.getByRole( 'region', { name: 'Navigation' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Duplicate' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Duplicated Navigation Menu' } )
+		).toBeVisible();
+
+		const menus = await requestUtils.rest( {
+			path: '/wp/v2/navigation',
+			params: { context: 'edit', search: 'Copy' },
+		} );
+		expect( menus ).toHaveLength( 1 );
+		expect( menus[ 0 ].meta[ META_KEY ] ).toBe( true );
+	} );
 } );
 
 test.describe( 'Navigation menu screen: Auto add new pages', () => {
