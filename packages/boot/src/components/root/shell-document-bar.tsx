@@ -1,38 +1,28 @@
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
-import { store as commandsStore } from '@wordpress/commands';
+import { globe, pencil } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useNavigate } from '@wordpress/route';
-import { __, sprintf } from '@wordpress/i18n';
+import { Breadcrumbs } from '@wordpress/admin-ui';
+import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	layout,
-	navigation,
-	page,
-	post,
-	symbol,
-	symbolFilled,
-} from '@wordpress/icons';
-import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
-	Button,
-	Icon,
-	Text,
-} from '@wordpress/ui';
+import type { ReactNode } from 'react';
 import { store as bootStore } from '../../store';
-import type { CanvasData } from '../../store/types';
+import type { CanvasData, RouteBreadcrumb } from '../../store/types';
+import { ShellPageActionsSlot } from './shell-page-actions';
 import styles from './shell-document-bar.module.scss';
 
-const POST_TYPE_ICONS: Record< string, typeof page > = {
-	post,
-	page,
-	wp_template: layout,
-	wp_template_part: symbolFilled,
-	wp_block: symbol,
-	wp_navigation: navigation,
+// The admin screens that manage each type, which the trail leads back to.
+const PARENT_SCREENS: Record< string, string > = {
+	post: '/posts',
+	page: '/pages',
+	wp_template: '/templates',
+	wp_template_part: '/template-parts',
+	wp_block: '/patterns',
+	wp_navigation: '/navigation',
 };
 
 type TitleField = string | { raw?: string; rendered?: string } | undefined;
@@ -45,8 +35,69 @@ function getTitle( title: TitleField ) {
 }
 
 /**
- * Names what the shell shows, with the type as its icon, and offers the ways
- * to work with that document: viewing it on the site, or editing it. It sits
+ * The box naming where the shell is, the same in every mode: the site's
+ * icon at its start, carrying the site's brand wherever the shell goes, the
+ * trail in its middle, and what to do there at its end.
+ *
+ * @param props          Component props.
+ * @param props.items    The trail to where the shell is, ending there.
+ * @param props.children What to do there, such as switching modes.
+ * @return The title box.
+ */
+function ShellTitle( {
+	items,
+	children,
+}: {
+	items: RouteBreadcrumb[];
+	children?: ReactNode;
+} ) {
+	const iconUrl = useSelect(
+		( select ) =>
+			(
+				select( coreStore ).getEntityRecord(
+					'root',
+					'__unstableBase'
+				) as { site_icon_url?: string } | undefined
+			 )?.site_icon_url,
+		[]
+	);
+
+	return (
+		<div className={ styles.document }>
+			<div className={ styles.start }>
+				{ iconUrl && (
+					<img className={ styles.icon } src={ iconUrl } alt="" />
+				) }
+			</div>
+			<Breadcrumbs items={ items } />
+			<div className={ styles.end }>{ children }</div>
+		</div>
+	);
+}
+
+/**
+ * Names the admin screen the shell shows, in the same place as the document
+ * it shows elsewhere, with the screen's own actions in it. A screen with more
+ * than one action shows its main one, and the rest in a menu after it.
+ *
+ * @param props       Component props.
+ * @param props.items The trail to the screen, ending with it.
+ * @return The page bar.
+ */
+export function ShellPageBar( { items }: { items: RouteBreadcrumb[] } ) {
+	return (
+		<ShellTitle items={ items }>
+			<ShellPageActionsSlot
+				bubblesVirtually
+				className={ styles.actions }
+			/>
+		</ShellTitle>
+	);
+}
+
+/**
+ * Names what the shell shows, after the screen that manages its type, and
+ * offers the ways to work with that document: viewing it on the site, or editing it. It sits
  * in the same place in each, so it carries over between them.
  *
  * @param props              Component props.
@@ -59,8 +110,7 @@ export default function ShellDocumentBar( {
 	editorCanvas?: CanvasData;
 } ) {
 	const navigate = useNavigate();
-	const { open: openCommandPalette } = useDispatch( commandsStore );
-	const { title, postType, typeLabel, link, editLink } = useSelect(
+	const { title, postType, parentLabel, link, editLink } = useSelect(
 		( select ) => {
 			const { getEntityLink, getShownEntity } = select( bootStore );
 			const { getEditedEntityRecord, getPostType } = select( coreStore );
@@ -76,8 +126,8 @@ export default function ShellDocumentBar( {
 				return {
 					title: getTitle( record?.title ),
 					postType: editorCanvas.postType,
-					typeLabel: getPostType( editorCanvas.postType )?.labels
-						?.singular_name,
+					parentLabel: getPostType( editorCanvas.postType )?.labels
+						?.name,
 					link: record?.link,
 					editLink: undefined,
 				};
@@ -94,7 +144,7 @@ export default function ShellDocumentBar( {
 			return {
 				title: hasContent ? shown.postTitle : shown.templateTitle,
 				postType: shownPostType,
-				typeLabel: getPostType( shownPostType )?.labels?.singular_name,
+				parentLabel: getPostType( shownPostType )?.labels?.name,
 				link: undefined,
 				editLink: hasContent
 					? getEntityLink( shown.postType, shown.postId )
@@ -120,6 +170,7 @@ export default function ShellDocumentBar( {
 	}
 
 	const displayTitle = title || __( '(no title)' );
+	const parentScreen = PARENT_SCREENS[ postType ];
 
 	// Viewing returns to the site at the entity's own page. Entities without
 	// one, such as templates, return to where the site was left.
@@ -150,31 +201,14 @@ export default function ShellDocumentBar( {
 	};
 
 	return (
-		<div className={ styles.document }>
-			<div className={ styles[ 'document-bar' ] }>
-				{ /* Like the editor's document bar, the title opens the command palette. */ }
-				<Button
-					variant="unstyled"
-					className={ styles[ 'title-button' ] }
-					aria-label={ sprintf(
-						/* translators: 1: Post type label, e.g. "Page". 2: Title. */
-						__( '%1$s: %2$s. Open command palette' ),
-						typeLabel ?? '',
-						displayTitle
-					) }
-					onClick={ () => openCommandPalette() }
-				>
-					<Icon
-						className={ styles.icon }
-						icon={ POST_TYPE_ICONS[ postType ] ?? page }
-						size={ 20 }
-					/>
-					<Text variant="body-sm" className={ styles.title }>
-						{ displayTitle }
-					</Text>
-				</Button>
-			</div>
-			{ /* Just outside the title box: related to what it names, but a choice of how to work with it. */ }
+		<ShellTitle
+			items={ [
+				...( parentScreen && parentLabel
+					? [ { label: parentLabel, to: parentScreen } ]
+					: [] ),
+				{ label: displayTitle },
+			] }
+		>
 			<ToggleGroupControl
 				className={ styles.modes }
 				label={ __( 'Mode' ) }
@@ -182,13 +216,19 @@ export default function ShellDocumentBar( {
 				value={ mode }
 				onChange={ onChangeMode }
 			>
-				<ToggleGroupControlOption value="view" label={ __( 'View' ) } />
-				<ToggleGroupControlOption
+				{ /* Icons, so the title has the room. Their names show on hover and focus. */ }
+				<ToggleGroupControlOptionIcon
+					value="view"
+					icon={ globe }
+					label={ __( 'View' ) }
+				/>
+				<ToggleGroupControlOptionIcon
 					value="edit"
+					icon={ pencil }
 					label={ __( 'Edit' ) }
 					disabled={ ! editorCanvas && ! editLink }
 				/>
 			</ToggleGroupControl>
-		</div>
+		</ShellTitle>
 	);
 }

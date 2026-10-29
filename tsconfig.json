@@ -107,6 +107,7 @@
 		{ "path": "routes/site-health" },
 		{ "path": "routes/site-preview" },
 		{ "path": "routes/shell-home" },
+		{ "path": "routes/shell-pages" },
 		{ "path": "routes/shell-section" },
 		{ "path": "routes/styles" },
 		{ "path": "routes/template" },

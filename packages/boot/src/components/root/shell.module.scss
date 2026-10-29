@@ -116,13 +116,19 @@
 // The menu toggle sits in a square as wide as the bar is tall.
 .bar-menu-toggle {
 	width: var(--site-shell-bar-height);
-	// So the site icon and name start as far from the separator as the
-	// toggle sits from it.
+	// So what follows starts as far from the separator as the toggle sits
+	// from it.
 	margin-inline-end: calc(var(--site-shell-slot-inset) - var(--wpds-dimension-gap-xs) - var(--wpds-dimension-padding-xs));
 }
 
 .bar-menu-toggle::after {
 	inset-inline-end: 0;
+}
+
+// A separator only shows where a screen's own tools meet the global ones.
+// Nothing follows the menu toggle but the editor's tools.
+.shell:not(.is-editing) .bar-menu-toggle::after {
+	display: none;
 }
 
 // The global items at the end, inset as far from the separator and the edge
@@ -135,6 +141,13 @@
 
 .bar-account::after {
 	inset-inline-start: 0;
+}
+
+// Before the global items at the end, there may be the editor's tools, a
+// screen's own items at the end, such as Styles, or what the middle of the
+// bar puts at its end, such as saving edited styles.
+.shell:not(.is-editing) .bar:not(:has(.bar-context > :not(:empty))) .bar-end:not(:has(> :not(.bar-account))) .bar-account::after {
+	display: none;
 }
 
 .body {
@@ -249,6 +262,12 @@
 		z-index: 0;
 		visibility: hidden;
 		transition-delay: 0s, 0s, 0s, 0s, 300ms;
+	}
+
+	// Opened from an admin screen, the editor fades in only once it has
+	// rendered, so the site stays in view until then.
+	.is-editing.is-editor-pending & {
+		visibility: visible;
 	}
 	overflow: hidden;
 	background: var(--wpds-color-background-surface-neutral);
@@ -406,12 +425,14 @@
 		border-block-end-color: var(--site-shell-bar-background);
 	}
 
-	// The editor's chrome comes in from the edges of the window, as though
-	// it had been waiting just out of view. The canvas between them
-	// crossfades from the site.
+	// The editor's header is the bar's tools for editing, so they fade in, as
+	// the tools for each screen do. The header itself stays, so the bar it
+	// fills is never see-through. The rest of the editor's chrome comes in
+	// from the edges of the window, as though it had been waiting just out of
+	// view. The canvas between them crossfades from the site.
 	@media not (prefers-reduced-motion: reduce) {
-		:global(.interface-interface-skeleton__header) {
-			animation: site-shell-from-top var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive) both;
+		:global(.editor-header) > * {
+			animation: site-shell-fade-in var(--site-shell-transition-duration) var(--site-shell-transition-easing) both;
 		}
 
 		:global(.interface-interface-skeleton__sidebar) {
@@ -436,9 +457,9 @@
 	}
 }
 
-@keyframes site-shell-from-top {
+@keyframes site-shell-fade-in {
 	from {
-		transform: translateY(-100%);
+		opacity: 0;
 	}
 }
 

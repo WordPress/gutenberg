@@ -195,12 +195,15 @@ function isFrontEndUrl( href: string, siteUrl: string ): boolean {
 		return false;
 	}
 
-	if ( target.origin !== site.origin ) {
+	const protocol = getProtocol( target.href );
+	if ( protocol && protocol !== 'http:' && protocol !== 'https:' ) {
 		return false;
 	}
 
-	const protocol = getProtocol( target.href );
-	if ( protocol && protocol !== 'http:' && protocol !== 'https:' ) {
+	// The site is the same over HTTP and HTTPS. A browser can load it over
+	// either, such as when it upgrades the site's HTTP address, while its
+	// pages still link to the address it is set up with.
+	if ( target.host !== site.host ) {
 		return false;
 	}
 
@@ -358,8 +361,13 @@ function bindPreviewNavigation(
 				return;
 			}
 
-			const resolvedHref = new URL( href, iframeWindow.location.href )
-				.href;
+			const resolvedUrl = new URL( href, iframeWindow.location.href );
+			// Stays on the protocol the site is shown over, which a link to
+			// the site's address may not use.
+			if ( resolvedUrl.host === iframeWindow.location.host ) {
+				resolvedUrl.protocol = iframeWindow.location.protocol;
+			}
+			const resolvedHref = resolvedUrl.href;
 
 			if (
 				isInPageHashNavigation(

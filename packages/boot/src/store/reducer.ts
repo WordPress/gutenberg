@@ -8,6 +8,7 @@ const initialState: State = {
 	entityLinks: {},
 	layout: 'default',
 	shownEntity: null,
+	sitePathRequest: null,
 };
 
 export function reducer( state: State = initialState, action: Action ): State {
@@ -61,6 +62,12 @@ export function reducer( state: State = initialState, action: Action ): State {
 			return {
 				...state,
 				shownEntity: action.shownEntity,
+			};
+
+		case 'SHOW_SITE_PATH':
+			return {
+				...state,
+				sitePathRequest: { path: action.path },
 			};
 
 		case 'SET_LAYOUT':

@@ -13,7 +13,7 @@ function SectionStage() {
 	const title = getSectionTitles()[ section ];
 
 	return (
-		<Page title={ title }>
+		<Page ariaLabel={ title }>
 			<div className={ styles.placeholder }>
 				<EmptyState.Root>
 					<EmptyState.Icon icon={ tool } />

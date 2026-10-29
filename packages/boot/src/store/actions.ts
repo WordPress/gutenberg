@@ -80,6 +80,19 @@ export function setShownEntity( shownEntity: ShownEntity | null ) {
 	};
 }
 
+/**
+ * Asks the site shell's site frame to show a location on the site, such as
+ * the page about to be edited.
+ *
+ * @param path The location's path, with any query string.
+ */
+export function showSitePath( path: string ) {
+	return {
+		type: 'SHOW_SITE_PATH' as const,
+		path,
+	};
+}
+
 export type Action =
 	| ReturnType< typeof registerMenuItem >
 	| ReturnType< typeof updateMenuItem >
@@ -87,4 +100,5 @@ export type Action =
 	| ReturnType< typeof registerEntityLinks >
 	| ReturnType< typeof setDashboardLink >
 	| ReturnType< typeof setLayout >
-	| ReturnType< typeof setShownEntity >;
+	| ReturnType< typeof setShownEntity >
+	| ReturnType< typeof showSitePath >;

@@ -66,6 +66,18 @@ function ShellSite( { isActive = true, isStyling = false }: ShellSiteProps ) {
 		}
 	}, [ preview ] );
 
+	// Follow a location the shell asks for, such as the page about to be
+	// edited, so the site shows it before growing into the editor.
+	const sitePathRequest = useSelect(
+		( select ) => select( bootStore ).getSitePathRequest(),
+		[]
+	);
+	useEffect( () => {
+		if ( sitePathRequest ) {
+			setPath( sitePathRequest.path );
+		}
+	}, [ sitePathRequest ] );
+
 	// Returning to the site restores the param for the location it shows.
 	// Keeping the param in step changes nothing on screen, so it starts no
 	// transition, which would otherwise cut short the one already running.

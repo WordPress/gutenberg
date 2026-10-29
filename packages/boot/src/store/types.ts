@@ -167,6 +167,44 @@ export interface RouteConfig {
 	 * ```
 	 */
 	title?: ( context: RouteLoaderContext ) => string | Promise< string >;
+
+	/**
+	 * Function that returns the trail of screens leading to the route, for a
+	 * screen nested in others, such as one settings screen inside another.
+	 * The last item is the route itself. When not defined, the trail is the
+	 * route's title alone.
+	 *
+	 * @param context Route context with params and search
+	 * @return The trail, or a Promise resolving to it
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   breadcrumbs: () => [
+	 *     { label: __( 'Settings' ), to: '/settings' },
+	 *     { label: __( 'Reading' ) },
+	 *   ],
+	 * };
+	 * ```
+	 */
+	breadcrumbs?: (
+		context: RouteLoaderContext
+	) => RouteBreadcrumb[] | Promise< RouteBreadcrumb[] >;
+}
+
+/**
+ * A screen in a route's trail.
+ */
+export interface RouteBreadcrumb {
+	/**
+	 * The screen's name.
+	 */
+	label: string;
+
+	/**
+	 * The screen's path. Optional for the last item, the route itself.
+	 */
+	to?: string;
 }
 
 /**
@@ -211,6 +249,15 @@ export interface ShownEntity {
 }
 
 /**
+ * A location the site shell's site frame is asked to show. A new request for
+ * the same path is a new object, so the frame returns to it even after being
+ * browsed away from it.
+ */
+export interface SitePathRequest {
+	path: string;
+}
+
+/**
  * The layout the app renders in.
  */
 export type Layout = 'default' | 'shell';
@@ -222,4 +269,5 @@ export interface State {
 	entityLinks: Record< string, EntityLinks >;
 	layout: Layout;
 	shownEntity: ShownEntity | null;
+	sitePathRequest: SitePathRequest | null;
 }
