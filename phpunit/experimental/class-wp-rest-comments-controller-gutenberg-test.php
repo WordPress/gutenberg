@@ -1285,6 +1285,36 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Akismet's spam cleanup fires `delete_comment` and `deleted_comment` with
+	 * whatever `get_comment()` returned for each row, which is null once the
+	 * row is already gone, so the cascades cannot require a `WP_Comment`.
+	 *
+	 * @dataProvider data_reaction_cascade_hooks
+	 *
+	 * @param string $hook The comment lifecycle action to fire.
+	 */
+	public function test_reaction_cascade_tolerates_missing_comment( $hook ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		do_action( $hook, (string) ( $note_id + 1000 ), null );
+
+		$this->assertSame( '1', get_comment( $reaction_id )->comment_approved, 'Reaction was touched by a cascade for a missing comment.' );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_reaction_cascade_hooks() {
+		return array(
+			'delete_comment'  => array( 'delete_comment' ),
+			'trashed_comment' => array( 'trashed_comment' ),
+		);
+	}
+
+	/**
 	 * Trashing a note trashes its reactions, so permanently deleting it
 	 * afterwards must still find and delete them.
 	 */
