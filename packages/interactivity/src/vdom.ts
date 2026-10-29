@@ -2,7 +2,7 @@ import { h, type ComponentChild, type JSX, type VNode } from 'preact';
 import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
 
-/** Associates opaque HTML props with detached, script-free fallback snapshots. */
+/** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
 const htmlFallbacks = new WeakMap< object, DocumentFragment >();
 
 const directivePrefix = `data-wp-`;
@@ -111,9 +111,9 @@ function splitDirectiveName( directiveName: string ): {
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 /**
- * Copies a node tree into a fragment, omitting script elements recursively.
- * Template contents are traversed separately because they are not ordinary
- * child nodes of their template element.
+ * Copies a node tree into the target's owner document, omitting script
+ * elements recursively. Template contents are traversed separately because
+ * they are not ordinary child nodes of their template element.
  *
  * @param source The node whose child nodes are copied.
  * @param target The fragment or cloned node that receives those children.
@@ -127,7 +127,9 @@ function copyFallbackChildren( source: Node, target: Node ): void {
 			continue;
 		}
 
-		const clone = child.cloneNode( false );
+		// Import directly into the snapshot owner, without creating a node in
+		// the source document or retaining that document through the snapshot.
+		const clone = target.ownerDocument!.importNode( child, false );
 		target.appendChild( clone );
 		if (
 			child.nodeType === 1 &&
@@ -144,8 +146,18 @@ function copyFallbackChildren( source: Node, target: Node ): void {
 }
 
 /**
- * Reads the script-free fallback snapshot recorded for an element vnode.
- * Callers must leave the snapshot detached and unmodified; insert a clone.
+ * Gets the inert template-contents document associated with the live document.
+ *
+ * @return The live document's shared template-contents owner document.
+ */
+function getTemplateContentsOwnerDocument(): Document {
+	return document.createElement( 'template' ).content.ownerDocument;
+}
+
+/**
+ * Reads the script-free fallback snapshot recorded for an element vnode. The
+ * snapshot is owned by the live document's shared template-contents document.
+ * Callers must leave it detached and unmodified; insert a clone.
  *
  * @param element The element vnode passed to a directive callback.
  * @return The detached fallback snapshot, or `undefined` when absent.
@@ -397,10 +409,11 @@ export function toVdom( root: Node ): ComponentChild {
 			};
 			props.dangerouslySetInnerHTML = htmlProps;
 			if ( hasDefaultHtmlDirective ) {
-				// Preserve a script-free snapshot at vnode construction time so a
-				// created host can copy it without parsing an HTML string.
+				// Preserve a script-free snapshot in the live document's shared
+				// template-contents document. Importing directly there neither
+				// requests fallback resources nor keeps a parsed page alive.
 				const snapshot =
-					elementNode.ownerDocument.createDocumentFragment();
+					getTemplateContentsOwnerDocument().createDocumentFragment();
 				copyFallbackChildren( elementNode, snapshot );
 				htmlFallbacks.set( htmlProps, snapshot );
 			}

@@ -1,7 +1,6 @@
-import { h } from 'preact';
-import type { ComponentChild } from 'preact';
+import { h, type ComponentChild, type VNode } from 'preact';
 import { describe, expect, it, vi } from 'vitest';
-import { parseDirectiveValue, toVdom } from '../vdom';
+import { getHtmlFallback, parseDirectiveValue, toVdom } from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
@@ -1334,5 +1333,66 @@ describe( 'toVdom', () => {
 				[ 'b', 'z' ],
 			] );
 		} );
+	} );
+} );
+
+describe( 'HTML fallback snapshots', () => {
+	it( 'uses the live document template-contents owner for every copied node', () => {
+		const fallbackMarkup = `<div data-wp-html="state.html">fallback<template><section>nested<template><b>deep</b></template></section></template></div>`;
+		const templateContentsDocument =
+			document.createElement( 'template' ).content.ownerDocument;
+		const liveSource = createElementFromHTML( fallbackMarkup );
+		const sourceTemplate = document.createElement( 'template' );
+		sourceTemplate.innerHTML = fallbackMarkup;
+		const templateSource =
+			sourceTemplate.content.querySelector( '[data-wp-html]' )!;
+		const parsedDocument = new DOMParser().parseFromString(
+			fallbackMarkup,
+			'text/html'
+		);
+		const parsedSource = parsedDocument.querySelector( '[data-wp-html]' )!;
+		const snapshots = [ liveSource, templateSource, parsedSource ].map(
+			( source ) => getHtmlFallback( toVdom( source ) as VNode< any > )!
+		);
+
+		// The inputs exercise the live, template-contents, and parsed-page docs.
+		expect( liveSource.ownerDocument ).toBe( document );
+		expect( templateSource.ownerDocument ).toBe( templateContentsDocument );
+		expect( parsedSource.ownerDocument ).not.toBe(
+			templateContentsDocument
+		);
+		expect(
+			parsedDocument.createElement( 'template' ).content.ownerDocument
+		).not.toBe( templateContentsDocument );
+
+		const snapshotOwnerDocuments = new Set< Document >();
+		/**
+		 * Collects owner documents from a snapshot node and nested template contents.
+		 *
+		 * @param node Snapshot node to inspect.
+		 */
+		function collectTemplateContentsOwners( node: Node ): void {
+			snapshotOwnerDocuments.add( node.ownerDocument! );
+			if (
+				node.nodeType === 1 &&
+				( node as Element ).localName === 'template'
+			) {
+				const contents = ( node as HTMLTemplateElement ).content;
+				snapshotOwnerDocuments.add( contents.ownerDocument );
+				for ( const child of contents.childNodes ) {
+					collectTemplateContentsOwners( child );
+				}
+			}
+			for ( const child of node.childNodes ) {
+				collectTemplateContentsOwners( child );
+			}
+		}
+
+		for ( const snapshot of snapshots ) {
+			collectTemplateContentsOwners( snapshot );
+		}
+		expect( snapshotOwnerDocuments ).toEqual(
+			new Set( [ templateContentsDocument ] )
+		);
 	} );
 } );
