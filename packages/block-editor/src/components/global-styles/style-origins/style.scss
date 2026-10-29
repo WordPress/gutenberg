@@ -23,11 +23,12 @@
 }
 
 .block-editor-style-changes__group {
-	margin-top: $grid-unit-20;
+	margin-top: $grid-unit-15;
 }
 
 .block-editor-style-changes__group + .block-editor-style-changes__group {
-	padding-top: $grid-unit-20;
+	margin-top: $grid-unit-20;
+	padding-top: $grid-unit-15;
 	border-top: $border-width solid $gray-300;
 }
 
@@ -35,18 +36,17 @@
 	min-height: $button-size-small;
 }
 
-// Nested to outrank the `Text` heading's own color and weight.
+// Nested to outrank the `Text` heading's own color.
 .block-editor-style-changes .block-editor-style-changes__heading {
 	margin: 0;
-	font-weight: 500;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .block-editor-style-changes__items {
 	display: flex;
 	flex-direction: column;
-	gap: $grid-unit-05;
-	margin: $grid-unit-05 0 0;
+	gap: $grid-unit-10;
+	margin: $grid-unit-10 0 0;
 	padding: 0;
 	list-style: none;
 }
@@ -64,7 +64,7 @@
 .block-editor-style-changes__source {
 	min-width: 0;
 	overflow: hidden;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	text-align: end;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -75,12 +75,11 @@
 .block-editor-style-changes__action.components-button {
 	flex: none;
 	font-size: $default-font-size;
-	font-weight: 500;
 	margin-inline-end: -$grid-unit-05;
 	padding: 0 $grid-unit-05;
 }
 
 .block-editor-style-changes__empty {
 	margin: $grid-unit-15 0 0;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
