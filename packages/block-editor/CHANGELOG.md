@@ -4,6 +4,8 @@
 
 ### Enhancements
 
+-   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
@@ -11,12 +13,15 @@
 
 ### Bug Fixes
 
+-   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
 -   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 
 ### Internal
 
@@ -35,6 +40,7 @@
 -   Convert the inserter hooks, patterns tab and media tab to TypeScript ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
 -   Convert the inserter components, the block autocompleter, the change design control and the block parent selector to TypeScript ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 -   Convert the grid visualizer, the entry points and the remaining stories and tests to TypeScript ([#85035](https://github.com/WordPress/gutenberg/pull/85035)).
+-   Remove the `gutenberg-global-styles-inheritance-ui` experiment and its block inspector indicators ([#85884](https://github.com/WordPress/gutenberg/pull/85884)).
 
 ## 19.0.0 (2026-10-20)
 
@@ -73,6 +79,7 @@
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
 -   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 -   `RichText`: Apply the formats at the caret to pasted text after a previous paste or undo, and when pasting plain text with `__unstablePastePlainText`, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
+
 
 ### Internal
 
