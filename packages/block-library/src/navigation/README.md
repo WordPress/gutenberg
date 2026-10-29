@@ -75,11 +75,15 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`contentRole`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`inserter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#inserter): `true`
+- [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+  - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `blockGap`: `true`
+  - `padding`: `true`
   - `units`: `["px","em","rem","vh","vw"]`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`

@@ -169,6 +169,65 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that block padding is removed from inner list containers only.
+	 *
+	 * The inner lists are built with `get_block_wrapper_attributes()`, so they
+	 * receive the block's padding too, which would apply it twice.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_padding_is_removed_from_inner_list_container() {
+		$block_content = '<nav class="wp-block-navigation" style="padding-top:1px;padding-right:2px;color:red;"><ul class="wp-block-navigation__container wp-block-navigation" style="padding-top:1px;padding-right:2px;color:red;"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'style' => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'   => '1px',
+							'right' => '2px',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation" style="padding-top:1px;padding-right:2px;color:red;"><ul class="wp-block-navigation__container wp-block-navigation" style="color:red;"><li class="wp-block-navigation-item">Item</li></ul></nav>',
+			$actual
+		);
+	}
+
+	/**
+	 * Test that the style attribute is removed when padding was its only declaration.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_style_attribute_is_removed_when_only_padding() {
+		$block_content = '<nav class="wp-block-navigation" style="padding-left:2px;"><ul class="wp-block-navigation__container wp-block-navigation" style="padding-left:2px;"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'style' => array(
+					'spacing' => array(
+						'padding' => array( 'left' => '2px' ),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$tags = new WP_HTML_Tag_Processor( $actual );
+		$this->assertTrue( $tags->next_tag( 'NAV' ) );
+		$this->assertSame( 'padding-left:2px;', $tags->get_attribute( 'style' ) );
+		$this->assertTrue( $tags->next_tag( 'UL' ) );
+		$this->assertNull( $tags->get_attribute( 'style' ) );
+	}
+
+	/**
 	 * Test that non-Navigation blocks are unchanged.
 	 *
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
