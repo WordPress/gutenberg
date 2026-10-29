@@ -34,12 +34,18 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 	let isComposing = false;
 	let isPointerDown = false;
 
+	// Listen for the release only during a press in this element, so fields
+	// don't each keep window listeners.
 	function onPointerDown() {
 		isPointerDown = true;
+		defaultView!.addEventListener( 'pointerup', onPointerUp );
+		defaultView!.addEventListener( 'pointercancel', onPointerUp );
 	}
 
 	function onPointerUp() {
 		isPointerDown = false;
+		defaultView!.removeEventListener( 'pointerup', onPointerUp );
+		defaultView!.removeEventListener( 'pointercancel', onPointerUp );
 	}
 
 	function onInput( event?: Event | Pick< InputEvent, 'inputType' > ) {
@@ -352,16 +358,6 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		'pointerdown',
 		onPointerDown
 	);
-	const unsubscribePointerUp = subscribeDelegatedListener(
-		defaultView!,
-		'pointerup',
-		onPointerUp
-	);
-	const unsubscribePointerCancel = subscribeDelegatedListener(
-		defaultView!,
-		'pointercancel',
-		onPointerUp
-	);
 	// Permanently subscribed rather than added on focus and removed on blur:
 	// `handleSelectionChange` checks whether the element is focused itself,
 	// and the shared underlying delegated listener keeps the number of native
@@ -402,8 +398,8 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
 		unsubscribePointerDown();
-		unsubscribePointerUp();
-		unsubscribePointerCancel();
+		// Removes the release listeners of a press still in progress.
+		onPointerUp();
 		unsubscribeSelectionChange();
 		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
 			unsubscribe()

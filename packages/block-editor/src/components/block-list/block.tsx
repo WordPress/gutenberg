@@ -757,7 +757,8 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 			const {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
-			} = select( blocksStore );
+				getAllBlockBindingsSources,
+			} = unlock( select( blocksStore ) );
 			const attributes =
 				getBlockAttributes( clientId ) ?? ghostBlock?.attributes;
 			const { name: blockName, isValid } = blockWithoutAttributes;
@@ -797,6 +798,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				bindableAttributes,
+				blockBindingsSources: getAllBlockBindingsSources(),
 				blockVisibility,
 				deviceType,
 				viewportSettings,
@@ -985,6 +987,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		defaultClassName,
 		originalBlockClientId,
 		bindableAttributes,
+		blockBindingsSources,
 		blockVisibility,
 		deviceType,
 		viewportSettings,
@@ -1028,6 +1031,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		canMove,
 		isBlockCurrentlyHidden,
 		bindableAttributes,
+		blockBindingsSources,
 		blockVisibility,
 		deviceType,
 		viewportSettings,

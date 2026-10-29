@@ -5,6 +5,11 @@
 ### Enhancements
 
 -   Use the design system focus ring for the rotation ruler ([#85535](https://github.com/WordPress/gutenberg/pull/85535)).
+-   Animate the details/crop sidebar when it opens or closes beside the canvas ([#85889](https://github.com/WordPress/gutenberg/pull/85889)).
+
+### Bug Fixes
+
+-   Keep the rotation ruler's center marker visible in forced colors mode ([#85546](https://github.com/WordPress/gutenberg/pull/85546)).
 
 ## 0.21.0 (2026-10-20)
 
