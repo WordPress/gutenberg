@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.9.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 2.0.3 (2019-01-03)
 
 ## 2.0.2 (2018-12-12)
