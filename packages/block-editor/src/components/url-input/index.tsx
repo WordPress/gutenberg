@@ -1,9 +1,16 @@
-import type { KeyboardEvent } from 'react';
+import type { FocusEvent, KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
+import {
+	UP,
+	DOWN,
+	ENTER,
+	TAB,
+	ESCAPE,
+	withIgnoreIMEEvents,
+} from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
@@ -12,7 +19,12 @@ import {
 	Popover,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
+import {
+	__experimentalUseFocusOutside as useFocusOutside,
+	useDebounce,
+	useEvent,
+	useInstanceId,
+} from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 import { store as blockEditorStore } from '../../store';
@@ -59,6 +71,7 @@ export default function URLInput( props: URLInputProps ) {
 		__experimentalShowInitialSuggestions: showInitialSuggestions = false,
 		autocompleteRef,
 		className,
+		closeSuggestionsOnNavigateOutside = false,
 		customValidity,
 		disableSuggestions,
 		disabled = false,
@@ -171,6 +184,20 @@ export default function URLInput( props: URLInputProps ) {
 				setSuggestions( nextSuggestions );
 				setSuggestionsValue( search );
 				setIsLoading( false );
+
+				// When the list may only show while the user is engaged with
+				// the field, don't open it (or announce results) if focus is
+				// known to be elsewhere by the time the results arrive.
+				const inputNode = controlInputRef.current;
+				if (
+					closeSuggestionsOnNavigateOutside &&
+					!! inputNode &&
+					inputNode.ownerDocument.activeElement !== inputNode
+				) {
+					setIsSuggestionsListOpen( false );
+					return;
+				}
+
 				setIsSuggestionsListOpen( !! nextSuggestions.length );
 
 				if ( nextSuggestions.length ) {
@@ -258,6 +285,20 @@ export default function URLInput( props: URLInputProps ) {
 		setIsSuggestionsListOpen( false );
 	}
 
+	function closeSuggestionsList() {
+		// Cancel any pending request, so that its response can't reopen the
+		// list after it was dismissed.
+		suggestionsRequestRef.current?.cancel?.();
+		suggestionsRequestRef.current = null;
+		setIsLoading( false );
+		setIsSuggestionsListOpen( false );
+		setSelectedSuggestion( null );
+	}
+
+	function handleFocusOutside() {
+		closeSuggestionsList();
+	}
+
 	function handleSuggestionClick( suggestion: LinkControlSuggestion ) {
 		selectLink( suggestion );
 		// Move focus to the input field when a link suggestion is clicked.
@@ -281,7 +322,10 @@ export default function URLInput( props: URLInputProps ) {
 		setIsComposing( false );
 	}
 
-	function handleFocus() {
+	function handleFocus( event: FocusEvent< HTMLInputElement > ) {
+		// Focus (re)entering the field cancels a pending focus-outside check.
+		focusOutsideProps.onFocus( event );
+
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
 		// or there is already a request in progress.
@@ -295,84 +339,122 @@ export default function URLInput( props: URLInputProps ) {
 		}
 	}
 
-	function handleKeyDown( event: KeyboardEvent< HTMLInputElement > ) {
-		onKeyDown?.( event );
+	const handleNonIMEKeyDown = useEvent(
+		( event: KeyboardEvent< HTMLInputElement > ) => {
+			onKeyDown?.( event );
 
-		// Unless the list can consume them, the keys must reach the editor for
-		// block navigation, so they mustn't be prevented.
-		if ( ! showSuggestions || ! suggestions.length || isLoading ) {
-			// Holding Shift extends the selection, which the browser handles.
+			// When closing on navigate-outside is enabled, Escape dismisses a
+			// visible suggestions list. The event mustn't propagate any further,
+			// so that a popover the component is rendered within stays open.
 			if (
-				! event.shiftKey &&
-				( event.keyCode === UP || event.keyCode === DOWN )
+				closeSuggestionsOnNavigateOutside &&
+				event.keyCode === ESCAPE &&
+				showSuggestions &&
+				suggestions.length > 0
 			) {
-				// Firefox on Windows leaves the caret in place, trapping focus,
-				// since the editor only navigates away from an edge.
-				// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
-				// The key events come from the input element.
-				const caret =
-					event.keyCode === UP
-						? 0
-						: ( event.target as HTMLInputElement ).value.length;
+				event.preventDefault();
+				event.stopPropagation();
+				closeSuggestionsList();
+				return;
+			}
 
-				// UP moves the caret to the start of the text, DOWN to the end.
-				// Once it is already there, with nothing selected, the key is
-				// left to the editor to navigate out of the field.
+			// Unless the list can consume them, the keys must reach the editor for
+			// block navigation, so they mustn't be prevented.
+			if ( ! showSuggestions || ! suggestions.length || isLoading ) {
+				// Holding Shift extends the selection, which the browser handles.
 				if (
-					( event.target as HTMLInputElement ).selectionStart !==
-						caret ||
-					( event.target as HTMLInputElement ).selectionEnd !== caret
+					! event.shiftKey &&
+					( event.keyCode === UP || event.keyCode === DOWN )
 				) {
+					// Firefox on Windows leaves the caret in place, trapping focus,
+					// since the editor only navigates away from an edge.
+					// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
+					// The key events come from the input element.
+					const caret =
+						event.keyCode === UP
+							? 0
+							: ( event.target as HTMLInputElement ).value.length;
+
+					// UP moves the caret to the start of the text, DOWN to the end.
+					// Once it is already there, with nothing selected, the key is
+					// left to the editor to navigate out of the field.
+					if (
+						( event.target as HTMLInputElement ).selectionStart !==
+							caret ||
+						( event.target as HTMLInputElement ).selectionEnd !==
+							caret
+					) {
+						event.preventDefault();
+						( event.target as HTMLInputElement ).setSelectionRange(
+							caret,
+							caret
+						);
+					}
+				} else if ( event.keyCode === ENTER && onSubmit ) {
 					event.preventDefault();
-					( event.target as HTMLInputElement ).setSelectionRange(
-						caret,
-						caret
+					onSubmit( null, event );
+				}
+
+				return;
+			}
+
+			// A `null` index looks up no suggestion.
+			const suggestion =
+				suggestions[ selectedSuggestion as number ] ?? null;
+
+			switch ( event.keyCode ) {
+				case UP:
+				case DOWN: {
+					event.preventDefault();
+
+					const offset = event.keyCode === UP ? -1 : 1;
+					// An unselected list is entered from the end nearest the key,
+					// and the ends wrap into each other.
+					const from =
+						selectedSuggestion ?? ( offset === -1 ? 0 : -1 );
+
+					setSelectedSuggestion(
+						( from + offset + suggestions.length ) %
+							suggestions.length
 					);
+					break;
 				}
-			} else if ( event.keyCode === ENTER && onSubmit ) {
-				event.preventDefault();
-				onSubmit( null, event );
-			}
-
-			return;
-		}
-
-		// A `null` index looks up no suggestion.
-		const suggestion = suggestions[ selectedSuggestion as number ] ?? null;
-
-		switch ( event.keyCode ) {
-			case UP:
-			case DOWN: {
-				event.preventDefault();
-
-				const offset = event.keyCode === UP ? -1 : 1;
-				// An unselected list is entered from the end nearest the key,
-				// and the ends wrap into each other.
-				const from = selectedSuggestion ?? ( offset === -1 ? 0 : -1 );
-
-				setSelectedSuggestion(
-					( from + offset + suggestions.length ) % suggestions.length
-				);
-				break;
-			}
-			case TAB: {
-				if ( suggestion ) {
-					selectLink( suggestion );
-					speak( __( 'Link selected.' ) );
+				case TAB: {
+					if ( suggestion ) {
+						selectLink( suggestion );
+						speak( __( 'Link selected.' ) );
+					}
+					break;
 				}
-				break;
-			}
-			case ENTER: {
-				event.preventDefault();
-				if ( suggestion ) {
-					selectLink( suggestion );
-				}
+				case ENTER: {
+					event.preventDefault();
+					if ( suggestion ) {
+						selectLink( suggestion );
+					}
 
-				onSubmit?.( suggestion, event );
-				break;
+					onSubmit?.( suggestion, event );
+					break;
+				}
 			}
 		}
-	}
+	);
+
+	// Keystrokes within an IME composition control the IME, not the field.
+	// The default control filters them out by itself; wrapping covers inputs
+	// mounted by `__experimentalRenderControl` consumers. The wrapper can't
+	// take the handler's closure directly: `react-hooks/refs` rejects passing
+	// a closure that reaches refs to a render-time call, while `useEvent`'s
+	// stable callback is fine to wrap.
+	const handleKeyDown = withIgnoreIMEEvents( handleNonIMEKeyDown );
+
+	// The handlers detect focus moving outside of the component. They are
+	// bound to both the input and the suggestions list, which share the
+	// hook's state, so that focus moving between the two is not treated as
+	// navigating outside.
+	const focusOutsideProps = useFocusOutside( handleFocusOutside );
+	const navigateOutsideProps = closeSuggestionsOnNavigateOutside
+		? focusOutsideProps
+		: undefined;
 
 	const controlProps = {
 		id: inputId, // Passes attribute to label for the for attribute
@@ -384,6 +466,9 @@ export default function URLInput( props: URLInputProps ) {
 	};
 
 	const inputProps: URLInputInputProps = {
+		// Spread first: the `onFocus` key below overrides the hook's handler,
+		// which `handleFocus` chains instead.
+		...navigateOutsideProps,
 		id: inputId,
 		value,
 		required,
@@ -427,6 +512,7 @@ export default function URLInput( props: URLInputProps ) {
 					className={ className }
 					handleSuggestionClick={ handleSuggestionClick }
 					isLoading={ isLoading }
+					navigateOutsideProps={ navigateOutsideProps }
 					renderSuggestions={ renderSuggestions }
 					selectedSuggestion={ selectedSuggestion }
 					onSuggestionHover={ setSelectedSuggestion }
@@ -491,6 +577,7 @@ function Suggestions( {
 	className,
 	handleSuggestionClick,
 	isLoading,
+	navigateOutsideProps,
 	renderSuggestions,
 	selectedSuggestion,
 	onSuggestionHover,
@@ -501,6 +588,7 @@ function Suggestions( {
 	suggestionsValue,
 }: URLInputSuggestionsListProps ) {
 	const suggestionsListProps = {
+		...navigateOutsideProps,
 		id: suggestionsListboxId,
 		ref: autocompleteRef,
 		role: 'listbox',
