@@ -88,16 +88,6 @@
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
 			color: $components-color-accent-inverted;
-			background-size: 100px 100%;
-			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
-			background-image: linear-gradient(
-				-45deg,
-				$components-color-accent 33%,
-				$components-color-accent-darker-20 33%,
-				$components-color-accent-darker-20 70%,
-				$components-color-accent 70%
-			);
-			/* stylelint-enable */
 		}
 	}
 
@@ -261,26 +251,6 @@
 		color: $gray-600;
 	}
 
-	&.is-busy,
-	&.is-secondary.is-busy,
-	&.is-secondary.is-busy:disabled,
-	&.is-secondary.is-busy[aria-disabled="true"] {
-		@media not (prefers-reduced-motion) {
-			animation: components-button__busy-animation 2500ms infinite linear;
-		}
-		background-size: 100px 100%;
-		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
-		background-image: linear-gradient(
-			-45deg,
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color.adjust($white, $lightness: -2%) 33%,
-			color.adjust($white, $lightness: -12%) 33%,
-			color.adjust($white, $lightness: -12%) 70%,
-			color.adjust($white, $lightness: -2%) 70%
-		);
-		/* stylelint-enable */
-	}
-
 	&.is-compact {
 		height: $button-size-compact;
 
@@ -335,7 +305,7 @@
 		// Offset the reserved 1px border so it doesn't widen the square
 		// icon button.
 		&:not(.has-text) {
-			svg,
+			svg:where(:not(.components-button__busy-spinner)),
 			.dashicon {
 				margin-inline: -$border-width;
 			}
@@ -369,10 +339,42 @@
 		outline: none;
 		flex-shrink: 0;
 	}
+
+	// Hide glyphs while leaving currentColor available to the spinner.
+	&.is-busy {
+		-webkit-text-fill-color: transparent;
+		text-decoration-color: transparent;
+		text-shadow: none;
+	}
+
+	&.is-busy > :not(.components-button__busy-spinner) {
+		opacity: 0;
+	}
+
+	.components-button__busy-spinner {
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		width: 1em;
+		height: 1em;
+		color: inherit;
+		pointer-events: none;
+
+		@media (prefers-reduced-motion) {
+			> * {
+				animation: none;
+			}
+		}
+
+		@media (forced-colors: active) {
+			> * {
+				stroke: currentColor;
+			}
+		}
+	}
 }
 
-@keyframes components-button__busy-animation {
-	0% {
-		background-position: 200px 0;
-	}
+// Establish a local positioning context without overriding consumer layouts.
+:where(.components-button.is-busy) {
+	position: relative;
 }
