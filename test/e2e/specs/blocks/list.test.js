@@ -215,7 +215,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pressKeyWithModifier( 'primary', 'm' );
+		await pressWithModifier( 'primary', 'm' );
 		await page.keyboard.type( '1' );
 
 		// Pointer device is needed. Shift+Tab won't focus the toolbar.
@@ -232,12 +232,12 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pressKeyWithModifier( 'primary', 'm' );
+		await pressWithModifier( 'primary', 'm' );
 		await page.keyboard.type( '1' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressKeyWithModifier( 'primaryShift', 'm' );
+		await pressWithModifier( 'primaryShift', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -246,19 +246,19 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pressKeyWithModifier( 'primary', 'm' );
+		await pressWithModifier( 'primary', 'm' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await pressKeyWithModifier( 'primary', 'm' );
+		await pressWithModifier( 'primary', 'm' );
 		await page.keyboard.type( 'i' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressKeyWithModifier( 'primaryShift', 'm' );
+		await pressWithModifier( 'primaryShift', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressKeyWithModifier( 'primaryShift', 'm' );
+		await pressWithModifier( 'primaryShift', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -267,16 +267,16 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pressKeyWithModifier( 'primary', 'm' );
+		await pressWithModifier( 'primary', 'm' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
-		await pressKeyWithModifier( 'primary', 'm' );
+		await pressWithModifier( 'primary', 'm' );
 		await page.keyboard.type( 'c' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'ArrowUp' );
-		await pressKeyWithModifier( 'primaryShift', 'm' );
+		await pressWithModifier( 'primaryShift', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
