@@ -518,36 +518,18 @@ function MediaEditorContent( {
 	// The choice is not carried across openings: the modal is transient, and
 	// re-opening with the panel hidden on a wide screen is how #81487 read to
 	// people in the first place. Within one opening it does hold — see
-	// `hasChosenPanelRef` below.
+	// `chosenPanel` below.
 	const isWide = useViewportMatch( 'small' );
-	// `null` when nothing is open, otherwise the open panel's id.
-	const [ activePanel, setActivePanel ] = useState< string | null >(
-		isWide ? DETAILS_PANEL : null
-	);
-	// Width picks the starting panel, but only until the user picks one. After
-	// that their choice holds for the rest of the session: closing the panel
-	// and then resizing — or crossing the breakpoint by rotating a tablet —
-	// should not reopen something they just dismissed.
-	const hasChosenPanelRef = useRef( false );
-	// The panel the toggle reopens, and the one width picks until the user
-	// picks their own. Tracked separately from `hasChosenPanelRef` because
-	// the two answer different questions: whether the panel should be open,
-	// and which tab it should show.
-	const lastPanelRef = useRef( DETAILS_PANEL );
-	const hasChosenTabRef = useRef( false );
-	// Switching tabs says nothing about whether the panel should be open, so
-	// it leaves `hasChosenPanelRef` alone: picking Details on a wide screen
-	// and then dragging the window narrow should still hand the canvas the
-	// full width.
-	const selectPanel = useCallback( ( panel: string ) => {
-		hasChosenTabRef.current = true;
-		lastPanelRef.current = panel;
-		setActivePanel( panel );
-	}, [] );
-	const togglePanel = useCallback( () => {
-		hasChosenPanelRef.current = true;
-		setActivePanel( ( open ) => ( open ? null : lastPanelRef.current ) );
-	}, [] );
+	// Width picks the starting panel, but only until the user opens or closes
+	// it. After that their choice holds for the rest of the session: closing
+	// the panel and then resizing — or crossing the breakpoint by rotating a
+	// tablet — should not reopen something they just dismissed. `undefined`
+	// until then, otherwise `null` for closed or the open panel's id.
+	const [ chosenPanel, setChosenPanel ] = useState< string | null >();
+	// The tab the user picked, `null` until they pick one. Tracked separately
+	// from `chosenPanel` because the two answer different questions: whether
+	// the panel should be open, and which tab it should show.
+	const [ chosenTab, setChosenTab ] = useState< string | null >( null );
 	// Below `small` a frame's header cannot fit the history cluster alongside
 	// its own controls, so it moves that cluster elsewhere. The same width
 	// undocks the panel, so this is `isWide` rather than a second query.
@@ -699,29 +681,33 @@ function MediaEditorContent( {
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
 
-	// Until the user picks a panel, follow the breakpoint: dragging a window
-	// narrow hands the canvas the full width instead of leaving a panel
-	// wedged beside it.
-	//
 	// Docked, the panel opens on Crop: the canvas is still beside it and
 	// cropping is what the editor is for. Below `small` an open panel covers
 	// the canvas, and crop controls with no crop in sight are not worth
 	// opening on, so Details leads there. Non-image media has no Crop tab at
-	// all (see `tabs`), so it always gets Details. `isImage` comes from a
-	// record that resolves after mount, which is why this runs in an effect
-	// rather than seeding `useState`.
-	useEffect( () => {
-		if ( hasChosenPanelRef.current && hasChosenTabRef.current ) {
-			return;
-		}
-		const defaultPanel = isWide && isImage ? CROP_PANEL : DETAILS_PANEL;
-		if ( ! hasChosenTabRef.current ) {
-			lastPanelRef.current = defaultPanel;
-		}
-		if ( ! hasChosenPanelRef.current ) {
-			setActivePanel( isWide ? lastPanelRef.current : null );
-		}
-	}, [ isWide, isImage ] );
+	// all (see `tabs`), so it always gets Details.
+	const currentTab =
+		chosenTab ?? ( isWide && isImage ? CROP_PANEL : DETAILS_PANEL );
+	// `null` when nothing is open, otherwise the open panel's id. Until the
+	// user opens or closes the panel, follow the breakpoint: dragging a window
+	// narrow hands the canvas the full width instead of leaving a panel
+	// wedged beside it.
+	let activePanel = chosenPanel;
+	if ( activePanel === undefined ) {
+		activePanel = isWide ? currentTab : null;
+	}
+	// Switching tabs says nothing about whether the panel should be open, so
+	// it leaves `chosenPanel` unset: picking Details on a wide screen and then
+	// dragging the window narrow should still hand the canvas the full width.
+	const selectPanel = useCallback( ( panel: string ) => {
+		setChosenTab( panel );
+		setChosenPanel( ( chosen ) =>
+			chosen === undefined ? chosen : panel
+		);
+	}, [] );
+	const togglePanel = useCallback( () => {
+		setChosenPanel( activePanel ? null : currentTab );
+	}, [ activePanel, currentTab ] );
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
