@@ -239,12 +239,20 @@ export function migratePackageToChangie(
 		throw new Error( `CHANGELOG.md not found at ${ changelogPath }` );
 	}
 
+	const content = fs.readFileSync( changelogPath, 'utf8' );
+	const parsed = parseChangelogContent( content );
+	if ( cleanFirst && parsed.unreleasedEntries.length === 0 ) {
+		return {
+			packageName: normalized,
+			versionsCreated: 0,
+			fragmentsCreated: 0,
+			operations: [],
+		};
+	}
+
 	if ( cleanFirst ) {
 		cleanPackageChangieFiles( normalized, repoRoot, dryRun );
 	}
-
-	const content = fs.readFileSync( changelogPath, 'utf8' );
-	const parsed = parseChangelogContent( content );
 
 	const changieConfig = loadChangieConfig( repoRoot );
 	const changesDir = path.resolve(
