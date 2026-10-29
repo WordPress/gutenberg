@@ -326,7 +326,7 @@ The automated package publishing workflow will at most bump the minor version of
 
 A `0.x` package is promoted to `1.0.0` by adding a **Stable Release** entry:
 
--   **For packages using Changie**: run `npm run changelog:promote-stable -- <package-name> --pr <PR#>` (or follow the interactive prompt). This creates the promotion fragment under `.changes/unreleased/`.
+-   **For packages using changelog fragments (via Changie)**: run `npm run changelog:add -- -j <package-name> -k "Stable Release" -m "PR=<PR#>" -b "Mark package as stable and production-ready."` (or select `Stable Release` in the interactive `npm run changelog:add` prompt). This creates the promotion fragment under `.changes/unreleased/`.
 -   **For manual packages**: add a `### Stable Release` subsection directly under `## Unreleased` in `CHANGELOG.md`:
 
 ```md

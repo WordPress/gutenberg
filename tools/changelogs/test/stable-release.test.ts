@@ -3,42 +3,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import yaml from 'js-yaml';
-import { promotePackageToStable } from '../lib/promote-stable.ts';
+import { run as addFragment } from '../bin/add.mts';
 import { validateFragment } from '../lib/validate.ts';
 import { execChangie } from '../lib/release.ts';
 import { previewUnreleasedFragments } from '../lib/preview.ts';
 import { loadChangieConfig } from '../lib/config.ts';
 
-describe( 'promotePackageToStable', () => {
-	it( 'rejects packages that are already at version >= 1.0.0', () => {
-		const tmpDir = fs.mkdtempSync(
-			path.join( os.tmpdir(), 'promote-test-' )
-		);
-		const pkgDir = path.join( tmpDir, 'packages', 'stable-pkg' );
-		fs.mkdirSync( pkgDir, { recursive: true } );
-		fs.writeFileSync(
-			path.join( pkgDir, 'package.json' ),
-			JSON.stringify( {
-				name: '@wordpress/stable-pkg',
-				version: '2.1.0',
-			} )
-		);
-		fs.writeFileSync(
-			path.join( tmpDir, '.changie.yaml' ),
-			'changes_dir: .changes\nunreleased_dir: unreleased\nprojects:\n  - label: StablePkg\n    key: stable-pkg\n'
-		);
-
-		expect( () =>
-			promotePackageToStable( {
-				packageName: 'stable-pkg',
-				pr: 12345,
-				repoRoot: tmpDir,
-			} )
-		).toThrow( /must be < 1.0.0/ );
-
-		fs.rmSync( tmpDir, { recursive: true, force: true } );
-	} );
-
+describe( 'Stable Release fragments', () => {
 	it( 'renders the promotion note and lists Stable Release last', () => {
 		const tmpDir = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'promote-test-' )
@@ -68,24 +39,32 @@ describe( 'promotePackageToStable', () => {
 			} )
 		);
 
-		const result = promotePackageToStable( {
-			packageName: 'pre-pkg',
-			pr: 54321,
-			body: 'Mark package as stable and production-ready.',
-			repoRoot: tmpDir,
-		} );
-
-		expect( result.packageName ).toBe( 'pre-pkg' );
-		expect( result.currentVersion ).toBe( '0.24.0' );
-		expect( fs.existsSync( result.fragmentPath ) ).toBe( true );
-
-		const content = fs.readFileSync( result.fragmentPath, 'utf8' );
+		expect(
+			addFragment(
+				[
+					'-j',
+					'pre-pkg',
+					'-k',
+					'Stable Release',
+					'-m',
+					'PR=54321',
+					'-b',
+					'Mark package as stable and production-ready.',
+					'--interactive=false',
+				],
+				tmpDir
+			)
+		).toBe( 0 );
+		const unreleasedDir = path.join( tmpDir, '.changes', 'unreleased' );
+		const fragments = fs.readdirSync( unreleasedDir );
+		expect( fragments ).toHaveLength( 1 );
+		const fragmentPath = path.join( unreleasedDir, fragments[ 0 ] );
+		const content = fs.readFileSync( fragmentPath, 'utf8' );
 		expect( content ).toContain( 'kind: Stable Release' );
-		expect( content ).toContain( "PR: '54321'" );
 
 		// Verify the generated fragment passes the same validation used by authoring and CI.
 		const errors = validateFragment(
-			result.fragmentPath,
+			fragmentPath,
 			content,
 			{ requirePr: '54321' },
 			tmpDir
@@ -134,7 +113,7 @@ describe( 'promotePackageToStable', () => {
 		);
 		expect( released ).toContain( note );
 		expect( released ).toContain( '### Stable Release' );
-		expect( fs.existsSync( result.fragmentPath ) ).toBe( false );
+		expect( fs.existsSync( fragmentPath ) ).toBe( false );
 
 		fs.rmSync( tmpDir, { recursive: true, force: true } );
 	} );
