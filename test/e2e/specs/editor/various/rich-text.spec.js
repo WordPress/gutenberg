@@ -404,16 +404,23 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( '4' );
 
-		await editor.canvas.locator( ':root' ).evaluate( () => {
-			// The selection change event should be called once. If there's only
-			// one item in `window.unsubscribes`, it means that only one
-			// function is present to disconnect the `mutationObserver`.
-			if ( window.unsubscribes.length === 1 ) {
-				throw new Error(
-					'The selection change event listener was never called.'
-				);
-			}
+		// The selection change event fires asynchronously, after the key
+		// press. Its listener adds a second item to `window.unsubscribes`,
+		// next to the one that disconnects the `mutationObserver`.
+		await expect
+			.poll(
+				() =>
+					editor.canvas
+						.locator( ':root' )
+						.evaluate( () => window.unsubscribes.length ),
+				{
+					message:
+						'The selection change event listener was never called.',
+				}
+			)
+			.toBe( 2 );
 
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
 		} );
 
