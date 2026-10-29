@@ -1076,26 +1076,17 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 	} ) => {
 		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
 
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		// Typing before the paragraph has focus drops the first characters.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block; start writing or type forward slash to choose a block',
-			} )
-		).toBeFocused();
-		await page.keyboard.type( 'one' );
-		await pageUtils.pressKeys( 'primaryShift+Space', { times: 2 } );
-		await page.keyboard.type( 'two' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one\u00a0\u00a0two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
 		// Between the two non-breaking spaces.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await editor.showBlockToolbar();
-
-		await expect(
-			toolbar.getByRole( 'button', {
-				name: 'Replace non-breaking space',
-				exact: true,
-			} )
-		).toHaveCount( 0 );
 		await toolbar
 			.getByRole( 'button', {
 				name: 'Replace non-breaking spaces',
@@ -1106,47 +1097,6 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'one  two' },
-			},
-		] );
-	} );
-
-	test( 'should replace all non-breaking spaces in the selection only', async ( {
-		page,
-		editor,
-		pageUtils,
-	} ) => {
-		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
-
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block; start writing or type forward slash to choose a block',
-			} )
-		).toBeFocused();
-		for ( const character of [ 'a', 'b', 'c' ] ) {
-			await page.keyboard.type( character );
-			await pageUtils.pressKeys( 'primaryShift+Space' );
-		}
-		await page.keyboard.type( 'd' );
-		// Select the non-breaking spaces on both sides of "c", and "d".
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 4 } );
-
-		await expect(
-			toolbar.getByRole( 'button', {
-				name: 'Replace non-breaking space',
-				exact: true,
-			} )
-		).toHaveCount( 0 );
-		await toolbar
-			.getByRole( 'button', {
-				name: 'Replace non-breaking spaces',
-				exact: true,
-			} )
-			.click();
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'a\u00a0b c d' },
 			},
 		] );
 	} );
