@@ -44,22 +44,20 @@ export default function useEditableRoot() {
 				node.contains( activeElement ) &&
 				getBlockClientId( activeElement ) ===
 					getSelectedBlockClientId();
-			// A tap focused the field and has not placed the caret yet. As
-			// the editing host, the wrapper would hold the old caret too, so
-			// iOS would leave it there. The selection observer takes over.
-			const isWaitingForCaret =
+			// A tap focused the field while the caret is still in another
+			// block. Drop that caret: with the wrapper as the editing host,
+			// iOS would keep it instead of placing one at the tap.
+			if (
 				isFieldFocused &&
-				! (
-					selection.anchorNode &&
-					activeElement!.contains( selection.anchorNode )
-				);
+				selection.anchorNode &&
+				! activeElement!.contains( selection.anchorNode )
+			) {
+				selection.removeAllRanges();
+			}
 
 			// Focus is moved separately below, only when an editable
 			// element belonging to the selected block holds it.
-			if (
-				! isWaitingForCaret &&
-				! setContentEditableWrapper( node, true, { focus: false } )
-			) {
+			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
 				return;
 			}
 
@@ -73,7 +71,11 @@ export default function useEditableRoot() {
 			// placed the caret yet; moving focus now would cancel the
 			// pending caret placement. The selection observer moves focus
 			// once the selection lands.
-			if ( isFieldFocused && ! isWaitingForCaret ) {
+			if (
+				isFieldFocused &&
+				selection.anchorNode &&
+				activeElement!.contains( selection.anchorNode )
+			) {
 				node.focus();
 			}
 
