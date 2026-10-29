@@ -1,11 +1,97 @@
-import { dirname, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import {
+	mkdtempSync,
+	mkdirSync,
+	readFileSync,
+	readdirSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import {
 	parseArgs,
 	resolveChangelogPath,
 	validateChangelog,
+	run,
 } from './validate-changelogs.ts';
+
+describe( 'native fragment compilation in changelog lint', () => {
+	test.each( [
+		'time: garbage',
+		'time: 123',
+		'time: [2026, 10]',
+		'time: "2026-10-29T10:30:00Z"\ncustom:\n  PR: "85369"\n  Metadata: [one, two]',
+		'time: "2026-10-29T10:30:00Z"\ncustom:\n  PR: "85369"\n  Metadata: {nested: value}',
+		'time: "2026-10-29T10:30:00Z"',
+	] )( 'checks native compatibility and preserves files: %s', ( fields ) => {
+		const root = mkdtempSync(
+			join( tmpdir(), 'changelog-native-validation-' )
+		);
+		try {
+			const pkgDir = join( root, 'packages', 'ui' );
+			const unreleased = join( root, '.changes', 'unreleased' );
+			const released = join( root, '.changes', 'ui' );
+			mkdirSync( pkgDir, { recursive: true } );
+			mkdirSync( unreleased, { recursive: true } );
+			mkdirSync( released );
+			writeFileSync(
+				join( root, '.changie.yaml' ),
+				[
+					'changesDir: .changes',
+					'unreleasedDir: unreleased',
+					'versionExt: md',
+					'versionFormat: "## {{.Version}}"',
+					'kindFormat: "### {{.Kind}}"',
+					'changeFormat: "- {{.Body}}"',
+					'kinds:',
+					'  - label: Bug Fixes',
+					'projects:',
+					'  - key: ui',
+					'    label: UI',
+					'    changelog: packages/ui/CHANGELOG.md',
+				].join( '\n' )
+			);
+			const changelogPath = join( pkgDir, 'CHANGELOG.md' );
+			const fragmentPath = join( unreleased, 'example.yaml' );
+			const baselinePath = join( released, '0.25.0.md' );
+			writeFileSync( changelogPath, '## 0.25.0\n' );
+			writeFileSync( baselinePath, '## 0.25.0\n' );
+			writeFileSync(
+				fragmentPath,
+				`project: ui\nkind: Bug Fixes\nbody: Fix alignment\n${ fields }\n` +
+					( fields.includes( 'custom:' )
+						? ''
+						: 'custom:\n  PR: "85369"\n' )
+			);
+			const files = [ changelogPath, fragmentPath, baselinePath ];
+			const before = files.map( ( file ) =>
+				readFileSync( file, 'utf8' )
+			);
+			const valid = fields === 'time: "2026-10-29T10:30:00Z"';
+			const errors = vi
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+			expect( run( [ changelogPath ], root ) ).toBe( valid ? 0 : 1 );
+			expect(
+				files.map( ( file ) => readFileSync( file, 'utf8' ) )
+			).toEqual( before );
+			expect( readdirSync( unreleased ) ).toEqual( [ 'example.yaml' ] );
+			expect( readdirSync( released ) ).toEqual( [ '0.25.0.md' ] );
+			const failure = expect.stringContaining(
+				'Changie fragment compilation failed for ui:'
+			);
+			expect( errors.mock.calls ).toEqual( valid ? [] : [ [ failure ] ] );
+			for ( const call of errors.mock.calls ) {
+				expect( console ).toHaveErroredWith( ...call );
+			}
+		} finally {
+			vi.restoreAllMocks();
+			rmSync( root, { recursive: true, force: true } );
+		}
+	} );
+} );
 
 const REPO_ROOT = resolve(
 	dirname( fileURLToPath( import.meta.url ) ),

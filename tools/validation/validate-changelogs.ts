@@ -17,6 +17,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs as parseNodeArgs } from 'node:util';
 import { isChangiePackage } from '@wordpress/changelog-tools/config';
 import { validateAllFragments } from '@wordpress/changelog-tools/validate';
+import { execChangie } from '@wordpress/changelog-tools/exec-changie';
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const REPO_ROOT = resolve( __dirname, '../..' );
@@ -422,10 +423,11 @@ export function parseArgs( argv: string[] ): ParseArgsResult {
 }
 
 /**
- * @param argv CLI arguments (without node / script path).
+ * @param argv     CLI arguments (without node / script path).
+ * @param repoRoot Repository to validate.
  * @return Exit code.
  */
-export function run( argv: string[] ): number {
+export function run( argv: string[], repoRoot = REPO_ROOT ): number {
 	let pr: string | undefined;
 	let requirePr: string | undefined;
 	let paths: string[];
@@ -441,17 +443,12 @@ export function run( argv: string[] ): number {
 	const files =
 		paths.length > 0
 			? paths.map( ( filePath ) => resolveChangelogPath( filePath ) )
-			: readdirSync( join( REPO_ROOT, 'packages' ), {
+			: readdirSync( join( repoRoot, 'packages' ), {
 					withFileTypes: true,
 				} )
 					.filter( ( entry ) => entry.isDirectory() )
 					.map( ( entry ) =>
-						join(
-							REPO_ROOT,
-							'packages',
-							entry.name,
-							'CHANGELOG.md'
-						)
+						join( repoRoot, 'packages', entry.name, 'CHANGELOG.md' )
 					)
 					.filter( ( filePath ) => existsSync( filePath ) )
 					.sort();
@@ -462,20 +459,40 @@ export function run( argv: string[] ): number {
 	}
 
 	let hasErrors = false;
+	const compiledProjects = new Set< string >();
 	for ( const filePath of files ) {
-		const relativePath = relative( REPO_ROOT, filePath );
+		const relativePath = relative( repoRoot, filePath );
 		const parts = relativePath.split( '/' );
 		const pkgDir = parts.length >= 2 ? parts[ 1 ] : '';
 
 		// If this package is managed by Changie, validate fragments instead of CHANGELOG.md Unreleased
-		if ( pkgDir && isChangiePackage( pkgDir, REPO_ROOT ) ) {
+		if ( pkgDir && isChangiePackage( pkgDir, repoRoot ) ) {
 			const fragmentErrors = validateAllFragments(
 				{ pr, requirePr, project: pkgDir },
-				REPO_ROOT
+				repoRoot
 			);
 			for ( const error of fragmentErrors ) {
 				console.error( error );
 				hasErrors = true;
+			}
+			if ( ! compiledProjects.has( pkgDir ) ) {
+				compiledProjects.add( pkgDir );
+				const result = execChangie(
+					[
+						'batch',
+						'0-unreleased',
+						'--dry-run',
+						'--project',
+						pkgDir,
+					],
+					repoRoot
+				);
+				if ( result.status !== 0 ) {
+					console.error(
+						`Changie fragment compilation failed for ${ pkgDir }: ${ result.error?.message || result.stderr || result.stdout || `exit status ${ result.status }` }`
+					);
+					hasErrors = true;
+				}
 			}
 			continue;
 		}
