@@ -3,7 +3,10 @@ import type { Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import type { ReactElement, ReactNode } from 'react';
-import { useResolvedStyle } from '../inherited-value-context';
+import {
+	getBlockElementLayers,
+	useResolvedStyle,
+} from '../inherited-value-context';
 import type { BlockStyleState } from '../../../hooks/types';
 import { BlockContextProvider } from '../../block-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
@@ -293,6 +296,18 @@ describe( 'useResolvedStyle hook', () => {
 		expect(
 			parsed.sources[ 'elements.h2.typography.fontSize' ].layer
 		).toBe( 'root' );
+	} );
+} );
+
+describe( 'getBlockElementLayers', () => {
+	test( 'takes the Accordion Heading level from block context', () => {
+		expect(
+			getBlockElementLayers(
+				'core/accordion-heading',
+				{},
+				{ 'core/accordion-heading-level': 2 }
+			)
+		).toEqual( [ 'heading', 'h2' ] );
 	} );
 } );
 
