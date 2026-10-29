@@ -17,12 +17,14 @@ const ALL_ICONS_MANIFEST = new Map(
 	manifest.map(
 		( entry: {
 			slug: string;
+			label: string;
 			collections?: string[];
 			keywords?: string[];
 		} ) => [
 			entry.slug,
 			{
 				slug: entry.slug,
+				label: entry.label,
 				collections: entry.collections ?? [],
 				keywords: entry.keywords ?? [],
 			},
@@ -94,10 +96,11 @@ const LibraryExample = ( {
 				return true;
 			}
 
-			// Keywords live in the manifest, so Storybook and the icons
-			// registry search the same terms.
+			// Labels and keywords live in the manifest, so Storybook and the
+			// icons registry search the same terms.
 			return (
 				name.toLowerCase().includes( normalizedFilter ) ||
+				!! iconInfo?.label.toLowerCase().includes( normalizedFilter ) ||
 				!! iconInfo?.keywords.some( ( keyword ) =>
 					keyword.toLowerCase().includes( normalizedFilter )
 				)
