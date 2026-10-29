@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
@@ -7,18 +7,6 @@ import { useResolvedStyle } from '../inherited-value-context';
 import type { BlockStyleState } from '../../../hooks/types';
 import { BlockContextProvider } from '../../block-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the resolving path. The off path lives in
-// `inherited-value-context-core.js`.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 // @ts-expect-error The stub provides only what the hook and its imports need.
 vi.mock( import( '@wordpress/data' ), () => ( {
