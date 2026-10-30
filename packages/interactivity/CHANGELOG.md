@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
