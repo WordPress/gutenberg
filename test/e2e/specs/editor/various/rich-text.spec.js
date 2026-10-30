@@ -344,61 +344,90 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '3' );
 
-		// Errors thrown in the page don't fail the test, so record what
-		// happens and assert it after typing.
 		await editor.canvas.locator( ':root' ).evaluate( () => {
-			window.mutations = [];
-			window.selectionChanges = 0;
-
-			const mutationObserver = new MutationObserver( ( records ) => {
-				window.mutations.push( records.map( ( { type } ) => type ) );
-			} );
-			mutationObserver.observe( document.body, {
+			let called;
+			// Errors thrown here only reach the console, so collect them.
+			window.errors = [];
+			const { body } = document;
+			const config = {
 				attributes: true,
 				childList: true,
 				characterData: true,
 				subtree: true,
+			};
+
+			const mutationObserver = new MutationObserver( ( records ) => {
+				if ( called || records.length > 1 ) {
+					window.errors.push( 'Typing should only mutate once.' );
+				}
+
+				records.forEach( ( record ) => {
+					if ( record.type !== 'characterData' ) {
+						window.errors.push(
+							`Typing mutated more than character data: ${ record.type }`
+						);
+					}
+				} );
+
+				called = true;
 			} );
 
-			function onSelectionChange() {
-				window.selectionChanges++;
-			}
-			document.addEventListener( 'selectionchange', onSelectionChange );
+			mutationObserver.observe( body, config );
 
-			window.unsubscribe = () => {
-				mutationObserver.disconnect();
-				document.removeEventListener(
-					'selectionchange',
-					onSelectionChange
-				);
-			};
+			window.unsubscribes = [ () => mutationObserver.disconnect() ];
+
+			document.addEventListener(
+				'selectionchange',
+				() => {
+					function throwMultipleSelectionChange() {
+						window.errors.push(
+							'Typing should only emit one selection change event.'
+						);
+					}
+
+					document.addEventListener(
+						'selectionchange',
+						throwMultipleSelectionChange,
+						{
+							once: true,
+						}
+					);
+
+					window.unsubscribes.push( () => {
+						document.removeEventListener(
+							'selectionchange',
+							throwMultipleSelectionChange
+						);
+					} );
+				},
+				{ once: true }
+			);
 		} );
 
 		await page.keyboard.type( '4' );
 
-		// The selection change event fires asynchronously, after the key press.
+		// The selection change event fires asynchronously, after the key
+		// press. Its listener adds a second item to `window.unsubscribes`,
+		// next to the one that disconnects the `mutationObserver`.
 		await expect
-			.poll( () =>
-				editor.canvas
-					.locator( ':root' )
-					.evaluate( () => window.selectionChanges )
+			.poll(
+				() =>
+					editor.canvas
+						.locator( ':root' )
+						.evaluate( () => window.unsubscribes.length ),
+				{
+					message:
+						'The selection change event listener was never called.',
+				}
 			)
-			.toBeGreaterThan( 0 );
+			.toBe( 2 );
 
-		const { mutations, selectionChanges } = await editor.canvas
-			.locator( ':root' )
-			.evaluate( () => {
-				window.unsubscribe();
-				return {
-					mutations: window.mutations,
-					selectionChanges: window.selectionChanges,
-				};
-			} );
+		const errors = await editor.canvas.locator( ':root' ).evaluate( () => {
+			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+			return window.errors;
+		} );
 
-		// Typing should mutate character data only, once, and emit one
-		// selection change event.
-		expect( mutations ).toEqual( [ [ 'characterData' ] ] );
-		expect( selectionChanges ).toBe( 1 );
+		expect( errors ).toEqual( [] );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
