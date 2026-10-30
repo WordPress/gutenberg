@@ -1,22 +1,49 @@
 import clsx from 'clsx';
-import type { Dispatch, ForwardedRef, SetStateAction } from 'react';
-import { useState, useEffect, forwardRef, useMemo } from '@wordpress/element';
+import type { ForwardedRef } from 'react';
+import {
+	useState,
+	useEffect,
+	useRef,
+	forwardRef,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import type { CurriedSelectorsOf } from '@wordpress/data';
+import {
+	__experimentalUseDropZone as useDropZone,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { range, GridRect, getGridInfo, getGridItemRect } from './utils';
+import {
+	range,
+	GridRect,
+	getGridInfo,
+	getGridItemRect,
+	getGridItemMeasurements,
+} from './utils';
+import {
+	getGridDropTarget,
+	getPixelRectFromGridRect,
+} from './get-grid-drop-target';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
+import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
+import type { ChildLayoutBlockStyle } from '../../hooks/types';
 import type {
 	AutoGridVisualizerProps,
-	DropZoneWithValidationOptions,
+	GridDragGrab,
+	GridDropIndicatorProps,
+	GridDropTarget,
 	GridInfo,
 	GridItemAttributes,
+	GridItemMeasurements,
+	GridPixelRect,
 	GridVisualizerCellProps,
 	GridVisualizerCellPosition,
+	GridVisualizerDropLayerProps,
 	GridVisualizerGridProps,
 	GridVisualizerProps,
 	ManualGridVisualizerProps,
@@ -71,7 +98,15 @@ const GridVisualizerGrid = forwardRef(
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
-		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
+		const isDroppingAllowed = useSelect(
+			( select ) =>
+				select( blockEditorStore ).isDraggingBlocks() &&
+				!! getBlockToPlaceInGrid(
+					select( blockEditorStore ),
+					gridClientId
+				),
+			[ gridClientId ]
+		);
 
 		// Get the element for the child grid block so we can
 		// compute its position and hide overlapping visualizer cells.
@@ -107,25 +142,15 @@ const GridVisualizerGrid = forwardRef(
 			};
 		}, [ gridElement ] );
 
-		useEffect( () => {
-			function onGlobalDrag() {
-				setIsDroppingAllowed( true );
-			}
-			function onGlobalDragEnd() {
-				setIsDroppingAllowed( false );
-			}
-			document.addEventListener( 'drag', onGlobalDrag );
-			document.addEventListener( 'dragend', onGlobalDragEnd );
-			return () => {
-				document.removeEventListener( 'drag', onGlobalDrag );
-				document.removeEventListener( 'dragend', onGlobalDragEnd );
-			};
-		}, [] );
-
 		return (
 			<BlockPopoverCover
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
+					// Popovers in the block tools slots are hidden once a drag
+					// has been over the block flow. A manual grid's stays, so
+					// that its drop layer can take blocks from the block flow
+					// and give them back.
+					'is-shown-while-dragging': isManualGrid,
 				} ) }
 				clientId={ gridClientId }
 				__unstablePopoverSlot="__unstable-block-tools-after"
@@ -138,6 +163,7 @@ const GridVisualizerGrid = forwardRef(
 					{ isManualGrid ? (
 						<ManualGridVisualizer
 							gridClientId={ gridClientId }
+							gridElement={ gridElement }
 							gridInfo={ gridInfo }
 							childGridRect={ childGridRect }
 						/>
@@ -178,10 +204,11 @@ function AutoGridVisualizer( {
 
 function ManualGridVisualizer( {
 	gridClientId,
+	gridElement,
 	gridInfo,
 	childGridRect,
 }: ManualGridVisualizerProps ) {
-	const [ highlightedRect, setHighlightedRect ] = useState< GridRect | null >(
+	const [ dropTarget, setDropTarget ] = useState< GridDropTarget | null >(
 		null
 	);
 
@@ -220,61 +247,56 @@ function ManualGridVisualizer( {
 		return rects;
 	}, [ gridItemStyles ] );
 
-	return range( 1, gridInfo.numRows ).map( ( row ) =>
-		range( 1, gridInfo.numColumns ).map( ( column ) => {
-			// Don't render visualizer cells for a selected child block
-			// that is itself a grid, so that only the child's grid
-			// visualizer is visible.
-			const isChildGridCell = childGridRect?.contains( column, row );
-			let color = gridInfo.currentColor;
-			if ( isChildGridCell ) {
-				color = 'transparent';
-			}
-			const isCellOccupied = occupiedRects.some( ( rect ) =>
-				rect.contains( column, row )
-			);
-			const isHighlighted =
-				highlightedRect?.contains( column, row ) ?? false;
-			return (
-				<GridVisualizerCell
-					key={ `${ row }-${ column }` }
-					color={ color }
-					className={ isHighlighted && 'is-highlighted' }
-				>
-					{ isCellOccupied && ! isChildGridCell ? (
-						<GridVisualizerDropZone
-							column={ column }
-							row={ row }
-							gridClientId={ gridClientId }
-							gridInfo={ gridInfo }
-							setHighlightedRect={ setHighlightedRect }
-						/>
-					) : (
-						<GridVisualizerAppender
-							column={ column }
-							row={ row }
-							gridClientId={ gridClientId }
-							gridInfo={ gridInfo }
-							setHighlightedRect={ setHighlightedRect }
-						/>
-					) }
-				</GridVisualizerCell>
-			);
-		} )
+	return (
+		<>
+			{ range( 1, gridInfo.numRows ).map( ( row ) =>
+				range( 1, gridInfo.numColumns ).map( ( column ) => {
+					// Don't render visualizer cells for a selected child block
+					// that is itself a grid, so that only the child's grid
+					// visualizer is visible.
+					const isChildGridCell = childGridRect?.contains(
+						column,
+						row
+					);
+					let color = gridInfo.currentColor;
+					if ( isChildGridCell ) {
+						color = 'transparent';
+					}
+					const isCellOccupied = occupiedRects.some( ( rect ) =>
+						rect.contains( column, row )
+					);
+					return (
+						<GridVisualizerCell
+							key={ `${ row }-${ column }` }
+							color={ color }
+						>
+							{ ! isCellOccupied && ! isChildGridCell && (
+								<GridVisualizerAppender
+									column={ column }
+									row={ row }
+									gridClientId={ gridClientId }
+									gridInfo={ gridInfo }
+								/>
+							) }
+						</GridVisualizerCell>
+					);
+				} )
+			) }
+			<GridVisualizerDropLayer
+				gridClientId={ gridClientId }
+				gridElement={ gridElement }
+				gridInfo={ gridInfo }
+				setDropTarget={ setDropTarget }
+			/>
+			{ dropTarget && <GridDropIndicator dropTarget={ dropTarget } /> }
+		</>
 	);
 }
 
-function GridVisualizerCell( {
-	color,
-	children,
-	className,
-}: GridVisualizerCellProps ) {
+function GridVisualizerCell( { color, children }: GridVisualizerCellProps ) {
 	return (
 		<div
-			className={ clsx(
-				'block-editor-grid-visualizer__cell',
-				className
-			) }
+			className="block-editor-grid-visualizer__cell"
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
 				color,
@@ -285,122 +307,342 @@ function GridVisualizerCell( {
 	);
 }
 
-function useGridVisualizerDropZone(
-	column: number,
-	row: number,
-	gridClientId: string,
-	gridInfo: GridInfo,
-	setHighlightedRect: Dispatch< SetStateAction< GridRect | null > >
-) {
+function getPixelRectStyle( rect: GridPixelRect ) {
+	return {
+		left: rect.left,
+		top: rect.top,
+		width: rect.right - rect.left,
+		height: rect.bottom - rect.top,
+	};
+}
+
+/**
+ * Gets the block being dragged, if it can be placed in the grid's cells.
+ *
+ * Only single blocks are placed in cells. Other drags, and blocks that can't
+ * be moved into the grid, leave the grid's drop layer inert, so they fall
+ * through to the block flow's drop zones.
+ *
+ * @param selectors    Block editor store selectors.
+ * @param gridClientId Client ID of the grid block.
+ *
+ * @return The client ID of the dragged block, or null.
+ */
+function getBlockToPlaceInGrid(
+	selectors: CurriedSelectorsOf< typeof blockEditorStore >,
+	gridClientId: string
+): string | null {
+	const {
+		getDraggedBlockClientIds,
+		getBlockParents,
+		getBlockRootClientId,
+		canMoveBlocks,
+		canRemoveBlocks,
+		canInsertBlocks,
+	} = selectors;
+	const clientIds = getDraggedBlockClientIds();
+	if ( clientIds.length !== 1 ) {
+		return null;
+	}
+	const [ clientId ] = clientIds;
+	// A grid can't be dropped into itself or into a grid inside it.
+	if (
+		clientId === gridClientId ||
+		getBlockParents( gridClientId ).includes( clientId )
+	) {
+		return null;
+	}
+	// The same checks as `moveBlocksToPosition`, so that a drop it would
+	// refuse doesn't change the block's placement either.
+	if ( ! canMoveBlocks( clientIds ) ) {
+		return null;
+	}
+	if (
+		getBlockRootClientId( clientId ) !== gridClientId &&
+		( ! canRemoveBlocks( clientIds ) ||
+			! canInsertBlocks( clientIds, gridClientId ) )
+	) {
+		return null;
+	}
+	return clientId;
+}
+
+/**
+ * A drop zone covering the whole grid. While a block is dragged over it, it
+ * works out which cells the block would land in, and which other blocks those
+ * cells overlap.
+ *
+ * @param props
+ * @param props.gridClientId  Client ID of the grid block.
+ * @param props.gridElement   The grid element in the canvas.
+ * @param props.gridInfo      Grid info, from `getGridInfo`.
+ * @param props.setDropTarget Called with the drop target, or null.
+ */
+function GridVisualizerDropLayer( {
+	gridClientId,
+	gridElement,
+	gridInfo,
+	setDropTarget,
+}: GridVisualizerDropLayerProps ) {
+	const layerRef = useRef< HTMLDivElement >( null );
+	const lastTargetRef = useRef< GridDropTarget | null >( null );
+	// Where the dragged block was grabbed, for the length of the drag.
+	const grabRef = useRef< GridDragGrab | null >( null );
+	// The grid measured when the drag started over it. Blocks don't move
+	// until the drop, so it is measured again only when the grid resizes.
+	const measurementsRef = useRef< {
+		srcClientId: string;
+		gridInfo: GridInfo;
+		measurements: GridItemMeasurements;
+	} | null >( null );
+	const isDragging = useSelect(
+		( select ) => select( blockEditorStore ).isDraggingBlocks(),
+		[]
+	);
+	useEffect( () => {
+		if ( ! isDragging ) {
+			grabRef.current = null;
+			measurementsRef.current = null;
+		}
+	}, [ isDragging ] );
+	const blockEditorSelectors = useSelect( blockEditorStore );
 	const {
 		getBlockAttributes,
 		getBlockRootClientId,
-		canInsertBlockType,
-		getBlockName,
-	} = useSelect( blockEditorStore );
+		getSelectedBlockStyleState,
+	} = blockEditorSelectors;
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
-
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
 		gridInfo.numColumns
 	);
 
-	return useDropZoneWithValidation( {
-		validateDrag( srcClientId ) {
-			const blockName = getBlockName( srcClientId );
-			if ( ! canInsertBlockType( blockName, gridClientId ) ) {
-				return false;
+	function clearDropTarget() {
+		lastTargetRef.current = null;
+		measurementsRef.current = null;
+		setDropTarget( null );
+	}
+
+	function getMeasurements( srcClientId: string ) {
+		const cached = measurementsRef.current;
+		if (
+			cached?.srcClientId === srcClientId &&
+			cached.gridInfo === gridInfo
+		) {
+			return cached.measurements;
+		}
+		const measurements = getGridItemMeasurements(
+			gridElement,
+			srcClientId
+		);
+		measurementsRef.current = { srcClientId, gridInfo, measurements };
+		return measurements;
+	}
+
+	function getDraggedBlock() {
+		return getBlockToPlaceInGrid( blockEditorSelectors, gridClientId );
+	}
+
+	function updateDropTarget( event: DragEvent ) {
+		const srcClientId = getDraggedBlock();
+		const layer = layerRef.current;
+		if ( ! srcClientId || ! layer ) {
+			clearDropTarget();
+			return;
+		}
+
+		const { columnTracks, rowTracks, siblings, src } =
+			getMeasurements( srcClientId );
+		if ( ! columnTracks.length || ! rowTracks.length ) {
+			clearDropTarget();
+			return;
+		}
+		const srcSpan = src?.rect ?? null;
+		const srcPixelRect = src?.pixelRect ?? null;
+		// The dragged block exists.
+		const srcLayout = (
+			getBlockAttributes( srcClientId ) as GridItemAttributes | null
+		 )?.style?.layout;
+		const columnSpan = srcSpan?.columnSpan ?? srcLayout?.columnSpan ?? 1;
+		const rowSpan = srcSpan?.rowSpan ?? srcLayout?.rowSpan ?? 1;
+
+		const layerRect = layer.getBoundingClientRect();
+		const scale = layer.offsetWidth / layerRect.width || 1;
+		const x = ( event.clientX - layerRect.left ) * scale;
+		const y = ( event.clientY - layerRect.top ) * scale;
+
+		// A block dragged by its body keeps the point it was grabbed at
+		// under the pointer, which the first move over the grid finds inside
+		// it. A block dragged by its handle, or from outside the grid, is
+		// centered on the pointer.
+		if ( grabRef.current?.srcClientId !== srcClientId ) {
+			const isGrabbed =
+				srcPixelRect &&
+				x >= srcPixelRect.left &&
+				x <= srcPixelRect.right &&
+				y >= srcPixelRect.top &&
+				y <= srcPixelRect.bottom;
+			grabRef.current = {
+				srcClientId,
+				grab:
+					isGrabbed && srcPixelRect
+						? {
+								grabX: x - srcPixelRect.left,
+								grabY: y - srcPixelRect.top,
+							}
+						: {},
+			};
+		}
+
+		// The block is measured by the area it takes up in the grid. Blocks
+		// dragged in from elsewhere are the size of the cells they span, up
+		// to the size of the grid.
+		const landing = getGridDropTarget( {
+			x,
+			y,
+			...grabRef.current.grab,
+			columnTracks,
+			rowTracks,
+			columnSpan,
+			rowSpan,
+			width: srcPixelRect
+				? srcPixelRect.right - srcPixelRect.left
+				: undefined,
+			height: srcPixelRect
+				? srcPixelRect.bottom - srcPixelRect.top
+				: undefined,
+		} );
+
+		const lastTarget = lastTargetRef.current;
+		if (
+			lastTarget?.srcClientId === srcClientId &&
+			lastTarget.landing.columnStart === landing.columnStart &&
+			lastTarget.landing.rowStart === landing.rowStart &&
+			lastTarget.landing.columnSpan === landing.columnSpan &&
+			lastTarget.landing.rowSpan === landing.rowSpan
+		) {
+			return;
+		}
+
+		const landingPixelRect = getPixelRectFromGridRect(
+			landing,
+			columnTracks,
+			rowTracks
+		);
+		if ( ! landingPixelRect ) {
+			clearDropTarget();
+			return;
+		}
+
+		const overlaps = siblings
+			.map( ( { rect } ) => rect )
+			.filter( ( rect ) => rect.intersectsRect( landing ) )
+			.map( ( rect ) =>
+				getPixelRectFromGridRect(
+					new GridRect( {
+						columnStart: Math.max(
+							rect.columnStart,
+							landing.columnStart
+						),
+						columnEnd: Math.min(
+							rect.columnEnd,
+							landing.columnEnd
+						),
+						rowStart: Math.max( rect.rowStart, landing.rowStart ),
+						rowEnd: Math.min( rect.rowEnd, landing.rowEnd ),
+					} ),
+					columnTracks,
+					rowTracks
+				)
+			)
+			.filter( ( rect ): rect is GridPixelRect => !! rect );
+
+		const target: GridDropTarget = {
+			srcClientId,
+			span: { columnSpan, rowSpan },
+			landing,
+			landingPixelRect,
+			overlaps,
+		};
+		lastTargetRef.current = target;
+		setDropTarget( target );
+	}
+
+	const dropZoneRef = useDropZone( {
+		onDragOver: updateDropTarget,
+		onDragLeave: clearDropTarget,
+		onDragEnd: clearDropTarget,
+		onDrop() {
+			const target = lastTargetRef.current;
+			clearDropTarget();
+			const srcClientId = getDraggedBlock();
+			if ( ! target || target.srcClientId !== srcClientId ) {
+				return;
 			}
-			// The dragged block exists.
-			const attributes = getBlockAttributes(
-				srcClientId
-			) as GridItemAttributes;
-			const rect = new GridRect( {
-				columnStart: column,
-				rowStart: row,
-				columnSpan: attributes.style?.layout?.columnSpan,
-				rowSpan: attributes.style?.layout?.rowSpan,
-			} );
-			const isInBounds = new GridRect( {
-				columnSpan: gridInfo.numColumns,
-				rowSpan: gridInfo.numRows,
-			} ).containsRect( rect );
-			return isInBounds;
-		},
-		onDragEnter( srcClientId ) {
-			// The dragged block exists.
-			const attributes = getBlockAttributes(
-				srcClientId
-			) as GridItemAttributes;
-			setHighlightedRect(
-				new GridRect( {
-					columnStart: column,
-					rowStart: row,
-					columnSpan: attributes.style?.layout?.columnSpan,
-					rowSpan: attributes.style?.layout?.rowSpan,
-				} )
-			);
-		},
-		onDragLeave() {
-			// onDragEnter can be called before onDragLeave if the user moves
-			// their mouse quickly, so only clear the highlight if it was set
-			// by this cell.
-			setHighlightedRect( ( prevHighlightedRect ) =>
-				prevHighlightedRect?.columnStart === column &&
-				prevHighlightedRect?.rowStart === row
-					? null
-					: prevHighlightedRect
-			);
-		},
-		onDrop( srcClientId ) {
-			setHighlightedRect( null );
-			// The dragged block exists.
-			const attributes = getBlockAttributes(
-				srcClientId
-			) as GridItemAttributes;
+			const { landing, span } = target;
+			const { columnStart, rowStart } = landing;
+			// A block bigger than the grid is shrunk to fit, as shown by the
+			// landing cells.
+			const layout = {
+				columnStart,
+				rowStart,
+				...( landing.columnSpan < span.columnSpan && {
+					columnSpan: landing.columnSpan,
+				} ),
+				...( landing.rowSpan < span.rowSpan && {
+					rowSpan: landing.rowSpan,
+				} ),
+			};
+			// The dragged block exists, and its style attribute is an object
+			// when set.
+			const { style } = getBlockAttributes( srcClientId ) as {
+				style?: ChildLayoutBlockStyle;
+			};
 			updateBlockAttributes( srcClientId, {
-				style: {
-					...attributes.style,
-					layout: {
-						...attributes.style?.layout,
-						columnStart: column,
-						rowStart: row,
-					},
-				},
+				style: getUpdatedChildLayoutStyle(
+					style,
+					layout,
+					getSelectedBlockStyleState( srcClientId )
+				),
 			} );
 			__unstableMarkNextChangeAsNotPersistent();
 			moveBlocksToPosition(
 				[ srcClientId ],
 				getBlockRootClientId( srcClientId ),
 				gridClientId,
-				getNumberOfBlocksBeforeCell( column, row )
+				getNumberOfBlocksBeforeCell( columnStart, rowStart )
 			);
 		},
 	} );
-}
 
-function GridVisualizerDropZone( {
-	column,
-	row,
-	gridClientId,
-	gridInfo,
-	setHighlightedRect,
-}: GridVisualizerCellPosition ) {
 	return (
 		<div
-			className="block-editor-grid-visualizer__drop-zone"
-			ref={ useGridVisualizerDropZone(
-				column,
-				row,
-				gridClientId,
-				gridInfo,
-				setHighlightedRect
-			) }
+			ref={ useMergeRefs( [ layerRef, dropZoneRef ] ) }
+			className="block-editor-grid-visualizer__drop-layer"
 		/>
+	);
+}
+
+function GridDropIndicator( { dropTarget }: GridDropIndicatorProps ) {
+	const { landingPixelRect, overlaps } = dropTarget;
+	return (
+		<div className="block-editor-grid-visualizer__drop-indicator">
+			<div
+				className="block-editor-grid-visualizer__landing"
+				style={ getPixelRectStyle( landingPixelRect ) }
+			/>
+			{ overlaps.map( ( rect, index ) => (
+				<div
+					key={ `overlap-${ index }` }
+					className="block-editor-grid-visualizer__overlap"
+					style={ getPixelRectStyle( rect ) }
+				/>
+			) ) }
+		</div>
 	);
 }
 
@@ -409,7 +651,6 @@ function GridVisualizerAppender( {
 	row,
 	gridClientId,
 	gridInfo,
-	setHighlightedRect,
 }: GridVisualizerCellPosition ) {
 	const {
 		updateBlockAttributes,
@@ -426,13 +667,6 @@ function GridVisualizerAppender( {
 		<ButtonBlockAppender
 			rootClientId={ gridClientId }
 			className="block-editor-grid-visualizer__appender"
-			ref={ useGridVisualizerDropZone(
-				column,
-				row,
-				gridClientId,
-				gridInfo,
-				setHighlightedRect
-			) }
 			// @ts-expect-error The appender ignores `style`.
 			style={ {
 				color: gridInfo.currentColor,
@@ -459,30 +693,4 @@ function GridVisualizerAppender( {
 			} }
 		/>
 	);
-}
-
-function useDropZoneWithValidation( {
-	validateDrag,
-	onDragEnter,
-	onDragLeave,
-	onDrop,
-}: DropZoneWithValidationOptions ) {
-	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
-	return useDropZone( {
-		onDragEnter() {
-			const [ srcClientId ] = getDraggedBlockClientIds();
-			if ( srcClientId && validateDrag( srcClientId ) ) {
-				onDragEnter( srcClientId );
-			}
-		},
-		onDragLeave() {
-			onDragLeave();
-		},
-		onDrop() {
-			const [ srcClientId ] = getDraggedBlockClientIds();
-			if ( srcClientId && validateDrag( srcClientId ) ) {
-				onDrop( srcClientId );
-			}
-		},
-	} );
 }
