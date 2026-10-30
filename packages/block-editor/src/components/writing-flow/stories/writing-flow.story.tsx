@@ -25,8 +25,8 @@ function DefaultStory() {
 		{ id: '2', content: 'This is the second block.' },
 		{ id: '3', content: 'This is the third block.' },
 	] );
-	const [ activeId, setActiveId ] = useState<string | null>( null );
-	const refs = useRef<(HTMLDivElement | null)[]>( [] );
+	const [ activeId, setActiveId ] = useState< string | null >( null );
+	const refs = useRef< ( HTMLDivElement | null )[] >( [] );
 
 	const updateBlock = ( id: string, newContent: string ) => {
 		setBlocks(
