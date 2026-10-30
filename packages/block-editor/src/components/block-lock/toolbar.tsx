@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useReducer, useRef, useEffect } from '@wordpress/element';
+import { useReducer, useRef, useEffect, useMemo } from '@wordpress/element';
 import { lock, unlock } from '@wordpress/icons';
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
@@ -10,6 +10,7 @@ export default function BlockLockToolbar( {
 	clientId,
 }: BlockLockControlProps ) {
 	const { canLock, isLocked } = useBlockLock( clientId );
+	const clientIds = useMemo( () => [ clientId ], [ clientId ] );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive: boolean ) => ! isActive,
@@ -52,7 +53,10 @@ export default function BlockLockToolbar( {
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (
-				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
+				<BlockLockModal
+					clientIds={ clientIds }
+					onClose={ toggleModal }
+				/>
 			) }
 		</>
 	);
