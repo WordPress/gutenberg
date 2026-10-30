@@ -1,5 +1,7 @@
 # FormToggle
 
+<p class="callout callout-alert">This component is deprecated. Use <code>Switch</code> from <code>@wordpress/ui</code> instead. See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide">migration guide</a>.</p>
+
 FormToggle switches a single setting on or off.
 
 ![On and off FormToggles. The top toggle is on, while the bottom toggle is off.](https://wordpress.org/gutenberg/files/2019/01/Toggle.jpg)

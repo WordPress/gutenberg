@@ -393,9 +393,7 @@ class WP_Navigation_Block_Renderer {
 
 			// If this is a navigation block, disable its overlay menu.
 			if ( 'core/navigation' === $block['blockName'] ) {
-				if ( ! isset( $block['attrs'] ) ) {
-					$block['attrs'] = array();
-				}
+				$block['attrs']              ??= array();
 				$block['attrs']['overlayMenu'] = 'never';
 				// Mark this as a nested navigation within an overlay template part
 				// so we can handle its rendering differently.
