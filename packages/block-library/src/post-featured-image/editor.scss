@@ -94,7 +94,8 @@
 	// Provide a minimum size for the placeholder when resized.
 	// Note, this should be as small as we can afford it, and exists only
 	// to ensure there's room for the upload button.
-	&[style*="height"] .components-placeholder {
+	&[style*="height"] .components-placeholder,
+	.components-placeholder[style*="height"] {
 		min-height: $grid-unit-60;
 		min-width: $grid-unit-60;
 		height: 100%;
