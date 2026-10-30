@@ -87,12 +87,12 @@ function setting( string $name, string $default_value ): string {
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
  * @param non-empty-list<string>          $command The program and its arguments.
- * @param 'pass'|'capture'|'quiet'       $mode    'pass' to pass its output to standard error,
- *                                                'capture' to return its standard output, or 'quiet'
- *                                                to also discard its standard error.
- * @param non-empty-string|null          $cwd     The working directory.
+ * @param 'pass'|'capture'|'quiet'        $mode    'pass' to pass its output to standard error,
+ *                                                 'capture' to return its standard output, or 'quiet'
+ *                                                 to also discard its standard error.
+ * @param non-empty-string|null           $cwd     The working directory.
  * @param array<non-empty-string, string> $env     Environment variables to set in addition to the
- *                                                current ones.
+ *                                                 current ones.
  * @return array{int, string} The exit status, and the standard output when captured.
  */
 function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array() ): array {
@@ -121,7 +121,7 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 /**
  * Runs a command, passing its output to standard error, and throws when it fails.
  *
- * @param non-empty-list<string>           $command The program and its arguments.
+ * @param non-empty-list<string>          $command The program and its arguments.
  * @param non-empty-string|null           $cwd     The working directory.
  * @param array<non-empty-string, string> $env     Environment variables to set in addition to the
  *                                                 current ones.
