@@ -510,18 +510,11 @@ function main( array $args ): void {
 		}
 	}
 
-	// Do what the generator's generate.sh does for trunk. Its Requests 1.x step applies only to
+	// Do what the generator's generate.sh does for trunk. Its correction of the types in the AVIF info
+	// class is not needed since r65047, which fixed them in core. Its Requests 1.x step applies only to
 	// versions of WordPress that bundle that library, which are not supported here.
 	if ( file_exists( $source_dir . '/wp-includes/Requests/Cookie/Jar.php' ) ) {
 		throw new RuntimeException( 'Generating the stubs for a version of WordPress with Requests 1.x is not supported.' );
-	}
-
-	// Fix the incorrect "binary string" type in the AVIF info class.
-	// TODO: Remove once https://github.com/WordPress/wordpress-develop/pull/15198 is committed and the
-	// commit recorded in wordpress-stubs/composer.json includes it.
-	$avif_file = $source_dir . '/wp-includes/class-avif-info.php';
-	if ( is_file( $avif_file ) ) {
-		file_put_contents( $avif_file, preg_replace( '/@(param|return) binary string/', '@$1 string', (string) file_get_contents( $avif_file ) ) );
 	}
 
 	report( 'Generating the WordPress stubs' );
