@@ -59,5 +59,11 @@ export function useBoundaryStyle( {
 		if ( globalStyle.innerHTML !== style ) {
 			globalStyle.innerHTML = style;
 		}
+
+		return () => {
+			if ( globalStyle && globalStyle.innerHTML === style ) {
+				globalStyle.innerHTML = '';
+			}
+		};
 	}, [ ref, activeFormats, activeReplacement ] );
 }
