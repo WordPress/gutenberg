@@ -2,7 +2,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import type { PostWithDate } from './types';
-import { isDateFloating } from './is-date-floating';
 
 const getFormattedDate = ( dateToDisplay: string | null ) =>
 	dateI18n(
@@ -14,10 +13,6 @@ const getFormattedDate = ( dateToDisplay: string | null ) =>
  * The date of a post, worded after its status.
  */
 const DateView = ( { item }: { item: PostWithDate } ) => {
-	if ( isDateFloating( item ) ) {
-		return <span>{ __( 'Immediately' ) }</span>;
-	}
-
 	const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 		item.status ?? ''
 	);
