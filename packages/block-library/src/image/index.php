@@ -215,9 +215,11 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		$custom_aria_label = sprintf( __( 'Enlarged image: %s' ), $alt );
 	}
 
-	if ( isset( $block['attrs']['id'] ) ) {
+	$img_metadata = isset( $block['attrs']['id'] ) ? wp_get_attachment_metadata( $block['attrs']['id'] ) : false;
+	// An id copied from another site can be missing or belong to a different
+	// file here, so the attachment only counts when it holds this image.
+	if ( $img_metadata && wp_image_file_matches_image_meta( $img_uploaded_src, $img_metadata, $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
-		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
 		$has_dimensions   = ( $img_metadata['width'] ?? '' ) && ( $img_metadata['height'] ?? '' );
 		$srcset_size      = $has_dimensions ? array( $img_metadata['width'], $img_metadata['height'] ) : 'large';
 		$img_srcset       = wp_get_attachment_image_srcset( $block['attrs']['id'], $srcset_size );
