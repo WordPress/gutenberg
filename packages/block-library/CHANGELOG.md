@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Post Excerpt: Render the "Read more" link and inspector controls when editing templates and patterns without a post context ([#86016](https://github.com/WordPress/gutenberg/pull/86016)).
 -   Navigation Link, Navigation Submenu: Keep the bold, italic, and other formatting of the text when editing it in the sidebar's Text field ([#85223](https://github.com/WordPress/gutenberg/pull/85223)).
 -   Playlist: Keep `&` intact in track audio and image URLs on the front end, so URLs with several query parameters, such as signed CDN or S3 links, load instead of being cut off at the first `&` ([#85931](https://github.com/WordPress/gutenberg/pull/85931)).
 -   Paragraph: Don't show an empty group in the block toolbar when the theme offers neither text alignment nor wide alignment ([#85796](https://github.com/WordPress/gutenberg/pull/85796)).
