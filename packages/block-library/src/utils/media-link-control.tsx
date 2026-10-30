@@ -1,8 +1,8 @@
-import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/ui';
+import { image, linkOff, page } from '@wordpress/icons';
+import { CheckboxControl, Stack } from '@wordpress/ui';
 import { useLinkPreview } from './link-picker';
 import { unlock } from '../lock-unlock';
 
@@ -23,6 +23,12 @@ const ALL_DESTINATIONS = [
 	LINK_DESTINATION_CUSTOM,
 ];
 
+interface MediaLinkSuggestion {
+	id: string;
+	title: string;
+	url?: string;
+}
+
 interface MediaLinkControlProps {
 	/**
 	 * The current link destination: `none`, `media`, `attachment` or
@@ -36,8 +42,9 @@ interface MediaLinkControlProps {
 	/** The attachment page's URL, which the `attachment` destination links to. */
 	mediaLink?: string;
 	/**
-	 * The destinations to offer, in order. The media file and attachment page
-	 * are only offered when they have a URL.
+	 * The destinations to offer. The media file and attachment page are only
+	 * offered when they have a URL, `none` offers to remove the link, and
+	 * `custom` offers page suggestions.
 	 */
 	destinations?: string[];
 	/** Called with the new link when a destination or custom URL is chosen. */
@@ -46,15 +53,15 @@ interface MediaLinkControlProps {
 
 /**
  * The block inspector's "Link to" field for a block that links to its media:
- * no link, the media file, the attachment page, or a custom URL chosen with
- * a `LinkPicker`.
+ * a `LinkPicker` that offers the media file and the attachment page above
+ * its page suggestions, with a button to remove the link.
  *
  * @param props                 Component props.
  * @param props.linkDestination The current link destination.
  * @param props.href            The current link URL.
  * @param props.mediaUrl        The media file's URL.
  * @param props.mediaLink       The attachment page's URL.
- * @param props.destinations    The destinations to offer, in order.
+ * @param props.destinations    The destinations to offer.
  * @param props.onChange        Called with the new link.
  */
 export function MediaLinkControl( {
@@ -65,78 +72,86 @@ export function MediaLinkControl( {
 	destinations = ALL_DESTINATIONS,
 	onChange,
 }: MediaLinkControlProps ) {
-	// Custom URL stays chosen while the user picks a URL, without changing
-	// the link until they do.
-	const [ isChoosingCustomUrl, setIsChoosingCustomUrl ] = useState( false );
-	const preview = useLinkPreview( { url: href } );
+	const linkPreview = useLinkPreview( { url: href } );
 
 	const destinationUrls = [
 		{ linkDestination: LINK_DESTINATION_MEDIA, url: mediaUrl },
 		{ linkDestination: LINK_DESTINATION_ATTACHMENT, url: mediaLink },
 	];
-	const labels: Record< string, string > = {
-		[ LINK_DESTINATION_NONE ]: __( 'None' ),
-		[ LINK_DESTINATION_MEDIA ]: __( 'Media file' ),
-		[ LINK_DESTINATION_ATTACHMENT ]: __( 'Attachment page' ),
-		[ LINK_DESTINATION_CUSTOM ]: __( 'Custom URL' ),
-	};
-	const options = destinations
-		.filter(
-			( destination ) =>
-				( destination !== LINK_DESTINATION_MEDIA || mediaUrl ) &&
-				( destination !== LINK_DESTINATION_ATTACHMENT || mediaLink )
-		)
-		.map( ( destination ) => ( {
-			value: destination,
-			label: labels[ destination ],
-		} ) );
+	const mediaSuggestions = [
+		{
+			id: LINK_DESTINATION_MEDIA,
+			title: __( 'Media file' ),
+			url: mediaUrl,
+			icon: image,
+		},
+		{
+			id: LINK_DESTINATION_ATTACHMENT,
+			title: __( 'Attachment page' ),
+			url: mediaLink,
+			icon: page,
+		},
+	].filter(
+		( suggestion ) =>
+			suggestion.url && destinations.includes( suggestion.id )
+	);
 
-	const currentDestination = isChoosingCustomUrl
-		? LINK_DESTINATION_CUSTOM
-		: ( linkDestination ??
-			getMediaLinkDestination( href, destinationUrls ) );
+	const currentDestination =
+		linkDestination ?? getMediaLinkDestination( href, destinationUrls );
+	const currentSuggestion = mediaSuggestions.find(
+		( suggestion ) => suggestion.id === currentDestination
+	);
+	const preview = currentSuggestion
+		? { ...linkPreview, title: currentSuggestion.title }
+		: linkPreview;
 
-	const onChangeDestination = ( destination: string ) => {
-		if ( destination === LINK_DESTINATION_CUSTOM ) {
-			setIsChoosingCustomUrl( true );
-			return;
-		}
-		setIsChoosingCustomUrl( false );
-		onChange( {
-			href: destinationUrls.find(
-				( destinationUrl ) =>
-					destinationUrl.linkDestination === destination
-			)?.url,
-			linkDestination: destination,
-		} );
-	};
+	const canChooseCustom = destinations.includes( LINK_DESTINATION_CUSTOM );
+	const canRemove =
+		destinations.includes( LINK_DESTINATION_NONE ) &&
+		currentDestination !== LINK_DESTINATION_NONE;
 
 	return (
-		<>
-			<WCSelectControl
-				__next40pxDefaultSize
-				label={ __( 'Link to' ) }
-				value={ currentDestination }
-				options={ options }
-				onChange={ onChangeDestination }
-			/>
-			{ currentDestination === LINK_DESTINATION_CUSTOM && (
+		<Stack direction="row" gap="xs" align="flex-end">
+			<div className="block-library-media-link-control__picker">
 				<LinkPicker
 					preview={ preview }
-					onSelect={ ( { url }: { url?: string } ) => {
-						setIsChoosingCustomUrl( false );
+					transformSuggestions={ (
+						suggestions: MediaLinkSuggestion[],
+						{ searchTerm }: { searchTerm: string }
+					) => [
+						...mediaSuggestions.filter( ( suggestion ) =>
+							suggestion.title
+								.toLowerCase()
+								.includes( searchTerm.toLowerCase() )
+						),
+						...( canChooseCustom ? suggestions : [] ),
+					] }
+					onSelect={ ( { url }: { url?: string } ) =>
 						onChange( {
 							href: url,
 							linkDestination: getMediaLinkDestination(
 								url,
 								destinationUrls
 							),
-						} );
-					} }
-					label={ __( 'URL' ) }
+						} )
+					}
+					label={ __( 'Link to' ) }
+				/>
+			</div>
+			{ canRemove && (
+				<Button
+					icon={ linkOff }
+					label={ __( 'Remove link' ) }
+					size="compact"
+					onClick={ () =>
+						onChange( {
+							href: undefined,
+							linkDestination: LINK_DESTINATION_NONE,
+						} )
+					}
 				/>
 			) }
-		</>
+		</Stack>
 	);
 }
 

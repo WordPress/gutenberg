@@ -46,23 +46,32 @@ const MEDIA_URL = 'https://example.com/wp-content/uploads/image.jpg';
 const MEDIA_LINK = 'https://example.com/?attachment_id=1';
 
 function getLinkTo() {
-	return screen.getByRole( 'combobox', { name: 'Link to' } );
+	return screen.getByRole( 'button', { name: /Link to/ } );
 }
 
-function getOptionLabels() {
-	return within( getLinkTo() )
-		.getAllByRole( 'option' )
-		.map( ( option ) => option.textContent );
+async function openLinkTo( user: ReturnType< typeof userEvent.setup > ) {
+	await user.click( getLinkTo() );
+	const listbox = await screen.findByRole( 'listbox' );
+	return within( listbox ).getAllByRole( 'option' );
 }
 
 describe( 'MediaLinkControl', () => {
 	beforeEach( () => {
 		( useSelect as Mock ).mockReturnValue( {
-			fetchSearchSuggestions: () => Promise.resolve( [] ),
+			fetchSearchSuggestions: () =>
+				Promise.resolve( [
+					{
+						id: 2,
+						title: 'About',
+						type: 'page',
+						kind: 'post-type',
+						url: 'https://example.com/about',
+					},
+				] ),
 		} );
 	} );
 
-	test( 'offers no link, the media file, the attachment page and a custom URL', () => {
+	test( 'has no Link to dropdown', () => {
 		render(
 			<MediaLinkControl
 				linkDestination="none"
@@ -72,16 +81,70 @@ describe( 'MediaLinkControl', () => {
 			/>
 		);
 
-		expect( getOptionLabels() ).toEqual( [
-			'None',
-			'Media file',
-			'Attachment page',
-			'Custom URL',
-		] );
-		expect( getLinkTo() ).toHaveValue( 'none' );
+		expect( screen.queryByRole( 'combobox' ) ).not.toBeInTheDocument();
 	} );
 
-	test( 'does not offer the attachment page when the media has none', () => {
+	test.each( [
+		[ 'none', undefined, 'Add link' ],
+		[ 'media', MEDIA_URL, 'Media file' ],
+		[ 'attachment', MEDIA_LINK, 'Attachment page' ],
+		[ 'custom', 'https://wordpress.org', 'https://wordpress.org' ],
+	] )(
+		'shows a %s link in the link preview',
+		( linkDestination, href, expected ) => {
+			render(
+				<MediaLinkControl
+					linkDestination={ linkDestination }
+					href={ href }
+					mediaUrl={ MEDIA_URL }
+					mediaLink={ MEDIA_LINK }
+					onChange={ vi.fn() }
+				/>
+			);
+
+			expect( getLinkTo() ).toHaveTextContent( expected );
+		}
+	);
+
+	test.each( [
+		[ MEDIA_URL, 'Media file' ],
+		[ MEDIA_LINK, 'Attachment page' ],
+	] )(
+		'works out the destination of %s when no destination is given',
+		( href, expected ) => {
+			render(
+				<MediaLinkControl
+					href={ href }
+					mediaUrl={ MEDIA_URL }
+					mediaLink={ MEDIA_LINK }
+					onChange={ vi.fn() }
+				/>
+			);
+
+			expect( getLinkTo() ).toHaveTextContent( expected );
+		}
+	);
+
+	test( 'offers the media file and attachment page above the page suggestions', async () => {
+		const user = userEvent.setup();
+		render(
+			<MediaLinkControl
+				linkDestination="none"
+				mediaUrl={ MEDIA_URL }
+				mediaLink={ MEDIA_LINK }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		const options = await openLinkTo( user );
+
+		expect( options[ 0 ] ).toHaveTextContent( 'Media file' );
+		expect( options[ 1 ] ).toHaveTextContent( 'Attachment page' );
+		expect( options[ 2 ] ).toHaveTextContent( 'About' );
+	} );
+
+	test( 'does not offer the attachment page when the media has none', async () => {
+		const user = userEvent.setup();
 		render(
 			<MediaLinkControl
 				linkDestination="none"
@@ -90,14 +153,14 @@ describe( 'MediaLinkControl', () => {
 			/>
 		);
 
-		expect( getOptionLabels() ).toEqual( [
-			'None',
-			'Media file',
-			'Custom URL',
-		] );
+		const options = await openLinkTo( user );
+
+		expect( options[ 0 ] ).toHaveTextContent( 'Media file' );
+		expect( options[ 1 ] ).toHaveTextContent( 'About' );
 	} );
 
-	test( 'offers only the destinations it is given', () => {
+	test( 'offers only the media file and attachment page without the custom destination', async () => {
+		const user = userEvent.setup();
 		render(
 			<MediaLinkControl
 				href={ MEDIA_URL }
@@ -108,92 +171,51 @@ describe( 'MediaLinkControl', () => {
 			/>
 		);
 
-		expect( getOptionLabels() ).toEqual( [
-			'Media file',
-			'Attachment page',
+		const options = await openLinkTo( user );
+
+		expect( options.map( ( option ) => option.textContent ) ).toEqual( [
+			expect.stringContaining( 'Media file' ),
+			expect.stringContaining( 'Attachment page' ),
 		] );
 	} );
 
 	test.each( [
-		[ MEDIA_URL, 'media' ],
-		[ MEDIA_LINK, 'attachment' ],
-	] )(
-		'works out the destination of %s when no destination is given',
-		( href, expected ) => {
-			render(
-				<MediaLinkControl
-					href={ href }
-					mediaUrl={ MEDIA_URL }
-					mediaLink={ MEDIA_LINK }
-					destinations={ [ 'media', 'attachment' ] }
-					onChange={ vi.fn() }
-				/>
-			);
-
-			expect( getLinkTo() ).toHaveValue( expected );
-		}
-	);
-
-	test.each( [
-		[ 'None', 'media', { href: undefined, linkDestination: 'none' } ],
-		[ 'Media file', 'none', { href: MEDIA_URL, linkDestination: 'media' } ],
+		[ 'Media file', { href: MEDIA_URL, linkDestination: 'media' } ],
 		[
 			'Attachment page',
-			'none',
 			{ href: MEDIA_LINK, linkDestination: 'attachment' },
+		],
+		[
+			'About',
+			{ href: 'https://example.com/about', linkDestination: 'custom' },
 		],
 	] )(
 		'links to the destination when %s is chosen',
-		async ( label, linkDestination, expected ) => {
+		async ( label, expected ) => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 			render(
 				<MediaLinkControl
-					linkDestination={ linkDestination }
-					href={ linkDestination === 'media' ? MEDIA_URL : undefined }
+					linkDestination="none"
 					mediaUrl={ MEDIA_URL }
 					mediaLink={ MEDIA_LINK }
 					onChange={ onChange }
 				/>
 			);
 
-			await user.selectOptions( getLinkTo(), label );
+			const options = await openLinkTo( user );
+			await user.click(
+				options.find( ( option ) =>
+					option.textContent?.includes( label )
+				)!
+			);
 
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( expected );
 		}
 	);
 
-	test( 'shows the custom URL in a link picker', () => {
-		render(
-			<MediaLinkControl
-				linkDestination="custom"
-				href="https://wordpress.org"
-				mediaUrl={ MEDIA_URL }
-				onChange={ vi.fn() }
-			/>
-		);
-
-		expect( getLinkTo() ).toHaveValue( 'custom' );
-		expect(
-			screen.getByRole( 'button', { name: /URL/ } )
-		).toHaveTextContent( 'https://wordpress.org' );
-	} );
-
-	test( 'does not show a link picker for the other destinations', () => {
-		render(
-			<MediaLinkControl
-				linkDestination="media"
-				href={ MEDIA_URL }
-				mediaUrl={ MEDIA_URL }
-				onChange={ vi.fn() }
-			/>
-		);
-
-		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
-	} );
-
-	test( 'links to a custom URL chosen in the link picker', async () => {
+	test( 'links to a typed URL', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
@@ -204,27 +226,20 @@ describe( 'MediaLinkControl', () => {
 			/>
 		);
 
-		await user.selectOptions( getLinkTo(), 'Custom URL' );
-
-		// Choosing Custom URL waits for a URL before changing the link.
-		expect( onChange ).not.toHaveBeenCalled();
-		expect( getLinkTo() ).toHaveValue( 'custom' );
-
-		await user.click( screen.getByRole( 'button', { name: /URL/ } ) );
+		await user.click( getLinkTo() );
 		const urlInput = await screen.findByRole( 'combobox', {
 			name: 'Search or type URL',
 		} );
 		await user.type( urlInput, 'https://wordpress.org' );
 		triggerEnter( urlInput );
 
-		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( {
 			href: 'https://wordpress.org',
 			linkDestination: 'custom',
 		} );
 	} );
 
-	test( 'links to the media file when its URL is chosen as a custom URL', async () => {
+	test( 'links to the media file when its URL is typed', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
@@ -236,17 +251,69 @@ describe( 'MediaLinkControl', () => {
 			/>
 		);
 
-		await user.click( screen.getByRole( 'button', { name: /URL/ } ) );
+		await user.click( getLinkTo() );
 		const urlInput = await screen.findByRole( 'combobox', {
 			name: 'Search or type URL',
 		} );
-		await user.type( urlInput, `${ MEDIA_URL }` );
+		await user.type( urlInput, MEDIA_URL );
 		triggerEnter( urlInput );
 
 		expect( onChange ).toHaveBeenCalledWith( {
 			href: MEDIA_URL,
 			linkDestination: 'media',
 		} );
+	} );
+
+	test( 'removes the link', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<MediaLinkControl
+				linkDestination="media"
+				href={ MEDIA_URL }
+				mediaUrl={ MEDIA_URL }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Remove link' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			href: undefined,
+			linkDestination: 'none',
+		} );
+	} );
+
+	test( 'does not offer to remove a link when there is none', () => {
+		render(
+			<MediaLinkControl
+				linkDestination="none"
+				mediaUrl={ MEDIA_URL }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Remove link' } )
+		).not.toBeInTheDocument();
+	} );
+
+	test( 'does not offer to remove the link without the none destination', () => {
+		render(
+			<MediaLinkControl
+				href={ MEDIA_URL }
+				mediaUrl={ MEDIA_URL }
+				mediaLink={ MEDIA_LINK }
+				destinations={ [ 'media', 'attachment' ] }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Remove link' } )
+		).not.toBeInTheDocument();
 	} );
 } );
 

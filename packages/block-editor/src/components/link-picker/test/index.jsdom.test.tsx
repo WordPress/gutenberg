@@ -445,6 +445,44 @@ describe( 'LinkPicker', () => {
 			// The suggestionsQuery prop is passed through to LinkControl
 			// which uses it to filter search results
 		} );
+
+		it( 'should show suggestions added by transformSuggestions before anything is typed', async () => {
+			const user = userEvent.setup();
+			const onSelect = vi.fn();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview() }
+					onSelect={ onSelect }
+					transformSuggestions={ ( suggestions ) => [
+						{
+							id: 'media',
+							title: 'Media file',
+							url: 'https://example.com/image.jpg',
+						},
+						...suggestions,
+					] }
+					label="Link"
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button' ) );
+
+			const suggestionsList = await screen.findByRole( 'listbox' );
+			const suggestions =
+				within( suggestionsList ).getAllByRole( 'option' );
+			expect( suggestions[ 0 ] ).toHaveTextContent( 'Media file' );
+			expect( suggestions[ 1 ] ).toHaveTextContent( 'Test Page 1' );
+
+			await user.click( suggestions[ 0 ] );
+
+			expect( onSelect ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: 'https://example.com/image.jpg',
+					title: 'Media file',
+				} )
+			);
+		} );
 	} );
 
 	describe( 'Plain URL mode', () => {
