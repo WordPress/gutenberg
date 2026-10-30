@@ -15,12 +15,11 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { withDispatch, useSelect } from '@wordpress/data';
+import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 import type { ComponentType, ReactNode, RefCallback } from 'react';
 import type { Block as BlockObject } from '@wordpress/blocks';
-import type { DataRegistry } from '@wordpress/data';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
@@ -267,249 +266,337 @@ function BlockListBlock( {
 	);
 }
 
-// The block's actions, passed to the `editor.BlockListBlock` filters.
-function mapDispatchToProps(
-	dispatch: DataRegistry[ 'dispatch' ],
-	ownProps: Pick< BlockListBlockProps, 'clientId' | 'rootClientId' >,
-	registry: DataRegistry
-) {
-	const {
-		updateBlockAttributes,
-		insertBlocks,
-		mergeBlocks,
-		replaceBlocks,
-		toggleSelection,
-		__unstableMarkLastChangeAsPersistent,
-		moveBlocksToPosition,
-		removeBlock,
-		selectBlock,
-	} = dispatch( blockEditorStore );
+const applyWithDispatch = withDispatch(
+	( dispatch, untypedOwnProps, registry ) => {
+		// The block list passes these props.
+		const ownProps = untypedOwnProps as Pick<
+			BlockListBlockProps,
+			'clientId' | 'rootClientId' | 'attributes'
+		>;
+		const {
+			updateBlockAttributes,
+			insertBlocks,
+			mergeBlocks,
+			replaceBlocks,
+			toggleSelection,
+			__unstableMarkLastChangeAsPersistent,
+			moveBlocksToPosition,
+			removeBlock,
+			selectBlock,
+		} = dispatch( blockEditorStore );
 
-	// Do not add new properties here, use `useDispatch` instead to avoid
-	// leaking new props to the public API (editor.BlockListBlock filter).
-	return {
-		setAttributes(
-			nextAttributes: Parameters<
-				BlockListBlockProps[ 'setAttributes' ]
-			>[ 0 ]
-		) {
-			const { getMultiSelectedBlockClientIds, getBlockAttributes } =
-				registry.select( blockEditorStore );
-			const multiSelectedBlockClientIds =
-				getMultiSelectedBlockClientIds();
-			const { clientId } = ownProps;
-			const attributes = getBlockAttributes( clientId ) ?? {};
-			const newAttributes =
-				typeof nextAttributes === 'function'
-					? nextAttributes( attributes )
-					: nextAttributes;
-
-			if ( ! multiSelectedBlockClientIds.length ) {
-				updateBlockAttributes( clientId, newAttributes );
-				return;
-			}
-
-			// Only the first block of a multi-selection renders its inspector
-			// and toolbar. For a multi-block attribute update, take that
-			// first block's attributes and get only the changed values
-			// from the update.
-			const changes = getAttributeChanges(
-				attributes,
-				newAttributes ?? {}
-			);
-
-			if ( ! changes ) {
-				return;
-			}
-
-			// Apply the changed attributes to every block in the selection.
-			const updatesByClientId: Record<
-				string,
-				Record< string, unknown >
-			> = {};
-			for ( const selectedClientId of multiSelectedBlockClientIds ) {
-				updatesByClientId[ selectedClientId ] = applyAttributeChanges(
-					getBlockAttributes( selectedClientId ) ?? {},
-					changes
-				);
-			}
-
-			updateBlockAttributes(
-				multiSelectedBlockClientIds,
-				updatesByClientId,
-				{ uniqueByBlock: true }
-			);
-		},
-		onInsertBlocks( blocks: BlockObject[], index: number ) {
-			const { rootClientId } = ownProps;
-			insertBlocks( blocks, index, rootClientId );
-		},
-		onInsertBlocksAfter( blocks: BlockObject[] ) {
-			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = registry.select( blockEditorStore );
-			const index = getBlockIndex( clientId );
-			insertBlocks( blocks, index + 1, rootClientId );
-		},
-		onMerge( forward?: boolean ) {
-			const { clientId, rootClientId } = ownProps;
-			const {
-				getPreviousBlockClientId,
-				getNextBlockClientId,
-				getBlock,
-				getBlockAttributes,
-				getBlockName,
-				getBlockOrder,
-				getBlockIndex,
-				getBlockRootClientId,
-				canInsertBlockType,
-			} = registry.select( blockEditorStore );
-
-			function switchToDefaultOrRemove() {
-				// The merged block exists.
-				const block = getBlock( clientId ) as TreeBlock;
-				// A default block type is registered.
-				const defaultBlockName = getDefaultBlockName() as string;
-				const defaultBlockType = getBlockType( defaultBlockName )!;
-				if ( getBlockName( clientId ) !== defaultBlockName ) {
-					const replacement = switchToBlockType(
-						block,
-						defaultBlockName
-					);
-					if ( replacement && replacement.length ) {
-						replaceBlocks( clientId, replacement );
-					}
-				} else if ( isUnmodifiedDefaultBlock( block ) ) {
-					const nextBlockClientId = getNextBlockClientId( clientId );
-					if ( nextBlockClientId ) {
-						registry.batch( () => {
-							removeBlock( clientId );
-							selectBlock( nextBlockClientId );
-						} );
-					}
-				} else if ( defaultBlockType.merge ) {
-					const attributes = defaultBlockType.merge(
-						{},
-						block.attributes
-					);
-					replaceBlocks(
-						[ clientId ],
-						[ createBlock( defaultBlockName, attributes ) ]
-					);
-				}
-			}
-
-			/**
-			 * Moves the block with clientId up one level. If the block type
-			 * cannot be inserted at the new location, it will be attempted to
-			 * convert to the default block type.
-			 *
-			 * @param _clientId       The block to move.
-			 * @param changeSelection Whether to change the selection to the
-			 *                        moved block.
-			 */
-			function moveFirstItemUp(
-				_clientId: string,
-				changeSelection = true
+		// Do not add new properties here, use `useDispatch` instead to avoid
+		// leaking new props to the public API (editor.BlockListBlock filter).
+		return {
+			setAttributes(
+				nextAttributes: Parameters<
+					BlockListBlockProps[ 'setAttributes' ]
+				>[ 0 ]
 			) {
-				// The wrapper block exists, with a registered type.
-				const wrapperBlockName = getBlockName( _clientId ) as string;
-				const wrapperBlockType = getBlockType( wrapperBlockName )!;
-				const isTextualWrapper = wrapperBlockType.category === 'text';
-				const targetRootClientId = getBlockRootClientId( _clientId );
-				const blockOrder = getBlockOrder( _clientId );
-				const [ firstClientId ] = blockOrder;
+				const { getMultiSelectedBlockClientIds, getBlockAttributes } =
+					registry.select( blockEditorStore );
+				const multiSelectedBlockClientIds =
+					getMultiSelectedBlockClientIds();
+				const { clientId, attributes } = ownProps;
+				const newAttributes =
+					typeof nextAttributes === 'function'
+						? nextAttributes( attributes )
+						: nextAttributes;
 
-				if (
-					blockOrder.length === 1 &&
-					isUnmodifiedBlock(
-						// The wrapper has this inner block.
-						getBlock( firstClientId ) as TreeBlock,
-						'content'
-					)
+				if ( ! multiSelectedBlockClientIds.length ) {
+					updateBlockAttributes( clientId, newAttributes );
+					return;
+				}
+
+				// Only the first block of a multi-selection renders its inspector
+				// and toolbar. For a multi-block attribute update, take that
+				// first block's attributes and get only the changed values
+				// from the update.
+				const changes = getAttributeChanges(
+					attributes ?? {},
+					newAttributes ?? {}
+				);
+
+				if ( ! changes ) {
+					return;
+				}
+
+				// Apply the changed attributes to every block in the selection.
+				const updatesByClientId: Record<
+					string,
+					Record< string, unknown >
+				> = {};
+				for ( const selectedClientId of multiSelectedBlockClientIds ) {
+					updatesByClientId[ selectedClientId ] =
+						applyAttributeChanges(
+							getBlockAttributes( selectedClientId ) ?? {},
+							changes
+						);
+				}
+
+				updateBlockAttributes(
+					multiSelectedBlockClientIds,
+					updatesByClientId,
+					{ uniqueByBlock: true }
+				);
+			},
+			onInsertBlocks( blocks: BlockObject[], index: number ) {
+				const { rootClientId } = ownProps;
+				insertBlocks( blocks, index, rootClientId );
+			},
+			onInsertBlocksAfter( blocks: BlockObject[] ) {
+				const { clientId, rootClientId } = ownProps;
+				const { getBlockIndex } = registry.select( blockEditorStore );
+				const index = getBlockIndex( clientId );
+				insertBlocks( blocks, index + 1, rootClientId );
+			},
+			onMerge( forward?: boolean ) {
+				const { clientId, rootClientId } = ownProps;
+				const {
+					getPreviousBlockClientId,
+					getNextBlockClientId,
+					getBlock,
+					getBlockAttributes,
+					getBlockName,
+					getBlockOrder,
+					getBlockIndex,
+					getBlockRootClientId,
+					canInsertBlockType,
+				} = registry.select( blockEditorStore );
+
+				function switchToDefaultOrRemove() {
+					// The merged block exists.
+					const block = getBlock( clientId ) as TreeBlock;
+					// A default block type is registered.
+					const defaultBlockName = getDefaultBlockName() as string;
+					const defaultBlockType = getBlockType( defaultBlockName )!;
+					if ( getBlockName( clientId ) !== defaultBlockName ) {
+						const replacement = switchToBlockType(
+							block,
+							defaultBlockName
+						);
+						if ( replacement && replacement.length ) {
+							replaceBlocks( clientId, replacement );
+						}
+					} else if ( isUnmodifiedDefaultBlock( block ) ) {
+						const nextBlockClientId =
+							getNextBlockClientId( clientId );
+						if ( nextBlockClientId ) {
+							registry.batch( () => {
+								removeBlock( clientId );
+								selectBlock( nextBlockClientId );
+							} );
+						}
+					} else if ( defaultBlockType.merge ) {
+						const attributes = defaultBlockType.merge(
+							{},
+							block.attributes
+						);
+						replaceBlocks(
+							[ clientId ],
+							[ createBlock( defaultBlockName, attributes ) ]
+						);
+					}
+				}
+
+				/**
+				 * Moves the block with clientId up one level. If the block type
+				 * cannot be inserted at the new location, it will be attempted to
+				 * convert to the default block type.
+				 *
+				 * @param _clientId       The block to move.
+				 * @param changeSelection Whether to change the selection to the
+				 *                        moved block.
+				 */
+				function moveFirstItemUp(
+					_clientId: string,
+					changeSelection = true
 				) {
-					removeBlock( _clientId );
-				} else if ( isTextualWrapper ) {
-					registry.batch( () => {
-						if (
-							canInsertBlockType(
-								getBlockName( firstClientId ),
-								targetRootClientId
-							)
-						) {
-							moveBlocksToPosition(
-								[ firstClientId ],
-								_clientId,
-								targetRootClientId,
-								getBlockIndex( _clientId )
-							);
-						} else {
-							const replacement = switchToBlockType(
-								// The wrapper has this inner block.
-								getBlock( firstClientId ) as TreeBlock,
-								// A default block type is registered.
-								getDefaultBlockName() as string
-							);
+					// The wrapper block exists, with a registered type.
+					const wrapperBlockName = getBlockName(
+						_clientId
+					) as string;
+					const wrapperBlockType = getBlockType( wrapperBlockName )!;
+					const isTextualWrapper =
+						wrapperBlockType.category === 'text';
+					const targetRootClientId =
+						getBlockRootClientId( _clientId );
+					const blockOrder = getBlockOrder( _clientId );
+					const [ firstClientId ] = blockOrder;
 
+					if (
+						blockOrder.length === 1 &&
+						isUnmodifiedBlock(
+							// The wrapper has this inner block.
+							getBlock( firstClientId ) as TreeBlock,
+							'content'
+						)
+					) {
+						removeBlock( _clientId );
+					} else if ( isTextualWrapper ) {
+						registry.batch( () => {
 							if (
-								replacement &&
-								replacement.length &&
-								replacement.every( ( block ) =>
-									canInsertBlockType(
-										block.name,
-										targetRootClientId
-									)
+								canInsertBlockType(
+									getBlockName( firstClientId ),
+									targetRootClientId
 								)
 							) {
-								insertBlocks(
-									replacement,
-									getBlockIndex( _clientId ),
+								moveBlocksToPosition(
+									[ firstClientId ],
+									_clientId,
 									targetRootClientId,
-									changeSelection
+									getBlockIndex( _clientId )
 								);
-								removeBlock( firstClientId, false );
 							} else {
-								switchToDefaultOrRemove();
+								const replacement = switchToBlockType(
+									// The wrapper has this inner block.
+									getBlock( firstClientId ) as TreeBlock,
+									// A default block type is registered.
+									getDefaultBlockName() as string
+								);
+
+								if (
+									replacement &&
+									replacement.length &&
+									replacement.every( ( block ) =>
+										canInsertBlockType(
+											block.name,
+											targetRootClientId
+										)
+									)
+								) {
+									insertBlocks(
+										replacement,
+										getBlockIndex( _clientId ),
+										targetRootClientId,
+										changeSelection
+									);
+									removeBlock( firstClientId, false );
+								} else {
+									switchToDefaultOrRemove();
+								}
+							}
+
+							// The store might have already removed the wrapper if
+							// it was unmodified. However, we still want to remove
+							// the wrapper unless there is content like a cite.
+							const wrapper = getBlock( _clientId );
+							if (
+								wrapper &&
+								! getBlockOrder( _clientId ).length &&
+								isUnmodifiedBlock( wrapper, 'content' )
+							) {
+								removeBlock( _clientId, false );
+							}
+						} );
+					} else {
+						switchToDefaultOrRemove();
+					}
+				}
+
+				// For `Delete` or forward merge, we should do the exact same thing
+				// as `Backspace`, but from the other block.
+				if ( forward ) {
+					if ( rootClientId ) {
+						const nextRootClientId =
+							getNextBlockClientId( rootClientId );
+
+						if ( nextRootClientId ) {
+							// If there is a block that follows with the same parent
+							// block name and the same attributes, merge the inner
+							// blocks.
+							if (
+								getBlockName( rootClientId ) ===
+								getBlockName( nextRootClientId )
+							) {
+								// Both root blocks exist.
+								const rootAttributes = getBlockAttributes(
+									rootClientId
+								) as Record< string, unknown >;
+								const previousRootAttributes =
+									getBlockAttributes(
+										nextRootClientId
+									) as Record< string, unknown >;
+
+								if (
+									Object.keys( rootAttributes ).every(
+										( key ) =>
+											rootAttributes[ key ] ===
+											previousRootAttributes[ key ]
+									)
+								) {
+									registry.batch( () => {
+										moveBlocksToPosition(
+											getBlockOrder( nextRootClientId ),
+											nextRootClientId,
+											rootClientId
+										);
+										removeBlock( nextRootClientId, false );
+									} );
+									return;
+								}
+							} else {
+								mergeBlocks( rootClientId, nextRootClientId );
+								return;
 							}
 						}
+					}
 
-						// The store might have already removed the wrapper if
-						// it was unmodified. However, we still want to remove
-						// the wrapper unless there is content like a cite.
-						const wrapper = getBlock( _clientId );
-						if (
-							wrapper &&
-							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock( wrapper, 'content' )
-						) {
-							removeBlock( _clientId, false );
+					const nextBlockClientId = getNextBlockClientId( clientId );
+
+					if ( ! nextBlockClientId ) {
+						return;
+					}
+
+					// Forward deleting an unmodified default block should
+					// remove it and move into the next block, not pull the
+					// next block's first item out of it.
+					// The merged block exists.
+					if (
+						isUnmodifiedDefaultBlock(
+							getBlock( clientId ) as TreeBlock
+						)
+					) {
+						// Select the first leaf block, so the caret starts at
+						// the beginning of the block's content rather than on
+						// a container's shell.
+						let firstLeafClientId = nextBlockClientId;
+						while ( getBlockOrder( firstLeafClientId ).length ) {
+							firstLeafClientId =
+								getBlockOrder( firstLeafClientId )[ 0 ];
 						}
-					} );
+						registry.batch( () => {
+							removeBlock( clientId );
+							selectBlock( firstLeafClientId );
+						} );
+					} else if ( getBlockOrder( nextBlockClientId ).length ) {
+						moveFirstItemUp( nextBlockClientId, false );
+					} else {
+						mergeBlocks( clientId, nextBlockClientId );
+					}
 				} else {
-					switchToDefaultOrRemove();
-				}
-			}
+					const previousBlockClientId =
+						getPreviousBlockClientId( clientId );
 
-			// For `Delete` or forward merge, we should do the exact same thing
-			// as `Backspace`, but from the other block.
-			if ( forward ) {
-				if ( rootClientId ) {
-					const nextRootClientId =
-						getNextBlockClientId( rootClientId );
+					if ( previousBlockClientId ) {
+						mergeBlocks( previousBlockClientId, clientId );
+					} else if ( rootClientId ) {
+						const previousRootClientId =
+							getPreviousBlockClientId( rootClientId );
 
-					if ( nextRootClientId ) {
-						// If there is a block that follows with the same parent
-						// block name and the same attributes, merge the inner
-						// blocks.
+						// If there is a preceding block with the same parent block
+						// name and the same attributes, merge the inner blocks.
 						if (
+							previousRootClientId &&
 							getBlockName( rootClientId ) ===
-							getBlockName( nextRootClientId )
+								getBlockName( previousRootClientId )
 						) {
 							// Both root blocks exist.
 							const rootAttributes = getBlockAttributes(
 								rootClientId
 							) as Record< string, unknown >;
 							const previousRootAttributes = getBlockAttributes(
-								nextRootClientId
+								previousRootClientId
 							) as Record< string, unknown >;
 
 							if (
@@ -521,143 +608,66 @@ function mapDispatchToProps(
 							) {
 								registry.batch( () => {
 									moveBlocksToPosition(
-										getBlockOrder( nextRootClientId ),
-										nextRootClientId,
-										rootClientId
+										getBlockOrder( rootClientId ),
+										rootClientId,
+										previousRootClientId
 									);
-									removeBlock( nextRootClientId, false );
+									removeBlock( rootClientId, false );
 								} );
 								return;
 							}
-						} else {
-							mergeBlocks( rootClientId, nextRootClientId );
-							return;
 						}
+
+						moveFirstItemUp( rootClientId );
+					} else {
+						switchToDefaultOrRemove();
 					}
 				}
-
-				const nextBlockClientId = getNextBlockClientId( clientId );
-
-				if ( ! nextBlockClientId ) {
-					return;
-				}
-
-				// Forward deleting an unmodified default block should
-				// remove it and move into the next block, not pull the
-				// next block's first item out of it.
-				// The merged block exists.
+			},
+			onReplace(
+				blocks: BlockObject | BlockObject[] | [ BlockObject[] ],
+				indexToSelect?: number | null,
+				initialPosition?: InitialPosition
+			) {
+				// A single block has no length, so it is passed on as is.
+				const blockList = blocks as BlockObject[];
 				if (
-					isUnmodifiedDefaultBlock(
-						getBlock( clientId ) as TreeBlock
+					blockList.length &&
+					! isUnmodifiedDefaultBlock(
+						blockList[ blockList.length - 1 ]
 					)
 				) {
-					// Select the first leaf block, so the caret starts at
-					// the beginning of the block's content rather than on
-					// a container's shell.
-					let firstLeafClientId = nextBlockClientId;
-					while ( getBlockOrder( firstLeafClientId ).length ) {
-						firstLeafClientId =
-							getBlockOrder( firstLeafClientId )[ 0 ];
-					}
-					registry.batch( () => {
-						removeBlock( clientId );
-						selectBlock( firstLeafClientId );
-					} );
-				} else if ( getBlockOrder( nextBlockClientId ).length ) {
-					moveFirstItemUp( nextBlockClientId, false );
-				} else {
-					mergeBlocks( clientId, nextBlockClientId );
+					__unstableMarkLastChangeAsPersistent();
 				}
-			} else {
-				const previousBlockClientId =
-					getPreviousBlockClientId( clientId );
-
-				if ( previousBlockClientId ) {
-					mergeBlocks( previousBlockClientId, clientId );
-				} else if ( rootClientId ) {
-					const previousRootClientId =
-						getPreviousBlockClientId( rootClientId );
-
-					// If there is a preceding block with the same parent block
-					// name and the same attributes, merge the inner blocks.
-					if (
-						previousRootClientId &&
-						getBlockName( rootClientId ) ===
-							getBlockName( previousRootClientId )
-					) {
-						// Both root blocks exist.
-						const rootAttributes = getBlockAttributes(
-							rootClientId
-						) as Record< string, unknown >;
-						const previousRootAttributes = getBlockAttributes(
-							previousRootClientId
-						) as Record< string, unknown >;
-
-						if (
-							Object.keys( rootAttributes ).every(
-								( key ) =>
-									rootAttributes[ key ] ===
-									previousRootAttributes[ key ]
-							)
-						) {
-							registry.batch( () => {
-								moveBlocksToPosition(
-									getBlockOrder( rootClientId ),
-									rootClientId,
-									previousRootClientId
-								);
-								removeBlock( rootClientId, false );
-							} );
-							return;
-						}
-					}
-
-					moveFirstItemUp( rootClientId );
-				} else {
-					switchToDefaultOrRemove();
-				}
-			}
-		},
-		onReplace(
-			blocks: BlockObject | BlockObject[] | [ BlockObject[] ],
-			indexToSelect?: number | null,
-			initialPosition?: InitialPosition
-		) {
-			// A single block has no length, so it is passed on as is.
-			const blockList = blocks as BlockObject[];
-			if (
-				blockList.length &&
-				! isUnmodifiedDefaultBlock( blockList[ blockList.length - 1 ] )
-			) {
-				__unstableMarkLastChangeAsPersistent();
-			}
-			//Unsynced patterns are nested in an array so we need to flatten them.
-			const replacementBlocks =
-				blockList?.length === 1 && Array.isArray( blockList[ 0 ] )
-					? blockList[ 0 ]
-					: ( blocks as BlockObject | BlockObject[] );
-			replaceBlocks(
-				[ ownProps.clientId ],
-				replacementBlocks,
-				indexToSelect,
-				initialPosition
-			);
-		},
-		onRemove() {
-			removeBlock( ownProps.clientId );
-		},
-		toggleSelection( selectionEnabled?: boolean ) {
-			toggleSelection( selectionEnabled );
-		},
-	};
-}
+				//Unsynced patterns are nested in an array so we need to flatten them.
+				const replacementBlocks =
+					blockList?.length === 1 && Array.isArray( blockList[ 0 ] )
+						? blockList[ 0 ]
+						: ( blocks as BlockObject | BlockObject[] );
+				replaceBlocks(
+					[ ownProps.clientId ],
+					replacementBlocks,
+					indexToSelect,
+					initialPosition
+				);
+			},
+			onRemove() {
+				removeBlock( ownProps.clientId );
+			},
+			toggleSelection( selectionEnabled?: boolean ) {
+				toggleSelection( selectionEnabled );
+			},
+		};
+	}
+);
 
 // This component is used by the BlockListBlockProvider component below. It will
 // add the props necessary for the `editor.BlockListBlock` filters.
-const FilteredBlockListBlock = withFilters( 'editor.BlockListBlock' )(
-	BlockListBlock
-	// `withFilters` erases the props of the filtered component.
-) as unknown as ComponentType<
+const FilteredBlockListBlock = compose(
+	applyWithDispatch,
+	withFilters( 'editor.BlockListBlock' )
+	// The dispatch props are added by the first HOC.
+)( BlockListBlock ) as ComponentType<
 	BlockListBlockProviderProps &
 		Pick<
 			BlockListBlockProps,
@@ -671,8 +681,7 @@ const FilteredBlockListBlock = withFilters( 'editor.BlockListBlock' )(
 			| 'attributes'
 			| 'isValid'
 			| 'isSelected'
-		> &
-		ReturnType< typeof mapDispatchToProps >
+		>
 >;
 
 // This component provides all the information we need through a single store
@@ -684,16 +693,6 @@ const FilteredBlockListBlock = withFilters( 'editor.BlockListBlock' )(
 function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	const { clientId, rootClientId, ghostBlock } = props;
 	// Stable fallback so the selector returns referentially equal values.
-	const registry = useRegistry();
-	const dispatchProps = useMemo(
-		() =>
-			mapDispatchToProps(
-				registry.dispatch,
-				{ clientId, rootClientId },
-				registry
-			),
-		[ registry, clientId, rootClientId ]
-	);
 	const ghostBlockWithoutAttributes = useMemo(
 		() =>
 			ghostBlock
@@ -1080,7 +1079,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					isValid,
 					isSelected,
 				} }
-				{ ...dispatchProps }
 			/>
 		</PrivateBlockContext.Provider>
 	);
