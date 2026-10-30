@@ -10,7 +10,7 @@ import type {
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
 import { GlobalStylesContext } from './context';
-import { isVariationWithProperties } from './utils';
+import { isVariationWithProperties, withUserCustomPresets } from './utils';
 
 interface StyleVariationsContainerProps {
 	gap?: number;
@@ -106,14 +106,17 @@ function StyleVariationsContainer( {
 					...css,
 					...blocks,
 				};
-				return {
-					...variation,
-					settings: variation.settings ?? {},
-					styles,
-				};
+				return withUserCustomPresets(
+					{
+						...variation,
+						settings: variation.settings ?? {},
+						styles,
+					},
+					user
+				);
 			} ),
 		];
-	}, [ fullStyleVariations, userStyles?.blocks, userStyles?.css ] );
+	}, [ fullStyleVariations, user, userStyles?.blocks, userStyles?.css ] );
 
 	if ( ! fullStyleVariations || fullStyleVariations.length < 1 ) {
 		return null;

@@ -25,6 +25,7 @@
 ### Bug Fixes
 
 -   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
+-   Keep custom presets, such as colors, fonts, font sizes and shadows, when applying a style variation, color palette or typeset ([#85185](https://github.com/WordPress/gutenberg/pull/85185)).
 
 ### Internal
 
