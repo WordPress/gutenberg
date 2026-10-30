@@ -69,7 +69,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		'isGlobalStyles' => true,
 	);
 
-	$settings['styles'] = array_merge( $global_styles, get_block_editor_theme_styles() );
+	$settings['styles'] = array_merge( $global_styles, gutenberg_get_block_editor_theme_styles() );
 
 	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();
 	// These settings may need to be updated based on data coming from theme.json sources.
@@ -124,3 +124,74 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
+
+/**
+ * Gets the theme's editor styles, adding to each style read from a theme file
+ * the URL of that file. The editor can then link the file rather than insert
+ * its contents, and the browser resolves the URLs in it relative to the file,
+ * without the editor rewriting them.
+ *
+ * The URL is versioned with a hash of the contents, so the browser fetches the
+ * file again when it changes, and so a later check can tell whether a filter
+ * changed the contents.
+ *
+ * @return array The editor styles.
+ */
+function gutenberg_get_block_editor_theme_styles() {
+	$styles = get_block_editor_theme_styles();
+	foreach ( $styles as $index => $style ) {
+		if ( isset( $style['baseURL'] ) ) {
+			$styles[ $index ]['href'] = add_query_arg( 'ver', md5( $style['css'] ), $style['baseURL'] );
+		}
+	}
+	return $styles;
+}
+
+/**
+ * Removes the file URL from the editor styles whose contents a filter changed,
+ * since the file no longer matches them, and preloads the files of the others,
+ * which the editor links.
+ *
+ * @param array $settings Block editor settings.
+ *
+ * @return array Block editor settings.
+ */
+function gutenberg_check_block_editor_style_files( $settings ) {
+	static $hrefs  = array();
+	static $hooked = false;
+
+	if ( empty( $settings['styles'] ) || ! is_array( $settings['styles'] ) ) {
+		return $settings;
+	}
+
+	foreach ( $settings['styles'] as $index => $style ) {
+		if ( ! is_array( $style ) || ! isset( $style['href'] ) ) {
+			continue;
+		}
+		if (
+			! is_string( $style['href'] ) ||
+			! isset( $style['css'] ) ||
+			! is_string( $style['css'] ) ||
+			! str_ends_with( $style['href'], 'ver=' . md5( $style['css'] ) )
+		) {
+			unset( $settings['styles'][ $index ]['href'] );
+			continue;
+		}
+		$hrefs[ $style['href'] ] = true;
+	}
+
+	if ( $hrefs && ! $hooked && ! did_action( 'admin_head' ) ) {
+		$hooked = true;
+		add_action(
+			'admin_head',
+			static function () use ( &$hrefs ) {
+				foreach ( array_keys( $hrefs ) as $href ) {
+					printf( '<link rel="preload" as="style" href="%s" />' . "\n", esc_url( $href ) );
+				}
+			}
+		);
+	}
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_check_block_editor_style_files', PHP_INT_MAX );
