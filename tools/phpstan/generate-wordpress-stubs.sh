@@ -8,12 +8,17 @@
 # from trunk, they are generated here with its generator, and installed through the path repository
 # in composer.json in place of the released package.
 #
+# The stubs are not committed. The package's composer.json records the source that they are generated
+# from, and `composer phpstan` runs this script with no option first, which generates them when they
+# are missing or were generated from another source.
+#
 # This is temporary. Once php-stubs/wordpress-stubs publishes builds from trunk, require a pinned one
 # instead, and remove this script, the wordpress-stubs/ package, and the path repository.
 #
 # Usage, through `composer phpstan:generate-wordpress-stubs -- <option>`:
 #
-#   (no option)          Regenerate the stubs from the commit they were last generated from.
+#   (no option)          Generate the stubs from the source recorded in wordpress-stubs/composer.json,
+#                        unless they already were. Add `--force` to generate them anyway.
 #   --commit=<ref>       Generate from a commit of wordpress-develop, such as `trunk`.
 #   --pr=<number|url>    Generate from the head of a wordpress-develop pull request, for a Gutenberg
 #                        pull request that depends on it. Before the Gutenberg pull request is
@@ -21,14 +26,20 @@
 #   --checkout[=<path>]  Generate from the working tree of a wordpress-develop checkout, including
 #                        changes to tracked files that are not committed yet. By default, this is the
 #                        checkout that Gutenberg is in, such as at src/wp-content/plugins/gutenberg.
-#                        Add `--pr` to name the pull request that the checkout is working on.
+#                        Add `--pr` to name the pull request that the checkout is working on. Stubs
+#                        generated from uncommitted changes cannot be generated again elsewhere, such
+#                        as in CI, so generate them with `--pr` or `--commit` before pushing.
 #
 # A commit is read from the wordpress-develop checkout that Gutenberg is in when it has the commit,
-# and is fetched from GitHub otherwise. After generating the stubs, run `composer update` and
-# `composer phpstan:baselines`.
+# and is fetched from GitHub otherwise. The options record the new source in composer.json, which is
+# what gets committed. After using one, run `composer update` and `composer phpstan:baselines`.
 
 # Exit if any command fails.
 set -euo pipefail
+
+# Report progress on standard error, since `composer phpstan` runs this before the analysis, whose
+# report may be read from standard output.
+exec 1>&2
 
 # Each of the following can be overridden with an environment variable of the same name, such as to
 # try a generator change, or a fork of wordpress-develop.
@@ -43,15 +54,17 @@ WORDPRESS_STUBS_COMMIT="${WORDPRESS_STUBS_COMMIT:-7c32aeca37ad7defa54758674ff62a
 # The GitHub repository that commits and pull requests are fetched from.
 WORDPRESS_DEVELOP_REPO="${WORDPRESS_DEVELOP_REPO:-WordPress/wordpress-develop}"
 
-PACKAGE_DIR="$(cd "$(dirname "$0")" && pwd)/wordpress-stubs"
-GUTENBERG_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+SCRIPT="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+PACKAGE_DIR="$(dirname "$SCRIPT")/wordpress-stubs"
+STUB_FILE="$PACKAGE_DIR/wordpress-stubs.stub"
+GUTENBERG_DIR="$(cd "$(dirname "$SCRIPT")/../.." && pwd)"
 
 # Where the generator is kept with its dependencies installed, one directory per repository and
 # commit, so that it is only set up once.
 WORDPRESS_STUBS_CACHE_DIR="${WORDPRESS_STUBS_CACHE_DIR:-$GUTENBERG_DIR/.cache/wordpress-stubs-generator}"
 
 usage() {
-	sed -n 's/^# \{0,1\}//; /^Usage/,/^A commit/p' "$0" | sed '$d' >&2
+	sed -n 's/^# \{0,1\}//; /^Usage/,/^A commit/p' "$SCRIPT" | sed '$d'
 	exit 1
 }
 
@@ -73,37 +86,70 @@ read_recorded() {
 		"$PACKAGE_DIR/composer.json" "$1"
 }
 
+# Prints a key for everything that the stubs are generated from, including this script, so that they
+# are generated again when any of it changes. The stubs record the key they were generated with.
+generation_key() {
+	{
+		echo "$WORDPRESS_DEVELOP_REPO $1 $2"
+		echo "$WORDPRESS_STUBS_REPO $WORDPRESS_STUBS_COMMIT"
+		cat "$SCRIPT"
+	} | git hash-object --stdin
+}
+
+# Prints the key that the existing stubs were generated with, if any.
+stub_key() {
+	if [[ -f "$STUB_FILE" ]]; then
+		sed -n '1,20s/^ \* Generation key: \([0-9a-f]*\)$/\1/p' "$STUB_FILE"
+	fi
+}
+
 COMMIT=''
 PR=''
 CHECKOUT=''
 USE_CHECKOUT=false
+FORCE=false
 for arg in "$@"; do
 	case "$arg" in
 		--commit=?*) COMMIT="${arg#*=}" ;;
 		--pr=?*) PR="${arg#*=}" ;;
 		--checkout) USE_CHECKOUT=true ;;
 		--checkout=?*) USE_CHECKOUT=true CHECKOUT="${arg#*=}" ;;
+		--force) FORCE=true ;;
 		*) usage ;;
 	esac
 done
 if [[ "$PR" =~ ^(https://github\.com/$WORDPRESS_DEVELOP_REPO/pull/)?([0-9]+)/?$ ]]; then
 	PR="${BASH_REMATCH[2]}"
 elif [[ -n "$PR" ]]; then
-	echo "Not a $WORDPRESS_DEVELOP_REPO pull request: $PR" >&2
+	echo "Not a $WORDPRESS_DEVELOP_REPO pull request: $PR"
 	exit 1
 fi
 if [[ -n "$COMMIT" && ( -n "$PR" || "$USE_CHECKOUT" == true ) ]]; then
 	usage
 fi
 
-# Without an option, regenerate from the commit recorded by the last generation, keeping its pull
-# request. Uncommitted changes cannot be regenerated, since they are not recorded.
+# Without an option, generate from the source recorded in composer.json, unless the stubs already
+# were. Uncommitted changes cannot be generated again, since they are not recorded, so stubs
+# generated from them are used as they are.
+RECORDED=false
 if [[ -z "$COMMIT" && -z "$PR" && "$USE_CHECKOUT" == false ]]; then
+	RECORDED=true
 	COMMIT="$(read_recorded commit)"
 	PR="$(read_recorded pull-request)"
-	if [[ -z "$COMMIT" || -n "$(read_recorded uncommitted-changes)" ]]; then
-		echo "The stubs were not generated from a commit that can be regenerated. Pass an option." >&2
+	if [[ -n "$(read_recorded uncommitted-changes)" ]]; then
+		if [[ -f "$STUB_FILE" && "$FORCE" == false ]]; then
+			echo "Using the WordPress stubs generated from uncommitted changes in a wordpress-develop checkout. Generate them with --pr or --commit before pushing, since they cannot be generated again elsewhere."
+			exit 0
+		fi
+		echo "The WordPress stubs were generated from uncommitted changes in a wordpress-develop checkout, which cannot be generated again. Pass an option."
 		usage
+	fi
+	if [[ -z "$COMMIT" ]]; then
+		echo "No source for the WordPress stubs is recorded in $PACKAGE_DIR/composer.json. Pass an option."
+		usage
+	fi
+	if [[ "$FORCE" == false && "$(stub_key)" == "$(generation_key "$COMMIT" "$PR")" ]]; then
+		exit 0
 	fi
 fi
 
@@ -143,7 +189,7 @@ LOCAL_CHECKOUT="${CHECKOUT:-$(find_checkout "$GUTENBERG_DIR")}"
 UNCOMMITTED=''
 if [[ "$USE_CHECKOUT" == true ]]; then
 	if [[ -z "$LOCAL_CHECKOUT" ]] || ! git -C "$LOCAL_CHECKOUT" rev-parse --git-dir > /dev/null 2>&1; then
-		echo "No wordpress-develop checkout found${CHECKOUT:+ at $CHECKOUT}." >&2
+		echo "No wordpress-develop checkout found${CHECKOUT:+ at $CHECKOUT}."
 		exit 1
 	fi
 	LOCAL_CHECKOUT="$(cd "$LOCAL_CHECKOUT" && pwd)"
@@ -193,7 +239,7 @@ fi
 cp -R "$GENERATOR_DIR" "$WORK_DIR/wordpress-stubs"
 cp -R "$SOURCE_DIR/src" "$WORK_DIR/wordpress-stubs/source/wordpress"
 
-echo "Generating the stubs"
+echo "Generating the WordPress stubs"
 (cd "$WORK_DIR/wordpress-stubs" && ./generate.sh)
 
 # The WordPress version at the commit, such as 7.2-beta1-64606-src. A path repository needs an
@@ -201,7 +247,7 @@ echo "Generating the stubs"
 # derived from this and the revision of the most recent trunk commit, such as 7.2.0-beta1.64757.
 WP_VERSION="$(php -r 'require $argv[1]; echo $wp_version;' "$SOURCE_DIR/src/wp-includes/version.php")"
 if [[ ! "$REVISION" =~ ^[0-9]+$ || ! "$WP_VERSION" =~ ^([0-9]+\.[0-9]+)(\.[0-9]+)?-([a-zA-Z]+[0-9]*)- ]]; then
-	echo "Unable to determine the revision ($REVISION) and version ($WP_VERSION) of the commit." >&2
+	echo "Unable to determine the revision ($REVISION) and version ($WP_VERSION) of the commit."
 	exit 1
 fi
 PACKAGE_VERSION="${BASH_REMATCH[1]}${BASH_REMATCH[2]:-.0}-${BASH_REMATCH[3]}.$REVISION"
@@ -231,13 +277,22 @@ fi
 		 * Generated from $SOURCE
 		 * with https://github.com/$WORDPRESS_STUBS_REPO/commit/$WORDPRESS_STUBS_COMMIT.
 		 *
-		 * Do not edit. Regenerate with \`composer phpstan:generate-wordpress-stubs\`.
+		 * Do not edit. This file is not committed: \`composer phpstan\` generates it from the source
+		 * recorded in composer.json, using tools/phpstan/generate-wordpress-stubs.sh.
+		 *
+		 * Generation key: $(generation_key "$COMMIT" "$PR")
 		 */
 	HEADER
 	awk 'header_done { print; next } /^ \*\/$/ { header_done = 1 }' "$WORK_DIR/wordpress-stubs/wordpress-stubs.php"
-} > "$PACKAGE_DIR/wordpress-stubs.stub"
+} > "$STUB_FILE"
 
-# Write the package, recording the source for the next regeneration. Uncommitted changes record no
+# The recorded source is only written when it changes, by an option.
+if [[ "$RECORDED" == true ]]; then
+	echo "Generated the WordPress stubs for WordPress $WP_VERSION from $SOURCE."
+	exit 0
+fi
+
+# Write the package, recording the source to generate the stubs from. Uncommitted changes record no
 # commit, since the one that captured them exists only in the checkout.
 php -r '
 	[ , $file, $version, $description, $commit, $pr, $revision ] = $argv;
@@ -265,4 +320,4 @@ php -r '
 	"$PR" \
 	"$REVISION"
 
-echo "Generated the stubs for WordPress $WP_VERSION from $SOURCE, as version $PACKAGE_VERSION."
+echo "Generated the WordPress stubs for WordPress $WP_VERSION from $SOURCE, as version $PACKAGE_VERSION. Run \`composer update\` and \`composer phpstan:baselines\`, and commit tools/phpstan/wordpress-stubs/composer.json."
