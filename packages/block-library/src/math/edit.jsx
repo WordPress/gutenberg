@@ -9,7 +9,7 @@ import {
 	ValidatedTextareaControl,
 	Link,
 } from '@wordpress/ui';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 
@@ -18,7 +18,6 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const formRef = useRef();
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -78,13 +77,9 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					offset={ 8 }
 					anchor={ blockRef }
 					focusOnMount={ false }
-					// Surface any parsing error before focus leaves the block.
-					// An invalid field is refocused, keeping the popover open.
-					onFocusOutside={ () => formRef.current?.reportValidity() }
 					__unstableSlotName="__unstable-block-tools-after"
 				>
 					<form
-						ref={ formRef }
 						style={ { padding: '16px', minWidth: '300px' } }
 						onSubmit={ ( event ) => event.preventDefault() }
 					>
