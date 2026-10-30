@@ -210,6 +210,7 @@ async function dev() {
 
 		process.on( 'SIGINT', cleanup );
 		process.on( 'SIGTERM', cleanup );
+		process.on( 'SIGHUP', cleanup );
 
 		// Wait for wp-build to complete its initial build, then start the
 		// on-ready command.
