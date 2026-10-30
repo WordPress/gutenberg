@@ -142,9 +142,9 @@ function has_color(): bool {
 			if ( false !== $force_color ) {
 				$has_color = ! in_array( strtolower( $force_color ), array( '0', 'false' ), true );
 				// A Windows console shows escape sequences as text until VT100 processing is enabled,
-				// which is_terminal() does otherwise.
-				if ( $has_color && '\\' === DIRECTORY_SEPARATOR && function_exists( 'sapi_windows_vt100_support' ) && stream_isatty( STDERR ) ) {
-					sapi_windows_vt100_support( STDERR, true );
+				// which is_terminal() does when standard error is a console.
+				if ( $has_color ) {
+					is_terminal();
 				}
 			} else {
 				$has_color = is_terminal();
