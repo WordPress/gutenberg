@@ -931,6 +931,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		editor,
 		page,
 	} ) => {
+		// The floating block toolbar of the second paragraph would cover the
+		// first one, so the click could land on the toolbar.
+		await editor.setIsFixedToolbar( true );
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )
 			.click();
@@ -938,25 +941,23 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second' );
 
-		// Select the first paragraph: the block toolbar the mouse move shows
-		// then sits above it, not over the paragraph that is clicked.
-		await page.keyboard.press( 'ArrowUp' );
-
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'First' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
 
-		// Click the second paragraph. The click lands at the center of the
+		// Click the first paragraph. The click lands at the center of the
 		// paragraph element, past the end of the short text, so the caret
 		// must be placed at the end of the text.
-		await editor.canvas.locator( 'p:text("Second")' ).click();
+		await editor.canvas.locator( 'p:text("First")' ).click();
 		await page.keyboard.type( '!' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: 'First' } },
-			{ name: 'core/paragraph', attributes: { content: 'Second!' } },
+			{ name: 'core/paragraph', attributes: { content: 'First!' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
+
+		await editor.setIsFixedToolbar( false );
 	} );
 
 	test( 'should not have a dead zone between blocks (lower)', async ( {
