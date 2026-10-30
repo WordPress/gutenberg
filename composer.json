@@ -33,7 +33,7 @@
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev",
 		"phpstan/extension-installer": "1.4.3",
-		"phpstan/phpstan": "2.3.2",
+		"phpstan/phpstan": "2.3.4",
 		"phpstan/phpstan-phpunit": "2.1.1",
 		"php-stubs/wordpress-stubs": "@dev",
 		"php-stubs/wordpress-tests-stubs": "7.1.0",
