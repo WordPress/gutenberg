@@ -99,6 +99,7 @@ export interface MediaUploadOptions {
 	filesList: ArrayLike< File >;
 	onError?: ( message: string ) => void;
 	onFileChange?: ( attachments: Array< Record< string, unknown > > ) => void;
+	onFilesChange?: ( attachments: Array< Record< string, unknown > > ) => void;
 	onSuccess?: ( attachments: Array< Record< string, unknown > > ) => void;
 	onBatchSuccess?: () => void;
 	multiple?: boolean;

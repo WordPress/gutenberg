@@ -112,6 +112,57 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'addItems', () => {
+		it( 'reports an ordered batch without changing per-file callbacks', () => {
+			const onChange = vi.fn();
+			const onBatchChange = vi.fn();
+			registry.dispatch( uploadStore ).addItems( {
+				files: [ jpegFile, mp4File ],
+				onChange,
+				onBatchChange,
+			} );
+
+			const items = registry.select( uploadStore ).getItems();
+			expect( items[ 0 ].batchId ).toBe( items[ 1 ].batchId );
+
+			const secondAttachment = { id: 2, url: 'https://example.com/2' };
+			items[ 1 ].onChange?.( [ secondAttachment ] );
+			expect( onChange ).toHaveBeenLastCalledWith( [ secondAttachment ] );
+			expect( onBatchChange ).toHaveBeenLastCalledWith( [
+				null,
+				secondAttachment,
+			] );
+
+			const firstAttachment = { id: 1, url: 'https://example.com/1' };
+			items[ 0 ].onChange?.( [ firstAttachment ] );
+			expect( onChange ).toHaveBeenLastCalledWith( [ firstAttachment ] );
+			expect( onBatchChange ).toHaveBeenLastCalledWith( [
+				firstAttachment,
+				secondAttachment,
+			] );
+		} );
+
+		it( 'removes a failed file from the batch snapshot', () => {
+			const onBatchChange = vi.fn();
+			const onError = vi.fn();
+			registry.dispatch( uploadStore ).addItems( {
+				files: [ jpegFile, mp4File ],
+				onBatchChange,
+				onError,
+			} );
+
+			const items = registry.select( uploadStore ).getItems();
+			items[ 0 ].onChange?.( [ { url: 'blob:first' } ] );
+			items[ 1 ].onChange?.( [ { url: 'blob:second' } ] );
+			const failure = new Error( 'Upload failed' );
+			items[ 0 ].onError?.( failure );
+
+			expect( onBatchChange ).toHaveBeenLastCalledWith( [
+				null,
+				{ url: 'blob:second' },
+			] );
+			expect( onError ).toHaveBeenCalledWith( failure );
+		} );
+
 		it( 'adds multiple items to the queue', () => {
 			const onError = vi.fn();
 			registry.dispatch( uploadStore ).addItems( {

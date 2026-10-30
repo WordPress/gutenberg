@@ -162,6 +162,46 @@ function shouldEnableHeicCanvasProcessing(): boolean {
 }
 
 /**
+ * Builds the queue's change callbacks for an upload.
+ *
+ * `onFilesChange` takes the queue's `onBatchChange`, which reports the current
+ * files in input order. An older queue without `onBatchChange` calls only
+ * `onChange`, so `onFileChange` keeps reporting until a batch change arrives.
+ *
+ * @param onFileChange  Function called each time a file or a temporary representation of the file is available.
+ * @param onFilesChange Function called with the current files from this upload, in input order.
+ */
+function getUploadChangeCallbacks(
+	onFileChange: MediaUploadOptions[ 'onFileChange' ],
+	onFilesChange: MediaUploadOptions[ 'onFilesChange' ]
+) {
+	if ( ! onFilesChange ) {
+		return { onChange: onFileChange };
+	}
+
+	let receivedBatchChange = false;
+	return {
+		// Older versions of the queue do not support onBatchChange.
+		onChange: ( attachments: Array< Record< string, unknown > > ) => {
+			if ( ! receivedBatchChange ) {
+				onFileChange?.( attachments );
+			}
+		},
+		onBatchChange: (
+			attachments: Array< Record< string, unknown > | null >
+		) => {
+			receivedBatchChange = true;
+			onFilesChange(
+				attachments.filter(
+					( attachment ): attachment is Record< string, unknown > =>
+						attachment !== null
+				)
+			);
+		},
+	};
+}
+
+/**
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
  *
@@ -173,6 +213,7 @@ function shouldEnableHeicCanvasProcessing(): boolean {
  * @param $3.filesList      List of files.
  * @param $3.onError        Function called when an error happens.
  * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param $3.onFilesChange  Function called with the current files from this upload, in input order.
  * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param $3.multiple       Whether the caller accepts more than one file.
@@ -186,6 +227,7 @@ function mediaUpload(
 		filesList,
 		onError = noop,
 		onFileChange,
+		onFilesChange,
 		onSuccess,
 		onBatchSuccess,
 		multiple = true,
@@ -197,7 +239,7 @@ function mediaUpload(
 
 	void registry.dispatch( uploadStore ).addItems( {
 		files: Array.from( filesList ),
-		onChange: onFileChange,
+		...getUploadChangeCallbacks( onFileChange, onFilesChange ),
 		onSuccess: ( attachments ) => {
 			// The private success callback takes the attachments.
 			(
@@ -231,6 +273,7 @@ function mediaUpload(
  * @param $3.filesList      List of files.
  * @param $3.onError        Function called when an error happens.
  * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param $3.onFilesChange  Function called with the current files from this upload, in input order when the upload uses one path.
  * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param $3.multiple       Whether the caller accepts more than one file.
@@ -244,6 +287,7 @@ async function heicMediaUpload(
 		filesList,
 		onError = noop,
 		onFileChange,
+		onFilesChange,
 		onSuccess,
 		onBatchSuccess,
 		multiple = true,
@@ -284,7 +328,10 @@ async function heicMediaUpload(
 	if ( heicFiles.length > 0 ) {
 		void registry.dispatch( uploadStore ).addItems( {
 			files: heicFiles,
-			onChange: onFileChange,
+			...getUploadChangeCallbacks(
+				onFileChange,
+				hasBothPaths ? undefined : onFilesChange
+			),
 			onSuccess: ( attachments ) => {
 				// The private success callback takes the attachments.
 				(
@@ -312,6 +359,8 @@ async function heicMediaUpload(
 			filesList: otherFiles,
 			onError,
 			onFileChange,
+			// A mixed upload has two independent paths and no combined snapshot.
+			onFilesChange: hasBothPaths ? undefined : onFilesChange,
 			onSuccess,
 			onBatchSuccess: coordinatedBatchSuccess,
 			multiple,

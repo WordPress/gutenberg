@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add an optional `onBatchChange` callback to `addItems` that reports the latest attachment for each input file while keeping the existing per-file `onChange` callback ([#84364](https://github.com/WordPress/gutenberg/pull/84364)).
+
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
