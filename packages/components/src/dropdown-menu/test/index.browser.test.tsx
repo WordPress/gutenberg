@@ -4,6 +4,7 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { check } from '@wordpress/icons';
+import '@wordpress/theme/design-tokens.css';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
 import { NavigableMenu } from '../../navigable-container';
