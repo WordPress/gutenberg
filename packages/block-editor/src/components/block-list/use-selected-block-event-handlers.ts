@@ -3,8 +3,10 @@ import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
+import { useContext } from '@wordpress/element';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { BlockRefs } from '../provider/block-refs-provider';
 
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
@@ -14,30 +16,19 @@ function isColorTransparent( color: string ) {
 }
 
 /**
- * Adds block behaviour:
+ * Adds selected block behaviour, once for the block list:
  *   - Removes the block on BACKSPACE.
  *   - Inserts a default block on ENTER.
  *   - Disables dragging of block contents.
  *
  * For a block that is part of a multi selection, only the drag handling is
  * added, so that dragging any of the selected blocks moves them all.
- *
- * @param options                 Options.
- * @param options.clientId        Block client ID.
- * @param options.isSelected      Whether the block is selected.
- * @param options.isMultiSelected Whether the block is part of a multi selection.
  */
-export function useEventHandlers( {
-	clientId,
-	isSelected,
-	isMultiSelected,
-}: {
-	clientId: string;
-	isSelected?: boolean;
-	isMultiSelected?: boolean;
-} ) {
+export function useSelectedBlockEventHandlers() {
+	const { refsMap } = useContext( BlockRefs );
 	const {
 		getBlockRootClientId,
+		getSelectedBlockClientId,
 		getSelectedBlockClientIds,
 		canMoveBlocks,
 		isZoomOut,
@@ -56,9 +47,17 @@ export function useEventHandlers( {
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect< HTMLElement >(
-		( node ) => {
-			if ( ! isSelected && ! isMultiSelected ) {
-				return;
+		( root ) => {
+			// The selected or multi-selected block that contains the target.
+			function getSelectedBlock( target: Node ) {
+				for ( const clientId of getSelectedBlockClientIds() ) {
+					const node = refsMap.get( clientId ) as
+						HTMLElement | undefined;
+					if ( node?.contains( target ) ) {
+						return { clientId, node };
+					}
+				}
+				return undefined;
 			}
 
 			/**
@@ -81,8 +80,13 @@ export function useEventHandlers( {
 					return;
 				}
 
+				const clientId = getSelectedBlockClientId();
 				// Key events target elements.
-				if ( target !== node || isTextField( target as Element ) ) {
+				if (
+					! clientId ||
+					target !== refsMap.get( clientId ) ||
+					isTextField( target as Element )
+				) {
 					return;
 				}
 
@@ -108,13 +112,15 @@ export function useEventHandlers( {
 			 * @param event Mouse down event.
 			 */
 			function onMouseDown( event: MouseEvent ) {
+				// Mouse events target elements.
+				const block = getSelectedBlock( event.target as Element );
 				if (
 					event.button !== 0 ||
 					event.shiftKey ||
 					event.metaKey ||
 					event.ctrlKey ||
 					event.altKey ||
-					! isMultiSelected ||
+					! block ||
 					! hasMultiSelection() ||
 					! __unstableIsFullySelected() ||
 					! canMoveBlocks( getSelectedBlockClientIds() )
@@ -122,6 +128,7 @@ export function useEventHandlers( {
 					return;
 				}
 
+				const { node } = block;
 				const { ownerDocument } = node;
 				// Multi-selected blocks are not draggable by themselves;
 				// the pressed one is, for the length of the press.
@@ -166,6 +173,8 @@ export function useEventHandlers( {
 			// targets, the next selected block peeks out from underneath it,
 			// and a count of the dragged blocks sits on its top right corner.
 			function startPile(
+				node: HTMLElement,
+				clientId: string,
 				event: DragEvent,
 				clientIds: string[],
 				rect: DOMRect,
@@ -302,6 +311,12 @@ export function useEventHandlers( {
 			function onDragStart( event: DragEvent ) {
 				// Checked to be an element below, before it is used as one.
 				const target = event.target as Element;
+				const block = getSelectedBlock( target );
+				if ( ! block ) {
+					return;
+				}
+				const { clientId, node } = block;
+				const isMultiSelected = hasMultiSelection();
 				const { activeElement } = node.ownerDocument;
 				// The drag may start on an image, which is draggable by
 				// default: it is the block's drag as long as no nested
@@ -464,7 +479,14 @@ export function useEventHandlers( {
 				}
 
 				const pile = isMultiSelectionDrag
-					? startPile( event, clientIds, rect, inverted )
+					? startPile(
+							node,
+							clientId,
+							event,
+							clientIds,
+							rect,
+							inverted
+						)
 					: undefined;
 
 				let hasStarted = false;
@@ -541,26 +563,22 @@ export function useEventHandlers( {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
-			node.addEventListener( 'dragstart', onDragStart );
-			node.addEventListener( 'mousedown', onMouseDown );
-
-			// Blocks in a multi selection only get the drag handling; the
-			// key and double click handling is for the selected block.
-			if ( ! isSelected ) {
-				return () => {
-					node.removeEventListener( 'dragstart', onDragStart );
-					node.removeEventListener( 'mousedown', onMouseDown );
-				};
-			}
-
-			node.addEventListener( 'keydown', onKeyDown );
-
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
 			 *
 			 * @param event Double-click event.
 			 */
 			function onDoubleClick( event: MouseEvent ) {
+				const clientId = getSelectedBlockClientId();
+				if (
+					! clientId ||
+					// Mouse events target elements.
+					! refsMap
+						.get( clientId )
+						?.contains( event.target as Element )
+				) {
+					return;
+				}
 				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
 				const isSyncedPattern = isReusableBlock( block );
@@ -580,20 +598,22 @@ export function useEventHandlers( {
 				editContentOnlySection( clientId );
 			}
 
-			node.addEventListener( 'dblclick', onDoubleClick );
+			root.addEventListener( 'keydown', onKeyDown );
+			root.addEventListener( 'dragstart', onDragStart );
+			root.addEventListener( 'mousedown', onMouseDown );
+			root.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
-				node.removeEventListener( 'keydown', onKeyDown );
-				node.removeEventListener( 'dragstart', onDragStart );
-				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'dblclick', onDoubleClick );
+				root.removeEventListener( 'keydown', onKeyDown );
+				root.removeEventListener( 'dragstart', onDragStart );
+				root.removeEventListener( 'mousedown', onMouseDown );
+				root.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
 		[
-			clientId,
-			isSelected,
-			isMultiSelected,
+			refsMap,
 			getBlockRootClientId,
+			getSelectedBlockClientId,
 			getSelectedBlockClientIds,
 			getBlock,
 			isReusableBlock,

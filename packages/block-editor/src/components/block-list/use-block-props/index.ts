@@ -18,7 +18,6 @@ import {
 } from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
 import { useRegisterBlockEventHandlers } from './use-register-block-event-handlers';
-import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
@@ -183,7 +182,6 @@ export function useBlockProps<
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useEventHandlers( { clientId, isSelected, isMultiSelected } ),
 		useIsHovered( { isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
