@@ -78,7 +78,7 @@ function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $
 }
 
 /**
- * Render the block style variation's styles.
+ * Generates the block style variation class name for a block and registers its stylesheet.
  *
  * In the case of nested blocks with variations applied, we want the parent
  * variation's styles to be rendered before their descendants. This solves the
@@ -87,18 +87,30 @@ function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $
  * in the DOM order. This is why the variation stylesheet generation is in a
  * different filter.
  *
- * @since 6.6.0
+ * @since 7.2.0
  *
  * @param array $parsed_block The parsed block.
+ * @return string|null The generated class name, or null if the block has no variation styles to render.
  *
- * @return array The parsed block with block style variation classname added.
+ * @phpstan-param array{
+ *     blockName: string|null,
+ *     attrs: array{
+ *         className?: string,
+ *         ...
+ *     },
+ *     ...
+ * } $parsed_block
  */
-function gutenberg_render_block_style_variation_support_styles( $parsed_block ) {
+function gutenberg_generate_block_style_variation_class_name( $parsed_block ) {
 	$classes    = $parsed_block['attrs']['className'] ?? null;
 	$variations = gutenberg_get_block_style_variation_name_from_class( $classes );
 
 	if ( ! $variations ) {
-		return $parsed_block;
+		return null;
+	}
+
+	if ( empty( $parsed_block['blockName'] ) || ! is_string( $parsed_block['blockName'] ) ) {
+		return null;
 	}
 
 	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
@@ -115,7 +127,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	}
 
 	if ( empty( $variation_data ) ) {
-		return $parsed_block;
+		return null;
 	}
 
 	// Recursively resolve any ref values with the appropriate value within the
@@ -124,7 +136,6 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 
 	$variation_instance = wp_unique_id( $variation . '--' );
 	$class_name         = "is-style-$variation_instance";
-	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
 	/*
 	 * Even though block style variations are effectively theme.json partials,
@@ -201,11 +212,50 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	}
 
 	if ( empty( $variation_styles ) ) {
-		return $parsed_block;
+		return null;
 	}
 
 	wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
 	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
+
+	return $class_name;
+}
+
+/**
+ * Render the block style variation's styles.
+ *
+ * In the case of nested blocks with variations applied, we want the parent
+ * variation's styles to be rendered before their descendants. This solves the
+ * issue of a block type being styled in both the parent and descendant: we want
+ * the descendant style to take priority, and this is done by loading it after,
+ * in the DOM order. This is why the variation stylesheet generation is in a
+ * different filter.
+ *
+ * @since 6.6.0
+ *
+ * @param array $parsed_block The parsed block.
+ *
+ * @return array The parsed block with block style variation classname added.
+ *
+ * @phpstan-param array{
+ *     blockName: string|null,
+ *     attrs: array{
+ *         className?: string,
+ *         ...
+ *     },
+ *     ...
+ * } $parsed_block
+ */
+function gutenberg_render_block_style_variation_support_styles( $parsed_block ) {
+	$class_name = gutenberg_generate_block_style_variation_class_name( $parsed_block );
+	if ( null === $class_name ) {
+		return $parsed_block;
+	}
+
+	$existing_class_name = $parsed_block['attrs']['className'] ?? '';
+	$updated_class_name  = '' !== $existing_class_name
+		? "$existing_class_name $class_name"
+		: $class_name;
 
 	/*
 	 * Add variation instance class name to block's className string so it can
@@ -221,6 +271,11 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  * block attributes in the `render_block_data` filter gets applied to the
  * block's markup.
  *
+ * Uses the class name that {@see gutenberg_render_block_style_variation_support_styles()}
+ * stored in the block attributes. Blocks that a parent parsed and rendered
+ * itself never reach that filter, so the class name is generated here instead
+ * via {@see gutenberg_generate_block_style_variation_class_name()}.
+ *
  * @since 6.6.0
  *
  * @see gutenberg_render_block_style_variation_support_styles
@@ -229,6 +284,15 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  * @param array  $block         Block object.
  *
  * @return string Filtered block content.
+ *
+ * @phpstan-param array{
+ *     blockName: string|null,
+ *     attrs: array{
+ *         className?: string,
+ *         ...
+ *     },
+ *     ...
+ * } $block
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
 	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {
@@ -246,7 +310,14 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 	 */
 	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block_class_name, $matches );
 
-	if ( empty( $matches ) ) {
+	$matched_class_name = $matches[0] ?? null;
+
+	// Direct WP_Block::render() calls skip render_block_data for the block itself.
+	if ( null === $matched_class_name ) {
+		$matched_class_name = gutenberg_generate_block_style_variation_class_name( $block );
+	}
+
+	if ( null === $matched_class_name ) {
 		return $block_content;
 	}
 
@@ -258,7 +329,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 		 * `render_block_data` filter is applied in markup.
 		 * See `gutenberg_render_block_style_variation_support_styles`.
 		 */
-		$tags->add_class( $matches[0] );
+		$tags->add_class( $matched_class_name );
 	}
 
 	return $tags->get_updated_html();
