@@ -107,7 +107,7 @@
 // The editor’s content area should allow shrinking so the meta box pane remains
 // visible and reachable. Apply common sizing to both editors, then specialise
 // overflow handling per editor so scroll behavior is correct.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) {
+.has-metaboxes .interface-interface-skeleton__content {
 	// Shared sizing for both editors.
 	.editor-visual-editor,
 	.editor-text-editor {
