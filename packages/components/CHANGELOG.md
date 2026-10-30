@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements.
 -   `ToolsPanel`: Keep the "Reset" label visible on the highlighted menu item ([#86060](https://github.com/WordPress/gutenberg/pull/86060)).
 -   `DropdownMenu`, `MenuItem`, `Autocomplete`: Synchronize the active item with pointer movement and keyboard navigation ([#85487](https://github.com/WordPress/gutenberg/pull/85487)).
 -   `UnitControl`: Use a neutral text color for static unit labels ([#85532](https://github.com/WordPress/gutenberg/pull/85532)).
