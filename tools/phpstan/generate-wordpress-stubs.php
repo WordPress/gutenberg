@@ -253,33 +253,30 @@ function setting( string $name, string $default_value ): string {
 /**
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
- * @param non-empty-list<string>           $command The program and its arguments.
- * @param 'pass'|'capture'|'quiet'|'files' $mode    'pass' to pass its output to standard error,
- *                                                  'capture' to return its standard output,
- *                                                  'quiet' to also discard its standard error, or
- *                                                  'files' to write its standard output and error
- *                                                  to the given files.
- * @param non-empty-string|null            $cwd     The working directory.
- * @param array<non-empty-string, string>  $env     Environment variables to set in addition to
- *                                                  the current ones.
- * @param array{string, string}|null       $files   For 'files', the files to write standard
- *                                                  output and error to, which, unlike pipes,
- *                                                  cannot fill up and block the command while
- *                                                  nothing reads them.
+ * @param non-empty-list<string>                          $command The program and its arguments.
+ * @param 'pass'|'capture'|'quiet'|array{string, string} $mode    'pass' to pass its output to
+ *                                                                standard error, 'capture' to
+ *                                                                return its standard output,
+ *                                                                'quiet' to also discard its
+ *                                                                standard error, or the files to
+ *                                                                write its standard output and
+ *                                                                error to, which, unlike pipes,
+ *                                                                cannot fill up and block it while
+ *                                                                nothing reads them.
+ * @param non-empty-string|null                          $cwd     The working directory.
+ * @param array<non-empty-string, string>                $env     Environment variables to set in
+ *                                                                addition to the current ones.
  * @return array{int, string} The exit status, and the standard output when captured.
  */
-function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array(), ?array $files = null ): array {
+function execute( array $command, $mode = 'pass', ?string $cwd = null, array $env = array() ): array {
 	$null_device = '\\' === DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null';
 	$descriptors = array( 0 => array( 'file', $null_device, 'r' ) );
-	if ( 'pass' === $mode ) {
+	if ( is_array( $mode ) ) {
+		$descriptors[1] = array( 'file', $mode[0], 'w' );
+		$descriptors[2] = array( 'file', $mode[1], 'w' );
+	} elseif ( 'pass' === $mode ) {
 		$descriptors[1] = STDERR;
 		$descriptors[2] = STDERR;
-	} elseif ( 'files' === $mode ) {
-		if ( null === $files ) {
-			throw new RuntimeException( 'No files to write the output of the command to.' );
-		}
-		$descriptors[1] = array( 'file', $files[0], 'w' );
-		$descriptors[2] = array( 'file', $files[1], 'w' );
 	} else {
 		$descriptors[1] = array( 'pipe', 'w' );
 		$descriptors[2] = 'quiet' === $mode ? array( 'file', $null_device, 'w' ) : STDERR;
@@ -765,7 +762,7 @@ function main( array $args ): void {
 	$error_file  = $work_dir . '/generator-errors.txt';
 	report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
 	try {
-		list( $status ) = execute( $generator_command, 'files', $work_dir, array(), array( $report_file, $error_file ) );
+		list( $status ) = execute( $generator_command, array( $report_file, $error_file ), $work_dir );
 	} finally {
 		clear_pending_row();
 	}
