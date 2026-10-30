@@ -722,11 +722,12 @@ function main( array $args ): void {
 
 	$generated_file = $work_dir . '/wordpress-stubs.php';
 
-	// The generator writes the stubs to a file and then reports on them, a title, the file, and a
-	// table of counts, which is discarded. Only its standard error is shown, which PHP warnings go to
-	// as well. Writing the stubs to standard output instead would avoid the file, but the generator
-	// prints them through Symfony Console, which strips what looks like formatting tags, such as the
-	// `</>` in the HTML API's docblocks.
+	// The generator writes the stubs to a file and then reports on them, a title, the file, a table of
+	// counts, and any declarations it found more than once, keeping the first. That report is
+	// discarded. Only its standard error is shown, which PHP warnings go to as well. Writing the stubs
+	// to standard output instead would avoid the file, but the generator prints them through Symfony
+	// Console, which strips what looks like formatting tags, such as the `</>` in the HTML API's
+	// docblocks.
 	$generator_command = array(
 		PHP_BINARY,
 		'-d',
