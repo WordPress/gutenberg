@@ -14,6 +14,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {Array}         imageSizes                             Available image sizes
  * @property {number}        maxWidth                               Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes                      Allowed block types
+ * @property {Array}         allowedFormats                         Allowed format types, by name; all registered format types when unset
  * @property {boolean}       hasFixedToolbar                        Whether or not the editor toolbar is fixed
  * @property {boolean}       distractionFree                        Whether or not the editor UI is distraction free
  * @property {boolean}       focusMode                              Whether the focus mode is enabled or not

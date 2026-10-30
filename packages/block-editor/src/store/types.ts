@@ -390,6 +390,7 @@ export interface PresetsByOrigin {
  */
 export type Settings = Record< string | symbol, unknown > & {
 	allowedBlockTypes?: boolean | string[];
+	allowedFormats?: string[];
 	alignWide?: boolean;
 	allowedMimeTypes?: Record< string, string > | null;
 	pageForPosts?: number;

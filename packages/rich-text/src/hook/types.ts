@@ -63,6 +63,8 @@ export type RichTextProps<
 	allowedFormats?: readonly string[];
 	withoutInteractiveFormatting?: boolean;
 	__unstableFormatTypeHandlerContext?: object;
+	// Props selected with `selectFormatTypeProps`.
+	formatTypeProps?: Record< string, unknown >;
 };
 
 /**

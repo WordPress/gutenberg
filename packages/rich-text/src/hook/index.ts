@@ -280,6 +280,7 @@ export function useRichText<
 	onChange,
 	__unstableDependencies = [],
 	__unstableFormatTypeHandlerContext,
+	formatTypeProps,
 	...props
 }: RichTextProps< V > ) {
 	const {
@@ -292,6 +293,7 @@ export function useRichText<
 		allowedFormats,
 		withoutInteractiveFormatting,
 		__unstableFormatTypeHandlerContext,
+		formatTypeProps,
 	} );
 
 	function addEditorOnlyFormats( record: RichTextRecord ) {

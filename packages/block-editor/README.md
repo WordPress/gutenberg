@@ -960,6 +960,7 @@ _Properties_
 - _imageSizes_ `Array`: Available image sizes
 - _maxWidth_ `number`: Max width to constraint resizing
 - _allowedBlockTypes_ `boolean|Array`: Allowed block types
+- _allowedFormats_ `Array`: Allowed format types, by name; all registered format types when unset
 - _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
 - _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 - _focusMode_ `boolean`: Whether the focus mode is enabled or not

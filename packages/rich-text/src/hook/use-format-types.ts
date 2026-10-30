@@ -1,6 +1,8 @@
-import { useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useContext, useMemo } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
+import type { SelectFunction } from '@wordpress/data';
 import { store as richTextStore } from '../store';
+import { FormatTypesContext } from '../contexts';
 import type { FormatType, RichTextFormatList } from '../types';
 
 /**
@@ -29,10 +31,6 @@ const interactiveContentTags = new Set( [
 	'textarea',
 	'video',
 ] );
-
-// The key the format types are selected under, next to the props selected
-// for each format type, which are keyed by format names (`namespace/name`).
-const FORMAT_TYPES_KEY = 'formatTypes';
 
 function isFormatTypeAllowed(
 	{ name, interactive, tagName }: FormatType,
@@ -81,6 +79,49 @@ function getPrefixedSelectKeys(
 }
 
 /**
+ * Selects the props that format types ask for to prepare a field's editable
+ * tree, keyed by format names (`namespace/name`) so a caller can spread them
+ * into the result of its own `useSelect`.
+ *
+ * @param select                       Select function.
+ * @param formatTypes                  Format types to select props for.
+ * @param allowedFormats               Allowed formats.
+ * @param withoutInteractiveFormatting Whether to leave out interactive formats.
+ * @param formatTypeHandlerContext     Context passed to format type methods.
+ */
+export function selectFormatTypeProps(
+	select: SelectFunction,
+	formatTypes: FormatType[],
+	allowedFormats: readonly string[] | undefined,
+	withoutInteractiveFormatting: boolean | undefined,
+	formatTypeHandlerContext: object
+) {
+	const selected: Record< string, unknown > = {};
+	for ( const type of formatTypes ) {
+		if (
+			type.__experimentalGetPropsForEditableTreePreparation &&
+			isFormatTypeAllowed(
+				type,
+				allowedFormats,
+				withoutInteractiveFormatting
+			)
+		) {
+			Object.assign(
+				selected,
+				prefixSelectKeys(
+					type.__experimentalGetPropsForEditableTreePreparation(
+						select,
+						formatTypeHandlerContext
+					),
+					type.name
+				)
+			);
+		}
+	}
+	return selected;
+}
+
+/**
  * This hook provides RichText with the `formatTypes` and its derived props from
  * experimental format type settings.
  *
@@ -88,74 +129,35 @@ function getPrefixedSelectKeys(
  * @param {Array}   options.allowedFormats                     Allowed formats
  * @param {boolean} options.withoutInteractiveFormatting       Whether to clean the interactive formatting or not.
  * @param {Object}  options.__unstableFormatTypeHandlerContext Context object passed to experimental format type methods.
+ * @param {Object}  options.formatTypeProps                    Props selected with `selectFormatTypeProps`.
  */
 export function useFormatTypes( {
 	allowedFormats,
 	withoutInteractiveFormatting,
 	__unstableFormatTypeHandlerContext,
+	formatTypeProps: keyedSelected = {},
 }: {
 	allowedFormats?: readonly string[];
 	withoutInteractiveFormatting?: boolean;
 	__unstableFormatTypeHandlerContext?: object;
+	formatTypeProps?: Record< string, unknown >;
 } ) {
-	// One subscription for the format types and the props some of them
-	// select: each mounted subscription costs every field.
-	const { [ FORMAT_TYPES_KEY ]: allFormatTypes, ...keyedSelected } =
-		useSelect(
-			( select ) => {
-				const selected: Record< string, unknown > = {
-					[ FORMAT_TYPES_KEY ]:
-						select( richTextStore ).getFormatTypes(),
-				};
-
-				if ( ! __unstableFormatTypeHandlerContext ) {
-					return selected;
-				}
-
-				for ( const type of selected[
-					FORMAT_TYPES_KEY
-				] as FormatType[] ) {
-					if (
-						type.__experimentalGetPropsForEditableTreePreparation &&
-						isFormatTypeAllowed(
-							type,
-							allowedFormats,
-							withoutInteractiveFormatting
-						)
-					) {
-						Object.assign(
-							selected,
-							prefixSelectKeys(
-								type.__experimentalGetPropsForEditableTreePreparation(
-									select,
-									__unstableFormatTypeHandlerContext
-								),
-								type.name
-							)
-						);
-					}
-				}
-
-				return selected;
-			},
-			[
-				allowedFormats,
-				withoutInteractiveFormatting,
-				__unstableFormatTypeHandlerContext,
-			]
-		);
+	const registry = useRegistry();
+	const offeredFormatTypes =
+		useContext( FormatTypesContext ) ??
+		registry.select( richTextStore ).getFormatTypes();
 	const formatTypes = useMemo(
 		() =>
-			( allFormatTypes as FormatType[] ).filter( ( type ) =>
+			offeredFormatTypes.filter( ( type ) =>
 				isFormatTypeAllowed(
 					type,
 					allowedFormats,
 					withoutInteractiveFormatting
 				)
 			),
-		[ allFormatTypes, allowedFormats, withoutInteractiveFormatting ]
+		[ offeredFormatTypes, allowedFormats, withoutInteractiveFormatting ]
 	);
-	const dispatch = useDispatch();
+	const { dispatch } = registry;
 	const prepareHandlers: FormatHandler[] = [];
 	const valueHandlers: FormatHandler[] = [];
 	const changeHandlers: ( (

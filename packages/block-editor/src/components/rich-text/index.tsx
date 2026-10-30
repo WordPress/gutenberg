@@ -12,7 +12,10 @@ import {
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import {
+	privateApis as richTextPrivateApis,
+	store as richTextStore,
+} from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import type { DistributiveOmit } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
@@ -64,6 +67,8 @@ import type {
 const {
 	useRichText,
 	getDomPositionKey,
+	selectFormatTypeProps,
+	FormatTypesContext,
 	KeyboardShortcutContext,
 	InputEventContext,
 	RichTextShortcut: UntypedRichTextShortcut,
@@ -134,6 +139,18 @@ function RichTextWrapper(
 
 	const shouldDisableForPattern =
 		isInsidePatternOverrides && ! hasOverrideEnabled;
+	const adjustedAllowedFormats = getAllowedFormats( {
+		allowedFormats,
+		disableFormats,
+	} );
+	const formatTypeHandlerContext = useMemo(
+		() => ( {
+			richTextIdentifier: identifier,
+			blockClientId: clientId,
+		} ),
+		[ identifier, clientId ]
+	);
+	const offeredFormatTypes = useContext( FormatTypesContext );
 
 	const selectField = ( select: SelectFunction ) => {
 		const selectSelection = () => {
@@ -302,11 +319,18 @@ function RichTextWrapper(
 			...selectSelection(),
 			...bindings,
 			isEditingHost: selectIsEditingHost( bindings.disableBoundBlock ),
+			...selectFormatTypeProps(
+				select,
+				offeredFormatTypes ?? select( richTextStore ).getFormatTypes(),
+				adjustedAllowedFormats,
+				withoutInteractiveFormatting,
+				formatTypeHandlerContext
+			),
 		};
 	};
-	// One subscription for the selection, the bindings and the editing host:
-	// each mounted subscription costs every field, and most fields need none
-	// of them until their block is selected.
+	// One subscription for the selection, the bindings, the editing host and
+	// the props format types select: each mounted subscription costs every
+	// field, and most fields need none of them until their block is selected.
 	const {
 		selectionStart,
 		selectionEnd,
@@ -317,6 +341,7 @@ function RichTextWrapper(
 		bindingsPlaceholder,
 		bindingsLabel,
 		isEditingHost,
+		...formatTypeProps
 	} = useSelect( selectField, [
 		clientId,
 		identifier,
@@ -331,6 +356,10 @@ function RichTextWrapper(
 		readOnly,
 		shouldDisableForPattern,
 		hasDefaultEditingMode,
+		offeredFormatTypes,
+		adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		formatTypeHandlerContext,
 	] );
 
 	const shouldDisableEditing =
@@ -340,10 +369,6 @@ function RichTextWrapper(
 		useSelect( blockEditorStore );
 	const { selectionChange, __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
-	const adjustedAllowedFormats = getAllowedFormats( {
-		allowedFormats,
-		disableFormats,
-	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 
@@ -456,13 +481,8 @@ function RichTextWrapper(
 		__unstableDependencies: [ tagName ],
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting,
-		__unstableFormatTypeHandlerContext: useMemo(
-			() => ( {
-				richTextIdentifier: identifier,
-				blockClientId: clientId,
-			} ),
-			[ identifier, clientId ]
-		),
+		__unstableFormatTypeHandlerContext: formatTypeHandlerContext,
+		formatTypeProps,
 	} );
 	// Focus follows the selection while focus is inside the canvas or was
 	// lost to the body. Focus placed elsewhere stays. Runs after

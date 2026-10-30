@@ -1,5 +1,6 @@
 import { createContext } from '@wordpress/element';
 import type { EventCallbacksSet } from './event-listeners';
+import type { FormatType } from './types';
 
 /**
  * Holds a Set of keyboard shortcut callbacks registered by format types (via
@@ -22,3 +23,13 @@ export const InputEventContext = createContext<
 	EventCallbacksSet< InputEvent >
 >( new Set() );
 InputEventContext.displayName = 'InputEventContext';
+
+/**
+ * Holds the format types an editor offers its fields, so the editor selects
+ * them once instead of every field subscribing. Without a provider, a field
+ * reads the registered format types when it renders.
+ */
+export const FormatTypesContext = createContext< FormatType[] | undefined >(
+	undefined
+);
+FormatTypesContext.displayName = 'FormatTypesContext';

@@ -14,6 +14,7 @@ import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
+import { FormatTypesProvider } from './format-types-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import BlockKeyboardShortcuts from '../block-keyboard-shortcuts';
@@ -435,7 +436,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 						<BlockKeyboardShortcuts />
 					</>
 				) }
-				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
+				<BlockRefsProvider>
+					<FormatTypesProvider>
+						{ props.children }
+					</FormatTypesProvider>
+				</BlockRefsProvider>
 			</SlotFillProvider>
 		);
 
