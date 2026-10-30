@@ -10,6 +10,7 @@ import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
+import PostDateView from './post-date-view';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import { useFields } from '../../dataviews/fields-loader';
 import revisionsField from '../../dataviews/fields/revisions';
@@ -323,6 +324,20 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 							};
 						}
 						return field;
+					}
+					if ( field.id === 'date' && field.render ) {
+						// The row edits the publish date, so it can't keep the
+						// "Modified:" label the field gives unpublished posts.
+						const DefaultDateView = field.render;
+						return {
+							...field,
+							render: ( props ) => (
+								<PostDateView
+									{ ...props }
+									defaultView={ DefaultDateView }
+								/>
+							),
+						};
 					}
 					return field;
 				} )
