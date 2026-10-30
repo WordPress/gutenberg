@@ -48,6 +48,12 @@ const ALL_ICONS_MANIFEST = new Map(
 
 const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
 
+const COLLECTION_LABELS = {
+	all: 'All (npm)',
+	core: 'REST API (core)',
+	'core-admin': 'PHP API (core-admin)',
+};
+
 type Collection = ( typeof COLLECTIONS )[ number ];
 
 const ICON_QUERY_PARAM = 'icon';
@@ -186,7 +192,7 @@ function IconDetails( {
 				</Text>
 				<code>{ slug }</code>
 				<CopySvgButton icon={ icon } />
-				<Stack direction="column" gap="sm" align="flex-start">
+				<Stack direction="row" gap="sm" align="center" wrap="wrap">
 					<Text variant="body-sm">Available in</Text>
 					<Stack
 						render={ <ul /> }
@@ -309,7 +315,7 @@ const LibraryExample = ( {
 						headingRef={ detailsHeadingRef }
 					/>
 				) }
-				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
+				<HStack justify="flex-start" alignment="top" spacing={ 8 } wrap>
 					<SearchControl
 						label="Icon name"
 						hideLabelFromVision={ false }
@@ -337,6 +343,7 @@ const LibraryExample = ( {
 					<ToggleGroupControl
 						label="Collection"
 						isBlock
+						help="core: available via the Icons REST API. core-admin: available via the server-side Icons API."
 						value={ collection }
 						onChange={ ( value: string | number | undefined ) =>
 							setCollection( ( value ?? 'all' ) as Collection )
@@ -346,7 +353,7 @@ const LibraryExample = ( {
 							<ToggleGroupControlOption
 								key={ option }
 								value={ option }
-								label={ option === 'all' ? 'All' : option }
+								label={ COLLECTION_LABELS[ option ] }
 							/>
 						) ) }
 					</ToggleGroupControl>
