@@ -662,25 +662,107 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		} );
 
 		await editor.selectBlocks( paragraphBlock );
-		await page
-			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
-			.click();
-		await page
-			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Heading', exact: true } )
-			.hover();
 
-		await expect( insertingBlocksUtils.indicator ).toBeVisible();
+		// DEBUG (temporary): log hover, insertion cue, block visibility and
+		// indicator changes.
+		await page.evaluate( () => {
+			window.dbg = [];
+			const t0 = performance.now();
+			const now = () => Math.round( performance.now() - t0 );
+			const d = ( n ) =>
+				! n
+					? 'null'
+					: n.getAttribute?.( 'aria-label' ) ||
+						n.textContent?.trim().slice( 0, 20 ) ||
+						n.className?.toString().slice( 0, 50 ) ||
+						n.tagName;
+			const be = window.wp.data.select( 'core/block-editor' );
+			let last = '';
+			window.wp.data.subscribe( () => {
+				const ids = be.getBlockOrder();
+				const cue = be.getBlockInsertionPoint();
+				const state = `cueVisible=${ be.isBlockInsertionPointVisible() } cue=${ cue?.rootClientId }@${ cue?.index } blockVisible=${ ids
+					.map(
+						( id ) =>
+							be.getBlockName( id ) +
+							':' +
+							be.isBlockVisible( id )
+					)
+					.join( ',' ) }`;
+				if ( state !== last ) {
+					last = state;
+					window.dbg.push( `${ now() } store ${ state }` );
+				}
+			}, 'core/block-editor' );
+			for ( const type of [
+				'mouseover',
+				'mouseout',
+				'mouseenter',
+				'mouseleave',
+			] ) {
+				document.addEventListener(
+					type,
+					( e ) => {
+						if ( e.target.closest?.( '[role="option"]' ) ) {
+							window.dbg.push(
+								`${ now() } ${ type } target=${ d( e.target ) } related=${ d( e.relatedTarget ) } at ${ e.clientX },${ e.clientY }`
+							);
+						}
+					},
+					true
+				);
+			}
+			new MutationObserver( () => {
+				const el = document.querySelector(
+					'[data-testid="block-list-insertion-point-indicator"]'
+				);
+				const r = el?.getBoundingClientRect();
+				const state = el
+					? `indicator ${ Math.round( r.x ) },${ Math.round(
+							r.y
+						) } ${ Math.round( r.width ) }x${ Math.round(
+							r.height
+						) } style=${ el.getAttribute( 'style' ) }`
+					: 'indicator absent';
+				if ( state !== window.lastIndicator ) {
+					window.lastIndicator = state;
+					window.dbg.push( `${ now() } ${ state }` );
+				}
+			} ).observe( document.body, {
+				subtree: true,
+				childList: true,
+				attributes: true,
+			} );
+		} );
 
-		const paragraphBoundingBox = await paragraphBlock.boundingBox();
-		const indicatorBoundingBox =
-			await insertingBlocksUtils.indicator.boundingBox();
+		try {
+			await page
+				.getByRole( 'toolbar', { name: 'Document tools' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+				.click();
+			await page
+				.getByRole( 'listbox', { name: 'Text' } )
+				.getByRole( 'option', { name: 'Heading', exact: true } )
+				.hover();
 
-		// Expect the indicator to be below the selected block.
-		expect( indicatorBoundingBox.y ).toBeGreaterThan(
-			paragraphBoundingBox.y
-		);
+			await expect( insertingBlocksUtils.indicator ).toBeVisible();
+
+			const paragraphBoundingBox = await paragraphBlock.boundingBox();
+			const indicatorBoundingBox =
+				await insertingBlocksUtils.indicator.boundingBox();
+
+			// Expect the indicator to be below the selected block.
+			expect( indicatorBoundingBox.y ).toBeGreaterThan(
+				paragraphBoundingBox.y
+			);
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.log(
+				'DEBUG\n' +
+					( await page.evaluate( () => window.dbg.join( '\n' ) ) )
+			);
+			throw error;
+		}
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403.
