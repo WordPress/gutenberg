@@ -276,35 +276,4 @@
 		}
 
 	}
-
-	@layer compositions {
-		.popup:has(input[role="combobox"]) .item {
-			/* Inset the paint without moving content or shrinking the hit area. */
-			position: relative;
-			isolation: isolate;
-			background-color: transparent;
-
-			&::before {
-				content: "";
-				position: absolute;
-				inset-block: 0;
-				inset-inline: var(--wpds-dimension-padding-xs);
-				z-index: -1;
-				border-radius: inherit;
-				pointer-events: none;
-			}
-
-			&[data-highlighted]:not([data-disabled])::before {
-				background-color: var(--wpds-color-background-interactive-brand-strong-active);
-
-				@media ( forced-colors: active ) {
-					background-color: Highlight;
-				}
-			}
-
-			&[data-disabled]::before {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
-			}
-		}
-	}
 }
