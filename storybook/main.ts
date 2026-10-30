@@ -63,6 +63,7 @@ const config: StorybookConfig = {
 		import.meta.resolve( './addons/source-link/preset.ts' ),
 		getAbsolutePath( 'storybook-addon-tag-badges' ),
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
+		import.meta.resolve( './addons/query-params/preset.ts' ),
 	],
 	framework: getAbsolutePath( '@storybook/react-vite' ),
 	tags: {
