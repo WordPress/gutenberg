@@ -37,9 +37,9 @@ function DefaultStory() {
 	};
 
 	const handleKeyDown = (
-    		e: KeyboardEvent<HTMLDivElement>,
-    		index: number
-		) => {
+		e: KeyboardEvent< HTMLDivElement >,
+		index: number
+	) => {
 		if ( e.key === 'Tab' ) {
 			e.preventDefault();
 			const next = refs.current[ index + 1 ];
@@ -69,7 +69,7 @@ function DefaultStory() {
 					<div key={ block.id } style={ { marginBottom: '12px' } }>
 						<div
 							ref={ ( el ) => {
-    								refs.current[ index ] = el;
+								refs.current[ index ] = el;
 							} }
 							contentEditable
 							suppressContentEditableWarning
