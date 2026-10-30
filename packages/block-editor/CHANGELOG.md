@@ -12,6 +12,7 @@
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
+-   Block alignment: Explain in the alignment menu when the template rather than a block on the page limits width, with a way to edit that template. Hosts supply the explanation through a private setting, since the block editor cannot know what a template is ([#82675](https://github.com/WordPress/gutenberg/pull/82675)).
 -   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
