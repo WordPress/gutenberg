@@ -11,6 +11,7 @@ import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import useTypeScript from './rules/use-typescript.mjs';
 import noBroadComponentSuppression from './rules/no-broad-component-suppression.mjs';
+import componentsImportAliases from './components-import-aliases.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -422,25 +423,7 @@ export default dedupePlugins( [
 			'@wordpress/use-import-as': [
 				'error',
 				{
-					'@wordpress/components': {
-						__experimentalText: 'WCText',
-						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
-						Autocomplete: 'WCAutocomplete',
-						Badge: 'WCBadge',
-						Card: 'WCCard',
-						CheckboxControl: 'WCCheckboxControl',
-						Icon: 'WCIcon',
-						IconButton: 'WCIconButton',
-						__experimentalInputControl: 'WCInputControl',
-						Menu: 'WCMenu',
-						Notice: 'WCNotice',
-						SelectControl: 'WCSelectControl',
-						Spinner: 'WCSpinner',
-						Tabs: 'WCTabs',
-						TextareaControl: 'WCTextareaControl',
-						Tooltip: 'WCTooltip',
-						VisuallyHidden: 'WCVisuallyHidden',
-					},
+					'@wordpress/components': componentsImportAliases,
 				},
 			],
 			'@wordpress/dependency-group': [ 'error', 'never' ],
