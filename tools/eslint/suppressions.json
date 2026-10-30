@@ -124,16 +124,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-list/block.tsx": {
-		"react-hooks/immutability": {
-			"count": 2
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/index.ts": {
-		"react-hooks/immutability": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/block-lock/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
