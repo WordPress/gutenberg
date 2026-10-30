@@ -24,6 +24,7 @@ export const keyboard = {
 
 		return (
 			<RichTextToolbarButton
+				name="keyboard"
 				icon={ button }
 				title={ title }
 				onClick={ onClick }

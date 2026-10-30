@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 // eslint-disable-next-line testing-library/no-manual-cleanup
 import { act, render, cleanup } from '@testing-library/react';
@@ -17,7 +18,7 @@ describe( 'PluginArea', () => {
 		} );
 	} );
 
-	const TestComponent = ( { content } ) => {
+	const TestComponent = ( { content }: { content: string } ) => {
 		return `plugin: ${ content }.`;
 	};
 
@@ -88,9 +89,11 @@ describe( 'PluginArea', () => {
 	} );
 
 	test( 'does not rerender when a plugin is added to a different scope', () => {
-		const ComponentSpy = vi.fn( ( { content } ) => {
-			return `plugin: ${ content }.`;
-		} );
+		const ComponentSpy: ComponentType< { content: string } > = vi.fn(
+			( { content }: { content: string } ) => {
+				return `plugin: ${ content }.`;
+			}
+		);
 
 		registerPlugin( 'scoped', {
 			render: () => <ComponentSpy content="scoped" />,
