@@ -98,11 +98,15 @@ function getLatestHeadings(
 
 				latestHeadings.push( {
 					// Convert line breaks to spaces, and get rid of HTML tags in the headings.
+					// Inline math keeps its LaTeX source in a MathML annotation,
+					// which browsers don't display, so leave it out too.
 					content: stripHTML(
-						headingAttributes.content.replace(
-							/(<br *\/?>)+/g,
-							' '
-						)
+						headingAttributes.content
+							.replace( /(<br *\/?>)+/g, ' ' )
+							.replace(
+								/<annotation(\s[^>]*)?>[\s\S]*?<\/annotation>/g,
+								''
+							)
 					),
 					level: headingAttributes.level,
 					link: canBeLinked
