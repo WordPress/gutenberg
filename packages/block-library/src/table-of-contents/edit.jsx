@@ -34,7 +34,7 @@ import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const HEADING_LEVEL_ITEMS = [
-	{ value: '', label: __( 'All levels' ) },
+	{ value: 'all', label: __( 'All levels' ) },
 	{ value: '1', label: __( 'Heading 1' ) },
 	{ value: '2', label: __( 'Heading 2' ) },
 	{ value: '3', label: __( 'Heading 3' ) },
@@ -233,15 +233,16 @@ export default function TableOfContentsEdit( {
 							HEADING_LEVEL_ITEMS.find(
 								( item ) =>
 									item.value ===
-									( maxLevel ? String( maxLevel ) : '' )
+									( maxLevel ? String( maxLevel ) : 'all' )
 							) ?? HEADING_LEVEL_ITEMS[ 0 ]
 						}
 						items={ HEADING_LEVEL_ITEMS }
 						onValueChange={ ( item ) =>
 							setAttributes( {
-								maxLevel: item?.value
-									? parseInt( item.value, 10 )
-									: undefined,
+								maxLevel:
+									item?.value && item.value !== 'all'
+										? parseInt( item.value, 10 )
+										: undefined,
 							} )
 						}
 						description={
