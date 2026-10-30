@@ -132,14 +132,21 @@ function is_terminal(): bool {
  * @return bool Whether to use colors.
  */
 function has_color(): bool {
-	$force_color = strtolower( (string) getenv( 'FORCE_COLOR' ) );
-	if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
-		return false;
+	/** @var bool|null $has_color */
+	static $has_color = null;
+	if ( null === $has_color ) {
+		if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
+			$has_color = false;
+		} else {
+			$force_color = strtolower( (string) getenv( 'FORCE_COLOR' ) );
+			if ( '' !== $force_color ) {
+				$has_color = '0' !== $force_color && 'false' !== $force_color;
+			} else {
+				$has_color = is_terminal();
+			}
+		}
 	}
-	if ( '' !== $force_color ) {
-		return '0' !== $force_color && 'false' !== $force_color;
-	}
-	return is_terminal();
+	return $has_color;
 }
 
 /**
