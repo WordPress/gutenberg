@@ -94,10 +94,7 @@
 }
 
 .edit-post-meta-boxes-main__liner {
-	// Enable scrolling only for the split view.
-	.edit-post-meta-boxes-main & {
-		overflow: auto;
-	}
+	overflow: auto;
 	// Keep the contents behind the resize handle.
 	isolation: isolate;
 
@@ -105,11 +102,6 @@
 	.is-resizing.edit-post-meta-boxes-main & {
 		display: unset;
 	}
-}
-
-// In case the canvas is not iframe’d.
-.edit-post-layout__metaboxes {
-	clear: both;
 }
 
 // When split view is active the editors should allow shrinking so the meta box
