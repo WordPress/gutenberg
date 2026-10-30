@@ -1,5 +1,3 @@
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
@@ -11,7 +9,7 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type { Layout } from '../layouts/types';
 import type {
-	BlockEditHookProps,
+	BlockSupportEditProps,
 	GridLayoutSyncProps,
 	GridVisualizerToolsProps,
 } from './types';
@@ -111,27 +109,21 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 	);
 }
 
-const addGridVisualizerToBlockEdit = createHigherOrderComponent(
-	( BlockEdit ) =>
-		function AddGridVisualizerToBlockEdit( props: BlockEditHookProps ) {
-			// The layout attribute holds the block's layout.
-			const layout = props.attributes.layout as Layout | undefined;
-			if ( layout?.type !== 'grid' ) {
-				return <BlockEdit key="edit" { ...props } />;
-			}
+function GridVisualizerEdit( {
+	clientId,
+	layout,
+}: BlockSupportEditProps & { layout?: Layout } ) {
+	if ( layout?.type !== 'grid' ) {
+		return null;
+	}
 
-			return (
-				<>
-					<GridTools clientId={ props.clientId } layout={ layout } />
-					<BlockEdit key="edit" { ...props } />
-				</>
-			);
-		},
-	'addGridVisualizerToBlockEdit'
-);
+	return <GridTools clientId={ clientId } layout={ layout } />;
+}
 
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/grid-visualizer',
-	addGridVisualizerToBlockEdit
-);
+export default {
+	edit: GridVisualizerEdit,
+	attributeKeys: [ 'layout' ],
+	hasSupport: () => true,
+	// Grid blocks keep their layout in sync even when not selected.
+	isActive: ( { layout }: { layout?: Layout } ) => layout?.type === 'grid',
+};

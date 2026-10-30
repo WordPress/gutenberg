@@ -17,6 +17,9 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+import { useBlockEditContext } from './context';
+import { renderBlockEditFeatures } from './features';
+import { SelectedBlockEditControlsSlot } from './selected-controls';
 import type { BlockEditPublicProps } from './types';
 
 const Edit = ( props: BlockEditPublicProps ) => {
@@ -49,6 +52,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	const registry = useRegistry();
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
+	const blockEditContext = useBlockEditContext();
 	// Read by the block's own subscription, rather than one more per block.
 	const {
 		bindableAttributes,
@@ -264,15 +268,30 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		return null;
 	}
 
+	const editProps = {
+		...props,
+		attributes: computedAttributes,
+		context,
+		setAttributes: setBoundAttributes,
+	};
+	const features = renderBlockEditFeatures( editProps, blockEditContext );
+	const selectedControls = props.isSelected && (
+		<SelectedBlockEditControlsSlot fillProps={ editProps } />
+	);
+
 	// An absent version compares as `false`.
 	if ( ( blockType.apiVersion as number ) > 1 ) {
 		return (
-			<EditWithFilters
-				{ ...props }
-				attributes={ computedAttributes }
-				context={ context }
-				setAttributes={ setBoundAttributes }
-			/>
+			<>
+				{ features }
+				<EditWithFilters
+					{ ...props }
+					attributes={ computedAttributes }
+					context={ context }
+					setAttributes={ setBoundAttributes }
+				/>
+				{ selectedControls }
+			</>
 		);
 	}
 
@@ -288,13 +307,17 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	);
 
 	return (
-		<EditWithFilters
-			{ ...props }
-			attributes={ computedAttributes }
-			className={ className }
-			context={ context }
-			setAttributes={ setBoundAttributes }
-		/>
+		<>
+			{ features }
+			<EditWithFilters
+				{ ...props }
+				attributes={ computedAttributes }
+				className={ className }
+				context={ context }
+				setAttributes={ setBoundAttributes }
+			/>
+			{ selectedControls }
+		</>
 	);
 };
 

@@ -8,7 +8,6 @@ import {
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
 const EMPTY_OBJECT: FitTextBlockState = {};
 const MIN_FONT_SIZE_FOR_WARNING = 12;
 import { optimizeFitText } from '../utils/fit-text-utils';
@@ -18,7 +17,7 @@ import InspectorControls from '../components/inspector-controls';
 import FitTextSizeWarning from '../components/fit-text-size-warning';
 import type { BlockAttributes } from '../store/types';
 import type {
-	BlockEditHookProps,
+	BlockSupportEditProps,
 	BlockWrapperProps,
 	FitTextAttributes,
 	FitTextControlProps,
@@ -407,59 +406,45 @@ function FitTextFontSize( {
 	return null;
 }
 
-/*
- * Fit-text requires that layout calculations be done even when a block is not
- * currently selected. Therefore, the regular hooking approach using an
- * exported `edit` method is not enough, and we must use this HoC with the
- * `editor.BlockEdit` filter.
- */
-const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
-	return function AddFitTextControl( props: BlockEditHookProps ) {
-		const { name, attributes, clientId, isSelected, setAttributes } = props;
-		// The block attributes include the fit text attributes.
-		const { fitText } = attributes as FitTextAttributes;
-		const supportsFitText = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
-		if ( ! supportsFitText ) {
-			return <BlockEdit { ...props } />;
-		}
-		return (
-			<>
-				<BlockEdit { ...props } />
-				<InspectorControls group="typography">
-					<FitTextControl
-						clientId={ clientId }
-						fitText={ fitText }
-						setAttributes={ setAttributes }
-						name={ name }
-						fontSize={
-							( attributes as FitTextAttributes ).fontSize
-						}
-						style={ ( attributes as FitTextAttributes ).style }
-					/>
-				</InspectorControls>
-				{ fitText && (
-					<FitTextFontSize
-						fitText={ fitText }
-						name={ name }
-						clientId={ clientId }
-						isSelected={ isSelected }
-					/>
-				) }
-			</>
-		);
-	};
-}, 'addFitTextControl' );
-
-addFilter(
-	'editor.BlockEdit',
-	'core/fit-text/add-fit-text-control',
-	addFitTextControl
-);
+function FitTextEdit( {
+	name,
+	clientId,
+	isSelected,
+	setAttributes,
+	fitText,
+	fontSize,
+	style,
+}: BlockSupportEditProps & FitTextAttributes ) {
+	return (
+		<>
+			<InspectorControls group="typography">
+				<FitTextControl
+					clientId={ clientId }
+					fitText={ fitText }
+					setAttributes={ setAttributes }
+					name={ name }
+					fontSize={ fontSize }
+					style={ style }
+				/>
+			</InspectorControls>
+			{ fitText && (
+				<FitTextFontSize
+					fitText={ fitText }
+					name={ name }
+					clientId={ clientId }
+					isSelected={ isSelected }
+				/>
+			) }
+		</>
+	);
+}
 
 export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
 	hasSupport: hasFitTextSupport,
-	edit: () => null,
+	edit: FitTextEdit,
+	// The text is sized to fit even when the block is not selected.
+	isActive: ( { fitText }: FitTextAttributes ) => !! fitText,
 };
