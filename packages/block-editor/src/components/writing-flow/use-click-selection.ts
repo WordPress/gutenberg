@@ -62,7 +62,9 @@ export default function useClickSelection() {
 					clickedClientId &&
 					clickedClientId === startClientId &&
 					node.contentEditable === 'true' &&
-					node.ownerDocument.activeElement === node
+					// Not `activeElement`: it stays on the body after the
+					// keyboard is hidden, when nothing has focus.
+					node.matches( ':focus' )
 				) {
 					event.preventDefault();
 					return;
