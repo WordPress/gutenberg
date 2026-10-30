@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#ISSUE](https://github.com/WordPress/gutenberg/pull/ISSUE)).
+-   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#86043](https://github.com/WordPress/gutenberg/pull/86043)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
 -   Navigation Link, Navigation Submenu: Keep the bold, italic, and other formatting of the text when editing it in the sidebar's Text field ([#85223](https://github.com/WordPress/gutenberg/pull/85223)).
 -   Playlist: Keep `&` intact in track audio and image URLs on the front end, so URLs with several query parameters, such as signed CDN or S3 links, load instead of being cut off at the first `&` ([#85931](https://github.com/WordPress/gutenberg/pull/85931)).
