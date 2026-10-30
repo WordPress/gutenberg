@@ -2,53 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, type Element as ReactElement } from '@wordpress/element';
 import {
 	SearchControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalGrid as Grid,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import * as iconsPackage from '@wordpress/icons';
-import manifest from '../../../packages/icons/src/manifest.json';
-
-const { Icon, ...availableIcons } = iconsPackage;
-
-const ALL_ICONS_MANIFEST = new Map(
-	manifest.map(
-		( entry: {
-			slug: string;
-			label: string;
-			collections?: string[];
-			keywords?: string[];
-		} ) => [
-			entry.slug,
-			{
-				slug: entry.slug,
-				label: entry.label,
-				collections: entry.collections ?? [],
-				keywords: entry.keywords ?? [],
-			},
-		]
-	)
-);
-
-const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
-
-type Collection = ( typeof COLLECTIONS )[ number ];
-
-function nameToSlug( name: string ): string {
-	return (
-		name
-			// Protect acronyms before conversion
-			.replace( /RTL/g, '-rtl' )
-			.replace( /LTR/g, '-ltr' )
-			.replace( /NE/g, '-ne' )
-			// Insert hyphen before each uppercase and convert to lowercase
-			.replace( /[A-Z]/g, ( letter ) => `-${ letter.toLowerCase() }` )
-			// Insert hyphen before digit when preceded by letter (e.g. Level1 -> level-1)
-			.replace( /([a-zA-Z])([0-9])/g, '$1-$2' )
-	);
-}
+import { Icon } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
+import { IconDetails } from './icon-details';
+import { IconGrid } from './icon-grid';
+import { COLLECTIONS, ICON_NAMES, type Collection } from './manifest';
+import { useSelectedIcon } from './use-selected-icon';
+import styles from './library.module.scss';
 
 const meta: Meta = {
 	component: Icon,
@@ -57,10 +20,10 @@ const meta: Meta = {
 	tags: [ '!autodocs' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },
+		layout: 'fullscreen',
 	},
 	argTypes: {
 		filter: { control: false },
-		size: { control: false },
 		collection: { control: false },
 	},
 };
@@ -68,52 +31,34 @@ export default meta;
 
 type LibraryArgs = {
 	filter: string;
-	size: string | number;
 	collection: Collection;
 };
 
 const LibraryExample = ( {
 	filter: initialFilter,
-	size: initialSize,
 	collection: initialCollection,
 }: LibraryArgs ): ReactElement => {
 	const [ filter, setFilter ] = useState( initialFilter );
-	const [ size, setSize ] = useState( initialSize );
 	const [ collection, setCollection ] = useState( initialCollection );
-	const normalizedFilter = filter.toLowerCase();
-	const filteredIcons = Object.fromEntries(
-		Object.entries( availableIcons ).filter( ( [ name ] ) => {
-			const iconInfo = ALL_ICONS_MANIFEST.get( nameToSlug( name ) );
-
-			if (
-				collection !== 'all' &&
-				! iconInfo?.collections.includes( collection )
-			) {
-				return false;
-			}
-
-			if ( ! normalizedFilter.length ) {
-				return true;
-			}
-
-			// Labels and keywords live in the manifest, so Storybook and the
-			// icons registry search the same terms.
-			return (
-				name.toLowerCase().includes( normalizedFilter ) ||
-				!! iconInfo?.label.toLowerCase().includes( normalizedFilter ) ||
-				!! iconInfo?.keywords.some( ( keyword ) =>
-					keyword.toLowerCase().includes( normalizedFilter )
-				)
-			);
-		} )
+	const { selectedName, selectIcon } = useSelectedIcon();
+	// Shown until an icon is selected.
+	const [ randomName ] = useState(
+		() => ICON_NAMES[ Math.floor( Math.random() * ICON_NAMES.length ) ]
 	);
 
-	const hasResults = Object.keys( filteredIcons ).length > 0;
-
 	return (
-		<div style={ { padding: 10 } }>
-			<VStack spacing={ 8 }>
-				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
+		<Stack gap="3xl" className={ styles.layout }>
+			<div className={ styles.details }>
+				<IconDetails name={ selectedName ?? randomName } />
+			</div>
+			<Stack direction="column" gap="lg" className={ styles.browser }>
+				<Stack
+					direction="row"
+					gap="lg"
+					justify="flex-start"
+					align="flex-start"
+					wrap="wrap"
+				>
 					<SearchControl
 						label="Icon name"
 						hideLabelFromVision={ false }
@@ -122,89 +67,43 @@ const LibraryExample = ( {
 							setFilter( value ?? '' )
 						}
 					/>
-					<ToggleGroupControl
-						label="Icon size"
-						isBlock
-						value={ size }
-						onChange={ ( value: string | number | undefined ) =>
-							setSize( value ?? '24' )
-						}
-					>
-						{ [ '16', '24', '32' ].map( ( option ) => (
-							<ToggleGroupControlOption
-								key={ option }
-								value={ option }
-								label={ option }
-							/>
-						) ) }
-					</ToggleGroupControl>
-					<ToggleGroupControl
-						label="Collection"
-						isBlock
-						value={ collection }
-						onChange={ ( value: string | number | undefined ) =>
-							setCollection( ( value ?? 'all' ) as Collection )
-						}
-					>
-						{ COLLECTIONS.map( ( option ) => (
-							<ToggleGroupControlOption
-								key={ option }
-								value={ option }
-								label={ option === 'all' ? 'All' : option }
-							/>
-						) ) }
-					</ToggleGroupControl>
-				</HStack>
-				{ hasResults ? (
-					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
-						{ Object.entries( filteredIcons ).map(
-							( [ name, icon ] ) => {
-								const slug = nameToSlug( name );
-								if ( ! ALL_ICONS_MANIFEST.has( slug ) ) {
-									throw new Error(
-										`Icon "${ name }" (slug: ${ slug }) is not found in the manifest. Add it to packages/icons/src/manifest.json.`
-									);
-								}
-								return (
-									<div
-										key={ name }
-										style={ {
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'center',
-											gap: 8,
-										} }
-									>
-										<Icon
-											icon={ icon }
-											size={ Number( size ) }
-										/>
-										<span
-											style={ {
-												fontSize: 11,
-												textAlign: 'center',
-												wordBreak: 'break-all',
-											} }
-										>
-											{ name }
-										</span>
-									</div>
-								);
+					<div style={ { width: 500, maxWidth: '100%' } }>
+						<ToggleGroupControl
+							label="Available in"
+							isBlock
+							value={ collection }
+							onChange={ ( value: string | number | undefined ) =>
+								setCollection(
+									( value ?? 'all' ) as Collection
+								)
 							}
-						) }
-					</Grid>
-				) : (
-					<p>No icons found.</p>
-				) }
-			</VStack>
-		</div>
+						>
+							{ COLLECTIONS.map( ( { value, label } ) => (
+								<ToggleGroupControlOption
+									key={ value }
+									value={ value }
+									label={ label }
+								/>
+							) ) }
+						</ToggleGroupControl>
+					</div>
+				</Stack>
+				<div className={ styles.grid }>
+					<IconGrid
+						filter={ filter }
+						collection={ collection }
+						selectedName={ selectedName }
+						onSelect={ selectIcon }
+					/>
+				</div>
+			</Stack>
+		</Stack>
 	);
 };
 
 export const Library: StoryObj< LibraryArgs > = {
 	args: {
 		filter: '',
-		size: '24',
 		collection: 'all',
 	},
 	render: ( args ) => <LibraryExample { ...args } />,

@@ -1,0 +1,36 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+.layout {
+	flex-direction: column;
+	padding: 24px;
+
+	@include break-xlarge {
+		flex-direction: row;
+		box-sizing: border-box;
+		height: 100vh;
+	}
+}
+
+.details {
+	@include break-xlarge {
+		flex: 0 0 420px;
+		overflow-y: auto;
+		padding: 4px;
+	}
+}
+
+.browser {
+	@include break-xlarge {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+.grid {
+	@include break-xlarge {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding: 4px;
+	}
+}
