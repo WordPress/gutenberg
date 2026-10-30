@@ -64,7 +64,7 @@ function report( string $message ): void {
  */
 function usage( int $status = 1 ): void {
 	$contents = (string) file_get_contents( __FILE__ );
-	if ( preg_match( '/^ \* (Usage.*?)^ \* A commit/ms', $contents, $matches ) ) {
+	if ( preg_match( '/\n \* (Usage.*?)\n \* A commit/s', $contents, $matches ) ) {
 		report( rtrim( (string) preg_replace( '/^ \*(?: |$)/m', '', $matches[1] ) ) );
 	}
 	exit( $status );
@@ -106,7 +106,7 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 
 	$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null );
 	if ( ! is_resource( $process ) ) {
-		throw new RuntimeException( "Unable to run {$command[0]}." );
+		throw new RuntimeException( "Unable to run $command[0]." );
 	}
 	$output = '';
 	if ( isset( $pipes[1] ) ) {
@@ -172,9 +172,10 @@ function composer(): array {
  * @param string $parent_dir The directory to create it in.
  * @param string $prefix     The prefix of its name.
  * @return string The path of the new directory.
+ * @throws RuntimeException When the directory cannot be created.
  */
 function create_directory( string $parent_dir, string $prefix ): string {
-	$dir = rtrim( $parent_dir, '/\\' ) . '/' . $prefix . bin2hex( random_bytes( 6 ) );
+	$dir = rtrim( $parent_dir, '/\\' ) . '/' . str_replace( '.', '', uniqid( $prefix, true ) );
 	if ( ! mkdir( $dir, 0777, true ) ) {
 		throw new RuntimeException( "Unable to create $dir." );
 	}
@@ -223,14 +224,17 @@ function find_checkout( string $dir ): ?string {
  * Reads the source that the package's composer.json records.
  *
  * @param string $file The package's composer.json.
- * @return array<mixed> The recorded source.
+ * @return array{commit: string, pull_request: string, uncommitted_changes: bool} The recorded source.
  */
 function read_recorded( string $file ): array {
-	$json = json_decode( (string) file_get_contents( $file ), true );
-	if ( is_array( $json ) && isset( $json['extra'] ) && is_array( $json['extra'] ) && isset( $json['extra']['source'] ) && is_array( $json['extra']['source'] ) ) {
-		return $json['extra']['source'];
-	}
-	return array();
+	$json   = json_decode( (string) file_get_contents( $file ), true );
+	$extra  = is_array( $json ) && isset( $json['extra'] ) && is_array( $json['extra'] ) ? $json['extra'] : array();
+	$source = isset( $extra['source'] ) && is_array( $extra['source'] ) ? $extra['source'] : array();
+	return array(
+		'commit'              => isset( $source['commit'] ) && is_string( $source['commit'] ) ? $source['commit'] : '',
+		'pull_request'        => isset( $source['pull-request'] ) && is_int( $source['pull-request'] ) ? (string) $source['pull-request'] : '',
+		'uncommitted_changes' => ! empty( $source['uncommitted-changes'] ),
+	);
 }
 
 /**
@@ -375,10 +379,10 @@ function main( array $args ): void {
 	// stubs generated from them are used as they are.
 	$recorded = '' === $commit && '' === $pr && ! $use_checkout;
 	if ( $recorded ) {
-		$source = read_recorded( $package_file );
-		$commit = isset( $source['commit'] ) && is_string( $source['commit'] ) ? $source['commit'] : '';
-		$pr     = isset( $source['pull-request'] ) && is_int( $source['pull-request'] ) ? (string) $source['pull-request'] : '';
-		if ( ! empty( $source['uncommitted-changes'] ) ) {
+		$recorded_source = read_recorded( $package_file );
+		$commit          = $recorded_source['commit'];
+		$pr              = $recorded_source['pull_request'];
+		if ( $recorded_source['uncommitted_changes'] ) {
 			if ( is_file( $stub_file ) && ! $force ) {
 				report( 'Using the WordPress stubs generated from uncommitted changes in a wordpress-develop checkout. Generate them with --pr or --commit before pushing, since they cannot be generated again elsewhere.' );
 				return;
@@ -513,7 +517,7 @@ function main( array $args ): void {
 	if ( null === $revision || ! preg_match( '/^(\d+\.\d+)(\.\d+)?-([a-zA-Z]+\d*)-/', $wp_version, $matches ) ) {
 		throw new RuntimeException( "Unable to determine the revision ($revision) and version ($wp_version) of the commit." );
 	}
-	$package_version = $matches[1] . ( '' !== $matches[2] ? $matches[2] : '.0' ) . "-{$matches[3]}.$revision";
+	$package_version = $matches[1] . ( '' !== $matches[2] ? $matches[2] : '.0' ) . "-$matches[3].$revision";
 
 	// Describe where the stubs came from: a trunk commit has a revision of its own, while a pull
 	// request or a checkout is described by the trunk revision it is based on. A commit in a checkout
