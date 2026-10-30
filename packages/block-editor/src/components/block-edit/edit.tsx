@@ -5,12 +5,11 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import type { ComponentType } from 'react';
 import type { BlockBindingsSource } from '@wordpress/blocks';
 import BlockContext from '../block-context';
-import isURLLike from '../link-control/is-url-like';
 import {
 	getBlockBindingsContext,
 	hasPatternOverridesDefaultBinding,
@@ -53,6 +52,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	const {
 		bindableAttributes,
 		blockBindingsSources: registeredSources = NO_SOURCES,
+		boundAttributes,
 	} = useContext( PrivateBlockContext );
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
@@ -88,87 +88,11 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		registeredSources,
 	] );
 
-	const computedAttributes = useSelect(
-		( select ) => {
-			if ( ! blockBindings ) {
-				return attributes;
-			}
-
-			const attributesFromSources: Record< string, unknown > = {};
-			const blockBindingsBySource = new Map<
-				Omit< BlockBindingsSource, 'name' >,
-				Record< string, { args?: Record< string, unknown > } >
-			>();
-
-			for ( const [ attributeName, binding ] of Object.entries(
-				blockBindings
-			) ) {
-				const { source: sourceName, args: sourceArgs } = binding;
-				// An absent source looks up nothing.
-				const source = registeredSources[ sourceName as string ];
-				if (
-					! source ||
-					! bindableAttributes?.includes( attributeName )
-				) {
-					continue;
-				}
-
-				blockBindingsBySource.set( source, {
-					...blockBindingsBySource.get( source ),
-					[ attributeName ]: {
-						args: sourceArgs,
-					},
-				} );
-			}
-
-			if ( blockBindingsBySource.size ) {
-				for ( const [ source, bindings ] of blockBindingsBySource ) {
-					// Get values in batch if the source supports it.
-					let values: Record< string, unknown > = {};
-					if ( ! source.getValues ) {
-						Object.keys( bindings ).forEach( ( attr ) => {
-							// Default to the source label when `getValues` doesn't exist.
-							values[ attr ] = source.label;
-						} );
-					} else {
-						values = source.getValues( {
-							select,
-							context,
-							clientId,
-							bindings,
-						} );
-					}
-					for ( const [ attributeName, value ] of Object.entries(
-						values
-					) ) {
-						if (
-							attributeName === 'url' &&
-							// Sources return URLs as strings.
-							( ! value || ! isURLLike( value as string ) )
-						) {
-							// Return null if value is not a valid URL.
-							attributesFromSources[ attributeName ] = null;
-						} else {
-							attributesFromSources[ attributeName ] = value;
-						}
-					}
-				}
-			}
-
-			return {
-				...attributes,
-				...attributesFromSources,
-			};
-		},
-		[
-			attributes,
-			bindableAttributes,
-			blockBindings,
-			clientId,
-			context,
-			registeredSources,
-		]
-	);
+	// Bound attributes take their values from their sources, which the block's
+	// own subscription selects.
+	const computedAttributes = boundAttributes
+		? { ...attributes, ...boundAttributes }
+		: attributes;
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes: Record< string, unknown > ) => {

@@ -29,6 +29,14 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import BlockContext from '../block-context';
+import {
+	getBlockBindingsContext,
+	getBoundAttributes,
+	replacePatternOverridesDefaultBinding,
+	selectBoundAttributes,
+} from '../../utils/block-bindings';
+import type { Bindings } from '../../utils/block-bindings';
 import {
 	getAttributeChanges,
 	applyAttributeChanges,
@@ -692,6 +700,7 @@ const FilteredBlockListBlock = compose(
 // component, and useBlockProps.
 function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	const { clientId, rootClientId, ghostBlock } = props;
+	const blockContext = useContext( BlockContext );
 	// Stable fallback so the selector returns referentially equal values.
 	const ghostBlockWithoutAttributes = useMemo(
 		() =>
@@ -771,6 +780,9 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 			} = settings;
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+			const bindings = attributes?.metadata?.bindings as
+				Bindings | undefined;
+			const blockBindingsSources = getAllBlockBindingsSources();
 			const blockVisibility = attributes?.metadata?.blockVisibility;
 			const deviceType =
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
@@ -798,13 +810,39 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				bindableAttributes,
-				blockBindingsSources: getAllBlockBindingsSources(),
+				blockBindingsSources,
 				blockVisibility,
 				deviceType,
 				viewportSettings,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
+				// Only blocks with bindings read their sources, here rather
+				// than in a subscription of their own.
+				...( bindings &&
+					selectBoundAttributes(
+						select,
+						clientId,
+						replacePatternOverridesDefaultBinding(
+							bindings,
+							// Blocks with pattern overrides have bindable
+							// attributes.
+							bindableAttributes as string[]
+						)!,
+						bindableAttributes,
+						blockBindingsSources,
+						getBlockBindingsContext(
+							blockContext,
+							blockType?.usesContext,
+							Object.values( bindings ).map(
+								// An absent source looks up nothing.
+								( binding ) =>
+									blockBindingsSources[
+										binding?.source as string
+									]
+							)
+						)
+					) ),
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -907,7 +945,13 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				),
 			};
 		},
-		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
+		[
+			clientId,
+			rootClientId,
+			ghostBlock,
+			ghostBlockWithoutAttributes,
+			blockContext,
+		]
 	);
 
 	// The ref also stores the window of the block element.
@@ -1032,6 +1076,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		isBlockCurrentlyHidden,
 		bindableAttributes,
 		blockBindingsSources,
+		boundAttributes: getBoundAttributes( selectedProps ),
 		blockVisibility,
 		deviceType,
 		viewportSettings,

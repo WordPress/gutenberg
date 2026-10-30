@@ -1,3 +1,7 @@
+import type { BlockBindingsSource as RegisteredSource } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
+import isURLLike from '../components/link-control/is-url-like';
+
 export type Binding = { source?: string; args?: Record< string, unknown > };
 export type Bindings = Record< string, Binding >;
 type BlockBindingsSource = { usesContext?: readonly string[] };
@@ -98,4 +102,100 @@ export function replacePatternOverridesDefaultBinding(
 	}
 
 	return bindingsWithDefaults;
+}
+
+const BOUND_ATTRIBUTE_PREFIX = 'boundAttribute:';
+
+/**
+ * Selects the values of the block's bound attributes from their sources, one
+ * key per attribute, so the block's subscription compares them one by one.
+ *
+ * @param select             The registry's `select`.
+ * @param clientId           The block client ID.
+ * @param blockBindings      The block's bindings, with defaults replaced.
+ * @param bindableAttributes The attributes the block can bind.
+ * @param registeredSources  The registered bindings sources, by name.
+ * @param context            The context for resolving the bindings.
+ *
+ * @return The values by prefixed attribute name.
+ */
+export function selectBoundAttributes(
+	select: DataRegistry[ 'select' ],
+	clientId: string,
+	blockBindings: Bindings,
+	bindableAttributes: string[] | undefined,
+	registeredSources: Record< string, Omit< RegisteredSource, 'name' > >,
+	context: Record< string, unknown >
+) {
+	const attributesFromSources: Record< string, unknown > = {};
+	const blockBindingsBySource = new Map<
+		Omit< RegisteredSource, 'name' >,
+		Record< string, { args?: Record< string, unknown > } >
+	>();
+
+	for ( const [ attributeName, binding ] of Object.entries(
+		blockBindings
+	) ) {
+		const { source: sourceName, args: sourceArgs } = binding;
+		// An absent source looks up nothing.
+		const source = registeredSources[ sourceName as string ];
+		if ( ! source || ! bindableAttributes?.includes( attributeName ) ) {
+			continue;
+		}
+
+		blockBindingsBySource.set( source, {
+			...blockBindingsBySource.get( source ),
+			[ attributeName ]: {
+				args: sourceArgs,
+			},
+		} );
+	}
+
+	for ( const [ source, bindings ] of blockBindingsBySource ) {
+		// Get values in batch if the source supports it.
+		let values: Record< string, unknown > = {};
+		if ( ! source.getValues ) {
+			Object.keys( bindings ).forEach( ( attr ) => {
+				// Default to the source label when `getValues` doesn't exist.
+				values[ attr ] = source.label;
+			} );
+		} else {
+			values = source.getValues( {
+				select,
+				context,
+				clientId,
+				bindings,
+			} );
+		}
+		for ( const [ attributeName, value ] of Object.entries( values ) ) {
+			attributesFromSources[ BOUND_ATTRIBUTE_PREFIX + attributeName ] =
+				attributeName === 'url' &&
+				// Sources return URLs as strings.
+				( ! value || ! isURLLike( value as string ) )
+					? // Return null if value is not a valid URL.
+						null
+					: value;
+		}
+	}
+
+	return attributesFromSources;
+}
+
+/**
+ * Returns the bound attribute values selected by `selectBoundAttributes`.
+ *
+ * @param selected The selected props.
+ *
+ * @return The values by attribute name, if the block has any.
+ */
+export function getBoundAttributes( selected: Record< string, unknown > ) {
+	let boundAttributes: Record< string, unknown > | undefined;
+	for ( const key in selected ) {
+		if ( key.startsWith( BOUND_ATTRIBUTE_PREFIX ) ) {
+			boundAttributes ??= {};
+			boundAttributes[ key.slice( BOUND_ATTRIBUTE_PREFIX.length ) ] =
+				selected[ key ];
+		}
+	}
+	return boundAttributes;
 }

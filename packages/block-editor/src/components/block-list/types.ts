@@ -79,6 +79,8 @@ export interface PrivateBlockContextValue {
 		string,
 		Omit< BlockBindingsSource, 'name' >
 	>;
+	// The values of the block's bound attributes, if it has any.
+	boundAttributes?: Record< string, unknown >;
 	blockVisibility?: BlockVisibility;
 	deviceType?: BlockVisibilityViewport;
 	viewportSettings?: ViewportBreakpoints;
@@ -229,4 +231,6 @@ export type BlockListBlockSelectedProps = Omit<
 	isSelectionEnabled?: boolean;
 	isLocked?: boolean;
 	canRemove?: boolean;
+	// The values of the block's bound attributes, by prefixed name.
+	[ boundAttribute: `boundAttribute:${ string }` ]: unknown;
 };
