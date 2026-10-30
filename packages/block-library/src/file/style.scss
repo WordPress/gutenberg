@@ -21,8 +21,8 @@
 }
 
 :where(.wp-block-file.is-layout-flex.alignright) {
-	// RTL rows start on the right, so flip the value to keep the block on the right.
-	justify-content: flex-end #{"/*rtl:flex-start;*/"};
+	/*rtl:ignore*/
+	justify-content: right;
 }
 
 // Without a file name the button is the only item in its row, so "space
