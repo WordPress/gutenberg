@@ -491,7 +491,7 @@ test.describe( 'Post Summary', () => {
 			await expect(
 				editButton
 					.locator( '..' )
-					.getByText( '(Add an excerpt)', { exact: true } )
+					.getByText( '(No excerpt)', { exact: true } )
 			).toBeVisible();
 
 			await editButton.click();
