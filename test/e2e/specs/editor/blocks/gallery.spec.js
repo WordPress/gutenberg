@@ -323,6 +323,53 @@ test.describe( 'Gallery', () => {
 			);
 	} );
 
+	test.describe( 'with a site default link', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-plugin-image-default-link-type-file'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-default-link-type-file'
+			);
+		} );
+
+		test( 'saves the site default link when inserted', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Add default block' } )
+				.click();
+			await page.keyboard.type( '/gallery' );
+			await expect(
+				page.getByRole( 'option', { name: 'Gallery', exact: true } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await page.keyboard.press( 'Enter' );
+
+			const [ { name, attributes } ] = await editor.getBlocks();
+			expect( name ).toBe( 'core/gallery' );
+			expect( attributes ).toEqual( {
+				allowResize: false,
+				aspectRatio: 'auto',
+				caption: '',
+				fixedHeight: true,
+				ids: [],
+				imageCrop: true,
+				images: [],
+				linkTo: 'file',
+				navigationButtonType: 'icon',
+				randomOrder: false,
+				shortCodeTransforms: [],
+				sizeSlug: 'large',
+			} );
+		} );
+	} );
+
 	test( 'when initially added the media library shows the Create Gallery view', async ( {
 		admin,
 		editor,
