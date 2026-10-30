@@ -598,6 +598,121 @@ test.describe( 'Navigation block', () => {
 			await expect( navigation.getNavBlockInserter() ).toBeFocused();
 		} );
 
+		test( 'keeps the label formatting when editing the sidebar Text field', async ( {
+			page,
+			editor,
+			requestUtils,
+		} ) => {
+			const createdMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"\\u003cstrong\\u003eShop\\u003c/strong\\u003e now","url":"https://example.com"} /-->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: createdMenu?.id },
+			} );
+
+			const linkLabel = editor.canvas.getByRole( 'textbox', {
+				name: 'Navigation link text',
+			} );
+			await linkLabel.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const textInput = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } );
+			await expect( textInput ).toHaveValue( 'Shop now' );
+
+			// Editing the plain text leaves the untouched bold text bold.
+			await textInput.fill( 'Shop later' );
+			await expect( linkLabel ).toHaveText( 'Shop later' );
+			await expect( linkLabel.locator( 'strong' ) ).toHaveText( 'Shop' );
+			// The menu's blocks are controlled inner blocks, so read them from
+			// the navigation block rather than the top of the tree.
+			const navClientId = await editor.canvas
+				.locator( '[data-type="core/navigation"]', { has: linkLabel } )
+				.getAttribute( 'data-block' );
+			await expect
+				.poll( () => editor.getBlocks( { clientId: navClientId } ) )
+				.toMatchObject( [
+					{
+						name: 'core/navigation-link',
+						attributes: { label: '<strong>Shop</strong> later' },
+					},
+				] );
+		} );
+
+		test( 'keeps a line break and an inline image in the label when editing the sidebar Text field', async ( {
+			page,
+			editor,
+			pageUtils,
+			requestUtils,
+		} ) => {
+			const createdMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"Shop\\u003cbr\\u003e\\u003cem\\u003enow\\u003c/em\\u003e \\u003cimg class=\\u0022wp-image-1\\u0022 src=\\u0022https://example.com/x.png\\u0022 alt=\\u0022\\u0022\\u003e","url":"https://example.com"} /-->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: createdMenu?.id },
+			} );
+
+			const linkLabel = editor.canvas.getByRole( 'textbox', {
+				name: 'Navigation link text',
+			} );
+			await linkLabel.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const textInput = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } );
+			const navClientId = await editor.canvas
+				.locator( '[data-type="core/navigation"]', { has: linkLabel } )
+				.getAttribute( 'data-block' );
+			const getLabel = async () =>
+				( await editor.getBlocks( { clientId: navClientId } ) )[ 0 ]
+					?.attributes.label;
+
+			await test.step( 'shows the line break and the image as symbols', async () => {
+				// A single-line field cannot hold either, so it shows a symbol.
+				await expect( textInput ).toHaveValue( 'Shop↵now 🖼️' );
+			} );
+
+			await test.step( 'typing keeps the line break, the formatting and the image', async () => {
+				await textInput.click();
+				await page.keyboard.press( 'End' );
+				await page.keyboard.type( '!' );
+				await expect( textInput ).toHaveValue( 'Shop↵now 🖼️!' );
+				await expect( linkLabel.locator( 'br' ) ).toHaveCount( 1 );
+				await expect( linkLabel.locator( 'em' ) ).toHaveText( 'now' );
+				await expect( linkLabel.locator( 'img' ) ).toHaveCount( 1 );
+				await expect
+					.poll( getLabel )
+					.toMatch( /^Shop<br><em>now<\/em> <img [^>]+>!$/ );
+			} );
+
+			await test.step( 'deleting the image symbol removes the image', async () => {
+				await page.keyboard.press( 'Backspace' );
+				await page.keyboard.press( 'Backspace' );
+				await expect( textInput ).toHaveValue( 'Shop↵now ' );
+				await expect( linkLabel.locator( 'img' ) ).toHaveCount( 0 );
+				await expect.poll( getLabel ).toBe( 'Shop<br><em>now</em> ' );
+			} );
+
+			await test.step( 'undo restores the image and the formatting', async () => {
+				await pageUtils.pressKeys( 'primary+z' );
+				await expect( linkLabel.locator( 'img' ) ).toHaveCount( 1 );
+				await expect( linkLabel.locator( 'br' ) ).toHaveCount( 1 );
+				await expect( linkLabel.locator( 'em' ) ).toHaveText( 'now' );
+				await expect( textInput ).toHaveValue( /^Shop↵now 🖼️/ );
+				await expect
+					.poll( getLabel )
+					.toMatch( /^Shop<br><em>now<\/em> <img [^>]+>/ );
+			} );
+		} );
+
 		test( 'should preserve focus in sidebar text input when typing (@firefox)', async ( {
 			page,
 			editor,

@@ -51,6 +51,7 @@ function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="language"
 				icon={ languageIcon }
 				label={ title }
 				title={ title }
