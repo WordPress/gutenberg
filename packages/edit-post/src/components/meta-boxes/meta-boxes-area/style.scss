@@ -88,7 +88,6 @@
 	// right below the "normal" area, which already provides the main drop zone.
 	.is-dragging-metaboxes &:not(.is-advanced) .meta-box-sortables {
 		min-height: 60px;
-		border-radius: $radius-large;
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 	}
 
