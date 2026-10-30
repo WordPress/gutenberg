@@ -6,7 +6,7 @@
 			/* Internal variables */
 			--wp-ui-calendar-cell-size: var(--wpds-dimension-size-md);
 			/* Days grow to fill the container, up to this size. */
-			--wp-ui-calendar-max-cell-size: calc(var(--wp-ui-calendar-cell-size) * 1.5);
+			--_wp-ui-calendar-max-cell-size: calc(var(--wp-ui-calendar-cell-size) * 1.5);
 
 			position: relative; /* Required to position the navigation toolbar. */
 			display: flow-root;
@@ -147,21 +147,21 @@
 			 */
 			grid-template-columns: repeat(auto-fit, minmax(min(calc(var(--wp-ui-calendar-cell-size) * 7), 100%), 1fr));
 			gap: var(--wpds-dimension-gap-lg);
-			max-width: calc(var(--wp-ui-calendar-max-cell-size) * 7);
+			max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 7);
 
 			/* Leave room for every month shown side by side (up to three). */
 			&:has(.month + .month) {
-				max-width: calc(var(--wp-ui-calendar-max-cell-size) * 14 + var(--wpds-dimension-gap-lg));
+				max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 14 + var(--wpds-dimension-gap-lg));
 			}
 
 			&:has(.month + .month + .month) {
-				max-width: calc(var(--wp-ui-calendar-max-cell-size) * 21 + var(--wpds-dimension-gap-lg) * 2);
+				max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 21 + var(--wpds-dimension-gap-lg) * 2);
 			}
 		}
 
 		.month {
 			/* Cap the day size when months stack in a single column. */
-			max-width: calc(var(--wp-ui-calendar-max-cell-size) * 7);
+			max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 7);
 		}
 
 		.month-grid {
