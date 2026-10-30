@@ -64,10 +64,9 @@ function report( string $message ): void {
  * @return bool Whether a pending row was on the current line.
  */
 function is_pending( ?bool $pending = null ): bool {
-	/** @var bool $current */
 	static $current = false;
 
-	$previous = $current;
+	$previous = true === $current;
 	if ( null !== $pending ) {
 		$current = $pending;
 	}
