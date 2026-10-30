@@ -1,6 +1,6 @@
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { Link, Text } from '@wordpress/ui';
+import { Link } from '@wordpress/ui';
 import type { FieldsScriptParts } from '../../types';
 import styles from './style.module.css';
 
@@ -22,14 +22,15 @@ export const fieldExtensions: FieldsScriptParts< PostWithExcerpt >[ string ] = {
 			{ __( 'Learn more about manual excerpts' ) }
 		</Link>
 	),
-	// Shows the first three lines of the excerpt.
+	// Shows the first three lines of the excerpt, as plain text that takes the
+	// typography of where it renders, like the values of other fields.
 	render: ( { item } ) => {
 		const excerpt =
 			typeof item.excerpt === 'string' ? item.excerpt : item.excerpt?.raw;
 		return excerpt ? (
-			<Text className={ styles.excerpt }>
+			<span className={ styles.excerpt }>
 				{ decodeEntities( excerpt ) }
-			</Text>
+			</span>
 		) : null;
 	},
 };
