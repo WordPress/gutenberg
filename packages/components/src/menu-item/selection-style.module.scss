@@ -1,40 +1,15 @@
-// Selection marks and action icons occupy independent leading spaces. Reset
-// these private values at each menu and group so nested menus stay independent.
+// Selection marks reserve menu-wide space. Action prefixes indent only their row.
 :global([role="menu"]) {
 	--_wp-components-menu-selection-width: 0px;
-	--_wp-components-menu-prefix-width: 0px;
 	--_wp-components-menu-item-inset: var(--wpds-dimension-padding-sm);
 }
 
 :global([role="menu"]):has(.item) {
 	--_wp-components-menu-selection-width: var(--wpds-dimension-size-2xs);
 	--_wp-components-menu-item-inset: 0px;
-}
 
-:global(.components-menu-group) {
-	--_wp-components-menu-prefix-width: 0px;
-}
-
-:global([role="menu"]):has(
-	> :global(.components-menu-item__button.has-icon):not(.item),
-	> .control-item:global(.has-icon)
-),
-	:global(.components-menu-group):has(
-	> :global([role="group"])
-	> :global(.components-menu-item__button.has-icon):not(.item)
-) {
-	--_wp-components-menu-prefix-width: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-gap-xs));
-}
-
-:global([role="menu"]):has(.item, .control-item) {
-	:global(.components-menu-item__button):not(.item) {
-		padding-inline-start:
-			calc(var(--_wp-components-menu-item-inset) +
-			var(--_wp-components-menu-selection-width) +
-			var(--_wp-components-menu-prefix-width));
-	}
-
-	:global(.components-menu-item__button.has-icon):not(.item) {
+	:global(.components-menu-item__button):not(.item),
+	:global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
 		padding-inline-start:
 			calc(var(--_wp-components-menu-item-inset) +
 			var(--_wp-components-menu-selection-width));
@@ -44,7 +19,6 @@
 		padding-inline-start:
 			calc(var(--_wp-components-menu-item-inset) +
 			var(--_wp-components-menu-selection-width) +
-			var(--_wp-components-menu-prefix-width) +
 			var(--wpds-border-width-xs));
 	}
 }
@@ -55,10 +29,6 @@
 	// Dropdowns already provide the leading inset around each group.
 	padding-inline-start: 0;
 	padding-inline-end: var(--wpds-dimension-padding-sm);
-
-	> :global(.components-menu-item__item) {
-		margin-inline-start: var(--_wp-components-menu-prefix-width, 0px);
-	}
 
 	> :global(.components-menu-items__item-icon) {
 		width: var(--wpds-dimension-size-2xs);
@@ -75,35 +45,7 @@
 	}
 }
 
-.control-item:global(.components-button.is-compact),
-.control-item:global(.components-button.is-compact.has-icon.has-text) {
-	--_wp-components-menu-prefix-offset: var(--_wp-components-menu-prefix-width, 0px);
-
-	min-height: var(--wpds-dimension-size-md);
-	height: auto;
-	justify-content: start;
-	gap: var(--wpds-dimension-gap-xs);
-	padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
-	padding-inline-start:
-		calc(var(--_wp-components-menu-item-inset, var(--wpds-dimension-padding-sm)) +
-		var(--_wp-components-menu-selection-width, 0px) +
-		var(--_wp-components-menu-prefix-offset));
-	padding-inline-end: var(--wpds-dimension-padding-sm);
-}
-
-.control-item:global(.components-button.is-compact.has-icon.has-text) {
-	--_wp-components-menu-prefix-offset: 0px;
-}
-
-:global(.components-dropdown-menu__menu):has(:global(.components-menu-group)) > .control-item {
+:global(.components-dropdown-menu__menu):has(.item):has(:global(.components-menu-group)) > :global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
 	margin-inline: var(--wpds-dimension-padding-sm);
 	width: calc(100% - 2 * var(--wpds-dimension-padding-sm));
-}
-
-.control-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	// Font-based icons and smaller glyphs share the SVG icon's leading space.
-	min-width: var(--wpds-dimension-size-sm);
 }

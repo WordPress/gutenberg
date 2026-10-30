@@ -3,8 +3,6 @@ import { menu } from '@wordpress/icons';
 import { useEffect, useState } from '@wordpress/element';
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
-import Icon from '../icon';
-import menuItemStyles from '../menu-item/selection-style.module.scss';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 import type {
@@ -220,8 +218,6 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 									} }
 									className={ clsx(
 										'components-dropdown-menu__menu-item',
-										control.title &&
-											menuItemStyles[ 'control-item' ],
 										{
 											'has-separator':
 												indexOfSet > 0 &&
@@ -230,21 +226,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 											'is-icon-only': ! control.title,
 										}
 									) }
-									icon={
-										control.icon && control.title ? (
-											<span
-												className={
-													menuItemStyles[
-														'control-icon'
-													]
-												}
-											>
-												<Icon icon={ control.icon } />
-											</span>
-										) : (
-											control.icon
-										)
-									}
+									icon={ control.icon }
 									label={ control.label }
 									onMouseMove={ (
 										event: React.MouseEvent< HTMLButtonElement >
