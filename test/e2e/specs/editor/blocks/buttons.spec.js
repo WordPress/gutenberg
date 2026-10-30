@@ -79,6 +79,43 @@ test.describe( 'Buttons', () => {
 		);
 	} );
 
+	test( 'closes the link editor when the button is deselected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( { name: 'core/buttons' } );
+		const buttonBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Button',
+			exact: true,
+		} );
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Button text' } )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect( urlInput ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( urlInput ).toBeHidden();
+
+		await editor.selectBlocks( buttonBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link', exact: true } )
+		).toBeVisible();
+		await expect( urlInput ).toBeHidden();
+	} );
+
 	test( 'moves focus from the link editor back to the button when escape is pressed after the URL has been submitted', async ( {
 		editor,
 		page,

@@ -5,9 +5,6 @@ import { useSelect } from '@wordpress/data';
 import { useResolvedStyle } from '../inherited-value-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
-// Coverage for `useResolvedStyle` with the inheritance indicator experiment
-// off, which is what WordPress Core gets. The cascade resolves either way: the
-// experiment gates the label treatment and the reset dot, not the values.
 // Only `useSelect` is called by the hook. The other four are needed at import
 // time by the store modules this file pulls in transitively.
 vi.mock( import( '@wordpress/data' ), () => ( {
@@ -46,7 +43,7 @@ const mockedUseSelect = useSelect as unknown as Mock<
 	( mapSelect: ( select: unknown ) => unknown ) => unknown
 >;
 
-describe( 'useResolvedStyle with the indicator experiment off', () => {
+describe( 'useResolvedStyle cascade layers', () => {
 	beforeEach( () => {
 		mockedUseSelect.mockReset();
 		mockedUseSelect.mockImplementation( ( mapSelect ) =>

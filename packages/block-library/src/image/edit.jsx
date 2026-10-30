@@ -86,7 +86,6 @@ export function ImageEdit( {
 } ) {
 	const {
 		url = '',
-		caption,
 		id,
 		width,
 		height,
@@ -112,11 +111,6 @@ export function ImageEdit( {
 		useResizeObserver();
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
-
-	const captionRef = useRef();
-	useEffect( () => {
-		captionRef.current = caption;
-	}, [ caption ] );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
@@ -257,7 +251,7 @@ export function ImageEdit( {
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( captionRef.current && ! mediaAttributes.caption ) {
+		if ( ! mediaAttributes.caption ) {
 			const { caption: omittedCaption, ...restMediaAttributes } =
 				mediaAttributes;
 			mediaAttributes = restMediaAttributes;

@@ -65,7 +65,7 @@ export default function withFilters( hookName: string ) {
 		}
 
 		class FilteredComponentRenderer extends Component {
-			static instances: FilteredComponentRenderer[];
+			static instances: Set< FilteredComponentRenderer >;
 
 			constructor( props: { [ key: string ]: any } ) {
 				super( props );
@@ -74,25 +74,22 @@ export default function withFilters( hookName: string ) {
 			}
 
 			componentDidMount() {
-				FilteredComponentRenderer.instances.push( this );
+				FilteredComponentRenderer.instances.add( this );
 
 				// If there were previously no mounted instances for components
 				// filtered on this hook, add the hook handler.
-				if ( FilteredComponentRenderer.instances.length === 1 ) {
+				if ( FilteredComponentRenderer.instances.size === 1 ) {
 					addAction( 'hookRemoved', namespace, onHooksUpdated );
 					addAction( 'hookAdded', namespace, onHooksUpdated );
 				}
 			}
 
 			componentWillUnmount() {
-				FilteredComponentRenderer.instances =
-					FilteredComponentRenderer.instances.filter(
-						( instance ) => instance !== this
-					);
+				FilteredComponentRenderer.instances.delete( this );
 
 				// If this was the last of the mounted components filtered on
 				// this hook, remove the hook handler.
-				if ( FilteredComponentRenderer.instances.length === 0 ) {
+				if ( FilteredComponentRenderer.instances.size === 0 ) {
 					removeAction( 'hookRemoved', namespace );
 					removeAction( 'hookAdded', namespace );
 				}
@@ -103,7 +100,7 @@ export default function withFilters( hookName: string ) {
 			}
 		}
 
-		FilteredComponentRenderer.instances = [];
+		FilteredComponentRenderer.instances = new Set();
 
 		/**
 		 * Updates the FilteredComponent definition, forcing a render for each
