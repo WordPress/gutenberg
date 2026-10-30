@@ -587,7 +587,11 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
-					{ ! isSectionBlock && <StyleInspectorSlots /> }
+					{ /* Like the Settings and Styles tabs, template parts keep their controls. */ }
+					{ ( ! isSectionBlock ||
+						blockName === 'core/template-part' ) && (
+						<StyleInspectorSlots />
+					) }
 				</>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }

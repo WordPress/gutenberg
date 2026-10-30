@@ -365,8 +365,7 @@ test.describe( 'Template Part', () => {
 		await expect( paragraph ).toBeVisible();
 	} );
 
-	// Reason: https://github.com/WordPress/gutenberg/issues/47003.
-	test.skip( 'can import a widget area into an empty template part', async ( {
+	test( 'can import a widget area into an empty template part', async ( {
 		admin,
 		editor,
 		page,
