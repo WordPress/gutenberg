@@ -20,6 +20,7 @@
 
 ### Bug Fixes
 
+-   `Calendar`, `RangeCalendar`: Show only the localized day number in day cells, without locale-specific suffixes such as `日` in Japanese ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 -   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
 -   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
 

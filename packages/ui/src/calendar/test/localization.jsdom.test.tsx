@@ -7,7 +7,7 @@ import { isRTL } from '@wordpress/i18n';
 import { Calendar, RangeCalendar } from '..';
 import * as Tooltip from '../../tooltip';
 import {
-	dateNumberFormatter,
+	formatDayNumber,
 	fullDateFormatter,
 	monthNameFormatter,
 	weekdayFormatter,
@@ -23,7 +23,7 @@ function expectGregorianDate( localeCode: string ) {
 	).toBeVisible();
 	expect(
 		screen.getByRole( 'gridcell', {
-			name: dateNumberFormatter( localeCode ).format( TEST_DATE ),
+			name: formatDayNumber( TEST_DATE, localeCode ),
 		} )
 	).toBeVisible();
 	expect(
@@ -71,6 +71,19 @@ describe.each( [
 
 		expectGregorianDate( 'fa-IR' );
 	} );
+
+	it.each( [ 'ja', 'zh-CN', 'ko' ] )(
+		'shows only the day number in day cells for %s',
+		( localeCode ) => {
+			render(
+				<Component defaultMonth={ TEST_DATE } locale={ localeCode } />
+			);
+
+			expect(
+				screen.getByRole( 'gridcell', { name: '15' } )
+			).toBeVisible();
+		}
+	);
 
 	it( 'localizes the navigation label through WordPress i18n', () => {
 		render( <Component locale="de" /> );
