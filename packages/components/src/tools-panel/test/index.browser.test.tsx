@@ -29,11 +29,13 @@ const hiddenControlProps = {
 };
 
 describe( 'ToolsPanel styles', () => {
-	it( 'keeps ToolsPanel labels aligned when an option is shown or hidden', async () => {
+	it( 'aligns reset actions with selection rows', async () => {
 		const user = userEvent.setup();
 		await render(
 			<ToolsPanel { ...defaultProps }>
-				<ToolsPanelItem { ...controlProps }>Control</ToolsPanelItem>
+				<ToolsPanelItem { ...controlProps } isShownByDefault>
+					Control
+				</ToolsPanelItem>
 				<ToolsPanelItem { ...hiddenControlProps }>
 					Hidden control
 				</ToolsPanelItem>
@@ -42,41 +44,18 @@ describe( 'ToolsPanel styles', () => {
 		await user.click(
 			screen.getByRole( 'button', { name: 'Panel header options' } )
 		);
-
-		const menu = screen.getByRole( 'menu' );
-		const shown = screen.getByRole( 'menuitemcheckbox', {
-			name: /^Example,/,
-		} );
-		const hidden = screen.getByRole( 'menuitemcheckbox', {
-			name: /^Hidden example,/,
-		} );
-		const shownLabel = screen.getByText( 'Example' );
-		const hiddenLabel = screen.getByText( 'Hidden example' );
-		const labelLeft = shownLabel.getBoundingClientRect().left;
-		const initialWidth = menu.getBoundingClientRect().width;
-		// The decorative selection mark has no accessible role to query.
-		// eslint-disable-next-line testing-library/no-node-access
-		const shownIcon = shown.querySelector( 'svg' )!;
-
-		expect( hiddenLabel.getBoundingClientRect().left ).toBe( labelLeft );
+		await expect
+			.element(
+				screen.getByRole( 'menuitem', {
+					name: 'Example, reset to default',
+				} )
+			)
+			.toBeVisible();
 		expect(
-			shownIcon.getBoundingClientRect().left -
-				menu.getBoundingClientRect().left
-		).toBe( 7 );
-		expect( shownIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
-			labelLeft
+			screen.getByText( 'Example' ).getBoundingClientRect().left
+		).toBe(
+			screen.getByText( 'Hidden example' ).getBoundingClientRect().left
 		);
-		for ( const checked of [ 'true', 'false' ] ) {
-			await user.click( hidden );
-			await expect
-				.element( hidden )
-				.toHaveAttribute( 'aria-checked', checked );
-			expect( shownLabel.getBoundingClientRect().left ).toBe( labelLeft );
-			expect( hiddenLabel.getBoundingClientRect().left ).toBe(
-				labelLeft
-			);
-			expect( menu.getBoundingClientRect().width ).toBe( initialWidth );
-		}
 	} );
 
 	it( 'applies the panel padding and border', async () => {

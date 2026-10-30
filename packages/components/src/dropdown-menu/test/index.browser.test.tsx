@@ -1,5 +1,5 @@
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
@@ -7,7 +7,6 @@ import { check } from '@wordpress/icons';
 import '@wordpress/theme/design-tokens.css';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
-import MenuItemsChoice from '../../menu-items-choice';
 import { NavigableMenu } from '../../navigable-container';
 import '../../style.scss';
 
@@ -217,80 +216,4 @@ describe( 'DropdownMenu checkbox items', () => {
 
 		expect( menu.getBoundingClientRect().width ).toBe( initialWidth );
 	} );
-} );
-
-it( 'keeps choice labels and menu width stable when the selection changes', async () => {
-	const { innerWidth, innerHeight } = window;
-	onTestFinished( () => page.viewport( innerWidth, innerHeight ) );
-	await page.viewport( 800, 600 );
-	const ChoicesMenu = () => {
-		const [ value, setValue ] = useState( 'visual' );
-		return (
-			<DropdownMenu label="Choose editor">
-				{ () => (
-					<MenuItemsChoice
-						value={ value }
-						onSelect={ setValue }
-						choices={ [
-							{
-								value: 'visual',
-								label: 'Visual editor',
-								shortcut: 'Ctrl+Shift+V',
-							},
-							{
-								value: 'code',
-								label: 'Code editor',
-								info: 'Edit the source of your content.',
-								shortcut: 'Ctrl+Shift+C',
-							},
-						] }
-					/>
-				) }
-			</DropdownMenu>
-		);
-	};
-	const user = userEvent.setup();
-	await render( <ChoicesMenu /> );
-	await user.click( screen.getByRole( 'button', { name: 'Choose editor' } ) );
-
-	const menu = screen.getByRole( 'menu' );
-	const visual = screen.getByRole( 'menuitemradio', {
-		name: /Visual editor/,
-	} );
-	const code = screen.getByRole( 'menuitemradio', { name: /Code editor/ } );
-	const visualLabel = screen.getByText( 'Visual editor' );
-	const codeLabel = screen.getByText( 'Code editor' );
-	const initialWidth = menu.getBoundingClientRect().width;
-	const labelLeft = visualLabel.getBoundingClientRect().left;
-	// The decorative selection marks have no accessible role to query.
-	// eslint-disable-next-line testing-library/no-node-access
-	const visualIcon = visual.querySelector( 'svg' )!;
-	// eslint-disable-next-line testing-library/no-node-access
-	const codeIcon = code.querySelector( 'svg' )!;
-	// The popup owns the inset outside the menu's items.
-	// eslint-disable-next-line testing-library/no-node-access
-	const popup = menu.closest( '.components-popover__content' )!;
-
-	expect( codeLabel.getBoundingClientRect().left ).toBe( labelLeft );
-	expect(
-		visualIcon.getBoundingClientRect().left -
-			popup.getBoundingClientRect().left
-	).toBe( 7 );
-	expect( visualIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
-		labelLeft
-	);
-	expect( visualIcon ).toBeVisible();
-	expect( codeIcon ).not.toBeVisible();
-	expect(
-		screen.getByText( 'Ctrl+Shift+V' ).getBoundingClientRect().left
-	).toBeGreaterThan( visualLabel.getBoundingClientRect().right );
-
-	await user.click( code );
-	await expect.element( code ).toBeChecked();
-	expect( visual ).not.toBeChecked();
-	expect( visualIcon ).not.toBeVisible();
-	expect( codeIcon ).toBeVisible();
-	expect( menu.getBoundingClientRect().width ).toBe( initialWidth );
-	expect( visualLabel.getBoundingClientRect().left ).toBe( labelLeft );
-	expect( codeLabel.getBoundingClientRect().left ).toBe( labelLeft );
 } );

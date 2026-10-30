@@ -268,19 +268,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 									accessibleWhenDisabled
 									disabled={ control.isDisabled }
 								>
-									{ control.title ? (
-										<span
-											className={
-												menuItemStyles[
-													'control-label'
-												]
-											}
-										>
-											{ control.title }
-										</span>
-									) : (
-										control.title
-									) }
+									{ control.title }
 								</Button>
 							) )
 						) }
