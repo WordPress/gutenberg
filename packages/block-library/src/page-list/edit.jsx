@@ -137,6 +137,7 @@ export default function PageListEdit( {
 		'postType',
 		'page',
 		{
+			context: 'view',
 			per_page: MAX_PAGE_COUNT,
 			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
 			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
