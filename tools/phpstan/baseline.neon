@@ -483,7 +483,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''img'' given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 4
 			path: ../../packages/block-library/src/image/index.php
 
 		-
@@ -597,6 +597,12 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''LI'' given\.$#'
 			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
+			identifier: empty.property
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
