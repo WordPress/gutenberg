@@ -17,6 +17,14 @@
 	}
 }
 
+// The calendar fills the field, up to the width it has in the panel
+// layout's popover (320px minus its padding), so it keeps the same size in
+// every layout instead of growing to its maximum in wide forms.
+.dataviews-controls__calendar {
+	width: 100%;
+	max-width: 288px;
+}
+
 .dataviews-controls__date-range-inputs > * {
 	min-width: 0;
 }

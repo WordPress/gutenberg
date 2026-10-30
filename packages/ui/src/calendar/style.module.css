@@ -5,9 +5,11 @@
 		.root {
 			/* Internal variables */
 			--wp-ui-calendar-cell-size: var(--wpds-dimension-size-md);
+			/* Days grow to fill the container, up to this size. */
+			--_wp-ui-calendar-max-cell-size: calc(var(--wp-ui-calendar-cell-size) * 1.5);
 
 			position: relative; /* Required to position the navigation toolbar. */
-			display: inline flow-root;
+			display: flow-root;
 			color: var(--wpds-color-foreground-content-neutral);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			font-family: var(--wpds-typography-font-family-body);
@@ -47,8 +49,12 @@
 			display: flex;
 			position: relative;
 
-			width: var(--wp-ui-calendar-cell-size);
-			height: var(--wp-ui-calendar-cell-size);
+			/*
+			 * Fill the column and stay square, so the range preview SVGs (drawn on
+			 * a square viewBox) scale without overflowing into the next row.
+			 */
+			width: 100%;
+			aspect-ratio: 1;
 
 			border: none;
 			border-radius: var(--wpds-border-radius-sm);
@@ -133,14 +139,36 @@
 
 		.months {
 			position: relative;
-			display: flex;
-			justify-content: center;
-			flex-wrap: wrap;
+			display: grid;
+			/*
+			 * Months share the width in equal columns and wrap once they reach
+			 * their minimum size. Equal columns keep a wrapped month as wide as
+			 * the ones above it.
+			 */
+			grid-template-columns: repeat(auto-fit, minmax(min(calc(var(--wp-ui-calendar-cell-size) * 7), 100%), 1fr));
 			gap: var(--wpds-dimension-gap-lg);
-			max-width: fit-content;
+			max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 7);
+
+			/* Leave room for every month shown side by side (up to three). */
+			&:has(.month + .month) {
+				max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 14 + var(--wpds-dimension-gap-lg));
+			}
+
+			&:has(.month + .month + .month) {
+				max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 21 + var(--wpds-dimension-gap-lg) * 2);
+			}
+		}
+
+		.month {
+			/* Cap the day size when months stack in a single column. */
+			max-width: calc(var(--_wp-ui-calendar-max-cell-size) * 7);
 		}
 
 		.month-grid {
+			/* Equal columns that share the available width. */
+			width: 100%;
+			min-width: calc(var(--wp-ui-calendar-cell-size) * 7);
+			table-layout: fixed;
 			border-collapse: separate;
 			border-spacing: 0 var(--wpds-dimension-gap-xs);
 		}
@@ -159,7 +187,6 @@
 		}
 
 		.weekday {
-			width: var(--wp-ui-calendar-cell-size);
 			height: var(--wp-ui-calendar-cell-size);
 			padding: 0;
 
