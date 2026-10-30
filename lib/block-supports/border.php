@@ -132,17 +132,9 @@ function gutenberg_get_border_classes_and_styles( $block_attributes ) {
 		$border_styles['width'] = is_numeric( $border['width'] ) ? "{$border['width']}px" : $border['width'];
 	}
 
-	$preset_slug = $block_attributes['borderColor'] ?? null;
-	if ( true === $preset_slug ) {
-		$preset_slug = 'true';
-	}
-
-	// Mirrors JS truthiness, so '0' is a slug. Arrays cannot form a class name.
-	$has_preset = is_string( $preset_slug )
-		? '' !== $preset_slug
-		: ( is_int( $preset_slug ) || is_float( $preset_slug ) ) && 0.0 !== (float) $preset_slug;
-
-	$border_styles['color'] = $has_preset ? "var:preset|color|{$preset_slug}" : ( $border['color'] ?? null );
+	// Preset slugs are strings in theme.json and the editor.
+	$preset_slug            = $block_attributes['borderColor'] ?? null;
+	$border_styles['color'] = is_string( $preset_slug ) && '' !== $preset_slug ? "var:preset|color|{$preset_slug}" : ( $border['color'] ?? null );
 
 	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
 		if ( ! isset( $border[ $side ] ) || ! is_array( $border[ $side ] ) ) {
