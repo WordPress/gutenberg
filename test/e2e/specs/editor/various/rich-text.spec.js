@@ -51,6 +51,41 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should only offer the formats the editor allows', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+				allowedFormats: [ 'core/bold' ],
+			} );
+		} );
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'test' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await editor.showBlockToolbar();
+
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold', exact: true } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Italic', exact: true } )
+		).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'primary+b' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>test</strong>' },
+			},
+		] );
+	} );
+
 	test( 'should apply formatting when selection is collapsed', async ( {
 		page,
 		editor,
