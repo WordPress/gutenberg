@@ -7,6 +7,10 @@
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
+### Bug Fixes
+
+-   Fire `admin_print_footer_scripts` in the footer of the generated full-page template, as `wp-admin/admin-footer.php` does, instead of calling the footer printers one by one, so full-page screens also print the translations of their script modules ([#84651](https://github.com/WordPress/gutenberg/pull/84651)).
+
 ### Internal
 
 -   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
