@@ -1,0 +1,967 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''FIGURE'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../lib/block-supports/layout.php
+
+		-
+			message: '#^Property WP_Block_Type\:\:\$selectors \(array\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: ../../lib/block-supports/states.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: ../../lib/block-supports/typography.php
+
+		-
+			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../lib/class-wp-duotone-gutenberg.php
+
+		-
+			message: '#^Parameter \#1 \$id \(int\) of method WP_REST_Global_Styles_Controller_Gutenberg\:\:prepare_links\(\) should be compatible with parameter \$post \(WP_Post\) of method WP_REST_Posts_Controller\:\:prepare_links\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: ../../lib/class-wp-rest-global-styles-controller-gutenberg.php
+
+		-
+			message: '#^Method WP_Theme_JSON_Gutenberg\:\:get_block_name_from_metadata_path\(\) should return string\|null but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Method WP_Theme_JSON_Gutenberg\:\:get_block_selectors\(\) should return object but returns array\<string, array\<string, string\>\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Parameter \#1 \$css of method WP_Theme_JSON_Gutenberg\:\:process_blocks_custom_css\(\) expects string, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:compute_spacing_sizes\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 3
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_block_name_from_metadata_path\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_block_nodes\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 3
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_feature_selector\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_viewport_breakpoint_value_in_pixels\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:is_valid_viewport_breakpoint_size\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:merge_spacing_sizes\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:remove_indirect_properties\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:resolve_custom_css_format\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:sanitize_viewport_settings\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 3
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:unwrap_shared_block_style_variations\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:update_button_width_declarations\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 4
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:update_paragraph_text_indent_selector\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 4
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:update_separator_declarations\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-gutenberg.php
+
+		-
+			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$blocks \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$core \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$i18n_schema \(array\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$theme \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user_custom_post_type_id \(int\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:inject_variations_from_block_style_variation_files\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:inject_variations_from_block_styles_registry\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:recursively_iterate_json\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 3
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:remove_json_comments\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:style_variation_has_scope\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../lib/client-assets.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: ../../lib/client-assets.php
+
+		-
+			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
+			identifier: empty.property
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/block-bindings.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SPAN'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/block-comments.php
+
+		-
+			message: '#^Cannot assign offset ''media_type'' to WP_REST_Request\.$#'
+			identifier: offsetAssign.dimType
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
+
+		-
+			message: '#^Cannot assign offset ''mime_type'' to WP_REST_Request\.$#'
+			identifier: offsetAssign.dimType
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
+
+		-
+			message: '#^WP_REST_Request does not accept array\<mixed, mixed\>\.$#'
+			identifier: offsetAssign.valueType
+			count: 2
+			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$_request$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/icons.php
+
+		-
+			message: '#^Property WP_Post\:\:\$post_date \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: ../../lib/compat/wordpress-7.1/rest-api.php
+
+		-
+			message: '#^Function gutenberg_exclude_notes_from_comment_count_7_2\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../lib/compat/wordpress-7.2/note-reactions.php
+
+		-
+			message: '#^Method WP_Sync_Save_Server\:\:handle_request\(\) should return WP_Error\|WP_REST_Response but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../lib/experimental/collaboration/class-wp-sync-save-server.php
+
+		-
+			message: '#^Access to an undefined property WP_Post\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 2
+			path: ../../lib/experimental/navigation-theme-opt-in.php
+
+		-
+			message: '#^Access to an undefined property WP_Post\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 2
+			path: ../../lib/experimental/navigation-theme-opt-in.php
+
+		-
+			message: '#^Function gutenberg_output_block_nav_menu\(\) never returns string so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../lib/experimental/navigation-theme-opt-in.php
+
+		-
+			message: '#^If condition is always false\.$#'
+			identifier: if.alwaysFalse
+			count: 1
+			path: ../../lib/experimental/navigation-theme-opt-in.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: ../../lib/experimental/navigation-theme-opt-in.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../../lib/experimental/navigation-theme-opt-in.php
+
+		-
+			message: '#^Cannot assign offset ''_fields'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
+			identifier: offsetAssign.dimType
+			count: 1
+			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
+
+		-
+			message: '#^Cannot assign offset ''context'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
+			identifier: offsetAssign.dimType
+			count: 1
+			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
+
+		-
+			message: '#^WP_REST_Request\<array\<string, mixed\>\> does not accept string\.$#'
+			identifier: offsetAssign.valueType
+			count: 1
+			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
+
+		-
+			message: '#^Action callback returns bool but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../lib/media/load.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SCRIPT'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../lib/media/load.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IMG'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/accordion-item/index.php
+
+		-
+			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: ../../packages/block-library/src/avatar/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/categories/index.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: ../../packages/block-library/src/categories/index.php
+
+		-
+			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/comment-author-avatar/index.php
+
+		-
+			message: '#^Variable \$spacing_string might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../packages/block-library/src/comment-author-avatar/index.php
+
+		-
+			message: '#^Parameter \#1 \$from of function human_time_diff expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/comment-date/index.php
+
+		-
+			message: '#^Function render_block_core_comment_reply_link\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/comment-reply-link/index.php
+
+		-
+			message: '#^Function render_block_core_comment_template\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/comment-template/index.php
+
+		-
+			message: '#^Function render_block_core_comments_pagination\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/comments-pagination/index.php
+
+		-
+			message: '#^Function render_block_core_comments_title\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 2
+			path: ../../packages/block-library/src/comments-title/index.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 2
+			path: ../../packages/block-library/src/comments-title/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IFRAME'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/cover/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IMG'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/details/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''OBJECT'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/file/index.php
+
+		-
+			message: '#^Cannot access property \$context on array\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: ../../packages/block-library/src/gallery/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/gallery/index.php
+
+		-
+			message: '#^Parameter \#2 \$block of function block_core_gallery_resolve_dynamic_source expects WP_Block, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/gallery/index.php
+
+		-
+			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../../packages/block-library/src/home-link/index.php
+
+		-
+			message: '#^Function render_block_core_icon\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 3
+			path: ../../packages/block-library/src/icon/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/icon/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''FIGCAPTION'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/image/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/image/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''img'' given\.$#'
+			identifier: argument.type
+			count: 4
+			path: ../../packages/block-library/src/image/index.php
+
+		-
+			message: '#^Parameter \#1 \$author_id of function get_author_posts_url expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/latest-comments/index.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp_with_offset of function date_i18n expects bool\|int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/latest-comments/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''input'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/loginout/index.php
+
+		-
+			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../../packages/block-library/src/navigation-link/index.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 2
+			path: ../../packages/block-library/src/navigation-link/index.php
+
+		-
+			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../../packages/block-library/src/navigation-submenu/index.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 3
+			path: ../../packages/block-library/src/navigation-submenu/index.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Function block_core_navigation_get_classic_menu_fallback\(\) should return object but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Function block_core_navigation_get_classic_menu_fallback_blocks\(\) should return array but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Function block_core_navigation_get_menu_items_at_location\(\) should return array but empty return statement found\.$#'
+			identifier: return.empty
+			count: 3
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Function block_core_navigation_maybe_use_classic_menu_fallback\(\) should return array but empty return statement found\.$#'
+			identifier: return.empty
+			count: 3
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Function block_core_navigation_maybe_use_classic_menu_fallback\(\) should return array but returns WP_Post\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_navigation_post\(\) should return WP_Block_List but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: mixed, post_name\: mixed, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IMG'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''LI'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
+			identifier: empty.property
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 3
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe access to private property WP_Navigation_Block_Renderer\:\:\$has_submenus through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 6
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe access to private property WP_Navigation_Block_Renderer\:\:\$needs_list_item_wrapper through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe access to private property WP_Navigation_Block_Renderer\:\:\$seen_menu_names through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 6
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:disable_overlay_menu_for_nested_navigation_blocks\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 3
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:does_block_need_a_list_item_wrapper\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_classes\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_block_markup\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_fallback\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_navigation_post\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks_html\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_layout_class\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_markup_for_inner_block\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_nav_attributes\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_nav_element_directives\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_navigation_name\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_overlay_blocks_from_template_part\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_overlay_inline_styles\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_responsive_container_classes\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_responsive_container_markup\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_styles\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_template_part_blocks_html\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_unique_navigation_name\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:handle_view_script_module_loading\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:has_submenus\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:is_interactive\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 4
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:is_responsive\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 4
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Variable \$responsive_container_content_directives might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../packages/block-library/src/navigation/index.php
+
+		-
+			message: '#^Function block_core_page_list_nest_pages\(\) should return array but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/page-list/index.php
+
+		-
+			message: '#^Function block_core_page_list_render_nested_page_list\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/page-list/index.php
+
+		-
+			message: '#^Function render_block_core_page_list\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 2
+			path: ../../packages/block-library/src/page-list/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''p'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/paragraph/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/playlist/index.php
+
+		-
+			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
+			identifier: empty.property
+			count: 1
+			path: ../../packages/block-library/src/playlist/index.php
+
+		-
+			message: '#^Function render_block_core_post_comments_form\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/post-comments-form/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''img'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/post-featured-image/index.php
+
+		-
+			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\<0, max\>\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Offset ''shortcodes_regexp'' does not exist on array\{html_regexp\: ''/\<\\\\/\?\[a\-z\]\[\^\>\]\*\?\>/i'', html_comment_regexp\: ''/\<\!\-\-\[\\\\s\\\\S\]\*\?\-\-\>/'', space_regexp\: ''/&nbsp;\|&\#160;/i'', html_entity_regexp\: ''/&\\\\S\+\?;/'', connector_regexp\: ''/\-\-\|\\\\x\{2014\}/u'', remove_regexp\: ''/\[\\\\x\{0021\}\-\\\\x\{0040\}…'', astral_regexp\: ''/\[\\\\x\{010000\}\-\\\\x…'', words_regexp\: ''/\\\\S\\\\s\+/u'', \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Offset ''shortcodes_regexp'' on array\{html_regexp\: ''/\<\\\\/\?\[a\-z\]\[\^\>\]\*\?\>/i'', html_comment_regexp\: ''/\<\!\-\-\[\\\\s\\\\S\]\*\?\-\-\>/'', space_regexp\: ''/&nbsp;\|&\#160;/i'', html_entity_regexp\: ''/&\\\\S\+\?;/'', connector_regexp\: ''/\-\-\|\\\\x\{2014\}/u'', remove_regexp\: ''/\[\\\\x\{0021\}\-\\\\x\{0040\}…'', astral_regexp\: ''/\[\\\\x\{010000\}\-\\\\x…'', words_regexp\: ''/\\\\S\\\\s\+/u'', \.\.\.\} in empty\(\) does not exist\.$#'
+			identifier: empty.offset
+			count: 1
+			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Parameter \#1 \$number of function number_format_i18n expects float, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Parameter \#3 \$number of function _n expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Parameter \#3 \$side of function apply_block_core_search_border_style expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/search/index.php
+
+		-
+			message: '#^Variable \$is_expandable_searchfield might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../packages/block-library/src/search/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/site-logo/index.php
+
+		-
+			message: '#^Function render_block_core_site_tagline\(\) should return string but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: ../../packages/block-library/src/site-tagline/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/social-link/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''button'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/tab-list/index.php
+
+		-
+			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''nav'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/table-of-contents/index.php
+
+		-
+			message: '#^Parameter \#1 \$args of function wp_tag_cloud expects array\{number\?\: int, link\?\: string, post_type\?\: string, echo\?\: bool, smallest\?\: int, largest\?\: int, unit\?\: string, format\?\: string, \.\.\.\}, array\{echo\: false, unit\: non\-empty\-string, taxonomy\: mixed, show_count\: mixed, number\: mixed, smallest\: float, largest\: float\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/block-library/src/tag-cloud/index.php
+
+		-
+			message: '#^Right side of \|\| is always true\.$#'
+			identifier: booleanOr.rightAlwaysTrue
+			count: 1
+			path: ../../packages/block-library/src/template-part/index.php
+
+		-
+			message: '#^Property WP_Block\:\:\$context \(array\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: ../../packages/block-library/src/term-template/index.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: ../../packages/core-actions/src/index.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: ../../packages/style-engine/src/class-wp-style-engine-css-rules-store.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(string\? \$style_value A single css preset value\.\)\: Unexpected token "\?", expected variable at offset 93 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../packages/style-engine/src/class-wp-style-engine.php
+
+		-
+			message: '#^PHPDoc tag @return has invalid value \(void\.\)\: Unexpected token "\.", expected TOKEN_HORIZONTAL_WS at offset 929 on line 10$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../packages/style-engine/src/class-wp-style-engine.php
+
+		-
+			message: '#^Parameter \#1 \$style_value of static method WP_Style_Engine\:\:get_slug_from_preset_value\(\) expects string, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/style-engine/src/class-wp-style-engine.php
+
+		-
+			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/wp-build/templates/page-wp-admin.php.template
+
+		-
+			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/wp-build/templates/page.php.template
