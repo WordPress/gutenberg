@@ -16,11 +16,7 @@ import type {
 import type { InitialPosition } from '../../store/types';
 import type { Layout } from '../../layouts/types';
 import type { BlockEditingMode } from '../block-editing-mode';
-import type {
-	BlockVisibility,
-	ViewportBreakpoints,
-} from '../block-visibility/use-block-visibility';
-import type { BlockVisibilityViewport } from '../block-visibility/constants';
+import type { BlockVisibility } from '../block-visibility/use-block-visibility';
 
 /**
  * The private information a block list block passes to its edit component
@@ -79,9 +75,6 @@ export interface PrivateBlockContextValue {
 		string,
 		Omit< BlockBindingsSource, 'name' >
 	>;
-	blockVisibility?: BlockVisibility;
-	deviceType?: BlockVisibilityViewport;
-	viewportSettings?: ViewportBreakpoints;
 	supportsSplitting?: boolean;
 	wrapperProps?: BlockListWrapperProps;
 	isAligned?: boolean;
@@ -223,6 +216,7 @@ export type BlockListBlockSelectedProps = Omit<
 	'clientId' | 'rootClientId' | 'ghostBlock' | 'wrapperProps'
 > & {
 	blockWithoutAttributes: Partial< Block >;
+	blockVisibility?: BlockVisibility;
 	name: string;
 	attributes: Record< string, unknown >;
 	isValid?: boolean;
