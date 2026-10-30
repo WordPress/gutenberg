@@ -52,9 +52,7 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 					}
 				)
 			);
-			// The author field of the post summary queries the users collection
-			// with `who=authors`, see `AuthorView` in `core-fields`.
-			$paths[] = sprintf( '/wp/v2/users?context=view&include[0]=%d&who=authors', $author_id );
+			gutenberg_preload_post_summary_author( $author_id );
 		}
 	}
 
@@ -62,10 +60,36 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 	if ( 'core/edit-site' === $context->name && isset( $context->post ) && 'page' === $context->post->post_type ) {
 		$author_id = (int) get_post_field( 'post_author', $context->post->ID );
 		if ( post_type_supports( 'page', 'author' ) && $author_id > 0 ) {
-			$paths[] = sprintf( '/wp/v2/users?context=view&include[0]=%d&who=authors', $author_id );
+			gutenberg_preload_post_summary_author( $author_id );
 		}
 	}
 
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_7_2', 10, 2 );
+
+/**
+ * Preloads the author request of the post summary, which queries the users
+ * collection with `who=authors` (see `AuthorView` in `core-fields`).
+ *
+ * `who` is deprecated in `WP_User_Query`, and preloading runs while the page
+ * renders, so the notice would be printed into the page. REST requests report
+ * it in a header instead, so it's silenced for this request.
+ *
+ * @param int $author_id The ID of the post author.
+ */
+function gutenberg_preload_post_summary_author( $author_id ) {
+	// Priority 11, so removing it keeps one added at the default priority.
+	add_filter( 'deprecated_argument_trigger_error', '__return_false', 11 );
+	$preload_data = rest_preload_api_request( array(), sprintf( '/wp/v2/users?context=view&include[0]=%d&who=authors', $author_id ) );
+	remove_filter( 'deprecated_argument_trigger_error', '__return_false', 11 );
+
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+		),
+		'after'
+	);
+}
