@@ -81,15 +81,15 @@ function report_row( string $label, string $value ): void {
 /**
  * Writes a row for a step that takes a while, without ending the line, so that it can be cleared.
  *
- * Only a terminal with colors gets it, since the row is cleared by moving back to the start of the
- * line, which a log would keep.
+ * Only a terminal gets it, since the row is cleared by moving back to the start of the line, which a
+ * log would keep, whether or not it has colors.
  *
  * @param non-empty-string $label The label.
  * @param string           $value The value.
  * @return bool Whether the row was written, to be cleared with clear_pending_row().
  */
 function report_pending_row( string $label, string $value ): bool {
-	if ( ! has_color() ) {
+	if ( ! is_terminal() ) {
 		return false;
 	}
 	fwrite( STDERR, format_row( $label, $value ) );
@@ -104,6 +104,23 @@ function clear_pending_row(): void {
 }
 
 /**
+ * Returns whether standard error is a terminal that handles escape sequences.
+ *
+ * @return bool Whether it is such a terminal.
+ */
+function is_terminal(): bool {
+	/** @var bool|null $is_terminal */
+	static $is_terminal = null;
+	if ( null === $is_terminal ) {
+		$is_terminal = stream_isatty( STDERR );
+		if ( $is_terminal && '\\' === DIRECTORY_SEPARATOR ) {
+			$is_terminal = function_exists( 'sapi_windows_vt100_support' ) && sapi_windows_vt100_support( STDERR, true );
+		}
+	}
+	return $is_terminal;
+}
+
+/**
  * Returns whether standard error supports colors.
  *
  * Colors are used on a terminal, unless the NO_COLOR environment variable is set. FORCE_COLOR turns
@@ -112,21 +129,14 @@ function clear_pending_row(): void {
  * @return bool Whether to use colors.
  */
 function has_color(): bool {
-	/** @var bool|null $has_color */
-	static $has_color = null;
-	if ( null === $has_color ) {
-		$force_color = strtolower( (string) getenv( 'FORCE_COLOR' ) );
-		if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
-			$has_color = false;
-		} elseif ( '' !== $force_color ) {
-			$has_color = '0' !== $force_color && 'false' !== $force_color;
-		} elseif ( '\\' === DIRECTORY_SEPARATOR ) {
-			$has_color = function_exists( 'sapi_windows_vt100_support' ) && sapi_windows_vt100_support( STDERR, true );
-		} else {
-			$has_color = stream_isatty( STDERR );
-		}
+	$force_color = strtolower( (string) getenv( 'FORCE_COLOR' ) );
+	if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
+		return false;
 	}
-	return $has_color;
+	if ( '' !== $force_color ) {
+		return '0' !== $force_color && 'false' !== $force_color;
+	}
+	return is_terminal();
 }
 
 /**
