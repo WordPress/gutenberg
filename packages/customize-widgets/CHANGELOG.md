@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use matching strong neutral colors for pressed header controls and semantic header background and border colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
