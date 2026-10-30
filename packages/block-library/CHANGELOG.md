@@ -8,6 +8,7 @@
 -   Button: Show the content controls (Text, Link to, Open in new tab, View) in every editing context, so the inspector opens on a Content tab like an Image or a Navigation Link. The block styles, color, typography, width, and border controls move to the Styles tab, and HTML element and Link relation to the Settings tab ([#85356](https://github.com/WordPress/gutenberg/pull/85356)).
 -   Social Icon: Add Link and View controls beside Text in the inspector's Content tab, so the link can be edited from the inspector (including after selecting the icon from its parent's List View) and from the List View popover in a content-only section ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 -   Playlist: Add a List View tab to the block inspector that lists the tracks by title; selecting a track selects it ([#85311](https://github.com/WordPress/gutenberg/pull/85311)).
+-   Playlist track: Open the block settings on a Content tab with the track file, Track image, Alternative text, Title, Artist and Album. The track can be replaced from there, and the Track image uses the same media control as the Image block, so its preview no longer overflows the sidebar ([#85310](https://github.com/WordPress/gutenberg/pull/85310)).
 
 ### Bug Fixes
 
