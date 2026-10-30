@@ -6,13 +6,10 @@ import {
 	RangeControl,
 	ToggleControl,
 	__experimentalNumberControl as NumberControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -90,23 +87,12 @@ export default {
 		const hasLayoutValue = ( key: string, defaultValue?: unknown ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
 			( resetLayout?.[ key ] ?? defaultValue );
-		const hasGridTypeValue = () =>
-			hasLayoutValue( 'isManualPlacement', false );
 		const hasColumnsAndRowsValue = () =>
 			hasLayoutValue( 'columnCount', defaultColumnCount ) ||
 			hasLayoutValue( 'rowCount' );
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
 		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
-		const resetGridType = () =>
-			onChange(
-				cleanEmptyObject( {
-					...layout,
-					isManualPlacement: resetLayout?.isManualPlacement,
-					rowCount: resetLayout?.rowCount,
-					minimumColumnWidth: resetLayout?.minimumColumnWidth,
-				} )
-			);
 		const resetColumnsAndRows = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -132,20 +118,6 @@ export default {
 
 		return (
 			<>
-				{ window.__experimentalEnableGridInteractivity && (
-					<ToolsPanelItem
-						label={ __( 'Grid item position' ) }
-						hasValue={ hasGridTypeValue }
-						onDeselect={ resetGridType }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<GridLayoutTypeControl
-							layout={ layout }
-							onChange={ onChange }
-						/>
-					</ToolsPanelItem>
-				) }
 				{ showColumnsControl && (
 					<ToolsPanelItem
 						label={ __( 'Columns and rows' ) }
@@ -569,72 +541,5 @@ function GridLayoutFillControl( { layout, onChange }: LayoutControlProps ) {
 				} )
 			}
 		/>
-	);
-}
-
-// Enables switching between grid types
-function GridLayoutTypeControl( { layout, onChange }: LayoutControlProps ) {
-	const { columnCount, rowCount, minimumColumnWidth, isManualPlacement } =
-		layout;
-
-	/**
-	 * When switching, temporarily save any custom values set on the
-	 * previous type so we can switch back without loss.
-	 */
-	const [ tempColumnCount, setTempColumnCount ] = useState(
-		columnCount || 3
-	);
-	const [ tempRowCount, setTempRowCount ] = useState( rowCount );
-	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
-		minimumColumnWidth || '12rem'
-	);
-
-	const gridPlacement = isManualPlacement ? 'manual' : 'auto';
-
-	const onChangeType = ( value?: string | number ) => {
-		if ( value === 'manual' ) {
-			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
-		} else {
-			setTempColumnCount( columnCount || 3 );
-			setTempRowCount( rowCount );
-		}
-		onChange( {
-			...layout,
-			columnCount: value === 'manual' ? tempColumnCount : tempColumnCount,
-			rowCount: value === 'manual' ? tempRowCount : undefined,
-			isManualPlacement: value === 'manual' ? true : undefined,
-			minimumColumnWidth:
-				value === 'auto' ? tempMinimumColumnWidth : null,
-		} );
-	};
-
-	const helpText =
-		gridPlacement === 'manual'
-			? __(
-					'Grid items can be manually placed in any position on the grid.'
-				)
-			: __(
-					'Grid items are placed automatically depending on their order.'
-				);
-
-	return (
-		<ToggleGroupControl
-			label={ __( 'Grid item position' ) }
-			value={ gridPlacement }
-			onChange={ onChangeType }
-			isBlock
-			help={ helpText }
-		>
-			<ToggleGroupControlOption
-				key="auto"
-				value="auto"
-				label={ __( 'Auto' ) }
-			/>
-			<ToggleGroupControlOption
-				key="manual"
-				value="manual"
-				label={ __( 'Manual' ) }
-			/>
-		</ToggleGroupControl>
 	);
 }
