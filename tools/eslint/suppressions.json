@@ -3551,9 +3551,6 @@
 	"packages/block-library/src/paragraph/use-enter.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/pattern/edit.jsx": {
@@ -6637,7 +6634,7 @@
 	},
 	"packages/components/src/autocomplete/index.tsx": {
 		"react-hooks/refs": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/base-control/stories/index.story.tsx": {
@@ -11507,11 +11504,6 @@
 		}
 	},
 	"packages/rich-text/src/test/normalise-formats.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/owns-selection.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

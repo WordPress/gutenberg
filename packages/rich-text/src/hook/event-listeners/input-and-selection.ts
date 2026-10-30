@@ -1,9 +1,12 @@
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
-import { ownsSelection } from '../../owns-selection';
+import { unlock } from '../../lock-unlock';
 import type { RichTextFormatList } from '../../types';
 import type { RichTextField } from '../types';
+
+const { ownsSelection } = unlock( composePrivateApis );
 
 /**
  * All inserting input types that would insert HTML into the DOM.

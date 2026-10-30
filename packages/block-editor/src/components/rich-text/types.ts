@@ -277,12 +277,12 @@ export type RichTextEventListenerProps = {
 };
 
 /**
- * Subscribes a rich text event listener to the editable element and returns
- * a cleanup.
+ * A mounted field: its element and the latest props of its event listeners.
  */
-export type RichTextEventListener = (
-	props: RefObject< RichTextEventListenerProps >
-) => ( element: HTMLElement ) => () => void;
+export type RichTextField = {
+	element: HTMLElement;
+	props: RefObject< RichTextEventListenerProps >;
+};
 
 export interface RichTextShortcutProps {
 	/** The character key of the shortcut. */

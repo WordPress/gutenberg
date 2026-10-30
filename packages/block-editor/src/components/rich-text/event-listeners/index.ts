@@ -1,54 +1,70 @@
-import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
-import beforeInputRules from './before-input-rules';
-import inputRules from './input-rules';
-import insertReplacementText from './insert-replacement-text';
-import removeBrowserShortcuts from './remove-browser-shortcuts';
-import shortcuts from './shortcuts';
-import inputEvents from './input-events';
-import pasteHandler, { drop } from './paste-handler';
-import { dragStart } from './drag-and-drop';
-import _delete from './delete';
-import enter from './enter';
-import firefoxCompat from './firefox-compat';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+import * as beforeInputRules from './before-input-rules';
+import * as inputRules from './input-rules';
+import * as insertReplacementText from './insert-replacement-text';
+import * as removeBrowserShortcuts from './remove-browser-shortcuts';
+import * as shortcuts from './shortcuts';
+import * as inputEvents from './input-events';
+import * as pasteHandler from './paste-handler';
+import * as dragAndDrop from './drag-and-drop';
+import * as deleteHandler from './delete';
+import * as enter from './enter';
+import * as firefoxCompat from './firefox-compat';
+import { unlock } from '../../../lock-unlock';
 import type { RichTextEventListenerProps } from '../types';
 
-const allEventListeners = [
-	beforeInputRules,
-	inputRules,
-	insertReplacementText,
-	removeBrowserShortcuts,
-	shortcuts,
-	inputEvents,
-	pasteHandler,
-	dragStart,
-	_delete,
-	enter,
-	firefoxCompat,
-];
+const { useDelegatedListeners } = unlock( composePrivateApis );
+
+// Text can be dropped on any field. After the writing flow's drop handler on
+// document capture, which inserts dropped blocks, and before the block drop
+// zones.
+const root = {
+	dragenter: { target: [ pasteHandler.onDragOver ] },
+	dragover: { target: [ pasteHandler.onDragOver ] },
+	drop: { target: [ pasteHandler.onDrop ] },
+};
+
+// Only the selected field handles editing events.
+const selectedListeners = {
+	// After the rich text package's handlers, which are added first and sync
+	// the record with the DOM, and before any other handler, so the writing
+	// flow and the block handlers that skip prevented events give way to them.
+	first: {
+		keydown: {
+			selection: [
+				removeBrowserShortcuts.onKeyDown,
+				shortcuts.onKeyDown,
+			],
+		},
+		beforeinput: {
+			selection: [ beforeInputRules.onBeforeInput, enter.onBeforeInput ],
+		},
+		input: { selection: [ inputRules.onInput ] },
+		compositionend: { selection: [ inputRules.onInput ] },
+		// Before the block's own drag start handler, which cancels the drags
+		// it does not carry.
+		dragstart: { selection: [ dragAndDrop.onDragStart ] },
+		focus: { target: [ firefoxCompat.onFocus ] },
+	},
+	default: {
+		keydown: { selection: [ deleteHandler.onKeyDown ] },
+		beforeinput: {
+			selection: [
+				insertReplacementText.onBeforeInput,
+				enter.onDefaultBeforeInput,
+			],
+		},
+		input: { selection: [ inputEvents.onInput ] },
+		paste: { selection: [ pasteHandler.onPaste ] },
+	},
+	root,
+};
+
+const listeners = { root };
 
 export function useEventListeners( props: RichTextEventListenerProps ) {
-	const propsRef = useRef( props );
-	useInsertionEffect( () => {
-		propsRef.current = props;
-	} );
-	const refEffects = useMemo(
-		() => allEventListeners.map( ( refEffect ) => refEffect( propsRef ) ),
-		[ propsRef ]
-	);
-	// A drop can land on any field, selected or not.
-	const dropEffect = useMemo( () => drop( propsRef ), [ propsRef ] );
-
-	return useRefEffect(
-		( element: HTMLElement ) => {
-			const cleanups = [
-				dropEffect,
-				...( props.isSelected ? refEffects : [] ),
-			].map( ( effect ) => effect( element ) );
-			return () => {
-				cleanups.forEach( ( cleanup ) => cleanup() );
-			};
-		},
-		[ refEffects, dropEffect, props.isSelected ]
+	return useDelegatedListeners(
+		props.isSelected ? selectedListeners : listeners,
+		props
 	);
 }

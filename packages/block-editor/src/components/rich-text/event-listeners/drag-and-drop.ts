@@ -5,19 +5,10 @@ import {
 	remove,
 	slice,
 	toHTMLString,
-	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
-import type {
-	RichTextEventListener,
-	RichTextEventListenerProps,
-} from '../types';
-
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
-const { ownsSelection } = unlock( richTextPrivateApis );
+import type { RichTextEventListenerProps, RichTextField } from '../types';
 
 interface TextDrag {
 	element: HTMLElement;
@@ -96,9 +87,11 @@ export function getTextDropPoint( event: DragEvent ) {
 /**
  * Starts a drag of the text selected in the field.
  *
- * @param props Rich text props.
+ * @param field Rich text field.
+ * @param event Drag start event.
  */
-export const dragStart: RichTextEventListener = ( props ) => ( element ) => {
+export function onDragStart( field: RichTextField, event: DragEvent ) {
+	const { element, props } = field;
 	const { ownerDocument } = element;
 	const defaultView = ownerDocument.defaultView!;
 
@@ -110,67 +103,54 @@ export const dragStart: RichTextEventListener = ( props ) => ( element ) => {
 		defaultView.removeEventListener( 'drop', stop );
 	}
 
-	function onDragStart( event: DragEvent ) {
-		const { getValue, onChange } = props.current;
-		const value = getValue();
-		const target = event.target as Node;
-		// The drag starts on the selected text, or on the editing host
-		// around the field when the host owns the selection.
-		const isSource =
-			element.contains( target ) ||
-			( target.contains( element ) && ownsSelection( element ) );
-		if ( event.defaultPrevented || isCollapsed( value ) || ! isSource ) {
-			return;
-		}
-
-		// Safari before 26.2 cannot locate the drop position.
-		if (
-			! ownerDocument.caretPositionFromPoint ||
-			! element.isContentEditable
-		) {
-			event.preventDefault();
-			return;
-		}
-
-		const { start, end } = value as { start: number; end: number };
-		const dragged = slice( value );
-		const dataTransfer = event.dataTransfer!;
-		dataTransfer.effectAllowed = 'move';
-		dataTransfer.clearData();
-		dataTransfer.setData( 'text/plain', getTextContent( dragged ) );
-		dataTransfer.setData( 'text/html', toHTMLString( { value: dragged } ) );
-		dataTransfer.setData( 'rich-text', 'true' );
-		textDrags.set( ownerDocument, {
-			element,
-			start,
-			end,
-			remove() {
-				stop();
-				onChange( remove( getValue(), start, end ) );
-			},
-			stop,
-		} );
-
-		// The block drop zones cancel every drag over them, which hides the
-		// browser's drop caret and shows the block insertion point instead.
-		defaultView.addEventListener( 'dragenter', stopPropagation, true );
-		defaultView.addEventListener( 'dragover', stopPropagation, true );
-		// Not tied to the source field, which may no longer be selected when
-		// the drag ends. A drop in this window also ends it, since Firefox
-		// skips `dragend` when the source node is removed.
-		defaultView.addEventListener( 'dragend', stop );
-		defaultView.addEventListener( 'drop', stop );
+	const { getValue, onChange } = props.current;
+	const value = getValue();
+	const target = event.target as Node;
+	// The drag starts on the selected text, or on the editing host
+	// around the field when the host owns the selection.
+	const isSource = element.contains( target ) || target.contains( element );
+	if ( event.defaultPrevented || isCollapsed( value ) || ! isSource ) {
+		return;
 	}
 
-	// Before the block's own drag start handler, which cancels the drags it
-	// does not carry.
-	return subscribeDelegatedListener(
-		defaultView,
-		'dragstart',
-		onDragStart as EventListener,
-		true
-	);
-};
+	// Safari before 26.2 cannot locate the drop position.
+	if (
+		! ownerDocument.caretPositionFromPoint ||
+		! element.isContentEditable
+	) {
+		event.preventDefault();
+		return;
+	}
+
+	const { start, end } = value as { start: number; end: number };
+	const dragged = slice( value );
+	const dataTransfer = event.dataTransfer!;
+	dataTransfer.effectAllowed = 'move';
+	dataTransfer.clearData();
+	dataTransfer.setData( 'text/plain', getTextContent( dragged ) );
+	dataTransfer.setData( 'text/html', toHTMLString( { value: dragged } ) );
+	dataTransfer.setData( 'rich-text', 'true' );
+	textDrags.set( ownerDocument, {
+		element,
+		start,
+		end,
+		remove() {
+			stop();
+			onChange( remove( getValue(), start, end ) );
+		},
+		stop,
+	} );
+
+	// The block drop zones cancel every drag over them, which hides the
+	// browser's drop caret and shows the block insertion point instead.
+	defaultView.addEventListener( 'dragenter', stopPropagation, true );
+	defaultView.addEventListener( 'dragover', stopPropagation, true );
+	// Not tied to the source field, which may no longer be selected when
+	// the drag ends. A drop in this window also ends it, since Firefox
+	// skips `dragend` when the source node is removed.
+	defaultView.addEventListener( 'dragend', stop );
+	defaultView.addEventListener( 'drop', stop );
+}
 
 /**
  * Returns the props a text drop on the field pastes with: the value with the

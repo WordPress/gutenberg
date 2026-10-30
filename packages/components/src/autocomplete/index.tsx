@@ -5,18 +5,22 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useMergeRefs,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
 	insert,
 	isCollapsed,
 	getTextContent,
-	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 import { isAppleOS, withIgnoreIMEEvents } from '@wordpress/keycodes';
 import type { RichTextValue } from '@wordpress/rich-text';
+import type { RefObject } from 'react';
 import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import type {
@@ -32,7 +36,7 @@ import type {
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
 
-const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+const { useDelegatedListeners } = unlock( composePrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -376,43 +380,43 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
+function onFieldKeyDown(
+	{
+		props,
+	}: {
+		props: RefObject< { onKeyDown: ( event: KeyboardEvent ) => void } >;
+	},
+	event: KeyboardEvent
+) {
+	props.current.onKeyDown( event );
+}
+
+// Capture phase. When the autocomplete popover is open,
+// Up/Down/Enter/Escape must navigate the completion list —
+// they shouldn't be consumed by ancestor handlers (e.g.
+// block-editor's writing-flow) for block navigation, block
+// splitting, or "move out of parent" actions. Those handlers
+// fire at bubble phase and gate on `event.defaultPrevented`,
+// so firing in capture lets us preventDefault first when the
+// popover is active.
+const listeners = { first: { keydown: { selection: [ onFieldKeyDown ] } } };
+
 // The popover is anchored to the element this hook's own `ref` lands on, so it
 // owns `contentRef` and callers don't provide one.
 export function useAutocompleteProps< TReplacement = RichTextValue >(
 	options: Omit< UseAutocompleteProps< TReplacement >, 'contentRef' >
 ) {
 	const ref = useRef< HTMLElement >( null );
-	const onKeyDownRef =
-		useRef< ( event: KeyboardEvent ) => void >( undefined );
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
-	onKeyDownRef.current = onKeyDown;
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: Event ) {
-				onKeyDownRef.current?.( event as KeyboardEvent );
-			}
-			// Capture phase. When the autocomplete popover is open,
-			// Up/Down/Enter/Escape must navigate the completion list —
-			// they shouldn't be consumed by ancestor handlers (e.g.
-			// block-editor's writing-flow) for block navigation, block
-			// splitting, or "move out of parent" actions. Those handlers
-			// fire at bubble phase and gate on `event.defaultPrevented`,
-			// so firing in capture lets us preventDefault first when the
-			// popover is active.
-			return subscribeOwnedListener(
-				element,
-				'keydown',
-				_onKeyDown,
-				true
-			);
-		}, [] ),
+		useDelegatedListeners( listeners, { onKeyDown } ),
 	] );
 
 	// We only want to show the popover if the user has typed something.
