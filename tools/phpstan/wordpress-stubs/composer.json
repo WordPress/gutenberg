@@ -4,6 +4,7 @@
 	"description": "WordPress stubs generated from https://github.com/WordPress/wordpress-develop/commit/8dd36d03d3492b54b5191955a8a157f485c0f318 (r64757), in place of the released package.",
 	"license": "GPL-2.0-or-later",
 	"extra": {
+		"todo": "Once https://github.com/WordPress/wordpress-develop/pull/15198 is committed, bump the commit with `composer phpstan:generate-wordpress-stubs -- --commit=trunk`, which also removes this note, and remove the AVIF fix from tools/phpstan/generate-wordpress-stubs.php.",
 		"source": {
 			"commit": "8dd36d03d3492b54b5191955a8a157f485c0f318",
 			"revision": 64757

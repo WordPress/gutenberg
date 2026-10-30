@@ -517,6 +517,8 @@ function main( array $args ): void {
 	}
 
 	// Fix the incorrect "binary string" type in the AVIF info class.
+	// TODO: Remove once https://github.com/WordPress/wordpress-develop/pull/15198 is committed and the
+	// commit recorded in wordpress-stubs/composer.json includes it.
 	$avif_file = $source_dir . '/wp-includes/class-avif-info.php';
 	if ( is_file( $avif_file ) ) {
 		file_put_contents( $avif_file, preg_replace( '/@(param|return) binary string/', '@$1 string', (string) file_get_contents( $avif_file ) ) );
