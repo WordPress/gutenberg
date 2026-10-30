@@ -1,13 +1,7 @@
 import type { CSSProperties } from 'react';
-import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
-import {
-	descriptionStyle,
-	itemStyle,
-	listStyle,
-	previewStyle,
-	textStyle,
-	tokenNameStyle,
-} from './token-preview-styles';
+import { groups } from '../../prebuilt/js/design-tokens.mjs';
+import { TokenText } from './token-item';
+import { itemStyle, listStyle, previewStyle } from './token-preview-styles';
 
 const cursorTokens = groups.cursor.tokens;
 
@@ -44,12 +38,7 @@ export function CursorTokenPreview() {
 								Hover me
 							</button>
 						</dd>
-						<dt style={ textStyle }>
-							<code style={ tokenNameStyle }>{ name }</code>
-							<span style={ descriptionStyle }>
-								{ tokens[ name ].$description }
-							</span>
-						</dt>
+						<TokenText name={ name } />
 					</div>
 				) ) }
 			</dl>
