@@ -682,7 +682,6 @@ const FilteredBlockListBlock = withFilters( 'editor.BlockListBlock' )(
 // component, and useBlockProps.
 function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	const { clientId, rootClientId, ghostBlock } = props;
-	// Stable fallback so the selector returns referentially equal values.
 	const registry = useRegistry();
 	const dispatchProps = useMemo(
 		() =>
@@ -693,6 +692,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 			),
 		[ registry, clientId, rootClientId ]
 	);
+	// Stable fallback so the selector returns referentially equal values.
 	const ghostBlockWithoutAttributes = useMemo(
 		() =>
 			ghostBlock
