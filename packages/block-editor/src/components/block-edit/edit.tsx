@@ -17,10 +17,9 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { PrivateBlockContext } from '../block-list/private-block-context';
-import { useBlockEditContext } from './context';
 import { renderBlockEditFeatures } from './features';
 import { SelectedBlockEditControlsSlot } from './selected-controls';
-import type { BlockEditPublicProps } from './types';
+import type { BlockEditContextValue, BlockEditPublicProps } from './types';
 
 const Edit = ( props: BlockEditPublicProps ) => {
 	const { name } = props;
@@ -47,12 +46,15 @@ const EditWithFilters = withFilters( 'editor.BlockEdit' )(
 // Outside a block list there is no block context, nor bindable attributes.
 const NO_SOURCES: Record< string, Omit< BlockBindingsSource, 'name' > > = {};
 
-const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
+// Renders the block's edit with its generated props, from `BlockEdit`.
+export default function useGeneratedEdit(
+	props: BlockEditPublicProps,
+	blockEditContext: BlockEditContextValue
+) {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
-	const blockEditContext = useBlockEditContext();
 	// Read by the block's own subscription, rather than one more per block.
 	const {
 		bindableAttributes,
@@ -319,6 +321,4 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			{ selectedControls }
 		</>
 	);
-};
-
-export default EditWithGeneratedProps;
+}
