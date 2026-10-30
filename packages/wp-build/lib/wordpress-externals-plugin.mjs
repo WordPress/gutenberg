@@ -11,6 +11,25 @@ import { getPackageInfo } from './package-utils.mjs';
 const GLOBAL_MODULE_PREFIX = '\0wp-global:';
 
 /**
+ * @typedef {Object} SharedModuleDependencies
+ * @property {Set<string>}         dependencies       Script handles.
+ * @property {Map<string, string>} moduleDependencies Script module ids, with their import kinds: `static` or `dynamic`.
+ */
+
+/**
+ * @typedef {SharedModuleDependencies & { importPath: string }} SharedModule
+ * A module that builds import a package from, with the dependencies of the
+ * module. `importPath` is the module's path, relative to the importing build's
+ * output file.
+ */
+
+/**
+ * @typedef {Object} SharedModules
+ * @property {string[]}                                                                   packages Packages imported from shared modules.
+ * @property {(specifier: string, importer: string | undefined) => Promise<SharedModule>} get      Gets, building it if needed, the shared module of a package.
+ */
+
+/**
  * Generate a content hash from file contents.
  * Uses SHA256 algorithm for broad compatibility across Node.js versions.
  *
@@ -69,13 +88,15 @@ export function createWordpressExternalsPlugin(
 	 * @param {string}        buildFormat       Build format: 'iife' for classic scripts, 'esm' for modules.
 	 * @param {Array<string>} extraDependencies Additional dependencies to include in the asset file.
 	 * @param {boolean}       generateAssetFile Whether to generate the .asset.php file. Default true.
+	 * @param {SharedModules} [sharedModules]   Packages to import from shared modules instead of bundling them.
 	 * @return {import('rolldown').Plugin} Rolldown plugin object.
 	 */
 	return function wordpressExternalsPlugin(
 		assetName = 'index.min',
 		buildFormat = 'iife',
 		extraDependencies = [],
-		generateAssetFile = true
+		generateAssetFile = true,
+		sharedModules = undefined
 	) {
 		const dependencies = new Set();
 		const moduleDependencies = new Map();
@@ -237,9 +258,49 @@ export function createWordpressExternalsPlugin(
 				};
 			},
 
-			resolveId( source, importer, extraOptions ) {
+			api: {
+				/**
+				 * Get the dependencies found so far.
+				 *
+				 * @return {SharedModuleDependencies} The script handles, and the script modules with their import kinds.
+				 */
+				getDependencies() {
+					return {
+						dependencies: new Set( [
+							...dependencies,
+							...extraDependencies,
+						] ),
+						moduleDependencies: new Map( moduleDependencies ),
+					};
+				},
+			},
+
+			async resolveId( source, importer, extraOptions ) {
 				if ( extraOptions.isEntry ) {
 					return null;
+				}
+
+				if ( sharedModules?.packages.includes( source ) ) {
+					const sharedModule = await sharedModules.get(
+						source,
+						importer
+					);
+					for ( const handle of sharedModule.dependencies ) {
+						dependencies.add( handle );
+					}
+					const isDynamicImport =
+						extraOptions.kind === 'dynamic-import';
+					for ( const [
+						id,
+						kind,
+					] of sharedModule.moduleDependencies ) {
+						if ( kind === 'static' && ! isDynamicImport ) {
+							moduleDependencies.set( id, 'static' );
+						} else if ( ! moduleDependencies.has( id ) ) {
+							moduleDependencies.set( id, 'dynamic' );
+						}
+					}
+					return { id: sharedModule.importPath, external: true };
 				}
 
 				if (
