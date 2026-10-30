@@ -826,7 +826,6 @@ function main( array $args ): void {
 		HEADER;
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
-	// The recorded source is only written when it changes, by an option.
 	// The done row names the WordPress version, then, dimmed, the commit that a fetched ref resolved
 	// to, the revision, and how long generating took. The check mark only goes with colors, as the
 	// row's label already says the same.
@@ -838,6 +837,8 @@ function main( array $args ): void {
 	$elapsed   = (int) round( microtime( true ) - $started );
 	$check     = has_color() && has_unicode() ? style( '✓ ', '32' ) : '';
 	$done      = $check . "WordPress $wp_version" . style( ' (' . implode( ', ', $details ) . ") in {$elapsed}s", '2' );
+
+	// The recorded source is only written when it changes, by an option.
 	if ( $recorded ) {
 		report_row( 'Done', $done );
 		return;
