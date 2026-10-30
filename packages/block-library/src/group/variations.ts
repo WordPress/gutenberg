@@ -50,7 +50,7 @@ const example = {
 	],
 };
 
-// A full width grid of 12 by 12 cells in manual placement mode, where blocks
+// A full width grid of 32 by 32 cells in manual placement mode, where blocks
 // are placed, sized and rotated on the canvas. Manual grids can only be edited
 // that way with the grid interactivity experiment, so the variation is only
 // registered with it. It sets no padding, so that it gets the theme's padding
@@ -63,8 +63,8 @@ const canvasVariation: BlockVariation = {
 		align: 'full',
 		layout: {
 			type: 'grid',
-			columnCount: 12,
-			rowCount: 12,
+			columnCount: 32,
+			rowCount: 32,
 			isManualPlacement: true,
 		},
 	},
@@ -80,10 +80,10 @@ const canvasVariation: BlockVariation = {
 					content: __( 'Anywhere.' ),
 					style: {
 						layout: {
-							columnStart: 2,
-							rowStart: 2,
-							columnSpan: 6,
-							rowSpan: 3,
+							columnStart: 5,
+							rowStart: 5,
+							columnSpan: 16,
+							rowSpan: 8,
 						},
 					},
 				},
@@ -94,10 +94,10 @@ const canvasVariation: BlockVariation = {
 					content: __( 'Blocks go where you put them.' ),
 					style: {
 						layout: {
-							columnStart: 6,
-							rowStart: 7,
-							columnSpan: 6,
-							rowSpan: 3,
+							columnStart: 16,
+							rowStart: 19,
+							columnSpan: 16,
+							rowSpan: 8,
 						},
 					},
 				},
