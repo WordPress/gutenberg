@@ -827,8 +827,8 @@ function main( array $args ): void {
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The done row names the WordPress version, then, dimmed, the commit that a fetched ref resolved
-	// to, the revision, and how long generating took. The check mark only goes with colors, as the
-	// row's label already says the same.
+	// to, the revision, and how long the whole run took, including fetching the source and setting up
+	// the generator. The check mark only goes with colors, as the row's label already says the same.
 	$details = array();
 	if ( $fetched_ref ) {
 		$details[] = short_commit( $commit );
