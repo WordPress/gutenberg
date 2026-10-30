@@ -368,10 +368,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
+		// Select the first paragraph: the block toolbar the mouse move shows
+		// then sits above it, not over the paragraph that is clicked.
+		await page.keyboard.press( 'ArrowUp' );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: '1' } )
+			.filter( { hasText: '2' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
 		await expect( multiBlockSelectionUtils.assertNativeSelection ).toPass();
