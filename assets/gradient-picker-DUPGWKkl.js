@@ -1,0 +1,57 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./react-Cd8OJmTE.js";import{n as i,t as a}from"./use-instance-id-DuzD68j8.js";import{c as o,n as s,t as c}from"./build-module-CqL0UdL5.js";import{o as l,s as u}from"./color-palette-kq_aH_cX.js";import{a as d,n as f,r as p,t as m}from"./circular-option-picker-1zTBzeUB.js";import{n as h,t as g}from"./component-lc2omK31.js";import{n as _,t as v}from"./component-CRE1lL-m.js";import{n as y,t as b}from"./custom-gradient-picker-CxPxnK_D.js";function SingleOrigin({className:e,clearGradient:t,gradients:n,onChange:i,value:a,selectedSlug:c,presentation:l,...u}){let d=(0,r.useMemo)(()=>n.map(({gradient:e,name:n,slug:r},u)=>{let d=l!==`command-buttons`&&(c?r===c:a===e);return(0,x.jsx)(m.Option,{value:e,isSelected:d,tooltipText:n||o(s(`Gradient code: %s`),e),style:{color:`rgba( 0,0,0,0 )`,background:e},onClick:d?t:()=>i(e,u,r),"aria-label":n?o(s(`Gradient: %s`),n):o(s(`Gradient code: %s`),e)},r)}),[n,a,i,t,c,l]);return(0,x.jsx)(m.OptionGroup,{className:e,options:d,...u})}function MultipleOrigin({className:e,clearGradient:t,gradients:n,onChange:r,value:a,selectedSlug:o,headingLevel:s,presentation:c}){let l=i(MultipleOrigin);return(0,x.jsx)(g,{spacing:3,className:e,children:n.map(({name:e,gradients:n},i)=>{let d=`color-palette-${l}-${i}`;return(0,x.jsxs)(g,{spacing:2,children:[(0,x.jsx)(v,{className:u[`color-heading`],level:s,id:d,children:e}),(0,x.jsx)(SingleOrigin,{clearGradient:t,gradients:n,onChange:(e,t,n)=>r(e,i,n),value:a,selectedSlug:o,presentation:c,"aria-labelledby":d})]},i)})})}function Component(e){let{asButtons:t,presentation:n,loop:r,actions:i,headingLevel:a,"aria-label":o,"aria-labelledby":s,...c}=e;d(`GradientPicker`,t);let{metaProps:l,labelProps:u,resolvedPresentation:f}=p(t,r,o,s,n),h=isMultipleOriginArray(e.gradients)?(0,x.jsx)(MultipleOrigin,{headingLevel:a,...c,presentation:f}):(0,x.jsx)(SingleOrigin,{...c,presentation:f});return(0,x.jsx)(m,{...l,...u,actions:i,options:h})}function GradientPicker({className:e,gradients:t=[],onChange:n,value:i,clearable:a=!0,enableAlpha:o=!0,disableCustomGradients:c=!1,__experimentalIsRenderedInSidebar:l,headingLevel:u=2,...d}){let f=(0,r.useCallback)(()=>n(void 0),[n]);return(0,x.jsxs)(g,{spacing:t.length?4:0,children:[!c&&(0,x.jsx)(b,{__experimentalIsRenderedInSidebar:l,enableAlpha:o,value:i,onChange:n}),(t.length>0||a)&&(0,x.jsx)(Component,{...d,className:e,clearGradient:f,gradients:t,onChange:n,value:i,actions:a&&!c&&(0,x.jsx)(m.ButtonAction,{onClick:f,accessibleWhenDisabled:!0,disabled:!i,children:s(`Clear`)}),headingLevel:u})]})}var x,isMultipleOriginObject,isMultipleOriginArray;function init_gradient_picker(){return(init_gradient_picker=e((()=>{c(),a(),n(),f(),y(),h(),_(),l(),x=t(),isMultipleOriginObject=e=>Array.isArray(e.gradients)&&!(`gradient`in e),isMultipleOriginArray=e=>e.length>0&&e.every(e=>isMultipleOriginObject(e));try{GradientPicker.__docgenInfo={description:`GradientPicker is a React component that renders a color gradient picker to
+define a multi step gradient. There's either a _linear_ or a _radial_ type
+available.
+
+\`\`\`jsx
+import { useState } from 'react';
+import { GradientPicker } from '@wordpress/components';
+
+const MyGradientPicker = () => {
+  const [ gradient, setGradient ] = useState( null );
+
+  return (
+    <GradientPicker
+      value={ gradient }
+      onChange={ ( currentGradient ) => setGradient( currentGradient ) }
+      gradients={ [
+        {
+          name: 'JShine',
+          gradient:
+            'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
+          slug: 'jshine',
+        },
+        {
+          name: 'Moonlit Asteroid',
+          gradient:
+            'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
+          slug: 'moonlit-asteroid',
+        },
+        {
+          name: 'Rastafarie',
+          gradient:
+            'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
+          slug: 'rastafari',
+        },
+      ] }
+    />
+  );
+};
+\`\`\``,displayName:`GradientPicker`,filePath:`/home/runner/work/gutenberg/gutenberg/packages/components/src/gradient-picker/index.tsx`,methods:[],props:{className:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`The class name added to the wrapper.`,name:`className`,required:!1,tags:{},type:{name:`string`}},onChange:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`The function called when a new gradient has been defined. It is passed
+the \`currentGradient\` as an argument. When a predefined gradient is
+selected, the second argument is its index (or, for multiple-origin
+gradients, the origin index) and the third argument is its slug.`,name:`onChange`,required:!0,tags:{},type:{name:`(currentGradient: string | undefined, index?: number | undefined, slug?: string | undefined) => void`}},value:{defaultValue:{value:`'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:"The current value of the gradient. Pass a css gradient string (See default value for example).\nOptionally pass in a `null` value to specify no gradient is currently selected.",name:`value`,required:!1,tags:{},type:{name:`string | null`}},selectedSlug:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`The slug of the currently selected predefined gradient.
+
+When set to a non-empty string, selection is determined by slug rather
+than by gradient value, which correctly handles palettes where two
+entries share the same gradient. Entries whose slug does not match will
+not appear selected in this mode, even if their gradient value matches
+\`value\`.
+
+An empty string is treated the same as \`undefined\`: selection falls
+back to matching by gradient value.`,name:`selectedSlug`,required:!1,tags:{},type:{name:`string`}},clearable:{defaultValue:{value:`true`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`Whether the palette should have a clearing button or not.`,name:`clearable`,required:!1,tags:{},type:{name:`boolean`}},headingLevel:{defaultValue:{value:`2`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`The heading level. Only applies in cases where gradients are provided
+from multiple origins (i.e. when the array passed as the \`gradients\` prop
+contains two or more items).`,name:`headingLevel`,required:!1,tags:{},type:{name:`enum`,raw:`HeadingSize`,value:[{value:`1`},{value:`2`},{value:`3`},{value:`4`},{value:`5`},{value:`6`},{value:`"1"`},{value:`"2"`},{value:`"3"`},{value:`"4"`},{value:`"5"`},{value:`"6"`}]}},presentation:{defaultValue:{value:`'listbox'`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:"How predefined gradient swatches behave and are exposed to assistive\ntechnology.\n\n- `listbox` uses one tab stop and arrow-key navigation, and exposes\n  selection with `aria-selected`.\n- `toggle-buttons` gives each swatch a tab stop and exposes selection with\n  `aria-pressed`.\n- `command-buttons` gives each swatch a tab stop and exposes no selection\n  state. `value` and `selectedSlug` do not mark predefined swatches as\n  selected, and activating a swatch always calls `onChange` with that\n  swatch. `value` still controls the custom gradient picker.",name:`presentation`,required:!1,tags:{},type:{name:`enum`,raw:`"listbox" | "toggle-buttons" | "command-buttons"`,value:[{value:`"listbox"`},{value:`"toggle-buttons"`},{value:`"command-buttons"`}]}},asButtons:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:'Whether the control should present as toggle buttons.\n@deprecated Use `presentation="toggle-buttons"` instead. An explicit\n`presentation` takes precedence.\n@ignore',name:`asButtons`,required:!1,tags:{},type:{name:`boolean`}},loop:{defaultValue:{value:`true`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:"Prevents keyboard interaction from wrapping around.\nOnly used with the `listbox` presentation.",name:`loop`,required:!1,tags:{},type:{name:`boolean`}},enableAlpha:{defaultValue:{value:`true`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`Whether to enable alpha transparency options in the picker.`,name:`enableAlpha`,required:!1,tags:{},type:{name:`boolean`}},"aria-label":{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`},{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`A label to identify the purpose of the control.`,name:`aria-label`,required:!1,tags:{},type:{name:`string`}},"aria-labelledby":{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`},{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`An ID of an element to provide a label for the control.`,name:`aria-labelledby`,required:!1,tags:{},type:{name:`string`}},gradients:{defaultValue:{value:`[]`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:"An array of objects as predefined gradients displayed above the gradient\nselector. Alternatively, if there are multiple sets (or 'origins') of\ngradients, you can pass an array of objects each with a `name` and a\n`gradients` array which will in turn contain the predefined gradient objects.",name:`gradients`,required:!1,tags:{},type:{name:`GradientsProp`}},__nextHasNoMargin:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`Start opting in to the new margin-free styles that will become the default
+in a future version, currently scheduled to be WordPress 6.4. (The prop
+can be safely removed once this happens.)
+@deprecated Default behavior since WP 6.5. Prop can be safely removed.
+@ignore`,name:`__nextHasNoMargin`,required:!1,tags:{},type:{name:`boolean`}},disableCustomGradients:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:"If true, the gradient picker will not be displayed and only defined\ngradients from `gradients` will be shown.",name:`disableCustomGradients`,required:!1,tags:{},type:{name:`boolean`}},__experimentalIsRenderedInSidebar:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/gradient-picker/types.ts`,name:`TypeLiteral`}],description:`Whether this is rendered in the sidebar.`,name:`__experimentalIsRenderedInSidebar`,required:!1,tags:{},type:{name:`boolean`}}},tags:{}}}catch{}})))()}export{init_gradient_picker as n,GradientPicker as t};

@@ -1,0 +1,9 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./react-Cd8OJmTE.js";import{n as i,o as a,t as o}from"./build-module-CqL0UdL5.js";import{a as s,i as c}from"./iframe-BbJPeSVw.js";function UnforwardedExternalLink(e,t){let{href:n,children:r,className:o,...s}=e,u=c(`components-external-link`,o),d=!!n?.startsWith(`#`),onClickHandler=t=>{d&&t.preventDefault(),e.onClick&&e.onClick(t)};return(0,l.jsxs)(`a`,{...s,className:u,href:n,onClick:onClickHandler,target:`_blank`,ref:t,children:[(0,l.jsx)(`span`,{className:`components-external-link__contents`,children:r}),(0,l.jsx)(`span`,{className:c(`components-external-link__icon`,`wp-exclude-emoji`),"aria-label":i(`(opens in a new tab)`),children:a()?`↖`:`↗`})]})}var l,u;function init_external_link(){return(init_external_link=e((()=>{s(),o(),n(),l=t(),u=(0,r.forwardRef)(UnforwardedExternalLink),u.displayName=`ExternalLink`;try{u.__docgenInfo={description:`Link to an external resource.
+
+\`\`\`jsx
+import { ExternalLink } from '@wordpress/components';
+
+const MyExternalLink = () => (
+  <ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
+);
+\`\`\``,displayName:`ExternalLink`,filePath:`/home/runner/work/gutenberg/gutenberg/packages/components/src/external-link/index.tsx`,methods:[],props:{children:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/external-link/types.ts`,name:`TypeLiteral`}],description:`The content to be displayed within the link.`,name:`children`,required:!0,tags:{},type:{name:`ReactNode`}},href:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/external-link/types.ts`,name:`TypeLiteral`}],description:`The URL of the external resource.`,name:`href`,required:!0,tags:{},type:{name:`string`}}},tags:{}}}catch{}})))()}export{init_external_link as n,u as t};

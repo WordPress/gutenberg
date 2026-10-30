@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function resolveAriaLabelledBy(e,t){return e??t}function init_resolveAriaLabelledBy(){return(init_resolveAriaLabelledBy=e((()=>{})))()}export{resolveAriaLabelledBy as n,init_resolveAriaLabelledBy as t};

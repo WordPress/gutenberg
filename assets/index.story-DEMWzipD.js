@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./component-lXS83C_h.js";import{n as i,t as a}from"./component-BdJhDt_r.js";var o,s,Item,Template,c;function init_index_story(){return(init_index_story=e((()=>{n(),i(),o=t(),s={component:a,id:`components-grid`,title:`Components/@wordpress-components/Grid`,argTypes:{as:{control:{type:`text`}},align:{control:{type:`text`}},children:{control:!1},columnGap:{control:{type:`text`}},columns:{table:{type:{summary:`number`}},control:{type:`number`}},justify:{control:{type:`text`}},rowGap:{control:{type:`text`}},rows:{table:{type:{summary:`number`}},control:{type:`number`}},templateColumns:{control:{type:`text`}},templateRows:{control:{type:`text`}}},tags:[`status-experimental`],parameters:{controls:{expanded:!0},docs:{canvas:{sourceState:`shown`}},componentStatus:{status:`not-recommended`,whereUsed:`global`,notes:`Planned for deprecation. Write your own CSS instead.`}}},Item=e=>(0,o.jsx)(r,{style:{borderRadius:8,background:`#eee`,padding:8,textAlign:`center`},...e}),Template=e=>(0,o.jsxs)(a,{...e,children:[(0,o.jsx)(Item,{children:`One`}),(0,o.jsx)(Item,{children:`Two`}),(0,o.jsx)(Item,{children:`Three`}),(0,o.jsx)(Item,{children:`Four`}),(0,o.jsx)(Item,{children:`Five`}),(0,o.jsx)(Item,{children:`Six`}),(0,o.jsx)(Item,{children:`Seven`}),(0,o.jsx)(Item,{children:`Eight`})]}),c=Template.bind({}),c.args={alignment:`bottom`,columns:4,gap:2},c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`props => <Grid {...props}>
+        <Item>One</Item>
+        <Item>Two</Item>
+        <Item>Three</Item>
+        <Item>Four</Item>
+        <Item>Five</Item>
+        <Item>Six</Item>
+        <Item>Seven</Item>
+        <Item>Eight</Item>
+    </Grid>`,...c.parameters?.docs?.source}}}})))()}init_index_story();export{c as Default,s as default};

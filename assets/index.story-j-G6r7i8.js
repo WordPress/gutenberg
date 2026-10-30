@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./component-lXS83C_h.js";import{n as i,t as a}from"./component-BY3Du5yg.js";var o,s,c,l,u,Template,d;function init_index_story(){return(init_index_story=e((()=>{n(),i(),o=t(),s={top:`top`,topLeft:`topLeft`,topRight:`topRight`,left:`left`,center:`center`,right:`right`,bottom:`bottom`,bottomLeft:`bottomLeft`,bottomRight:`bottomRight`,edge:`edge`,stretch:`stretch`},c={row:`row`,column:`column`,responsive:[`column`,`row`]},l={"space-around":`space-around`,"space-between":`space-between`,"space-evenly":`space-evenly`,stretch:`stretch`,center:`center`,end:`end`,"flex-end":`flex-end`,"flex-start":`flex-start`,start:`start`},u={component:a,title:`Components/@wordpress-components/Layout/HStack`,id:`components-hstack`,argTypes:{as:{control:!1},children:{control:!1},alignment:{control:{type:`select`},options:Object.keys(s),mapping:s},direction:{control:{type:`select`},options:Object.keys(c),mapping:c},justify:{control:{type:`select`},options:Object.keys(l),mapping:l},spacing:{control:{type:`text`}}},tags:[`status-experimental`],parameters:{controls:{expanded:!0},docs:{canvas:{sourceState:`shown`}},componentStatus:{status:`not-recommended`,whereUsed:`global`,notes:"Use [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui` instead."}}},Template=e=>(0,o.jsx)(a,{...e,style:{background:`#eee`,minHeight:`3rem`},children:[`One`,`Two`,`Three`,`Four`,`Five`].map(e=>(0,o.jsx)(r,{style:{background:`#b9f9ff`},children:e},e))}),d=Template.bind({}),d.args={spacing:`3`},d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`args => <HStack {...args} style={{
+  background: '#eee',
+  minHeight: '3rem'
+}}>
+        {['One', 'Two', 'Three', 'Four', 'Five'].map(text => <View key={text} style={{
+    background: '#b9f9ff'
+  }}>
+                {text}
+            </View>)}
+    </HStack>`,...d.parameters?.docs?.source}}}})))()}init_index_story();export{d as Default,u as default};

@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./external-link-Bt6cBMNG.js";var i,a,Template,o;function init_index_story(){return(init_index_story=e((()=>{n(),i=t(),a={component:r,title:`Components/@wordpress-components/Navigation/ExternalLink`,id:`components-externallink`,argTypes:{children:{control:{type:`text`}}},parameters:{controls:{expanded:!0},docs:{canvas:{sourceState:`shown`}},componentStatus:{status:`not-recommended`,whereUsed:`global`,notes:"Use [`Link`](?path=/docs/design-system-components-link--docs) from `@wordpress/ui` instead, with the `openInNewTab` prop set."}}},Template=({...e})=>(0,i.jsx)(r,{...e}),o=Template.bind({}),o.args={children:`WordPress`,href:`https://wordpress.org`},o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`({
+  ...args
+}) => {
+  return <ExternalLink {...args} />;
+}`,...o.parameters?.docs?.source}}}})))()}init_index_story();export{o as Default,a as default};

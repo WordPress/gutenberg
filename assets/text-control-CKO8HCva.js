@@ -1,0 +1,24 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./react-Cd8OJmTE.js";import{n as i,t as a}from"./use-instance-id-DuzD68j8.js";import{n as o,t as s}from"./base-control-Br0KG0a3.js";function UnforwardedTextControl(e,t){let{__nextHasNoMarginBottom:n,__next40pxDefaultSize:r,label:a,hideLabelFromVision:o,value:u,help:d,id:f,className:p,onChange:m,type:h=`text`,...g}=e,_=i(l,`inspector-text-control`,f),onChangeValue=e=>m(e.target.value);return(0,c.jsx)(s,{label:a,hideLabelFromVision:o,id:_,help:d,className:p,children:(0,c.jsx)(`input`,{className:`components-text-control__input`,type:h,id:_,value:u,onChange:onChangeValue,"aria-describedby":d?_+`__help`:void 0,ref:t,...g})})}var c,l;function init_text_control(){return(init_text_control=e((()=>{a(),n(),o(),c=t(),l=(0,r.forwardRef)(UnforwardedTextControl),l.displayName=`TextControl`;try{l.__docgenInfo={description:`TextControl components let users enter and edit text.
+
+\`\`\`jsx
+import { TextControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const MyTextControl = () => {
+  const [ className, setClassName ] = useState( '' );
+
+  return (
+    <TextControl
+      label="Additional CSS Class"
+      value={ className }
+      onChange={ ( value ) => setClassName( value ) }
+    />
+  );
+};
+\`\`\``,displayName:`TextControl`,filePath:`/home/runner/work/gutenberg/gutenberg/packages/components/src/text-control/index.tsx`,methods:[],props:{className:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:``,name:`className`,required:!1,tags:{},type:{name:`string`}},label:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`If this property is added, a label will be generated using label property as the content.`,name:`label`,required:!1,tags:{},type:{name:`ReactNode`}},hideLabelFromVision:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`If true, the label will only be visible to screen readers.`,name:`hideLabelFromVision`,required:!1,tags:{},type:{name:`boolean`}},help:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`Additional description for the control.
+
+Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an \`aria-describedby\` attribute.`,name:`help`,required:!1,tags:{},type:{name:`ReactNode`}},__nextHasNoMarginBottom:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`Start opting into the new margin-free styles that will become the default in a future version.
+@deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+@ignore`,name:`__nextHasNoMarginBottom`,required:!1,tags:{},type:{name:`boolean`}},onChange:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/text-control/types.ts`,name:`TypeLiteral`}],description:`A function that receives the value of the input.`,name:`onChange`,required:!0,tags:{},type:{name:`(value: string) => void`}},value:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/text-control/types.ts`,name:`TypeLiteral`}],description:`The current value of the input.`,name:`value`,required:!0,tags:{},type:{name:`string | number`}},type:{defaultValue:{value:`'text'`},declarations:[{fileName:`gutenberg/packages/components/src/text-control/types.ts`,name:`TypeLiteral`}],description:`Type of the input element to render. Defaults to "text".`,name:`type`,required:!1,tags:{},type:{name:`enum`,raw:`"number" | "date" | "email" | "password" | "url" | "text" | "time" | "search" | "tel" | "datetime-local"`,value:[{value:`"number"`},{value:`"date"`},{value:`"email"`},{value:`"password"`},{value:`"url"`},{value:`"text"`},{value:`"time"`},{value:`"search"`},{value:`"tel"`},{value:`"datetime-local"`}]}},__next40pxDefaultSize:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/text-control/types.ts`,name:`TypeLiteral`}],description:`Start opting into the larger default height that will become the default size in a future version.
+@deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+@ignore`,name:`__next40pxDefaultSize`,required:!1,tags:{},type:{name:`boolean`}}},tags:{}}}catch{}})))()}export{init_text_control as n,l as t};

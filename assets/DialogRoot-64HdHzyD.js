@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{h as t,p as n}from"./DirectionProvider-DPUHKTPr.js";import{l as r,u as i}from"./DialogTitle-I4hqJ1Ba.js";var a;function init_DialogRoot(){return(init_DialogRoot=e((()=>{t(),r(),a=n(function DialogRoot(e){return i(`dialog`,e)})})))()}export{init_DialogRoot as n,a as t};

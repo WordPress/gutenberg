@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function areArraysEqual(e,t,n=Object.is){let{length:r}=e;if(r!==t.length)return!1;for(let i=0;i<r;i+=1)if(!n(e[i],t[i]))return!1;return!0}function init_areArraysEqual(){return(init_areArraysEqual=e((()=>{})))()}export{init_areArraysEqual as n,areArraysEqual as t};

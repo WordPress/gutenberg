@@ -1,0 +1,7 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./react-Cd8OJmTE.js";import{n as i,t as a}from"./line-height-control-D9ixuQY7.js";var o,s,Template,c,l;function init_index_story(){return(init_index_story=e((()=>{n(),i(),o=t(),s={component:a,id:`blockeditor-lineheightcontrol`,title:`Editor/Block Editor/LineHeightControl`},Template=e=>{let[t,n]=(0,r.useState)();return(0,o.jsx)(a,{onChange:n,value:t,...e})},c=Template.bind({}),c.args={__unstableInputWidth:`100px`},l=Template.bind({}),l.args={...c.args,__unstableInputWidth:`100%`},c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`props => {
+  const [value, setValue] = useState<string | number>();
+  return <LineHeightControl onChange={setValue} value={value} {...props} />;
+}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`props => {
+  const [value, setValue] = useState<string | number>();
+  return <LineHeightControl onChange={setValue} value={value} {...props} />;
+}`,...l.parameters?.docs?.source}}}})))()}init_index_story();export{c as Default,l as UnconstrainedWidth,s as default};

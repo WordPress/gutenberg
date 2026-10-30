@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{h as t,r as n,u as r}from"./blocks-Bi8bw4xb.js";import{t as i}from"./jsx-runtime-BxZPLZy3.js";import{i as a,r as o}from"./react-sPqhvIIV.js";import{n as s,r as c,t as l}from"./motion.story-DSLZyZOu.js";function _createMdxContent(e){let t={h1:`h1`,...a(),...e.components};return(0,u.jsxs)(u.Fragment,{children:[(0,u.jsx)(r,{of:c,tags:[`!docs-only`]}),`
+`,(0,u.jsx)(t.h1,{id:`motion`,children:`Motion`}),`
+`,(0,u.jsx)(n,{of:l})]})}function MDXContent(e={}){let{wrapper:t}={...a(),...e.components};return t?(0,u.jsx)(t,{...e,children:(0,u.jsx)(_createMdxContent,{...e})}):_createMdxContent(e)}var u;function init_motion(){return(init_motion=e((()=>{u=i(),o(),t(),s()})))()}init_motion();export{MDXContent as default};
