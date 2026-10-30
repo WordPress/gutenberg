@@ -142,6 +142,38 @@ describe( 'useSelect', () => {
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'bar' );
 	} );
 
+	it( 'throws when switching between a store and a function while debugging', () => {
+		globalThis.SCRIPT_DEBUG = true;
+		registry.registerStore( 'testStore', counterStore() );
+		const TestComponent = ( { mapSelect } ) => {
+			useSelect( mapSelect, [] );
+			return null;
+		};
+		const { rerender } = render(
+			<RegistryProvider value={ registry }>
+				<TestComponent mapSelect="testStore" />
+			</RegistryProvider>
+		);
+
+		try {
+			expect( () =>
+				rerender(
+					<RegistryProvider value={ registry }>
+						<TestComponent
+							mapSelect={ ( select ) =>
+								select( 'testStore' ).get()
+							}
+						/>
+					</RegistryProvider>
+				)
+			).toThrow(
+				'Switching useSelect from static to mapping is not allowed'
+			);
+		} finally {
+			globalThis.SCRIPT_DEBUG = false;
+		}
+	} );
+
 	it( 'does not rerender a nested component that is to be unmounted', () => {
 		registry.registerStore( 'toggler', {
 			reducer: ( state = false, action ) =>

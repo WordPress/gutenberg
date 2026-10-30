@@ -1,7 +1,7 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -36,33 +36,30 @@ export function useEventHandlers( {
 	isSelected?: boolean;
 	isMultiSelected?: boolean;
 } ) {
-	const registry = useRegistry();
+	const {
+		getBlockRootClientId,
+		getSelectedBlockClientIds,
+		canMoveBlocks,
+		isZoomOut,
+		hasMultiSelection,
+		__unstableIsFullySelected,
+		isSectionBlock,
+		editedContentOnlySection,
+		getBlock,
+	} = unlock( useSelect( blockEditorStore ) );
+	const {
+		removeBlock,
+		resetZoomLevel,
+		startDraggingBlocks,
+		stopDraggingBlocks,
+		editContentOnlySection,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isSelected && ! isMultiSelected ) {
 				return;
 			}
-
-			// Only read the store for a selected block.
-			const {
-				getBlockRootClientId,
-				getSelectedBlockClientIds,
-				canMoveBlocks,
-				isZoomOut,
-				hasMultiSelection,
-				__unstableIsFullySelected,
-				isSectionBlock,
-				editedContentOnlySection,
-				getBlock,
-			} = unlock( registry.select( blockEditorStore ) );
-			const {
-				removeBlock,
-				resetZoomLevel,
-				startDraggingBlocks,
-				stopDraggingBlocks,
-				editContentOnlySection,
-			} = unlock( registry.dispatch( blockEditorStore ) );
 
 			/**
 			 * Interprets keydown event intent to remove or insert after block if
@@ -592,6 +589,25 @@ export function useEventHandlers( {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ clientId, isSelected, isMultiSelected, registry ]
+		[
+			clientId,
+			isSelected,
+			isMultiSelected,
+			getBlockRootClientId,
+			getSelectedBlockClientIds,
+			getBlock,
+			isReusableBlock,
+			isTemplatePart,
+			removeBlock,
+			isZoomOut,
+			resetZoomLevel,
+			hasMultiSelection,
+			canMoveBlocks,
+			startDraggingBlocks,
+			stopDraggingBlocks,
+			isSectionBlock,
+			editedContentOnlySection,
+			editContentOnlySection,
+		]
 	);
 }
