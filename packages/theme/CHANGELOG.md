@@ -11,10 +11,6 @@
 
 -   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
 
-### Bug Fixes
-
--   `ThemeProvider`: Map Button colors to semantic tokens while preserving legacy accent aliases for other components ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
-
 ### Internal
 
 -   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).

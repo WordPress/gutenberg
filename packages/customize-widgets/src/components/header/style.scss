@@ -48,12 +48,8 @@
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed {
+		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
-
-			&:is(:disabled, [aria-disabled="true"]):not(.is-busy) {
-				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
-			}
 		}
 
 		&:focus:not(:active) {
