@@ -311,7 +311,12 @@ export function createDefaultEntitySyncManager(
 				toObjectId( recordId ),
 				edits,
 				getEditOrigin( options ),
-				{ isNewUndoLevel: isNewUndoLevel( options ) }
+				{
+					isNewUndoLevel: isNewUndoLevel( options ),
+					...( options.baseline
+						? { baseline: options.baseline }
+						: {} ),
+				}
 			);
 		},
 

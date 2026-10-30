@@ -412,9 +412,15 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 			 *
 			 * @param crdtDoc
 			 * @param changes
+			 * @param options
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
+			applyChangesToCRDTDoc: ( crdtDoc, changes, options ) =>
+				applyPostChangesToCRDTDoc(
+					crdtDoc,
+					changes,
+					syncedProperties,
+					options
+				),
 
 			/**
 			 * Create the awareness instance for the entity's CRDT document.

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Real\-time\ collaboration\:\ a\ keystroke\ made\ while\ a\ remote\ change\ was\ still\ on\ its\ way\ to\ the\ block\ editor\ no\ longer\ deletes\ the\ peer\'s\ block\ or\ reverts\ the\ peer\'s\ text\.\ \`useEntityBlockEditor\`\ now\ tells\ the\ sync\ layer\ which\ blocks\ a\ change\ was\ made\ against\,\ through\ the\ new\ \`baseline\`\ option\ of\ \`editEntityRecord\`\,\ and\ the\ post\ sync\ config\ applies\ only\ that\ change\.
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).

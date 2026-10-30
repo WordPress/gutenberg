@@ -32,6 +32,12 @@ export type EntitySyncRecordId = string | number;
 export interface EntitySyncEditOptions {
 	isCached: boolean;
 	undoIgnore: boolean;
+	/**
+	 * The record values the edit was computed against, for the fields where
+	 * the caller knows them. Lets the manager apply only the caller's own
+	 * change when the shared document has moved past that value.
+	 */
+	baseline?: EntitySyncRecord;
 }
 
 /**
