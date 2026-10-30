@@ -5,9 +5,8 @@
 	flex-shrink: 0;
 	overflow: hidden;
 	inline-size: 24px;
-	block-size: 24px;
-	/* Centre the avatar on the first line of a name that wraps. */
-	margin-block: calc((1lh - 24px) / 2);
+	/* One line of text tall, so it sits on the first line of a name that wraps. */
+	block-size: 1lh;
 	align-items: center;
 	justify-content: start;
 	display: flex;
@@ -33,11 +32,11 @@
 
 .icon {
 	display: flex;
+	align-items: center;
 	flex-shrink: 0;
 	inline-size: 24px;
-	block-size: 24px;
-	/* Centre the icon on the first line of a name that wraps. */
-	margin-block: calc((1lh - 24px) / 2);
+	/* One line of text tall, so it sits on the first line of a name that wraps. */
+	block-size: 1lh;
 }
 
 .icon svg {
