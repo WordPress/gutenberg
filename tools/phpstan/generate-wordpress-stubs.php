@@ -295,18 +295,19 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 /**
  * Returns the exception for a command that failed, naming the command.
  *
- * A `--header` argument is left out, since it may span several lines.
+ * An argument that spans several lines, such as the generator's header, is shortened to its first.
  *
  * @param int                    $status  The exit status.
  * @param non-empty-list<string> $command The program and its arguments.
  * @return RuntimeException The exception.
  */
 function command_failed( int $status, array $command ): RuntimeException {
-	$shown = array_filter(
-		$command,
-		static function ( string $argument ): bool {
-			return 0 !== strpos( $argument, '--header=' );
-		}
+	$shown = array_map(
+		static function ( string $argument ): string {
+			$line_end = strpos( $argument, "\n" );
+			return false !== $line_end ? substr( $argument, 0, $line_end ) . '...' : $argument;
+		},
+		$command
 	);
 	return new RuntimeException( "Exited with status $status: " . implode( ' ', $shown ) );
 }
