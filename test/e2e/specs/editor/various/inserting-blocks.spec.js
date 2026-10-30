@@ -80,7 +80,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'webkit',
+			false && testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
 
@@ -146,7 +146,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'webkit',
+			false && testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
 
@@ -211,7 +211,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'webkit',
+			false && testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
 
@@ -274,7 +274,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'webkit',
+			false && testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
 		const PATTERN_NAME = 'My synced pattern';
@@ -375,7 +375,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	}, testInfo ) => {
 		testInfo.skip(
-			testInfo.project.name === 'webkit',
+			false && testInfo.project.name === 'webkit',
 			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
 
