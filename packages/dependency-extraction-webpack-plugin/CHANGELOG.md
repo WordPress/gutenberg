@@ -4,7 +4,7 @@
 
 ### Documentation
 
--   Document the list of `@wordpress/*` packages that are bundled rather than externalized ([#60258](https://github.com/WordPress/gutenberg/issues/60258)).
+-   Document the list of `@wordpress/*` packages that are bundled rather than externalized ([#86013](https://github.com/WordPress/gutenberg/pull/86013)).
 
 ## 7.0.0 (2026-10-20)
 
