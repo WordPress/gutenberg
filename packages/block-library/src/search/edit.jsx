@@ -616,18 +616,28 @@ export default function SearchEdit( {
 			{ controls }
 			<Wrapper { ...blockProps }>
 				{ showLabel && (
-					<RichText
-						identifier="label"
+					// Render a <label> like the front end does, so `label`
+					// element styles from theme.json apply in the editor too.
+					// The editable text sits in a <span> because a <label>
+					// can't take the textbox role. It isn't tied to the input,
+					// so clicking it edits the text instead of focusing the field.
+					// eslint-disable-next-line jsx-a11y/label-has-associated-control
+					<label
 						className={ labelClassnames }
-						aria-label={ __( 'Label text' ) }
-						placeholder={ __( 'Add label…' ) }
-						withoutInteractiveFormatting
-						value={ label }
-						onChange={ ( html ) =>
-							setAttributes( { label: html } )
-						}
 						style={ typographyProps.style }
-					/>
+					>
+						<RichText
+							identifier="label"
+							tagName="span"
+							aria-label={ __( 'Label text' ) }
+							placeholder={ __( 'Add label…' ) }
+							withoutInteractiveFormatting
+							value={ label }
+							onChange={ ( html ) =>
+								setAttributes( { label: html } )
+							}
+						/>
+					</label>
 				) }
 
 				<ResizableBox
