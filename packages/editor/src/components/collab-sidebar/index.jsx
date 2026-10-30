@@ -159,8 +159,8 @@ function NotesSidebar( { postId, drafts } ) {
 			{ notes.length > 0 && (
 				<AddNoteToolbarButton
 					count={
-						notes.filter(
-							( thread ) => thread.blockClientId === clientId
+						notes.filter( ( thread ) =>
+							thread.blockClientIds.includes( clientId )
 						).length
 					}
 					onClick={ addNewNoteForBlock }
