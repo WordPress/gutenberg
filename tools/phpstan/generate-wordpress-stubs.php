@@ -607,26 +607,24 @@ function main( array $args ): void {
 	// out, apart from any duplicate declarations it lists.
 	$generated_file = $work_dir . '/wordpress-stubs.php';
 
-	list( $status, $output ) = execute(
-		array(
-			PHP_BINARY,
-			$generator_dir . '/vendor/bin/generate-stubs',
-			'--force',
-			"--finder=$generator_dir/finder.php",
-			"--visitor=$generator_dir/visitor.php",
-			'--header=' . GENERATOR_HEADER,
-			'--functions',
-			'--classes',
-			'--interfaces',
-			'--traits',
-			"--out=$generated_file",
-		),
-		'capture',
-		$work_dir
+	$generator_command = array(
+		PHP_BINARY,
+		$generator_dir . '/vendor/bin/generate-stubs',
+		'--force',
+		"--finder=$generator_dir/finder.php",
+		"--visitor=$generator_dir/visitor.php",
+		'--header=' . GENERATOR_HEADER,
+		'--functions',
+		'--classes',
+		'--interfaces',
+		'--traits',
+		"--out=$generated_file",
 	);
+
+	list( $status, $output ) = execute( $generator_command, 'capture', $work_dir );
 	if ( 0 !== $status ) {
 		report( trim( $output ) );
-		throw new RuntimeException( "The generator exited with status $status." );
+		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $generator_command ) );
 	}
 	$duplicates = strpos( $output, 'Duplicate declarations found' );
 	if ( false !== $duplicates ) {
