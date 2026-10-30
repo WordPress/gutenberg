@@ -546,12 +546,15 @@ function main( array $args ): void {
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
 		run( array( 'git', '-C', $local_checkout, 'read-tree', "$commit:src" ), null, $env );
 		run( array( 'git', '-C', $local_checkout, '-c', 'core.autocrlf=false', 'checkout-index', '--all', "--prefix=$source_dir/" ), null, $env );
-		$repo_dir = $local_checkout;
+		$repo_dir    = $local_checkout;
+		$fetched_ref = false;
 	} else {
 		report_row( 'Source', $source_label . style( ' (GitHub)', '2' ) );
 		$repo_dir = $work_dir . '/wordpress-develop';
 		fetch_commit( $repo_dir, $develop_repo, $commit, array( '/src/' ) );
-		$commit = resolve_commit( $repo_dir, 'HEAD' );
+		// A ref, such as the head of a pull request, is only resolved to a commit once fetched.
+		$fetched_ref = ! is_commit_hash( $commit );
+		$commit      = resolve_commit( $repo_dir, 'HEAD' );
 		mkdir( dirname( $source_dir ) );
 		rename( $repo_dir . '/src', $source_dir );
 	}
@@ -681,7 +684,7 @@ function main( array $args ): void {
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The recorded source is only written when it changes, by an option.
-	$done = style( '✓ ', '32' ) . "WordPress $wp_version" . style( ' (' . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
+	$done = style( '✓ ', '32' ) . "WordPress $wp_version" . style( ' (' . ( $fetched_ref ? short_commit( $commit ) . ', ' : '' ) . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
 	if ( $recorded ) {
 		report_row( 'Done', $done );
 		return;
