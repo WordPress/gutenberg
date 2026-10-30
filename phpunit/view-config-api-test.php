@@ -233,6 +233,48 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The `author` row shows the field's placeholder when the post has no
+	 * author, for every post type using the default form.
+	 *
+	 * @dataProvider data_default_form_post_types
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_author_layout_shows_placeholder_if_empty( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			register_post_type( $post_type );
+		}
+
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertSame(
+			array(
+				'type'                   => 'panel',
+				'showPlaceholderIfEmpty' => true,
+			),
+			$this->get_form_field( $config, 'author' )['layout']
+		);
+
+		if ( 'page' !== $post_type && 'post' !== $post_type ) {
+			unregister_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Post types with their own form do not get an `author` member appended
+	 * by the `author` layout patch.
+	 *
+	 * @dataProvider data_post_types_with_own_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_author_layout_is_not_appended_to_own_forms( $post_type ) {
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertNull( $this->get_form_field( $config, 'author' ) );
+	}
+
+	/**
 	 * The `attachment` post type provides the form of the media editor: the
 	 * editable fields in a regular layout, then the rest in panels.
 	 */
