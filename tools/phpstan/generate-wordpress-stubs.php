@@ -157,13 +157,23 @@ function has_color(): bool {
 /**
  * Returns whether standard error can show characters beyond ASCII, such as a check mark.
  *
- * A Windows console or a log read there may use a legacy code page rather than UTF-8, so Windows
- * gets ASCII only.
+ * Elsewhere, this depends on the locale, which the first of the LC_ALL, LC_CTYPE, and LANG
+ * environment variables that is set gives, such as en_US.UTF-8. A Windows console or a log read
+ * there may use a legacy code page rather than UTF-8, so Windows gets ASCII only.
  *
  * @return bool Whether to use characters beyond ASCII.
  */
 function has_unicode(): bool {
-	return '\\' !== DIRECTORY_SEPARATOR;
+	if ( '\\' === DIRECTORY_SEPARATOR ) {
+		return false;
+	}
+	foreach ( array( 'LC_ALL', 'LC_CTYPE', 'LANG' ) as $name ) {
+		$locale = (string) getenv( $name );
+		if ( '' !== $locale ) {
+			return 1 === preg_match( '/utf-?8/i', $locale );
+		}
+	}
+	return false;
 }
 
 /**
