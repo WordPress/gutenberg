@@ -29,7 +29,7 @@ export const ANCHOR_ATTR_SCHEMA: BlockAttribute = {
  *                   directly off the body's first element child instead of
  *                   re-parsing originalContent for each fix.
  *
- * @return Fixed block object
+ * @return Fixed block object, or the same block when nothing changed.
  */
 export function applyBuiltInValidationFixes(
 	block: Block,
@@ -76,6 +76,16 @@ export function applyBuiltInValidationFixes(
 		ANCHOR_ATTR_SCHEMA,
 		rootElement
 	);
+
+	// Return the same block when no value changed, so callers can skip
+	// validating it again: the result would be the same.
+	const isChanged = Object.keys( {
+		...attributes,
+		...updatedBlockAttributes,
+	} ).some( ( key ) => attributes[ key ] !== updatedBlockAttributes[ key ] );
+	if ( ! isChanged ) {
+		return block;
+	}
 
 	return {
 		...block,

@@ -92,12 +92,19 @@ export function applyBlockDeprecatedVersions(
 
 		// If the migrated block is not valid initially, try the built-in fixes.
 		if ( ! isValid ) {
-			migratedBlock = applyBuiltInValidationFixes(
+			const fixedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
 				deprecatedBlockType,
 				parsedBody
 			);
-			[ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+			// Validating again only helps when the fixes changed something.
+			if ( fixedBlock !== migratedBlock ) {
+				migratedBlock = fixedBlock;
+				[ isValid ] = validateBlock(
+					migratedBlock,
+					deprecatedBlockType
+				);
+			}
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block

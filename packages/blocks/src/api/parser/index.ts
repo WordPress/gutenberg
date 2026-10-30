@@ -133,10 +133,10 @@ function applyBlockValidation(
 	parsedBody?: Element | null
 ): Block {
 	// Attempt to validate the block.
-	const [ isValid ] = validateBlock( unvalidatedBlock, blockType );
+	const validation = validateBlock( unvalidatedBlock, blockType );
 
-	if ( isValid ) {
-		return { ...unvalidatedBlock, isValid, validationIssues: [] };
+	if ( validation[ 0 ] ) {
+		return { ...unvalidatedBlock, isValid: true, validationIssues: [] };
 	}
 
 	// If the block is invalid, attempt some built-in fixes
@@ -146,11 +146,12 @@ function applyBlockValidation(
 		blockType,
 		parsedBody
 	);
-	// Attempt to validate the block once again after the built-in fixes.
-	const [ isFixedValid, validationIssues ] = validateBlock(
-		fixedBlock,
-		blockType
-	);
+	// Attempt to validate the block once again after the built-in fixes,
+	// unless they changed nothing.
+	const [ isFixedValid, validationIssues ] =
+		fixedBlock === unvalidatedBlock
+			? validation
+			: validateBlock( fixedBlock, blockType );
 
 	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
 }
