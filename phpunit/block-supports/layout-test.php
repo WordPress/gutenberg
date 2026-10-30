@@ -745,6 +745,34 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that the box-sizing of a child with a fixed size in a flex layout reaches the
+	 * stylesheet, which filters every declaration through safecss_filter_attr().
+	 *
+	 * @covers ::gutenberg_add_box_sizing_to_safe_style_css
+	 */
+	public function test_fixed_flex_child_keeps_box_sizing_in_stylesheet() {
+		$child_layout_styles = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'selfStretch' => 'fixed',
+				'flexSize'    => '320px',
+			),
+			array()
+		);
+
+		$this->assertSame(
+			'.wp-container-content-test{flex-basis:320px;box-sizing:border-box;}',
+			gutenberg_style_engine_get_stylesheet_from_css_rules(
+				$child_layout_styles,
+				array(
+					'context'  => 'block-supports',
+					'prettify' => false,
+				)
+			)
+		);
+	}
+
+	/**
 	 * Check that gutenberg_render_layout_support_flag() renders the correct classnames on the wrapper.
 	 *
 	 * @dataProvider data_layout_support_flag_renders_classnames_on_wrapper
