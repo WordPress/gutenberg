@@ -98,6 +98,10 @@
 
 .default-controls-item {
 	color: $gray-900;
+
+	&:focus .reset-label {
+		color: inherit;
+	}
 }
 
 // Preserve the established specificity so disabled MenuItem styles
