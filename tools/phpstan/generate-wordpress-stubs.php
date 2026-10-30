@@ -709,10 +709,13 @@ function main( array $args ): void {
 		"--out=$generated_file",
 	);
 
-	$pending                 = report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
-	list( $status, $output ) = execute( $generator_command, 'errors', $work_dir );
-	if ( $pending ) {
-		clear_pending_row();
+	$pending = report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
+	try {
+		list( $status, $output ) = execute( $generator_command, 'errors', $work_dir );
+	} finally {
+		if ( $pending ) {
+			clear_pending_row();
+		}
 	}
 	$output = trim( $output );
 	if ( '' !== $output ) {
