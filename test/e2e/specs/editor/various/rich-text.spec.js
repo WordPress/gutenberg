@@ -1098,4 +1098,100 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			},
 		] );
 	} );
+
+	test( 'should delete all content of a block', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'Hello' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'x' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'x' } },
+			] );
+	} );
+
+	test( 'should delete all content of a block with siblings', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// A block with siblings is edited through the canvas wrapper as the
+		// editing host, where WebKit removes the whole element.
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+		] );
+	} );
+
+	test( 'should delete all content of a block with siblings from the Edit menu', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		// Runs the command of Edit > Delete, which has no Backspace or Delete
+		// key press, on every platform.
+		await editor.canvas
+			.locator( 'body' )
+			.evaluate( ( body ) => body.ownerDocument.execCommand( 'delete' ) );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+		] );
+	} );
 } );

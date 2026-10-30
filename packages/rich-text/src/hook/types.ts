@@ -89,8 +89,20 @@ export type EventListenerProps = {
 };
 
 /**
- * Subscribes listeners to the editable element and returns a cleanup.
+ * A mounted editable element, the latest props of its event listeners, and
+ * the state they keep between events.
  */
-export type EventListenerEffect = (
-	props: RefObject< EventListenerProps >
-) => ( element: HTMLElement ) => () => void;
+export type RichTextField = {
+	element: HTMLElement;
+	props: RefObject< EventListenerProps >;
+	isComposing?: boolean;
+	isPointerDown?: boolean;
+	selectionSnapshot?: {
+		anchorNode: Node | null;
+		anchorOffset: number;
+		focusNode: Node | null;
+		focusOffset: number;
+		processedStart: number | undefined;
+		processedEnd: number | undefined;
+	};
+};
