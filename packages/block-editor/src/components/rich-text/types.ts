@@ -111,6 +111,9 @@ export type ToolbarControlFill = [
 		props: ComponentProps< typeof ToolbarButton > & {
 			isActive?: boolean;
 			title: string;
+			// The name a button in the "More" dropdown was given, which
+			// sorts the core formats.
+			name?: string;
 		};
 	},
 ];
