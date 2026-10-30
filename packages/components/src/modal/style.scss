@@ -254,10 +254,15 @@ body.modal-open {
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 	overflow: auto;
+	// Follow the frame where it clips the inset focus outline.
+	border-bottom-left-radius: inherit;
+	border-bottom-right-radius: inherit;
 
 	&.hide-header {
 		margin-top: 0;
 		padding-top: var(--wpds-dimension-padding-2xl);
+		border-top-left-radius: inherit;
+		border-top-right-radius: inherit;
 	}
 
 	&.is-scrollable:focus-visible {
