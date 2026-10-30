@@ -1,14 +1,10 @@
-import { forwardRef, useInsertionEffect, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	create,
-	split,
-	toHTMLString,
-	privateApis as richTextPrivateApis,
-} from '@wordpress/rich-text';
-import { useRefEffect } from '@wordpress/compose';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 import type { ForwardedRef, RefObject } from 'react';
 import { RichTextWrapper } from './';
 import { store as blockEditorStore } from '../../store';
@@ -21,62 +17,64 @@ import type {
 	RichTextMultilineProps,
 } from './types';
 
-const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+const { useDelegatedListeners } = unlock( composePrivateApis );
 
-function useEnterRef(
-	props: RefObject< RichTextMultilineLineState | undefined >
+function onKeyDown(
+	{
+		props,
+	}: {
+		props: RefObject<
+			RichTextMultilineLineState & { registry: DataRegistry }
+		>;
+	},
+	event: KeyboardEvent
 ) {
-	const registry = useRegistry();
+	if ( event.keyCode !== ENTER ) {
+		return;
+	}
+
+	event.preventDefault();
+
+	const { value, values, onChange, index, identifier, clientId, registry } =
+		props.current;
 	const { getSelectionStart, getSelectionEnd } =
-		useSelect( blockEditorStore );
-	const { selectionChange } = useDispatch( blockEditorStore );
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event: KeyboardEvent ) {
-			if ( event.keyCode !== ENTER ) {
-				return;
-			}
+		registry.select( blockEditorStore );
+	const { offset: start } = getSelectionStart();
+	const { offset: end } = getSelectionEnd();
 
-			event.preventDefault();
+	// Cannot split if there is no selection.
+	if ( typeof start !== 'number' || typeof end !== 'number' ) {
+		return;
+	}
 
-			// Set before any event.
-			const { value, values, onChange, index, identifier, clientId } =
-				props.current!;
-			const { offset: start } = getSelectionStart();
-			const { offset: end } = getSelectionEnd();
+	const richTextValue = create( { html: value } );
+	richTextValue.start = start;
+	richTextValue.end = end;
 
-			// Cannot split if there is no selection.
-			if ( typeof start !== 'number' || typeof end !== 'number' ) {
-				return;
-			}
+	// Splitting at a selection returns both parts.
+	const array = split( richTextValue )!.map( ( v ) =>
+		toHTMLString( { value: v } )
+	);
 
-			const richTextValue = create( { html: value } );
-			richTextValue.start = start;
-			richTextValue.end = end;
-
-			// Splitting at a selection returns both parts.
-			const array = split( richTextValue )!.map( ( v ) =>
-				toHTMLString( { value: v } )
-			);
-
-			const newValues = values.slice();
-			newValues.splice( index, 1, ...array );
-			registry.batch( () => {
-				onChange( newValues );
-				selectionChange(
-					// Multiline fields are in blocks.
-					clientId!,
-					`${ identifier }-${ index + 1 }`,
-					0,
-					0
-				);
-			} );
-		}
-		// Capture phase so this runs before the generic rich text enter
-		// listener, which skips events that already had their default
-		// prevented.
-		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
-	}, [] );
+	const newValues = values.slice();
+	newValues.splice( index, 1, ...array );
+	const { selectionChange } = registry.dispatch( blockEditorStore );
+	registry.batch( () => {
+		onChange( newValues );
+		selectionChange(
+			// Multiline fields are in blocks.
+			clientId!,
+			`${ identifier }-${ index + 1 }`,
+			0,
+			0
+		);
+	} );
 }
+
+// Capture phase so this runs before the generic rich text enter
+// listener, which skips events that already had their default
+// prevented.
+const listeners = { first: { keydown: { selection: [ onKeyDown ] } } };
 
 function Line( lineProps: RichTextMultilineLineProps ) {
 	const {
@@ -90,11 +88,12 @@ function Line( lineProps: RichTextMultilineLineProps ) {
 	} = lineProps;
 	const { clientId } = useBlockEditContext();
 	const { selectionChange } = useDispatch( blockEditorStore );
-	const latestRef = useRef< RichTextMultilineLineState >( undefined );
-	useInsertionEffect( () => {
-		latestRef.current = { ...lineProps, clientId };
+	const registry = useRegistry();
+	const ref = useDelegatedListeners( listeners, {
+		...lineProps,
+		clientId,
+		registry,
 	} );
-	const ref = useEnterRef( latestRef );
 	return (
 		<RichTextWrapper
 			key={ index }

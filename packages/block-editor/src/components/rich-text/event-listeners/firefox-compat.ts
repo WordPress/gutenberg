@@ -2,11 +2,8 @@ import { store as blockEditorStore } from '../../../store';
 import type { RichTextField } from '../types';
 
 export function onFocus( { element, props }: RichTextField ) {
-	const { registry, isSelected } = props.current;
-	if (
-		! isSelected ||
-		! registry.select( blockEditorStore ).isMultiSelecting()
-	) {
+	const { registry } = props.current;
+	if ( ! registry.select( blockEditorStore ).isMultiSelecting() ) {
 		return;
 	}
 
