@@ -286,12 +286,12 @@
 
 	// Inset beside the open menu, against the bar's dark background.
 	&.is-beside-menu {
-		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
+		border-radius: calc(var(--wpds-border-radius-xl) / var(--site-shell-pip-scale));
 	}
 
 	&.is-thumbnail {
 		// The radius and outline are scaled down along with the frame.
-		border-radius: calc(var(--wpds-border-radius-md) / var(--site-shell-pip-scale));
+		border-radius: calc(var(--wpds-border-radius-xl) / var(--site-shell-pip-scale));
 		box-shadow: 0 0 0 calc(1px / var(--site-shell-pip-scale)) var(--wpds-color-stroke-surface-neutral-weak);
 
 		// The transform is set inline, so the grown one, worked out alongside
@@ -332,14 +332,14 @@
 	// The canvas and the footer below it read as one rounded card.
 	.is-menu-open & :global(.interface-interface-skeleton__body) {
 		margin-block-start: var(--site-shell-inset);
-		border-start-start-radius: var(--wpds-border-radius-md);
-		border-start-end-radius: var(--wpds-border-radius-md);
+		border-start-start-radius: var(--wpds-border-radius-xl);
+		border-start-end-radius: var(--wpds-border-radius-xl);
 		overflow: hidden;
 	}
 
 	.is-menu-open & :global(.interface-interface-skeleton__footer) {
-		border-end-start-radius: var(--wpds-border-radius-md);
-		border-end-end-radius: var(--wpds-border-radius-md);
+		border-end-start-radius: var(--wpds-border-radius-xl);
+		border-end-end-radius: var(--wpds-border-radius-xl);
 		overflow: hidden;
 	}
 
