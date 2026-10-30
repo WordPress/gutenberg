@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `start --hot`: Give the script and script module webpack configurations the names `scripts` and `modules`. Without them the dev client cannot tell the two compilations apart, so with `--experimental-modules` the editor reloaded in a loop instead of applying Fast Refresh, and the generated asset files registered handles prefixed with `undefined-` ([#85747](https://github.com/WordPress/gutenberg/issues/85747)).
+-   `start --hot`: Name the script and script module webpack configurations, so the dev client can tell the two compilations apart. Without the names, `--experimental-modules` reloaded the editor in a loop instead of applying Fast Refresh, and the generated asset files registered handles prefixed with `undefined-` ([#86031](https://github.com/WordPress/gutenberg/pull/86031)).
 
 ## 37.0.0 (2026-10-20)
 
