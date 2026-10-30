@@ -50,8 +50,8 @@ const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
 
 const COLLECTION_LABELS = {
 	all: 'All (npm)',
-	core: 'REST API (core)',
-	'core-admin': 'PHP API (core-admin)',
+	core: 'core collection',
+	'core-admin': 'core-admin collection',
 };
 
 type Collection = ( typeof COLLECTIONS )[ number ];
