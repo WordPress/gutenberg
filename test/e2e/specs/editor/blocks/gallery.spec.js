@@ -565,6 +565,135 @@ test.describe( 'Gallery', () => {
 			} )
 			.toBeLessThanOrEqual( 1 );
 	} );
+
+	test( "can set an image's link from the Content tab after selecting it in the List View", async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						id: landscapeMedia.id,
+						url: landscapeMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Gallery' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings.getByRole( 'tab', { name: 'List View' } ).click();
+		await settings
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'link', { name: 'Image' } )
+			.first()
+			.click();
+
+		await expect(
+			settings.getByRole( 'tab', { name: 'Content' } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+		const content = settings.getByRole( 'tabpanel', { name: 'Content' } );
+		await expect(
+			content.getByRole( 'button', { name: 'Image' } ).first()
+		).toBeVisible();
+		await expect(
+			content.getByRole( 'textbox', { name: 'Alternative text' } )
+		).toBeVisible();
+		const linkTo = content.getByRole( 'button', { name: /Link to/ } );
+		await expect( linkTo ).toBeVisible();
+		const newTab = content.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+		await expect( newTab ).toBeVisible();
+
+		// Before anything is typed, the link picker offers the media file and
+		// the attachment page first.
+		await linkTo.click();
+		await page
+			.getByRole( 'listbox' )
+			.getByRole( 'option', { name: /Media file/ } )
+			.click();
+		await expect( linkTo ).toContainText( 'Media file' );
+		await expect
+			.poll( async () => ( await editor.getBlocks() )[ 0 ].innerBlocks )
+			.toMatchObject( [
+				{
+					name: 'core/image',
+					attributes: {
+						href: uploadedMedia.source_url,
+						linkDestination: 'media',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: { linkDestination: 'none' },
+				},
+			] );
+
+		await linkTo.click();
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await urlInput.fill( 'https://wordpress.org' );
+		await urlInput.press( 'Enter' );
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes
+			)
+			.toMatchObject( {
+				href: 'https://wordpress.org',
+				linkDestination: 'custom',
+			} );
+
+		await newTab.check();
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes
+			)
+			.toMatchObject( {
+				href: 'https://wordpress.org',
+				linkTarget: '_blank',
+				// The toolbar's link popover joins noopener onto an empty rel
+				// the same way.
+				rel: ' noopener',
+			} );
+
+		await content.getByRole( 'button', { name: 'Remove link' } ).click();
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes
+			)
+			.toMatchObject( { linkDestination: 'none' } );
+		expect(
+			( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ].attributes.href
+		).toBeUndefined();
+		await expect(
+			content.getByRole( 'button', { name: 'Remove link' } )
+		).toBeHidden();
+	} );
 } );
 
 class GalleryBlockUtils {

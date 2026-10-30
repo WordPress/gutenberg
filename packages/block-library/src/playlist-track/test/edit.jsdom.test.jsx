@@ -6,18 +6,33 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
+// The Content tab's track and track image controls are `MediaReplaceFlow`s
+// too, which `MediaControl` renders with a class name of its own.
+let mockSidebarMediaReplaceFlowProps;
+let mockTrackImageMediaReplaceFlowProps;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
 		await import( '../../../../block-editor/src/components/plain-text' );
 
 	return {
+		store: {},
 		BlockControls: ( { children } ) => <div>{ children }</div>,
 		BlockIcon: () => <span />,
-		InspectorControls: ( { children } ) => <div>{ children }</div>,
+		InspectorControls: ( { children, group = 'default' } ) => (
+			<div data-testid={ `inspector-controls-${ group }` }>
+				{ children }
+			</div>
+		),
 		MediaPlaceholder: () => <div />,
 		MediaReplaceFlow: ( props ) => {
-			mockMediaReplaceFlowProps = props;
+			if ( ! props.className ) {
+				mockMediaReplaceFlowProps = props;
+			} else if ( props.allowedTypes.includes( 'image' ) ) {
+				mockTrackImageMediaReplaceFlowProps = props;
+			} else {
+				mockSidebarMediaReplaceFlowProps = props;
+			}
 			const { name, onSelect } = props;
 			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
 		},
@@ -32,11 +47,20 @@ vi.mock( import( '@wordpress/block-editor' ), async () => {
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	const data = await importOriginal();
 	const mockUseDispatch = vi.fn();
+	// `MediaControl` reads the block editor settings straight from the store;
+	// everything else keeps the real `useSelect`.
+	const mockUseSelect = ( mapSelect, ...rest ) =>
+		typeof mapSelect === 'function'
+			? data.useSelect( mapSelect, ...rest )
+			: { getSettings: () => ( {} ) };
 
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useDispatch' ) {
 				return mockUseDispatch;
+			}
+			if ( property === 'useSelect' ) {
+				return mockUseSelect;
 			}
 
 			return target[ property ];
@@ -103,6 +127,8 @@ function renderEdit( props = {} ) {
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
+		mockSidebarMediaReplaceFlowProps = undefined;
+		mockTrackImageMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: vi.fn(),
 		} );
@@ -295,6 +321,122 @@ describe( 'PlaylistTrackEdit', () => {
 		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).toStrictEqual( {
 			blob: undefined,
 		} );
+	} );
+
+	it( 'shows the track file, track image, title, artist and album in order in the Content tab', () => {
+		renderEdit( { isSelected: true } );
+
+		const contentTab = screen.getByTestId( 'inspector-controls-content' );
+		const controls = [
+			within( contentTab ).getByText( 'song.mp3' ),
+			within( contentTab ).getByText( 'cover.jpg' ),
+			within( contentTab ).getByRole( 'textbox', {
+				name: 'Alternative text',
+			} ),
+			within( contentTab ).getByRole( 'textbox', { name: 'Title' } ),
+			within( contentTab ).getByRole( 'textbox', { name: 'Artist' } ),
+			within( contentTab ).getByRole( 'textbox', { name: 'Album' } ),
+		];
+
+		controls.slice( 1 ).forEach( ( control, index ) => {
+			expect(
+				// eslint-disable-next-line no-bitwise
+				controls[ index ].compareDocumentPosition( control ) &
+					window.Node.DOCUMENT_POSITION_FOLLOWING
+			).toBeTruthy();
+		} );
+		expect(
+			screen.queryByTestId( 'inspector-controls-default' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the track image as a media control in the Content tab', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( mockTrackImageMediaReplaceFlowProps ).toEqual(
+			expect.objectContaining( {
+				allowedTypes: [ 'image' ],
+				mediaURL: 'https://example.com/cover.jpg',
+			} )
+		);
+		// The preview is the control's constrained thumbnail, not a full-size
+		// image.
+		expect(
+			screen.queryByRole( 'img', { name: 'Preview of the track image' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'sets the track image from the Content tab media control', () => {
+		const { setAttributes } = renderEdit( {
+			attributes: { image: undefined, imageAlt: undefined },
+			isSelected: true,
+		} );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onSelect( {
+				url: 'https://example.com/new-cover.jpg',
+				alt: 'A new cover',
+			} );
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			image: 'https://example.com/new-cover.jpg',
+			imageAlt: 'A new cover',
+		} );
+	} );
+
+	it( 'removes the track image from the Content tab media control', () => {
+		const { setAttributes } = renderEdit( { isSelected: true } );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onReset();
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			image: undefined,
+			imageAlt: undefined,
+		} );
+	} );
+
+	it( 'shows the track file and a replace control in the Content tab for a single selected track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( screen.getByText( 'song.mp3' ) ).toBeInTheDocument();
+		expect( mockSidebarMediaReplaceFlowProps ).toEqual(
+			expect.objectContaining( {
+				allowedTypes: [ 'audio' ],
+				mediaId: 1,
+				mediaURL: 'https://example.com/song.mp3',
+			} )
+		);
+	} );
+
+	it( 'does not show the Content tab replace control when multiple tracks are selected', () => {
+		// Replacing the source of every selected track with one file makes no
+		// sense, so the control follows the toolbar replace control.
+		renderEdit( { isSelected: false } );
+
+		expect( screen.queryByText( 'song.mp3' ) ).not.toBeInTheDocument();
+		expect( mockSidebarMediaReplaceFlowProps ).toBeUndefined();
+	} );
+
+	it( 'replaces the track from the Content tab media picker', () => {
+		const { setAttributes } = renderEdit( { isSelected: true } );
+
+		mockSidebarMediaReplaceFlowProps.onSelect( {
+			id: 2,
+			url: 'https://example.com/replacement.mp3',
+			title: 'Replacement Track',
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				blob: undefined,
+				id: 2,
+				src: 'https://example.com/replacement.mp3',
+				title: 'Replacement Track',
+			} )
+		);
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {

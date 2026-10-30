@@ -1,22 +1,55 @@
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RangeControl,
-	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
+import { RichTextData } from '@wordpress/rich-text';
+import { InputControl } from '@wordpress/ui';
+import { getFilename } from '@wordpress/url';
 import { MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT } from './edit';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
+import {
+	MediaLinkControl,
+	MediaLinkNewTabControl,
+} from '../utils/media-link-control';
+import ViewLinkButton from '../utils/view-link-button';
+
+/**
+ * Returns the text of a rich text attribute, without its formatting.
+ *
+ * @param {string|RichTextData} value The attribute's value.
+ * @return {string} The plain text.
+ */
+function getPlainText( value ) {
+	return value ? RichTextData.fromHTMLString( value.toString() ).text : '';
+}
+
+/**
+ * Returns plain text as the HTML of a rich text attribute, so that characters
+ * such as `<` and `&` are kept as typed instead of read as markup.
+ *
+ * @param {string} text The plain text.
+ * @return {string} The attribute's HTML.
+ */
+function toRichTextHTML( text ) {
+	return RichTextData.fromPlainText( text ).toHTMLString();
+}
 
 export default function FileBlockInspector( {
 	hrefs,
-	openInNewWindow,
+	id,
+	fileName,
+	downloadButtonText,
+	textLinkTarget,
 	showDownloadButton,
-	changeLinkDestinationOption,
-	changeOpenInNewWindow,
-	changeShowDownloadButton,
+	isUploading,
+	onSelectFile,
+	onUploadError,
+	setAttributes,
 	displayPreview,
 	changeDisplayPreview,
 	previewHeight,
@@ -24,17 +57,139 @@ export default function FileBlockInspector( {
 } ) {
 	const { href, textLinkHref, attachmentPage } = hrefs;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
-	if ( attachmentPage ) {
-		linkDestinationOptions = [
-			{ value: href, label: __( 'Media file' ) },
-			{ value: attachmentPage, label: __( 'Attachment page' ) },
-		];
-	}
+	const defaultDownloadButtonText = _x( 'Download', 'button label' );
 
 	return (
 		<>
+			<InspectorControls group="content">
+				<ToolsPanel
+					label={ __( 'Media' ) }
+					resetAll={ () => {
+						onSelectFile( undefined );
+						setAttributes( {
+							textLinkTarget: undefined,
+							showDownloadButton: true,
+							downloadButtonText: defaultDownloadButtonText,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'File' ) }
+						isShownByDefault
+						hasValue={ () => !! href }
+						onDeselect={ () => onSelectFile( undefined ) }
+					>
+						<MediaControl
+							mediaId={ id }
+							mediaUrl={ href }
+							filename={ getFilename( href ) }
+							onSelect={ onSelectFile }
+							onError={ onUploadError }
+							onReset={ () => onSelectFile( undefined ) }
+							isUploading={ isUploading }
+							emptyLabel={ __( 'Add file' ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'File name' ) }
+						isShownByDefault
+						hasValue={ () => !! getPlainText( fileName ) }
+						onDeselect={ () =>
+							setAttributes( { fileName: undefined } )
+						}
+					>
+						<InputControl
+							label={ __( 'File name' ) }
+							value={ getPlainText( fileName ) }
+							onValueChange={ ( value ) =>
+								setAttributes( {
+									fileName: toRichTextHTML( value ),
+								} )
+							}
+							autoComplete="off"
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Link to' ) }
+						isShownByDefault
+						hasValue={ () => textLinkHref !== href }
+						onDeselect={ () =>
+							setAttributes( { textLinkHref: href } )
+						}
+					>
+						<MediaLinkControl
+							href={ textLinkHref }
+							mediaUrl={ href }
+							mediaLink={ attachmentPage }
+							destinations={ [ 'media', 'attachment' ] }
+							onChange={ ( { href: newHref } ) =>
+								setAttributes( { textLinkHref: newHref } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Open in new tab' ) }
+						isShownByDefault
+						hasValue={ () => !! textLinkTarget }
+						onDeselect={ () =>
+							setAttributes( { textLinkTarget: undefined } )
+						}
+					>
+						<MediaLinkNewTabControl
+							linkTarget={ textLinkTarget }
+							onChange={ ( { linkTarget } ) =>
+								setAttributes( { textLinkTarget: linkTarget } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ViewLinkButton url={ textLinkHref } />
+					<ToolsPanelItem
+						label={ __( 'Show download button' ) }
+						isShownByDefault
+						hasValue={ () => ! showDownloadButton }
+						onDeselect={ () =>
+							setAttributes( { showDownloadButton: true } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show download button' ) }
+							checked={ showDownloadButton }
+							onChange={ ( value ) =>
+								setAttributes( { showDownloadButton: value } )
+							}
+						/>
+					</ToolsPanelItem>
+					{ showDownloadButton && (
+						<ToolsPanelItem
+							label={ __( 'Download button text' ) }
+							isShownByDefault
+							hasValue={ () =>
+								getPlainText( downloadButtonText ) !==
+								defaultDownloadButtonText
+							}
+							onDeselect={ () =>
+								setAttributes( {
+									downloadButtonText:
+										defaultDownloadButtonText,
+								} )
+							}
+						>
+							<InputControl
+								label={ __( 'Download button text' ) }
+								value={ getPlainText( downloadButtonText ) }
+								onValueChange={ ( value ) =>
+									setAttributes( {
+										downloadButtonText:
+											toRichTextHTML( value ),
+									} )
+								}
+								autoComplete="off"
+							/>
+						</ToolsPanelItem>
+					) }
+				</ToolsPanel>
+			</InspectorControls>
 			<InspectorControls>
 				{ href.endsWith( '.pdf' ) && (
 					<ToolsPanel
@@ -85,54 +240,6 @@ export default function FileBlockInspector( {
 						) }
 					</ToolsPanel>
 				) }
-
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						changeLinkDestinationOption( href );
-						changeOpenInNewWindow( false );
-						changeShowDownloadButton( true );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						label={ __( 'Link to' ) }
-						isShownByDefault
-						hasValue={ () => textLinkHref !== href }
-						onDeselect={ () => changeLinkDestinationOption( href ) }
-					>
-						<WCSelectControl
-							label={ __( 'Link to' ) }
-							value={ textLinkHref }
-							options={ linkDestinationOptions }
-							onChange={ changeLinkDestinationOption }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Open in new tab' ) }
-						isShownByDefault
-						hasValue={ () => !! openInNewWindow }
-						onDeselect={ () => changeOpenInNewWindow( false ) }
-					>
-						<ToggleControl
-							label={ __( 'Open in new tab' ) }
-							checked={ openInNewWindow }
-							onChange={ changeOpenInNewWindow }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Show download button' ) }
-						isShownByDefault
-						hasValue={ () => ! showDownloadButton }
-						onDeselect={ () => changeShowDownloadButton( true ) }
-					>
-						<ToggleControl
-							label={ __( 'Show download button' ) }
-							checked={ showDownloadButton }
-							onChange={ changeShowDownloadButton }
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
 			</InspectorControls>
 		</>
 	);

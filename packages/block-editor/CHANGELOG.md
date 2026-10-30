@@ -16,6 +16,7 @@
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 -   DimensionsTool: Show an icon in the shape of each ratio next to the aspect ratio options and the selected value ([#85812](https://github.com/WordPress/gutenberg/pull/85812)).
+-   Block Inspector: Slide the inspector in for a Social Icon inside a Navigation block, as it does for its Social Icons parent ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
