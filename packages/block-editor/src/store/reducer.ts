@@ -1054,10 +1054,7 @@ export const blocks = pipe(
 				} );
 				newState.set(
 					'',
-					( state.get( '' ) ?? [] ).concat(
-						// @ts-expect-error `blockOrder` is a `Map`, so this reads `undefined`.
-						blockOrder[ '' ]
-					)
+					( state.get( '' ) ?? [] ).concat( blockOrder.get( '' )! )
 				);
 				return newState;
 			}
