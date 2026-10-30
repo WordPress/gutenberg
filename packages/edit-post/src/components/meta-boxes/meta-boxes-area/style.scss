@@ -90,8 +90,6 @@
 		margin-bottom: 20px;
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-		// Meta boxes have no spacing around them, so the placeholder shouldn't
-		// be rounded either.
 		.sortable-placeholder {
 			border-radius: 0;
 		}
