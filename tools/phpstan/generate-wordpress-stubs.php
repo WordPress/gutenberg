@@ -586,20 +586,20 @@ function main( array $args ): void {
 	}
 	$key    = $generation_key( $commit, $pr );
 	$header = <<<HEADER
-<?php
-/**
- * Generated stub declarations for WordPress trunk, for Gutenberg's PHPStan analysis.
- *
- * Generated from $description
- * with https://github.com/$stubs_repo/commit/$stubs_commit.
- *
- * Do not edit. This file is not committed: `composer phpstan` generates it from the source
- * recorded in composer.json, using tools/phpstan/generate-wordpress-stubs.php.
- *
- * Generation key: $key
- */
+		<?php
+		/**
+		 * Generated stub declarations for WordPress trunk, for Gutenberg's PHPStan analysis.
+		 *
+		 * Generated from $description
+		 * with https://github.com/$stubs_repo/commit/$stubs_commit.
+		 *
+		 * Do not edit. This file is not committed: `composer phpstan` generates it from the source
+		 * recorded in composer.json, using tools/phpstan/generate-wordpress-stubs.php.
+		 *
+		 * Generation key: $key
+		 */
 
-HEADER;
+		HEADER;
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The recorded source is only written when it changes, by an option.
