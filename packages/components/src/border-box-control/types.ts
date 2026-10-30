@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Border,
 	ColorProps,
@@ -37,7 +34,9 @@ export type BorderBoxControlProps = ColorProps &
 		 */
 		popoverPlacement?: PopoverProps[ 'placement' ];
 		/**
-		 * The space between the popover and the control wrapper.
+		 * The space between the popover and the control wrapper. A number
+		 * displaces the popover along its main axis; pass an object to also
+		 * displace it along its cross axis.
 		 */
 		popoverOffset?: PopoverProps[ 'offset' ];
 		/**
@@ -86,7 +85,9 @@ export type SplitControlsProps = ColorProps &
 		 */
 		popoverPlacement?: PopoverProps[ 'placement' ];
 		/**
-		 * The space between the popover and the control wrapper.
+		 * The space between the popover and the control wrapper. A number
+		 * displaces the popover along its main axis; pass an object to also
+		 * displace it along its cross axis.
 		 */
 		popoverOffset?: PopoverProps[ 'offset' ];
 		/**

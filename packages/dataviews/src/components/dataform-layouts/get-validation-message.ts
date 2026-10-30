@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { FieldValidity } from '../../types';
 
 function countInvalidFields( validity: FieldValidity | undefined ): number {

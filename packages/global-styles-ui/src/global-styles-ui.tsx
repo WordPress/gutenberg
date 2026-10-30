@@ -1,10 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Navigator, useNavigator } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error: Not typed yet.
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useMemo, useEffect, Fragment } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
@@ -13,20 +9,18 @@ import {
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesProvider } from './provider';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
-import ScreenTypographyElement from './screen-typography-element';
+import ScreenElement from './screen-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
+import ScreenTextShadows from './screen-text-shadows';
+import ScreenTextShadowsEdit from './screen-text-shadows-edit';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
@@ -211,6 +205,9 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text">
+						<ScreenElement element="text" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/font-sizes">
 						<FontSizes />
 					</GlobalStylesNavigationScreen>
@@ -238,26 +235,22 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
 						<ScreenShadowsEdit />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows">
+						<ScreenTextShadows />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows/edit/:category/:slug">
+						<ScreenTextShadowsEdit />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/text">
-						<ScreenTypographyElement element="text" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/link">
-						<ScreenTypographyElement element="link" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/heading">
-						<ScreenTypographyElement element="heading" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/caption">
-						<ScreenTypographyElement element="caption" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/button">
-						<ScreenTypographyElement element="button" />
-					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/:element">
+						<ScreenElement
+							showStateControls={ showBlockStateControls }
+						/>
 					</GlobalStylesNavigationScreen>
 					{ blocks.map( ( block ) => (
 						<Fragment key={ block.name }>

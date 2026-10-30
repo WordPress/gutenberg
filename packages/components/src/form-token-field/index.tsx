@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	KeyboardEvent,
@@ -9,20 +6,13 @@ import type {
 	FocusEvent,
 	ReactNode,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
@@ -33,7 +23,6 @@ import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const identity = ( value: string ) => value;
 
@@ -410,14 +399,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function handleUpArrowKey() {
 		setSelectedSuggestionIndex( ( index ) => {
 			return (
-				( index === 0
+				( index <= 0
 					? getMatchingSuggestions(
 							incompleteTokenValue,
 							suggestions,
 							value,
 							maxSuggestions,
 							saveTransform
-					  ).length
+						).length
 					: index ) - 1
 			);
 		} );
@@ -693,7 +682,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 							matchingSuggestions.length
 						),
 						matchingSuggestions.length
-				  )
+					)
 				: __( 'No results.' );
 
 			debouncedSpeak( message, 'assertive' );

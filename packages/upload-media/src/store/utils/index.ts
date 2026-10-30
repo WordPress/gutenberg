@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { exceedsClientProcessingMemory } from '../../feature-detection';
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
@@ -60,10 +58,14 @@ interface VipsResizeOptions {
 	 * Maximum output bit depth.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized.
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
- * Cached dynamic import promise for @wordpress/vips/worker.
+ * Cached dynamic import promise for `@wordpress/vips/worker`.
  *
  * The module contains ~10MB of inlined WASM code. By using a dynamic import,
  * the WASM is only loaded when vips functions are actually called at image
@@ -72,21 +74,22 @@ interface VipsResizeOptions {
  * The promise is cached so the module is only resolved once.
  */
 let vipsModulePromise:
-	| Promise< typeof import('@wordpress/vips/worker') >
-	| undefined;
+	Promise< typeof import( '@wordpress/vips/worker' ) > | undefined;
 
 /**
  * The resolved module reference, available synchronously after the first
  * load completes. Used by terminateVipsWorker() and vipsCancelOperations().
  */
-let vipsModule: typeof import('@wordpress/vips/worker') | undefined;
+let vipsModule: typeof import( '@wordpress/vips/worker' ) | undefined;
 
 /**
- * Lazily loads and caches the @wordpress/vips/worker module.
+ * Lazily loads and caches the `@wordpress/vips/worker` module.
  *
  * @return The vips worker module.
  */
-function loadVipsModule(): Promise< typeof import('@wordpress/vips/worker') > {
+function loadVipsModule(): Promise<
+	typeof import( '@wordpress/vips/worker' )
+> {
 	if ( ! vipsModulePromise ) {
 		vipsModulePromise = import( '@wordpress/vips/worker' ).then(
 			( mod ) => {
@@ -111,11 +114,7 @@ export async function vipsConvertImageFormat(
 	id: QueueItemId,
 	file: File,
 	type:
-		| 'image/jpeg'
-		| 'image/png'
-		| 'image/webp'
-		| 'image/avif'
-		| 'image/gif',
+		'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif' | 'image/gif',
 	options: VipsConvertOptions = {}
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
@@ -132,6 +131,46 @@ export async function vipsConvertImageFormat(
 	return new File( [ new Blob( [ buffer as ArrayBuffer ] ) ], fileName, {
 		type,
 	} );
+}
+
+/**
+ * Encodes a decoded canvas as a JPEG using vips in a web worker, copying the
+ * EXIF block from the source file the canvas was decoded from.
+ *
+ * Declines with null when the image is too large to hold in wasm-vips memory.
+ * The raw pixels can't be shrunk on load, so the tighter interlaced budget
+ * applies.
+ *
+ * @param id      Queue item ID.
+ * @param canvas  Canvas holding the decoded, upright image.
+ * @param source  The image file the canvas was decoded from.
+ * @param quality JPEG quality (0-1).
+ * @return JPEG data, or null if the image is too large.
+ */
+export async function vipsEncodeCanvasAsJpeg(
+	id: QueueItemId,
+	canvas: OffscreenCanvas,
+	source: File,
+	quality: number
+): Promise< Blob | null > {
+	const { width, height } = canvas;
+	if (
+		exceedsClientProcessingMemory( { width, height, interlaced: true } )
+	) {
+		return null;
+	}
+	const { vipsEncodePixelsAsJpeg: encodePixelsAsJpeg } =
+		await loadVipsModule();
+	const ctx = canvas.getContext( '2d' );
+	if ( ! ctx ) {
+		throw new Error( 'Could not get canvas 2d context' );
+	}
+	const pixels = ctx.getImageData( 0, 0, width, height ).data.buffer;
+	const buffer = await encodePixelsAsJpeg( id, pixels, width, height, {
+		quality,
+		metadataSource: await source.arrayBuffer(),
+	} );
+	return new Blob( [ buffer as ArrayBuffer ], { type: 'image/jpeg' } );
 }
 
 /**
@@ -214,6 +253,7 @@ export async function vipsResizeImage(
 		quality,
 		stripMeta,
 		maxBitdepth,
+		preserveAnimation,
 	} = options;
 
 	if ( signal?.aborted ) {
@@ -227,6 +267,7 @@ export async function vipsResizeImage(
 			quality,
 			stripMeta,
 			maxBitdepth,
+			preserveAnimation,
 		} );
 
 	let fileName = file.name;
@@ -363,6 +404,9 @@ let completedVipsOperations = 0;
 /**
  * Maximum number of vips operations before recycling the worker.
  * Each operation can consume 50-100MB+ of WASM memory for large images.
+ * The threshold is unchanged now that wasm-vips memory can grow to 2 GiB: a
+ * grown heap is only handed back when the worker is recycled, so a lower
+ * ceiling on accumulation still matters.
  */
 const MAX_VIPS_OPS_BEFORE_RECYCLE = 50;
 

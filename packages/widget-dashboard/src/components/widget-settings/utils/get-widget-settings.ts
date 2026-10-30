@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { sprintf, __ } from '@wordpress/i18n';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
@@ -17,6 +14,6 @@ export function getWidgetSettingsTitle( widgetType?: WidgetType ): string {
 				/* translators: %s: Widget title. */
 				__( '%s settings' ),
 				widgetType.title
-		  )
+			)
 		: __( 'Widget settings' );
 }

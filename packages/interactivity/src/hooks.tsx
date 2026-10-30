@@ -1,9 +1,5 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
-
-/**
- * External dependencies
- */
 import {
 	h as createElement,
 	options,
@@ -14,14 +10,17 @@ import {
 	type Context,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-
-/**
- * Internal dependencies
- */
 import { store, stores, universalUnlock } from './store';
-import { warn, type SyncAwareFunction } from './utils';
+import {
+	warn,
+	isReservedKey,
+	getOwnProperty,
+	type SyncAwareFunction,
+} from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 import { PENDING_GETTER } from './proxies/state';
+import { getObjectFromProxy } from './proxies/registry';
+import { isDirectiveMap } from './vdom';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -67,6 +66,7 @@ interface DirectiveArgs {
 		class?: string;
 		style?: string | Record< string, string | number >;
 		content?: ComponentChildren;
+		dangerouslySetInnerHTML?: { __html: string };
 	} >;
 	/**
 	 * The inherited context.
@@ -94,7 +94,7 @@ interface DirectiveOptions {
 }
 
 export interface Evaluate {
-	( entry: DirectiveEntry, ...args: any[] ): any;
+	( entry: DirectiveEntry ): any;
 }
 
 interface GetEvaluate {
@@ -116,11 +116,16 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext< any >( { client: {}, server: {} } );
+const context = createContext< any >( {
+	client: Object.create( null ),
+	server: Object.create( null ),
+} );
 
-// WordPress Directives.
-const directiveCallbacks: Record< string, DirectiveCallback > = {};
-const directivePriorities: Record< string, number > = {};
+// WordPress Directives. Looked up by directive names from the markup, so they
+// have no prototype.
+const directiveCallbacks: Record< string, DirectiveCallback > =
+	Object.create( null );
+const directivePriorities: Record< string, number > = Object.create( null );
 
 /**
  * Registers a new directive type in the Interactivity API runtime.
@@ -203,12 +208,55 @@ export const directive = (
 	directivePriorities[ name ] = priority;
 };
 
+/*
+ * Checks whether `value`, read as `parent[ key ]`, is a method that `parent`
+ * inherits, such as `Array.prototype.push`. Store proxies return wrapped
+ * functions, so for a registered proxy the check reads its target.
+ */
+const isInheritedMethod = ( parent: any, key: string, value: unknown ) => {
+	if (
+		typeof value !== 'function' ||
+		parent === null ||
+		parent === undefined
+	) {
+		return false;
+	}
+	const obj = Object( parent );
+	const target = getObjectFromProxy( obj );
+	if ( target && Object.prototype.hasOwnProperty.call( target, key ) ) {
+		return false;
+	}
+	for (
+		let proto = Object.getPrototypeOf( target ?? obj );
+		proto !== null;
+		proto = Object.getPrototypeOf( proto )
+	) {
+		const descriptor = Object.getOwnPropertyDescriptor( proto, key );
+		if ( descriptor ) {
+			return target
+				? typeof descriptor.value === 'function'
+				: descriptor.value === value;
+		}
+	}
+	return false;
+};
+
 // Resolve the path to some property of the store object.
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
 		warn(
 			`Namespace missing for "${ path }". The value for that path won't be resolved.`
 		);
+		return;
+	}
+	const pathParts = path.split( '.' );
+	// Paths and namespaces come from the markup.
+	if ( isReservedKey( namespace ) || pathParts.some( isReservedKey ) ) {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn(
+				`The path "${ path }" in the "${ namespace }" namespace contains a reserved property name. The value for that path won't be resolved.`
+			);
+		}
 		return;
 	}
 	let resolvedStore = stores.get( namespace );
@@ -223,12 +271,31 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 	const current = {
 		...resolvedStore,
-		context: getScope().context[ namespace ],
+		context: getOwnProperty( getScope().context, namespace ),
 	};
 
 	try {
-		const pathParts = path.split( '.' );
-		return pathParts.reduce( ( acc, key ) => acc[ key ], current );
+		let parent: any;
+		let value: any = current;
+		for ( const key of pathParts ) {
+			parent = value;
+			value = value[ key ];
+		}
+		if (
+			isInheritedMethod(
+				parent,
+				pathParts[ pathParts.length - 1 ],
+				value
+			)
+		) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The path "${ path }" in the "${ namespace }" namespace ends in an inherited method. The value for that path won't be resolved.`
+				);
+			}
+			return;
+		}
+		return value;
 	} catch ( e ) {
 		if ( e === PENDING_GETTER ) {
 			return PENDING_GETTER;
@@ -236,11 +303,18 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 };
 
-// Generate the evaluate function.
+/**
+ * Creates an evaluator bound to a directive scope.
+ *
+ * Returned functions restore the caller's scope when the wrapped call throws.
+ *
+ * @param args       Arguments used to bind the evaluator to a scope.
+ * @param args.scope Scope used to resolve directive values.
+ * @return An evaluator for directive entries.
+ */
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
-	// TODO: When removing the temporarily remaining `value( ...args )` call below, remove the `...args` parameter too.
-	( entry, ...args ) => {
+	( entry ) => {
 		let { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
@@ -252,24 +326,22 @@ export const getEvaluate: GetEvaluate =
 		const value = resolve( path, namespace );
 		// Functions are returned without invoking them.
 		if ( typeof value === 'function' ) {
-			// Except if they have a negation operator present, for backward compatibility.
-			// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
-			// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
 			if ( hasNegationOperator ) {
 				warn(
-					'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
+					`The value of "${ path }" is a function and cannot be negated. Please use derived state instead.`
 				);
-				const functionResult = ! value( ...args );
 				resetScope();
-				return functionResult;
+				return undefined;
 			}
 			// Reset scope before return and wrap the function so it will still run within the correct scope.
 			resetScope();
 			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
-				const functionResult = value( ...functionArgs );
-				resetScope();
-				return functionResult;
+				try {
+					return value( ...functionArgs );
+				} finally {
+					resetScope();
+				}
 			};
 			// Preserve the sync property from the original function
 			if ( value.sync ) {
@@ -337,7 +409,7 @@ const Directives = ( {
 					element,
 					originalProps,
 					previousScope: scope,
-			  } )
+				} )
 			: element;
 
 	const props = { ...originalProps, children };
@@ -366,6 +438,14 @@ const Directives = ( {
 // Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
 options.vnode = ( vnode: VNode< any > ) => {
+	// Only maps built by `toVdom()` passed its directive name checks. Delete any
+	// other `__directives` value so Preact doesn't set it on the element.
+	if (
+		vnode.props.__directives &&
+		! isDirectiveMap( vnode.props.__directives )
+	) {
+		delete vnode.props.__directives;
+	}
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -8,10 +5,15 @@ import {
 	Link,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
+import type {
+	View,
+	Action,
+	SupportedLayouts,
+	Form,
+} from '@wordpress/dataviews';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -27,24 +29,17 @@ import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import {
-	getDefaultView,
-	getActiveViewOverridesForTab,
-	DEFAULT_VIEWS,
-	DEFAULT_LAYOUTS,
+	getActiveViewOverrides,
 	viewToQuery,
+	type ViewListEntry,
+	type ViewOverrides,
 } from './view-utils';
 import { QuickEditModal } from './quick-edit-modal';
-
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
-
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
  */
@@ -61,10 +56,60 @@ function getItemLevel( item: Post ) {
 }
 
 function PostList() {
-	const invalidate = useInvalidate();
 	const { type: postType, slug = 'all' } = useParams( {
 		from: '/types/$type/list/$slug',
 	} );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+		form: quickEditForm,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverrides( viewList, slug ),
+		[ viewList, slug ]
+	);
+
+	if ( ! defaultView ) {
+		// The route canvas resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<PostListView
+			postType={ postType }
+			slug={ slug }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			viewList={ viewList }
+			activeViewOverrides={ activeViewOverrides }
+			quickEditForm={ quickEditForm }
+		/>
+	);
+}
+
+function PostListView( {
+	postType,
+	slug,
+	defaultView,
+	defaultLayouts,
+	viewList,
+	activeViewOverrides,
+	quickEditForm,
+}: {
+	postType: string;
+	slug: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	viewList: ViewListEntry[] | undefined;
+	activeViewOverrides: ViewOverrides;
+	quickEditForm: Form | undefined;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const postTypeObject = useSelect(
@@ -80,15 +125,6 @@ function PostList() {
 				name: postType,
 			} ),
 		[ postType ]
-	);
-
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( postTypeObject );
-	}, [ postTypeObject ] );
-
-	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( slug ),
-		[ slug ]
 	);
 
 	// Callback to handle URL query parameter changes
@@ -110,6 +146,7 @@ function PostList() {
 		name: postType,
 		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -210,7 +247,8 @@ function PostList() {
 	const quickEditAction = useMemo(
 		() => ( {
 			id: 'quick-edit',
-			label: __( 'Quick Edit' ),
+			label: ( items: Post[] ) =>
+				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
@@ -236,47 +274,7 @@ function PostList() {
 	);
 
 	const actions = useMemo( () => {
-		const _actions = [
-			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					case 'permanently-delete':
-						return [
-							{
-								...action,
-								isEligible( item ) {
-									if ( item.type === 'attachment' ) {
-										return true;
-									}
-									return action.isEligible?.( item ) ?? false;
-								},
-							},
-						];
-
-					// Media can in some circumstances need a trash option, but
-					// we need to extend the REST API to support it. See
-					// https://github.com/WordPress/wordpress-develop/pull/9210.
-					// Once that is merged we should fix this.
-					case 'move-to-trash':
-						return [
-							{
-								...action,
-								isEligible( item ) {
-									if ( item.type === 'attachment' ) {
-										return false;
-									}
-									return action.isEligible?.( item ) ?? false;
-								},
-							},
-						];
-
-					// Skip revisions as the admin does not support it
-					case 'view-post-revisions':
-						return [];
-				}
-
-				return [ action ];
-			} ),
-		];
+		const _actions = [ ...postTypeActions ];
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
 		}
@@ -342,25 +340,20 @@ function PostList() {
 			}
 			hasPadding={ false }
 		>
-			{ DEFAULT_VIEWS.length > 1 && (
+			{ viewList && viewList.length > 1 && (
 				<div className="routes-post-list__tabs-wrapper">
-					<Tabs
-						onSelect={ handleTabChange }
-						selectedTabId={ slug ?? 'all' }
-					>
-						<Tabs.TabList>
-							{ DEFAULT_VIEWS.map(
-								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
-										tabId={ filter.slug }
-										key={ filter.slug }
-									>
-										{ filter.label }
-									</Tabs.Tab>
-								)
-							) }
-						</Tabs.TabList>
-					</Tabs>
+					<WCTabs onSelect={ handleTabChange } selectedTabId={ slug }>
+						<WCTabs.TabList>
+							{ viewList.map( ( entry ) => (
+								<WCTabs.Tab
+									tabId={ entry.slug }
+									key={ entry.slug }
+								>
+									{ entry.title }
+								</WCTabs.Tab>
+							) ) }
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews
@@ -374,7 +367,7 @@ function PostList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
+				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				selection={ selection }
@@ -391,6 +384,12 @@ function PostList() {
 						},
 					} );
 				} }
+				isItemClickable={ ( item: Post ) =>
+					// Restoring comes before editing, so a trashed post's title
+					// does not link to the editor. Cast because the assignable
+					// statuses `status` is typed as exclude 'trash'.
+					( item.status as string ) !== 'trash'
+				}
 				renderItemLink={ ( { item, ...props }: { item: Post } ) => (
 					<Link
 						to={ `/types/${ postType }/edit/${ encodeURIComponent(
@@ -413,6 +412,7 @@ function PostList() {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						quickEditForm={ quickEditForm }
 					/>
 				) }
 		</Page>

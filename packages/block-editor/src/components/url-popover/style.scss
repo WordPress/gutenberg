@@ -48,6 +48,11 @@
 	border-top: $border-width solid $gray-900;
 }
 
+.block-editor-url-popover__link-container-content {
+	display: flex;
+	align-items: center;
+}
+
 .block-editor-url-popover__link-editor,
 .block-editor-url-popover__link-viewer {
 	display: flex;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'editableRoot host mode', () => {
@@ -39,7 +36,37 @@ test.describe( 'editableRoot host mode', () => {
 			.toBe( true );
 	} );
 
-	test( 'a heading (no support) is not hosted', async ( {
+	test( 'wrapper becomes the editing host for a list item with siblings', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'a' } },
+				{ name: 'core/list-item', attributes: { content: 'b' } },
+			],
+		} );
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: List item' } )
+				.first()
+		);
+
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate(
+						( root ) =>
+							!! root.ownerDocument.querySelector(
+								'[contenteditable="true"] [data-block]'
+							)
+					)
+			)
+			.toBe( true );
+	} );
+
+	test( 'wrapper becomes the editing host for a heading with siblings', async ( {
 		editor,
 		page,
 	} ) => {
@@ -64,6 +91,6 @@ test.describe( 'editableRoot host mode', () => {
 							)
 					)
 			)
-			.toBe( false );
+			.toBe( true );
 	} );
 } );

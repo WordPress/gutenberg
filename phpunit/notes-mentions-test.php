@@ -80,8 +80,8 @@ class Tests_Notes_Mentions extends WP_UnitTestCase {
 	/**
 	 * Records wp_mail() calls and short-circuits delivery.
 	 *
-	 * @param null                                              $short_circuit Short-circuit value.
-	 * @param array{ to: string|string[], subject: string, message: string } $atts wp_mail() arguments.
+	 * @param null                                                           $short_circuit Short-circuit value.
+	 * @param array{ to: string|string[], subject: string, message: string } $atts          wp_mail() arguments.
 	 * @return bool Always true to indicate a "sent" message.
 	 */
 	public function capture_mail( $short_circuit, $atts ): bool {

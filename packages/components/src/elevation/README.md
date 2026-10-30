@@ -1,8 +1,6 @@
 # Elevation
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This component is deprecated. Use the <a href="https://wordpress.github.io/gutenberg/?path=/docs/foundations-design-language-elevation--page">elevation tokens</a> from <code>@wordpress/base-styles</code> instead.</p>
 
 `Elevation` is a core component that renders shadow, using the component system's shadow system.
 

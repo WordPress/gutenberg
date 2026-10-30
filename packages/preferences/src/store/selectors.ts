@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-/**
- * Internal dependencies
- */
 import type { StoreState } from './types';
 
 const withDeprecatedKeys =

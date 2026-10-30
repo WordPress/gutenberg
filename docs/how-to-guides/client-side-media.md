@@ -138,6 +138,17 @@ add_filter( 'image_max_bit_depth', function () {
 
 The client snaps the cap to the depths the AVIF encoder supports (8, 10, or 12 bits).
 
+### Animated image sub-sizes
+
+The `wp_generate_animated_image_subsizes` filter controls whether sub-sizes of animated GIF and WebP images keep their animation. By default they do, including cropped sizes such as `thumbnail`, which cut every frame with the same crop. Returning `false` generates sub-sizes from the first frame only, matching WordPress core's server-side behavior:
+
+```php
+// Generate static sub-sizes from the first frame of animated images.
+add_filter( 'wp_generate_animated_image_subsizes', '__return_false' );
+```
+
+Animated sub-sizes take longer to encode and produce larger files than static ones; for long animations, each sub-size can approach the original file's size. An animation too large to decode in the browser's memory budget falls back to a static sub-size. Uploads that take the server-side path still produce static sub-sizes, as core has no animated resize support.
+
 ## Supported file formats
 
 Client-side processing handles the following MIME types in the WASM/vips pipeline: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`. Files outside this set fall through to one of two paths depending on type:
@@ -288,11 +299,11 @@ WordPress calls this endpoint automatically as part of the client-side upload pi
 
 ## Cross-origin isolation considerations
 
-Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/nicolo-ribaudo/tc39-proposal-structs/blob/main/test262-filtering/isolation-explainer.md) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
+Client-side media processing requires `SharedArrayBuffer` for WASM threading. WordPress enables this automatically on block editor screens using [`Document-Isolation-Policy`](https://github.com/WICG/document-isolation-policy) (DIP), which provides per-document cross-origin isolation without affecting other iframes on the page.
 
 ### Impact on plugins
 
--   **External scripts**: Scripts loaded from other origins will automatically get a `crossorigin="anonymous"` attribute added, handled by WordPress server-side (via HTML processing) and client-side (via a MutationObserver).
+-   **External resources**: Scripts, styles, images, audio, and video loaded from other origins keep working without a `crossorigin` attribute. `isolate-and-credentialless` loads them without credentials rather than blocking them, so resources behind a signed cookie or a logged-in session are the one case that breaks. WordPress does not add `crossorigin="anonymous"` to them, since that would force a CORS request that fails for hosts without `Access-Control-Allow-Origin` headers.
 -   **Third-party page builders**: DIP is skipped on admin pages with an `action` parameter other than `edit`, to avoid conflicts with page builders that rely on same-origin iframe access.
 -   **External images**: Importing an external image into the media library is handled server-side — the editor sends the image URL to `POST /wp/v2/media` (the `url` parameter) and the server downloads and sideloads the file. A browser cross-origin fetch would be subject to CORS and fails in a `credentialless` isolated document, so plugins importing remote media should use the same server-side path (exposed to the editor as the `mediaSideloadFromUrl` setting) rather than `fetch()`ing image bytes in the browser.
 

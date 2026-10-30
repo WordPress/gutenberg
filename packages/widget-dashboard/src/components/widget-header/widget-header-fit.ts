@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Ref } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
 import { createContext, useContext, useEffect } from '@wordpress/element';
 

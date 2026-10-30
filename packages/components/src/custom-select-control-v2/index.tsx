@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-/**
- * Internal dependencies
- */
 import CustomSelect from './custom-select';
 import type { CustomSelectProps } from './types';
 import type { WordPressComponentProps } from '../context';

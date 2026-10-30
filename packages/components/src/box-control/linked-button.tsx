@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { link, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 
 export default function LinkedButton( {

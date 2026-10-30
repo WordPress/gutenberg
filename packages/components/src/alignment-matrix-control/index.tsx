@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Cell from './cell';
 import { Composite } from '../composite';
 import AlignmentMatrixControlIcon from './icon';

@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
@@ -15,10 +12,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { Card, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import { fetchExperiments, type Experiment } from './api';
 
@@ -51,22 +44,19 @@ function ExperimentsPage() {
 	const settings = useMemo( () => {
 		const combined: Record< string, boolean > = {};
 
+		// The `siteSettings` field only records experiments that have been
+		// explicitly set by the user. We must fill the defaults from the schema
+		// from `fetchExperiments`.
 		for ( const exp of experiments ?? [] ) {
-			combined[ exp.id ] = false;
+			combined[ exp.id ] = exp.defaultValue;
 		}
 
 		for ( const [ key, value ] of Object.entries( gutenbergExperiments ) ) {
 			combined[ key ] = Boolean( value );
 		}
 
-		// `active_templates` lives in its own top-level WP option.
-		// An object value means enabled.
-		const activeTemplates = siteSettings?.active_templates;
-		combined.active_templates =
-			typeof activeTemplates === 'object' && activeTemplates !== null;
-
 		return combined;
-	}, [ experiments, gutenbergExperiments, siteSettings ] );
+	}, [ experiments, gutenbergExperiments ] );
 
 	const setSettings = async ( values: Record< string, boolean > ) => {
 		const [ changedId ] = Object.keys( values );
@@ -74,20 +64,12 @@ function ExperimentsPage() {
 			( exp ) => exp.id === changedId
 		);
 
-		const editPayload: Record< string, unknown > = {};
-
-		// `active_templates` lives in its own top-level WP option.
-		if ( 'active_templates' in values ) {
-			editPayload.active_templates = values.active_templates ? {} : null;
-			delete values.active_templates;
-		}
-
-		if ( Object.keys( values ).length > 0 ) {
-			editPayload[ 'gutenberg-experiments' ] = {
+		const editPayload: Record< string, unknown > = {
+			'gutenberg-experiments': {
 				...gutenbergExperiments,
 				...values,
-			};
-		}
+			},
+		};
 		const groupLabel = changedExperiment?.groupLabel ?? '';
 
 		edit( editPayload );
@@ -157,7 +139,7 @@ function ExperimentsPage() {
 	}, [ experiments ] );
 
 	if ( experiments === null || ! siteSettings ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	return (

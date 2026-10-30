@@ -4,17 +4,134 @@
 
 ### Enhancements
 
--   Widgets: carry a widget's declarative `actions` from `widget.json` into
-    the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+-   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+-   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+
+### Internal
+
+-   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the `@wordpress/theme` entry points ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Declare `@wordpress/theme` as an optional peer dependency again, so the fallback plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).
+-   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+
+## 0.26.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Remove the automatic Babel processing for `packages/components`, including the Emotion transform, implicit project Babel configuration support, and build-time dependencies. Projects that rely on these transforms must run Babel separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Support importing `.svg` files from JavaScript. The SVG is inlined into the bundle (and into transpiled packages) and the import resolves to a `data:` URI ([#85147](https://github.com/WordPress/gutenberg/pull/85147)).
+-   Add a `{prefix}_{page_slug}_wp_admin_preload_paths` filter to the generated wp-admin page template, so a page can preload the REST API requests its JavaScript issues on mount ([#77353](https://github.com/WordPress/gutenberg/pull/77353)).
+
+### Enhancements
+
+-   Expose a script's exports on its global as read-only data properties, holding the same values, instead of esbuild's getters, which forwarded to the getters of the module's own exports. Every use of a script's export by another script went through them, which was costly while the page loads ([#85180](https://github.com/WordPress/gutenberg/pull/85180)).
+-   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
+
+### Bug Fixes
+
+-   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
+-   Add `generate_animated_image_subsizes` to the page template `/?_fields=` preload path, keeping it in sync with the `_fields` list in `@wordpress/core-data` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 0.25.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Add the `@babel/core` dependency, a peer of `esbuild-plugin-babel` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   Keep the build machine's absolute paths out of worker source maps when `wpWorkers` redirects a module with `resolve`, so the output is reproducible across checkouts ([#84163](https://github.com/WordPress/gutenberg/pull/84163)).
+
+### Internal
+
+-   Drop the optional `@wordpress/boot`, `@wordpress/private-apis`, and `@wordpress/route` peer dependencies, unused since they are no longer bundled ([#83601](https://github.com/WordPress/gutenberg/pull/83601)).
+
+## 0.24.0 (2026-09-23)
+
+### Enhancements
+
+-   Carry a widget's `attributes` from `widget.json` into `build/widgets/registry.php` ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+-   Build `.cjs`, `.mts` and `.cts` source files, including route and widget entry points, and rewrite their local imports to the emitted `.mjs` or `.cjs` extension ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+-   Import route stage, inspector and canvas files by their full file name, so a route entry no longer depends on esbuild extending an extensionless path ([#83071](https://github.com/WordPress/gutenberg/pull/83071)).
+
+### Internal
+
+-   Declare `@wordpress/theme` as a dev dependency, so the types of the optional peer dependency resolve when dependencies are isolated ([#83129](https://github.com/WordPress/gutenberg/pull/83129)).
+
+## 0.23.0 (2026-09-10)
+
+### Breaking Changes
+
+-   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
+
+### Enhancements
+
+-   Target `@wordpress/browserslist-config` for JavaScript and CSS when the project has no Browserslist config, instead of Browserslist's implicit defaults ([#82179](https://github.com/WordPress/gutenberg/pull/82179)).
+-   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Bug Fixes
+
+-   Fix generated regular CSS injection in Browser Mode while retaining the existing Node and jsdom test behavior ([#82154](https://github.com/WordPress/gutenberg/pull/82154)).
+-   Pages: require authentication and a configurable capability (new `capability` page setting, default `manage_options`) before rendering generated standalone pages, so `admin_init` entry points such as `admin-post.php` no longer serve them to logged-out visitors ([#82254](https://github.com/WordPress/gutenberg/pull/82254)).
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 2.x releases. ([#82139](https://github.com/WordPress/gutenberg/pull/82139))
+-   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
+
+### Internal
+
+-   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
+
+## 0.22.0 (2026-08-26)
+
+### Internal
+
+-   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
+### Bug Fixes
+
+-   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
+-   Pages: use the boot module that ships with Core when the plugin has no local one, so plugin pages are no longer empty ([#81761](https://github.com/WordPress/gutenberg/pull/81761)).
+
+### Documentation
+
+-   Widget attributes: the `relevance` hint documents the `'medium'` tier
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+## 0.21.0 (2026-08-12)
+
+### Enhancements
+
+-   Widgets: carry an action's `icon` and `relevance` from `widget.json`
+    into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`
     into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Render a no-JavaScript heading and notice from the generated page templates ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
+
+### Bug Fixes
+
+-   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
+-   Wrap script bundles in an IIFE to avoid `use strict` affecting external code in concatenated JavaScript files ([#79792](https://github.com/WordPress/gutenberg/pull/79792).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.20.0 (2026-07-29)
+
+### Enhancements
+
+-   Widgets: carry a widget's declarative `actions` from `widget.json` into
+    the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
 
 ### Bug Fixes
 
 -   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
 -   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
 -   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
--   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
 
 ## 0.19.0 (2026-07-14)
 

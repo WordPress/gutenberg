@@ -2,18 +2,61 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `encodePixelsAsJpeg` and its worker counterpart `vipsEncodePixelsAsJpeg`, which encode raw RGBA pixels as a JPEG while copying the EXIF block from the image file they were decoded from ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
+
+## 5.0.0 (2026-10-20)
+
 ### Breaking Changes
 
-- `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Enhancements
 
-- Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+-   Add an optional `preserveAnimation` option to `resizeImage`. A resize of an animated image then keeps every frame, re-encoded with `gifsave` settings tuned for speed and size (`effort: 2`, `interframe_maxerror: 8`), instead of flattening to the first frame. Cropped resizes cut every frame with the same rectangle. An animation whose decoded frames would not fit the WASM heap flattens too, so the resize degrades rather than failing ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+-   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
+
+## 4.3.0 (2026-10-07)
+
+## 4.2.0 (2026-09-23)
+
+## 4.1.0 (2026-09-10)
 
 ### Bug Fixes
 
-- `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
-- `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
+-   Keep indexed (palette) PNGs indexed when resizing, compressing, converting, or rotating them, instead of re-encoding them as truecolour, which made sub-sizes several times larger than the original. The image quality setting is not applied to the resulting palette, since PNG output stays lossless. Reported against core as https://core.trac.wordpress.org/ticket/65922 ([#81895](https://github.com/WordPress/gutenberg/issues/81895)).
+
+### Internal
+
+-   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
+
+## 4.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 3.1.0 (2026-08-12)
+
+## 3.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
+### Enhancements
+
+-   Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+
+### Bug Fixes
+
+-   `convertImageFormat`: Only decode all animation frames when the output format supports animation. Converting a long animated GIF to a still format (e.g. a JPEG poster) previously decoded every frame as one vertical strip, which exceeded the JPEG encoder's 65,500 px dimension limit and produced a film-strip image instead of a single frame ([#80259](https://github.com/WordPress/gutenberg/issues/80259)).
+-   `resizeImage`: Generate sub-sizes of animated images from the first frame only, matching WordPress core's server-side behavior. Re-encoding a full animated GIF per sub-size took tens of seconds per size for long GIFs and could produce sub-sizes larger than the original file ([#80266](https://github.com/WordPress/gutenberg/issues/80266)).
 
 ## 2.4.0 (2026-07-14)
 

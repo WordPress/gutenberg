@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // Default to WordPress core's admin theme blue when the host hasn't
@@ -22,6 +23,11 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	user-select: none;
 	touch-action: none;
 	cursor: ew-resize;
+	// A number line, not prose: `__ticks` keeps negatives on the left in
+	// every locale, so the numerals must read that way too. Inherited `rtl`
+	// sends each tick label through bidi and `-45°` comes out `45°-`.
+	/*rtl:ignore*/
+	direction: ltr;
 	// Always declare the container so the inline-size query below can
 	// match. Cheap; only affects layout if a child uses cqw/cqh.
 	container-type: inline-size;
@@ -33,8 +39,7 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	}
 
 	&:has(.rotation-ruler__input:focus-visible) {
-		outline: 2px solid $rotation-ruler-accent;
-		outline-offset: 2px;
+		@include outset-ring__focus();
 		border-radius: 4px;
 	}
 }
@@ -47,7 +52,7 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	margin: -1px;
 	padding: 0;
 	border: 0;
-	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
 	overflow: hidden;
 	white-space: nowrap;
 }
@@ -65,6 +70,10 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	border-radius: 1px;
 	transform: translateX(-50%);
 	pointer-events: none;
+
+	@media (forced-colors: active) {
+		background: CanvasText;
+	}
 }
 
 .rotation-ruler__strip {
@@ -162,9 +171,12 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 // Sign sits flush to the left of the number (mirror of the unit).
 // Rendered only for negative values, and removed from flow so the
 // leading `-` does not nudge the digits off the marker line.
+// Both spans are out of flow, so bidi never reorders them: their sides are
+// whatever `left`/`right` say. Mirrored, the label reads `°45-`.
 .rotation-ruler__active-label-sign {
 	position: absolute;
 	top: 0;
+	/*rtl:ignore*/
 	right: 100%;
 }
 
@@ -173,6 +185,7 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 .rotation-ruler__active-label-unit {
 	position: absolute;
 	top: 0;
+	/*rtl:ignore*/
 	left: 100%;
 }
 

@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TreeSelect from '../';
 
 const meta: Meta< typeof TreeSelect > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/TreeSelect',
+	title: 'Components/@wordpress-components/Selection & Input/Common/TreeSelect',
 	id: 'components-treeselect',
 	component: TreeSelect,
 	argTypes: {

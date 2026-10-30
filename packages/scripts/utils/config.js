@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * Internal dependencies
- */
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -42,41 +35,6 @@ const hasCssnanoConfig = () =>
 	hasProjectFile( '.cssnanorc.yml' ) ||
 	hasProjectFile( 'cssnano.config.js' ) ||
 	hasPackageProp( 'cssnano' );
-
-/**
- * Returns path to a Jest configuration which should be provided as the explicit
- * configuration when there is none available for discovery by Jest in the
- * project environment. Returns undefined if Jest should be allowed to discover
- * an available configuration.
- *
- * This can be used in cases where multiple possible configurations are
- * supported. Since Jest will only discover `jest.config.js`, or `jest` package
- * directive, such custom configurations must be specified explicitly.
- *
- * @param {"e2e"|"unit"} suffix Suffix of configuration file to accept.
- *
- * @return {string= | undefined} Override or fallback configuration file path.
- */
-function getJestOverrideConfigFile( suffix ) {
-	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
-		return;
-	}
-
-	if ( hasProjectFile( `jest-${ suffix }.config.js` ) ) {
-		return fromProjectRoot( `jest-${ suffix }.config.js` );
-	}
-
-	if ( ! hasJestConfig() ) {
-		return fromConfigRoot( `jest-${ suffix }.config.js` );
-	}
-}
-
-// See https://jestjs.io/docs/configuration.
-const hasJestConfig = () =>
-	hasProjectFile( 'jest.config.js' ) ||
-	hasProjectFile( 'jest.config.json' ) ||
-	hasProjectFile( 'jest.config.ts' ) ||
-	hasPackageProp( 'jest' );
 
 // See https://prettier.io/docs/en/configuration.html.
 const hasPrettierConfig = () =>
@@ -161,15 +119,15 @@ const getWebpackArgs = () => {
 	) {
 		/**
 		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
-		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
-		 * `entry-two.js` -> `[ 'entry-two', './entry-two.js' ]`
+		 * `./entry-one.jsx` -> `[ 'entry-one', './entry-one.jsx' ]`
+		 * `entry-two.tsx` -> `[ 'entry-two', './entry-two.tsx' ]`
 		 *
 		 * @param {string} path The path provided.
 		 *
 		 * @return {string[]} The entry pair of its name and the file path.
 		 */
 		const pathToEntry = ( path ) => {
-			const entryName = basename( path, '.js' );
+			const entryName = basename( path, extname( path ) );
 
 			return [ entryName, path ];
 		};
@@ -323,7 +281,7 @@ function getWebpackEntryPoints( buildType ) {
 
 					// Detects the proper file extension used in the defined source directory.
 					const [ entryFilepath ] = glob(
-						`${ entryName }.?(m)[jt]s?(x)`,
+						`${ entryName }.?([cm])[jt]s?(x)`,
 						{
 							absolute: true,
 							cwd: fromProjectRoot( getProjectSourcePath() ),
@@ -359,7 +317,7 @@ function getWebpackEntryPoints( buildType ) {
 
 		// 3. Checks whether a standard file name can be detected in the defined source directory,
 		//    and converts the discovered file to entry point.
-		const [ entryFile ] = glob( 'index.[jt]s?(x)', {
+		const [ entryFile ] = glob( 'index.@([cm]ts|js|jsx|ts|tsx)', {
 			absolute: true,
 			cwd: fromProjectRoot( getProjectSourcePath() ),
 		} );
@@ -447,14 +405,12 @@ function getPhpFilePaths( context, props ) {
 }
 
 module.exports = {
-	getJestOverrideConfigFile,
 	getPhpFilePaths,
 	getProjectSourcePath,
 	getWebpackArgs,
 	getWebpackEntryPoints,
 	hasBabelConfig,
 	hasCssnanoConfig,
-	hasJestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
 };

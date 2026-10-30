@@ -1,26 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Dropdown,
-	FlexItem,
-	SelectControl,
-	Icon as WCIcon,
-} from '@wordpress/components';
+import { Dropdown, FlexItem, Icon as WCIcon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { Stack, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Select, Stack, Tooltip } from '@wordpress/ui';
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
@@ -102,12 +86,13 @@ function OperatorSelector( {
 					{ filter.name }
 				</FlexItem>
 
-				<SelectControl
-					className="dataviews-filters__summary-operators-filter-select"
-					label={ __( 'Conditions' ) }
+				<Select.Root
+					items={ operatorOptions }
 					value={ value }
-					options={ operatorOptions }
-					onChange={ ( newValue ) => {
+					onValueChange={ ( newValue ) => {
+						if ( newValue === null ) {
+							return;
+						}
 						const newOperator = newValue as Operator;
 						const currentOperator = currentFilter?.operator;
 						const newFilters = currentFilter
@@ -145,7 +130,7 @@ function OperatorSelector( {
 											return _filter;
 										}
 									),
-							  ]
+								]
 							: [
 									...( view.filters ?? [] ),
 									{
@@ -153,17 +138,35 @@ function OperatorSelector( {
 										operator: newOperator,
 										value: undefined,
 									},
-							  ];
+								];
 						onChangeView( {
 							...view,
 							page: 1,
 							filters: newFilters,
 						} );
 					} }
-					size="small"
-					variant="minimal"
-					hideLabelFromVision
-				/>
+				>
+					<Select.Trigger
+						size="small"
+						variant="minimal"
+						aria-label={ __( 'Conditions' ) }
+						className="dataviews-filters__summary-operators-filter-select"
+						style={ { minWidth: 0 } }
+					/>
+					<Select.Popup width="content">
+						{ operatorOptions.map( ( option ) => (
+							<Select.Item
+								key={ option.value }
+								value={ option.value }
+								size="small"
+							>
+								<Select.ItemLabel>
+									{ option.label }
+								</Select.ItemLabel>
+							</Select.Item>
+						) ) }
+					</Select.Popup>
+				</Select.Root>
 			</Stack>
 		)
 	);
@@ -229,7 +232,7 @@ export default function Filter( {
 			activeElements = [
 				{
 					value: filterInView.value,
-					// @ts-ignore
+					// @ts-expect-error `label` is a `string[]` here, but the element type expects a `string`.
 					label,
 				},
 			];
@@ -247,7 +250,7 @@ export default function Filter( {
 				? field.getValueFormatted( {
 						item: { [ field.id ]: filterInView.value },
 						field,
-				  } )
+					} )
 				: String( filterInView.value );
 
 		activeElements = [
@@ -269,6 +272,7 @@ export default function Filter( {
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
+			className="dataviews-filters__summary-chip-dropdown"
 			contentClassName="dataviews-filters__summary-popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
 			onClose={ () => {

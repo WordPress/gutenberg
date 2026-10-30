@@ -4,5 +4,15 @@
 	"description": "Displays the latest news from WordPress.org and Planet WordPress.",
 	"category": "dashboard",
 	"presentation": "content-bleed",
-	"textdomain": "default"
+	"textdomain": "default",
+	"actions": [
+		{
+			"id": "news-visit",
+			"label": "Visit WordPress News",
+			"icon": "core/external",
+			"relevance": "high",
+			"href": "https://wordpress.org/news/",
+			"openInNewTab": true
+		}
+	]
 }

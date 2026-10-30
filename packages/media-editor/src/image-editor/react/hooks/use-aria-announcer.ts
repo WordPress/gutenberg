@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { CropperState } from '../../core/types';
 import { getSourceRegion } from '../../core/source-region';
 
@@ -164,7 +157,9 @@ function buildAnnouncement(
  * @param state The current cropper state to announce.
  */
 export function useAriaAnnouncer( state: CropperState ): void {
-	const timerRef = useRef< ReturnType< typeof setTimeout > >();
+	const timerRef = useRef< ReturnType< typeof setTimeout > | undefined >(
+		undefined
+	);
 	const prevMessageRef = useRef( '' );
 	const prevStateRef = useRef< CropperState | null >( null );
 	const latestStateRef = useRef( state );

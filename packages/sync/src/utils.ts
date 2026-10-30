@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-
-/**
- * Internal dependencies
- */
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,

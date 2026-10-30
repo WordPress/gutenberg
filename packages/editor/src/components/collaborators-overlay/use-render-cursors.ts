@@ -2,12 +2,12 @@ import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import type {
 	CoreDataPrivateApis,
 	ResolvedSelection,
+	SelectionEndpoint,
 	PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
@@ -16,7 +16,9 @@ import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
+import { blockContainerOf } from './cursor-dom-utils';
 import type { SelectionRect } from './cursor-dom-utils';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -32,9 +34,15 @@ export interface CursorData {
 	clientId: number;
 	color: string;
 	avatarUrl?: string;
-	x: number;
-	y: number;
-	height: number;
+	// The local clientId of the block this cursor sits in, so consumers can
+	// tell whether a collaborator is working in the same block as the local
+	// user. Absent when the selection could not be resolved to a block.
+	blockClientId?: string;
+	// x/y/height absent for multi-block selections — avatar comes from
+	// use-block-highlighting; only selectionRects are rendered here.
+	x?: number;
+	y?: number;
+	height?: number;
 	isMe?: boolean;
 	selectionRects?: SelectionRect[];
 }
@@ -94,11 +102,16 @@ export function useRenderCursors(
 			return;
 		}
 
-		// Pre-compute the overlay rect once, same for every user.
-		const overlayRect = overlayElement.getBoundingClientRect();
-		const overlayContext = {
-			editorDocument: blockEditorDocument,
-			overlayRect,
+		// Measure the overlay rect once, same for every user, and only when
+		// there is a cursor to draw: measuring forces a layout.
+		let overlayContext:
+			{ editorDocument: Document; overlayRect: DOMRect } | undefined;
+		const getOverlayContext = () => {
+			overlayContext ??= {
+				editorDocument: blockEditorDocument,
+				overlayRect: overlayElement.getBoundingClientRect(),
+			};
+			return overlayContext;
 		};
 
 		const results: CursorData[] = [];
@@ -130,16 +143,12 @@ export function useRenderCursors(
 					// Selection may reference a stale Yjs position.
 					return;
 				}
-			} else if (
-				selection.type === SelectionType.SelectionInOneBlock ||
-				selection.type === SelectionType.SelectionInMultipleBlocks
-			) {
+			} else if ( selection.type === SelectionType.SelectionInOneBlock ) {
 				try {
 					start = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorStartPosition,
 					} );
-
 					end = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorEndPosition,
@@ -148,36 +157,90 @@ export function useRenderCursors(
 					// Selection may reference a stale Yjs position.
 					return;
 				}
+			} else if (
+				selection.type === SelectionType.SelectionInMultipleBlocks
+			) {
+				// Each endpoint is either a CursorEndpoint (character offset
+				// inside a RichText field) or a WholeBlockEndpoint (block selected
+				// as a unit, no character offset). Resolve independently so each
+				// end uses the right Yjs anchor regardless of block type.
+				const resolveEndpoint = (
+					endpoint: SelectionEndpoint
+				): ResolvedSelection => resolveSelection( endpoint );
+				try {
+					start = resolveEndpoint( selection.startEndpoint );
+					end = resolveEndpoint( selection.endEndpoint );
+				} catch {
+					// Selection may reference a stale Yjs position.
+					return;
+				}
+
+				// Promote inner-block endpoints (e.g. list-items → list) to
+				// their direct [data-block] parent before passing to
+				// computeSelectionVisual, so that function receives
+				// container-level IDs and needs no promotion logic of its own.
+				const promote = ( r: ResolvedSelection ): ResolvedSelection => {
+					if ( ! r.localClientId ) {
+						return r;
+					}
+					const el = blockEditorDocument.querySelector< HTMLElement >(
+						`[data-block="${ r.localClientId }"]`
+					);
+					if ( ! el ) {
+						return r;
+					}
+					const container = blockContainerOf( el );
+					const containerId = container.getAttribute( 'data-block' );
+					if ( ! containerId || containerId === r.localClientId ) {
+						return r;
+					}
+					return {
+						...r,
+						localClientId: containerId,
+						richTextOffset: null,
+						attributeKey: null,
+					};
+				};
+				start = promote( start );
+				if ( end ) {
+					end = promote( end );
+				}
 			}
 
-			const userName = user.collaboratorInfo.name;
+			const userName = getCollaboratorDisplayName(
+				user.collaboratorInfo
+			);
 			const clientId = user.clientId;
 			const color = user.isMe
 				? 'var(--wp-admin-theme-color)'
-				: getAvatarBorderColor( user.collaboratorInfo.id );
+				: getAvatarBorderColor(
+						user.collaboratorInfo.id ?? user.clientId
+					);
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			const selectionVisual = computeSelectionVisual(
 				selection,
 				start,
 				end,
-				overlayContext
+				getOverlayContext()
 			);
 
-			if ( selectionVisual.coords ) {
+			const hasCoords = Boolean( selectionVisual.coords );
+			const hasRects =
+				( selectionVisual.selectionRects?.length ?? 0 ) > 0;
+			if ( hasCoords || hasRects ) {
 				const cursorData: CursorData = {
 					userName,
 					clientId,
 					color,
 					avatarUrl,
 					isMe: user.isMe,
-					...selectionVisual.coords,
+					blockClientId: start.localClientId ?? undefined,
+					...( selectionVisual.coords ?? {} ),
 				};
-
 				if ( selectionVisual.selectionRects ) {
 					cursorData.selectionRects = selectionVisual.selectionRects;
 				}
-
 				results.push( cursorData );
 			}
 		} );

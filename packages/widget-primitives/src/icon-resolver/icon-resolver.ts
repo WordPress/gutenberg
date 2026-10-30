@@ -5,10 +5,6 @@
  * icon name (`collection/icon-name`) into a renderable `WidgetIcon`;
  * `useWidgetTypes` invokes it while assembling each `WidgetType`.
  */
-
-/**
- * Internal dependencies
- */
 import type { WidgetIcon, WidgetIconReference } from '../types';
 
 /**

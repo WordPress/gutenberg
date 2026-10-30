@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NormalizedRect, Size } from '../../../core/types';
 
 /**

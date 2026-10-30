@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useDispatchWithMap } from '../use-dispatch';
 import type { DataRegistry } from '../../types';
 
@@ -95,7 +88,7 @@ const withDispatch = (
 		dispatch: DataRegistry[ 'dispatch' ],
 		ownProps: Record< string, unknown >,
 		registry: DataRegistry
-	) => Record< string, ( ...args: unknown[] ) => unknown >
+	) => Record< string, ( ...args: never[] ) => unknown >
 ) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( ownProps: Record< string, unknown > ) => {

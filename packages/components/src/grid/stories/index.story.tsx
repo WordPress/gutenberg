@@ -1,17 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { Grid } from '..';
 
 const meta: Meta< typeof Grid > = {
 	component: Grid,
-	title: 'Components/Grid',
+	id: 'components-grid',
+	title: 'Components/@wordpress-components/Grid',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		align: { control: { type: 'text' } },

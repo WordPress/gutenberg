@@ -2,6 +2,51 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Allow `@wordpress/core-fields` to use private APIs: the fields it registers on the server read private selectors of `@wordpress/core-data` (`getTemplateId`, `getHomePage`, and `getPostsPageId`) and private components of `@wordpress/media-utils` (`MediaEdit` and `MediaEditControl`) ([#84696](https://github.com/WordPress/gutenberg/pull/84696)).
+-   Add `@wordpress/core-actions` to the list of core modules allowed to use private APIs ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Add `@wordpress/notices` to the list of core modules allowed to use private APIs ([#84656](https://github.com/WordPress/gutenberg/pull/84656)).
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84901](https://github.com/WordPress/gutenberg/pull/84901)).
+
+## 2.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### Internal
+
+-   Keep `@wordpress/sync` in the list of core modules allowed to use private APIs for backward compatibility only. The package no longer uses private APIs, but copies published to npm before that change opt in at module load, so a plugin bundling one of those copies would throw at load time without this entry ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
+## 1.56.0 (2026-09-23)
+
+## 1.55.0 (2026-09-10)
+
+### Bug fixes
+
+-   Restore `@wordpress/dataviews` in the list of core modules allowed to use private APIs. DataViews copies published to npm before the private API cleanup opt in at module load, so plugin bundles embedding them throw without the entry. [#82221](https://github.com/WordPress/gutenberg/pull/82221)
+
+## 1.54.0 (2026-08-26)
+
+### Internal
+
+-   Remove `@wordpress/dataviews` from the list of core modules using private APIs, since importing private APIs is no longer allowed in the package. [#81478](https://github.com/WordPress/gutenberg/pull/81478)
+
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove `@wordpress/content-types` from the list of core modules using private APIs, as part of removing the content types experiment. [#81340](https://github.com/WordPress/gutenberg/pull/81340)
+
+## 1.52.0 (2026-07-29)
+
 ## 1.51.0 (2026-07-14)
 
 ### Enhancements

@@ -28,17 +28,17 @@ function gutenberg_create_block_style_variation_instance_name( $block, $variatio
  *
  * @since 6.6.0
  *
- * @param string $class_string CSS class string to look for a variation in.
- *
- * @return array|null The block style variation name if found.
+ * @param string|null $class_string CSS class string to look for a variation in.
+ * @return string[]|null The block style variation names (empty if none found), or null if a string was not supplied.
+ * @phpstan-return ( $class_string is string ? list<non-empty-string> : null )
  */
-function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
+function gutenberg_get_block_style_variation_name_from_class( $class_string ): ?array {
 	if ( ! is_string( $class_string ) ) {
 		return null;
 	}
 
 	preg_match_all( '/\bis-style-(?!default)(\S+)\b/', $class_string, $matches );
-	return $matches[1] ?? null;
+	return $matches[1];
 }
 
 /**
@@ -225,10 +225,10 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  *
  * @see gutenberg_render_block_style_variation_support_styles
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
  *
- * @return string                Filtered block content.
+ * @return string Filtered block content.
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
 	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {

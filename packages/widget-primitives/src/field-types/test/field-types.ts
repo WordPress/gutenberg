@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
 import {
 	getFieldType,
 	registerFieldType,

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { home } from '@wordpress/icons';
 import { EmptyState, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import styles from './no-widgets-state.module.css';
 

@@ -1,20 +1,13 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
 import { space } from '../utils/space';
 import type { DividerProps } from './types';
 import styles from './style.module.scss';
 
-function UnconnectedDivider(
+export function UnconnectedDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {

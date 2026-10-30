@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -46,10 +43,19 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
-		// Arrow up skips non-empty blocks and column/columns wrappers,
-		// navigating directly to the prior text input. Since columns
-		// are side by side, "1st col" and "2nd col" are on the same
-		// visual line, so ArrowUp goes to "First paragraph".
+		// Arrow up in inner blocks should navigate through (1) column wrapper,
+		// (2) text fields.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/column' );
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/columns' );
+
+		// Arrow up from focused (columns) block wrapper exits nested context
+		// to prior text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -324,6 +330,94 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			.toBe( `<!-- wp:paragraph -->
 <p><br></p>
 <!-- /wp:paragraph -->` );
+	} );
+
+	test( 'should navigate up over an empty line inside a block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph block' },
+		} );
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		await page.keyboard.type( 'Pre block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Foo' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph block' },
+			},
+			{
+				name: 'core/preformatted',
+				attributes: { content: 'Pre block<br><br>Foo' },
+			},
+		] );
+
+		// The second ArrowUp starts on the empty line and must stop on the
+		// first line, not leave the block.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph block' },
+			},
+			{
+				name: 'core/preformatted',
+				attributes: { content: 'PreX block<br><br>Foo' },
+			},
+		] );
+	} );
+
+	test( 'should navigate up from an empty line at the end of a citation', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( 'Quote text' );
+		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Quote citation' } )
+			.click();
+		await page.keyboard.type( 'Cite line' );
+		await pageUtils.pressKeys( 'shift+Enter' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { citation: 'Cite line<br>' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Quote text' },
+					},
+				],
+			},
+		] );
+
+		// ArrowUp from the empty last line must move to the citation's first
+		// line, not into the quoted text.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { citation: 'XCite line<br>' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Quote text' },
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'should not create extra line breaks in multiline value', async ( {
@@ -838,7 +932,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
@@ -1046,7 +1140,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveClass( /is-selected/ );
 	} );
 
-	test( 'should prevent browser default formatting on multi selection', async ( {
+	test( 'should format a multi selection with the shortcut, not the browser default', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -1066,15 +1160,15 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>first</p>
+<p>fir<strong>st</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>second</p>
+<p><strong>seco</strong>nd</p>
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should move to the start of the first line on ArrowUp (-firefox)', async ( {
+	test( 'should move to the start of the first line on ArrowUp', async ( {
 		page,
 		editor,
 	} ) => {
@@ -1186,6 +1280,89 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// The caret moved down one line net (down, down, up).
 		await expect.poll( getCaretLine ).toBe( lineBefore + 1 );
 		expect( await scrollWatcher ).toEqual( [] );
+	} );
+
+	test( 'should move the caret to the next block when only the block padding is below the viewport', async ( {
+		page,
+		editor,
+	} ) => {
+		for ( let i = 1; i <= 20; i++ ) {
+			await editor.insertBlock( {
+				name: 'core/preformatted',
+				attributes: { content: `Block ${ i }` },
+			} );
+		}
+
+		await editor.canvas.getByText( 'Block 10', { exact: true } ).click();
+
+		// Scroll so the block's text is within the viewport and its bottom
+		// edge, just past the text, is 3px below it.
+		const offset = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { bottom } = document.activeElement.getBoundingClientRect();
+			document.documentElement.scrollTop +=
+				bottom - window.innerHeight - 3;
+			return document.getSelection().focusOffset;
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '.' );
+
+		// The text is monospaced, so the caret keeps its offset.
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).slice( 9, 11 ) )
+			.toMatchObject( [
+				{
+					name: 'core/preformatted',
+					attributes: { content: 'Block 10' },
+				},
+				{
+					name: 'core/preformatted',
+					attributes: {
+						content: `${ 'Block 11'.slice( 0, offset ) }.${ 'Block 11'.slice( offset ) }`,
+					},
+				},
+			] );
+	} );
+
+	test( 'should move the caret to the previous block when only the block padding is above the viewport', async ( {
+		page,
+		editor,
+	} ) => {
+		for ( let i = 1; i <= 20; i++ ) {
+			await editor.insertBlock( {
+				name: 'core/preformatted',
+				attributes: { content: `Block ${ i }` },
+			} );
+		}
+
+		await editor.canvas.getByText( 'Block 10', { exact: true } ).click();
+
+		// Scroll so the block's text is within the viewport and its top edge,
+		// just before the text, is 3px above it.
+		const offset = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { top } = document.activeElement.getBoundingClientRect();
+			document.documentElement.scrollTop += top + 3;
+			return document.getSelection().focusOffset;
+		} );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '.' );
+
+		// The text is monospaced, so the caret keeps its offset.
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).slice( 8, 10 ) )
+			.toMatchObject( [
+				{
+					name: 'core/preformatted',
+					attributes: {
+						content: `${ 'Block 9'.slice( 0, offset ) }.${ 'Block 9'.slice( offset ) }`,
+					},
+				},
+				{
+					name: 'core/preformatted',
+					attributes: { content: 'Block 10' },
+				},
+			] );
 	} );
 
 	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
@@ -1312,7 +1489,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	test( 'should show format toolbar when selecting text from the left edge of a block', async ( {
 		editor,
 		page,
+		browserName,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			browserName === 'chromium',
+			'Chromium does not extend a selection from non-editable padding into editable text.'
+		);
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
@@ -1346,6 +1530,23 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
+
+		// The selection is editable: typing replaces it. A selection made
+		// while the text was non-editable would show the toolbar but not
+		// take input. The engines differ in where the selection starts.
+		const selected = await editor.canvas
+			.locator( ':root' )
+			.evaluate( ( root ) =>
+				root.ownerDocument.getSelection().toString()
+			);
+		expect( selected ).not.toBe( '' );
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world'.replace( selected, 'x' ) },
+			},
+		] );
 	} );
 
 	// Regression test: ArrowDown should not skip over a paragraph that contains
@@ -1384,6 +1585,54 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			'body:not(:focus) :focus, body:focus .is-selected'
 		);
 		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
+	} );
+
+	test( 'inserts the container default block on Enter on a selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+					},
+				},
+			],
+		} );
+
+		const firstImage = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.first();
+		await editor.selectBlocks( firstImage );
+		await expect( firstImage ).toBeFocused();
+
+		// A gallery defines the image as its default block, so Enter
+		// inserts a new empty image after the selected one.
+		await page.keyboard.press( 'Enter' );
+
+		await expect
+			.poll( () =>
+				editor.getBlocks().then( ( [ gallery ] ) =>
+					gallery.innerBlocks.map( ( { name, attributes } ) => ( {
+						name,
+						hasUrl: !! attributes.url,
+					} ) )
+				)
+			)
+			.toEqual( [
+				{ name: 'core/image', hasUrl: true },
+				{ name: 'core/image', hasUrl: false },
+				{ name: 'core/image', hasUrl: true },
+			] );
 	} );
 } );
 

@@ -1,16 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-import {
-	store as coreStore,
-	type GlobalStylesRevision,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from '../context';
 import type { Revision, User } from './types';
 
@@ -75,14 +65,9 @@ export default function useGlobalStylesRevisions( {
 			const _isDirty = dirtyEntityRecords.length > 0;
 			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 			const globalStyles = globalStylesId
-				? getEntityRecord< GlobalStylesRevision >(
-						'root',
-						'globalStyles',
-						globalStylesId
-				  )
+				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
 				: undefined;
 			const _revisionsCount: number =
-				// @ts-expect-error - _links is not typed in GlobalStylesRevision
 				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 			// @ts-expect-error - getRevisions is not fully typed
 			const globalStylesRevisions: RawRevision[] = globalStylesId
@@ -91,7 +76,7 @@ export default function useGlobalStylesRevisions( {
 						'globalStyles',
 						globalStylesId,
 						_query
-				  ) || EMPTY_ARRAY
+					) || EMPTY_ARRAY
 				: EMPTY_ARRAY;
 			// @ts-expect-error - getUsers is not fully typed
 			const _authors: User[] =
@@ -102,7 +87,7 @@ export default function useGlobalStylesRevisions( {
 						'globalStyles',
 						globalStylesId,
 						_query,
-				  ] )
+					] )
 				: false;
 			return {
 				authors: _authors,

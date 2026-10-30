@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 6.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   `createNotice`: Add a `details` option, for longer plain text that supplements the message. `InlineNotices` shows it behind a "Show details" disclosure, with a button to copy the message and the details together. Web addresses in the details are links that open in a new tab ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Enhancements
+
+-   `InlineNotices`: Render notices with the `@wordpress/ui` `Notice`. The markup changes: the `.components-notice*` classes are gone, each notice has the `notices-inline-notices__notice` class, and each list has the `notices-inline-notices__list` class. Each notice still announces its message when it is created ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Deprecations
+
+-   `createNotice`: Deprecate the `__unstableHTML` option. Pass the message as plain text, and any longer account as `details` ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Bug Fixes
+
+-   `InlineNotices`: Render nothing when every child renders nothing ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+## 5.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+## 5.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 5.53.0 (2026-08-12)
+
+## 5.52.0 (2026-07-29)
+
 ### Internal
 
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).

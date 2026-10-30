@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import parse from 'html-react-parser';
-
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';

@@ -8,31 +8,21 @@ The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](htt
 
 ### Resources for learning how to use Figma
 
-[Getting started with Figma](https://help.figma.com/category/9-getting-started)
+[Getting started with Figma](https://help.figma.com/hc/en-us/categories/360002051613-Get-started)
 
 [Top Online Tutorials to Learn Figma for UI/UX Design](https://medium.com/quick-design/top-online-tutorials-to-learn-figma-for-ui-ux-design-4e9c6721a72d)
 
-[Take a Tour Around Figma](https://help.figma.com/article/12-getting-familiar-with-figma)
+[Take a Tour Around Figma](https://help.figma.com/hc/en-us/articles/15297425105303-Explore-design-files)
 
 ### Learning how to use files and projects
 
-[Getting started with Figma files and projects](https://help.figma.com/article/298-getting-started-with-files-and-projects)
-
-[What are files?](https://help.figma.com/article/298-getting-started-with-files-and-projects#files)
-
-[What are projects?](https://help.figma.com/article/298-getting-started-with-files-and-projects#projects)
+[Guide to files and projects](https://help.figma.com/hc/en-us/articles/1500005554982-Guide-to-files-and-projects)
 
 [Video tutorial](https://www.youtube.com/watch?v=c5HS6smhq2E)
 
-[FAQ](https://help.figma.com/article/298-getting-started-with-files-and-projects#faq)
-
 ### Learning how to use components
 
-[Getting started with components](https://help.figma.com/article/66-components)
-
-[What are components?](https://help.figma.com/article/66-components#components)
-
-[Video tutorial](https://help.figma.com/article/66-components#videos)
+[Guide to components in Figma](https://help.figma.com/hc/en-us/articles/360038662654-Guide-to-components-in-Figma)
 
 ### Learning how to use WordPress Figma libraries
 

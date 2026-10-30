@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type { Ability, AbilityCategory } from '../types';
 import {
 	REGISTER_ABILITY,
@@ -99,8 +92,7 @@ interface UnregisterAbilityCategoryAction {
 type AbilitiesAction = RegisterAbilityAction | UnregisterAbilityAction;
 
 type AbilitiesCategoryAction =
-	| RegisterAbilityCategoryAction
-	| UnregisterAbilityCategoryAction;
+	RegisterAbilityCategoryAction | UnregisterAbilityCategoryAction;
 
 const DEFAULT_STATE: Record< string, Ability > = {};
 

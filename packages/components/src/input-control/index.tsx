@@ -1,22 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
-import { space } from '../utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
 
@@ -94,8 +82,12 @@ export function UnforwardedInputControl(
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
-					paddingInlineStart={ prefix ? space( 1 ) : undefined }
-					paddingInlineEnd={ suffix ? space( 1 ) : undefined }
+					paddingInlineStart={
+						prefix ? 'var(--wpds-dimension-padding-xs)' : undefined
+					}
+					paddingInlineEnd={
+						suffix ? 'var(--wpds-dimension-padding-xs)' : undefined
+					}
 					ref={ ref }
 					size={ size }
 					stateReducer={ stateReducer }

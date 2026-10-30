@@ -9,26 +9,79 @@ const {
  * Allowlist: only the listed components are permitted from these packages.
  * Any other named import will be flagged with the package's message.
  *
+ * Components in `caution` are marked "Use with caution". They are flagged
+ * unless the `allowUseWithCaution` option is enabled.
+ *
  * `message` supports `{{ name }}` and `{{ source }}` placeholders.
  *
- * @type {Record<string, { allowed: string[], message?: string }>}
+ * @type {Record<string, { allowed: string[], caution?: string[], message?: string }>}
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Autocomplete',
 			'Badge',
+			'Calendar',
 			'Card',
+			'Checkbox',
+			'CheckboxControl',
+			'CheckboxGroup',
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
+			'Input',
+			'InputControl',
+			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
 			'Link',
+			'Notice',
+			'Progress',
+			'Radio',
+			'RadioGroup',
+			'RadioGroupControl',
+			'RangeCalendar',
+			'SearchableChipSelect',
+			'SearchableChipSelectControl',
+			'Select',
+			'SelectControl',
 			'Skeleton',
+			'Spinner',
 			'Stack',
+			'Switch',
+			'SwitchControl',
 			'Tabs',
 			'Text',
+			'Textarea',
+			'TextareaControl',
 			'Tooltip',
+			'ValidityIndicator',
 			'VisuallyHidden',
+			'getWpCompatOverlaySlot',
+			'useEnableWpCompatOverlaySlot',
+			'useKeyboardShortcutProps',
+		],
+		caution: [
+			'AlertDialog',
+			'Avatar',
+			'Breadcrumb',
+			'Button',
+			'ButtonLink',
+			'Combobox',
+			'ControlWithError',
+			'Dialog',
+			'Drawer',
+			'IconButton',
+			'Menu',
+			'Meter',
+			'Popover',
+			'SearchableSelect',
+			'SearchableSelectControl',
+			'ValidatedInputControl',
+			'ValidatedTextareaControl',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -47,23 +100,27 @@ const DENYLIST = {
 	'@wordpress/components': {
 		ExternalLink:
 			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
-		__experimentalDivider: '{{ name }} is planned for deprecation.',
+		__experimentalDivider:
+			'Use a Separator subcomponent such as `Menu.Separator` from `@wordpress/ui` when one exists. Otherwise write your own CSS, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalElevation:
 			'Use elevation tokens from `@wordpress/base-styles` instead.',
 		__experimentalGrid:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalScrollable: '{{ name }} is planned for deprecation.',
+		__experimentalScrollable: 'Write your own CSS instead.',
 		__experimentalSpacer: '{{ name }} is planned for deprecation.',
 		__experimentalSurface:
 			'Write your own CSS instead, preferably using the design tokens available in `@wordpress/theme`.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalView: '{{ name }} is planned for deprecation.',
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
-		__experimentalZStack:
-			'{{ name }} is planned for deprecation. Write your own CSS instead.',
-		Animate: '{{ name }} is planned for deprecation.',
+		__experimentalZStack: 'Write your own CSS instead.',
+		Animate:
+			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		Badge: 'Use `{{ name }}` from `@wordpress/ui` instead.',
+		BaseControl:
+			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',
@@ -71,15 +128,34 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		CheckboxControl:
+			'Use `CheckboxControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
-		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
+		FormToggle:
+			'Use `Switch` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
+		__experimentalInputControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
+		ProgressBar:
+			'Use `Progress` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide',
+		RadioControl:
+			'Use `RadioGroupControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
+		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
-		TabbableContainer: '{{ name }} is planned for deprecation.',
+		TabbableContainer:
+			'For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
+		TextControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+		TextareaControl:
+			'Use `TextareaControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide',
+		Tip: 'Use `Notice` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-tip--migration-guide',
+		ToggleControl:
+			'Use `SwitchControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
@@ -94,9 +170,20 @@ const rule = {
 				'Encourage the use of recommended UI components in a WordPress environment.',
 			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md',
 		},
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					allowUseWithCaution: {
+						type: 'boolean',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create( context ) {
+		const { allowUseWithCaution = false } = context.options[ 0 ] ?? {};
 		const privateApisState = createPrivateApisState();
 
 		return {
@@ -130,7 +217,11 @@ const rule = {
 
 					if (
 						allowlistEntry &&
-						! allowlistEntry.allowed.includes( name )
+						! allowlistEntry.allowed.includes( name ) &&
+						! (
+							allowUseWithCaution &&
+							allowlistEntry.caution?.includes( name )
+						)
 					) {
 						context.report( {
 							node: specifier,

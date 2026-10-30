@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -98,6 +90,132 @@ test.describe( 'Image', () => {
 				.locator( ':root' )
 				.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
+	} );
+
+	test( 'should keep a caption typed while the image uploads', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		// Hold the upload until the caption is typed.
+		let releaseUpload;
+		const uploadReleased = new Promise( ( resolve ) => {
+			releaseUpload = resolve;
+		} );
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if ( route.request().method() === 'POST' ) {
+				await uploadReleased;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		await expect( image ).toHaveAttribute( 'src', /^blob:/ );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await page.keyboard.type( 'Typed while uploading' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: { caption: 'Typed while uploading' },
+			},
+		] );
+		const [ uploadingImage ] = await editor.getBlocks();
+		expect( uploadingImage.attributes.id ).toBeUndefined();
+		releaseUpload();
+
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: expect.any( Number ),
+					url: expect.stringMatching( /^https?:\/\// ),
+					caption: 'Typed while uploading',
+				},
+			},
+		] );
+	} );
+
+	test( 'should hide an empty caption when the image is deselected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+		} );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const caption = imageBlock.getByRole( 'textbox', {
+			name: 'Image caption text',
+		} );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await expect( caption ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( caption ).toBeHidden();
+
+		await editor.selectBlocks( imageBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add caption' } )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect( caption ).toBeHidden();
+	} );
+
+	test( 'should show the caption again when removing it is undone', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+				caption: 'Caption',
+			},
+		} );
+		const caption = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'textbox', { name: 'Image caption text' } );
+		await expect( caption ).toHaveText( 'Caption' );
+
+		await editor.clickBlockToolbarButton( 'Remove caption' );
+		await expect( caption ).toBeHidden();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: undefined } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( caption ).toHaveText( 'Caption' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: 'Caption' } },
+			] );
 	} );
 
 	test( 'should allow soft line breaks in caption', async ( {
@@ -246,7 +364,7 @@ test.describe( 'Image', () => {
 		] = await editor.getBlocks();
 
 		// Open the media editor modal from the block toolbar.
-		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Edit image' );
 		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
 		await expect( modal ).toBeVisible();
 
@@ -276,11 +394,11 @@ test.describe( 'Image', () => {
 			imageBlock.locator( '.components-spinner' )
 		).toBeHidden();
 
-		// Closing the modal returns focus to the Crop toolbar button. The
-		// button is disabled (not hidden) while the edit loads, so it stays in
-		// the DOM to receive focus rather than dropping it to the canvas.
+		// Closing the modal returns focus to the "Edit image" toolbar button.
+		// The button is disabled (not hidden) while the edit loads, so it stays
+		// in the DOM to receive focus rather than dropping it to the canvas.
 		await expect(
-			page.locator( 'role=button[name="Crop"i]' )
+			page.locator( 'role=button[name="Edit image"i]' )
 		).toBeFocused();
 	} );
 
@@ -320,6 +438,36 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// Serve Openverse and its image hosts locally; CI runners can't reliably fetch them.
+		const mockImages = [
+			'10x10_e2e_test_image_green.png',
+			'10x10_e2e_test_image_z9T8jK.png',
+		];
+		await page.route( 'https://api.openverse.org/v1/images/?*', ( route ) =>
+			route.fulfill( {
+				json: {
+					results: mockImages.map( ( fileName, index ) => ( {
+						id: `mock-${ index }`,
+						title: fileName,
+						url: `https://openverse.test/${ fileName }`,
+						thumbnail: `https://openverse.test/${ fileName }`,
+						license: 'cc0',
+						license_version: '1.0',
+					} ) ),
+				},
+			} )
+		);
+		await page.route( 'https://openverse.test/*', ( route ) =>
+			route.fulfill( {
+				path: path.join(
+					__dirname,
+					'../../../assets',
+					new URL( route.request().url() ).pathname
+				),
+				headers: { 'Access-Control-Allow-Origin': '*' },
+			} )
+		);
+
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
@@ -343,18 +491,25 @@ test.describe( 'Image', () => {
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
-			await blockLibrary
-				.getByRole( 'tabpanel', { name: 'Media' } )
-				.getByRole( 'tab', { name: 'Openverse' } )
+			// The tab browses one source at a time, chosen from the menu
+			// beside the search field.
+			const mediaTab = blockLibrary.getByRole( 'tabpanel', {
+				name: 'Media',
+			} );
+			await mediaTab
+				.getByRole( 'button', { name: 'Media source' } )
+				.click();
+			await page
+				.getByRole( 'menuitemradio', { name: 'Openverse' } )
 				.click();
 		}
 
 		await openMediaTab();
 
-		// Drag the first image from the media library into the image block.
+		// Drag the first image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.first()
 			.dragTo( imageBlock, { steps: 3 } );
 
@@ -384,10 +539,10 @@ test.describe( 'Image', () => {
 
 		await openMediaTab();
 
-		// Drag the second image from the media library into the image block.
+		// Drag the second image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.nth( 1 )
 			.dragTo( imageBlock, { steps: 3 } );
 
@@ -883,6 +1038,49 @@ test.describe( 'Image', () => {
 		await expect( uriInput ).toBeFocused();
 		await expect( uriInput ).toBeEmpty();
 	} );
+
+	test( 'should give the image its context menu while selected @webkit @firefox', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/1024x768_e2e_test_image.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { id: media.id, url: media.source_url },
+		} );
+
+		// The inserted block is selected, so its resize box is rendered over
+		// the image once the image has its size.
+		const image = editor.canvas.locator( '.wp-block-image img' );
+		await expect(
+			editor.canvas.locator( '.components-resizable-box__handle-bottom' )
+		).toBeVisible();
+
+		// The browser offers the image menu (copy image, open in new tab)
+		// when the image is the target of the right click.
+		const target = image.evaluate(
+			( element ) =>
+				new Promise( ( resolve ) => {
+					element.ownerDocument.addEventListener(
+						'contextmenu',
+						( event ) => {
+							event.preventDefault();
+							resolve( event.target === element );
+						},
+						{ once: true }
+					);
+				} )
+		);
+		// At the image's position, so the click goes to whatever is on top.
+		const box = await image.boundingBox();
+		await page.mouse.click( box.x + box.width / 2, box.y + box.height / 2, {
+			button: 'right',
+		} );
+		expect( await target ).toBe( true );
+	} );
 } );
 
 test.describe( 'Image - lightbox', () => {
@@ -1004,6 +1202,130 @@ test.describe( 'Image - lightbox', () => {
 			} );
 			expect( margin ).toBe( '0px' );
 		} );
+
+		// Regression test for https://github.com/WordPress/gutenberg/issues/82283.
+		test.describe( 'when a plugin wraps the image', () => {
+			let largeMedia;
+
+			test.beforeAll( async ( { requestUtils } ) => {
+				largeMedia = await requestUtils.uploadMedia(
+					'./assets/1024x768_e2e_test_image_size.jpeg'
+				);
+				await requestUtils.activatePlugin(
+					'gutenberg-test-image-picture-wrapper'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-image-picture-wrapper'
+				);
+			} );
+
+			test( 'Trigger button should still be placed inside the figure', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ largeMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ largeMedia.source_url }" alt="" class="wp-image-${ largeMedia.id }"/><figcaption class="wp-element-caption">A caption.</figcaption></figure>
+				<!-- /wp:image -->` );
+
+				const postId = await editor.publishPost();
+				await page.setViewportSize( { width: 500, height: 800 } );
+				await page.goto( `/?p=${ postId }` );
+
+				const image = page.locator( '.wp-lightbox-container img' );
+				await expect( image ).toBeVisible();
+				// The button is only positioned once the image has loaded.
+				await expect
+					.poll( () =>
+						page.evaluate(
+							() =>
+								document.querySelector(
+									'button.lightbox-trigger'
+								).style.top
+						)
+					)
+					.not.toBe( '' );
+
+				const figureBox = await page
+					.locator( '.wp-lightbox-container' )
+					.boundingBox();
+				const buttonBox = await page
+					.locator( 'button.lightbox-trigger' )
+					.boundingBox();
+
+				expect( buttonBox.y ).toBeGreaterThanOrEqual( figureBox.y );
+				expect( buttonBox.x + buttonBox.width ).toBeLessThanOrEqual(
+					figureBox.x + figureBox.width
+				);
+
+				// A mispositioned button pushes the page sideways.
+				const { scrollWidth, clientWidth } = await page.evaluate(
+					() => ( {
+						scrollWidth: document.documentElement.scrollWidth,
+						clientWidth: document.documentElement.clientWidth,
+					} )
+				);
+				expect( scrollWidth ).toBe( clientWidth );
+			} );
+		} );
+
+		test.describe( 'Overlay not a direct child of body', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-lightbox-overlay-wrapper'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-lightbox-overlay-wrapper'
+				);
+			} );
+
+			test( 'should make only the rest of the page inert and restore it on close', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+				<!-- /wp:image --> ` );
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+
+				const wrapper = page.locator( '#site-wrap' );
+				const pageContent = page.locator(
+					'#site-wrap > :has(.wp-lightbox-container)'
+				);
+				const overlay = page.locator(
+					'#site-wrap > .wp-lightbox-overlay'
+				);
+				await expect( overlay ).toBeAttached();
+
+				// A direct child of <body> the theme made inert must stay inert
+				// after closing.
+				await page.evaluate( () => {
+					const themeInert = document.createElement( 'div' );
+					themeInert.id = 'theme-inert';
+					themeInert.inert = true;
+					document.body.prepend( themeInert );
+				} );
+
+				await page.locator( '.wp-lightbox-container img' ).click();
+				await expect( overlay ).toHaveClass( /active/ );
+				await expect( wrapper ).not.toHaveAttribute( 'inert' );
+				await expect( pageContent ).toHaveAttribute( 'inert' );
+
+				await overlay.getByRole( 'button', { name: 'Close' } ).click();
+				await expect( overlay ).not.toHaveClass( /active/ );
+				await expect( pageContent ).not.toHaveAttribute( 'inert' );
+				await expect( page.locator( '#theme-inert' ) ).toHaveAttribute(
+					'inert'
+				);
+			} );
+		} );
 	} );
 } );
 
@@ -1063,6 +1385,109 @@ test.describe( 'Image - Site editor', () => {
 <!-- \\/wp:image -->`
 		);
 		expect( await editor.getEditedPostContent() ).toMatch( regex );
+	} );
+} );
+
+// Regression test for https://github.com/WordPress/gutenberg/pull/70575.
+test.describe( 'Image - dimensions forced by global styles', () => {
+	let uploadedMedia;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			'./assets/200x150_e2e_test_image_opaque.png'
+		);
+
+		// Mimic a theme that forces a fixed height on image blocks. User
+		// global styles load after the block's own stylesheet, so this rule
+		// wins the equal-specificity cascade against the block's `height: auto`
+		// unless the block sets an inline `height: auto` (which always wins).
+		const stylesPostId =
+			await requestUtils.getCurrentThemeGlobalStylesPostId();
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/global-styles/${ stylesPostId }`,
+			data: {
+				id: stylesPostId,
+				styles: {
+					css: '.wp-block-image img { height: 100px; }',
+				},
+			},
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.resetThemeGlobalStyles();
+		await requestUtils.deleteAllMedia();
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'preserves the aspect ratio when only the width is set', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				id: uploadedMedia.id,
+				url: uploadedMedia.source_url,
+				sizeSlug: 'full',
+				width: '200px',
+			},
+		} );
+
+		const image = editor.canvas.locator(
+			'role=document[name="Block: Image"i] >> role=img'
+		);
+		await expect( image ).toBeVisible();
+		await image.evaluate( ( img ) => img.decode() );
+
+		const box = await image.boundingBox();
+		// The 200x150 image displayed at 200px wide keeps its 4:3 aspect
+		// ratio (150px tall) instead of being squished to the 100px height
+		// forced by global styles.
+		expect( box.width / box.height ).toBeCloseTo( 4 / 3, 1 );
+	} );
+
+	test( 'preserves the aspect ratio for images in a grid gallery', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				layout: { type: 'grid' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+			],
+		} );
+
+		// The grid variation relabels the block to "Gallery Grid", so select
+		// by data-type rather than by the block's accessible name.
+		const image = editor.canvas.locator(
+			'[data-type="core/gallery"] [data-type="core/image"] img'
+		);
+		await expect( image ).toBeVisible();
+
+		// Grid galleries do not crop images, so the image keeps its baseline
+		// `height: auto` and is not squished by the global styles. Poll so the
+		// assertion waits for the image to load and the layout to settle.
+		await expect
+			.poll( async () => {
+				const box = await image.boundingBox();
+				return box ? box.width / box.height : 0;
+			} )
+			.toBeCloseTo( 4 / 3, 1 );
 	} );
 } );
 

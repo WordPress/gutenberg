@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, useState } from '@wordpress/element';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -24,7 +21,7 @@ export function useArchiveLabel() {
 					'postType',
 					'wp_template',
 					templateId
-			  )?.slug
+				)?.slug
 			: null;
 	}, [] );
 	const taxonomyMatches = templateSlug?.match(

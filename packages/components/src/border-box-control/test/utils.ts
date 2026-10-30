@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getBorderDiff,
 	getCommonBorder,
@@ -11,6 +9,8 @@ import {
 	isCompleteBorder,
 	isDefinedBorder,
 	isEmptyBorder,
+	splitBoxShorthand,
+	unpackBoxShorthand,
 } from '../utils';
 
 const completeBorder = { color: '#000', style: 'solid', width: '1px' };
@@ -48,14 +48,14 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should determine a undefined, null, and {} to be empty', () => {
 			expect( isEmptyBorder( undefined ) ).toBe( true );
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `null` is outside the declared `Border | undefined` input; resilience is tested.
 			expect( isEmptyBorder( null ) ).toBe( true );
 			expect( isEmptyBorder( {} ) ).toBe( true );
 		} );
 
 		it( 'should determine object missing all border props to be empty', () => {
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( isEmptyBorder( nonBorder ) ).toBe( true );
 		} );
 
@@ -115,14 +115,14 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should determine a undefined, null, and {} to be incomplete', () => {
 			expect( isCompleteBorder( undefined ) ).toBe( false );
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `null` is outside the declared `Border | undefined` input; resilience is tested.
 			expect( isCompleteBorder( null ) ).toBe( false );
 			expect( isCompleteBorder( {} ) ).toBe( false );
 		} );
 
 		it( 'should determine objects missing border props to be incomplete', () => {
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( isCompleteBorder( nonBorder ) ).toBe( false );
 			expect( isCompleteBorder( partialBorder ) ).toBe( false );
 			expect( isCompleteBorder( partialWithExtraProp ) ).toBe( false );
@@ -158,7 +158,7 @@ describe( 'BorderBoxControl Utils', () => {
 			expect( hasMixedBorders( undefined ) ).toBe( false );
 			expect( hasMixedBorders( {} ) ).toBe( false );
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `nonBorder` is not assignable to `AnyBorder`; resilience is tested.
 			expect( hasMixedBorders( nonBorder ) ).toBe( false );
 		} );
 
@@ -179,14 +179,14 @@ describe( 'BorderBoxControl Utils', () => {
 		it( 'should return undefined when no border provided', () => {
 			expect( getSplitBorders( undefined ) ).toEqual( undefined );
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `null` is outside the declared `Border | undefined` input; resilience is tested.
 			expect( getSplitBorders( null ) ).toEqual( undefined );
 		} );
 
 		it( 'should return undefined when supplied border is empty', () => {
 			expect( getSplitBorders( {} ) ).toEqual( undefined );
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( getSplitBorders( nonBorder ) ).toEqual( undefined );
 		} );
 
@@ -196,6 +196,202 @@ describe( 'BorderBoxControl Utils', () => {
 				right: completeBorder,
 				bottom: completeBorder,
 				left: completeBorder,
+			} );
+		} );
+
+		it( 'should unpack 4-value box shorthand border width into individual sides', () => {
+			const borderWith4Values = {
+				color: 'currentColor',
+				style: 'solid',
+				width: '0 0 0 2px',
+			};
+
+			expect( getSplitBorders( borderWith4Values ) ).toEqual( {
+				top: { color: 'currentColor', style: 'solid', width: '0' },
+				right: { color: 'currentColor', style: 'solid', width: '0' },
+				bottom: { color: 'currentColor', style: 'solid', width: '0' },
+				left: { color: 'currentColor', style: 'solid', width: '2px' },
+			} );
+		} );
+
+		it( 'should unpack 2-value and 3-value box shorthand border width into individual sides', () => {
+			const borderWith2Values = {
+				color: 'red',
+				style: 'solid',
+				width: '10px 20px',
+			};
+
+			expect( getSplitBorders( borderWith2Values ) ).toEqual( {
+				top: { color: 'red', style: 'solid', width: '10px' },
+				right: { color: 'red', style: 'solid', width: '20px' },
+				bottom: { color: 'red', style: 'solid', width: '10px' },
+				left: { color: 'red', style: 'solid', width: '20px' },
+			} );
+
+			const borderWith3Values = {
+				color: 'blue',
+				style: 'dashed',
+				width: '10px 20px 30px',
+			};
+
+			expect( getSplitBorders( borderWith3Values ) ).toEqual( {
+				top: { color: 'blue', style: 'dashed', width: '10px' },
+				right: { color: 'blue', style: 'dashed', width: '20px' },
+				bottom: { color: 'blue', style: 'dashed', width: '30px' },
+				left: { color: 'blue', style: 'dashed', width: '20px' },
+			} );
+		} );
+
+		it( 'should preserve complex expressions like calc() inside shorthand border width', () => {
+			const borderWithCalc = {
+				color: 'black',
+				style: 'solid',
+				width: 'calc(10px + 2px) 0 0 4px',
+			};
+
+			expect( getSplitBorders( borderWithCalc ) ).toEqual( {
+				top: {
+					color: 'black',
+					style: 'solid',
+					width: 'calc(10px + 2px)',
+				},
+				right: { color: 'black', style: 'solid', width: '0' },
+				bottom: { color: 'black', style: 'solid', width: '0' },
+				left: { color: 'black', style: 'solid', width: '4px' },
+			} );
+		} );
+
+		it( 'should unpack shorthand border widths separated by tabs or newlines into individual sides', () => {
+			const borderWithTabs = {
+				color: 'currentColor',
+				style: 'solid',
+				width: '0\t0\t0\t2px',
+			};
+
+			expect( getSplitBorders( borderWithTabs ) ).toEqual( {
+				top: { color: 'currentColor', style: 'solid', width: '0' },
+				right: { color: 'currentColor', style: 'solid', width: '0' },
+				bottom: { color: 'currentColor', style: 'solid', width: '0' },
+				left: { color: 'currentColor', style: 'solid', width: '2px' },
+			} );
+		} );
+	} );
+
+	describe( 'splitBoxShorthand', () => {
+		it( 'should split space-separated values while respecting parentheses', () => {
+			expect( splitBoxShorthand( '0 0 0 2px' ) ).toEqual( [
+				'0',
+				'0',
+				'0',
+				'2px',
+			] );
+			expect( splitBoxShorthand( '  10px   20px  ' ) ).toEqual( [
+				'10px',
+				'20px',
+			] );
+			expect(
+				splitBoxShorthand(
+					'calc(10px + 2px) 0 0 calc(var(--base) * 2)'
+				)
+			).toEqual( [
+				'calc(10px + 2px)',
+				'0',
+				'0',
+				'calc(var(--base) * 2)',
+			] );
+		} );
+
+		it( 'should split values separated by tabs or newlines', () => {
+			expect( splitBoxShorthand( '0\t0\t0\t2px' ) ).toEqual( [
+				'0',
+				'0',
+				'0',
+				'2px',
+			] );
+			expect( splitBoxShorthand( '10px\n20px\n30px\n40px' ) ).toEqual( [
+				'10px',
+				'20px',
+				'30px',
+				'40px',
+			] );
+		} );
+	} );
+
+	describe( 'unpackBoxShorthand', () => {
+		it( 'should return all sides unchanged for non-string, empty, or single values', () => {
+			expect( unpackBoxShorthand( undefined ) ).toEqual( {
+				top: undefined,
+				right: undefined,
+				bottom: undefined,
+				left: undefined,
+			} );
+			expect( unpackBoxShorthand( 0 ) ).toEqual( {
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0,
+			} );
+			expect( unpackBoxShorthand( '2px' ) ).toEqual( {
+				top: '2px',
+				right: '2px',
+				bottom: '2px',
+				left: '2px',
+			} );
+			expect( unpackBoxShorthand( 'calc(10px + 2px)' ) ).toEqual( {
+				top: 'calc(10px + 2px)',
+				right: 'calc(10px + 2px)',
+				bottom: 'calc(10px + 2px)',
+				left: 'calc(10px + 2px)',
+			} );
+		} );
+
+		it( 'should unpack 2, 3, and 4 value box shorthands correctly', () => {
+			// 2 values: [top/bottom, right/left]
+			expect( unpackBoxShorthand( '10px 20px' ) ).toEqual( {
+				top: '10px',
+				right: '20px',
+				bottom: '10px',
+				left: '20px',
+			} );
+
+			// 3 values: [top, right/left, bottom]
+			expect( unpackBoxShorthand( '10px 20px 30px' ) ).toEqual( {
+				top: '10px',
+				right: '20px',
+				bottom: '30px',
+				left: '20px',
+			} );
+
+			// 4 values: [top, right, bottom, left]
+			expect( unpackBoxShorthand( '0 0 0 2px' ) ).toEqual( {
+				top: '0',
+				right: '0',
+				bottom: '0',
+				left: '2px',
+			} );
+		} );
+
+		it( 'should fallback gracefully if more than 4 values are provided', () => {
+			expect( unpackBoxShorthand( '1px 2px 3px 4px 5px' ) ).toEqual( {
+				top: '1px 2px 3px 4px 5px',
+				right: '1px 2px 3px 4px 5px',
+				bottom: '1px 2px 3px 4px 5px',
+				left: '1px 2px 3px 4px 5px',
+			} );
+		} );
+
+		it( 'should unpack box shorthands separated by tabs or newlines', () => {
+			expect( unpackBoxShorthand( '0\t0\t0\t2px' ) ).toEqual( {
+				top: '0',
+				right: '0',
+				bottom: '0',
+				left: '2px',
+			} );
+			expect( unpackBoxShorthand( '10px\n20px' ) ).toEqual( {
+				top: '10px',
+				right: '20px',
+				bottom: '10px',
+				left: '20px',
 			} );
 		} );
 	} );
@@ -208,7 +404,7 @@ describe( 'BorderBoxControl Utils', () => {
 
 		it( 'should only return differences for border related properties', () => {
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			const diff = getBorderDiff( nonBorder, { caffeine: 'coffee' } );
 			expect( diff ).toEqual( {} );
 		} );
@@ -218,7 +414,7 @@ describe( 'BorderBoxControl Utils', () => {
 				...completeBorder,
 				color: '#21759b',
 				// Checking for extra resilience, even if not a valid type.
-				// @ts-expect-error
+				// @ts-expect-error `caffeine` is not a declared `Border` property; the test checks it is ignored.
 				caffeine: 'cola',
 			} );
 			expect( diff ).toEqual( { color: '#21759b' } );
@@ -317,7 +513,7 @@ describe( 'BorderBoxControl Utils', () => {
 			expect( getShorthandBorderStyle( undefined ) ).toEqual( undefined );
 			expect( getShorthandBorderStyle( {} ) ).toEqual( undefined );
 			// Checking for extra resilience, even if not a valid type.
-			// @ts-expect-error
+			// @ts-expect-error `nonBorder` has no properties in common with `Border`; resilience is tested.
 			expect( getShorthandBorderStyle( nonBorder ) ).toEqual( undefined );
 		} );
 

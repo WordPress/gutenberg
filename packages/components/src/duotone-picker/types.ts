@@ -1,3 +1,5 @@
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
+
 export type DuotonePickerProps = {
 	/**
 	 * Whether there should be a button to clear the duotone value.
@@ -36,19 +38,61 @@ export type DuotonePickerProps = {
 	 */
 	value?: string[] | 'unset';
 	/**
-	 * Callback which is called when the duotone colors change.
-	 */
-	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
-	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
+	 * The slug of the selected duotone preset. When a non-empty `selectedSlug`
+	 * is provided, selection is decided strictly by slug, which keeps two
+	 * presets holding the same pair of colors apart. Presets whose slug does
+	 * not match will not appear selected in this mode, even if their colors
+	 * match `value`.
 	 *
+	 * An empty string is treated the same as `undefined`: selection falls back
+	 * to matching by color value.
+	 */
+	selectedSlug?: string;
+	/**
+	 * Callback which is called when the duotone colors change.
+	 *
+	 * When the change comes from picking a preset out of `duotonePalette`, the
+	 * preset's index and slug are passed too. Two presets can hold the same
+	 * pair of colors, so the value alone does not identify which one was
+	 * picked.
+	 *
+	 * Both are omitted whenever no preset is being picked: the custom, unset
+	 * and clear controls, and deselecting the currently selected preset, which
+	 * reports `undefined` alone.
+	 */
+	onChange: (
+		value: DuotonePickerProps[ 'value' ] | undefined,
+		index?: number,
+		slug?: string
+	) => void;
+	/**
+	 * How predefined duotone swatches behave and are exposed to assistive
+	 * technology.
+	 *
+	 * - `listbox` uses one tab stop and arrow-key navigation, and exposes
+	 *   selection with `aria-selected`.
+	 * - `toggle-buttons` gives each swatch a tab stop and exposes selection with
+	 *   `aria-pressed`.
+	 * - `command-buttons` gives each swatch a tab stop and exposes no selection
+	 *   state. `value` and `selectedSlug` do not mark predefined swatches as
+	 *   selected, and activating a swatch always calls `onChange` with that
+	 *   swatch.
+	 *
+	 * @default 'listbox'
+	 */
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
+	/**
+	 * Whether the control should present as toggle buttons.
+	 *
+	 * @deprecated Use `presentation="toggle-buttons"` instead. An explicit
+	 * `presentation` takes precedence.
 	 * @default false
+	 * @ignore
 	 */
 	asButtons?: boolean;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `asButtons` is not true.
+	 * Only used with the `listbox` presentation.
 	 *
 	 * @default true
 	 */

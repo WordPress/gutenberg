@@ -1,18 +1,11 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useElevation } from './hook';
 import type { ElevationProps } from './types';
 
-function UnconnectedElevation(
+export function UnconnectedElevation(
 	props: WordPressComponentProps< ElevationProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {

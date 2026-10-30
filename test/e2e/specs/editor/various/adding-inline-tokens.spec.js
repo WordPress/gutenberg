@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import { randomUUID } from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'adding inline tokens', () => {
@@ -23,7 +16,7 @@ test.describe( 'adding inline tokens', () => {
 	} ) => {
 		// Create a paragraph.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'a ' );
@@ -79,5 +72,39 @@ test.describe( 'adding inline tokens', () => {
 				attributes: { content: expect.stringMatching( contentRegex2 ) },
 			},
 		] );
+	} );
+
+	test( 'should select an inline image by clicking it @webkit @firefox', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		const { source_url: src } = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		// Two images of different widths, so the popover shows which one is
+		// selected.
+		const image = ( width ) =>
+			`<img class="wp-image-1" style="width: ${ width }px;" src="${ src }" alt="">`;
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: `a ${ image( 10 ) } b ${ image( 20 ) } c` },
+		} );
+
+		const images = editor.canvas.locator( 'img' );
+		const width = page.getByRole( 'spinbutton', { name: 'Width' } );
+
+		// A click on the image selects it and opens its popover.
+		await images.first().click();
+		await expect( width ).toHaveValue( '10' );
+
+		// A click on another image moves the selection and the popover to
+		// it, without going through the text in between.
+		await images.last().click();
+		await expect( width ).toHaveValue( '20' );
+		await expect( width ).toBeInViewport();
+
+		await images.first().click();
+		await expect( width ).toHaveValue( '10' );
 	} );
 } );

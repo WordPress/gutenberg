@@ -1,12 +1,8 @@
 # RadioGroup
 
-<div class="callout callout-alert">
-This component is deprecated. Consider using `RadioControl` or `ToggleGroupControl` instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Consider using `RadioControl` or `ToggleGroupControl` instead.</p>
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 Use a RadioGroup component when you want users to select one option from a small set of options.
 

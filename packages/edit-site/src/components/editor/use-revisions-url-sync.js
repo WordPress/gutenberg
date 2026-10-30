@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );

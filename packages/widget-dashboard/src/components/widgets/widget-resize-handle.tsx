@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import type { ResizeHandleRenderProps } from '@wordpress/grid';
-
-/**
- * Internal dependencies
- */
 import styles from './widget-resize-handle.module.css';
 
 type WidgetResizeHandleProps = Omit< ResizeHandleRenderProps, 'ref' >;
@@ -26,7 +15,7 @@ type WidgetResizeHandleProps = Omit< ResizeHandleRenderProps, 'ref' >;
 export const WidgetResizeHandle = forwardRef<
 	HTMLDivElement,
 	WidgetResizeHandleProps
->( function WidgetResizeHandle(
+>( function UnforwardedWidgetResizeHandle(
 	{ listeners, attributes, verticalResizable, isResizing },
 	ref
 ) {

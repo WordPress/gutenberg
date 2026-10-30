@@ -22,6 +22,16 @@ export type SandBoxProps = {
 	 */
 	allowPopups?: boolean;
 	/**
+	 * Whether to include `allow-forms` in the iframe's sandbox attribute.
+	 * When true, content inside the iframe is allowed to submit forms.
+	 *
+	 * Enable this for previews whose content includes forms that should be
+	 * submittable.
+	 *
+	 * @default false
+	 */
+	allowForms?: boolean;
+	/**
 	 * The HTML to render in the body of the iframe document.
 	 *
 	 * @default ''

@@ -1,14 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
 	Icon as WCIcon,
-	Notice,
+	Notice as WCNotice,
 	Popover,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { check, chevronDown } from '@wordpress/icons';
 
@@ -86,7 +83,7 @@ export function UploadStatusPopover( {
 
 	return (
 		<div className="media-upload-modal__upload-status">
-			{ isUploading && <Spinner /> }
+			{ isUploading && <WCSpinner /> }
 			<Button
 				className="media-upload-modal__upload-status__trigger"
 				size="compact"
@@ -127,7 +124,7 @@ export function UploadStatusPopover( {
 								key={ file.id }
 								className="media-upload-modal__upload-status__item"
 							>
-								{ file.status === 'uploading' && <Spinner /> }
+								{ file.status === 'uploading' && <WCSpinner /> }
 								{ file.status === 'uploaded' && (
 									<WCIcon icon={ check } size={ 16 } />
 								) }
@@ -141,7 +138,7 @@ export function UploadStatusPopover( {
 									</span>
 								) }
 								{ file.status === 'error' && (
-									<Notice
+									<WCNotice
 										status="error"
 										isDismissible={ !! onDismissError }
 										onRemove={ () =>
@@ -149,7 +146,7 @@ export function UploadStatusPopover( {
 										}
 									>
 										{ file.name }: { file.error }
-									</Notice>
+									</WCNotice>
 								) }
 							</li>
 						) ) }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { UnitControlProps } from '../unit-control/types';
 import type { LABELS } from './utils';
 
@@ -82,9 +79,7 @@ export type BoxControlProps = Pick<
 		 * Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
 		 */
 		sides?: readonly (
-			| keyof BoxControlValue
-			| 'horizontal'
-			| 'vertical'
+			keyof BoxControlValue | 'horizontal' | 'vertical'
 		)[];
 		/**
 		 * If this property is true, when the box control is unlinked, vertical and horizontal controls
@@ -138,6 +133,7 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 	) => void;
 	selectedUnits: BoxControlValue;
 	setSelectedUnits: React.Dispatch< React.SetStateAction< BoxControlValue > >;
+	units?: UnitControlProps[ 'units' ];
 	values: BoxControlValue;
 	/**
 	 * Collection of sides to allow control of. If omitted or empty, all sides will be available.

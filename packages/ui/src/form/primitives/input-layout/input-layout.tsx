@@ -10,7 +10,7 @@ import type { InputLayoutProps } from './types';
  * including disabled states and standard prefix/suffix slots.
  */
 export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
-	function InputLayout(
+	function UnforwardedInputLayout(
 		{
 			className,
 			children,

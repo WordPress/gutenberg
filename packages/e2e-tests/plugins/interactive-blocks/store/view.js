@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getElement } from '@wordpress/interactivity';
 
 // A non-object state should never be allowed.

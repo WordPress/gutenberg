@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useContext, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import ItemActions, { PrimaryActions } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
