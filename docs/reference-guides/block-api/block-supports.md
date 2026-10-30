@@ -1005,6 +1005,35 @@ supports: {
 }
 ```
 
+## rotation
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block can be rotated. When it does, the block editor shows a Rotation control in the Position panel of the block settings. The rotation can be set separately for each viewport (desktop, tablet and mobile), and it is applied with the CSS `rotate` property, so it combines with any `transform` a theme or block applies.
+
+```js
+supports: {
+	// Enable the Rotation control.
+	rotation: true
+}
+```
+
+When the block declares support for `rotation`, its attributes definition is extended to include the `style` attribute.
+
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotation` support is declared. It stores the angle in degrees, in the range -180 to 180, in `rotate`. Tablet and mobile overrides are stored under `@tablet` and `@mobile`, where 0 removes the default rotation on that viewport. For example:
+
+```js
+attributes: {
+    style: {
+        rotate: 15,
+        '@mobile': {
+            rotate: 0
+        }
+    }
+}
+```
+
 ## shadow
 
 _**Note:** Since WordPress 6.5._
