@@ -129,25 +129,27 @@ async function preloadResolutions() {
 	const core = resolveSelect( coreDataStore );
 	const coreSelect = select( coreDataStore );
 
-	// `gutenberg_block_editor_preload_paths_6_9` only ships the
-	// front-page / home template lookups when the site editor is on the
-	// root screen. Mirror that filter here so we don't fire them as real
-	// network requests when they aren't preloaded.
+	// `site-editor.php` only ships the front-page / home template lookups
+	// when no post is being edited. Mirror that here so we don't fire them
+	// as real network requests when they aren't preloaded.
 	const params = new URLSearchParams( window.location.search );
 	const routeParam = params.get( 'p' );
 	const isRootScreen = routeParam === null || routeParam === '/';
-	// When editing a specific page (`p=/page/N`), the server preloads
-	// the page record and its template lookup. Pick those up in a
-	// second phase once the postType entity config has resolved. The
-	// match runs the same `:postId` parsing the post-mount router
-	// uses, but pre-mount so the kickoff can drive the resolver.
+	// When editing a specific page (`p=/page/N`, or `p=/page&postId=N`
+	// from the pages list), the server preloads the page record and its
+	// template lookup. Pick those up in a second phase once the postType
+	// entity config has resolved. The match runs the same `:postId`
+	// parsing the post-mount router uses, but pre-mount so the kickoff
+	// can drive the resolver.
 	const pageMatch =
 		routeParam !== null
 			? recognizePath( [ pageItemRoute ], routeParam )
 			: undefined;
-	const pageId = pageMatch?.params?.postId
-		? Number( pageMatch.params.postId )
-		: null;
+	const pageId =
+		Number(
+			pageMatch?.params?.postId ??
+				( routeParam === '/page' && params.get( 'postId' ) )
+		) || null;
 
 	try {
 		await Promise.all( [
@@ -193,7 +195,7 @@ async function preloadResolutions() {
 				? [
 						core.getDefaultTemplateId( { slug: 'front-page' } ),
 						core.getDefaultTemplateId( { slug: 'home' } ),
-				  ]
+					]
 				: [] ),
 			...( pageId
 				? [
@@ -208,7 +210,33 @@ async function preloadResolutions() {
 						// for every page being edited, to decide whether
 						// to surface homepage-specific actions.
 						core.getDefaultTemplateId( { slug: 'front-page' } ),
-				  ]
+						// Read by the editor sidebar and its panels, as in
+						// the post editor's kickoff.
+						core.getAutosaves( 'page', pageId ),
+						core.getCurrentUser(),
+						core.getEntityRecords( 'root', 'taxonomy' ),
+						core.canUser( 'create', {
+							kind: 'postType',
+							name: 'wp_template',
+						} ),
+						// The templates the page can switch to, as
+						// `useTemplates` in `post-template/hooks.js` asks.
+						core.getEntityRecords( 'postType', 'wp_template', {
+							per_page: -1,
+							post_type: 'page',
+						} ),
+						unlock( core ).getViewConfig( 'postType', 'page', {
+							fields: 'form',
+						} ),
+						// These report failures of their own, so they must
+						// not cut the rest of the kickoff short.
+						unlock( core )
+							.getFieldsConfig( 'postType', 'page' )
+							.catch( () => {} ),
+						unlock( core )
+							.getEntityActionsConfig( 'postType', 'page' )
+							.catch( () => {} ),
+					]
 				: [] ),
 		] );
 
