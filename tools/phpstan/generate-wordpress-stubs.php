@@ -80,7 +80,10 @@ function usage( int $status = 1 ): void {
  */
 function setting( string $name, string $default_value ): string {
 	$value = getenv( $name );
-	return false === $value || '' === $value ? $default_value : $value;
+	if ( false === $value || '' === $value ) {
+		return $default_value;
+	}
+	return $value;
 }
 
 /**
@@ -166,7 +169,10 @@ function succeeds( array $command ): bool {
  */
 function composer(): array {
 	$binary = getenv( 'COMPOSER_BINARY' );
-	return false !== $binary && '' !== $binary ? array( PHP_BINARY, $binary ) : array( 'composer' );
+	if ( false === $binary || '' === $binary ) {
+		return array( 'composer' );
+	}
+	return array( PHP_BINARY, $binary );
 }
 
 /**
