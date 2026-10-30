@@ -263,6 +263,21 @@ describe( 'buildBlockHighlightCss', () => {
 		).toBe( '' );
 	} );
 
+	it( 'does not tint a block left without the marker of a shared inline note', () => {
+		expect(
+			buildBlockHighlightCss(
+				[
+					{
+						id: 7,
+						author: 1,
+						blockClientIds: [ 'block-inline', 'abc-1' ],
+					},
+				],
+				getBlockAttributes
+			)
+		).toBe( '' );
+	} );
+
 	it( 'tints every block of a shared note', () => {
 		const css = buildBlockHighlightCss(
 			[ { id: 7, author: 1, blockClientIds: [ 'abc-1', 'abc-2' ] } ],
