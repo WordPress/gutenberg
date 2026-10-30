@@ -4,6 +4,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/default-custom-properties" as *;
 
 .block-editor-iframe__body {
 	position: relative;
@@ -59,6 +60,15 @@
 
 		body {
 			min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
+
+			// Add a white backing layer for consistent semi-transparent color blending
+			&::before {
+				content: "";
+				position: absolute;
+				inset: 0;
+				background-color: $white;
+				z-index: -1;
+			}
 
 			> .is-root-container:not(.wp-block-post-content) {
 				flex: 1;
