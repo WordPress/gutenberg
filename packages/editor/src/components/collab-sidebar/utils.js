@@ -707,6 +707,30 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
 }
 
 /**
+ * Keeps the notes of both blocks when one block is merged into another. The
+ * merged block takes the first block's metadata, so the second block's notes
+ * would otherwise lose their block while their markers move with the text.
+ *
+ * @param {Object} attributes Attributes of the merged block.
+ * @param {Object} blockA     Block merged into.
+ * @param {Object} blockB     Block merged from.
+ * @return {Object} Attributes with the note IDs of both blocks.
+ */
+export function mergeNoteAttributes( attributes, blockA, blockB ) {
+	const noteIds = getNoteIdsFromMetadata( blockB.attributes.metadata );
+	if ( noteIds.length === 0 ) {
+		return attributes;
+	}
+	const metadata = noteIds.reduce(
+		addNoteIdToMetadata,
+		attributes.metadata ?? {}
+	);
+	return metadata === attributes.metadata
+		? attributes
+		: { ...attributes, metadata };
+}
+
+/**
  * Calculate final top positions for all floating note threads in the
  * editor's content coordinate space. Adjusts positions to prevent overlapping
  * by pushing threads above the selected one upward and threads below it downward.

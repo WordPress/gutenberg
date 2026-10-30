@@ -1319,6 +1319,7 @@ describe( 'actions', () => {
 					offset: 0,
 				} ),
 				getBlockEditingMode: () => 'default',
+				getSettings: () => ( {} ),
 			};
 			const dispatch = Object.assign( vi.fn(), {
 				replaceBlocks: vi.fn(),
@@ -1492,6 +1493,7 @@ describe( 'actions', () => {
 					offset: 0,
 				} ),
 				getBlockEditingMode: () => 'default',
+				getSettings: () => ( {} ),
 			};
 			const dispatch = Object.assign( vi.fn(), {
 				replaceBlocks: vi.fn(),

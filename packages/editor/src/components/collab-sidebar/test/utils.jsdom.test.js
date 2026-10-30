@@ -17,6 +17,7 @@ import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
+	mergeNoteAttributes,
 	calculateNotePositions,
 	pickPrimaryNote,
 	getNoteAtCaret,
@@ -177,6 +178,43 @@ describe( 'addNoteIdToMetadata', () => {
 	it( 'dedupes a string id against a numeric id already in the array', () => {
 		const result = addNoteIdToMetadata( { noteId: [ 1, 2 ] }, '2' );
 		expect( result ).toEqual( { noteId: [ 1, 2 ] } );
+	} );
+} );
+
+describe( 'mergeNoteAttributes', () => {
+	it( 'adds the note IDs of the merged block', () => {
+		const result = mergeNoteAttributes(
+			{ content: 'onetwo', metadata: { name: 'One', noteId: [ 1 ] } },
+			{ attributes: { metadata: { name: 'One', noteId: [ 1 ] } } },
+			{ attributes: { metadata: { name: 'Two', noteId: [ 2, 1 ] } } }
+		);
+		expect( result ).toEqual( {
+			content: 'onetwo',
+			metadata: { name: 'One', noteId: [ 1, 2 ] },
+		} );
+	} );
+
+	it( 'adds the note IDs when the first block has no metadata', () => {
+		const result = mergeNoteAttributes(
+			{ content: 'onetwo' },
+			{ attributes: {} },
+			{ attributes: { metadata: { noteId: [ 2 ] } } }
+		);
+		expect( result ).toEqual( {
+			content: 'onetwo',
+			metadata: { noteId: [ 2 ] },
+		} );
+	} );
+
+	it( 'returns the attributes unchanged when the merged block has no notes', () => {
+		const attributes = { content: 'onetwo', metadata: { noteId: [ 1 ] } };
+		expect(
+			mergeNoteAttributes(
+				attributes,
+				{ attributes: { metadata: { noteId: [ 1 ] } } },
+				{ attributes: { metadata: { name: 'Two' } } }
+			)
+		).toBe( attributes );
 	} );
 } );
 
