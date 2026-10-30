@@ -6,17 +6,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
-import {
-	useMemo,
-	useState,
-	useRef,
-	useEffect,
-	forwardRef,
-} from '@wordpress/element';
+import { useMemo, useState, useRef, forwardRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { plus } from '@wordpress/icons';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
@@ -46,7 +40,9 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
-	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	// What to focus when the main pane mounts again: a button's ref, or `true`
+	// for the first tabbable element.
+	const focusOnReturnRef = useRef( null );
 	// Stable initial value for LinkControl's uncontrolled inputValue prop.
 	// We track the search with the searchInputValueRef, then update the
 	// initialSearchValue state with the observed searchInputValueRef
@@ -61,7 +57,6 @@ function UnforwardedLinkUI( props, ref ) {
 		searchInputValueRef.current = value;
 		setInitialSearchValue( value );
 	};
-	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
 
@@ -103,7 +98,7 @@ function UnforwardedLinkUI( props, ref ) {
 		props.onChange( pageLink );
 		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
-		setShouldFocusPane( true );
+		focusOnReturnRef.current = true;
 		// Clear search input value
 		updateSearchValue( '' );
 	};
@@ -118,26 +113,22 @@ function UnforwardedLinkUI( props, ref ) {
 	);
 
 	// Focus management when transitioning between panes
-	useEffect( () => {
-		if ( shouldFocusPane && linkControlWrapperRef.current ) {
-			// If we have a specific element to focus, focus it
-			if ( shouldFocusPane?.current ) {
-				// Focus the specific element passed
-				shouldFocusPane.current.focus();
-			} else {
-				// Focus the first tabbable element (keyboard-accessible, excluding tabindex="-1")
-				const tabbableElements = focus.tabbable.find(
-					linkControlWrapperRef.current
-				);
-				const nextFocusTarget =
-					tabbableElements[ 0 ] || linkControlWrapperRef.current;
-				nextFocusTarget.focus();
-			}
-
-			// Reset the state
-			setShouldFocusPane( false );
+	const linkControlWrapperRef = useRefEffect( ( node ) => {
+		const focusOnReturn = focusOnReturnRef.current;
+		if ( ! focusOnReturn ) {
+			return;
 		}
-	}, [ shouldFocusPane ] );
+		focusOnReturnRef.current = null;
+		// If we have a specific element to focus, focus it
+		if ( focusOnReturn.current ) {
+			focusOnReturn.current.focus();
+		} else {
+			// Focus the first tabbable element (keyboard-accessible, excluding tabindex="-1")
+			const tabbableElements = focus.tabbable.find( node );
+			const nextFocusTarget = tabbableElements[ 0 ] || node;
+			nextFocusTarget.focus();
+		}
+	}, [] );
 
 	const blockEditingMode = useBlockEditingMode();
 	const canAddBlock = blockEditingMode !== 'disabled';
@@ -251,7 +242,7 @@ function UnforwardedLinkUI( props, ref ) {
 					clientId={ props.clientId }
 					onBack={ () => {
 						setAddingBlock( false );
-						setShouldFocusPane( addBlockButtonRef );
+						focusOnReturnRef.current = addBlockButtonRef;
 						updateSearchValue( searchInputValueRef.current );
 					} }
 					onBlockInsert={ props?.onBlockInsert }
@@ -263,7 +254,7 @@ function UnforwardedLinkUI( props, ref ) {
 					postType={ postType }
 					onBack={ () => {
 						setAddingPage( false );
-						setShouldFocusPane( addPageButtonRef );
+						focusOnReturnRef.current = addPageButtonRef;
 						updateSearchValue( searchInputValueRef.current );
 					} }
 					onPageCreated={ handlePageCreated }
