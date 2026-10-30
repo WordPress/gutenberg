@@ -25,6 +25,7 @@ import type {
 import type { FontFamily } from '@wordpress/core-data';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
+import Pagination, { getFontsPerPage } from './pagination';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
 import {
@@ -129,6 +130,27 @@ function InstalledFonts() {
 					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 			)
 		: [];
+
+	// Theme and custom fonts are paginated as one list, theme fonts first.
+	const [ page, setPage ] = useState( 1 );
+	const pageSize = getFontsPerPage();
+	const totalPages = Math.ceil(
+		( baseThemeFonts.length + baseCustomFonts.length ) / pageSize
+	);
+	const itemsStart = ( page - 1 ) * pageSize;
+	const itemsLimit = page * pageSize;
+	const pageThemeFonts = baseThemeFonts.slice( itemsStart, itemsLimit );
+	const pageCustomFonts = baseCustomFonts.slice(
+		Math.max( itemsStart - baseThemeFonts.length, 0 ),
+		Math.max( itemsLimit - baseThemeFonts.length, 0 )
+	);
+
+	// Go back a page when the last font of the last page is deleted.
+	useEffect( () => {
+		if ( totalPages > 0 && page > totalPages ) {
+			setPage( totalPages );
+		}
+	}, [ page, totalPages ] );
 
 	const customFontFamilyId =
 		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
@@ -304,7 +326,7 @@ function InstalledFonts() {
 										{ __( 'No fonts installed.' ) }
 									</WCText>
 								) }
-								{ baseThemeFonts.length > 0 && (
+								{ pageThemeFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library__fonts-title">
 											{
@@ -321,7 +343,7 @@ function InstalledFonts() {
 											role="list"
 											className="font-library__fonts-list"
 										>
-											{ baseThemeFonts.map( ( font ) => (
+											{ pageThemeFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
 													className="font-library__fonts-list-item"
@@ -349,7 +371,7 @@ function InstalledFonts() {
 										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 									</VStack>
 								) }
-								{ baseCustomFonts.length > 0 && (
+								{ pageCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library__fonts-title">
 											{
@@ -366,7 +388,7 @@ function InstalledFonts() {
 											role="list"
 											className="font-library__fonts-list"
 										>
-											{ baseCustomFonts.map( ( font ) => (
+											{ pageCustomFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
 													className="font-library__fonts-list-item"
@@ -418,6 +440,24 @@ function InstalledFonts() {
 									}
 									size="small"
 									onClick={ () => {
+										// Show the page of the font, so focus can return to it.
+										const fontIndex = [
+											...baseThemeFonts,
+											...baseCustomFonts,
+										].findIndex(
+											( font ) =>
+												font.slug ===
+													libraryFontSelected?.slug &&
+												font.source ===
+													libraryFontSelected?.source
+										);
+										if ( fontIndex !== -1 ) {
+											setPage(
+												Math.floor(
+													fontIndex / pageSize
+												) + 1
+											);
+										}
 										setLastSelectedFontSlug(
 											libraryFontSelected?.slug
 										);
@@ -504,6 +544,13 @@ function InstalledFonts() {
 									<Progress.Indicator />
 								</Progress.Track>
 							</Progress.Root>
+						) }
+						{ ! libraryFontSelected && totalPages > 1 && (
+							<Pagination
+								page={ page }
+								totalPages={ totalPages }
+								onChange={ setPage }
+							/>
 						) }
 						{ shouldDisplayDeleteButton && (
 							<Button
