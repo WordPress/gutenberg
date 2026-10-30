@@ -46,6 +46,7 @@ const DimensionControls = ( {
 	setAttributes,
 	selectedStyleState,
 	hasSelectedStyleState = false,
+	isInFixedGridCell = false,
 } ) => {
 	const { style } = attributes;
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
@@ -116,6 +117,11 @@ const DimensionControls = ( {
 			defaultAspectRatio="auto"
 			scaleOptions={ scaleOptions }
 			unitsOptions={ units }
+			tools={
+				isInFixedGridCell
+					? [ 'scale' ]
+					: [ 'aspectRatio', 'widthHeight', 'scale' ]
+			}
 		/>
 	);
 };
