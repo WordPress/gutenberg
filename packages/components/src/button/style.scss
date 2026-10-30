@@ -416,7 +416,6 @@
 		&:is(:disabled, [aria-disabled="true"]) {
 			color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
 
-			&:not(.is-busy),
 			&:not(.is-primary, .is-secondary, .is-tertiary) {
 				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
