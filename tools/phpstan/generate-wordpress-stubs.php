@@ -86,21 +86,20 @@ function report_row( string $label, string $value ): void {
  *
  * @param non-empty-string $label The label.
  * @param string           $value The value.
- * @return bool Whether the row was written, to be cleared with clear_pending_row().
  */
-function report_pending_row( string $label, string $value ): bool {
-	if ( ! is_terminal() ) {
-		return false;
+function report_pending_row( string $label, string $value ): void {
+	if ( is_terminal() ) {
+		fwrite( STDERR, format_row( $label, $value ) );
 	}
-	fwrite( STDERR, format_row( $label, $value ) );
-	return true;
 }
 
 /**
  * Clears a row written by report_pending_row(), returning to the start of its line.
  */
 function clear_pending_row(): void {
-	fwrite( STDERR, "\r\033[K" );
+	if ( is_terminal() ) {
+		fwrite( STDERR, "\r\033[K" );
+	}
 }
 
 /**
@@ -750,13 +749,11 @@ function main( array $args ): void {
 		"--out=$generated_file",
 	);
 
-	$pending = report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
+	report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
 	try {
 		list( $status, $output ) = execute( $generator_command, 'errors', $work_dir );
 	} finally {
-		if ( $pending ) {
-			clear_pending_row();
-		}
+		clear_pending_row();
 	}
 	$output = trim( $output );
 	if ( '' !== $output ) {
