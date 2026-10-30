@@ -1,4 +1,3 @@
-import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -31,6 +30,7 @@ import {
 import type {
 	BlockStyleState,
 	BlockListBlockFeatureProps,
+	BlockSupportContext,
 	ChildLayoutBlockStyle,
 	ChildLayoutControlsPureProps,
 	ChildLayoutRule,
@@ -41,10 +41,11 @@ import type {
 import type { ChildLayout } from '../components/child-layout-control/types';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+type ChildLayoutProps = BlockListBlockFeatureProps & {
+	style?: ChildLayoutBlockStyle;
+};
 
-// Used for generating the instance ID
-const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // These are the serialized `selfStretch` values. `max` used to be called
 // "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
@@ -342,29 +343,25 @@ export function getUpdatedChildLayoutStyle(
 	} );
 }
 
-function useBlockPropsChildLayoutStyles( {
-	style,
-}: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
-	const { shouldRenderChildLayoutStyles, viewportSettings } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			return {
-				shouldRenderChildLayoutStyles: ! settings.disableLayoutStyles,
-				// The editor features hold the viewport settings.
-				viewportSettings: settings?.__experimentalFeatures?.viewport as
-					Record< string, unknown > | undefined,
-			};
-		}
-	);
+// The child layout styles, for the block's place in its parent's layout.
+function getChildLayoutCSS(
+	{ clientId, style }: ChildLayoutProps,
+	{
+		blockEditorSettings,
+		parentLayout: context,
+	}: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+) {
+	const shouldRenderChildLayoutStyles =
+		! blockEditorSettings.disableLayoutStyles;
+	const viewportSettings = (
+		blockEditorSettings.__experimentalFeatures as
+			Record< string, unknown > | undefined
+	 )?.viewport as Record< string, unknown > | undefined;
 	const layout = style?.layout ?? {};
 	const { columnStart, rowStart, columnSpan, rowSpan } = layout;
-	// The layout context holds the parent block's layout.
-	const parentLayout = ( useLayout() as Layout | undefined ) || {};
-	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
-	const selector = `.wp-container-content-${ id }`;
+	const parentLayout = ( context as Layout | undefined ) || {};
+	const selector = `.wp-container-content-${ clientId }`;
 
-	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
-	// write code that stores a string attribute instead of a number.
 	if ( process.env.NODE_ENV === 'development' ) {
 		if ( columnStart && typeof columnStart !== 'number' ) {
 			throw new Error( 'columnStart must be a number' );
@@ -397,15 +394,25 @@ function useBlockPropsChildLayoutStyles( {
 		].join( '' );
 	}
 
-	useStyleOverride( { css } );
+	return css;
+}
 
-	// Only attach a container class if there is generated CSS to be attached.
-	if ( ! css ) {
+function getBlockProps(
+	props: ChildLayoutProps,
+	context: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+) {
+	if ( ! getChildLayoutCSS( props, context ) ) {
 		return;
 	}
 
-	// Attach a `wp-container-content` id-based classname.
-	return { className: `wp-container-content-${ id }` };
+	return { className: `wp-container-content-${ props.clientId }` };
+}
+
+function useStyles(
+	props: ChildLayoutProps,
+	context: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+) {
+	useStyleOverride( { css: getChildLayoutCSS( props, context ) } );
 }
 
 function ChildLayoutControlsPure( {
@@ -696,7 +703,8 @@ addFilter(
 );
 
 export default {
-	useBlockProps: useBlockPropsChildLayoutStyles,
+	getBlockProps,
+	useStyles,
 	edit: ChildLayoutControlsPure,
 	attributeKeys: [ 'style' ],
 	hasSupport() {

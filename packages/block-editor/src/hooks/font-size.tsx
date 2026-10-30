@@ -18,6 +18,7 @@ import {
 } from './utils';
 import { useSettings } from '../components/use-settings';
 import type {
+	BlockSupportContext,
 	BlockWrapperProps,
 	FontSizeEditProps,
 	FontSizeStyle,
@@ -170,25 +171,25 @@ export function useIsFontSizeDisabled( {
 	);
 }
 
-function useBlockProps( {
-	name,
-	fontSize,
-	style,
-}: {
-	name: string;
-	fontSize?: string;
-	style?: FontSizeStyle;
-} ) {
-	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
-		'typography.fontSizes',
-		'typography.fluid',
-		'layout'
-	) as [
-		// The settings hold the presets, fluid typography and layout settings.
-		FontSizePreset[] | undefined,
-		boolean | Record< string, unknown > | undefined,
-		Record< string, unknown > | undefined,
-	];
+function getBlockProps(
+	{
+		name,
+		fontSize,
+		style,
+	}: {
+		name: string;
+		fontSize?: string;
+		style?: FontSizeStyle;
+	},
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+) {
+	// The settings hold the presets, fluid typography and layout settings.
+	const fontSizes = settings[ 'typography.fontSizes' ] as
+		FontSizePreset[] | undefined;
+	const fluidTypographySettings = settings[ 'typography.fluid' ] as
+		boolean | Record< string, unknown > | undefined;
+	const layoutSettings = settings.layout as
+		Record< string, unknown > | undefined;
 
 	/*
 	 * Only add inline styles if the block supports font sizes,
@@ -242,7 +243,8 @@ function useBlockProps( {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
+	settings: [ 'typography.fontSizes', 'typography.fluid', 'layout' ],
 	addSaveProps,
 	attributeKeys: [ 'fontSize', 'style' ],
 	hasSupport( name: string | BlockType ) {

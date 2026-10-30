@@ -1,4 +1,3 @@
-import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import type { BlockConfiguration } from '@wordpress/blocks';
@@ -62,13 +61,14 @@ function registerWithSkip( {
 }
 
 function getClassNames( style: PanelStyle ) {
-	const { result } = renderHook( () =>
-		color.useBlockProps( { name: BLOCK_NAME, style } )
+	const props = color.getBlockProps(
+		{ name: BLOCK_NAME, style },
+		{ settings: {} }
 	);
-	return result.current.className?.split( ' ' ) ?? [];
+	return props.className?.split( ' ' ) ?? [];
 }
 
-describe( 'color useBlockProps has-background', () => {
+describe( 'color getBlockProps has-background', () => {
 	afterEach( () => {
 		unregisterBlockType( BLOCK_NAME );
 	} );

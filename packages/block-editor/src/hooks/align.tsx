@@ -9,7 +9,8 @@ import {
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import { BlockControls, BlockAlignmentControl } from '../components';
-import useAvailableAlignments, {
+import {
+	getAvailableAlignments,
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -21,8 +22,10 @@ import type {
 	AlignEditProps,
 	AlignSupport,
 	BlockListBlockFeatureProps,
+	BlockSupportContext,
 	BlockWrapperProps,
 } from './types';
+import type { Layout } from '../layouts/types';
 
 /**
  * An array which includes all possible valid alignments,
@@ -249,7 +252,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 export default {
 	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
-	useBlockProps,
+	getBlockProps,
 	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],
 	hasSupport( name: string | BlockType ) {
@@ -257,13 +260,29 @@ export default {
 	},
 };
 
-function useBlockProps( { name, align }: BlockListBlockFeatureProps ) {
+function getBlockProps(
+	{ name, align }: BlockListBlockFeatureProps,
+	{
+		blockEditorSettings,
+		parentLayout,
+	}: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+) {
 	const blockAllowedAlignments = getValidAlignments(
 		// The `align` support is a boolean or a list of alignments.
 		getBlockSupport( name, 'align' ) as AlignSupport,
 		hasBlockSupport( name, 'alignWide', true )
 	);
-	const validAlignments = useAvailableAlignments( blockAllowedAlignments );
+	// As `useAvailableAlignments` does, for the parent's layout.
+	const validAlignments = getAvailableAlignments(
+		[ 'none', ...blockAllowedAlignments ],
+		( parentLayout ?? {} ) as Layout,
+		{
+			wideControlsEnabled: !! blockEditorSettings.alignWide,
+			themeSupportsLayout: !! blockEditorSettings.supportsLayout,
+			isBlockBasedTheme:
+				!! blockEditorSettings.__unstableIsBlockBasedTheme,
+		}
+	);
 
 	if ( validAlignments.some( ( alignment ) => alignment.name === align ) ) {
 		return { 'data-align': align };

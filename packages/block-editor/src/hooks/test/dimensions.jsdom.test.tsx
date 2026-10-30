@@ -131,7 +131,7 @@ describe( 'getDimensionsClassesAndStyles', () => {
 	} );
 } );
 
-describe( 'useBlockProps', () => {
+describe( 'getBlockProps', () => {
 	const blockName = 'test/dimensions-with-aspect-ratio';
 
 	afterEach( () => {
@@ -157,7 +157,7 @@ describe( 'useBlockProps', () => {
 		registerDimensionsBlock();
 
 		expect(
-			dimensions.useBlockProps( {
+			dimensions.getBlockProps( {
 				name: blockName,
 				style: {
 					dimensions: {
@@ -178,7 +178,7 @@ describe( 'useBlockProps', () => {
 		registerDimensionsBlock();
 
 		expect(
-			dimensions.useBlockProps( {
+			dimensions.getBlockProps( {
 				name: blockName,
 				style: {
 					dimensions: {

@@ -13,7 +13,6 @@ import {
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-import { useInstanceId } from '@wordpress/compose';
 import {
 	getCSSRules,
 	compileCSS,
@@ -54,7 +53,6 @@ import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
@@ -67,6 +65,7 @@ import type {
 	BlockStyle,
 	BlockStyleControlsProps,
 	BlockStyleState,
+	BlockSupportContext,
 	BlockWrapperProps,
 	StateStylesCSSOptions,
 } from './types';
@@ -1171,7 +1170,9 @@ export default {
 	hasSupport: hasStyleSupport,
 	addSaveProps,
 	attributeKeys: [ 'style' ],
-	useBlockProps,
+	getBlockProps,
+	useStyles,
+	settings: [ 'viewport' ],
 };
 
 // Defines which element types are supported, including their hover styles or
@@ -1185,9 +1186,6 @@ const elementTypes = [
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 	},
 ];
-
-// Used for generating the instance ID
-const STYLE_BLOCK_PROPS_REFERENCE = {};
 
 /**
  * Generates CSS rules for block element styles (buttons, links, headings, etc.).
@@ -1277,7 +1275,7 @@ function getElementCSSRules(
 	return rules.length > 0 ? rules.join( '' ) : undefined;
 }
 
-function useBlockProps( {
+function getBlockProps( {
 	clientId,
 	name,
 	style,
@@ -1286,14 +1284,29 @@ function useBlockProps( {
 	name: string;
 	style?: PanelStyle;
 } ) {
-	const blockElementsContainerIdentifier = useInstanceId(
-		STYLE_BLOCK_PROPS_REFERENCE,
-		'wp-elements'
+	return addSaveProps(
+		{ className: `wp-elements-${ clientId }` },
+		name,
+		{ style },
+		skipSerializationPathsEdit
 	);
+}
 
-	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
+function useStyles(
+	{
+		clientId,
+		name,
+		style,
+	}: {
+		clientId: string;
+		name: string;
+		style?: PanelStyle;
+	},
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+) {
+	const baseElementSelector = `.wp-elements-${ clientId }`;
 	const blockElementStyles = style?.elements;
-	const [ viewportSettings ] = useSettings( 'viewport' );
+	const viewportSettings = settings.viewport;
 
 	const styles = useMemo( () => {
 		const cssRules: string[] = [];
@@ -1338,13 +1351,6 @@ function useBlockProps( {
 	] );
 
 	usePrivateStyleOverride( { css: styles, clientId } );
-
-	return addSaveProps(
-		{ className: blockElementsContainerIdentifier },
-		name,
-		{ style },
-		skipSerializationPathsEdit
-	);
 }
 
 addFilter(
