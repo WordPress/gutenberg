@@ -96,13 +96,6 @@ export default function PostExcerptEditor( props ) {
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
 
-	if ( ! postType || ! postId ) {
-		return (
-			<div { ...blockProps }>
-				<p>{ __( 'This block will display the excerpt.' ) }</p>
-			</div>
-		);
-	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
 			<div { ...blockProps }>
@@ -173,30 +166,41 @@ export default function PostExcerptEditor( props ) {
 
 	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt;
 
-	const excerptContent = isEditable ? (
-		<RichText
-			className={ excerptClassName }
-			aria-label={ __( 'Excerpt text' ) }
-			value={
-				isSelected
-					? rawOrRenderedExcerpt
-					: ( ! isTrimmed
-							? rawOrRenderedExcerpt
-							: trimmedExcerpt + ELLIPSIS ) ||
-						__( 'No excerpt found' )
-			}
-			onChange={ setExcerpt }
-			tagName="p"
-			allowedFormats={ [] }
-			preserveWhiteSpace
-		/>
-	) : (
-		<p className={ excerptClassName }>
-			{ ! isTrimmed
-				? rawOrRenderedExcerpt || __( 'No excerpt found' )
-				: trimmedExcerpt + ELLIPSIS }
-		</p>
-	);
+	let excerptContent;
+	if ( ! postType || ! postId ) {
+		excerptContent = (
+			<p className={ excerptClassName }>
+				{ __( 'This block will display the excerpt.' ) }
+			</p>
+		);
+	} else if ( isEditable ) {
+		excerptContent = (
+			<RichText
+				className={ excerptClassName }
+				aria-label={ __( 'Excerpt text' ) }
+				value={
+					isSelected
+						? rawOrRenderedExcerpt
+						: ( ! isTrimmed
+								? rawOrRenderedExcerpt
+								: trimmedExcerpt + ELLIPSIS ) ||
+							__( 'No excerpt found' )
+				}
+				onChange={ setExcerpt }
+				tagName="p"
+				allowedFormats={ [] }
+				preserveWhiteSpace
+			/>
+		);
+	} else {
+		excerptContent = (
+			<p className={ excerptClassName }>
+				{ ! isTrimmed
+					? rawOrRenderedExcerpt || __( 'No excerpt found' )
+					: trimmedExcerpt + ELLIPSIS }
+			</p>
+		);
+	}
 	return (
 		<>
 			<InspectorControls>

@@ -3978,6 +3978,14 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/post-excerpt/test/edit.jsdom.test.jsx": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/post-excerpt/transforms.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
