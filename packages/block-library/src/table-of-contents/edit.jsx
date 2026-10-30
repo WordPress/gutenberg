@@ -9,13 +9,13 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	ToggleControl,
-	SelectControl as WCSelectControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -32,6 +32,16 @@ import TableOfContentsList from './list';
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
 import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+const HEADING_LEVEL_ITEMS = [
+	{ value: '', label: __( 'All levels' ) },
+	{ value: '1', label: __( 'Heading 1' ) },
+	{ value: '2', label: __( 'Heading 2' ) },
+	{ value: '3', label: __( 'Heading 3' ) },
+	{ value: '4', label: __( 'Heading 4' ) },
+	{ value: '5', label: __( 'Heading 5' ) },
+	{ value: '6', label: __( 'Heading 6' ) },
+];
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
@@ -217,24 +227,24 @@ export default function TableOfContentsEdit( {
 					}
 					isShownByDefault
 				>
-					<WCSelectControl
+					<SelectControl
 						label={ __( 'Include headings down to level' ) }
-						value={ maxLevel || '' }
-						options={ [
-							{ value: '', label: __( 'All levels' ) },
-							{ value: '1', label: __( 'Heading 1' ) },
-							{ value: '2', label: __( 'Heading 2' ) },
-							{ value: '3', label: __( 'Heading 3' ) },
-							{ value: '4', label: __( 'Heading 4' ) },
-							{ value: '5', label: __( 'Heading 5' ) },
-							{ value: '6', label: __( 'Heading 6' ) },
-						] }
-						onChange={ ( value ) =>
+						value={
+							HEADING_LEVEL_ITEMS.find(
+								( item ) =>
+									item.value ===
+									( maxLevel ? String( maxLevel ) : '' )
+							) ?? HEADING_LEVEL_ITEMS[ 0 ]
+						}
+						items={ HEADING_LEVEL_ITEMS }
+						onValueChange={ ( item ) =>
 							setAttributes( {
-								maxLevel: value ? parseInt( value ) : undefined,
+								maxLevel: item?.value
+									? parseInt( item.value, 10 )
+									: undefined,
 							} )
 						}
-						help={
+						description={
 							! maxLevel
 								? __(
 										'Including all heading levels in the table of contents.'
