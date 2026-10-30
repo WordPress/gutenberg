@@ -1,12 +1,24 @@
-
 .dataviews-bulk-actions-footer__item-count {
-	color: $gray-900;
-	font-weight: 500;
-	font-size: 11px;
-	text-transform: uppercase;
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
-.dataviews-bulk-actions-footer__container {
-	margin-right: auto;
-	min-height: $grid-unit-40;
+.dataviews-bulk-actions {
+	box-sizing: border-box;
+	min-height: 52px;
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	background: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.dataviews-bulk-actions__clear {
+	margin-inline-start: auto;
+}
+
+.dataviews-bulk-actions__action {
+	--wp-components-color-accent: var(--wpds-color-foreground-interactive-neutral);
+	--wp-components-color-accent-darker-20: var(--wpds-color-foreground-interactive-neutral-active);
+
+	&.is-secondary:not(:hover, :active, :focus, :disabled, [aria-disabled="true"]) {
+		border-color: var(--wpds-color-stroke-interactive-neutral);
+	}
 }

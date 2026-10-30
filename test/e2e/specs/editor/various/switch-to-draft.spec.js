@@ -1,7 +1,5 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 /** @typedef {import('@playwright/test').Page} Page */
 /** @typedef {import('@wordpress/e2e-test-utils-playwright').Admin} Admin */
@@ -45,9 +43,9 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 						postStatus === 'schedule'
 					);
 
-					await editor.openDocumentSettingsSidebar();
-					await page
-						.getByRole( 'button', { name: 'Change status:' } )
+					const summary = await openPostSummary( { editor, page } );
+					await summary
+						.getByRole( 'button', { name: 'Edit Status' } )
 						.click();
 					await page.getByRole( 'radio', { name: 'Draft' } ).click();
 

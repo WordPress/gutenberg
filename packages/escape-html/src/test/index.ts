@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	escapeAmpersand,
 	escapeQuotationMark,
@@ -68,6 +66,7 @@ describe( 'escapeGreaterThan', () => {
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
+	testEscapeLessThan( escapeAttribute );
 	testUnstableEscapeGreaterThan( escapeAttribute );
 } );
 

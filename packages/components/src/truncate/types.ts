@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 
 export type TruncateEllipsizeMode =
-	| 'auto'
-	| 'head'
-	| 'tail'
-	| 'middle'
-	| 'none';
+	'auto' | 'head' | 'tail' | 'middle' | 'none';
 
 export type TruncateProps = {
 	/**

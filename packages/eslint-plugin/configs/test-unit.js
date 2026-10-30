@@ -1,9 +1,10 @@
-module.exports = {
-	extends: [ 'plugin:jest/recommended' ],
-	rules: {
-		'jest/expect-expect': [
-			'error',
-			{ assertFunctionNames: [ 'expect', 'measurePerformance' ] },
-		],
+const vitest = require( '@vitest/eslint-plugin' );
+
+module.exports = [
+	vitest.configs.recommended,
+	{
+		rules: {
+			'vitest/valid-title': [ 'error', { allowArguments: true } ],
+		},
 	},
-};
+];

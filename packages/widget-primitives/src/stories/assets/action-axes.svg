@@ -1,0 +1,44 @@
+<svg viewBox="0 0 880 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A widget declares one action as pure data: an envelope of id and label, plus exactly one fulfillment, chosen by the key it writes. That fixes what triggering the action means. Two decisions are left to the host: the materialization, which primitive it mounts, which must be a real link primitive wherever the surface allows one; and the placement, where the affordance goes.">
+  <defs>
+    <marker id="arrow-aa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="868" height="348" rx="12" fill="#ffffff"/>
+
+  <text x="440" y="38" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#334155">What the declaration fixes, and what the host decides.</text>
+
+  <text x="170" y="68" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">the widget declares</text>
+  <text x="626" y="68" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">the host decides</text>
+
+  <!-- The declaration -->
+  <rect x="44" y="100" width="252" height="200" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="64" y="128" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">action</text>
+  <rect x="62" y="140" width="216" height="124" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
+  <text x="74" y="158" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#b07020" opacity="0.7">envelope</text>
+  <text x="74" y="178" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#855317">id: 'view-report'</text>
+  <text x="74" y="196" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#855317">label: 'View report'</text>
+  <line x1="70" y1="208" x2="270" y2="208" stroke="#e8cf9e" stroke-width="1"/>
+  <text x="74" y="226" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#b07020" opacity="0.7">fulfillment</text>
+  <text x="74" y="246" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" font-weight="700" fill="#b07020">href: 'site-health.php'</text>
+  <text x="64" y="284" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">pure data · the key names the fulfillment</text>
+
+  <!-- Fan -->
+  <line x1="300" y1="200" x2="412" y2="154" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-aa)"/>
+  <line x1="300" y1="200" x2="412" y2="246" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-aa)"/>
+
+  <!-- Decision 1: materialization -->
+  <rect x="416" y="116" width="420" height="76" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="436" y="142" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">materialization</text>
+  <text x="436" y="161" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">which primitive the host mounts</text>
+  <text x="436" y="179" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">a real link primitive wherever the surface allows one</text>
+
+  <!-- Decision 2: placement -->
+  <rect x="416" y="208" width="420" height="76" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="436" y="234" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">placement</text>
+  <text x="436" y="253" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">where the affordance goes</text>
+  <text x="436" y="271" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">More menu, footer, command palette</text>
+
+  <text x="440" y="326" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#855317">declared once · fulfilled one way · materialized per surface · placed by the host</text>
+</svg>

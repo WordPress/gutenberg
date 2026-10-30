@@ -16,10 +16,7 @@ type LoadingOptions = { type: 'loading'; origin?: never };
 type NoAnimationOptions = { type?: never; origin?: never };
 
 export type GetAnimateOptions =
-	| AppearOptions
-	| SlideInOptions
-	| LoadingOptions
-	| NoAnimationOptions;
+	AppearOptions | SlideInOptions | LoadingOptions | NoAnimationOptions;
 
 // Create a new type that and distributes the `Pick` operator separately to
 // every individual type of a union, thus preserving that same union.
@@ -28,5 +25,5 @@ type DistributiveTypeAndOptions< T extends { type?: any } > = T extends any
 	: never;
 
 export type AnimateProps = DistributiveTypeAndOptions< GetAnimateOptions > & {
-	children: ( props: { className?: string } ) => JSX.Element;
+	children: ( props: { className?: string } ) => React.JSX.Element;
 };

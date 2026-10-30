@@ -1,7 +1,4 @@
 /* eslint-disable no-console */
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 
 const code = ( input ) => {

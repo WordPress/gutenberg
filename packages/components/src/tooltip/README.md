@@ -1,5 +1,7 @@
 # ToolTip
 
+<p class="callout callout-alert">This component is deprecated. Use <a href="https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs"><code>Tooltip</code> from <code>@wordpress/ui</code></a> instead.</p>
+
 Tooltip is a React component to render floating help text relative to a node when it receives focus or it is hovered upon by a mouse. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
 
 ## Usage
@@ -51,7 +53,7 @@ Option to hide the tooltip when the anchor is clicked.
 Used to specify the tooltip's placement with respect to its anchor.
 
 -   Required: No
--   Default: `'bottom'`
+-   Default: `'top'`
 
 #### `position`: `string`
 
@@ -60,7 +62,7 @@ _Note: use the `placement` prop instead when possible._
 Legacy way to specify the popover's position with respect to its anchor. Specify y- and x-axis as a space-separated string. Supports `'top'`, `'middle'`, `'bottom'` y axis, and `'left'`, `'center'`, `'right'` x axis.
 
 -   Required: No
--   Default: `'bottom'`
+-   Default: `'top'`
 
 #### `shortcut`: `string` | `object`
 

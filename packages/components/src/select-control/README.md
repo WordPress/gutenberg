@@ -92,8 +92,6 @@ const MySelectControl = () => {
 				{ label: 'Small', value: '25%' },
 			] }
 			onChange={ ( newSize ) => setSize( newSize ) }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -115,8 +113,6 @@ Render a user interface to select multiple users from a list.
 		{ value: 'b', label: 'User B' },
 		{ value: 'c', label: 'User c' },
 	] }
-	__next40pxDefaultSize
-	__nextHasNoMarginBottom
 />
 ```
 
@@ -131,8 +127,6 @@ const [ item, setItem ] = useState( '' );
     label={ __( 'My dinosaur' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
-    __next40pxDefaultSize
-    __nextHasNoMarginBottom
 >
 	<optgroup label="Theropods">
 		<option value="Tyrannosaurus">Tyrannosaurus</option>
@@ -231,22 +225,6 @@ The style variant of the control.
 -   Type: `'default' | 'minimal'`
 -   Required: No
 -   Default: `'default'`
-
-### __next40pxDefaultSize
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ## Related components
 

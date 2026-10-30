@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 import { dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as customizeWidgetsStore } from '../store';
 
 export default function getInserterOuterSection() {

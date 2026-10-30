@@ -23,7 +23,7 @@ _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-na
 ### `placeholder: String`
 
 _Optional._ Placeholder text to show when the field is empty, similar to the
-[`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+[`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/placeholder).
 
 ### `disableLineBreaks: Boolean`
 

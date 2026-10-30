@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { VisuallyHidden } from '../visually-hidden';
 import type { TokenProps } from './types';
@@ -47,7 +36,7 @@ export default function Token( {
 	const transformedValue = displayTransform( value );
 	const termPositionAndCount = sprintf(
 		/* translators: 1: term name, 2: term position in a set of terms, 3: total term set count. */
-		__( '%1$s (%2$s of %3$s)' ),
+		__( '%1$s (%2$d of %3$d)' ),
 		transformedValue,
 		termPosition,
 		termsCount
@@ -70,13 +59,13 @@ export default function Token( {
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
+			{ /* Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence. */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled */ }
 			<Button
 				className="components-form-token-field__remove-token"
 				size="small"
 				icon={ closeSmall }
 				onClick={ ! disabled ? onClick : undefined }
-				// Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence.
-				// eslint-disable-next-line no-restricted-syntax
 				disabled={ disabled }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
