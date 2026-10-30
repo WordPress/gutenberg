@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .components-duotone-picker__color-indicator::before {
 	background: transparent;
 }
@@ -10,6 +12,10 @@
 	&.is-pressed:hover:not(:disabled) {
 		// Hover state has to be overridden too.
 		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		color: transparent;
+	}
+
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
 		color: transparent;
 	}
 

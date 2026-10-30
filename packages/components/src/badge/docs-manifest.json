@@ -1,5 +1,6 @@
 {
 	"$schema": "../../schemas/docs-manifest.json",
 	"displayName": "Badge",
-	"filePath": "./index.tsx"
+	"filePath": "./index.tsx",
+	"deprecated": "Please use `Badge` from the `@wordpress/ui` package instead."
 }

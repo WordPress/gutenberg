@@ -1,9 +1,4 @@
 const { registerBlockBindingsSource } = wp.blocks;
-const { InspectorControls } = wp.blockEditor;
-const { PanelBody, TextControl } = wp.components;
-const { createHigherOrderComponent } = wp.compose;
-const { createElement: el, Fragment } = wp.element;
-const { addFilter } = wp.hooks;
 const { fieldsList } = window.testingBindings || {};
 
 const getValues = ( { bindings } ) => {
@@ -13,13 +8,20 @@ const getValues = ( { bindings } ) => {
 	}
 	return newValues;
 };
-const setValues = ( { dispatch, bindings } ) => {
+const setValues = ( { dispatch, context, bindings } ) => {
+	const newMeta = {};
 	Object.values( bindings ).forEach( ( { args, newValue } ) => {
-		// Example of what could be done.
-		dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, {
-			meta: { [ args?.key ]: newValue },
-		} );
+		newMeta[ args.key ] = newValue;
 	} );
+
+	dispatch( 'core' ).editEntityRecord(
+		'postType',
+		context?.postType,
+		context?.postId,
+		{
+			meta: newMeta,
+		}
+	);
 };
 
 registerBlockBindingsSource( {
@@ -27,7 +29,13 @@ registerBlockBindingsSource( {
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
-	getFieldsList: () => fieldsList,
+	getFieldsList() {
+		return Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
+			label: field.label || key,
+			type: field.type || 'string',
+			args: field.args || { key },
+		} ) );
+	},
 } );
 
 registerBlockBindingsSource( {
@@ -51,43 +59,3 @@ registerBlockBindingsSource( {
 	getValues,
 	canUserEditValue: () => true,
 } );
-
-const withBlockBindingsInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			if ( ! props.attributes?.metadata?.bindings?.content ) {
-				return el( BlockEdit, props );
-			}
-
-			return el(
-				Fragment,
-				{},
-				el( BlockEdit, props ),
-				el(
-					InspectorControls,
-					{},
-					el(
-						PanelBody,
-						{ title: 'Bindings' },
-						el( TextControl, {
-							__next40pxDefaultSize: true,
-							__nextHasNoMarginBottom: true,
-							label: 'Content',
-							value: props.attributes.content,
-							onChange: ( content ) =>
-								props.setAttributes( {
-									content,
-								} ),
-						} )
-					)
-				)
-			);
-		};
-	}
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'testing/bindings-inspector-control',
-	withBlockBindingsInspectorControl
-);

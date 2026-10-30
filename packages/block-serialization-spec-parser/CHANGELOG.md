@@ -2,11 +2,104 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+
+## 6.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 5.57.0 (2026-10-07)
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
 ## 5.22.0 (2025-04-11)
 
 ## 5.21.0 (2025-03-27)
 
 ## 5.20.0 (2025-03-13)
+
+## 5.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 5.19.0 (2025-02-28)
 
@@ -30,6 +123,12 @@
 
 ## 5.9.0 (2024-10-03)
 
+## 5.8.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 5.8.0 (2024-09-19)
 
 ## 5.7.0 (2024-09-05)
@@ -45,6 +144,12 @@
 ## 5.2.0 (2024-06-26)
 
 ## 5.1.0 (2024-06-15)
+
+## 5.0.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 5.0.0 (2024-05-31)
 
@@ -66,6 +171,12 @@
 
 ## 4.52.0 (2024-02-21)
 
+## 4.51.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.51.0 (2024-02-09)
 
 ## 4.50.0 (2024-01-24)
@@ -84,6 +195,12 @@
 
 ## 4.43.0 (2023-10-05)
 
+## 4.42.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.42.0 (2023-09-20)
 
 ## 4.41.0 (2023-08-31)
@@ -97,6 +214,12 @@
 ## 4.37.0 (2023-07-05)
 
 ## 4.36.0 (2023-06-23)
+
+## 4.35.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 4.35.0 (2023-06-07)
 
@@ -116,6 +239,12 @@
 
 ## 4.27.0 (2023-02-15)
 
+## 4.26.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.26.0 (2023-02-01)
 
 ## 4.25.0 (2023-01-11)
@@ -133,6 +262,12 @@
 ## 4.19.0 (2022-10-05)
 
 ## 4.18.0 (2022-09-21)
+
+## 4.17.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 4.17.0 (2022-09-13)
 
@@ -156,6 +291,12 @@
 
 ## 4.7.0 (2022-04-21)
 
+## 4.6.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.6.0 (2022-04-08)
 
 ## 4.5.0 (2022-03-23)
@@ -164,7 +305,19 @@
 
 ## 4.3.0 (2022-01-27)
 
+## 4.2.1 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.2.0 (2021-07-21)
+
+## 4.1.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 4.1.0 (2021-05-20)
 
@@ -177,6 +330,30 @@
 
 ## 3.8.0 (2021-03-17)
 
+## 3.7.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.4.1 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.3.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.0.1 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 3.0.0 (2019-03-06)
 
 ### Breaking Changes
@@ -186,6 +363,12 @@
 ### New Features
 
 -   A `parser.php` file generated from the PEGJS grammar is now added upon installation.
+
+## 2.0.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 2.0.2 (2018-12-12)
 

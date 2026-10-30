@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import {
-	StyledUnitControl,
-	ControlWrapper,
-} from './styles/focal-point-picker-style';
+import clsx from 'clsx';
+import { Flex } from '../flex';
+import UnitControl from '../unit-control';
+import styles from './style.module.scss';
 import { fractionToPercentage } from './utils';
 import type {
 	UnitControlProps,
@@ -22,7 +15,6 @@ const TEXTCONTROL_MAX = 100;
 const noop = () => {};
 
 export default function FocalPointPickerControls( {
-	__nextHasNoMarginBottom,
 	hasHelpText,
 	onChange = noop,
 	point = {
@@ -49,10 +41,10 @@ export default function FocalPointPickerControls( {
 	};
 
 	return (
-		<ControlWrapper
-			className="focal-point-picker__controls"
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			hasHelpText={ hasHelpText }
+		<Flex
+			className={ clsx( styles.controls, 'focal-point-picker__controls', {
+				[ styles[ 'has-help-text' ] ]: hasHelpText,
+			} ) }
 			gap={ 4 }
 		>
 			<FocalPointUnitControl
@@ -81,15 +73,17 @@ export default function FocalPointPickerControls( {
 				}
 				dragDirection="s"
 			/>
-		</ControlWrapper>
+		</Flex>
 	);
 }
 
 function FocalPointUnitControl( props: UnitControlProps ) {
 	return (
-		<StyledUnitControl
-			__next40pxDefaultSize
-			className="focal-point-picker__controls-position-unit-control"
+		<UnitControl
+			className={ clsx(
+				styles[ 'unit-control' ],
+				'focal-point-picker__controls-position-unit-control'
+			) }
 			labelPosition="top"
 			max={ TEXTCONTROL_MAX }
 			min={ TEXTCONTROL_MIN }

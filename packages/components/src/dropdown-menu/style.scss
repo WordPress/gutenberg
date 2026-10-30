@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-dropdown-menu__toggle {
 	vertical-align: top;
 }
@@ -13,8 +16,9 @@
 		width: 100%;
 		padding: 6px;
 		outline: none;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		white-space: nowrap;
+		font-weight: var(--wpds-typography-font-weight-default);
 
 		&.has-separator {
 			margin-top: 6px;
@@ -26,7 +30,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $gray-300;
+			background-color: var(--wpds-color-stroke-surface-neutral);
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -53,11 +57,22 @@
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-button {
-		min-height: $button-size-next-default-40px;
+		min-height: $grid-unit-40;
 		height: auto;
 		text-align: left;
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
+
+		// Offset the 1px border reserved by Button, since the height here
+		// is determined by the content rather than fixed.
+		padding-top: $grid-unit-05 - $border-width;
+		padding-bottom: $grid-unit-05 - $border-width;
+
+		&.has-icon {
+			// Matches the `.has-icon` padding of Button.
+			padding-top: 6px - $border-width;
+			padding-bottom: 6px - $border-width;
+		}
 	}
 
 }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	TRANSLATION_FUNCTIONS,
 	REGEXP_SPRINTF_PLACEHOLDER,
@@ -9,6 +6,7 @@ const {
 const { getTranslateFunctionArgs } = require( './get-translate-function-args' );
 const { getTextContentFromNode } = require( './get-text-content-from-node' );
 const { getTranslateFunctionName } = require( './get-translate-function-name' );
+const { hasTruthyJsxAttribute } = require( './has-truthy-jsx-attribute' );
 const isPackageInstalled = require( './is-package-installed' );
 
 module.exports = {
@@ -18,5 +16,6 @@ module.exports = {
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
 	getTranslateFunctionName,
+	hasTruthyJsxAttribute,
 	isPackageInstalled,
 };

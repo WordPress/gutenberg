@@ -1,0 +1,94 @@
+import { describe, expect, it, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
+import { useSelect } from '@wordpress/data';
+import PostActions from '../';
+import { usePostActions } from '../actions';
+
+vi.mock( import( '@wordpress/data' ), { spy: true } );
+vi.mock( import( '../actions' ), () => ( { usePostActions: vi.fn() } ) );
+
+const mockedUseSelect = vi.mocked( useSelect );
+const mockedUsePostActions = vi.mocked( usePostActions );
+
+const item = { id: 123, title: { raw: 'Test post' } };
+
+async function renderPostActions() {
+	mockedUseSelect.mockReturnValue( {
+		item,
+		permissions: { canUpdate: true },
+	} );
+
+	await render(
+		<PostActions
+			postType="post"
+			postId={ item.id }
+			onActionPerformed={ undefined }
+		/>
+	);
+}
+
+describe( 'PostActions', () => {
+	it( 'keeps the unavailable actions trigger focusable and closed', async () => {
+		const user = userEvent.setup();
+		mockedUsePostActions.mockReturnValue( [] );
+		await renderPostActions();
+
+		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
+		expect( trigger ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.tab();
+		expect( trigger ).toHaveFocus();
+
+		await user.keyboard( '{Enter}' );
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+	} );
+
+	it.each( [ 'Delete', 'Delete……\u00a0' ] )(
+		'moves focus to modal action "%s" and returns it after cancellation',
+		async ( label ) => {
+			const user = userEvent.setup();
+			mockedUsePostActions.mockReturnValue( [
+				{
+					id: 'delete',
+					label,
+					RenderModal: ( {
+						closeModal,
+					}: {
+						closeModal?: () => void;
+					} ) => <button onClick={ closeModal }>Cancel</button>,
+				},
+				{ id: 'view', label: 'View', callback: () => {} },
+			] );
+			await renderPostActions();
+
+			const trigger = screen.getByRole( 'button', { name: 'Actions' } );
+			await user.click( trigger );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'View' } )
+			).toBeInTheDocument();
+			await user.click(
+				await screen.findByRole( 'menuitem', {
+					name: label === 'Delete' ? 'Delete…' : label.trim(),
+				} )
+			);
+			expect(
+				await screen.findByRole( 'dialog', { name: label.trim() } )
+			).toBeInTheDocument();
+
+			const cancelButton = await screen.findByRole( 'button', {
+				name: 'Cancel',
+			} );
+			await waitFor( () => expect( cancelButton ).toHaveFocus() );
+
+			await user.click( cancelButton );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
+			expect( trigger ).toHaveFocus();
+		}
+	);
+} );

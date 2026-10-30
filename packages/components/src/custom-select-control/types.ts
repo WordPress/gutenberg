@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
 /**
@@ -82,6 +79,11 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	onMouseOver?: MouseEventHandler< HTMLButtonElement >;
 	/**
 	 * The list of options that can be chosen from.
+	 *
+	 * Options can provide custom styles through `style` and `className`. Hovered
+	 * and keyboard-active options use the design system's highlight colors so
+	 * text stays readable. Custom text and background colors apply while the
+	 * option is inactive; other custom styling remains in effect.
 	 */
 	options: ReadonlyArray< T >;
 	/**
@@ -89,7 +91,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 *
 	 * @default 'default'
 	 */
-	size?: 'default' | 'small' | '__unstable-large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
@@ -117,14 +119,8 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Do not throw a warning for the deprecated 36px default size.
-	 * For internal components of other components that already throw the warning.
-	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
 	 * @ignore
 	 */
-	__shouldNotWarnDeprecated36pxSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 };

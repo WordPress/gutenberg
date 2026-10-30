@@ -30,7 +30,6 @@ const MyBorderControl = () => {
 
 	return (
 		<BorderControl
-			__next40pxDefaultSize
 			colors={ colors }
 			label={ __( 'Border' ) }
 			onChange={ setBorder }
@@ -126,13 +125,6 @@ new border value.
 -   Required: No
 -   Default: `true`
 
-### `size`: `string`
-
-Size of the control.
-
--   Required: No
--   Default: `default`
--   Allowed values: `default`, `__unstable-large`
 
 ### `value`: `Object`
 
@@ -164,10 +156,3 @@ Flags whether this `BorderControl` should also render a `RangeControl` for
 additional control over a border's width.
 
 -   Required: No
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`

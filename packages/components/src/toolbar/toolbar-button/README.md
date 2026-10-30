@@ -10,13 +10,13 @@ To create general interfaces, you'll want to render ToolbarButton in a [Toolbar]
 
 ```jsx
 import { Toolbar, ToolbarButton } from '@wordpress/components';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 
 function MyToolbar() {
 	return (
 		<Toolbar label="Options">
 			<ToolbarButton
-				icon={ edit }
+				icon={ pencil }
 				label="Edit"
 				onClick={ () => alert( 'Editing' ) }
 			/>
@@ -32,14 +32,14 @@ If you're working on a custom block and you want to add controls to the block to
 ```jsx
 import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 
 function Edit() {
 	return (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
-					icon={ edit }
+					icon={ pencil }
 					label="Edit"
 					onClick={ () => alert( 'Editing' ) }
 				/>

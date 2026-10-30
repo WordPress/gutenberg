@@ -1,0 +1,86 @@
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
+import rule from '../no-ds-tokens';
+
+const RuleTester = configureRuleTester( { describe, it } );
+
+const ruleTester = new RuleTester( {
+	languageOptions: {
+		ecmaVersion: 6,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
+		},
+	},
+} );
+
+ruleTester.run( 'no-ds-tokens', rule, {
+	valid: [
+		{
+			code: `const style = 'color: var(--my-custom-prop)';`,
+		},
+		{
+			code: `const style = 'color: blue';`,
+		},
+		{
+			code: 'const style = `border: 1px solid var(--other-prefix-token)`;',
+		},
+		{
+			code: `const name = 'something--wpds-color';`,
+		},
+		{
+			code: `<div style={ { color: 'var(--my-custom-prop)' } } />`,
+		},
+	],
+	invalid: [
+		{
+			code: `const style = 'color: var(--wpds-color-foreground-content-neutral)';`,
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+		{
+			code: 'const style = `color: var(--wpds-color-foreground-content-neutral)`;',
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+		{
+			code: `<div style={ { color: 'var(--wpds-color-foreground-content-neutral)' } } />`,
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+		{
+			code: 'const style = `border: 1px solid var(--wpds-color-stroke-surface-neutral, var(--wpds-color-stroke-surface-neutral-weak))`;',
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+		{
+			code: `const token = '--wpds-color-foreground-content-neutral';`,
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+		{
+			code: 'const style = `--wpds-color-foreground-content-neutral: red`;',
+			errors: [
+				{
+					messageId: 'disallowed',
+				},
+			],
+		},
+	],
+} );

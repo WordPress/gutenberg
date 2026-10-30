@@ -1,20 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
+const EMPTY_OBJECT = {};
+
 /**
- * Returns the previous edit from the current undo offset
- * for the entity records edits history, if any.
+ * Returns the undo manager holding the entity records edits history.
  *
  * @param state State tree.
  *
@@ -97,6 +93,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 
@@ -138,6 +135,7 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 				'root',
 				'__unstableBase'
 			) as SiteData | undefined;
+			// Still resolving getEntityRecord.
 			if ( ! siteData ) {
 				return null;
 			}
@@ -153,9 +151,23 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
-			return { postType: 'wp_template', postId: frontPageTemplateId };
+			if ( frontPageTemplateId ) {
+				return {
+					postType: 'wp_template',
+					postId: frontPageTemplateId,
+				};
+			}
+			// Resolution is finished and no front-page template exists.
+			if ( frontPageTemplateId === '' ) {
+				return EMPTY_OBJECT;
+			}
+			// Still resolving getDefaultTemplateId.
+			return null;
 		},
 		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
 			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
@@ -203,8 +215,9 @@ export const getTemplateId = createRegistrySelector(
 			if ( ! templates ) {
 				return;
 			}
-			const id = templates.find( ( { slug } ) => slug === 'front-page' )
-				?.id;
+			const id = templates.find(
+				( { slug } ) => slug === 'front-page'
+			)?.id;
 			if ( id ) {
 				return id;
 			}
@@ -258,3 +271,192 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+/**
+ * Returns the editor settings.
+ *
+ * @param state Data state.
+ * @return Editor settings object or null if not loaded.
+ */
+export function getEditorSettings(
+	state: State
+): Record< string, any > | null {
+	return state.editorSettings;
+}
+
+/**
+ * Returns the editor assets.
+ *
+ * @param state Data state.
+ * @return Editor assets object or null if not loaded.
+ */
+export function getEditorAssets( state: State ): Record< string, any > | null {
+	return state.editorAssets;
+}
+
+/**
+ * Returns whether collaboration is supported.
+ *
+ * @param state Data state.
+ * @return Whether collaboration is supported.
+ */
+export function isCollaborationSupported( state: State ): boolean {
+	return state.collaborationSupported;
+}
+
+/**
+ * Returns the view configuration for the given entity type.
+ *
+ * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
+ * it is consumed by the `getViewConfig` resolver to request a subset of the
+ * config via the REST API `_fields` parameter and does not affect what is read
+ * here. Partial responses are merged in the reducer, so the returned object may
+ * accumulate properties across requests for the same entity.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The view configuration or undefined if not loaded.
+ */
+export function getViewConfig(
+	state: State,
+	kind: string,
+	name: string
+): Record< string, any > | undefined {
+	return (
+		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
+			default_view: undefined,
+			default_layouts: undefined,
+			view_list: undefined,
+			form: undefined,
+		}
+	);
+}
+
+/**
+ * The fields registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-fields` route.
+ */
+export interface FieldsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each field, in registration order.
+	 */
+	fields: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the fields, in
+	 * registration order, with the ids of the fields each provides.
+	 */
+	script_modules: Array< { id: string; fields: string[] } >;
+}
+
+/**
+ * Returns the fields registered on the server for the given entity, as the
+ * `/wp/v2/entity-fields` REST API route returns them.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The fields config, or undefined if not loaded.
+ */
+export function getFieldsConfig(
+	state: State,
+	kind: string,
+	name: string
+): FieldsConfig | undefined {
+	return state.fieldsConfigs?.[ kind ]?.[ name ];
+}
+
+/**
+ * The actions registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-actions` route.
+ */
+export interface EntityActionsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each action, in registration order.
+	 */
+	actions: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the actions, in
+	 * registration order, with the ids of the actions each provides.
+	 */
+	script_modules: Array< { id: string; actions: string[] } >;
+}
+
+/**
+ * Returns the actions registered on the server for the given entity, as the
+ * `/wp/v2/entity-actions` REST API route returns them: the serializable part of each
+ * action, and the script modules providing their JavaScript parts.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The actions config, or undefined if not loaded.
+ */
+export function getEntityActionsConfig(
+	state: State,
+	kind: string,
+	name: string
+): EntityActionsConfig | undefined {
+	return state.entityActionsConfigs?.[ kind ]?.[ name ];
+}
+
+/**
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
+ *
+ * @param state Data state.
+ *
+ * @return The current sync connection state, prioritized by importance.
+ */
+export function getSyncConnectionStatus(
+	state: State
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
+		return undefined;
+	}
+
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+
+	let coalesced: ConnectionStatus | undefined;
+
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
+		if (
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
+		) {
+			coalesced = status;
+		}
+	}
+
+	return coalesced;
+}
+
+/**
+ * Returns the sync connection status for a single entity, or undefined if
+ * the entity is not being synced or no provider has reported a status yet.
+ *
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
+ *
+ * @return The sync connection status for the entity.
+ */
+export function getEntitySyncConnectionStatus(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
+): ConnectionStatus | undefined {
+	return state.syncConnectionStatuses?.[
+		`${ kind }/${ name }:${ recordId }`
+	];
+}
