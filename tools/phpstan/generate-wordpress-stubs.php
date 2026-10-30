@@ -217,14 +217,15 @@ function setting( string $name, string $default_value ): string {
 /**
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
- * @param non-empty-list<string>          $command The program and its arguments.
- * @param 'pass'|'capture'|'quiet'        $mode    'pass' to pass its output to standard error,
- *                                                 'capture' to return its standard output, or 'quiet'
- *                                                 to also discard its standard error.
- * @param non-empty-string|null           $cwd     The working directory.
- * @param array<non-empty-string, string> $env     Environment variables to set in addition to the
- *                                                 current ones.
- * @return array{int, string} The exit status, and the standard output when captured.
+ * @param non-empty-list<string>              $command The program and its arguments.
+ * @param 'pass'|'capture'|'quiet'|'combined' $mode    'pass' to pass its output to standard error,
+ *                                                     'capture' to return its standard output,
+ *                                                     'quiet' to also discard its standard error,
+ *                                                     or 'combined' to return both.
+ * @param non-empty-string|null               $cwd     The working directory.
+ * @param array<non-empty-string, string>     $env     Environment variables to set in addition to
+ *                                                     the current ones.
+ * @return array{int, string} The exit status, and the output when captured.
  */
 function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array() ): array {
 	$null_device = '\\' === DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null';
@@ -234,10 +235,18 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 		$descriptors[2] = STDERR;
 	} else {
 		$descriptors[1] = array( 'pipe', 'w' );
-		$descriptors[2] = 'quiet' === $mode ? array( 'file', $null_device, 'w' ) : STDERR;
+		if ( 'quiet' === $mode ) {
+			$descriptors[2] = array( 'file', $null_device, 'w' );
+		} elseif ( 'combined' === $mode ) {
+			$descriptors[2] = array( 'redirect', 1 );
+		} else {
+			$descriptors[2] = STDERR;
+		}
 	}
 
-	$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null );
+	// PHPStan's signature of proc_open() takes descriptors of strings only, though a redirection's
+	// target is a descriptor number, which PHP requires to be an integer.
+	$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null ); // @phpstan-ignore argument.type
 	if ( ! is_resource( $process ) ) {
 		throw new RuntimeException( "Unable to run $command[0]." );
 	}
@@ -664,13 +673,12 @@ function main( array $args ): void {
 		throw new RuntimeException( 'Generating the stubs for a version of WordPress with Requests 1.x is not supported.' );
 	}
 
-	// The generator's own report, a title, the temporary file it wrote, and a table of counts, is left
-	// out, apart from any duplicate declarations it lists.
 	$generated_file = $work_dir . '/wordpress-stubs.php';
 
 	$generator_command = array(
 		PHP_BINARY,
 		$generator_dir . '/vendor/bin/generate-stubs',
+		'--no-ansi',
 		'--force',
 		"--finder=$generator_dir/finder.php",
 		"--visitor=$generator_dir/visitor.php",
@@ -683,17 +691,31 @@ function main( array $args ): void {
 	);
 
 	$pending                 = report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
-	list( $status, $output ) = execute( $generator_command, 'capture', $work_dir );
+	list( $status, $output ) = execute( $generator_command, 'combined', $work_dir );
 	if ( $pending ) {
 		clear_pending_row();
 	}
-	if ( 0 !== $status ) {
-		report( trim( $output ) );
-		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $generator_command ) );
+
+	// The generator ends with a report of its own: a title, the temporary file it wrote, and a table
+	// of counts. Leave that out, but keep what comes before it, such as PHP warnings, and after it,
+	// such as a list of duplicate declarations. All of the output is kept when it fails, or when the
+	// report is not found.
+	if ( 0 === $status && preg_match( '/^PHP Stubs Generator\n=+\n.*?(?:^ -[- ]+\n.*?){3}/ms', $output, $matches, PREG_OFFSET_CAPTURE ) ) {
+		$output = substr( $output, 0, $matches[0][1] ) . substr( $output, $matches[0][1] + strlen( $matches[0][0] ) );
 	}
-	$duplicates = strpos( $output, 'Duplicate declarations found' );
-	if ( false !== $duplicates ) {
-		report( trim( substr( $output, $duplicates ) ) );
+	$output = trim( $output );
+	if ( '' !== $output ) {
+		report( $output );
+	}
+	if ( 0 !== $status ) {
+		// The header is left out of the command, since it spans several lines.
+		$shown_command = array_filter(
+			$generator_command,
+			static function ( string $argument ): bool {
+				return 0 !== strpos( $argument, '--header=' );
+			}
+		);
+		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $shown_command ) );
 	}
 	$stubs = (string) file_get_contents( $generated_file );
 
