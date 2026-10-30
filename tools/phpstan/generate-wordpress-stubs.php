@@ -114,12 +114,23 @@ function is_terminal(): bool {
 	/** @var bool|null $is_terminal */
 	static $is_terminal = null;
 	if ( null === $is_terminal ) {
-		$is_terminal = 'dumb' !== getenv( 'TERM' ) && stream_isatty( STDERR );
-		if ( $is_terminal && '\\' === DIRECTORY_SEPARATOR ) {
-			$is_terminal = function_exists( 'sapi_windows_vt100_support' ) && sapi_windows_vt100_support( STDERR, true );
-		}
+		$is_terminal = 'dumb' !== getenv( 'TERM' ) && stream_isatty( STDERR ) && enable_vt100();
 	}
 	return $is_terminal;
+}
+
+/**
+ * Enables VT100 processing when standard error is a Windows console, which shows escape sequences
+ * as text without it.
+ *
+ * @return bool Whether standard error handles escape sequences as far as the platform goes: always
+ *              outside Windows, and on Windows when processing could be enabled.
+ */
+function enable_vt100(): bool {
+	if ( '\\' !== DIRECTORY_SEPARATOR ) {
+		return true;
+	}
+	return function_exists( 'sapi_windows_vt100_support' ) && stream_isatty( STDERR ) && sapi_windows_vt100_support( STDERR, true );
 }
 
 /**
@@ -141,10 +152,8 @@ function has_color(): bool {
 			$force_color = getenv( 'FORCE_COLOR' );
 			if ( false !== $force_color ) {
 				$has_color = ! in_array( strtolower( $force_color ), array( '0', 'false' ), true );
-				// A Windows console shows escape sequences as text until VT100 processing is enabled,
-				// which is_terminal() does when standard error is a console.
 				if ( $has_color ) {
-					is_terminal();
+					enable_vt100();
 				}
 			} else {
 				$has_color = is_terminal();
