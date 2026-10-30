@@ -68,29 +68,40 @@ function report_row( string $label, string $value ): void {
 }
 
 /**
- * Returns text styled for standard error, when it supports colors.
+ * Returns whether standard error supports colors.
  *
- * Colors are used on a terminal, unless the NO_COLOR environment variable is set, or anywhere when
- * FORCE_COLOR is.
+ * Colors are used on a terminal, unless the NO_COLOR environment variable is set. FORCE_COLOR turns
+ * them on anywhere, or off when it is 0 or false, as in Node.js tools.
  *
- * @param string           $text The text.
- * @param non-empty-string $sgr  The SGR parameters of the style, such as 1 for bold.
- * @return string The styled text.
+ * @return bool Whether to use colors.
  */
-function style( string $text, string $sgr ): string {
+function has_color(): bool {
+	/** @var bool|null $has_color */
 	static $has_color = null;
 	if ( null === $has_color ) {
+		$force_color = strtolower( (string) getenv( 'FORCE_COLOR' ) );
 		if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
 			$has_color = false;
-		} elseif ( '' !== (string) getenv( 'FORCE_COLOR' ) ) {
-			$has_color = true;
+		} elseif ( '' !== $force_color ) {
+			$has_color = '0' !== $force_color && 'false' !== $force_color;
 		} elseif ( '\\' === DIRECTORY_SEPARATOR ) {
 			$has_color = function_exists( 'sapi_windows_vt100_support' ) && sapi_windows_vt100_support( STDERR, true );
 		} else {
 			$has_color = stream_isatty( STDERR );
 		}
 	}
-	return $has_color ? "\033[{$sgr}m$text\033[0m" : $text;
+	return $has_color;
+}
+
+/**
+ * Returns text styled for standard error, when it supports colors.
+ *
+ * @param string           $text The text.
+ * @param non-empty-string $sgr  The SGR parameters of the style, such as 1 for bold.
+ * @return string The styled text.
+ */
+function style( string $text, string $sgr ): string {
+	return has_color() ? "\033[{$sgr}m$text\033[0m" : $text;
 }
 
 /**
