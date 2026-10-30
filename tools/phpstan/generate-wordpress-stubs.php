@@ -424,9 +424,17 @@ function main( array $args ): void {
 			report( "No source for the WordPress stubs is recorded in $package_file. Pass an option." );
 			usage();
 		}
-		if ( ! $force && read_stub_key( $stub_file ) === $generation_key( $commit, $pr ) ) {
+		if ( $force ) {
+			report( 'Generating the WordPress stubs again, as requested with --force.' );
+		} elseif ( ! is_file( $stub_file ) ) {
+			report( 'Generating the WordPress stubs, which are missing, from the source recorded in tools/phpstan/wordpress-stubs/composer.json.' );
+		} elseif ( read_stub_key( $stub_file ) !== $generation_key( $commit, $pr ) ) {
+			report( 'Generating the WordPress stubs again, since the source recorded in tools/phpstan/wordpress-stubs/composer.json, the generator, or this script has changed since they were generated.' );
+		} else {
 			return;
 		}
+	} else {
+		report( 'Generating the WordPress stubs.' );
 	}
 
 	$work_dir = create_directory( sys_get_temp_dir(), 'wordpress-stubs.' );
@@ -469,14 +477,14 @@ function main( array $args ): void {
 	}
 
 	if ( null !== $local_checkout && preg_match( '/^[0-9a-f]{40}$/', $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
-		report( "Reading $develop_repo@$commit from $local_checkout" );
+		report( "Reading $develop_repo@$commit from the wordpress-develop checkout at $local_checkout." );
 		// Check out the commit's src directory with an index of its own, leaving the checkout as it is.
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
 		run( array( 'git', '-C', $local_checkout, 'read-tree', "$commit:src" ), null, $env );
 		run( array( 'git', '-C', $local_checkout, '-c', 'core.autocrlf=false', 'checkout-index', '--all', "--prefix=$source_dir/" ), null, $env );
 		$repo_dir = $local_checkout;
 	} else {
-		report( "Fetching $develop_repo@$commit" );
+		report( "Fetching $develop_repo@$commit from GitHub, since " . ( null !== $local_checkout ? "the wordpress-develop checkout at $local_checkout does not have it." : 'Gutenberg is not in a wordpress-develop checkout.' ) );
 		$repo_dir = $work_dir . '/wordpress-develop';
 		fetch_commit( $repo_dir, $develop_repo, $commit, array( '/src/' ) );
 		$commit = resolve_commit( $repo_dir, 'HEAD' );
@@ -492,9 +500,9 @@ function main( array $args ): void {
 	// to be used.
 	$generator_dir = $cache_dir . '/' . str_replace( '/', '-', $stubs_repo ) . "-$stubs_commit-" . substr( sha1( $packages ), 0, 12 );
 	if ( is_dir( $generator_dir ) ) {
-		report( "Using $stubs_repo@$stubs_commit from $generator_dir" );
+		report( "Using the generator, $stubs_repo@$stubs_commit, cached in $generator_dir." );
 	} else {
-		report( "Fetching $stubs_repo@$stubs_commit" );
+		report( "Fetching the generator, $stubs_repo@$stubs_commit, and installing its pinned packages." );
 		$setup_dir = create_directory( $cache_dir, '.setup-' );
 		register_shutdown_function(
 			static function () use ( $setup_dir ): void {
@@ -517,9 +525,12 @@ function main( array $args ): void {
 		throw new RuntimeException( 'Generating the stubs for a version of WordPress with Requests 1.x is not supported.' );
 	}
 
-	report( 'Generating the WordPress stubs' );
+	// The generator's own report, a title, the temporary file it wrote, and a table of counts, is left
+	// out, apart from any duplicate declarations it lists.
+	report( 'Running the generator.' );
 	$generated_file = $work_dir . '/wordpress-stubs.php';
-	run(
+
+	list( $status, $output ) = execute(
 		array(
 			PHP_BINARY,
 			$generator_dir . '/vendor/bin/generate-stubs',
@@ -533,8 +544,17 @@ function main( array $args ): void {
 			'--traits',
 			"--out=$generated_file",
 		),
+		'capture',
 		$work_dir
 	);
+	if ( 0 !== $status ) {
+		report( trim( $output ) );
+		throw new RuntimeException( "The generator exited with status $status." );
+	}
+	$duplicates = strpos( $output, 'Duplicate declarations found' );
+	if ( false !== $duplicates ) {
+		report( trim( substr( $output, $duplicates ) ) );
+	}
 	$stubs = (string) file_get_contents( $generated_file );
 
 	// Shim the global $wpdb declaration, since it is actually set up inside a function call.
