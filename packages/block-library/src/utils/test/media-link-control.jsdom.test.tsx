@@ -38,7 +38,7 @@ vi.mock( import( '../link-picker' ), async ( importOriginal ) => ( {
 		title: url || 'Add link',
 		url: url ?? '',
 		image: null,
-		badges: [],
+		badges: url ? [ { label: 'Page' } ] : [],
 	} ),
 } ) );
 
@@ -105,6 +105,36 @@ describe( 'MediaLinkControl', () => {
 			expect( getLinkTo() ).toHaveTextContent( expected );
 		}
 	);
+
+	test.each( [
+		[ 'media', MEDIA_URL ],
+		[ 'attachment', MEDIA_LINK ],
+	] )( 'does not badge a %s link as a page', ( linkDestination, href ) => {
+		render(
+			<MediaLinkControl
+				linkDestination={ linkDestination }
+				href={ href }
+				mediaUrl={ MEDIA_URL }
+				mediaLink={ MEDIA_LINK }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect( getLinkTo() ).not.toHaveTextContent( 'Page' );
+	} );
+
+	test( 'badges a custom link', () => {
+		render(
+			<MediaLinkControl
+				linkDestination="custom"
+				href="https://wordpress.org"
+				mediaUrl={ MEDIA_URL }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect( getLinkTo() ).toHaveTextContent( 'Page' );
+	} );
 
 	test.each( [
 		[ MEDIA_URL, 'Media file' ],
