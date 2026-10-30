@@ -10,15 +10,31 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
-	// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
-	overflow: hidden;
-	// Use clip instead of overflow: hidden so that sticky position works on child elements.
-	overflow: clip;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
 	/*rtl:raw: direction: ltr; */
+
+	// The background layers round their own corners, so the cover doesn't clip
+	// its content and elements such as Navigation submenus can extend past it.
+	// With a border as well, the layers' inherited radius is larger than the
+	// inner edge of the border and leaves a gap at the corners, so clip instead.
+	&.has-border.has-border-radius {
+		// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
+		overflow: hidden;
+		// Use clip instead of overflow: hidden so that sticky position works on child elements.
+		overflow: clip;
+
+		// Keep the layers square so the clip rounds them to the inner edge of the border.
+		&.has-background-dim::before,
+		.wp-block-cover__background,
+		.wp-block-cover__gradient-background,
+		.wp-block-cover__image-background,
+		.wp-block-cover__video-background,
+		.wp-block-cover__embed-background {
+			border-radius: 0;
+		}
+	}
 
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
@@ -58,6 +74,7 @@
 		bottom: 0;
 		right: 0;
 		opacity: 0.5;
+		border-radius: inherit;
 	}
 
 	// The following styles are needed to support legacy blocks added prior to the update
@@ -179,6 +196,7 @@
 		object-fit: cover;
 		outline: none;
 		border: none;
+		border-radius: inherit;
 		box-shadow: none;
 	}
 
@@ -206,8 +224,12 @@
 		max-height: none;
 		outline: none;
 		border: none;
+		border-radius: inherit;
 		box-shadow: none;
 		pointer-events: none; // Prevent interaction with the iframe
+		// The iframe below is oversized to cover the block, so clip it here
+		// now that the cover itself doesn't clip.
+		overflow: hidden;
 
 		.wp-block-embed__wrapper {
 			position: absolute;
