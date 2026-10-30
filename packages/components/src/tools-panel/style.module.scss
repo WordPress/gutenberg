@@ -100,7 +100,7 @@
 	color: $gray-900;
 
 	// Match the foreground of the highlighted item's brand fill.
-	&:is(:focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) .reset-label {
+	&:focus .reset-label {
 		color: inherit;
 	}
 }
