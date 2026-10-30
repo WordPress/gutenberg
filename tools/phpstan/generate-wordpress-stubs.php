@@ -163,16 +163,21 @@ function has_color(): bool {
  * @return bool Whether to use characters beyond ASCII.
  */
 function has_unicode(): bool {
-	if ( '\\' === DIRECTORY_SEPARATOR ) {
-		return false;
-	}
-	foreach ( array( 'LC_ALL', 'LC_CTYPE', 'LANG' ) as $name ) {
-		$locale = (string) getenv( $name );
-		if ( '' !== $locale ) {
-			return 1 === preg_match( '/utf-?8/i', $locale );
+	/** @var bool|null $has_unicode */
+	static $has_unicode = null;
+	if ( null === $has_unicode ) {
+		$has_unicode = false;
+		if ( '\\' !== DIRECTORY_SEPARATOR ) {
+			foreach ( array( 'LC_ALL', 'LC_CTYPE', 'LANG' ) as $name ) {
+				$locale = (string) getenv( $name );
+				if ( '' !== $locale ) {
+					$has_unicode = 1 === preg_match( '/utf-?8/i', $locale );
+					break;
+				}
+			}
 		}
 	}
-	return false;
+	return $has_unicode;
 }
 
 /**
