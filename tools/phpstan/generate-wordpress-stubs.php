@@ -60,7 +60,8 @@ function report( string $message ): void {
 /**
  * Prints the usage from this file's docblock, and exits.
  *
- * @param int $status The exit status.
+ * @param int<0, 1> $status The exit status.
+ * @return never
  */
 function usage( int $status = 1 ): void {
 	$contents = (string) file_get_contents( __FILE__ );
@@ -73,9 +74,9 @@ function usage( int $status = 1 ): void {
 /**
  * Reads an environment variable, which can override a setting.
  *
- * @param string $name          The name of the variable.
- * @param string $default_value The value when the variable is not set or is empty.
- * @return string The value.
+ * @param non-empty-string $name          The name of the variable.
+ * @param non-empty-string $default_value The value when the variable is not set or is empty.
+ * @return non-empty-string The value.
  */
 function setting( string $name, string $default_value ): string {
 	$value = getenv( $name );
@@ -85,12 +86,13 @@ function setting( string $name, string $default_value ): string {
 /**
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
- * @param list<string>          $command The program and its arguments.
- * @param string                $mode    'pass' to pass its output to standard error, 'capture' to
- *                                       return its standard output, or 'quiet' to also discard its
- *                                       standard error.
- * @param string|null           $cwd     The working directory.
- * @param array<string, string> $env     Environment variables to set in addition to the current ones.
+ * @param non-empty-list<string>          $command The program and its arguments.
+ * @param 'pass'|'capture'|'quiet'       $mode    'pass' to pass its output to standard error,
+ *                                                'capture' to return its standard output, or 'quiet'
+ *                                                to also discard its standard error.
+ * @param non-empty-string|null          $cwd     The working directory.
+ * @param array<non-empty-string, string> $env     Environment variables to set in addition to the
+ *                                                current ones.
  * @return array{int, string} The exit status, and the standard output when captured.
  */
 function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array() ): array {
@@ -119,9 +121,10 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 /**
  * Runs a command, passing its output to standard error, and throws when it fails.
  *
- * @param list<string>          $command The program and its arguments.
- * @param string|null           $cwd     The working directory.
- * @param array<string, string> $env     Environment variables to set in addition to the current ones.
+ * @param non-empty-list<string>           $command The program and its arguments.
+ * @param non-empty-string|null           $cwd     The working directory.
+ * @param array<non-empty-string, string> $env     Environment variables to set in addition to the
+ *                                                 current ones.
  */
 function run( array $command, ?string $cwd = null, array $env = array() ): void {
 	list( $status ) = execute( $command, 'pass', $cwd, $env );
@@ -133,8 +136,8 @@ function run( array $command, ?string $cwd = null, array $env = array() ): void 
 /**
  * Runs a command, and returns its standard output without surrounding whitespace.
  *
- * @param list<string> $command The program and its arguments.
- * @param bool         $check   Whether to throw when the command fails, rather than return its output.
+ * @param non-empty-list<string> $command The program and its arguments.
+ * @param bool                   $check   Whether to throw when the command fails, rather than return its output.
  * @return string The output.
  */
 function capture( array $command, bool $check = true ): string {
@@ -148,7 +151,7 @@ function capture( array $command, bool $check = true ): string {
 /**
  * Runs a command quietly, and returns whether it succeeded.
  *
- * @param list<string> $command The program and its arguments.
+ * @param non-empty-list<string> $command The program and its arguments.
  * @return bool Whether it exited with status 0.
  */
 function succeeds( array $command ): bool {
@@ -159,7 +162,7 @@ function succeeds( array $command ): bool {
 /**
  * Returns the command that runs Composer: the one running this script, when Composer runs it.
  *
- * @return list<string> The program and its leading arguments.
+ * @return non-empty-list<string> The program and its leading arguments.
  */
 function composer(): array {
 	$binary = getenv( 'COMPOSER_BINARY' );
@@ -169,9 +172,9 @@ function composer(): array {
 /**
  * Creates a new, empty directory in the given one.
  *
- * @param string $parent_dir The directory to create it in.
- * @param string $prefix     The prefix of its name.
- * @return string The path of the new directory.
+ * @param string           $parent_dir The directory to create it in.
+ * @param non-empty-string $prefix     The prefix of its name.
+ * @return non-empty-string The path of the new directory.
  * @throws RuntimeException When the directory cannot be created.
  */
 function create_directory( string $parent_dir, string $prefix ): string {
@@ -185,7 +188,7 @@ function create_directory( string $parent_dir, string $prefix ): string {
 /**
  * Removes a file, or a directory with everything in it, including the read-only files that Git writes.
  *
- * @param string $path The file or directory, which need not exist.
+ * @param non-empty-string $path The file or directory, which need not exist.
  */
 function remove_path( string $path ): void {
 	if ( is_dir( $path ) && ! is_link( $path ) ) {
@@ -207,8 +210,8 @@ function remove_path( string $path ): void {
 /**
  * Returns the directory of the wordpress-develop checkout that contains the given directory, if any.
  *
- * @param string $dir The directory.
- * @return string|null The checkout's directory.
+ * @param non-empty-string $dir The directory.
+ * @return non-empty-string|null The checkout's directory.
  */
 function find_checkout( string $dir ): ?string {
 	while ( dirname( $dir ) !== $dir ) {
@@ -223,8 +226,9 @@ function find_checkout( string $dir ): ?string {
 /**
  * Reads the source that the package's composer.json records.
  *
- * @param string $file The package's composer.json.
- * @return array{commit: string, pull_request: string, uncommitted_changes: bool} The recorded source.
+ * @param non-empty-string $file The package's composer.json.
+ * @return array{commit: string, pull_request: ''|numeric-string, uncommitted_changes: bool} The
+ *         recorded source.
  */
 function read_recorded( string $file ): array {
 	$json   = json_decode( (string) file_get_contents( $file ), true );
@@ -232,7 +236,7 @@ function read_recorded( string $file ): array {
 	$source = isset( $extra['source'] ) && is_array( $extra['source'] ) ? $extra['source'] : array();
 	return array(
 		'commit'              => isset( $source['commit'] ) && is_string( $source['commit'] ) ? $source['commit'] : '',
-		'pull_request'        => isset( $source['pull-request'] ) && is_int( $source['pull-request'] ) ? (string) $source['pull-request'] : '',
+		'pull_request'        => isset( $source['pull-request'] ) && is_int( $source['pull-request'] ) && $source['pull-request'] > 0 ? (string) $source['pull-request'] : '',
 		'uncommitted_changes' => ! empty( $source['uncommitted-changes'] ),
 	);
 }
@@ -240,10 +244,10 @@ function read_recorded( string $file ): array {
 /**
  * Fetches a single commit of a GitHub repository into a directory, limited to the given paths.
  *
- * @param string       $dir      The directory, which is created or must be empty.
- * @param string       $repo     The repository, such as WordPress/wordpress-develop.
- * @param string       $commit   The commit or ref to fetch.
- * @param list<string> $patterns The sparse checkout patterns.
+ * @param non-empty-string                 $dir      The directory, which is created or must be empty.
+ * @param non-empty-string                 $repo     The repository, such as WordPress/wordpress-develop.
+ * @param non-empty-string                 $commit   The commit or ref to fetch.
+ * @param non-empty-list<non-empty-string> $patterns The sparse checkout patterns.
  */
 function fetch_commit( string $dir, string $repo, string $commit, array $patterns ): void {
 	run( array( 'git', 'init', '--quiet', $dir ) );
@@ -254,17 +258,33 @@ function fetch_commit( string $dir, string $repo, string $commit, array $pattern
 }
 
 /**
+ * Returns the full hash of a commit.
+ *
+ * @param non-empty-string $dir The repository.
+ * @param non-empty-string $ref The commit, branch, or other ref.
+ * @return non-empty-string The hash.
+ * @throws RuntimeException When the ref is not a commit in the repository.
+ */
+function resolve_commit( string $dir, string $ref ): string {
+	$hash = capture( array( 'git', '-C', $dir, 'rev-parse', '--verify', '--quiet', "$ref^{commit}" ) );
+	if ( '' === $hash ) {
+		throw new RuntimeException( "$ref is not a commit in $dir." );
+	}
+	return $hash;
+}
+
+/**
  * Returns the SVN revision of the most recent trunk commit in the history of a commit, that is, the
  * revision of the commit itself when it is on trunk. A shallow clone is deepened until one is found.
  *
- * @param string $dir    The repository.
- * @param string $commit The commit.
- * @return int|null The revision.
+ * @param non-empty-string $dir    The repository.
+ * @param non-empty-string $commit The commit.
+ * @return positive-int|null The revision.
  */
 function find_revision( string $dir, string $commit ): ?int {
 	for ( $i = 0; $i < 20; $i++ ) {
 		$message = capture( array( 'git', '-C', $dir, 'log', '-1', '--format=%B', '--grep=^git-svn-id: ', $commit ) );
-		if ( preg_match( '/^git-svn-id: [^@]*@(\d+) /m', $message, $matches ) ) {
+		if ( preg_match( '/^git-svn-id: [^@]*@(\d+) /m', $message, $matches ) && (int) $matches[1] > 0 ) {
 			return (int) $matches[1];
 		}
 		if ( 'true' !== capture( array( 'git', '-C', $dir, 'rev-parse', '--is-shallow-repository' ) ) ) {
@@ -278,8 +298,8 @@ function find_revision( string $dir, string $commit ): ?int {
 /**
  * Returns whether a commit is itself on trunk, rather than based on it.
  *
- * @param string $dir    The repository.
- * @param string $commit The commit.
+ * @param non-empty-string $dir    The repository.
+ * @param non-empty-string $commit The commit.
  * @return bool Whether the commit has a revision.
  */
 function is_trunk_commit( string $dir, string $commit ): bool {
@@ -289,7 +309,7 @@ function is_trunk_commit( string $dir, string $commit ): bool {
 /**
  * Reads the key that the existing stubs were generated with, if any.
  *
- * @param string $file The stubs.
+ * @param non-empty-string $file The stubs.
  * @return string The key, or an empty string.
  */
 function read_stub_key( string $file ): string {
@@ -297,13 +317,13 @@ function read_stub_key( string $file ): string {
 		return '';
 	}
 	$head = (string) file_get_contents( $file, false, null, 0, 2048 );
-	return preg_match( '/^ \* Generation key: ([0-9a-f]+)$/m', $head, $matches ) ? $matches[1] : '';
+	return preg_match( '/^ \* Generation key: ([0-9a-f]{40})$/m', $head, $matches ) ? $matches[1] : '';
 }
 
 /**
  * Generates the stubs.
  *
- * @param string[] $args The command line arguments.
+ * @param list<string> $args The command line arguments.
  */
 function main( array $args ): void {
 	// Each of the following can be overridden with an environment variable of the same name, such as
@@ -336,6 +356,11 @@ function main( array $args ): void {
 	// Returns a key for everything that the stubs are generated from, including this script, so that
 	// they are generated again when any of it changes. The stubs record the key they were generated
 	// with.
+	/**
+	 * @param non-empty-string  $commit The commit.
+	 * @param ''|numeric-string $pr     The pull request number, if any.
+	 * @return non-empty-string The key.
+	 */
 	$generation_key = static function ( string $commit, string $pr ) use ( $develop_repo, $stubs_repo, $stubs_commit, $packages ): string {
 		return sha1( implode( "\n", array( $develop_repo, $commit, $pr, $stubs_repo, $stubs_commit, $packages, (string) file_get_contents( __FILE__ ) ) ) );
 	};
@@ -417,9 +442,12 @@ function main( array $args ): void {
 		if ( null === $local_checkout || ! succeeds( array( 'git', '-C', $local_checkout, 'rev-parse', '--git-dir' ) ) ) {
 			throw new RuntimeException( 'No wordpress-develop checkout found' . ( '' !== $checkout ? " at $checkout" : '' ) . '.' );
 		}
-		$local_checkout = (string) realpath( $local_checkout );
-		$head_commit    = capture( array( 'git', '-C', $local_checkout, 'rev-parse', 'HEAD' ) );
-		$branch         = capture( array( 'git', '-C', $local_checkout, 'symbolic-ref', '--short', '-q', 'HEAD' ), false );
+		$local_checkout = realpath( $local_checkout );
+		if ( false === $local_checkout ) {
+			throw new RuntimeException( 'Unable to resolve the path of the wordpress-develop checkout.' );
+		}
+		$head_commit = resolve_commit( $local_checkout, 'HEAD' );
+		$branch      = capture( array( 'git', '-C', $local_checkout, 'symbolic-ref', '--short', '-q', 'HEAD' ), false );
 		// Capture the working tree as a commit without changing the checkout. It is empty when there
 		// are no changes to tracked files.
 		$commit = capture( array( 'git', '-C', $local_checkout, 'stash', 'create' ) );
@@ -431,6 +459,9 @@ function main( array $args ): void {
 	} elseif ( '' !== $pr && '' === $commit ) {
 		$commit = "refs/pull/$pr/head";
 	}
+	if ( '' === $commit ) {
+		throw new RuntimeException( 'No wordpress-develop commit to generate the stubs from.' );
+	}
 
 	if ( null !== $local_checkout && preg_match( '/^[0-9a-f]{40}$/', $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
 		report( "Reading $develop_repo@$commit from $local_checkout" );
@@ -438,18 +469,17 @@ function main( array $args ): void {
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
 		run( array( 'git', '-C', $local_checkout, 'read-tree', "$commit:src" ), null, $env );
 		run( array( 'git', '-C', $local_checkout, '-c', 'core.autocrlf=false', 'checkout-index', '--all', "--prefix=$source_dir/" ), null, $env );
-		$revision = find_revision( $local_checkout, $commit );
-		$is_trunk = is_trunk_commit( $local_checkout, $commit );
+		$repo_dir = $local_checkout;
 	} else {
 		report( "Fetching $develop_repo@$commit" );
-		$clone_dir = $work_dir . '/wordpress-develop';
-		fetch_commit( $clone_dir, $develop_repo, $commit, array( '/src/' ) );
-		$commit   = capture( array( 'git', '-C', $clone_dir, 'rev-parse', 'HEAD' ) );
-		$revision = find_revision( $clone_dir, $commit );
-		$is_trunk = is_trunk_commit( $clone_dir, $commit );
+		$repo_dir = $work_dir . '/wordpress-develop';
+		fetch_commit( $repo_dir, $develop_repo, $commit, array( '/src/' ) );
+		$commit = resolve_commit( $repo_dir, 'HEAD' );
 		mkdir( dirname( $source_dir ) );
-		rename( $clone_dir . '/src', $source_dir );
+		rename( $repo_dir . '/src', $source_dir );
 	}
+	$revision = find_revision( $repo_dir, $commit );
+	$is_trunk = is_trunk_commit( $repo_dir, $commit );
 
 	// Set up the generator unless it is cached. Its Composer scripts would install the latest
 	// WordPress release as the source to generate from, so they are skipped. It is set up in a
