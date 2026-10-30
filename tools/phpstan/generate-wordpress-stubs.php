@@ -106,13 +106,16 @@ function clear_pending_row(): void {
 /**
  * Returns whether standard error is a terminal that handles escape sequences.
  *
+ * A terminal that declares itself dumb with the TERM environment variable, as some editors' shells
+ * do, does not.
+ *
  * @return bool Whether it is such a terminal.
  */
 function is_terminal(): bool {
 	/** @var bool|null $is_terminal */
 	static $is_terminal = null;
 	if ( null === $is_terminal ) {
-		$is_terminal = stream_isatty( STDERR );
+		$is_terminal = 'dumb' !== getenv( 'TERM' ) && stream_isatty( STDERR );
 		if ( $is_terminal && '\\' === DIRECTORY_SEPARATOR ) {
 			$is_terminal = function_exists( 'sapi_windows_vt100_support' ) && sapi_windows_vt100_support( STDERR, true );
 		}
@@ -123,8 +126,8 @@ function is_terminal(): bool {
 /**
  * Returns whether standard error supports colors.
  *
- * Colors are used on a terminal, unless the NO_COLOR environment variable is set. FORCE_COLOR turns
- * them on anywhere, or off when it is 0 or false, as in Node.js tools.
+ * Colors are used on a terminal, unless the NO_COLOR environment variable is set. Otherwise,
+ * FORCE_COLOR turns them on anywhere, or off when it is 0 or false.
  *
  * @return bool Whether to use colors.
  */
