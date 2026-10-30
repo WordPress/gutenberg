@@ -137,8 +137,8 @@ function enable_vt100(): bool {
  * Returns whether standard error supports colors.
  *
  * Colors are used on a terminal, unless the NO_COLOR environment variable is set. Otherwise,
- * FORCE_COLOR turns them on anywhere, even when it is set to an empty value, or off when it is 0 or
- * false.
+ * FORCE_COLOR turns them on anywhere, or off when it is 0 or false. As at no-color.org and
+ * force-color.org, either counts as set only when it is not empty.
  *
  * @return bool Whether to use colors.
  */
@@ -149,8 +149,8 @@ function has_color(): bool {
 		if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
 			$has_color = false;
 		} else {
-			$force_color = getenv( 'FORCE_COLOR' );
-			if ( false !== $force_color ) {
+			$force_color = (string) getenv( 'FORCE_COLOR' );
+			if ( '' !== $force_color ) {
 				$has_color = ! in_array( strtolower( $force_color ), array( '0', 'false' ), true );
 				if ( $has_color ) {
 					enable_vt100();
