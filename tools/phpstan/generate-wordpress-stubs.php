@@ -533,7 +533,7 @@ function main( array $args ): void {
 		throw new RuntimeException( 'No wordpress-develop commit to generate the stubs from.' );
 	}
 	if ( $uncommitted ) {
-		$source_label = "$develop_repo@" . short_commit( $head_commit ) . ' with uncommitted changes';
+		$source_label = ( '' !== $pr ? "$develop_repo#$pr at " : "$develop_repo@" ) . short_commit( $head_commit ) . ' with uncommitted changes';
 	} elseif ( '' !== $pr ) {
 		$source_label = "$develop_repo#$pr" . ( "refs/pull/$pr/head" !== $commit ? ' at ' . short_commit( $commit ) : '' );
 	} else {
