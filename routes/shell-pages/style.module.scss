@@ -1,0 +1,5 @@
+// The list sits on the same surface as the rest of the screen, rather than
+// the stronger one DataViews uses by default.
+.page {
+	--wp-dataviews-color-background: var(--wpds-color-background-surface-neutral);
+}

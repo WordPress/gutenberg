@@ -15,6 +15,7 @@ import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 } from '@wordpress/ui';
+import styles from './style.module.scss';
 
 const STATUSES = [
 	{ value: 'publish', label: __( 'Published' ) },
@@ -94,7 +95,11 @@ function PagesStage() {
 		useEntityRecords< Post >( 'postType', 'page', query );
 
 	return (
-		<Page ariaLabel={ __( 'Pages' ) } hasPadding={ false }>
+		<Page
+			ariaLabel={ __( 'Pages' ) }
+			hasPadding={ false }
+			className={ styles.page }
+		>
 			<ShellPageActions>
 				<Button
 					variant="outline"
