@@ -44,7 +44,7 @@ namespace Gutenberg\PHPStan\WordPressStubs;
 use RuntimeException;
 
 /**
- * The header that the generator's generate.sh passes, which is replaced afterwards.
+ * The header that the generator's generate.sh passes, which is replaced afterward.
  */
 const GENERATOR_HEADER = "/**\n * Generated stub declarations for WordPress.\n * @see https://wordpress.org\n * @see https://github.com/php-stubs/wordpress-stubs\n */";
 
@@ -400,9 +400,13 @@ function main( array $args ): void {
 	}
 
 	$work_dir = create_directory( sys_get_temp_dir(), 'wordpress-stubs.' );
-	register_shutdown_function( __NAMESPACE__ . '\remove_path', $work_dir );
+	register_shutdown_function(
+		static function () use ( $work_dir ): void {
+			remove_path( $work_dir );
+		}
+	);
 
-	// The generator reads the WordPress source from source/wordpress in its working directory.
+	// The generator reads the WordPress source from `source/wordpress` in its working directory.
 	$source_dir = $work_dir . '/source/wordpress';
 
 	$local_checkout = '' !== $checkout ? $checkout : find_checkout( $gutenberg_dir );
@@ -448,15 +452,19 @@ function main( array $args ): void {
 	}
 
 	// Set up the generator unless it is cached. Its Composer scripts would install the latest
-	// WordPress release in source/wordpress, so they are skipped. It is set up in a directory of its
-	// own and moved into place once done, so that an interrupted run leaves nothing to be used.
+	// WordPress release in `source/wordpress`, so they are skipped. It is set up in a directory of
+	// its own and moved into place once done, so that an interrupted run leaves nothing to be used.
 	$generator_dir = $cache_dir . '/' . str_replace( '/', '-', $stubs_repo ) . "-$stubs_commit-" . substr( sha1( $packages ), 0, 12 );
 	if ( is_dir( $generator_dir ) ) {
 		report( "Using $stubs_repo@$stubs_commit from $generator_dir" );
 	} else {
 		report( "Fetching $stubs_repo@$stubs_commit" );
 		$setup_dir = create_directory( $cache_dir, '.setup-' );
-		register_shutdown_function( __NAMESPACE__ . '\remove_path', $setup_dir );
+		register_shutdown_function(
+			static function () use ( $setup_dir ): void {
+				remove_path( $setup_dir );
+			}
+		);
 		fetch_commit( $setup_dir, $stubs_repo, $stubs_commit, array( '/*' ) );
 		$package_list = preg_split( '/\s+/', $packages, -1, PREG_SPLIT_NO_EMPTY );
 		run( array_merge( composer(), array( "--working-dir=$setup_dir", 'require', '--dev', '--no-update', '--no-interaction' ), false !== $package_list ? $package_list : array() ) );
