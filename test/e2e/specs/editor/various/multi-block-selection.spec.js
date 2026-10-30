@@ -537,27 +537,6 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: '1' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/group',
-			innerBlocks: [
-				{
-					name: 'core/paragraph',
-					attributes: { content: '2' },
-				},
-			],
-		} );
-		// To hide the block tool bar.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-
-		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.all();
-
 		// DEBUG (temporary): log mouse, focus and selection events.
 		await editor.canvas.locator( ':root' ).evaluate( () => {
 			window.dbg = [];
@@ -584,6 +563,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 					.join( ',' ) }`;
 			};
 			for ( const type of [
+				'keydown',
 				'mousedown',
 				'mouseout',
 				'mouseover',
@@ -614,6 +594,27 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				attributeFilter: [ 'contenteditable' ],
 			} );
 		} );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '1' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '2' },
+				},
+			],
+		} );
+		// To hide the block tool bar.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		const [ paragraph1, paragraph2 ] = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.all();
 
 		await paragraph1.hover();
 		await page.mouse.down();
