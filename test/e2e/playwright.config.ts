@@ -95,7 +95,7 @@ const config = defineConfig( {
 				 * ```
 				 * See `.github/workflows/end2end-test-playwright.yml` for advanced usages.
 				 */
-				headless: os.type() !== 'Linux',
+				headless: true,
 			},
 			grep: /@webkit/,
 			grepInvert: /-webkit/,
