@@ -102,7 +102,7 @@ export function MediaLinkControl( {
 		( suggestion ) => suggestion.id === currentDestination
 	);
 	const preview = currentSuggestion
-		? { ...linkPreview, title: currentSuggestion.title }
+		? { ...linkPreview, title: currentSuggestion.title, badges: [] }
 		: linkPreview;
 
 	const canChooseCustom = destinations.includes( LINK_DESTINATION_CUSTOM );
