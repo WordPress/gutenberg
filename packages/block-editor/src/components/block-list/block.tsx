@@ -16,9 +16,9 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { compose, useRefEffect } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
-import type { ComponentType, ReactNode, RefCallback } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import type { Block as BlockObject } from '@wordpress/blocks';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
@@ -33,9 +33,9 @@ import {
 	getAttributeChanges,
 	applyAttributeChanges,
 } from '../../utils/multi-selection-attributes';
-import { useBlockVisibility } from '../block-visibility/';
+import { isBlockHidden } from '../block-visibility/use-block-visibility';
+import { CurrentViewport } from './';
 import { unlock } from '../../lock-unlock';
-import { deviceTypeKey } from '../../store/private-keys';
 import type { InitialPosition, TreeBlock } from '../../store/types';
 import type {
 	BlockListBlockProps,
@@ -757,7 +757,8 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 			const {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
-			} = select( blocksStore );
+				getAllBlockBindingsSources,
+			} = unlock( select( blocksStore ) );
 			const attributes =
 				getBlockAttributes( clientId ) ?? ghostBlock?.attributes;
 			const { name: blockName, isValid } = blockWithoutAttributes;
@@ -771,9 +772,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 			const blockVisibility = attributes?.metadata?.blockVisibility;
-			const deviceType =
-				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
-			const viewportSettings = settings?.__experimentalFeatures?.viewport;
 
 			// A missing version compares false.
 			const hasLightBlockWrapper =
@@ -797,9 +795,8 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				bindableAttributes,
+				blockBindingsSources: getAllBlockBindingsSources(),
 				blockVisibility,
-				deviceType,
-				viewportSettings,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
@@ -896,8 +893,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					? blocksWithSameName[ 0 ]
 					: false,
 				blockVisibility,
-				deviceType,
-				viewportSettings,
 				supportsSplitting: hasBlockSupport(
 					blockName,
 					'splitting',
@@ -908,23 +903,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
 	);
 
-	// The ref also stores the window of the block element.
-	const defaultViewRef = useRefEffect( ( element: HTMLElement ) => {
-		if ( element ) {
-			const { ownerDocument } = element;
-			// A rendered element's document has a window.
-			const defaultView = ownerDocument.defaultView!;
-			defaultViewRef.current = defaultView;
-		}
-	}, [] ) as RefCallback< HTMLElement > & { current?: Window };
-
-	// Use block visibility hook with data from existing useSelect to avoid extra subscription
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
-		blockVisibility: selectedProps?.blockVisibility,
-		deviceType: selectedProps?.deviceType,
-		viewportSettings: selectedProps?.viewportSettings,
-		view: defaultViewRef.current,
-	} );
+	const currentViewport = useContext( CurrentViewport );
 
 	// Users of the editor.BlockListBlock filter used to be able to
 	// access the block prop.
@@ -985,11 +964,14 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		defaultClassName,
 		originalBlockClientId,
 		bindableAttributes,
-		blockVisibility,
-		deviceType,
-		viewportSettings,
+		blockBindingsSources,
 		supportsSplitting,
 	} = selectedProps;
+
+	const isBlockCurrentlyHidden = isBlockHidden(
+		selectedProps.blockVisibility,
+		currentViewport
+	);
 
 	const privateContext = {
 		isPreviewMode,
@@ -1028,9 +1010,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		canMove,
 		isBlockCurrentlyHidden,
 		bindableAttributes,
-		blockVisibility,
-		deviceType,
-		viewportSettings,
+		blockBindingsSources,
 		supportsSplitting,
 	};
 

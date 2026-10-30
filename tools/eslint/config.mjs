@@ -427,13 +427,19 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Card: 'WCCard',
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
+						IconButton: 'WCIconButton',
 						__experimentalInputControl: 'WCInputControl',
+						Menu: 'WCMenu',
+						Notice: 'WCNotice',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
+						Tabs: 'WCTabs',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
+						VisuallyHidden: 'WCVisuallyHidden',
 					},
 				},
 			],
@@ -914,6 +920,24 @@ export default dedupePlugins( [
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
 						'--wp-components-color-* variables are internal. Use semantic WPDS design tokens directly.',
+				},
+			],
+		},
+	},
+
+	// Override: Block library src — no effects. Existing ones are recorded in
+	// the suppressions file until they are replaced.
+	{
+		files: [ 'packages/block-library/src/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax,
+				{
+					selector:
+						'CallExpression[callee.name=/^use(Layout|Insertion)?Effect$/]',
+					message:
+						'Avoid effects in blocks. Compute the value during render, handle it in the event that causes it, read it with a store selector, or use `useRefEffect` to subscribe to a DOM node.',
 				},
 			],
 		},

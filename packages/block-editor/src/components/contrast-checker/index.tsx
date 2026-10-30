@@ -2,7 +2,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 import namesPlugin from 'colord/plugins/names';
 import { colord, extend } from 'colord';
 import { __, sprintf } from '@wordpress/i18n';
-import { Notice } from '@wordpress/components';
+import { Notice as WCNotice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import type { ContrastCheckerProps, ContrastWarning } from './types';
 
@@ -165,13 +165,13 @@ function ContrastChecker( props: ContrastCheckerProps ) {
 
 	return (
 		<div className="block-editor-contrast-checker">
-			<Notice
+			<WCNotice
 				spokenMessage={ null }
 				status="warning"
 				isDismissible={ false }
 			>
 				{ warning.message }
-			</Notice>
+			</WCNotice>
 		</div>
 	);
 }
