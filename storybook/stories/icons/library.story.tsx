@@ -350,7 +350,7 @@ const LibraryExample = ( {
 					{ /* A fixed width keeps the control from resizing as the help text changes. */ }
 					<div style={ { width: 540, maxWidth: '100%' } }>
 						<ToggleGroupControl
-							label="Collection"
+							label="Available in"
 							isBlock
 							help={ COLLECTION_HELP[ collection ] }
 							value={ collection }
