@@ -382,6 +382,54 @@ function gutenberg_register_excerpt_layout_7_2( $post_type ) {
 add_action( 'registered_post_type', 'gutenberg_register_excerpt_layout_7_2' );
 
 /**
+ * Shows the placeholder of the `author` field in its panel row when the post
+ * has no author, as the post summary did before it moved to the form.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_author_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'author',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `author` layout on top of the view configuration of every post
+ * type using the default form, the only form listing the `author` field at its
+ * top level. Post types providing their own form are skipped, since the patch
+ * would append the member there.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_author_layout_7_2( $post_type ) {
+	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_author_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_author_layout_7_2' );
+
+/**
  * Registers the entity view configuration filters that layer on top of the base
  * definitions, at a priority between those (5) and third-party callbacks (10),
  * and the base definitions for entities that gained one in 7.2, at the base
