@@ -346,6 +346,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await editor.canvas.locator( ':root' ).evaluate( () => {
 			let called;
+			// Errors thrown here only reach the console, so collect them.
+			window.errors = [];
 			const { body } = document;
 			const config = {
 				attributes: true,
@@ -356,12 +358,12 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 			const mutationObserver = new MutationObserver( ( records ) => {
 				if ( called || records.length > 1 ) {
-					throw new Error( 'Typing should only mutate once.' );
+					window.errors.push( 'Typing should only mutate once.' );
 				}
 
 				records.forEach( ( record ) => {
 					if ( record.type !== 'characterData' ) {
-						throw new Error(
+						window.errors.push(
 							`Typing mutated more than character data: ${ record.type }`
 						);
 					}
@@ -378,7 +380,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				'selectionchange',
 				() => {
 					function throwMultipleSelectionChange() {
-						throw new Error(
+						window.errors.push(
 							'Typing should only emit one selection change event.'
 						);
 					}
@@ -404,18 +406,28 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( '4' );
 
-		await editor.canvas.locator( ':root' ).evaluate( () => {
-			// The selection change event should be called once. If there's only
-			// one item in `window.unsubscribes`, it means that only one
-			// function is present to disconnect the `mutationObserver`.
-			if ( window.unsubscribes.length === 1 ) {
-				throw new Error(
-					'The selection change event listener was never called.'
-				);
-			}
+		// The selection change event fires asynchronously, after the key
+		// press. Its listener adds a second item to `window.unsubscribes`,
+		// next to the one that disconnects the `mutationObserver`.
+		await expect
+			.poll(
+				() =>
+					editor.canvas
+						.locator( ':root' )
+						.evaluate( () => window.unsubscribes.length ),
+				{
+					message:
+						'The selection change event listener was never called.',
+				}
+			)
+			.toBe( 2 );
 
+		const errors = await editor.canvas.locator( ':root' ).evaluate( () => {
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+			return window.errors;
 		} );
+
+		expect( errors ).toEqual( [] );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
