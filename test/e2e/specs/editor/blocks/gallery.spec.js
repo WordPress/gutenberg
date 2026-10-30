@@ -616,14 +616,21 @@ test.describe( 'Gallery', () => {
 		await expect(
 			content.getByRole( 'textbox', { name: 'Alternative text' } )
 		).toBeVisible();
-		const linkTo = content.getByRole( 'combobox', { name: 'Link to' } );
+		const linkTo = content.getByRole( 'button', { name: /Link to/ } );
 		await expect( linkTo ).toBeVisible();
 		const newTab = content.getByRole( 'checkbox', {
 			name: 'Open in new tab',
 		} );
 		await expect( newTab ).toBeVisible();
 
-		await linkTo.selectOption( { label: 'Media file' } );
+		// Before anything is typed, the link picker offers the media file and
+		// the attachment page first.
+		await linkTo.click();
+		await page
+			.getByRole( 'listbox' )
+			.getByRole( 'option', { name: /Media file/ } )
+			.click();
+		await expect( linkTo ).toContainText( 'Media file' );
 		await expect
 			.poll( async () => ( await editor.getBlocks() )[ 0 ].innerBlocks )
 			.toMatchObject( [
@@ -640,8 +647,7 @@ test.describe( 'Gallery', () => {
 				},
 			] );
 
-		await linkTo.selectOption( { label: 'Custom URL' } );
-		await content.getByRole( 'button', { name: /URL/ } ).click();
+		await linkTo.click();
 		const urlInput = page.getByRole( 'combobox', {
 			name: 'Search or type URL',
 		} );
@@ -672,6 +678,21 @@ test.describe( 'Gallery', () => {
 				// the same way.
 				rel: ' noopener',
 			} );
+
+		await content.getByRole( 'button', { name: 'Remove link' } ).click();
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes
+			)
+			.toMatchObject( { linkDestination: 'none' } );
+		expect(
+			( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ].attributes.href
+		).toBeUndefined();
+		await expect(
+			content.getByRole( 'button', { name: 'Remove link' } )
+		).toBeHidden();
 	} );
 } );
 
