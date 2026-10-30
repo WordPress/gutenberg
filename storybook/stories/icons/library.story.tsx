@@ -48,8 +48,14 @@ const ALL_ICONS_MANIFEST = new Map(
 
 const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
 
+const COLLECTION_HELP = {
+	all: 'All icons, available from the @wordpress/icons package.',
+	core: 'Icons also available via the Icons REST API.',
+	'core-admin': 'Icons also available via the server-side Icons API.',
+};
+
 const COLLECTION_LABELS = {
-	all: 'All (npm)',
+	all: 'npm',
 	core: 'core collection',
 	'core-admin': 'core-admin collection',
 };
@@ -341,23 +347,28 @@ const LibraryExample = ( {
 							/>
 						) ) }
 					</ToggleGroupControl>
-					<ToggleGroupControl
-						label="Collection"
-						isBlock
-						help="core: available via the Icons REST API. core-admin: available via the server-side Icons API."
-						value={ collection }
-						onChange={ ( value: string | number | undefined ) =>
-							setCollection( ( value ?? 'all' ) as Collection )
-						}
-					>
-						{ COLLECTIONS.map( ( option ) => (
-							<ToggleGroupControlOption
-								key={ option }
-								value={ option }
-								label={ COLLECTION_LABELS[ option ] }
-							/>
-						) ) }
-					</ToggleGroupControl>
+					{ /* A fixed width keeps the control from resizing as the help text changes. */ }
+					<div style={ { width: 540, maxWidth: '100%' } }>
+						<ToggleGroupControl
+							label="Collection"
+							isBlock
+							help={ COLLECTION_HELP[ collection ] }
+							value={ collection }
+							onChange={ ( value: string | number | undefined ) =>
+								setCollection(
+									( value ?? 'all' ) as Collection
+								)
+							}
+						>
+							{ COLLECTIONS.map( ( option ) => (
+								<ToggleGroupControlOption
+									key={ option }
+									value={ option }
+									label={ COLLECTION_LABELS[ option ] }
+								/>
+							) ) }
+						</ToggleGroupControl>
+					</div>
 				</HStack>
 				{ hasResults ? (
 					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
