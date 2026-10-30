@@ -2,6 +2,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import DateEdit from '../post_type_supports/date/edit';
 
+// The date picker measures its layout.
+globalThis.wpVitest.mockResizeObserver();
+
 const field = {
 	id: 'date',
 	label: 'Date',
@@ -12,7 +15,7 @@ const field = {
 } as any;
 
 describe( 'DateEdit', () => {
-	it( 'resets the date of a post to `null`', () => {
+	it( 'resets the date of a post to `null`', async () => {
 		const onChange = vi.fn();
 		render(
 			<DateEdit
@@ -25,11 +28,13 @@ describe( 'DateEdit', () => {
 				onChange={ onChange }
 			/>
 		);
-		fireEvent.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+		fireEvent.click(
+			await screen.findByRole( 'button', { name: 'Reset' } )
+		);
 		expect( onChange ).toHaveBeenCalledWith( { date: null } );
 	} );
 
-	it( 'disables the reset of a draft that publishes immediately', () => {
+	it( 'disables the reset of a draft that publishes immediately', async () => {
 		render(
 			<DateEdit
 				data={ {
@@ -42,7 +47,7 @@ describe( 'DateEdit', () => {
 			/>
 		);
 		expect(
-			screen.getByRole( 'button', { name: 'Reset' } )
+			await screen.findByRole( 'button', { name: 'Reset' } )
 		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 } );
