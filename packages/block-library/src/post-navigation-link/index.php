@@ -215,19 +215,15 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		}
 	}
 
-	$background_and_border_output  = wp_style_engine_get_styles(
+	$styles = wp_style_engine_get_styles(
 		array(
 			'background' => $background_styles,
 			'border'     => $border_styles,
-		)
-	);
-	$shadow_output                 = wp_get_shadow_classes_and_styles( $attributes );
-	$dimensions_and_spacing_output = wp_style_engine_get_styles(
-		array(
 			'dimensions' => array(
 				'minHeight' => $block_styles['dimensions']['minHeight'] ?? null,
 				'minWidth'  => $block_styles['dimensions']['minWidth'] ?? null,
 			),
+			'shadow'     => $block_styles['shadow'] ?? null,
 			'spacing'    => array(
 				'margin'  => $block_styles['spacing']['margin'] ?? null,
 				'padding' => $block_styles['spacing']['padding'] ?? null,
@@ -235,16 +231,7 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		)
 	);
 
-	$class_names = implode(
-		' ',
-		array_filter(
-			array(
-				$background_and_border_output['classnames'] ?? '',
-				$shadow_output['class'] ?? '',
-				$dimensions_and_spacing_output['classnames'] ?? '',
-			)
-		)
-	);
+	$class_names = $styles['classnames'] ?? '';
 
 	// The style engine only adds `has-background` for a gradient, the background block support adds it for an image too.
 	if ( ! empty( $background_styles['backgroundImage'] ) && ! in_array( 'has-background', explode( ' ', $class_names ), true ) ) {
@@ -253,7 +240,7 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 
 	return array(
 		'class' => $class_names,
-		'style' => ( $background_and_border_output['css'] ?? '' ) . ( $shadow_output['style'] ?? '' ) . ( $dimensions_and_spacing_output['css'] ?? '' ),
+		'style' => $styles['css'] ?? '',
 	);
 }
 
