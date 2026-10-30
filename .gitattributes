@@ -26,6 +26,3 @@ tsconfig*.json linguist-language=jsonc
 
 # PHPStan stub files are PHP.
 *.stub linguist-language=PHP diff=php
-
-# The lock file for the dependencies of the WordPress stubs generator.
-tools/phpstan/wordpress-stubs-generator.lock linguist-language=JSON linguist-generated
