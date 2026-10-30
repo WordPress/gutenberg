@@ -18,6 +18,7 @@
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
 -   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
+-   Post summary: Label the date of draft, pending and private posts as their publish date instead of "Modified:" ([#86035](https://github.com/WordPress/gutenberg/pull/86035)).
 
 ## 16.0.0 (2026-10-20)
 
