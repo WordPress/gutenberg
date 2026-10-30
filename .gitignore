@@ -3,6 +3,7 @@ build
 build-module
 build-style
 build-types
+build-php
 build-wp
 node_modules
 .wasm-vips-build

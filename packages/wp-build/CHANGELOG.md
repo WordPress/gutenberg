@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+-   Export `compileStyleFile()` and `compileCss()` from `@wordpress/build/compile-style`, so a package can emit its styles in another form with the same scoped class names as the JavaScript build ([#85756](https://github.com/WordPress/gutenberg/pull/85756)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
 ### Internal

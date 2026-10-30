@@ -1,0 +1,56 @@
+{
+	"name": "button",
+	"content": { "required": true },
+	"props": {
+		"tone": {
+			"type": "string",
+			"enum": [ "brand", "neutral" ],
+			"default": "brand"
+		},
+		"variant": {
+			"type": "string",
+			"enum": [ "solid", "outline", "minimal", "unstyled" ],
+			"default": "solid"
+		},
+		"size": {
+			"type": "string",
+			"enum": [ "default", "compact", "small" ],
+			"default": "default"
+		},
+		"type": {
+			"type": "string",
+			"enum": [ "button", "submit", "reset" ],
+			"default": "button"
+		},
+		"disabled": { "type": "boolean", "default": false },
+		"class": { "type": "string", "default": "" }
+	},
+	"classes": {
+		"base": [
+			"utils/css/global-css-defense:button",
+			"utils/css/resets:box-sizing",
+			"utils/css/focus:outset-ring--focus-except-active"
+		],
+		"variants": {
+			"tone": {
+				"brand": [ "is-brand" ],
+				"neutral": [ "is-neutral" ]
+			},
+			"variant": {
+				"solid": [ "button", "is-solid" ],
+				"outline": [ "button", "is-outline" ],
+				"minimal": [ "button", "is-minimal" ],
+				"unstyled": [ "is-unstyled" ]
+			},
+			"size": {
+				"default": [],
+				"compact": [ "is-compact" ],
+				"small": [ "is-small" ]
+			}
+		}
+	},
+	"react": {
+		"component": "Button",
+		"props": { "focusableWhenDisabled": false }
+	}
+}
