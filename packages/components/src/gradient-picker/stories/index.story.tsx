@@ -124,7 +124,6 @@ export const WithNoExistingGradients: GradientPickerStory = {
 export const CustomGradientOnly: GradientPickerStory = {
 	render: Template,
 	args: {
-		gradients: [],
 		clearable: false,
 	},
 };

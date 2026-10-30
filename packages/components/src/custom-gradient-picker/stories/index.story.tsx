@@ -16,7 +16,7 @@ const meta: Meta< typeof CustomGradientPicker > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Deprecated. Use [`GradientPicker`](?path=/docs/components-gradientpicker--docs) with `gradients={ [] }` and `clearable={ false }` instead.',
+			notes: 'Deprecated. Use [`GradientPicker`](?path=/docs/components-gradientpicker--docs) with `clearable={ false }` instead.',
 		},
 	},
 };

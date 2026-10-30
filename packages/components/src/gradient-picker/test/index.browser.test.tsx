@@ -237,7 +237,6 @@ describe( 'GradientPicker', () => {
 		const onChange = vi.fn();
 		await render(
 			<GradientPicker
-				gradients={ [] }
 				clearable={ false }
 				value={ GRADIENT_B }
 				onChange={ onChange }

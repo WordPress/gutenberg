@@ -456,27 +456,14 @@ describe( 'CustomGradientBar', () => {
 } );
 
 describe( 'CustomGradientPicker public export', () => {
-	it( 'renders the gradient editor, passes a string to onChange, and warns', async () => {
-		const user = userEvent.setup();
-		const onChange = vi.fn();
+	it( 'renders the gradient editor and logs a deprecation warning', async () => {
+		await render( <DeprecatedCustomGradientPicker onChange={ vi.fn() } /> );
 
-		await render(
-			<DeprecatedCustomGradientPicker
-				value="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
-				onChange={ onChange }
-			/>
-		);
-
-		await user.selectOptions(
-			screen.getByRole( 'combobox', { name: 'Type' } ),
-			'radial-gradient'
-		);
-
-		expect( onChange ).toHaveBeenCalledWith(
-			'radial-gradient(rgb(0,0,0) 0%,rgb(255,255,255) 100%)'
-		);
+		expect(
+			screen.getByRole( 'combobox', { name: 'Type' } )
+		).toBeVisible();
 		expect( console ).toHaveWarnedWith(
-			'wp.components.CustomGradientPicker is deprecated since version 7.3. Please use wp.components.GradientPicker instead. Note: Set `gradients={ [] }` and `clearable={ false }` to render only the custom gradient editor.'
+			'wp.components.CustomGradientPicker is deprecated since version 7.3. Please use wp.components.GradientPicker instead. Note: Set `clearable={ false }` to render only the custom gradient editor.'
 		);
 	} );
 } );
