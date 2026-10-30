@@ -146,13 +146,18 @@ export default function TemplatePartEdit( {
 					)
 				: false;
 
+			// A placeholder has no template part yet: it needs to create one.
 			const _canUserEdit = hasResolvedEntity
 				? select( coreStore ).canUser( 'update', {
 						kind: 'postType',
 						name: 'wp_template_part',
 						id: templatePartId,
 					} )
-				: false;
+				: ! templatePartId &&
+					select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: 'wp_template_part',
+					} );
 
 			return {
 				hasInnerBlocks: getBlockCount( clientId ) > 0,
