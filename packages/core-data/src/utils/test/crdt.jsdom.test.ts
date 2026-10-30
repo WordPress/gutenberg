@@ -21,7 +21,7 @@ import {
 	type YPostRecord,
 } from '../crdt';
 import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
-import { updateSelectionHistory } from '../crdt-selection';
+import { getSelectionHistory, updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
 /**
@@ -270,6 +270,53 @@ describe( 'crdt', () => {
 			const title = map.get( 'title' );
 			expect( title ).toBeInstanceOf( Y.Text );
 			expect( title?.toString() ).toBe( 'New Title' );
+		} );
+
+		it( 'saves the selection from before a change in its undo level', () => {
+			addBlockToDoc( map, 'block-1', 'abcdef' );
+			const undoManager = new Y.UndoManager(
+				doc.getMap( CRDT_RECORD_MAP_KEY )
+			);
+			const savedSelections: unknown[] = [];
+			undoManager.on( 'stack-item-added', () => {
+				savedSelections.push( getSelectionHistory( doc )[ 0 ]?.start );
+			} );
+			const caretAt = ( offset: number ) => ( {
+				selectionStart: {
+					clientId: 'block-1',
+					attributeKey: 'content',
+					offset,
+				},
+				selectionEnd: {
+					clientId: 'block-1',
+					attributeKey: 'content',
+					offset,
+				},
+			} );
+
+			// A caret move and the next edit applied in one batch, with no
+			// timers running in between.
+			doc.transact( () =>
+				applyPostChangesToCRDTDoc(
+					doc,
+					{ selection: caretAt( 3 ) } as PostChanges,
+					defaultSyncedProperties
+				)
+			);
+			doc.transact( () =>
+				applyPostChangesToCRDTDoc(
+					doc,
+					{
+						title: 'New Title',
+						selection: caretAt( 0 ),
+					} as PostChanges,
+					defaultSyncedProperties
+				)
+			);
+
+			expect( savedSelections ).toMatchObject( [
+				{ clientId: 'block-1', offset: 3 },
+			] );
 		} );
 
 		it( 'does not sync disallowed properties', () => {

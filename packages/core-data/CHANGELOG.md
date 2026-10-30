@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Real-time collaboration: Undo restores the caret from before the change when several changes are applied at once ([#85980](https://github.com/WordPress/gutenberg/pull/85980)).
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
