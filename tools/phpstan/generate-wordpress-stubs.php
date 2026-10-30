@@ -727,7 +727,8 @@ function main( array $args ): void {
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The recorded source is only written when it changes, by an option.
-	$done = style( '✓ ', '32' ) . "WordPress $wp_version" . style( ' (' . ( $fetched_ref ? short_commit( $commit ) . ', ' : '' ) . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
+	// The check mark is left out without colors, since a console or log may not use UTF-8.
+	$done = ( has_color() ? style( '✓ ', '32' ) : '' ) . "WordPress $wp_version" . style( ' (' . ( $fetched_ref ? short_commit( $commit ) . ', ' : '' ) . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
 	if ( $recorded ) {
 		report_row( 'Done', $done );
 		return;
