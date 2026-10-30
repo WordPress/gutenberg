@@ -8,6 +8,7 @@ import '../style.scss';
 import '../../dropdown/style.scss';
 import '../../popover/style.scss';
 import CustomGradientPicker from '../';
+import DeprecatedCustomGradientPicker from '../deprecated';
 import CustomGradientBar from '../gradient-bar';
 import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
 
@@ -451,5 +452,18 @@ describe( 'CustomGradientBar', () => {
 		await user.keyboard( '[ArrowRight]' );
 
 		expect( onChange ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'CustomGradientPicker public export', () => {
+	it( 'renders the gradient editor and logs a deprecation warning', async () => {
+		await render( <DeprecatedCustomGradientPicker onChange={ vi.fn() } /> );
+
+		expect(
+			screen.getByRole( 'combobox', { name: 'Type' } )
+		).toBeVisible();
+		expect( console ).toHaveWarnedWith(
+			'wp.components.CustomGradientPicker is deprecated since version 7.3. Please use wp.components.GradientPicker instead. Note: Set `clearable={ false }` to render only the custom gradient editor.'
+		);
 	} );
 } );
