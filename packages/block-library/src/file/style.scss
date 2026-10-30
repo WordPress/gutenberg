@@ -25,18 +25,6 @@
 	justify-content: right;
 }
 
-// Without a file name the button is the only item in its row, so "space
-// between" alone would leave it at the start on the front end. The editor
-// always renders the file name field, so this keeps the two in step. Only a
-// button with no file name before it is matched, so a button that wraps below
-// a long file name stays at the start, as it does in the editor.
-.wp-block-file.is-content-justification-space-between {
-	> .wp-block-file__button:first-child,
-	> .wp-block-file__embed + .wp-block-file__button {
-		margin-inline-start: auto;
-	}
-}
-
 // Matches Global Styles specificity so a font size set there can win, since
 // block library styles load first.
 :root :where(.wp-block-file:not(.wp-element-button)) {

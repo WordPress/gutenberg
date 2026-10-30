@@ -281,19 +281,23 @@ function FileEdit( {
 						) }
 					</ResizableBox>
 				) }
-				<RichText
-					identifier="fileName"
-					tagName="a"
-					value={ fileName }
-					placeholder={ __( 'Write file name…' ) }
-					withoutInteractiveFormatting
-					onChange={ ( text ) =>
-						setAttributes( {
-							fileName: removeAnchorTag( text ),
-						} )
-					}
-					href={ textLinkHref }
-				/>
+				{ /* Like captions, an empty file name only shows while the block is
+				selected, so the layout matches the front end, which omits it. */ }
+				{ ( isSelected || ! RichText.isEmpty( fileName ) ) && (
+					<RichText
+						identifier="fileName"
+						tagName="a"
+						value={ fileName }
+						placeholder={ __( 'Write file name…' ) }
+						withoutInteractiveFormatting
+						onChange={ ( text ) =>
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
+						}
+						href={ textLinkHref }
+					/>
+				) }
 				{ showDownloadButton && (
 					<div className="wp-block-file__button-richtext-wrapper">
 						{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
