@@ -651,6 +651,83 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
+		// DEBUG (temporary): log hover targets, layout changes and the
+		// insertion point, printed only on failure.
+		await page.evaluate( () => {
+			window.dbg = [];
+			const t0 = performance.now();
+			const log = ( m ) =>
+				window.dbg.push(
+					Math.round( performance.now() - t0 ) + ' ' + m
+				);
+			const d = ( n ) =>
+				n
+					? ( n.getAttribute?.( 'aria-label' ) ||
+							( n.textContent || '' ).trim().slice( 0, 20 ) ||
+							n.tagName ) +
+						'<' +
+						n.tagName +
+						'>'
+					: 'null';
+			for ( const type of [ 'mouseover', 'mouseout', 'mousemove' ] ) {
+				document.addEventListener(
+					type,
+					( e ) => {
+						if ( type === 'mousemove' && window.dbgMoves > 3 ) {
+							return;
+						}
+						window.dbgMoves = ( window.dbgMoves || 0 ) + 1;
+						log(
+							`${ type } ${ d( e.target ) } x=${ e.clientX } y=${ e.clientY }`
+						);
+					},
+					true
+				);
+			}
+			document.addEventListener(
+				'scroll',
+				( e ) =>
+					log(
+						`scroll ${ d( e.target ) } top=${ e.target.scrollTop }`
+					),
+				true
+			);
+			let lastVisible;
+			window.wp.data.subscribe( () => {
+				const visible = window.wp.data
+					.select( 'core/block-editor' )
+					.isBlockInsertionPointVisible();
+				if ( visible !== lastVisible ) {
+					lastVisible = visible;
+					log( `insertionPointVisible=${ visible }` );
+				}
+			} );
+			new MutationObserver( () => {
+				const panel = document.querySelector(
+					'.block-editor-inserter__block-list, .block-editor-inserter__panel-content'
+				);
+				if ( panel && ! window.dbgPanel ) {
+					window.dbgPanel = true;
+					new ResizeObserver( ( entries ) => {
+						for ( const entry of entries ) {
+							log(
+								`panel size ${ Math.round( entry.contentRect.width ) }x${ Math.round( entry.contentRect.height ) } scrollH=${ entry.target.scrollHeight } clientW=${ entry.target.clientWidth }`
+							);
+						}
+					} ).observe( panel );
+				}
+				const heading = document.querySelector(
+					'[role="option"][aria-label="Heading"]'
+				);
+				if ( heading && heading !== window.dbgHeading ) {
+					window.dbgHeading = heading;
+					const r = heading.getBoundingClientRect();
+					log(
+						`heading element ${ ( window.dbgHeadingCount = ( window.dbgHeadingCount || 0 ) + 1 ) } at x=${ Math.round( r.x ) } y=${ Math.round( r.y ) } w=${ Math.round( r.width ) }`
+					);
+				}
+			} ).observe( document.body, { childList: true, subtree: true } );
+		} );
 		await editor.canvas
 			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
@@ -671,16 +748,31 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.hover();
 
-		await expect( insertingBlocksUtils.indicator ).toBeVisible();
+		try {
+			await expect( insertingBlocksUtils.indicator ).toBeVisible();
 
-		const paragraphBoundingBox = await paragraphBlock.boundingBox();
-		const indicatorBoundingBox =
-			await insertingBlocksUtils.indicator.boundingBox();
+			const paragraphBoundingBox = await paragraphBlock.boundingBox();
+			const indicatorBoundingBox =
+				await insertingBlocksUtils.indicator.boundingBox();
 
-		// Expect the indicator to be below the selected block.
-		expect( indicatorBoundingBox.y ).toBeGreaterThan(
-			paragraphBoundingBox.y
-		);
+			// Expect the indicator to be below the selected block.
+			expect( indicatorBoundingBox.y ).toBeGreaterThan(
+				paragraphBoundingBox.y
+			);
+		} catch ( error ) {
+			const heading = await page
+				.getByRole( 'listbox', { name: 'Text' } )
+				.getByRole( 'option', { name: 'Heading', exact: true } )
+				.boundingBox();
+			// eslint-disable-next-line no-console
+			console.log(
+				'DEBUG heading now ' +
+					JSON.stringify( heading ) +
+					'\n' +
+					( await page.evaluate( () => window.dbg.join( '\n' ) ) )
+			);
+			throw error;
+		}
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403.
