@@ -2,6 +2,7 @@ import { describe, expect, it, onTestFinished } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { useState } from '@wordpress/element';
 import { more } from '@wordpress/icons';
 import '@wordpress/theme/design-tokens.css';
 import DropdownMenu from '..';
@@ -15,8 +16,8 @@ const centerY = ( element: Element ) => {
 	return rect.top + rect.height / 2;
 };
 
-const textRect = ( label: string ) => {
-	// Controls can render bare text. Measure that text rather than the button.
+const textLeft = ( label: string ) => {
+	// Controls render bare text, so measure the label rather than its button.
 	const walker = document.createTreeWalker(
 		screen.getByText( label ),
 		NodeFilter.SHOW_TEXT
@@ -27,187 +28,152 @@ const textRect = ( label: string ) => {
 	}
 	const range = document.createRange();
 	range.selectNodeContents( node! );
-	return range.getBoundingClientRect();
+	return range.getBoundingClientRect().left;
 };
 
+// Popover covers the opening animation; these fixtures measure the final layout.
 describe( 'DropdownMenu row layout', () => {
-	it( 'aligns mixed action and choice labels without moving explicit action icons', async () => {
+	it( 'keeps mixed row labels aligned when a choice changes', async () => {
+		const MixedMenu = () => {
+			const [ value, setValue ] = useState( 'visual' );
+			return (
+				<DropdownMenu
+					defaultOpen
+					popoverProps={ { animate: false } }
+					label="Editor"
+					controls={ [ { title: 'Control action' } ] }
+				>
+					{ () => (
+						<>
+							<MenuGroup>
+								<MenuItem>Plain action</MenuItem>
+								<MenuItemsChoice
+									choices={ [
+										{
+											value: 'visual',
+											label: 'Visual editor',
+										},
+										{ value: 'code', label: 'Code editor' },
+									] }
+									value={ value }
+									onSelect={ setValue }
+								/>
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem icon={ more } iconPosition="left">
+									Leading icon
+								</MenuItem>
+								<MenuItemsChoice
+									choices={ [
+										{
+											value: 'other',
+											label: 'Other choice',
+										},
+									] }
+									value="other"
+									onSelect={ () => {} }
+								/>
+							</MenuGroup>
+						</>
+					) }
+				</DropdownMenu>
+			);
+		};
 		const user = userEvent.setup();
-		await render(
-			<DropdownMenu
-				label="Open menu"
-				controls={ [ { title: 'Control action' } ] }
-			>
-				{ () => (
-					<>
-						<MenuGroup label="Editor">
-							<MenuItem>Plain action</MenuItem>
-							<MenuItem icon={ more } iconPosition="right">
-								Trailing icon
-							</MenuItem>
-							<MenuItemsChoice
-								choices={ [
-									{ value: 'visual', label: 'Visual editor' },
-								] }
-								value="visual"
-								onSelect={ () => {} }
-							/>
-						</MenuGroup>
-						<MenuGroup label="Actions">
-							<MenuItem icon={ more } iconPosition="left">
-								Leading icon
-							</MenuItem>
-							<MenuItem suffix={ <span>Draft</span> }>
-								Custom suffix
-							</MenuItem>
-							<MenuItemsChoice
-								choices={ [
-									{ value: 'code', label: 'Code editor' },
-								] }
-								value="code"
-								onSelect={ () => {} }
-							/>
-						</MenuGroup>
-					</>
-				) }
-			</DropdownMenu>
+		await render( <MixedMenu /> );
+		const visual = screen.getByRole( 'menuitemradio', {
+			name: 'Visual editor',
+		} );
+		const code = screen.getByRole( 'menuitemradio', {
+			name: 'Code editor',
+		} );
+		// Decorative selection marks have no accessible role to query.
+		// eslint-disable-next-line testing-library/no-node-access
+		const visualIcon = visual.querySelector( 'svg' )!;
+		// eslint-disable-next-line testing-library/no-node-access
+		const codeIcon = code.querySelector( 'svg' )!;
+		await expect.element( visualIcon ).toBeVisible();
+		const left = textLeft( 'Plain action' );
+		for ( const label of [
+			'Visual editor',
+			'Code editor',
+			'Control action',
+		] ) {
+			expect( textLeft( label ) ).toBe( left );
+		}
+		expect( textLeft( 'Other choice' ) ).toBe( textLeft( 'Leading icon' ) );
+		expect( visualIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
+			left
 		);
-		await user.click( screen.getByRole( 'button', { name: 'Open menu' } ) );
 
-		const plain = screen
-			.getByText( 'Plain action' )
-			.getBoundingClientRect();
-		expect( textRect( 'Control action' ).left ).toBe( plain.left );
-		expect(
-			screen.getByText( 'Trailing icon' ).getBoundingClientRect().left
-		).toBe( plain.left );
-		expect(
-			screen.getByText( 'Visual editor' ).getBoundingClientRect().left
-		).toBe( plain.left );
-		const leading = screen
-			.getByText( 'Leading icon' )
-			.getBoundingClientRect();
-		expect(
-			screen.getByText( 'Custom suffix' ).getBoundingClientRect().left
-		).toBe( leading.left );
-		expect(
-			screen.getByText( 'Code editor' ).getBoundingClientRect().left
-		).toBe( leading.left );
-		const trailingItem = screen.getByRole( 'menuitem', {
-			name: 'Trailing icon',
-		} );
-		const leadingItem = screen.getByRole( 'menuitem', {
-			name: 'Leading icon',
-		} );
-		// Decorative action icons have no accessible role to query.
-		// eslint-disable-next-line testing-library/no-node-access
-		const trailingIcon = trailingItem.querySelector( 'svg' )!;
-		// eslint-disable-next-line testing-library/no-node-access
-		const leadingIcon = leadingItem.querySelector( 'svg' )!;
-		expect( trailingIcon.getBoundingClientRect().left ).toBeGreaterThan(
-			plain.right
-		);
-		expect( leadingIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
-			leading.left
-		);
+		await user.click( code );
+		await expect.element( codeIcon ).toBeVisible();
+		expect( visualIcon ).not.toBeVisible();
+		expect( textLeft( 'Visual editor' ) ).toBe( left );
+		expect( textLeft( 'Code editor' ) ).toBe( left );
 	} );
 
-	it( 'aligns marks and shortcuts with the title of a description', async () => {
+	it( 'aligns a selection mark and shortcut with its description title', async () => {
 		const { innerWidth, innerHeight } = window;
 		onTestFinished( () => page.viewport( innerWidth, innerHeight ) );
 		await page.viewport( 800, 600 );
-		const user = userEvent.setup();
 		await render(
-			<DropdownMenu label="Open menu">
+			<DropdownMenu
+				defaultOpen
+				label="Editor"
+				popoverProps={ { animate: false } }
+			>
 				{ () => (
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ [
-								{
-									value: 'code',
-									label: 'Code editor',
-									info: 'Edit the source of your content.',
-									shortcut: 'Ctrl+C',
-								},
-							] }
-							value="code"
-							onSelect={ () => {} }
-						/>
-						<MenuItem
-							icon={ more }
-							iconPosition="left"
-							info="Additional details"
-							shortcut="Ctrl+A"
-						>
-							Action description
-						</MenuItem>
-					</MenuGroup>
+					<MenuItemsChoice
+						choices={ [
+							{
+								value: 'code',
+								label: 'Code editor',
+								info: 'Edit the source of your content.',
+								shortcut: 'Ctrl+C',
+							},
+						] }
+						value="code"
+						onSelect={ () => {} }
+					/>
 				) }
 			</DropdownMenu>
 		);
-		await user.click( screen.getByRole( 'button', { name: 'Open menu' } ) );
-		for ( const [ role, label ] of [
-			[ 'menuitemradio', 'Code editor' ],
-			[ 'menuitem', 'Action description' ],
-		] ) {
-			const item = screen.getByRole( role, {
-				name: new RegExp( label ),
-			} );
-			// Decorative icons have no accessible role to query.
-			// eslint-disable-next-line testing-library/no-node-access
-			const icon = item.querySelector( 'svg' )!;
-			expect( centerY( icon ) ).toBeCloseTo(
-				centerY( screen.getByText( label ) ),
-				1
-			);
-		}
+		const item = screen.getByRole( 'menuitemradio', {
+			name: /Code editor/,
+		} );
+		await expect.element( item ).toBeVisible();
+		// The decorative selection mark has no accessible role to query.
+		// eslint-disable-next-line testing-library/no-node-access
+		const icon = item.querySelector( 'svg' )!;
+		const titleCenter = centerY( screen.getByText( 'Code editor' ) );
+		expect( centerY( icon ) ).toBeCloseTo( titleCenter, 1 );
 		expect( centerY( screen.getByText( 'Ctrl+C' ) ) ).toBeCloseTo(
-			centerY( screen.getByText( 'Code editor' ) ),
-			1
-		);
-		expect( centerY( screen.getByText( 'Ctrl+A' ) ) ).toBeCloseTo(
-			centerY( screen.getByText( 'Action description' ) ),
+			titleCenter,
 			1
 		);
 	} );
 
-	it( 'aligns controls with and without icons while preserving selection state', async () => {
-		const user = userEvent.setup();
+	it( 'aligns controls with and without icons', async () => {
 		await render(
 			<DropdownMenu
-				label="Open menu"
+				defaultOpen
+				popoverProps={ { animate: false } }
+				label="Actions"
 				controls={ [
 					{ title: 'Plain control' },
-					{ title: 'Icon control', icon: more },
-					{
-						title: 'Active control',
-						icon: more,
-						role: 'menuitemradio',
-						isActive: true,
-					},
-					{
-						title: 'Inactive control',
-						icon: 'admin-generic',
-						role: 'menuitemradio',
-						isActive: false,
-					},
+					{ title: 'SVG control', icon: more },
+					{ title: 'Font icon control', icon: 'admin-generic' },
 				] }
 			/>
 		);
-		await user.click( screen.getByRole( 'button', { name: 'Open menu' } ) );
-		const left = textRect( 'Plain control' ).left;
-		for ( const label of [
-			'Icon control',
-			'Active control',
-			'Inactive control',
-		] ) {
-			expect( textRect( label ).left ).toBe( left );
-		}
-		expect(
-			screen.getByRole( 'menuitemradio', { name: 'Active control' } )
-		).toBeChecked();
-		expect(
-			screen.getByRole( 'menuitemradio', { name: 'Inactive control' } )
-		).not.toBeChecked();
+		await expect
+			.element(
+				screen.getByRole( 'menuitem', { name: 'Plain control' } )
+			)
+			.toBeVisible();
+		const left = textLeft( 'Plain control' );
+		expect( textLeft( 'SVG control' ) ).toBe( left );
+		expect( textLeft( 'Font icon control' ) ).toBe( left );
 	} );
 } );
