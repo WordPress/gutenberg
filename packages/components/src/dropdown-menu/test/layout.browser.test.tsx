@@ -101,7 +101,8 @@ describe( 'DropdownMenu row layout', () => {
 		] ) {
 			expect( textLeft( label ) ).toBe( left );
 		}
-		expect( textLeft( 'Other choice' ) ).toBe( textLeft( 'Leading icon' ) );
+		expect( textLeft( 'Other choice' ) ).toBe( left );
+		expect( textLeft( 'Leading icon' ) ).toBeGreaterThan( left );
 		expect( visualIcon.getBoundingClientRect().right ).toBeLessThanOrEqual(
 			left
 		);
@@ -152,28 +153,5 @@ describe( 'DropdownMenu row layout', () => {
 			titleCenter,
 			1
 		);
-	} );
-
-	it( 'aligns controls with and without icons', async () => {
-		await render(
-			<DropdownMenu
-				defaultOpen
-				popoverProps={ { animate: false } }
-				label="Actions"
-				controls={ [
-					{ title: 'Plain control' },
-					{ title: 'SVG control', icon: more },
-					{ title: 'Font icon control', icon: 'admin-generic' },
-				] }
-			/>
-		);
-		await expect
-			.element(
-				screen.getByRole( 'menuitem', { name: 'Plain control' } )
-			)
-			.toBeVisible();
-		const left = textLeft( 'Plain control' );
-		expect( textLeft( 'SVG control' ) ).toBe( left );
-		expect( textLeft( 'Font icon control' ) ).toBe( left );
 	} );
 } );

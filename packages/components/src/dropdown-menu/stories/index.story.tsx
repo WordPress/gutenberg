@@ -207,8 +207,8 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 };
 
 /**
- * Selection rows share their label column with ordinary actions. Action icons
- * keep their explicit position, and each group reserves its own prefix space.
+ * Selection rows share their leading selection space with ordinary actions.
+ * Action icons keep their explicit position and indent only their own label.
  */
 export const MixedContent: StoryObj< typeof DropdownMenu > = {
 	args: { label: 'Mixed menu', icon: more },
@@ -276,8 +276,8 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 };
 
 /**
- * Controls with and without icons share a label column. Selection state and
- * activation remain controlled by the caller.
+ * Prefix icons indent only their own label. Controls without icons start at the
+ * icon column. Selection state and activation remain controlled by the caller.
  */
 export const MixedControls: StoryObj< typeof DropdownMenu > = {
 	args: { label: 'Control options', icon: more },
