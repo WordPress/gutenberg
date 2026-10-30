@@ -660,8 +660,9 @@ function main( array $args ): void {
 	if ( '' === $commit ) {
 		throw new RuntimeException( 'No wordpress-develop commit to generate the stubs from.' );
 	}
-	if ( $uncommitted ) {
-		$source_label = ( '' !== $pr ? "$develop_repo#$pr at " : "$develop_repo@" ) . short_commit( $head_commit ) . ' with uncommitted changes';
+	if ( $use_checkout ) {
+		// A commit in the checkout is not named after the repository, since it may not have been pushed.
+		$source_label = short_commit( $head_commit ) . ( '' !== $branch ? " on $branch" : '' ) . ( $uncommitted ? ' with uncommitted changes' : '' ) . ( '' !== $pr ? ", for $develop_repo#$pr" : '' );
 	} elseif ( '' !== $pr ) {
 		$source_label = "$develop_repo#$pr" . ( "refs/pull/$pr/head" !== $commit ? ' at ' . short_commit( $commit ) : '' );
 	} else {
