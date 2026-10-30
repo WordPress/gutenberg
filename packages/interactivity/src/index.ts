@@ -13,7 +13,7 @@ import {
 import { parseDirectiveName, parseDirectiveValue, toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
-import { getScope } from './scopes';
+import { getScope, runWithoutScope } from './scopes';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 import {
@@ -52,6 +52,12 @@ export { useState, useRef } from 'preact/hooks';
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
+/**
+ * Returns the consent-gated private APIs used by internal consumers.
+ *
+ * @param lock Required acknowledgment of private API use.
+ * @return The private interactivity APIs.
+ */
 export const privateApis = (
 	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 ) => {
@@ -80,6 +86,8 @@ export const privateApis = (
 			warn,
 			afterNextFrame,
 			getScope,
+			/** Runs a callback without a directive scope and restores the caller's stack. */
+			runWithoutScope,
 		};
 	}
 
