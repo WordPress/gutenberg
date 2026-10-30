@@ -1,4 +1,9 @@
-import { useHistory, useLocation, RouterProvider } from './router';
+import {
+	useHistory,
+	useLocation,
+	RouterProvider,
+	recognizePath,
+} from './router';
 import { useLink, Link } from './link';
 import { lock } from './lock-unlock';
 
@@ -9,4 +14,5 @@ lock( privateApis, {
 	RouterProvider,
 	useLink,
 	Link,
+	recognizePath,
 } );
