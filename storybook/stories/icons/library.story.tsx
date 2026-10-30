@@ -192,7 +192,7 @@ function IconDetails( {
 				</Text>
 				<code>{ slug }</code>
 				<CopySvgButton icon={ icon } />
-				<Stack direction="row" gap="sm" align="center" wrap="wrap">
+				<Stack direction="column" gap="sm" align="flex-start">
 					<Text variant="body-sm">Available in</Text>
 					<Stack
 						render={ <ul /> }
