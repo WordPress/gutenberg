@@ -46,7 +46,7 @@ describe( 'MediaPreview', () => {
 		expect( embed.tagName ).toBe( 'OBJECT' );
 		expect( embed ).toHaveAttribute(
 			'data',
-			'https://example.com/file.pdf'
+			'https://example.com/file.pdf#view=Fit&zoom=page-fit'
 		);
 		expect( embed ).toHaveAttribute( 'type', 'application/pdf' );
 	} );

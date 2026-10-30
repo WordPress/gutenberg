@@ -91,7 +91,11 @@ function MediaPreviewContent( {
 			// can't display it, e.g. when the request fails.
 			return (
 				<object
-					data={ mediaUrl }
+					className="media-editor-preview__pdf"
+					// Ask the viewer to fit the whole page rather than the
+					// width. Chrome reads `view`, Firefox reads `zoom`, and
+					// Safari ignores both.
+					data={ `${ mediaUrl }#view=Fit&zoom=page-fit` }
 					type="application/pdf"
 					aria-label={ __( 'Embed of the selected PDF file.' ) }
 				>

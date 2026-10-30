@@ -50,9 +50,12 @@
 
 	&--pdf {
 		align-items: stretch;
+		width: 100%;
+		max-width: $wide-content-width;
+		margin-inline: auto;
 	}
 
-	&--pdf object {
+	&__pdf {
 		display: flex;
 		flex: 1;
 		align-items: center;
