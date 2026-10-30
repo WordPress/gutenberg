@@ -84,4 +84,75 @@ test.describe( 'Page List block', () => {
 		expect( innerHTML ).not.toContain( '&lt;strong&gt;' );
 		expect( innerHTML ).not.toContain( '&lt;/strong&gt;' );
 	} );
+
+	test.describe( 'for users who cannot edit every page', () => {
+		const author = {
+			username: 'pagelistauthor',
+			email: 'pagelistauthor@example.com',
+			password: 'pagelistauthorpassword',
+		};
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createUser( { ...author, roles: [ 'author' ] } );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'lists published pages for an author', async ( {
+			browser,
+			requestUtils,
+		} ) => {
+			// An author can view published pages but cannot edit any of them, so
+			// the REST API refuses an `edit` context request for pages.
+			await requestUtils.createPage( {
+				title: 'Page visible to authors',
+				status: 'publish',
+			} );
+
+			const context = await browser.newContext( {
+				baseURL: requestUtils.baseURL,
+				storageState: { cookies: [], origins: [] },
+			} );
+			const page = await context.newPage();
+			await page.goto( '/wp-login.php' );
+			await page
+				.getByLabel( 'Username or Email Address' )
+				.fill( author.username );
+			await page
+				.getByLabel( 'Password', { exact: true } )
+				.fill( author.password );
+			await page.getByRole( 'button', { name: 'Log In' } ).click();
+			await page.waitForURL( '**/wp-admin/**' );
+
+			await page.goto( '/wp-admin/post-new.php' );
+			await page.waitForFunction( () => !! window.wp?.blocks );
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-post', 'welcomeGuide', false );
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.insertBlocks(
+						window.wp.blocks.createBlock( 'core/page-list' )
+					);
+			} );
+
+			const pageListBlock = page
+				.frameLocator( '[name=editor-canvas]' )
+				.getByRole( 'document', { name: 'Block: Page List' } );
+
+			await expect(
+				pageListBlock
+					.locator( 'li' )
+					.filter( { hasText: 'Page visible to authors' } )
+			).toBeVisible();
+			await expect( pageListBlock ).not.toContainText(
+				'Cannot retrieve Pages'
+			);
+
+			await context.close();
+		} );
+	} );
 } );

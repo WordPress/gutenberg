@@ -139,6 +139,10 @@ export default function PageListEdit( {
 		{
 			per_page: MAX_PAGE_COUNT,
 			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+			// The block lists the pages a visitor can see, so it doesn't need
+			// the `edit` context. That context leaves out the pages the user
+			// cannot edit and is refused outright for authors and contributors.
+			context: 'view',
 			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
 			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
 			// sort.
