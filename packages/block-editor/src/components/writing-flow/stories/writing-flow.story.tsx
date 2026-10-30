@@ -1,8 +1,9 @@
 import { useState, useRef } from '@wordpress/element';
+import type { KeyboardEvent } from 'react';
 import { WritingFlow } from '@wordpress/block-editor';
 
 export default {
-	title: 'BlockEditor/WritingFlow',
+	title: 'Components/WritingFlow',
 	component: WritingFlow,
 	parameters: {
 		docs: {
@@ -24,10 +25,10 @@ function DefaultStory() {
 		{ id: '2', content: 'This is the second block.' },
 		{ id: '3', content: 'This is the third block.' },
 	] );
-	const [ activeId, setActiveId ] = useState( null );
-	const refs = useRef( [] );
+	const [ activeId, setActiveId ] = useState<string | null>( null );
+	const refs = useRef<(HTMLDivElement | null)[]>( [] );
 
-	const updateBlock = ( id, newContent ) => {
+	const updateBlock = ( id: string, newContent: string ) => {
 		setBlocks(
 			blocks.map( ( block ) =>
 				block.id === id ? { ...block, content: newContent } : block
@@ -35,7 +36,10 @@ function DefaultStory() {
 		);
 	};
 
-	const handleKeyDown = ( e, index ) => {
+	const handleKeyDown = (
+    	e: KeyboardEvent<HTMLDivElement>,
+    	index: number
+	) => {
 		if ( e.key === 'Tab' ) {
 			e.preventDefault();
 			const next = refs.current[ index + 1 ];
@@ -64,7 +68,9 @@ function DefaultStory() {
 				{ blocks.map( ( block, index ) => (
 					<div key={ block.id } style={ { marginBottom: '12px' } }>
 						<div
-							ref={ ( el ) => ( refs.current[ index ] = el ) }
+							ref={ ( el ) => {
+    							refs.current[ index ] = el;
+							} }
 							contentEditable
 							suppressContentEditableWarning
 							onFocus={ () => setActiveId( block.id ) }
