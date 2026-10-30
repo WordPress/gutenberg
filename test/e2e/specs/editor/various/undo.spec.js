@@ -213,6 +213,45 @@ test.describe( 'undo', () => {
 		).toBeDisabled();
 	} );
 
+	test( 'should not end the undo level when leaving a format with the arrow key', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a<strong>b</strong>' },
+		} );
+		await page.keyboard.press( 'End' );
+		// At the end of a format, the arrow keys enter and leave it without
+		// moving the caret.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'y' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong>y</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
 	test( 'should undo each format change across blocks separately', async ( {
 		editor,
 		page,
