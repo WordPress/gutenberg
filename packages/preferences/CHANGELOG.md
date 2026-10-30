@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the scrollable Preferences area’s focus outline visible on narrow screens ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
+
 ## 5.0.0 (2026-10-20)
 
 ### Breaking Changes

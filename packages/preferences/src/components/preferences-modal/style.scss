@@ -16,10 +16,15 @@
 		height: 70%;
 	}
 
-	// Clears spacing to flush fit the navigator component to the modal edges.
-	@media (max-width: #{ (breakpoints.$break-medium - 1) }) {
-		.components-modal__content {
+	.components-modal__content {
+		// Reserve space for the inset focus outline without scrolling it away.
+		@media (max-width: #{ (breakpoints.$break-medium - 1) }) {
 			padding: 0;
+			border: var(--wpds-border-width-focus) solid transparent;
+
+			@media (forced-colors: active) {
+				border-color: Canvas;
+			}
 		}
 	}
 }
