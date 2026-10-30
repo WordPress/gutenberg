@@ -114,12 +114,9 @@ test.describe( 'Page List', () => {
 			},
 			statusVisibility: {
 				performEdit: async ( page ) => {
-					const editButton = page.getByRole( 'button', {
-						name: 'Edit Status',
+					const status = page.getByRole( 'combobox', {
+						name: 'Status',
 					} );
-					await editButton.locator( '..' ).hover();
-					await editButton.click();
-					const statusAndVisibility = editButton.locator( '..' );
 					const options = [
 						'Published',
 						'Draft',
@@ -128,12 +125,11 @@ test.describe( 'Page List', () => {
 					];
 
 					for ( const option of options ) {
+						await status.click();
 						await page
-							.getByRole( 'radio', { name: option } )
+							.getByRole( 'option', { name: option } )
 							.click();
-						await expect( statusAndVisibility ).toContainText(
-							option
-						);
+						await expect( status ).toHaveText( option );
 
 						if ( option !== 'Private' ) {
 							await page
@@ -145,51 +141,34 @@ test.describe( 'Page List', () => {
 					}
 				},
 				assertInitialState: async ( page ) => {
-					const statusAndVisibility = page
-						.getByRole( 'button', {
-							name: 'Edit Status',
-						} )
-						.locator( '..' );
-					await expect( statusAndVisibility ).toContainText(
-						'Published'
-					);
+					await expect(
+						page.getByRole( 'combobox', { name: 'Status' } )
+					).toHaveText( 'Published' );
 				},
 				assertEditedState: async ( page ) => {
-					const statusAndVisibility = page
-						.getByRole( 'button', {
-							name: 'Edit Status',
-						} )
-						.locator( '..' );
-					await expect( statusAndVisibility ).toContainText(
-						'Private'
-					);
+					await expect(
+						page.getByRole( 'combobox', { name: 'Status' } )
+					).toHaveText( 'Private' );
 				},
 			},
 			author: {
 				assertInitialState: async ( page ) => {
-					const author = page
-						.getByRole( 'button', { name: 'Edit Author' } )
-						.locator( '..' );
-					await expect( author ).toContainText( 'admin' );
+					await expect(
+						page.getByRole( 'combobox', { name: 'Author' } )
+					).toHaveText( 'admin' );
 				},
 				performEdit: async ( page ) => {
-					const editButton = page.getByRole( 'button', {
-						name: 'Edit Author',
-					} );
-					await editButton.locator( '..' ).hover();
-					await editButton.click();
-					const selectElement = page.locator(
-						'select:has(option[value="1"])'
-					);
-					await selectElement.selectOption( {
-						label: 'Test Author',
-					} );
+					await page
+						.getByRole( 'combobox', { name: 'Author' } )
+						.click();
+					await page
+						.getByRole( 'option', { name: 'Test Author' } )
+						.click();
 				},
 				assertEditedState: async ( page ) => {
-					const author = page
-						.getByRole( 'button', { name: 'Edit Author' } )
-						.locator( '..' );
-					await expect( author ).toContainText( 'Test Author' );
+					await expect(
+						page.getByRole( 'combobox', { name: 'Author' } )
+					).toHaveText( 'Test Author' );
 				},
 			},
 			date: {
@@ -240,26 +219,20 @@ test.describe( 'Page List', () => {
 			},
 			slug: {
 				assertInitialState: async ( page ) => {
-					const slug = page
-						.getByRole( 'button', { name: 'Edit Slug' } )
-						.locator( '..' );
-					await expect( slug ).toContainText( 'privacy-policy' );
+					await expect(
+						page.getByRole( 'textbox', { name: 'Link' } )
+					).toHaveValue( 'privacy-policy' );
 				},
 				performEdit: async ( page ) => {
-					const editButton = page.getByRole( 'button', {
-						name: 'Edit Slug',
-					} );
-					await editButton.locator( '..' ).hover();
-					await editButton.click();
-					await expect(
-						page.getByRole( 'link', {
-							// The permalink preview, on whatever host the
-							// test site runs.
-							name: /^https?:\/\/[^/]+\//,
-						} )
-					).toBeVisible();
+					await page
+						.getByRole( 'textbox', { name: 'Link' } )
+						.fill( 'privacy' );
 				},
-				assertEditedState: async () => {},
+				assertEditedState: async ( page ) => {
+					await expect(
+						page.getByRole( 'textbox', { name: 'Link' } )
+					).toHaveValue( 'privacy' );
+				},
 			},
 			parent: {
 				assertInitialState: async ( page ) => {
@@ -486,9 +459,9 @@ test.describe( 'Page List', () => {
 		// } );
 
 		test.describe( 'Field trigger', () => {
-			const getStatusField = async ( page ) => {
+			const getDateField = async ( page ) => {
 				const editButton = page.getByRole( 'button', {
-					name: 'Edit Status',
+					name: 'Edit Date',
 				} );
 				const row = editButton.locator( '..' );
 				// The raw mouse clicks below use the row's bounding box, so
@@ -497,11 +470,13 @@ test.describe( 'Page List', () => {
 				await row.hover();
 				return { editButton, row };
 			};
+			const getDatetimeInput = ( page ) =>
+				page.locator( 'input[type="datetime-local"]' );
 
 			test( 'opens the flyout when clicking anywhere on the row', async ( {
 				page,
 			} ) => {
-				const { editButton, row } = await getStatusField( page );
+				const { editButton, row } = await getDateField( page );
 				const box = await row.boundingBox();
 
 				// Click the value area, away from the edit button.
@@ -510,9 +485,7 @@ test.describe( 'Page List', () => {
 					box.y + box.height / 2
 				);
 
-				await expect(
-					page.getByRole( 'radio', { name: 'Draft' } )
-				).toBeVisible();
+				await expect( getDatetimeInput( page ) ).toBeVisible();
 				await expect( editButton ).toHaveAttribute(
 					'aria-expanded',
 					'true'
@@ -522,35 +495,29 @@ test.describe( 'Page List', () => {
 			test( 'returns focus to the edit button when the flyout is dismissed', async ( {
 				page,
 			} ) => {
-				const { editButton, row } = await getStatusField( page );
+				const { editButton, row } = await getDateField( page );
 				const box = await row.boundingBox();
 				await page.mouse.click(
 					box.x + box.width * 0.5,
 					box.y + box.height / 2
 				);
-				await expect(
-					page.getByRole( 'radio', { name: 'Draft' } )
-				).toBeVisible();
+				await expect( getDatetimeInput( page ) ).toBeVisible();
 
 				await page.keyboard.press( 'Escape' );
 
-				await expect(
-					page.getByRole( 'radio', { name: 'Draft' } )
-				).toBeHidden();
+				await expect( getDatetimeInput( page ) ).toBeHidden();
 				await expect( editButton ).toBeFocused();
 
 				// Focus landing back on the trigger is what lets the field be
 				// reopened from the keyboard.
 				await page.keyboard.press( 'Enter' );
-				await expect(
-					page.getByRole( 'radio', { name: 'Draft' } )
-				).toBeVisible();
+				await expect( getDatetimeInput( page ) ).toBeVisible();
 			} );
 
 			test( 'keeps the flyout usable after double-clicking a field row', async ( {
 				page,
 			} ) => {
-				const { row } = await getStatusField( page );
+				const { row } = await getDateField( page );
 				const box = await row.boundingBox();
 				const x = box.x + box.width * 0.5;
 				const y = box.y + box.height / 2;
@@ -559,16 +526,14 @@ test.describe( 'Page List', () => {
 				// made every later click on a row a no-op. See #79348. It now
 				// toggles the flyout twice, leaving it closed.
 				await page.mouse.dblclick( x, y );
-				await expect(
-					page.getByRole( 'radio', { name: 'Draft' } )
-				).toBeHidden();
+				await expect( getDatetimeInput( page ) ).toBeHidden();
 
-				const dateEditButton = page.getByRole( 'button', {
-					name: 'Edit Date',
+				const discussionEditButton = page.getByRole( 'button', {
+					name: 'Edit Discussion',
 				} );
-				await dateEditButton.click();
+				await discussionEditButton.click();
 
-				await expect( dateEditButton ).toHaveAttribute(
+				await expect( discussionEditButton ).toHaveAttribute(
 					'aria-expanded',
 					'true'
 				);
@@ -606,26 +571,20 @@ test.describe( 'Page List', () => {
 			await expect( modal ).toContainText(
 				'Changes will be applied to all selected pages.'
 			);
-			for ( const name of [
-				'Edit Status',
-				'Edit Date',
-				'Edit Author',
-				'Edit Discussion',
-			] ) {
+			for ( const name of [ 'Edit Date', 'Edit Discussion' ] ) {
 				await expect(
 					modal.getByRole( 'button', { name } )
 				).toBeVisible();
 			}
-			await modal.getByRole( 'button', { name: 'Edit Status' } ).click();
-			const pending = page.getByRole( 'radio', {
-				name: 'Pending Review',
-			} );
-			await pending.check();
-			await expect( pending ).toBeChecked();
-			await page.keyboard.press( 'Escape' );
 			await expect(
-				modal.getByRole( 'button', { name: 'Edit Status' } )
-			).toBeFocused();
+				modal.getByRole( 'combobox', { name: 'Author' } )
+			).toBeVisible();
+			const status = modal.getByRole( 'combobox', { name: 'Status' } );
+			await status.click();
+			await page
+				.getByRole( 'option', { name: 'Pending Review' } )
+				.click();
+			await expect( status ).toHaveText( 'Pending Review' );
 		} );
 
 		test( 'keeps mobile grid selection visible and restores focus after cancelling', async ( {

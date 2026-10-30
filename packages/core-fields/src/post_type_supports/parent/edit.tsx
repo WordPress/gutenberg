@@ -1,4 +1,5 @@
 import removeAccents from 'remove-accents';
+import type { ReactNode } from 'react';
 import { ComboboxControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
@@ -15,7 +16,6 @@ import { Link } from '@wordpress/ui';
 import { filterURLForDisplay } from '@wordpress/url';
 import type { PostWithParent } from './types';
 import { getTitleWithFallbackName } from './utils';
-import styles from './style.module.css';
 
 type TreeBase = {
 	id: number;
@@ -99,9 +99,11 @@ export const getItemPriority = ( name: string, searchValue: string ) => {
 export function PageAttributesParent( {
 	data,
 	onChangeControl,
+	help = __( 'Choose a parent page.' ),
 }: {
 	data: PostWithParent;
 	onChangeControl: ( newValue: number ) => void;
+	help?: ReactNode;
 } ) {
 	const [ fieldValue, setFieldValue ] = useState< string >( '' );
 
@@ -251,7 +253,7 @@ export function PageAttributesParent( {
 	return (
 		<ComboboxControl
 			label={ __( 'Parent' ) }
-			help={ __( 'Choose a parent page.' ) }
+			help={ help }
 			value={ pageId?.toString() }
 			options={ parentOptions }
 			onFilterValueChange={ debounce(
@@ -265,8 +267,8 @@ export function PageAttributesParent( {
 }
 
 /*
- * The parent control, linking to the documentation with `Link` from `@wordpress/ui` and styled with a CSS
- * module.
+ * The parent control, explaining child pages and linking to the documentation
+ * with `Link` from `@wordpress/ui` in its help text.
  */
 export const ParentEdit = ( {
 	data,
@@ -293,46 +295,46 @@ export const ParentEdit = ( {
 		[ id, onChange ]
 	);
 
-	return (
-		<fieldset className={ styles.parent }>
-			<div>
-				{ createInterpolateElement(
-					sprintf(
-						/* translators: %1$s The home URL of the WordPress installation without the scheme. */
-						__(
-							'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s<wbr />/services<wbr />/pricing.'
-						),
-						filterURLForDisplay( homeUrl ).replace(
-							/([/.])/g,
-							'<wbr />$1'
-						)
+	const help = (
+		<>
+			{ createInterpolateElement(
+				sprintf(
+					/* translators: %1$s The home URL of the WordPress installation without the scheme. */
+					__(
+						'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s<wbr />/services<wbr />/pricing.'
 					),
-					{
-						wbr: <wbr />,
-					}
-				) }
-				<p>
-					{ createInterpolateElement(
-						__(
-							'They also show up as sub-items in the default navigation menu. <a>Learn more.</a>'
-						),
-						{
-							a: (
-								<Link
-									href={ __(
-										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
-									) }
-									openInNewTab
-								/>
-							),
-						}
-					) }
-				</p>
-				<PageAttributesParent
-					data={ data }
-					onChangeControl={ onChangeControl }
-				/>
-			</div>
-		</fieldset>
+					filterURLForDisplay( homeUrl ).replace(
+						/([/.])/g,
+						'<wbr />$1'
+					)
+				),
+				{
+					wbr: <wbr />,
+				}
+			) }{ ' ' }
+			{ createInterpolateElement(
+				__(
+					'They also show up as sub-items in the default navigation menu. <a>Learn more.</a>'
+				),
+				{
+					a: (
+						<Link
+							href={ __(
+								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
+							) }
+							openInNewTab
+						/>
+					),
+				}
+			) }
+		</>
+	);
+
+	return (
+		<PageAttributesParent
+			data={ data }
+			onChangeControl={ onChangeControl }
+			help={ help }
+		/>
 	);
 };
