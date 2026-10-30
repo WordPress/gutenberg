@@ -1,12 +1,14 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
 import Avatar from '../collaborators-presence/avatar';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
 import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
 import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
+import { useRecentlyTyped } from './use-recently-typed';
 import { useRenderCursors } from './use-render-cursors';
 import { type CursorRegistry } from './cursor-registry';
 
@@ -18,6 +20,12 @@ const RERENDER_DELAY_MS = 500;
 // applying formatting shifts text but the cursor's logical position is
 // unchanged). Only active when remote cursors are visible.
 const CURSOR_REDRAW_INTERVAL_MS = 10_000;
+
+// How long after the last keystroke an avatar stays hidden. `isTyping` only
+// clears on pointer movement, so without this a keyboard-only user would
+// never see the avatar again. Long enough not to flicker between keystrokes,
+// short enough that a pause in writing brings the avatar back.
+const TYPING_PAUSE_MS = 1000;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
@@ -46,15 +54,49 @@ export function Overlay( {
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
 
-	const { cursors, rerenderCursorsAfterDelay } = useRenderCursors(
-		overlayElement,
+	// A cursor avatar sits above the line it annotates, so it covers the text
+	// while that text is being written. Hide it for as long as the local user
+	// is typing in the same block, matching how the block toolbar gets out of
+	// the way. An avatar in another block isn't covering anything the local
+	// user is writing, so it stays. Carets and selection highlights always
+	// stay put: they are what tells you where someone else is working, and
+	// they never overlap the text.
+	const { isTyping, selectedBlockClientId } = useSelect( ( select ) => {
+		const { isTyping: _isTyping, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		return {
+			isTyping: _isTyping(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	}, [] );
+
+	const recentlyTyped = useRecentlyTyped(
 		blockEditorDocument ?? null,
-		postId ?? null,
-		postType ?? null,
-		RERENDER_DELAY_MS
+		TYPING_PAUSE_MS
 	);
 
-	const { highlights, rerenderHighlightsAfterDelay } = useBlockHighlighting(
+	// The block whose avatars would be sitting over the text the local user
+	// is writing right now, which is the only case worth hiding them for.
+	// Both signals matter: `isTyping` brings the avatar back as soon as the
+	// pointer moves, and `recentlyTyped` brings it back after a pause in
+	// writing even if the pointer never moves at all.
+	const blockClientIdBeingWritten =
+		isTyping && recentlyTyped ? selectedBlockClientId : null;
+
+	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
+		useRenderCursors(
+			overlayElement,
+			blockEditorDocument ?? null,
+			postId ?? null,
+			postType ?? null,
+			RERENDER_DELAY_MS
+		);
+
+	const {
+		highlights,
+		rerenderHighlightsAfterDelay,
+		rerenderHighlightsOnResize,
+	} = useBlockHighlighting(
 		overlayElement,
 		blockEditorDocument ?? null,
 		postId ?? null,
@@ -64,10 +106,12 @@ export function Overlay( {
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
 	// resizes, and re-render the cursors and block highlights.
+	// Use the RAF-based callback so positions are measured after the browser
+	// has finished layout, without an arbitrary fixed delay.
 	const onResize = useCallback( () => {
-		rerenderCursorsAfterDelay();
-		rerenderHighlightsAfterDelay();
-	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
+		rerenderCursorsOnResize();
+		rerenderHighlightsOnResize();
+	}, [ rerenderCursorsOnResize, rerenderHighlightsOnResize ] );
 	const resizeObserverRef = useResizeObserver( onResize );
 
 	// Trigger the initial position computation on mount.
@@ -97,18 +141,21 @@ export function Overlay( {
 		resizeObserverRef,
 	] );
 
-	// Track cursor element refs for registry registration.
+	// Track cursor and highlight avatar element refs for registry registration.
 	const cursorRefsMap = useRef< Map< number, HTMLElement > >( new Map() );
 
-	// Keep the registry in sync whenever the rendered cursors change.
+	// Keep the registry in sync whenever cursors or highlights change.
 	useEffect( () => {
 		if ( ! cursorRegistry ) {
 			return;
 		}
 		const refs = cursorRefsMap.current;
-		const currentIds = new Set( cursors.map( ( c ) => c.clientId ) );
+		const currentIds = new Set( [
+			...cursors.map( ( c ) => c.clientId ),
+			...highlights.map( ( h ) => h.clientId ),
+		] );
 
-		// Unregister cursors that are no longer rendered.
+		// Unregister elements that are no longer rendered.
 		for ( const id of refs.keys() ) {
 			if ( ! currentIds.has( id ) ) {
 				cursorRegistry.unregisterCursor( id );
@@ -116,13 +163,13 @@ export function Overlay( {
 			}
 		}
 
-		// Register or update cursors that are currently rendered.
+		// Register or update elements that are currently rendered.
 		for ( const [ id, el ] of refs.entries() ) {
 			cursorRegistry.registerCursor( id, el );
 		}
 
 		return () => cursorRegistry.removeAll();
-	}, [ cursors, cursorRegistry ] );
+	}, [ cursors, highlights, cursorRegistry ] );
 
 	// Callback ref factory to capture each cursor's DOM element.
 	const setCursorRef = useCallback(
@@ -157,49 +204,61 @@ export function Overlay( {
 								} }
 							/>
 						) ) }
-					<div
-						ref={ setCursorRef( cursor.clientId ) }
-						className="collaborators-overlay-user"
-						style={ {
-							left: `${ cursor.x }px`,
-							top: `${ cursor.y }px`,
-						} }
-					>
-						{ ! cursor.isMe && (
-							<div
-								className="collaborators-overlay-user-cursor"
-								style={ {
-									backgroundColor: cursor.color,
-									height: `${ cursor.height }px`,
-								} }
-							/>
-						) }
-						<Avatar
-							className="collaborators-overlay-user-label"
-							variant="badge"
-							size="small"
-							src={ cursor.avatarUrl }
-							name={ cursor.userName }
-							label={ cursor.isMe ? __( 'You' ) : undefined }
-							borderColor={ cursor.color }
-						/>
-					</div>
+					{ cursor.x !== undefined && (
+						<div
+							ref={ setCursorRef( cursor.clientId ) }
+							className="collaborators-overlay-user"
+							style={ {
+								left: `${ cursor.x }px`,
+								top: `${ cursor.y }px`,
+							} }
+						>
+							{ ! cursor.isMe && (
+								<div
+									className="collaborators-overlay-user-cursor"
+									style={ {
+										backgroundColor: cursor.color,
+										height: `${ cursor.height }px`,
+									} }
+								/>
+							) }
+							{ cursor.blockClientId !==
+								blockClientIdBeingWritten && (
+								<Avatar
+									className="collaborators-overlay-user-label"
+									variant="badge"
+									size="small"
+									src={ cursor.avatarUrl }
+									name={ cursor.userName }
+									label={
+										cursor.isMe ? __( 'You' ) : undefined
+									}
+									borderColor={ cursor.color }
+								/>
+							) }
+						</div>
+					) }
 				</div>
 			) ) }
 			{ highlights.map( ( highlight ) => (
-				<Avatar
+				<div
 					key={ highlight.blockId }
-					className="collaborators-overlay-block-label"
-					variant="badge"
-					size="small"
-					src={ highlight.avatarUrl }
-					name={ highlight.userName }
-					borderColor={ highlight.color }
+					ref={ setCursorRef( highlight.clientId ) }
 					style={ {
+						position: 'absolute',
 						left: `${ highlight.x }px`,
 						top: `${ highlight.y }px`,
 					} }
-				/>
+				>
+					<Avatar
+						className="collaborators-overlay-block-label"
+						variant="badge"
+						size="small"
+						src={ highlight.avatarUrl }
+						name={ highlight.userName }
+						borderColor={ highlight.color }
+					/>
+				</div>
 			) ) }
 		</div>
 	);

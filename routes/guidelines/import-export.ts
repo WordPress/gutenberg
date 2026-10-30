@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { downloadBlob } from '@wordpress/blob';
 import { dispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import {
 	scopeSlug,
 	blockSlug,

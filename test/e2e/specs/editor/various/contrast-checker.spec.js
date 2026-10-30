@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // Per-context warning messages rendered inside the color popover's notice.
@@ -110,10 +107,10 @@ test.describe( 'Contrast Checker', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
-		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );
 
 		const editorSettings = page.getByRole( 'region', {
@@ -419,7 +416,7 @@ test.describe( 'Contrast Checker', () => {
 			.getByRole( 'button', { name: 'Elements options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
 			.click();
 		await elementsPanel
 			.getByRole( 'button', { name: 'Elements options' } )

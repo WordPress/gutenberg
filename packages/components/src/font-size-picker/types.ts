@@ -1,4 +1,9 @@
-export type FontSizePickerProps = {
+import type { ToggleGroupControlProps } from '../toggle-group-control/types';
+
+export type FontSizePickerProps = Pick<
+	ToggleGroupControlProps,
+	'__next40pxDefaultSize' | 'size'
+> & {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
 	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
@@ -74,20 +79,6 @@ export type FontSizePickerProps = {
 	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Size of the control.
-	 *
-	 * @deprecated This prop no longer has any effect.
-	 * @ignore
-	 */
-	size?: 'default' | '__unstable-large';
 };
 
 export type FontSize = {

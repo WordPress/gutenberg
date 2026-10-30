@@ -344,6 +344,7 @@ The following presets can be defined via `theme.json`:
 - `spacing.spacingSizes`/`spacing.spacingScale`: generates a single custom property per preset value.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
+- `typography.textShadowPresets`: generates a single class and custom property per preset value.
 
 The naming schema for the classes and the custom properties is as follows:
 
@@ -505,13 +506,13 @@ body {
 .has-big-font-size { font-size: 32; }
 .has-normal-font-size { font-size: 16; }
 
-/* Block-level classes (bounded to the group block) */
-.wp-block-group.has-black-color { color: #a156b4 !important; }
-.wp-block-group.has-black-background-color { background-color: #a156b4 !important; }
-.wp-block-group.has-black-border-color { border-color: #a156b4 !important; }
-.wp-block-group.has-white-color { color: #444 !important; }
-.wp-block-group.has-white-background-color { background-color: #444 !important; }
-.wp-block-group.has-white-border-color { border-color: #444 !important; }
+/* Block-level classes (bounded to the group block, wrapped in :where() to keep the same specificity as top-level classes) */
+:where(.wp-block-group).has-black-color { color: #a156b4 !important; }
+:where(.wp-block-group).has-black-background-color { background-color: #a156b4 !important; }
+:where(.wp-block-group).has-black-border-color { border-color: #a156b4 !important; }
+:where(.wp-block-group).has-white-color { color: #444 !important; }
+:where(.wp-block-group).has-white-background-color { background-color: #444 !important; }
+:where(.wp-block-group).has-white-border-color { border-color: #444 !important; }
 
 ```
 {% end %}
@@ -1041,7 +1042,11 @@ h3 {
 {% end %}
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
+Pseudo selectors are supported for these elements:
+
+- `link` and `button`: `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link`.
+- `textInput`: `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and the `::placeholder` pseudo-element.
+- `select`: `:hover`, `:focus`, `:focus-visible`, `:active`.
 
 ```json
 "elements": {
@@ -1052,6 +1057,25 @@ Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:
 			":hover": {
 				"color": {
 					"text": "hotpink"
+				}
+			}
+		}
+	}
+```
+
+`:user-valid` and `:user-invalid` only match after a visitor has interacted with the field, so empty required fields aren't marked as invalid when the page loads. `::placeholder` styles the placeholder text, not the field itself:
+
+```json
+"elements": {
+		"textInput": {
+			":user-invalid": {
+				"border": {
+					"color": "#d63638"
+				}
+			},
+			"::placeholder": {
+				"color": {
+					"text": "#757575"
 				}
 			}
 		}
@@ -1110,7 +1134,7 @@ Responsive overrides can be placed directly on a block node:
 @media (width <= 480px) { :root :where(.wp-block-group) { color: hotpink; } }
 ```
 
-They can also be placed on element nodes within a block:
+A breakpoint can also carry styles for a block's elements, including their pseudo selectors:
 
 ```json
 {
@@ -1143,10 +1167,10 @@ They can also be placed on element nodes within a block:
 ```
 
 ```css
-:root :where(.wp-block-group a)        { color: blue; }
-@media (width <= 480px) { :root :where(.wp-block-group a)       { color: red; } }
-:root :where(.wp-block-group a:hover)  { color: navy; }
-@media (width <= 480px) { :root :where(.wp-block-group a:hover) { color: darkred; } }
+:root :where(.wp-block-group a:where(:not(.wp-element-button))) { color: blue; }
+@media (width <= 480px) { :root :where(.wp-block-group a:where(:not(.wp-element-button))) { color: red; } }
+:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover) { color: navy; }
+@media (width <= 480px) { :root :where(.wp-block-group a:where(:not(.wp-element-button)):hover) { color: darkred; } }
 ```
 
 Responsive overrides are always output after the default styles they override, so the cascade order is preserved without needing to increase specificity.

@@ -100,6 +100,7 @@
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"align": true,
 		"html": false,
@@ -128,12 +129,15 @@
 		"color": {
 			"heading": true,
 			"text": true,
+			"link": true,
+			"button": true,
 			"background": false,
 			"__experimentalSkipSerialization": [ "gradients" ],
 			"enableContrastChecker": false
 		},
 		"dimensions": {
-			"aspectRatio": true
+			"aspectRatio": true,
+			"minWidth": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -152,7 +156,8 @@
 			"allowJustification": false
 		},
 		"interactivity": {
-			"clientNavigation": true
+			"clientNavigation": true,
+			"interactive": true
 		},
 		"filter": {
 			"duotone": true

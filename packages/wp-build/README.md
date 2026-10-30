@@ -6,7 +6,7 @@ Build tool for WordPress plugins.
 
 `@wordpress/build` is an opinionated build system designed for WordPress plugins. It provides:
 
-- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using esbuild
+- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using Rolldown
 - **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
 - **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
 - **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
@@ -52,12 +52,24 @@ or via npm script:
 }
 ```
 
+### Build Concurrency
+
+By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
+
 ### Testing Generated Styles
 
-Generated CSS module output skips automatic style injection when `NODE_ENV` is
-`test`. Node-based DOM implementations such as jsdom do not reliably support
-modern CSS features, so tests that need actual styles in the DOM should
-run in a browser environment.
+Generated CSS output skips automatic style injection in Node-based environments
+when `NODE_ENV` is `test` and `process` is defined. Browsers have no `process`,
+so they always receive styles. Node-based DOM implementations such as jsdom do
+not reliably support modern CSS features, so tests that need actual styles in
+the DOM should run in a browser environment.
+
+## Browser support
+
+JavaScript and CSS builds use [Browserslist](https://github.com/browserslist/browserslist)
+when specifying build targets. You can either [provide your own](https://github.com/browserslist/browserslist#config-file),
+or the default [`@wordpress/browserslist-config`](https://www.npmjs.com/package/@wordpress/browserslist-config)
+will be used to follow [WordPress browser support](https://make.wordpress.org/core/handbook/best-practices/browser-support/).
 
 ## Package Configuration
 
@@ -107,7 +119,7 @@ Additional script dependencies:
 
 ```json
 {
-	"wpScriptExtraDependencies": ["wp-polyfill"]
+	"wpScriptExtraDependencies": [ "wp-polyfill" ]
 }
 ```
 
@@ -277,7 +289,7 @@ Pages can be defined as simple strings or as objects with initialization modules
 			"my-admin-page",
 			{
 				"id": "my-other-page",
-				"init": ["@my-plugin/my-page-init"]
+				"init": [ "@my-plugin/my-page-init" ]
 			}
 		]
 	}
@@ -287,9 +299,10 @@ Pages can be defined as simple strings or as objects with initialization modules
 **Page Configuration:**
 
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "experimental": true }` - Page with optional init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "capability": "edit_theme_options", "experimental": true }` - Page with optional init modules
     - **`id`** (required): The page slug used in WordPress admin URLs
     - **`init`** (optional): Array of script module IDs to execute during page initialization
+    - **`capability`** (optional, default `manage_options`): Capability a user needs to view the page. Full-page mode enforces this itself, since it renders outside the menu page callback flow; match it to the capability used when registering the page's menu entry.
     - **`experimental`** (optional, default `false`): When `true`, the page is excluded from WordPress Core builds (`IS_WORDPRESS_CORE=true`), along with any route that belongs only to experimental pages.
 
 **Generated Files:**
@@ -301,6 +314,12 @@ This generates two page modes:
 - `build/pages.php` - Loader for all pages
 
 Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
+
+**Boot module:**
+
+Pages boot through the `@wordpress/boot` script module, which ships with WordPress Core 7.0+ and the Gutenberg plugin. Plugins do not need their own `packages/boot`.
+
+The generated page files use a plugin-local `build/modules/boot/index.min.asset.php` if it exists, and Core's copy in `wp-includes/js/dist/script-modules/boot/` otherwise. If neither is available, the page enqueues nothing and shows only the "This screen requires JavaScript" notice.
 
 **Registering a menu item for WP-Admin mode:**
 
@@ -426,6 +445,18 @@ This configuration:
 - **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
 - **Asset files**: `.asset.php` files are always generated for WordPress dependency management
 
+## SVG imports
+
+SVG files can be imported from JavaScript. The file is inlined into the JavaScript and the import resolves to a `data:` URI:
+
+```js
+import logo from './logo.svg';
+
+const Example = () => <img src={ logo } alt="" />;
+```
+
+Because the SVG travels with the JavaScript, it works in bundles and in transpiled packages (`build/`, `build-module/`) without a public path or an extra file to ship. Other image formats are not supported yet.
+
 ## Output Structure
 
 The built tool generates several files in the `build/` directory, but the primary output is the PHP registration file.
@@ -471,7 +502,7 @@ For routes that should appear on multiple pages:
 {
 	"route": {
 		"path": "/settings",
-		"page": ["my-admin-page", "other-page"]
+		"page": [ "my-admin-page", "other-page" ]
 	}
 }
 ```
@@ -522,13 +553,13 @@ Export a `route` object with optional hooks. Each hook receives `{ params, searc
 
 ```tsx
 export const route = {
-	beforeLoad: ({ params, search }) => {
+	beforeLoad: ( { params, search } ) => {
 		// Pre-navigation validation, auth checks
 	},
-	loader: ({ params, search }) => {
+	loader: ( { params, search } ) => {
 		// Data preloading
 	},
-	canvas: ({ params, search }) => {
+	canvas: ( { params, search } ) => {
 		// Return CanvasData to use default canvas (editor)
 		return {
 			postType: params.type,
@@ -542,7 +573,7 @@ export const route = {
 
 		// Return undefined to show no canvas
 		// return undefined;
-	}
+	},
 };
 ```
 
@@ -569,26 +600,28 @@ Widgets provide a file-based discovery system for building self-contained UI com
 ```text
 widgets/
   hello-world/
-    widget.json     # Static discovery metadata (required)
-    widget.ts       # Runtime schema entry point (optional)
-    render.tsx      # UI component entry point (optional)
-    render.scss     # Optional styles (bundled inline when imported from render.tsx)
-    package.json    # Optional npm dependencies manifest
+    widget.json       # Static discovery metadata (required)
+    widget.ts         # Runtime values entry point (optional)
+    render.tsx        # UI component entry point (optional)
+    style.module.css  # Optional styles, imported from render.tsx and injected at runtime
+    package.json      # Optional npm dependencies manifest
 ```
 
 ### Why two entries?
 
 Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata between `block.json` and `edit.js`:
 
-| Concern | Lives in | Reason |
-| --- | --- | --- |
-| Identity (`name`) | both (must match) | server needs it to register; client uses it to resolve the runtime entry |
-| Translatable metadata (`title`, `description`, `help`, `keywords`) | `widget.json` | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime |
-| Framing (`category`, `presentation`) | `widget.json` | plain JSON the host reads without a JS runtime |
-| Attribute schema (types, options, labels, `relevance`) | `widget.ts` | needs TypeScript coupling with `render` props; labels are translated with `__()` |
-| Icon and `example` | `widget.ts` | runtime values co-located with the attribute schema |
+| Concern                                                            | Lives in          | Reason                                                                                                                           |
+| ------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Identity (`name`)                                                  | `widget.json`     | server needs it to register; the record carries it to the client                                                                 |
+| Translatable metadata (`title`, `description`, `help`, `keywords`) | `widget.json`     | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime                             |
+| Framing (`category`, `presentation`)                               | `widget.json`     | plain JSON the host reads without a JS runtime                                                                                   |
+| Icon and actions (`icon`, `actions`)                               | `widget.json`     | plain JSON; the icon is a registered name resolved client-side, action labels are translated server-side via `textdomain`        |
+| Attribute schema (types, options, labels, `relevance`)             | `widget.json`     | plain JSON; labels translated server-side via `textdomain`; a `widget.ts` entry with the same `id` adds what JSON cannot express |
+| `example` attributes                                               | `widget.json`     | plain JSON; a `widget.ts` `example` wins when its values need code                                                               |
+| Attribute props that need code                                     | `widget.ts`       | runtime values                                                                                                                   |
 
-Rule of thumb: anything the host needs before loading a widget's module — identity, translatable copy, framing — goes in `widget.json`, which the build forwards to `build/widgets/registry.php` and exposes through the REST API. Anything that needs TypeScript or runtime values (attribute schema, icon, `example`) goes in `widget.ts`.
+Rule of thumb: anything the host needs before loading a widget's module — identity, translatable copy, framing, attribute schema, example attributes — goes in `widget.json`, which the build forwards to `build/widgets/registry.php` and exposes through the REST API. Anything that needs code (an attribute's `Edit` component or custom validator, an `example` with runtime values) goes in `widget.ts`.
 
 ### `widget.json` — static discovery metadata
 
@@ -599,6 +632,9 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 	"description": "A simple example widget.",
 	"help": {
 		"content": "A short note for compact surfaces such as tooltips."
+	},
+	"example": {
+		"attributes": { "greeting": "World", "showDate": true }
 	},
 	"category": "demo",
 	"textdomain": "my-plugin"
@@ -611,19 +647,22 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 - **`title`** (optional): Human-readable title. Translated server-side using `textdomain`.
 - **`description`** (optional): Short description. Translated server-side using `textdomain`.
 - **`help`** (optional): Contextual help note for compact surfaces. An object with `content` (may carry `<em>`/`<strong>`) and optional `links` (`label`, `href`). Translated server-side using `textdomain`.
+- **`icon`** (optional): Registered icon name (`collection/icon-name`), resolved client-side through the site's icon registry. A name that does not match the shape is dropped at registration.
+- **`actions`** (optional): Declarative actions, each with `id`, `label` and `href`, plus optional `icon`, `relevance` (`high`, `medium`, `low`), `download` and `openInNewTab`. Labels are translated server-side using `textdomain`. A relative `href` naming a file in the widget directory resolves to its URL at registration; `data:` and `javascript:` hrefs are rejected.
 - **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
+- **`attributes`** (optional): Attribute schema, one entry per attribute with the JSON-expressible subset of a DataViews `Field` (`id`, `type`, `label`, `elements`, `isValid` without `custom`, ...) plus an optional `relevance` (`high`, `medium`, `low`). `type` may name a registered field type. `label`, `header`, `description`, `placeholder`, and option labels and descriptions are translated server-side using `textdomain`.
+- **`example`** (optional): Structured example, `{ "attributes": { … } }`: the attributes hosts preview the widget with, and apply to a new instance created without any. JSON values only; an `example` in `widget.ts` wins over it.
 - **`category`** (optional): Grouping category for filtering
 - **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
-- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`
+- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, `keywords`, action labels and attribute labels
 
-### `widget.ts` — runtime schema
+### `widget.ts` — runtime values
 
-Exports a default object with the widget's runtime contract: typed attributes (with translated labels), icon, and example data. Identity and translatable copy (`title`, `description`, `keywords`) live in `widget.json`. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
+Optional. Exports a default object with what needs code: attribute entries that add an `Edit` component or a custom validator to a `widget.json` attribute with the same `id`, and an `example` whose values only exist at runtime, which wins over the `widget.json` one. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
 
 ```ts
-import { wordpress } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 import type { WidgetAttributeField } from '@wordpress/widget-primitives';
+import { GreetingControl } from './greeting-control';
 
 type HelloWorldAttributes = {
 	greeting: string;
@@ -631,39 +670,19 @@ type HelloWorldAttributes = {
 };
 
 const widget = {
-	name: 'my-plugin/hello-world',
-	icon: wordpress,
-	attributes: [
-		{
-			id: 'greeting',
-			type: 'text',
-			label: __( 'Greeting', 'my-plugin' ),
-			relevance: 'high',
-		},
-		{
-			id: 'showDate',
-			type: 'boolean',
-			label: __( 'Show current date', 'my-plugin' ),
-		},
-	] satisfies WidgetAttributeField< HelloWorldAttributes >[],
-	example: {
-		attributes: {
-			greeting: 'World',
-			showDate: true,
-		},
-	},
+	attributes: [ { id: 'greeting', Edit: GreetingControl } ] satisfies Partial<
+		WidgetAttributeField< HelloWorldAttributes >
+	>[],
 };
 
 export default widget;
 ```
 
-Each attribute entry is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'low'`). The widget declares importance; the host decides where to expose each field. When absent, `relevance` defaults to `'low'`.
-
-The same `HelloWorldAttributes` type is consumed by `render.tsx`, giving the author a single source of truth for the data contract.
+Entries merge by `id` with the `widget.json` schema: the JSON value wins a shared key, the module adds the rest, and `isValid` merges rule by rule so JSON rules and a module `custom` validator coexist. A widget whose attributes and example are plain data needs no `widget.ts`.
 
 ### `render.tsx` — UI component
 
-The render entry receives `attributes` matching the schema declared in `widget.ts`. It is bundled with CSS support (import `.scss` / `.css` directly).
+The render entry receives `attributes` matching the schema declared in `widget.json` and, when the host allows edits, `setAttributes`. Styles are imported from the entry, as a CSS Module (`style.module.css`) or a plain `.css` / `.scss` file, and injected at runtime.
 
 ```tsx
 interface HelloWorldRenderProps {
@@ -677,21 +696,23 @@ export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
 	return (
 		<div>
 			Hello, { attributes.greeting ?? 'World' }!
-			{ attributes.showDate && <time>{ new Date().toLocaleDateString() }</time> }
+			{ attributes.showDate && (
+				<time>{ new Date().toLocaleDateString() }</time>
+			) }
 		</div>
 	);
 }
 ```
 
-All non-JSON entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`, `.mjs`.
+All non-JSON entries are optional. Either entry may use any of `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts` or `.cts`; ship one file per entry.
 
 ### Widgets Build Output
 
 The build system generates:
 
-- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM)
+- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM), when the widget ships a `render.*` entry
 - `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
-- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
+- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM), when the widget ships a `widget.*` entry
 - `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
 - `build/widgets/registry.php` — Widget registry data
 - `build/widgets.php` — Script module registration logic

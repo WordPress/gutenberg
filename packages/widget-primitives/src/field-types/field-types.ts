@@ -10,16 +10,13 @@
  * The `resolveFields` function converts any reference to a registered name
  * into the standard per-field `Field` properties that DataViews recognizes.
  */
-
-/**
- * WordPress dependencies
- */
 import type { Field, FieldTypeName } from '@wordpress/dataviews';
 
 /**
- * Any lowercase name, plain (`location`) or namespaced (`acme/rating`).
- * The `string & {}` form keeps DataViews' native names as IDE
- * suggestions when unioned with `FieldTypeName`.
+ * One or two lowercase kebab-case segments, each starting with a letter,
+ * plain (`location`) or namespaced (`acme/rating`); see
+ * `FIELD_TYPE_NAME_PATTERN`. The `string & {}` form keeps DataViews' native
+ * names as IDE suggestions when unioned with `FieldTypeName`.
  */
 export type RegisteredFieldTypeName = string & {};
 
@@ -50,8 +47,9 @@ type FieldTypeDefaults< Item > = Pick<
  * built-in defaults (sort, operators, validation semantics)
  * the resolved field inherits for anything not provided here.
  */
-export interface FieldTypeDefinition< Item = unknown >
-	extends FieldTypeDefaults< Item > {
+export interface FieldTypeDefinition<
+	Item = unknown,
+> extends FieldTypeDefaults< Item > {
 	name: RegisteredFieldTypeName;
 	baseType?: FieldTypeName;
 }

@@ -1,5 +1,6 @@
 /**
- * Shared positioning defaults for item-list popups, e.g. Select or Combobox.
+ * Shared positioning defaults for item-list popups, e.g. Select, Combobox,
+ * or Autocomplete.
  */
 export const ITEM_POPUP_POSITIONER_PROPS = {
 	align: 'start',

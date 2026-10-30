@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 
 export const ALLOWED_FILE_EXTENSIONS = [ 'otf', 'ttf', 'woff', 'woff2' ];

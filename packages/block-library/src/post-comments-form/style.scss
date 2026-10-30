@@ -59,15 +59,6 @@
 		}
 	}
 
-	.comment-form-author,
-	.comment-form-email,
-	.comment-form-url {
-		label {
-			display: block;
-			margin-bottom: 0.25em;
-		}
-	}
-
 	.comment-form-cookies-consent {
 		display: flex;
 		gap: 0.25em;
@@ -84,4 +75,11 @@
 			margin-left: 0.5em;
 		}
 	}
+}
+
+:where(.wp-block-post-comments-form .comment-form-author label),
+:where(.wp-block-post-comments-form .comment-form-email label),
+:where(.wp-block-post-comments-form .comment-form-url label) {
+	display: block;
+	margin-bottom: 0.25em;
 }

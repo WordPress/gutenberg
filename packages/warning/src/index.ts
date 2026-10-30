@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { logged } from './utils';
 
 function isDev(): boolean {

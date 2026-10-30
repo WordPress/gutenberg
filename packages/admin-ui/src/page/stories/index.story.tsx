@@ -1,21 +1,21 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
-import { Badge, Button, Text } from '@wordpress/ui';
+import { useCallback, useState } from '@wordpress/element';
+import {
+	Badge,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
+	Button,
+	Text,
+} from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
+import type { NavigationLinkProps } from '../../navigation/types';
 import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
 	component: Page,
-	title: 'Admin UI/Page',
+	id: 'admin-ui-page',
+	title: 'Design System/Admin UI/Page',
 	parameters: {
 		layout: 'fullscreen',
 	},
@@ -25,7 +25,6 @@ const meta: Meta< typeof Page > = {
 				<Story />
 			</div>
 		),
-		withRouter,
 	],
 };
 
@@ -53,6 +52,7 @@ export const WithSubtitle: Story = {
 };
 
 export const WithBreadcrumbs: Story = {
+	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		breadcrumbs: (
@@ -79,6 +79,7 @@ export const WithVisual: Story = {
 };
 
 export const WithVisualAndBreadcrumbs: Story = {
+	decorators: [ withRouter ],
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
@@ -117,6 +118,7 @@ export const WithImageVisual: Story = {
 };
 
 export const WithBreadcrumbsAndSubtitle: Story = {
+	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		subTitle: 'All of the subtitle text you need goes here.',
@@ -152,6 +154,7 @@ export const WithTitleAndBadges: Story = {
 };
 
 export const WithBreadcrumbsAndBadges: Story = {
+	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		breadcrumbs: (
@@ -187,7 +190,81 @@ export const WithActions: Story = {
 	},
 };
 
+/**
+ * Demonstrates `components.link`: a custom link that intercepts navigation and
+ * drives `currentHref` from local state, keeping the links usable without a
+ * real router.
+ */
+export const WithInteractiveNavigation: Story = {
+	render: function Render( args ) {
+		const [ currentHref, setCurrentHref ] = useState( '/overview' );
+		const link = useCallback(
+			( { href, children, ...props }: NavigationLinkProps ) => (
+				<a
+					{ ...props }
+					href={ href }
+					onClick={ ( event ) => {
+						event.preventDefault();
+						setCurrentHref( href );
+					} }
+				>
+					{ children }
+				</a>
+			),
+			[]
+		);
+
+		return (
+			<Page
+				{ ...args }
+				components={ { link } }
+				navigation={ {
+					items: [
+						{ label: 'Overview', href: '/overview' },
+						{ label: 'Products', href: '/products' },
+						{ label: 'Orders', href: '/orders' },
+						{ label: 'Customers', href: '/customers' },
+					],
+					currentHref,
+				} }
+			/>
+		);
+	},
+	args: {
+		title: 'Analytics',
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithNavigation: Story = {
+	...WithInteractiveNavigation,
+};
+
+export const WithNavigationAndActions: Story = {
+	...WithInteractiveNavigation,
+	args: {
+		title: 'Analytics',
+		subTitle: 'Review key metrics to understand performance.',
+		actions: (
+			<>
+				<Button size="compact" variant="outline">
+					Export
+				</Button>
+				<Button size="compact" variant="solid">
+					Add widget
+				</Button>
+			</>
+		),
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
 export const FullHeader: Story = {
+	decorators: [ withRouter ],
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'All of the subtitle text you need goes here.',
@@ -200,6 +277,15 @@ export const FullHeader: Story = {
 			/>
 		),
 		badges: <Badge intent="informational">Status</Badge>,
+		navigation: {
+			items: [
+				{ label: 'Overview', href: '/overview' },
+				{ label: 'Products', href: '/products' },
+				{ label: 'Orders', href: '/orders' },
+				{ label: 'Customers', href: '/customers' },
+			],
+			currentHref: '/overview',
+		},
 		actions: (
 			<>
 				<Button size="compact" variant="outline">

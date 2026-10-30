@@ -1,22 +1,31 @@
-/**
- * WordPress dependencies
- */
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { info } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, Link, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { help } from '@wordpress/icons';
+import {
+	Icon,
+	Link,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Popover,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import styles from './widget-header.module.css';
 
 export interface WidgetInfotipProps {
 	/**
+	 * Names the popup; shown in it when `showTitle`.
+	 */
+	title: string;
+
+	/**
+	 * Show the title, for a header that clips it.
+	 */
+	showTitle?: boolean;
+
+	/**
 	 * Help content to display; may carry `<em>`/`<strong>`.
 	 */
-	content: string;
+	content?: string;
 
 	/**
 	 * Links rendered after the content.
@@ -28,21 +37,27 @@ export interface WidgetInfotipProps {
 }
 
 /**
- * Header infotip: a click-open popover holding the widget type's help note.
- *
- * @param {WidgetInfotipProps} props Component props.
+ * Header infotip: a hover- or click-open popover with the help note and, when
+ * the header clips it, the full title. The ref reaches the trigger.
  */
-export function WidgetInfotip( {
-	content,
-	links,
-}: WidgetInfotipProps ): React.ReactNode {
+export const WidgetInfotip = forwardRef<
+	HTMLButtonElement,
+	WidgetInfotipProps
+>( function UnforwardedWidgetInfotip(
+	{ title, showTitle = false, content, links },
+	ref
+): React.ReactNode {
 	return (
 		<Popover.Root modal="trap-focus">
 			<Popover.Trigger
+				ref={ ref }
+				openOnHover
+				delay={ 200 }
+				closeDelay={ 200 }
 				aria-label={ __( 'More information' ) }
 				className={ styles.help }
 			>
-				<Icon icon={ info } size={ 20 } />
+				<Icon icon={ help } size={ 20 } />
 			</Popover.Trigger>
 
 			<Popover.Popup
@@ -50,17 +65,23 @@ export function WidgetInfotip( {
 				positioner={ <Popover.Positioner side="top" align="start" /> }
 			>
 				<Popover.Arrow />
-				<VisuallyHidden render={ <Popover.Title /> }>
-					{ __( 'More information' ) }
-				</VisuallyHidden>
+				{ ! showTitle && (
+					<VisuallyHidden render={ <Popover.Title /> }>
+						{ title }
+					</VisuallyHidden>
+				) }
 
 				<Stack direction="column" align="start" gap="sm">
-					<Popover.Description>
-						{ createInterpolateElement( content, {
-							em: <em />,
-							strong: <strong />,
-						} ) }
-					</Popover.Description>
+					{ showTitle && <Popover.Title>{ title }</Popover.Title> }
+
+					{ content && (
+						<Popover.Description>
+							{ createInterpolateElement( content, {
+								em: <em />,
+								strong: <strong />,
+							} ) }
+						</Popover.Description>
+					) }
 
 					{ links && links.length > 0 && (
 						<Stack direction="row" align="start" gap="sm">
@@ -79,4 +100,4 @@ export function WidgetInfotip( {
 			</Popover.Popup>
 		</Popover.Root>
 	);
-}
+} );

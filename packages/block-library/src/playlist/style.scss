@@ -4,6 +4,9 @@
 $waveform-player-height: 100px;
 
 .wp-block-playlist {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;

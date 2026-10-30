@@ -6,16 +6,9 @@
  * `ResolveWidgetModule`) live in `@wordpress/widget-primitives` and are
  * imported from there directly; this module does not re-export them.
  */
-
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type {
+	ColumnSteps,
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,
 } from '@wordpress/grid';
@@ -45,6 +38,12 @@ export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
  * placement happens to be at runtime.
  */
 export type DashboardTilePlacement = GridTilePlacement | MasonryTilePlacement;
+
+/**
+ * Attribute bag of a widget instance, as edited by the dashboard's
+ * attribute surfaces.
+ */
+export type WidgetAttributeValues = Record< string, unknown >;
 
 /**
  * A widget placed on the dashboard.
@@ -114,18 +113,27 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Maximum column count for the widget dashboard on wide containers.
- * Not user-configurable; container width steps the count down to two
- * and one column at fixed breakpoints.
+ * Column count of the default policy on a wide container. A default, not
+ * a ceiling: the package renders whatever the host asks for.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
 /**
- * Settings common to every grid model. Column count is resolved from
- * the dashboard container width (see
- * `utils/resolve-dashboard-column-count`). `columns` and `minColumnWidth`
- * on this type remain for persisted payloads and `@wordpress/grid`
- * compatibility; the dashboard ignores user-facing values for both.
+ * Column policy used when the host sets neither `gridSettings.columns` nor
+ * `gridSettings.minColumnWidth`: one column from 0px, two from 600px and
+ * {@link WIDGET_DASHBOARD_COLUMN_COUNT} from 960px of container width. The
+ * steps are data the host can replace; the package applies none of its own.
+ */
+export const WIDGET_DASHBOARD_COLUMN_STEPS: ColumnSteps = {
+	0: 1,
+	600: 2,
+	960: WIDGET_DASHBOARD_COLUMN_COUNT,
+};
+
+/**
+ * Settings common to every grid model. The column policy travels to the
+ * `@wordpress/grid` surface untouched: the surface measures its own width
+ * and resolves the count from `columns` and `minColumnWidth`.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -134,14 +142,21 @@ export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Target column count (cap). The dashboard always uses
-	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}; persisted values are ignored.
+	 * Column count. A number applies at every width; a map applies a count
+	 * from each container width up (`{ 0: 1, 600: 2, 960: 4 }` is one
+	 * column from 0px, two from 600px, four from 960px). A step can be
+	 * `'auto'`, which lifts the cap from that width up and leaves the count
+	 * to `minColumnWidth`; with no floor set, the step is skipped and the
+	 * count below it holds. Counts are floored at one with no ceiling.
+	 * Absent, the policy is the default steps (`DEFAULT_GRID.columns`), or
+	 * whatever `minColumnWidth` fits when that is set.
 	 */
-	columns?: number;
+	columns?: number | ColumnSteps;
 
 	/**
-	 * Per-tile minimum width in pixels. Unused by the dashboard; column
-	 * count is derived from container width instead.
+	 * Per-column floor in pixels. The surface fits as many columns as its
+	 * width allows at this floor, capped by `columns` when set, down to one.
+	 * A non-finite or non-positive value is unset.
 	 */
 	minColumnWidth?: number;
 }
@@ -154,8 +169,9 @@ export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
 	model?: 'grid';
 
 	/**
-	 * Row height in pixels (`200` small, `300` medium, `400` large). Every
-	 * tile in a row fills the row vertically.
+	 * Row height in pixels. Any positive value is honored; `ROW_HEIGHT_PRESETS`
+	 * suggests three. Every tile in a row fills the row vertically, and a
+	 * tile's stored `height` counts rows of this size.
 	 */
 	rowHeight?: number;
 }
@@ -183,8 +199,46 @@ export interface WidgetMasonryLayoutSettings extends BaseWidgetGridSettings {
  * pre-union shape.
  */
 export type WidgetGridSettings =
-	| WidgetGridLayoutSettings
-	| WidgetMasonryLayoutSettings;
+	WidgetGridLayoutSettings | WidgetMasonryLayoutSettings;
+
+/**
+ * The operations that act on one placed widget.
+ */
+export type DashboardInstanceOperation = 'remove' | 'move' | 'resize' | 'edit';
+
+/**
+ * A request for an instance operation: the placed widget, and its type
+ * when registered. The type is absent when it is not in `widgetTypes`
+ * (a plugin gone, a module that failed to load): the engine still asks,
+ * because the instance is still on the board, but a policy that keys
+ * locks on the type has nothing to match.
+ */
+export interface DashboardInstanceOperationRequest {
+	operation: DashboardInstanceOperation;
+	widget: DashboardWidget;
+	widgetType?: WidgetType;
+}
+
+/**
+ * An operation the dashboard asks permission for, with its subject.
+ * `customize` is entering customize mode; `reset` is restoring the default
+ * layout; `insert` is offering a widget type in the inserter; `remove`,
+ * `move`, `resize`, and `edit` act on a placed widget.
+ */
+export type DashboardOperationRequest =
+	| { operation: 'customize' }
+	| { operation: 'reset' }
+	| { operation: 'insert'; widgetType: WidgetType }
+	| DashboardInstanceOperationRequest;
+
+/**
+ * Answers whether an operation is allowed. Return `true` for operations
+ * you do not govern: policies compose restrictively, so a default `false`
+ * would deny every operation the engine adds later.
+ */
+export type CanPerformDashboardOperation = (
+	request: DashboardOperationRequest
+) => boolean;
 
 /**
  * Props for `WidgetDashboard`.

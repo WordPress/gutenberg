@@ -9,15 +9,18 @@ import type { RootProps } from './types';
  * Every drawer must include a `Drawer.Title` component for accessibility — it
  * serves as both the visible heading and the accessible label for the drawer.
  *
- * Always include a visible close affordance, either `Drawer.CloseIcon` or a
+ * Always include a visible close affordance, either `Drawer.CloseIconButton` or a
  * clear dismissing action button. If your drawer has a "Cancel" button in the
  * footer, the close icon may be redundant and create confusion about what
  * clicking "X" means.
  *
- * Use `Drawer.CloseIcon` for informational drawers where dismissing is safe
+ * Use `Drawer.CloseIconButton` for informational drawers where dismissing is safe
  * and expected. For drawers requiring explicit user choice (especially
  * destructive actions), omit the close icon and rely on footer action buttons
  * like "Cancel" and "Confirm" instead.
+ *
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-dialog-usage-guidelines--docs)
+ * for when to use `Dialog` or `Drawer`.
  */
 function Root( {
 	modal = true,

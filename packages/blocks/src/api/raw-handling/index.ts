@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { getPhrasingContentSchema } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { htmlToBlocks } from './html-to-blocks';
 import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';

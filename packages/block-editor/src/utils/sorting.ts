@@ -1,6 +1,9 @@
 type Comparable = string | number | undefined;
-type SortItem = Record< string, Comparable >;
-type SortField< T > = string | ( ( item: T ) => Comparable );
+type SortItem = object;
+type ComparableKey< T > = {
+	[ K in keyof T ]: T[ K ] extends Comparable ? K : never;
+}[ keyof T ];
+type SortField< T > = ComparableKey< T > | ( ( item: T ) => Comparable );
 
 /**
  * Mirrors the `>` operator for `Comparable` values: lexicographic when both
@@ -21,13 +24,11 @@ function isGreater( a: Comparable, b: Comparable ): boolean {
  * Recursive stable sorting comparator function.
  *
  * @param field Field to sort by.
- * @param items Items to sort.
  * @param order Order, 'asc' or 'desc'.
  * @return Comparison function to be used in a `.sort()`.
  */
 const comparator = < T extends SortItem >(
 	field: SortField< T >,
-	items: T[],
 	order: string
 ) => {
 	return ( a: T, b: T ) => {
@@ -37,8 +38,8 @@ const comparator = < T extends SortItem >(
 			cmpA = field( a );
 			cmpB = field( b );
 		} else {
-			cmpA = a[ field ];
-			cmpB = b[ field ];
+			cmpA = a[ field ] as Comparable;
+			cmpB = b[ field ] as Comparable;
 		}
 
 		if ( isGreater( cmpA, cmpB ) ) {
@@ -47,16 +48,7 @@ const comparator = < T extends SortItem >(
 			return order === 'asc' ? -1 : 1;
 		}
 
-		const orderA = items.findIndex( ( item ) => item === a );
-		const orderB = items.findIndex( ( item ) => item === b );
-
-		// Stable sort: maintaining original array order
-		if ( orderA > orderB ) {
-			return 1;
-		} else if ( orderB > orderA ) {
-			return -1;
-		}
-
+		// `Array.prototype.toSorted` is stable, so ties keep their original order.
 		return 0;
 	};
 };
@@ -77,5 +69,5 @@ export function orderBy< T extends SortItem >(
 	field: SortField< T >,
 	order = 'asc'
 ) {
-	return items.concat().sort( comparator( field, items, order ) );
+	return items.toSorted( comparator( field, order ) );
 }

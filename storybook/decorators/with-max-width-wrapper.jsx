@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import styled from '@emotion/styled';
+import styles from './with-max-width-wrapper.module.scss';
 
 const maxWidthWrapperMap = {
 	none: 0,
@@ -9,19 +6,6 @@ const maxWidthWrapperMap = {
 	'small-container': 600,
 	'large-container': 960,
 };
-
-const Indicator = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 32px;
-	background: #e0e0e0;
-	text-transform: uppercase;
-	font-size: 11px;
-	font-weight: var( --wpds-typography-font-weight-emphasis );
-	color: #757575;
-	margin-top: 24px;
-`;
 
 export const WithMaxWidthWrapper = ( Story, context ) => {
 	/**
@@ -36,7 +20,9 @@ export const WithMaxWidthWrapper = ( Story, context ) => {
 	return (
 		<div style={ { maxWidth } }>
 			<Story { ...context } />
-			<Indicator>{ `Max-Width Wrapper - ${ maxWidth }px` }</Indicator>
+			<div
+				className={ styles.indicator }
+			>{ `Max-Width Wrapper - ${ maxWidth }px` }</div>
 		</div>
 	);
 };

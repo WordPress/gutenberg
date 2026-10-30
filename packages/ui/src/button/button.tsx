@@ -4,19 +4,20 @@ import { speak } from '@wordpress/a11y';
 import { forwardRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { type ButtonProps } from './types';
+import { Spinner } from '../spinner';
 import styles from './style.module.css';
 import resetStyles from '../utils/css/resets.module.css';
-import focusStyles from '../utils/css/focus.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
  *
  * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
- * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
+ * for when to use `Button`, `IconButton`, `Link`, or `ButtonLink`.
  */
 export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
-	function Button(
+	function UnforwardedButton(
 		{
 			tone = 'brand',
 			variant = 'solid',
@@ -59,6 +60,9 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 				{ ...props }
 			>
 				{ children }
+				{ loading && variant !== 'unstyled' && (
+					<Spinner className={ styles.spinner } />
+				) }
 			</_Button>
 		);
 	}

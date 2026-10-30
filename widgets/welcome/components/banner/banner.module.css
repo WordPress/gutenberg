@@ -16,12 +16,12 @@
 	overflow: hidden;
 }
 
-.bannerContent {
+.banner-content {
 	position: relative;
 	z-index: 1;
 }
 
-.bannerLink {
+.banner-link {
 	color: inherit;
 	text-decoration: underline;
 	text-underline-offset: 0.2em;

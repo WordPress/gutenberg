@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { postCategories as icon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';

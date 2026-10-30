@@ -1,17 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	privateApis as blocksPrivateApis,
 	getBlockType,
 	unregisterBlockVariation,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -21,7 +14,7 @@ import transforms from './transforms';
 import variations from './variations';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -29,6 +22,8 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately, like the paragraph.
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
@@ -62,13 +57,13 @@ export const settings = {
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
 						level
-				  )
+					)
 				: sprintf(
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						__( 'Level %1$s. %2$s' ),
 						level,
 						content
-				  );
+					);
 		}
 	},
 	transforms,
@@ -84,20 +79,6 @@ export const settings = {
 	save,
 	variations,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'content',
-			label: __( 'Content' ),
-			type: 'text',
-			Edit: 'rich-text', // TODO: replace with custom component
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'content' ],
-	};
-}
 
 export const init = () => {
 	const block = initBlock( { name, metadata, settings } );

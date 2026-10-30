@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
-import { group, row, stack, grid } from '@wordpress/icons';
+import { group, row, stack, grid, layout } from '@wordpress/icons';
 
 const example = {
 	innerBlocks: [
@@ -86,5 +83,18 @@ const variations = [
 		example,
 	},
 ];
+
+if ( window.__experimentalEnableGridInteractivity ) {
+	variations.push( {
+		name: 'group-canvas',
+		title: __( 'Canvas' ),
+		description: __( 'Place blocks freely on a grid.' ),
+		attributes: { layout: { type: 'grid', isManualPlacement: true } },
+		scope: [ 'block', 'inserter', 'transform' ],
+		isActive: [ 'layout.type', 'layout.isManualPlacement' ],
+		icon: layout,
+		example,
+	} );
+}
 
 export default variations;

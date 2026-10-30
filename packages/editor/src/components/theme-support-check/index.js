@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**

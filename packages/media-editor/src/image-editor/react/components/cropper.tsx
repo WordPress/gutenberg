@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useCallback,
@@ -16,20 +8,16 @@ import {
 	useLayoutEffect,
 	useId,
 	forwardRef,
+	flushSync,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type {
-	CropperState,
 	HandlePosition,
 	StencilProps,
 	Size,
 	NormalizedRect,
 } from '../../core/types';
-import type { CropperController } from '../hooks/use-cropper-reducer';
+import type { CropperController } from '../hooks/use-cropper-controller';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
 import {
@@ -78,7 +66,7 @@ const SETTLE_STENCIL_TRANSITION = [
 export interface CropperProps {
 	/** Image source URL. */
 	src: string;
-	/** The cropper controller from `useCropperReducer` or a composite store. */
+	/** The cropper controller from `useCropperController` or a composite store. */
 	controller: CropperController;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
@@ -104,19 +92,17 @@ export interface CropperProps {
 	freeformCrop?: boolean;
 	/** Focus the crop area when the cropper mounts. */
 	focusOnMount?: boolean;
+	/**
+	 * Ignore all crop interaction: pointer drags, wheel zoom, keyboard
+	 * pan/zoom and the stencil's resize handles. Any gesture already in
+	 * flight is cancelled. Used while the edit is being saved, so the
+	 * modifiers sent to the server cannot change after the request starts.
+	 */
+	disabled?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
-	/**
-	 * Callback fired on every state change. Fires at pointermove rate
-	 * during drags, so keep the handler light — no heavy work, no
-	 * expensive parent re-renders. For commit-style events (drag end,
-	 * settled crop), use `onGestureEnd` instead.
-	 *
-	 * Useful for lightweight syncing with external tools, analytics,
-	 * or AI agents. Receives the full state so consumers can derive
-	 * whatever they need.
-	 */
-	onStateChange?: ( state: CropperState ) => void;
+	/** Callback fired when the image fails to load. */
+	onImageError?: () => void;
 	/** Fires when a continuous gesture begins (pan drag, handle resize, pinch zoom). */
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointerup, resize settle). */
@@ -137,7 +123,7 @@ export interface CropperProps {
  *
  * @param root0                   Component props implementing CropperProps.
  * @param root0.src               Image source URL.
- * @param root0.controller        The cropper controller from `useCropperReducer` or a composite store.
+ * @param root0.controller        The cropper controller from `useCropperController` or a composite store.
  * @param root0.stencil           Custom stencil component.
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
@@ -148,8 +134,9 @@ export interface CropperProps {
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
  * @param root0.focusOnMount      Focus the crop area on mount.
+ * @param root0.disabled          Ignore all crop interaction.
  * @param root0.onImageLoaded     Image load callback.
- * @param root0.onStateChange     Every-frame state callback.
+ * @param root0.onImageError      Image error callback.
  * @param root0.onGestureStart    Gesture boundary start.
  * @param root0.onGestureEnd      Gesture boundary end.
  * @param root0.className         Additional CSS class.
@@ -169,8 +156,9 @@ function CropperInner(
 		aspectRatio,
 		freeformCrop = false,
 		focusOnMount = false,
+		disabled = false,
 		onImageLoaded,
-		onStateChange,
+		onImageError,
 		onGestureStart,
 		onGestureEnd,
 		className,
@@ -257,11 +245,16 @@ function CropperInner(
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setCanvasSize( ( prev ) => {
-					if ( prev.width === width && prev.height === height ) {
-						return prev;
-					}
-					return { width, height };
+				// Render before the next paint, so the image keeps up with
+				// a container that is resizing every frame (such as while
+				// the sidebar animates) instead of trailing it by a frame.
+				flushSync( () => {
+					setCanvasSize( ( prev ) => {
+						if ( prev.width === width && prev.height === height ) {
+							return prev;
+						}
+						return { width, height };
+					} );
 				} );
 			}
 		} );
@@ -270,11 +263,6 @@ function CropperInner(
 			observer.disconnect();
 		};
 	}, [] );
-
-	// Notify consumer of state changes.
-	useEffect( () => {
-		onStateChange?.( state );
-	}, [ state, onStateChange ] );
 
 	// ARIA announcements: announce significant state changes for screen readers
 	// via the centralized @wordpress/a11y speak() API called inside the hook.
@@ -574,14 +562,17 @@ function CropperInner(
 			return;
 		}
 
-		setCropRect( snappedCropRect );
+		// The display scale crossing the threshold is not an edit, so the
+		// snap must not record an undo entry. Recording it here would also
+		// clear the redo stack whenever an undo or redo crosses it.
+		adjustCropRectForViewport( snappedCropRect );
 	}, [
+		adjustCropRectForViewport,
 		aspectRatio,
 		displayScale,
 		freeformCrop,
 		naturalWidth,
 		naturalHeight,
-		setCropRect,
 		state,
 	] );
 
@@ -597,6 +588,7 @@ function CropperInner(
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
+		disabled,
 	} );
 
 	// Compose focus-visibility tracking into the canvas event handlers.
@@ -644,6 +636,7 @@ function CropperInner(
 		},
 		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
 			if (
+				disabled ||
 				isResizingRef.current ||
 				isTouchPinchingRef.current ||
 				( event.pointerType === 'touch' && event.isPrimary === false )
@@ -761,7 +754,9 @@ function CropperInner(
 
 	// Settling animation: brief transition after resize end.
 	const [ settling, setSettling ] = useState( false );
-	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const settleTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 	const finishSettling = useCallback( () => {
 		clearTimeout( settleTimerRef.current );
 		isSettlingRef.current = false;
@@ -963,23 +958,9 @@ function CropperInner(
 		};
 	}
 
-	// Forward the root element to the consumer's ref.
-	const setContainerRef = useCallback(
-		( element: HTMLDivElement | null ) => {
-			if ( typeof ref === 'function' ) {
-				ref( element );
-			} else if ( ref ) {
-				(
-					ref as React.MutableRefObject< HTMLDivElement | null >
-				 ).current = element;
-			}
-		},
-		[ ref ]
-	);
-
 	return (
 		<div
-			ref={ setContainerRef }
+			ref={ ref }
 			className={ clsx(
 				'wp-media-editor-image-editor',
 				isDragging && 'wp-media-editor-image-editor--dragging',
@@ -1054,6 +1035,7 @@ function CropperInner(
 						src={ src }
 						alt=""
 						onLoad={ handleImageLoad }
+						onError={ onImageError }
 						style={ imageStyle }
 						draggable={ false }
 					/>
@@ -1079,7 +1061,7 @@ function CropperInner(
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
-						isResizeDisabled={ isTouchPinching }
+						isResizeDisabled={ isTouchPinching || disabled }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }

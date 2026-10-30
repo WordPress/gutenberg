@@ -3,6 +3,11 @@ export interface FixtureItem {
 	label: string;
 }
 
+export interface FixtureGroup {
+	label: string;
+	items: FixtureItem[];
+}
+
 export const ITEMS: FixtureItem[] = [
 	{ value: 'apple', label: 'Apple' },
 	{ value: 'apricot', label: 'Apricot' },
@@ -54,4 +59,31 @@ export const ITEMS: FixtureItem[] = [
 	{ value: 'strawberry', label: 'Strawberry' },
 	{ value: 'tangerine', label: 'Tangerine' },
 	{ value: 'watermelon', label: 'Watermelon' },
+];
+
+export const GROUPED_ITEMS: FixtureGroup[] = [
+	{
+		label: 'Common',
+		items: [
+			{ value: 'apple', label: 'Apple' },
+			{ value: 'banana', label: 'Banana' },
+			{ value: 'orange', label: 'Orange' },
+		],
+	},
+	{
+		label: 'Berries',
+		items: [
+			{ value: 'strawberry', label: 'Strawberry' },
+			{ value: 'blueberry', label: 'Blueberry' },
+			{ value: 'raspberry', label: 'Raspberry' },
+		],
+	},
+	{
+		label: 'Tropical',
+		items: [
+			{ value: 'mango', label: 'Mango' },
+			{ value: 'pineapple', label: 'Pineapple' },
+			{ value: 'papaya', label: 'Papaya' },
+		],
+	},
 ];

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 // Regression test for https://github.com/WordPress/gutenberg/issues/75778.

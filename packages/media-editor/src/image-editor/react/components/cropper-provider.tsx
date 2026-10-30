@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
-	useCropperReducer,
+	useCropperController,
 	type CropperController,
-} from '../hooks/use-cropper-reducer';
+} from '../hooks/use-cropper-controller';
 import type { CropperState } from '../../core/types';
 
 /**
  * The context value type for the CropperProvider.
- * Contains the cropper controller from useCropperReducer.
+ * Contains the cropper controller from useCropperController.
  */
 type CropperContextValue = CropperController | null;
 
@@ -31,7 +24,7 @@ interface CropperProviderProps {
 }
 
 /**
- * Convenience context provider that wraps `useCropperReducer`.
+ * Convenience context provider that wraps `useCropperController`.
  *
  * Provides the pure cropper controller (state + setters, NO undo
  * history) to all descendant components via React context.
@@ -49,7 +42,7 @@ export function CropperProvider( {
 	initialState,
 	children,
 }: CropperProviderProps ) {
-	const cropperReturn = useCropperReducer( initialState );
+	const cropperReturn = useCropperController( initialState );
 
 	return (
 		<CropperContext.Provider value={ cropperReturn }>

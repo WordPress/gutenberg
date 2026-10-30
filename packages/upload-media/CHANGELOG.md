@@ -2,9 +2,88 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
+-   Finish uploading an image that wasm-vips can process but the browser cannot decode. The big image size threshold check let the `createImageBitmap()` rejection escape, leaving the upload stuck in thumbnail generation ([#83530](https://github.com/WordPress/gutenberg/pull/83530)).
+
+## 0.43.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. Sub-sizes of animated GIF and WebP images, cropped ones included, keep their animation instead of flattening to the first frame unless the setting is `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+-   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
+
+### Internal
+
+-   Remove unused internal filename helpers and the orphaned URL dependency ([#85094](https://github.com/WordPress/gutenberg/pull/85094)).
+-   Convert the private actions tests to TypeScript ([#84930](https://github.com/WordPress/gutenberg/pull/84930)).
+
+## 0.42.0 (2026-10-07)
+
+## 0.41.0 (2026-09-23)
+
+### New Features
+
+-   Add the `isHeicFile` export, which recognizes a HEIC/HEIF image from its file header rather than from the MIME type the browser infers from the file name ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+
+### Bug Fixes
+
+-   Detect HEIC uploads from the file header rather than the file name, so a HEIC file with a wrong extension or an empty MIME type is converted instead of leaving the upload stuck, and abandon a stalled `ImageDecoder` decode after a timeout instead of hanging the upload ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+-   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+
+## 0.40.0 (2026-09-10)
+
+### Bug Fixes
+
+-   A HEIC file that fails to convert for a reason other than a missing decoder, such as a damaged or truncated file or a canvas that could not be created, is no longer reported as the browser being unable to read HEIC. That message names a browser that would decode HEIC instead, which is no help when the codec was never the problem. It is now kept for the one case that earns it, where no decoding strategy is available at all; everything else reports a processing error ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
+### Internal
+
+-   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
+-   Remove unused dependency `@wordpress/preferences` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.39.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.38.0 (2026-08-12)
+
+### Enhancements
+
+-   The error shown when a HEIC file cannot be converted now explains the failure in terms of the browser and operating system in use, and points at the browsers that do decode HEIC there, since HEIC decoding depends on OS-provided codecs. Exposed as the new `getHeicUnsupportedMessage` and `getHeicConversionAdvice` exports ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
+
+### Bug Fixes
+
+-   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
+## 0.37.0 (2026-07-29)
+
+### Breaking Changes
+
+-   `vipsResizeImage`, `vipsCompressImage`, and `vipsConvertImageFormat` now accept their optional parameters (`smartCrop`, `addSuffix`, `signal`, `scaledSuffix`, `quality`, `interlaced`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+
+### Enhancements
+
+-   Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+-   Animated GIF to video conversion is now abandoned after a timeout (default 30 seconds) and skipped entirely for GIFs whose total decoded pixels (width × height × frame count) exceed a budget. In both cases the original GIF upload is kept and no error is surfaced; a `SCRIPT_DEBUG` diagnostic explains the skip. Both knobs are configurable via the `TranscodeGif` operation args ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
+
+### Bug Fixes
+
+-   `cancelItem` no longer awaits the best-effort worker cancellation calls. A busy vips worker is synchronously blocked inside a wasm call and cannot answer the cancellation RPC until every operation already queued in the worker finishes, which for a large animated GIF left cancelled items stuck in the queue - and the parent attachment unfinalized - for minutes ([#80376](https://github.com/WordPress/gutenberg/issues/80376)).
+-   Pass `isTransportOnly: true` to the `mediaUpload` setting when the queue uploads a file, so consumers that manage the upload lifecycle themselves (progress tracking, save locking) don't handle the same file twice ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+
+## 0.36.0 (2026-07-14)
+
 ### Enhancement
 
-- Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
+-   Honor the `wp_editor_set_quality` filter for client-side processed images. Sub-size resizing and transcoding now use the size-aware quality reported by the new `image_quality` field on the attachment upload response, instead of a hardcoded default.
 
 ### Enhancements
 

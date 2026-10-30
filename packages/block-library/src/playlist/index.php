@@ -8,7 +8,7 @@
 /**
  * Renders the `core/playlist` block on server.
  *
- * @since 6.9.0
+ * @since 7.1.0
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
@@ -37,13 +37,18 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$playlist_tracks[] = $track_id;
 
 				// Extract track metadata from block attributes.
-				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
-				$artist     = $track_attributes['artist'] ?? '';
-				$album      = $track_attributes['album'] ?? '';
-				$image      = $track_attributes['image'] ?? '';
-				$image_alt  = $track_attributes['imageAlt'] ?? '';
-				$url        = $track_attributes['src'] ?? '';
-				$aria_label = $title;
+				$track_title_attr = $track_attributes['title'] ?? null;
+				$track_artist     = $track_attributes['artist'] ?? null;
+				$track_album      = $track_attributes['album'] ?? null;
+				$track_image      = $track_attributes['image'] ?? null;
+				$track_src        = $track_attributes['src'] ?? null;
+				$title            = ! empty( $track_title_attr ) && is_string( $track_title_attr ) ? $track_title_attr : __( 'Unknown title' );
+				$artist           = is_string( $track_artist ) ? $track_artist : '';
+				$album            = is_string( $track_album ) ? $track_album : '';
+				$image            = is_string( $track_image ) ? $track_image : '';
+				$image_alt        = $track_attributes['imageAlt'] ?? '';
+				$url              = is_string( $track_src ) ? $track_src : '';
+				$aria_label       = $title;
 
 				if ( $title && $artist && $album ) {
 					$aria_label = sprintf(
@@ -57,13 +62,14 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 				// Data is passed to wp_interactivity_state() which JSON-encodes it,
 				// so we use wp_strip_all_tags() instead of esc_html() to prevent
-				// HTML injection without double-encoding. URLs still use esc_url().
+				// HTML injection without double-encoding. For the same reason, URLs
+				// use sanitize_url(), as esc_url() would turn `&` into `&#038;`.
 				$tracks_data[ $track_id ] = array(
-					'url'       => esc_url( $url ),
+					'url'       => sanitize_url( $url ),
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => esc_url( $image ),
+					'image'     => sanitize_url( $image ),
 					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
@@ -140,33 +146,43 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	></div>';
 
 	// Add the waveform player container inside the figure.
-	$figure = null;
-	preg_match( '/<figure[^>]*>/', $content, $figure );
-	if ( ! empty( $figure[0] ) ) {
-		$content = preg_replace( '/(<figure[^>]*>)/', '$1' . $html, $content, 1 );
-	}
+	$processor = new class( $content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Inserts HTML immediately after the current token.
+		 *
+		 * @since 7.1.4
+		 *
+		 * @param string $html HTML to insert.
+		 */
+		public function block_core_playlist_insert_after( string $html ) {
+			$this->set_bookmark( 'here' );
+			$span = $this->bookmarks['here'];
 
-	$processor = new WP_HTML_Tag_Processor( $content );
-	$processor->next_tag( 'figure' );
-	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $span->start + $span->length, 0, $html );
+		}
+	};
 
 	$waveform_style = $attributes['waveformStyle'] ?? 'bars';
 
-	$processor->set_attribute(
-		'data-wp-context',
-		wp_json_encode(
-			array(
-				'playlistId'            => $playlist_id,
-				'currentId'             => $playlist_tracks[0],
-				'isPlaying'             => false,
-				'tracks'                => $playlist_tracks,
-				'waveformStyle'         => $waveform_style,
-				'showPlayButtonArtwork' => $show_play_button_artwork,
-				'labelPauseTrack'       => __( 'Pause' ),
-				'labelSelectTrack'      => __( 'Play' ),
+	if ( $processor->next_tag( 'figure' ) ) {
+		$processor->block_core_playlist_insert_after( $html );
+		$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
+		$processor->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array(
+					'playlistId'            => $playlist_id,
+					'currentId'             => $playlist_tracks[0],
+					'isPlaying'             => false,
+					'tracks'                => $playlist_tracks,
+					'waveformStyle'         => $waveform_style,
+					'showPlayButtonArtwork' => $show_play_button_artwork,
+					'labelPauseTrack'       => __( 'Pause' ),
+					'labelSelectTrack'      => __( 'Play' ),
+				)
 			)
-		)
-	);
+		);
+	}
 
 	// Track IDs are render-time only. Add them after inner blocks have rendered
 	// so track buttons can update the Interactivity API state without storing
@@ -197,7 +213,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 /**
  * Registers the `core/playlist` block on server.
  *
- * @since 6.9.0
+ * @since 7.1.0
  */
 function register_block_core_playlist() {
 	register_block_type_from_metadata(

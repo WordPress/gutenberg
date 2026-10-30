@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Locator, Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from '../fixtures';
 
 const USER_A_TEXT =

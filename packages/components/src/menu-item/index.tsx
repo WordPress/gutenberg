@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
@@ -30,6 +19,7 @@ function UnforwardedMenuItem(
 		iconPosition = 'right',
 		shortcut,
 		isSelected,
+		onMouseMove,
 		role = 'menuitem',
 		suffix,
 		...buttonProps
@@ -69,6 +59,19 @@ function UnforwardedMenuItem(
 			className={ className }
 			accessibleWhenDisabled
 			{ ...buttonProps }
+			onMouseMove={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
+				onMouseMove?.( event );
+				const menu = event.currentTarget.closest( '[role="menu"]' );
+				if (
+					! event.defaultPrevented &&
+					role.startsWith( 'menuitem' ) &&
+					menu?.contains(
+						event.currentTarget.ownerDocument.activeElement
+					)
+				) {
+					event.currentTarget.focus( { preventScroll: true } );
+				}
+			} }
 		>
 			<span className="components-menu-item__item">{ children }</span>
 			{ ! suffix && (

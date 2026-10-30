@@ -2,6 +2,7 @@
 	"name": "core/site-preview",
 	"title": "Site preview",
 	"description": "Shows preview of the site homepage.",
+	"icon": "dashboard-widgets/site-logo",
 	"category": "dashboard",
 	"presentation": "full-bleed",
 	"textdomain": "default"

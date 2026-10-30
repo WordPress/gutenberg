@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ItemExitOverlayRect } from './item-exit-overlay';
 import type { RectSnapshot } from './use-layout-shift-animation';
 
@@ -35,9 +28,7 @@ type UseItemExitAnimationOptions = {
 		string,
 		RectSnapshot
 	> | null;
-	childrenCacheRef: React.MutableRefObject<
-		Map< string, React.ReactElement >
-	>;
+	childrenCacheRef: React.RefObject< Map< string, React.ReactElement > >;
 };
 
 type UseItemExitAnimationResult = {

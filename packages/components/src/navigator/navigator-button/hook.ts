@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { escapeAttribute } from '@wordpress/escape-html';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import Button from '../../button';

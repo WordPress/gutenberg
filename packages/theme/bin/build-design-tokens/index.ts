@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, build } from '@terrazzo/parser';
-import config from '../../terrazzo.config';
+import config from '../../terrazzo.config.ts';
 
 const sources = await Promise.all(
 	config.tokens.map( async ( tokenUrl: URL ) => ( {
@@ -12,23 +12,12 @@ const sources = await Promise.all(
 );
 
 const {
-	tokens: parsedTokens,
+	tokens,
 	sources: parsedSources,
 	resolver,
 } = await parse( sources, {
 	config,
-	skipLint: true,
 } );
-
-// Temporary workaround for Terrazzo bug where `alphabetize: false` leaves token
-// map keys in JSON Pointer form (e.g. `#/foo/bar`) while `aliasOf` references
-// remain dot-delimited (e.g. `foo.bar`), breaking alias lookups. Transforms the
-// map keys using the already-normalized `token.id`.
-//
-// See: https://github.com/terrazzoapp/terrazzo/issues/734
-const tokens = Object.fromEntries(
-	Object.values( parsedTokens ).map( ( token ) => [ token.id, token ] )
-);
 
 const { outputFiles } = await build( tokens, {
 	sources: parsedSources,

@@ -1,0 +1,47 @@
+/*
+ * The avatar, icon and name of the author views of posts and templates.
+ */
+.avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	inline-size: 24px;
+	block-size: 24px;
+	align-items: center;
+	justify-content: start;
+	display: flex;
+}
+
+.avatar img {
+	inline-size: 16px;
+	block-size: 16px;
+	object-fit: cover;
+	opacity: 0;
+	border-radius: 100%;
+}
+
+@media not (prefers-reduced-motion) {
+	.avatar img {
+		transition: opacity 0.1s linear;
+	}
+}
+
+.avatar.is-loaded img {
+	opacity: 1;
+}
+
+.icon {
+	display: flex;
+	flex-shrink: 0;
+	inline-size: 24px;
+	block-size: 24px;
+}
+
+.icon svg {
+	margin-inline-start: -4px;
+	fill: currentColor;
+}
+
+.name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

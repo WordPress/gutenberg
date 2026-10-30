@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedRect, Size } from '../types';
 
 /**

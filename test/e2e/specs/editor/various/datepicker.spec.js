@@ -1,7 +1,5 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 // Set browser to a timezone that's different to `timezone`.
 test.use( {
@@ -22,9 +20,8 @@ TIMEZONES.forEach( ( timezone ) => {
 			await requestUtils.updateSiteSettings( { timezone } );
 		} );
 
-		test.beforeEach( async ( { admin, editor } ) => {
+		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
-			await editor.openDocumentSettingsSidebar();
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -33,84 +30,43 @@ TIMEZONES.forEach( ( timezone ) => {
 			} );
 		} );
 
-		test( 'should show the publishing date as "Immediately" if the date is not altered', async ( {
-			page,
-		} ) => {
-			await expect(
-				page.getByRole( 'button', { name: 'Change date' } )
-			).toHaveText( 'Immediately' );
-		} );
-
 		test( 'should show the publishing date if the date is in the past', async ( {
+			editor,
 			page,
 		} ) => {
-			const datepicker = page.getByRole( 'button', {
-				name: 'Change date',
-			} );
-			await datepicker.click();
+			const summary = await openPostSummary( { editor, page } );
+			await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 
-			// Change the publishing date to a year in the future.
+			const lastYear = new Date().getFullYear() - 1;
 			await page
-				.getByRole( 'group', { name: 'Date' } )
-				.getByRole( 'spinbutton', { name: 'Year' } )
-				.click();
-			await page.keyboard.press( 'ArrowDown' );
+				.getByLabel( 'Date time' )
+				.fill( `${ lastYear }-03-15T10:00` );
 			await page.keyboard.press( 'Escape' );
 
-			// The expected date format will be "Sep 26, 2018 11:52 pm".
+			// The row renders the date in the site timezone, so the wall time
+			// entered above must come back unshifted regardless of the
+			// browser timezone.
 			await expect(
-				page.getByRole( 'button', { name: 'Change date' } )
-			).toContainText( /^[A-Za-z]+\s\d{1,2},\s\d{1,4}/ );
+				summary.getByText( `Mar 15, ${ lastYear } 10:00 am` )
+			).toBeVisible();
 		} );
 
 		test( 'should show the publishing date if the date is in the future', async ( {
+			editor,
 			page,
 		} ) => {
-			const datepicker = page.getByRole( 'button', {
-				name: 'Change date',
-			} );
-			await datepicker.click();
+			const summary = await openPostSummary( { editor, page } );
+			await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 
-			// Change the publishing date to a year in the future.
+			const nextYear = new Date().getFullYear() + 1;
 			await page
-				.getByRole( 'group', { name: 'Date' } )
-				.getByRole( 'spinbutton', { name: 'Year' } )
-				.click();
-			await page.keyboard.press( 'ArrowUp' );
+				.getByLabel( 'Date time' )
+				.fill( `${ nextYear }-03-15T10:00` );
 			await page.keyboard.press( 'Escape' );
 
-			// The expected date format will be "Sep 26, 2018 11:52 pm".
 			await expect(
-				page.getByRole( 'button', { name: 'Change date' } )
-			).toContainText( /^[A-Za-z]+\s\d{1,2},\s\d{1,4}/ );
-		} );
-
-		test( 'should show the publishing date as "Immediately" if the date is cleared', async ( {
-			page,
-		} ) => {
-			const datepicker = page.getByRole( 'button', {
-				name: 'Change date',
-			} );
-			await datepicker.click();
-
-			// Change the publishing date to a year in the future.
-			await page
-				.getByRole( 'group', { name: 'Date' } )
-				.getByRole( 'spinbutton', { name: 'Year' } )
-				.click();
-			await page.keyboard.press( 'ArrowUp' );
-			await page.keyboard.press( 'Escape' );
-
-			// Clear the date.
-			await datepicker.click();
-			await page
-				.getByLabel( 'Change publish date' )
-				.getByRole( 'button', { name: 'Now' } )
-				.click();
-
-			await expect(
-				page.getByRole( 'button', { name: 'Change date' } )
-			).toHaveText( 'Immediately' );
+				summary.getByText( `Mar 15, ${ nextYear } 10:00 am` )
+			).toBeVisible();
 		} );
 	} );
 } );

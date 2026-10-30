@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { info, caution, error, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import type { BadgeProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Icon from '../icon';
@@ -35,12 +25,21 @@ function contextBasedIcon( intent: BadgeProps[ 'intent' ] = 'default' ) {
 	}
 }
 
+/**
+ * @deprecated Use `Badge` from `@wordpress/ui` instead.
+ */
 function Badge( {
 	className,
 	intent = 'default',
 	children,
 	...props
 }: WordPressComponentProps< BadgeProps, 'span', false > ) {
+	deprecated( 'wp.components.privateApis.Badge', {
+		since: '7.2',
+		alternative: 'Badge from @wordpress/ui',
+		hint: 'This private API will be completely removed within a few Gutenberg plugin releases.',
+	} );
+
 	const icon = contextBasedIcon( intent );
 	const hasIcon = !! icon;
 

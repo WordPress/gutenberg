@@ -30,7 +30,7 @@
 
 	// Match the uppercase 11px heading the panel's other controls use for
 	// their labels (Zoom, Aspect ratio) so the groups read as section
-	// headings. Mirrors `baseLabelTypography` from `@wordpress/components`.
+	// headings. Matches InputControl's label typography in `@wordpress/components`.
 	&__label {
 		font-size: 11px;
 		font-weight: var(--wpds-typography-font-weight-emphasis);

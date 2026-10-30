@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 

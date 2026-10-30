@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block context', () => {
@@ -68,7 +65,7 @@ test.describe( 'Block context', () => {
 			} )
 			.click();
 		await editorPage
-			.getByRole( 'menuitem', { name: 'Preview in new tab' } )
+			.getByRole( 'menuitem', { name: 'Preview (opens in a new tab)' } )
 			.click();
 
 		// Check non-default context values are populated.

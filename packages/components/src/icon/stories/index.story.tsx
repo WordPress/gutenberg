@@ -5,7 +5,8 @@ import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
-	title: 'Components/Icon',
+	id: 'components-icon',
+	title: 'Components/@wordpress-components/Icon',
 	component: Icon,
 	parameters: {
 		controls: { expanded: true },

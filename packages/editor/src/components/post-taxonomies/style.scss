@@ -18,6 +18,11 @@
 	}
 }
 
+.editor-post-taxonomies__hierarchical-terms-add,
+.editor-post-taxonomies__hierarchical-terms-submit {
+	align-self: flex-start;
+}
+
 .editor-post-taxonomies__hierarchical-terms-subchoices {
 	margin-top: $grid-unit-10;
 	margin-left: $grid-unit-20;

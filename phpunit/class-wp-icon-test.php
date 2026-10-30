@@ -36,9 +36,11 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 	}
 
 	public function test_wp_get_icon_size_null_leaves_dimensions_untouched() {
-		$output = wp_get_icon( 'core/plus', array( 'size' => null ) );
-		$this->assertStringNotContainsString( 'width=', $output );
-		$this->assertStringNotContainsString( 'height=', $output );
+		$output    = wp_get_icon( 'core/plus', array( 'size' => null ) );
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+		$this->assertNull( $processor->get_attribute( 'width' ) );
+		$this->assertNull( $processor->get_attribute( 'height' ) );
 	}
 
 	public function test_wp_get_icon_size_zero_outputs_zero_dimensions() {
@@ -81,5 +83,22 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 	public function test_wp_get_icon_escapes_attributes() {
 		$output = wp_get_icon( 'core/plus', array( 'class' => '"><script>alert(1)</script>' ) );
 		$this->assertStringNotContainsString( '<script>', $output );
+	}
+
+	public function test_core_collection_is_public() {
+		$collection = WP_Icon_Collections_Registry::get_instance()->get_registered( 'core' );
+
+		$this->assertIsArray( $collection, 'The core collection should be registered.' );
+		$this->assertTrue( $collection['public'], 'The core collection should be public.' );
+	}
+
+	public function test_core_admin_collection_is_not_public() {
+		$collection = WP_Icon_Collections_Registry::get_instance()->get_registered( 'core-admin' );
+
+		$this->assertIsArray( $collection, 'The core-admin collection should be registered.' );
+		$this->assertFalse(
+			$collection['public'],
+			'The core-admin collection should not be public, so that the admin icons stay out of the REST API.'
+		);
 	}
 }

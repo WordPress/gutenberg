@@ -18,6 +18,19 @@
 	"supports": {
 		"align": [ "wide" ],
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -58,6 +71,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
 		}

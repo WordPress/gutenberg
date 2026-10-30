@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Middleware } from 'redux';
 import isPromise from 'is-promise';
 

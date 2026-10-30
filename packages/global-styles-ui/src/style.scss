@@ -2,7 +2,6 @@
 @use "@wordpress/base-styles/colors";
 @use "@wordpress/base-styles/mixins";
 @use "./font-library/style.scss" as *;
-@use "./pagination/style.scss" as *;
 @use "./screen-revisions/style.scss" as *;
 @use "./size-control/style.scss" as *;
 @use "./variations/style.scss" as *;
@@ -28,6 +27,25 @@
 	overflow: hidden;
 }
 
+.global-styles-ui-element-preview {
+	// The screen is a scrolling flex column, and this box hides its overflow,
+	// so without this it collapses when the panels below are taller than the
+	// screen.
+	flex-shrink: 0;
+	height: 120px;
+	margin: 0 variables.$grid-unit-20 20px;
+	border-radius: 2px;
+	overflow: hidden;
+	background: #f0f0f0;
+
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+}
+
 .global-styles-ui-font-size__item {
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -49,9 +67,52 @@
 	border-radius: 2px;
 }
 
+.global-styles-ui-block-types-filter {
+	margin-bottom: variables.$grid-unit-20;
+	padding: 0 variables.$grid-unit-20;
+}
+
 .global-styles-ui-block-types-search {
-	margin-bottom: 10px;
-	padding: 0 16px;
+	flex-grow: 1;
+}
+
+.global-styles-ui-block-types-item-list {
+	// Inset the rows, and their focus rings, from the edges of the sidebar,
+	// like List View. Icons have about 4px of space inside their 24px box, so
+	// with the small item padding the icon itself lines up with the 16px inset
+	// of the header, search field and headings.
+	margin-inline: variables.$grid-unit-05;
+
+	.global-styles-ui-block-types-item__icon {
+		min-width: variables.$grid-unit-30;
+	}
+
+	// Bordered and already inside the screen padding, so it lines up with its
+	// heading without the inset.
+	&.global-styles-ui-element-block-overrides__list {
+		margin-inline: 0;
+	}
+}
+
+.global-styles-ui-block-types-item-list__no-results {
+	padding-top: variables.$grid-unit-20;
+}
+
+// The rows above and below a group title already have about 5px of padding,
+// so these margins are smaller than the space they appear to leave.
+.global-styles-ui-block-types-group + .global-styles-ui-block-types-group {
+	margin-top: variables.$grid-unit-15;
+}
+
+// Keep the last row clear of the bottom of the scroll container. Padding
+// rather than margin, so it is kept at the end of the scrollable area.
+.global-styles-ui-block-types-group:last-child {
+	padding-bottom: variables.$grid-unit-15;
+}
+
+.global-styles-ui-block-types-group__title {
+	margin-bottom: variables.$grid-unit-15;
+	padding: 0 variables.$grid-unit-20;
 }
 
 .global-styles-ui-screen-typography__font-variants-count {
@@ -101,6 +162,16 @@
 	// Match the height of the rest of the icons (24px).
 	height: variables.$grid-unit * 3;
 	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+}
+
+.global-styles-ui__palette-preview {
+	display: inline-flex;
+
+	> * + * {
+		margin-inline-start: calc(-1 * variables.$grid-unit);
+	}
 }
 
 .global-styles-ui__shadows-panel__options-container,
@@ -116,37 +187,61 @@
 	overflow: hidden;
 }
 
-.global-styles-ui__shadow-preview-panel {
+.global-styles-ui__shadow-preview-panel,
+.global-styles-ui__text-shadow-preview-panel {
 	height: 144px;
 	border: #ddd 1px solid;
 	border-radius: 2px;
 	overflow: auto;
 	@include mixins.checkerboard-background( 8px );
-
-	.global-styles-ui__shadow-preview-block {
-		border: #ddd 1px solid;
-		border-radius: 2px;
-		background-color: #fff;
-		width: 60%;
-		height: 60px;
-	}
 }
 
-.global-styles-ui__shadow-editor__dropdown-content {
+.global-styles-ui__shadow-preview-block {
+	border: #ddd 1px solid;
+	border-radius: 2px;
+	background-color: #fff;
+	width: 60%;
+	height: 60px;
+}
+
+.global-styles-ui__text-shadow-preview-panel {
+	// Pull up against the screen header and separate from the editor below.
+	margin-block: variables.$grid-unit-10 * -1 variables.$grid-unit-20;
+}
+
+.global-styles-ui__text-shadow-preview-text {
+	font-size: 24px;
+}
+
+.global-styles-ui__text-shadow-editor__header {
+	margin-block-end: variables.$grid-unit-10;
+}
+
+.global-styles-ui__text-shadow-editor__inputs {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: variables.$grid-unit-20;
+}
+
+.global-styles-ui__shadow-editor__dropdown-content,
+.global-styles-ui__text-shadow-editor__dropdown-content {
 	width: 280px;
 }
 
-.global-styles-ui__shadow-editor-panel {
+.global-styles-ui__shadow-editor-panel,
+.global-styles-ui__text-shadow-editor-panel {
 	// because tooltip of the range control is too close to the edge and creates overflow
 	margin-bottom: 4px;
 }
 
-.global-styles-ui__shadow-editor__dropdown {
+.global-styles-ui__shadow-editor__dropdown,
+.global-styles-ui__text-shadow-editor__dropdown {
 	width: 100%;
 	position: relative;
 }
 
-.global-styles-ui__shadow-editor__dropdown-toggle {
+.global-styles-ui__shadow-editor__dropdown-toggle,
+.global-styles-ui__text-shadow-editor__dropdown-toggle {
 	width: 100%;
 	height: auto;
 	padding-top: 8px;
@@ -160,17 +255,15 @@
 	}
 }
 
-.global-styles-ui__shadow-editor__remove-button {
+.global-styles-ui__shadow-editor__remove-button,
+.global-styles-ui__text-shadow-editor__remove-button {
 	position: absolute;
 	right: 8px;
 	top: 8px;
 	opacity: 0;
 
-	&.global-styles-ui__shadow-editor__remove-button {
-		border: none;
-	}
-
 	.global-styles-ui__shadow-editor__dropdown-toggle:hover + &,
+	.global-styles-ui__text-shadow-editor__dropdown-toggle:hover + &,
 	&:focus,
 	&:hover {
 		opacity: 1;
@@ -269,6 +362,7 @@
 }
 
 .global-styles-ui-color-palette-panel,
-.global-styles-ui-gradient-palette-panel {
+.global-styles-ui-gradient-palette-panel,
+.global-styles-ui-duotone-palette-panel {
 	padding: variables.$grid-unit-20;
 }

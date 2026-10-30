@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, NormalizedPoint, CropperAction } from './types';
 import { MAX_ZOOM } from './constants';
 import { getMinZoom, restrictPanZoom } from './containment';
@@ -15,7 +12,7 @@ import { getMinZoom, restrictPanZoom } from './containment';
  * the crop center. Returns `null` when the clamped zoom matches the
  * current zoom (no-op).
  *
- * Extracted so multiple hooks (the pure `useCropperReducer` and the
+ * Extracted so multiple hooks (the pure `useCropperController` and the
  * composite `useMediaEditorState`) can share the math without
  * duplicating it.
  *
@@ -48,7 +45,7 @@ export function buildFocalPointZoomAction(
 		? {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
-		  }
+			}
 		: { width: 1, height: 1 };
 	const { pan: clampedPan }: { pan: NormalizedPoint } = restrictPanZoom(
 		{

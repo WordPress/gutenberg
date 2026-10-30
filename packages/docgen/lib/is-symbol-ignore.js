@@ -1,10 +1,7 @@
-/**
- * Internal dependencies
- */
 const getSymbolTagsByName = require( './get-symbol-tags-by-name' );
 
 /**
- * Returns true if, given a symbol object, it contains a @ignore tag, or false
+ * Returns true if, given a symbol object, it contains a `@ignore` tag, or false
  * otherwise.
  *
  * @param {Object} symbol Symbol object.

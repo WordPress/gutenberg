@@ -1,10 +1,12 @@
-/**
- * Internal dependencies
- */
 import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
-import { isPlainObject, navigationSignal, deepClone } from './utils';
+import {
+	isPlainObject,
+	navigationSignal,
+	deepClone,
+	jsonReviver,
+} from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -18,7 +20,7 @@ const serverStates = new Map();
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = ( namespace?: string ) =>
+export const getConfig = < T extends object = any >( namespace?: string ): T =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
@@ -111,8 +113,8 @@ type ConvertGeneratorsToPromises< T > = {
 			? T[ K ]
 			: ConvertGeneratorToPromise< T[ K ] >
 		: T[ K ] extends object
-		? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
-		: T[ K ];
+			? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
+			: T[ K ];
 };
 type ConvertPromiseToGenerator< T > = T extends (
 	...args: infer A
@@ -125,8 +127,8 @@ type ConvertPromisesToGenerators< T > = {
 			? T[ K ]
 			: ConvertPromiseToGenerator< T[ K ] >
 		: T[ K ] extends object
-		? Prettify< ConvertPromisesToGenerators< T[ K ] > >
-		: T[ K ];
+			? Prettify< ConvertPromisesToGenerators< T[ K ] > >
+			: T[ K ];
 };
 
 export const universalUnlock =
@@ -262,14 +264,14 @@ export function store(
 export const parseServerData = ( dom = document ) => {
 	const jsonDataScriptTag =
 		// Preferred Script Module data passing form
-		dom.getElementById(
-			'wp-script-module-data-@wordpress/interactivity'
+		dom.querySelector(
+			'script[id="wp-script-module-data-@wordpress/interactivity"]'
 		) ??
 		// Legacy form
-		dom.getElementById( 'wp-interactivity-data' );
-	if ( jsonDataScriptTag?.textContent ) {
+		dom.querySelector( 'script[id="wp-interactivity-data"]' );
+	if ( jsonDataScriptTag instanceof HTMLScriptElement ) {
 		try {
-			return JSON.parse( jsonDataScriptTag.textContent );
+			return JSON.parse( jsonDataScriptTag.text, jsonReviver );
 		} catch {}
 	}
 	return {};

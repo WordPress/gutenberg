@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createSelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type { AnnotationsState, Annotation } from '../types';
 
 /**

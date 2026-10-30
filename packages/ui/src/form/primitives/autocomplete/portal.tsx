@@ -11,7 +11,11 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function AutocompletePortal( { container, ...restProps }, ref ) {
 		return (
 			<_Autocomplete.Portal
-				container={ container ?? getWpCompatOverlaySlot() }
+				container={
+					container === undefined
+						? getWpCompatOverlaySlot()
+						: container
+				}
 				{ ...restProps }
 				ref={ ref }
 			/>

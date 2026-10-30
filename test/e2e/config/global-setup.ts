@@ -1,29 +1,16 @@
-/**
- * External dependencies
- */
+import path from 'path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
 
-async function globalSetup( config: FullConfig ) {
-	const { storageState, baseURL } = config.projects[ 0 ].use;
-	const storageStatePath =
-		typeof storageState === 'string' ? storageState : undefined;
-
+async function setupSite( baseURL?: string, storageStatePath?: string ) {
 	const requestContext = await request.newContext( {
 		baseURL,
 	} );
 
 	const requestUtils = new RequestUtils( requestContext, {
+		baseURL,
 		storageStatePath,
 	} );
 
@@ -46,6 +33,30 @@ async function globalSetup( config: FullConfig ) {
 	] );
 
 	await requestContext.dispose();
+}
+
+async function globalSetup( config: FullConfig ) {
+	const sites = process.env.WP_BASE_URLS?.split( ',' );
+	if ( sites ) {
+		await Promise.all(
+			sites.map( ( site, index ) =>
+				setupSite(
+					site,
+					path.join(
+						process.env.WP_ARTIFACTS_PATH!,
+						`storage-states/admin-${ index }.json`
+					)
+				)
+			)
+		);
+		return;
+	}
+
+	const { storageState, baseURL } = config.projects[ 0 ].use;
+	await setupSite(
+		baseURL,
+		typeof storageState === 'string' ? storageState : undefined
+	);
 }
 
 export default globalSetup;
