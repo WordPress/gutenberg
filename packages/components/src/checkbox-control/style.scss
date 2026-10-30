@@ -1,7 +1,5 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 .components-checkbox-control {
 	--checkbox-input-size: 16px;
@@ -30,7 +28,7 @@
 	&:checked::before,
 	&[aria-checked="mixed"]::before {
 		margin: -3px -5px;
-		color: $white;
+		color: var(--wpds-color-foreground-interactive-brand-strong);
 
 		@include break-medium() {
 			margin: -4px 0 0 -5px;
@@ -38,8 +36,8 @@
 	}
 
 	&[aria-checked="mixed"] {
-		background: $components-color-accent;
-		border-color: $components-color-accent;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
 
 		&::before {
 			// Inherited from `forms.css`.
@@ -77,8 +75,8 @@
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 	}
-	background: $white;
-	color: $gray-900;
+	background: var(--wpds-color-background-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	clear: none;
 	display: inline-block;
 	line-height: 0;
@@ -98,8 +96,8 @@
 	}
 
 	&:not(:disabled):is(:checked, :indeterminate) {
-		background: $components-color-accent;
-		border-color: $components-color-accent;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
 	}
 
 	&:not(:disabled) {
@@ -134,7 +132,7 @@
 
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
-	color: $white;
+	color: var(--wpds-color-foreground-interactive-brand-strong);
 	cursor: var(--wpds-cursor-control);
 	position: absolute;
 	left: 50%;
@@ -144,12 +142,18 @@ svg.components-checkbox-control__indeterminate {
 	height: var(--checkbox-input-size);
 	user-select: none;
 	pointer-events: none;
+	// Override the browser's SVG default so indicators follow forced system colors.
+	forced-color-adjust: auto;
 }
 
 .components-checkbox-control:has(:disabled) {
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
 	}
 }
 
