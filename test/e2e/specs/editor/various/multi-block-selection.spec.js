@@ -362,19 +362,19 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
+		// The floating block toolbar of the second paragraph would cover the
+		// first one, so the shift-click could land on the toolbar.
+		await editor.setIsFixedToolbar( true );
 		await editor.canvas
 			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		// Select the first paragraph: the block toolbar the mouse move shows
-		// then sits above it, not over the paragraph that is clicked.
-		await page.keyboard.press( 'ArrowUp' );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: '2' } )
+			.filter( { hasText: '1' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
 		await expect( multiBlockSelectionUtils.assertNativeSelection ).toPass();
@@ -402,6 +402,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 2, 3 ] );
+
+		await editor.setIsFixedToolbar( false );
 	} );
 
 	// @see https://github.com/WordPress/gutenberg/issues/34118
