@@ -19,6 +19,7 @@ const PAGES_QUERY = [
 	{
 		per_page: MAX_PAGE_COUNT,
 		_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+		context: 'view',
 		// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
 		// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
 		// sort.
