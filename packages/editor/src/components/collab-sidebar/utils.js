@@ -400,6 +400,87 @@ export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
 }
 
 /**
+ * Whether a text selection starts in one block and ends in another.
+ *
+ * @param {WPSelectionPoint} start Block-editor selection start.
+ * @param {WPSelectionPoint} end   Block-editor selection end.
+ * @return {boolean} True for a text selection across blocks.
+ */
+export function isCrossBlockTextSelection( start, end ) {
+	return (
+		!! start?.clientId &&
+		!! end?.clientId &&
+		start.clientId !== end.clientId &&
+		start.offset !== undefined &&
+		end.offset !== undefined
+	);
+}
+
+/**
+ * Read a text selection across blocks as the range to mark in each block, in
+ * document order: the first block from the caret to its end, the blocks in
+ * between whole, and the last block from its start to the caret. Blocks with
+ * no rich text, or no selected text, are left out.
+ *
+ * @param {Object}                        selectors
+ * @param {() => WPSelectionPoint}        selectors.getSelectionStart         Block-editor selector.
+ * @param {() => WPSelectionPoint}        selectors.getSelectionEnd           Block-editor selector.
+ * @param {() => string[]}                selectors.getSelectedBlockClientIds Block-editor selector.
+ * @param {(clientId: string) => ?Object} selectors.getBlockAttributes        Block attributes, with rich text as `RichTextData`.
+ * @return {?Array<{clientId: string, attributeKey: string, start: number, end: number}>} Ranges, or null when the selection isn't text across blocks.
+ */
+export function readMultiBlockSelection( {
+	getSelectionStart,
+	getSelectionEnd,
+	getSelectedBlockClientIds,
+	getBlockAttributes,
+} ) {
+	const selectionStart = getSelectionStart();
+	const selectionEnd = getSelectionEnd();
+	// Empty when the selection spans blocks with different parents.
+	const clientIds = getSelectedBlockClientIds();
+	if (
+		! isCrossBlockTextSelection( selectionStart, selectionEnd ) ||
+		clientIds.length < 2
+	) {
+		return null;
+	}
+
+	// The selection may run backwards.
+	const [ head, tail ] =
+		selectionStart.clientId === clientIds[ 0 ]
+			? [ selectionStart, selectionEnd ]
+			: [ selectionEnd, selectionStart ];
+
+	const ranges = [];
+	clientIds.forEach( ( clientId, index ) => {
+		const isFirst = index === 0;
+		const isLast = index === clientIds.length - 1;
+		const attributes = getBlockAttributes( clientId ) ?? {};
+		let attributeKey = Object.keys( attributes ).find(
+			( key ) => attributes[ key ] instanceof RichTextData
+		);
+		if ( isFirst ) {
+			attributeKey = head.attributeKey;
+		} else if ( isLast ) {
+			attributeKey = tail.attributeKey;
+		}
+		const value = attributes[ attributeKey ];
+		if ( ! ( value instanceof RichTextData ) ) {
+			return;
+		}
+		const start = isFirst ? Math.min( head.offset, value.text.length ) : 0;
+		const end = isLast
+			? Math.min( tail.offset, value.text.length )
+			: value.text.length;
+		if ( start < end ) {
+			ranges.push( { clientId, attributeKey, start, end } );
+		}
+	} );
+	return ranges.length > 0 ? ranges : null;
+}
+
+/**
  * Wrap a rich-text range with a core/note marker. Returns a new
  * RichTextData ready to write back into block attributes, or null when the
  * incoming value isn't a rich-text instance (legacy/string attributes).
@@ -663,6 +744,20 @@ export function hasFocusWithin( element ) {
 }
 
 /**
+ * Block a thread shows at: the selected block when the note belongs to it,
+ * else the note's first block.
+ *
+ * @param {Object}  thread           Note thread.
+ * @param {?string} selectedClientId Selected block client ID.
+ * @return {?string} Block client ID.
+ */
+export function getAnchorClientId( thread, selectedClientId ) {
+	return thread.blockClientIds?.includes( selectedClientId )
+		? selectedClientId
+		: thread.blockClientId;
+}
+
+/**
  * Picks the most relevant thread from a list: first unresolved, else first.
  *
  * @param {Array} threads Ordered list of thread objects.
@@ -690,6 +785,30 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
 		...metadata,
 		noteId: ids.size > 0 ? [ ...ids ] : undefined,
 	};
+}
+
+/**
+ * Keeps the notes of both blocks when one block is merged into another. The
+ * merged block takes the first block's metadata, so the second block's notes
+ * would otherwise lose their block while their markers move with the text.
+ *
+ * @param {Object} attributes Attributes of the merged block.
+ * @param {Object} blockA     Block merged into.
+ * @param {Object} blockB     Block merged from.
+ * @return {Object} Attributes with the note IDs of both blocks.
+ */
+export function mergeNoteAttributes( attributes, blockA, blockB ) {
+	const noteIds = getNoteIdsFromMetadata( blockB.attributes.metadata );
+	if ( noteIds.length === 0 ) {
+		return attributes;
+	}
+	const metadata = noteIds.reduce(
+		addNoteIdToMetadata,
+		attributes.metadata ?? {}
+	);
+	return metadata === attributes.metadata
+		? attributes
+		: { ...attributes, metadata };
 }
 
 /**

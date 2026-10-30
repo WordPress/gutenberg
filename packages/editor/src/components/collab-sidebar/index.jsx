@@ -29,6 +29,7 @@ import {
 	useNoteThreads,
 	usePickNote,
 } from './hooks';
+import { isCrossBlockTextSelection } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
@@ -39,9 +40,20 @@ function NotesSidebar( { postId, drafts } ) {
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
 	const { clientId, isClassicBlock } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
+		const {
+			getBlockName,
+			getMultiSelectedBlockClientIds,
+			getSelectedBlockClientId,
+			getSelectionEnd,
+			getSelectionStart,
+		} = select( blockEditorStore );
+		// Text selected across blocks starts a note shared by them.
+		const _clientId = isCrossBlockTextSelection(
+			getSelectionStart(),
+			getSelectionEnd()
+		)
+			? getMultiSelectedBlockClientIds()[ 0 ]
+			: getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
 			isClassicBlock: _clientId
@@ -116,13 +128,13 @@ function NotesSidebar( { postId, drafts } ) {
 			setPreference( 'core', 'notesDisplayMode', 'full' );
 		}
 
-		if ( targetNoteId === 'new' ) {
-			onStart( targetClientId );
-		}
+		// A note on text across blocks belongs to the first block with text.
+		const noteClientId =
+			targetNoteId === 'new' ? onStart( targetClientId ) : targetClientId;
 
 		// A special case for the List View, where block selection isn't required to trigger an action.
 		// The action won't do anything if the block is already selected.
-		pickNote( targetNoteId, targetClientId, { focus: true } );
+		pickNote( targetNoteId, noteClientId, { focus: true } );
 	}
 
 	function addNewNoteForBlock( targetClientId ) {
@@ -159,8 +171,8 @@ function NotesSidebar( { postId, drafts } ) {
 			{ notes.length > 0 && (
 				<AddNoteToolbarButton
 					count={
-						notes.filter(
-							( thread ) => thread.blockClientId === clientId
+						notes.filter( ( thread ) =>
+							thread.blockClientIds.includes( clientId )
 						).length
 					}
 					onClick={ addNewNoteForBlock }

@@ -25,6 +25,7 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
+import { mergeNoteAttributes } from '../collab-sidebar/utils';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -130,6 +131,7 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	mergeBlockAttributesKey,
 } = unlock( privateApis );
 
 /**
@@ -474,6 +476,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
+			[ mergeBlockAttributesKey ]: mergeNoteAttributes,
 		};
 
 		if ( isRevisionsMode ) {
