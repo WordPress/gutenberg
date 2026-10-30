@@ -570,6 +570,10 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 			array(),
 			array(
 				array(
+					'id'    => 1,
+					'title' => 'Track with ID but no source',
+				),
+				array(
 					'title' => 'Track without source or id',
 				),
 			)
@@ -577,5 +581,10 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 		$output = do_blocks( $markup );
 		$this->assertEmpty( trim( $output ) );
+
+		$track_output = do_blocks(
+			'<!-- wp:playlist-track {"id":1,"title":"Track with ID but no source"} /-->'
+		);
+		$this->assertEmpty( trim( $track_output ) );
 	}
 }

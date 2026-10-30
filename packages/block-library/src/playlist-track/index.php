@@ -17,8 +17,8 @@
  * @return string Returns the Playlist Track.
  */
 function render_block_core_playlist_track( $attributes, $content = '', $block = null ) {
-	// A track must have an attachment ID or a playable source URL to render.
-	if ( empty( $attributes['id'] ) && empty( $attributes['src'] ) ) {
+	// A track needs a source URL to be playable.
+	if ( empty( $attributes['src'] ) ) {
 		return '';
 	}
 
