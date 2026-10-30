@@ -1,6 +1,5 @@
 import { __, _x } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { download } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { downloadBlob } from '@wordpress/blob';
 import { store as coreStore } from '@wordpress/core-data';
@@ -82,7 +81,6 @@ export default function SiteExport() {
 
 	return (
 		<MoreMenuItem
-			icon={ download }
 			onClick={ handleExport }
 			info={ __(
 				'Download your theme with updated templates and styles.'

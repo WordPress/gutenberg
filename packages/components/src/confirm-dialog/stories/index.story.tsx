@@ -6,7 +6,7 @@ import { ConfirmDialog } from '../component';
 
 const meta: Meta< typeof ConfirmDialog > = {
 	component: ConfirmDialog,
-	title: 'Components/Overlays/ConfirmDialog',
+	title: 'Components/@wordpress-components/Overlays/ConfirmDialog',
 	id: 'components-confirmdialog',
 	argTypes: {
 		isOpen: {

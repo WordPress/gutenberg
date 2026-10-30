@@ -34,10 +34,22 @@ export interface SyncAwareFunction extends Function {
 /**
  * Executes a callback function after the next frame is rendered.
  *
+ * Both arms below — the `requestAnimationFrame` call and the 100 ms
+ * `setTimeout` fallback — funnel through the same inner `setTimeout`, so the
+ * callback always runs *one macrotask after* whichever arm wins, not inside
+ * that arm's own turn. That deferral, not registration order, is the
+ * property this function is relied on for: it is what makes a callback
+ * registered inside a `requestAnimationFrame` callback wait for the next
+ * task instead of running in the same one, and it is why consumers that
+ * need a settled frame (rather than a settled microtask) schedule through
+ * this function. This is *not* a FIFO guarantee — when two registrations'
+ * arms race, the funnel does not preserve the order they were registered
+ * in; it reproduces whatever order the races themselves produce.
+ *
  * @param callback The callback function to be executed.
  * @return A promise that resolves after the callback function is executed.
  */
-const afterNextFrame = ( callback: () => void ) => {
+export const afterNextFrame = ( callback: () => void ) => {
 	return new Promise< void >( ( resolve ) => {
 		const done = () => {
 			clearTimeout( timeout );
@@ -86,6 +98,34 @@ export const onDOMReady = ( callback: () => void ) => {
 		document.addEventListener( 'DOMContentLoaded', callback );
 	}
 };
+
+/**
+ * Subscribes to changes in any signal accessed inside the callback, re-running
+ * the callback whenever those signals change. The callback runs without an
+ * ambient directive scope and the previous scope is restored afterwards.
+ *
+ * @example
+ * ```js
+ * const unwatch = watch( () => {
+ *   console.log( state.counter );
+ * } );
+ *
+ * // Later, to stop watching:
+ * unwatch();
+ * ```
+ *
+ * @param callback The callback to execute when a dependency changes.
+ * @return A cleanup function to stop watching.
+ */
+export const watch: typeof effect = ( callback ) =>
+	effect( () => {
+		setScope();
+		try {
+			return callback();
+		} finally {
+			resetScope();
+		}
+	} );
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
@@ -372,7 +412,7 @@ export function kebabToCamelCase( str: string ): string {
 		} );
 }
 
-const logged: Set< string > = new Set();
+export const logged: Set< string > = new Set();
 
 /**
  * Shows a warning with `message` if environment is not `production`.
@@ -400,6 +440,47 @@ export const warn = ( message: string ): void => {
 		logged.add( message );
 	}
 };
+
+/**
+ * Checks whether a property key leads out of an object's own data:
+ * `__proto__` to its prototype, `constructor` to its constructor, and
+ * `prototype` to a function's prototype.
+ *
+ * @param key The property key.
+ * @return Whether the key is reserved.
+ */
+export const isReservedKey = ( key: unknown ): boolean =>
+	key === '__proto__' || key === 'constructor' || key === 'prototype';
+
+/**
+ * Reads a property that an object owns, ignoring inherited properties such
+ * as `Object.prototype.valueOf`.
+ *
+ * @param object The object to read.
+ * @param key    The property key.
+ * @return The value, or `undefined` if the object doesn't own the property.
+ */
+export const getOwnProperty = (
+	object: Record< string, any >,
+	key: string
+): any =>
+	Object.prototype.hasOwnProperty.call( object, key )
+		? object[ key ]
+		: undefined;
+
+/**
+ * `JSON.parse()` reviver that removes keys named `__proto__`.
+ *
+ * `JSON.parse()` creates `__proto__` as an own property. Copying it by
+ * assignment, as in a `for...in` loop or `Object.assign()`, replaces the
+ * target's prototype instead.
+ *
+ * @param key   The property key.
+ * @param value The parsed value.
+ * @return The value, or `undefined` to remove the key.
+ */
+export const jsonReviver = ( key: string, value: unknown ): unknown =>
+	key === '__proto__' ? undefined : value;
 
 /**
  * Checks if the passed `candidate` is a plain object with just the `Object`

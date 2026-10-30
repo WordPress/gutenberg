@@ -28,13 +28,6 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 
 ## Props
 
-### `as`
-
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
- - Required: Yes
-
-The HTML element to render the component as.
-
 ### `className`
 
  - Type: `string`

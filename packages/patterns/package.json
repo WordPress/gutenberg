@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "2.55.0",
+	"version": "3.0.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,32 +19,32 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
 		"build-style",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/index.js",
-		"src/store/index.js",
+		"src/index.ts",
+		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",
 		"build-module/index.mjs",
@@ -66,7 +66,11 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"change-case": "^4.1.2"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

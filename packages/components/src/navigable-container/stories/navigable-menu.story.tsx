@@ -3,7 +3,7 @@ import { fn } from 'storybook/test';
 import { NavigableMenu } from '..';
 
 const meta: Meta< typeof NavigableMenu > = {
-	title: 'Components/Containers/NavigableMenu',
+	title: 'Components/@wordpress-components/Containers/NavigableMenu',
 	id: 'components-navigablemenu',
 	component: NavigableMenu,
 	argTypes: {

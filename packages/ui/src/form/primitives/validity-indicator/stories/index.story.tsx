@@ -3,7 +3,8 @@ import { ValidityIndicator } from '../index';
 
 const meta: Meta< typeof ValidityIndicator > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/ValidityIndicator',
+	title: 'Components/@wordpress-ui/Form/Primitives/ValidityIndicator',
+	id: 'design-system-components-form-primitives-validityindicator',
 	component: ValidityIndicator,
 	parameters: {
 		componentStatus: {

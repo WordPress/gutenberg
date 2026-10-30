@@ -14,9 +14,11 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 export function NavigationLinkUI( {
 	insertedBlockClientId,
 	setInsertedBlockClientId,
+	allowedBlockNames,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
+	const { getBlock } = useSelect( blockEditorStore );
 
 	const { insertedBlockName, insertedBlockAttributes } = useSelect(
 		( select ) => {
@@ -82,8 +84,10 @@ export function NavigationLinkUI( {
 		const shouldAutoSelectBlock = false;
 
 		// If we have an existing inserted block and a new block is being set,
-		// remove the original block to avoid duplicates
-		if ( insertedBlockClientId && newBlock ) {
+		// remove the original block to avoid duplicates.
+		// "Browse all" calls this from the main inserter after the link UI has
+		// closed, and closing already removed the original block.
+		if ( newBlock && getBlock( insertedBlockClientId ) ) {
 			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
 		setInsertedBlockClientId( newBlock?.clientId ?? null );
@@ -93,6 +97,7 @@ export function NavigationLinkUI( {
 		<LinkUI
 			clientId={ insertedBlockClientId }
 			link={ insertedBlockAttributes }
+			allowedBlockNames={ allowedBlockNames }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function

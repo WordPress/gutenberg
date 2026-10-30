@@ -13,6 +13,7 @@ import {
 	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -109,7 +110,6 @@ export default function NavigationSubmenuEdit( {
 	const {
 		parentCount,
 		isParentOfSelectedBlock,
-		isImmediateParentOfSelectedBlock,
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
@@ -150,10 +150,6 @@ export default function NavigationSubmenuEdit( {
 					clientId,
 					true
 				),
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
@@ -188,11 +184,9 @@ export default function NavigationSubmenuEdit( {
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
+	if ( ! isSelected && isLinkOpen ) {
+		setIsLinkOpen( false );
+	}
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
@@ -259,9 +253,18 @@ export default function NavigationSubmenuEdit( {
 				)
 			: ALLOWED_BLOCKS;
 
+	// Shadow serialization is skipped so the shadow lands on the dropdown, not the item.
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const navigationChildBlockProps =
 		getNavigationChildBlockProps( innerBlocksColors );
-	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
+	const submenuBlockProps = {
+		...navigationChildBlockProps,
+		style: {
+			...navigationChildBlockProps.style,
+			...shadowProps.style,
+		},
+	};
+	const innerBlocksProps = useInnerBlocksProps( submenuBlockProps, {
 		allowedBlocks,
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
@@ -271,14 +274,12 @@ export default function NavigationSubmenuEdit( {
 		// see: https://github.com/WordPress/gutenberg/pull/34615.
 		__experimentalCaptureToolbars: true,
 
-		renderAppender:
-			isSelected ||
-			( isImmediateParentOfSelectedBlock &&
-				! selectedBlockHasChildren ) ||
-			// Show the appender while dragging to allow inserting element between item and the appender.
-			hasChildren
-				? InnerBlocks.ButtonBlockAppender
-				: false,
+		// Show the dropdown appender whenever the submenu has items, also
+		// while dragging to allow inserting element between item and the
+		// appender. An empty submenu falls back to the button appender.
+		renderAppender: hasChildren
+			? InnerBlocks.DefaultBlockAppender
+			: isSelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';

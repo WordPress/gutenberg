@@ -33,6 +33,11 @@
 		"anchor": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -47,6 +52,30 @@
 			}
 		},
 		"shadow": true,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": false,
+				"radius": false,
+				"style": false,
+				"width": false
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}

@@ -1,18 +1,38 @@
 import { __ } from '@wordpress/i18n';
 import { applyFormat, insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
-import { RichTextShortcut } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
-import type {
-	NonBreakingSpaceEditProps,
-	NonBreakingSpacePopoverAnchorProps,
-} from '../types';
+import {
+	RichTextShortcut,
+	RichTextToolbarButton,
+} from '@wordpress/block-editor';
+import { Popover, SVG, Path } from '@wordpress/components';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
+const NBSP = '\u00a0';
 
-function PopoverAnchor( { contentRef }: NonBreakingSpacePopoverAnchorProps ) {
+const icon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M4.5 9.5H6V14h12V9.5h1.5v6h-15z" />
+	</SVG>
+);
+
+// The selected text, or the characters on both sides of the caret.
+function getNonBreakingSpaceRange( { text, start, end }: RichTextValue ) {
+	if ( start === undefined || end === undefined ) {
+		return null;
+	}
+
+	const from = start === end ? Math.max( start - 1, 0 ) : start;
+	const to = start === end ? end + 1 : end;
+
+	return text.slice( from, to ).includes( NBSP ) ? [ from, to ] : null;
+}
+
+function PopoverAnchor( {
+	contentRef,
+}: Pick< FormatEditProps, 'contentRef' > ) {
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
@@ -33,9 +53,32 @@ export const nonBreakingSpace = {
 	title,
 	tagName: 'span',
 	className: 'non-breaking-space',
-	edit( { value, onChange, contentRef }: NonBreakingSpaceEditProps ) {
+	edit( { value, onChange, onFocus, contentRef }: FormatEditProps ) {
 		function addNonBreakingSpace() {
-			onChange( insert( value, '\u00a0' ) );
+			onChange( insert( value, NBSP ) );
+		}
+
+		const range = getNonBreakingSpaceRange( value );
+		const rangeText = range
+			? value.text.slice( range[ 0 ], range[ 1 ] )
+			: '';
+		const nonBreakingSpaceCount = rangeText.split( NBSP ).length - 1;
+
+		function replaceNonBreakingSpaces() {
+			if ( ! range ) {
+				return;
+			}
+
+			const [ from, to ] = range;
+			const { text } = value;
+			onChange( {
+				...value,
+				text:
+					text.slice( 0, from ) +
+					text.slice( from, to ).replaceAll( NBSP, ' ' ) +
+					text.slice( to ),
+			} );
+			onFocus();
 		}
 
 		const selectedValue =
@@ -50,7 +93,20 @@ export const nonBreakingSpace = {
 					character=" "
 					onUse={ addNonBreakingSpace }
 				/>
-				{ selectedValue === '\u00a0' && (
+				{ range && (
+					<RichTextToolbarButton
+						name="non-breaking-space"
+						icon={ icon }
+						title={
+							nonBreakingSpaceCount === 1
+								? __( 'Replace non-breaking space' )
+								: __( 'Replace non-breaking spaces' )
+						}
+						onClick={ replaceNonBreakingSpaces }
+						isActive
+					/>
+				) }
+				{ selectedValue === NBSP && (
 					<PopoverAnchor contentRef={ contentRef } />
 				) }
 			</>
@@ -61,7 +117,6 @@ export const nonBreakingSpace = {
 		text: string
 	) => RichTextValue[ 'formats' ] {
 		return ( formats, text ) => {
-			const NBSP = '\u00a0';
 			// Not a complete `RichTextValue`: the callback only receives
 			// `formats` and `text`. The assertion is safe because `applyFormat`
 			// is passed explicit indices (so it never falls back to `start`/

@@ -33,9 +33,18 @@ const meta: Meta< typeof ColorGen > = {
 		},
 	},
 	parameters: {
-		// FIXME: Color scale sample text fails color-contrast.
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
+		a11y: {
+			config: {
+				rules: [
+					{
+						id: 'color-contrast',
+						// These samples demonstrate generated contrast, including failures.
+						// Keep contrast checks enabled for all other story content.
+						selector: ':not([data-color-contrast-sample])',
+					},
+				],
+			},
+		},
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -126,6 +135,8 @@ function ColorScaleCombination( {
 				gap: '1rem',
 				padding: '1rem',
 				border: '1px solid #dcdcde',
+				backgroundColor: '#fff',
+				color: '#1e1e1e',
 			} }
 		>
 			<ThemeProvider
@@ -139,8 +150,14 @@ function ColorScaleCombination( {
 					Background seed: <code>{ background }</code>.
 				</p>
 			</header>
-			<RampTable ramps={ ramps } warnings={ warnings } />
-			<ColorWarningDetails warnings={ warnings } />
+			<p>
+				Text samples show foreground colors on their corresponding
+				backgrounds. Hover over a sample for its step and color value,
+				or expand Color values below the ramps. Color pairs may not meet
+				text contrast requirements.
+			</p>
+			<RampTable label={ label } ramps={ ramps } warnings={ warnings } />
+			<ColorWarningDetails label={ label } warnings={ warnings } />
 		</article>
 	);
 }

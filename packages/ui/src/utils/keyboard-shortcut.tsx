@@ -66,7 +66,10 @@ const KeyboardShortcutDescription = forwardRef<
 		descriptionId: string;
 		shortcut: KeyboardShortcut;
 	}
->( function KeyboardShortcutDescription( { descriptionId, shortcut }, ref ) {
+>( function UnforwardedKeyboardShortcutDescription(
+	{ descriptionId, shortcut },
+	ref
+) {
 	return (
 		<VisuallyHidden
 			id={ descriptionId }
@@ -92,7 +95,7 @@ const KeyboardShortcutDisplay = forwardRef<
 		className?: string;
 		shortcut: KeyboardShortcut;
 	}
->( function KeyboardShortcutDisplay( { className, shortcut }, ref ) {
+>( function UnforwardedKeyboardShortcutDisplay( { className, shortcut }, ref ) {
 	return (
 		<span ref={ ref } aria-hidden="true" className={ className } dir="ltr">
 			{ shortcut.displayShortcut }

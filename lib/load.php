@@ -39,7 +39,35 @@ if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
  */
 function gutenberg_is_experiment_enabled( $name ) {
 	$experiments = get_option( 'gutenberg-experiments' );
-	return ! empty( $experiments[ $name ] );
+
+	if ( is_array( $experiments ) && array_key_exists( $name, $experiments ) ) {
+		return ! empty( $experiments[ $name ] );
+	}
+
+	return gutenberg_get_experiment_default( $name );
+}
+
+/**
+ * Returns the state of an experiment on a site that has not made a choice about
+ * it on the Experiments screen.
+ *
+ * Experiments start out off. One that is being rolled out to every site is on
+ * by default instead, and unticking its checkbox turns it back off.
+ *
+ * @since 24.2.0
+ *
+ * @param string $name The name of the experiment.
+ *
+ * @return bool True when the experiment is on by default.
+ */
+function gutenberg_get_experiment_default( $name ) {
+	switch ( $name ) {
+		case 'gutenberg-react-19':
+			return ! gutenberg_has_react_19_incompatible_extension();
+
+		default:
+			return false;
+	}
 }
 
 // These files only need to be loaded if within a rest server instance.
@@ -64,10 +92,23 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-templates-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/note-reactions.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
+	require __DIR__ . '/compat/wordpress-7.2/notes.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-utils.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-fields-registry.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-fields-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/preload.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-entity-fields-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-actions-registry.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-actions-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-entity-actions-controller-7-2.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -77,8 +118,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-icon-collections-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-icon-collections-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-entity-fields-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-entity-actions-registry-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
@@ -94,7 +139,6 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
 require __DIR__ . '/compat/plugin/connectors.php';
-require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
 
 // WordPress 7.1 compat.
@@ -102,11 +146,15 @@ require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
 require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
-require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // WordPress 7.2 compat.
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
+require __DIR__ . '/compat/wordpress-7.2/media.php';
+require __DIR__ . '/compat/wordpress-7.2/post.php';
+
+// WordPress 7.3 compat.
+require __DIR__ . '/compat/wordpress-7.3/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -117,13 +165,19 @@ require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
 
+// Experiment defaults, which `gutenberg_get_experiment_default()` reads below.
+require __DIR__ . '/experimental/experiments/react-19.php';
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/extensible-site-editor.php';
 	require __DIR__ . '/experimental/theme-preview/load.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
-	require __DIR__ . '/experimental/dataform-inspector-preload.php';
+if (
+	gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ||
+	gutenberg_is_experiment_enabled( 'gutenberg-media-editor' )
+) {
+	require __DIR__ . '/experimental/route-entity-fields-preload.php';
 }
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 	require __DIR__ . '/experimental/media-editor/load.php';
@@ -131,6 +185,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
+}
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-wpds-admin-restyle' ) ) {
+	require __DIR__ . '/experimental/wpds-admin/load.php';
 }
 
 // Plugin specific code.
@@ -144,7 +202,6 @@ require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
-require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experimental/experiments/load.php';
 require __DIR__ . '/block-template-utils.php';
@@ -158,6 +215,23 @@ if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-processor-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
+}
+if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
+	/*
+	 * Remove the WordPress core callback registering the same fields, or every
+	 * field is registered twice and the second registration is refused.
+	 */
+	$core_field_collections_priority = has_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections' );
+	if ( false !== $core_field_collections_priority ) {
+		remove_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections', $core_field_collections_priority );
+	}
+	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
+}
+if ( is_dir( __DIR__ . '/../build/scripts/core-actions' ) ) {
+	require_once __DIR__ . '/../build/scripts/core-actions/index.php';
+	// The plugin registers its copy of the core actions instead of the one
+	// WordPress ships, which would otherwise register them first.
+	remove_action( 'wp_entity_actions_api_init', 'register_core_entity_actions', 0 );
 }
 
 // Block supports overrides.

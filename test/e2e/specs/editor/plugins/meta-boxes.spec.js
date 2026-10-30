@@ -135,12 +135,12 @@ test.describe( 'Meta boxes', () => {
 			.fill( 'A published post' );
 
 		const excerptButton = page.getByRole( 'button', {
-			name: 'Add an excerpt…',
+			name: 'Edit Excerpt',
 		} );
 		await excerptButton.click();
 
 		await page
-			.getByRole( 'textbox', { name: 'Write an Excerpt' } )
+			.getByRole( 'textbox', { name: 'Excerpt' } )
 			.fill( 'Explicitly set excerpt.' );
 
 		const postId = await editor.publishPost();

@@ -93,6 +93,21 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
+	 * Names of the icons that replace Dashicons, keyed by Dashicon class name.
+	 * Built from the manifest on first use.
+	 *
+	 * @var array<string, string>|null
+	 */
+	protected $dashicon_replacements = null;
+
+	/**
+	 * Resolved path of the core icon library directory.
+	 *
+	 * @var string|false|null
+	 */
+	private $core_icon_library_directory = null;
+
+	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
 	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
@@ -107,15 +122,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @param array  $icon_properties {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label     Required. A human-readable label for the icon.
-	 *     @type string $content   Optional. SVG markup for the icon.
-	 *                             If not provided, the content will be retrieved from the `file_path` if set.
-	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
-	 *     @type string $file_path Optional. The full path to the file containing the icon content.
-	 *     @type bool   $public    Optional. Whether the icon is exposed through the REST API, and
-	 *                             therefore selectable in the editor's Icon block. Non-public icons
-	 *                             stay available to server-side code via {@see wp_get_icon()}.
-	 *                             Default true.
+	 *     @type string   $label     Required. A human-readable label for the icon.
+	 *     @type string   $content   Optional. SVG markup for the icon.
+	 *                               If not provided, the content will be retrieved from the `file_path` if set.
+	 *                               If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string   $file_path Optional. The full path to the file containing the icon content.
+	 *     @type string[] $keywords  Optional. Additional search terms for the icon, matched by
+	 *                               `get_registered_icons()` alongside the name and label.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
@@ -158,7 +171,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'public' ), 1 );
+		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'keywords' ), 1 );
 		foreach ( array_keys( $icon_properties ) as $key ) {
 			if ( ! array_key_exists( $key, $allowed_keys ) ) {
 				_doing_it_wrong(
@@ -196,13 +209,26 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( isset( $icon_properties['public'] ) && ! is_bool( $icon_properties['public'] ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'Icon public property must be a boolean.', 'gutenberg' ),
-				'7.2.0'
-			);
-			return false;
+		if ( array_key_exists( 'keywords', $icon_properties ) ) {
+			if ( ! is_array( $icon_properties['keywords'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
+					'7.2.0'
+				);
+				return false;
+			}
+
+			foreach ( $icon_properties['keywords'] as $keyword ) {
+				if ( ! is_string( $keyword ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
+						'7.2.0'
+					);
+					return false;
+				}
+			}
 		}
 
 		if (
@@ -311,7 +337,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *
 	 * Overridden so that the file validation is applied even when the base
 	 * `WP_Icons_Registry` is provided by WordPress core rather than the
-	 * Gutenberg compat shim.
+	 * Gutenberg compat shim, and so that core icons skip sanitization.
 	 *
 	 * @param string $icon_name Icon name including namespace.
 	 * @return string|null The content of the icon, if found.
@@ -335,7 +361,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				return null;
 			}
 
-			$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
+			$content = file_get_contents( $icon_path );
+
+			// Core icons are trusted, so skip the costly sanitization.
+			if ( ! $this->is_core_icon_file( $icon_path ) ) {
+				$content = $this->sanitize_icon_content( $content );
+			}
 
 			if ( empty( $content ) ) {
 				wp_trigger_error(
@@ -351,16 +382,59 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
-	 * Modified to also search in icon labels
+	 * Determines whether an icon file is a core icon.
+	 *
+	 * @param string $icon_path Icon file path, resolved with `realpath()`.
+	 * @return bool Whether the file is in the core icon library.
+	 */
+	private function is_core_icon_file( $icon_path ) {
+		if ( null === $this->core_icon_library_directory ) {
+			$this->core_icon_library_directory = realpath( gutenberg_dir_path() . 'packages/icons/src/library' );
+		}
+
+		return is_string( $this->core_icon_library_directory ) && str_starts_with( $icon_path, $this->core_icon_library_directory . DIRECTORY_SEPARATOR );
+	}
+
+	/**
+	 * Determines whether an icon matches a search term.
+	 *
+	 * The term is matched case-insensitively against the icon's name, its label,
+	 * and any of its keywords.
+	 *
+	 * @param array  $icon   Registered icon properties.
+	 * @param string $search Search term.
+	 * @return bool True if the icon matches the search term, false otherwise.
+	 */
+	protected function icon_matches_search( $icon, $search ) {
+		if ( false !== stripos( $icon['name'], $search ) ) {
+			return true;
+		}
+
+		if ( false !== stripos( $icon['label'], $search ) ) {
+			return true;
+		}
+
+		foreach ( $icon['keywords'] ?? array() as $keyword ) {
+			if ( false !== stripos( $keyword, $search ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Modified to also search in icon labels and keywords.
+	 *
+	 * @param string $search Optional. Search term matched against each icon's name,
+	 *                       label, and keywords. Default empty string, which returns
+	 *                       every registered icon.
 	 */
 	public function get_registered_icons( $search = '' ) {
 		$icons = array();
 
 		foreach ( $this->registered_icons as $icon ) {
-			if ( ! empty( $search )
-				&& false === stripos( $icon['name'], $search )
-				&& false === stripos( $icon['label'], $search )
-			) {
+			if ( ! empty( $search ) && ! $this->icon_matches_search( $icon, $search ) ) {
 				continue;
 			}
 
@@ -372,12 +446,56 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Returns the name of the icon that replaces a Dashicon in the admin interface.
+	 *
+	 * The replacements come from the `dashicons` property of the `core-admin`
+	 * icons in the Gutenberg manifest, so they follow the icons the plugin ships
+	 * rather than the ones in WordPress core.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $dashicon Dashicon class name, such as `dashicons-admin-post`.
+	 * @return string|null Namespaced name of the replacement icon, such as `core-admin/pin`,
+	 *                     or null if the Dashicon has no replacement or the replacement
+	 *                     is not registered.
+	 */
+	public function get_admin_icon_name_for_dashicon( $dashicon ) {
+		if ( ! is_string( $dashicon ) ) {
+			return null;
+		}
+
+		if ( null === $this->dashicon_replacements ) {
+			$this->dashicon_replacements = array();
+
+			$manifest_path = gutenberg_dir_path() . 'packages/icons/src/manifest.php';
+			$manifest      = is_readable( $manifest_path ) ? include $manifest_path : array();
+
+			foreach ( is_array( $manifest ) ? $manifest : array() as $icon_name => $icon_data ) {
+				if (
+					empty( $icon_data['dashicons'] ) ||
+					! in_array( 'core-admin', $icon_data['collections'] ?? array(), true )
+				) {
+					continue;
+				}
+
+				foreach ( $icon_data['dashicons'] as $replaced_dashicon ) {
+					$this->dashicon_replacements[ $replaced_dashicon ] = 'core-admin/' . $icon_name;
+				}
+			}
+		}
+
+		$icon_name = $this->dashicon_replacements[ $dashicon ] ?? null;
+
+		return null !== $icon_name && $this->is_registered( $icon_name ) ? $icon_name : null;
+	}
+
+	/**
 	 * Returns the shared registry instance.
 	 *
 	 * The base `$instance` slot is intentionally not redefined, so both
 	 * `WP_Icons_Registry::get_instance()` (used by core) and this method share
 	 * one instance. An existing base registry is upgraded, replaying any
-	 * non-`core/` icons so they are not lost.
+	 * non-`core/` and non-`core-admin/` icons so they are not lost.
 	 */
 	public static function get_instance() {
 		if ( ! self::$instance instanceof self ) {
@@ -386,7 +504,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 			if ( null !== $original_registry ) {
 				foreach ( $original_registry->get_registered_icons() as $icon ) {
-					if ( str_starts_with( $icon['name'], 'core/' ) ) {
+					if ( str_starts_with( $icon['name'], 'core/' ) || str_starts_with( $icon['name'], 'core-admin/' ) ) {
 						continue;
 					}
 					$icon_properties = array( 'label' => $icon['label'] );
@@ -397,8 +515,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 					} else {
 						continue;
 					}
-					if ( isset( $icon['public'] ) ) {
-						$icon_properties['public'] = $icon['public'];
+					if ( ! empty( $icon['keywords'] ) ) {
+						$icon_properties['keywords'] = $icon['keywords'];
 					}
 					$gutenberg_registry->register( $icon['name'], $icon_properties );
 				}

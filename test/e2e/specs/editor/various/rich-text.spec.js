@@ -122,6 +122,38 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		expect( count ).toBe( 1 );
 	} );
 
+	test( 'should highlight the active format when the canvas root is the editing host', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// With more than one block, the canvas root is the editing host and
+		// has focus, not the field.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"]' )
+			.first()
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( 'a' );
+
+		expect(
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement === document.body )
+		).toBe( true );
+
+		const boundary = editor.canvas.locator(
+			'[data-rich-text-format-boundary]'
+		);
+		await expect( boundary ).toHaveCount( 1 );
+		await expect( boundary ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
@@ -635,6 +667,31 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should keep active formatting for input after an inline paste', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( '123' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		pageUtils.setClipboardData( { plainText: 'a' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		await pageUtils.pressKeys( 'primary+v' );
+		await page.keyboard.type( 'b' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>1aab23</strong>' },
+			},
+		] );
+	} );
+
 	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
 	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,
@@ -964,6 +1021,177 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				],
 			},
 			{ name: 'core/paragraph', attributes: { content: 'Outside' } },
+		] );
+	} );
+
+	test( 'should replace selected non-breaking spaces from the toolbar', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', {
+				name: 'Replace non-breaking space',
+				exact: true,
+			} );
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'one' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await editor.showBlockToolbar();
+		await expect( button ).toBeVisible();
+
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await page.keyboard.type( 'three' );
+		await editor.showBlockToolbar();
+		await expect( button ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await button.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two three' },
+			},
+		] );
+		await expect( button ).toHaveCount( 0 );
+
+		await page.keyboard.type( '!' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two!' },
+			},
+		] );
+	} );
+
+	test( 'should replace the non-breaking spaces on both sides of the caret', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one\u00a0\u00a0two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
+		// Between the two non-breaking spaces.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await editor.showBlockToolbar();
+		await toolbar
+			.getByRole( 'button', {
+				name: 'Replace non-breaking spaces',
+				exact: true,
+			} )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one  two' },
+			},
+		] );
+	} );
+
+	test( 'should delete all content of a block', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'Hello' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'x' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'x' } },
+			] );
+	} );
+
+	test( 'should delete all content of a block with siblings', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// A block with siblings is edited through the canvas wrapper as the
+		// editing host, where WebKit removes the whole element.
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+		] );
+	} );
+
+	test( 'should delete all content of a block with siblings from the Edit menu', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		// Runs the command of Edit > Delete, which has no Backspace or Delete
+		// key press, on every platform.
+		await editor.canvas
+			.locator( 'body' )
+			.evaluate( ( body ) => body.ownerDocument.execCommand( 'delete' ) );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
 		] );
 	} );
 } );

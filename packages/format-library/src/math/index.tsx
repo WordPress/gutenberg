@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	insert,
 	insertObject,
@@ -7,12 +7,30 @@ import {
 	getTextContent,
 	useAnchor,
 } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
+import type { RichTextValue } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { ValidatedInputControl, Link } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ValidatedInputControl,
+	Link,
+} from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
-import type { InlineMathUIProps, EditMathProps } from '../types';
+import type { FormatEditProps } from '../types';
+
+interface InlineMathUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	activeObjectAttributes: Record< string, string >;
+	contentRef: React.RefObject< HTMLElement >;
+	/**
+	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
+	 */
+	latexToMathML?: (
+		latex: string,
+		options?: { displayMode?: boolean }
+	) => string;
+}
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -20,15 +38,14 @@ const title = __( 'Math' );
 function InlineUI( {
 	value,
 	onChange,
-	activeAttributes,
+	activeObjectAttributes,
 	contentRef,
 	latexToMathML,
 }: InlineMathUIProps ) {
 	const [ latex, setLatex ] = useState(
-		activeAttributes?.[ 'data-latex' ] || ''
+		activeObjectAttributes[ 'data-latex' ] || ''
 	);
 	const [ error, setError ] = useState< string | null >( null );
-	const formRef = useRef< HTMLFormElement >( null );
 
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
@@ -56,6 +73,10 @@ function InlineUI( {
 			setError( null );
 		}
 
+		if ( value.start === undefined ) {
+			return;
+		}
+
 		const newReplacements = value.replacements.slice();
 		newReplacements[ value.start ] = {
 			type: name,
@@ -77,13 +98,9 @@ function InlineUI( {
 			offset={ 8 }
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
-			// Surface any parsing error before focus leaves the popover.
-			// An invalid field is refocused, keeping the popover open.
-			onFocusOutside={ () => formRef.current?.reportValidity() }
 			className="block-editor-format-toolbar__math-popover"
 		>
 			<form
-				ref={ formRef }
 				style={ { minWidth: '300px', padding: '16px' } }
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
@@ -119,7 +136,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditMathProps ) {
+}: FormatEditProps ) {
 	const [ latexToMathML, setLatexToMathML ] =
 		useState<
 			( latex: string, options?: { displayMode?: boolean } ) => string
@@ -139,7 +156,7 @@ function Edit( {
 			// the button toggles back to the exact text it was created from.
 			// Keep the restored text selected so it can be edited or
 			// re-marked right away.
-			const latex = activeObjectAttributes?.[ 'data-latex' ] || '';
+			const latex = activeObjectAttributes[ 'data-latex' ] || '';
 			newValue = insert( value, latex );
 			newValue.start = newValue.end - latex.length;
 		} else {
@@ -172,6 +189,7 @@ function Edit( {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="math"
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }
@@ -181,7 +199,7 @@ function Edit( {
 				<InlineUI
 					value={ value }
 					onChange={ onChange }
-					activeAttributes={ activeObjectAttributes }
+					activeObjectAttributes={ activeObjectAttributes }
 					contentRef={ contentRef }
 					latexToMathML={ latexToMathML }
 				/>

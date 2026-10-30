@@ -32,6 +32,11 @@
 	"supports": {
 		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -40,6 +45,10 @@
 				"text": true,
 				"link": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"shadow": true,
 		"spacing": {

@@ -9,9 +9,11 @@ import type { SwitchProps } from './types';
  * A low-level switch primitive.
  *
  * Use `Field` to associate an accessible label.
+ *
+ * Prefer `SwitchControl` for labeled items.
  */
 export const Switch = forwardRef< HTMLSpanElement, SwitchProps >(
-	function Switch( { className, ...props }, ref ) {
+	function UnforwardedSwitch( { className, ...props }, ref ) {
 		return (
 			<_Switch.Root
 				ref={ ref }

@@ -6,7 +6,7 @@ import {
 	ToggleControl,
 	Placeholder,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	TextControl,
 	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
@@ -26,7 +26,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	useMemo,
-	useEffect,
 	useState,
 	createInterpolateElement,
 } from '@wordpress/element';
@@ -41,9 +40,7 @@ import { unlock } from '../lock-unlock';
 import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { isDefaultBlockStyleState, ResolutionTool } = unlock(
-	blockEditorPrivateApis
-);
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 const hasDimensionValue = ( value ) =>
 	value !== undefined && value !== null && value !== '';
@@ -132,13 +129,18 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink, selectedStyleState } = useSelect(
+	const {
+		media,
+		postType,
+		postPermalink,
+		selectedStyleState,
+		hasSelectedStyleState,
+	} = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
+			const { getSelectedBlockStyleState, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
 			return {
 				media:
 					featuredImage &&
@@ -152,12 +154,11 @@ export default function PostFeaturedImageEdit( {
 					postId
 				)?.link,
 				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
@@ -220,11 +221,9 @@ export default function PostFeaturedImageEdit( {
 	};
 
 	// Reset temporary url when media is available.
-	useEffect( () => {
-		if ( mediaUrl && temporaryURL ) {
-			setTemporaryURL();
-		}
-	}, [ mediaUrl, temporaryURL ] );
+	if ( mediaUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
@@ -477,7 +476,7 @@ export default function PostFeaturedImageEdit( {
 						}
 						style={ imageStyles }
 					/>
-					{ temporaryURL && <Spinner /> }
+					{ temporaryURL && <WCSpinner /> }
 				</>
 			);
 	}
@@ -505,8 +504,8 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
-				{ !! isLink ? (
+				{ /* Wrap the image in an <a> to pick up the theme's inherited link styles. Never wrap the placeholder, since its buttons must not sit inside an anchor. */ }
+				{ !! isLink && ( featuredImage || temporaryURL ) ? (
 					<a href={ postPermalink } target={ linkTarget }>
 						{ image }
 					</a>

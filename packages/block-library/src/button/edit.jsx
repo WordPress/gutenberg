@@ -1,13 +1,18 @@
 import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	useEffect,
 	useState,
 	useRef,
 	useMemo,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { TextControl, ToolbarButton, Popover } from '@wordpress/components';
+import {
+	TextControl,
+	ToolbarButton,
+	Popover,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
@@ -16,6 +21,7 @@ import {
 	LinkControl,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalGetDimensionsClassesAndStyles as useDimensionsProps,
@@ -27,7 +33,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { link, linkOff } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	createBlock,
 	cloneBlock,
@@ -40,15 +47,18 @@ import {
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Link } from '@wordpress/ui';
+import { CheckboxControl, Link } from '@wordpress/ui';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { getSuggestionsQuery, useLinkPreview } from '../utils/link-picker';
+import ViewLinkButton from '../utils/view-link-button';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
@@ -122,6 +132,103 @@ function useEnter( clientId ) {
 	}, [] );
 }
 
+/**
+ * The content controls shown in the block inspector's Content tab and in the
+ * List View popover, mirroring the Navigation Link block's panel.
+ *
+ * The canvas, the link popover, and this panel all write through the same
+ * `setText`, `setLink`, and `unlink` so the three surfaces can't drift.
+ *
+ * @param {Object}                   props
+ * @param {string}                   props.text           The button text.
+ * @param {string}                   props.url            The button link.
+ * @param {boolean}                  props.opensInNewTab  Whether the link opens in a new tab.
+ * @param {boolean}                  props.isTextEditable Whether the text field is enabled.
+ * @param {boolean}                  props.isLinkEditable Whether the link fields are shown.
+ * @param {( text: string ) => void} props.setText        Updates the button text.
+ * @param {( link: Object ) => void} props.setLink        Updates the link, new tab, and nofollow attributes.
+ * @param {() => void}               props.unlink         Removes the link and its attributes.
+ */
+function ContentControls( {
+	text,
+	url,
+	opensInNewTab,
+	isTextEditable,
+	isLinkEditable,
+	setText,
+	setLink,
+	unlink,
+} ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const preview = useLinkPreview( { url } );
+
+	return (
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
+				setText( '' );
+				unlink();
+			} }
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			<ToolsPanelItem
+				hasValue={ () => !! text?.length }
+				label={ __( 'Text' ) }
+				onDeselect={ () => setText( '' ) }
+				isShownByDefault
+			>
+				<TextControl
+					label={ __( 'Text' ) }
+					value={ text ? stripHTML( text.toString() ) : '' }
+					onChange={ setText }
+					disabled={ ! isTextEditable }
+					autoComplete="off"
+				/>
+			</ToolsPanelItem>
+			{ isLinkEditable && (
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
+						label={ __( 'Link to' ) }
+						onDeselect={ unlink }
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ ( { url: newUrl } ) =>
+								setLink( { url: newUrl } )
+							}
+							// Like a navigation link, offer pages before anything is typed.
+							suggestionsQuery={ getSuggestionsQuery() }
+							label={ __( 'Link to' ) }
+						/>
+					</ToolsPanelItem>
+					{ /* Like the toolbar link popover, only offer the new tab setting once there is a link to open. */ }
+					{ url && (
+						<ToolsPanelItem
+							hasValue={ () => opensInNewTab }
+							label={ __( 'Open in new tab' ) }
+							onDeselect={ () =>
+								setLink( { opensInNewTab: false } )
+							}
+							isShownByDefault
+						>
+							<CheckboxControl
+								label={ __( 'Open in new tab' ) }
+								checked={ opensInNewTab }
+								onCheckedChange={ ( value ) =>
+									setLink( { opensInNewTab: value } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
+					<ViewLinkButton url={ url } />
+				</>
+			) }
+		</ToolsPanel>
+	);
+}
+
 function ButtonEdit( props ) {
 	const {
 		attributes,
@@ -166,6 +273,7 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
@@ -174,6 +282,19 @@ function ButtonEdit( props ) {
 		onKeyDown,
 	} );
 	const blockEditingMode = useBlockEditingMode();
+	// Inside a Navigation block every item edits from a Settings panel, so a
+	// Button there gets one too. Elsewhere it appears only in content-only
+	// editing, where the toolbar's link controls are hidden.
+	const isInsideNavigation = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlockParentsByBlockName(
+				clientId,
+				'core/navigation'
+			).length,
+		[ clientId ]
+	);
+	const hasContentControls =
+		blockEditingMode === 'contentOnly' || isInsideNavigation;
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
@@ -185,6 +306,7 @@ function ButtonEdit( props ) {
 		createPageEntity,
 		userCanCreatePages,
 		lockUrlControls = false,
+		lockTextControls = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSelected ) {
@@ -193,23 +315,31 @@ function ButtonEdit( props ) {
 
 			const _settings = select( blockEditorStore ).getSettings();
 
-			const blockBindingsSource = getBlockBindingsSource(
-				metadata?.bindings?.url?.source
-			);
+			// A bound attribute is locked unless its source lets the user
+			// edit the value, which is also what makes the canvas read-only.
+			const isLocked = ( binding ) =>
+				!! binding &&
+				! getBlockBindingsSource( binding.source )?.canUserEditValue?.(
+					{
+						select,
+						context,
+						args: binding.args,
+					}
+				);
 
 			return {
 				createPageEntity: _settings.__experimentalCreatePageEntity,
 				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
-				lockUrlControls:
-					!! metadata?.bindings?.url &&
-					! blockBindingsSource?.canUserEditValue?.( {
-						select,
-						context,
-						args: metadata?.bindings?.url?.args,
-					} ),
+				lockUrlControls: isLocked( metadata?.bindings?.url ),
+				lockTextControls: isLocked( metadata?.bindings?.text ),
 			};
 		},
-		[ context, isSelected, metadata?.bindings?.url ]
+		[
+			context,
+			isSelected,
+			metadata?.bindings?.url,
+			metadata?.bindings?.text,
+		]
 	);
 
 	async function handleCreate( pageTitle ) {
@@ -243,6 +373,25 @@ function ButtonEdit( props ) {
 		setIsEditingURL( true );
 	}
 
+	// The canvas, the link popover, and the content panel write through
+	// these so the three can't drift.
+	function setText( value ) {
+		// A link inside the button's own link is invalid HTML.
+		setAttributes( { text: removeAnchorTag( value ) } );
+	}
+
+	function setLink( changes ) {
+		setAttributes(
+			getUpdatedLinkAttributes( {
+				rel,
+				url,
+				opensInNewTab,
+				nofollow,
+				...changes,
+			} )
+		);
+	}
+
 	function unlink() {
 		setAttributes( {
 			url: undefined,
@@ -252,11 +401,10 @@ function ButtonEdit( props ) {
 		setIsEditingURL( false );
 	}
 
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsEditingURL( false );
-		}
-	}, [ isSelected ] );
+	// Close the link popover when the block is deselected.
+	if ( ! isSelected && isEditingURL ) {
+		setIsEditingURL( false );
+	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
@@ -338,16 +486,13 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) =>
-						setAttributes( {
-							text: removeAnchorTag( value ),
-						} )
-					}
+					onChange={ setText }
 					withoutInteractiveFormatting
 					className={ clsx(
 						className,
 						'wp-block-button__link',
 						colorProps.className,
+						backgroundProps.className,
 						borderProps.className,
 						typographyProps.className,
 						{
@@ -362,6 +507,7 @@ function ButtonEdit( props ) {
 					style={ {
 						...borderProps.style,
 						...colorProps.style,
+						...backgroundProps.style,
 						...spacingProps.style,
 						...shadowProps.style,
 						...typographyProps.style,
@@ -377,64 +523,56 @@ function ButtonEdit( props ) {
 					{ isLinkTag && ! lockUrlControls && (
 						<ToolbarButton
 							name="link"
-							icon={ ! isURLSet ? link : linkOff }
-							title={ ! isURLSet ? __( 'Link' ) : __( 'Unlink' ) }
-							shortcut={
-								! isURLSet
-									? displayShortcut.primary( 'k' )
-									: displayShortcut.primaryShift( 'k' )
-							}
-							onClick={ ! isURLSet ? startEditing : unlink }
+							icon={ link }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ () => setIsEditingURL( ! isEditingURL ) }
 							isActive={ isURLSet }
 						/>
 					) }
 				</BlockControls>
 			) }
-			{ isLinkTag &&
-				isSelected &&
-				( isEditingURL || isURLSet ) &&
-				! lockUrlControls && (
-					<Popover
-						placement="bottom"
-						onClose={ () => {
-							setIsEditingURL( false );
+			{ isLinkTag && isSelected && isEditingURL && ! lockUrlControls && (
+				<Popover
+					placement="bottom"
+					onClose={ () => {
+						setIsEditingURL( false );
+						richTextRef.current?.focus();
+					} }
+					anchor={ popoverAnchor }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName="__unstable-block-tools-after"
+					shift
+				>
+					<LinkControl
+						value={ linkValue }
+						onChange={ setLink }
+						onRemove={ () => {
+							unlink();
 							richTextRef.current?.focus();
 						} }
-						anchor={ popoverAnchor }
-						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName="__unstable-block-tools-after"
-						shift
-					>
-						<LinkControl
-							value={ linkValue }
-							onChange={ ( {
-								url: newURL,
-								opensInNewTab: newOpensInNewTab,
-								nofollow: newNofollow,
-							} ) =>
-								setAttributes(
-									getUpdatedLinkAttributes( {
-										rel,
-										url: newURL,
-										opensInNewTab: newOpensInNewTab,
-										nofollow: newNofollow,
-									} )
-								)
-							}
-							onRemove={ () => {
-								unlink();
-								richTextRef.current?.focus();
-							} }
-							forceIsEditingLink={ isEditingURL }
-							settings={ LINK_SETTINGS }
-							createSuggestion={
-								createPageEntity && handleCreate
-							}
-							withCreateSuggestion={ userCanCreatePages }
-							createSuggestionButtonText={ createButtonText }
-						/>
-					</Popover>
-				) }
+						forceIsEditingLink={ ! isURLSet }
+						settings={ LINK_SETTINGS }
+						createSuggestion={ createPageEntity && handleCreate }
+						withCreateSuggestion={ userCanCreatePages }
+						createSuggestionButtonText={ createButtonText }
+					/>
+				</Popover>
+			) }
+			{ hasContentControls && (
+				<InspectorControls group="content">
+					<ContentControls
+						text={ text }
+						url={ url }
+						opensInNewTab={ opensInNewTab }
+						isTextEditable={ ! lockTextControls }
+						isLinkEditable={ isLinkTag && ! lockUrlControls }
+						setText={ setText }
+						setLink={ setLink }
+						unlink={ unlink }
+					/>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }

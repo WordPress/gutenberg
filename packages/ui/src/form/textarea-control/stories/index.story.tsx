@@ -7,7 +7,8 @@ import {
 
 const meta: Meta< typeof TextareaControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/TextareaControl',
+	title: 'Components/@wordpress-ui/Form/TextareaControl',
+	id: 'design-system-components-form-textareacontrol',
 	component: TextareaControl,
 	argTypes: {
 		defaultValue: { control: false },

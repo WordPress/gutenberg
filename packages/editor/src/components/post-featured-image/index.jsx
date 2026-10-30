@@ -4,11 +4,11 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
-	Notice,
+	Notice as WCNotice,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
@@ -176,20 +176,25 @@ function PostFeaturedImage( {
 							DEFAULT_FEATURE_IMAGE_LABEL
 						}
 						onSelect={ onUpdateImage }
+						featuredImageFlow
+						// The deprecated name is passed too, because
+						// `editor.MediaUpload` callbacks read it to recognize
+						// the featured image. It will be removed in the near
+						// future, and passing both raises no warning.
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								{ isMissingMedia ? (
-									<Notice
+									<WCNotice
 										status="warning"
 										isDismissible={ false }
 									>
 										{ __(
 											'Could not retrieve the featured image data.'
 										) }
-									</Notice>
+									</WCNotice>
 								) : (
 									<Button
 										__next40pxDefaultSize
@@ -227,7 +232,7 @@ function PostFeaturedImage( {
 										) }
 										{ ( isLoading ||
 											isRequestingFeaturedImageMedia ) && (
-											<Spinner />
+											<WCSpinner />
 										) }
 										{ ! featuredImageId &&
 											! isLoading &&

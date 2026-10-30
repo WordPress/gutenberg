@@ -25,7 +25,7 @@ const wrappedRender = (
  * Prefer `TextareaControl` when using with a standard label and description.
  */
 export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
-	function Textarea(
+	function UnforwardedTextarea(
 		{
 			className,
 			defaultValue,

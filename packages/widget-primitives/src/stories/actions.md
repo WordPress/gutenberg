@@ -16,7 +16,7 @@ The widget names the intent and, through the key it writes, how the action is fu
 
 Every action carries an **envelope** and exactly one **fulfillment**, which says what triggering it means. The envelope is the action's identity: an `id`, a `label`, and optionally an `icon` (a registered icon name) and a `relevance` hint.
 
-The fulfillment is named by the key that carries it, not by a separate discriminator. Today the only key is `href`, so the only fulfillment is a link: triggering the action goes to a target.
+The fulfillment is named by the key that carries it, not by a separate discriminator. A declaration has one key today, `href`, so its only fulfillment is a link: triggering the action goes to a target.
 
 ```ts
 {
@@ -63,3 +63,30 @@ The widget lists its actions; it never specifies where they go. The host maps th
 `relevance` carries the widget's side of that decision: `'high'` marks an action worth the most prominent surface, `'medium'` one worth persistent but compact visibility, and `'low'` (the default) the rest. Attributes use the same vocabulary: the widget declares intent, and the host owns the surface.
 
 The dashboard maps it as: `'high'` as text links in a persistent footer, `'medium'` beside them as compact icon affordances, the rest in the "More" menu. Full-bleed widgets keep every action in the menu.
+
+## Runtime actions
+
+A declaration is static: it exists before the widget mounts. A label with a count, a target that follows the instance's attributes, or a download of the rows on screen only exist afterwards. A mounted widget declares those through `useWidgetActions`.
+
+```ts
+const hosted = useWidgetActions(
+	rows.length > 0
+		? [
+				{
+					id: 'export',
+					label: __( 'Download CSV' ),
+					relevance: 'medium',
+					callback: () => downloadBlob( 'report.csv', toCsv( rows ) ),
+				},
+			]
+		: []
+);
+```
+
+A runtime action takes the same envelope and one fulfillment: `href`, or `callback`, a function the host runs. A promise it returns keeps the action pending until it settles; reporting the outcome stays the callback's.
+
+-   **Each call declares its own set.** The list replaces that call's previous one, so an action that does not apply is left out; it is compared by value and needs no memoization. Calls from several components of one widget compose, and the last declaration of an `id` wins.
+-   **A shared `id` upgrades the declared action.** The runtime action takes its place and keeps the declared `icon` and `relevance` it leaves out: a declared "Details" becomes "Review 3 items" once the counts arrive. A declared action is never withdrawn, so one that only applies sometimes is declared at runtime alone.
+-   **Placement stays the host's.** Runtime actions ride the same `relevance` scale.
+
+The hook returns `false` under a host without the `actions` capability, and the widget keeps rendering its own affordance.

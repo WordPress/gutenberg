@@ -4,7 +4,7 @@ import ResizableBox from '..';
 
 const meta: Meta< typeof ResizableBox > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Utilities/ResizableBox',
+	title: 'Components/@wordpress-components/Utilities/ResizableBox',
 	id: 'components-resizablebox',
 	component: ResizableBox,
 	argTypes: {

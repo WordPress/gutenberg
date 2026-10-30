@@ -21,30 +21,20 @@ Do not treat an API as private only because its name starts with
 public compatibility obligations. Verify their status against the
 [canonical API boundary guidance](/docs/contributors/code/coding-guidelines.md#legacy-experimental-apis-plugin-only-apis-and-private-apis).
 
-Use the package contribution workflows only when changing
-`packages/components`, `packages/ui`, or `packages/theme`. A package change
-must consider its published API and users beyond the Gutenberg call sites.
+Use the package contribution workflows when changing `packages/components`, `packages/ui`, or `packages/theme`. A package change must consider its published API and users beyond the Gutenberg call sites. When a change includes both package code and application code, check both contracts. Keep product-specific behavior in the consuming package; add shared behavior to the Design System only when it belongs in a reusable component or token.
 
-If the public surface cannot meet a product need, document the behaviour,
+If the public surface cannot meet a product need, document the behavior,
 affected consumers, attempted composition, and proposed public contract. Do
 not bypass that decision with a package-private import.
 
 ## Check the target version
 
-Before choosing or reviewing an API, identify where the application gets it in
-production:
+For a Gutenberg change, use the proposed source and its dependencies. Check other versions when the consuming application runs a different package or WordPress release:
 
-1. For a Gutenberg change, use the PR head or current checkout.
-2. If the application bundles the package, check the installed package version.
-3. If WordPress provides the package at runtime, check the application's minimum
-   supported WordPress version. Verify that version provides the required export
-   and script or style handle.
+1. If the application bundles the package, check the installed package version.
+2. If WordPress provides the package at runtime, check the application's minimum supported WordPress version. Verify that version provides the required export and script or style handle.
 
-Build tools call the third case "externalized": the package is not included in
-the application bundle. Inspect the build configuration and generated asset
-metadata to confirm which case applies. The default
-[`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md)
-externalizes many WordPress packages.
+Build tools call the second case "externalized": the package is not included in the application bundle. When the source of the runtime dependency is unclear, inspect the build configuration and generated asset metadata. The default [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) externalizes many WordPress packages.
 
 Use the package documentation as the source of durable facts:
 
@@ -58,11 +48,9 @@ Use the package documentation as the source of durable facts:
 Use evidence for the state it actually describes:
 
 - The deployed checkout or runtime is authoritative for available exports,
-  styles, and runtime behaviour. An installed package proves compile-time
+  styles, and runtime behavior. An installed package proves compile-time
   types, not an externalized runtime API.
-- In a review, the supplied diff describes the proposed post-change state;
-  use the checkout as its baseline and supporting context. Do not reject a
-  change merely because the diff has not been applied to that checkout.
+- In a review, establish whether the checkout is the base, proposed head, or another revision. Read the diff with the corresponding source. An unapplied diff is not evidence that its new API is missing, and a head checkout is not evidence of the old behavior.
 - The Design System MCP server and current Storybook describe current
   recommendations. They do not prove that an older target exports an API.
 
@@ -89,7 +77,7 @@ instead of copying component mappings into documentation or agent instructions:
 2. Otherwise, inspect the maintained `ALLOWLIST` and `DENYLIST` in the
    [`use-recommended-components` ESLint rule source](/packages/eslint-plugin/rules/use-recommended-components.js).
    Its [documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md)
-   explains rule behaviour and links migration guides.
+   explains rule behavior and links migration guides.
 3. When the rule does not cover a component, inspect that component's
    `*.story.*` source file in the target checkout. Use its `componentStatus` and
    notes. The [rendered Storybook](https://wordpress.github.io/gutenberg/) is a
@@ -99,20 +87,21 @@ instead of copying component mappings into documentation or agent instructions:
 
 For an application on older package versions, use the corresponding version of
 those sources and verify the choice against its installed exports, types, and
-documentation. Preserve behavioural, styling, accessibility, and compatibility
+documentation. Preserve behavioral, styling, accessibility, and compatibility
 parity when migrating an existing component.
+
+For forms that edit a dataset, consider [`DataForm`](/packages/dataviews/README.md#dataform). For inline validation, read the [Validated Form Controls overview](/packages/ui/src/form/with-validation/stories/overview.mdx), including its status and limitations, and verify the target-version exports. Choose based on the form's state and validation needs rather than replacing individual controls without checking the whole form.
 
 Use semantic `--wpds-*` custom properties for Design System interface styling.
 Use `--wp--preset--*` custom properties for `theme.json` presets and
 block-facing styles. Token names and values change over time, so do not copy a
 token inventory into a guide, application convention, or skill.
 
+Prefer component props when they already express the styling intent. For custom styles, use the Design System MCP server's `get_design_tokens` when available. Without MCP, use the [Design Tokens Reference](/packages/theme/docs/tokens.md#how-to-pick-a-token). Choose a token by semantic purpose and state, not by matching its current raw value. Not every CSS literal needs a token. Use the active theme's `theme.json` presets when styling blocks or content previews, including previews inside the editor.
+
 ### Setup depends on the document
 
-Standard WordPress editor screens manage shared styles centrally. A separate
-application, iframe, popup window, or portal can require its own stylesheet
-and theming setup. Inventory which public packages render in each document,
-then follow the applicable package setup guidance:
+Standard WordPress editor screens manage shared styles centrally. A separate application, iframe, or popup window can require its own stylesheet and theming setup. Inventory which public packages render in each document, then follow the applicable package setup guidance:
 
 - [`@wordpress/components`](/packages/components/README.md)
 - [`@wordpress/ui`](/packages/ui/README.md#setup)
@@ -121,6 +110,10 @@ then follow the applicable package setup guidance:
 Apply setup only for packages that render there rather than copying a combined
 recipe into every document.
 
+A [React portal](https://react.dev/reference/react-dom/createPortal) changes DOM placement and can remain in the same document. Inspect its actual container and `ownerDocument` before adding document setup. CSS selectors and inherited custom properties follow the DOM tree, so a class on a toolbar or a nested theme provider may not reach a popup portaled outside that subtree. Apply product-specific popup styling through documented props or a class on the popup itself. Verify that its stylesheet is present in the destination document.
+
+Follow the [`ThemeProvider` nesting and root guidance](/packages/theme/README.md#nesting-providers) when overlays need theme overrides. Do not add an `isRoot` provider for every overlay; it changes document-level tokens, and only one root provider is supported per document.
+
 When an application directly bundles `@wordpress/components` and
 `@wordpress/ui`, follow the `@wordpress/ui` README’s documented overlay
 compatibility setup. Test overlays and focus in their actual rendering
@@ -128,9 +121,7 @@ documents.
 
 ## Change a package safely
 
-Start with a consumer and precedent audit: who needs the behaviour, which
-existing component or token is closest, and why public composition is not
-enough. Then follow the source guidance for the package being changed:
+Identify the affected consumers and a relevant component or token precedent. For a new capability, establish why existing public composition is insufficient. For a bug fix or internal refactor, identify the contract to restore or preserve. Follow the source guidance for the package being changed:
 
 - [`@wordpress/components` contribution guide](/packages/components/CONTRIBUTING.md)
 - [`@wordpress/ui` contribution guide](/packages/ui/CONTRIBUTING.md)
@@ -139,25 +130,93 @@ enough. Then follow the source guidance for the package being changed:
 
 Keep implementation details distinct from public API. For public changes,
 decide and document compatibility, migration, release, generated-output, and
-consumer implications. Verify CSS and interaction behaviour in a browser where
-unit tests cannot establish cascade order, focus geometry, or portal behaviour.
+consumer implications. Verify CSS and interaction behavior in a browser where
+unit tests cannot establish cascade order, focus geometry, or portal behavior.
 
-When a Design System package is bundled while one or more dependencies are supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check each supported entrypoint and version pairing before changing or removing the dependency contract.
+When changing a contract between a bundled Design System package and a dependency supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check the supported entrypoints and version pairings affected by that contract. An unrelated internal edit does not need this matrix.
 
-Before declaring package work complete, follow the applicable package source
-guidance and account for each relevant contract surface: public
-exports and types; semantics, states, interaction, and refs; compatibility and
-migration; focused tests and stories; public documentation and recommendation
-metadata; generated output; and the required changelog. Mark a surface not
-applicable rather than silently skipping it.
+Before declaring package work complete, check the requirements affected by the change:
 
-## Review checklist
+- Public exports and types, including declarations that resolve through the package's declared dependencies.
+- Semantics, states, interaction, refs, compatibility, and migration.
+- Focused tests and stories, public documentation, and component recommendation metadata when status or exports change.
+- Generated output and the changelog required by the [package policy](/packages/README.md#maintaining-changelogs).
 
-Consumer reviews verify the public contract and user-facing result: documented
-imports, styles and tokens in each document, overlay and iframe setup,
-semantics, keyboard/focus behaviour, states, responsive behaviour, and tests.
+An internal refactor does not automatically need new stories or public documentation. Explain unresolved requirements without adding a checklist of unrelated surfaces to every contribution.
 
-Package-contribution reviews additionally assess public exports, external
-consumers, compatibility, source conventions, generated files, documentation,
-stories, and release impact. A source convention is evidence to compare with
-the current codebase, not a substitute for demonstrating user impact.
+### Compare contracts before replacing an API
+
+Compare the affected old and new behavior before removing, renaming, or replacing a component, prop, token, or extension point. Include accepted values and defaults, controlled and uncontrolled state, callback arguments, rendered semantics, ref targets, styling hooks, and keyboard or focus behavior where they apply. A compact comparison table can help with a multi-part migration.
+
+Search consumers beyond the changed package. Migrating all repository call sites does not prove compatibility for plugins or other npm consumers. Check documented extension points, such as SlotFill children and render callbacks, against the values and compositions they previously accepted. An adapter that handles built-in callers may not handle third-party input. If external usage cannot be established, state that limit and make any retirement of supported behavior explicit.
+
+Before removing or changing a public API, use [Veloria](https://veloria.dev/) to look for usage in WordPress.org plugins and themes. Search relevant identifiers, hooks, styling hooks, and common access patterns, then inspect matches in context. Record the search scope and relevant results. Matches can demonstrate compatibility impact; no matches do not prove that removal is safe. Private code, commercial products distributed elsewhere, and usages obscured by compilation or dynamic access may remain undiscovered. Use this evidence alongside the API's support policy and migration options.
+
+For tokens, compare semantic purpose and affected modes as well as default values. Follow the [token source guide](/packages/theme/tokens/README.md) and [build procedure](/packages/theme/README.md#building), then inspect the generated assets and consumers affected by the change. Two tokens with equal values in one theme are not necessarily interchangeable.
+
+## Replace a legacy component
+
+When `@wordpress/ui` provides a replacement for a `@wordpress/components` component, the replacement happens in the stages below. Each stage lists the condition to meet before it starts, the changes that belong together, and what a reviewer should check. A small replacement can combine adjacent stages in one pull request. `@wordpress/components` remains supported, so a legacy component can stay supported and not recommended indefinitely.
+
+A new component with a similar name is not necessarily a replacement. Use [Compare contracts before replacing an API](#compare-contracts-before-replacing-an-api) to decide whether it covers the legacy component's use cases, and which differences a migration guide must explain.
+
+### 1. Alias the legacy import
+
+Add a `WC*` alias as soon as a public `@wordpress/ui` export has the same name as a `@wordpress/components` export, including a private API of `@wordpress/components`. The alias depends only on the name collision. It does not depend on the new component's status, or on whether the new component replaces the legacy one.
+
+Add the mapping to the `@wordpress/use-import-as` configuration in [`tools/eslint/config.mjs`](/tools/eslint/config.mjs), and rename every existing import, including destructuring from `unlock( privateApis )`. The alias is a convention of this repository, so it needs no changes to the `@wordpress/components` documentation or changelog.
+
+### 2. Try the replacement in Gutenberg
+
+Before recommending the new component, migrate a handful of Gutenberg consumers that represent different uses of the legacy component. Readiness judged without real consumers has tended to be optimistic. These migrations find gaps in the new API while it can still change, and they provide the material for the migration guide.
+
+Mark each of these imports as intentional early adoption with an `eslint-disable-next-line` directive on the import specifier, as described in the rule's [inline exceptions](/packages/eslint-plugin/docs/rules/use-recommended-components.md#inline-exceptions). Fix gaps in `@wordpress/ui` itself rather than working around them in the consumer. When the APIs differ, start a `migration-guide.mdx` story in the legacy component's `stories` directory. A reviewer should check behavioral and visual parity with the legacy component in each migrated consumer.
+
+### 3. Recommend the replacement
+
+Recommend the new component when its API is stable, known blockers such as overlay compatibility or accessibility issues are resolved, it looks and behaves consistently next to `@wordpress/components` in the same interface, and the trial migrations left no unresolved gaps.
+
+Make these changes in one pull request, so that the recommendation sources stay consistent:
+
+- Follow [Component status](/packages/ui/CONTRIBUTING.md#component-status) to mark the new component `recommended`, move the `manifest` tag from the legacy story to the new one, update the `use-recommended-components` allowlist, and regenerate the manifest snapshot.
+- Mark the legacy component `not-recommended` in its story, and add it to the rule's `DENYLIST` with a message that names the replacement. A `not-recommended` status and a denylist entry always change together.
+- Finish the migration guide and link it from the [rule documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md#migration-guides).
+- Remove the early-adoption directives from the trial migrations, and add the remaining legacy imports to `tools/eslint/suppressions.json`.
+- Add changelog entries for changes that package consumers see, such as new lint errors from `@wordpress/eslint-plugin`.
+
+A reviewer should check that the Storybook statuses, `manifest` tags, allowlist, and denylist agree, that the denylist message names a public alternative, and that the migration guide covers behavioral differences such as defaults and submitted form values, not only renamed props.
+
+### 4. Migrate other consumers selectively
+
+Do not migrate the remaining Gutenberg consumers only because a replacement is recommended. Each migration takes time to review and risks regressions. Migrate a consumer when you are already changing its file, when the new component brings a tangible benefit to that consumer, or when the legacy component is headed toward deprecation, which requires migrating every direct consumer first.
+
+When a migration is its own pull request, keep it focused, such as on one area of the editor. After each migration, run `npm run lint:js:prune-suppressions` and commit the reduced counts. A reviewer should check parity against the migration guide, including overlays that render next to `@wordpress/components` overlays.
+
+### 5. Decide whether to deprecate
+
+Whether to deprecate a legacy component is a separate decision for each component. Recommending a replacement does not by itself require a deprecation.
+
+To deprecate, follow the [soft-deprecation steps](/packages/components/CONTRIBUTING.md#compatibility). Before deprecating, look for plugin and theme usage as described in [Compare contracts before replacing an API](#compare-contracts-before-replacing-an-api). Add the runtime warning only after Gutenberg no longer imports the component directly, because the warnings fail tests that check the console. When another `@wordpress/components` component still renders the legacy one, export a warning adapter from the package entry point and keep the internal component silent, as in [#83040](https://github.com/WordPress/gutenberg/pull/83040).
+
+The deprecation pull request:
+
+- Calls `deprecated()` from `@wordpress/deprecated` with `since`, the planned removal `version`, and the `alternative`.
+- Sets the removal `version` according to how widely plugins and themes use the component. It is usually at least two major WordPress versions after `since`, such as `since: '7.3'` with removal in `7.5`.
+- Adds a deprecation notice to the component's README.
+- Moves the story under `Deprecated`, with a stable story `id` so that existing links continue to work.
+- Adds a `@wordpress/components` changelog entry.
+- Has the **Needs Dev Note** label, so that the deprecation is announced in the WordPress release's developer notes. See the [dev note workflow](/docs/contributors/code/backward-compatibility.md#dev-note-workflow).
+
+A reviewer should check that no Gutenberg screen logs the warning, including through other components that render the legacy one.
+
+## Verify the affected behavior
+
+Select verification from the changed contract and the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure). Use existing coverage where it proves the behavior. Keep state and structural checks in jsdom; use Browser Mode or a reproducible browser check for computed styles, layout, native focus, scrolling, and transitions. Load the styles used by the real consumer. Class assertions, mocked geometry, and snapshots alone do not prove visual parity.
+
+Do not add or request tests just because coverage is absent. Rely on a third-party dependency's tests for behavior it owns and that the change leaves intact. Focus local coverage on our transformations, overrides, state handling, and integration where they introduce a concrete regression risk. Identify the supported use case, likely failure, and consequence before adding a test, then choose the smallest check not already covered. Avoid duplicating dependency suites, enumerating every prop combination, or building fixtures for speculative edge cases. Weigh realistic likelihood and impact together; an uncommon supported use case can still matter when failure has a serious consequence.
+
+For interaction changes, check the keyboard and pointer paths, accessible names, state transitions, dismissal, or focus return that our changes can affect. Use existing coverage of unchanged behavior. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
+
+For style or token changes, select conditions based on the declarations or token modes being changed. Relevant cases can include light and dark themes, nested providers, density, RTL, forced colors, reduced motion, long or translated content, zoom, or constrained containers; this is not a required test matrix. Inspect composed consumers where their overrides or layout can change the result. Check whether a responsive decision depends on the viewport or the component's container before choosing a breakpoint or measurement API.
+
+Run the repository's applicable lint, type, generation, and build checks. Distinguish verified results from manual steps that have not been run. A blocked browser check limits a parity claim; it does not by itself prove a defect.

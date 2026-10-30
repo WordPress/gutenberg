@@ -16,7 +16,7 @@ import type { ValidatedControlProps } from '../types';
 export const ValidatedTextareaControl = forwardRef<
 	HTMLTextAreaElement,
 	React.ComponentProps< typeof TextareaControl > & ValidatedControlProps
->( function ValidatedTextareaControl(
+>( function UnforwardedValidatedTextareaControl(
 	{ required, markWhenOptional, customValidity, ...restProps },
 	forwardedRef
 ) {

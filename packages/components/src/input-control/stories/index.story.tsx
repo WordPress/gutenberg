@@ -8,7 +8,7 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 import Button from '../../button';
 
 const meta: Meta< typeof InputControl > = {
-	title: 'Components/Selection & Input/Common/InputControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/InputControl',
 	id: 'components-inputcontrol',
 	component: InputControl,
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },

@@ -17,12 +17,22 @@
 	},
 	"supports": {
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"shadow": true,
 		"spacing": {

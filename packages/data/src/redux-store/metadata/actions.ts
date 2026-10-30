@@ -123,7 +123,10 @@ export function failResolutions(
  *
  * @return Action object.
  */
-export function invalidateResolution( selectorName: string, args: unknown[] ) {
+export function invalidateResolution(
+	selectorName: string,
+	args?: unknown[] | null
+) {
 	return {
 		type: 'INVALIDATE_RESOLUTION',
 		selectorName,

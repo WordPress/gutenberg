@@ -84,14 +84,14 @@ export { default as Dropdown } from './dropdown';
 export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
-export { Elevation as __experimentalElevation } from './elevation';
+export { default as __experimentalElevation } from './elevation/deprecated';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
 export { default as FormFileUpload } from './form-file-upload';
-export { default as FormToggle } from './form-toggle';
+export { default as FormToggle } from './form-toggle/deprecated';
 export { default as FormTokenField } from './form-token-field';
 export { default as GradientPicker } from './gradient-picker';
 export { default as CustomGradientPicker } from './custom-gradient-picker';
@@ -158,7 +158,7 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { Spacer as __experimentalSpacer } from './spacer';
-export { Scrollable as __experimentalScrollable } from './scrollable';
+export { default as __experimentalScrollable } from './scrollable/deprecated';
 export { default as Spinner } from './spinner';
 export { Surface as __experimentalSurface } from './surface';
 export { default as TabPanel } from './tab-panel';
@@ -186,7 +186,7 @@ export {
 	ToolsPanelItem as __experimentalToolsPanelItem,
 	ToolsPanelContext as __experimentalToolsPanelContext,
 } from './tools-panel';
-export { default as Tooltip } from './tooltip';
+export { default as Tooltip } from './tooltip/deprecated';
 export {
 	default as __experimentalTreeGrid,
 	TreeGridRow as __experimentalTreeGridRow,

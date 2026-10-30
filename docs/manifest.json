@@ -2610,12 +2610,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/lazy-import",
-		"slug": "packages-lazy-import",
-		"markdown_source": "../packages/lazy-import/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
@@ -2718,15 +2712,15 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/project-management-automation",
-		"slug": "packages-project-management-automation",
-		"markdown_source": "../packages/project-management-automation/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/react-i18n",
 		"slug": "packages-react-i18n",
 		"markdown_source": "../packages/react-i18n/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-inert-value",
+		"slug": "packages-react-inert-value",
+		"markdown_source": "../packages/react-inert-value/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2811,6 +2805,12 @@
 		"title": "@wordpress/sync",
 		"slug": "packages-sync",
 		"markdown_source": "../packages/sync/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/theme-build-tools",
+		"slug": "packages-theme-build-tools",
+		"markdown_source": "../packages/theme-build-tools/README.md",
 		"parent": "packages"
 	},
 	{

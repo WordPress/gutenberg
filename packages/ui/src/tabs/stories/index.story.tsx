@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, cloneElement } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { link, more, wordpress } from '@wordpress/icons';
 import * as Tabs from '../';
 import * as Tooltip from '../../tooltip';
+import { Icon } from '../../icon';
 
 const meta: Meta< typeof Tabs.Root > = {
-	title: 'Design System/Components/Tabs',
+	title: 'Components/@wordpress-ui/Tabs',
+	id: 'design-system-components-tabs',
 	component: Tabs.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {
@@ -79,7 +81,7 @@ export const Minimal: StoryObj< typeof Tabs.Root > = {
 };
 
 export const SizeAndOverflowPlayground: StoryObj< typeof Tabs.Root > = {
-	render: function SizeAndOverflowPlayground( props ) {
+	render: function SizeAndOverflowPlaygroundRender( props ) {
 		const [ fullWidth, setFullWidth ] = useState( false );
 		return (
 			<div>
@@ -235,33 +237,21 @@ export const WithDisabledTab: StoryObj< typeof Tabs.Root > = {
 	},
 };
 
-const LinkIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( link, props );
-};
-
-const MoreIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( more, props );
-};
-
-const WordpressIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( wordpress, props );
-};
-
 const tabWithIconsData = [
 	{
 		value: 'tab1',
 		label: 'Tab one',
-		icon: WordpressIcon,
+		icon: wordpress,
 	},
 	{
 		value: 'tab2',
 		label: 'Tab two',
-		icon: LinkIcon,
+		icon: link,
 	},
 	{
 		value: 'tab3',
 		label: 'Tab three',
-		icon: MoreIcon,
+		icon: more,
 	},
 ];
 
@@ -270,19 +260,13 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 		...Default.args,
 		children: [
 			<Tabs.List key="list">
-				{ tabWithIconsData.map( ( { value, label, icon: Icon } ) => (
+				{ tabWithIconsData.map( ( { value, label, icon } ) => (
 					<Tooltip.Root key={ value }>
 						<Tooltip.Trigger
 							aria-label={ label }
 							render={ <Tabs.Tab value={ value } /> }
 						>
-							{ /* TODO: potentially refactor with new Icon component */ }
-							<Icon
-								style={ {
-									width: '20px',
-									height: '20px',
-								} }
-							/>
+							<Icon icon={ icon } size={ 20 } />
 						</Tooltip.Trigger>
 						<Tooltip.Popup
 							positioner={
@@ -360,4 +344,40 @@ export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
 			</Tabs.Panel>,
 		],
 	},
+};
+
+/**
+ * Resize the container to compare painted tab padding with actual overflow.
+ */
+export const MinimalTabsOverflow: StoryObj< typeof Tabs.Root > = {
+	render: () => (
+		<div
+			style={ {
+				width: 140,
+				padding: 16,
+				resize: 'horizontal',
+				overflow: 'auto',
+				boxSizing: 'content-box',
+			} }
+		>
+			<Tabs.Root defaultValue="Content">
+				<Tabs.List
+					variant="minimal"
+					aria-label="Resizable minimal tabs"
+					style={ { maxWidth: '100%' } }
+				>
+					{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
+						<Tabs.Tab key={ label } value={ label }>
+							{ label }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
+				{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
+					<Tabs.Panel key={ label } value={ label }>
+						<ThemedParagraph>{ label } panel</ThemedParagraph>
+					</Tabs.Panel>
+				) ) }
+			</Tabs.Root>
+		</div>
+	),
 };

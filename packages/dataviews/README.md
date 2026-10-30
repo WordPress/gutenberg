@@ -218,7 +218,7 @@ const view = {
 
 Properties:
 
--   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`. See "Layout types".
+-   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`, `pickerActivity`. See "Layout types".
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
@@ -436,7 +436,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, and `pickerGrid`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`, and `pickerActivity`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -561,8 +561,10 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
--   `DataViews.BulkActionToolbar`
+-   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
+
+Bulk actions are now rendered within the built-in table and grid layouts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)). `DataViews.BulkActionToolbar` remains available for compatibility but renders nothing, so you can remove it from custom compositions.
 
 #### example
 
@@ -622,13 +624,13 @@ The component behaves differently to a regular `DataViews` component in the foll
 
 There are also a few differences in the implementation:
 
--   Only the `pickerGrid` and `pickerTable` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid` and `table` layouts respectively.
+-   Only the `pickerGrid`, `pickerTable`, and `pickerActivity` layout types are supported for `DataViewsPicker`. These layouts are similar to the regular `grid`, `table`, and `activity` layouts respectively.
 -   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
 -   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
 -   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
 -   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
 -   Only the `callback` style of action is supported. `RenderModal` is unsupported.
--   The `isEligible` callback for actions is unsupported.
+-   An action's `isEligible` callback disables its footer button when no selected item is eligible, and the callback receives only the eligible items.
 -   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
 
 Example:
@@ -689,7 +691,7 @@ Same as `DataViews`. The fields describe the visible items for each record in th
 
 #### `view`: `Object`
 
-Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid` and `pickerTable` layout types are supported.
+Same as `DataViews`. The view object configures how the dataset is visible to the user. Note that only the `pickerGrid`, `pickerTable`, and `pickerActivity` layout types are supported.
 
 #### `onChangeView`: `function`
 
@@ -702,7 +704,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 **Important differences from `DataViews`:**
 
 -   Only `callback` style actions are supported. `RenderModal` is unsupported.
--   The `isEligible` callback for actions is unsupported.
+-   An action's `isEligible` callback disables its footer button when no selected item is eligible; the callback receives only the eligible items.
 -   The `isPrimary` option is used to render a `primary` variant of `Button`.
 -   To implement multi-selection, ensure all actions have `supportsBulk: true`. For single selection use `supportsBulk: false`.
 
@@ -724,7 +726,7 @@ Same as `DataViews`. Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-Limits the available layouts. Only `pickerGrid` and `pickerTable` are supported for `DataViewsPicker`.
+Limits the available layouts. Only `pickerGrid`, `pickerTable`, and `pickerActivity` are supported for `DataViewsPicker`.
 
 Example:
 
@@ -773,7 +775,18 @@ Same as `DataViews`. An element to display when the `data` prop is empty.
 
 #### `children`: React node
 
-Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition.
+Optional. Custom UI to render instead of the default picker layout. When provided, you can use the same subcomponents as `DataViews` for free composition, plus the picker's own `DataViewsPicker.Footer`, `DataViewsPicker.BulkActionToolbar`, `DataViewsPicker.Actions`, `DataViewsPicker.PageSelect` and `DataViewsPicker.PageNavigation`, the page select and the previous/next buttons on their own. `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, so a picker can compose its footer from the parts it has room for:
+
+```jsx
+<DataViewsPicker.Footer>
+	<DataViewsPicker.Pagination>
+		<DataViewsPicker.PageSelect />
+	</DataViewsPicker.Pagination>
+	<DataViewsPicker.Actions />
+</DataViewsPicker.Footer>
+```
+
+Placing a composed footer is the consumer's business, so each of those parts takes a `className` too, as `DataViews.Layout` does, and a footer can be laid out from the consumer's own stylesheet without wrapping its parts in extra elements.
 
 **Unsupported properties:**
 
@@ -1073,6 +1086,10 @@ The unique identifier of the action.
 
 The user facing description of the action.
 
+Provide a translated label without an ellipsis. DataViews adds a translated ellipsis when an action with `RenderModal` is displayed in a menu. Buttons and default modal headings use the label without this added punctuation. Callback actions use the label unchanged in menus.
+
+For compatibility, DataViews recognizes common trailing ellipses in existing labels: `…`, `⋯`, and runs of three or more periods, ideographic full stops, or fullwidth full stops, including repeated ellipses and surrounding whitespace. It preserves these labels in menus without adding another ellipsis and removes the recognized suffix from buttons. This is a best-effort fallback, not a complete parser for every language. Migrate existing labels to text without an ellipsis rather than relying on this detection. Default modal headings still use the supplied label unchanged.
+
 -   Type: `string | function`
 -   Required
 -   Example:
@@ -1137,11 +1154,11 @@ Whether the action is disabled.
 
 ### `context`
 
-Where this action would be visible.
+The context the action is limited to: `list` for the lists of items. Without it, the action shows everywhere. DataViews does not filter the actions by context: the consumer does, before passing them.
 
 -   Type: `string`
 -   Optional
--   One of: `list`, `single`
+-   One of: `list`
 
 ### `callback`
 
@@ -1591,10 +1608,13 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 	Edit: {
 		control: 'text',
 		prefix: ReactComponent,
-		suffix: ReactComponent,
+		prefixPadding: 'minimal',
+		suffix: 'USD',
 	}
 }
 ```
+
+`prefix` and `suffix` are a string or a React component, rendered inside the input's prefix and suffix slots, which handle padding and vertical alignment, so a component should contain only the content. `prefixPadding` and `suffixPadding` are `default` (the default) or `minimal`; use `minimal` when the slot contains an icon or a button.
 
 -   `datetime` configuration:
 
@@ -1620,8 +1640,10 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 -   `operator`: the currently selected filter operator for this field. Used by DataViews filters to determine which control to render based on the operator type
 -   `validity`: object representing the validity of the field's value (see validity section)
 -   `config`: object representing extra config for the component:
-    -   `prefix`: a React component to be rendered as a prefix
-    -   `suffix`: a React component to be rendered as a suffix
+    -   `prefix`: a string or a React component to be rendered as a prefix
+    -   `prefixPadding`: the padding of the prefix slot, `default` (the default) or `minimal` (text control)
+    -   `suffix`: a string or a React component to be rendered as a suffix
+    -   `suffixPadding`: the padding of the suffix slot, `default` (the default) or `minimal` (text control)
     -   `rows`: the number of rows to display (e.g., in the text area component)
     -   `compact`: whether to render a compact version without the calendar widget (datetime control)
 
@@ -1709,8 +1731,8 @@ When the field declares a type, it gets a default sort function:
 
 The default sorting can be overridden by providing a custom sort function. It takes the following arguments:
 
--   `a`: the first item to compare
--   `b`: the second item to compare
+-   `a`: the value of the field (as returned by `getValue`) for the first item to compare
+-   `b`: the value of the field (as returned by `getValue`) for the second item to compare
 -   `direction`: either `asc` (ascending) or `desc` (descending)
 
 It should return a number where:

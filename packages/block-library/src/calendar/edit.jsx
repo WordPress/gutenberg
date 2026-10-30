@@ -1,6 +1,6 @@
 import memoize from 'memize';
 import { calendar as icon } from '@wordpress/icons';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Placeholder, Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useBlockProps } from '@wordpress/block-editor';
@@ -86,7 +86,7 @@ export default function CalendarEdit( { attributes, name } ) {
 			<div { ...blockProps }>
 				<Placeholder icon={ icon } label={ __( 'Calendar' ) }>
 					{ ! hasPostsResolved ? (
-						<Spinner />
+						<WCSpinner />
 					) : (
 						__( 'No published posts found.' )
 					) }
@@ -99,7 +99,7 @@ export default function CalendarEdit( { attributes, name } ) {
 		<>
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

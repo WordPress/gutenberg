@@ -5,8 +5,7 @@ import { Icon, Stack } from '@wordpress/ui';
 import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
-	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/ToggleControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/ToggleControl',
 	id: 'components-togglecontrol',
 	component: ToggleControl,
 	argTypes: {
@@ -19,9 +18,9 @@ const meta: Meta< typeof ToggleControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `ToggleControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Use [`SwitchControl`](?path=/docs/design-system-components-form-switchcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-togglecontrol--migration-guide).',
 		},
 	},
 };

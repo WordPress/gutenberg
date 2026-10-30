@@ -3,13 +3,22 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	useCallback,
 	useEffect,
-	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
-import { compose, useResizeObserver } from '@wordpress/compose';
+import {
+	Placeholder,
+	SandBox,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
+import {
+	compose,
+	useEvent,
+	useMergeRefs,
+	useReducedMotion,
+	useResizeObserver,
+} from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -128,12 +137,9 @@ function CoverEdit( {
 		useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
-	// Ref to access latest values after async operations (e.g. getMediaColor),
+	// Reads the latest values after async operations (e.g. getMediaColor),
 	// avoiding stale values that could overwrite concurrent remote changes.
-	const propsRef = useRef( { attributes, overlayColor } );
-	useLayoutEffect( () => {
-		propsRef.current = { attributes, overlayColor };
-	} );
+	const getLatestProps = useEvent( () => ( { attributes, overlayColor } ) );
 
 	const { media } = useSelect(
 		( select ) => {
@@ -171,7 +177,7 @@ function CoverEdit( {
 
 			// Read latest values after await to avoid stale closures.
 			const { attributes: currentAttrs, overlayColor: currentOverlay } =
-				propsRef.current;
+				getLatestProps();
 
 			let newOverlayColor = currentOverlay.color;
 			if ( ! currentAttrs.isUserOverlayColor ) {
@@ -199,6 +205,7 @@ function CoverEdit( {
 		setAttributes,
 		setOverlayColor,
 		useFeaturedImage,
+		getLatestProps,
 	] );
 
 	// instead of destructuring the attributes
@@ -257,7 +264,7 @@ function CoverEdit( {
 
 		// Read latest values to avoid stale closures.
 		const { attributes: currentAttrs, overlayColor: currentOverlay } =
-			propsRef.current;
+			getLatestProps();
 
 		let newOverlayColor = currentOverlay.color;
 		if ( ! currentAttrs.isUserOverlayColor ) {
@@ -357,7 +364,7 @@ function CoverEdit( {
 		const averageBackgroundColor = await getMediaColor( url );
 
 		// Read latest dimRatio after await to avoid stale closure.
-		const { attributes: currentAttrs } = propsRef.current;
+		const { attributes: currentAttrs } = getLatestProps();
 
 		const newIsDark = compositeIsDark(
 			currentAttrs.dimRatio,
@@ -387,7 +394,7 @@ function CoverEdit( {
 		const averageBackgroundColor = await getMediaColor( url );
 
 		// Read latest overlayColor after await to avoid stale closure.
-		const { overlayColor: currentOverlay } = propsRef.current;
+		const { overlayColor: currentOverlay } = getLatestProps();
 
 		const newIsDark = compositeIsDark(
 			newDimRatio,
@@ -445,6 +452,8 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
+	const prefersReducedMotion = useReducedMotion();
+
 	// Compute embed HTML for editor display via SandBox
 	const embedHtml = useMemo( () => {
 		if (
@@ -453,8 +462,10 @@ function CoverEdit( {
 		) {
 			return null;
 		}
-		return getBackgroundEmbedHtml( embedPreview.html );
-	}, [ embedPreview, backgroundType ] );
+		return getBackgroundEmbedHtml( embedPreview.html, {
+			autoplay: ! prefersReducedMotion,
+		} );
+	}, [ embedPreview, backgroundType, prefersReducedMotion ] );
 
 	// Set while the media editor has pointed the cover at a freshly
 	// generated file the browser hasn't finished loading; cleared by the
@@ -513,7 +524,11 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	// State, not a ref, so that the element is there on the next render.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ ref, setDropZoneElement ] ),
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -522,12 +537,20 @@ function CoverEdit( {
 		{
 			allowedBlocks,
 			templateLock,
-			dropZoneElement: ref.current,
+			dropZoneElement,
 		}
 	);
 
 	const mediaElement = useRef();
 	const editMediaButtonRef = useRef();
+
+	// `autoPlay` only applies when the video loads, so pause a video that is
+	// already playing when the user turns on reduced motion.
+	useEffect( () => {
+		if ( prefersReducedMotion && isVideoBackground ) {
+			mediaElement.current?.pause();
+		}
+	}, [ prefersReducedMotion, isVideoBackground ] );
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
@@ -543,10 +566,17 @@ function CoverEdit( {
 			return;
 		}
 
+		const previousImage = { id, url: getLatestProps().attributes.url };
+		let isUndone = false;
 		openMediaEditorModal( {
 			id,
 			onClose: () => {
 				editMediaButtonRef.current?.focus();
+			},
+			onUndo: () => {
+				isUndone = true;
+				setIsSwappingMedia( false );
+				setAttributes( previousImage );
 			},
 			onUpdate: async ( { id: newId, url: newUrl } ) => {
 				if ( typeof newId !== 'number' ) {
@@ -569,12 +599,16 @@ function CoverEdit( {
 				if ( newUrl ) {
 					const averageBackgroundColor =
 						await getMediaColor( newUrl );
+					// Snackbar Undo can run while the image color is loading.
+					if ( isUndone ) {
+						return;
+					}
 
 					// Read latest values after await to avoid stale closures.
 					const {
 						attributes: currentAttrs,
 						overlayColor: currentOverlay,
-					} = propsRef.current;
+					} = getLatestProps();
 
 					let newOverlayColor = currentOverlay.color;
 					if ( ! currentAttrs.isUserOverlayColor ) {
@@ -601,7 +635,7 @@ function CoverEdit( {
 				const {
 					hasParallax: currentHasParallax,
 					isRepeated: currentIsRepeated,
-				} = propsRef.current.attributes;
+				} = getLatestProps().attributes;
 				if ( currentHasParallax || currentIsRepeated ) {
 					setIsSwappingMedia( false );
 				}
@@ -609,6 +643,7 @@ function CoverEdit( {
 		} );
 	}, [
 		id,
+		getLatestProps,
 		openMediaEditorModal,
 		setAttributes,
 		setOverlayColor,
@@ -633,7 +668,7 @@ function CoverEdit( {
 
 		// Read latest values after await to avoid stale closures.
 		const { attributes: currentAttrs, overlayColor: currentOverlay } =
-			propsRef.current;
+			getLatestProps();
 
 		const newOverlayColor = ! currentAttrs.isUserOverlayColor
 			? averageBackgroundColor
@@ -703,10 +738,13 @@ function CoverEdit( {
 			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
+			onSelectMedia={ onSelectMedia }
+			onUploadError={ onUploadError }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
+			isSelected={ isSelected }
 		/>
 	);
 
@@ -833,7 +871,7 @@ function CoverEdit( {
 					<video
 						ref={ mediaElement }
 						className="wp-block-cover__video-background"
-						autoPlay
+						autoPlay={ ! prefersReducedMotion }
 						muted
 						loop
 						src={ url }
@@ -858,7 +896,7 @@ function CoverEdit( {
 					</div>
 				) }
 				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
-					<Spinner />
+					<WCSpinner />
 				) }
 
 				{ showOverlay && (
@@ -883,7 +921,7 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ ( isUploadingMedia || isSwappingMedia ) && <Spinner /> }
+				{ ( isUploadingMedia || isSwappingMedia ) && <WCSpinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons

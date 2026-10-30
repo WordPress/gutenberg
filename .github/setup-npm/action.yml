@@ -49,6 +49,6 @@ runs:
           uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
               path: ${{ steps.npm.outputs.cache-dir }}
-              key: npm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(format('{0}package-lock.json', steps.npm.outputs.path-prefix), format('{0}patches/**', steps.npm.outputs.path-prefix)) }}
+              key: npm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(format('{0}package-lock.json', steps.npm.outputs.path-prefix)) }}
               restore-keys: |
                   npm-cache-${{ runner.os }}-${{ runner.arch }}-

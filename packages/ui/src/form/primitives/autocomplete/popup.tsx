@@ -9,7 +9,7 @@ import { Positioner } from './positioner';
 import type { AutocompletePopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
-	function Popup(
+	function UnforwardedPopup(
 		{ className, portal, positioner, width, ...restProps },
 		ref
 	) {
@@ -18,6 +18,7 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
+					itemPopupStyles[ 'fixed-width-presets' ],
 					getItemPopupWidthClassName( width ),
 					className
 				) }

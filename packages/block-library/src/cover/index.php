@@ -16,6 +16,15 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
+	// The view module decides whether a background video may play, so it is
+	// only needed for the two video background types.
+	if (
+		isset( $attributes['backgroundType'] ) &&
+		in_array( $attributes['backgroundType'], array( 'video', 'embed-video' ), true )
+	) {
+		wp_enqueue_script_module( '@wordpress/block-library/cover/view' );
+	}
+
 	// Handle embed video background.
 	if (
 		isset( $attributes['backgroundType'] ) &&
@@ -30,11 +39,13 @@ function render_block_core_cover( $attributes, $content ) {
 		$oembed_html = wp_oembed_get( $url );
 
 		if ( $oembed_html ) {
-			// Extract iframe src from the oEmbed HTML.
-			preg_match( '/src=["\']([^"\']+)["\']/', $oembed_html, $src_matches );
-			if ( ! empty( $src_matches[1] ) ) {
-				$iframe_src = $src_matches[1];
-
+			// Read the iframe src with the HTML API, which returns the attribute
+			// value decoded, so `&amp;` in the query string becomes `&`.
+			$oembed_processor = new WP_HTML_Tag_Processor( $oembed_html );
+			$iframe_src       = $oembed_processor->next_tag( 'IFRAME' )
+				? $oembed_processor->get_attribute( 'src' )
+				: null;
+			if ( is_string( $iframe_src ) && '' !== $iframe_src ) {
 				// Detect provider from iframe src URL.
 				$lower_src = strtolower( $iframe_src );
 				$provider  = null;
@@ -50,7 +61,8 @@ function render_block_core_cover( $attributes, $content ) {
 				}
 
 				// Modify iframe src to add background video parameters based on provider.
-				$parsed_url = wp_parse_url( $iframe_src );
+				$parsed_url         = wp_parse_url( $iframe_src );
+				$reduced_motion_src = null;
 				if ( $parsed_url && isset( $parsed_url['host'] ) ) {
 					// Parse existing query parameters.
 					$query_params = array();
@@ -58,9 +70,12 @@ function render_block_core_cover( $attributes, $content ) {
 						parse_str( $parsed_url['query'], $query_params );
 					}
 
-					// Add background video parameters based on provider.
+					// Add background video parameters based on provider. The
+					// autoplay parameters are kept separate so a source without
+					// them can also be built, which the view script swaps in for
+					// a visitor who has asked for reduced motion.
+					$autoplay_params = array();
 					if ( 'youtube' === $provider ) {
-						$query_params['autoplay']       = '1';
 						$query_params['mute']           = '1';
 						$query_params['loop']           = '1';
 						$query_params['controls']       = '0';
@@ -74,32 +89,53 @@ function render_block_core_cover( $attributes, $content ) {
 						if ( $video_id ) {
 								$query_params['playlist'] = $video_id;
 						}
+
+						$autoplay_params['autoplay'] = '1';
 					} elseif ( 'vimeo' === $provider ) {
-						$query_params['autoplay']    = '1';
 						$query_params['muted']       = '1';
 						$query_params['loop']        = '1';
-						$query_params['background']  = '1';
 						$query_params['controls']    = '0';
 						$query_params['transparent'] = '0';
+
+						// Vimeo's background mode always autoplays, so it can only
+						// be used when autoplay is allowed.
+						$autoplay_params['autoplay']   = '1';
+						$autoplay_params['background'] = '1';
 					} elseif ( 'videopress' === $provider || 'wordpress-tv' === $provider ) {
-						$query_params['autoplay'] = '1';
-						$query_params['loop']     = '1';
-						$query_params['muted']    = '1';
+						$query_params['loop']  = '1';
+						$query_params['muted'] = '1';
+
+						$autoplay_params['autoplay'] = '1';
 					}
 
 					// Rebuild the URL with new parameters.
-					$iframe_src = $parsed_url['scheme'] . '://' . $parsed_url['host'];
+					$iframe_base = $parsed_url['scheme'] . '://' . $parsed_url['host'];
 					if ( isset( $parsed_url['path'] ) ) {
-						$iframe_src .= $parsed_url['path'];
+						$iframe_base .= $parsed_url['path'];
 					}
-					if ( ! empty( $query_params ) ) {
-						$iframe_src .= '?' . http_build_query( $query_params );
-					}
+
+					$reduced_motion_src = empty( $query_params )
+						? $iframe_base
+						: $iframe_base . '?' . http_build_query( $query_params );
+
+					$iframe_src = empty( $autoplay_params )
+						? $reduced_motion_src
+						: $iframe_base . '?' . http_build_query( array_merge( $query_params, $autoplay_params ) );
 				}
 
-				// Build the iframe HTML that will replace the figure.
+				// Build the iframe HTML that will replace the figure. The server
+				// renders the autoplaying source, and the view script swaps in the
+				// one without autoplay for a visitor who prefers reduced motion.
 				$iframe_html = sprintf(
-					'<div class="wp-block-cover__video-background wp-block-cover__embed-background"><iframe src="%s" title="Background video" frameborder="0" allow="autoplay; fullscreen"></iframe></div>',
+					'<div class="wp-block-cover__video-background wp-block-cover__embed-background" data-wp-interactive="core/cover" data-wp-context=\'%s\'><iframe src="%s" data-wp-bind--src="state.videoSrc" title="Background video" frameborder="0" allow="autoplay; fullscreen"></iframe></div>',
+					esc_attr(
+						wp_json_encode(
+							array(
+								'src'              => $iframe_src,
+								'reducedMotionSrc' => $reduced_motion_src,
+							)
+						)
+					),
 					esc_url( $iframe_src )
 				);
 
@@ -125,6 +161,31 @@ function render_block_core_cover( $attributes, $content ) {
 					}
 				}
 			}
+		}
+
+		return $content;
+	}
+
+	// Handle uploaded video background. The video is saved with `autoplay`, so
+	// the view module stops it for a visitor who prefers reduced motion. The
+	// directives are added here rather than in the saved markup so existing
+	// content does not need a deprecation.
+	if (
+		isset( $attributes['backgroundType'] ) &&
+		'video' === $attributes['backgroundType']
+	) {
+		$processor = new WP_HTML_Tag_Processor( $content );
+
+		if ( $processor->next_tag(
+			array(
+				'tag_name'   => 'VIDEO',
+				'class_name' => 'wp-block-cover__video-background',
+			)
+		) ) {
+			$processor->set_attribute( 'data-wp-interactive', 'core/cover' );
+			$processor->set_attribute( 'data-wp-init', 'callbacks.stopBackgroundVideo' );
+
+			$content = $processor->get_updated_html();
 		}
 
 		return $content;

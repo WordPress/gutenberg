@@ -12,7 +12,7 @@ You can use the functions documented on this page to register a block with JavaS
 
 -   **Type:** `Function`
 
-Every block starts by registering a new block type definition. To register, you use the `registerBlockType` function from the [`wp-blocks` package](/packages/blocks/README.md#registerBlockType). The function takes two arguments, a block `name` and a block configuration object.
+Every block starts by registering a new block type definition. To register, you use the `registerBlockType` function from the [`wp-blocks` package](/packages/blocks/README.md#registerblocktype). The function takes two arguments, a block `name` and a block configuration object.
 
 ### Block Name
 

@@ -7,7 +7,7 @@ import type { CompositeGroupProps } from './types';
 export const CompositeGroup = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeGroupProps, 'div', false >
->( function CompositeGroup( props, ref ) {
+>( function UnforwardedCompositeGroup( props, ref ) {
 	const context = useCompositeContext();
 	const { children, ...restProps } = props;
 

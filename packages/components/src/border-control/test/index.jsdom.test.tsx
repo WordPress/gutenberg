@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
 import type { Border, BorderControlProps } from '../types';
-import { COLORS } from '../../utils';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -139,6 +138,44 @@ describe( 'BorderControl', () => {
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
 
+		it( 'should not offer a percentage unit for the width', () => {
+			const props = createProps();
+			render( <TestBorderControl { ...props } /> );
+
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			expect(
+				within( unitSelect ).queryByRole( 'option', { name: '%' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should keep the unit of a percentage width until it is changed', async () => {
+			const user = userEvent.setup();
+			const props = createProps( {
+				value: { ...defaultBorder, width: '10%' },
+			} );
+			const { rerender } = render( <TestBorderControl { ...props } /> );
+
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			expect( unitSelect ).toHaveValue( '%' );
+
+			await user.selectOptions( unitSelect, 'px' );
+
+			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
+				...defaultBorder,
+				width: '10px',
+			} );
+
+			rerender( <TestBorderControl { ...props } /> );
+
+			expect(
+				within( unitSelect ).queryByRole( 'option', { name: '%' } )
+			).not.toBeInTheDocument();
+		} );
+
 		describe( 'color indicator inline styles', () => {
 			const getIndicatorWrapper = ( border: Border ) => {
 				render(
@@ -155,13 +192,14 @@ describe( 'BorderControl', () => {
 			};
 
 			/* eslint-disable jest-dom/prefer-to-have-style -- These jsdom tests check normalized inline style values without browser layout. */
-			it( 'should fall back to gray-300 when a style is set without a color', () => {
+			it( 'should fall back to a neutral surface stroke when a style is set without a color', () => {
 				const indicatorWrapper = getIndicatorWrapper( {
 					style: 'solid',
 					color: '',
 				} );
 				const expectedStyle = document.createElement( 'div' ).style;
-				expectedStyle.borderColor = COLORS.gray[ 300 ];
+				expectedStyle.borderColor =
+					'var(--wpds-color-stroke-surface-neutral)';
 
 				expect(
 					( indicatorWrapper as HTMLElement ).style.borderStyle
