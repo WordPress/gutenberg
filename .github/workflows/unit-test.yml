@@ -557,15 +557,15 @@ jobs:
 
             # The WordPress stubs are not committed, and generating them from the core commit that
             # tools/phpstan/wordpress-stubs/composer.json records takes a while, so they are cached by
-            # that file and the script that generates them. The script generates them again when the
-            # cached ones were generated from another source. As with the result cache, only runs on
-            # trunk save a cache.
+            # that file, the script that generates them, and the generator's lock file. The script
+            # generates them again when the cached ones were generated from another source. As with the
+            # result cache, only runs on trunk save a cache.
             - name: Restore the WordPress stubs
               id: restore-wordpress-stubs
               uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: tools/phpstan/wordpress-stubs/wordpress-stubs.stub
-                  key: ${{ runner.os }}-wordpress-stubs-${{ hashFiles('tools/phpstan/wordpress-stubs/composer.json', 'tools/phpstan/generate-wordpress-stubs.sh') }}
+                  key: ${{ runner.os }}-wordpress-stubs-${{ hashFiles('tools/phpstan/wordpress-stubs/composer.json', 'tools/phpstan/generate-wordpress-stubs.sh', 'tools/phpstan/wordpress-stubs-generator.lock') }}
 
             - name: Generate the WordPress stubs
               run: composer phpstan:generate-wordpress-stubs

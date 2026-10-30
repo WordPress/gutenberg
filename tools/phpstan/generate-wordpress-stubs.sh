@@ -57,10 +57,15 @@ WORDPRESS_DEVELOP_REPO="${WORDPRESS_DEVELOP_REPO:-WordPress/wordpress-develop}"
 SCRIPT="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 PACKAGE_DIR="$(dirname "$SCRIPT")/wordpress-stubs"
 STUB_FILE="$PACKAGE_DIR/wordpress-stubs.stub"
+
+# The generator's dependencies, which determine its output, are installed from this lock file, since
+# the generator does not commit one. When it is missing, such as after changing the generator's
+# commit, the dependencies are updated, and the lock file is written for committing.
+GENERATOR_LOCK="$(dirname "$SCRIPT")/wordpress-stubs-generator.lock"
 GUTENBERG_DIR="$(cd "$(dirname "$SCRIPT")/../.." && pwd)"
 
-# Where the generator is kept with its dependencies installed, one directory per repository and
-# commit, so that it is only set up once.
+# Where the generator is kept with its dependencies installed, one directory per repository, commit,
+# and lock file, so that it is only set up once.
 WORDPRESS_STUBS_CACHE_DIR="${WORDPRESS_STUBS_CACHE_DIR:-$GUTENBERG_DIR/.cache/wordpress-stubs-generator}"
 
 usage() {
@@ -86,13 +91,17 @@ read_recorded() {
 		"$PACKAGE_DIR/composer.json" "$1"
 }
 
-# Prints a key for everything that the stubs are generated from, including this script, so that they
-# are generated again when any of it changes. The stubs record the key they were generated with.
+# Prints a key for everything that the stubs are generated from, including this script and the
+# generator's lock file, so that they are generated again when any of it changes. The stubs record the
+# key they were generated with.
 generation_key() {
 	{
 		echo "$WORDPRESS_DEVELOP_REPO $1 $2"
 		echo "$WORDPRESS_STUBS_REPO $WORDPRESS_STUBS_COMMIT"
 		cat "$SCRIPT"
+		if [[ -f "$GENERATOR_LOCK" ]]; then
+			cat "$GENERATOR_LOCK"
+		fi
 	} | git hash-object --stdin
 }
 
@@ -224,13 +233,27 @@ fi
 # Set up the generator unless it is cached. Its Composer scripts would install the latest WordPress
 # release in source/wordpress, where it reads the WordPress source from, so they are skipped. It is
 # moved into the cache only once set up, so that an interrupted run leaves nothing behind.
-GENERATOR_DIR="$WORDPRESS_STUBS_CACHE_DIR/${WORDPRESS_STUBS_REPO//\//-}-$WORDPRESS_STUBS_COMMIT"
-if [[ -d "$GENERATOR_DIR" ]]; then
+GENERATOR_DIR=''
+if [[ -f "$GENERATOR_LOCK" ]]; then
+	LOCK_HASH="$(git hash-object "$GENERATOR_LOCK")"
+	GENERATOR_DIR="$WORDPRESS_STUBS_CACHE_DIR/${WORDPRESS_STUBS_REPO//\//-}-$WORDPRESS_STUBS_COMMIT-${LOCK_HASH:0:12}"
+fi
+if [[ -n "$GENERATOR_DIR" && -d "$GENERATOR_DIR" ]]; then
 	echo "Using $WORDPRESS_STUBS_REPO@$WORDPRESS_STUBS_COMMIT from $GENERATOR_DIR"
 else
 	echo "Fetching $WORDPRESS_STUBS_REPO@$WORDPRESS_STUBS_COMMIT"
 	fetch_commit "$WORK_DIR/generator" "$WORDPRESS_STUBS_REPO" "$WORDPRESS_STUBS_COMMIT" '/*'
-	composer --working-dir="$WORK_DIR/generator" update --no-interaction --no-progress --no-scripts
+	if [[ -n "$GENERATOR_DIR" ]]; then
+		cp "$GENERATOR_LOCK" "$WORK_DIR/generator/composer.lock"
+		composer --working-dir="$WORK_DIR/generator" install --no-interaction --no-progress --no-scripts
+	else
+		composer --working-dir="$WORK_DIR/generator" update --no-interaction --no-progress --no-scripts
+		cp "$WORK_DIR/generator/composer.lock" "$GENERATOR_LOCK"
+		echo "Wrote $GENERATOR_LOCK, which is to be committed."
+		LOCK_HASH="$(git hash-object "$GENERATOR_LOCK")"
+		GENERATOR_DIR="$WORDPRESS_STUBS_CACHE_DIR/${WORDPRESS_STUBS_REPO//\//-}-$WORDPRESS_STUBS_COMMIT-${LOCK_HASH:0:12}"
+		rm -rf "$GENERATOR_DIR"
+	fi
 	mkdir -p "$WORDPRESS_STUBS_CACHE_DIR"
 	mv "$WORK_DIR/generator" "$GENERATOR_DIR"
 fi
