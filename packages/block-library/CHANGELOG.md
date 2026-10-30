@@ -6,6 +6,7 @@
 
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 -   Button: Show the content controls (Text, Link to, Open in new tab, View) in every editing context, so the inspector opens on a Content tab like an Image or a Navigation Link. The block styles, color, typography, width, and border controls move to the Styles tab, and HTML element and Link relation to the Settings tab ([#85356](https://github.com/WordPress/gutenberg/pull/85356)).
+-   Social Icon: Add Link and View controls beside Text in the inspector's Content tab, so the link can be edited from the inspector (including after selecting the icon from its parent's List View) and from the List View popover in a content-only section ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
