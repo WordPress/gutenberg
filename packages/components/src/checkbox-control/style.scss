@@ -142,12 +142,18 @@ svg.components-checkbox-control__indeterminate {
 	height: var(--checkbox-input-size);
 	user-select: none;
 	pointer-events: none;
+	// Override the browser's SVG default so indicators follow forced system colors.
+	forced-color-adjust: auto;
 }
 
 .components-checkbox-control:has(:disabled) {
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
 	}
 }
 
