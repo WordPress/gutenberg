@@ -32,7 +32,8 @@
 			opacity: 1;
 		}
 
-		.dataforms-layouts-panel__field-label {
+		.dataforms-layouts-panel__field-label,
+		.dataforms-layouts-panel__field-placeholder {
 			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
@@ -152,6 +153,27 @@
 
 	> * {
 		min-width: 0;
+	}
+}
+
+// A placeholder stands in for an empty value, so it is muted by color. It keeps
+// the emphasized weight of values, the cue that the row is editable, which is
+// all that tells it apart from the label when forced colors replace the color.
+.dataforms-layouts-panel__field-placeholder {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// Wraps the render output of a value followed by its placeholder, without
+// adding a box of its own.
+.dataforms-layouts-panel__field-value {
+	display: contents;
+
+	> * {
+		min-width: 0;
+	}
+
+	&:not(:empty) + .dataforms-layouts-panel__field-placeholder {
+		display: none;
 	}
 }
 
