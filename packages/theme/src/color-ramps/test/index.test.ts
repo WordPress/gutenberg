@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { getLuminance, serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+import {
+	get,
+	getLuminance,
+	serialize,
+	to,
+	HSL,
+	OKLCH,
+	sRGB,
+} from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '..';
 import { buildRamp } from '../lib';
 import {
@@ -184,6 +192,27 @@ describe( 'buildRamps', () => {
 			).toMatchSnapshot();
 		}
 	);
+
+	it( 'keeps the generated neutral steps in the hue of a near-gray seed', () => {
+		// The "Modern" admin background, whose chroma sits just under the
+		// achromatic threshold.
+		const seed = '#222524';
+		const { ramp } = buildBgRamp( seed );
+		const seedHue = get( seed, [ OKLCH, 'h' ] );
+
+		for ( const step of [
+			'surface1',
+			'surface3',
+			'stroke1',
+			'stroke2',
+			'stroke3',
+		] as const ) {
+			expect( get( ramp[ step ], [ OKLCH, 'c' ] ) ).toBeGreaterThan( 0 );
+			expect(
+				Math.abs( get( ramp[ step ], [ OKLCH, 'h' ] ) - seedHue )
+			).toBeLessThan( 15 );
+		}
+	} );
 
 	it( 'does not return warnings resolved by seed rescaling', () => {
 		const result = buildBgRamp( '#3876a8' );
