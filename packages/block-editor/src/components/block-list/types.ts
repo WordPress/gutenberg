@@ -77,6 +77,8 @@ export interface PrivateBlockContextValue {
 	>;
 	supportsSplitting?: boolean;
 	wrapperProps?: BlockListWrapperProps;
+	// The block supports' wrapper props, merged with the filtered ones.
+	blockSupportProps?: BlockListWrapperProps;
 	isAligned?: boolean;
 }
 
@@ -223,4 +225,7 @@ export type BlockListBlockSelectedProps = Omit<
 	isSelectionEnabled?: boolean;
 	isLocked?: boolean;
 	canRemove?: boolean;
+	blockEditorSettings: Record< string, unknown >;
+	// The settings the block supports read, by prefixed path.
+	[ blockSupportSetting: `blockSupportSetting:${ string }` ]: unknown;
 };

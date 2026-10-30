@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useInstanceId } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
@@ -23,21 +22,21 @@ import {
 	setStyleForState,
 } from './block-style-state';
 import { VALID_BLOCK_PSEUDO_STATES } from './states';
-import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type { PanelStyle } from '../components/global-styles/types';
 import type {
+	BlockListBlockFeatureProps,
+	BlockSupportContext,
 	BlockSupportEditProps,
 	BlockWrapperProps,
 	CustomCSSControlProps,
 	CustomCSSStateEntry,
 } from './types';
 
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+type CustomCSSProps = BlockListBlockFeatureProps & { style?: PanelStyle };
 
-// Stable reference for useInstanceId.
-const CUSTOM_CSS_INSTANCE_REFERENCE = {};
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // Stable empty object reference for useSelect.
 const EMPTY_STYLE: PanelStyle = {};
@@ -265,36 +264,53 @@ function CustomCSSEdit( {
  * @param props.name     Block name.
  * @return Block props including className for custom CSS scoping.
  */
-function useBlockProps( {
-	style,
-	clientId,
-	name,
-}: {
-	style?: PanelStyle;
-	clientId: string;
-	name: string;
-} ) {
-	const [ viewportSettings ] = useSettings( 'viewport' );
-
-	const customCSSStateEntries = useMemo(
-		() => getCustomCSSStateEntries( style, name, viewportSettings ),
-		[ style, name, viewportSettings ]
+// The block's custom CSS, transformed the same way as global styles. Only CSS
+// states that don't contain HTML markup are processed.
+function getCustomCSS(
+	{ style, clientId, name }: CustomCSSProps,
+	viewportSettings: unknown
+) {
+	return processCustomCSSStateEntries(
+		getCustomCSSStateEntries( style, name, viewportSettings ),
+		`.wp-custom-css-${ clientId }`
 	);
+}
+
+function getBlockProps(
+	props: CustomCSSProps,
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+) {
+	// Only add the class if custom CSS produced rules.
+	if ( ! getCustomCSS( props, settings.viewport ) ) {
+		return {};
+	}
+
+	return {
+		className: `has-custom-css wp-custom-css-${ props.clientId }`,
+	};
+}
+
+function useStyles(
+	{ style, clientId, name }: CustomCSSProps,
+	{
+		settings,
+		blockEditorSettings,
+	}: Pick< BlockSupportContext, 'settings' | 'blockEditorSettings' >
+) {
+	const viewportSettings = settings.viewport;
 
 	// Keep valid CSS states even when another state contains HTML markup,
 	// matching the server-side rendering in
 	// gutenberg_render_custom_css_support_styles().
-	const canEditCSS = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
-		[]
-	);
+	const { canEditCSS } = blockEditorSettings;
 
 	const { createWarningNotice } = useDispatch( noticesStore );
 
 	// Show a warning notice when the user lacks edit_css and a block has
 	// custom CSS. The fixed notice ID ensures only one notice is shown
 	// regardless of how many blocks have CSS.
-	const hasCustomCSS = customCSSStateEntries.length > 0;
+	const hasCustomCSS =
+		getCustomCSSStateEntries( style, name, viewportSettings ).length > 0;
 	useEffect( () => {
 		if ( ! canEditCSS && hasCustomCSS ) {
 			createWarningNotice(
@@ -309,43 +325,20 @@ function useBlockProps( {
 		}
 	}, [ canEditCSS, hasCustomCSS, createWarningNotice ] );
 
-	const customCSSIdentifier = useInstanceId(
-		CUSTOM_CSS_INSTANCE_REFERENCE,
-		'wp-custom-css'
-	);
-
-	const customCSSSelector = `.${ customCSSIdentifier }`;
-
-	// Transform the custom CSS using the same logic as global styles.
-	// Only process CSS states that don't contain HTML markup.
-	const transformedCSS = useMemo(
-		() =>
-			processCustomCSSStateEntries(
-				customCSSStateEntries,
-				customCSSSelector
-			),
-		[ customCSSStateEntries, customCSSSelector ]
-	);
-
 	// Inject the CSS via style override. The type makes EditorStyles print
 	// it after all other overrides (e.g. block style variations), matching
 	// the front end where the custom CSS stylesheet is printed last. The
 	// clientId keeps custom CSS overrides in block order relative to each
 	// other, which is the order they print in on the front end.
+	const css = useMemo(
+		() => getCustomCSS( { style, clientId, name }, viewportSettings ),
+		[ style, clientId, name, viewportSettings ]
+	);
 	usePrivateStyleOverride( {
-		css: transformedCSS,
+		css,
 		clientId,
 		__unstableType: 'custom-css',
 	} );
-
-	// Only add the class if custom CSS produced rules.
-	if ( ! transformedCSS ) {
-		return {};
-	}
-
-	return {
-		className: `has-custom-css ${ customCSSIdentifier }`,
-	};
 }
 
 /**
@@ -393,7 +386,9 @@ function addSaveProps(
 
 export default {
 	edit: CustomCSSEdit,
-	useBlockProps,
+	getBlockProps,
+	useStyles,
+	settings: [ 'viewport' ],
 	addSaveProps,
 	attributeKeys: [ 'style' ],
 	hasSupport( name: string | BlockType ) {
