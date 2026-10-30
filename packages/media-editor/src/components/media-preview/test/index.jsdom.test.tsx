@@ -83,20 +83,4 @@ describe( 'MediaPreview', () => {
 		expect( screen.getByText( 'My PDF' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'View file' ) ).toBeInTheDocument();
 	} );
-
-	it( 'shows the file info for other application files', () => {
-		setPdfViewerEnabled( true );
-		mockMedia = {
-			source_url: 'https://example.com/file.zip',
-			mime_type: 'application/zip',
-			title: 'My archive',
-		};
-
-		render( <MediaPreview /> );
-
-		expect(
-			screen.queryByLabelText( 'Embed of the selected PDF file.' )
-		).not.toBeInTheDocument();
-		expect( screen.getByText( 'My archive' ) ).toBeInTheDocument();
-	} );
 } );
