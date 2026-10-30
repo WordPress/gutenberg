@@ -241,6 +241,68 @@ test.describe( 'Playlist block', () => {
 		await expect( playerArtwork ).toHaveCount( 0 );
 	} );
 
+	test( 'lists the tracks in the List View tab and opens the settings of the clicked track', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/playlist',
+			innerBlocks: [ 'First Track', 'Second Track' ].map( ( title ) => ( {
+				name: 'core/playlist-track',
+				attributes: {
+					id: uploadedAudio.id,
+					src: uploadedAudio.source_url,
+					title,
+				},
+			} ) ),
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Playlist',
+				exact: true,
+			} )
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+		// One row per track, named after the track, plus the appender row.
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 3 );
+		await expect(
+			listView.getByRole( 'gridcell', { name: /First Track/ } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'gridcell', { name: /Second Track/ } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'button', { name: 'Add Playlist track' } )
+		).toBeVisible();
+
+		await listView
+			.getByRole( 'gridcell', { name: /Second Track/ } )
+			.getByRole( 'link' )
+			.click();
+
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const block = window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlock();
+					return block && [ block.name, block.attributes.title ];
+				} )
+			)
+			.toEqual( [ 'core/playlist-track', 'Second Track' ] );
+		await expect(
+			page.getByRole( 'textbox', { name: 'Title' } )
+		).toHaveValue( 'Second Track' );
+	} );
+
 	test( 'keeps the playlist when the only added track fails to upload', async ( {
 		admin,
 		editor,
