@@ -406,7 +406,7 @@ function main( array $args ): void {
 		}
 	);
 
-	// The generator reads the WordPress source from `source/wordpress` in its working directory.
+	// The generator's finder reads the WordPress source from a fixed path in its working directory.
 	$source_dir = $work_dir . '/source/wordpress';
 
 	$local_checkout = '' !== $checkout ? $checkout : find_checkout( $gutenberg_dir );
@@ -452,8 +452,9 @@ function main( array $args ): void {
 	}
 
 	// Set up the generator unless it is cached. Its Composer scripts would install the latest
-	// WordPress release in `source/wordpress`, so they are skipped. It is set up in a directory of
-	// its own and moved into place once done, so that an interrupted run leaves nothing to be used.
+	// WordPress release as the source to generate from, so they are skipped. It is set up in a
+	// directory of its own and moved into place once done, so that an interrupted run leaves nothing
+	// to be used.
 	$generator_dir = $cache_dir . '/' . str_replace( '/', '-', $stubs_repo ) . "-$stubs_commit-" . substr( sha1( $packages ), 0, 12 );
 	if ( is_dir( $generator_dir ) ) {
 		report( "Using $stubs_repo@$stubs_commit from $generator_dir" );
