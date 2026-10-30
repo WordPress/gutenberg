@@ -94,13 +94,23 @@ function style( string $text, string $sgr ): string {
 }
 
 /**
+ * Returns whether a string is a full commit hash, rather than a branch or other ref.
+ *
+ * @param string $commit The commit hash or ref.
+ * @return bool Whether it is a full commit hash.
+ */
+function is_commit_hash( string $commit ): bool {
+	return 1 === preg_match( '/^[0-9a-f]{40}$/', $commit );
+}
+
+/**
  * Shortens a commit hash for display, leaving any other ref as it is.
  *
  * @param string $commit The commit hash or ref.
  * @return string The short hash or the ref.
  */
 function short_commit( string $commit ): string {
-	return preg_match( '/^[0-9a-f]{40}$/', $commit ) ? substr( $commit, 0, 12 ) : $commit;
+	return is_commit_hash( $commit ) ? substr( $commit, 0, 12 ) : $commit;
 }
 
 /**
@@ -454,6 +464,7 @@ function main( array $args ): void {
 	// already were. Uncommitted changes cannot be generated again, since they are not recorded, so
 	// stubs generated from them are used as they are.
 	$recorded = '' === $commit && '' === $pr && ! $use_checkout;
+	$reason   = '';
 	if ( $recorded ) {
 		$recorded_source = read_recorded( $package_file );
 		$commit          = $recorded_source['commit'];
@@ -479,10 +490,8 @@ function main( array $args ): void {
 		} else {
 			return;
 		}
-		report( style( 'Generating the WordPress stubs', '1' ) . style( " ($reason)", '2' ) );
-	} else {
-		report( style( 'Generating the WordPress stubs', '1' ) );
 	}
+	report( style( 'Generating the WordPress stubs', '1' ) . ( '' !== $reason ? style( " ($reason)", '2' ) : '' ) );
 	$started = microtime( true );
 
 	$work_dir = create_directory( sys_get_temp_dir(), 'wordpress-stubs.' );
@@ -531,7 +540,7 @@ function main( array $args ): void {
 		$source_label = "$develop_repo@" . short_commit( $commit );
 	}
 
-	if ( null !== $local_checkout && preg_match( '/^[0-9a-f]{40}$/', $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
+	if ( null !== $local_checkout && is_commit_hash( $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
 		report_row( 'Source', $source_label . style( ' (local checkout)', '2' ) );
 		// Check out the commit's src directory with an index of its own, leaving the checkout as it is.
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
