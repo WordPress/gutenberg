@@ -464,7 +464,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_color_classes_and_styles() {
 		return array(
-			'custom'                       => array(
+			'custom'                        => array(
 				'block_attributes' => array(
 					'style' => array(
 						'color' => array(
@@ -479,7 +479,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 					'style' => 'color:#d92828;background-color:#ffffff;background:linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);',
 				),
 			),
-			'preset'                       => array(
+			'preset'                        => array(
 				'block_attributes' => array(
 					'textColor'       => 'contrast',
 					'backgroundColor' => 'base',
@@ -489,7 +489,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 					'class' => 'has-text-color has-contrast-color has-background has-base-background-color has-vivid-cyan-blue-to-vivid-purple-gradient-background',
 				),
 			),
-			'preset wins over custom'      => array(
+			'preset wins over custom'       => array(
 				'block_attributes' => array(
 					'textColor' => 'contrast',
 					'style'     => array(
@@ -502,7 +502,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 					'class' => 'has-text-color has-contrast-color',
 				),
 			),
-			'null preset uses custom text' => array(
+			'null preset uses custom text'  => array(
 				'block_attributes' => array(
 					'textColor' => null,
 					'style'     => array(
@@ -516,19 +516,25 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 					'style' => 'color:#d92828;',
 				),
 			),
-			'numeric preset'               => array(
+			'non-string preset uses custom' => array(
 				'block_attributes' => array(
 					'textColor' => 1,
+					'style'     => array(
+						'color' => array(
+							'text' => '#d92828',
+						),
+					),
 				),
 				'expected'         => array(
-					'class' => 'has-text-color has-1-color',
+					'class' => 'has-text-color',
+					'style' => 'color:#d92828;',
 				),
 			),
-			'empty'                        => array(
+			'empty'                         => array(
 				'block_attributes' => array(),
 				'expected'         => array(),
 			),
-			'malformed color'              => array(
+			'malformed color'               => array(
 				'block_attributes' => array(
 					'style' => array(
 						'color' => '#d92828',
@@ -536,7 +542,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 				),
 				'expected'         => array(),
 			),
-			'malformed attributes'         => array(
+			'malformed attributes'          => array(
 				'block_attributes' => 'color',
 				'expected'         => array(),
 			),
