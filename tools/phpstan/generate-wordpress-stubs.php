@@ -244,33 +244,33 @@ function setting( string $name, string $default_value ): string {
 /**
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
- * @param non-empty-list<string>            $command    The program and its arguments.
- * @param 'pass'|'capture'|'quiet'|'errors' $mode       'pass' to pass its output to standard error,
- *                                                      'capture' to return its standard output,
- *                                                      'quiet' to also discard its standard error,
- *                                                      or 'errors' to return its standard error and
- *                                                      discard its standard output.
- * @param non-empty-string|null             $cwd        The working directory.
- * @param array<non-empty-string, string>   $env        Environment variables to set in addition to
- *                                                      the current ones.
- * @param non-empty-string|null             $error_file For 'errors', the file to write standard
- *                                                      error to, which, unlike a second pipe, cannot
- *                                                      fill up and block the command while nothing
- *                                                      reads it.
- * @return array{int, string} The exit status, and the output when captured.
+ * @param non-empty-list<string>           $command The program and its arguments.
+ * @param 'pass'|'capture'|'quiet'|'files' $mode    'pass' to pass its output to standard error,
+ *                                                  'capture' to return its standard output,
+ *                                                  'quiet' to also discard its standard error, or
+ *                                                  'files' to write its standard output and error
+ *                                                  to the given files.
+ * @param non-empty-string|null            $cwd     The working directory.
+ * @param array<non-empty-string, string>  $env     Environment variables to set in addition to
+ *                                                  the current ones.
+ * @param array{string, string}|null       $files   For 'files', the files to write standard
+ *                                                  output and error to, which, unlike pipes,
+ *                                                  cannot fill up and block the command while
+ *                                                  nothing reads them.
+ * @return array{int, string} The exit status, and the standard output when captured.
  */
-function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array(), ?string $error_file = null ): array {
+function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array(), ?array $files = null ): array {
 	$null_device = '\\' === DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null';
 	$descriptors = array( 0 => array( 'file', $null_device, 'r' ) );
 	if ( 'pass' === $mode ) {
 		$descriptors[1] = STDERR;
 		$descriptors[2] = STDERR;
-	} elseif ( 'errors' === $mode ) {
-		if ( null === $error_file ) {
-			throw new RuntimeException( 'No file to write the standard error of the command to.' );
+	} elseif ( 'files' === $mode ) {
+		if ( null === $files ) {
+			throw new RuntimeException( 'No files to write the output of the command to.' );
 		}
-		$descriptors[1] = array( 'file', $null_device, 'w' );
-		$descriptors[2] = array( 'file', $error_file, 'w' );
+		$descriptors[1] = array( 'file', $files[0], 'w' );
+		$descriptors[2] = array( 'file', $files[1], 'w' );
 	} else {
 		$descriptors[1] = array( 'pipe', 'w' );
 		$descriptors[2] = 'quiet' === $mode ? array( 'file', $null_device, 'w' ) : STDERR;
@@ -285,11 +285,7 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 		$output = (string) stream_get_contents( $pipes[1] );
 		fclose( $pipes[1] );
 	}
-	$status = proc_close( $process );
-	if ( 'errors' === $mode && null !== $error_file ) {
-		$output = (string) file_get_contents( $error_file );
-	}
-	return array( $status, $output );
+	return array( proc_close( $process ), $output );
 }
 
 /**
@@ -729,12 +725,14 @@ function main( array $args ): void {
 
 	$generated_file = $work_dir . '/wordpress-stubs.php';
 
-	// The generator writes the stubs to a file and then reports on them, a title, the file, a table of
-	// counts, and any declarations it found more than once, keeping the first. That report is
-	// discarded. Only its standard error is shown, which PHP warnings go to as well. Writing the stubs
-	// to standard output instead would avoid the file, but the generator prints them through Symfony
-	// Console, which strips what looks like formatting tags, such as the `</>` in the HTML API's
-	// docblocks.
+	// The generator writes the stubs to a file and then reports on them on standard output: a title,
+	// the file, a table of counts, and any declarations it found more than once, of which the stubs
+	// keep the first. Of that report, only the duplicates are shown, since the first may not be the
+	// declaration that PHPStan should see. They are found by the heading that the pinned generator
+	// gives them, rather than by the layout of the report, which comes from Symfony Console. Its
+	// standard error is shown too, which PHP warnings go to as well. Writing the stubs to standard
+	// output instead would avoid the file, but the generator prints them through Symfony Console,
+	// which strips what looks like formatting tags, such as the `</>` in the HTML API's docblocks.
 	$generator_command = array(
 		PHP_BINARY,
 		'-d',
@@ -751,13 +749,17 @@ function main( array $args ): void {
 		"--out=$generated_file",
 	);
 
+	$report_file = $work_dir . '/generator-report.txt';
+	$error_file  = $work_dir . '/generator-errors.txt';
 	report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
 	try {
-		list( $status, $output ) = execute( $generator_command, 'errors', $work_dir, array(), $work_dir . '/generator-errors.txt' );
+		list( $status ) = execute( $generator_command, 'files', $work_dir, array(), array( $report_file, $error_file ) );
 	} finally {
 		clear_pending_row();
 	}
-	$output = trim( $output );
+	$report     = (string) file_get_contents( $report_file );
+	$duplicates = strpos( $report, 'Duplicate declarations found' );
+	$output     = trim( (string) file_get_contents( $error_file ) . "\n" . ( false !== $duplicates ? substr( $report, $duplicates ) : '' ) );
 	if ( '' !== $output ) {
 		report( $output );
 	}
