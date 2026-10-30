@@ -25,6 +25,7 @@ import {
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 	getNoteAnchorRect,
+	getNoteRanges,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -1302,5 +1303,65 @@ describe( 'getNoteAnchorRect', () => {
 
 		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 120 );
 		expect( getNoteAnchorRect( 34, blockEl ).top ).toBe( 180 );
+	} );
+} );
+
+describe( 'getNoteRanges', () => {
+	const at = ( clientId, offset ) => ( {
+		clientId,
+		attributeKey: 'content',
+		offset,
+	} );
+	const blocks = ( ...clientIds ) =>
+		clientIds.map( ( clientId ) =>
+			clientId === 'image'
+				? { clientId, attributes: {} }
+				: {
+						clientId,
+						attributes: {
+							content: RichTextData.fromHTMLString( 'abcdef' ),
+						},
+						attributeKey: 'content',
+					}
+		);
+
+	it( 'takes the selected text of one block', () => {
+		expect(
+			getNoteRanges( {
+				blocks: blocks( 'a' ),
+				selectionStart: at( 'a', 5 ),
+				selectionEnd: at( 'a', 2 ),
+			} )
+		).toEqual(
+			new Map( [
+				[ 'a', { attributeKey: 'content', start: 2, end: 5 } ],
+			] )
+		);
+	} );
+
+	it( 'takes the first block from the caret, the middle in full and the last up to the caret', () => {
+		expect(
+			getNoteRanges( {
+				blocks: blocks( 'a', 'b', 'c' ),
+				selectionStart: at( 'c', 3 ),
+				selectionEnd: at( 'a', 2 ),
+			} )
+		).toEqual(
+			new Map( [
+				[ 'a', { attributeKey: 'content', start: 2, end: 6 } ],
+				[ 'b', { attributeKey: 'content', start: 0, end: 6 } ],
+				[ 'c', { attributeKey: 'content', start: 0, end: 3 } ],
+			] )
+		);
+	} );
+
+	it( 'takes a block without a sole rich text field as a whole', () => {
+		expect(
+			getNoteRanges( {
+				blocks: blocks( 'a', 'image', 'c' ),
+				selectionStart: at( 'a', 2 ),
+				selectionEnd: at( 'c', 3 ),
+			} ).has( 'image' )
+		).toBe( false );
 	} );
 } );

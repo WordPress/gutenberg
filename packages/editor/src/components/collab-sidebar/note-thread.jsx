@@ -265,7 +265,7 @@ export function NoteThread( {
 		return (
 			<AddNote
 				key={ anchorClientId }
-				clientId={ anchorClientId }
+				clientIds={ note.blockClientIds }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
