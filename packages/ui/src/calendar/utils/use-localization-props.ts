@@ -219,7 +219,14 @@ export const useLocalizationProps = ( {
 			dir: isRightToLeft ? 'rtl' : 'ltr',
 			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
-				formatDay: dayNumberFormatter.format,
+				// Some locales (e.g. `ja`, `zh`, `ko`) append a literal suffix
+				// such as `日` to a standalone day, which doesn't belong in a
+				// calendar grid. Only keep the localized day number.
+				formatDay: ( date: Date ) =>
+					dayNumberFormatter
+						.formatToParts( date )
+						.find( ( part ) => part.type === 'day' )?.value ??
+					dayNumberFormatter.format( date ),
 				formatWeekdayName: weekdayNarrowFormatter.format,
 				formatCaption: monthNameFormatter.format,
 			},
