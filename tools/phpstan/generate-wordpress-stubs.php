@@ -675,21 +675,20 @@ function main( array $args ): void {
 		$source_label = "$develop_repo@" . short_commit( $commit );
 	}
 
-	if ( null !== $local_checkout && is_commit_hash( $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
+	// A ref, such as the head of a pull request, is only resolved to a commit once fetched.
+	$fetched_ref = ! is_commit_hash( $commit );
+	if ( null !== $local_checkout && ! $fetched_ref && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
 		report_row( 'Source', $source_label . style( ' (local checkout)', '2' ) );
 		// Check out the commit's src directory with an index of its own, leaving the checkout as it is.
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
 		run( array( 'git', '-C', $local_checkout, 'read-tree', "$commit:src" ), null, $env );
 		run( array( 'git', '-C', $local_checkout, '-c', 'core.autocrlf=false', 'checkout-index', '--all', "--prefix=$source_dir/" ), null, $env );
-		$repo_dir    = $local_checkout;
-		$fetched_ref = false;
+		$repo_dir = $local_checkout;
 	} else {
 		report_row( 'Source', $source_label . style( ' (GitHub)', '2' ) );
 		$repo_dir = $work_dir . '/wordpress-develop';
 		fetch_commit( $repo_dir, $develop_repo, $commit, array( '/src/' ) );
-		// A ref, such as the head of a pull request, is only resolved to a commit once fetched.
-		$fetched_ref = ! is_commit_hash( $commit );
-		$commit      = resolve_commit( $repo_dir, 'HEAD' );
+		$commit = resolve_commit( $repo_dir, 'HEAD' );
 		mkdir( dirname( $source_dir ) );
 		rename( $repo_dir . '/src', $source_dir );
 	}
