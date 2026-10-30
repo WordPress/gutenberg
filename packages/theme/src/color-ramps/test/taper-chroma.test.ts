@@ -24,17 +24,21 @@ describe( 'taperChroma', () => {
 		}
 	);
 
-	it( 'carries a near-gray tint without a cut-off at the achromatic threshold', () => {
+	it( 'carries a near-gray tint in proportion to the seed chroma', () => {
 		const getNearGrayChroma = ( chroma: number ) =>
 			getTaperedChroma(
-				{ space: OKLCH, coords: [ 0.26, chroma, 170 ], alpha: 1 },
-				0.3
+				{ space: OKLCH, coords: [ 0.99, chroma, 250 ], alpha: 1 },
+				0.8
 			);
-		const belowThreshold = getNearGrayChroma( 0.0049 );
-		const aboveThreshold = getNearGrayChroma( 0.0051 );
+		const chromas = [ 0.0005, 0.002, 0.0049, 0.0051 ].map(
+			getNearGrayChroma
+		);
 
-		expect( belowThreshold ).toBeGreaterThan( 0 );
-		expect( aboveThreshold - belowThreshold ).toBeLessThan( 0.001 );
+		for ( let index = 1; index < chromas.length; index++ ) {
+			expect( chromas[ index ] ).toBeGreaterThan( chromas[ index - 1 ] );
+		}
+		expect( chromas[ 0 ] ).toBeGreaterThan( 0 );
+		expect( chromas[ 0 ] ).toBeLessThan( 0.0005 * 5 );
 	} );
 
 	it( 'keeps a gray seed gray', () => {
