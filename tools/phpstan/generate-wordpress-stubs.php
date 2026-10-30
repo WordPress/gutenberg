@@ -720,6 +720,17 @@ function main( array $args ): void {
 		if ( ! rename( $setup_dir, $generator_dir ) ) {
 			throw new RuntimeException( "Unable to move the generator to $generator_dir." );
 		}
+
+		// Remove the setups of other generator commits or packages, which take over 100 MB each and
+		// are left behind whenever the pins change. A branch that still pins one sets it up again.
+		// Only directories named like a setup are removed, in case the cache directory is shared
+		// with other things. Setups in progress, under names starting with a period, are kept.
+		$cache_entries = scandir( $cache_dir );
+		foreach ( false !== $cache_entries ? $cache_entries : array() as $name ) {
+			if ( basename( $generator_dir ) !== $name && 1 === preg_match( '/^[\w.-]+-[0-9a-f]{40}(?:-[0-9a-f]{12})?$/', $name ) && '.' !== $name[0] && is_dir( "$cache_dir/$name" ) ) {
+				remove_path( "$cache_dir/$name" );
+			}
+		}
 	}
 
 	// Do what the generator's generate.sh does for trunk. Its correction of the types in the AVIF info
