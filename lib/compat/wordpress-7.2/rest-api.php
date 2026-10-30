@@ -499,3 +499,30 @@ function gutenberg_rest_only_include_revisioned_meta( $response, $post ) {
 	return $response;
 }
 add_filter( 'rest_prepare_revision', 'gutenberg_rest_only_include_revisioned_meta', 10, 2 );
+
+/**
+ * Keeps the callbacks of internal REST requests, such as the editors'
+ * preloaded ones, from printing deprecated argument notices into the page.
+ * REST requests report them in a header instead, see `rest_api_default_filters()`.
+ *
+ * @param mixed $response The response so far.
+ * @return mixed The response, unchanged.
+ */
+function gutenberg_silence_rest_deprecated_arguments( $response ) {
+	// Priority 11 leaves the filter that REST requests add at 10 alone when removed.
+	add_filter( 'deprecated_argument_trigger_error', '__return_false', 11 );
+	return $response;
+}
+add_filter( 'rest_request_before_callbacks', 'gutenberg_silence_rest_deprecated_arguments' );
+
+/**
+ * Stops silencing deprecated argument notices after a REST request's callbacks.
+ *
+ * @param mixed $response The response.
+ * @return mixed The response, unchanged.
+ */
+function gutenberg_restore_rest_deprecated_arguments( $response ) {
+	remove_filter( 'deprecated_argument_trigger_error', '__return_false', 11 );
+	return $response;
+}
+add_filter( 'rest_request_after_callbacks', 'gutenberg_restore_rest_deprecated_arguments' );

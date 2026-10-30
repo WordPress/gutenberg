@@ -52,6 +52,17 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 					}
 				)
 			);
+			// The author field of the post summary queries the users collection
+			// with `who=authors`, see `AuthorView` in `core-fields`.
+			$paths[] = sprintf( '/wp/v2/users?context=view&include[0]=%d&who=authors', $author_id );
+		}
+	}
+
+	// The site editor shows the same post summary for pages.
+	if ( 'core/edit-site' === $context->name && isset( $context->post ) && 'page' === $context->post->post_type ) {
+		$author_id = (int) get_post_field( 'post_author', $context->post->ID );
+		if ( post_type_supports( 'page', 'author' ) && $author_id > 0 ) {
+			$paths[] = sprintf( '/wp/v2/users?context=view&include[0]=%d&who=authors', $author_id );
 		}
 	}
 
