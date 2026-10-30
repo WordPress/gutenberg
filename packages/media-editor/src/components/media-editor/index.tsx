@@ -243,7 +243,7 @@ interface MediaEditorFrameContextValue {
 	onSave: () => void;
 	/**
 	 * When `true`, the media has a lineage root to restore to, so the
-	 * "Restore original image" menu item is shown.
+	 * history menu shows its "Restore original" item.
 	 */
 	canRestoreOriginal: boolean;
 	/**
@@ -287,17 +287,8 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const {
-		isImage,
-		isSaving,
-		onCancel,
-		isWide,
-		activePanel,
-		onTogglePanel,
-		canRestoreOriginal,
-		isSourceReplaced,
-		onRestoreOriginal,
-	} = useMediaEditorFrameContext();
+	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
+		useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
@@ -329,40 +320,18 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					toggleProps={ { size: 'compact' } }
 				>
 					{ ( { onClose: closeMenu } ) => (
-						<>
-							{ canRestoreOriginal && (
-								<MenuGroup>
-									<MenuItem
-										icon={ backup }
-										iconPosition="left"
-										disabled={
-											isSourceReplaced || isSaving
-										}
-										info={ __(
-											'Discards unsaved changes and loads the original image.'
-										) }
-										onClick={ () => {
-											onRestoreOriginal();
-											closeMenu();
-										} }
-									>
-										{ __( 'Restore original image' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-							<MenuGroup>
-								<MenuItem
-									icon={ keyboard }
-									iconPosition="left"
-									onClick={ () => {
-										setIsShortcutsModalOpen( true );
-										closeMenu();
-									} }
-								>
-									{ __( 'Keyboard shortcuts' ) }
-								</MenuItem>
-							</MenuGroup>
-						</>
+						<MenuGroup>
+							<MenuItem
+								icon={ keyboard }
+								iconPosition="left"
+								onClick={ () => {
+									setIsShortcutsModalOpen( true );
+									closeMenu();
+								} }
+							>
+								{ __( 'Keyboard shortcuts' ) }
+							</MenuItem>
+						</MenuGroup>
 					) }
 				</DropdownMenu>
 			) }
@@ -386,8 +355,16 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, isWide, activePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		isUndoRedoDisabled,
+		isWide,
+		activePanel,
+		canRestoreOriginal,
+		isSourceReplaced,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const {
 		reset,
 		isDirty,
@@ -433,15 +410,6 @@ function HistoryActions() {
 		>
 			<Button
 				size="compact"
-				variant="tertiary"
-				disabled={ isUndoRedoDisabled || ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
-			<Button
-				size="compact"
 				icon={ undo }
 				label={ __( 'Undo' ) }
 				showTooltip
@@ -464,6 +432,48 @@ function HistoryActions() {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
+			<DropdownMenu
+				icon={ backup }
+				label={ __( 'History' ) }
+				popoverProps={ { placement: 'top-start' } }
+				toggleProps={ {
+					size: 'compact',
+					disabled:
+						isUndoRedoDisabled ||
+						( ! isDirty && ! canRestoreOriginal ),
+					accessibleWhenDisabled: true,
+				} }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<>
+						<MenuGroup>
+							<MenuItem
+								disabled={ isUndoRedoDisabled || ! isDirty }
+								onClick={ () => {
+									handleReset();
+									closeMenu();
+								} }
+							>
+								{ __( 'Reset image edits' ) }
+							</MenuItem>
+						</MenuGroup>
+						{ canRestoreOriginal && (
+							<MenuGroup>
+								<MenuItem
+									disabled={ isSourceReplaced || isSaving }
+									info={ __( 'Discards unsaved changes.' ) }
+									onClick={ () => {
+										onRestoreOriginal();
+										closeMenu();
+									} }
+								>
+									{ __( 'Restore original' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
 		</Stack>
 	);
 }
