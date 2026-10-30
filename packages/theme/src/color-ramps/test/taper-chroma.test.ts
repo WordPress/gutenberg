@@ -24,6 +24,28 @@ describe( 'taperChroma', () => {
 		}
 	);
 
+	it( 'carries a near-gray tint without a cut-off at the achromatic threshold', () => {
+		const getNearGrayChroma = ( chroma: number ) =>
+			getTaperedChroma(
+				{ space: OKLCH, coords: [ 0.26, chroma, 170 ], alpha: 1 },
+				0.3
+			);
+		const belowThreshold = getNearGrayChroma( 0.0049 );
+		const aboveThreshold = getNearGrayChroma( 0.0051 );
+
+		expect( belowThreshold ).toBeGreaterThan( 0 );
+		expect( aboveThreshold - belowThreshold ).toBeLessThan( 0.001 );
+	} );
+
+	it( 'keeps a gray seed gray', () => {
+		const result = taperChroma(
+			{ space: OKLCH, coords: [ 0.26, 0, NaN ], alpha: 1 },
+			0.3
+		);
+
+		expect( 'c' in result ? result.c : result.coords[ 1 ] ).toBe( 0 );
+	} );
+
 	it( 'reduces chroma gradually near the white lightness boundary', () => {
 		const seed: PlainColorObject = {
 			space: OKLCH,

@@ -18,7 +18,7 @@ export interface TaperChromaOptions {
 	kDark?: number; // floor multiplier near darker side (default 0.85)
 	// Achromatic handling
 	hueFallback?: number; // degrees: if seed is achromatic and you still want color
-	achromaEpsilon?: number; // ≤ this chroma → treat as achromatic (default 0.005)
+	achromaEpsilon?: number; // < this chroma → fade the carried chroma toward gray (default 0.005)
 }
 
 /**
@@ -62,19 +62,26 @@ export function createChromaTaper(
 
 	const chromaIsTiny = cSeed < achromaEpsilon;
 	const hueIsInvalid = hSeed === null || ! Number.isFinite( hSeed );
+	const hueFallback = options.hueFallback;
+	const useHueFallback =
+		typeof hueFallback === 'number' && ( chromaIsTiny || hueIsInvalid );
 
-	if ( chromaIsTiny || hueIsInvalid ) {
-		if ( typeof options.hueFallback === 'number' ) {
-			hSeed = normalizeHue( options.hueFallback );
-		} else {
-			// Respect achromatic intent: grayscale at target L
-			return ( lTarget ) => ( {
-				space: OKLCH,
-				coords: [ clamp01( lTarget ), 0, 0 ],
-				alpha: 1,
-			} );
-		}
+	if ( useHueFallback ) {
+		hSeed = normalizeHue( hueFallback );
+	} else if ( hueIsInvalid ) {
+		// Respect achromatic intent: grayscale at target L
+		return ( lTarget ) => ( {
+			space: OKLCH,
+			coords: [ clamp01( lTarget ), 0, 0 ],
+			alpha: 1,
+		} );
 	}
+
+	// Fade near-gray seeds toward gray rather than cutting them off at the
+	// threshold, so a slight tint carries into every step in proportion.
+	const achromaticFade = useHueFallback
+		? 1
+		: clamp01( cSeed / Math.max( achromaEpsilon, 1e-6 ) );
 
 	// Capacity at seed
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
@@ -83,7 +90,8 @@ export function createChromaTaper(
 	// Seed vividness ratio (hue-fair normalization)
 	const denom = cmaxSeed > 0 ? cmaxSeed : 1e-6;
 	const seedRelative = clamp01( cSeed / denom );
-	const seedCarry = Math.pow( seedRelative, clamp01( carry ) );
+	const seedCarry =
+		Math.pow( seedRelative, clamp01( carry ) ) * achromaticFade;
 
 	return ( lTarget ) => {
 		const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
