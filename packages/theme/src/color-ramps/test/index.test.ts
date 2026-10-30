@@ -193,26 +193,47 @@ describe( 'buildRamps', () => {
 		}
 	);
 
-	it( 'keeps the generated neutral steps in the hue of a near-gray seed', () => {
-		// The "Modern" admin background, whose chroma sits just under the
-		// achromatic threshold.
-		const seed = '#222524';
-		const { ramp } = buildBgRamp( seed );
-		const seedHue = get( seed, [ OKLCH, 'h' ] );
+	it.each( [
+		// The "Modern" and "Light" admin backgrounds.
+		'#222524',
+		'#eaeeed',
+		// Near-white seeds whose tint is barely perceptible.
+		'#fcfcfd',
+		'#f6f7f9',
+	] )(
+		'keeps the generated neutral steps of near-gray seed %s in its hue and near-gray',
+		( seed ) => {
+			const { ramp } = buildBgRamp( seed );
+			const seedChroma = get( seed, [ OKLCH, 'c' ] );
+			const seedHue = get( seed, [ OKLCH, 'h' ] );
 
-		for ( const step of [
-			'surface1',
-			'surface3',
-			'stroke1',
-			'stroke2',
-			'stroke3',
-		] as const ) {
-			expect( get( ramp[ step ], [ OKLCH, 'c' ] ) ).toBeGreaterThan( 0 );
-			expect(
-				Math.abs( get( ramp[ step ], [ OKLCH, 'h' ] ) - seedHue )
-			).toBeLessThan( 15 );
+			for ( const step of [
+				'surface1',
+				'surface3',
+				'surface6',
+				'stroke1',
+				'stroke2',
+				'stroke3',
+				'stroke4',
+			] as const ) {
+				const chroma = get( ramp[ step ], [ OKLCH, 'c' ] );
+				const hueDistance = Math.abs(
+					get( ramp[ step ], [ OKLCH, 'h' ] ) - seedHue
+				);
+
+				// Pure white and black have no room for chroma.
+				const lightness = get( ramp[ step ], [ OKLCH, 'l' ] );
+				if ( lightness > 0.999 || lightness < 0.001 ) {
+					continue;
+				}
+				expect( chroma ).toBeGreaterThan( 0 );
+				expect( chroma ).toBeLessThan( seedChroma * 6 );
+				expect(
+					Math.min( hueDistance, 360 - hueDistance )
+				).toBeLessThan( 15 );
+			}
 		}
-	} );
+	);
 
 	it( 'does not return warnings resolved by seed rescaling', () => {
 		const result = buildBgRamp( '#3876a8' );
