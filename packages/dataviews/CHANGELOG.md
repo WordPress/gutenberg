@@ -18,7 +18,6 @@
 
 ### Bug Fixes
 
--   Prevent bulk-action buttons from adopting brand colors with updated Button styles ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 
 ## 21.0.0 (2026-10-20)
