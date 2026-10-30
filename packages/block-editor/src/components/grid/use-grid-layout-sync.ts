@@ -55,6 +55,9 @@ export function useGridLayoutSync( {
 		const updates: Record< string, Record< string, unknown > > = {};
 
 		if ( gridLayout.isManualPlacement ) {
+			// Manual grids need explicit counts; variations may not define them.
+			const columnCount = gridLayout.columnCount ?? 3;
+			const rowCount = gridLayout.rowCount ?? 3;
 			const occupiedRects: GridRect[] = [];
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
@@ -96,8 +99,7 @@ export function useGridLayoutSync( {
 				}
 				const [ newColumnStart, newRowStart ] = placeBlock(
 					occupiedRects,
-					// A manual grid has a column count.
-					gridLayout.columnCount!,
+					columnCount,
 					columnSpan,
 					rowSpan,
 					previouslySelectedBlockRect?.columnEnd,
@@ -127,14 +129,16 @@ export function useGridLayoutSync( {
 			const bottomMostRow = Math.max(
 				...occupiedRects.map( ( r ) => r.rowEnd )
 			);
+			const newRowCount = Math.max( rowCount, bottomMostRow );
 			if (
-				! gridLayout.rowCount ||
-				gridLayout.rowCount < bottomMostRow
+				gridLayout.columnCount !== columnCount ||
+				gridLayout.rowCount !== newRowCount
 			) {
 				updates[ gridClientId ] = {
 					layout: {
 						...gridLayout,
-						rowCount: bottomMostRow,
+						columnCount,
+						rowCount: newRowCount,
 					},
 				};
 			}

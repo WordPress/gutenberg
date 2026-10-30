@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -57,6 +61,12 @@
 
 ## 5.34.0 (2025-10-29)
 
+## 5.33.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 5.33.0 (2025-10-17)
 
 ## 5.32.0 (2025-10-01)
@@ -85,6 +95,12 @@
 
 ## 5.20.0 (2025-03-13)
 
+## 5.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 5.19.0 (2025-02-28)
 
 ## 5.18.0 (2025-02-12)
@@ -107,6 +123,12 @@
 
 ## 5.9.0 (2024-10-03)
 
+## 5.8.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 5.8.0 (2024-09-19)
 
 ## 5.7.0 (2024-09-05)
@@ -122,6 +144,12 @@
 ## 5.2.0 (2024-06-26)
 
 ## 5.1.0 (2024-06-15)
+
+## 5.0.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 5.0.0 (2024-05-31)
 
@@ -143,6 +171,12 @@
 
 ## 4.52.0 (2024-02-21)
 
+## 4.51.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.51.0 (2024-02-09)
 
 ## 4.50.0 (2024-01-24)
@@ -161,6 +195,12 @@
 
 ## 4.43.0 (2023-10-05)
 
+## 4.42.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.42.0 (2023-09-20)
 
 ## 4.41.0 (2023-08-31)
@@ -174,6 +214,12 @@
 ## 4.37.0 (2023-07-05)
 
 ## 4.36.0 (2023-06-23)
+
+## 4.35.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 4.35.0 (2023-06-07)
 
@@ -193,6 +239,12 @@
 
 ## 4.27.0 (2023-02-15)
 
+## 4.26.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.26.0 (2023-02-01)
 
 ## 4.25.0 (2023-01-11)
@@ -210,6 +262,12 @@
 ## 4.19.0 (2022-10-05)
 
 ## 4.18.0 (2022-09-21)
+
+## 4.17.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 4.17.0 (2022-09-13)
 
@@ -237,6 +295,12 @@
 
 ## 4.7.0 (2022-04-21)
 
+## 4.6.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.6.0 (2022-04-08)
 
 ## 4.5.0 (2022-03-23)
@@ -245,7 +309,19 @@
 
 ## 4.3.0 (2022-01-27)
 
+## 4.2.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
 ## 4.2.0 (2021-07-21)
+
+## 4.1.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 4.1.0 (2021-05-20)
 
@@ -257,6 +333,48 @@
 -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
 
 ## 3.10.0 (2021-03-17)
+
+## 3.9.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.8.1 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.7.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.5.1 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.4.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 3.1.1 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
+
+## 2.0.6 (2026-10-28)
+
+### Bug Fixes
+
+-   Only accept HTML whitespace in block delimiters.
 
 ## 2.0.3 (2019-01-03)
 
