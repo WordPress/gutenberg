@@ -84,8 +84,9 @@
 	}
 
 	// Give empty meta box areas a height while dragging, so that a meta box can
-	// be dropped into them.
-	.is-dragging-metaboxes & .meta-box-sortables {
+	// be dropped into them. The "advanced" area is skipped because it renders
+	// right below the "normal" area, which already provides the main drop zone.
+	.is-dragging-metaboxes &:not(.is-advanced) .meta-box-sortables {
 		min-height: 60px;
 		outline: $border-width dashed $gray-400;
 		outline-offset: -$border-width;
