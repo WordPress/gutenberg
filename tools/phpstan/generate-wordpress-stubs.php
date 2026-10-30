@@ -233,8 +233,7 @@ function find_checkout( string $dir ): ?string {
  * Reads the source that the package's composer.json records.
  *
  * @param non-empty-string $file The package's composer.json.
- * @return array{commit: string, pull_request: ''|numeric-string, uncommitted_changes: bool} The
- *         recorded source.
+ * @return array{commit: string, pull_request: ''|numeric-string, uncommitted_changes: bool} The recorded source.
  */
 function read_recorded( string $file ): array {
 	$json   = json_decode( (string) file_get_contents( $file ), true );
