@@ -217,45 +217,58 @@ function setting( string $name, string $default_value ): string {
 /**
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
- * @param non-empty-list<string>              $command The program and its arguments.
- * @param 'pass'|'capture'|'quiet'|'combined' $mode    'pass' to pass its output to standard error,
- *                                                     'capture' to return its standard output,
- *                                                     'quiet' to also discard its standard error,
- *                                                     or 'combined' to return both.
- * @param non-empty-string|null               $cwd     The working directory.
- * @param array<non-empty-string, string>     $env     Environment variables to set in addition to
- *                                                     the current ones.
+ * @param non-empty-list<string>            $command The program and its arguments.
+ * @param 'pass'|'capture'|'quiet'|'errors' $mode    'pass' to pass its output to standard error,
+ *                                                   'capture' to return its standard output,
+ *                                                   'quiet' to also discard its standard error, or
+ *                                                   'errors' to return its standard error and
+ *                                                   discard its standard output.
+ * @param non-empty-string|null             $cwd     The working directory.
+ * @param array<non-empty-string, string>   $env     Environment variables to set in addition to the
+ *                                                   current ones.
  * @return array{int, string} The exit status, and the output when captured.
  */
 function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array() ): array {
 	$null_device = '\\' === DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null';
 	$descriptors = array( 0 => array( 'file', $null_device, 'r' ) );
+	$error_file  = null;
 	if ( 'pass' === $mode ) {
 		$descriptors[1] = STDERR;
 		$descriptors[2] = STDERR;
+	} elseif ( 'errors' === $mode ) {
+		// Standard error goes to a file, which, unlike a second pipe, cannot fill up and block the
+		// command while nothing reads it.
+		$error_file = tempnam( sys_get_temp_dir(), 'wordpress-stubs-errors.' );
+		if ( false === $error_file ) {
+			throw new RuntimeException( 'Unable to create a temporary file.' );
+		}
+		$descriptors[1] = array( 'file', $null_device, 'w' );
+		$descriptors[2] = array( 'file', $error_file, 'w' );
 	} else {
 		$descriptors[1] = array( 'pipe', 'w' );
-		if ( 'quiet' === $mode ) {
-			$descriptors[2] = array( 'file', $null_device, 'w' );
-		} elseif ( 'combined' === $mode ) {
-			$descriptors[2] = array( 'redirect', 1 );
-		} else {
-			$descriptors[2] = STDERR;
-		}
+		$descriptors[2] = 'quiet' === $mode ? array( 'file', $null_device, 'w' ) : STDERR;
 	}
 
-	// PHPStan's signature of proc_open() takes descriptors of strings only, though a redirection's
-	// target is a descriptor number, which PHP requires to be an integer.
-	$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null ); // @phpstan-ignore argument.type
-	if ( ! is_resource( $process ) ) {
-		throw new RuntimeException( "Unable to run $command[0]." );
+	try {
+		$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null );
+		if ( ! is_resource( $process ) ) {
+			throw new RuntimeException( "Unable to run $command[0]." );
+		}
+		$output = '';
+		if ( isset( $pipes[1] ) ) {
+			$output = (string) stream_get_contents( $pipes[1] );
+			fclose( $pipes[1] );
+		}
+		$status = proc_close( $process );
+		if ( null !== $error_file ) {
+			$output = (string) file_get_contents( $error_file );
+		}
+		return array( $status, $output );
+	} finally {
+		if ( null !== $error_file ) {
+			remove_path( $error_file );
+		}
 	}
-	$output = '';
-	if ( isset( $pipes[1] ) ) {
-		$output = (string) stream_get_contents( $pipes[1] );
-		fclose( $pipes[1] );
-	}
-	return array( proc_close( $process ), $output );
 }
 
 /**
@@ -675,10 +688,16 @@ function main( array $args ): void {
 
 	$generated_file = $work_dir . '/wordpress-stubs.php';
 
+	// The generator writes the stubs to a file and then reports on them, a title, the file, and a
+	// table of counts, which is discarded. Only its standard error is shown, which PHP warnings go to
+	// as well. Writing the stubs to standard output instead would avoid the file, but the generator
+	// prints them through Symfony Console, which strips what looks like formatting tags, such as the
+	// `</>` in the HTML API's docblocks.
 	$generator_command = array(
 		PHP_BINARY,
+		'-d',
+		'display_errors=stderr',
 		$generator_dir . '/vendor/bin/generate-stubs',
-		'--no-ansi',
 		'--force',
 		"--finder=$generator_dir/finder.php",
 		"--visitor=$generator_dir/visitor.php",
@@ -691,17 +710,9 @@ function main( array $args ): void {
 	);
 
 	$pending                 = report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
-	list( $status, $output ) = execute( $generator_command, 'combined', $work_dir );
+	list( $status, $output ) = execute( $generator_command, 'errors', $work_dir );
 	if ( $pending ) {
 		clear_pending_row();
-	}
-
-	// The generator ends with a report of its own: a title, the temporary file it wrote, and a table
-	// of counts. Leave that out, but keep what comes before it, such as PHP warnings, and after it,
-	// such as a list of duplicate declarations. All the output is kept when it fails, or when the
-	// report is not found.
-	if ( 0 === $status && preg_match( '/^PHP Stubs Generator\n=+\n.*?(?:^ -[- ]+\n.*?){3}/ms', $output, $matches, PREG_OFFSET_CAPTURE ) ) {
-		$output = substr( $output, 0, $matches[0][1] ) . substr( $output, $matches[0][1] + strlen( $matches[0][0] ) );
 	}
 	$output = trim( $output );
 	if ( '' !== $output ) {
