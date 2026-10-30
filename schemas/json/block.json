@@ -554,6 +554,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"rotation": {
+					"description": "This value signals that a block can be rotated. When it does, the block editor shows a Rotation control in the Position panel of the block settings, and the angle can be set separately for each viewport.\n\nWhen the block declares support for rotation, its attributes definition is extended to include the style attribute.",
+					"type": "boolean",
+					"default": false
+				},
 				"lock": {
 					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
 					"type": "boolean",
