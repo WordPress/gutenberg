@@ -195,33 +195,16 @@ export function parseRawBlock(
 		return;
 	}
 
-	// Parse inner blocks recursively. This must happen *before* parsing this
-	// block's HTML — hpq uses a single shared document body, so each parse
-	// clobbers the previous one. We need this block's parsed body to remain
-	// stable through getBlockAttributes / validation / deprecation, so the
-	// recursion (which clobbers the body for each inner block) has to run
-	// first.
+	// Parse inner blocks recursively.
 	const parsedInnerBlocks = normalizedBlock.innerBlocks
 		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
 
 	// Parse this block's innerHTML once and share the result with attribute
-	// extraction, validation fixes, and deprecation handling. Capture the
-	// root element eagerly: subsequent parses (e.g. of freshly serialized
-	// content inside the validation fixes) detach this element from the
-	// shared body, but detached elements still respond correctly to
-	// attribute and class reads.
-	// Parse via hpq, then deep-clone so the captured body is independent of
-	// hpq's shared document. Subsequent parses elsewhere in the pipeline
-	// (notably `fixCustomClassname`'s fallback path, which renders and
-	// re-parses save content) reset hpq's shared body — without the clone,
-	// `parsedBody` would silently change content under our feet between
-	// deprecation iterations.
+	// extraction, validation fixes, and deprecation handling.
 	const innerHTML = normalizedBlock.innerHTML;
-	const sharedBody = parseHtml( innerHTML ) as Element;
-	const parsedBody =
-		( sharedBody?.cloneNode( true ) as Element | null ) ?? null;
+	const parsedBody = parseHtml( innerHTML );
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(

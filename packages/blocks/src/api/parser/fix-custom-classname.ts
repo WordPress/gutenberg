@@ -59,10 +59,6 @@ export function fixCustomClassname(
 	const { className: omittedClassName, ...attributesSansClassName } =
 		modifiedBlockAttributes;
 	const serialized = getSaveContent( blockType, attributesSansClassName );
-	// `getHTMLRootElementClasses` writes the rendered output into hpq's
-	// shared document body. Callers that pass `rootElement` are insulated by
-	// the deep clone of `parsedBody` in `parseRawBlock`; without that clone,
-	// this parse would mutate the shared body under our feet.
 	const defaultClasses = getHTMLRootElementClasses( serialized );
 	const actualClasses =
 		rootElement !== undefined

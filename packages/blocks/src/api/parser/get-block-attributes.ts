@@ -1,4 +1,3 @@
-import { parse as hpqParse } from 'hpq';
 import type { MatcherObj } from 'hpq';
 import memoize from 'memize';
 import { applyFilters } from '@wordpress/hooks';
@@ -246,23 +245,29 @@ export const matcherFromSource = memoize(
 	}
 );
 
+let parsingDocument: Document | undefined;
+
 /**
  * Parse a HTML string into DOM tree.
  *
  * Content is missing whenever there is nothing to parse, such as a self-closing
- * shortcode, and is treated as empty markup: `hpq` hands anything that is not a
- * string straight to the matcher, so passing it through would give the matchers
- * a missing node to work with.
+ * shortcode, and is treated as empty markup, so the matchers always get a node
+ * to work with.
  *
  * @param innerHTML HTML string or already parsed DOM node.
  *
  * @return Parsed DOM node.
  */
 export function parseHtml( innerHTML: string | Node | undefined ): Element {
-	return hpqParse(
-		( innerHTML ?? '' ) as string | Element,
-		( h: Element ) => h
-	);
+	if ( innerHTML && typeof innerHTML !== 'string' ) {
+		return innerHTML as Element;
+	}
+	// Each parse gets its own body, so a parsed block stays intact while
+	// other markup is parsed.
+	parsingDocument ??= document.implementation.createHTMLDocument( '' );
+	const body = parsingDocument.createElement( 'body' );
+	body.innerHTML = innerHTML ?? '';
+	return body;
 }
 
 /**
@@ -293,10 +298,7 @@ export function parseWithAttributeSchema(
  *                        provided, the internal HTML parse is skipped. Useful
  *                        for sharing a single parse across multiple callers
  *                        operating on the same innerHTML string (e.g. block
- *                        validation, deprecation iteration). Note: hpq uses a
- *                        single shared document body, so a parsed node held
- *                        across other parses will be detached. Detached nodes
- *                        still respond correctly to attribute and class reads.
+ *                        validation, deprecation iteration).
  *
  * @return All block attributes.
  */
