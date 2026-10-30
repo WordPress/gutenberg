@@ -32,6 +32,7 @@
 
 ### Bug Fixes
 
+-   `ToolsPanel`: Keep the "Reset" label visible on the highlighted menu item ([#86045](https://github.com/WordPress/gutenberg/pull/86045)).
 -   `MenuItem`: Keep the menu width stable when a checkbox or radio item is checked or unchecked ([#85831](https://github.com/WordPress/gutenberg/pull/85831)).
 -   `DropdownMenu`: Keep the height of `MenuItem` consistent regardless of whether it has an icon ([#85503](https://github.com/WordPress/gutenberg/pull/85503)).
 -   `ColorPicker`: Fire `onChange` immediately for hex and RGB input, so an edit is no longer lost when the picker closes right after it ([#85734](https://github.com/WordPress/gutenberg/pull/85734)).
