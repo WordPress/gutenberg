@@ -38,6 +38,7 @@ Read only what your task needs, when it needs it:
 
 -   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
 -   **User-facing copy**: before writing or changing a string a user reads, read `docs/contributors/documentation/copy-guide.md` — it covers terminology, capitalization, and how to word an error message.
+-   **Security**: before writing PHP that prints data into HTML, accepts input or exposes data, follow the [security skill](.agents/skills/security/SKILL.md) — it covers escaping, XSS, sanitizing and permission checks.
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
 ## Markdown files
