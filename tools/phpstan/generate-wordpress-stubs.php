@@ -717,7 +717,7 @@ function main( array $args ): void {
 	file_put_contents( $package_file, $json . "\n" );
 
 	report_row( 'Done', $done . style( ", recorded as version $package_version", '2' ) );
-	report_row( 'Next', 'Run `composer update` and `composer phpstan:baselines`, then commit wordpress-stubs/composer.json.' );
+	report_row( 'Next', 'Run `composer update` and `composer phpstan:baselines`, then commit tools/phpstan/wordpress-stubs/composer.json.' );
 }
 
 try {
