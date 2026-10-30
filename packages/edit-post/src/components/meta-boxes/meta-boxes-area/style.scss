@@ -83,6 +83,14 @@
 		z-index: 2; // Stack above the .is-loading::before overlay.
 	}
 
+	// Give empty meta box areas a height while dragging, so that a meta box can
+	// be dropped into them.
+	.is-dragging-metaboxes & .meta-box-sortables {
+		min-height: 60px;
+		outline: $border-width dashed $gray-400;
+		outline-offset: -$border-width;
+	}
+
 	// Hide disabled meta boxes using CSS so that we don't interfere with plugins
 	// that modify `element.style.display` on the meta box.
 	.is-hidden {
