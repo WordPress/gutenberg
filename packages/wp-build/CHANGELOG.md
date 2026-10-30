@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Derive CSS module class names from the stylesheet's CSS as well as its path, so two builds of a package share class names only where their CSS is identical. This stops an older bundled copy of a package from styling a newer copy's elements. All CSS module class names change once with this release.
+-   Derive CSS module class names from the stylesheet's CSS as well as its path, so two builds of a package share class names only where their CSS is identical. This stops an older bundled copy of a package from styling a newer copy's elements. All CSS module class names change once with this release ([#86062](https://github.com/WordPress/gutenberg/pull/86062)).
 
 ## 0.26.0 (2026-10-20)
 
