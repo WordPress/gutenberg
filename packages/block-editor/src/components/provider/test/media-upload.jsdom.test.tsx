@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { select as selectStore, useRegistry, useSelect } from '@wordpress/data';
-import { createElement } from '@wordpress/element';
+import type { DataRegistry } from '@wordpress/data';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { BlockEditorProvider } from '../';
 import { store as blockEditorStore } from '../../../store';
+import type { MediaUploadFunction } from '../types';
 
 vi.mock( import( '@wordpress/blob' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -19,49 +20,60 @@ vi.mock( import( '@wordpress/upload-media' ), async ( importOriginal ) => ( {
 
 window.__clientSideMediaProcessing = true;
 
-const serverUploads = new Map();
+/** The callbacks the upload queue hands to the server-side upload function. */
+interface ServerUpload {
+	onFileChange: ( attachments: Array< Record< string, unknown > > ) => void;
+	onError: ( error: Error ) => void;
+}
 
-function serverMediaUpload( { filesList: [ file ], onFileChange, onError } ) {
+const serverUploads = new Map< string, ServerUpload >();
+
+function serverMediaUpload( {
+	filesList: [ file ],
+	onFileChange,
+	onError,
+}: ServerUpload & { filesList: File[] } ) {
 	serverUploads.set( file.name, { onFileChange, onError } );
 }
 
-async function finishServerUpload( name ) {
+async function finishServerUpload( name: string ) {
 	await waitFor( () => expect( serverUploads.has( name ) ).toBe( true ) );
 	serverUploads
-		.get( name )
+		.get( name )!
 		.onFileChange( [ { id: name, url: `https://example.com/${ name }` } ] );
 }
 
-async function failServerUpload( name ) {
+async function failServerUpload( name: string ) {
 	await waitFor( () => expect( serverUploads.has( name ) ).toBe( true ) );
-	serverUploads.get( name ).onError( new Error( `${ name } was refused.` ) );
+	serverUploads.get( name )!.onError( new Error( `${ name } was refused.` ) );
 }
 
-function createFiles( ...names ) {
+function createFiles( ...names: string[] ) {
 	return names.map(
 		( name ) => new File( [ name ], name, { type: 'text/plain' } )
 	);
 }
 
-function setUpMediaUpload( onRegistry ) {
-	let mediaUpload;
+function setUpMediaUpload( onRegistry?: ( registry: DataRegistry ) => void ) {
+	let mediaUpload: MediaUploadFunction | undefined;
 	const GetMediaUpload = () => {
 		const registry = useRegistry();
 		onRegistry?.( registry );
 		mediaUpload = useSelect(
-			( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+			( select ) =>
+				// The provider replaces the setting with its upload function.
+				select( blockEditorStore ).getSettings()
+					.mediaUpload as MediaUploadFunction,
 			[]
 		);
 		return null;
 	};
 	render(
-		createElement(
-			BlockEditorProvider,
-			{ settings: { mediaUpload: serverMediaUpload } },
-			createElement( GetMediaUpload )
-		)
+		<BlockEditorProvider settings={ { mediaUpload: serverMediaUpload } }>
+			<GetMediaUpload />
+		</BlockEditorProvider>
 	);
-	return mediaUpload;
+	return mediaUpload!;
 }
 
 describe( 'mediaUpload with client-side media processing', () => {
@@ -130,18 +142,28 @@ describe( 'mediaUpload with client-side media processing', () => {
 	} );
 
 	it( 'falls back to onFileChange when an older queue ignores onBatchChange', () => {
-		let registry;
+		let registry: DataRegistry | undefined;
 		const mediaUpload = setUpMediaUpload( ( value ) => {
 			registry = value;
 		} );
-		const originalDispatch = registry.dispatch.bind( registry );
-		const oldAddItems = vi.fn( ( { files, onChange } ) => {
-			files.forEach( ( file ) =>
-				onChange( [ { url: `blob:${ file.name }` } ] )
-			);
-		} );
+		const originalDispatch = registry!.dispatch.bind( registry );
+		const oldAddItems = vi.fn(
+			( {
+				files,
+				onChange,
+			}: {
+				files: File[];
+				onChange: (
+					attachments: Array< Record< string, unknown > >
+				) => void;
+			} ) => {
+				files.forEach( ( file ) =>
+					onChange( [ { url: `blob:${ file.name }` } ] )
+				);
+			}
+		);
 		const dispatchSpy = vi
-			.spyOn( registry, 'dispatch' )
+			.spyOn( registry!, 'dispatch' )
 			.mockImplementation( ( store ) =>
 				store === uploadStore
 					? { addItems: oldAddItems }
@@ -238,7 +260,7 @@ describe( 'mediaUpload with client-side media processing', () => {
 		const mediaUpload = setUpMediaUpload();
 		const onSuccess = vi.fn();
 		const onError = vi.fn();
-		const queuedAtBatchSuccess = [];
+		const queuedAtBatchSuccess: string[][] = [];
 		const onBatchSuccess = vi.fn( () =>
 			queuedAtBatchSuccess.push(
 				selectStore( uploadStore )
