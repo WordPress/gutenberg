@@ -62,7 +62,13 @@ export default function useClickSelection() {
 					clickedClientId &&
 					clickedClientId === startClientId &&
 					node.contentEditable === 'true' &&
-					node.ownerDocument.activeElement === node
+					node.ownerDocument.activeElement === node &&
+					// The body is also the active element when nothing has
+					// focus, e.g. after the keyboard is dismissed.
+					getBlockClientId(
+						node.ownerDocument.defaultView!.getSelection()!
+							.anchorNode
+					) === clickedClientId
 				) {
 					event.preventDefault();
 					return;
