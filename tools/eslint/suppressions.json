@@ -4355,9 +4355,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
