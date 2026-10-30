@@ -47,11 +47,6 @@ export function IconDetails( { name }: { name: string } ) {
 							<li key={ value }>
 								<Badge
 									intent={ isAvailable ? 'stable' : 'none' }
-									style={
-										isAvailable
-											? undefined
-											: { opacity: 0.5 }
-									}
 								>
 									{ label }
 								</Badge>
