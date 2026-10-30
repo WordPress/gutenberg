@@ -218,6 +218,37 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'has-background', $output );
 	}
 
+	public function test_rendered_link_style_starts_with_the_background() {
+		$attributes                                    = $this->styled_attributes();
+		$attributes['style']['background']['gradient'] = 'linear-gradient(red, blue)';
+
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'div' ) );
+		$this->assertSame(
+			'background-image:linear-gradient(red, blue);border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:30px',
+			$processor->get_attribute( 'style' )
+		);
+	}
+
+	public function test_background_ignores_clip() {
+		$attributes = array(
+			'type'  => 'previous',
+			'style' => array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(red, blue)',
+					'backgroundClip' => 'text',
+				),
+			),
+		);
+
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$this->assertStringNotContainsString( 'background-clip', $output );
+		$this->assertSame( 1, substr_count( $output, 'has-background' ) );
+	}
+
 	public function test_null_from_the_post_link_filter_omits_the_styles() {
 		add_filter( 'previous_post_link', '__return_null' );
 		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
