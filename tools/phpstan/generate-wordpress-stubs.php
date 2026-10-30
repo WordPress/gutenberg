@@ -58,6 +58,52 @@ function report( string $message ): void {
 }
 
 /**
+ * Writes a labeled line of progress to standard error, aligned with the others.
+ *
+ * @param non-empty-string $label The label, such as Source.
+ * @param string           $value The value.
+ */
+function report_row( string $label, string $value ): void {
+	report( '  ' . style( str_pad( $label, 11 ), '2' ) . $value );
+}
+
+/**
+ * Returns text styled for standard error, when it supports colors.
+ *
+ * Colors are used on a terminal, unless the NO_COLOR environment variable is set, or anywhere when
+ * FORCE_COLOR is.
+ *
+ * @param string           $text The text.
+ * @param non-empty-string $sgr  The SGR parameters of the style, such as 1 for bold.
+ * @return string The styled text.
+ */
+function style( string $text, string $sgr ): string {
+	static $has_color = null;
+	if ( null === $has_color ) {
+		if ( '' !== (string) getenv( 'NO_COLOR' ) ) {
+			$has_color = false;
+		} elseif ( '' !== (string) getenv( 'FORCE_COLOR' ) ) {
+			$has_color = true;
+		} elseif ( '\\' === DIRECTORY_SEPARATOR ) {
+			$has_color = function_exists( 'sapi_windows_vt100_support' ) && sapi_windows_vt100_support( STDERR, true );
+		} else {
+			$has_color = stream_isatty( STDERR );
+		}
+	}
+	return $has_color ? "\033[{$sgr}m$text\033[0m" : $text;
+}
+
+/**
+ * Shortens a commit hash for display, leaving any other ref as it is.
+ *
+ * @param string $commit The commit hash or ref.
+ * @return string The short hash or the ref.
+ */
+function short_commit( string $commit ): string {
+	return preg_match( '/^[0-9a-f]{40}$/', $commit ) ? substr( $commit, 0, 12 ) : $commit;
+}
+
+/**
  * Prints the usage from this file's docblock, and exits.
  *
  * @param int<0, 1> $status The exit status.
@@ -425,17 +471,19 @@ function main( array $args ): void {
 			usage();
 		}
 		if ( $force ) {
-			report( 'Generating the WordPress stubs again, as requested with --force.' );
+			$reason = 'forced';
 		} elseif ( ! is_file( $stub_file ) ) {
-			report( 'Generating the WordPress stubs, which are missing, from the source recorded in tools/phpstan/wordpress-stubs/composer.json.' );
+			$reason = 'missing';
 		} elseif ( read_stub_key( $stub_file ) !== $generation_key( $commit, $pr ) ) {
-			report( 'Generating the WordPress stubs again, since the source recorded in tools/phpstan/wordpress-stubs/composer.json, the generator, or this script has changed since they were generated.' );
+			$reason = 'out of date';
 		} else {
 			return;
 		}
+		report( style( 'Generating the WordPress stubs', '1' ) . style( " ($reason)", '2' ) );
 	} else {
-		report( 'Generating the WordPress stubs.' );
+		report( style( 'Generating the WordPress stubs', '1' ) );
 	}
+	$started = microtime( true );
 
 	$work_dir = create_directory( sys_get_temp_dir(), 'wordpress-stubs.' );
 	register_shutdown_function(
@@ -475,16 +523,23 @@ function main( array $args ): void {
 	if ( '' === $commit ) {
 		throw new RuntimeException( 'No wordpress-develop commit to generate the stubs from.' );
 	}
+	if ( $uncommitted ) {
+		$source_label = "$develop_repo@" . short_commit( $head_commit ) . ' with uncommitted changes';
+	} elseif ( '' !== $pr ) {
+		$source_label = "$develop_repo#$pr" . ( "refs/pull/$pr/head" !== $commit ? ' at ' . short_commit( $commit ) : '' );
+	} else {
+		$source_label = "$develop_repo@" . short_commit( $commit );
+	}
 
 	if ( null !== $local_checkout && preg_match( '/^[0-9a-f]{40}$/', $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
-		report( "Reading $develop_repo@$commit from the wordpress-develop checkout at $local_checkout." );
+		report_row( 'Source', $source_label . style( ' (local checkout)', '2' ) );
 		// Check out the commit's src directory with an index of its own, leaving the checkout as it is.
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
 		run( array( 'git', '-C', $local_checkout, 'read-tree', "$commit:src" ), null, $env );
 		run( array( 'git', '-C', $local_checkout, '-c', 'core.autocrlf=false', 'checkout-index', '--all', "--prefix=$source_dir/" ), null, $env );
 		$repo_dir = $local_checkout;
 	} else {
-		report( "Fetching $develop_repo@$commit from GitHub, since " . ( null !== $local_checkout ? "the wordpress-develop checkout at $local_checkout does not have it." : 'Gutenberg is not in a wordpress-develop checkout.' ) );
+		report_row( 'Source', $source_label . style( ' (GitHub)', '2' ) );
 		$repo_dir = $work_dir . '/wordpress-develop';
 		fetch_commit( $repo_dir, $develop_repo, $commit, array( '/src/' ) );
 		$commit = resolve_commit( $repo_dir, 'HEAD' );
@@ -500,9 +555,9 @@ function main( array $args ): void {
 	// to be used.
 	$generator_dir = $cache_dir . '/' . str_replace( '/', '-', $stubs_repo ) . "-$stubs_commit-" . substr( sha1( $packages ), 0, 12 );
 	if ( is_dir( $generator_dir ) ) {
-		report( "Using the generator, $stubs_repo@$stubs_commit, cached in $generator_dir." );
+		report_row( 'Generator', "$stubs_repo@" . short_commit( $stubs_commit ) . style( ' (cached)', '2' ) );
 	} else {
-		report( "Fetching the generator, $stubs_repo@$stubs_commit, and installing its pinned packages." );
+		report_row( 'Generator', "$stubs_repo@" . short_commit( $stubs_commit ) . style( ' (installing)', '2' ) );
 		$setup_dir = create_directory( $cache_dir, '.setup-' );
 		register_shutdown_function(
 			static function () use ( $setup_dir ): void {
@@ -527,7 +582,6 @@ function main( array $args ): void {
 
 	// The generator's own report, a title, the temporary file it wrote, and a table of counts, is left
 	// out, apart from any duplicate declarations it lists.
-	report( 'Running the generator.' );
 	$generated_file = $work_dir . '/wordpress-stubs.php';
 
 	list( $status, $output ) = execute(
@@ -618,8 +672,9 @@ function main( array $args ): void {
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The recorded source is only written when it changes, by an option.
+	$done = style( '✓ ', '32' ) . "WordPress $wp_version" . style( ' (' . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
 	if ( $recorded ) {
-		report( "Generated the WordPress stubs for WordPress $wp_version from $description." );
+		report_row( 'Done', $done );
 		return;
 	}
 
@@ -649,7 +704,8 @@ function main( array $args ): void {
 	);
 	file_put_contents( $package_file, $json . "\n" );
 
-	report( "Generated the WordPress stubs for WordPress $wp_version from $description, as version $package_version. Run `composer update` and `composer phpstan:baselines`, and commit tools/phpstan/wordpress-stubs/composer.json." );
+	report_row( 'Done', $done . style( ", recorded as version $package_version", '2' ) );
+	report_row( 'Next', 'Run `composer update` and `composer phpstan:baselines`, then commit wordpress-stubs/composer.json.' );
 }
 
 try {
