@@ -8,7 +8,7 @@ import {
 	serialize,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import type { BlockInstance } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -120,12 +120,15 @@ function setUp() {
 		type: 'wp_template_part',
 		content: '',
 	} );
-	registry.dispatch( editorStore ).setupEditor( {
-		id: 1,
-		type: 'post',
-		content: '',
-		status: 'draft',
-	} );
+	registry.dispatch( editorStore ).setupEditor(
+		{
+			id: 1,
+			type: 'post',
+			content: '',
+			status: 'draft',
+		},
+		{}
+	);
 
 	registry.dispatch( blockEditorStore ).resetBlocks( [
 		{
@@ -142,16 +145,16 @@ function setUp() {
 					innerBlocks: [],
 				},
 			],
-		} as unknown as BlockInstance,
+		} as unknown as Block,
 	] );
 
 	// Copies the template part's blocks to its entity, as its block's
 	// `useEntityBlockEditor` does.
-	let lastBlocks: BlockInstance[] | undefined;
+	let lastBlocks: Block[] | undefined;
 	registry.subscribe( () => {
 		const blocks = registry
 			.select( blockEditorStore )
-			.getBlocks( 'part' ) as BlockInstance[];
+			.getBlocks( 'part' ) as Block[];
 		if ( blocks !== lastBlocks ) {
 			lastBlocks = blocks;
 			core.editEntityRecord(
@@ -160,11 +163,8 @@ function setUp() {
 				TEMPLATE_PART_ID,
 				{
 					blocks,
-					content: ( {
-						blocks: edited,
-					}: {
-						blocks: BlockInstance[];
-					} ) => serialize( edited ),
+					content: ( { blocks: edited }: { blocks: Block[] } ) =>
+						serialize( edited ),
 				},
 				{ undoIgnore: true }
 			);
@@ -217,7 +217,7 @@ describe( 'useCommitPendingMediaEdits', () => {
 			apiVersion: 3,
 			attributes: { id: { type: 'number' } },
 			mediaEditor: {
-				getMedia: ( { id } ) => ( { id } ),
+				getMedia: ( { id } ) => ( { id: id as number } ),
 				applyMedia: ( attributes, media ) => ( { id: media.id } ),
 			},
 			save: () => null,
