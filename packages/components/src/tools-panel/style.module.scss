@@ -96,6 +96,11 @@
 	text-transform: uppercase;
 }
 
+// Match the foreground of the highlighted item's brand fill.
+.default-controls-item:is(:focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) .reset-label {
+	color: inherit;
+}
+
 .default-controls-item {
 	color: $gray-900;
 }
