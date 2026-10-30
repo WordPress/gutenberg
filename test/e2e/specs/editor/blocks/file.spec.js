@@ -67,13 +67,15 @@ test.describe( 'File', () => {
 			content.getByRole( 'heading', { name: 'Media' } )
 		).toBeVisible();
 		await expect(
-			content.getByRole( 'button', { name: /e2e-test-document.*\.pdf/ } )
+			content.getByRole( 'button', {
+				name: /^e2e-test-document.*\.pdf$/,
+			} )
 		).toBeVisible();
 		await expect(
 			content.getByRole( 'textbox', { name: 'File name' } )
 		).toHaveValue( 'e2e-test-document' );
 		await expect(
-			content.getByRole( 'combobox', { name: 'Link to' } )
+			content.getByRole( 'button', { name: /Link to/ } )
 		).toBeVisible();
 		await expect(
 			content.getByRole( 'checkbox', { name: 'Open in new tab' } )
@@ -104,32 +106,51 @@ test.describe( 'File', () => {
 
 	test( 'changes the link from the Content tab', async ( {
 		editor,
+		page,
 		fileBlockUtils,
 	} ) => {
 		await fileBlockUtils.insertFileBlock( uploadedPdf );
 		const content = fileBlockUtils.getContentPanel();
 
+		const linkTo = content.getByRole( 'button', { name: /Link to/ } );
+		await expect( linkTo ).toContainText( 'Media file' );
+
+		// The popover offers only the media file and the attachment page, and
+		// the File block always links somewhere, so there is no Remove link.
+		await linkTo.click();
+		const suggestions = page.getByRole( 'listbox' );
 		// The attachment page link comes from the attachment record, so wait
 		// for the option to be offered before choosing it.
-		const linkTo = content.getByRole( 'combobox', { name: 'Link to' } );
+		await expect( suggestions.getByRole( 'option' ) ).toHaveText( [
+			/Media file/,
+			/Attachment page/,
+		] );
 		await expect(
-			linkTo.getByRole( 'option', { name: 'Attachment page' } )
-		).toBeAttached();
-		await linkTo.selectOption( { label: 'Attachment page' } );
+			page.getByRole( 'button', { name: 'Remove link' } )
+		).toBeHidden();
+		await suggestions
+			.getByRole( 'option', { name: /Attachment page/ } )
+			.click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/file',
 				attributes: { textLinkHref: uploadedPdf.link },
 			},
 		] );
+		await expect( linkTo ).toContainText( 'Attachment page' );
 
-		await linkTo.selectOption( { label: 'Media file' } );
+		await linkTo.click();
+		await page
+			.getByRole( 'listbox' )
+			.getByRole( 'option', { name: /Media file/ } )
+			.click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/file',
 				attributes: { textLinkHref: uploadedPdf.source_url },
 			},
 		] );
+		await expect( linkTo ).toContainText( 'Media file' );
 
 		const newTab = content.getByRole( 'checkbox', {
 			name: 'Open in new tab',
@@ -207,7 +228,7 @@ test.describe( 'File', () => {
 		const content = fileBlockUtils.getContentPanel();
 
 		await content
-			.getByRole( 'button', { name: /e2e-test-document.*\.pdf/ } )
+			.getByRole( 'button', { name: /^e2e-test-document.*\.pdf$/ } )
 			.click();
 		await page
 			.getByTestId( 'form-file-upload-input' )
