@@ -104,11 +104,8 @@ export function replacePatternOverridesDefaultBinding(
 	return bindingsWithDefaults;
 }
 
-const BOUND_ATTRIBUTE_PREFIX = 'boundAttribute:';
-
 /**
- * Selects the values of the block's bound attributes from their sources, one
- * key per attribute, so the block's subscription compares them one by one.
+ * Selects the values of the block's bound attributes from their sources.
  *
  * @param select             The registry's `select`.
  * @param clientId           The block client ID.
@@ -117,7 +114,7 @@ const BOUND_ATTRIBUTE_PREFIX = 'boundAttribute:';
  * @param registeredSources  The registered bindings sources, by name.
  * @param context            The context for resolving the bindings.
  *
- * @return The values by prefixed attribute name.
+ * @return The values by attribute name.
  */
 export function selectBoundAttributes(
 	select: DataRegistry[ 'select' ],
@@ -168,7 +165,7 @@ export function selectBoundAttributes(
 			} );
 		}
 		for ( const [ attributeName, value ] of Object.entries( values ) ) {
-			attributesFromSources[ BOUND_ATTRIBUTE_PREFIX + attributeName ] =
+			attributesFromSources[ attributeName ] =
 				attributeName === 'url' &&
 				// Sources return URLs as strings.
 				( ! value || ! isURLLike( value as string ) )
@@ -179,23 +176,4 @@ export function selectBoundAttributes(
 	}
 
 	return attributesFromSources;
-}
-
-/**
- * Returns the bound attribute values selected by `selectBoundAttributes`.
- *
- * @param selected The selected props.
- *
- * @return The values by attribute name, if the block has any.
- */
-export function getBoundAttributes( selected: Record< string, unknown > ) {
-	let boundAttributes: Record< string, unknown > | undefined;
-	for ( const key in selected ) {
-		if ( key.startsWith( BOUND_ATTRIBUTE_PREFIX ) ) {
-			boundAttributes ??= {};
-			boundAttributes[ key.slice( BOUND_ATTRIBUTE_PREFIX.length ) ] =
-				selected[ key ];
-		}
-	}
-	return boundAttributes;
 }

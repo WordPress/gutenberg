@@ -90,9 +90,13 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 
 	// Bound attributes take their values from their sources, which the block's
 	// own subscription selects.
-	const computedAttributes = boundAttributes
-		? { ...attributes, ...boundAttributes }
-		: attributes;
+	const computedAttributes = useMemo(
+		() =>
+			boundAttributes
+				? { ...attributes, ...boundAttributes }
+				: attributes,
+		[ attributes, boundAttributes ]
+	);
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes: Record< string, unknown > ) => {

@@ -225,6 +225,4 @@ export type BlockListBlockSelectedProps = Omit<
 	isSelectionEnabled?: boolean;
 	isLocked?: boolean;
 	canRemove?: boolean;
-	// The values of the block's bound attributes, by prefixed name.
-	[ boundAttribute: `boundAttribute:${ string }` ]: unknown;
 };
