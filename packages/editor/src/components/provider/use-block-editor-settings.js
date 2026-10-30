@@ -9,6 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	privateApis,
@@ -130,6 +131,7 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	managePatternsUrlKey,
 } = unlock( privateApis );
 
 /**
@@ -160,6 +162,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		hiddenBlockTypes,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
+		managePatternsUrl,
 		pageOnFront,
 		pageForPosts,
 		restBlockPatternCategories,
@@ -255,6 +258,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					kind: 'postType',
 					name: 'page',
 				} ),
+				// The site editor and templates both check whether the user has
+				// edit_theme_options capabilities. Use the same check to decide
+				// which screen manages patterns.
+				managePatternsUrl: canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template',
+				} )
+					? addQueryArgs( 'site-editor.php', { p: '/pattern' } )
+					: addQueryArgs( 'edit.php', { post_type: 'wp_block' } ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				// The post type's singular name, but only for real, front-end
@@ -432,6 +444,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
+			[ managePatternsUrlKey ]: managePatternsUrl,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
@@ -498,6 +511,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		undo,
 		createPageEntity,
 		userCanCreatePages,
+		managePatternsUrl,
 		pageOnFront,
 		pageForPosts,
 		postType,

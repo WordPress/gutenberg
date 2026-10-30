@@ -1,6 +1,7 @@
 import { SearchControl } from '@wordpress/components';
 import { Stack, Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import ManagePatternsLink from '../block-patterns-tab/manage-patterns-link';
 import type { PatternExplorerSidebarProps } from '../types';
 
 function PatternExplorerSidebar( {
@@ -27,6 +28,7 @@ function PatternExplorerSidebar( {
 					</Tabs.Tab>
 				) ) }
 			</Tabs.List>
+			<ManagePatternsLink />
 		</Stack>
 	);
 }
