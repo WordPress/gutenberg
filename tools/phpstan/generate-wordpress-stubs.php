@@ -294,6 +294,25 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 }
 
 /**
+ * Returns the exception for a command that failed, naming the command.
+ *
+ * A `--header` argument is left out, since it may span several lines.
+ *
+ * @param int                    $status  The exit status.
+ * @param non-empty-list<string> $command The program and its arguments.
+ * @return RuntimeException The exception.
+ */
+function command_failed( int $status, array $command ): RuntimeException {
+	$shown = array_filter(
+		$command,
+		static function ( string $argument ): bool {
+			return 0 !== strpos( $argument, '--header=' );
+		}
+	);
+	return new RuntimeException( "Exited with status $status: " . implode( ' ', $shown ) );
+}
+
+/**
  * Runs a command, passing its output to standard error, and throws when it fails.
  *
  * @param non-empty-list<string>          $command The program and its arguments.
@@ -304,7 +323,7 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 function run( array $command, ?string $cwd = null, array $env = array() ): void {
 	list( $status ) = execute( $command, 'pass', $cwd, $env );
 	if ( 0 !== $status ) {
-		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $command ) );
+		throw command_failed( $status, $command );
 	}
 }
 
@@ -318,7 +337,7 @@ function run( array $command, ?string $cwd = null, array $env = array() ): void 
 function capture( array $command, bool $check = true ): string {
 	list( $status, $output ) = execute( $command, $check ? 'capture' : 'quiet' );
 	if ( $check && 0 !== $status ) {
-		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $command ) );
+		throw command_failed( $status, $command );
 	}
 	return trim( $output );
 }
@@ -744,14 +763,7 @@ function main( array $args ): void {
 		report( $output );
 	}
 	if ( 0 !== $status ) {
-		// The header is left out of the command, since it spans several lines.
-		$shown_command = array_filter(
-			$generator_command,
-			static function ( string $argument ): bool {
-				return 0 !== strpos( $argument, '--header=' );
-			}
-		);
-		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $shown_command ) );
+		throw command_failed( $status, $generator_command );
 	}
 	$stubs = (string) file_get_contents( $generated_file );
 
