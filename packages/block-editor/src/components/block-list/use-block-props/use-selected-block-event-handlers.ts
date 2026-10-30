@@ -1,12 +1,10 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { useContext } from '@wordpress/element';
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-import { BlockRefs } from '../provider/block-refs-provider';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
@@ -16,49 +14,55 @@ function isColorTransparent( color: string ) {
 }
 
 /**
- * Adds selected block behaviour, once for the block list:
+ * Adds block behaviour:
  *   - Removes the block on BACKSPACE.
  *   - Inserts a default block on ENTER.
  *   - Disables dragging of block contents.
  *
  * For a block that is part of a multi selection, only the drag handling is
  * added, so that dragging any of the selected blocks moves them all.
+ *
+ * @param options                 Options.
+ * @param options.clientId        Block client ID.
+ * @param options.isSelected      Whether the block is selected.
+ * @param options.isMultiSelected Whether the block is part of a multi selection.
  */
-export function useSelectedBlockEventHandlers() {
-	const { refsMap } = useContext( BlockRefs );
-	const {
-		getBlockRootClientId,
-		getSelectedBlockClientId,
-		getSelectedBlockClientIds,
-		canMoveBlocks,
-		isZoomOut,
-		hasMultiSelection,
-		__unstableIsFullySelected,
-		isSectionBlock,
-		editedContentOnlySection,
-		getBlock,
-	} = unlock( useSelect( blockEditorStore ) );
-	const {
-		removeBlock,
-		resetZoomLevel,
-		startDraggingBlocks,
-		stopDraggingBlocks,
-		editContentOnlySection,
-	} = unlock( useDispatch( blockEditorStore ) );
+export function useEventHandlers( {
+	clientId,
+	isSelected,
+	isMultiSelected,
+}: {
+	clientId: string;
+	isSelected?: boolean;
+	isMultiSelected?: boolean;
+} ) {
+	const registry = useRegistry();
 
 	return useRefEffect< HTMLElement >(
-		( root ) => {
-			// The selected or multi-selected block that contains the target.
-			function getSelectedBlock( target: Node ) {
-				for ( const clientId of getSelectedBlockClientIds() ) {
-					const node = refsMap.get( clientId ) as
-						HTMLElement | undefined;
-					if ( node?.contains( target ) ) {
-						return { clientId, node };
-					}
-				}
-				return undefined;
+		( node ) => {
+			if ( ! isSelected && ! isMultiSelected ) {
+				return;
 			}
+
+			// Only read the store for a selected block.
+			const {
+				getBlockRootClientId,
+				getSelectedBlockClientIds,
+				canMoveBlocks,
+				isZoomOut,
+				hasMultiSelection,
+				__unstableIsFullySelected,
+				isSectionBlock,
+				editedContentOnlySection,
+				getBlock,
+			} = unlock( registry.select( blockEditorStore ) );
+			const {
+				removeBlock,
+				resetZoomLevel,
+				startDraggingBlocks,
+				stopDraggingBlocks,
+				editContentOnlySection,
+			} = unlock( registry.dispatch( blockEditorStore ) );
 
 			/**
 			 * Interprets keydown event intent to remove or insert after block if
@@ -80,13 +84,8 @@ export function useSelectedBlockEventHandlers() {
 					return;
 				}
 
-				const clientId = getSelectedBlockClientId();
 				// Key events target elements.
-				if (
-					! clientId ||
-					target !== refsMap.get( clientId ) ||
-					isTextField( target as Element )
-				) {
+				if ( target !== node || isTextField( target as Element ) ) {
 					return;
 				}
 
@@ -112,15 +111,13 @@ export function useSelectedBlockEventHandlers() {
 			 * @param event Mouse down event.
 			 */
 			function onMouseDown( event: MouseEvent ) {
-				// Mouse events target elements.
-				const block = getSelectedBlock( event.target as Element );
 				if (
 					event.button !== 0 ||
 					event.shiftKey ||
 					event.metaKey ||
 					event.ctrlKey ||
 					event.altKey ||
-					! block ||
+					! isMultiSelected ||
 					! hasMultiSelection() ||
 					! __unstableIsFullySelected() ||
 					! canMoveBlocks( getSelectedBlockClientIds() )
@@ -128,7 +125,6 @@ export function useSelectedBlockEventHandlers() {
 					return;
 				}
 
-				const { node } = block;
 				const { ownerDocument } = node;
 				// Multi-selected blocks are not draggable by themselves;
 				// the pressed one is, for the length of the press.
@@ -173,8 +169,6 @@ export function useSelectedBlockEventHandlers() {
 			// targets, the next selected block peeks out from underneath it,
 			// and a count of the dragged blocks sits on its top right corner.
 			function startPile(
-				node: HTMLElement,
-				clientId: string,
 				event: DragEvent,
 				clientIds: string[],
 				rect: DOMRect,
@@ -311,12 +305,6 @@ export function useSelectedBlockEventHandlers() {
 			function onDragStart( event: DragEvent ) {
 				// Checked to be an element below, before it is used as one.
 				const target = event.target as Element;
-				const block = getSelectedBlock( target );
-				if ( ! block ) {
-					return;
-				}
-				const { clientId, node } = block;
-				const isMultiSelected = hasMultiSelection();
 				const { activeElement } = node.ownerDocument;
 				// The drag may start on an image, which is draggable by
 				// default: it is the block's drag as long as no nested
@@ -479,14 +467,7 @@ export function useSelectedBlockEventHandlers() {
 				}
 
 				const pile = isMultiSelectionDrag
-					? startPile(
-							node,
-							clientId,
-							event,
-							clientIds,
-							rect,
-							inverted
-						)
+					? startPile( event, clientIds, rect, inverted )
 					: undefined;
 
 				let hasStarted = false;
@@ -563,22 +544,26 @@ export function useSelectedBlockEventHandlers() {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
+			node.addEventListener( 'dragstart', onDragStart );
+			node.addEventListener( 'mousedown', onMouseDown );
+
+			// Blocks in a multi selection only get the drag handling; the
+			// key and double click handling is for the selected block.
+			if ( ! isSelected ) {
+				return () => {
+					node.removeEventListener( 'dragstart', onDragStart );
+					node.removeEventListener( 'mousedown', onMouseDown );
+				};
+			}
+
+			node.addEventListener( 'keydown', onKeyDown );
+
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
 			 *
 			 * @param event Double-click event.
 			 */
 			function onDoubleClick( event: MouseEvent ) {
-				const clientId = getSelectedBlockClientId();
-				if (
-					! clientId ||
-					// Mouse events target elements.
-					! refsMap
-						.get( clientId )
-						?.contains( event.target as Element )
-				) {
-					return;
-				}
 				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
 				const isSyncedPattern = isReusableBlock( block );
@@ -598,36 +583,15 @@ export function useSelectedBlockEventHandlers() {
 				editContentOnlySection( clientId );
 			}
 
-			root.addEventListener( 'keydown', onKeyDown );
-			root.addEventListener( 'dragstart', onDragStart );
-			root.addEventListener( 'mousedown', onMouseDown );
-			root.addEventListener( 'dblclick', onDoubleClick );
+			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
-				root.removeEventListener( 'keydown', onKeyDown );
-				root.removeEventListener( 'dragstart', onDragStart );
-				root.removeEventListener( 'mousedown', onMouseDown );
-				root.removeEventListener( 'dblclick', onDoubleClick );
+				node.removeEventListener( 'keydown', onKeyDown );
+				node.removeEventListener( 'dragstart', onDragStart );
+				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[
-			refsMap,
-			getBlockRootClientId,
-			getSelectedBlockClientId,
-			getSelectedBlockClientIds,
-			getBlock,
-			isReusableBlock,
-			isTemplatePart,
-			removeBlock,
-			isZoomOut,
-			resetZoomLevel,
-			hasMultiSelection,
-			canMoveBlocks,
-			startDraggingBlocks,
-			stopDraggingBlocks,
-			isSectionBlock,
-			editedContentOnlySection,
-			editContentOnlySection,
-		]
+		[ clientId, isSelected, isMultiSelected, registry ]
 	);
 }
