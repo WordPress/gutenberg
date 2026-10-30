@@ -54,49 +54,53 @@ const GENERATOR_HEADER = "/**\n * Generated stub declarations for WordPress.\n *
  * @param string $message The message.
  */
 function report( string $message ): void {
-	fwrite( STDERR, ( is_pending( false ) ? "\r\033[K" : '' ) . $message . "\n" );
+	fwrite( STDERR, $message . "\n" );
 }
 
 /**
- * Returns whether a pending row is on the current line, and optionally sets it.
+ * Formats a labeled row of progress, aligned with the others.
  *
- * @param bool|null $pending Whether a pending row is on the current line now, if it changed.
- * @return bool Whether a pending row was on the current line.
- */
-function is_pending( ?bool $pending = null ): bool {
-	static $current = false;
-
-	$previous = true === $current;
-	if ( null !== $pending ) {
-		$current = $pending;
-	}
-	return $previous;
-}
-
-/**
- * Writes a row for a step that takes a while, which the next line of progress replaces.
- *
- * Only a terminal with colors gets it, since the row is replaced by moving back to the start of the
- * line, which a log would keep.
- *
- * @param non-empty-string $label The label.
+ * @param non-empty-string $label The label, such as Source.
  * @param string           $value The value.
+ * @return string The row.
  */
-function report_pending_row( string $label, string $value ): void {
-	if ( has_color() ) {
-		fwrite( STDERR, '  ' . style( str_pad( $label, 11 ), '2' ) . $value );
-		is_pending( true );
-	}
+function format_row( string $label, string $value ): string {
+	return '  ' . style( str_pad( $label, 11 ), '2' ) . $value;
 }
 
 /**
- * Writes a labeled line of progress to standard error, aligned with the others.
+ * Writes a labeled row of progress to standard error.
  *
  * @param non-empty-string $label The label, such as Source.
  * @param string           $value The value.
  */
 function report_row( string $label, string $value ): void {
-	report( '  ' . style( str_pad( $label, 11 ), '2' ) . $value );
+	report( format_row( $label, $value ) );
+}
+
+/**
+ * Writes a row for a step that takes a while, without ending the line, so that it can be cleared.
+ *
+ * Only a terminal with colors gets it, since the row is cleared by moving back to the start of the
+ * line, which a log would keep.
+ *
+ * @param non-empty-string $label The label.
+ * @param string           $value The value.
+ * @return bool Whether the row was written, to be cleared with clear_pending_row().
+ */
+function report_pending_row( string $label, string $value ): bool {
+	if ( ! has_color() ) {
+		return false;
+	}
+	fwrite( STDERR, format_row( $label, $value ) );
+	return true;
+}
+
+/**
+ * Clears a row written by report_pending_row(), returning to the start of its line.
+ */
+function clear_pending_row(): void {
+	fwrite( STDERR, "\r\033[K" );
 }
 
 /**
@@ -653,8 +657,11 @@ function main( array $args ): void {
 		"--out=$generated_file",
 	);
 
-	report_pending_row( 'Stubs', style( 'generating…', '2' ) );
+	$pending                 = report_pending_row( 'Stubs', style( 'generating…', '2' ) );
 	list( $status, $output ) = execute( $generator_command, 'capture', $work_dir );
+	if ( $pending ) {
+		clear_pending_row();
+	}
 	if ( 0 !== $status ) {
 		report( trim( $output ) );
 		throw new RuntimeException( "Exited with status $status: " . implode( ' ', $generator_command ) );
