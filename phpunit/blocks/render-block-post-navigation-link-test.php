@@ -227,4 +227,182 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'style=', $output );
 		$this->assertStringNotContainsString( 'has-border-color', $output );
 	}
+
+	/**
+	 * Creates an attachment whose navigation can be rendered through a real query.
+	 *
+	 * @param int $parent_id Parent post ID, or zero for unattached media.
+	 * @return int Attachment ID.
+	 */
+	private function create_attachment( $parent_id = 0 ) {
+		update_option( 'wp_attachment_pages_enabled', 1 );
+
+		return self::factory()->attachment->create(
+			array(
+				'post_parent'    => $parent_id,
+				'post_status'    => 'inherit',
+				'post_title'     => 'Attachment navigation test',
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+	}
+
+	/**
+	 * Checks the link color generated for this particular block wrapper.
+	 *
+	 * @param string $output Rendered block.
+	 */
+	private function assert_link_color( $output ) {
+		$this->assertSame( 1, preg_match( '/\bwp-elements-[\w-]+/', $output, $matches ) );
+		$this->assertStringContainsString(
+			'.' . $matches[0] . ' a:where(:not(.wp-element-button)){color:#123456;}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	public function test_unattached_attachment_has_no_previous_link() {
+		$attachment_id = $this->create_attachment();
+		$output        = $this->render_block( $attachment_id, array( 'type' => 'previous' ) );
+
+		$this->assertTrue( is_attachment() );
+		$this->assertStringContainsString( 'post-navigation-link-previous', $output );
+		$this->assertStringContainsString( '></div>', $output );
+		$this->assertStringNotContainsString( '<a ', $output );
+	}
+
+	public function test_unattached_attachment_previous_link_withholds_empty_wrapper_styles() {
+		$attributes          = $this->styled_attributes();
+		$attributes['style'] = array_merge( $attributes['style'], $this->background_attributes()['style'] );
+		$output              = $this->render_block( $this->create_attachment(), $attributes );
+
+		$this->assertStringContainsString( '></div>', $output );
+		$this->assertStringNotContainsString( 'style=', $output );
+		$this->assertStringNotContainsString( 'has-border-color', $output );
+		$this->assertStringNotContainsString( 'has-background', $output );
+	}
+
+	public function test_unattached_attachment_previous_link_has_no_orphan_label_or_arrow() {
+		$output = $this->render_block(
+			$this->create_attachment(),
+			array(
+				'type'      => 'previous',
+				'label'     => 'Back to the parent',
+				'showTitle' => true,
+				'linkLabel' => true,
+				'arrow'     => 'chevron',
+				'style'     => array( 'elements' => array( 'link' => array( 'color' => array( 'text' => '#123456' ) ) ) ),
+			)
+		);
+
+		$this->assertStringContainsString( '></div>', $output );
+		$this->assertStringNotContainsString( '<a ', $output );
+		$this->assertStringNotContainsString( 'Back to the parent', $output );
+		$this->assertStringNotContainsString( 'post-navigation-link__arrow', $output );
+	}
+
+	public function test_attached_attachment_previous_link_points_to_its_parent() {
+		$attachment_id = $this->create_attachment( self::$first_post_id );
+		$output        = $this->render_block( $attachment_id, array( 'type' => 'previous' ) );
+
+		$this->assertTrue( is_attachment() );
+		$this->assertStringContainsString( 'href="' . esc_url( get_permalink( self::$first_post_id ) ) . '"', $output );
+		$this->assertStringContainsString( 'rel="prev"', $output );
+		$this->assertStringNotContainsString( 'href="' . esc_url( get_permalink( $attachment_id ) ) . '"', $output );
+	}
+
+	public function test_attached_attachment_previous_link_keeps_custom_content_and_link_color() {
+		$output = $this->render_block(
+			$this->create_attachment( self::$first_post_id ),
+			array(
+				'type'      => 'previous',
+				'label'     => '<em>Back</em>',
+				'showTitle' => true,
+				'linkLabel' => true,
+				'arrow'     => 'arrow',
+				'style'     => array( 'elements' => array( 'link' => array( 'color' => array( 'text' => '#123456' ) ) ) ),
+			)
+		);
+
+		$this->assertStringContainsString( 'href="' . esc_url( get_permalink( self::$first_post_id ) ) . '"', $output );
+		$this->assertStringContainsString( '<em>Back</em>', $output );
+		$this->assertStringContainsString( 'First post', $output );
+		$this->assertStringContainsString( 'is-arrow-arrow', $output );
+		$this->assert_link_color( $output );
+	}
+
+	public function test_unattached_attachment_next_link_is_unchanged() {
+		$output = $this->render_block( $this->create_attachment(), array( 'type' => 'next' ) );
+
+		$this->assertStringContainsString( 'post-navigation-link-next', $output );
+		$this->assertStringContainsString( '></div>', $output );
+		$this->assertStringNotContainsString( '<a ', $output );
+	}
+
+	public function test_attached_attachment_next_link_is_unchanged() {
+		$output = $this->render_block( $this->create_attachment( self::$first_post_id ), array( 'type' => 'next' ) );
+
+		$this->assertStringContainsString( 'post-navigation-link-next', $output );
+		$this->assertStringContainsString( '></div>', $output );
+		$this->assertStringNotContainsString( '<a ', $output );
+	}
+
+	public function test_ordinary_post_previous_link_is_unchanged() {
+		$output = $this->render_block( self::$second_post_id, array( 'type' => 'previous' ) );
+
+		$this->assertFalse( is_attachment() );
+		$this->assertStringContainsString( 'href="' . esc_url( get_permalink( self::$first_post_id ) ) . '"', $output );
+		$this->assertStringContainsString( 'rel="prev"', $output );
+	}
+
+	public function test_ordinary_post_next_link_is_unchanged() {
+		$output = $this->render_block(
+			self::$first_post_id,
+			array(
+				'type'  => 'next',
+				'label' => 'Ahead',
+				'style' => array( 'elements' => array( 'link' => array( 'color' => array( 'text' => '#123456' ) ) ) ),
+			)
+		);
+
+		$this->assertStringContainsString( 'href="' . esc_url( get_permalink( self::$second_post_id ) ) . '"', $output );
+		$this->assertStringContainsString( 'rel="next"', $output );
+		$this->assertStringContainsString( 'Ahead', $output );
+		$this->assert_link_color( $output );
+	}
+
+	public function test_unattached_attachment_previous_link_filter_can_supply_a_link() {
+		$calls    = array();
+		$callback = static function ( $output, $format, $link, $post, $adjacent ) use ( &$calls ) {
+			$calls[] = array( $output, $format, $link, $post, $adjacent );
+			return '<a href="https://example.org/media/">Media library</a>';
+		};
+		add_filter( 'previous_post_link', $callback, 10, 5 );
+		try {
+			$output = $this->render_block( $this->create_attachment(), $this->styled_attributes() );
+		} finally {
+			remove_filter( 'previous_post_link', $callback, 10 );
+		}
+
+		$this->assertSame( array( array( '', '%link', _x( 'Previous', 'label for previous post link', 'default' ), '', 'previous' ) ), $calls );
+		$this->assertStringContainsString( '<a href="https://example.org/media/">Media library</a>', $output );
+		$this->assertStringContainsString( 'border-style:dashed', $output );
+	}
+
+	public function test_unattached_attachment_previous_link_filter_can_return_null() {
+		$calls    = array();
+		$callback = static function ( $output, $format, $link, $post, $adjacent ) use ( &$calls ) {
+			$calls[] = array( $output, $format, $link, $post, $adjacent );
+			return null;
+		};
+		add_filter( 'previous_post_link', $callback, 10, 5 );
+		try {
+			$output = $this->render_block( $this->create_attachment(), $this->styled_attributes() );
+		} finally {
+			remove_filter( 'previous_post_link', $callback, 10 );
+		}
+
+		$this->assertSame( array( array( '', '%link', _x( 'Previous', 'label for previous post link', 'default' ), '', 'previous' ) ), $calls );
+		$this->assertStringContainsString( '></div>', $output );
+		$this->assertStringNotContainsString( 'style=', $output );
+	}
 }
