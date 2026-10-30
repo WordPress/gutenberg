@@ -169,13 +169,70 @@ export const isDirectiveMap = ( value: unknown ): boolean =>
 	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 /**
+ * Gets the namespace named by the parsed value of a `data-wp-interactive`
+ * attribute: the value itself when it is a string, or the `namespace` string of
+ * an object. It is the single place that interprets these values, so
+ * {@link toVdom} and its callers resolve a `data-wp-interactive` attribute to
+ * the same namespace.
+ *
+ * @param value The `value` returned by {@link parseDirectiveValue} for the
+ *              attribute.
+ * @return The namespace, or null when the value names none or a reserved key.
+ */
+export const getInteractiveNamespace = (
+	value: string | Record< string, unknown >
+): string | null => {
+	const namespace =
+		// eslint-disable-next-line no-nested-ternary
+		typeof value === 'string'
+			? value
+			: typeof value?.namespace === 'string'
+				? value.namespace
+				: null;
+	return isReservedKey( namespace ) ? null : namespace;
+};
+
+/**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
  *
- * @param root The root element or node to start traversing on.
+ * Unprefixed directives get the namespace of the nearest `data-wp-interactive`
+ * at or above their element within `root`. Where there is none, the namespace
+ * passed as `namespace` applies, as if `root` sat inside a
+ * `data-wp-interactive` that names it; `null` stands for no namespace. When
+ * `namespace` is omitted, the namespace in effect where the conversion is
+ * requested applies: the enclosing conversion's for `<template>` content, and
+ * `null` for a top-level call. The ancestors of `root` are never read. A
+ * namespace prefix in a directive value always takes precedence.
+ *
+ * @example
+ * ```js
+ * // The directives of the region resolve against `my-plugin`, the namespace
+ * // of the interactive element that contains it.
+ * toVdom( region, 'my-plugin' );
+ * ```
+ *
+ * @param root      The root element or node to start traversing on.
+ * @param namespace Optional namespace for the unprefixed directives that no
+ *                  `data-wp-interactive` within `root` governs.
  * @return The resulting vDOM tree.
  */
-export function toVdom( root: Node ): ComponentChild {
+export function toVdom(
+	root: Node,
+	namespace?: string | null
+): ComponentChild {
+	if ( namespace === undefined ) {
+		return convertToVdom( root );
+	}
+	namespaces.push( namespace );
+	try {
+		return convertToVdom( root );
+	} finally {
+		namespaces.pop();
+	}
+}
+
+function convertToVdom( root: Node ): ComponentChild {
 	const nodesToRemove = new Set< Node >();
 	const nodesToReplace = new Set< Node >();
 
@@ -240,18 +297,7 @@ export function toVdom( root: Node ): ComponentChild {
 					parseDirectiveValue( attributeValue );
 				if ( attributeName === 'data-wp-interactive' ) {
 					island = true;
-					const islandNamespace =
-						// eslint-disable-next-line no-nested-ternary
-						typeof value === 'string'
-							? value
-							: typeof value?.namespace === 'string'
-								? value.namespace
-								: null;
-					namespaces.push(
-						isReservedKey( islandNamespace )
-							? null
-							: islandNamespace
-					);
+					namespaces.push( getInteractiveNamespace( value ) );
 				} else if ( isReservedKey( namespace ) ) {
 					if ( globalThis.SCRIPT_DEBUG ) {
 						warn(
