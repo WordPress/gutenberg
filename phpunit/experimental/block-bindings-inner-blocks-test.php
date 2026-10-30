@@ -129,9 +129,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function test_bindings_to_the_same_source_inside_the_value_are_ignored() {
-		/*
-		 * The supplied Group is bound to the same source, which would expand forever.
-		 */
 		$this->value = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Nested own</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
 		$output      = $this->render_group();
 		$this->assertStringContainsString( '>Nested own</p>', $output );
@@ -151,10 +148,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->value = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/other-inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>From test</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
 		$output      = $this->render_group();
 		unregister_block_bindings_source( 'test/other-inner-blocks' );
-
-		/*
-		 * The supplied Group keeps its own inner blocks instead of asking the other source.
-		 */
 		$this->assertStringContainsString( '>From test</p>', $output );
 		$this->assertStringNotContainsString( 'From other', $output );
 	}
@@ -198,9 +191,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 
 	public function test_value_goes_inside_an_empty_group() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		/*
-		 * Classic themes get an inner container from `wp_restore_group_inner_container()`.
-		 */
 		$this->assertMatchesRegularExpression( '#^<div class="wp-block-group[^"]*">(<div class="wp-block-group__inner-container[^"]*">)?\s*<p[^>]*>One</p>\s*(</div>)?</div>$#', $this->render_group( null, '' ) );
 	}
 
