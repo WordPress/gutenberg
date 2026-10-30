@@ -170,7 +170,14 @@ const LINK_WRAPPER_BLOCK_TYPES = [
 	'core/post-comments-link',
 ];
 
-const HEADING_LEVEL_ELEMENT = /^h[1-6]$/;
+const HEADING_LEVEL_ELEMENTS = new Set( [
+	'h1',
+	'h2',
+	'h3',
+	'h4',
+	'h5',
+	'h6',
+] );
 
 /**
  * Maps a block to the root-level Global Styles element layers that paint it
@@ -217,7 +224,7 @@ function getElementLayers(
  * @return Block names, or an empty array for an element no block renders as.
  */
 export function getBlockTypesForElement( element: string ): string[] {
-	const key = HEADING_LEVEL_ELEMENT.test( element ) ? 'heading' : element;
+	const key = HEADING_LEVEL_ELEMENTS.has( element ) ? 'heading' : element;
 	if ( ! Object.hasOwn( ELEMENT_BLOCK_TYPES, key ) ) {
 		return [];
 	}
