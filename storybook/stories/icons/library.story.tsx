@@ -126,6 +126,7 @@ function CopySvgButton( { icon }: { icon: IconComponent } ) {
 						error: iconsPackage.error,
 					}[ result.status ]
 				}
+				size={ 16 }
 			/>
 			Copy SVG
 		</Button>
