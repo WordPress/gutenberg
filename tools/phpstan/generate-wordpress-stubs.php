@@ -821,8 +821,17 @@ function main( array $args ): void {
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The recorded source is only written when it changes, by an option.
-	// The check mark only goes with colors, as the row's label already says the same.
-	$done = ( has_color() && has_unicode() ? style( '✓ ', '32' ) : '' ) . "WordPress $wp_version" . style( ' (' . ( $fetched_ref ? short_commit( $commit ) . ', ' : '' ) . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
+	// The done row names the WordPress version, then, dimmed, the commit that a fetched ref resolved
+	// to, the revision, and how long generating took. The check mark only goes with colors, as the
+	// row's label already says the same.
+	$details = array();
+	if ( $fetched_ref ) {
+		$details[] = short_commit( $commit );
+	}
+	$details[] = ( $is_trunk ? '' : 'based on ' ) . "r$revision";
+	$elapsed   = (int) round( microtime( true ) - $started );
+	$check     = has_color() && has_unicode() ? style( '✓ ', '32' ) : '';
+	$done      = $check . "WordPress $wp_version" . style( ' (' . implode( ', ', $details ) . ") in {$elapsed}s", '2' );
 	if ( $recorded ) {
 		report_row( 'Done', $done );
 		return;
