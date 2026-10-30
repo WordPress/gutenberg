@@ -3011,7 +3011,7 @@ class WP_Theme_JSON_Gutenberg {
 							__( '"%s" is a reserved slug and cannot be used as a color preset in theme.json as it conflicts with core CSS classes.', 'gutenberg' ),
 							$slug
 						),
-						'7.1.0'
+						'7.3.0'
 					);
 					continue;
 				}
