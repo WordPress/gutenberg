@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `get_patterns` and `get_pattern_details` tools, serving the design system pattern guidance (copy to clipboard, destructive actions, error messages, save and submit) from the Storybook docs manifest. The server instructions now describe how patterns, components, and design tokens relate, and which tools to call for each kind of request ([#84864](https://github.com/WordPress/gutenberg/pull/84864)).
+
 ## 0.15.0 (2026-10-20)
 
 ### Breaking Changes

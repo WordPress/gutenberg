@@ -8,6 +8,7 @@ import {
 	useLayoutEffect,
 	useId,
 	forwardRef,
+	flushSync,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type {
@@ -100,6 +101,8 @@ export interface CropperProps {
 	disabled?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
+	/** Callback fired when the image fails to load. */
+	onImageError?: () => void;
 	/** Fires when a continuous gesture begins (pan drag, handle resize, pinch zoom). */
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointerup, resize settle). */
@@ -133,6 +136,7 @@ export interface CropperProps {
  * @param root0.focusOnMount      Focus the crop area on mount.
  * @param root0.disabled          Ignore all crop interaction.
  * @param root0.onImageLoaded     Image load callback.
+ * @param root0.onImageError      Image error callback.
  * @param root0.onGestureStart    Gesture boundary start.
  * @param root0.onGestureEnd      Gesture boundary end.
  * @param root0.className         Additional CSS class.
@@ -154,6 +158,7 @@ function CropperInner(
 		focusOnMount = false,
 		disabled = false,
 		onImageLoaded,
+		onImageError,
 		onGestureStart,
 		onGestureEnd,
 		className,
@@ -240,11 +245,16 @@ function CropperInner(
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setCanvasSize( ( prev ) => {
-					if ( prev.width === width && prev.height === height ) {
-						return prev;
-					}
-					return { width, height };
+				// Render before the next paint, so the image keeps up with
+				// a container that is resizing every frame (such as while
+				// the sidebar animates) instead of trailing it by a frame.
+				flushSync( () => {
+					setCanvasSize( ( prev ) => {
+						if ( prev.width === width && prev.height === height ) {
+							return prev;
+						}
+						return { width, height };
+					} );
 				} );
 			}
 		} );
@@ -1025,6 +1035,7 @@ function CropperInner(
 						src={ src }
 						alt=""
 						onLoad={ handleImageLoad }
+						onError={ onImageError }
 						style={ imageStyle }
 						draggable={ false }
 					/>

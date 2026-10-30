@@ -206,6 +206,27 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The `wp_block` view list renames "My patterns" to "Site patterns" in place,
+	 * keeping its slug, and the table aligns the author column to the start.
+	 */
+	public function test_wp_block_site_patterns_view_and_author_alignment() {
+		$config = gutenberg_get_entity_view_config( 'postType', 'wp_block' );
+
+		$this->assertSame(
+			array( 'all-patterns', 'my-patterns' ),
+			array_slice( array_column( $config['view_list'], 'slug' ), 0, 2 )
+		);
+		$this->assertSame( 'Site patterns', $config['view_list'][1]['title'] );
+		$this->assertSame(
+			array(
+				'width' => '1%',
+				'align' => 'start',
+			),
+			$config['default_layouts']['table']['layout']['styles']['author']
+		);
+	}
+
+	/**
 	 * The default configuration exposes the documented shape for an unknown entity.
 	 */
 	public function test_default_config_for_unknown_entity() {

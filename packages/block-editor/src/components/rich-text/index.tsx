@@ -724,7 +724,9 @@ function RichTextWrapper(
 						supportsSplitting,
 					} ),
 					anchorRef,
-					setAnchorElement,
+					// Only the selected field shows the toolbar that needs the
+					// element. Storing it on mount would render every field twice.
+					isSelected && setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning

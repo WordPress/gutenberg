@@ -1,8 +1,9 @@
 @use "@wordpress/base-styles/animations" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
-@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/z-index" as *;
+
+$modal-header-height: calc(#{variables.$header-height} + var(--wpds-dimension-padding-sm));
 
 body.modal-open {
 	overflow: hidden;
@@ -15,7 +16,7 @@ body.modal-open {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.35);
+	background-color: rgba(0, 0, 0, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// This animates the appearance of the backdrop.
@@ -39,14 +40,14 @@ body.modal-open {
 	align-self: flex-end;
 	margin: 0;
 	width: 100%;
-	max-height: calc(100% - #{$grid-unit-50});
-	background: $white;
-	box-shadow: $elevation-large;
-	border-radius: $radius-large $radius-large 0 0;
+	max-height: calc(100% - var(--wpds-dimension-gap-3xl));
+	background: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: variables.$elevation-large;
+	border-radius: var(--wpds-border-radius-lg) var(--wpds-border-radius-lg) 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-content-neutral);
 	// Animate the modal frame/contents appearing on the page.
 	animation-name: components-modal__appear-animation;
 	animation-fill-mode: forwards;
@@ -56,7 +57,7 @@ body.modal-open {
 	h1,
 	h2,
 	h3 {
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@media not (prefers-reduced-motion) {
@@ -71,12 +72,12 @@ body.modal-open {
 	// Show a centered modal on bigger screens.
 	@include break-small() {
 		align-self: auto;
-		border-radius: $radius-large;
+		border-radius: var(--wpds-border-radius-lg);
 		margin: auto;
 		width: auto;
 		min-width: var(--wpds-dimension-surface-width-sm);
-		max-width: calc(100% - #{$grid-unit-20 * 2});
-		max-height: calc(100% - #{$header-height * 2});
+		max-width: calc(100% - var(--wpds-dimension-gap-lg) * 2);
+		max-height: calc(100% - #{variables.$header-height * 2});
 
 		&.has-size-small,
 		&.has-size-medium,
@@ -113,7 +114,7 @@ body.modal-open {
 		:where(.components-modal__content) {
 			display: flex;
 			// If this container is scrollable, bottom padding won't apply so we use margin instead.
-			margin-bottom: $grid-unit-30;
+			margin-bottom: var(--wpds-dimension-gap-xl);
 			padding-bottom: 0;
 
 			> :last-child {
@@ -125,14 +126,14 @@ body.modal-open {
 			// Reset the mobile bottom-sheet overrides so the desktop
 			// full-screen modal is centered with rounded corners.
 			margin: auto;
-			border-radius: $radius-large;
-			width: calc(100% - #{ $grid-unit-20 * 2 });
-			height: calc(100% - #{ $grid-unit-20 * 2 });
+			border-radius: var(--wpds-border-radius-lg);
+			width: calc(100% - var(--wpds-dimension-gap-lg) * 2);
+			height: calc(100% - var(--wpds-dimension-gap-lg) * 2);
 		}
 
 		@include break-medium() {
-			width: calc(100% - #{ $grid-unit-50 * 2 });
-			height: calc(100% - #{ $grid-unit-50 * 2 });
+			width: calc(100% - var(--wpds-dimension-gap-3xl) * 2);
+			height: calc(100% - var(--wpds-dimension-gap-3xl) * 2);
 			max-width: none;
 		}
 	}
@@ -195,13 +196,13 @@ body.modal-open {
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	border-bottom: $border-width solid transparent;
-	padding: $grid-unit-30;
+	border-bottom: var(--wpds-border-width-xs) solid transparent;
+	padding: var(--wpds-dimension-padding-2xl);
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-10; // 72px
+	height: $modal-header-height;
 	width: 100%;
 	// Stack above modal content that may overlap the header.
 	z-index: 10;
@@ -210,7 +211,7 @@ body.modal-open {
 	left: 0;
 
 	.components-modal__header-heading {
-		font-size: $font-size-x-large;
+		font-size: var(--wpds-typography-font-size-xl);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
@@ -240,23 +241,23 @@ body.modal-open {
 	display: inline-block;
 
 	svg {
-		max-width: $button-size;
-		max-height: $button-size;
-		padding: $grid-unit-10;
+		max-width: variables.$button-size;
+		max-height: variables.$button-size;
+		padding: var(--wpds-dimension-padding-sm);
 	}
 }
 
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-10;
+	margin-top: $modal-header-height;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
-	padding: $grid-unit-05 $grid-unit-30 $grid-unit-30;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 	overflow: auto;
 
 	&.hide-header {
 		margin-top: 0;
-		padding-top: $grid-unit-30;
+		padding-top: var(--wpds-dimension-padding-2xl);
 	}
 
 	&.is-scrollable:focus-visible {
