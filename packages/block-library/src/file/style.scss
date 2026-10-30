@@ -36,6 +36,12 @@
 	margin-bottom: 1.5em;
 }
 
+// Keeps trunk's spacing in themes without block gap support, which only get a
+// zero specificity fallback gap. Any Global Styles gap is more specific and wins.
+div:where(.wp-block-file) {
+	gap: 1.3em 0.75em;
+}
+
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 :where(.wp-block-file__button) {
 	border-radius: 2em;

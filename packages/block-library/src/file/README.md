@@ -38,7 +38,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `backgroundSize`: `true`
   - `gradient`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - `blockGap`: `{"sides":["horizontal","vertical"],"__experimentalDefault":"0.75em"}`
+  - `blockGap`: `{"sides":["horizontal","vertical"]}`
   - `margin`: `true`
   - `padding`: `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):

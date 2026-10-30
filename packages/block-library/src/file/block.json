@@ -76,8 +76,7 @@
 		},
 		"spacing": {
 			"blockGap": {
-				"sides": [ "horizontal", "vertical" ],
-				"__experimentalDefault": "0.75em"
+				"sides": [ "horizontal", "vertical" ]
 			},
 			"margin": true,
 			"padding": true
