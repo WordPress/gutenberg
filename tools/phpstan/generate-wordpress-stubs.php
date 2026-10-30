@@ -82,7 +82,7 @@ function report_row( string $label, string $value ): void {
  * Writes a row for a step that takes a while, without ending the line, so that it can be cleared.
  *
  * Only a terminal gets it, since the row is cleared by moving back to the start of the line, which a
- * log would keep, whether or not it has colors.
+ * log would keep, whether it has colors.
  *
  * @param non-empty-string $label The label.
  * @param string           $value The value.
@@ -698,7 +698,7 @@ function main( array $args ): void {
 
 	// The generator ends with a report of its own: a title, the temporary file it wrote, and a table
 	// of counts. Leave that out, but keep what comes before it, such as PHP warnings, and after it,
-	// such as a list of duplicate declarations. All of the output is kept when it fails, or when the
+	// such as a list of duplicate declarations. All the output is kept when it fails, or when the
 	// report is not found.
 	if ( 0 === $status && preg_match( '/^PHP Stubs Generator\n=+\n.*?(?:^ -[- ]+\n.*?){3}/ms', $output, $matches, PREG_OFFSET_CAPTURE ) ) {
 		$output = substr( $output, 0, $matches[0][1] ) . substr( $output, $matches[0][1] + strlen( $matches[0][0] ) );
