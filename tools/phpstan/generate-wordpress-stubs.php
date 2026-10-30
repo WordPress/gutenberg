@@ -54,7 +54,40 @@ const GENERATOR_HEADER = "/**\n * Generated stub declarations for WordPress.\n *
  * @param string $message The message.
  */
 function report( string $message ): void {
-	fwrite( STDERR, $message . "\n" );
+	fwrite( STDERR, ( is_pending( false ) ? "\r\033[K" : '' ) . $message . "\n" );
+}
+
+/**
+ * Returns whether a pending row is on the current line, and optionally sets it.
+ *
+ * @param bool|null $pending Whether a pending row is on the current line now, if it changed.
+ * @return bool Whether a pending row was on the current line.
+ */
+function is_pending( ?bool $pending = null ): bool {
+	/** @var bool $current */
+	static $current = false;
+
+	$previous = $current;
+	if ( null !== $pending ) {
+		$current = $pending;
+	}
+	return $previous;
+}
+
+/**
+ * Writes a row for a step that takes a while, which the next line of progress replaces.
+ *
+ * Only a terminal with colors gets it, since the row is replaced by moving back to the start of the
+ * line, which a log would keep.
+ *
+ * @param non-empty-string $label The label.
+ * @param string           $value The value.
+ */
+function report_pending_row( string $label, string $value ): void {
+	if ( has_color() ) {
+		fwrite( STDERR, '  ' . style( str_pad( $label, 11 ), '2' ) . $value );
+		is_pending( true );
+	}
 }
 
 /**
@@ -621,6 +654,7 @@ function main( array $args ): void {
 		"--out=$generated_file",
 	);
 
+	report_pending_row( 'Stubs', style( 'generating…', '2' ) );
 	list( $status, $output ) = execute( $generator_command, 'capture', $work_dir );
 	if ( 0 !== $status ) {
 		report( trim( $output ) );
