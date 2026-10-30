@@ -6,6 +6,7 @@
 
 -   Use the design system focus ring for the rotation ruler ([#85535](https://github.com/WordPress/gutenberg/pull/85535)).
 -   Animate the details/crop sidebar when it opens or closes beside the canvas ([#85889](https://github.com/WordPress/gutenberg/pull/85889)).
+-   `MediaPreview` shows an inline preview of PDF files when the browser has a built-in PDF viewer, and falls back to the file info otherwise ([#86002](https://github.com/WordPress/gutenberg/pull/86002)).
 
 ### Bug Fixes
 
