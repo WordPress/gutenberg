@@ -141,6 +141,11 @@ function has_color(): bool {
 			$force_color = strtolower( (string) getenv( 'FORCE_COLOR' ) );
 			if ( '' !== $force_color ) {
 				$has_color = '0' !== $force_color && 'false' !== $force_color;
+				// A Windows console shows escape sequences as text until VT100 processing is enabled,
+				// which is_terminal() does otherwise.
+				if ( $has_color && '\\' === DIRECTORY_SEPARATOR && function_exists( 'sapi_windows_vt100_support' ) && stream_isatty( STDERR ) ) {
+					sapi_windows_vt100_support( STDERR, true );
+				}
 			} else {
 				$has_color = is_terminal();
 			}
