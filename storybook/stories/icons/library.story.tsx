@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { addons } from 'storybook/preview-api';
 import { speak } from '@wordpress/a11y';
 import { useCopyToClipboard } from '@wordpress/compose';
 import {
@@ -19,9 +18,15 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import * as iconsPackage from '@wordpress/icons';
-import { Badge, Button, Stack, Text, VisuallyHidden } from '@wordpress/ui';
+import {
+	Badge,
+	Button,
+	Link,
+	Stack,
+	Text,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import manifest from '../../../packages/icons/src/manifest.json';
-import { SET_QUERY_PARAMS } from '../../addons/query-params/constants';
 
 const { Icon, ...availableIcons } = iconsPackage;
 
@@ -62,8 +67,6 @@ const COLLECTION_LABELS = {
 
 type Collection = ( typeof COLLECTIONS )[ number ];
 
-const ICON_QUERY_PARAM = 'icon';
-
 const COPY_FEEDBACK_TIMEOUT = 2000;
 
 function nameToSlug( name: string ): string {
@@ -80,17 +83,38 @@ function nameToSlug( name: string ): string {
 	);
 }
 
-function getIconFromUrl(): string | null {
-	// The manager forwards its custom query params to the preview iframe.
-	return new URLSearchParams( window.location.search ).get(
-		ICON_QUERY_PARAM
-	);
+const ICON_NAMES = Object.keys( availableIcons );
+
+/**
+ * Returns the window whose URL is shown in the address bar. Stories render in
+ * an iframe, so the selected icon is kept in the hash of the manager URL,
+ * where it can be shared as a link.
+ */
+function getTopWindow(): Window {
+	try {
+		// Throws if the manager is on another origin, e.g. a composed Storybook.
+		void window.parent.location.href;
+		return window.parent;
+	} catch {
+		return window;
+	}
 }
 
-function setIconInUrl( slug: string | null ) {
-	addons
-		.getChannel()
-		.emit( SET_QUERY_PARAMS, { [ ICON_QUERY_PARAM ]: slug } );
+function getIconNameFromHash(): string | null {
+	const slug = decodeURIComponent(
+		getTopWindow().location.hash.replace( /^#/, '' )
+	);
+	return ICON_NAMES.find( ( name ) => nameToSlug( name ) === slug ) ?? null;
+}
+
+function setIconInHash( slug: string | null ) {
+	const { history, location } = getTopWindow();
+	const url = location.href.replace( /#.*$/, '' );
+	history.replaceState(
+		history.state,
+		'',
+		slug ? `${ url }#${ slug }` : url
+	);
 }
 
 function CopySvgButton( { icon }: { icon: IconComponent } ) {
@@ -177,7 +201,7 @@ function IconDetails( {
 	return (
 		<Stack
 			direction="row"
-			gap="xl"
+			gap="2xl"
 			align="center"
 			wrap="wrap"
 			style={ {
@@ -203,9 +227,9 @@ function IconDetails( {
 					<Text variant="body-sm">Available in</Text>
 					<Stack
 						render={ <ul /> }
-						direction="row"
+						direction="column"
 						gap="sm"
-						wrap="wrap"
+						align="flex-start"
 						style={ { margin: 0, padding: 0, listStyle: 'none' } }
 					>
 						<AvailabilityBadge
@@ -223,6 +247,67 @@ function IconDetails( {
 					</Stack>
 				</Stack>
 			</Stack>
+			<LibraryDescription />
+		</Stack>
+	);
+}
+
+function LibraryDescription() {
+	return (
+		<Stack
+			direction="column"
+			gap="md"
+			style={ { flex: '1 1 320px', maxWidth: 640 } }
+		>
+			<Text render={ <p /> } style={ { margin: 0 } }>
+				This library lists every icon in the{ ' ' }
+				<code>@wordpress/icons</code> package. Select an icon to see its
+				details. The URL updates, so you can share a link to it.
+			</Text>
+			<Text render={ <p /> } style={ { margin: 0 } }>
+				&ldquo;Available in&rdquo; shows where you can use an icon:
+			</Text>
+			<Stack
+				render={ <ul /> }
+				direction="column"
+				gap="sm"
+				style={ { margin: 0, paddingInlineStart: 20 } }
+			>
+				<Text render={ <li /> }>
+					<strong>@wordpress/icons</strong>: every icon. Import it
+					from the npm package in JavaScript.{ ' ' }
+					<Link
+						href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-icons/#usage"
+						openInNewTab
+					>
+						See the usage example
+					</Link>
+					.
+				</Text>
+				<Text render={ <li /> }>
+					<strong>core collection</strong>: registered in WordPress.
+					Render it in PHP with{ ' ' }
+					<code>wp_get_icon( &apos;core/plus&apos; )</code>. It is
+					also available through the Icons REST API and in the Icon
+					block.
+				</Text>
+				<Text render={ <li /> }>
+					<strong>core-admin collection</strong>: registered in
+					WordPress for the admin interface. Render it in PHP with{ ' ' }
+					<code>wp_get_icon( &apos;core-admin/plus&apos; )</code>. It
+					is not available through the REST API.
+				</Text>
+			</Stack>
+			<Text render={ <p /> } style={ { margin: 0 } }>
+				See{ ' ' }
+				<Link
+					href="https://developer.wordpress.org/reference/functions/wp_get_icon/"
+					openInNewTab
+				>
+					wp_get_icon()
+				</Link>{ ' ' }
+				for how to render icons from a collection.
+			</Text>
 		</Stack>
 	);
 }
@@ -257,23 +342,28 @@ const LibraryExample = ( {
 	const [ filter, setFilter ] = useState( initialFilter );
 	const [ size, setSize ] = useState( initialSize );
 	const [ collection, setCollection ] = useState( initialCollection );
-	const [ selectedName, setSelectedName ] = useState( () => {
-		const slugFromUrl = getIconFromUrl();
-		return (
-			Object.keys( availableIcons ).find(
-				( name ) => nameToSlug( name ) === slugFromUrl
-			) ?? null
-		);
-	} );
+	const [ selectedName, setSelectedName ] = useState( getIconNameFromHash );
+	// Shown until an icon is selected.
+	const [ randomName ] = useState(
+		() => ICON_NAMES[ Math.floor( Math.random() * ICON_NAMES.length ) ]
+	);
 	const detailsHeadingRef = useRef< HTMLHeadingElement >( null );
 
-	// Drop the param when leaving the story, so it doesn't stick to the URL
-	// of other stories.
-	useEffect( () => () => setIconInUrl( null ), [] );
+	useEffect( () => {
+		const topWindow = getTopWindow();
+		const onHashChange = () => setSelectedName( getIconNameFromHash() );
+		topWindow.addEventListener( 'hashchange', onHashChange );
+		return () => {
+			topWindow.removeEventListener( 'hashchange', onHashChange );
+			// Drop the hash when leaving the story, so it doesn't stick to
+			// the URL of other stories.
+			setIconInHash( null );
+		};
+	}, [] );
 
 	const selectIcon = ( name: string ) => {
 		setSelectedName( name );
-		setIconInUrl( nameToSlug( name ) );
+		setIconInHash( nameToSlug( name ) );
 		// Move focus to the details shown above the list. Focusing also
 		// scrolls them into view.
 		requestAnimationFrame( () => detailsHeadingRef.current?.focus() );
@@ -311,17 +401,16 @@ const LibraryExample = ( {
 	return (
 		<div style={ { padding: 10 } }>
 			<VStack spacing={ 8 }>
-				{ selectedName && (
-					<IconDetails
-						name={ selectedName }
-						icon={
-							availableIcons[
-								selectedName as keyof typeof availableIcons
-							]
-						}
-						headingRef={ detailsHeadingRef }
-					/>
-				) }
+				<IconDetails
+					name={ selectedName ?? randomName }
+					icon={
+						availableIcons[
+							( selectedName ??
+								randomName ) as keyof typeof availableIcons
+						]
+					}
+					headingRef={ detailsHeadingRef }
+				/>
 				<HStack justify="flex-start" alignment="top" spacing={ 8 } wrap>
 					<SearchControl
 						label="Icon name"
