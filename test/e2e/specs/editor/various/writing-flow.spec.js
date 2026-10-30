@@ -938,20 +938,24 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second' );
 
+		// Select the first paragraph: the block toolbar the mouse move shows
+		// then sits above it, not over the paragraph that is clicked.
+		await page.keyboard.press( 'ArrowUp' );
+
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'First' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
 
-		// Click the first paragraph. The click lands at the center of the
+		// Click the second paragraph. The click lands at the center of the
 		// paragraph element, past the end of the short text, so the caret
 		// must be placed at the end of the text.
-		await editor.canvas.locator( 'p:text("First")' ).click();
+		await editor.canvas.locator( 'p:text("Second")' ).click();
 		await page.keyboard.type( '!' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: 'First!' } },
-			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second!' } },
 		] );
 	} );
 
