@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { WritingFlow } from '@wordpress/block-editor';
 
 export default {
