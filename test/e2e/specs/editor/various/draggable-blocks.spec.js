@@ -549,6 +549,72 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 
+	for ( const caretIn of [ undefined, '1', '2' ] ) {
+		test( `can drag a list item by its bullet${
+			caretIn ? ` with the caret in item ${ caretIn }` : ''
+		} (@webkit)`, async ( { page, editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{ name: 'core/list-item', attributes: { content: '1' } },
+					{ name: 'core/list-item', attributes: { content: '2' } },
+					{ name: 'core/list-item', attributes: { content: '3' } },
+				],
+			} );
+
+			const items = editor.canvas.getByRole( 'document', {
+				name: 'Block: List item',
+			} );
+			if ( caretIn ) {
+				await editor.canvas
+					.getByRole( 'textbox', { name: 'List text' } )
+					.filter( { hasText: caretIn } )
+					.click();
+			}
+			await expect(
+				editor.canvas.getByRole( 'textbox', { name: 'Editor canvas' } )
+			).toHaveCount( caretIn ? 1 : 0 );
+
+			const firstItemBox = await items.nth( 0 ).boundingBox();
+			const lastItemBox = await items.nth( 2 ).boundingBox();
+
+			// The bullet sits just left of the list item's box.
+			await page.mouse.move(
+				firstItemBox.x - 16,
+				firstItemBox.y + firstItemBox.height / 2
+			);
+			await page.mouse.down();
+			// The press selects the item, which lets it be dragged.
+			await expect( items.nth( 0 ) ).toHaveClass( /is-selected/ );
+			await dragTo(
+				page,
+				lastItemBox.x + lastItemBox.width / 2,
+				lastItemBox.y + lastItemBox.height - 2
+			);
+			await page.mouse.up();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: { content: '2' },
+						},
+						{
+							name: 'core/list-item',
+							attributes: { content: '3' },
+						},
+						{
+							name: 'core/list-item',
+							attributes: { content: '1' },
+						},
+					],
+				},
+			] );
+		} );
+	}
+
 	test( 'can drag a multi-selection by dragging inside a selected block', async ( {
 		editor,
 		page,
