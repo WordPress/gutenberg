@@ -5,7 +5,7 @@ test.describe( 'Block viewport visibility', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'hides a block for the viewport of the canvas, not of the window', async ( {
+	test( 'shows a block hidden on desktop while the canvas is tablet-sized', async ( {
 		editor,
 		page,
 	} ) => {
@@ -20,17 +20,16 @@ test.describe( 'Block viewport visibility', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
-				content: 'Hidden on tablet',
-				metadata: { blockVisibility: { viewport: { tablet: false } } },
+				content: 'Hidden on desktop',
+				metadata: { blockVisibility: { viewport: { desktop: false } } },
 			},
 		} );
 		await editor.saveDraft();
 
-		// Blocks mounted on load have no later render to correct a wrong
-		// first match.
+		// Reload so no block is selected: a selected hidden block still renders.
 		await page.reload();
 		await expect(
-			editor.canvas.getByText( 'Always visible' )
+			editor.canvas.getByText( 'Always visible', { exact: true } )
 		).toBeVisible();
 
 		const canvasWidth = await editor.canvas
@@ -41,7 +40,7 @@ test.describe( 'Block viewport visibility', () => {
 		expect( await page.evaluate( () => window.innerWidth ) ).toBe( 1000 );
 
 		await expect(
-			editor.canvas.getByText( 'Hidden on tablet' )
-		).toBeHidden();
+			editor.canvas.getByText( 'Hidden on desktop', { exact: true } )
+		).toBeVisible();
 	} );
 } );
