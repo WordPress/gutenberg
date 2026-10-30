@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
@@ -13,17 +13,6 @@ import type { PanelStyle, StyleSettings } from '../types';
 globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 // Scoped to the panel: the notice is also announced into a body live region.
 const clipsToTextNotice = ( container: HTMLElement ) =>
@@ -104,10 +93,7 @@ describe( 'hasBackgroundGradientValue', () => {
 } );
 
 /**
- * Tests for the inherited Global Styles treatment in `BackgroundPanel`.
- *
- * Override state is asserted through the accessible "Reset to inherited
- * value" button.
+ * Tests for inherited Global Styles values in `BackgroundPanel`.
  *
  * Slot inventory:
  *
@@ -227,39 +213,8 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 	} );
 } );
 
-describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
+describe( 'BackgroundPanel inherited Global Styles values', () => {
 	describe( 'Background gradient slot', () => {
-		it( 'applies the local-override className when a local gradient is set', () => {
-			const inheritedValue = {
-				background: {
-					gradient:
-						'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)',
-				},
-			};
-			const value = {
-				background: {
-					gradient:
-						'linear-gradient(135deg, rgb(255, 0, 0) 0%, rgb(0, 0, 255) 100%)',
-				},
-			};
-
-			render(
-				<BackgroundPanel
-					value={ value }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
-
-			expect(
-				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
-		} );
-
 		it( 'does not commit on mount when at-rest (display-without-commit)', () => {
 			const inheritedValue = {
 				background: {
@@ -284,7 +239,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Background image slot', () => {
-		it( 'exposes an accessible reset-to-inherited button when size/position/repeat settings are enabled', () => {
+		it( 'exposes an accessible reset button for a local image when size/position/repeat settings are enabled', () => {
 			const inheritedValue = {
 				background: {
 					backgroundImage: {
@@ -318,9 +273,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
-					name: /reset to inherited value/i,
-				} )
+				screen.getByRole( 'button', { name: 'Reset' } )
 			).toBeInTheDocument();
 		} );
 
@@ -350,9 +303,6 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 	} );
 
 	describe( 'Background image inner sub-controls (display-without-commit only)', () => {
-		// The panel-level inheritance class hook on the outer
-		// ToolsPanelItem is sufficient. The inner sub-controls only need
-		// to preserve display-without-commit behavior.
 		it( 'does not commit on mount or popover open when at-rest (display-without-commit, sub-controls)', async () => {
 			const user = userEvent.setup();
 

@@ -10,11 +10,21 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $contributor_id;
 	protected static $subscriber_id;
 	protected static $author_id;
+	protected static $moderator_id;
 	protected static $user_ids = array();
 	protected static $post_id;
 	protected static $num_notes = 10;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		add_role(
+			'comment_moderator',
+			'Comment Moderator',
+			array(
+				'read'              => true,
+				'moderate_comments' => true,
+			)
+		);
+
 		self::$admin_id       = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -40,6 +50,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'role' => 'author',
 			)
 		);
+		self::$moderator_id   = $factory->user->create(
+			array(
+				'role' => 'comment_moderator',
+			)
+		);
 
 		self::$user_ids = array(
 			'administrator' => self::$admin_id,
@@ -51,11 +66,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
+		remove_role( 'comment_moderator' );
+
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$contributor_id );
 		self::delete_user( self::$subscriber_id );
 		self::delete_user( self::$author_id );
+		self::delete_user( self::$moderator_id );
 	}
 
 	/**
@@ -804,7 +822,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'no parent'                     => array( 'none', '2764', true, 'rest_comment_invalid_parent', 400 ),
 			'parent is a regular comment'   => array( 'comment', '2764', true, 'rest_comment_invalid_parent', 400 ),
 			'content is not in emoji list'  => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
-			'emoji outside the curated set' => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
+			'emoji outside the curated set' => array( 'note', '1f525', true, 'rest_comment_invalid_reaction', 400 ),
 			'uppercase hex key'             => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
 			'emoji name instead of hex'     => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'                => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
@@ -941,8 +959,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public function data_valid_reaction_emojis() {
-		// The five quick reactions: heart, celebration, smile, eyes, rocket.
+		// The seven quick reactions: thumbs up, plus, heart, celebration, smile, eyes, rocket.
 		return array(
+			'thumbs up'   => array( '1f44d' ),
+			'plus'        => array( '2795' ),
 			'heart'       => array( '2764' ),
 			'celebration' => array( '1f389' ),
 			'smile'       => array( '1f604' ),
@@ -1210,6 +1230,24 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * A user with moderate_comments but no editing capabilities cannot remove a
+	 * reaction on a post they cannot edit.
+	 */
+	public function test_moderator_cannot_delete_reaction() {
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$moderator_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ), 'Reaction must still exist.' );
 	}
 
 	/**

@@ -7,6 +7,10 @@
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
+### Bug Fixes
+
+-   Derive CSS module class names from the stylesheet's CSS as well as its path, so two builds of a package share class names only where their CSS is identical. This stops an older bundled copy of a package from styling a newer copy's elements. All CSS module class names change once with this release ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
 ### Internal
 
 -   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).

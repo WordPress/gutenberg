@@ -15,7 +15,7 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
 import { unlock } from '../lock-unlock';
-import { BROWSER_BACKUP_NOTICE_ID } from './constants';
+import { BROWSER_BACKUP_NOTICE_ID, STORE_NAME } from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -715,13 +715,55 @@ export function viewBrowserBackup( { title, content, excerpt, time } ) {
 /**
  * Replaces the editor's content with the browser backup shown in the
  * revisions view. Like any edit, it is saved by the next save or autosave.
+ *
+ * For unpublished posts, the current content is saved first so that it is kept
+ * as a revision.
  */
 export const restoreBrowserBackup =
 	() =>
-	( { select, dispatch, registry } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const backup = select.getBrowserBackup();
 		if ( ! backup ) {
 			return;
+		}
+
+		// A save that is already in progress would make the save below a
+		// no-op, so wait for it to finish.
+		if ( select.isSavingPost() ) {
+			await new Promise( ( resolve ) => {
+				const unsubscribe = registry.subscribe( () => {
+					if ( ! select.isSavingPost() ) {
+						unsubscribe();
+						resolve();
+					}
+				}, STORE_NAME );
+			} );
+		}
+
+		// Save the current content first so that it is stored as a revision.
+		if (
+			shouldSaveBeforeRestore( select, {
+				title: backup.title.raw,
+				content: backup.content.raw,
+				excerpt: backup.excerpt.raw,
+			} )
+		) {
+			await dispatch.savePost();
+			if ( didSaveFail( select ) ) {
+				registry.dispatch( noticesStore ).createErrorNotice(
+					__(
+						'The backup was not restored because the current version of the post could not be saved first. Your content has not been changed.'
+					),
+					// Revisions mode does not show inline notices, so use
+					// a snackbar.
+					{
+						type: 'snackbar',
+						explicitDismiss: true,
+						id: 'editor-revision-restore-failed',
+					}
+				);
+				return;
+			}
 		}
 
 		dispatch.setCurrentRevisionId( null );
@@ -733,6 +775,15 @@ export const restoreBrowserBackup =
 		registry
 			.dispatch( noticesStore )
 			.removeNotice( BROWSER_BACKUP_NOTICE_ID );
+
+		// Replaces the "Draft saved" notice of the save above, which is about
+		// the previous content, not the restored backup.
+		registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Backup restored.' ), {
+				type: 'snackbar',
+				id: 'editor-save',
+			} );
 	};
 
 /**
@@ -802,6 +853,36 @@ function hasContentToReplace( fields, edits ) {
  */
 function didSaveFail( select ) {
 	return select.didPostSaveRequestFail() || select.isEditedPostDirty();
+}
+
+/**
+ * Returns whether the current content should be saved before a restore
+ * replaces it: the post is saveable, neither its saved nor its edited status
+ * is public, and the restore would change it.
+ *
+ * @param {Object} select The editor store selectors.
+ * @param {Object} edits  The edits the restore would apply.
+ * @return {boolean} Whether to save first.
+ */
+function shouldSaveBeforeRestore( select, edits ) {
+	return (
+		select.isEditedPostSaveable() &&
+		UNPUBLISHED_POST_STATUSES.includes(
+			select.getCurrentPostAttribute( 'status' )
+		) &&
+		UNPUBLISHED_POST_STATUSES.includes(
+			select.getEditedPostAttribute( 'status' )
+		) &&
+		hasContentToReplace(
+			{
+				title: select.getEditedPostAttribute( 'title' ),
+				content: select.getEditedPostContent(),
+				excerpt: select.getEditedPostAttribute( 'excerpt' ),
+				meta: select.getEditedPostAttribute( 'meta' ),
+			},
+			edits
+		)
+	);
 }
 
 /**
@@ -879,25 +960,7 @@ export const restoreRevision =
 		// nor the edited status is public, so that unsaved edits are not
 		// published. A post that can't be saved has no title, content, or
 		// excerpt to keep.
-		const shouldSaveCurrentContent =
-			select.isEditedPostSaveable() &&
-			UNPUBLISHED_POST_STATUSES.includes(
-				select.getCurrentPostAttribute( 'status' )
-			) &&
-			UNPUBLISHED_POST_STATUSES.includes(
-				select.getEditedPostAttribute( 'status' )
-			) &&
-			hasContentToReplace(
-				{
-					title: select.getEditedPostAttribute( 'title' ),
-					content: select.getEditedPostContent(),
-					excerpt: select.getEditedPostAttribute( 'excerpt' ),
-					meta: select.getEditedPostAttribute( 'meta' ),
-				},
-				edits
-			);
-
-		if ( shouldSaveCurrentContent ) {
+		if ( shouldSaveBeforeRestore( select, edits ) ) {
 			await dispatch.savePost();
 			if ( didSaveFail( select ) ) {
 				registry.dispatch( noticesStore ).createErrorNotice(
