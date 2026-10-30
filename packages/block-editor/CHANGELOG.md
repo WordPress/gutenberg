@@ -6,6 +6,10 @@
 
 - `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 
+### New Features
+
+-   Add the `allowedFormats` setting, which limits the formats the editor offers its rich text fields to the listed format names. All registered formats are offered when it is unset ([#86005](https://github.com/WordPress/gutenberg/pull/86005)).
+
 ### Enhancements
 
 -   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
