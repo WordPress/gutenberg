@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import spawn from 'cross-spawn';
 import { spawnWatchProcess, stopWatchProcess } from './process.mjs';
+import { hashSource, writeBuildStamp } from './build-stamp.mts';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
@@ -105,6 +106,7 @@ async function dev() {
 	console.log( '🔨 Starting development build...\n' );
 
 	const startTime = Date.now();
+	const sourceHash = hashSource();
 
 	// Clean up marker file from previous runs
 	readyMarkerFile.cleanup();
@@ -232,6 +234,10 @@ async function dev() {
 		buildWatch.stdout.on( 'data', async ( data ) => {
 			const output = data.toString();
 			process.stdout.write( output );
+			// wp-build logs ✅ after each rebuild.
+			if ( isReady && output.includes( '✅' ) ) {
+				writeBuildStamp( hashSource() );
+			}
 			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
 				isReady = true;
 
@@ -262,6 +268,7 @@ async function dev() {
 					);
 				}
 
+				writeBuildStamp( sourceHash );
 				readyMarkerFile.create();
 			}
 		} );
