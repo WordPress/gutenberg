@@ -223,13 +223,6 @@ const config: StorybookConfig = {
 				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
 				// meaningful budget above the current 3.15 MB largest chunk.
 				chunkSizeWarningLimit: 3_500,
-				/**
-				 * Oxc is Vite's default minifier. Preserve function and class
-				 * names so Storybook docs render `<BoxControl>` rather than a
-				 * mangled `<J>`.
-				 *
-				 * @see https://github.com/storybookjs/storybook/issues/20769
-				 */
 				minify: NODE_ENV === 'production' ? 'oxc' : false,
 				rolldownOptions: {
 					checks: {
@@ -239,9 +232,12 @@ const config: StorybookConfig = {
 						// timing warnings.
 						pluginTimings: false,
 					},
-					// Only in production. An `output.minify` object replaces
-					// Vite's minify setting, so setting it during development
-					// would minify the dev build.
+					// Preserve function and class names so Storybook renders
+					// `<BoxControl>` rather than a mangled `<J>`. Since setting
+					// `output.minify` overrides Vite's minify setting, assign
+					// it only in production where we expect minification.
+					//
+					// See: https://github.com/storybookjs/storybook/issues/20769
 					output:
 						NODE_ENV === 'production'
 							? {
