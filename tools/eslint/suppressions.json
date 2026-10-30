@@ -221,7 +221,7 @@
 	},
 	"packages/block-editor/src/components/child-layout-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/control.tsx": {
