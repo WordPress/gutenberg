@@ -3,6 +3,7 @@ import { useMemo } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 export function useEditedPostContext() {
 	return useSelect( ( select ) => {
@@ -140,13 +141,46 @@ export function useAvailableTemplates( {
 
 export function usePostTemplatePanelMode() {
 	return useSelect( ( select ) => {
-		const { getEditorSettings, getCurrentTemplateId, getCurrentPostType } =
-			select( editorStore );
-		const { getPostType, canUser } = select( coreStore );
+		const {
+			getEditorSettings,
+			getCurrentTemplateId,
+			getCurrentPostType,
+			getCurrentPostId,
+		} = select( editorStore );
+		const { getPostType, canUser, getEditedEntityRecord } =
+			select( coreStore );
 		const postTypeSlug = getCurrentPostType();
-		const postType = getPostType( postTypeSlug );
 		const settings = getEditorSettings();
 		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+		/*
+		 * A template can name the template it is rendered inside, so that the
+		 * header, the footer and whatever else surrounds it live in one place
+		 * instead of being repeated in every template. It is not a viewable
+		 * post type, so it is answered before the checks below.
+		 *
+		 * The `template` property is the server's answer for whether it can:
+		 * a site whose WordPress does not carry the field leaves the panel to
+		 * the checks below, the same way it behaved before the field existed.
+		 */
+		if ( postTypeSlug === TEMPLATE_POST_TYPE ) {
+			const template = getEditedEntityRecord(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				getCurrentPostId()
+			);
+
+			if ( template?.template !== undefined ) {
+				const canEditTemplates =
+					canUser( 'create', {
+						kind: 'postType',
+						name: TEMPLATE_POST_TYPE,
+					} ) ?? false;
+				return isBlockTheme && canEditTemplates
+					? 'template-parent'
+					: null;
+			}
+		}
+		const postType = getPostType( postTypeSlug );
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;

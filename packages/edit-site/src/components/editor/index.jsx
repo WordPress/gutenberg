@@ -35,6 +35,7 @@ import {
 	useSyncDeprecatedEntityIntoState,
 } from './use-resolve-edited-entity';
 import SitePreview from './site-preview';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -100,6 +101,25 @@ export default function EditSiteEditor( {
 		[]
 	);
 	const postWithTemplate = !! context?.postId;
+	/*
+	 * A template can name the template it is rendered inside, so the canvas has
+	 * one to show around it the way a page does. `null` means it is rendered on
+	 * its own.
+	 */
+	const parentTemplateId = useSelect(
+		( select ) => {
+			if ( postWithTemplate || postType !== TEMPLATE_POST_TYPE ) {
+				return undefined;
+			}
+			return (
+				unlock( select( coreDataStore ) ).getTemplateId(
+					postType,
+					postId
+				) ?? undefined
+			);
+		},
+		[ postWithTemplate, postType, postId ]
+	);
 	const editorPostType = postWithTemplate ? context.postType : postType;
 	const editorPostId = postWithTemplate ? context.postId : postId;
 	useEditorTitle( editorPostType, editorPostId );
@@ -205,7 +225,7 @@ export default function EditSiteEditor( {
 				<Editor
 					postType={ postWithTemplate ? context.postType : postType }
 					postId={ postWithTemplate ? context.postId : postId }
-					templateId={ postWithTemplate ? postId : undefined }
+					templateId={ postWithTemplate ? postId : parentTemplateId }
 					settings={ editorSettings }
 					renderingMode={ renderingMode }
 					className="edit-site-editor__editor-interface"

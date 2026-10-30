@@ -7,58 +7,77 @@
  */
 
 /**
- * Adds the `reading_settings` field to the `wp_template` form configuration.
+ * Adds the `template` and `reading_settings` fields to the `wp_template` form
+ * configuration.
  *
  * The `fields` list is pinned rather than merged because a merged member is
- * appended to the end of the list, and the link belongs above the last edited
+ * appended to the end of the list, and both belong above the last edited
  * date. Keep it in sync with the list built in
  * _gutenberg_get_entity_view_config_posttype_wp_template().
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
+function _gutenberg_add_form_fields_to_wp_template_view_config( $data ) {
+	$fields = array(
+		array(
+			'id'     => 'description',
+			'layout' => array(
+				'type'          => 'panel',
+				'labelPosition' => 'top',
+			),
+		),
+		array(
+			'id'     => 'description_readonly',
+			'layout' => array(
+				'type'          => 'regular',
+				'labelPosition' => 'none',
+			),
+		),
+	);
+
+	/*
+	 * The template a template is rendered inside is behind an experiment, and
+	 * the field reads a REST field that is only registered with it, so the form
+	 * leaves it out until the experiment is on. The list is pinned as a whole,
+	 * which is why the member is dropped here rather than added by the feature.
+	 */
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-template-inheritance' ) ) {
+		$fields[] = 'template';
+	}
+
+	$fields = array_merge(
+		$fields,
+		array(
+			array(
+				'id'     => 'reading_settings',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+			// The following fields are only meaningful in the `home`/`index`
+			// template summary. They edit other entities (`root/site` and the
+			// posts page); the editor merges those records into the form data
+			// under a namespace and controls when the fields are shown.
+			'posts_page_title',
+			'posts_per_page',
+			'default_comment_status',
+		)
+	);
+
 	return $data->replace(
 		array(
 			'form' => array(
-				'fields' => array(
-					array(
-						'id'     => 'description',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
-						),
-					),
-					array(
-						'id'     => 'description_readonly',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					array(
-						'id'     => 'reading_settings',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					array(
-						'id'     => 'last_edited_date',
-						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'none',
-						),
-					),
-					'revisions',
-					// The following fields are only meaningful in the `home`/`index`
-					// template summary. They edit other entities (`root/site` and the
-					// posts page); the editor merges those records into the form data
-					// under a namespace and controls when the fields are shown.
-					'posts_page_title',
-					'posts_per_page',
-					'default_comment_status',
-				),
+				'fields' => $fields,
 			),
 		),
 		1
@@ -351,7 +370,7 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	);
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
-		'_gutenberg_add_reading_settings_to_wp_template_view_config',
+		'_gutenberg_add_form_fields_to_wp_template_view_config',
 		6,
 		1
 	);

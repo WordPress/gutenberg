@@ -5032,6 +5032,39 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_templates() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'   => 1,
+				'templates' => array(
+					array(
+						'name'     => '404',
+						'template' => 'layout',
+					),
+					array(
+						'name' => 'search',
+					),
+				),
+			)
+		);
+
+		$templates = $theme_json->get_templates();
+
+		$this->assertEqualSetsWithIndex(
+			array(
+				'404'    => array( 'template' => 'layout' ),
+				'search' => array( 'template' => '' ),
+			),
+			$templates
+		);
+	}
+
+	public function test_get_templates_without_any() {
+		$theme_json = new WP_Theme_JSON_Gutenberg( array( 'version' => 1 ) );
+
+		$this->assertSame( array(), $theme_json->get_templates() );
+	}
+
 	public function test_get_from_editor_settings() {
 		$input = array(
 			'disableCustomColors'    => true,

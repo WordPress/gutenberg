@@ -3,6 +3,7 @@ import deepFreeze from 'deep-freeze';
 import {
 	getEntityActionsConfig,
 	getFieldsConfig,
+	getTemplateId,
 	getUndoManager,
 } from '../private-selectors';
 import type { State } from '../selectors';
@@ -87,5 +88,98 @@ describe( 'getEntityActionsConfig', () => {
 		expect(
 			getEntityActionsConfig( state, 'postType', 'post' )
 		).toBeUndefined();
+	} );
+} );
+
+describe( 'getTemplateId', () => {
+	type TestTemplate = { id: string; slug: string; template?: string };
+
+	function setUpRegistry( {
+		editedTemplate,
+		templates,
+	}: {
+		editedTemplate?: Partial< TestTemplate >;
+		templates?: TestTemplate[];
+	} ) {
+		getTemplateId.registry = {
+			select: () => ( {
+				getEditedEntityRecord: () => editedTemplate,
+				getEntityRecords: () => templates,
+			} ),
+		} as never;
+	}
+
+	const layout: TestTemplate = { id: 'theme//layout', slug: 'layout' };
+
+	it( 'returns undefined until the edited template is received', () => {
+		setUpRegistry( { editedTemplate: undefined, templates: [ layout ] } );
+
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'returns null for a template that names no template to render inside', () => {
+		setUpRegistry( {
+			editedTemplate: { slug: 'page-404', template: '' },
+			templates: [ layout ],
+		} );
+
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBeNull();
+	} );
+
+	it( 'returns the ID of the template it names', () => {
+		setUpRegistry( {
+			editedTemplate: { slug: 'page-404', template: 'layout' },
+			templates: [ layout ],
+		} );
+
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBe( 'theme//layout' );
+	} );
+
+	it( 'returns undefined until the templates are received', () => {
+		setUpRegistry( {
+			editedTemplate: { slug: 'page-404', template: 'layout' },
+			templates: undefined,
+		} );
+
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'returns null when the template it names no longer exists', () => {
+		setUpRegistry( {
+			editedTemplate: { slug: 'page-404', template: 'deleted' },
+			templates: [ layout ],
+		} );
+
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBeNull();
 	} );
 } );
