@@ -110,6 +110,17 @@ describe( 'post_type_supports', () => {
 		expect( isVisible?.( { status: 'publish' } ) ).toBe( false );
 	} );
 
+	// A save drops an `undefined` date, which would keep the old one.
+	it.each( [ 'date', 'scheduled_date' ] )(
+		'resets the date when the %s control is cleared',
+		( id ) => {
+			const { setValue } = postTypeSupports[ id ];
+			expect( setValue?.( { item: {}, value: undefined } ) ).toEqual( {
+				date: null,
+			} );
+		}
+	);
+
 	it( 'shows the date to the users who can publish the post', () => {
 		const { isVisible } = postTypeSupports.date;
 		expect( isVisible?.( { _links: { 'wp:action-publish': [] } } ) ).toBe(
