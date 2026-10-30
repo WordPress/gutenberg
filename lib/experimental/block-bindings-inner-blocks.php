@@ -50,18 +50,43 @@ function gutenberg_block_bindings_remove_inner_blocks_from_editor( $settings ) {
 add_filter( 'block_editor_settings_all', 'gutenberg_block_bindings_remove_inner_blocks_from_editor' );
 
 /**
- * Returns whether a value supplies inner blocks: block markup, or an empty
- * string for no inner blocks. Anything else, like the plain text of a field,
- * leaves the block with its own inner blocks.
+ * Determines whether the value of a block bindings source supplies inner
+ * blocks.
+ *
+ * Serialized block markup supplies them, and an empty string supplies none.
+ * Any other value, like the plain text of a field, leaves the block with its
+ * own inner blocks.
  *
  * @param mixed $value The value of the source.
  * @return bool Whether the value supplies inner blocks.
  */
 function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
-	return '' === $value || (
-		is_string( $value ) &&
-		'<!-- wp:' === substr( $value, strspn( $value, " \t\n\f\r" ), 8 )
-	);
+	return '' === $value || ( is_string( $value ) && str_starts_with( ltrim( $value, " \t\n\f\r" ), '<!-- wp:' ) );
+}
+
+/**
+ * Parses the inner blocks a block bindings source supplies.
+ *
+ * The markup never went through the filters that sanitize post content on
+ * save, and the user who supplied it may not be allowed unfiltered HTML, so it
+ * is sanitized as on save, attributes of its blocks included. Its embeds are
+ * expanded as the embeds of the content were, before its blocks render.
+ *
+ * @global WP_Embed $wp_embed WordPress Embed object.
+ *
+ * @param string $markup The serialized blocks.
+ * @return array[] The parsed blocks.
+ */
+function gutenberg_block_bindings_parse_inner_blocks( $markup ) {
+	global $wp_embed;
+
+	$markup = wp_kses_post( $markup );
+	if ( $wp_embed instanceof WP_Embed ) {
+		$markup = $wp_embed->run_shortcode( $markup );
+		$markup = $wp_embed->autoembed( $markup );
+	}
+
+	return gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ) );
 }
 
 /**
@@ -69,7 +94,8 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
  *
  * Removes their `innerBlocks` bindings: none of them gets its inner blocks from
  * a source, so that two sources whose values bind each other's can't render
- * forever.
+ * forever. Removes the bindings and metadata this leaves empty, as the editor
+ * does.
  *
  * Also removes their custom CSS, which only users who can edit CSS may add:
  * whoever supplied the value is unknown.
@@ -88,7 +114,6 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 
 		if ( isset( $block['attrs']['metadata']['bindings']['innerBlocks'] ) ) {
 			unset( $block['attrs']['metadata']['bindings']['innerBlocks'] );
-			// Drop what's left empty, as the editor does.
 			if ( empty( $block['attrs']['metadata']['bindings'] ) ) {
 				unset( $block['attrs']['metadata']['bindings'] );
 			}
@@ -103,7 +128,11 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 
 /**
  * Returns the inner content of a block with slots for the given number of
- * inner blocks, where its own inner blocks were.
+ * inner blocks.
+ *
+ * The slots replace the block's own inner blocks and the HTML between them. A
+ * block without inner blocks gets them before the closing tag of the element
+ * that wraps its content.
  *
  * @param array $inner_content The inner content of the block.
  * @param int   $count         The number of inner blocks.
@@ -115,40 +144,57 @@ function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
 		return null;
 	}
 
-	// Keeps the HTML around the block's own inner blocks as it is, and drops the
-	// HTML between them.
-	$slots = array_keys( $inner_content, null, true );
-	if ( $slots ) {
-		return array_merge(
-			array_slice( $inner_content, 0, $slots[0] ),
-			array_fill( 0, $count, null ),
-			array_slice( $inner_content, end( $slots ) + 1 )
-		);
+	$slots     = array_fill( 0, $count, null );
+	$own_slots = array_keys( $inner_content, null, true );
+	if ( $own_slots ) {
+		$before_first_slot = array_slice( $inner_content, 0, $own_slots[0] );
+		$after_last_slot   = array_slice( $inner_content, end( $own_slots ) + 1 );
+		return array_merge( $before_first_slot, $slots, $after_last_slot );
 	}
 
-	// Without any, Group and Column wrap them in one element, so they go before
-	// its closer. Serializes the HTML token by token, as
-	// `WP_HTML_Processor::serialize()` does, and starts the second part there.
-	$processor = WP_HTML_Processor::create_fragment( implode( '', $inner_content ) );
+	$wrapper_parts = gutenberg_block_bindings_split_at_wrapper_closer( implode( '', $inner_content ) );
+	if ( null === $wrapper_parts ) {
+		return null;
+	}
+	return array_merge( array( $wrapper_parts[0] ), $slots, array( $wrapper_parts[1] ) );
+}
+
+/**
+ * Splits the HTML of an element that wraps a block's content before the
+ * element's closing tag.
+ *
+ * @param string $html The HTML of the wrapper element.
+ * @return string[]|null The HTML before the closing tag and the HTML from it,
+ *                       or null if the HTML has no wrapper element to split.
+ */
+function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
+	$processor = WP_HTML_Processor::create_fragment( $html );
 	if ( null === $processor ) {
 		return null;
 	}
-	$parts        = array( '', '' );
-	$part         = 0;
-	$closer_depth = null;
+
+	$before                = '';
+	$after                 = '';
+	$depth_outside_wrapper = null;
+	$is_at_wrapper_closer  = false;
 	while ( $processor->next_token() ) {
-		if ( null === $closer_depth && '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer() ) {
-			// A closer is visited at the depth of the element that contains it.
-			$closer_depth = $processor->get_current_depth() - 1;
-		} elseif ( 0 === $part && $processor->is_tag_closer() && $processor->get_current_depth() === $closer_depth ) {
-			$part = 1;
+		if ( null === $depth_outside_wrapper && '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer() ) {
+			$depth_outside_wrapper = $processor->get_current_depth() - 1;
+		} elseif ( $processor->is_tag_closer() && $processor->get_current_depth() === $depth_outside_wrapper ) {
+			$is_at_wrapper_closer = true;
 		}
-		$parts[ $part ] .= $processor->serialize_token();
+
+		if ( $is_at_wrapper_closer ) {
+			$after .= $processor->serialize_token();
+		} else {
+			$before .= $processor->serialize_token();
+		}
 	}
-	if ( 1 !== $part || null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
+
+	if ( ! $is_at_wrapper_closer || null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
 		return null;
 	}
-	return array_merge( array( $parts[0] ), array_fill( 0, $count, null ), array( $parts[1] ) );
+	return array( $before, $after );
 }
 
 /**
@@ -156,9 +202,9 @@ function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
  * before the block renders them.
  *
  * Runs on the value that `WP_Block::process_block_bindings()` resolves for
- * `innerBlocks`, and returns null so that it never becomes an attribute.
- *
- * @global WP_Embed $wp_embed WordPress Embed object.
+ * `innerBlocks`, and returns null so that it never becomes an attribute. Only
+ * a binding in the block's own metadata replaces them, not the one the
+ * `__default` binding expands to.
  *
  * @param mixed    $value          The value of the source.
  * @param string   $source_name    The name of the source.
@@ -168,29 +214,16 @@ function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
  * @return mixed The value, or null for `innerBlocks`.
  */
 function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
-	global $wp_embed;
-
 	if ( 'innerBlocks' !== $attribute_name ) {
 		return $value;
 	}
 
-	// `__default` bindings don't bind inner blocks: only an explicit binding does.
-	$binding = $block_instance->parsed_block['attrs']['metadata']['bindings']['innerBlocks'] ?? null;
-	if ( ! gutenberg_block_bindings_is_inner_blocks_value( $value ) || ! isset( $binding['source'] ) || $binding['source'] !== $source_name ) {
+	$own_binding_source = $block_instance->parsed_block['attrs']['metadata']['bindings']['innerBlocks']['source'] ?? null;
+	if ( $own_binding_source !== $source_name || ! gutenberg_block_bindings_is_inner_blocks_value( $value ) ) {
 		return null;
 	}
 
-	// The markup skips the filters that sanitize post content when it's saved,
-	// and the user who supplied it may not be allowed unfiltered HTML. Like on
-	// save, this also sanitizes the attributes of the blocks, through the
-	// `pre_kses` filter.
-	$markup = wp_kses_post( $value );
-	if ( $wp_embed instanceof WP_Embed ) {
-		$markup = $wp_embed->run_shortcode( $markup );
-		$markup = $wp_embed->autoembed( $markup );
-	}
-	$blocks = gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ) );
-
+	$blocks        = gutenberg_block_bindings_parse_inner_blocks( $value );
 	$inner_content = gutenberg_block_bindings_get_inner_content( $block_instance->parsed_block['innerContent'] ?? null, count( $blocks ) );
 	if ( null === $inner_content ) {
 		return null;
@@ -199,11 +232,8 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->parsed_block['innerBlocks']  = $blocks;
 	$block_instance->parsed_block['innerContent'] = $inner_content;
 	$block_instance->parsed_block['innerHTML']    = implode( '', array_filter( $inner_content, 'is_string' ) );
+	$block_instance->inner_blocks                 = new WP_Block_List( array() );
 	$block_instance->refresh_parsed_block_dependents();
-	// The refresh keeps the previous inner blocks when there are none.
-	if ( empty( $blocks ) ) {
-		$block_instance->inner_blocks = new WP_Block_List( array() );
-	}
 
 	return null;
 }
