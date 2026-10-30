@@ -20,6 +20,7 @@
 
 -   DataForm: Keep the first line of a panel field label that wraps level with its value ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
+-   `DataViewsPicker` `pickerTable` layout: make the whole `table` the composite, so `aria-activedescendant` sits on the `listbox` itself and screen readers announce the row the arrow keys move to. The layout also honors `itemListLabel` and marks the listbox as `aria-multiselectable` now, and grouped data is one tab stop holding a labelled `group` per group instead of one composite per group ([#83354](https://github.com/WordPress/gutenberg/pull/83354)).
 
 ## 21.0.0 (2026-10-20)
 
