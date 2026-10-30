@@ -55,6 +55,10 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
+import {
+	MediaLinkControl,
+	MediaLinkNewTabControl,
+} from '../utils/media-link-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	getActiveDimensionValue,
@@ -76,6 +80,7 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
+	getNewTabLinkAttributes,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -561,6 +566,20 @@ export default function Image( {
 		}
 	}
 
+	// Mirrors the toolbar's link popover, where linking the image turns off
+	// the lightbox and removing the link resets it.
+	function onSetLink( { href: newHref, linkDestination: newDestination } ) {
+		setAttributes( {
+			href: newHref,
+			linkDestination: newDestination,
+			...( newHref &&
+				lightboxChecked && { lightbox: { enabled: false } } ),
+		} );
+		if ( ! newHref ) {
+			resetLightbox();
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -970,6 +989,15 @@ export default function Image( {
 						resetAll={ () => {
 							onSelectImage( undefined );
 							setAttributes( { isDecorative: false } );
+							if ( showUrlInput ) {
+								onSetLink( {
+									href: undefined,
+									linkDestination: 'none',
+								} );
+								setAttributes(
+									getNewTabLinkAttributes( false, rel )
+								);
+							}
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -1052,6 +1080,45 @@ export default function Image( {
 									help={ __(
 										'Hidden from assistive technologies.'
 									) }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ showUrlInput && (
+							<ToolsPanelItem
+								label={ __( 'Link to' ) }
+								isShownByDefault
+								hasValue={ () => !! href }
+								onDeselect={ () =>
+									onSetLink( {
+										href: undefined,
+										linkDestination: 'none',
+									} )
+								}
+							>
+								<MediaLinkControl
+									linkDestination={ linkDestination }
+									href={ href }
+									mediaUrl={ image?.source_url || url }
+									mediaLink={ image?.link }
+									onChange={ onSetLink }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ showUrlInput && (
+							<ToolsPanelItem
+								label={ __( 'Open in new tab' ) }
+								isShownByDefault
+								hasValue={ () => linkTarget === '_blank' }
+								onDeselect={ () =>
+									setAttributes(
+										getNewTabLinkAttributes( false, rel )
+									)
+								}
+							>
+								<MediaLinkNewTabControl
+									linkTarget={ linkTarget }
+									rel={ rel }
+									onChange={ setAttributes }
 								/>
 							</ToolsPanelItem>
 						) }
