@@ -1206,4 +1206,39 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'x' } },
 		] );
 	} );
+
+	test( 'should collapse white space around nested formats', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `
+			<!-- wp:paragraph -->
+			<p>Before <strong> <em> bold italic </em></strong> after.</p>
+			<!-- /wp:paragraph -->
+		` );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			exact: true,
+		} );
+		// Exact text: `toHaveText` would collapse the spaces itself.
+		await expect( paragraph ).toHaveJSProperty(
+			'textContent',
+			'Before bold italic after.'
+		);
+
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'Before <strong><em>bold italic</em></strong> after.x',
+				},
+			},
+		] );
+	} );
 } );

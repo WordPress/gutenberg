@@ -185,6 +185,22 @@ describe( 'create', () => {
 			expect( result.html ).toBe( 'a <strong><em>b</em></strong> c' );
 		} );
 
+		it( 'should collapse a space after text that collapsed to nothing', () => {
+			const result = fromHTML(
+				'Before <strong> <em> bold italic </em></strong> after.'
+			);
+			expect( result.text ).toBe( 'Before bold italic after.' );
+			expect( result.html ).toBe(
+				'Before <strong><em>bold italic</em></strong> after.'
+			);
+		} );
+
+		it( 'should collapse a line break after a space in an element', () => {
+			const result = fromHTML( '<em>a </em>\nb' );
+			expect( result.text ).toBe( 'a b' );
+			expect( result.html ).toBe( '<em>a</em> b' );
+		} );
+
 		it( 'should collapse spaces between multiple sibling elements', () => {
 			const result = fromHTML(
 				'<em>a </em><strong> b </strong><em> c</em>'
