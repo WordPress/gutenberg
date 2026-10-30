@@ -41,7 +41,7 @@ export default function AuthorView( { item }: { item: MediaItem } ) {
 	};
 
 	return (
-		<Stack direction="row" align="center" justify="flex-start">
+		<Stack direction="row" align="flex-start" justify="flex-start">
 			{ !! imageUrl && (
 				<div
 					className={ clsx( styles.avatar, {
