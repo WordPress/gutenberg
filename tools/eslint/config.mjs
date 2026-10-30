@@ -436,6 +436,7 @@ export default dedupePlugins( [
 						Notice: 'WCNotice',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
+						Tabs: 'WCTabs',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 						VisuallyHidden: 'WCVisuallyHidden',

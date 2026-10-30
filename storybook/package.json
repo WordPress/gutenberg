@@ -81,7 +81,7 @@
 	"scripts": {
 		"manifest-snapshot": "node ./scripts/generate-manifest-snapshot.mjs ./build/manifests/components.json",
 		"postmanifest-snapshot": "prettier --write components-manifest.yml",
-		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/sanitize-components-manifest.mts ./build/manifests/components.json && node ./scripts/inject-legacy-docgen.mjs ./build/manifests/components.json && node ./scripts/add-agent-docs-note.mjs ./build/index.html",
+		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/sanitize-components-manifest.mts ./build/manifests/components.json && node ./scripts/add-agent-docs-note.mjs ./build/index.html",
 		"storybook:dev": "storybook dev -c . -p 50240",
 		"test:smoke": "npm run test:smoke:build && vitest run --config vitest.config.mts",
 		"test:smoke:build": "node ./scripts/smoke-static-build.mjs",
