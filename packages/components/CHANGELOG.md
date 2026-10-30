@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Button`: Use WPDS color tokens directly. Customize colors with `ThemeProvider` instead of legacy `--wp-components-color-*` overrides. With the token stylesheet loaded, WPDS colors take precedence over the admin color scheme ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 
 ### Enhancements

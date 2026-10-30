@@ -70,7 +70,8 @@
 
 			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
 			@include break-small() {
-				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+				&:not(.is-horizontal)
+				.block-editor-block-mover__move-button-container {
 					position: relative;
 					top: -10px;
 				}
@@ -123,8 +124,8 @@
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed {
-			background: $gray-900;
+		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
 		&:focus:not(:active) {
