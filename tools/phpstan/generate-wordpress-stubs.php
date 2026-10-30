@@ -143,6 +143,18 @@ function has_color(): bool {
 }
 
 /**
+ * Returns whether standard error can show characters beyond ASCII, such as a check mark.
+ *
+ * A Windows console or a log read there may use a legacy code page rather than UTF-8, so Windows
+ * gets ASCII only.
+ *
+ * @return bool Whether to use characters beyond ASCII.
+ */
+function has_unicode(): bool {
+	return '\\' !== DIRECTORY_SEPARATOR;
+}
+
+/**
  * Returns text styled for standard error, when it supports colors.
  *
  * @param string           $text The text.
@@ -670,7 +682,7 @@ function main( array $args ): void {
 		"--out=$generated_file",
 	);
 
-	$pending                 = report_pending_row( 'Stubs', style( 'generating…', '2' ) );
+	$pending                 = report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
 	list( $status, $output ) = execute( $generator_command, 'capture', $work_dir );
 	if ( $pending ) {
 		clear_pending_row();
@@ -746,8 +758,8 @@ function main( array $args ): void {
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
 	// The recorded source is only written when it changes, by an option.
-	// The check mark is left out without colors, since a console or log may not use UTF-8.
-	$done = ( has_color() ? style( '✓ ', '32' ) : '' ) . "WordPress $wp_version" . style( ' (' . ( $fetched_ref ? short_commit( $commit ) . ', ' : '' ) . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
+	// The check mark only goes with colors, as the row's label already says the same.
+	$done = ( has_color() && has_unicode() ? style( '✓ ', '32' ) : '' ) . "WordPress $wp_version" . style( ' (' . ( $fetched_ref ? short_commit( $commit ) . ', ' : '' ) . ( $is_trunk ? '' : 'based on ' ) . "r$revision) in " . (int) round( microtime( true ) - $started ) . 's', '2' );
 	if ( $recorded ) {
 		report_row( 'Done', $done );
 		return;
