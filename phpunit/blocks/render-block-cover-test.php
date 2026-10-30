@@ -162,4 +162,104 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		$this->assertSame( 'xyz', $query_params['si'] ?? null, 'Parameters after the first one should keep their names.' );
 		$this->assertArrayNotHasKey( 'amp;si', $query_params );
 	}
+
+	/**
+	 * Tests that border classes are added to the wrapper when a border and a
+	 * border radius are set, so the cover only clips its content when it has to.
+	 *
+	 * @dataProvider data_border_classes
+	 *
+	 * @covers ::gutenberg_render_block_core_cover
+	 *
+	 * @param array $attributes        Block attributes.
+	 * @param bool  $has_border        Whether the `has-border` class is expected.
+	 * @param bool  $has_border_radius Whether the `has-border-radius` class is expected.
+	 */
+	public function test_gutenberg_render_block_core_cover_border_classes( $attributes, $has_border, $has_border_radius ) {
+		$attributes = array_merge(
+			array(
+				'backgroundType'   => 'image',
+				'useFeaturedImage' => false,
+			),
+			$attributes
+		);
+		$content    = '<div class="wp-block-cover"><span class="wp-block-cover__background"></span><div class="wp-block-cover__inner-container"></div></div>';
+		$rendered   = gutenberg_render_block_core_cover( $attributes, $content );
+
+		$processor = new WP_HTML_Tag_Processor( $rendered );
+		$processor->next_tag();
+
+		$this->assertTrue( $processor->has_class( 'wp-block-cover' ), 'The wrapper should keep its block class.' );
+		$this->assertSame( $has_border, $processor->has_class( 'has-border' ), 'Unexpected has-border class.' );
+		$this->assertSame( $has_border_radius, $processor->has_class( 'has-border-radius' ), 'Unexpected has-border-radius class.' );
+
+		$processor->next_tag();
+		$this->assertFalse( $processor->has_class( 'has-border' ), 'Only the wrapper should get the border classes.' );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_render_block_core_cover_border_classes().
+	 *
+	 * @return array
+	 */
+	public function data_border_classes() {
+		return array(
+			'no border'                    => array( array(), false, false ),
+			'unified width and radius'     => array(
+				array(
+					'style' => array(
+						'border' => array(
+							'width'  => '4px',
+							'radius' => '20px',
+						),
+					),
+				),
+				true,
+				true,
+			),
+			'per-side width, corner radii' => array(
+				array(
+					'style' => array(
+						'border' => array(
+							'top'    => array( 'width' => '4px' ),
+							'radius' => array( 'topLeft' => '20px' ),
+						),
+					),
+				),
+				true,
+				true,
+			),
+			'color only, no radius'        => array(
+				array( 'style' => array( 'border' => array( 'color' => '#000' ) ) ),
+				true,
+				false,
+			),
+			'preset color only'            => array(
+				array( 'borderColor' => 'contrast' ),
+				true,
+				false,
+			),
+			'radius only'                  => array(
+				array( 'style' => array( 'border' => array( 'radius' => '20px' ) ) ),
+				false,
+				true,
+			),
+			'empty corner radii'           => array(
+				array(
+					'style' => array(
+						'border' => array(
+							'radius' => array( 'topLeft' => '' ),
+						),
+					),
+				),
+				false,
+				false,
+			),
+			'malformed border value'       => array(
+				array( 'style' => array( 'border' => 'solid' ) ),
+				false,
+				false,
+			),
+		);
+	}
 }

@@ -44,6 +44,7 @@ import {
 	getPositionClassName,
 	mediaPosition,
 } from '../shared';
+import { getBorderClassNames } from '../border-class-names';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
@@ -818,7 +819,8 @@ function CoverEdit( {
 			'has-custom-content-position':
 				! isContentPositionCenter( contentPosition ),
 		},
-		getPositionClassName( contentPosition )
+		getPositionClassName( contentPosition ),
+		getBorderClassNames( attributes )
 	);
 
 	const showOverlay =

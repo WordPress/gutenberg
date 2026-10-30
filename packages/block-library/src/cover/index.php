@@ -6,6 +6,66 @@
  */
 
 /**
+ * Adds `has-border` and `has-border-radius` classes to the cover wrapper.
+ *
+ * The cover only clips its content when both are set (see style.scss), so
+ * elements such as Navigation submenus can extend past it otherwise. The
+ * classes are added on render so that saved markup doesn't change.
+ *
+ * @since 7.3.0
+ *
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block rendered content.
+ *
+ * @return string The content with the border classes added to the wrapper.
+ */
+function block_core_cover_add_border_classes( $attributes, $content ) {
+	$border = $attributes['style']['border'] ?? null;
+	if ( ! is_array( $border ) ) {
+		$border = array();
+	}
+
+	$is_set = static function ( $value ) {
+		return is_string( $value ) || is_numeric( $value ) ? '' !== trim( (string) $value ) : false;
+	};
+
+	$has_border = $is_set( $attributes['borderColor'] ?? null );
+	foreach ( array( 'width', 'style', 'color' ) as $property ) {
+		$has_border = $has_border || $is_set( $border[ $property ] ?? null );
+	}
+	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+		if ( ! is_array( $border[ $side ] ?? null ) ) {
+			continue;
+		}
+		foreach ( array( 'width', 'style', 'color' ) as $property ) {
+			$has_border = $has_border || $is_set( $border[ $side ][ $property ] ?? null );
+		}
+	}
+
+	$radius            = $border['radius'] ?? null;
+	$has_border_radius = is_array( $radius )
+		? count( array_filter( $radius, $is_set ) ) > 0
+		: $is_set( $radius );
+
+	if ( ! $has_border && ! $has_border_radius ) {
+		return $content;
+	}
+
+	$processor = new WP_HTML_Tag_Processor( $content );
+	if ( ! $processor->next_tag() ) {
+		return $content;
+	}
+	if ( $has_border ) {
+		$processor->add_class( 'has-border' );
+	}
+	if ( $has_border_radius ) {
+		$processor->add_class( 'has-border-radius' );
+	}
+
+	return $processor->get_updated_html();
+}
+
+/**
  * Renders the `core/cover` block on server.
  *
  * @since 6.0.0
@@ -16,6 +76,8 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
+	$content = block_core_cover_add_border_classes( $attributes, $content );
+
 	// The view module decides whether a background video may play, so it is
 	// only needed for the two video background types.
 	if (
