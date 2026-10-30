@@ -5,6 +5,7 @@
 		"types": [ "style-imports" ]
 	},
 	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
