@@ -5,7 +5,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 } from '../registration';
-import { getSaveContent } from '../serializer';
+import { getSaveContent, loadedBlocks } from '../serializer';
 import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
@@ -233,6 +233,17 @@ export function parseRawBlock(
 		normalizedBlock,
 		blockType
 	);
+
+	if (
+		updatedBlock.isValid &&
+		updatedBlock.attributes === parsedBlock.attributes &&
+		! isFallbackBlock
+	) {
+		loadedBlocks.set( updatedBlock.attributes, {
+			attributes: { ...updatedBlock.attributes },
+			innerContent: normalizedBlock.innerContent,
+		} );
+	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block
