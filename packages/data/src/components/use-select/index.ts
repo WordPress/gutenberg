@@ -133,7 +133,6 @@ class Store {
 	registry: DataRegistry;
 	select: SelectFunction;
 	mapSelect: MapSelect | undefined;
-	lastMapSelect: MapSelect | undefined;
 	lastMapResult: unknown;
 	lastMapResultValid = false;
 	lastIsAsync: boolean | undefined;
@@ -145,8 +144,8 @@ class Store {
 	storeStatesOnMount: unknown[] | undefined;
 	// The `subscribe` function, which is passed to the `useSyncExternalStore` hook, could
 	// be called multiple times to establish multiple subscriptions. That's why we need to
-	// keep a list of active subscriptions.
-	activeSubscriptions: ActiveSubscription[] = [];
+	// keep a set of active subscriptions.
+	activeSubscriptions = new Set< ActiveSubscription >();
 
 	constructor( registry: DataRegistry, suspense: boolean ) {
 		this.registry = registry;
@@ -190,18 +189,13 @@ class Store {
 			},
 			unsubs: [],
 		};
-		for ( const name of activeStores! ) {
-			subscription.unsubs.push(
-				this.listenToStore( subscription, name )
-			);
-		}
-		this.activeSubscriptions.push( subscription );
+		subscription.unsubs = activeStores!.map( ( name ) =>
+			this.listenToStore( subscription, name )
+		);
+		this.activeSubscriptions.add( subscription );
 
 		return () => {
-			this.activeSubscriptions.splice(
-				this.activeSubscriptions.indexOf( subscription ),
-				1
-			);
+			this.activeSubscriptions.delete( subscription );
 
 			for ( const unsub of subscription.unsubs ) {
 				unsub?.();
@@ -231,10 +225,10 @@ class Store {
 	updateValue(): void {
 		const { registry, select, mapSelect } = this;
 
-		// If the last value is valid, and the `mapSelect` callback hasn't changed,
-		// then we can safely return the cached value. The value can change only on
-		// store update, and in that case value will be invalidated by the listener.
-		if ( this.lastMapResultValid && mapSelect === this.lastMapSelect ) {
+		// If the last value is valid, then we can safely return the cached value.
+		// The value can change only on store update or a new `mapSelect`, and
+		// both invalidate it.
+		if ( this.lastMapResultValid ) {
 			return;
 		}
 
@@ -283,12 +277,14 @@ class Store {
 		if ( ! isShallowEqual( this.lastMapResult, mapResult ) ) {
 			this.lastMapResult = mapResult;
 		}
-		this.lastMapSelect = mapSelect;
 		this.lastMapResultValid = true;
 	}
 
 	update( mapSelect: MapSelect, isAsync: boolean ) {
-		this.mapSelect = mapSelect;
+		if ( mapSelect !== this.mapSelect ) {
+			this.mapSelect = mapSelect;
+			this.lastMapResultValid = false;
+		}
 
 		const wasAsync = this.lastIsAsync;
 		// `listenToStore` reads the mode when it subscribes, so record it
@@ -311,15 +307,19 @@ class Store {
 		// keeps the listener registered at all times, so a dispatch can't
 		// slip through an unsubscribed gap.
 		if ( wasAsync !== isAsync ) {
-			for ( const subscription of this.activeSubscriptions ) {
-				subscription.unsubs.forEach( ( unsub, index ) => {
-					unsub?.();
-					subscription.unsubs[ index ] = this.listenToStore(
-						subscription,
-						this.activeStores![ index ]
-					);
-				} );
-			}
+			this.switchMode();
+		}
+	}
+
+	switchMode() {
+		for ( const subscription of this.activeSubscriptions ) {
+			subscription.unsubs.forEach( ( unsub, index ) => {
+				unsub?.();
+				subscription.unsubs[ index ] = this.listenToStore(
+					subscription,
+					this.activeStores![ index ]
+				);
+			} );
 		}
 	}
 }
