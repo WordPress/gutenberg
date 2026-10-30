@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
+import { createContext, useContext, useState } from '@wordpress/element';
 import Notice from '../index';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
@@ -9,6 +10,17 @@ vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	speak: vi.fn(),
 } ) );
 const mockedSpeak = vi.mocked( speak );
+
+const TestContext = createContext( 'context-value' );
+
+// A child using hooks, like any `contextConnect`-ed or Emotion-styled
+// component. Regression case for
+// https://github.com/WordPress/gutenberg/issues/61199.
+function ChildWithHooks() {
+	const value = useContext( TestContext );
+	const [ text ] = useState( 'stateful' );
+	return <span>{ value + ':' + text }</span>;
+}
 
 function getNoticeWrapper( container: HTMLElement ) {
 	return container.firstChild;
@@ -112,6 +124,64 @@ describe( 'Notice', () => {
 			);
 
 			expect( speak ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should speak a spokenMessage element that is distinct from children', () => {
+			render(
+				<Notice spokenMessage={ <em>Custom message</em> }>
+					Visible content
+				</Notice>
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				'<em>Custom message</em>',
+				'polite'
+			);
+		} );
+
+		it( 'should not speak when spokenMessage is null', () => {
+			render( <Notice spokenMessage={ null }>FYI</Notice> );
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should speak the same message again after an empty message', () => {
+			const { rerender } = render(
+				<Notice spokenMessage="Saved">Content</Notice>
+			);
+			rerender( <Notice spokenMessage="">Content</Notice> );
+			rerender( <Notice spokenMessage="Saved">Content</Notice> );
+
+			expect( speak ).toHaveBeenCalledTimes( 2 );
+			expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
+			expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
+		} );
+
+		it( 'should speak a message containing components that use hooks', () => {
+			render(
+				<Notice>
+					Saving
+					<ChildWithHooks />
+				</Notice>
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				'Saving<span>context-value:stateful</span>',
+				'polite'
+			);
+		} );
+
+		// Regression test for https://github.com/WordPress/gutenberg/issues/61199.
+		it( 'should not crash when a child using hooks is conditionally rendered', () => {
+			const { rerender } = render(
+				<Notice>
+					Saving
+					<ChildWithHooks />
+				</Notice>
+			);
+
+			expect( () => rerender( <Notice>Saved</Notice> ) ).not.toThrow();
+			expect( speak ).toHaveBeenLastCalledWith( 'Saved', 'polite' );
 		} );
 	} );
 

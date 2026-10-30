@@ -45,6 +45,7 @@
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
 -   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
+-   `Notice`, `Snackbar`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
 
 ### Internal
 
