@@ -63,21 +63,6 @@ export type FieldFormatSettings = {
 };
 
 /**
- * A snapshot of the value, to classify the change since the last one.
- */
-export type MarkPersistentSnapshot = {
-	html: unknown;
-	text: string;
-	hasActiveFormats: boolean;
-};
-
-export type UseMarkPersistentOptions = {
-	html: unknown;
-	value: Pick< RichTextValue, 'text' | 'activeFormats' >;
-	onMarkPersistent: () => void;
-};
-
-/**
  * Props of `RichText.Content`. Other props go to the element.
  */
 export type RichTextContentProps = {
