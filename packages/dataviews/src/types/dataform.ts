@@ -133,7 +133,7 @@ export type PanelLayout = {
 	/**
 	 * Whether the summary shows the field's `placeholder` instead of its
 	 * `render` output when the value is `undefined`, `null`, or an empty
-	 * string. `false` by default.
+	 * string, or when the `render` output is empty. `false` by default.
 	 */
 	showPlaceholderIfEmpty?: boolean;
 };
@@ -168,7 +168,8 @@ export type NormalizedPanelLayout = {
 	editVisibility: EditVisibility;
 
 	/**
-	 * Whether the summary shows the field's `placeholder` when the value is empty.
+	 * Whether the summary shows the field's `placeholder` when the value or its
+	 * `render` output is empty.
 	 */
 	showPlaceholderIfEmpty: boolean;
 };

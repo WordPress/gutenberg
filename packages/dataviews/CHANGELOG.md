@@ -16,6 +16,7 @@
 -   Use the design system outline for keyboard focus on grid cards ([#85364](https://github.com/WordPress/gutenberg/pull/85364)).
 -   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
 -   DataForm: Mute the placeholder that the `panel` layout shows for an empty value, so it no longer looks like a value ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
+-   DataForm: The `showPlaceholderIfEmpty` option of the `panel` layout also shows the placeholder when the field's `render` output is empty, like for an id matching no record ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
 
 ### Bug Fixes
 

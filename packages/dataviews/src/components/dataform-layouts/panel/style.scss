@@ -163,6 +163,20 @@
 	font-weight: var(--wpds-typography-font-weight-default);
 }
 
+// Wraps the render output of a value followed by its placeholder, without
+// adding a box of its own.
+.dataforms-layouts-panel__field-value {
+	display: contents;
+
+	> * {
+		min-width: 0;
+	}
+
+	&:not(:empty) + .dataforms-layouts-panel__field-placeholder {
+		display: none;
+	}
+}
+
 .dataforms-layouts-panel__field-trigger--label-top
 .dataforms-layouts-panel__field-label {
 	width: 100%;
