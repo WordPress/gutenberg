@@ -62,7 +62,7 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
  * `getShadowClassesAndStyles()`. Does not check block support or skipped
  * serialization.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param array $block_attributes Block attributes.
  * @return array Array with `class` and `style` keys, each present only when non-empty.
