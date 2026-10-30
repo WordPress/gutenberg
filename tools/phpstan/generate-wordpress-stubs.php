@@ -759,7 +759,7 @@ function main( array $args ): void {
 	}
 	$report     = (string) file_get_contents( $report_file );
 	$duplicates = strpos( $report, 'Duplicate declarations found' );
-	$output     = trim( (string) file_get_contents( $error_file ) . "\n" . ( false !== $duplicates ? substr( $report, $duplicates ) : '' ) );
+	$output     = trim( file_get_contents( $error_file ) . "\n" . ( false !== $duplicates ? substr( $report, $duplicates ) : '' ) );
 	if ( '' !== $output ) {
 		report( $output );
 	}
