@@ -53,12 +53,6 @@ const ALL_ICONS_MANIFEST = new Map(
 
 const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
 
-const COLLECTION_HELP = {
-	all: 'All icons, available from the @wordpress/icons package.',
-	core: 'Icons also available via the Icons REST API.',
-	'core-admin': 'Icons also available via the server-side Icons API.',
-};
-
 const COLLECTION_LABELS = {
 	all: 'npm',
 	core: 'core collection',
@@ -436,12 +430,11 @@ const LibraryExample = ( {
 							/>
 						) ) }
 					</ToggleGroupControl>
-					{ /* A fixed width keeps the control from resizing as the help text changes. */ }
+					{ /* Wide enough to fit each option label on one line. */ }
 					<div style={ { width: 540, maxWidth: '100%' } }>
 						<ToggleGroupControl
 							label="Available in"
 							isBlock
-							help={ COLLECTION_HELP[ collection ] }
 							value={ collection }
 							onChange={ ( value: string | number | undefined ) =>
 								setCollection(
