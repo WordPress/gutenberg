@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `DropdownMenu`, `MenuItemsChoice`, `ToolsPanel`: Align mixed menu rows, leading selection marks, descriptions, and controls ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
+-   `DropdownMenu`, `MenuItemsChoice`, `ToolsPanel`: Align leading selection marks, mixed menu rows, and description titles ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
 -   `FontSizePicker`: Use the WordPress UI select for choosing preset sizes ([#86661](https://github.com/WordPress/gutenberg/pull/86661)).
