@@ -28,7 +28,7 @@ yarn.lock
 /perf-envs
 /composer.lock
 
-# The WordPress stubs generated for PHPStan by tools/phpstan/generate-wordpress-stubs.sh.
+# The WordPress stubs generated for PHPStan by tools/phpstan/generate-wordpress-stubs.php.
 /tools/phpstan/wordpress-stubs/wordpress-stubs.stub
 
 # The /.cache folder is needed for phpcs to cache results between runs, while other .cache folders must be ignored

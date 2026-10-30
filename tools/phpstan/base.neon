@@ -45,7 +45,7 @@ parameters:
 			- ../../packages/block-serialization-default-parser/test
 	# WordPress itself is declared by the stubs that szepeviktor/phpstan-wordpress loads, which are
 	# generated from core trunk, or from a core pull request that a change depends on, by
-	# generate-wordpress-stubs.sh, and installed from wordpress-stubs/. `composer phpstan` generates
+	# generate-wordpress-stubs.php, and installed from wordpress-stubs/. `composer phpstan` generates
 	# them first, when they are missing or out of date.
 	bootstrapFiles:
 		- bootstrap.php
