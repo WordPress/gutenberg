@@ -747,6 +747,9 @@ function main( array $args ): void {
 		'-d',
 		'display_errors=stderr',
 		$generator_dir . '/vendor/bin/generate-stubs',
+		// Symfony Console would otherwise style the report in some terminals, such as Git Bash on
+		// Windows, even when writing it to a file.
+		'--no-ansi',
 		'--force',
 		"--finder=$generator_dir/finder.php",
 		"--visitor=$generator_dir/visitor.php",
