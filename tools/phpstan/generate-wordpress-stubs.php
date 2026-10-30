@@ -720,16 +720,19 @@ function main( array $args ): void {
 		if ( ! rename( $setup_dir, $generator_dir ) ) {
 			throw new RuntimeException( "Unable to move the generator to $generator_dir." );
 		}
+	}
 
-		// Remove the setups of other generator commits or packages, which take over 100 MB each and
-		// are left behind whenever the pins change. A branch that still pins one sets it up again.
-		// Only directories named like a setup are removed, in case the cache directory is shared
-		// with other things. Setups in progress, under names starting with a period, are kept.
-		$cache_entries = scandir( $cache_dir );
-		foreach ( false !== $cache_entries ? $cache_entries : array() as $name ) {
-			if ( basename( $generator_dir ) !== $name && 1 === preg_match( '/^[\w.-]+-[0-9a-f]{40}(?:-[0-9a-f]{12})?$/', $name ) && '.' !== $name[0] && is_dir( "$cache_dir/$name" ) ) {
-				remove_path( "$cache_dir/$name" );
-			}
+	// Remove the setups of other generator commits or packages that have not been used for a week,
+	// which take over 100 MB each and are left behind whenever the pins change. A setup's directory
+	// is touched whenever it is used, so that switching between branches with different pins keeps
+	// both. Only directories named like a setup are removed, in case the cache directory is shared
+	// with other things, and setups in progress, under names starting with a period, are kept.
+	touch( $generator_dir );
+	$cache_entries = scandir( $cache_dir );
+	foreach ( false !== $cache_entries ? $cache_entries : array() as $name ) {
+		$path = "$cache_dir/$name";
+		if ( basename( $generator_dir ) !== $name && '.' !== $name[0] && 1 === preg_match( '/^[\w.-]+-[0-9a-f]{40}(?:-[0-9a-f]{12})?$/', $name ) && is_dir( $path ) && filemtime( $path ) < time() - 7 * 24 * 60 * 60 ) {
+			remove_path( $path );
 		}
 	}
 
