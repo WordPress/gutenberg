@@ -111,7 +111,7 @@ function CopySvgButton( { icon }: { icon: IconComponent } ) {
 	);
 
 	return (
-		<Button ref={ ref } variant="outline" tone="neutral" size="compact">
+		<Button ref={ ref } variant="outline" tone="neutral" size="small">
 			<Button.Icon
 				icon={
 					{
