@@ -238,30 +238,30 @@ function setting( string $name, string $default_value ): string {
 /**
  * Runs a command without a shell, so that its arguments need no quoting on any platform.
  *
- * @param non-empty-list<string>            $command The program and its arguments.
- * @param 'pass'|'capture'|'quiet'|'errors' $mode    'pass' to pass its output to standard error,
- *                                                   'capture' to return its standard output,
- *                                                   'quiet' to also discard its standard error, or
- *                                                   'errors' to return its standard error and
- *                                                   discard its standard output.
- * @param non-empty-string|null             $cwd     The working directory.
- * @param array<non-empty-string, string>   $env     Environment variables to set in addition to the
- *                                                   current ones.
+ * @param non-empty-list<string>            $command    The program and its arguments.
+ * @param 'pass'|'capture'|'quiet'|'errors' $mode       'pass' to pass its output to standard error,
+ *                                                      'capture' to return its standard output,
+ *                                                      'quiet' to also discard its standard error,
+ *                                                      or 'errors' to return its standard error and
+ *                                                      discard its standard output.
+ * @param non-empty-string|null             $cwd        The working directory.
+ * @param array<non-empty-string, string>   $env        Environment variables to set in addition to
+ *                                                      the current ones.
+ * @param non-empty-string|null             $error_file For 'errors', the file to write standard
+ *                                                      error to, which, unlike a second pipe, cannot
+ *                                                      fill up and block the command while nothing
+ *                                                      reads it.
  * @return array{int, string} The exit status, and the output when captured.
  */
-function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array() ): array {
+function execute( array $command, string $mode = 'pass', ?string $cwd = null, array $env = array(), ?string $error_file = null ): array {
 	$null_device = '\\' === DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null';
 	$descriptors = array( 0 => array( 'file', $null_device, 'r' ) );
-	$error_file  = null;
 	if ( 'pass' === $mode ) {
 		$descriptors[1] = STDERR;
 		$descriptors[2] = STDERR;
 	} elseif ( 'errors' === $mode ) {
-		// Standard error goes to a file, which, unlike a second pipe, cannot fill up and block the
-		// command while nothing reads it.
-		$error_file = tempnam( sys_get_temp_dir(), 'wordpress-stubs-errors.' );
-		if ( false === $error_file ) {
-			throw new RuntimeException( 'Unable to create a temporary file.' );
+		if ( null === $error_file ) {
+			throw new RuntimeException( 'No file to write the standard error of the command to.' );
 		}
 		$descriptors[1] = array( 'file', $null_device, 'w' );
 		$descriptors[2] = array( 'file', $error_file, 'w' );
@@ -270,26 +270,20 @@ function execute( array $command, string $mode = 'pass', ?string $cwd = null, ar
 		$descriptors[2] = 'quiet' === $mode ? array( 'file', $null_device, 'w' ) : STDERR;
 	}
 
-	try {
-		$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null );
-		if ( ! is_resource( $process ) ) {
-			throw new RuntimeException( "Unable to run $command[0]." );
-		}
-		$output = '';
-		if ( isset( $pipes[1] ) ) {
-			$output = (string) stream_get_contents( $pipes[1] );
-			fclose( $pipes[1] );
-		}
-		$status = proc_close( $process );
-		if ( null !== $error_file ) {
-			$output = (string) file_get_contents( $error_file );
-		}
-		return array( $status, $output );
-	} finally {
-		if ( null !== $error_file ) {
-			remove_path( $error_file );
-		}
+	$process = proc_open( $command, $descriptors, $pipes, $cwd, array() !== $env ? array_merge( getenv(), $env ) : null );
+	if ( ! is_resource( $process ) ) {
+		throw new RuntimeException( "Unable to run $command[0]." );
 	}
+	$output = '';
+	if ( isset( $pipes[1] ) ) {
+		$output = (string) stream_get_contents( $pipes[1] );
+		fclose( $pipes[1] );
+	}
+	$status = proc_close( $process );
+	if ( 'errors' === $mode && null !== $error_file ) {
+		$output = (string) file_get_contents( $error_file );
+	}
+	return array( $status, $output );
 }
 
 /**
@@ -751,7 +745,7 @@ function main( array $args ): void {
 
 	report_pending_row( 'Stubs', style( 'generating' . ( has_unicode() ? '…' : '...' ), '2' ) );
 	try {
-		list( $status, $output ) = execute( $generator_command, 'errors', $work_dir );
+		list( $status, $output ) = execute( $generator_command, 'errors', $work_dir, array(), $work_dir . '/generator-errors.txt' );
 	} finally {
 		clear_pending_row();
 	}
