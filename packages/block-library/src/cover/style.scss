@@ -16,10 +16,11 @@
 	// Use clip instead of overflow: hidden so that sticky position works on child elements.
 	overflow: clip;
 
-	// Stop clipping while a Navigation overlay is open. Safari clips a fixed
-	// overlay to this box when it sits inside a sticky element in the cover.
-	// The overlay covers the viewport, so nothing that would bleed is visible.
-	@at-root .has-modal-open & {
+	// Stop clipping while a Navigation overlay inside this cover is open. Safari
+	// clips a fixed overlay to this box when it sits inside a sticky element in
+	// the cover. The overlay covers the viewport, so nothing that would bleed is
+	// visible.
+	&:has(.wp-block-navigation__responsive-container.is-menu-open) {
 		overflow: visible;
 	}
 	// This block has customizable padding, border-box makes that more predictable.
