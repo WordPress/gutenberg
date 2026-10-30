@@ -22,6 +22,7 @@
 
 ### Breaking Changes
 
+-   `Button`: Use WPDS color tokens directly. Customize colors with `ThemeProvider` instead of legacy `--wp-components-color-*` overrides. With the token stylesheet loaded, WPDS colors take precedence over the admin color scheme ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 
 ### Enhancements
@@ -30,7 +31,6 @@
 -   `Spinner`: Use a neutral half-circle arc with a stroke that scales with its size ([#85859](https://github.com/WordPress/gutenberg/pull/85859)).
 -   `Tooltip`: Match the dark gray background of the design system tooltip ([#85858](https://github.com/WordPress/gutenberg/pull/85858)).
 -   `Modal`: Adapt colors and rounded corners to the design system theme ([#85855](https://github.com/WordPress/gutenberg/pull/85855)).
--   `Button`: Align primary, secondary, tertiary, pressed, and destructive colors with semantic design tokens while preserving admin color schemes ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   Popup menu and option items: Use solid WPDS brand highlights for the active item and keep inactive items neutral ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   `DropdownMenu`: Focus the menu on pointer opening and enter its items with arrow keys ([#85486](https://github.com/WordPress/gutenberg/pull/85486)).
 -   `RangeControl`: Use the design system outline for the slider thumb focus ring ([#85536](https://github.com/WordPress/gutenberg/pull/85536)).

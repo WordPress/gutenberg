@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `ThemeProvider`: Map Button colors to semantic tokens while preserving legacy accent aliases for other components ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
-
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).

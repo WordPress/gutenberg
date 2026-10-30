@@ -1,7 +1,5 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 /**
  * For easier testing of potential regressions, you can use a Button variant matrix
@@ -38,7 +36,7 @@
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-content-neutral);
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
@@ -54,7 +52,7 @@
 			[role^="menuitem"],
 			[role="option"]
 		) {
-		color: $components-color-accent;
+		color: var(--wpds-color-foreground-interactive-brand);
 	}
 
 	/**
@@ -63,14 +61,14 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-button-brand-strong;
-		color: $components-color-accent-inverted;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
 		text-decoration: none;
 		text-shadow: none;
 
 		&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
-			background: $components-color-button-brand-strong-active;
-			color: $components-color-button-brand-strong-foreground-active;
+			background: var(--wpds-color-background-interactive-brand-strong-active);
+			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 
 		// A busy button keeps its regular appearance, even when disabled.
@@ -82,15 +80,15 @@
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $components-color-accent-inverted;
+			color: var(--wpds-color-foreground-interactive-brand-strong);
 			background-size: 100px 100%;
 			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
-				$components-color-button-brand-strong 33%,
-				$components-color-button-brand-strong-active 33%,
-				$components-color-button-brand-strong-active 70%,
-				$components-color-button-brand-strong 70%
+				var(--wpds-color-background-interactive-brand-strong) 33%,
+				var(--wpds-color-background-interactive-brand-strong-active) 33%,
+				var(--wpds-color-background-interactive-brand-strong-active) 70%,
+				var(--wpds-color-background-interactive-brand-strong) 70%
 			);
 			/* stylelint-enable */
 		}
@@ -103,7 +101,7 @@
 	&.is-secondary,
 	&.is-tertiary {
 		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-brand-weak);
-		--_wp-components-button-background-weak-active: #{$components-color-button-brand-weak-active};
+		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-brand-weak-active);
 
 		&:is(:disabled, [aria-disabled="true"]) {
 			color: var(--wpds-color-foreground-interactive-brand-disabled);
@@ -122,8 +120,8 @@
 			transition: border-color 0.1s linear;
 		}
 
-		border-color: $components-color-button-brand-stroke;
-		color: $components-color-button-brand;
+		border-color: var(--wpds-color-stroke-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
 		background: var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-brand-weak));
 
 		&:is(:hover, :active):not(
@@ -131,13 +129,13 @@
 			[aria-disabled="true"],
 			.is-pressed
 		) {
-			border-color: $components-color-button-brand-stroke-active;
-			color: $components-color-button-brand-active;
-			background: var(--_wp-components-button-background-weak-active, #{$components-color-button-brand-weak-active});
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
+			color: var(--wpds-color-foreground-interactive-brand-active);
+			background: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
 		}
 
 		&:focus:not(:active) {
-			border-color: $components-color-button-brand-stroke;
+			border-color: var(--wpds-color-stroke-interactive-brand);
 		}
 
 		&:is(:disabled, [aria-disabled="true"]):not(:focus) {
@@ -151,7 +149,7 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: $components-color-button-brand;
+		color: var(--wpds-color-foreground-interactive-brand);
 		background: var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-brand-weak));
 
 		&:is(:hover, :active):not(
@@ -159,47 +157,13 @@
 			[aria-disabled="true"],
 			.is-pressed
 		) {
-			background: var(--_wp-components-button-background-weak-active, #{$components-color-button-brand-weak-active});
-			color: $components-color-button-brand-active;
+			background: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
+			color: var(--wpds-color-foreground-interactive-brand-active);
 		}
 
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
 			margin-left: -($grid-unit-15 * 0.5);
-		}
-	}
-
-	/**
-	 * Destructive buttons.
-	 */
-	&.is-destructive {
-		--wp-components-color-accent: var(--wpds-color-foreground-interactive-error);
-		--wp-components-color-accent-darker-20: var(--wpds-color-foreground-interactive-error-active);
-		--wp-components-color-accent-inverted: var(--wpds-color-foreground-interactive-error-strong);
-		--wp-components-color-button-brand-strong: var(--wpds-color-background-interactive-error-strong);
-		--wp-components-color-button-brand-strong-active: var(--wpds-color-background-interactive-error-strong-active);
-		--wp-components-color-button-brand-strong-foreground-active: var(--wpds-color-foreground-interactive-error-strong-active);
-		--wp-components-color-button-brand: var(--wpds-color-foreground-interactive-error);
-		--wp-components-color-button-brand-active: var(--wpds-color-foreground-interactive-error-active);
-		--wp-components-color-button-brand-stroke: var(--wpds-color-stroke-interactive-error);
-		--wp-components-color-button-brand-stroke-active: var(--wpds-color-stroke-interactive-error-active);
-		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-error-weak);
-		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
-
-		&:not(.is-primary, .is-secondary, .is-tertiary, .is-pressed) {
-			color: var(--wpds-color-foreground-interactive-error);
-
-			&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
-				color: var(--wpds-color-foreground-interactive-error-active);
-			}
-
-			&:active:not(:disabled, [aria-disabled="true"], .is-link) {
-				background: var(--wpds-color-background-interactive-error-active);
-			}
-
-			&:is(:disabled, [aria-disabled="true"]) {
-				color: var(--wpds-color-foreground-interactive-error-disabled);
-			}
 		}
 	}
 
@@ -216,7 +180,7 @@
 		outline: none;
 		text-align: left;
 		font-weight: var(--wpds-typography-font-weight-default);
-		color: $components-color-accent;
+		color: var(--wpds-color-foreground-interactive-brand);
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
 		text-decoration-thickness: from-font;
@@ -236,7 +200,7 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 	}
 
@@ -249,13 +213,95 @@
 		.is-destructive,
 		.is-pressed
 	):active {
-		color: $components-color-foreground;
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $gray-600;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
+	/**
+	 * Destructive buttons.
+	 */
+	&.is-destructive {
+		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-error-weak);
+		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
+
+		&:where(.is-primary) {
+			background: var(--wpds-color-background-interactive-error-strong);
+			color: var(--wpds-color-foreground-interactive-error-strong);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+				background: var(--wpds-color-background-interactive-error-strong-active);
+				color: var(--wpds-color-foreground-interactive-error-strong-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				background: var(--wpds-color-background-interactive-error-strong-disabled);
+				color: var(--wpds-color-foreground-interactive-error-strong-disabled);
+			}
+
+			&.is-busy,
+			&.is-busy:disabled,
+			&.is-busy[aria-disabled="true"] {
+				color: var(--wpds-color-foreground-interactive-error-strong);
+				background-size: 100px 100%;
+				/* stylelint-disable -- Keep gradient stops readable. */
+				background-image: linear-gradient(
+					-45deg,
+					var(--wpds-color-background-interactive-error-strong) 33%,
+					var(--wpds-color-background-interactive-error-strong-active) 33%,
+					var(--wpds-color-background-interactive-error-strong-active) 70%,
+					var(--wpds-color-background-interactive-error-strong) 70%
+				);
+				/* stylelint-enable */
+			}
+		}
+
+		&:where(.is-secondary, .is-tertiary) {
+			color: var(--wpds-color-foreground-interactive-error);
+			background: var(--wpds-color-background-interactive-error-weak);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+				color: var(--wpds-color-foreground-interactive-error-active);
+				background: var(--wpds-color-background-interactive-error-weak-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-disabled);
+				background: var(--wpds-color-background-interactive-error-weak-disabled);
+			}
+		}
+
+		&:where(.is-secondary) {
+			border-color: var(--wpds-color-stroke-interactive-error);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+				border-color: var(--wpds-color-stroke-interactive-error-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]):not(:focus) {
+				border-color: var(--wpds-color-stroke-interactive-error-disabled);
+			}
+		}
+
+		&:where(:not(.is-primary, .is-secondary, .is-tertiary, .is-pressed)) {
+			color: var(--wpds-color-foreground-interactive-error);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-active);
+			}
+
+			&:active:not(:disabled, [aria-disabled="true"], .is-link) {
+				background: var(--wpds-color-background-interactive-error-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-disabled);
+			}
+		}
 	}
 
 	&.is-busy,
@@ -264,7 +310,11 @@
 	&.is-secondary.is-busy[aria-disabled="true"] {
 		&.is-secondary:not(.is-pressed),
 		&.is-tertiary:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			color: $components-color-button-brand-active;
+			color: var(--wpds-color-foreground-interactive-brand-active);
+
+			&.is-destructive {
+				color: var(--wpds-color-foreground-interactive-error-active);
+			}
 		}
 
 		@media not (prefers-reduced-motion) {

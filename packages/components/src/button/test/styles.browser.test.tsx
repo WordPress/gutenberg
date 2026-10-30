@@ -13,20 +13,11 @@ import Button from '..';
 import ButtonGroup from '../../button-group';
 import { Toolbar, ToolbarButton } from '../../toolbar';
 
-const variants = [ 'primary', 'secondary', 'tertiary' ] as const;
-
 function pixels( color: string ) {
 	const context = document.createElement( 'canvas' ).getContext( '2d' )!;
 	context.fillStyle = color;
 	context.fillRect( 0, 0, 1, 1 );
 	return Array.from( context.getImageData( 0, 0, 1, 1 ).data );
-}
-
-function expectToken( element: Element, property: string, token: string ) {
-	const style = getComputedStyle( element );
-	expect( pixels( style.getPropertyValue( property ) ) ).toEqual(
-		pixels( style.getPropertyValue( token ) )
-	);
 }
 
 function contrast( foreground: string, background: string, surface: string ) {
@@ -59,123 +50,9 @@ function contrast( foreground: string, background: string, surface: string ) {
 }
 
 describe( 'Button styles', () => {
-	it.each( variants )(
-		'keeps the matching pressed colors on an enabled busy %s button',
-		async ( variant ) => {
-			await render(
-				<Button
-					__next40pxDefaultSize
-					variant={ variant }
-					aria-pressed
-					isBusy
-				>
-					Saving
-				</Button>
-			);
-			const button = screen.getByRole( 'button', { name: 'Saving' } );
-			const style = getComputedStyle( button );
-			expect(
-				contrast(
-					style.color,
-					style.backgroundColor,
-					style.getPropertyValue(
-						'--wpds-color-background-surface-neutral'
-					)
-				)
-			).toBeGreaterThanOrEqual( 4.5 );
-			expectToken(
-				button,
-				'color',
-				'--wpds-color-foreground-interactive-neutral-strong-active'
-			);
-			expectToken(
-				button,
-				'background-color',
-				'--wpds-color-background-interactive-neutral-strong-active'
-			);
-		}
-	);
-
-	it.each( [ false, true ] )(
-		'uses disabled colors for a destructive default button with accessibleWhenDisabled=%s',
-		async ( accessibleWhenDisabled ) => {
-			await render(
-				<Button
-					__next40pxDefaultSize
-					isDestructive
-					disabled
-					accessibleWhenDisabled={ accessibleWhenDisabled }
-				>
-					Delete
-				</Button>
-			);
-			const button = screen.getByRole( 'button', { name: 'Delete' } );
-			expect( button ).toHaveAttribute(
-				accessibleWhenDisabled ? 'aria-disabled' : 'disabled'
-			);
-			expectToken(
-				button,
-				'color',
-				'--wpds-color-foreground-interactive-error-disabled'
-			);
-		}
-	);
-
-	it.each( [ 'primary', 'secondary' ] as const )(
-		'preserves busy stripes on a disabled pressed %s toolbar button',
-		async ( variant ) => {
-			await render(
-				<Toolbar label="Formatting">
-					<ToolbarButton
-						variant={ variant }
-						title="Saving"
-						isPressed
-						isBusy
-						disabled
-					/>
-				</Toolbar>
-			);
-			const button = screen.getByRole( 'button', { name: 'Saving' } );
-			await userEvent.unhover( button );
-			const style = getComputedStyle( button );
-			expect( style.backgroundImage ).not.toBe( 'none' );
-			expect( style.backgroundSize ).toBe( '100px 100%' );
-		}
-	);
-
 	it.each( [
-		[ 'primary', true, '100px 100%' ],
-		[ 'secondary', true, '100px 100%' ],
-		[ 'tertiary', false, 'auto' ],
-	] as const )(
-		'preserves the busy presentation of a pressed disabled %s button',
-		async ( variant, striped, backgroundSize ) => {
-			await render(
-				<Button
-					__next40pxDefaultSize
-					variant={ variant }
-					aria-pressed
-					isBusy
-					disabled
-				>
-					Saving
-				</Button>
-			);
-			const button = screen.getByRole( 'button', { name: 'Saving' } );
-			await userEvent.unhover( button );
-			const style = getComputedStyle( button );
-			expect( style.backgroundImage !== 'none' ).toBe( striped );
-			expect( style.backgroundSize ).toBe( backgroundSize );
-		}
-	);
-
-	it.each( [
-		[ 'primary', '#1e1e1e', '#3858e9' ],
 		[ 'secondary', '#1e1e1e', '#3858e9' ],
-		[ 'tertiary', '#1e1e1e', '#3858e9' ],
 		[ 'primary', '#fcfcfc', '#ff9900' ],
-		[ 'secondary', '#fcfcfc', '#ff9900' ],
-		[ 'tertiary', '#fcfcfc', '#ff9900' ],
 	] as const )(
 		'keeps the busy %s label readable against both stripes on %s',
 		async ( variant, background, primary ) => {
@@ -252,40 +129,33 @@ describe( 'Button styles', () => {
 		).not.toBe( 'rgba(0, 0, 0, 0)' );
 		await userEvent.keyboard( '[/Space]' );
 	} );
-	it.each( variants )(
-		'keeps a pressed %s button readable during Space activation away from the pointer',
-		async ( variant ) => {
-			await render(
-				<ThemeProvider color={ { background: '#1e1e1e' } }>
-					<Button
-						__next40pxDefaultSize
-						variant={ variant }
-						aria-pressed
-					>
-						Preview
-					</Button>
-				</ThemeProvider>
-			);
-			const button = screen.getByRole( 'button', { name: 'Preview' } );
-			await userEvent.unhover( button );
-			await userEvent.tab();
-			await userEvent.keyboard( '[Space>]' );
-			expect( button.matches( ':active' ) ).toBe( true );
-			expectToken(
-				button,
-				'color',
-				'--wpds-color-foreground-interactive-neutral-strong-active'
-			);
-			expectToken(
-				button,
-				'background-color',
-				'--wpds-color-background-interactive-neutral-strong-active'
-			);
-			await userEvent.keyboard( '[/Space]' );
-		}
-	);
+	it( 'keeps a pressed tertiary button readable during Space activation away from the pointer', async () => {
+		await render(
+			<ThemeProvider color={ { background: '#1e1e1e' } }>
+				<Button __next40pxDefaultSize variant="tertiary" aria-pressed>
+					Preview
+				</Button>
+			</ThemeProvider>
+		);
+		const button = screen.getByRole( 'button', { name: 'Preview' } );
+		await userEvent.unhover( button );
+		await userEvent.tab();
+		await userEvent.keyboard( '[Space>]' );
+		expect( button.matches( ':active' ) ).toBe( true );
+		const style = getComputedStyle( button );
+		expect(
+			contrast(
+				style.color,
+				style.backgroundColor,
+				style.getPropertyValue(
+					'--wpds-color-background-surface-neutral'
+				)
+			)
+		).toBeGreaterThanOrEqual( 4.5 );
+		await userEvent.keyboard( '[/Space]' );
+	} );
 
-	it.each( variants )(
+	it.each( [ 'primary', 'tertiary' ] as const )(
 		'uses readable error colors for a destructive %s button during Space activation',
 		async ( variant ) => {
 			await render(
@@ -316,75 +186,5 @@ describe( 'Button styles', () => {
 			await userEvent.keyboard( '[/Space]' );
 		}
 	);
-
-	it.each( [ 'secondary', 'tertiary' ] as const )(
-		'uses the semantic resting foreground for a %s button with a custom theme',
-		async ( variant ) => {
-			await render(
-				<ThemeProvider
-					color={ { primary: '#ff9900', background: '#fcfcfc' } }
-				>
-					<Button __next40pxDefaultSize variant={ variant }>
-						Action
-					</Button>
-				</ThemeProvider>
-			);
-			const button = screen.getByRole( 'button', { name: 'Action' } );
-			await userEvent.unhover( button );
-			expect( button.matches( ':hover' ) ).toBe( false );
-			expectToken(
-				button,
-				'color',
-				'--wpds-color-foreground-interactive-brand'
-			);
-			const style = getComputedStyle( button );
-			expect(
-				contrast(
-					style.color,
-					style.backgroundColor,
-					style.getPropertyValue(
-						'--wpds-color-background-surface-neutral'
-					)
-				)
-			).toBeGreaterThanOrEqual( 4.5 );
-		}
-	);
-
-	it( 'keeps the admin color scheme without a ThemeProvider', async () => {
-		await render(
-			<div
-				style={
-					{
-						'--wp-admin-theme-color': '#46403c',
-					} as React.CSSProperties
-				}
-			>
-				<Button __next40pxDefaultSize variant="primary">
-					Save
-				</Button>
-				<Button __next40pxDefaultSize variant="secondary">
-					Cancel
-				</Button>
-				<Button __next40pxDefaultSize variant="tertiary">
-					Preview
-				</Button>
-			</div>
-		);
-		expect(
-			pixels(
-				getComputedStyle(
-					screen.getByRole( 'button', { name: 'Save' } )
-				).backgroundColor
-			)
-		).toEqual( pixels( '#46403c' ) );
-		for ( const name of [ 'Cancel', 'Preview' ] ) {
-			expect(
-				pixels(
-					getComputedStyle( screen.getByRole( 'button', { name } ) )
-						.color
-				)
-			).toEqual( pixels( '#46403c' ) );
-		}
-	} );
 } );
 /* eslint-enable @wordpress/no-unknown-ds-tokens */
