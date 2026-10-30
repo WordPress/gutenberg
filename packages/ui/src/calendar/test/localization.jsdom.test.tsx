@@ -72,7 +72,7 @@ describe.each( [
 		expectGregorianDate( 'fa-IR' );
 	} );
 
-	it.each( [ 'ja', 'zh-CN', 'ko' ] )(
+	it.each( [ 'ja', 'zh-CN', 'ko', 'cs' ] )(
 		'shows only the day number in day cells for %s',
 		( localeCode ) => {
 			render(
