@@ -46,6 +46,7 @@
 
 ### Bug Fixes
 
+-   Post Template: Pass the context available to the block on to the blocks inside it, so context provided by the Query block reaches them ([#68608](https://github.com/WordPress/gutenberg/issues/68608)).
 -   Media & Text: Replace deprecated `word-break: break-word` and prevent long content from widening the text column. Nested blocks that only override `word-break` can now wrap long unbroken text mid-word ([#82580](https://github.com/WordPress/gutenberg/pull/82580)).
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 -   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
