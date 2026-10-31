@@ -4,6 +4,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,
+	getTemplateChainBlocks,
 	isCollaborationEnabledForCurrentPost,
 } from '../private-selectors';
 import { lock } from '../../lock-unlock';
@@ -79,6 +80,68 @@ describe( 'getPostBlocksByName', () => {
 			'core/heading',
 		] );
 		expect( result ).toEqual( [ 'block1', 'block2', 'block3' ] );
+	} );
+} );
+
+describe( 'getTemplateChainBlocks', () => {
+	// An Index template whose Content block holds a Page template, whose own
+	// Content block holds the page, next to the page's title.
+	const blocks = new Map( [
+		[ 'header', { name: 'core/template-part', parent: '' } ],
+		[ 'index-content', { name: 'core/post-content', parent: '' } ],
+		[ 'main', { name: 'core/group', parent: 'index-content' } ],
+		[ 'title', { name: 'core/post-title', parent: 'main' } ],
+		[ 'page-content', { name: 'core/post-content', parent: 'main' } ],
+		[ 'paragraph', { name: 'core/paragraph', parent: 'page-content' } ],
+		[ 'query', { name: 'core/query', parent: 'main' } ],
+		[ 'query-content', { name: 'core/post-content', parent: 'query' } ],
+	] );
+
+	getTemplateChainBlocks.registry = {
+		select: () => ( {
+			getBlocksByName: ( blockNames ) =>
+				Array.from( blocks.keys() ).filter( ( clientId ) =>
+					blockNames.includes( blocks.get( clientId ).name )
+				),
+			// Root first, as the block editor store returns them.
+			getBlockParents: ( clientId ) => {
+				const parents = [];
+				let parent = blocks.get( clientId ).parent;
+				while ( parent ) {
+					parents.unshift( parent );
+					parent = blocks.get( parent ).parent;
+				}
+				return parents;
+			},
+			getBlockName: ( clientId ) => blocks.get( clientId ).name,
+		} ),
+	};
+
+	const postBlockTypes = [
+		'core/post-title',
+		'core/post-featured-image',
+		'core/post-content',
+	];
+
+	it( 'returns nothing when no templates are nested', () => {
+		expect( getTemplateChainBlocks( {}, postBlockTypes, 0 ) ).toEqual( {
+			slotIds: [],
+			postBlockIds: [],
+		} );
+	} );
+
+	it( 'finds the slot and the post blocks inside it', () => {
+		expect( getTemplateChainBlocks( {}, postBlockTypes, 1 ) ).toEqual( {
+			slotIds: [ 'index-content' ],
+			postBlockIds: [ 'title', 'page-content' ],
+		} );
+	} );
+
+	it( 'finds no post blocks when the chain is deeper than the slots', () => {
+		expect( getTemplateChainBlocks( {}, postBlockTypes, 3 ) ).toEqual( {
+			slotIds: [ 'index-content', 'page-content' ],
+			postBlockIds: [],
+		} );
 	} );
 } );
 
