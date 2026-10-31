@@ -64,7 +64,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$result = $method->invoke( $reflection, $site_title_block );
 
 		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://' . WP_TESTS_DOMAIN . '" target="_self" rel="home">Test Blog</a></h1></li>';
-		$this->assertEquals( $expected, $result );
+		$this->assertSame( $expected, $result );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$result = $method->invoke( $reflection, $heading_block );
 
 		$expected = '<div class="wp-block-testsuite-sample-block">Hello World</div>';
-		$this->assertEquals( $expected, $result );
+		$this->assertSame( $expected, $result );
 
 		unregister_block_type( 'testsuite/sample-block' );
 	}
@@ -160,7 +160,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$result = $method->invoke( $reflection, $heading_block );
 
 		$expected = '<li class="wp-block-navigation-item"><div class="wp-block-testsuite-sample-block">Hello World</div></li>';
-		$this->assertEquals( $expected, $result );
+		$this->assertSame( $expected, $result );
 
 		remove_filter( 'block_core_navigation_listable_blocks', $filter_needs_list_item_wrapper_function, 10, 1 );
 
@@ -184,7 +184,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		$actual   = $method->invoke( $reflection, $attributes );
 		$expected = new WP_Block_List( array(), $attributes );
-		$this->assertEquals( $actual, $expected );
+		$this->assertEquals( $expected, $actual );
 		$this->assertCount( 0, $actual );
 	}
 
