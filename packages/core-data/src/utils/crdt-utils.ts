@@ -305,3 +305,26 @@ function findBlockByClientIdInBlocks(
 
 	return null;
 }
+
+/**
+ * Tokenize an HTML string so that complete HTML tags, HTML comments, and HTML
+ * entities are treated as indivisible atomic tokens, and plain text is split
+ * into individual characters.
+ *
+ * This ensures that when computing deltas for real-time collaboration, HTML
+ * tags are inserted or deleted as whole units, preventing concurrent operations
+ * from interleaving characters inside tags or corrupting attributes.
+ *
+ * Attribute values with quotes (including those containing `>` or `<`) are
+ * kept intact.
+ *
+ * @param html The HTML string to tokenize.
+ * @return An array of tokens.
+ */
+export function tokenizeHtml( html: string ): string[] {
+	return (
+		html.match(
+			/<!--[\s\S]*?-->|<\/?[a-zA-Z][a-zA-Z0-9:-]*(?:"[^"]*"|'[^']*'|[^'">])*>|&[a-zA-Z0-9#]+;|[\s\S]/g
+		) ?? []
+	);
+}
