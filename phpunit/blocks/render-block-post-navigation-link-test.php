@@ -227,4 +227,77 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'style=', $output );
 		$this->assertStringNotContainsString( 'has-border-color', $output );
 	}
+
+	public function test_link_does_not_open_in_a_new_tab_by_default() {
+		$output = $this->render_block( self::$second_post_id, array( 'type' => 'previous' ) );
+
+		$this->assertStringNotContainsString( 'target=', $output );
+		$this->assertStringContainsString( 'rel="prev"', $output );
+	}
+
+	public function test_self_link_target_does_not_open_in_a_new_tab() {
+		$output = $this->render_block(
+			self::$second_post_id,
+			array(
+				'type'       => 'previous',
+				'linkTarget' => '_self',
+			)
+		);
+
+		$this->assertStringNotContainsString( 'target=', $output );
+		$this->assertStringContainsString( 'rel="prev"', $output );
+	}
+
+	public function test_blank_link_target_opens_in_a_new_tab_and_keeps_the_existing_rel() {
+		$output = $this->render_block(
+			self::$second_post_id,
+			array(
+				'type'       => 'previous',
+				'linkTarget' => '_blank',
+			)
+		);
+
+		$this->assertStringContainsString( 'target="_blank"', $output );
+		$this->assertStringContainsString( 'rel="prev noopener noreferrer"', $output );
+	}
+
+	public function test_blank_link_target_applies_to_the_next_link() {
+		$output = $this->render_block(
+			self::$first_post_id,
+			array(
+				'type'       => 'next',
+				'linkTarget' => '_blank',
+			)
+		);
+
+		$this->assertStringContainsString( 'target="_blank"', $output );
+		$this->assertStringContainsString( 'rel="next noopener noreferrer"', $output );
+	}
+
+	public function test_blank_link_target_adds_the_target_when_the_title_is_shown() {
+		$output = $this->render_block(
+			self::$second_post_id,
+			array(
+				'type'       => 'previous',
+				'showTitle'  => true,
+				'linkTarget' => '_blank',
+			)
+		);
+
+		$this->assertSame( 1, substr_count( $output, 'target="_blank"' ) );
+		$this->assertStringContainsString( 'First post', $output );
+	}
+
+	public function test_blank_link_target_with_no_adjacent_post_renders_an_empty_wrapper() {
+		$output = $this->render_block(
+			self::$first_post_id,
+			array(
+				'type'       => 'previous',
+				'linkTarget' => '_blank',
+			)
+		);
+
+		$this->assertStringContainsString( '></div>', $output, 'The wrapper should render with no content.' );
+		$this->assertStringNotContainsString( 'target=', $output );
+	}
 }

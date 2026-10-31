@@ -42,6 +42,7 @@
 -   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
 -   Image: Animate touch-swipe navigation in the gallery lightbox so the image follows the finger and slides off on commit, with a quick fade-in for the next image ([#79114](https://github.com/WordPress/gutenberg/pull/79114)).
 -   Post Navigation Link: Add background image, size, and gradient support, withheld from the empty wrapper the same way as border, shadow and spacing ([#83940](https://github.com/WordPress/gutenberg/pull/83940)).
+-   Post Navigation Link: Add an "Open in new tab" setting, so the link can open in a new tab like in other blocks that link to posts ([#69285](https://github.com/WordPress/gutenberg/issues/69285)).
 -   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
 
 ### Bug Fixes

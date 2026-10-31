@@ -115,6 +115,16 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	// The `{next,previous}_post_link` filters can return null, which renders as no link.
 	$content = (string) $content;
 
+	if ( '' !== $content && '_blank' === ( $attributes['linkTarget'] ?? '_self' ) ) {
+		$processor = new WP_HTML_Tag_Processor( $content );
+		while ( $processor->next_tag( 'a' ) ) {
+			$processor->set_attribute( 'target', '_blank' );
+			$rel = trim( ( $processor->get_attribute( 'rel' ) ?? '' ) . ' noopener noreferrer' );
+			$processor->set_attribute( 'rel', $rel );
+		}
+		$content = $processor->get_updated_html();
+	}
+
 	/*
 	 * Background, border, dimensions, shadow and spacing serialization is
 	 * skipped for this block so those styles can be withheld from the empty
