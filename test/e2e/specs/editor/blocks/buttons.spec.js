@@ -226,8 +226,12 @@ test.describe( 'Buttons', () => {
 			} )
 			.click();
 
-		const newTabCheckbox = page.getByLabel( 'Open in new tab' );
-		const noFollowCheckbox = page.getByLabel( 'nofollow' );
+		// Scope to the link popover: the sidebar has its own "Open in new tab".
+		const linkPopover = page.getByRole( 'region', {
+			name: 'Editor content',
+		} );
+		const newTabCheckbox = linkPopover.getByLabel( 'Open in new tab' );
+		const noFollowCheckbox = linkPopover.getByLabel( 'nofollow' );
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await newTabCheckbox.click();
@@ -299,6 +303,11 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
+		// The inspector opens on the Content tab; the style controls are on the Styles tab.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Styles' } )
+			.click();
 
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
@@ -318,6 +327,10 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
+		// Wait for the text color palette to finish closing: both palettes list the same colors.
+		await expect(
+			page.getByRole( 'option', { name: 'Vivid red' } )
+		).toHaveCount( 1 );
 		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
 
 		// Check the content.
@@ -335,6 +348,11 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
+		// The inspector opens on the Content tab; the style controls are on the Styles tab.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Styles' } )
+			.click();
 
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
@@ -363,6 +381,10 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
+		// Wait for the text color palette to finish closing: both palettes list the same colors.
+		await expect(
+			page.getByRole( 'button', { name: /Custom color picker/i } )
+		).toHaveCount( 1 );
 		await page
 			.getByRole( 'button', { name: /Custom color picker/i } )
 			.click();
@@ -388,6 +410,11 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
+		// The inspector opens on the Content tab; the style controls are on the Styles tab.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Styles' } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -420,6 +447,11 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
+		// The inspector opens on the Content tab; the style controls are on the Styles tab.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Styles' } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -470,6 +502,11 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
+		// The inspector opens on the Content tab; the style controls are on the Styles tab.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Styles' } )
+			.click();
 
 		// Apply named colors to the first button. Text and background color
 		// controls now live in the Typography and Background panels.
@@ -491,6 +528,10 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
+		// Wait for the text color palette to finish closing: both palettes list the same colors.
+		await expect(
+			page.getByRole( 'option', { name: 'Vivid red' } )
+		).toHaveCount( 1 );
 		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
 
 		// Select the parent Buttons block so the appender is visible.
@@ -682,6 +723,11 @@ test.describe( 'Buttons', () => {
 			await editor.selectBlocks( buttonBlock );
 
 			await editor.openDocumentSettingsSidebar();
+			// The inspector opens on the Content tab; the style controls are on the Styles tab.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tab', { name: 'Styles' } )
+				.click();
 
 			const settingsPanel = page.getByRole( 'region', {
 				name: 'Editor settings',
@@ -861,29 +907,199 @@ test.describe( 'Buttons', () => {
 		} );
 	} );
 
-	test( 'keeps the usual inspector outside a Navigation block', async ( {
+	test.describe( 'Inspector outside a Navigation block', () => {
+		test.beforeEach( async ( { editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Testing',
+							url: 'https://wordpress.org/',
+						},
+					},
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test( 'opens on the content controls', async ( { page } ) => {
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// A Button edits like an Image or a Navigation Link: the
+			// Content tab comes first and holds the text and link fields.
+			await expect(
+				settings.getByRole( 'tab', { name: 'Content' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Text' } )
+			).toHaveValue( 'Testing' );
+			await expect(
+				settings.getByRole( 'button', { name: /^Link to/ } )
+			).toHaveText( /wordpress\.org/ );
+			await expect(
+				settings.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'link', { name: 'View' } )
+			).toHaveAttribute( 'href', 'https://wordpress.org/' );
+		} );
+
+		test( 'keeps styles and settings on their own tabs', async ( {
+			page,
+		} ) => {
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			await settings.getByRole( 'tab', { name: 'Styles' } ).click();
+			await expect(
+				settings.getByRole( 'radio', { name: 'Outline' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'group', { name: 'Width' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Text' } )
+			).toBeHidden();
+
+			await settings.getByRole( 'tab', { name: 'Settings' } ).click();
+			await expect(
+				settings.getByRole( 'combobox', { name: 'HTML element' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Link relation' } )
+			).toBeVisible();
+		} );
+
+		test( 'edits the button from the content controls', async ( {
+			editor,
+			page,
+		} ) => {
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			await settings
+				.getByRole( 'textbox', { name: 'Text' } )
+				.fill( 'Changed' );
+			await settings
+				.getByRole( 'checkbox', { name: 'Open in new tab' } )
+				.check();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'Changed',
+								url: 'https://wordpress.org/',
+								linkTarget: '_blank',
+								rel: 'noopener',
+							},
+						},
+					],
+				},
+			] );
+			await expect(
+				editor.canvas.getByRole( 'textbox', { name: 'Button text' } )
+			).toHaveText( 'Changed' );
+		} );
+	} );
+
+	test( 'edits a Button from the Content tab after picking it in the List View tab', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/buttons',
 			innerBlocks: [
-				{ name: 'core/button', attributes: { text: 'Testing' } },
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'First',
+						url: 'https://wordpress.org/',
+					},
+				},
+				{ name: 'core/button', attributes: { text: 'Second' } },
 			],
 		} );
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Button', exact: true } )
-			.click();
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Buttons',
+				exact: true,
+			} )
+		);
 		await editor.openDocumentSettingsSidebar();
 
 		const settings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
+		await settings.getByRole( 'tab', { name: 'List View' } ).click();
+		await settings
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } )
+			.getByRole( 'link', { name: 'First' } )
+			.click();
+
+		// The Button opens on its Content tab with its text and link.
 		await expect(
-			settings.getByRole( 'heading', { name: 'Settings' } )
-		).toBeHidden();
+			settings.getByRole( 'tab', { name: 'Content' } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+		const textInput = settings.getByRole( 'textbox', { name: 'Text' } );
+		await expect( textInput ).toHaveValue( 'First' );
+		const linkButton = settings.getByRole( 'button', { name: /^Link to/ } );
+		await expect( linkButton ).toHaveText( /wordpress\.org/ );
 		await expect(
-			settings.getByRole( 'textbox', { name: 'Text' } )
-		).toBeHidden();
+			settings.getByRole( 'checkbox', { name: 'Open in new tab' } )
+		).toBeVisible();
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/' );
+
+		// Edits from the sidebar reach the block.
+		await textInput.fill( 'Changed' );
+		await linkButton.click();
+		const linkInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect( linkInput ).toBeFocused();
+		await linkInput.fill( 'https://example.com/' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			settings.getByRole( 'button', { name: /^Link to/ } )
+		).toHaveText( /example\.com/ );
+		await expect(
+			editor.canvas
+				.getByRole( 'textbox', { name: 'Button text' } )
+				.first()
+		).toHaveText( 'Changed' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Changed',
+							url: 'https://example.com/',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: { text: 'Second' },
+					},
+				],
+			},
+		] );
 	} );
 } );
