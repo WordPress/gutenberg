@@ -74,7 +74,7 @@ export default function PostTitleEdit( {
 		titleElement = userCanEdit ? (
 			<PlainText
 				tagName={ TagName }
-				placeholder={ __( '(no title)' ) }
+				placeholder={ placeholder || __( '(no title)' ) }
 				value={ rawTitle }
 				onChange={ setTitle }
 				__experimentalVersion={ 2 }
@@ -100,7 +100,7 @@ export default function PostTitleEdit( {
 					target={ linkTarget }
 					rel={ rel }
 					placeholder={
-						! rawTitle.length ? __( '(no title)' ) : null
+						! rawTitle.length ? __( '(no title)' ) : placeholder
 					}
 					value={ rawTitle }
 					onChange={ setTitle }
