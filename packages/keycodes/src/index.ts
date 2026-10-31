@@ -524,6 +524,19 @@ export const isKeyboardEvent: WPModifierHandler< WPEventKeyHandler > =
 				key = String.fromCharCode( event.keyCode ).toLowerCase();
 			}
 
+			// Non-Latin layouts, like Cyrillic, report the localized character
+			// in `event.key`, so fall back to the key code for letters and
+			// digits. Only with Ctrl/Cmd held, so plain typing isn't affected.
+			if (
+				( event.ctrlKey || event.metaKey ) &&
+				character.length === 1 &&
+				key.length === 1 &&
+				key.charCodeAt( 0 ) > 127 &&
+				/^[A-Z0-9]$/.test( String.fromCharCode( event.keyCode ) )
+			) {
+				key = String.fromCharCode( event.keyCode ).toLowerCase();
+			}
+
 			// `event.key` returns the value of the key pressed, taking into the state of
 			// modifier keys such as `Shift`. If the shift key is pressed, a different
 			// value may be returned depending on the keyboard layout. It is necessary to
