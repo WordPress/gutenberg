@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/item-term-ancestor-classes.php';
 require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 
 /**
@@ -112,9 +113,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$open_on_hover           = 'hover' === $computed_visibility;
 	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
 
-	$classes = array(
-		'wp-block-navigation-item',
-	);
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$term_ancestor_classes = gutenberg_block_core_shared_navigation_item_get_term_ancestor_classes( $attributes );
+	} else {
+		$term_ancestor_classes = block_core_shared_navigation_item_get_term_ancestor_classes( $attributes );
+	}
+
+	$classes = array_merge( array( 'wp-block-navigation-item' ), $term_ancestor_classes );
 
 	if ( $has_submenu ) {
 		$classes[] = 'has-child';
