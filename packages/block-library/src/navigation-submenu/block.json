@@ -91,7 +91,11 @@
 		}
 	},
 	"selectors": {
-		"shadow": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container"
+		"background": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container",
+		"border": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container",
+		"color": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container",
+		"shadow": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container",
+		"spacing": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container"
 	},
 	"editorStyle": "wp-block-navigation-submenu-editor",
 	"style": "wp-block-navigation-submenu"
