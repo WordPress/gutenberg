@@ -33,6 +33,10 @@
 -   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 -   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
 
+### Bug Fixes
+
+-   Raw handling: drop the empty bookmark links Word adds to headings instead of pasting them as `<a></a>` ([#83524](https://github.com/WordPress/gutenberg/pull/83524)).
+
 ## 16.2.0 (2026-10-07)
 
 ### Bug Fixes
