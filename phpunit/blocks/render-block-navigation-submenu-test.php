@@ -63,7 +63,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -90,7 +90,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		);
 		$tags->get_attribute( 'class' );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'wp-block-navigation__submenu-container has-text-color has-purple-color has-background has-yellow-background-color',
 			$tags->get_attribute( 'class' ),
 			'Submenu block colors inherited from context not applied correctly'
@@ -110,7 +110,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -160,7 +160,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -210,7 +210,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -232,9 +232,14 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertStringNotContainsString(
+			'has-text-color',
 			$actual,
-			'has-text-color has-background',
-			'Submenu block should not apply "has-*" color classes if missing from context'
+			'Submenu block should not apply "has-text-color" class if missing from context'
+		);
+		$this->assertStringNotContainsString(
+			'has-background',
+			$actual,
+			'Submenu block should not apply "has-background" class if missing from context'
 		);
 	}
 
