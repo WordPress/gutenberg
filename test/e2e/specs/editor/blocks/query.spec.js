@@ -724,3 +724,87 @@ test.describe( 'Query block', () => {
 		} );
 	} );
 } );
+
+test.describe( 'Query block in the front page template', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await Promise.all( [
+			requestUtils.deleteAllPosts(),
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
+		await requestUtils.createPost( {
+			title: 'Latest post',
+			status: 'publish',
+		} );
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'front-page',
+			title: 'Front Page',
+			content:
+				'<!-- wp:query {"queryId":1,"query":{"inherit":true}} --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-title /--><!-- /wp:post-template --></div><!-- /wp:query -->',
+		} );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllPages(),
+			requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+			} ),
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllPosts(),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'should show the static homepage', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		const homepage = await requestUtils.createPage( {
+			title: 'Static homepage',
+			status: 'publish',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: homepage.id,
+		} );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//front-page',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		const postTemplate = editor.canvas.getByRole( 'document', {
+			name: 'Block: Post Template',
+		} );
+		await expect(
+			postTemplate.getByRole( 'document', { name: 'Block: Title' } )
+		).toHaveText( 'Static homepage' );
+	} );
+
+	test( 'should show the latest posts without a static homepage', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//front-page',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		const postTemplate = editor.canvas.getByRole( 'document', {
+			name: 'Block: Post Template',
+		} );
+		await expect(
+			postTemplate.getByRole( 'document', { name: 'Block: Title' } )
+		).toHaveText( 'Latest post' );
+	} );
+} );
