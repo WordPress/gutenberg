@@ -12,19 +12,18 @@ export default function addContainer(
 	container.id = `a11y-speak-${ ariaLive }`;
 	container.className = 'a11y-speak-region';
 
-	container.setAttribute(
-		'style',
-		'position:absolute;' +
-			'margin:-1px;' +
-			'padding:0;' +
-			'height:1px;' +
-			'width:1px;' +
-			'overflow:hidden;' +
-			'clip-path:inset(50%);' +
-			'border:0;' +
-			'word-wrap:normal !important;' +
-			'word-break:normal !important;'
-	);
+	Object.assign( container.style, {
+		position: 'absolute',
+		margin: '-1px',
+		padding: '0',
+		height: '1px',
+		width: '1px',
+		overflow: 'hidden',
+		clipPath: 'inset(50%)',
+		border: '0',
+	} );
+	container.style.setProperty( 'word-wrap', 'normal', 'important' );
+	container.style.setProperty( 'word-break', 'normal', 'important' );
 	container.setAttribute( 'aria-live', ariaLive );
 	container.setAttribute( 'aria-relevant', 'additions text' );
 	container.setAttribute( 'aria-atomic', 'true' );
