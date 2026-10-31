@@ -133,6 +133,8 @@
 		}
 
 		.month {
+			/* Also size the absolute month snapshot used during navigation. */
+			width: 100%;
 			/* Each row shares its remaining width, including an incomplete last row. */
 			flex: 1 0 calc(var(--wp-ui-calendar-cell-size) * 7);
 		}
