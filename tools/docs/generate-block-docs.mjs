@@ -149,8 +149,8 @@ function readBlockJson( blockDir ) {
 function getBlockFiles( blockDir ) {
 	const dir = path.join( BLOCK_LIBRARY_DIR, blockDir );
 	return {
-		hasSaveScript: [ 'save.js', 'save.jsx' ].some( ( filename ) =>
-			fs.existsSync( path.join( dir, filename ) )
+		hasSaveScript: [ 'save.js', 'save.jsx', 'save.ts', 'save.tsx' ].some(
+			( filename ) => fs.existsSync( path.join( dir, filename ) )
 		),
 		hasIndexPhp: fs.existsSync( path.join( dir, 'index.php' ) ),
 	};

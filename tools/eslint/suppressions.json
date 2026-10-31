@@ -6182,11 +6182,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/init-block.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/utils/is-block-metadata-experimental.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

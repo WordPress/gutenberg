@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Query: Add a "With Results" block, the inverse of Query No Results. It holds the blocks that should only appear when the query has matching posts, so content like a heading or Post Template can be hidden as a group when a Query Loop has nothing to show ([#83125](https://github.com/WordPress/gutenberg/pull/83125)).
+
 ### Enhancements
 
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
