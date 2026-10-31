@@ -43,6 +43,7 @@
 -   Image: Animate touch-swipe navigation in the gallery lightbox so the image follows the finger and slides off on commit, with a quick fade-in for the next image ([#79114](https://github.com/WordPress/gutenberg/pull/79114)).
 -   Post Navigation Link: Add background image, size, and gradient support, withheld from the empty wrapper the same way as border, shadow and spacing ([#83940](https://github.com/WordPress/gutenberg/pull/83940)).
 -   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
+-   Navigation Link: Add color support for text and background ([#83457](https://github.com/WordPress/gutenberg/pull/83457)).
 
 ### Bug Fixes
 
