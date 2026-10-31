@@ -2,11 +2,14 @@ import { __ } from '@wordpress/i18n';
 import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { viewPostRevisions } from '@wordpress/fields';
 import { addQueryArgs } from '@wordpress/url';
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { usePostActions } = unlock( editorPrivateApis );
 
 export const useEditPostAction = () => {
 	const history = useHistory();
@@ -28,6 +31,44 @@ export const useEditPostAction = () => {
 			},
 		} ),
 		[ history ]
+	);
+};
+
+/**
+ * Returns the actions registered for a post type, with the site editor specific
+ * overrides applied.
+ *
+ * @param {Object} options The options passed to `usePostActions`.
+ * @return {Array} The actions.
+ */
+export const useSiteEditorPostActions = ( options ) => {
+	const postTypeActions = usePostActions( options );
+	const history = useHistory();
+	return useMemo(
+		() =>
+			postTypeActions.map( ( action ) =>
+				action.id === viewPostRevisions.id
+					? {
+							...action,
+							callback( items ) {
+								const post = items[ 0 ];
+								history.navigate(
+									addQueryArgs(
+										`/${ post.type }/${ post.id }`,
+										{
+											canvas: 'edit',
+											revision:
+												post._links?.[
+													'predecessor-version'
+												]?.[ 0 ]?.id,
+										}
+									)
+								);
+							},
+						}
+					: action
+			),
+		[ postTypeActions, history ]
 	);
 };
 
