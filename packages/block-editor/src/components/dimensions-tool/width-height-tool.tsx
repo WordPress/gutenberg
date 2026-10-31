@@ -3,6 +3,8 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import SizeSuggestionsControl from './size-suggestions-control';
+import { getPixelAmount } from './utils';
 import type { WidthHeightToolProps, WidthHeightToolValue } from './types';
 
 /**
@@ -17,11 +19,19 @@ export default function WidthHeightTool( {
 	value = {},
 	onChange = () => {},
 	units,
+	naturalWidth,
+	naturalHeight,
 	isShownByDefault = true,
 }: WidthHeightToolProps ) {
 	// null, undefined, and 'auto' all represent the default value.
 	const width = value.width === 'auto' ? '' : ( value.width ?? '' );
 	const height = value.height === 'auto' ? '' : ( value.height ?? '' );
+
+	// Sizes are only suggested in pixels, so a value in another unit keeps
+	// the field that can edit it.
+	const hasNaturalSize = !! naturalWidth && !! naturalHeight;
+	const widthPixels = hasNaturalSize ? getPixelAmount( width ) : null;
+	const heightPixels = hasNaturalSize ? getPixelAmount( height ) : null;
 
 	const onDimensionChange =
 		( dimension: keyof WidthHeightToolValue ) =>
@@ -46,15 +56,24 @@ export default function WidthHeightTool( {
 				onDeselect={ onDimensionChange( 'width' ) }
 				panelId={ panelId }
 			>
-				<UnitControl
-					label={ __( 'Width' ) }
-					placeholder={ __( 'Auto' ) }
-					labelPosition="top"
-					units={ units }
-					min={ 0 }
-					value={ width }
-					onChange={ onDimensionChange( 'width' ) }
-				/>
+				{ widthPixels !== null ? (
+					<SizeSuggestionsControl
+						label={ __( 'Width' ) }
+						value={ widthPixels }
+						onChange={ onDimensionChange( 'width' ) }
+						naturalSize={ naturalWidth! }
+					/>
+				) : (
+					<UnitControl
+						label={ __( 'Width' ) }
+						placeholder={ __( 'Auto' ) }
+						labelPosition="top"
+						units={ units }
+						min={ 0 }
+						value={ width }
+						onChange={ onDimensionChange( 'width' ) }
+					/>
+				) }
 			</ToolsPanelItem>
 			<ToolsPanelItem
 				style={ { gridColumn: 'span 1' } }
@@ -64,15 +83,24 @@ export default function WidthHeightTool( {
 				onDeselect={ onDimensionChange( 'height' ) }
 				panelId={ panelId }
 			>
-				<UnitControl
-					label={ __( 'Height' ) }
-					placeholder={ __( 'Auto' ) }
-					labelPosition="top"
-					units={ units }
-					min={ 0 }
-					value={ height }
-					onChange={ onDimensionChange( 'height' ) }
-				/>
+				{ heightPixels !== null ? (
+					<SizeSuggestionsControl
+						label={ __( 'Height' ) }
+						value={ heightPixels }
+						onChange={ onDimensionChange( 'height' ) }
+						naturalSize={ naturalHeight! }
+					/>
+				) : (
+					<UnitControl
+						label={ __( 'Height' ) }
+						placeholder={ __( 'Auto' ) }
+						labelPosition="top"
+						units={ units }
+						min={ 0 }
+						value={ height }
+						onChange={ onDimensionChange( 'height' ) }
+					/>
+				) }
 			</ToolsPanelItem>
 		</>
 	);

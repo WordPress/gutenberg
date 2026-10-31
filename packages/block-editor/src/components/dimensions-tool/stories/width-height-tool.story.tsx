@@ -56,3 +56,15 @@ export const Default: StoryFn< WidthHeightToolProps > = ( {
 Default.args = {
 	panelId: 'panel-id',
 };
+
+/**
+ * With the natural size of the content, the fields suggest fractions of it,
+ * e.g. half the size of a high density screenshot.
+ */
+export const WithSizeSuggestions: StoryFn< WidthHeightToolProps > =
+	Default.bind( {} );
+WithSizeSuggestions.args = {
+	panelId: 'panel-id',
+	naturalWidth: 1600,
+	naturalHeight: 1000,
+};

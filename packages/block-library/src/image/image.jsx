@@ -767,6 +767,8 @@ export default function Image( {
 				defaultAspectRatio="auto"
 				scaleOptions={ scaleOptions }
 				unitsOptions={ dimensionsUnitsOptions }
+				naturalWidth={ naturalWidth }
+				naturalHeight={ naturalHeight }
 				tools={
 					isWideAligned
 						? [ 'aspectRatio', 'scale' ]
