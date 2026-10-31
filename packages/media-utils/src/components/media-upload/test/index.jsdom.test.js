@@ -56,4 +56,84 @@ describe( 'MediaUpload', () => {
 			expect( instance.frame.detach ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
+
+	describe( 'buildAndSetGalleryFrame', () => {
+		it( 'leaves image editing to the MediaFrame.Post handler', () => {
+			const originalWp = window.wp;
+			const coreEditImageContent = vi.fn();
+			const attachments = {
+				models: [],
+				props: { toJSON: () => ( {} ) },
+			};
+
+			class MediaFramePost {
+				constructor( options ) {
+					this.options = options;
+					this.handlers = [];
+					this.states = { add: vi.fn() };
+					this.on = ( event, callback, context ) => {
+						this.handlers.push( { event, callback, context } );
+					};
+					this.on(
+						'content:render:edit-image',
+						coreEditImageContent,
+						this
+					);
+				}
+
+				static extend( methods ) {
+					return class extends this {
+						constructor( options ) {
+							super( options );
+							Object.assign( this, methods );
+							this.createStates();
+						}
+					};
+				}
+			}
+
+			const Controller = vi.fn();
+			window.wp = {
+				media: {
+					view: {
+						MediaFrame: { Post: MediaFramePost },
+						l10n: { createGalleryTitle: 'Create Gallery' },
+					},
+					controller: {
+						Library: Controller,
+						EditImage: Controller,
+						GalleryEdit: Controller,
+						GalleryAdd: Controller,
+					},
+					query: vi.fn( () => attachments ),
+					model: { Selection: Controller },
+				},
+			};
+
+			try {
+				for ( const value of [ [ 15 ], [] ] ) {
+					const instance = new MediaUpload( { value } );
+					instance.buildAndSetGalleryFrame();
+
+					expect( instance.frame.options.state ).toBe(
+						value.length ? 'gallery-edit' : 'gallery'
+					);
+					expect(
+						instance.frame.handlers.filter(
+							( { event } ) =>
+								event === 'content:render:edit-image'
+						)
+					).toEqual( [
+						{
+							event: 'content:render:edit-image',
+							callback: coreEditImageContent,
+							context: instance.frame,
+						},
+					] );
+				}
+			} finally {
+				window.wp = originalWp;
+			}
+		} );
+	} );
 } );
