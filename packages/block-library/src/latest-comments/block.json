@@ -4,7 +4,7 @@
 	"name": "core/latest-comments",
 	"title": "Latest Comments",
 	"category": "widgets",
-	"description": "Display a list of your most recent comments.",
+	"description": "Displays a list of your most recent comments.",
 	"keywords": [ "recent comments" ],
 	"textdomain": "default",
 	"attributes": {
