@@ -138,21 +138,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
-	function changeLinkDestinationOption( newHref ) {
-		// Choose Media File or Attachment Page (when file is in Media Library).
-		setAttributes( { textLinkHref: newHref } );
-	}
-
-	function changeOpenInNewWindow( newValue ) {
-		setAttributes( {
-			textLinkTarget: newValue ? '_blank' : false,
-		} );
-	}
-
-	function changeShowDownloadButton( newValue ) {
-		setAttributes( { showDownloadButton: newValue } );
-	}
-
 	function changeDisplayPreview( newValue ) {
 		setAttributes( { displayPreview: newValue } );
 	}
@@ -213,11 +198,15 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					attachmentPage,
 				} }
 				{ ...{
-					openInNewWindow: !! textLinkTarget,
+					id,
+					fileName,
+					downloadButtonText,
+					textLinkTarget,
 					showDownloadButton,
-					changeLinkDestinationOption,
-					changeOpenInNewWindow,
-					changeShowDownloadButton,
+					isUploading: !! temporaryURL,
+					onSelectFile,
+					onUploadError,
+					setAttributes,
 					displayPreview,
 					changeDisplayPreview,
 					previewHeight,

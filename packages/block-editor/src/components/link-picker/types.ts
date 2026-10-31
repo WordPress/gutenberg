@@ -2,6 +2,7 @@ import type {
 	LinkControlValue,
 	LinkPreviewBadge,
 	LinkSuggestionsQuery,
+	TransformSuggestions,
 } from '../link-control/types';
 
 /**
@@ -43,6 +44,16 @@ export interface LinkPickerProps {
 	suggestionsQuery?: LinkSuggestionsQuery;
 	label?: string;
 	help?: string;
+	/**
+	 * Whether to search for suggestions as the user types. Turn it off to
+	 * only accept a URL.
+	 */
+	showSuggestions?: boolean;
+	/**
+	 * Changes the suggestions before they are shown, including the ones shown
+	 * before anything is typed.
+	 */
+	transformSuggestions?: TransformSuggestions;
 }
 
 /**
