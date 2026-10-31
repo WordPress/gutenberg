@@ -69,10 +69,10 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 			 * is the same for all custom queries. This way the link is not empty and
 			 * preserves all the other existent query args.
 			 *
-			 * @see https://developer.wordpress.org/reference/functions/paginate_links/
+			 * @link https://developer.wordpress.org/reference/functions/paginate_links/
 			 *
 			 * The proper fix of this should be in core. Track Ticket:
-			 * @see https://core.trac.wordpress.org/ticket/53868
+			 * @link https://core.trac.wordpress.org/ticket/53868
 			 *
 			 * TODO: After two WP versions (starting from the WP version the core patch landed),
 			 * we should remove this and call `paginate_links` with the proper new arg.
