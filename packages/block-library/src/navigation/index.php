@@ -290,10 +290,7 @@ class WP_Navigation_Block_Renderer {
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
-				$inner_blocks_html .= sprintf(
-					'<ul %1$s>',
-					$container_attributes
-				);
+				$inner_blocks_html .= static::get_list_open_tag( $container_attributes );
 			}
 
 			if ( ! $is_list_item && $is_list_open ) {
@@ -315,6 +312,36 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		return $inner_blocks_html;
+	}
+
+	/**
+	 * Builds the opening tag for the navigation block's list element.
+	 *
+	 * The list is not the block's wrapper element, but it is still rendered with
+	 * `get_block_wrapper_attributes()` because Core generates the block's layout
+	 * and alignment styles with selectors that target the list rather than the
+	 * outer `<nav>`. Reusing the wrapper attributes keeps those styles working,
+	 * at the cost of repeating some of them on both elements.
+	 *
+	 * The `anchor` block support is the one attribute that must not be repeated.
+	 * It renders the user-supplied HTML anchor as `id`, so emitting the wrapper
+	 * attributes verbatim puts the same `id` on both the `<nav>` and the list,
+	 * which is invalid HTML. The outer `<nav>` keeps the anchor, so it is
+	 * removed from the list here.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $container_attributes The block wrapper attributes for the list element.
+	 * @return string The opening `<ul>` tag.
+	 */
+	private static function get_list_open_tag( $container_attributes ) {
+		$processor = new WP_HTML_Tag_Processor( sprintf( '<ul %1$s>', $container_attributes ) );
+
+		if ( $processor->next_tag( 'UL' ) ) {
+			$processor->remove_attribute( 'id' );
+		}
+
+		return $processor->get_updated_html();
 	}
 
 	/**
