@@ -36,6 +36,32 @@ type Story = StoryObj< typeof Calendar >;
 
 export const Default: Story = {};
 
+/**
+ * Resize the container or change `numberOfMonths` to try the fluid layout.
+ * The container scrolls when it becomes narrower than one month's minimum.
+ */
+export const FluidWidth: Story = {
+	decorators: [
+		( Story ) => (
+			<div
+				style={ {
+					width: '100%',
+					resize: 'horizontal',
+					overflow: 'auto',
+					outline:
+						'1px solid var(--wpds-color-stroke-surface-neutral)',
+				} }
+			>
+				<Story />
+			</div>
+		),
+	],
+	args: {
+		defaultMonth: new Date( 2026, 0, 1 ),
+		defaultValue: new Date( 2026, 0, 15 ),
+	},
+};
+
 export const DisabledDates: Story = {
 	args: {
 		disabled: DISABLED_DATES_SAMPLE,
