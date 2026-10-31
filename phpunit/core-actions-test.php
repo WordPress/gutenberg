@@ -41,6 +41,19 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	const PAGE_ACTIONS = array( 'set-as-homepage', 'set-as-posts-page' );
 
 	/**
+	 * The action of the `post_type_supports` module opening an entity, for
+	 * pages, templates, template parts, patterns, and navigation menus, and
+	 * the users who can edit them, shown before the others.
+	 */
+	const EDIT_ACTION = 'edit-post';
+
+	/**
+	 * The action of the `page` module opening the quick edit form of pages,
+	 * for the users who can edit them, shown after the edit action.
+	 */
+	const QUICK_EDIT_ACTION = 'quick-edit';
+
+	/**
 	 * Administrator user id.
 	 *
 	 * @var int
@@ -154,19 +167,20 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * Pages are viewable and support revisions, titles, and page attributes,
-	 * and the user can create them and manage the site options: they have
-	 * every action of the `post_type_supports` module, then the actions of
-	 * the `page` module, in the order the actions are shown.
+	 * and the user can edit and create them and manage the site options: they
+	 * have every action of the `post_type_supports` module and the actions of
+	 * the `page` module, with the quick edit action after the edit one and the
+	 * homepage actions last, in the order the actions are shown.
 	 */
 	public function test_the_actions_of_pages() {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array_merge( array( 'view-post', 'view-post-revisions', 'duplicate-post', 'rename-post', 'order-pages' ), self::EVERY_POST_TYPE );
-		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
+		$this->assertSame( array_merge( array( self::EDIT_ACTION, self::QUICK_EDIT_ACTION ), $ids, self::PAGE_ACTIONS ), $this->get_action_ids( 'page' ) );
 		$this->assertSame(
 			array(
-				self::POST_TYPE_SUPPORTS => $ids,
-				self::PAGE               => self::PAGE_ACTIONS,
+				self::POST_TYPE_SUPPORTS => array_merge( array( self::EDIT_ACTION ), $ids ),
+				self::PAGE               => array_merge( array( self::QUICK_EDIT_ACTION ), self::PAGE_ACTIONS ),
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
@@ -194,12 +208,12 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		wp_set_current_user( self::$admin_id );
 
 		$this->assertSame(
-			array_merge( array( 'view-post-revisions', 'duplicate-pattern', 'rename-post', 'export-pattern' ), self::EVERY_POST_TYPE ),
+			array_merge( array( self::EDIT_ACTION, 'view-post-revisions', 'duplicate-pattern', 'rename-post', 'export-pattern' ), self::EVERY_POST_TYPE ),
 			$this->get_action_ids( 'wp_block' )
 		);
 		$this->assertSame(
 			array(
-				self::POST_TYPE_SUPPORTS => array_merge( array( 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
+				self::POST_TYPE_SUPPORTS => array_merge( array( self::EDIT_ACTION, 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
 				self::WP_BLOCK           => array( 'duplicate-pattern', 'export-pattern' ),
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'wp_block' ), 'actions', 'id' )
@@ -214,7 +228,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		switch_theme( 'block-theme' );
 
 		$this->assertSame(
-			array_merge( array( 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
+			array_merge( array( self::EDIT_ACTION, 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
 			$this->get_action_ids( 'wp_template' )
 		);
 	}
@@ -228,7 +242,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 		switch_theme( 'block-theme' );
 		$this->assertSame(
-			array_merge( array( 'view-post-revisions', 'duplicate-template-part', 'rename-post' ), self::EVERY_POST_TYPE ),
+			array_merge( array( self::EDIT_ACTION, 'view-post-revisions', 'duplicate-template-part', 'rename-post' ), self::EVERY_POST_TYPE ),
 			$this->get_action_ids( 'wp_template_part' ),
 			'A block theme can duplicate template parts.'
 		);
@@ -306,6 +320,47 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The edit action is only registered for pages, templates, template
+	 * parts, patterns, and navigation menus, and for the users who can edit
+	 * them.
+	 */
+	public function test_the_edit_action_depends_on_the_current_user() {
+		switch_theme( 'block-theme' );
+
+		wp_set_current_user( self::$admin_id );
+		foreach ( array( 'page', 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ) as $post_type ) {
+			$this->assertSame( self::EDIT_ACTION, $this->get_action_ids( $post_type )[0], "Administrators can edit the entities of $post_type." );
+		}
+		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'post' ), 'Posts do not have the action.' );
+
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame( self::EDIT_ACTION, $this->get_action_ids( 'page' )[0], 'Editors can edit pages.' );
+		$this->assertSame( self::EDIT_ACTION, $this->get_action_ids( 'wp_block' )[0], 'Editors can edit patterns.' );
+		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'wp_template' ), 'Editors cannot edit templates.' );
+		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'wp_template_part' ), 'Editors cannot edit template parts.' );
+		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'wp_navigation' ), 'Editors cannot edit navigation menus.' );
+
+		wp_set_current_user( self::$contributor_id );
+		$this->assertNotContains( self::EDIT_ACTION, $this->get_action_ids( 'page' ), 'Contributors cannot edit pages.' );
+	}
+
+	/**
+	 * The quick edit action is only registered for pages, and for the users
+	 * who can edit them.
+	 */
+	public function test_the_quick_edit_action_depends_on_the_current_user() {
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame( self::QUICK_EDIT_ACTION, $this->get_action_ids( 'page' )[1], 'It follows the edit action.' );
+		$this->assertNotContains( self::QUICK_EDIT_ACTION, $this->get_action_ids( 'post' ), 'Posts do not have the action.' );
+
+		wp_set_current_user( self::$editor_id );
+		$this->assertContains( self::QUICK_EDIT_ACTION, $this->get_action_ids( 'page' ), 'Editors can edit pages.' );
+
+		wp_set_current_user( self::$contributor_id );
+		$this->assertNotContains( self::QUICK_EDIT_ACTION, $this->get_action_ids( 'page' ), 'Contributors cannot edit pages.' );
+	}
+
+	/**
 	 * Setting the homepage or the posts page changes the site settings, so
 	 * the actions of the `page` module are only registered for the users who
 	 * can manage the site options.
@@ -371,6 +426,26 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 			),
 			$actions['view-post-revisions']
 		);
+		$this->assertSame(
+			array(
+				'id'      => 'edit-post',
+				'label'   => 'Edit',
+				'context' => 'list',
+				'origin'  => array( 'registeredBy' => 'core' ),
+			),
+			$actions['edit-post']
+		);
+		$this->assertSame(
+			array(
+				'id'           => 'quick-edit',
+				'label'        => 'Quick edit',
+				'context'      => 'list',
+				'isPrimary'    => true,
+				'supportsBulk' => true,
+				'origin'       => array( 'registeredBy' => 'core' ),
+			),
+			$actions['quick-edit']
+		);
 	}
 
 	/**
@@ -426,11 +501,11 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array( 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete' );
-		$this->assertSame( array_merge( $ids, self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
+		$this->assertSame( array_merge( array( self::EDIT_ACTION, self::QUICK_EDIT_ACTION ), $ids, self::PAGE_ACTIONS, array( 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
 		$this->assertSame(
 			array(
-				self::POST_TYPE_SUPPORTS => array_merge( $ids, array( 'move-to-trash' ) ),
-				self::PAGE               => self::PAGE_ACTIONS,
+				self::POST_TYPE_SUPPORTS => array_merge( array( self::EDIT_ACTION ), $ids, array( 'move-to-trash' ) ),
+				self::PAGE               => array_merge( array( self::QUICK_EDIT_ACTION ), self::PAGE_ACTIONS ),
 			),
 			array_column( wp_get_registered_entity_action_modules( 'postType', 'page' ), 'actions', 'id' )
 		);
