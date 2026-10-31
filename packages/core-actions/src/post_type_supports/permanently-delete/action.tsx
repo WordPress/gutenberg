@@ -166,6 +166,17 @@ const permanentlyDeletePost: ActionScriptParts< PostWithPermissions > = {
 								createErrorNotice( errorMessage, {
 									type: 'snackbar',
 								} );
+
+								// Some items may still have been deleted, so
+								// report those.
+								const deletedItems = items.filter(
+									( _item, index ) =>
+										promiseResult[ index ].status ===
+										'fulfilled'
+								);
+								if ( deletedItems.length > 0 ) {
+									onActionPerformed?.( deletedItems );
+								}
 							}
 
 							setIsBusy( false );
