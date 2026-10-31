@@ -1440,3 +1440,41 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		).toEqual( {} );
 	} );
 } );
+
+describe( 'useOpenImageMediaEditorModal pending crops', () => {
+	beforeEach( () => {
+		vi.clearAllMocks();
+	} );
+
+	it( 'passes the block client ID, so the editor can defer crops', async () => {
+		const { openMediaEditorModal } = await runModalUpdate( {
+			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
+			hookOptions: { clientId: 'image-1' },
+		} );
+
+		expect( openMediaEditorModal ).toHaveBeenCalledWith(
+			expect.objectContaining( { id: 1, clientId: 'image-1' } )
+		);
+	} );
+
+	it( 'repoints to a restored original without waiting for its file', async () => {
+		const onUrlChange = vi.fn();
+		const { setAttributes } = await runModalUpdate( {
+			attributes: { id: 2, url: 'cropped.jpg', alt: '', caption: '' },
+			updatePayload: {
+				id: 1,
+				url: 'original.jpg',
+				isPending: true,
+				previewUrl: 'blob:preview',
+			},
+			hookOptions: { onUrlChange },
+		} );
+
+		// The block shows the preview, so no load event would clear a
+		// loading state.
+		expect( onUrlChange ).not.toHaveBeenCalled();
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( { id: 1, url: 'original.jpg' } )
+		);
+	} );
+} );

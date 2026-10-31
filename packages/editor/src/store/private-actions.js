@@ -5,10 +5,17 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import {
+	parse,
+	__unstableSerializeAndClean,
+	getBlockType,
+} from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { revokeBlobURL } from '@wordpress/blob';
+import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import isTemplateRevertable from './utils/is-template-revertable';
+import commitPendingMediaEditsToBlocks from './utils/commit-pending-media-edits';
 import { buildRevisionsPageQuery } from './private-selectors';
 import {
 	getDeviceTypeByCanvasWidth,
@@ -1103,3 +1110,233 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Writes the pending media edits of an entity.
+ *
+ * @param {Object} registry The data registry.
+ * @param {Object} entity   The entity, as `{ kind, name, id }`.
+ * @param {Object} edits    Pending media edits, keyed by block client ID.
+ * @param {Object} options  Options passed to `editEntityRecord`.
+ */
+function writePendingMediaEdits( registry, entity, edits, options ) {
+	registry.dispatch( coreStore ).editEntityRecord(
+		entity.kind,
+		entity.name,
+		entity.id,
+		{
+			pendingMediaEdits: Object.keys( edits ).length ? edits : undefined,
+		},
+		options
+	);
+}
+
+/**
+ * Sets or clears the media edit for a block, held until the entity that owns
+ * the block is saved. See `getMediaEditOwnerForBlock`.
+ *
+ * The edits are stored as a transient edit on that entity, so they take part
+ * in undo and mark it as unsaved, but aren't sent with it.
+ *
+ * @param {string}  clientId Block client ID.
+ * @param {?Object} edit     The pending edit, or `undefined` to clear it.
+ */
+export const setPendingMediaEdit =
+	( clientId, edit ) =>
+	( { select, registry } ) => {
+		const owner = select.getMediaEditOwnerForBlock( clientId );
+		if ( ! owner ) {
+			return;
+		}
+		const { [ clientId ]: previous, ...others } =
+			select.getPendingMediaEdits( owner );
+		if ( previous === edit ) {
+			return;
+		}
+		writePendingMediaEdits(
+			registry,
+			owner,
+			edit ? { ...others, [ clientId ]: edit } : others
+		);
+	};
+
+/**
+ * Clears an entity's media edits for the given blocks.
+ *
+ * @param {Object}   entity    The entity, as `{ kind, name, id }`.
+ * @param {string[]} clientIds Block client IDs.
+ * @param {Object}   options   Options passed to `editEntityRecord`.
+ */
+export const clearPendingMediaEdits =
+	( entity, clientIds, options ) =>
+	( { select, registry } ) => {
+		const current = select.getPendingMediaEdits( entity );
+		const next = { ...current };
+		for ( const clientId of clientIds ) {
+			delete next[ clientId ];
+		}
+		if ( Object.keys( next ).length === Object.keys( current ).length ) {
+			return;
+		}
+		writePendingMediaEdits( registry, entity, next, options );
+	};
+
+// Commits in progress, keyed by registry and then entity, so an entity saved
+// twice at once (e.g. by `savePost` and the save panel) commits its edits once.
+const inFlightMediaCommits = new WeakMap();
+
+/**
+ * Saves the media edits waiting for an entity to be saved, such as crops made
+ * in the media editor, and points their blocks at the new images.
+ *
+ * @param {Object} entity The entity, as `{ kind, name, id }`.
+ *
+ * @return {Promise<Object|undefined>} A save error, if any edit failed.
+ */
+export const commitPendingMediaEdits =
+	( entity ) =>
+	( { select, dispatch, registry } ) => {
+		if ( ! inFlightMediaCommits.has( registry ) ) {
+			inFlightMediaCommits.set( registry, new Map() );
+		}
+		const commits = inFlightMediaCommits.get( registry );
+		const key = `${ entity.kind }:${ entity.name }:${ entity.id }`;
+		if ( ! commits.has( key ) ) {
+			commits.set(
+				key,
+				commitEntityMediaEdits( entity, {
+					select,
+					dispatch,
+					registry,
+				} ).finally( () => commits.delete( key ) )
+			);
+		}
+		return commits.get( key );
+	};
+
+async function commitEntityMediaEdits(
+	entity,
+	{ select, dispatch, registry }
+) {
+	const pendingEdits = select.getPendingMediaEdits( entity );
+	if ( ! Object.keys( pendingEdits ).length ) {
+		return undefined;
+	}
+	const { done, error } = await commitPendingMediaEditsToBlocks(
+		registry,
+		pendingEdits
+	);
+	// Not undoable: undoing the block changes is enough to go back to the
+	// original image.
+	dispatch.clearPendingMediaEdits( entity, done, { undoIgnore: true } );
+	for ( const clientId of done ) {
+		const { previewUrl } = pendingEdits[ clientId ];
+		if ( previewUrl ) {
+			revokeBlobURL( previewUrl );
+		}
+	}
+	if ( ! error ) {
+		return undefined;
+	}
+	// A failed request is usually a plain object rather than an `Error`.
+	const reason = typeof error?.message === 'string' ? error.message : '';
+	return {
+		code: error?.code,
+		// Keeps the HTTP status, which the save failure notice shows.
+		data: error?.data,
+		message: reason
+			? sprintf(
+					/* translators: %s: Error message. */
+					__( 'An edited image could not be saved. %s' ),
+					reason
+				)
+			: __( 'An edited image could not be saved.' ),
+	};
+}
+
+/**
+ * Whether a media edit made on the block can wait for its entity to be saved.
+ *
+ * @param {Object} select   Editor store selectors.
+ * @param {Object} registry The data registry.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether the edit can be deferred.
+ */
+function canDeferMediaEdit( select, registry, clientId ) {
+	const blockName =
+		clientId &&
+		registry.select( blockEditorStore ).getBlockName( clientId );
+	return (
+		!! blockName &&
+		!! getBlockType( blockName )?.mediaEditor &&
+		!! select.getMediaEditOwnerForBlock( clientId )
+	);
+}
+
+/**
+ * Opens the media editor for an attachment shown by a block.
+ *
+ * When the block's type declares `mediaEditor` and the block belongs to an
+ * entity, a crop is held as a pending media edit and saved when that entity
+ * is saved.
+ * `onUpdate` is still called, with `isPending` and `previewUrl` set, so the
+ * block can apply changes that don't wait, such as alt text.
+ *
+ * @param {Object}                   options
+ * @param {number}                   options.id         Attachment ID.
+ * @param {string}                   [options.clientId] Block client ID.
+ * @param {(update: Object) => void} [options.onUpdate] Called when the media editor saves.
+ * @param {() => void}               [options.onUndo]   Called when an immediate save is undone.
+ * @param {() => void}               [options.onClose]  Called when the media editor closes.
+ */
+export const openMediaEditorForBlock =
+	( { id, clientId, onUpdate, onUndo, onClose } ) =>
+	( { select, dispatch, registry } ) => {
+		if (
+			clientId &&
+			select.getMediaEditorStateForBlock( clientId ).isLocked
+		) {
+			return;
+		}
+		const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
+		const deferCrop = canDeferMediaEdit( select, registry, clientId );
+		const pendingEdit = deferCrop
+			? select.getPendingMediaEditForBlock( clientId )
+			: undefined;
+
+		registry.dispatch( mediaEditorStore ).openMediaEditorModal( {
+			id,
+			deferCrop,
+			pendingCrop: pendingEdit,
+			onUpdate: ( update ) => {
+				if ( ! deferCrop ) {
+					onUpdate?.( update );
+					return;
+				}
+				const { pendingCrop, ...rest } = update;
+				// Any save without a pending crop replaces the earlier one.
+				dispatch.setPendingMediaEdit(
+					clientId,
+					pendingCrop
+						? {
+								...pendingCrop,
+								sourceId: update.id,
+								sourceUrl: update.url,
+							}
+						: undefined
+				);
+				onUpdate?.(
+					pendingCrop
+						? {
+								...rest,
+								isPending: true,
+								previewUrl: pendingCrop.previewUrl,
+							}
+						: rest
+				);
+			},
+			onUndo,
+			onClose,
+		} );
+	};

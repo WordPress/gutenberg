@@ -21,7 +21,7 @@ import type {
 	KeyedEntityAction,
 	UsersState,
 } from './private-types';
-import type { EntityConfig } from './types';
+import type { EntityConfig, PreSaveHandler } from './types';
 
 /**
  * Reducer managing authors state. Keyed by id.
@@ -925,6 +925,27 @@ export function entityActionsConfigs(
 	return state;
 }
 
+/**
+ * Reducer managing the functions called before a record is saved.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function preSaveHandlers(
+	state: Array< PreSaveHandler > = [],
+	action: Action
+) {
+	switch ( action.type ) {
+		case 'ADD_PRE_SAVE_HANDLER':
+			return [ ...state, action.handler ];
+		case 'REMOVE_PRE_SAVE_HANDLER':
+			return state.filter( ( handler ) => handler !== action.handler );
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -953,4 +974,5 @@ export default combineReducers( {
 	viewConfigs,
 	fieldsConfigs,
 	entityActionsConfigs,
+	preSaveHandlers,
 } );

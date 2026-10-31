@@ -1,6 +1,7 @@
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
+import type { PreSaveHandler } from './types';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import logEntityDeprecation from './utils/log-entity-deprecation';
@@ -459,4 +460,15 @@ export function getEntitySyncConnectionStatus(
 	return state.syncConnectionStatuses?.[
 		`${ kind }/${ name }:${ recordId }`
 	];
+}
+
+/**
+ * Returns the functions to call before a record is saved.
+ *
+ * @param state Data state.
+ *
+ * @return The pre-save handlers.
+ */
+export function getPreSaveHandlers( state: State ): Array< PreSaveHandler > {
+	return state.preSaveHandlers;
 }

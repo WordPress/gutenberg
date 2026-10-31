@@ -14,7 +14,6 @@ import {
 	privateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -25,8 +24,6 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
-
-const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
@@ -130,6 +127,7 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	getMediaEditorStateKey,
 } = unlock( privateApis );
 
 /**
@@ -322,7 +320,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { openMediaEditorForBlock } = unlock( useDispatch( editorStore ) );
 
 	/**
 	 * Creates a Post entity.
@@ -403,12 +401,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: ( {
-				id,
-				onUpdate,
-				onUndo,
-				onClose,
-			} ) => openMediaEditorModal( { id, onUpdate, onUndo, onClose } ),
+			[ openMediaEditorModalKey ]: openMediaEditorForBlock,
+			[ getMediaEditorStateKey ]: ( select, clientId ) =>
+				unlock( select( editorStore ) ).getMediaEditorStateForBlock(
+					clientId
+				),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
@@ -507,7 +504,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
-		openMediaEditorModal,
+		openMediaEditorForBlock,
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,

@@ -10,6 +10,11 @@ import {
 	buildModifiers,
 	type Modifier,
 } from '../media-editor-modal/build-modifiers';
+import {
+	createPendingCropPreview,
+	getPendingCropperState,
+	type MediaEditorPendingCrop,
+} from './pending-crop';
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
 // endpoint only accepts this whitelist.
@@ -34,10 +39,20 @@ export interface MediaEditorSaveResult {
 		id: number;
 		url?: string;
 	};
+	/**
+	 * Set when the crop was deferred. Nothing was written for the crop, and
+	 * `id` and `url` are the attachment it applies to.
+	 */
+	pendingCrop?: MediaEditorPendingCrop;
 }
 
 interface UseSaveMediaEditorArgs {
 	session: MediaEditorSession;
+	/**
+	 * Return a crop through `onSaved` as `pendingCrop` instead of saving it.
+	 * Details edits are still saved.
+	 */
+	deferCrop?: boolean;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
@@ -92,8 +107,39 @@ function getMetadataEdits(
 	return metadataEdits;
 }
 
+/**
+ * Builds a pending crop, or returns `undefined` if the preview can't be
+ * rendered (e.g. a cross-origin image taints the canvas). The caller then
+ * saves the crop instead.
+ *
+ * @param session   The media editor session.
+ * @param modifiers The crop's `/edit` modifiers.
+ * @param mimeType  The source image's MIME type.
+ * @return The pending crop, or `undefined`.
+ */
+async function getPendingCrop(
+	session: MediaEditorSession,
+	modifiers: Modifier[],
+	mimeType?: string
+): Promise< MediaEditorPendingCrop | undefined > {
+	const { state } = session.cropper;
+	try {
+		return {
+			modifiers,
+			cropperState: getPendingCropperState( state ),
+			aspectRatioValue: session.cropOptions.aspectRatioValue,
+			previewUrl: await createPendingCropPreview( state, mimeType ),
+		};
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn( 'Could not preview the crop, saving it now.', error );
+		return undefined;
+	}
+}
+
 export function useSaveMediaEditor( {
 	session,
+	deferCrop = false,
 	id,
 	isImage,
 	media,
@@ -121,6 +167,44 @@ export function useSaveMediaEditor( {
 			const targetId = replacementSource?.id ?? id;
 			const targetUrl = replacementSource?.url ?? media?.source_url;
 			const targetMedia = replacementSource?.media ?? media;
+
+			const pendingCrop =
+				deferCrop && modifiers.length > 0
+					? await getPendingCrop(
+							session,
+							modifiers,
+							targetMedia?.mime_type
+						)
+					: undefined;
+
+			if ( pendingCrop ) {
+				// Only details edits are saved now. The host commits the crop.
+				const hasDetailsEdits = registry
+					.select( coreStore )
+					.hasEditsForEntityRecord(
+						'postType',
+						'attachment',
+						targetId
+					);
+				saved = hasDetailsEdits
+					? ( ( await saveEditedEntityRecord(
+							'postType',
+							'attachment',
+							targetId,
+							{ throwOnError: true }
+						) ) as Media | undefined )
+					: undefined;
+				const next = ( saved ?? targetMedia ) as Media | null;
+				if ( next ) {
+					onSaved?.( {
+						id: targetId,
+						url: targetUrl,
+						media: next,
+						pendingCrop,
+					} );
+				}
+				return;
+			}
 
 			// Both a fresh crop and a bare replacement swap the block's image,
 			// so both offer an Undo back to the current attachment.
@@ -232,6 +316,7 @@ export function useSaveMediaEditor( {
 	}, [
 		clearEntityRecordEdits,
 		createErrorNotice,
+		deferCrop,
 		id,
 		isImage,
 		media,

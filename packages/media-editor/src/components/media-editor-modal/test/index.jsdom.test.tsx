@@ -4,12 +4,14 @@ import type { ReactNode } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { MediaEditorModal } from '../index';
+import MediaEditor from '../../media-editor';
 
 let mockSaveResult: {
 	id: number;
 	url: string;
 	media: { id: number; source_url: string };
 	previous?: { id: number; url: string };
+	pendingCrop?: object;
 } = {
 	id: 11,
 	url: 'edited.jpg',
@@ -21,6 +23,8 @@ let mockSaveResult: {
 };
 const mockOnUpdate = vi.fn();
 let mockOnUndo: ( () => void ) | undefined;
+let mockDeferCrop = false;
+let mockPendingCrop: object | null = null;
 const mockOnClose = vi.fn();
 const mockCloseMediaEditorModal = vi.fn();
 const mockCreateSuccessNotice = vi.fn();
@@ -88,6 +92,8 @@ describe( 'MediaEditorModal', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
 		mockOnUndo = undefined;
+		mockDeferCrop = false;
+		mockPendingCrop = null;
 		mockSaveResult = {
 			id: 11,
 			url: 'edited.jpg',
@@ -102,6 +108,8 @@ describe( 'MediaEditorModal', () => {
 			mapSelect( () => ( {
 				isOpen: () => true,
 				getId: () => 10,
+				getDeferCrop: () => mockDeferCrop,
+				getPendingCrop: () => mockPendingCrop,
 				getOnUpdate: () => mockOnUpdate,
 				getOnUndo: () => mockOnUndo,
 				getOnClose: () => mockOnClose,
@@ -177,6 +185,46 @@ describe( 'MediaEditorModal', () => {
 			screen.getByRole( 'button', { name: 'Save result' } )
 		);
 
+		expect( mockCreateSuccessNotice ).not.toHaveBeenCalled();
+	} );
+
+	it( 'passes deferCrop and an earlier pending crop to the editor', () => {
+		mockDeferCrop = true;
+		mockPendingCrop = { previewUrl: 'blob:earlier' };
+
+		render( <MediaEditorModal /> );
+
+		expect(
+			( MediaEditor as unknown as Mock ).mock.calls[ 0 ][ 0 ]
+		).toEqual(
+			expect.objectContaining( {
+				deferCrop: true,
+				pendingCrop: mockPendingCrop,
+			} )
+		);
+	} );
+
+	it( 'passes a pending crop to onUpdate without the undo snackbar', () => {
+		const pendingCrop = { previewUrl: 'blob:cropped' };
+		mockSaveResult = {
+			id: 10,
+			url: 'original.jpg',
+			media: { id: 10, source_url: 'original.jpg' },
+			pendingCrop,
+		};
+
+		render( <MediaEditorModal /> );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Save result' } )
+		);
+
+		expect( mockOnUpdate ).toHaveBeenCalledWith( {
+			id: 10,
+			url: 'original.jpg',
+			pendingCrop,
+		} );
+		expect( mockCloseMediaEditorModal ).toHaveBeenCalled();
 		expect( mockCreateSuccessNotice ).not.toHaveBeenCalled();
 	} );
 } );

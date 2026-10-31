@@ -714,6 +714,40 @@ export interface BlockType<
 		attributes: Attributes,
 		options: { context: string }
 	) => string | void;
+	/**
+	 * How the block uses an attachment that can be edited in the media
+	 * editor.
+	 */
+	mediaEditor?: BlockMediaEditorSettings< Attributes >;
+}
+
+/**
+ * An attachment as a block sees it.
+ */
+export interface BlockMediaReference {
+	id?: number;
+	url?: string;
+}
+
+/**
+ * Lets the editor open the media editor for a block, and point the block at
+ * a new attachment without the block being mounted.
+ */
+export interface BlockMediaEditorSettings<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> {
+	/**
+	 * Returns the attachment the block shows.
+	 */
+	getMedia: ( attributes: Attributes ) => BlockMediaReference;
+	/**
+	 * Returns the attributes that point the block at a new attachment. The
+	 * media is an attachment REST response.
+	 */
+	applyMedia: (
+		attributes: Attributes,
+		media: Record< string, any >
+	) => Partial< Attributes >;
 }
 
 /**

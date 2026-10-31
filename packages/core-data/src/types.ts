@@ -272,6 +272,12 @@ export interface EntityConfig {
 	plural?: string;
 	rawAttributes?: ReadonlyArray< string >;
 	transientEdits?: Record< string, boolean | TransientEditConfig >;
+	/**
+	 * Transient edits that still count as unsaved changes. They aren't sent
+	 * with the record, so a pre-save handler has to turn them into edits that
+	 * are. See `addPreSaveHandler`.
+	 */
+	dirtyTransientEdits?: Record< string, boolean >;
 	mergedEdits?: Record< string, boolean >;
 	supportsPagination?: boolean;
 	getTitle?: ( record: EntityTitleRecord ) => string | undefined;
@@ -288,6 +294,15 @@ export interface EntityConfig {
 	syncConfig?: SyncConfig;
 	meta?: Record< string, unknown >;
 }
+
+/**
+ * Called before a record is saved, other than by an autosave. Returns the
+ * record to save, which may include edits made by the handler.
+ */
+export type PreSaveHandler = (
+	record: Record< string, unknown >,
+	context: { kind: string; name: string; recordId?: string | number }
+) => Promise< Record< string, unknown > > | Record< string, unknown >;
 
 /**
  * A function to call instead of `apiFetch()`, such as a batch's `add`.

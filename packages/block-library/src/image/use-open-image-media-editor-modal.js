@@ -233,6 +233,7 @@ function hasKnownAttachmentMetadata( attachment ) {
 }
 
 export function useOpenImageMediaEditorModal( {
+	clientId,
 	attributes,
 	setAttributes,
 	onClose,
@@ -338,7 +339,7 @@ export function useOpenImageMediaEditorModal( {
 	);
 
 	const handleMediaUpdate = useCallback(
-		async ( { id: newId, url: newUrl }, undoState ) => {
+		async ( { id: newId, url: newUrl, isPending }, undoState ) => {
 			if ( typeof newId !== 'number' ) {
 				return;
 			}
@@ -360,7 +361,12 @@ export function useOpenImageMediaEditorModal( {
 				undoState.undoAttributes.url = currentBlockAttributes.url;
 				nextAttributes.id = newId;
 				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
-				if ( nextAttributes.url !== currentBlockAttributes.url ) {
+				// With a pending crop the block shows the crop preview, not
+				// the new URL, so there's no file to wait for.
+				if (
+					! isPending &&
+					nextAttributes.url !== currentBlockAttributes.url
+				) {
 					// The block is about to point at a freshly generated file
 					// the browser hasn't loaded yet; let the caller show a
 					// loading state until its <img> fires load/error. Raising
@@ -443,6 +449,7 @@ export function useOpenImageMediaEditorModal( {
 						// block then clears its loading state by matching
 						// the pending URL against the rendered one.
 						if (
+							! isPending &&
 							derivedAttributes.url &&
 							derivedAttributes.url !== latestBlockAttributes.url
 						) {
@@ -509,6 +516,7 @@ export function useOpenImageMediaEditorModal( {
 		const undoState = { undoAttributes: {}, isUndone: false };
 		openMediaEditorModal( {
 			id,
+			clientId,
 			onUpdate: ( updated ) => handleMediaUpdate( updated, undoState ),
 			onUndo: () => {
 				undoState.isUndone = true;
@@ -525,6 +533,7 @@ export function useOpenImageMediaEditorModal( {
 			onClose,
 		} );
 	}, [
+		clientId,
 		getCachedAttachmentRecord,
 		handleMediaUpdate,
 		id,

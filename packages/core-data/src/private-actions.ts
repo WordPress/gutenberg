@@ -15,7 +15,11 @@ import type {
 	MediaEdits,
 	SaveDirtyEntitiesOptions,
 } from './private-types';
-import type { DeleteEntityRecordOptions, EntityConfig } from './types';
+import type {
+	DeleteEntityRecordOptions,
+	EntityConfig,
+	PreSaveHandler,
+} from './types';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -252,6 +256,34 @@ export function receiveEntityActionsConfig(
 		name,
 		config,
 	};
+}
+
+/**
+ * Adds a function to call before a record is saved, other than by an
+ * autosave. It can return the record with more edits, or throw to fail the
+ * save.
+ *
+ * @param handler The function.
+ *
+ * @return Action object.
+ */
+export function addPreSaveHandler(
+	handler: PreSaveHandler
+): ActionOf< 'ADD_PRE_SAVE_HANDLER' > {
+	return { type: 'ADD_PRE_SAVE_HANDLER', handler };
+}
+
+/**
+ * Removes a function added with `addPreSaveHandler`.
+ *
+ * @param handler The function.
+ *
+ * @return Action object.
+ */
+export function removePreSaveHandler(
+	handler: PreSaveHandler
+): ActionOf< 'REMOVE_PRE_SAVE_HANDLER' > {
+	return { type: 'REMOVE_PRE_SAVE_HANDLER', handler };
 }
 
 /**
