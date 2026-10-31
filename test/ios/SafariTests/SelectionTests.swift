@@ -7,6 +7,16 @@ import XCTest
 final class SelectionTests: XCTestCase {
 	let app = XCUIApplication()
 
+	/// How long the first tap gets to focus the paragraph before a retry.
+	/// Focus can take over 3 seconds to show when the tap lands, and a
+	/// retry on a paragraph that is about to focus opens the edit menu, so
+	/// retry only once the tap has clearly been dropped.
+	static let focusRetryTimeout: TimeInterval = 10
+	/// How long the keyboard and the canvas get to settle after focus.
+	static let settleTimeout: TimeInterval = 5
+	/// The pause between two reads of a frame while it settles.
+	static let settleInterval: useconds_t = 250_000
+
 	var web: XCUIElement { app.webViews.firstMatch }
 	var editor: Editor { Editor( app: app ) }
 
@@ -27,6 +37,22 @@ final class SelectionTests: XCTestCase {
 		app.coordinate( withNormalizedOffset: .zero ).withOffset( CGVector( dx: x, dy: y ) )
 	}
 
+	/// The element's frame once two reads in a row agree. The keyboard and
+	/// its accessory bar slide in after focus and move the canvas, so an
+	/// early read points at where the element was, e.g. on the accessory bar.
+	func stableFrame( of element: XCUIElement ) -> CGRect {
+		let deadline = Date( timeIntervalSinceNow: Self.settleTimeout )
+		var previous = element.frame
+		usleep( Self.settleInterval )
+		var current = element.frame
+		while current != previous && Date() < deadline {
+			previous = current
+			usleep( Self.settleInterval )
+			current = element.frame
+		}
+		return current
+	}
+
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
 		// A new post starting with this content: run.sh passes the content
 		// argument of post-new.php through unescaped.
@@ -44,18 +70,37 @@ final class SelectionTests: XCTestCase {
 
 		// Select the second paragraph, with the caret at the end of its line:
 		// a tap on the caret opens the edit menu instead of selecting a word.
-		second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		// The simulator now and then drops a tap, like the first one of a
+		// run, so tap again if focus does not show.
+		let lineEnd = second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) )
+		lineEnd.tap()
 		let focused = web.textViews.matching( NSPredicate( format: "hasKeyboardFocus == true" ) ).firstMatch
+		if !focused.waitForExistence( timeout: Self.focusRetryTimeout ) {
+			lineEnd.tap()
+		}
 		XCTAssertTrue( focused.waitForExistence( timeout: 10 ), "The tap did not focus the paragraph" )
+
+		// Wait for the keyboard and for the canvas to stop moving under it,
+		// so the frames below are where the words are now. Without a
+		// software keyboard the canvas does not move, so this does not
+		// assert.
+		_ = app.keyboards.firstMatch.waitForExistence( timeout: Self.settleTimeout )
+		let target = stableFrame( of: second )
 
 		// The emphasis makes "bravo" a text element of its own, with its
 		// own frame.
 		let bravo = web.staticTexts[ "bravo" ].frame
-		let target = second.frame
 
-		// Double tap the first word, "Delta".
+		// Double tap the first word, "Delta". The simulator now and then
+		// delivers the double tap as two single taps: the second lands on
+		// the caret the first placed and opens the Paste, Select, Select All
+		// menu. Its Select selects the word at the caret, "Delta".
 		point( target.minX + 15, target.midY ).doubleTap()
 		let cut = app.menuItems[ "Cut" ]
+		let select = app.menuItems[ "Select" ]
+		if !cut.waitForExistence( timeout: 5 ) && select.exists {
+			select.tap()
+		}
 		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word" )
 
 		// The start handle's knob sits above the line, at the start of the
