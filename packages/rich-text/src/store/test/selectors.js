@@ -5,6 +5,7 @@ import {
 	getFormatType,
 	getFormatTypeForBareElement,
 	getFormatTypeForClassName,
+	getFormatTypeForStyleProperty,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -71,6 +72,51 @@ describe( 'selectors', () => {
 			);
 
 			expect( result ).toEqual( formatTypeClassName );
+		} );
+	} );
+
+	describe( 'getFormatTypeForStyleProperty', () => {
+		const formatTypeStyleProperty = {
+			name: 'core/test-format-style-property',
+			className: null,
+			tagName: 'span',
+			styleProperty: 'color',
+		};
+		const state = deepFreeze( {
+			formatTypes: {
+				'core/test-format-bare-tag': formatTypeBareTag,
+				'core/test-format-style-property': formatTypeStyleProperty,
+			},
+		} );
+
+		it( 'should get a format type by style property', () => {
+			const result = getFormatTypeForStyleProperty(
+				state,
+				'span',
+				'color: red;'
+			);
+
+			expect( result ).toEqual( formatTypeStyleProperty );
+		} );
+
+		it( 'should not get a format type for a different property', () => {
+			const result = getFormatTypeForStyleProperty(
+				state,
+				'span',
+				'font-weight: 700;'
+			);
+
+			expect( result ).toBeUndefined();
+		} );
+
+		it( 'should not get a format type for a different tag name', () => {
+			const result = getFormatTypeForStyleProperty(
+				state,
+				'strong',
+				'color: red;'
+			);
+
+			expect( result ).toBeUndefined();
 		} );
 	} );
 } );
