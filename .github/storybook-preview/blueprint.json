@@ -1,0 +1,14 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/storybook/index.html",
+	"steps": [
+		{
+			"step": "unzip",
+			"zipFile": {
+				"resource": "bundled",
+				"path": "/storybook.zip"
+			},
+			"extractToPath": "/wordpress/storybook"
+		}
+	]
+}
