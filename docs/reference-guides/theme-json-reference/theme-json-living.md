@@ -368,6 +368,7 @@ Typography styles.
 | textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
+| textWrap | Sets the `text-wrap` CSS property. | `string`, `{ ref }` |
 
 ---
 
