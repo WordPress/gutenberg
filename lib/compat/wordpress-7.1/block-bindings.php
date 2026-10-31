@@ -99,3 +99,80 @@ function gutenberg_restore_list_item_inner_blocks_after_binding( $block_content,
 	return substr( $block_content, 0, $closer_position ) . $inner_blocks_html . substr( $block_content, $closer_position );
 }
 add_filter( 'render_block', 'gutenberg_restore_list_item_inner_blocks_after_binding', 10, 3 );
+
+/**
+ * Callback to retrieve the post edit URL for the block binding.
+ *
+ * @since 7.2.0
+ *
+ * @param array    $source_args    Array containing source arguments.
+ * @param WP_Block $block_instance The block instance.
+ * @return string|null The post edit URL, or null if the user cannot edit.
+ */
+function gutenberg_block_bindings_post_edit_url_callback( $source_args, $block_instance ) {
+	$post_id = $block_instance->context['postId'] ?? get_the_ID();
+
+	if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+		return null;
+	}
+
+	return get_edit_post_link( $post_id, 'raw' );
+}
+
+/**
+ * Registers the post edit URL block binding source.
+ *
+ * @since 7.2.0
+ */
+function gutenberg_register_block_bindings_post_edit_url() {
+	register_block_bindings_source(
+		'core/post-edit-url',
+		array(
+			'label'              => _x( 'Post Edit URL', 'block bindings source', 'gutenberg' ),
+			'uses_context'       => array( 'postId' ),
+			'get_value_callback' => 'gutenberg_block_bindings_post_edit_url_callback',
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_bindings_post_edit_url' );
+
+/**
+ * Conditionally hides blocks bound to the post edit url if the user lacks capabilities.
+ *
+ * The Block Bindings API falls back to static markup if the binding callback returns null.
+ * This filter is load bearing, it ensures unauthorized users don't see a dead link
+ * or an empty button shell on the frontend.
+ *
+ * @since 7.2.0
+ *
+ * @param string   $block_content The block content.
+ * @param array    $block         The parsed block.
+ * @param WP_Block $instance      The block instance.
+ * @return string The block content, or empty string if unauthorized.
+ */
+function gutenberg_hide_post_edit_url_bound_blocks( $block_content, $block, $instance ) {
+	$post_id = $instance->context['postId'] ?? get_the_ID();
+
+	$bindings = $block['attrs']['metadata']['bindings'] ?? array();
+	if ( is_array( $bindings ) ) {
+		foreach ( $bindings as $binding ) {
+			if ( is_array( $binding ) && isset( $binding['source'] ) && 'core/post-edit-url' === $binding['source'] ) {
+				if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+					return '';
+				}
+			}
+		}
+	}
+
+	if ( 'core/buttons' === $block['blockName'] ) {
+		$classes = $block['attrs']['className'] ?? '';
+		if ( str_contains( $classes, 'wp-block-post-edit-link-wrapper' ) ) {
+			if ( ! preg_match( '/\bwp-block-button\b/', $block_content ) ) {
+				return '';
+			}
+		}
+	}
+
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_hide_post_edit_url_bound_blocks', 10, 3 );
