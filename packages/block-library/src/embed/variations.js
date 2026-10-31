@@ -316,7 +316,7 @@ const variations = [
 		attributes: { providerNameSlug: 'wordpress-tv', responsive: true },
 	},
 	{
-		name: 'amazon-kindle',
+		name: 'amazon',
 		title: getTitle( 'Amazon Kindle' ),
 		icon: embedAmazonIcon,
 		keywords: [ __( 'ebook' ) ],
@@ -325,7 +325,7 @@ const variations = [
 			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
-		attributes: { providerNameSlug: 'amazon-kindle' },
+		attributes: { providerNameSlug: 'amazon' },
 	},
 	{
 		name: 'pinterest',
