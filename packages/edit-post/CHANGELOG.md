@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Meta Boxes: Initialize classic meta boxes even when a stale `template-locked` rendering mode cannot resolve a template, so meta box values keep saving on Update. ([#82951](https://github.com/WordPress/gutenberg/issues/82951))
+
 ### Enhancements
 
 -   Meta Boxes: Use the design system outline for the panel toggle's keyboard focus ring ([#85355](https://github.com/WordPress/gutenberg/pull/85355)).
