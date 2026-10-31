@@ -116,19 +116,16 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			"<!-- wp:navigation-link {\"label\":\"Sample Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'Sample Page'
-			) !== false
+		$this->assertStringContainsString(
+			'Sample Page',
+			gutenberg_render_block_core_navigation_link(
+				$navigation_link_block->attributes,
+				array(),
+				$navigation_link_block
+			)
 		);
 	}
 
@@ -139,10 +136,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			"<!-- wp:navigation-link {\"type\":\"page\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
+		$this->assertSame(
 			'',
 			gutenberg_render_block_core_navigation_link(
 				$navigation_link_block->attributes,
@@ -159,11 +156,11 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			"<!-- wp:navigation-link {\"label\":\"Draft Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'',
 			gutenberg_render_block_core_navigation_link(
 				$navigation_link_block->attributes,
@@ -180,19 +177,16 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			"<!-- wp:navigation-link {\"label\":\"Cats\",\"type\":\"category\",\"id\":{$category_id},\"url\":\"{$url}/?cat={$category_id}\"} /-->"
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'Cats'
-			) !== false
+		$this->assertStringContainsString(
+			'Cats',
+			gutenberg_render_block_core_navigation_link(
+				$navigation_link_block->attributes,
+				array(),
+				$navigation_link_block
+			)
 		);
 	}
 
@@ -200,19 +194,16 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:navigation-link {"label":"My Website","url":"https://example.com"} /-->'
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'My Website'
-			) !== false
+		$this->assertStringContainsString(
+			'My Website',
+			gutenberg_render_block_core_navigation_link(
+				$navigation_link_block->attributes,
+				array(),
+				$navigation_link_block
+			)
 		);
 	}
 
@@ -233,21 +224,18 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 
 		foreach ( $urls_before_render as $idx => $link ) {
-				$parsed_blocks = parse_blocks( '<!-- wp:navigation-link {"label":"test label", "url": "' . $link . '"} /-->' );
-			$this->assertEquals( 1, count( $parsed_blocks ) );
-				$block             = $parsed_blocks[0];
+			$parsed_blocks = parse_blocks( '<!-- wp:navigation-link {"label":"test label", "url": "' . $link . '"} /-->' );
+			$this->assertCount( 1, $parsed_blocks );
+			$block                 = $parsed_blocks[0];
 			$navigation_link_block = new WP_Block( $block, array() );
-				$this->assertEquals(
-					true,
-					strpos(
-						gutenberg_render_block_core_navigation_link(
-							$navigation_link_block->attributes,
-							array(),
-							$navigation_link_block
-						),
-						$urls_after_render[ $idx ]
-					) !== false
-				);
+			$this->assertStringContainsString(
+				$urls_after_render[ $idx ],
+				gutenberg_render_block_core_navigation_link(
+					$navigation_link_block->attributes,
+					array(),
+					$navigation_link_block
+				)
+			);
 		}
 	}
 
@@ -258,11 +246,11 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			"<!-- wp:navigation-link {\"label\":\"Draft Custom Post Type\",\"type\":\"cats\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'',
 			gutenberg_render_block_core_navigation_link(
 				$navigation_link_block->attributes,
@@ -279,19 +267,16 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks(
 			"<!-- wp:navigation-link {\"label\":\"Metal Dogs\",\"type\":\"dogs\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"{$url}/?page_id={$page_id}\"} /-->"
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
+		$this->assertCount( 1, $parsed_blocks );
 
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'Metal Dogs'
-			) !== false
+		$this->assertStringContainsString(
+			'Metal Dogs',
+			gutenberg_render_block_core_navigation_link(
+				$navigation_link_block->attributes,
+				array(),
+				$navigation_link_block
+			)
 		);
 	}
 }
