@@ -88,6 +88,10 @@
 
 -   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
 
+### Bug Fixes
+
+-   Image: Refresh backed-up image URLs after edits while preserving caption markup ([#83541](https://github.com/WordPress/gutenberg/pull/83541)).
+
 ## 11.1.0 (2026-09-23)
 
 ### Enhancements
