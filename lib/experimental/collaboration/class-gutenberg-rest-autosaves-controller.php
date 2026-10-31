@@ -32,6 +32,16 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
 
 	/**
+	 * Request parameter holding the serialized CRDT document to persist on the
+	 * parent post when an autosave promotes an auto-draft to a draft.
+	 *
+	 * This string must match CRDT_AUTOSAVE_DOCUMENT_KEY in @wordpress/core-data.
+	 *
+	 * @var string
+	 */
+	public const CRDT_DOCUMENT_PARAM = 'crdt_document';
+
+	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
 	 *
 	 * A snapshot is a state vector plus a delete set, so it grows with the
@@ -148,6 +158,10 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return $autosave_id;
 		}
 
+		if ( $should_promote_auto_draft ) {
+			$this->store_crdt_document( $post->ID, $request );
+		}
+
 		// Only save a CRDT snapshot with an autosave (not with parent post)
 		if ( $autosave_id !== $post->ID ) {
 			$this->store_crdt_snapshot( $autosave_id, $request );
@@ -160,6 +174,46 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
+	}
+
+	/**
+	 * Persists the CRDT document sent with the autosave that promotes an
+	 * auto-draft to a draft.
+	 *
+	 * That autosave is the only one that writes the parent post. Later
+	 * autosaves only create revisions, and the document is otherwise persisted
+	 * only by a manual save. Without this, a post that is never saved manually
+	 * has parent content but no persisted document. A peer loading such a post
+	 * builds a new document from the parent content, and when that document
+	 * syncs it can replace the live content every other peer is editing.
+	 *
+	 * The document is written in the same request as the parent content so
+	 * the two describe the same state. A peer loading the post applies the
+	 * persisted document and then reconciles it against the parent content,
+	 * so a document that is newer or older than the parent would be treated
+	 * as a conflict.
+	 *
+	 * Anything invalid is ignored rather than erroring. A missing document
+	 * leaves the post as it was before this parameter existed.
+	 *
+	 * @param int             $post_id Parent post ID.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return void
+	 */
+	private function store_crdt_document( $post_id, $request ) {
+		$doc = $request->get_param( self::CRDT_DOCUMENT_PARAM );
+
+		$is_valid_doc = (
+			is_string( $doc ) &&
+			'' !== $doc &&
+			strlen( $doc ) <= WP_Sync_Save_Server::MAX_DOC_LENGTH
+		);
+
+		if ( ! $is_valid_doc ) {
+			return;
+		}
+
+		update_post_meta( $post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, wp_slash( $doc ) );
 	}
 
 	/**
