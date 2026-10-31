@@ -138,7 +138,9 @@
 		}
 
 		.month-grid {
-			width: 100%;
+			/* Keep intrinsic sizing compact while filling months with a definite width. */
+			width: calc(var(--wp-ui-calendar-cell-size) * 7);
+			min-width: 100%;
 			table-layout: fixed;
 			border-collapse: separate;
 			border-spacing: 0 var(--wpds-dimension-gap-xs);
