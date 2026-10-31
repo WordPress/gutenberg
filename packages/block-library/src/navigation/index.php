@@ -331,26 +331,28 @@ class WP_Navigation_Block_Renderer {
 			return new WP_Block_List( array(), $attributes );
 		}
 
-		// Only published posts are valid. If this is changed then a corresponding change
-		// must also be implemented in `use-navigation-menu.js`.
-		if ( 'publish' === $navigation_post->post_status ) {
-			$parsed_blocks = parse_blocks( $navigation_post->post_content );
-
-			// 'parse_blocks' includes a null block with '\n\n' as the content when
-			// it encounters whitespace. This code strips it.
-			$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-
-			// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
-			// TODO: See if we can move the apply_block_hooks_to_content_from_post_object() call
-			// before the parse_blocks() call further above, to avoid the extra serialization/parsing.
-			$markup = serialize_blocks( $blocks );
-			$markup = apply_block_hooks_to_content_from_post_object( $markup, $navigation_post );
-			$blocks = parse_blocks( $markup );
-
-			// TODO - this uses the full navigation block attributes for the
-			// context which could be refined.
-			return new WP_Block_List( $blocks, $attributes );
+		// Only a published `wp_navigation` post is valid. If this is changed then a
+		// corresponding change must also be implemented in `use-navigation-menu.js`.
+		if ( 'wp_navigation' !== $navigation_post->post_type || 'publish' !== $navigation_post->post_status ) {
+			return new WP_Block_List( array(), $attributes );
 		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+
+		// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
+		// TODO: See if we can move the apply_block_hooks_to_content_from_post_object() call
+		// before the parse_blocks() call further above, to avoid the extra serialization/parsing.
+		$markup = serialize_blocks( $blocks );
+		$markup = apply_block_hooks_to_content_from_post_object( $markup, $navigation_post );
+		$blocks = parse_blocks( $markup );
+
+		// TODO - this uses the full navigation block attributes for the
+		// context which could be refined.
+		return new WP_Block_List( $blocks, $attributes );
 	}
 
 	/**
@@ -593,9 +595,12 @@ class WP_Navigation_Block_Renderer {
 				return $navigation_name;
 			}
 
-			// Only published posts are valid. If this is changed then a corresponding change
-			// must also be implemented in `use-navigation-menu.js`.
-			if ( 'publish' === $navigation_post->post_status ) {
+			// Only a published `wp_navigation` post is valid. If this is changed then a
+			// corresponding change must also be implemented in `use-navigation-menu.js`.
+			if (
+				'wp_navigation' === $navigation_post->post_type &&
+				'publish' === $navigation_post->post_status
+			) {
 				return $navigation_post->post_title;
 			}
 		}
