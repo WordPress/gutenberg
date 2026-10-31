@@ -292,6 +292,7 @@ The settings section has the following structure:
 	}
 }
 ```
+
 {% end %}
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
@@ -515,6 +516,7 @@ body {
 :where(.wp-block-group).has-white-border-color { border-color: #444 !important; }
 
 ```
+
 {% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
@@ -757,6 +759,7 @@ Each block declares which style properties it exposes via the [block supports me
 	}
 }
 ```
+
 {% Gutenberg %}
 
 ```json
@@ -849,7 +852,9 @@ Each block declares which style properties it exposes via the [block supports me
 	}
 }
 ```
+
 {% end %}
+
 ### Top-level styles
 
 Styles found at the top-level will be enqueued using the `body` selector.
@@ -877,6 +882,7 @@ body {
 ```
 
 {% end %}
+
 ### Block styles
 
 Styles found within a block will be enqueued using the block selector.
@@ -922,6 +928,7 @@ p { /* The core/paragraph opts out from the default behaviour and uses p as a se
 	color: var( --wp--preset--color--tertiary );
 }
 ```
+
 {% end %}
 
 #### Referencing a style
@@ -1039,7 +1046,9 @@ h3 {
 	font-size: var( --wp--preset--font-size--smaller );
 }
 ```
+
 {% end %}
+
 ##### Element pseudo selectors
 
 Pseudo selectors are supported for these elements:
@@ -1448,6 +1457,7 @@ body {
 	--wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif";
 }
 ```
+
 {% end %}
 
 A few notes about this process:
@@ -1525,7 +1535,7 @@ For blocks that contain inner blocks, such as Group, Columns, Buttons, and Socia
 	"version": 3,
 	"settings": {
 		"spacing": {
-			"blockGap": true,
+			"blockGap": true
 		}
 	},
 	"styles": {
@@ -1540,9 +1550,33 @@ The setting for `blockGap` is either a boolean or `null` value and is `null` by 
 
 - `true`: Opt into displaying _Block spacing_ controls in the editor UI and output `blockGap` styles.
 - `false`: Opt out of displaying _Block spacing_ controls in the editor UI, with `blockGap` styles stored in `theme.json` still being rendered. This allows themes to use `blockGap` values without allowing users to make changes within the editor.
-- `null` (default): Opt out of displaying _Block spacing_ controls, _and_ prevent the output of `blockGap` styles.
+- `null` (default): Opt out of displaying _Block spacing_ controls and suppress configured `blockGap` styles. Flex and grid layouts still receive fallback gap styles.
 
-The value defined for the root `styles.spacing.blockGap` style is also output as a CSS property, named `--wp--style--block-gap`.
+The CSS generation behavior above depends on the root `settings.spacing.blockGap` setting. Setting `settings.blocks.<block-name>.spacing.blockGap` to `null` does not disable generated gap styles for that block.
+
+When the root setting is `null`, the default fallback gap for flex and grid layouts is `0.5em`. Some blocks provide their own fallback, such as `2em` for the Columns block. Setting `blockGap` to `null` also leaves margins from the browser or theme in place, so it does not guarantee zero spacing between blocks.
+
+To set the gap to zero while hiding the _Block spacing_ controls, set the root `settings.spacing.blockGap` to `false` and `styles.spacing.blockGap` to `"0"`:
+
+```json
+{
+	"version": 3,
+	"settings": {
+		"spacing": {
+			"blockGap": false
+		}
+	},
+	"styles": {
+		"spacing": {
+			"blockGap": "0"
+		}
+	}
+}
+```
+
+Block-specific styles and styles saved by users can override this value.
+
+When the root `settings.spacing.blockGap` setting is `true` or `false`, the value defined for the root `styles.spacing.blockGap` style is also output as the CSS custom property `--wp--style--block-gap`.
 
 ### Why does it take so long to update the styles in the browser?
 

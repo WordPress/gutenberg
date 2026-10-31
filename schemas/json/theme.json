@@ -489,7 +489,7 @@
 					"type": "object",
 					"properties": {
 						"blockGap": {
-							"description": "Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap.\nA value of `null` instead of `false` further disables layout styles from being generated.",
+							"description": "Shows the Block spacing controls when `true`. At the root `settings.spacing.blockGap` path, `true` and `false` enable configured block gap styles; `null` suppresses these styles while retaining fallback gaps for flex and grid layouts. Block-level settings do not disable generated gap styles.",
 							"oneOf": [
 								{ "type": "boolean" },
 								{ "type": "null" }
@@ -1788,7 +1788,7 @@
 					"type": "object",
 					"properties": {
 						"blockGap": {
-							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
+							"description": "Sets the spacing between blocks when the root `settings.spacing.blockGap` is `true` or `false`. The root `styles.spacing.blockGap` value also sets the `--wp--style--block-gap` CSS custom property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
