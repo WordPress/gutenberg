@@ -47,11 +47,14 @@ function MetaBoxesArea( { location } ) {
 		if ( formRef.current ) {
 			move( container.current, formRef.current );
 		}
+		// The order buttons depend on which meta box areas are visible.
+		window.postboxes?.updateOrderButtonsProperties?.();
 
 		return () => {
 			if ( formRef.current ) {
 				move( document.querySelector( '#metaboxes' ), formRef.current );
 			}
+			window.postboxes?.updateOrderButtonsProperties?.();
 		};
 	}, [ location ] );
 
