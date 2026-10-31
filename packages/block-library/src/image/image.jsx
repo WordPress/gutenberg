@@ -54,7 +54,7 @@ import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
-import { MediaControl } from '../utils/media-control';
+import { MediaPanel, MediaPanelItem } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	getActiveDimensionValue,
@@ -964,99 +964,89 @@ export default function Image( {
 				</BlockControls>
 			) }
 			{ isSingleSelected && (
-				<InspectorControls group="content">
-					<ToolsPanel
-						label={ __( 'Media' ) }
-						resetAll={ () => {
-							onSelectImage( undefined );
-							setAttributes( { isDecorative: false } );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						{ ! lockUrlControls && (
-							<ToolsPanelItem
-								label={ __( 'Image' ) }
-								hasValue={ () => !! url }
-								onDeselect={ () => onSelectImage( undefined ) }
-								isShownByDefault
-							>
-								<MediaControl
-									mediaId={ id }
-									mediaUrl={ url }
-									alt={ alt }
-									filename={
-										image?.media_details?.sizes?.full
-											?.file ||
-										image?.slug ||
-										getFilename( url )
-									}
-									allowedTypes={ ALLOWED_MEDIA_TYPES }
-									onSelect={ onSelectImage }
-									onSelectURL={ onSelectURL }
-									onError={ onUploadError }
-									onReset={ () => onSelectImage( undefined ) }
-									isUploading={ isUploading }
-									emptyLabel={ __( 'Add image' ) }
-								/>
-							</ToolsPanelItem>
-						) }
-						{ ! isDecorative && (
-							<ToolsPanelItem
+				<MediaPanel
+					resetAll={ () => {
+						onSelectImage( undefined );
+						setAttributes( { isDecorative: false } );
+					} }
+				>
+					{ ! lockUrlControls && (
+						<MediaPanelItem
+							label={ __( 'Image' ) }
+							hasValue={ () => !! url }
+							onDeselect={ () => onSelectImage( undefined ) }
+							mediaId={ id }
+							mediaUrl={ url }
+							filename={
+								image?.media_details?.sizes?.full?.file ||
+								image?.slug ||
+								getFilename( url )
+							}
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							onSelect={ onSelectImage }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+							onReset={ () => onSelectImage( undefined ) }
+							isUploading={ isUploading }
+							emptyLabel={ __( 'Add image' ) }
+						/>
+					) }
+					{ ! isDecorative && (
+						<ToolsPanelItem
+							label={ __( 'Alternative text' ) }
+							isShownByDefault
+							hasValue={ () => !! alt }
+							onDeselect={ () =>
+								setAttributes( { alt: undefined } )
+							}
+						>
+							<WCTextareaControl
 								label={ __( 'Alternative text' ) }
-								isShownByDefault
-								hasValue={ () => !! alt }
-								onDeselect={ () =>
-									setAttributes( { alt: undefined } )
+								value={ alt || '' }
+								onChange={ updateAlt }
+								readOnly={ lockAltControls }
+								help={
+									lockAltControls ? (
+										<>{ lockAltControlsMessage }</>
+									) : (
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
+											{ __(
+												'Describe the purpose of the image.'
+											) }
+										</ExternalLink>
+									)
 								}
-							>
-								<WCTextareaControl
-									label={ __( 'Alternative text' ) }
-									value={ alt || '' }
-									onChange={ updateAlt }
-									readOnly={ lockAltControls }
-									help={
-										lockAltControls ? (
-											<>{ lockAltControlsMessage }</>
-										) : (
-											<ExternalLink
-												href={
-													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-													__(
-														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-													)
-												}
-											>
-												{ __(
-													'Describe the purpose of the image.'
-												) }
-											</ExternalLink>
-										)
-									}
-								/>
-							</ToolsPanelItem>
-						) }
+							/>
+						</ToolsPanelItem>
+					) }
 
-						{ ! lockAltControls && ! lightboxChecked && (
-							<ToolsPanelItem
+					{ ! lockAltControls && ! lightboxChecked && (
+						<ToolsPanelItem
+							label={ __( 'Mark as decorative' ) }
+							isShownByDefault
+							hasValue={ () => !! isDecorative }
+							onDeselect={ () =>
+								setAttributes( { isDecorative: false } )
+							}
+						>
+							<WCCheckboxControl
 								label={ __( 'Mark as decorative' ) }
-								isShownByDefault
-								hasValue={ () => !! isDecorative }
-								onDeselect={ () =>
-									setAttributes( { isDecorative: false } )
-								}
-							>
-								<WCCheckboxControl
-									label={ __( 'Mark as decorative' ) }
-									checked={ !! isDecorative }
-									onChange={ updateIsDecorative }
-									help={ __(
-										'Hidden from assistive technologies.'
-									) }
-								/>
-							</ToolsPanelItem>
-						) }
-					</ToolsPanel>
-				</InspectorControls>
+								checked={ !! isDecorative }
+								onChange={ updateIsDecorative }
+								help={ __(
+									'Hidden from assistive technologies.'
+								) }
+							/>
+						</ToolsPanelItem>
+					) }
+				</MediaPanel>
 			) }
 			<InspectorControls
 				group="dimensions"
