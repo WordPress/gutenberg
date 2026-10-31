@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Keep `progress` up to date on queue items, counting sub-size operations towards their parent ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
+
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).

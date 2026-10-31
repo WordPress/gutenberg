@@ -1,6 +1,3 @@
-import { privateApis } from '@wordpress/media-utils';
-import { unlock } from '../../lock-unlock';
-
-const { sideloadMedia: mediaSideload } = unlock( privateApis );
+import { sideloadMedia as mediaSideload } from '@wordpress/media-utils';
 
 export default mediaSideload;
