@@ -285,3 +285,96 @@ describe( 'negation operator', () => {
 		expect( console ).not.toHaveWarned();
 	} );
 } );
+
+describe( 'input value and checked attributes', () => {
+	it( 'does not overwrite the value or checked state when the element re-renders', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, { state: { invalid: false } } );
+
+		const region = createRegion(
+			namespace,
+			'<input id="text" value="from server" data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="empty" value="" data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="box" type="checkbox" checked data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="one" type="radio" name="r" value="1" checked data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="two" type="radio" name="r" value="2" data-wp-bind--aria-invalid="state.invalid">'
+		);
+		await hydrateRegion( region );
+
+		const text = region.querySelector( '#text' ) as HTMLInputElement;
+		const empty = region.querySelector( '#empty' ) as HTMLInputElement;
+		const box = region.querySelector( '#box' ) as HTMLInputElement;
+		const one = region.querySelector( '#one' ) as HTMLInputElement;
+		const two = region.querySelector( '#two' ) as HTMLInputElement;
+
+		// The visitor edits every control.
+		text.value = 'typed';
+		empty.value = 'typed';
+		box.checked = false;
+		one.checked = false;
+		two.checked = true;
+
+		// The `aria-invalid` binding on the same elements re-renders them.
+		await act( () => {
+			state.invalid = true;
+		} );
+
+		expect( text ).toHaveAttribute( 'aria-invalid', 'true' );
+		expect( text.value ).toBe( 'typed' );
+		expect( empty.value ).toBe( 'typed' );
+		expect( box.checked ).toBe( false );
+		expect( two.checked ).toBe( true );
+
+		// The edit also survives the next re-render, when invalid returns to false.
+		await act( () => {
+			state.invalid = false;
+		} );
+
+		expect( text ).toHaveAttribute( 'aria-invalid', 'false' );
+		expect( text.value ).toBe( 'typed' );
+		expect( empty.value ).toBe( 'typed' );
+		expect( box.checked ).toBe( false );
+		expect( two.checked ).toBe( true );
+	} );
+
+	it( 'treats a server-rendered value and checked as defaults, not as the current values', async () => {
+		const namespace = uniqueNamespace();
+		store( namespace, { state: { invalid: false } } );
+
+		const region = createRegion(
+			namespace,
+			'<input id="text" value="from server" data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="box" type="checkbox" checked data-wp-bind--aria-invalid="state.invalid">'
+		);
+		await hydrateRegion( region );
+
+		const text = region.querySelector( '#text' ) as HTMLInputElement;
+		const box = region.querySelector( '#box' ) as HTMLInputElement;
+
+		expect( text.value ).toBe( 'from server' );
+		expect( text.defaultValue ).toBe( 'from server' );
+		expect( box.checked ).toBe( true );
+	} );
+
+	it( 'lets data-wp-bind--value control the live value', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, { state: { shown: 'bound' } } );
+
+		const region = createRegion(
+			namespace,
+			'<input value="from server" data-wp-bind--value="state.shown">'
+		);
+		await hydrateRegion( region );
+
+		const input = region.querySelector( 'input' ) as HTMLInputElement;
+		expect( input.value ).toBe( 'bound' );
+
+		await act( () => {
+			state.shown = 'updated';
+		} );
+
+		expect( input.value ).toBe( 'updated' );
+		// The server-rendered value stays the default.
+		expect( input.defaultValue ).toBe( 'from server' );
+	} );
+} );
