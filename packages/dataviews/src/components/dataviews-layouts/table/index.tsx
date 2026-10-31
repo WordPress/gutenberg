@@ -2,7 +2,11 @@ import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Spinner as WCSpinner, Popover } from '@wordpress/components';
-import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	useResizeObserver,
+} from '@wordpress/compose';
 import {
 	useContext,
 	useEffect,
@@ -366,10 +370,26 @@ function ViewTable< Item >( {
 		hadSelectionRef.current = showBulkActions;
 	}, [ showBulkActions ] );
 
-	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
-		scrollContainerRef: containerRef,
-		enabledHorizontal: !! actions?.length,
-	} );
+	const { isHorizontalScrollEnd, isVerticallyScrolled, scrollContentRef } =
+		useScrollState( { scrollContainerRef: containerRef } );
+	// Size the scroll fade to the visible area of the scroll container it is
+	// stuck in. Written to the DOM directly, like the bulk actions toolbar
+	// position, and measured whenever the fade mounts.
+	const scrollFadeRef = useRefEffect( ( fade: HTMLDivElement ) => {
+		const container = fade.parentElement;
+		if ( ! container ) {
+			return;
+		}
+		const syncScrollFadeHeight = () =>
+			fade.style.setProperty(
+				'--wp-dataviews-table-scroll-fade-height',
+				`${ container.clientHeight }px`
+			);
+		syncScrollFadeHeight();
+		const resizeObserver = new ResizeObserver( syncScrollFadeHeight );
+		resizeObserver.observe( container );
+		return () => resizeObserver.disconnect();
+	}, [] );
 
 	const disableHeaderControls = showBulkActions;
 
@@ -477,6 +497,15 @@ function ViewTable< Item >( {
 
 	return (
 		<>
+			{ /* With actions, the sticky actions column carries the fade. */ }
+			{ ! actions?.length && (
+				<div
+					className="dataviews-view-table__scroll-fade"
+					ref={ scrollFadeRef }
+					hidden={ isHorizontalScrollEnd }
+					aria-hidden="true"
+				/>
+			) }
 			{ ( hasBulkActions || isActionInProgress ) && (
 				<div
 					className={ clsx(
@@ -508,6 +537,7 @@ function ViewTable< Item >( {
 					'has-media-aspect-ratio': !! mediaAspectRatio,
 				} ) }
 				style={ tableStyle }
+				ref={ scrollContentRef }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
