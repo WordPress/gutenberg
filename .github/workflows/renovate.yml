@@ -1,0 +1,63 @@
+name: Renovate
+
+on:
+    schedule:
+        - cron: '17 1 * * *'
+    workflow_dispatch:
+        inputs:
+            logLevel:
+                description: 'Log level'
+                type: choice
+                default: info
+                options:
+                    - info
+                    - debug
+            dryRun:
+                description: 'Dry run'
+                type: choice
+                default: 'no'
+                options:
+                    - 'no'
+                    - extract
+                    - lookup
+                    - full
+
+# Only one run at a time; a second run would race on the same branches.
+concurrency:
+    group: ${{ github.workflow }}
+
+# Disable permissions for all available scopes by default.
+# Renovate authenticates with a GitHub App token instead of GITHUB_TOKEN.
+permissions: {}
+
+jobs:
+    renovate:
+        name: Renovate
+        runs-on: 'ubuntu-24.04'
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        permissions: {}
+        steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.RENOVATE_APP_CLIENT_ID }}
+                  private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-issues: write
+                  permission-pull-requests: write
+                  permission-workflows: write
+
+            - name: Run Renovate
+              uses: renovatebot/github-action@9fea9f0fbf80401026d11d03911d62b1f70fef1f # v46.3.3
+              with:
+                  token: ${{ steps.app-token.outputs.token }}
+                  renovate-version: 44.106.0
+              env:
+                  LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
+                  RENOVATE_DRY_RUN: ${{ inputs.dryRun != 'no' && inputs.dryRun || 'null' }}
+                  RENOVATE_REPOSITORIES: ${{ github.repository }}
+                  RENOVATE_ONBOARDING: 'false'
+                  RENOVATE_REQUIRE_CONFIG: 'required'
+                  # Commits through the API so GitHub signs them as the app.
+                  RENOVATE_PLATFORM_COMMIT: 'enabled'

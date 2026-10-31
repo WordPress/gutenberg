@@ -1,0 +1,141 @@
+{
+	$schema: 'https://docs.renovatebot.com/renovate-schema.json',
+	extends: [
+		'config:recommended',
+		'helpers:pinGitHubActionDigests',
+	],
+	// The daily cron in `.github/workflows/renovate.yml` decides when it runs.
+	labels: [ 'dependencies', '[Type] Build Tooling' ],
+	semanticCommits: 'disabled',
+	prConcurrentLimit: 10,
+	prHourlyLimit: 2,
+	// Matches `min-release-age` in `.npmrc`.
+	minimumReleaseAge: '1 day',
+	// The lockfile must be written by the npm version CI uses.
+	constraints: {
+		node: '>=24.18.0',
+		npm: '>=11.16.0',
+	},
+	postUpdateOptions: [ 'npmDedupe' ],
+	// Security updates stay with Dependabot, see `.github/dependabot.yml`.
+	vulnerabilityAlerts: {
+		enabled: false,
+	},
+	// In-range updates only touch the lockfile; out-of-range ones replace the range.
+	rangeStrategy: 'update-lockfile',
+	dependencyDashboard: true,
+
+	packageRules: [
+		{
+			matchDepTypes: [ 'peerDependencies' ],
+			enabled: false,
+		},
+		// Majors are grouped with minor and patch updates; CI decides whether they break us.
+		{
+			groupName: 'npm dependencies',
+			matchManagers: [ 'npm' ],
+			separateMajorMinor: false,
+		},
+		// Tightly coupled packages get their own PR; later rules take precedence.
+		{
+			groupName: 'DefinitelyTyped',
+			matchPackageNames: [ '@types/**' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Babel',
+			extends: [ 'monorepo:babel' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Emotion',
+			extends: [ 'monorepo:emotion' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'React',
+			extends: [ 'monorepo:react' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Storybook',
+			extends: [ 'monorepo:storybook' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'ESLint packages',
+			extends: [ 'packages:eslint' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Stylelint packages',
+			extends: [ 'packages:stylelint' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'JS unit testing packages',
+			extends: [ 'packages:jsUnitTest' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'PostCSS packages',
+			extends: [ 'packages:postcss' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Webpack packages',
+			matchPackageNames: [ 'webpack', 'webpack-*' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Sass packages',
+			matchPackageNames: [ 'sass', 'sass-*', 'esbuild-sass-plugin' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Terrazzo packages',
+			matchPackageNames: [ '@terrazzo/**' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Vitest',
+			matchPackageNames: [
+				'vitest',
+				'vitest-browser-react',
+				'@vitest/**',
+				// Versioned independently of Vitest.
+				'!@vitest/eslint-plugin',
+			],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Vite',
+			matchPackageNames: [ 'vite', '@vitejs/**' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'Composer dependencies',
+			matchManagers: [ 'composer' ],
+			separateMajorMinor: false,
+		},
+		{
+			groupName: 'GitHub Actions',
+			matchManagers: [ 'github-actions' ],
+			labels: [ 'GitHub Actions', '[Type] Build Tooling' ],
+			minimumReleaseAge: '7 days',
+			separateMajorMinor: false,
+		},
+	],
+
+	customManagers: [
+		// Keeps the Renovate version pinned in the workflow up to date.
+		{
+			customType: 'regex',
+			managerFilePatterns: [ '.github/workflows/renovate.yml' ],
+			matchStrings: [ 'renovate-version: (?<currentValue>[^\\s]+)' ],
+			datasourceTemplate: 'docker',
+			depNameTemplate: 'renovate',
+			packageNameTemplate: 'ghcr.io/renovatebot/renovate',
+		},
+	],
+}
