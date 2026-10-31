@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Shortcode`: Copy the parsed attributes when the instance is created from an attribute string, so `set()` no longer changes the memoized result of `attrs()` and every later shortcode parsed from the same text ([#85212](https://github.com/WordPress/gutenberg/pull/85212)).
+
 ## 5.0.0 (2026-10-20)
 
 ### Breaking Changes

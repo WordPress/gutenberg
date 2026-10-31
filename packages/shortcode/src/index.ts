@@ -279,7 +279,10 @@ class Shortcode implements ShortcodeInstance {
 
 		// Parse a string of attributes.
 		if ( typeof attributes === 'string' ) {
-			this.attrs = attrs( attributes );
+			// `attrs()` is memoized, so copy its result. Otherwise `set()`
+			// would change the cached value returned for the same text.
+			const { named, numeric } = attrs( attributes );
+			this.attrs = { named: { ...named }, numeric: [ ...numeric ] };
 			// Identify a correctly formatted `attrs` object.
 		} else if (
 			'named' in attributes &&
