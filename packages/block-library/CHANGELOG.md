@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   Playlist track: Open the block settings on a Content tab with the track file, Track image, Alternative text, Title, Artist and Album. The track can be replaced from there, and the Track image uses the same media control as the Image block, so its preview no longer overflows the sidebar ([#85310](https://github.com/WordPress/gutenberg/pull/85310)).
 
 ### Bug Fixes
 

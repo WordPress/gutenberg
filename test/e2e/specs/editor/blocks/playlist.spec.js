@@ -241,6 +241,197 @@ test.describe( 'Playlist block', () => {
 		await expect( playerArtwork ).toHaveCount( 0 );
 	} );
 
+	test( 'edits the track from the Content tab of the block settings', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/playlist',
+			innerBlocks: [
+				{
+					name: 'core/playlist-track',
+					attributes: {
+						id: uploadedAudio.id,
+						src: uploadedAudio.source_url,
+						title: 'Existing Track',
+						artist: 'Existing Artist',
+						album: 'Existing Album',
+					},
+				},
+			],
+		} );
+
+		await editor.canvas
+			.getByRole( 'button', { name: /Existing Track/ } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+
+		const blockSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			blockSettings.getByRole( 'tab', {
+				name: 'Content',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		const contentTab = blockSettings.getByRole( 'tabpanel', {
+			name: 'Content',
+		} );
+		// The track file and the track image are both media controls, named
+		// after the current file or, without one, what they add.
+		const trackControl = contentTab.getByRole( 'button', {
+			name: 'playlist-e2e-test.wav',
+		} );
+		const trackImageControl = contentTab.getByRole( 'button', {
+			name: 'Add image',
+		} );
+		const titleInput = contentTab.getByRole( 'textbox', { name: 'Title' } );
+		const artistInput = contentTab.getByRole( 'textbox', {
+			name: 'Artist',
+		} );
+		const albumInput = contentTab.getByRole( 'textbox', { name: 'Album' } );
+		const controlsInOrder = [
+			trackControl,
+			trackImageControl,
+			titleInput,
+			artistInput,
+			albumInput,
+		];
+
+		for ( const control of controlsInOrder ) {
+			await expect( control ).toBeVisible();
+		}
+		const tops = [];
+		for ( const control of controlsInOrder ) {
+			tops.push( ( await control.boundingBox() ).y );
+		}
+		expect( tops ).toEqual( [ ...tops ].sort( ( a, b ) => a - b ) );
+		await expect( artistInput ).toHaveValue( 'Existing Artist' );
+		await expect( albumInput ).toHaveValue( 'Existing Album' );
+		// Alternative text describes the track image, so it waits for one.
+		await expect(
+			contentTab.getByRole( 'textbox', { name: 'Alternative text' } )
+		).toBeHidden();
+
+		await trackImageControl.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Open Media Library' } )
+			.click();
+		const mediaLibrary = page.locator( '.media-modal' );
+		await mediaLibrary
+			.getByRole( 'tab', { name: 'Media Library' } )
+			.click();
+		await mediaLibrary
+			.locator( `.attachment[data-id="${ uploadedImage.id }"]` )
+			.click();
+		await mediaLibrary
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		await expect(
+			contentTab.getByRole( 'button', {
+				name: uploadedImage.source_url.split( '/' ).pop(),
+			} )
+		).toBeVisible();
+		await expect(
+			contentTab.getByRole( 'textbox', { name: 'Alternative text' } )
+		).toBeVisible();
+
+		await titleInput.fill( 'Edited Track' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/playlist',
+				innerBlocks: [
+					{
+						name: 'core/playlist-track',
+						attributes: {
+							id: uploadedAudio.id,
+							src: uploadedAudio.source_url,
+							image: uploadedImage.source_url,
+							title: 'Edited Track',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'replaces the track from the settings sidebar media picker', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Both audio uploads share a file name, so give the replacement a
+		// title of its own to tell them apart once it is in the track.
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/media/${ uploadedSecondAudio.id }`,
+			data: { title: 'Replacement Track' },
+		} );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/playlist',
+			innerBlocks: [
+				{
+					name: 'core/playlist-track',
+					attributes: {
+						id: uploadedAudio.id,
+						src: uploadedAudio.source_url,
+						title: 'Existing Track',
+					},
+				},
+			],
+		} );
+
+		await editor.canvas
+			.getByRole( 'button', { name: /Existing Track/ } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		// The track control is named after the current file.
+		await page
+			.getByRole( 'button', { name: 'playlist-e2e-test.wav' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Open Media Library' } )
+			.click();
+
+		const mediaLibrary = page.locator( '.media-modal' );
+		await mediaLibrary
+			.getByRole( 'tab', { name: 'Media Library' } )
+			.click();
+		await mediaLibrary
+			.locator( `.attachment[data-id="${ uploadedSecondAudio.id }"]` )
+			.click();
+		await mediaLibrary
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		await expect(
+			page.getByRole( 'textbox', { name: 'Title' } )
+		).toHaveValue( 'Replacement Track' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/playlist',
+				innerBlocks: [
+					{
+						name: 'core/playlist-track',
+						attributes: {
+							id: uploadedSecondAudio.id,
+							src: uploadedSecondAudio.source_url,
+							title: 'Replacement Track',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'keeps the playlist when the only added track fails to upload', async ( {
 		admin,
 		editor,
