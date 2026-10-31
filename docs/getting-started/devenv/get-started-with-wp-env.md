@@ -8,15 +8,36 @@ Before following this guide, install [Node.js development tools](/docs/getting-s
 
 ## Quick start
  
-1. Download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your operating system.
+1. Install and start a Docker runtime, such as [Colima](https://github.com/abiosoft/colima) on macOS or [Docker Desktop](https://www.docker.com/products/docker-desktop). See [Set up Docker](#set-up-docker) below.
 2. Run `npm -g install @wordpress/env` in the terminal to install `wp-env` globally.
 3. In the terminal, navigate to an existing plugin directory, theme directory, or a new working directory.
 4. Run `wp-env start` in the terminal to start the local WordPress environment.
 5. After the script runs, navigate to <code>http://localhost:8888/wp-admin</code> and log into the WordPress dashboard using username `admin` and password `password`.
 
-## Set up Docker Desktop
+## Set up Docker
 
-The `wp-env` tool uses [Docker](https://www.docker.com/) to create a virtual machine that runs the local WordPress site. The Docker Desktop application is free for small businesses, personal use, education, and non-commercial open-source projects. See their [FAQ](https://docs.docker.com/desktop/faqs/general/#do-i-need-to-pay-to-use-docker-desktop) for more information.
+The `wp-env` tool uses [Docker](https://www.docker.com/) to create a virtual machine that runs the local WordPress site. Any Docker runtime that provides the `docker` CLI and Docker Compose v2 works.
+
+### Colima (macOS)
+
+[Colima](https://github.com/abiosoft/colima) is free and open source, needs no account, and runs without a GUI. Install and start it with [Homebrew](https://brew.sh/):
+
+```sh
+brew install colima docker docker-buildx docker-compose
+colima start --cpu 4 --memory 4
+```
+
+Homebrew installs Buildx and Compose as Docker CLI plugins outside the CLI's search path. On Apple Silicon, point the CLI at them by adding this property to `~/.docker/config.json`, keeping whatever else is already in the file:
+
+```json
+"cliPluginsExtraDirs": [ "/opt/homebrew/lib/docker/cli-plugins" ]
+```
+
+Colima remembers the CPU and memory settings, so later starts are just `colima start`. To start it at login instead, run `brew services start colima`.
+
+### Docker Desktop
+
+The Docker Desktop application is free for small businesses, personal use, education, and non-commercial open-source projects. See their [FAQ](https://docs.docker.com/desktop/faqs/general/#do-i-need-to-pay-to-use-docker-desktop) for more information.
 
 Use the links below to download and install Docker Desktop for your operating system.
 
@@ -28,9 +49,13 @@ If you are using a version of Ubuntu prior to 20.04.1, see the additional [troub
 
 After successful installation, start the Docker Desktop application and follow the prompts to get set up. You should generally use the recommended (default) settings, and creating a Docker account is optional.
 
+### Other runtimes
+
+On Windows, [Rancher Desktop](https://rancherdesktop.io/) with its dockerd (moby) engine is a free alternative to Docker Desktop. On Linux, you can use [Docker Engine](https://docs.docker.com/engine/install/).
+
 ## Install and run `wp-env`
 
-The `wp-env` tool is used to create a local WordPress environment with Docker. So, after you have set up Docker Desktop, open the terminal and install the `wp-env` by running the command:
+The `wp-env` tool is used to create a local WordPress environment with Docker. So, after you have set up Docker, open the terminal and install the `wp-env` by running the command:
 
 ```sh
 npm -g install @wordpress/env
@@ -78,8 +103,8 @@ Here are a few instructions if you need to start over or want to remove what was
 
 When using `wp-env`, it's common to get the error: `Error while running docker-compose command`
 
--   Check that Docker Desktop is started and running.
--   Check Docker Desktop dashboard for logs, restart, or remove existing virtual machines.
+-   Check that Docker is running. With Colima, `colima status` shows whether it is.
+-   With Docker Desktop, check the dashboard for logs, restart, or remove existing virtual machines. With Colima, run `colima restart`.
 -   Then try rerunning `wp-env start`.
 
 If you see the error: `Host is already in use by another container`
@@ -138,6 +163,7 @@ Your environment should now be set up at <code>http://localhost:8888</code>.
 ## Additional resources
 
 - [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
+- [Colima](https://github.com/abiosoft/colima) (Official documentation)
 - [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
 - [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
 - [wp-env: Simple Local Environments for WordPress](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/) (Make WordPress Core Blog)

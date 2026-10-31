@@ -20,9 +20,28 @@ The database credentials are: user `root`, password `password`. For a comprehens
 
 `wp-env` relies on a few commonly used developer tools:
 
--   **Docker**. `wp-env` is powered by Docker by default. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+-   **Docker**. `wp-env` is powered by Docker by default. Any Docker runtime that provides the `docker` CLI and Docker Compose v2 works. See [Docker runtime](#docker-runtime) below.
 -   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
 -   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+### Docker runtime
+
+On macOS, you can use [Colima](https://github.com/abiosoft/colima). It's free and open source, needs no account, and runs without a GUI.
+
+```sh
+$ brew install colima docker docker-buildx docker-compose
+$ colima start --cpu 4 --memory 4
+```
+
+Homebrew installs Buildx and Compose as Docker CLI plugins outside the CLI's search path. On Apple Silicon, point the CLI at them by adding this property to `~/.docker/config.json`, keeping whatever else is already in the file:
+
+```json
+"cliPluginsExtraDirs": [ "/opt/homebrew/lib/docker/cli-plugins" ]
+```
+
+Colima remembers the CPU and memory settings, so later starts are just `colima start`. To start it at login instead, run `brew services start colima`.
+
+On Windows, use [Rancher Desktop](https://rancherdesktop.io/) with its dockerd (moby) engine, or [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend). On Linux, use [Docker Engine](https://docs.docker.com/engine/install/). Docker Desktop is also available for [macOS](https://docs.docker.com/desktop/install/mac-install/) and [Linux](https://docs.docker.com/desktop/install/linux-install/).
 
 ## Experimental runtimes
 
@@ -113,7 +132,7 @@ $ wp-env start --update
 
 ### Starting the environment
 
-First, ensure that Docker is running. You can do this by clicking on the Docker icon in the system tray or menu bar.
+First, ensure that Docker is running. With Colima, run `colima start`. With Docker Desktop or Rancher Desktop, open the app.
 
 Then, change to a directory that contains a WordPress plugin or theme:
 
@@ -179,7 +198,9 @@ $ wp-env start --update
 
 Restarting Docker will restart the underlying Docker containers and volumes which can fix many issues.
 
-To restart Docker:
+With Colima, run `colima restart`.
+
+With Docker Desktop:
 
 1. Click on the Docker icon in the system tray or menu bar.
 2. Select _Restart_.
