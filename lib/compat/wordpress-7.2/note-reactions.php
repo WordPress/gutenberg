@@ -225,13 +225,13 @@ function gutenberg_get_note_reaction_ids( WP_Comment $note, string $status = 'an
  *
  * @since 7.2.0
  *
- * @param string     $comment_id The comment ID as a numeric string.
- * @param WP_Comment $comment    The comment being deleted.
+ * @param string          $comment_id The comment ID as a numeric string.
+ * @param WP_Comment|null $comment    The comment being deleted.
  *
  * @phpstan-param numeric-string $comment_id
  */
-function gutenberg_delete_note_reactions( $comment_id, WP_Comment $comment ): void {
-	if ( 'note' !== $comment->comment_type ) {
+function gutenberg_delete_note_reactions( $comment_id, ?WP_Comment $comment ): void {
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
 		return;
 	}
 
@@ -258,13 +258,14 @@ add_action( 'delete_comment', 'gutenberg_delete_note_reactions', 10, 2 );
  *
  * @since 7.2.0
  *
- * @param string     $comment_id The comment ID as a numeric string.
- * @param WP_Comment $comment    The trashed comment.
+ * @param string          $comment_id The comment ID as a numeric string.
+ * @param WP_Comment|null $comment    The trashed comment, or null when a plugin
+ *                                    fires the action for a missing row.
  *
  * @phpstan-param numeric-string $comment_id
  */
-function gutenberg_trash_note_reactions( $comment_id, WP_Comment $comment ): void {
-	if ( 'note' !== $comment->comment_type ) {
+function gutenberg_trash_note_reactions( $comment_id, ?WP_Comment $comment ): void {
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
 		return;
 	}
 
