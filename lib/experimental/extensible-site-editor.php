@@ -44,3 +44,18 @@ function gutenberg_unregister_view_post_revisions_entity_action() {
 	}
 }
 add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_view_post_revisions_entity_action' );
+
+/**
+ * Unregisters the "Edit" action of pages, templates, template parts, and
+ * patterns.
+ *
+ * The action only signals it was performed: the list showing it opens the
+ * editor. The lists of the extensible site editor open an item on click and
+ * do not handle the action, so it would do nothing there.
+ */
+function gutenberg_unregister_extensible_site_editor_edit_post_action() {
+	foreach ( array( 'page', 'wp_template', 'wp_template_part', 'wp_block' ) as $post_type ) {
+		wp_unregister_entity_actions( 'postType', $post_type, array( 'edit-post' ) );
+	}
+}
+add_action( 'wp_entity_actions_api_init', 'gutenberg_unregister_extensible_site_editor_edit_post_action' );

@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import page from '../page';
 
 describe( 'page', () => {
 	it( 'maps the id of each page action to its JavaScript parts', () => {
 		expect( Object.keys( page ) ).toEqual( [
+			'quick-edit',
 			'set-as-homepage',
 			'set-as-posts-page',
 		] );
@@ -11,8 +12,9 @@ describe( 'page', () => {
 			// The data of the action, such as its id and label, is
 			// registered on the server.
 			expect( parts ).not.toHaveProperty( 'id' );
-			expect( 'RenderModal' in parts ).toBe( true );
 		}
+		expect( 'RenderModal' in page[ 'set-as-homepage' ] ).toBe( true );
+		expect( 'RenderModal' in page[ 'set-as-posts-page' ] ).toBe( true );
 	} );
 
 	it.each( [
@@ -58,5 +60,52 @@ describe( 'page', () => {
 
 		expect( page[ 'set-as-homepage' ].isEligible?.( post ) ).toBe( false );
 		expect( page[ 'set-as-posts-page' ].isEligible?.( post ) ).toBe( true );
+	} );
+
+	describe( 'quick-edit', () => {
+		const post = {
+			id: 1,
+			type: 'page',
+			status: 'draft' as const,
+			title: 'About',
+			content: '',
+		};
+		const quickEdit = page[ 'quick-edit' ];
+		const { isEligible, label } = quickEdit;
+		const callback =
+			'callback' in quickEdit ? quickEdit.callback : undefined;
+
+		it( 'offers to quick edit the pages that are not in the trash', () => {
+			expect( isEligible?.( post ) ).toBe( true );
+			expect( isEligible?.( { ...post, status: 'publish' } ) ).toBe(
+				true
+			);
+			expect( isEligible?.( { ...post, status: 'trash' } ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'is labelled as a bulk edit for several pages', () => {
+			expect( typeof label ).toBe( 'function' );
+			if ( typeof label !== 'function' ) {
+				return;
+			}
+			expect( label( [ post ] ) ).toBe( 'Quick edit' );
+			expect( label( [ post, { ...post, id: 2 } ] ) ).toBe( 'Bulk edit' );
+		} );
+
+		it( 'only signals it was performed, for the list to open the form', () => {
+			const onActionPerformed = vi.fn();
+
+			callback?.( [ post ], { registry: {}, onActionPerformed } );
+
+			expect( onActionPerformed ).toHaveBeenCalledWith( [ post ] );
+		} );
+
+		it( 'does nothing in a list that does not handle it', () => {
+			expect( () =>
+				callback?.( [ post ], { registry: {} } )
+			).not.toThrow();
+		} );
 	} );
 } );

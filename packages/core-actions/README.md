@@ -8,8 +8,8 @@ WordPress registers them on the server through the entity actions API, like a pl
 
 The actions of this package live in folders of `src`, one per collection:
 
--   `post_type_supports`: the default actions of every post type (`delete-post`, `duplicate-post`, `move-to-trash`, `order-pages`, `permanently-delete`, `rename-post`, `reset-post`, `restore`, `view-post`, and `view-post-revisions`).
--   `page`: the actions pages have on top of the defaults (`set-as-homepage` and `set-as-posts-page`).
+-   `post_type_supports`: the default actions of every post type (`delete-post`, `duplicate-post`, `edit-post`, `move-to-trash`, `order-pages`, `permanently-delete`, `rename-post`, `reset-post`, `restore`, `view-post`, and `view-post-revisions`).
+-   `page`: the actions pages have on top of the defaults (`quick-edit`, `set-as-homepage`, and `set-as-posts-page`).
 -   `wp_block`: the actions patterns have on top of the defaults (`duplicate-pattern` and `export-pattern`).
 -   `wp_template_part`: the actions template parts have on top of the defaults (`duplicate-template-part`).
 
@@ -17,6 +17,8 @@ Each action has a folder named after its id, with the data of the action in `act
 
 `src/index.php` registers the actions of each post type exposed in the REST API, on the `wp_entity_actions_api_init` action at priority 0, so a plugin hooking it at the default priority can remove or replace them:
 
+-   `edit-post`, for pages, templates, template parts, patterns, and navigation menus, when the user can edit them. Only the lists show it, as a primary action for navigation menus only.
+-   `quick-edit`, for pages, when the user can edit them. Only the lists show it.
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.
 -   `duplicate-post`, for the post types the user can create, except templates, template parts, and patterns. Only in the Gutenberg plugin.
@@ -69,6 +71,27 @@ add_action( 'wp_entity_actions_api_init', function () {
 ```
 
 The actions are shown in registration order, so an action registered again moves to the end of the actions of the entity. A property the script module provides takes precedence over the one registered in PHP: the label of `view-post-revisions`, which shows the number of revisions, comes from its module.
+
+The `edit-post` action does not navigate by itself: how a post is edited depends on the screen listing it. Its callback only calls `onActionPerformed` with the posts, so the screen opens the editor from the `onActionPerformed( actionId, items )` handler it passes to `usePostActions`, when `actionId` is `edit-post`, like the pages list of the site editor:
+
+```js
+const onActionPerformed = useCallback(
+	( actionId, items ) => {
+		if ( actionId === 'edit-post' ) {
+			const post = items[ 0 ];
+			history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
+		}
+	},
+	[ history ]
+);
+const actions = usePostActions( {
+	postType: 'page',
+	context: 'list',
+	onActionPerformed,
+} );
+```
+
+The `quick-edit` action works the same way: its callback only calls `onActionPerformed` with the pages, so the screen opens its quick edit form for them when `actionId` is `quick-edit`. In a list that does not handle it, each of these actions does nothing.
 
 ## Contributing to this package
 
