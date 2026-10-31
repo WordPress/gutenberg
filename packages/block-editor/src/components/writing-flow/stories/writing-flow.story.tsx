@@ -3,7 +3,7 @@ import type { KeyboardEvent } from 'react';
 import WritingFlow from '..';
 
 export default {
-	title: 'BlockEditor/WritingFlow',
+	title: 'Components/WritingFlow',
 	component: WritingFlow,
 	parameters: {
 		docs: {
