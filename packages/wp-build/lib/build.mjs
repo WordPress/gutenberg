@@ -1419,12 +1419,14 @@ async function transpilePackage( packageName ) {
 		// Declaration files have no code to transpile.
 		ignore: [ ...IGNORE_PATTERNS, '**/*.d.{ts,mts,cts}' ],
 		absolute: true,
+		dot: true,
 	} );
 
 	const assetFiles = await glob( `src/**/*.${ ASSET_EXTENSIONS }`, {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
+		dot: true,
 	} );
 
 	const buildDir = path.join( packageDir, 'build' );
