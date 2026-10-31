@@ -474,6 +474,14 @@ if ( hasExperimentalModulesFlag ) {
 			outputModule: true,
 		},
 
+		optimization: {
+			...baseConfig.optimization,
+			// Script modules don't use React Fast Refresh, so they don't need a
+			// shared runtime. A runtime chunk here would also be written to the
+			// same `runtime.js` as the scripts runtime and overwrite it.
+			runtimeChunk: false,
+		},
+
 		output: {
 			...baseConfig.output,
 			module: true,
