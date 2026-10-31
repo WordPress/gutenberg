@@ -13,6 +13,33 @@ describe.each( [
 	[ 'Calendar', Calendar ],
 	[ 'RangeCalendar', RangeCalendar ],
 ] as const )( '%s layout', ( _, Component ) => {
+	it.each( [
+		{ label: 'one month', numberOfMonths: 1, width: 224 },
+		{ label: 'two months', numberOfMonths: 2, width: 464 },
+	] )(
+		'keeps $label at the minimum width in a content-sized container',
+		async ( { numberOfMonths, width } ) => {
+			await render(
+				<ThemeProvider isRoot>
+					<div style={ { width: 800 } }>
+						<div style={ { width: 'fit-content' } }>
+							<Component
+								defaultMonth={ TEST_DATE }
+								numberOfMonths={ numberOfMonths }
+							/>
+						</div>
+					</div>
+				</ThemeProvider>
+			);
+			expect(
+				screen.getByRole( 'application' ).getBoundingClientRect().width
+			).toBe( width );
+			for ( const grid of screen.getAllByRole( 'grid' ) ) {
+				expect( grid.getBoundingClientRect().width ).toBe( 224 );
+			}
+		}
+	);
+
 	it( 'fills the container and preserves its minimum width when constrained', async () => {
 		const view = await render(
 			<ThemeProvider isRoot>
