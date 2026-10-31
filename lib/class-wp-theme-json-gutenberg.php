@@ -683,7 +683,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Responsive media queries.
 	 */
 	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
-		$breakpoints = static::sanitize_viewport_settings( $viewport_settings );
+		$breakpoints = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize_viewport_settings( $viewport_settings );
 
 		$responsive_media_queries = array();
 
@@ -713,115 +713,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $responsive_media_queries;
-	}
-
-	/**
-	 * Checks whether a viewport breakpoint value is a safe CSS length.
-	 *
-	 * Viewport breakpoints are limited to numeric `px`, `em`, and `rem` lengths.
-	 * CSS functions, percentages, and other units are rejected because breakpoint
-	 * values are interpolated into generated media queries.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $value Value to check.
-	 * @return bool Whether the value is valid.
-	 */
-	private static function is_valid_viewport_breakpoint_size( $value ) {
-		if ( ! is_string( $value ) ) {
-			return false;
-		}
-
-		$value = trim( $value );
-		if ( '' === $value ) {
-			return false;
-		}
-
-		return 1 === preg_match( '/^(?:\d+|\d*\.\d+)(?:px|em|rem)$/', $value );
-	}
-
-	/**
-	 * Converts a valid viewport breakpoint size to pixels for ordering checks.
-	 *
-	 * Generated media queries keep the original units. This method only
-	 * normalizes values so `mobile` and `tablet` can be compared safely. `em`
-	 * and `rem` lengths use a 16px base for comparison.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $value Viewport breakpoint size.
-	 * @return float|null Viewport breakpoint size in pixels, or null when invalid.
-	 */
-	private static function get_viewport_breakpoint_value_in_pixels( $value ) {
-		if ( ! static::is_valid_viewport_breakpoint_size( $value ) ) {
-			return null;
-		}
-
-		$value = trim( $value );
-		$unit  = substr( $value, -3 );
-		if ( 'rem' === $unit ) {
-			$number = (float) substr( $value, 0, -3 );
-		} else {
-			$unit   = substr( $value, -2 );
-			$number = (float) substr( $value, 0, -2 );
-		}
-
-		/*
-		 * Use the most common browser default font size as the base for em/rem
-		 * media query conversions. This pixel value is only used to compare
-		 * breakpoint order; generated media queries keep the original units.
-		 */
-		return 'px' === $unit ? $number : $number * 16;
-	}
-
-	/**
-	 * Sanitizes and normalizes viewport breakpoint settings.
-	 *
-	 * Keeps only supported breakpoint keys, trims valid CSS lengths, and returns
-	 * the default breakpoints when no valid custom breakpoint is provided. When
-	 * only one breakpoint is valid, it remains keyed by its configured state and
-	 * uses a single max-width media query. When `tablet` is not larger than
-	 * `mobile`, it is removed.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $viewport_settings Viewport settings from theme.json.
-	 * @return array Sanitized viewport breakpoint settings.
-	 */
-	private static function sanitize_viewport_settings( $viewport_settings ) {
-		if ( ! is_array( $viewport_settings ) ) {
-			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
-		}
-
-		$breakpoints = array();
-		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
-			$value = $viewport_settings[ $breakpoint ] ?? null;
-			$px    = static::get_viewport_breakpoint_value_in_pixels( $value );
-			if ( null !== $px ) {
-				$breakpoints[ $breakpoint ] = array(
-					'value' => trim( $value ),
-					'px'    => $px,
-				);
-			}
-		}
-
-		if ( empty( $breakpoints ) ) {
-			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
-		}
-
-		if ( 1 === count( $breakpoints ) ) {
-			$breakpoint = key( $breakpoints );
-			return array( $breakpoint => $breakpoints[ $breakpoint ]['value'] );
-		}
-
-		$sanitized = array( 'mobile' => $breakpoints['mobile']['value'] );
-
-		if ( isset( $breakpoints['tablet'] ) && $breakpoints['mobile']['px'] < $breakpoints['tablet']['px']
-		) {
-			$sanitized['tablet'] = $breakpoints['tablet']['value'];
-		}
-
-		return $sanitized;
 	}
 
 	/**
@@ -930,11 +821,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * )
 	 */
 	protected static function schema_in_root_and_per_origin( $schema ) {
-		$schema_in_root_and_per_origin = $schema;
-		foreach ( static::VALID_ORIGINS as $origin ) {
-			$schema_in_root_and_per_origin[ $origin ] = $schema;
-		}
-		return $schema_in_root_and_per_origin;
+		return WP_Theme_JSON_Sanitizer_Gutenberg::schema_in_root_and_per_origin( $schema );
 	}
 
 	/**
@@ -1194,6 +1081,12 @@ class WP_Theme_JSON_Gutenberg {
 		$new_theme_json = $theme_json;
 		$variations     = $new_theme_json['styles']['variations'];
 
+		foreach ( array_keys( $variations ) as $variation_name ) {
+			if ( ! in_array( $variation_name, array_merge( array(), ...array_values( $valid_variations ) ), true ) ) {
+				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
+			}
+		}
+
 		foreach ( $valid_variations as $block_type => $registered_variations ) {
 			foreach ( $registered_variations as $variation_name ) {
 				$block_level_data = $new_theme_json['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
@@ -1277,279 +1170,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The sanitized output.
 	 */
 	protected static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations ) {
-
-		$output = array();
-
-		if ( ! is_array( $input ) ) {
-			return $output;
-		}
-
-		// Preserve only the top most level keys.
-		$output = array_intersect_key( $input, array_flip( static::VALID_TOP_LEVEL_KEYS ) );
-
-		/*
-		 * Remove any rules that are annotated as "top" in VALID_STYLES constant.
-		 * Some styles are only meant to be available at the top-level (e.g.: blockGap),
-		 * hence, the schema for blocks & elements should not have them.
-		 */
-		$styles_non_top_level = static::VALID_STYLES;
-		foreach ( array_keys( $styles_non_top_level ) as $section ) {
-			// array_key_exists() needs to be used instead of isset() because the value can be null.
-			if ( array_key_exists( $section, $styles_non_top_level ) && is_array( $styles_non_top_level[ $section ] ) ) {
-				foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
-					if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
-						unset( $styles_non_top_level[ $section ][ $prop ] );
-					}
-				}
-			}
-		}
-
-		// Build the schema based on valid block & element names.
-		$schema                   = array();
-		$schema_styles_elements   = array();
-		$responsive_media_queries = static::get_viewport_media_queries( $input['settings']['viewport'] ?? null );
-
-		/*
-		 * Set allowed element pseudo selectors and responsive breakpoint states.
-		 * Target data structure in schema:
-		 * e.g.
-		 * - top level elements: `$schema['styles']['elements']['link'][':hover']`.
-		 * - block level elements: `$schema['styles']['blocks']['core/button']['elements']['link'][':hover']`.
-		 * - block responsive elements: `$schema['styles']['blocks']['core/button']['@tablet']['elements']['link'][':hover']`.
-		 */
-		foreach ( $valid_element_names as $element ) {
-			$schema_styles_elements[ $element ] = $styles_non_top_level;
-
-			if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
-				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-					$schema_styles_elements[ $element ][ $pseudo_selector ] = $styles_non_top_level;
-				}
-			}
-
-			// Add responsive breakpoint states for elements.
-			foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
-				$schema_styles_elements[ $element ][ $breakpoint_state ] = $styles_non_top_level;
-			}
-		}
-
-		$schema_styles_blocks   = array();
-		$schema_settings_blocks = array();
-		$breakpoint_states      = array_keys( $responsive_media_queries );
-
-		$common_block_settings = static::VALID_SETTINGS;
-		// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
-		unset(
-			$common_block_settings['viewport'],
-			$common_block_settings['blockVisibility']
-		);
-
-		/*
-		 * Generate a schema for blocks.
-		 * - Block styles can contain `elements`, `variations`, and responsive breakpoint state definitions.
-		 * - Variations definitions cannot be nested.
-		 * - Variations can contain styles for inner `blocks`, `elements`, and responsive breakpoint states.
-		 * - Variation inner `blocks` styles can contain `elements` and responsive breakpoint states.
-		 *
-		 * As each variation needs both a `blocks` schema and responsive `blocks` schemas
-		 * for further nested inner `blocks`, the overall schema is generated in multiple passes.
-		 *
-		 * All blocks start with the same style schema. Build that common schema
-		 * once, then add block-specific pseudo and custom states below.
-		 */
-		$responsive_block_schema             = $styles_non_top_level;
-		$responsive_block_schema['elements'] = $schema_styles_elements;
-
-		$common_block_schema             = $styles_non_top_level;
-		$common_block_schema['elements'] = $schema_styles_elements;
-
-		foreach ( $breakpoint_states as $breakpoint_state ) {
-			$common_block_schema[ $breakpoint_state ] = $responsive_block_schema;
-		}
-
-		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ] = $common_block_settings;
-			$schema_styles_blocks[ $block ]   = $common_block_schema;
-
-			// Add responsive pseudo-selectors only to blocks that support them.
-			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-				foreach ( $breakpoint_states as $breakpoint_state ) {
-					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-						$schema_styles_blocks[ $block ][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
-					}
-				}
-			}
-
-			// Add pseudo-selectors for blocks that support them.
-			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-				foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-					$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
-				}
-			}
-
-			// Add custom states for blocks that support them (e.g. '-current' for navigation).
-			if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $block ] ) ) {
-				foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $block ] as $custom_state ) {
-					$custom_state_schema = $styles_non_top_level;
-					// The same pseudo-selectors valid for the block at the top level
-					// are also valid within each custom state.
-					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo ) {
-							$custom_state_schema[ $pseudo ] = $styles_non_top_level;
-						}
-					}
-					$schema_styles_blocks[ $block ][ $custom_state ] = $custom_state_schema;
-				}
-			}
-		}
-
-		$block_style_variation_styles             = static::VALID_STYLES;
-		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
-		$block_style_variation_styles['elements'] = $schema_styles_elements;
-
-		foreach ( $valid_block_names as $block ) {
-			// Build the schema for each block style variation.
-			$style_variation_names = array();
-			if (
-				! empty( $input['styles']['blocks'][ $block ]['variations'] ) &&
-				is_array( $input['styles']['blocks'][ $block ]['variations'] ) &&
-				isset( $valid_variations[ $block ] )
-			) {
-				$style_variation_names = array_intersect(
-					array_keys( $input['styles']['blocks'][ $block ]['variations'] ),
-					$valid_variations[ $block ]
-				);
-			}
-
-			$schema_styles_variations = array();
-			if ( ! empty( $style_variation_names ) ) {
-				foreach ( $style_variation_names as $variation_name ) {
-					$variation_schema = $block_style_variation_styles;
-
-					// Add responsive breakpoint states to block style variations.
-					foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
-						$variation_schema[ $breakpoint_state ]             = $styles_non_top_level;
-						$variation_schema[ $breakpoint_state ]['elements'] = $schema_styles_elements;
-
-						if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-							foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-								$variation_schema[ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
-							}
-						}
-					}
-
-					// Add pseudo-selectors to variations for blocks that support them.
-					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-							$variation_schema[ $pseudo_selector ] = $styles_non_top_level;
-						}
-					}
-
-					$schema_styles_variations[ $variation_name ] = $variation_schema;
-				}
-			}
-
-			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
-		}
-
-		$schema['styles']                                 = static::VALID_STYLES;
-		$schema['styles']['blocks']                       = $schema_styles_blocks;
-		$schema['styles']['elements']                     = $schema_styles_elements;
-		$schema['settings']                               = static::VALID_SETTINGS;
-		$schema['settings']['blocks']                     = $schema_settings_blocks;
-		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
-
-		/*
-		 * Add block style variation states to the top-level styles schema.
-		 *
-		 * Block style variations defined in a standalone JSON partial within a
-		 * theme's `styles` directory declare their styles at the root of the
-		 * `styles` object, so they are sanitized against the top-level schema.
-		 * It needs to allow the same states that are allowed for variations
-		 * declared inline in theme.json, otherwise those states are silently
-		 * removed as unknown keys.
-		 *
-		 * The `blockTypes` property is only present on block style variation
-		 * partials, so it both identifies the config as a variation and
-		 * determines which pseudo-selectors are valid for it. Regular
-		 * theme.json files are unaffected.
-		 */
-		if ( ! empty( $input['blockTypes'] ) && is_array( $input['blockTypes'] ) ) {
-			$variation_pseudo_selectors = array();
-			foreach ( $input['blockTypes'] as $variation_block_type ) {
-				if ( is_string( $variation_block_type ) && isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ] ) ) {
-					$variation_pseudo_selectors = array_merge(
-						$variation_pseudo_selectors,
-						static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ]
-					);
-				}
-			}
-			$variation_pseudo_selectors = array_unique( $variation_pseudo_selectors );
-
-			foreach ( $breakpoint_states as $breakpoint_state ) {
-				$schema['styles'][ $breakpoint_state ]             = $styles_non_top_level;
-				$schema['styles'][ $breakpoint_state ]['elements'] = $schema_styles_elements;
-
-				foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
-					$schema['styles'][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
-				}
-			}
-
-			foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
-				$schema['styles'][ $pseudo_selector ] = $styles_non_top_level;
-			}
-		}
-
-		// Remove anything that's not present in the schema.
-		foreach ( array( 'styles', 'settings' ) as $subtree ) {
-			if ( ! isset( $input[ $subtree ] ) ) {
-				continue;
-			}
-
-			if ( ! is_array( $input[ $subtree ] ) ) {
-				unset( $output[ $subtree ] );
-				continue;
-			}
-
-			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
-
-			if ( 'settings' === $subtree && array_key_exists( 'viewport', $input[ $subtree ] ) ) {
-				$result['viewport'] = static::sanitize_viewport_settings( $input[ $subtree ]['viewport'] );
-			}
-
-			if ( 'settings' === $subtree ) {
-				// Preset leaves are untyped in VALID_SETTINGS, but consumers read `$preset['slug']` as a string.
-				$is_valid_preset = static function ( $preset ) {
-					return is_array( $preset ) && ( ! isset( $preset['slug'] ) || is_scalar( $preset['slug'] ) );
-				};
-				foreach ( static::get_setting_nodes( array( 'settings' => $result ) ) as $node ) {
-					foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-						$path    = array_merge( array_slice( $node['path'], 1 ), $preset_metadata['path'] );
-						$presets = _wp_array_get( $result, $path, null );
-						if ( ! is_array( $presets ) ) {
-							continue;
-						}
-						if ( isset( $presets[0] ) ) {
-							$presets = array_values( array_filter( $presets, $is_valid_preset ) );
-						} else {
-							foreach ( static::VALID_ORIGINS as $origin ) {
-								if ( isset( $presets[ $origin ] ) && is_array( $presets[ $origin ] ) ) {
-									$presets[ $origin ] = array_values( array_filter( $presets[ $origin ], $is_valid_preset ) );
-								}
-							}
-						}
-						_wp_array_set( $result, $path, $presets );
-					}
-				}
-			}
-
-			if ( empty( $result ) ) {
-				unset( $output[ $subtree ] );
-			} else {
-				$output[ $subtree ] = static::resolve_custom_css_format( $result );
-			}
-		}
-
-		return $output;
+		return WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations );
 	}
 
 	/**
@@ -1977,53 +1598,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The modified $tree.
 	 */
 	protected static function remove_keys_not_in_schema( $tree, $schema ) {
-		if ( ! is_array( $tree ) ) {
-			return $tree;
-		}
-
-		foreach ( $tree as $key => $value ) {
-			// Remove keys not in the schema or with null/empty values.
-			if ( ! array_key_exists( $key, $schema ) ) {
-				unset( $tree[ $key ] );
-				continue;
-			}
-
-			// Validate type if schema specifies a boolean marker.
-			if ( is_bool( $schema[ $key ] ) ) {
-				// Schema expects a boolean value - validate the input matches.
-				if ( ! is_bool( $value ) ) {
-					unset( $tree[ $key ] );
-					continue;
-				}
-				// Type matches, keep the value and continue to next key.
-				continue;
-			}
-
-			if ( is_array( $schema[ $key ] ) ) {
-				if ( ! is_array( $value ) ) {
-					unset( $tree[ $key ] );
-				} elseif ( wp_is_numeric_array( $value ) ) {
-					// If indexed, process each item in the array.
-					foreach ( $value as $item_key => $item_value ) {
-						if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
-							$tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
-						} else {
-							// If the schema does not define a further structure, keep the value as is.
-							$tree[ $key ][ $item_key ] = $item_value;
-						}
-					}
-				} else {
-					// If associative, process as a single object.
-					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
-
-					if ( empty( $tree[ $key ] ) ) {
-						unset( $tree[ $key ] );
-					}
-				}
-			}
-		}
-
-		return $tree;
+		return WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema( $tree, $schema );
 	}
 
 	/**
@@ -5347,7 +4922,7 @@ class WP_Theme_JSON_Gutenberg {
 		self::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
 
 		if ( $allow_viewport && array_key_exists( 'viewport', $input ) ) {
-			$output['viewport'] = static::sanitize_viewport_settings( $input['viewport'] );
+			$output['viewport'] = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize_viewport_settings( $input['viewport'] );
 		}
 
 		return $output;
@@ -6041,71 +5616,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $declarations;
-	}
-
-	/**
-	 * This is used to convert the internal representation of variables to the CSS representation.
-	 * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
-	 *
-	 * @since 6.3.0
-	 * @since 7.2.0 Preset reference slugs are kebab-cased to match the generated custom properties.
-	 * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
-	 * @return string The converted variable.
-	 */
-	private static function convert_custom_properties( $value ) {
-		$prefix     = 'var:';
-		$prefix_len = strlen( $prefix );
-		$token_in   = '|';
-		$token_out  = '--';
-		if ( str_starts_with( $value, $prefix ) ) {
-			$parts = explode( $token_in, substr( $value, $prefix_len ) );
-
-			/*
-			 * The slug of a preset reference is kebab-cased so the resulting
-			 * custom property matches the one generated from the preset,
-			 * whose slug is also kebab-cased (see `get_settings_values_by_slug()`).
-			 * For slugs that are not already kebab-cased (e.g. `n27`), a verbatim
-			 * conversion produces a reference to a custom property that does
-			 * not exist (`--wp--preset--font-family--n27` instead of the
-			 * generated `--wp--preset--font-family--n-27`).
-			 *
-			 * Duotone is the exception: its custom properties are generated by
-			 * `WP_Duotone_Gutenberg` from the presets it registers in
-			 * `get_all_global_styles_presets()`. Duotone references are
-			 * kebab-cased all the same: the editor and the JS style engine
-			 * kebab-case the references of every preset type, and
-			 * `WP_Duotone_Gutenberg` looks up presets by kebab-cased filter ID.
-			 */
-			if ( 3 === count( $parts ) && 'preset' === $parts[0] ) {
-				$parts[2] = _wp_to_kebab_case( $parts[2] );
-			}
-
-			$value = 'var(--wp--' . implode( $token_out, $parts ) . ')';
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Given a tree, converts the internal representation of variables to the CSS representation.
-	 * It is recursive and modifies the input in-place.
-	 *
-	 * @since 6.3.0
-	 * @param array $tree Input to process.
-	 * @return array The modified $tree.
-	 */
-	private static function resolve_custom_css_format( $tree ) {
-		$prefix = 'var:';
-
-		foreach ( $tree as $key => $data ) {
-			if ( is_string( $data ) && str_starts_with( $data, $prefix ) ) {
-				$tree[ $key ] = self::convert_custom_properties( $data );
-			} elseif ( is_array( $data ) ) {
-				$tree[ $key ] = self::resolve_custom_css_format( $data );
-			}
-		}
-
-		return $tree;
 	}
 
 	/**

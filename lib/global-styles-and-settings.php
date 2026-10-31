@@ -418,3 +418,41 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }
+
+/**
+ * Reports what WordPress would drop or coerce when reading a theme.json structure.
+ *
+ * Runs the same migration, block style variation unwrapping and sanitization as constructing
+ * a theme.json object, and returns what those steps removed or replaced instead of the object.
+ * An empty list means the structure is kept as given. It does not mean every value renders,
+ * and it says nothing about CSS values beyond their shape.
+ *
+ * Paths point into the structure after migration, so a version 1 or 2 file is reported with
+ * its migrated key names. The result depends on the blocks and block styles registered at the
+ * time of the call.
+ *
+ * The shape of each diagnostic is not final. `code` and `path` are the keys to rely on, and
+ * `message` is display text. This function stays in the plugin until the shape has been
+ * exercised by real callers.
+ *
+ * @since 7.2.0
+ *
+ * @param array  $theme_json A structure that follows the theme.json schema.
+ * @param array  $args {
+ *     Optional. Validation arguments.
+ *
+ *     @type string $origin What source of data the structure represents. One of 'blocks',
+ *                          'default', 'theme', or 'custom'. Default 'theme'.
+ * }
+ * @return array[] Diagnostics, each with `code`, `path` and `message` keys. See
+ *                 {@see WP_Theme_JSON_Sanitizer_Gutenberg::collect()} for each key.
+ */
+function gutenberg_validate_theme_json( $theme_json, $args = array() ) {
+	$args = wp_parse_args( $args, array( 'origin' => 'theme' ) );
+
+	return WP_Theme_JSON_Sanitizer_Gutenberg::collect(
+		static function () use ( $theme_json, $args ) {
+			new WP_Theme_JSON_Gutenberg( $theme_json, $args['origin'] );
+		}
+	);
+}
