@@ -1344,6 +1344,33 @@ describe( 'state', () => {
 			);
 		} );
 
+		it( 'should move the block up when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_UP',
+				clientIds: [ 'ribs' ],
+				rootClientId: null,
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+		} );
+
 		it( 'should move the nested block up', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
@@ -1497,6 +1524,33 @@ describe( 'state', () => {
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_DOWN',
 				clientIds: [ 'chicken' ],
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should move the block down when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_DOWN',
+				clientIds: [ 'chicken' ],
+				rootClientId: null,
 			} );
 
 			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
@@ -1806,6 +1860,45 @@ describe( 'state', () => {
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				clientIds: [ 'ribs' ],
+				index: 0,
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [
+				'ribs',
+				'chicken',
+				'veggies',
+			] );
+		} );
+
+		it( 'should move block when fromRootClientId and toRootClientId are null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
+				fromRootClientId: null,
+				toRootClientId: null,
 				index: 0,
 			} );
 
