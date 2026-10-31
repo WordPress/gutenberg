@@ -566,6 +566,8 @@ The `wp-watch` directive is executed:
 
 The `wp-watch` directive can return a function. If it does, the returned function is used as cleanup logic, i.e., it will run just before the callback runs again, and it will run again when the element is removed from the DOM.
 
+The callback runs in the element's directive scope, but the cleanup does not. Return the cleanup wrapped with [`withScope()`](#withscope) to keep the element's scope.
+
 As a reference, some use cases for this directive may be:
 
 -   Logging
@@ -619,7 +621,7 @@ store( 'myPlugin', {
 
 </details>
 
-The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
+The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM. As with `wp-watch`, the returned function runs without a directive scope: return it wrapped with [`withScope()`](#withscope) to keep the element's scope.
 
 ### `wp-run`
 
@@ -1301,7 +1303,7 @@ If you subscribe to any value returned by `getServerContext()` or `getServerStat
 
 Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
 
-When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+When the Interactivity API runtime executes the actions and directive callbacks of an element, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
 
 An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
 
@@ -1315,6 +1317,23 @@ store( 'mySliderPlugin', {
 				} ),
 				3_000
 			);
+		},
+	},
+} );
+```
+
+The same applies to cleanups. A cleanup returned by a `data-wp-watch` or `data-wp-init` callback, or by a [`watch()`](#watch) callback, runs without a directive scope, so `getContext()`, `getElement()` and `getServerContext()` throw inside it. To keep a scope, return the cleanup wrapped with `withScope()` from code that has the scope, such as the `data-wp-watch` or `data-wp-init` callback itself:
+
+```js
+store( 'myPlugin', {
+	callbacks: {
+		logRemoval: () => {
+			// The element's scope is available here, so the wrapped
+			// cleanup keeps it.
+			return withScope( () => {
+				const { name } = getContext();
+				console.log( `Cleaning up ${ name }` );
+			} );
 		},
 	},
 } );
@@ -1432,6 +1451,27 @@ const unwatch = watch( () => {
 	return () => {
 		document.removeEventListener( 'click', handler );
 	};
+} );
+```
+
+Like the callback, the cleanup runs without a directive scope, even when an action of an element triggers the re-run or the `unwatch()` call. To keep a scope, wrap it with [`withScope()`](#withscope) in code that has one, such as an action, and return the wrapped function:
+
+```js
+store( 'myPlugin', {
+	actions: {
+		startWatching: () => {
+			// Wrapped here, where the action's scope is available.
+			const cleanup = withScope( () => {
+				const { name } = getContext();
+				console.log( `Stopped watching for ${ name }` );
+			} );
+
+			watch( () => {
+				console.log( 'Counter is ' + state.counter );
+				return cleanup;
+			} );
+		},
+	},
 } );
 ```
 
