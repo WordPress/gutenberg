@@ -110,11 +110,11 @@ function wp_register_core_field_collections() {
 	wp_register_entity_field_collection( __DIR__ . '/page' );
 
 	// wp_template: unregister unwanted default fields, and register its own.
-	wp_unregister_entity_fields( 'postType', 'wp_template', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
+	wp_unregister_entity_fields( 'postType', 'wp_template', array( 'author', 'date', 'excerpt', 'notesCount', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
 	wp_register_entity_field_collection( __DIR__ . '/wp_template' );
 
 	// wp_template_part: unregister unwanted default fields, and register its own.
-	wp_unregister_entity_fields( 'postType', 'wp_template_part', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
+	wp_unregister_entity_fields( 'postType', 'wp_template_part', array( 'author', 'date', 'excerpt', 'notesCount', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
 	wp_register_entity_field_collection( __DIR__ . '/wp_template_part' );
 
 	// wp_block: unregister unwanted default fields, and register its own.
