@@ -10,7 +10,10 @@
 const path = require( 'path' );
 const { readFileSync } = require( 'fs' );
 const { red, yellow } = require( 'chalk' );
-const packageLockPath = path.resolve( __dirname, '../../package-lock.json' );
+// An optional path argument lets tests point the script at a fixture.
+const packageLockPath = process.argv[ 2 ]
+	? path.resolve( process.argv[ 2 ] )
+	: path.resolve( __dirname, '../../package-lock.json' );
 const packageLock = JSON.parse( readFileSync( packageLockPath, 'utf8' ) );
 
 const dependencies = /** @type {Array<[string, any]>} */ (
