@@ -1,5 +1,5 @@
 import momentLib from 'moment';
-import { describe, expect, it, test } from 'vitest';
+import { afterEach, describe, expect, it, test } from 'vitest';
 import {
 	getSettings,
 	date as dateNoI18n,
@@ -77,7 +77,7 @@ describe( 'Function date', () => {
 		[ 'B', '499' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
-		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'e I T', '+00:00 0 UTC' ],
 		[ 'O P Z', '+0000 +00:00 0' ],
 		[ 'c', '2019-06-18T11:00:00+00:00' ],
 		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ],
@@ -246,6 +246,64 @@ describe( 'Function date', () => {
 	} );
 } );
 
+describe( 'Format character e (timezone identifier)', () => {
+	const settings = getSettings();
+	const dateValue = '2019-06-18T11:00:00.000Z';
+
+	afterEach( () => {
+		setSettings( settings );
+	} );
+
+	it( 'should return the site timezone identifier, not its abbreviation', () => {
+		setSettings( {
+			...settings,
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+				abbr: 'EDT',
+			},
+		} );
+		expect( dateNoI18n( 'e', dateValue ) ).toBe( 'America/New_York' );
+		expect( dateI18n( 'e', dateValue ) ).toBe( 'America/New_York' );
+	} );
+
+	it( 'should return the timezone passed as an argument', () => {
+		expect( dateNoI18n( 'e', dateValue, 'Asia/Kolkata' ) ).toBe(
+			'Asia/Kolkata'
+		);
+	} );
+
+	it( 'should return the UTC offset when the site uses a manual offset', () => {
+		setSettings( {
+			...settings,
+			timezone: { ...settings.timezone, offset: 3.5, string: '' },
+		} );
+		expect( dateNoI18n( 'e', dateValue ) ).toBe( '+03:30' );
+		expect( dateNoI18n( 'e', dateValue, '-05:00' ) ).toBe( '-05:00' );
+	} );
+
+	it( 'should return +00:00 when the site uses a zero manual offset, like wp_date()', () => {
+		setSettings( {
+			...settings,
+			timezone: { ...settings.timezone, offset: 0, string: '' },
+		} );
+		expect( dateNoI18n( 'e', dateValue ) ).toBe( '+00:00' );
+	} );
+
+	it( 'should return UTC for a site with the UTC timezone string', () => {
+		setSettings( {
+			...settings,
+			timezone: { ...settings.timezone, offset: 0, string: 'UTC' },
+		} );
+		expect( dateNoI18n( 'e', dateValue ) ).toBe( 'UTC' );
+	} );
+
+	it( 'should return UTC for gmdate()', () => {
+		expect( gmdate( 'e', dateValue ) ).toBe( 'UTC' );
+	} );
+} );
+
 describe( 'Function gmdate', () => {
 	test.each( [
 		[ 'j/n/y', '18/6/19' ],
@@ -265,7 +323,7 @@ describe( 'Function gmdate', () => {
 		[ 'B', '499' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
-		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'e I T', 'UTC 0 UTC' ],
 		[ 'O P Z', '+0000 +00:00 0' ],
 		[ 'c', '2019-06-18T11:00:00+00:00' ],
 		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ],
@@ -348,7 +406,7 @@ describe( 'Function dateI18n', () => {
 		[ 'B', '499' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
-		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'e I T', 'UTC 0 UTC' ],
 		[ 'O P Z', '+0000 +00:00 0' ],
 		[ 'c', '2019-06-18T11:00:00+00:00' ],
 		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ], // Day and month should be in English, as per RFC 2822.
@@ -605,7 +663,7 @@ describe( 'Function gmdateI18n', () => {
 		[ 'B', '499' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
-		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
+		[ 'e I T', 'UTC 0 UTC' ],
 		[ 'O P Z', '+0000 +00:00 0' ],
 		[ 'c', '2019-06-18T11:00:00+00:00' ],
 		[ 'r', 'Tue, 18 Jun 2019 11:00:00 +0000' ], // Day and month should be in English, as per RFC 2822.
