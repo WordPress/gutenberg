@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Media upload modal: Apply media type restrictions to the file picker ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
