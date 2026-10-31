@@ -69,11 +69,16 @@ Beyond the current URL, the store's state describes the navigation itself: wheth
 
 #### `data-wp-router-region`
 
-It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
+It defines a region that is updated on navigation. It requires a unique ID as the value and must be on an element that has `data-wp-interactive` or sits inside an element that does. A region without its own `data-wp-interactive` inherits the namespace of its nearest `data-wp-interactive` ancestor, on the page that supplied its content, so when the ancestor's namespace differs between two pages, each page's content uses its own. An element that the router keeps between the two pages, though, keeps what it set up when it mounted — `data-wp-watch` callbacks, `data-wp-on-window` and `data-wp-on-document` listeners, and `data-wp-init` — with the namespace and references it had then; give it a different `data-wp-key` on each page to mount it again (see [Where to place router regions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#where-to-place-router-regions) in the Client-Side Navigation guide). A router region with neither is not updated. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
 
-<div class="callout callout-warning">
-When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
+```html
+<div data-wp-interactive="myblock">
+	<h1>Not updated on navigation</h1>
+	<div data-wp-router-region="main-list">
+		<!-- Updated on navigation; its directives use the "myblock" namespace. -->
+	</div>
 </div>
+```
 
 The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
 
