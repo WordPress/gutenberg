@@ -1085,6 +1085,24 @@ describe( 'prependHTTP', () => {
 
 		expect( prependHTTP( url ) ).toBe( 'http://wordpress.org' );
 	} );
+
+	it.each( [
+		'HTTPS://wordpress.org',
+		'Http://wordpress.org',
+		'MAILTO:foo@wordpress.org',
+		'chrome-extension://abcdef/options.html',
+		'web+demo2://wordpress.org',
+		'localhost:8888',
+	] )( 'should not prepend http to a URL with a scheme: %s', ( url ) => {
+		expect( prependHTTP( url ) ).toBe( url );
+	} );
+
+	it.each( [ 'wordpress.org:8080/path', 'my-site:8080/path', 'site1:80' ] )(
+		'should prepend http to a host and port: %s',
+		( url ) => {
+			expect( prependHTTP( url ) ).toBe( 'http://' + url );
+		}
+	);
 } );
 
 describe( 'prependHTTPS', () => {
@@ -1153,6 +1171,24 @@ describe( 'prependHTTPS', () => {
 
 		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
 	} );
+
+	it.each( [
+		'HTTPS://wordpress.org',
+		'Http://wordpress.org',
+		'MAILTO:foo@wordpress.org',
+		'chrome-extension://abcdef/options.html',
+		'web+demo2://wordpress.org',
+		'localhost:8888',
+	] )( 'should not prepend https to a URL with a scheme: %s', ( url ) => {
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it.each( [ 'wordpress.org:8080/path', 'my-site:8080/path', 'site1:80' ] )(
+		'should prepend https to a host and port: %s',
+		( url ) => {
+			expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+		}
+	);
 } );
 
 it( 'should prepend https to a domain with an anchor', () => {
