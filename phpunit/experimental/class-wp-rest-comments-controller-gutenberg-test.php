@@ -10,11 +10,21 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $contributor_id;
 	protected static $subscriber_id;
 	protected static $author_id;
+	protected static $moderator_id;
 	protected static $user_ids = array();
 	protected static $post_id;
 	protected static $num_notes = 10;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		add_role(
+			'comment_moderator',
+			'Comment Moderator',
+			array(
+				'read'              => true,
+				'moderate_comments' => true,
+			)
+		);
+
 		self::$admin_id       = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -40,6 +50,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'role' => 'author',
 			)
 		);
+		self::$moderator_id   = $factory->user->create(
+			array(
+				'role' => 'comment_moderator',
+			)
+		);
 
 		self::$user_ids = array(
 			'administrator' => self::$admin_id,
@@ -51,11 +66,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
+		remove_role( 'comment_moderator' );
+
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$contributor_id );
 		self::delete_user( self::$subscriber_id );
 		self::delete_user( self::$author_id );
+		self::delete_user( self::$moderator_id );
 	}
 
 	/**
@@ -1212,6 +1230,24 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * A user with moderate_comments but no editing capabilities cannot remove a
+	 * reaction on a post they cannot edit.
+	 */
+	public function test_moderator_cannot_delete_reaction() {
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$moderator_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ), 'Reaction must still exist.' );
 	}
 
 	/**
