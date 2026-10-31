@@ -1,9 +1,9 @@
 import { useState, useRef } from '@wordpress/element';
 import type { KeyboardEvent } from 'react';
-import { WritingFlow } from '@wordpress/block-editor';
+import WritingFlow from '..';
 
 export default {
-	title: 'Components/WritingFlow',
+	title: 'BlockEditor/WritingFlow',
 	component: WritingFlow,
 	parameters: {
 		docs: {
@@ -75,10 +75,14 @@ function DefaultStory() {
 							suppressContentEditableWarning
 							onFocus={ () => setActiveId( block.id ) }
 							onBlur={ ( e ) =>
-								updateBlock( block.id, e.target.textContent )
+								updateBlock(
+									block.id,
+									e.target.textContent ?? ''
+								)
 							}
 							onKeyDown={ ( e ) => handleKeyDown( e, index ) }
 							role="textbox"
+							aria-label={ `Block ${ index + 1 }` }
 							aria-multiline="true"
 							tabIndex={ 0 }
 							style={ {
