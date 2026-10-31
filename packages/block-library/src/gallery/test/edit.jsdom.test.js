@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import {
@@ -17,6 +17,7 @@ import { unlock } from '../../lock-unlock';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
+globalThis.wpVitest.mockScrollIntoView();
 
 const IMAGE_ATTRIBUTES = {
 	id: 1,
@@ -115,6 +116,131 @@ describe( 'Gallery block', () => {
 
 			expect(
 				screen.getByRole( 'button', { name: 'Align block' } )
+			).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Image link', () => {
+		const setupImage = ( attributes = {}, settings = {} ) =>
+			setup(
+				createBlock( 'core/gallery', {}, [
+					createBlock( 'core/image', {
+						...IMAGE_ATTRIBUTES,
+						...attributes,
+					} ),
+				] ),
+				{
+					// The editor always provides this, and the link picker
+					// can't list its suggestions without it.
+					__experimentalFetchLinkSuggestions: async () => [],
+					...settings,
+				}
+			);
+
+		const getLinkTo = () =>
+			screen.getByRole( 'button', { name: /Link to/ } );
+
+		const LIGHTBOX_SETTINGS = {
+			__experimentalFeatures: {
+				lightbox: { enabled: true, allowEditing: true },
+			},
+		};
+
+		test( "offers the link in an image's Content tab", async () => {
+			await setupImage();
+			await selectBlock( 'Block: Image' );
+
+			expect(
+				screen.getByRole( 'tab', { name: 'Content' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			expect(
+				await screen.findByRole( 'button', { name: /Link to/ } )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Link to' } )
+			).not.toBeInTheDocument();
+			// There is no link to remove yet.
+			expect(
+				screen.queryByRole( 'button', { name: 'Remove link' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).not.toBeChecked();
+		} );
+
+		test( 'does not offer a link for a decorative image', async () => {
+			await setupImage( { isDecorative: true } );
+			await selectBlock( 'Block: Image' );
+
+			expect(
+				await screen.findByRole( 'checkbox', {
+					name: 'Mark as decorative',
+				} )
+			).toBeChecked();
+			expect(
+				screen.queryByRole( 'button', { name: /Link to/ } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'checkbox', { name: 'Open in new tab' } )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'turns off the lightbox when the image is linked', async () => {
+			const user = userEvent.setup();
+			await setupImage( {}, LIGHTBOX_SETTINGS );
+			await selectBlock( 'Block: Image' );
+
+			await screen.findByRole( 'button', { name: /Link to/ } );
+			// An image that opens in a lightbox can't be marked as
+			// decorative, so the checkbox shows whether the lightbox is on.
+			expect(
+				screen.queryByRole( 'checkbox', { name: 'Mark as decorative' } )
+			).not.toBeInTheDocument();
+
+			await user.click( getLinkTo() );
+			const listbox = await screen.findByRole( 'listbox' );
+			await user.click(
+				within( listbox ).getByRole( 'option', { name: /Media file/ } )
+			);
+
+			expect( getLinkTo() ).toHaveTextContent( 'Media file' );
+			expect(
+				screen.getByRole( 'button', { name: 'Remove link' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Mark as decorative' } )
+			).toBeInTheDocument();
+		} );
+
+		test( 'removes the link and keeps the lightbox off', async () => {
+			const user = userEvent.setup();
+			await setupImage(
+				{
+					href: IMAGE_ATTRIBUTES.url,
+					linkDestination: 'media',
+					lightbox: { enabled: false },
+				},
+				LIGHTBOX_SETTINGS
+			);
+			await selectBlock( 'Block: Image' );
+
+			expect(
+				await screen.findByRole( 'button', { name: /Link to/ } )
+			).toHaveTextContent( 'Media file' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Remove link' } )
+			);
+
+			expect( getLinkTo() ).not.toHaveTextContent( 'Media file' );
+			expect(
+				screen.queryByRole( 'button', { name: 'Remove link' } )
+			).not.toBeInTheDocument();
+			// Like removing the link from the toolbar, the lightbox stays off
+			// rather than turning back on by default, so the image can still
+			// be marked as decorative.
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Mark as decorative' } )
 			).toBeInTheDocument();
 		} );
 	} );

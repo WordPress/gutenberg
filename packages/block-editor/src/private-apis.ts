@@ -71,6 +71,10 @@ import {
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
 import { LinkPicker } from './components/link-picker';
+import {
+	getMediaLinkDestination,
+	getNewTabLinkAttributes,
+} from './components/url-popover/link-destinations';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
@@ -150,6 +154,8 @@ lock( privateApis, {
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,
+	getMediaLinkDestination,
+	getNewTabLinkAttributes,
 	useRemoteUrlData,
 	PrivateBlockContext,
 	useListViewPanelState,
