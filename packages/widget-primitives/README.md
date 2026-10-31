@@ -83,6 +83,8 @@ Applications mount the provider. `useWidgetHost` reads the bag directly, for a c
 
 The second capability is `actions` (`WidgetHostActions`): `declare` takes the runtime actions of one instance. A host that places actions binds it where it mounts the widget's render.
 
+The third capability is `title`: the translated title of the widget the host renders, as the host shows it. A widget builds accessible names from it, such as the name of a chart, instead of keeping its own copy of the title. Without it, the widget falls back to a name of its own.
+
 ### Contract types
 
 `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`, and `WidgetAttributeRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts. `WidgetAttributeRecord` is an attribute as `widget.json` declares it: the JSON-expressible subset of a DataViews `Field`.

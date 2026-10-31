@@ -14,7 +14,7 @@ A widget renders inside a host, and the host inside an application. Some of what
 
 The provider merges its value over the inherited one, so an application can mount a base host once and layer capabilities per subtree. Reading without any provider yields `{}`.
 
-The application mounts the provider, wrapping the dashboard or whatever surface renders widgets, and the rendering engine keeps no dependency on the application's router. A host nests one only to bind a capability to the instance it renders, as `actions` below.
+The application mounts the provider, wrapping the dashboard or whatever surface renders widgets, and the rendering engine keeps no dependency on the application's router. A host nests one only to bind a capability to the instance it renders, as `actions` and `title` below.
 
 ## The `links` capability
 
@@ -45,6 +45,14 @@ actions: {
 `declare` replaces the runtime actions of one instance; an empty list withdraws them. The host binds it to the instance it renders, so the widget never names which instance it is. `WidgetRender` joins what every `useWidgetActions` call under it declares, so `declare` always receives the whole list.
 
 The list carries data, not UI: placement and materialization stay the host's. The widget's side is `useWidgetActions`, and the Actions page covers how the list joins the declared actions.
+
+## The `title` capability
+
+```ts
+title: string;
+```
+
+The translated title of the widget the host renders, as the host shows it, for example in a widget header. A widget can't translate the title in its `widget.json` itself: only string literals passed to `__()` reach its translation file. So it reads the title from the host to name what it renders, and the name follows any change to the title.
 
 ## Providing it
 
@@ -94,6 +102,22 @@ const host = useMemo< WidgetHost >(
 
 A host that mounts an instance twice, as a drag preview does, keeps each render's list apart, so one unmounting does not withdraw the other's.
 
+### `title`, per instance
+
+The provider that binds `actions` also carries the title of the widget it wraps:
+
+```tsx
+const host = useMemo< WidgetHost >(
+	() => ( {
+		actions: { declare: ( actions ) => place( uuid, actions ) },
+		title: widgetType.title,
+	} ),
+	[ place, uuid, widgetType.title ]
+);
+```
+
+A surface that renders a widget without a title to give, such as a story mounting its render component directly, leaves it out.
+
 ## Consuming it
 
 Most consumers touch the seam here and nowhere else. `HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise. A new document never routes, because a router link buys nothing for it, and `HostLink` reads that off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
@@ -112,7 +136,17 @@ It composes through the `render` prop of a UI link, which merges its own anchor 
 
 `Link`, `ButtonLink` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
 
-`useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
+`useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders. A widget reads `title` through it to name what it renders, keeping a name of its own for a host that gives none:
+
+```tsx
+const { title } = useWidgetHost();
+const label = title
+	? /* translators: %s: The title of the widget. */
+	  sprintf( __( '%s chart' ), title )
+	: __( 'Sales chart' );
+```
+
+The whole name goes through `sprintf`, so a locale can put the title where its grammar needs it.
 
 The **WithHostLink** story runs it against a demo router, with a toggle that removes the capability from the host bag.
 
