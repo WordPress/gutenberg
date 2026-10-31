@@ -155,10 +155,14 @@ function MediaEditorRoute() {
 									{ ! isNarrow && (
 										<MediaEditor.HistoryActions />
 									) }
-									<MediaEditor.HeaderActions />
+									{ /* Same order as the block editor's
+									     header: sidebar toggle, save, then the
+									     more menu. */ }
+									<MediaEditor.PanelToggle />
 									{ /* Compact to match the header's other
 									     controls, as elsewhere in wp-admin. */ }
 									<MediaEditor.SaveActions size="compact" />
+									<MediaEditor.MoreMenu />
 								</>
 							}
 						>
