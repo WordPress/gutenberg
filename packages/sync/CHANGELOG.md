@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `onRemoteReplacement` sync config option, called with the record as it was when a remote document that shares no history replaced the record's top-level keys, so the replaced content can be stored somewhere recoverable ([#85876](https://github.com/WordPress/gutenberg/pull/85876)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

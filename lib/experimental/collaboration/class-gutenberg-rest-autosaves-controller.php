@@ -32,6 +32,22 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
 
 	/**
+	 * Request parameter asking for the submitted content to be stored as a
+	 * permanent revision instead of an autosave.
+	 *
+	 * A peer whose shared document was replaced by a conflicting one (see
+	 * `onRemoteReplacement` in @wordpress/sync) sends the content it held so
+	 * it can be restored from the revisions screen. The parent post and the
+	 * user's autosave are left untouched: the replacing content is the current
+	 * state of the post, and the next autosave overwrites the autosave anyway.
+	 *
+	 * This string must match CRDT_RECOVERY_POINT_KEY in @wordpress/core-data.
+	 *
+	 * @var string
+	 */
+	public const CRDT_RECOVERY_POINT_PARAM = 'crdt_recovery_point';
+
+	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
 	 *
 	 * A snapshot is a state vector plus a delete set, so it grows with the
@@ -130,7 +146,11 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			current_user_can( 'edit_post', $post->ID )
 		);
 
-		if ( $should_promote_auto_draft ) {
+		$is_recovery_point = rest_sanitize_boolean( $request->get_param( self::CRDT_RECOVERY_POINT_PARAM ) );
+
+		if ( $is_recovery_point ) {
+			$autosave_id = _wp_put_post_revision( $post_data );
+		} elseif ( $should_promote_auto_draft ) {
 			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
 		} elseif ( $this->is_redundant_autosave( $post, $post_data, $meta ) ) {
 			/*
@@ -148,8 +168,9 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return $autosave_id;
 		}
 
-		// Only save a CRDT snapshot with an autosave (not with parent post)
-		if ( $autosave_id !== $post->ID ) {
+		// Only save a CRDT snapshot with an autosave (not with parent post or
+		// a recovery point).
+		if ( $autosave_id !== $post->ID && ! $is_recovery_point ) {
 			$this->store_crdt_snapshot( $autosave_id, $request );
 		}
 
