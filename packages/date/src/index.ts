@@ -605,6 +605,14 @@ export function humanTimeDiff(
 }
 
 /**
+ * Matches ISO 8601 calendar dates without a timezone designator:
+ * "YYYY-MM-DD", optionally followed by a local time
+ * ("YYYY-MM-DD[T ]HH:mm[:ss[.fraction]]").
+ */
+const ZONELESS_ISO_DATE =
+	/^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?$/;
+
+/**
  * Creates a moment instance using the given timezone or, if none is provided, using global settings.
  *
  * @param dateValue Date object or string, parsable
@@ -622,7 +630,19 @@ function buildMoment(
 	dateValue: Moment | Date | string | number,
 	timezone: string | number = ''
 ) {
-	const dateMoment = momentLib( dateValue );
+	let dateMoment;
+	if (
+		typeof dateValue === 'string' &&
+		ZONELESS_ISO_DATE.test( dateValue )
+	) {
+		// Zoneless ISO strings are wall time in the site's configured
+		// timezone, matching getDate(). Every other string shape keeps the
+		// historical moment.js parsing behavior.
+		ensureWPTimezone();
+		dateMoment = momentLib.tz( dateValue, WP_ZONE );
+	} else {
+		dateMoment = momentLib( dateValue );
+	}
 
 	if ( timezone !== '' ) {
 		return isUTCOffset( timezone )
