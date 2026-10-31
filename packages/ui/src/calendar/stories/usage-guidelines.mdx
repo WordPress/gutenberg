@@ -18,6 +18,12 @@ When using `application`, include the current month in any custom `aria-label` o
 
 ## Usage
 
+### Sizing
+
+Both calendars fill their container width without a maximum. Each month has a minimum width of seven day cells, or 224px with the default tokens. Days grow horizontally and keep their height. Constrain the container width when you need a compact calendar.
+
+Multiple months share the available width equally on each row. Months wrap when another minimum-width month and the gap do not fit. Months on an incomplete last row expand to fill that row. Below the minimum width, the calendar overflows; the parent decides whether to scroll or clip it through its `overflow` style.
+
 ### Uncontrolled Mode
 
 The component manages its own selection. Use `defaultValue` to set the initial value, and `onValueChange` to react to changes.
