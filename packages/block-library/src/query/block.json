@@ -41,6 +41,10 @@
 		"enhancedPagination": {
 			"type": "boolean",
 			"default": false
+		},
+		"useAlphabeticalPagination": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "templateSlug", "postType" ],
@@ -48,7 +52,8 @@
 		"queryId": "queryId",
 		"query": "query",
 		"displayLayout": "displayLayout",
-		"enhancedPagination": "enhancedPagination"
+		"enhancedPagination": "enhancedPagination",
+		"useAlphabeticalPagination": "useAlphabeticalPagination"
 	},
 	"supports": {
 		"anchor": true,
