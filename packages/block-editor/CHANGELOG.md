@@ -34,6 +34,7 @@
 
 ### Internal
 
+-   Block Removal Warning Modal: Use `Text` and `Stack` from `@wordpress/ui` instead of raw paragraphs ([#85274](https://github.com/WordPress/gutenberg/pull/85274)).
 -   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 -   Convert the block toolbar, switcher, mover, preview and settings menu to TypeScript ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
 -   Convert the grid item tools, ChildLayoutControl and the layout hooks to TypeScript ([#84985](https://github.com/WordPress/gutenberg/pull/84985)).
