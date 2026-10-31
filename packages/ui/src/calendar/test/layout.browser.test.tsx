@@ -68,6 +68,51 @@ describe.each( [
 		expect( calendar.parentElement?.scrollWidth ).toBe( 224 );
 	} );
 
+	it.each( [ 1, 2 ] )(
+		'preserves month widths during navigation with numberOfMonths=%s',
+		async ( numberOfMonths ) => {
+			await render(
+				<ThemeProvider isRoot>
+					<div style={ { width: 700 } }>
+						<Component
+							defaultMonth={ TEST_DATE }
+							numberOfMonths={ numberOfMonths }
+						/>
+					</div>
+				</ThemeProvider>
+			);
+			const calendar = screen.getByRole( 'application' );
+			const initialWidths = screen
+				.getAllByRole( 'grid' )
+				.map( ( grid ) => grid.getBoundingClientRect().width );
+			let outgoingWidths: number[] = [];
+			const observer = new MutationObserver( () => {
+				// eslint-disable-next-line testing-library/no-node-access -- Outgoing animation snapshots are hidden from the accessibility tree.
+				const outgoingGrids = calendar.querySelectorAll(
+					'[aria-hidden="true"] [role="grid"]'
+				);
+				if ( outgoingGrids.length ) {
+					outgoingWidths = Array.from(
+						outgoingGrids,
+						( grid ) => grid.getBoundingClientRect().width
+					);
+				}
+			} );
+			observer.observe( calendar, { childList: true, subtree: true } );
+			try {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: /next month/i } )
+				);
+				expect( outgoingWidths ).toHaveLength( numberOfMonths );
+				outgoingWidths.forEach( ( width, index ) => {
+					expect( width ).toBeCloseTo( initialWidths[ index ], 1 );
+				} );
+			} finally {
+				observer.disconnect();
+			}
+		}
+	);
+
 	it( 'shares each row equally between months and wraps when they do not fit', async () => {
 		const view = await render(
 			<ThemeProvider isRoot>
