@@ -301,13 +301,11 @@ class WP_Block_Parser {
 			: array();
 
 		/*
-		 * This state isn't allowed
-		 * This is an error
+		 * A closer can't be void or have attributes, but existing content may
+		 * contain one, so it's accepted rather than rejected: a void closer such
+		 * as `<!-- /wp:image /-->` is parsed as a void block, and attributes on
+		 * a closer that isn't void are ignored.
 		 */
-		if ( $is_closer && ( $is_void || $has_attrs ) ) {
-			// we can ignore them since they don't hurt anything.
-		}
-
 		if ( $is_void ) {
 			return array( 'void-block', $name, $attrs, $started_at, $length );
 		}
