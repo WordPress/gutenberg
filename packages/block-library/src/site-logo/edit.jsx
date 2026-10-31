@@ -219,7 +219,7 @@ const SiteLogo = ( {
 	const shouldUseNewUrl = ! window?.__experimentalUseCustomizerSiteLogoUrl;
 
 	const siteIconSettingsUrl = shouldUseNewUrl
-		? siteUrl + '/wp-admin/options-general.php'
+		? siteUrl + '/wp-admin/site-editor.php?p=%2Fidentity'
 		: siteUrl + '/wp-admin/customize.php?autofocus[section]=title_tagline';
 
 	const syncSiteIconHelpText = createInterpolateElement(
