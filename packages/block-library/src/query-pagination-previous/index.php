@@ -47,7 +47,18 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	} else {
 		$block_query     = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		$block_max_pages = $block_query->max_num_pages;
-		$total           = ! $max_page || $max_page > $block_max_pages ? $block_max_pages : $max_page;
+		$offset          = $block->context['query']['offset'] ?? 0;
+		$has_offset      = is_numeric( $offset ) && 0 < absint( $offset );
+		$per_page        = (int) $block_query->get( 'posts_per_page' );
+		if ( $has_offset && 0 < $block_max_pages && 0 < $per_page ) {
+			// Remove only the initial offset, not the posts skipped by preceding pages.
+			$query_offset   = $block_query->get( 'offset' );
+			$initial_offset = is_numeric( $query_offset ) ? max( 0, absint( $query_offset ) - $per_page * ( max( 1, $page ) - 1 ) ) : 0;
+			if ( $initial_offset ) {
+				$block_max_pages = (int) ceil( max( 0, $block_query->found_posts - $initial_offset ) / $per_page );
+			}
+		}
+		$total = ! $max_page || $max_page > $block_max_pages ? $block_max_pages : $max_page;
 		wp_reset_postdata();
 
 		if ( 1 < $page && $page <= $total ) {
