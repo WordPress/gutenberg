@@ -91,4 +91,22 @@ describe( 'TemplateEdit', () => {
 		expect( select ).toHaveTextContent( 'Default template' );
 		expect( select ).not.toHaveAttribute( 'data-placeholder' );
 	} );
+
+	it( 'selects no template for several posts edited at once', () => {
+		render(
+			<RegistryProvider
+				value={ createTestRegistry( { isBlockTheme: true } ) }
+			>
+				<TemplateEdit
+					data={ { type: 'post' } }
+					field={ field }
+					onChange={ () => {} }
+				/>
+			</RegistryProvider>
+		);
+
+		const select = screen.getByRole( 'combobox', { name: 'Template' } );
+		expect( select ).toHaveAttribute( 'data-placeholder' );
+		expect( select ).toBeEnabled();
+	} );
 } );

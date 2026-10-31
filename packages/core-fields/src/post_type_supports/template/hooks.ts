@@ -1,6 +1,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplate } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../shared/title/get-item-title';
 import { unlock } from '../../lock-unlock';
 import type { PostWithTemplate } from './types';
@@ -13,6 +14,8 @@ import type { PostWithTemplate } from './types';
  * The mode the template field renders in for a post, or null when the post
  * cannot be assigned a template: its post type is not viewable, the classic
  * theme offers no template for it, or the block theme resolves no template.
+ * A record without an id stands for several posts edited at once, which a
+ * block theme can assign any template of their post type.
  *
  * @param record The post.
  * @return 'block-theme', 'classic', or null.
@@ -31,15 +34,16 @@ export function useTemplateFieldMode(
 			if ( ! select( coreStore ).getCurrentTheme()?.is_block_theme ) {
 				return hasAvailableTemplates ? 'classic' : null;
 			}
+			if ( ! postId ) {
+				return 'block-theme';
+			}
 			// The field only assigns a template from the list, which any
 			// user who can edit posts may read, so it applies whenever the
 			// post resolves to a template.
-			const templateId = postId
-				? unlock( select( coreStore ) ).getTemplateId(
-						postType,
-						postId
-					)
-				: undefined;
+			const templateId = unlock( select( coreStore ) ).getTemplateId(
+				postType,
+				postId
+			);
 			return templateId ? 'block-theme' : null;
 		},
 		[ postType, postId, hasAvailableTemplates ]
@@ -73,7 +77,8 @@ const NAME_NOT_FOUND = '';
 
 /**
  * The human-readable label of the default template that would apply to a
- * post, given its type, id, and slug.
+ * post, given its type, id, and slug. Without an id, as for several posts
+ * edited at once, each post keeps its own default, so the label is generic.
  *
  * @param postType The post type.
  * @param postId   The post id.
@@ -86,8 +91,11 @@ export function useDefaultTemplateLabel(
 ): string {
 	return useSelect(
 		( select ) => {
-			if ( ! postType || ! postId ) {
+			if ( ! postType ) {
 				return NAME_NOT_FOUND;
+			}
+			if ( ! postId ) {
+				return __( 'Default template' );
 			}
 
 			const postIdStr = String( postId );
