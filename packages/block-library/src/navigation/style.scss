@@ -549,6 +549,16 @@ button.wp-block-navigation-item__content {
 		transform: translateY(0);
 	}
 }
+@keyframes overlay-menu__fade-out-animation {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(0.5em);
+	}
+}
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
@@ -591,6 +601,11 @@ button.wp-block-navigation-item__content {
 		@media not (prefers-reduced-motion) {
 			animation: overlay-menu__fade-in-animation 0.1s ease-out;
 			animation-fill-mode: forwards;
+
+			&.is-menu-closing {
+				animation-name: overlay-menu__fade-out-animation;
+				pointer-events: none;
+			}
 		}
 
 		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
