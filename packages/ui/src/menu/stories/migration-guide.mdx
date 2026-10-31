@@ -1,0 +1,166 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Components/Menu/Migration Guide" />
+
+# Migrating extensible menus
+
+A menu that accepts items from another package or an extension API needs a
+compatibility layer. The menu owner must render every `Menu` part with the same
+copy of `@wordpress/ui` as its `Menu.Root`.
+
+Gutenberg can bundle `@wordpress/ui` separately into each consuming package.
+Two packages can therefore use different Menu contexts even when they depend on
+the same package version. An extension API that can cross package bundles must
+not ask extensions to import and inject their own `Menu.Item`.
+
+## Let the menu owner render extension items
+
+Keep the extension-facing API stable. Pass a host-owned item adapter through
+`ActionItem.Slot`'s `fillProps.as`. This supplies the default component for each
+item. Then use the slot's `children` callback to place the flattened, rendered
+items in the host's Menu structure. An item's own `as` overrides the default,
+so handle custom renderers as a separate contract.
+
+```jsx
+function ExtensibleMenu() {
+	return (
+		<Menu.Root>
+			<Menu.Trigger>Options</Menu.Trigger>
+			<Menu.Popup>
+				<ActionItem.Slot
+					name="core/plugin-more-menu"
+					fillProps={ { as: ExtensionMenuItem } }
+				>
+					{ ( items ) => (
+						<Menu.Group>
+							<Menu.GroupLabel>Extensions</Menu.GroupLabel>
+							{ items }
+						</Menu.Group>
+					) }
+				</ActionItem.Slot>
+			</Menu.Popup>
+		</Menu.Root>
+	);
+}
+```
+
+The fill continues to use its existing public component. It does not need to
+know which menu implementation renders it.
+
+```jsx
+<ActionItem name="core/plugin-more-menu" onClick={ openSettings }>
+	Settings
+</ActionItem>
+```
+
+## Preserve the old item contract
+
+The adapter is compatibility code. Inventory the extension API's documented
+props and its deliberate pass-through behavior before writing it. Map the old
+semantics to Menu instead of forwarding unknown props or inferring behavior
+from presentation.
+
+For example, this adapter is complete only for an extension API that supports
+text labels, command callbacks, and links:
+
+```jsx
+function ExtensionMenuItem( { children, href, onClick } ) {
+	const label = <Menu.ItemLabel>{ children }</Menu.ItemLabel>;
+
+	if ( href !== undefined ) {
+		return (
+			<Menu.LinkItem href={ href } onClick={ onClick }>
+				{ label }
+			</Menu.LinkItem>
+		);
+	}
+
+	return <Menu.Item onClick={ onClick }>{ label }</Menu.Item>;
+}
+```
+
+Do not copy this shortened adapter when the old component supports more than
+these props. Check each part of the existing contract:
+
+-   Treat every defined `href`, including an empty string, as a link if the old
+    component did so.
+-   Map `target="_blank"` to `openInNewTab`. If the old API supports other
+    targets, decide how to preserve or deprecate them before migrating.
+-   Use `Menu.CheckboxItem` for boolean checkbox state. Preserve
+    `aria-checked="mixed"` with a correctly named item that keeps the
+    `menuitemcheckbox` role and state.
+-   Use `Menu.RadioItem` only when the item can join a `Menu.RadioGroup`. If it
+    cannot, preserve the old `menuitemradio` role and checked state on a regular
+    item as a compatibility fallback. Do not infer a radio group from
+    presentation alone.
+-   Preserve accessible names when the old API accepts text through `children`,
+    `aria-label`, or a legacy `label` prop.
+-   Render `Menu.ItemLabel` as the first direct child. Only an optional direct
+    `Menu.ItemDescription` can follow it. Plain text, a fragment, or another
+    child structure fails Menu's development validation.
+-   If the old API accepts more than one checked-state input, such as
+    `isSelected` and `aria-checked`, preserve their precedence as well as their
+    values.
+-   Convert legacy shortcut shapes to Menu's shortcut contract. Do not pass an
+    incompatible object through unchanged.
+-   Keep every supported icon input. For example, a legacy component may accept
+    Dashicon slug strings that a newer icon component does not render.
+-   Pass activation events to existing callbacks, and preserve disabled and
+    dismissal behavior.
+
+Keep the adapter next to the menu being migrated. Different extension points
+usually have different legacy contracts, so a shared adapter can hide
+incompatibilities instead of removing them.
+
+## Treat custom item renderers as a separate contract
+
+An extension-supplied component override bypasses the host-owned adapter. The
+menu owner cannot know whether arbitrary output forwards its ref, spreads the
+props Menu supplies, renders the expected native element, has an accessible
+name, or participates in keyboard navigation.
+
+Do not wrap an unknown component in `Menu.Item` and assume that makes it
+compatible. New extension APIs should not accept arbitrary item renderers. For
+an existing API, prefer to deprecate the override with a supported migration
+path. If the API intentionally supports a finite set of renderers, define that
+contract and provide an adapter for each one. Otherwise, preserve the old menu
+until the contract can be replaced, or make an explicit breaking change under
+the package's release policy.
+
+## Test the compatibility layer
+
+Test through the public extension API, not only by rendering the adapter
+directly. Cover every supported item kind and prop shape, including:
+
+-   commands, links, empty links, and supported link targets;
+-   checkbox `true`, `false`, and `mixed` states, plus radio `true` and `false`;
+-   labels, descriptions, icons, shortcuts, disabled items, and callbacks; and
+-   Arrow key navigation, Enter and Space activation, Escape dismissal, and
+    focus return.
+
+If custom renderers remain supported, test each supported renderer with the
+same keyboard and focus checks.
+
+## Migration order
+
+1. Inventory the existing extension contract and its current consumers.
+2. Add tests for the behavior the migration must preserve.
+3. Add a host-owned adapter and pass it through the slot without changing the
+   public fill API.
+4. Use the slot's `children` callback to compose fills into the new menu
+   structure.
+5. Resolve custom component overrides before switching the owning menu.
+6. Migrate the owner's internal items to `@wordpress/ui`.
+7. Verify built-in and third-party fills in the real application.
+8. Deprecate legacy item props only in a separate compatibility change.
+
+See [the DropdownMenu migration tracker](https://github.com/WordPress/gutenberg/issues/61094)
+and [the ActionItem slot changes](https://github.com/WordPress/gutenberg/pull/81507).
+The [editor Options menu migration](https://github.com/WordPress/gutenberg/pull/81564)
+demonstrates the host-owned adapter and slot callback. It still retains a
+temporary fallback for custom `as` renderers, whose compatibility and
+deprecation path need a separate change. For semantic and keyboard requirements,
+see the WAI-ARIA definitions of
+[`menuitemcheckbox`](https://www.w3.org/TR/wai-aria-1.2/#menuitemcheckbox) and
+[`menuitemradio`](https://www.w3.org/TR/wai-aria-1.2/#menuitemradio), and the
+[Menu and Menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/).
