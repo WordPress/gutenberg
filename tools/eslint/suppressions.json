@@ -10630,11 +10630,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/hooks/push-changes-to-global-styles/format-style-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/hooks/push-changes-to-global-styles/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -10646,22 +10641,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/hooks/push-changes-to-global-styles/style-labels.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/hooks/push-changes-to-global-styles/test/format-style-value.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/hooks/push-changes-to-global-styles/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/hooks/push-changes-to-global-styles/test/style-labels.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
