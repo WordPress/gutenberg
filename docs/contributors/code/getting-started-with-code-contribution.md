@@ -12,8 +12,8 @@ We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nv
 -   Git
     Gutenberg is using git for source control. Make sure you have an updated version of git installed on your computer, as well as a GitHub account. You can read the [Git Workflow](/docs/contributors/code/git-workflow.md) to learn more about using git and GitHub with Gutenberg
 
--   [Recommended] Docker Desktop
-    We recommend using the [wp-env package](/packages/env/README.md) for setting WordPress environment locally. You'll need to install Docker to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/getting-started/devenv/README.md).
+-   [Recommended] Docker
+    We recommend using the [wp-env package](/packages/env/README.md) for setting WordPress environment locally. You'll need a Docker runtime, such as [Colima](https://github.com/abiosoft/colima) on macOS or Docker Desktop, to use `wp-env`. See [Set up Docker](/docs/getting-started/devenv/get-started-with-wp-env.md#set-up-docker) for details.
     > Note: To install Docker on Windows 10 Home Edition, follow the [install instructions from Docker for Windows with WSL2](https://docs.docker.com/docker-for-windows/wsl/).
 
 As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](https://wampserver.aviatechno.net/), or [MAMP](https://www.mamp.info/), or even use a remote server.
@@ -87,7 +87,7 @@ MySQL is listening on port 51220
  ✔ Done! (in 261s 898ms)
 ```
 
-And if you open Docker dashboard by rightclicking the icon in the menu bar(on Mac) or system tray (on Linux and Windows) and selecting 'Dashboard', you will see that the script has downloaded some Docker Images, and is running a Docker Container with fully functional WordPress installation:
+If you use Docker Desktop and open its dashboard by rightclicking the icon in the menu bar(on Mac) or system tray (on Linux and Windows) and selecting 'Dashboard', you will see that the script has downloaded some Docker Images, and is running a Docker Container with fully functional WordPress installation:
 ![Screenshot of the WordPress Docker Container Running](https://cldup.com/mt9cKES-YZ.png)
 ![Screenshot of the Downloaded Docker Images for WordPress Development Environment](https://cldup.com/bNpgaRSkcG.png)
 
