@@ -1,6 +1,6 @@
 import { Component } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Card, CollapsibleCard, Notice, Stack, Text } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
@@ -168,7 +168,10 @@ export default class ErrorBoundary extends Component {
 								getErrorReport( error, componentStack )
 							}
 						>
-							{ __( 'Copy error' ) }
+							{ _x(
+								'Copy error',
+								'button label: copy the error message'
+							) }
 						</CopyButton>
 					</Notice.Actions>
 				</Notice.Root>

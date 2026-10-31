@@ -1,7 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import { Slot } from '@wordpress/components';
 import { RawHTML, useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
 import CopyButton from './copy-button';
@@ -150,7 +150,10 @@ export default function InlineNotice( {
 							text={ `${ content }\n\n${ details }` }
 							label={
 								status === 'error'
-									? __( 'Copy error' )
+									? _x(
+											'Copy error',
+											'button label: copy the error message'
+										)
 									: __( 'Copy message' )
 							}
 						/>
