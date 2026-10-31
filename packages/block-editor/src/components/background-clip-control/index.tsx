@@ -1,12 +1,22 @@
-import { CustomSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
-const BACKGROUND_CLIP_OPTIONS = [
-	{ key: 'border-box', name: __( 'Border box' ) },
-	{ key: 'padding-box', name: __( 'Padding box' ) },
-	{ key: 'content-box', name: __( 'Content box' ) },
-	{ key: 'text', name: __( 'Text' ) },
+interface BackgroundClipItem {
+	value: string;
+	label: string;
+}
+
+const BACKGROUND_CLIP_ITEMS: BackgroundClipItem[] = [
+	{ value: 'border-box', label: __( 'Border box' ) },
+	{ value: 'padding-box', label: __( 'Padding box' ) },
+	{ value: 'content-box', label: __( 'Content box' ) },
+	{ value: 'text', label: __( 'Text' ) },
 ];
+
+const DEFAULT_ITEM: BackgroundClipItem = {
+	value: 'default',
+	label: __( 'Default' ),
+};
 
 interface BackgroundClipControlProps {
 	value?: string;
@@ -19,43 +29,50 @@ export default function BackgroundClipControl( {
 	onChange,
 	allowedValues,
 }: BackgroundClipControlProps ) {
-	const options = (
-		allowedValues
-			? BACKGROUND_CLIP_OPTIONS.filter( ( option ) =>
-					allowedValues.includes( option.key )
-				)
-			: BACKGROUND_CLIP_OPTIONS
-	).map( ( option ) => ( {
-		...option,
-		className: `block-editor-background-clip-control__option is-${ option.key }`,
-	} ) );
+	const items = allowedValues
+		? BACKGROUND_CLIP_ITEMS.filter( ( item ) =>
+				allowedValues.includes( item.value )
+			)
+		: BACKGROUND_CLIP_ITEMS;
 
-	if ( ! options.length ) {
+	if ( ! items.length ) {
 		return null;
 	}
 
-	// Unset is its own option, not the first allowed value.
-	const defaultOption = {
-		key: 'default',
-		name: __( 'Default' ),
-		className: 'block-editor-background-clip-control__option is-default',
-	};
-	const selectedOption =
-		options.find( ( option ) => option.key === value ) ?? defaultOption;
+	const visibleItems = [ DEFAULT_ITEM, ...items ];
+	const selectedItem =
+		items.find( ( item ) => item.value === value ) ?? DEFAULT_ITEM;
 
 	return (
-		<CustomSelectControl
+		<SelectControl
 			className="block-editor-background-clip-control"
 			label={ __( 'Clip' ) }
-			options={ [ defaultOption, ...options ] }
-			value={ selectedOption }
-			onChange={ ( { selectedItem } ) =>
-				onChange(
-					selectedItem?.key === defaultOption.key
-						? undefined
-						: selectedItem?.key
-				)
-			}
-		/>
+			items={ visibleItems }
+			value={ selectedItem }
+			onValueChange={ ( item ) => {
+				if (
+					! item ||
+					item.value === DEFAULT_ITEM.value ||
+					item.value === null
+				) {
+					onChange( undefined );
+				} else {
+					onChange( item.value );
+				}
+			} }
+		>
+			{ visibleItems.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+					className={ `block-editor-background-clip-control__option is-${ item.value }` }
+				>
+					<SelectControl.ItemLabel>
+						{ item.label }
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ) }
+		</SelectControl>
 	);
 }
