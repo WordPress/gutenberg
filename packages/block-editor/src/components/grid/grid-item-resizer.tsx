@@ -194,8 +194,7 @@ function GridItemResizerInner( {
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
-						columnStart: isManualGrid ? columnStart : undefined,
-						rowStart: isManualGrid ? rowStart : undefined,
+						...( isManualGrid && { columnStart, rowStart } ),
 					} );
 				} }
 			/>

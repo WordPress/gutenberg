@@ -48,7 +48,12 @@ describe( 'ChildLayoutControl', () => {
 		panelId: 'client-id',
 	};
 
+	const originalGridInteractivity =
+		window.__experimentalEnableGridInteractivity;
+
 	afterEach( () => {
+		window.__experimentalEnableGridInteractivity =
+			originalGridInteractivity;
 		vi.clearAllMocks();
 	} );
 
@@ -101,6 +106,28 @@ describe( 'ChildLayoutControl', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Row span' } )
 		).toHaveValue( 2 );
+	} );
+
+	it( 'shows column and row start controls for auto-placement grids', () => {
+		window.__experimentalEnableGridInteractivity = false;
+
+		renderControl( {
+			parentLayout: {
+				type: 'grid',
+				isManualPlacement: false,
+			},
+			value: {
+				columnStart: 2,
+				rowStart: 3,
+			},
+		} );
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Column start' } )
+		).toHaveValue( 2 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Row start' } )
+		).toHaveValue( 3 );
 	} );
 
 	it( 'sets a numeric span when entering 1 into an empty span control', async () => {
