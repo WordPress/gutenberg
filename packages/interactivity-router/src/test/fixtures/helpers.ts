@@ -41,7 +41,10 @@ export const pageHtml = ( body: string ) =>
  *
  * @return The recorded changes and a function to stop recording.
  */
-export function recordLifecycle() {
+export function recordLifecycle(): {
+	changes: Lifecycle[];
+	stop: () => void;
+} {
 	const changes: Lifecycle[] = [];
 	let isInitialRun = true;
 	const stop = watch( () => {
