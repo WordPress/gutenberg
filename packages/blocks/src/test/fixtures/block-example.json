@@ -1,0 +1,11 @@
+{
+	"apiVersion": 3,
+	"name": "repro/disclosure",
+	"title": "Disclosure",
+	"category": "widgets",
+	"attributes": {
+		"open": { "type": "boolean", "default": false },
+		"label": { "type": "string" }
+	},
+	"example": { "attributes": { "open": true } }
+}
