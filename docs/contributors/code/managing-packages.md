@@ -12,7 +12,7 @@ The repository also contains internal workspaces under `tools/` and `test/` for 
 
 ## Supply chain policy
 
-`.npmrc` opts in to the npm v12 defaults that refuse git references (`EALLOWGIT`) and tarball URLs (`EALLOWREMOTE`), and extends that to local tarball files (`EALLOWFILE`). Local directories stay at the npm default, which gates nothing here: the `file:` links between workspaces resolve as workspaces rather than directory dependencies.
+npm v12 refuses git references (`EALLOWGIT`) and tarball URLs (`EALLOWREMOTE`) by default, and `.npmrc` extends that to local tarball files (`EALLOWFILE`). Local directories stay at the npm default, which gates nothing here: the `file:` links between workspaces resolve as workspaces rather than directory dependencies.
 
 Install scripts are opt-in: every dependency that ships one is recorded in `allowScripts` in the root `package.json`, and `strict-allow-scripts` fails the install with `ESTRICTALLOWSCRIPTS` on anything missing from that list. Every entry is `false`, so nothing compiles on install. `test/ai-development` installs with `--prefix`, so it carries its own copy of the policy.
 
