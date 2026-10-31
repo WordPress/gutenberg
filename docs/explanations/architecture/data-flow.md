@@ -6,6 +6,10 @@ A block editor post is the proper block-aware representation of a post: a collec
 
 A block editor post is not the artifact it produces, namely the `post_content`. The latter is the printed page, optimized for the reader but retaining its invisible markings for later editing.
 
+In practical terms, this means that the block editor always operates on a structured, in-memory representation of content rather than directly manipulating HTML. This allows the editor to reason about blocks semantically—for example, understanding that a heading is a heading with a specific level, rather than just a fragment of markup.
+
+Developers working with the block editor should think of `post_content` as a persistence format, not as the primary data structure used during editing. All editing operations—selection, transformation, validation, and nesting—happen on the block tree, which is then serialized back into HTML only when the post is saved.
+
 The input and output of the block editor is a tree of block objects with the current format:
 
 ```js
@@ -31,6 +35,8 @@ During the lifecycle of the block in the editor, the block object can receive ex
 
 -   `isValid`: A boolean representing whether the block is valid or not;
 -   `originalContent`: The original HTML serialization of the block.
+
+It is important to note that this metadata is transient and editor-specific. Properties such as `isValid` or `originalContent` are not persisted to `post_content`; instead, they exist solely to support editor behavior, validation, and block recovery during an editing session.
 
 **Examples**
 
@@ -123,3 +129,5 @@ A purely dynamic block that is to be server-rendered before display could look l
 In summary, the block editor workflow parses the saved document to an in-memory tree of blocks, using token delimiters to help. During editing, all manipulations happen within the block tree. The process ends by serializing the blocks back to the `post_content`.
 
 The workflow process relies on a serialization/parser pair to persist posts. Hypothetically, the post data structure could be stored using a plugin or retrieved from a remote JSON file to be converted to the block tree.
+
+Understanding this lifecycle is essential for developers extending or integrating with the block editor. Whether working with custom blocks, data stores, or transformations, all changes ultimately flow through this parse-edit-serialize cycle.
