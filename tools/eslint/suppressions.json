@@ -4111,6 +4111,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/post-terms/test/hooks.jsdom.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/post-terms/use-post-terms.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
