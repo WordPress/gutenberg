@@ -223,12 +223,12 @@ const selectThemePatterns = createSelector(
 
 		const restBlockPatterns = getBlockPatterns() as ThemePattern[];
 
-		const patterns = ( restBlockPatterns || [] )
-			.filter(
+		const patterns = filterOutDuplicatesByName(
+			( restBlockPatterns || [] ).filter(
 				( pattern ) =>
 					! EXCLUDED_PATTERN_SOURCES.includes( pattern.source )
 			)
-			.filter( filterOutDuplicatesByName )
+		)
 			.filter( ( pattern ) => pattern.inserter !== false )
 			.map( normalizeThemePattern );
 		return {
