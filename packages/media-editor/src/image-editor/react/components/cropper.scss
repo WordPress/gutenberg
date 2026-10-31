@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // Handle touch target size — used for the handle ::before hit area. The
@@ -139,18 +140,22 @@ $handle-touch-target-size: 44px;
 		border: 1px solid $gray-900;
 		box-sizing: border-box;
 		pointer-events: none;
-		transition: border-color 0.15s ease, box-shadow 0.15s ease;
 	}
 
-	// Blue border on the crop rectangle when the canvas has keyboard focus.
+	// Focus ring on the crop rectangle when the canvas has keyboard focus.
 	// Uses a JS-controlled class rather than :focus-visible — browsers can
 	// restore :focus-visible across programmatic focus calls, making pure
 	// CSS unreliable for pointer-to-keyboard transitions. The :focus check
 	// on the canvas ensures the outline appears only when the canvas
 	// itself is focused, not when focus is on a child handle.
 	&__canvas--focus-visible:focus &__stencil-rect {
-		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
-		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
+		@include outset-ring__focus();
+
+		// The ring sits on a child of the focused canvas, so forced colors
+		// would paint it as CanvasText rather than the focus Highlight.
+		@media (forced-colors: active) {
+			outline-color: Highlight;
+		}
 	}
 
 	&__handle {
@@ -173,7 +178,7 @@ $handle-touch-target-size: 44px;
 		border-radius: 50%;
 		box-sizing: border-box;
 		pointer-events: auto;
-		transition: background-color 0.15s ease, box-shadow 0.15s ease;
+		transition: background-color 0.15s ease;
 
 		&:focus {
 			outline: none;
@@ -187,7 +192,8 @@ $handle-touch-target-size: 44px;
 		.wp-media-editor-image-editor__canvas--focus-visible &:focus {
 			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
 			border-color: transparent;
-			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
+			@include outset-ring__focus();
+			box-shadow: 0 0 0 calc(var(--wpds-border-width-focus)) $white;
 		}
 
 		// Extend touch target to the minimum accessible hit area.
