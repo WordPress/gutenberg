@@ -1,6 +1,9 @@
-import { h, type ComponentChild, type JSX } from 'preact';
+import { h, type ComponentChild, type JSX, type VNode } from 'preact';
 import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
+
+/** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
+const htmlFallbacks = new WeakMap< object, DocumentFragment >();
 
 const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
@@ -116,6 +119,68 @@ function splitDirectiveName( directiveName: string ): {
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
+
+/**
+ * Copies a node tree into the target's owner document, omitting script
+ * elements recursively. HTML-namespace template contents are traversed
+ * separately because they are not ordinary child nodes of their template
+ * element; elements named `template` in other namespaces use their child nodes.
+ *
+ * @param source The node whose child nodes are copied.
+ * @param target The fragment or cloned node that receives those children.
+ */
+function copyFallbackChildren( source: Node, target: Node ): void {
+	for ( const child of Array.from( source.childNodes ) ) {
+		if (
+			child.nodeType === 1 &&
+			( child as Element ).localName === 'script'
+		) {
+			continue;
+		}
+
+		// Import directly into the snapshot owner, without creating a node in
+		// the source document or retaining that document through the snapshot.
+		const clone = target.ownerDocument!.importNode( child, false );
+		target.appendChild( clone );
+		if (
+			child.nodeType === 1 &&
+			( child as Element ).namespaceURI ===
+				'http://www.w3.org/1999/xhtml' &&
+			( child as Element ).localName === 'template'
+		) {
+			copyFallbackChildren(
+				( child as HTMLTemplateElement ).content,
+				( clone as HTMLTemplateElement ).content
+			);
+		} else {
+			copyFallbackChildren( child, clone );
+		}
+	}
+}
+
+/**
+ * Gets the inert template-contents document associated with the live document.
+ *
+ * @return The live document's shared template-contents owner document.
+ */
+function getTemplateContentsOwnerDocument(): Document {
+	return document.createElement( 'template' ).content.ownerDocument;
+}
+
+/**
+ * Reads the script-free fallback snapshot recorded for an element vnode. The
+ * snapshot is owned by the live document's shared template-contents document.
+ * Callers must leave it detached and unmodified; insert a clone.
+ *
+ * @param element The element vnode passed to a directive callback.
+ * @return The detached fallback snapshot, or `undefined` when absent.
+ */
+export function getHtmlFallback(
+	element: VNode< any >
+): DocumentFragment | undefined {
+	const htmlProps = element.props.dangerouslySetInnerHTML;
+	return htmlProps && htmlFallbacks.get( htmlProps );
+}
 
 /**
  * Parses the namespace and value from a directive attribute value.
@@ -352,9 +417,19 @@ export function toVdom( root: Node ): ComponentChild {
 			// vnodes, since the directive writes to the DOM directly rather
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
-			props.dangerouslySetInnerHTML = {
+			const htmlProps = {
 				__html: elementNode.innerHTML,
 			};
+			props.dangerouslySetInnerHTML = htmlProps;
+			if ( hasDefaultHtmlDirective ) {
+				// Preserve a script-free snapshot in the live document's shared
+				// template-contents document. Importing directly there neither
+				// requests fallback resources nor keeps a parsed page alive.
+				const snapshot =
+					getTemplateContentsOwnerDocument().createDocumentFragment();
+				copyFallbackChildren( elementNode, snapshot );
+				htmlFallbacks.set( htmlProps, snapshot );
+			}
 		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
