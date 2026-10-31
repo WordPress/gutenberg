@@ -914,3 +914,68 @@ export function scrollNoteThreadIntoView( noteId, container ) {
 		element?.scrollIntoView( { block: 'nearest' } );
 	} );
 }
+
+// `date_gmt` is a fixed-width `Y-m-d\TH:i:s` string, so the helpers below
+// compare timestamps as strings. Parsing them as `Date` would read them as
+// local time.
+
+/**
+ * Returns the newest `date_gmt` across the given note threads and their replies.
+ *
+ * @param {Array} threads Note threads, each optionally carrying a `reply` array.
+ * @return {?string} Newest `date_gmt` found, or `null` when there is none.
+ */
+export function getLatestNoteActivity( threads ) {
+	let latest = null;
+	for ( const thread of threads ?? [] ) {
+		for ( const entry of [ thread, ...( thread?.reply ?? [] ) ] ) {
+			const date = entry?.date_gmt;
+			if ( date && ( latest === null || date > latest ) ) {
+				latest = date;
+			}
+		}
+	}
+	return latest;
+}
+
+/**
+ * Whether any of the threads, or their replies, has activity by somebody other
+ * than the current user since `lastSeen`.
+ *
+ * @param {Array}   threads       Note threads, each optionally carrying a `reply` array.
+ * @param {?string} lastSeen      `date_gmt` the user last saw the post's notes, if ever.
+ * @param {?number} currentUserId Current user id. Without it nothing counts.
+ * @return {boolean} Whether there is unseen activity.
+ */
+export function hasUnseenNoteActivity( threads, lastSeen, currentUserId ) {
+	if ( ! currentUserId ) {
+		return false;
+	}
+	return ( threads ?? [] ).some( ( thread ) =>
+		[ thread, ...( thread?.reply ?? [] ) ].some(
+			( entry ) =>
+				!! entry?.date_gmt &&
+				entry.author !== currentUserId &&
+				( ! lastSeen || entry.date_gmt > lastSeen )
+		)
+	);
+}
+
+/**
+ * Records a post's "notes last seen" timestamp, keeping only the `limit` most
+ * recently seen posts.
+ *
+ * @param {?Object} lastSeen  Existing `{ [ postId ]: date_gmt }` map.
+ * @param {number}  postId    Post the timestamp belongs to.
+ * @param {string}  timestamp Newest `date_gmt` the user has been shown.
+ * @param {number}  limit     How many posts to keep.
+ * @return {Object} New map.
+ */
+export function setNotesLastSeen( lastSeen, postId, timestamp, limit ) {
+	const entries = Object.entries( { ...lastSeen, [ postId ]: timestamp } );
+	if ( entries.length <= limit ) {
+		return Object.fromEntries( entries );
+	}
+	entries.sort( ( [ , a ], [ , b ] ) => b.localeCompare( a ) );
+	return Object.fromEntries( entries.slice( 0, limit ) );
+}

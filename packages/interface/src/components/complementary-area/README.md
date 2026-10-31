@@ -9,6 +9,20 @@ Besides rendering the complementary area, the component renders a button in `Pin
 
 ## Props
 
+### badge
+
+Shows a dot over the pinned toolbar toggle, flagging that the area has something new. The dot is hidden from assistive technology; pass `badgeLabel` so it is announced. Without a badge the pinned toggle's markup is left untouched.
+
+-   Type: `Boolean`
+-   Required: No
+
+### badgeLabel
+
+Accessible label for the pinned toolbar toggle while a badge is shown, replacing `title` so the badge is announced and appears in the toggle's tooltip - for example "All notes, new activity". Ignored when there is no `badge`.
+
+-   Type: `String`
+-   Required: No
+
 ### children
 
 The content to be displayed within the complementary area.
