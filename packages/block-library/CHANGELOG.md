@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Search: Move the block's own Width setting to the `dimensions.width` block support, so width is set from the Dimensions panel and can be set in Global Styles. Existing `width` and `widthUnit` attributes keep rendering and migrate when a post is re-saved ([#82224](https://github.com/WordPress/gutenberg/pull/82224)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes

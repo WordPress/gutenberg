@@ -97,7 +97,11 @@
 		"dimensions": {
 			"minHeight": true,
 			"minWidth": true,
-			"__experimentalSkipSerialization": true
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"width": true
+			}
 		},
 		"spacing": {
 			"margin": true,
