@@ -701,7 +701,13 @@ export function MediaUploadModal( {
 		if ( allowedTypes?.includes( '*' ) ) {
 			return undefined;
 		}
-		return allowedTypes?.join( ',' );
+		return allowedTypes
+			?.map( ( type ) =>
+				[ 'image', 'audio', 'video' ].includes( type )
+					? `${ type }/*`
+					: type
+			)
+			.join( ',' );
 	}, [ allowedTypes ] );
 
 	if ( ! isOpen ) {
