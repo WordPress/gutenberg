@@ -122,7 +122,7 @@ directive(
 					'The data-wp-each directive can only be used on <template> elements.'
 				);
 			}
-			return;
+			return undefined;
 		}
 
 		const { Provider } = inheritedContext;
@@ -137,26 +137,26 @@ directive(
 					'The usage of multiple data-wp-each directives on the same element is not supported. Please pick only one.'
 				);
 			}
-			return;
+			return undefined;
 		}
 
 		if ( uniqueId ) {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warnUniqueIdNotSupported( 'each', uniqueId );
 			}
-			return;
+			return undefined;
 		}
 
 		let iterable = evaluate( entry );
 		if ( iterable === PENDING_GETTER ) {
-			return;
+			return undefined;
 		}
 		if ( typeof iterable === 'function' ) {
 			iterable = iterable();
 		}
 
 		if ( typeof iterable?.[ Symbol.iterator ] !== 'function' ) {
-			return;
+			return undefined;
 		}
 
 		const itemProp = suffix ? kebabToCamelCase( suffix ) : 'item';
@@ -207,7 +207,7 @@ directive(
 		const entry = eachChild.find( isDefaultDirectiveSuffix );
 
 		if ( ! entry ) {
-			return;
+			return undefined;
 		}
 
 		const iterable = evaluate( entry );

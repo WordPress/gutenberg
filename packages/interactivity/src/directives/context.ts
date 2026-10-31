@@ -24,7 +24,7 @@ directive(
 					'The usage of data-wp-context--unique-id (two hyphens) is not supported. To add a unique ID to the directive, please use data-wp-context---unique-id (three hyphens) instead.'
 				);
 			}
-			return;
+			return undefined;
 		}
 
 		const { Provider } = inheritedContext;
