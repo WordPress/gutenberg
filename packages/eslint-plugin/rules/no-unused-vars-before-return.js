@@ -11,6 +11,23 @@
 const FUNCTION_SCOPE_JSX_IDENTIFIERS = new WeakMap();
 
 /**
+ * Set of method names which mutate the object they are called on. A variable
+ * assigned from one of these cannot be safely moved past an early return,
+ * since doing so would also move the mutation and change behavior.
+ *
+ * @type {Set<string>}
+ */
+const MUTATING_METHODS = new Set( [
+	'push',
+	'pop',
+	'shift',
+	'unshift',
+	'splice',
+	'sort',
+	'reverse',
+] );
+
+/**
  * Returns the closest function scope for the given node, or undefined if it
  * cannot be determined.
  *
@@ -68,6 +85,31 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 			);
 		}
 
+		/**
+		 * Given an Espree CallExpression node, returns true if the call mutates
+		 * the object it is called on, or false otherwise. Such a call cannot be
+		 * deferred past a return statement without altering behavior, since the
+		 * mutation would be deferred along with it.
+		 *
+		 * @param {Object} node Node to test.
+		 *
+		 * @return {boolean} Whether the call mutates its callee object.
+		 */
+		function isMutatingMethodCall( node ) {
+			const { callee } = node;
+
+			if ( callee.type !== 'MemberExpression' ) {
+				return false;
+			}
+
+			// Account for both `foo.shift()` and `foo[ 'shift' ]()`.
+			const name = callee.computed
+				? callee.property.value
+				: callee.property.name;
+
+			return MUTATING_METHODS.has( name );
+		}
+
 		return {
 			JSXIdentifier( node ) {
 				// Currently, a scope's variable references does not include JSX
@@ -104,6 +146,10 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 							def.node.init.type === 'CallExpression' &&
 							// Allow unused if part of an object destructuring.
 							! isExemptObjectDestructureDeclarator( def.node ) &&
+							// Allow calls which mutate the object they are
+							// called on, since deferring the assignment would
+							// also defer the mutation.
+							! isMutatingMethodCall( def.node.init ) &&
 							// Only target assignments preceding `return`.
 							def.node.range[ 1 ] < node.range[ 1 ]
 						);
