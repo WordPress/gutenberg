@@ -1,12 +1,21 @@
 import clsx from 'clsx';
 import { useContextSystem } from '../context';
 import type { SurfaceProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import styles from './style.module.scss';
 
 export function useSurface(
 	props: WordPressComponentProps< SurfaceProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< SurfaceProps, 'div' >,
+	| 'backgroundSize'
+	| 'borderBottom'
+	| 'borderLeft'
+	| 'borderRight'
+	| 'borderTop'
+	| 'variant',
+	{ className: string; style: React.CSSProperties | undefined }
+> {
 	const {
 		backgroundSize = 12,
 		borderBottom = false,

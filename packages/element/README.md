@@ -285,7 +285,7 @@ _Parameters_
 
 _Returns_
 
-- Dangerously-rendering component.
+- `React.ReactElement`: Dangerously-rendering component.
 
 ### render
 

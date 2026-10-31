@@ -8,7 +8,7 @@ import {
 } from '@wordpress/element';
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type { ToolsPanelItemProps } from '../types';
 
@@ -16,7 +16,19 @@ const noop = () => {};
 
 export function useToolsPanelItem(
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< ToolsPanelItemProps, 'div' >,
+	| 'defaultShown'
+	| 'hasValue'
+	| 'isShownByDefault'
+	| 'label'
+	| 'panelId'
+	| 'resetAllFilter'
+	| 'onDeselect'
+	| 'onSelect'
+	| 'onShownChange',
+	{ className: string; isShown: boolean; shouldRenderPlaceholder: boolean }
+> {
 	const {
 		className,
 		defaultShown,
