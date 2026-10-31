@@ -37,9 +37,17 @@ interface ConnectorData {
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
+export interface McpAdapterData {
+	status: 'not-installed' | 'inactive' | 'active' | 'network-active';
+	endpoint: string;
+	canInstall: boolean;
+	canActivate: boolean;
+}
+
 interface ConnectorScriptModuleData {
 	connectors?: Record< string, ConnectorData >;
 	isFileModDisabled?: boolean;
+	mcpAdapter?: McpAdapterData;
 }
 
 function getConnectorScriptModuleData(): ConnectorScriptModuleData {
@@ -63,6 +71,10 @@ export function getConnectorData(): Record< string, ConnectorData > {
 
 export function getIsFileModDisabled(): boolean {
 	return !! getConnectorScriptModuleData().isFileModDisabled;
+}
+
+export function getMcpAdapterData(): McpAdapterData | undefined {
+	return getConnectorScriptModuleData().mcpAdapter;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
