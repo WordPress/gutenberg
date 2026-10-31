@@ -433,6 +433,12 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__patterns-manage-button.components-button {
+	justify-content: center;
+	margin-top: $grid-unit-10;
+	width: 100%;
+}
+
 // Roughly the search field, a tab bar, two rows of cards and the pager.
 // Above this the panel fills the tab and the results scroll internally;
 // below it the panel keeps this height and the tab panel scrolls instead,
