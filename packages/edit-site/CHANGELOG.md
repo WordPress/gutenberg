@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block theme previews: show the previewed theme as a badge below the sidebar screen title, rather than prefixing the title itself ([#84029](https://github.com/WordPress/gutenberg/pull/84029)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -16,8 +20,6 @@
 
 -   Keep Quick edit popovers accessible after opening View options ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 -   Label the quick edit action as Bulk edit when multiple pages are selected ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
-
-## 7.6.0 (2026-10-07)
 
 ## 7.5.0 (2026-09-23)
 
