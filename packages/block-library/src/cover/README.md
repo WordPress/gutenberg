@@ -182,7 +182,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **filter**:
-  - duotone: `.wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background`
+  - duotone: `.wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > picture > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background`
 
 ## Block Markup
 
