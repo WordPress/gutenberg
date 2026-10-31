@@ -8,6 +8,7 @@ import { routerRegions } from './directives/router-region';
 import {
 	initialVdomPromise,
 	hydrateRegions,
+	hydrateAllRemaining,
 	getRegionRootFragment,
 } from './hydration';
 import { parseDirectiveName, parseDirectiveValue, toVdom } from './vdom';
@@ -59,6 +60,7 @@ export const privateApis = (
 		return {
 			getRegionRootFragment,
 			initialVdomPromise,
+			hydrateAllRemaining,
 			toVdom,
 			// Parses directive attribute names for internal consumers.
 			parseDirectiveName,
