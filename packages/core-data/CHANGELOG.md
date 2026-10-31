@@ -25,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Correct the `useResourcePermissions` return type to match its permission and resolution object, including permissions for entity resources with an ID ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 -   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
 
 ### Internal
