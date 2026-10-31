@@ -1,11 +1,4 @@
 .wp-block-playlist-track {
-	&:has([aria-current="true"]) {
-		background-color: color-mix(in srgb, currentColor 10%, transparent);
-	}
-
-	&:hover {
-		background-color: color-mix(in srgb, currentColor 15%, transparent);
-	}
 
 	.wp-block-playlist__tracklist-show-numbers & {
 		counter-increment: playlist-track;
@@ -24,6 +17,14 @@
 		border: 0;
 		outline-offset: 2px;
 		cursor: pointer;
+
+		&[aria-current="true"] {
+			background-color: color-mix(in srgb, currentColor 10%, transparent);
+		}
+
+		&:hover {
+			background-color: color-mix(in srgb, currentColor 15%, transparent);
+		}
 
 		.wp-block-playlist__tracklist-show-numbers &::before {
 			content: counter(playlist-track);
