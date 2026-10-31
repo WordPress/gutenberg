@@ -40,6 +40,7 @@
 -   Restore focus to the grid selection checkbox after cancelling bulk selection ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 -   Enable overlay compatibility for `DataViews` and `DataViewsPicker` in directly bundled applications so `@wordpress/ui` popups stack above `@wordpress/components` overlays ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 -   DataForm: Center the `prefix` and `suffix` of the `text` control's `Edit` config vertically and give them the standard input padding, so consumers pass only the content. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
+-   List layout: The up and down arrow keys on an item's actions button move focus to the adjacent row when one item ID is a prefix of another, such as `1` and `12`, instead of jumping to the wrong row ([#84541](https://github.com/WordPress/gutenberg/pull/84541)).
 
 ### Internal
 
