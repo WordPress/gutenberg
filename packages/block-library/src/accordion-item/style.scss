@@ -1,5 +1,6 @@
 .wp-block-accordion-item {
-	&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon {
+	&.is-open > .wp-block-accordion-heading
+	.wp-block-accordion-heading__toggle-icon:not(.is-stateful) {
 		transform: rotate(45deg);
 	}
 

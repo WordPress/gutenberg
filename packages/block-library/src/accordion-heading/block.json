@@ -93,7 +93,15 @@
 		"showIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"icon": {
+			"type": "string",
+			"role": "content"
+		},
+		"iconStates": {
+			"type": "object"
 		}
 	},
-	"textdomain": "default"
+	"textdomain": "default",
+	"editorStyle": "wp-block-accordion-heading-editor"
 }
