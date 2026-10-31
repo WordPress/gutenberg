@@ -436,30 +436,27 @@ if ( hasExperimentalModulesFlag ) {
 	 * Add block.json files to compilation to ensure changes trigger rebuilds when watching
 	 */
 	class BlockJsonDependenciesPlugin {
-		constructor() {
-			/** @type {ReadonlyArray<string>} */
-			this.blockJsonFiles = glob( '**/block.json', {
-				absolute: true,
-				cwd: fromProjectRoot( getProjectSourcePath() ),
-			} );
-		}
-
 		/**
 		 * Apply the plugin
 		 * @param {webpack.Compiler} compiler the compiler instance
 		 * @return {void}
 		 */
 		apply( compiler ) {
-			if ( this.blockJsonFiles.length ) {
-				compiler.hooks.compilation.tap(
-					'BlockJsonDependenciesPlugin',
-					( compilation ) => {
-						compilation.fileDependencies.addAll(
-							this.blockJsonFiles
-						);
-					}
-				);
-			}
+			compiler.hooks.compilation.tap(
+				'BlockJsonDependenciesPlugin',
+				( compilation ) => {
+					const sourcePath = fromProjectRoot(
+						getProjectSourcePath()
+					);
+					compilation.contextDependencies.add( sourcePath );
+					compilation.fileDependencies.addAll(
+						glob( '**/block.json', {
+							absolute: true,
+							cwd: sourcePath,
+						} )
+					);
+				}
+			);
 		}
 	}
 
