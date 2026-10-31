@@ -273,6 +273,35 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should keep the last render and flag the control when an attribute is invalid', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'test/auto-register-with-controls',
+		} );
+		await editor.openDocumentSettingsSidebar();
+
+		const block = editor.canvas.getByRole( 'document', {
+			name: 'Block: Auto Register With Controls',
+		} );
+		await expect( block ).toContainText( 'My Emoji Collection' );
+
+		// The `count` attribute has a maximum of 20.
+		const count = page.getByRole( 'spinbutton', { name: 'Count' } );
+		await count.fill( '25' );
+		await count.blur();
+
+		await expect(
+			page.getByText( 'Value is above the maximum.' )
+		).toBeVisible();
+		await expect( block ).toContainText( 'Error loading block' );
+		await expect( block ).toContainText( 'My Emoji Collection' );
+
+		await count.fill( '3' );
+		await expect( block ).not.toContainText( 'Error loading block' );
+	} );
+
 	test.describe( 'with block bindings', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin(

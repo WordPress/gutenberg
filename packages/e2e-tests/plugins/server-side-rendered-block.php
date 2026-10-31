@@ -114,6 +114,8 @@ add_action(
 					'count'         => array(
 						'type'    => 'integer',
 						'default' => 5,
+						'minimum' => 0,
+						'maximum' => 20,
 						'label'   => 'Count',
 					),
 					'spacing'       => array(
