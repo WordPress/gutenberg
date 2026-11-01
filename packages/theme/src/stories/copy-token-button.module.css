@@ -1,0 +1,54 @@
+.button {
+	opacity: 0;
+	transition: opacity 0.1s;
+	flex-shrink: 0;
+
+	:global([data-token-row]):hover &,
+	:global([data-token-row]):focus-within &,
+	&:focus-visible,
+	&[data-copied] {
+		opacity: 1;
+	}
+
+	&[data-copied] {
+		color: var(--wpds-color-foreground-content-success-weak);
+	}
+
+	/* Without hover, the control must always be reachable. */
+	@media (hover: none) {
+		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
+}
+
+/*
+ * The share link is an anchor inside a wrapper that handles the reveal. The
+ * doubled class raises specificity over the Storybook docs link styles.
+ */
+.link.link a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	width: 24px;
+	height: 24px;
+	border-radius: var(--wpds-border-radius-sm);
+	font-family: var(--wpds-typography-font-family-mono);
+	font-size: var(--wpds-typography-font-size-md);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	text-decoration: none;
+	border-block-end: 0;
+
+	&:hover {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+
+	&:focus-visible {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: 0;
+	}
+}
