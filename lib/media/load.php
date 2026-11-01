@@ -249,35 +249,34 @@ add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
  * companion file would linger on disk after the attachment is deleted.
  *
  * @param int $post_id Attachment ID being deleted.
- * @return bool Whether a companion file was deleted.
  */
-function gutenberg_delete_heic_companion_file( int $post_id ): bool {
+function gutenberg_delete_heic_companion_file( int $post_id ): void {
 	$metadata = wp_get_attachment_metadata( $post_id, true );
 
 	$source_image = $metadata['source_image'] ?? null;
 	if ( ! is_string( $source_image ) || '' === $source_image ) {
-		return false;
+		return;
 	}
 
 	$attached_file = get_attached_file( $post_id, true );
 
 	if ( ! $attached_file ) {
-		return false;
+		return;
 	}
 
 	$uploads = wp_get_upload_dir();
 
 	if ( empty( $uploads['basedir'] ) ) {
-		return false;
+		return;
 	}
 
 	$companion_path = path_join( dirname( $attached_file ), wp_basename( $source_image ) );
 
 	if ( ! file_exists( $companion_path ) ) {
-		return false;
+		return;
 	}
 
-	return wp_delete_file_from_directory( $companion_path, $uploads['basedir'] );
+	wp_delete_file_from_directory( $companion_path, $uploads['basedir'] );
 }
 
 add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
