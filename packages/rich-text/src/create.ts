@@ -441,6 +441,7 @@ function collapseWhiteSpace(
 ) {
 	const clone = element.cloneNode( true ) as HTMLElement;
 	clone.normalize();
+	let precedingSpace = isRoot || hasPrecedingSpace;
 	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
 		if ( node.nodeType === node.TEXT_NODE ) {
 			let newNodeValue = node.nodeValue!;
@@ -453,11 +454,7 @@ function collapseWhiteSpace(
 				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
 			}
 
-			if (
-				i === 0 &&
-				newNodeValue.startsWith( ' ' ) &&
-				( isRoot || hasPrecedingSpace )
-			) {
+			if ( i === 0 && newNodeValue.startsWith( ' ' ) && precedingSpace ) {
 				newNodeValue = newNodeValue.slice( 1 );
 			}
 			if (
@@ -469,20 +466,26 @@ function collapseWhiteSpace(
 			}
 
 			node.nodeValue = newNodeValue;
+			// Text that collapsed to nothing keeps the space before it.
+			if ( newNodeValue ) {
+				precedingSpace = newNodeValue.endsWith( ' ' );
+			}
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			const { previousSibling, nextSibling } = node;
-			const prevHasSpace = previousSibling?.textContent!.endsWith( ' ' );
-			const nextHasSpace = nextSibling?.textContent!.startsWith( ' ' );
-			node.replaceWith(
-				collapseWhiteSpace(
-					node as HTMLElement,
-					false,
-					previousSibling
-						? prevHasSpace
-						: isRoot || hasPrecedingSpace,
-					nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
-				)
+			const { nextSibling } = node;
+			// The next sibling is not collapsed yet, so any white space counts.
+			const nextHasSpace = /^[ \n\t\r\f]/.test(
+				nextSibling?.textContent ?? ''
 			);
+			const collapsed = collapseWhiteSpace(
+				node as HTMLElement,
+				false,
+				precedingSpace,
+				nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
+			);
+			node.replaceWith( collapsed );
+			precedingSpace = collapsed.textContent!.endsWith( ' ' );
+		} else {
+			precedingSpace = !! node.textContent?.endsWith( ' ' );
 		}
 	} );
 	return clone;
