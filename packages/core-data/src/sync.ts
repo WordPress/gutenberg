@@ -56,6 +56,16 @@ export {
  */
 export const CRDT_AUTOSAVE_SNAPSHOT_KEY = 'crdt_snapshot';
 
+/**
+ * Key under which the autosave that promotes an auto-draft to a draft sends
+ * the serialized CRDT document, so the server persists it on the parent post
+ * in the same request that writes the parent's content.
+ *
+ * This string must match CRDT_DOCUMENT_PARAM in
+ * Gutenberg_REST_Autosaves_Controller on the PHP side.
+ */
+export const CRDT_AUTOSAVE_DOCUMENT_KEY = 'crdt_document';
+
 let syncManager: SyncManager;
 
 export function getSyncManager(): SyncManager | undefined {
@@ -435,13 +445,39 @@ async function beforeSave(
 	}
 
 	if ( isAutosave ) {
+		const syncEdits: EntitySyncRecord = {};
+
 		// Capture the CRDT snapshot in the same tick as the payload so it
 		// describes exactly the content being autosaved.
 		const snapshot = manager.getEntitySnapshot( objectType, objectId );
 
-		return snapshot
-			? { [ CRDT_AUTOSAVE_SNAPSHOT_KEY ]: snapshot }
-			: undefined;
+		if ( snapshot ) {
+			syncEdits[ CRDT_AUTOSAVE_SNAPSHOT_KEY ] = snapshot;
+		}
+
+		// The autosave that promotes an auto-draft to a draft is the only
+		// autosave that writes the parent post. Later autosaves only create
+		// revisions, and the document is otherwise persisted only by a
+		// manual save, so a post that is never saved manually would have
+		// parent content but no persisted document. A peer loading such a
+		// post builds a new document from the parent content, and that
+		// document can replace the live one on sync. Send the document so
+		// the server writes it together with the parent content.
+		const isAutoDraftPromotion =
+			'postType' === kind && 'auto-draft' === persistedRecord?.status;
+
+		if ( isAutoDraftPromotion ) {
+			const serializedDoc = await manager.createPersistedCRDTDoc(
+				objectType,
+				objectId
+			);
+
+			if ( serializedDoc ) {
+				syncEdits[ CRDT_AUTOSAVE_DOCUMENT_KEY ] = serializedDoc;
+			}
+		}
+
+		return Object.keys( syncEdits ).length ? syncEdits : undefined;
 	}
 
 	// Add meta for the persisted CRDT document during real post saves so the
