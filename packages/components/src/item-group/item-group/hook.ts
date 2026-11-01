@@ -1,12 +1,21 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type { ItemGroupProps } from '../types';
 import styles from '../style.module.scss';
 
 export function useItemGroup(
 	props: WordPressComponentProps< ItemGroupProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< ItemGroupProps, 'div' >,
+	'isRounded',
+	{
+		className: string;
+		isBordered: boolean;
+		isSeparated: boolean;
+		role: React.AriaRole;
+	}
+> {
 	const {
 		className,
 		isBordered = false,

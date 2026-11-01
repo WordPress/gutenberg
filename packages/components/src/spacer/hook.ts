@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { space } from '../utils/space';
 import type { SpacerProps } from './types';
@@ -12,7 +12,24 @@ function isDefined< T >( o: T ): o is Exclude< T, null | undefined > {
 
 export function useSpacer(
 	props: WordPressComponentProps< SpacerProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< SpacerProps, 'div' >,
+	| 'margin'
+	| 'marginBottom'
+	| 'marginLeft'
+	| 'marginRight'
+	| 'marginTop'
+	| 'marginX'
+	| 'marginY'
+	| 'padding'
+	| 'paddingBottom'
+	| 'paddingLeft'
+	| 'paddingRight'
+	| 'paddingTop'
+	| 'paddingX'
+	| 'paddingY',
+	{ className: string; style: React.CSSProperties }
+> {
 	const {
 		className,
 		margin,

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `RawHTML`: Declare the return type as `React.ReactElement`, so the published type declarations no longer inline the `div` attribute types of the `@types/react` version used at build time and type-check with `@types/react` 18 again ([#84464](https://github.com/WordPress/gutenberg/issues/84464)).
+
 ### Internal
 
 -   Convert the remaining tests to TypeScript ([#85159](https://github.com/WordPress/gutenberg/pull/85159)).

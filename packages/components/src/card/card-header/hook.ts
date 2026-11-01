@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import styles from '../style.module.scss';
 import { getPaddingBySize } from '../get-padding-by-size';
@@ -7,7 +7,11 @@ import type { HeaderProps } from '../types';
 
 export function useCardHeader(
 	props: WordPressComponentProps< HeaderProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< HeaderProps, 'div' >,
+	'isBorderless' | 'isShady' | 'size',
+	{ className: string }
+> {
 	const {
 		className,
 		isBorderless = false,

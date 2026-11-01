@@ -1,12 +1,24 @@
 import clsx from 'clsx';
 import styles from '../style.module.scss';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type { SplitControlsProps } from '../types';
 
 export function useBorderBoxControlSplitControls(
 	props: WordPressComponentProps< SplitControlsProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< SplitControlsProps, 'div' >,
+	never,
+	{
+		centeredClassName: string;
+		className: string;
+		colors: NonNullable< SplitControlsProps[ 'colors' ] >;
+		enableAlpha: boolean;
+		enableStyle: boolean;
+		rightAlignedClassName: string;
+		__experimentalIsRenderedInSidebar: boolean;
+	}
+> {
 	const {
 		className,
 		colors = [],
