@@ -218,6 +218,40 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'has-background', $output );
 	}
 
+	public function test_previous_arrow_keeps_the_custom_label() {
+		$output = $this->render_block(
+			self::$second_post_id,
+			array(
+				'type'      => 'previous',
+				'label'     => 'Read previous',
+				'showTitle' => true,
+				'arrow'     => 'arrow',
+			)
+		);
+
+		$this->assertMatchesRegularExpression(
+			'#<span class="wp-block-post-navigation-link__arrow-previous is-arrow-arrow" aria-hidden="true">←</span><span class="post-navigation-link__label">Read previous</span> <a [^>]+>First post</a>#',
+			$output
+		);
+	}
+
+	public function test_next_arrow_keeps_the_custom_label() {
+		$output = $this->render_block(
+			self::$first_post_id,
+			array(
+				'type'      => 'next',
+				'label'     => 'Read next',
+				'showTitle' => true,
+				'arrow'     => 'chevron',
+			)
+		);
+
+		$this->assertMatchesRegularExpression(
+			'#<span class="post-navigation-link__label">Read next</span> <a [^>]+>Second post</a><span class="wp-block-post-navigation-link__arrow-next is-arrow-chevron" aria-hidden="true">»</span>#',
+			$output
+		);
+	}
+
 	public function test_null_from_the_post_link_filter_omits_the_styles() {
 		add_filter( 'previous_post_link', '__return_null' );
 		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
