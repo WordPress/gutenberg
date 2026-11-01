@@ -314,7 +314,7 @@ const PlaylistEdit = ( {
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
-			const sortedBlocks = innerBlockTracks.toSorted( ( a, b ) => {
+			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
 				const titleA = a.attributes.title || '';
 				const titleB = b.attributes.title || '';
 
