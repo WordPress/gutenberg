@@ -4,8 +4,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Button, Icon, Stack, Text } from '@wordpress/ui';
+import { useWidgetIdentity } from '@wordpress/widget-primitives';
 import styles from './style.module.css';
 
 function PreviewUrlBar( {
@@ -43,6 +44,7 @@ function PreviewUrlBar( {
 }
 
 export default function SitePreview() {
+	const { title } = useWidgetIdentity();
 	const [ isIframeLoading, setIsIframeLoading ] = useState( true );
 	const [ isVisitLoading, setIsVisitLoading ] = useState( false );
 	const [ isEditLoading, setIsEditLoading ] = useState( false );
@@ -92,14 +94,14 @@ export default function SitePreview() {
 						justify="center"
 						className={ styles.loading }
 					>
-						<Spinner />
+						<WCSpinner />
 					</Stack>
 				) }
 				<iframe
 					className={ styles.iframe }
 					loading="lazy"
 					scrolling="no"
-					title={ __( 'Site preview' ) }
+					title={ title ?? __( 'Site preview' ) }
 					src={ src }
 					onLoad={ () => setIsIframeLoading( false ) }
 					// @ts-expect-error — `inert` is not yet in React's HTMLAttributes

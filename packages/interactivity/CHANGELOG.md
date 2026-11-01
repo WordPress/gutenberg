@@ -2,13 +2,47 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Limit the attributes that `data-wp-bind` can set on `object` elements. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Improve the handling of values bound with `data-wp-bind` to URL attributes, such as `href` and `src`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Harden the runtime's handling of property names used as object keys in directive paths, namespaces and merged state. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Ignore directives whose name, suffix, unique ID or namespace is a reserved property name. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-bind`: Don't bind the `__directives` prop, and only read a `__directives` prop that the runtime created. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-bind`: Don't bind `children` or `dangerouslySetInnerHTML`, or `content` on a `<template>`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-class` and `data-wp-style`: Ignore a `class` that `data-wp-bind` set to a value other than a string, and a `style` it set to a value other than a string or plain object, instead of throwing. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-style`: Write into a copy of a style object that `data-wp-bind` set, not into the object itself. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Don't resolve a directive path that ends in a method inherited from a prototype, such as `context.list.push`. The runtime calls a resolved function without its object, so these methods threw and stopped hydration. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only read a namespace's context from an own property of the context map, so a namespace named after an `Object.prototype` method does not resolve to that method. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-each`: Render items when the item name is `has-own-property`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Remove `__proto__` keys when parsing JSON from markup or server data. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-style`: Only read top-level declarations when converting a style string. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   `data-wp-context`: Fix context for namespaces named after a built-in object property, such as `toString`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Skip `data-wp-bind--on*` directives instead of binding event handler attributes. Bind an event handler with `data-wp-on--*` instead. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag and pollute the store. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+
+### Internal
+
+-   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+
+## 8.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `data-wp-html` keeps the element's server-rendered content when its value is `{ "wpServerHtml": true }`, the stand-in for an `asDangerousHTML()` value in the page's data, whether it comes from `state`, `context` or a `data-wp-each` item ([#84889](https://github.com/WordPress/gutenberg/pull/84889)).
+-   Speed up hydration by only parsing object-like directive values as JSON and reading attributes with `getAttributeNames()` ([#81699](https://github.com/WordPress/gutenberg/pull/81699)).
+
 ### Bug Fixes
 
 -   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
+-   `data-wp-html` now follows its value on every update and after navigation: tokens render, pending values keep the content, anything else empties the element. Throwing getters and functions no longer break rendering. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   `data-wp-html` is ignored, with a warning, when combined with `data-wp-text`, `data-wp-each` or `data-wp-router-region` on the same element. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Interactive islands inside server-rendered `data-wp-each-child` items are no longer hydrated twice. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Functions called from directive values restore the caller's scope when they throw. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
 
 ### Internal
 
@@ -114,6 +148,12 @@
 
 -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
 
+## 6.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.33.0 (2025-10-17)
 
 ### Enhancements
@@ -169,6 +209,12 @@
 
 ## 6.20.0 (2025-03-13)
 
+## 6.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.19.0 (2025-02-28)
 
 ## 6.18.0 (2025-02-12)
@@ -220,6 +266,12 @@
 
 ## 6.9.0 (2024-10-03)
 
+## 6.8.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements
@@ -269,6 +321,12 @@
 -   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/directives-and-store.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
 
 ## 6.1.0 (2024-06-15)
+
+## 6.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
 
 ## 6.0.0 (2024-05-31)
 
@@ -332,6 +390,12 @@
 
 -   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
 -   Improve context merges using proxies. ([59187](https://github.com/WordPress/gutenberg/pull/59187))
+
+## 5.0.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
 
 ## 5.0.0 (2024-02-09)
 
@@ -414,6 +478,12 @@
 ## 2.5.0 (2023-10-18)
 
 ## 2.4.0 (2023-10-05)
+
+## 2.3.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden directive processing and client-side navigation.
 
 ## 2.3.0 (2023-09-20)
 

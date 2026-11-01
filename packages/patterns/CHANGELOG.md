@@ -2,9 +2,25 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The package now bundles TypeScript types ([#85256](https://github.com/WordPress/gutenberg/pull/85256)).
+
+### Internal
+
+-   Convert the store, `isOverridableBlock`, the constants and `lock-unlock` to TypeScript ([#85253](https://github.com/WordPress/gutenberg/pull/85253)).
+-   Convert the pattern modals, the category selector and `useAddPatternCategory` to TypeScript ([#85254](https://github.com/WordPress/gutenberg/pull/85254)).
+-   Convert the block menu items, the overrides panel and the override controls to TypeScript ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
+
+## 3.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Add the `CreateTemplatePartModal` and `CreateTemplatePartModalContents` private APIs, moved from `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 
 ## 2.57.0 (2026-10-07)
 

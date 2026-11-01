@@ -3,11 +3,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
+import type { ComponentProps } from 'react';
 import * as Dialog from '../index';
 import {
 	getWpCompatOverlaySlot,
 	__resetWpCompatOverlaySlotCacheForTests,
 } from '../../utils/wp-compat-overlay-slot';
+
+type Size = NonNullable< ComponentProps< typeof Dialog.Popup >[ 'size' ] >;
+
+const ALL_SIZES = Object.keys( {
+	auto: true,
+	small: true,
+	medium: true,
+	large: true,
+	stretch: true,
+	full: true,
+} satisfies Record< Size, true > ) as Size[];
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
@@ -74,14 +86,7 @@ describe( 'Dialog', () => {
 
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
 
-		for ( const size of [
-			'auto',
-			'small',
-			'medium',
-			'large',
-			'stretch',
-			'full',
-		] as const ) {
+		for ( const size of ALL_SIZES ) {
 			view.rerender(
 				<Dialog.Root open>
 					<Dialog.Popup size={ size }>

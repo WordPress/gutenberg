@@ -68,14 +68,16 @@ export const _Default: Story = {
 	},
 };
 
-const ALL_SIZES = [
-	'small',
-	'medium',
-	'large',
-	'stretch',
-	'full',
-	'auto',
-] as const;
+type Size = NonNullable< ComponentProps< typeof Dialog.Popup >[ 'size' ] >;
+
+const ALL_SIZES = Object.keys( {
+	small: true,
+	medium: true,
+	large: true,
+	stretch: true,
+	full: true,
+	auto: true,
+} satisfies Record< Size, true > ) as Size[];
 
 function SizeSelector( {
 	value,

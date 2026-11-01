@@ -2,13 +2,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import warning from '@wordpress/warning';
 import type { ReactNode } from 'react';
 import { SelectControl } from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../../utils/use-enable-wp-compat-overlay-slot';
 
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
+
+const mockedWarning = vi.mocked( warning );
+
 describe( 'SelectControl', () => {
 	const mockItems = [
-		{ value: '', label: 'Select' },
+		{ value: null, label: 'None' },
 		{ value: 'option1', label: 'Option 1' },
 		{ value: 'option2', label: 'Option 2' },
 		{ value: 'option3', label: 'Option 3' },
@@ -28,6 +33,66 @@ describe( 'SelectControl', () => {
 			ref.current?.focus();
 		} );
 		expect( trigger ).toHaveFocus();
+	} );
+
+	it( 'calls focus and blur handlers passed to the trigger slot', async () => {
+		const user = userEvent.setup();
+		const onFocus = vi.fn();
+		const onBlur = vi.fn();
+
+		render(
+			<>
+				<SelectControl
+					label="Country"
+					items={ mockItems }
+					trigger={
+						<SelectControl.Trigger
+							onFocus={ onFocus }
+							onBlur={ onBlur }
+						/>
+					}
+				/>
+				<button>Next field</button>
+			</>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Country' } );
+
+		await user.tab();
+		expect( trigger ).toHaveFocus();
+		expect( onFocus ).toHaveBeenCalledTimes( 1 );
+		expect( onFocus.mock.calls[ 0 ][ 0 ].target ).toBe( trigger );
+		expect( onBlur ).not.toHaveBeenCalled();
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', { name: 'Next field' } )
+		).toHaveFocus();
+		expect( onBlur ).toHaveBeenCalledTimes( 1 );
+		expect( onBlur.mock.calls[ 0 ][ 0 ].target ).toBe( trigger );
+	} );
+
+	it( 'forwards both control and trigger slot refs to the visible trigger', () => {
+		const controlRef = createRef< HTMLButtonElement >();
+		const triggerRef = createRef< HTMLButtonElement >();
+
+		const { unmount } = render(
+			<SelectControl
+				ref={ controlRef }
+				label="Country"
+				items={ mockItems }
+				trigger={ <SelectControl.Trigger ref={ triggerRef } /> }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Country' } );
+
+		expect( controlRef.current ).toBe( trigger );
+		expect( triggerRef.current ).toBe( trigger );
+
+		unmount();
+		expect( controlRef.current ).toBeNull();
+		expect( triggerRef.current ).toBeNull();
 	} );
 
 	it( 'renders accessible label and description', () => {
@@ -51,7 +116,7 @@ describe( 'SelectControl', () => {
 		render(
 			<SelectControl
 				label="Country"
-				items={ mockItems }
+				items={ mockItems.slice( 1 ) }
 				placeholder="Choose a country"
 			/>
 		);
@@ -131,7 +196,7 @@ describe( 'SelectControl', () => {
 		).toBeVisible();
 	} );
 
-	it( 'passes the current value to custom trigger content', async () => {
+	it( 'passes the current value to custom trigger children', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -139,7 +204,11 @@ describe( 'SelectControl', () => {
 				label="Country"
 				items={ mockItems }
 				defaultValue={ mockItems[ 1 ] }
-				triggerContent={ ( item ) => `Selected ${ item.label }` }
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => `Selected ${ item.label }` }
+					</SelectControl.Trigger>
+				}
 			/>
 		);
 
@@ -235,6 +304,65 @@ describe( 'SelectControl', () => {
 
 	// Slot is identified by a data attribute, not a user-facing role/text.
 	/* eslint-disable testing-library/no-node-access */
+	describe( 'empty values', () => {
+		afterEach( () => {
+			mockedWarning.mockClear();
+		} );
+
+		it( 'shows the label of a selected null item', () => {
+			render(
+				<SelectControl
+					label="Country"
+					items={ mockItems }
+					defaultValue={ mockItems[ 0 ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Country' } )
+			).toHaveTextContent( 'None' );
+		} );
+
+		it( 'warns when an item has an empty string value', () => {
+			render(
+				<SelectControl
+					label="Country"
+					items={ [
+						{ value: '', label: 'Default' },
+						{ value: 'option1', label: 'Option 1' },
+					] }
+				/>
+			);
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				expect.stringContaining(
+					'SelectControl: empty string item values'
+				)
+			);
+		} );
+
+		it( 'does not warn when a custom serializer gives an empty value a name', () => {
+			render(
+				<SelectControl
+					label="Country"
+					items={ [
+						{ value: '', label: 'Default' },
+						{ value: 'option1', label: 'Option 1' },
+					] }
+					itemToStringValue={ ( item ) => item.value || 'default' }
+				/>
+			);
+
+			expect( mockedWarning ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not warn for null and non-empty values', () => {
+			render( <SelectControl label="Country" items={ mockItems } /> );
+
+			expect( mockedWarning ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'wp compat overlay slot', () => {
 		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
 

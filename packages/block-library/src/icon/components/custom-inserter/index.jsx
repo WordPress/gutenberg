@@ -1,5 +1,9 @@
 import { __ } from '@wordpress/i18n';
-import { Modal, SearchControl, Spinner } from '@wordpress/components';
+import {
+	Modal,
+	SearchControl,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import { Stack, Tabs } from '@wordpress/ui';
 import { useState, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
@@ -125,7 +129,7 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 									role="status"
 									aria-label={ __( 'Loading…' ) }
 								>
-									<Spinner />
+									<WCSpinner />
 								</div>
 							) : (
 								<IconGrid

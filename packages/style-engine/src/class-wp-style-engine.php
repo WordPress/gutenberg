@@ -421,7 +421,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Checks whether an incoming block style value is valid.
 		 *
-		 * @param string? $style_value A single css preset value.
+		 * @param string $style_value A single CSS preset value.
 		 *
 		 * @return bool
 		 */
@@ -437,8 +437,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string[]|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
 		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
 		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
-		 *
-		 * @return void.
 		 */
 		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $rules_group = '' ) {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
@@ -724,14 +722,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string $style_value      A single raw style value from $block_styles array.
 		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
-		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
 		 */
 		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
 		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
-			if ( empty( $style_value ) || ! is_string( $style_value ) ) {
-				return array();
-			}
-
 			if ( ! in_array( $style_value, static::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
 				return array();
 			}

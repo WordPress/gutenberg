@@ -32,6 +32,44 @@ test.describe( 'Paragraph', () => {
 		expect( firstBlockTagName ).toBe( 'P' );
 	} );
 
+	test( 'should not show an empty toolbar group without alignment controls', async ( {
+		editor,
+		page,
+	} ) => {
+		// A theme without text or wide alignment leaves the toolbar's block
+		// group with nothing to show.
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const { __experimentalFeatures: features } =
+				select( 'core/block-editor' ).getSettings();
+			dispatch( 'core/block-editor' ).updateSettings( {
+				alignWide: false,
+				__experimentalFeatures: {
+					...features,
+					layout: undefined,
+					typography: { ...features.typography, textAlign: false },
+				},
+			} );
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Hello' );
+		await editor.showBlockToolbar();
+
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Paragraph' } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align text' } )
+		).toBeHidden();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align block' } )
+		).toBeHidden();
+		await expect(
+			toolbar.locator( '.components-toolbar-group:not(:has(button))' )
+		).toHaveCount( 0 );
+	} );
+
 	test.describe( 'Empty paragraph', () => {
 		test.use( {
 			// Make the viewport large enough so that a scrollbar isn't displayed.
@@ -171,9 +209,7 @@ test.describe( 'Paragraph', () => {
 				);
 				const heading = editor.canvas.locator( 'text=Heading' );
 
-				await draggingUtils.simulateDraggingHTML(
-					'<h2>Draggable</h2>'
-				);
+				await draggingUtils.simulateDraggingBlocks();
 
 				const firstBlockBox = await emptyParagraph.boundingBox();
 				const headingBox = await heading.boundingBox();
@@ -303,9 +339,7 @@ test.describe( 'Paragraph', () => {
 				);
 				const heading = editor.canvas.locator( 'text=Heading' );
 
-				await draggingUtils.simulateDraggingHTML(
-					'<h2>Draggable</h2>'
-				);
+				await draggingUtils.simulateDraggingBlocks();
 
 				const secondBlockBox = await emptyParagraph.boundingBox();
 				const headingBox = await heading.boundingBox();
@@ -415,9 +449,7 @@ test.describe( 'Paragraph', () => {
 					.locator( '[data-type="core/paragraph"]' )
 					.nth( 1 );
 
-				await draggingUtils.simulateDraggingHTML(
-					'<h2>Draggable</h2>'
-				);
+				await draggingUtils.simulateDraggingBlocks();
 
 				const firstBlockBox = await firstEmptyParagraph.boundingBox();
 				const secondBlockBox = await secondEmptyParagraph.boundingBox();
@@ -541,35 +573,48 @@ class DraggingUtils {
 	}
 
 	async simulateDraggingHTML( html ) {
+		await this.simulateDragging( 'text/html', html );
+	}
+
+	async simulateDraggingBlocks() {
+		await this.simulateDragging(
+			'wp-blocks',
+			JSON.stringify( { type: 'inserter', blocks: [] } )
+		);
+	}
+
+	async simulateDragging( type, data ) {
 		// Insert a dummy draggable element on the page to simulate dragging
-		// HTML from other places. The dummy element will get removed once the drag starts.
-		await this.page.evaluate( ( _html ) => {
-			const draggable = document.createElement( 'div' );
-			draggable.draggable = true;
-			draggable.style.width = '10px';
-			draggable.style.height = '10px';
-			// Position it at the top left corner for convenience.
-			draggable.style.position = 'fixed';
-			draggable.style.top = 0;
-			draggable.style.left = 0;
-			draggable.style.zIndex = 999999;
+		// from other places. The dummy element will get removed once the drag starts.
+		await this.page.evaluate(
+			( [ _type, _data ] ) => {
+				const draggable = document.createElement( 'div' );
+				draggable.draggable = true;
+				draggable.style.width = '10px';
+				draggable.style.height = '10px';
+				// Position it at the top left corner for convenience.
+				draggable.style.position = 'fixed';
+				draggable.style.top = 0;
+				draggable.style.left = 0;
+				draggable.style.zIndex = 999999;
 
-			draggable.addEventListener(
-				'dragstart',
-				( event ) => {
-					// Set the data transfer to some HTML on dragstart.
-					event.dataTransfer.setData( 'text/html', _html );
+				draggable.addEventListener(
+					'dragstart',
+					( event ) => {
+						event.dataTransfer.setData( _type, _data );
 
-					// Some browsers will cancel the drag if the source is immediately removed.
-					setTimeout( () => {
-						draggable.remove();
-					}, 0 );
-				},
-				{ once: true }
-			);
+						// Some browsers will cancel the drag if the source is immediately removed.
+						setTimeout( () => {
+							draggable.remove();
+						}, 0 );
+					},
+					{ once: true }
+				);
 
-			document.body.appendChild( draggable );
-		}, html );
+				document.body.appendChild( draggable );
+			},
+			[ type, data ]
+		);
 
 		// This is where the dummy draggable element is at.
 		await this.page.mouse.move( 0, 0 );

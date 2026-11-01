@@ -227,8 +227,12 @@ function Fields( {
 	contentRef,
 }: FieldsProps ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceBlocks, selectionChange } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		replaceBlocks,
+		selectionChange,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
 	const keys: string[] = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
@@ -261,9 +265,9 @@ function Fields( {
 			const fields = clientIds.map( ( clientId, i ) =>
 				getFieldFormatSettings( clientId, keys[ i ] )
 			);
-			const lists: string[][] = fields
+			const lists = fields
 				.map( ( field ) => field?.allowedFormats )
-				.filter( Boolean );
+				.filter( ( list ): list is readonly string[] => !! list );
 			return {
 				allowedFormats: lists.length
 					? lists.reduce( ( a, b ) =>
@@ -334,6 +338,8 @@ function Fields( {
 				),
 				{ uniqueByBlock: true }
 			);
+			// The next change to these blocks starts a new undo level.
+			__unstableMarkLastChangeAsPersistent();
 			return;
 		}
 		// The selected text was replaced, by an inline image or a
@@ -345,9 +351,7 @@ function Fields( {
 			return;
 		}
 		const [ clientId ] = clientIds;
-		const block = registry
-			.select( blockEditorStore )
-			.getBlock( clientId ) as { attributes: Record< string, unknown > };
+		const block = registry.select( blockEditorStore ).getBlock( clientId )!;
 		registry.batch( () => {
 			selectionChange( clientId, keys[ 0 ], start, end );
 			replaceBlocks(

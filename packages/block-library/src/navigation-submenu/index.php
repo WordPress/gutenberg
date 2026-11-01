@@ -318,7 +318,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
  * @since 5.9.0
  *
  * @uses render_block_core_navigation_submenu()
- * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation_submenu() {
 	register_block_type_from_metadata(

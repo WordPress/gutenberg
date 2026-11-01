@@ -2,9 +2,25 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useCopyToClipboard`: Add an optional `onError` callback for a failed copy ([#85269](https://github.com/WordPress/gutenberg/pull/85269)).
+
+### Bug Fixes
+
+-   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+-   `useMergeRefs`: Accept disabled refs and object refs that start `undefined` ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
+-   `useDebounce`: Accept partial options ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
+
+## 9.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Type `withGlobalEvents` and `withState` instead of returning `any`, and let `withGlobalEvents` take only the events it handles ([#84382](https://github.com/WordPress/gutenberg/pull/84382)).
 
 ### Bug Fixes
 
@@ -13,6 +29,7 @@
 ### Internal
 
 -   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
+-   Refactor to TypeScript ([#84382](https://github.com/WordPress/gutenberg/pull/84382)).
 
 ## 8.10.0 (2026-10-07)
 

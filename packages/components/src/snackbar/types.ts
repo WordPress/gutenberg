@@ -10,7 +10,8 @@ type SnackbarOnlyProps = {
 	icon?: ReactNode;
 	/**
 	 * Whether to require user action to dismiss the snackbar.
-	 * By default, this is dismissed on a timeout, without user interaction.
+	 * By default, this is dismissed on a timeout, without user interaction:
+	 * after 6 seconds, or after 10 seconds when the snackbar has an action.
 	 *
 	 * @default false
 	 */

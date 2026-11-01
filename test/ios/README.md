@@ -1,6 +1,6 @@
 # iOS tests
 
-XCUITest suites that drive Safari on an iOS simulator, for behavior only
+XCUITest suites that drive the editor in a web view on an iOS simulator, for behavior only
 touch gestures show, such as selecting text with the selection handles.
 
 Run them on macOS with Xcode and [xcodegen](https://github.com/yonaskolb/XcodeGen)
