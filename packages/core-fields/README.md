@@ -39,7 +39,7 @@ And each folder of fields may have:
 - `format`, for the post types supporting `post-formats` when the theme supports post formats. Its elements are the formats of the theme, plus `standard`.
 - `last_edited_date`, for every post type.
 - `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
-- `parent`, for the post types supporting `page-attributes`.
+- `parent`, for hierarchical post types supporting `page-attributes`.
 - `password`, for every post type but the design ones.
 - `ping_status`, for the post types supporting `trackbacks`.
 - `post-content-info`, for the post types supporting `editor`.

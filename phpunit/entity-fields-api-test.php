@@ -545,7 +545,6 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		return array(
 			'discussion'        => array( 'discussion', array( 'comments', 'trackbacks' ) ),
 			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
-			'parent'            => array( 'parent', array( 'page-attributes' ) ),
 			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
 			'title'             => array( 'title', array( 'title' ) ),
 			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
@@ -618,6 +617,49 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 			$this->assertContains( $field_id, array_column( wp_get_registered_entity_fields( 'postType', $post_type ), 'id' ), "$post_type gets the field." );
 		}
 		$this->assertNotContains( $field_id, array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_without' ), 'id' ) );
+	}
+
+	/**
+	 * The parent field requires both hierarchy and page attributes support.
+	 *
+	 * @dataProvider data_parent_field_requirements
+	 *
+	 * @param bool $hierarchical   Whether the post type is hierarchical.
+	 * @param bool $has_attributes Whether the post type supports page attributes.
+	 * @param bool $has_parent     Whether the parent field should be registered.
+	 */
+	public function test_the_parent_field_requires_hierarchy_and_page_attributes( $hierarchical, $has_attributes, $has_parent ) {
+		register_post_type(
+			'gutenberg_parent',
+			array(
+				'show_in_rest' => true,
+				'hierarchical' => $hierarchical,
+				'supports'     => $has_attributes ? array( 'page-attributes' ) : array(),
+			)
+		);
+
+		try {
+			self::reset_registry();
+			$ids = array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_parent' ), 'id' );
+		} finally {
+			unregister_post_type( 'gutenberg_parent' );
+		}
+
+		$this->assertSame( $has_parent, in_array( 'parent', $ids, true ) );
+	}
+
+	/**
+	 * Hierarchy and page attributes support are independent post type settings.
+	 *
+	 * @return array[] Post type settings and expected parent field registration.
+	 */
+	public function data_parent_field_requirements() {
+		return array(
+			'hierarchical with attributes'        => array( true, true, true ),
+			'hierarchical without attributes'     => array( true, false, false ),
+			'non-hierarchical with attributes'    => array( false, true, false ),
+			'non-hierarchical without attributes' => array( false, false, false ),
+		);
 	}
 
 	/**
