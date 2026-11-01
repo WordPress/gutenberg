@@ -522,8 +522,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., '`var:preset|<PRESET_TYPE>|<PRESET_SLUG>`'.
 		 *
-		 * @param array $style_value      A single raw style value or css preset property from the $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param string $style_value      A single raw style value or CSS preset property from the $block_styles array.
+		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
 		 * @return array|string[] An array of CSS classnames, or empty array.
 		 */
