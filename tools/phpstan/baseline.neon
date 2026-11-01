@@ -7,12 +7,6 @@ parameters:
 			path: ../../lib/block-supports/layout.php
 
 		-
-			message: '#^Property WP_Block_Type\:\:\$selectors \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../lib/block-supports/states.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
@@ -233,18 +227,6 @@ parameters:
 			identifier: offsetAssign.valueType
 			count: 2
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$_request$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
