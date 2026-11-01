@@ -205,12 +205,6 @@ parameters:
 			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
 
 		-
-			message: '#^Action callback returns bool but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: ../../lib/media/load.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SCRIPT'' given\.$#'
 			identifier: argument.type
 			count: 1

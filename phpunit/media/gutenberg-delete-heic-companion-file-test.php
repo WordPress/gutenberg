@@ -40,10 +40,7 @@ class Gutenberg_Delete_HEIC_Companion_File_Test extends WP_UnitTestCase {
 		$metadata['source_image'] = $heic_name;
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
-		$this->assertTrue(
-			gutenberg_delete_heic_companion_file( $attachment_id ),
-			'Function should report that a companion file was deleted.'
-		);
+		gutenberg_delete_heic_companion_file( $attachment_id );
 		$this->assertFileDoesNotExist( $heic_path, 'Companion file should be deleted alongside the attachment.' );
 	}
 
@@ -60,8 +57,8 @@ class Gutenberg_Delete_HEIC_Companion_File_Test extends WP_UnitTestCase {
 		$this->assertIsArray( $metadata );
 		$this->assertArrayNotHasKey( 'source_image', $metadata );
 
-		// Should report no deletion and not raise even though the hook fires.
-		$this->assertFalse( gutenberg_delete_heic_companion_file( $attachment_id ) );
+		// Should not raise even though the hook fires.
+		gutenberg_delete_heic_companion_file( $attachment_id );
 
 		wp_delete_attachment( $attachment_id, true );
 
