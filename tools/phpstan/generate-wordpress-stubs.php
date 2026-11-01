@@ -9,7 +9,7 @@
  * in composer.json in place of the released package.
  *
  * The stubs are not committed. The package's composer.json records the source that they are generated
- * from, and `composer phpstan` runs this script with no option first, which generates them when they
+ * from, and `composer phpstan` runs this script with only `--quiet` first, which generates them when they
  * are missing or were generated from another source.
  *
  * This is temporary. Once php-stubs/wordpress-stubs publishes builds from trunk, require a pinned one
@@ -18,8 +18,9 @@
  * Usage, through `composer phpstan:generate-wordpress-stubs -- <option>`:
  *
  *   (no option)          Generate the stubs from the source recorded in wordpress-stubs/composer.json,
- *                        unless they already were. Add `--force` to generate them anyway.
- *   --commit=<ref>       Generate from a commit of wordpress-develop, such as `trunk`.
+ *                        unless they already were. Add `--force` to generate them anyway, or
+ *                        `--quiet` to not report that they already were, as `composer phpstan` does.
+ *   --commit=<ref>      Generate from a commit of wordpress-develop, such as `trunk`.
  *   --pr=<number|url>    Generate from the head of a wordpress-develop pull request, for a Gutenberg
  *                        pull request that depends on it. Before the Gutenberg pull request is
  *                        merged, regenerate with `--commit=trunk` once the core change is committed.
@@ -568,6 +569,7 @@ function main( array $args ): void {
 	$checkout     = '';
 	$use_checkout = false;
 	$force        = false;
+	$quiet        = false;
 	foreach ( $args as $arg ) {
 		if ( preg_match( '/^--(commit|pr|checkout)=(.+)$/', $arg, $matches ) ) {
 			if ( 'commit' === $matches[1] ) {
@@ -582,6 +584,8 @@ function main( array $args ): void {
 			$use_checkout = true;
 		} elseif ( '--force' === $arg ) {
 			$force = true;
+		} elseif ( '--quiet' === $arg ) {
+			$quiet = true;
 		} elseif ( '--help' === $arg ) {
 			usage( 0 );
 		} else {
@@ -625,8 +629,10 @@ function main( array $args ): void {
 		} elseif ( read_stub_key( $stub_file ) !== $generation_key( $commit, $pr ) ) {
 			$reason = 'out of date';
 		} else {
-			$source_label = '' !== $pr ? "$develop_repo#$pr at " . short_commit( $commit ) : "$develop_repo@" . short_commit( $commit );
-			report( "The WordPress stubs are already generated from $source_label. Add --force to generate them again." );
+			if ( ! $quiet ) {
+				$source_label = '' !== $pr ? "$develop_repo#$pr at " . short_commit( $commit ) : "$develop_repo@" . short_commit( $commit );
+				report( "The WordPress stubs are already generated from $source_label. Add --force to generate them again." );
+			}
 			return;
 		}
 	}
