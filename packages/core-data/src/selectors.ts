@@ -1732,9 +1732,10 @@ export const getRevision = (
  * here. Partial responses are merged in the reducer, so the returned object may
  * accumulate properties across requests for the same entity.
  *
- * @param state Data state.
- * @param kind  Entity kind.
- * @param name  Entity name.
+ * @param state   Data state.
+ * @param kind    Entity kind.
+ * @param name    Entity name.
+ * @param options Optional options.
  *
  * @return The view configuration or undefined if not loaded.
  */
@@ -1742,6 +1743,7 @@ export function getViewConfig(
 	state: State,
 	kind: string,
 	name: string,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	options?: Record< string, any >
 ): Record< string, any > | undefined {
 	return (
@@ -1753,4 +1755,3 @@ export function getViewConfig(
 		}
 	);
 }
-

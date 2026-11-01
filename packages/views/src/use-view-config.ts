@@ -44,7 +44,7 @@ export function useViewConfig( {
 					fieldsKey
 						? {
 								fields: fieldsKey,
-						  }
+							}
 						: undefined
 				) as any ) ?? {
 					default_view: undefined,
