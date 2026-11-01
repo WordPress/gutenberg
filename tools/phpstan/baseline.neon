@@ -343,12 +343,6 @@ parameters:
 			path: ../../packages/block-library/src/accordion-item/index.php
 
 		-
-			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../packages/block-library/src/avatar/index.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
 			identifier: argument.type
 			count: 1
@@ -363,12 +357,6 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
 			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-author-avatar/index.php
-
-		-
-			message: '#^Variable \$spacing_string might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../../packages/block-library/src/comment-author-avatar/index.php
 
@@ -487,12 +475,6 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_navigation_post\(\) should return WP_Block_List but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: mixed, post_name\: mixed, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
 			identifier: argument.type
 			count: 1
@@ -511,20 +493,8 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
-			identifier: empty.property
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Variable \$responsive_container_content_directives might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
@@ -537,12 +507,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
 			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/playlist/index.php
-
-		-
-			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
-			identifier: empty.property
 			count: 1
 			path: ../../packages/block-library/src/playlist/index.php
 
@@ -565,18 +529,6 @@ parameters:
 			path: ../../packages/block-library/src/post-time-to-read/index.php
 
 		-
-			message: '#^Offset ''shortcodes_regexp'' does not exist on array\{html_regexp\: ''/\<\\\\/\?\[a\-z\]\[\^\>\]\*\?\>/i'', html_comment_regexp\: ''/\<\!\-\-\[\\\\s\\\\S\]\*\?\-\-\>/'', space_regexp\: ''/&nbsp;\|&\#160;/i'', html_entity_regexp\: ''/&\\\\S\+\?;/'', connector_regexp\: ''/\-\-\|\\\\x\{2014\}/u'', remove_regexp\: ''/\[\\\\x\{0021\}\-\\\\x\{0040\}…'', astral_regexp\: ''/\[\\\\x\{010000\}\-\\\\x…'', words_regexp\: ''/\\\\S\\\\s\+/u'', \.\.\.\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
-			message: '#^Offset ''shortcodes_regexp'' on array\{html_regexp\: ''/\<\\\\/\?\[a\-z\]\[\^\>\]\*\?\>/i'', html_comment_regexp\: ''/\<\!\-\-\[\\\\s\\\\S\]\*\?\-\-\>/'', space_regexp\: ''/&nbsp;\|&\#160;/i'', html_entity_regexp\: ''/&\\\\S\+\?;/'', connector_regexp\: ''/\-\-\|\\\\x\{2014\}/u'', remove_regexp\: ''/\[\\\\x\{0021\}\-\\\\x\{0040\}…'', astral_regexp\: ''/\[\\\\x\{010000\}\-\\\\x…'', words_regexp\: ''/\\\\S\\\\s\+/u'', \.\.\.\} in empty\(\) does not exist\.$#'
-			identifier: empty.offset
-			count: 1
-			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
 			message: '#^Parameter \#1 \$number of function number_format_i18n expects float, string given\.$#'
 			identifier: argument.type
 			count: 2
@@ -591,12 +543,6 @@ parameters:
 		-
 			message: '#^Parameter \#3 \$side of function apply_block_core_search_border_style expects string, null given\.$#'
 			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/search/index.php
-
-		-
-			message: '#^Variable \$is_expandable_searchfield might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: ../../packages/block-library/src/search/index.php
 
@@ -635,12 +581,6 @@ parameters:
 			identifier: booleanOr.rightAlwaysTrue
 			count: 1
 			path: ../../packages/block-library/src/template-part/index.php
-
-		-
-			message: '#^Property WP_Block\:\:\$context \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../packages/block-library/src/term-template/index.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'

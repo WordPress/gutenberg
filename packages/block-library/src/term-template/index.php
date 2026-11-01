@@ -17,7 +17,7 @@
  * @return string Returns the output of the term template.
  */
 function render_block_core_term_template( $attributes, $content, $block ) {
-	if ( ! isset( $block->context ) || empty( $block->context['termQuery'] ) ) {
+	if ( empty( $block->context['termQuery'] ) ) {
 		return '';
 	}
 

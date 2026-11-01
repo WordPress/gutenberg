@@ -58,11 +58,6 @@ function block_core_post_time_to_read_word_count( $text, $type ) {
 	// Remove all HTML comments.
 	$text = preg_replace( $settings['html_comment_regexp'], '', $text );
 
-	// If a shortcode regular expression has been provided use it to remove shortcodes.
-	if ( ! empty( $settings['shortcodes_regexp'] ) ) {
-		$text = preg_replace( $settings['shortcodes_regexp'], "\n", $text );
-	}
-
 	// Normalize non-breaking space to a normal space.
 	$text = preg_replace( $settings['space_regexp'], ' ', $text );
 
