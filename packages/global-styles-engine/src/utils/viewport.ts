@@ -7,7 +7,8 @@ const DEFAULT_VIEWPORT_BREAKPOINTS = {
 
 type ViewportBreakpoint = keyof typeof DEFAULT_VIEWPORT_BREAKPOINTS;
 type ViewportSettings = Partial< Record< ViewportBreakpoint, string > >;
-type ViewportBreakpoints = Partial< Record< ViewportBreakpoint, string > >;
+type ViewportBreakpoints = Partial< Record< ViewportBreakpoint, string > > &
+	Record< string, string | undefined >;
 
 // Matches positive CSS length values supported for viewport breakpoints, and
 // captures the numeric value and unit for conversion to pixels.
@@ -15,13 +16,17 @@ const VIEWPORT_SIZE_REGEXP = /^(\d+|\d*\.\d+)(px|em|rem)$/;
 const DEFAULT_FONT_SIZE = 16;
 
 function isViewportSettings(
-	configOrSettings: GlobalStylesConfig | ViewportSettings
+	configOrSettings: unknown
 ): configOrSettings is ViewportSettings {
-	return 'mobile' in configOrSettings || 'tablet' in configOrSettings;
+	return (
+		typeof configOrSettings === 'object' &&
+		configOrSettings !== null &&
+		( 'mobile' in configOrSettings || 'tablet' in configOrSettings )
+	);
 }
 
 function getViewportSettings(
-	configOrSettings?: GlobalStylesConfig | ViewportSettings
+	configOrSettings?: unknown
 ): ViewportSettings {
 	if ( ! configOrSettings || typeof configOrSettings !== 'object' ) {
 		return {};
@@ -31,7 +36,7 @@ function getViewportSettings(
 		return configOrSettings;
 	}
 
-	return configOrSettings.settings?.viewport ?? {};
+	return ( configOrSettings as GlobalStylesConfig ).settings?.viewport ?? {};
 }
 
 function isValidViewportSize( value: unknown ): value is string {
@@ -88,7 +93,7 @@ export function getViewportBreakpointValueInPixels(
  * @return Sanitized viewport breakpoints.
  */
 export function getViewportBreakpoints(
-	configOrSettings?: GlobalStylesConfig | ViewportSettings
+	configOrSettings?: GlobalStylesConfig | ViewportSettings | unknown
 ): ViewportBreakpoints {
 	const viewportSettings = getViewportSettings( configOrSettings );
 	const breakpoints: ViewportBreakpoints = {};
@@ -134,7 +139,7 @@ export function getViewportBreakpoints(
  * @return Responsive media queries keyed by alias.
  */
 export function getResponsiveMediaQueries(
-	configOrSettings?: GlobalStylesConfig | ViewportSettings
+	configOrSettings?: GlobalStylesConfig | ViewportSettings | unknown
 ): Record< string, string > {
 	const breakpoints = getViewportBreakpoints( configOrSettings );
 	const mediaQueries: Record< string, string > = {};

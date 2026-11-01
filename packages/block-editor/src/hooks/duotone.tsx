@@ -12,7 +12,9 @@ import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSelector,
-	privateApis as globalStylesEnginePrivateApis,
+	getDuotoneFilter,
+	getDuotoneStylesheet,
+	getDuotoneUnsetStylesheet,
 } from '@wordpress/global-styles-engine';
 import {
 	BlockControls,
@@ -29,7 +31,6 @@ import {
 	useBlockSettings,
 	usePrivateStyleOverride,
 } from './utils';
-import { unlock } from '../lock-unlock';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -44,9 +45,6 @@ import type {
 	DuotoneValue,
 } from './types';
 import type { PanelStyle } from '../components/global-styles/types';
-
-const { getDuotoneFilter, getDuotoneStylesheet, getDuotoneUnsetStylesheet } =
-	unlock( globalStylesEnginePrivateApis );
 
 const EMPTY_ARRAY: never[] = [];
 

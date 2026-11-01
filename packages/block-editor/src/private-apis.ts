@@ -1,4 +1,4 @@
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getDuotoneFilter } from '@wordpress/global-styles-engine';
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock, unlock } from './lock-unlock';
@@ -81,8 +81,6 @@ import {
 	isRelativePath,
 } from './components/link-control/is-url-like';
 import { isElementVisible } from './utils/dom';
-
-const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Private `@wordpress/block-editor` APIs.

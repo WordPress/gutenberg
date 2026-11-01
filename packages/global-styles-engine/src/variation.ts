@@ -3,8 +3,8 @@ import { getValueFromObjectPath } from './utils/object';
 type StyleTree = Record< string, any >;
 
 interface GlobalStyles {
-	settings?: StyleTree;
-	styles?: StyleTree;
+	settings?: any;
+	styles?: any;
 }
 
 interface GetVariationStyleOptions {
@@ -29,11 +29,15 @@ interface GetVariationStyleOptions {
  */
 export function getVariationStyle(
 	globalStyles: GlobalStyles | null | undefined,
-	name: string,
-	variation: string,
+	name?: string | null,
+	variation?: string | null,
 	{ resolveRefs = true }: GetVariationStyleOptions = {}
 ): StyleTree | undefined {
-	if ( ! globalStyles?.styles?.blocks?.[ name ]?.variations?.[ variation ] ) {
+	if (
+		! name ||
+		! variation ||
+		! globalStyles?.styles?.blocks?.[ name ]?.variations?.[ variation ]
+	) {
 		return undefined;
 	}
 

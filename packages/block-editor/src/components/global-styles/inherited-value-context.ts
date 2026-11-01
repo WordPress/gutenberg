@@ -1,8 +1,11 @@
 import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import { resolveStyle } from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	ResolvedStyle,
+} from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../../store';
 import {
 	globalStylesDataKey,
@@ -11,10 +14,7 @@ import {
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
 import BlockContext from '../block-context';
-import { unlock } from '../../lock-unlock';
 import type { BlockStyleState } from '../../hooks/types';
-
-const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Reads the Global Styles payload and returns it as a `GlobalStylesConfig`
@@ -345,7 +345,7 @@ export function useResolvedStyle(
 	blockName: string | null | undefined,
 	className?: string | null,
 	selectedState: BlockStyleState | null = null
-) {
+): ResolvedStyle {
 	const { variationName, headingLevel } = useVariationAndElements(
 		blockName,
 		className

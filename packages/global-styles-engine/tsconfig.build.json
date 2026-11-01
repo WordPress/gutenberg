@@ -8,7 +8,6 @@
 		{ "path": "../blocks/tsconfig.build.json" },
 		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../style-engine/tsconfig.build.json" }
 	]
 }
