@@ -25,6 +25,17 @@ export const InsertionPointOpenRef = createContext<
 >( undefined );
 InsertionPointOpenRef.displayName = 'InsertionPointOpenRefContext';
 
+/**
+ * Renders the in-between insertion point popover, optionally with a quick
+ * inserter when `__unstableWithInserter` is set on the insertion point.
+ *
+ * @param {Object} props                       Component props.
+ * @param {string} props.__unstablePopoverSlot Optional popover slot name.
+ * @param {Object} props.__unstableContentRef  Ref to the scrollable canvas content.
+ * @param {string} props.operation             Insertion operation type.
+ * @param {string} props.nearestSide           Preferred side for group operations.
+ * @return {import('react').ReactElement|null} Insertion point UI, or null when hidden.
+ */
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
@@ -180,6 +191,8 @@ function InbetweenInsertionPointPopover( {
 		orientationClassname
 	);
 
+	const placeBeforeFirstBlock = isInserterShown && ! previousClientId;
+
 	return (
 		<BlockPopoverInbetween
 			previousClientId={ previousClientId }
@@ -188,6 +201,7 @@ function InbetweenInsertionPointPopover( {
 			__unstableContentRef={ __unstableContentRef }
 			operation={ operation }
 			nearestSide={ nearestSide }
+			placeBeforeFirstBlock={ placeBeforeFirstBlock }
 		>
 			<motion.div
 				layout={ ! disableMotion }
@@ -202,6 +216,7 @@ function InbetweenInsertionPointPopover( {
 				onFocus={ onFocus }
 				className={ clsx( className, {
 					'is-with-inserter': isInserterShown,
+					'is-before-first-block': placeBeforeFirstBlock,
 				} ) }
 				onHoverEnd={ maybeHideInserterPoint }
 			>
