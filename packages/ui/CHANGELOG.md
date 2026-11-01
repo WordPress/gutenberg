@@ -8,7 +8,9 @@
 
 ### New Features
 
+-   `Badge`: Add an optional `infotip` popup with a trailing help icon ([#85309](https://github.com/WordPress/gutenberg/pull/85309)).
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
+-   `Notice.List`: Add announcements for added and changed notices, excluding hidden content, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
 
 ### Enhancements
 
@@ -18,7 +20,9 @@
 
 ### Bug Fixes
 
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 -   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
+-   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
 
 ### Documentation
 

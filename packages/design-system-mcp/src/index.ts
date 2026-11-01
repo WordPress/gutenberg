@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/server';
 import { registerTools } from './tools/index.ts';
 
 export { parseComponents, parseComponentDetail } from './parse-components.ts';
+export { parsePatterns } from './parse-patterns.ts';
 
 export function createServer() {
 	const server = new McpServer(
@@ -11,9 +12,18 @@ export function createServer() {
 		},
 		{
 			instructions: [
-				'Provides discovery and usage information for the WordPress Design System. Covers components in `@wordpress/components` and `@wordpress/ui`, and the underlying design tokens from `@wordpress/theme` exposed as `--wpds-*` CSS custom properties.',
-				'In a typical flow, a user will often refer to components by generic names ("button", "dropdown menu") that don\'t match the actual export. Call `get_components` first to map the request to canonical component names, then `get_component_details` for one or more of those names to get props, descriptions, and usage notes.',
-				'`get_design_tokens` covers the semantic, themeable design tokens that the components are built on. While these can be used for custom styling that adapts to the current design system theme settings, prefer using the available component APIs when available.',
+				'Provides guidance for building interfaces with the WordPress Design System, at three levels:',
+				[
+					'- Patterns describe how to approach a kind of interaction, such as confirming a destructive action or saving a form. A pattern says which components to choose for the situation and how to configure them.',
+					'- Components are the building blocks in `@wordpress/ui` and `@wordpress/components`, documented with their props, examples, and import statements.',
+					'- Design tokens are the themeable `--wpds-*` CSS custom properties from `@wordpress/theme` that the components are built on, for styling that no component covers.',
+				].join( '\n' ),
+				'Use the appropriate tool for each request:',
+				[
+					'- To answer a question about a specific component, such as its props or how to import it, call `get_component_details`. When the request uses a generic name ("dropdown menu") instead of the export name, call `get_components` first to find it.',
+					'- To build an interface or a user flow, call `get_patterns` first to check whether a pattern covers the situation. If one does, call `get_pattern_details` and follow it: patterns record decisions that component documentation cannot, such as when to use one component instead of another. If none does, work from the components. In both cases, call `get_component_details` for the components you will use.',
+					'- For custom styling, call `get_design_tokens`. Prefer component props when a component already expresses the styling intent.',
+				].join( '\n' ),
 			].join( '\n\n' ),
 		}
 	);
