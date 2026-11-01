@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .rich-text {
@@ -55,8 +56,8 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	background-color: transparent;
 }
 
+// A background, not a pseudo-element: generated content adds a caret stop in
+// Firefox.
 .is-selected .non-breaking-space {
-	outline: 1px solid currentColor;
-	outline-offset: -1px;
-	opacity: 0.8;
+	background: radial-gradient(circle, $alert-red 2px, transparent 2.5px) center / 100% 100% no-repeat;
 }

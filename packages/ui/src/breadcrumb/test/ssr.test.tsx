@@ -10,7 +10,9 @@ describe( 'Breadcrumb server rendering', () => {
 				<Breadcrumb.LinkItem href="/section?view=all#latest">
 					Section
 				</Breadcrumb.LinkItem>
-				<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				<Breadcrumb.CurrentItem aria-current="true">
+					Current
+				</Breadcrumb.CurrentItem>
 			</Breadcrumb.Root>
 		);
 
@@ -18,7 +20,53 @@ describe( 'Breadcrumb server rendering', () => {
 		expect( view ).toContain( '<ol' );
 		expect( view ).toContain( 'href="/"' );
 		expect( view ).toContain( 'href="/section?view=all#latest"' );
-		expect( view ).toContain( 'aria-current="page"' );
+		expect( view ).toContain( 'aria-current="true"' );
 		expect( view ).not.toContain( 'aria-haspopup="menu"' );
+	} );
+	it.each( [
+		[ undefined, 'navigation', 'page' ],
+		[ true, 'list', 'true' ],
+		[ 'true', 'list', 'true' ],
+		[ 'page', 'navigation', 'page' ],
+	] as const )(
+		'renders a current-only trail with aria-current=%j and role=%s on the server',
+		( ariaCurrent, role, renderedAriaCurrent ) => {
+			const view = renderToStaticMarkup(
+				<Breadcrumb.Root aria-label="Hierarchy">
+					<Breadcrumb.CurrentItem
+						aria-current={ ariaCurrent }
+						render={ <span aria-current="step" /> }
+					>
+						Document
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect( view ).toContain( `role="${ role }"` );
+			expect( view ).toMatch(
+				role === 'list'
+					? /<ol[^>]*aria-label="Hierarchy"/
+					: /<nav[^>]*aria-label="Hierarchy"/
+			);
+			expect( view.match( /aria-label="Hierarchy"/g ) ).toHaveLength( 1 );
+			expect( view ).toContain( 'role="list"' );
+			expect( view ).toContain(
+				`aria-current="${ renderedAriaCurrent }"`
+			);
+			expect( view.match( /aria-current=/g ) ).toHaveLength( 1 );
+		}
+	);
+
+	it( 'infers selection semantics from declared buttons before measurement', () => {
+		const view = renderToStaticMarkup(
+			<Breadcrumb.Root aria-label="Hierarchy">
+				<Breadcrumb.ButtonItem>Document</Breadcrumb.ButtonItem>
+				<Breadcrumb.CurrentItem>Paragraph</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+		);
+		expect( view ).toContain( 'role="list"' );
+		expect( view ).toMatch( /<ol[^>]*aria-label="Hierarchy"/ );
+		expect( view ).toContain( 'type="button"' );
+		expect( view ).toContain( 'aria-current="true"' );
+		expect( view ).not.toContain( '<nav' );
 	} );
 } );

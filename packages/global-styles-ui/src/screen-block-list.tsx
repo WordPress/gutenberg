@@ -2,13 +2,16 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
-	FlexItem,
 	SearchControl,
 	__experimentalHStack as HStack,
+	__experimentalItemGroup as ItemGroup,
 	__experimentalText as WCText,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, VisuallyHidden } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -19,19 +22,34 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
-import type { BlockType } from '@wordpress/blocks';
+import type { BlockType, BlockTypeIcon } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
-	// @ts-expect-error: Not typed yet.
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import { funnel } from '@wordpress/icons';
+import {
+	button,
+	caption,
+	formInput,
+	formSelect,
+	funnel,
+	heading,
+	headingLevel1,
+	headingLevel2,
+	headingLevel3,
+	headingLevel4,
+	headingLevel5,
+	headingLevel6,
+	link,
+} from '@wordpress/icons';
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
+import { ELEMENTS, type ElementName } from './screen-element';
+import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 import { unlock } from './lock-unlock';
 import { GlobalStylesContext } from './context';
@@ -45,6 +63,50 @@ const {
 	useHasBackgroundPanel,
 	searchItems,
 } = unlock( blockEditorPrivateApis );
+
+// `text` is the site's base text, styled under Typography rather than listed.
+type ListedElementName = Exclude< ElementName, 'text' >;
+
+/*
+ * Elements are listed alongside blocks, grouped under subheadings, so that
+ * anything styleable is one list away rather than behind its own drilldown.
+ * Their labels are the titles of their screens, singular to match how blocks
+ * are listed.
+ */
+const ELEMENT_GROUPS: { title: string; elements: ListedElementName[] }[] = [
+	{
+		title: __( 'Elements' ),
+		elements: [ 'link', 'caption', 'cite' ],
+	},
+	{
+		title: __( 'Headings' ),
+		// `heading` styles every level at once; each level can then override
+		// it. Themes set most of their heading styles here.
+		elements: [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+	},
+	{
+		title: __( 'Form controls' ),
+		elements: [ 'textInput', 'select', 'button' ],
+	},
+];
+
+// Where an element maps closely to a block, it reuses that block's icon, e.g.
+// the Heading block's icon for all headings and the Button block's for buttons.
+const ELEMENT_ICONS: Record< ListedElementName, React.ReactElement > = {
+	link,
+	caption,
+	cite: caption,
+	heading,
+	h1: headingLevel1,
+	h2: headingLevel2,
+	h3: headingLevel3,
+	h4: headingLevel4,
+	h5: headingLevel5,
+	h6: headingLevel6,
+	textInput: formInput,
+	select: formSelect,
+	button,
+};
 
 /**
  * Whether a value, or anything nested inside it, holds a real user value.
@@ -139,44 +201,73 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	return hasGlobalStyles;
 }
 
-interface BlockMenuItemProps {
-	block: any;
-	isCustomized: boolean;
+interface ListMenuItemProps {
+	path: string;
+	icon: BlockTypeIcon;
+	title: string;
 }
 
-function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
+// Shared by blocks and elements so that every row in the list looks the same.
+function ListMenuItem( { path, icon, title }: ListMenuItemProps ) {
+	return (
+		<NavigationButtonAsItem path={ path }>
+			<Stack direction="row" align="center" gap="sm">
+				<BlockIcon
+					className="global-styles-ui-block-types-item__icon"
+					icon={ icon }
+				/>
+				<span>{ title }</span>
+			</Stack>
+		</NavigationButtonAsItem>
+	);
+}
+
+interface BlockMenuItemProps {
+	block: any;
+}
+
+export function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
 	}
 
 	return (
-		<NavigationButtonAsItem
+		<ListMenuItem
 			path={ '/blocks/' + encodeURIComponent( block.name ) }
-		>
-			<HStack justify="flex-start" spacing={ 2 }>
-				<BlockIcon
-					className="global-styles-ui-block-types-item__icon"
-					icon={ block.icon }
-				/>
-				<FlexItem>{ block.title }</FlexItem>
-				{ isCustomized && (
-					<>
-						<VisuallyHidden>
-							{ __( 'Has custom styles' ) }
-						</VisuallyHidden>
-						<span
-							aria-hidden="true"
-							className="global-styles-ui-block-types-item__indicator"
-						/>
-					</>
-				) }
-			</HStack>
-		</NavigationButtonAsItem>
+			icon={ block.icon }
+			title={ block.title }
+		/>
 	);
 }
 
-function EmptyBlockList( {
+function ElementMenuItem( { element }: { element: ListedElementName } ) {
+	return (
+		<ListMenuItem
+			path={ '/blocks/elements/' + element }
+			icon={ ELEMENT_ICONS[ element ] }
+			title={ ELEMENTS[ element ].title }
+		/>
+	);
+}
+
+interface ListGroupProps {
+	title: string;
+	children: React.ReactNode;
+}
+
+function ListGroup( { title, children }: ListGroupProps ) {
+	return (
+		<div className="global-styles-ui-block-types-group">
+			<div className="global-styles-ui-block-types-group__title">
+				<Subtitle level={ 3 }>{ title }</Subtitle>
+			</div>
+			{ children }
+		</div>
+	);
+}
+
+function EmptyList( {
 	filterValue,
 	styleFilter,
 }: {
@@ -187,8 +278,8 @@ function EmptyBlockList( {
 	// or not the customized filter is also on.
 	const label =
 		'customized' === styleFilter && ! filterValue
-			? __( "You haven't customized any blocks yet." )
-			: __( 'No blocks found.' );
+			? __( "You haven't customized any blocks or elements yet." )
+			: __( 'No results found.' );
 	return (
 		<WCText
 			align="center"
@@ -200,12 +291,35 @@ function EmptyBlockList( {
 	);
 }
 
-interface BlockListProps {
+interface ListProps {
 	filterValue: string;
 	styleFilter: StyleFilter;
 }
 
-function BlockList( { filterValue, styleFilter }: BlockListProps ) {
+function getFilteredElementGroups(
+	filterValue: string,
+	styleFilter: StyleFilter,
+	customizedElementNames: Set< string >
+) {
+	const search = filterValue.trim().toLowerCase();
+	return ELEMENT_GROUPS.map( ( group ) => ( {
+		...group,
+		elements: group.elements.filter(
+			( element ) =>
+				// The element's name and group title match too, so "h1" finds
+				// Heading 1 and "form" lists the form controls.
+				( ! search ||
+					[ ELEMENTS[ element ].title, element, group.title ]
+						.join( ' ' )
+						.toLowerCase()
+						.includes( search ) ) &&
+				( styleFilter !== 'customized' ||
+					customizedElementNames.has( element ) )
+		),
+	} ) ).filter( ( group ) => group.elements.length > 0 );
+}
+
+function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { user } = useContext( GlobalStylesContext );
@@ -226,6 +340,25 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		return names;
 	}, [ user ] );
 
+	// Reads the user layer only, for the same reason as blocks.
+	const customizedElementNames = useMemo( () => {
+		const names = new Set< string >();
+		Object.entries( user?.styles?.elements ?? {} ).forEach(
+			( [ name, styles ] ) => {
+				if ( hasAnyValue( styles ) ) {
+					names.add( name );
+				}
+			}
+		);
+		return names;
+	}, [ user ] );
+
+	const filteredElementGroups = getFilteredElementGroups(
+		filterValue,
+		styleFilter,
+		customizedElementNames
+	);
+
 	// Ranks title matches above keyword, category and description matches, the
 	// same way the inserter does. Without a search value the list keeps its
 	// registration order.
@@ -242,9 +375,13 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 			: searchedBlockTypes;
 
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
+	const elementCount = filteredElementGroups.reduce(
+		( total, group ) => total + group.elements.length,
+		0
+	);
 
 	// Announce result count on change
-	const hasResults = filteredBlockTypes.length > 0;
+	const hasBlockResults = filteredBlockTypes.length > 0;
 	useEffect( () => {
 		if ( ! filterValue && styleFilter === 'all' ) {
 			return;
@@ -257,45 +394,71 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		// fragile and depends on the number of rendered elements of `BlockMenuItem`,
 		// which is now one.
 		// @see https://github.com/WordPress/gutenberg/pull/39117#discussion_r816022116
-		// An empty list renders the empty state message as its only child, so
-		// only count the children when there are results to count.
-		const count = hasResults
+		const blockCount = hasBlockResults
 			? blockTypesListRef.current?.childElementCount || 0
 			: 0;
+		const count = elementCount + blockCount;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),
 			count
 		);
 		debouncedSpeak( resultsFoundMessage, 'polite' );
-	}, [ filterValue, styleFilter, hasResults, debouncedSpeak ] );
+	}, [
+		filterValue,
+		styleFilter,
+		hasBlockResults,
+		elementCount,
+		debouncedSpeak,
+	] );
+
+	if ( ! elementCount && ! hasBlockResults ) {
+		return (
+			<EmptyList
+				filterValue={ filterValue }
+				styleFilter={ styleFilter }
+			/>
+		);
+	}
 
 	return (
-		<div
-			ref={ blockTypesListRef }
-			className="global-styles-ui-block-types-item-list"
-			// By default, BlockMenuItem has a role=listitem so this div must have a list role.
-			role="list"
-		>
-			{ filteredBlockTypes.length === 0 ? (
-				<EmptyBlockList
-					filterValue={ filterValue }
-					styleFilter={ styleFilter }
-				/>
-			) : (
-				filteredBlockTypes.map( ( block ) => (
-					<BlockMenuItem
-						block={ block }
-						isCustomized={ customizedBlockNames.has( block.name ) }
-						key={ 'menu-itemblock-' + block.name }
-					/>
-				) )
+		<>
+			{ filteredElementGroups.map( ( group ) => (
+				<ListGroup key={ group.title } title={ group.title }>
+					<ItemGroup
+						className="global-styles-ui-block-types-item-list"
+						size="small"
+					>
+						{ group.elements.map( ( element ) => (
+							<ElementMenuItem
+								key={ element }
+								element={ element }
+							/>
+						) ) }
+					</ItemGroup>
+				</ListGroup>
+			) ) }
+			{ hasBlockResults && (
+				<ListGroup title={ __( 'Blocks' ) }>
+					<ItemGroup
+						ref={ blockTypesListRef }
+						className="global-styles-ui-block-types-item-list"
+						size="small"
+					>
+						{ filteredBlockTypes.map( ( block ) => (
+							<BlockMenuItem
+								block={ block }
+								key={ 'menu-itemblock-' + block.name }
+							/>
+						) ) }
+					</ItemGroup>
+				</ListGroup>
 			) }
-		</div>
+		</>
 	);
 }
 
-const MemoizedBlockList = memo( BlockList );
+const MemoizedBlockAndElementList = memo( BlockAndElementList );
 
 function ScreenBlockList() {
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -305,9 +468,9 @@ function ScreenBlockList() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Blocks' ) }
+				title={ __( 'Blocks & Elements' ) }
 				description={ __(
-					"Customize how a block looks everywhere it's used."
+					"Customize how a block or element looks everywhere it's used."
 				) }
 			/>
 			<HStack
@@ -355,7 +518,7 @@ function ScreenBlockList() {
 					</Menu.Popup>
 				</Menu.Root>
 			</HStack>
-			<MemoizedBlockList
+			<MemoizedBlockAndElementList
 				filterValue={ deferredFilterValue }
 				styleFilter={ styleFilter }
 			/>

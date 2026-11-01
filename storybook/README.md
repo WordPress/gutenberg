@@ -12,6 +12,12 @@ Run locally in your development environment running: `npm run storybook:dev` fro
 
 Component pages declare their recommendation status with `parameters.componentStatus` (`recommended`, `use-with-caution`, `not-recommended` or `unaudited`). Parameters never reach the story index, so `status-indexer.ts` reads that value from the source at index time and tags every entry of the file with the status's `use-*` tag, listed next to its label and icon in `components/component-status-indicator/statuses.ts`. The sidebar shows the matching icon next to the component name, except for recommended, which is the default and has no icon. The tag filter next to the search box can include or exclude any status. Recommendation gets its own namespace because the `status-private` and `status-experimental` tags answer a different question, the API lifecycle and how a component can be imported, and are still declared by hand in each story's `tags` array. A component can carry one tag from each namespace, and since the tag filter sorts alphabetically, the shared `use-` prefix keeps the four statuses together below the `status-*` ones. All badge definitions live in `badges.js`, keyed by the tag that triggers them.
 
+## Manifests
+
+The Storybook build publishes machine-readable manifests at `manifests/components.json` and `manifests/docs.json`, which the [design system MCP server](/packages/design-system-mcp/README.md) serves to AI agents. `preview.jsx` excludes every story and document from the manifests by default, so a story file or MDX document must opt in with the `manifest` tag. In an MDX document, add it to the `<Meta />` block, as in `<Meta title="Design System/Patterns/Example" tags={ [ 'manifest' ] } />`.
+
+Standalone MDX documents are written to `docs.json`. Documents attached to a story file with `<Meta of={ … } />` are written to that file's entry in `components.json` instead. The MCP server serves every document under "Design System/Patterns" with its `get_patterns` and `get_pattern_details` tools, so a new pattern document must be standalone and tagged. The pattern list in the MCP server names each pattern with the last segment of its `<Meta />` title, and describes it with the document's lead paragraph, directly after the `#` heading. Write that paragraph so that it says what the pattern is for.
+
 ## Manifest snapshot regression testing
 
 Storybook upgrades and inocuous code refactoring have been a frequent source of accidental documentation regressions, resulting in component or prop descriptions being accidentally removed.

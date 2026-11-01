@@ -4,6 +4,18 @@
 
 ### Bug Fixes
 
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.12.0 (2026-10-07)
+
+### Bug Fixes
+
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
 ### Internal

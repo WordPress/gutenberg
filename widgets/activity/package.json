@@ -12,8 +12,7 @@
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/ui": "file:../../packages/ui",
-		"@wordpress/widget-primitives": "file:../../packages/widget-primitives"
+		"@wordpress/ui": "file:../../packages/ui"
 	},
 	"devDependencies": {
 		"@types/react": "^19.3.0"

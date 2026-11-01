@@ -7,7 +7,10 @@ const exclusions = require( '../polyfill-exclusions' );
 builder( {
 	modules: [ 'es.', 'web.' ],
 	exclude: exclusions,
-	summary: { console: { size: true, modules: true } },
+	summary: {
+		console: { size: true, modules: true },
+		comment: { modules: true },
+	},
 	targets: require( '@wordpress/browserslist-config' ),
 	filename: './build/polyfill.js',
 } )

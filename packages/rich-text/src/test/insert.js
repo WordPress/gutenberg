@@ -60,4 +60,22 @@ describe( 'insert', () => {
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
 	} );
+
+	it( 'should append without a selection', () => {
+		const record = {
+			formats: [ , , ],
+			replacements: [ , , ],
+			text: 'ab',
+		};
+		const expected = {
+			formats: [ , , , ],
+			replacements: [ , , , ],
+			text: 'abc',
+			start: 3,
+			end: 3,
+		};
+		const result = insert( deepFreeze( record ), 'c' );
+
+		expect( result ).toEqual( expected );
+	} );
 } );

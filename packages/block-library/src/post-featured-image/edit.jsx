@@ -6,7 +6,7 @@ import {
 	ToggleControl,
 	Placeholder,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	TextControl,
 	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
@@ -26,7 +26,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	useMemo,
-	useEffect,
 	useState,
 	createInterpolateElement,
 } from '@wordpress/element';
@@ -222,11 +221,9 @@ export default function PostFeaturedImageEdit( {
 	};
 
 	// Reset temporary url when media is available.
-	useEffect( () => {
-		if ( mediaUrl && temporaryURL ) {
-			setTemporaryURL();
-		}
-	}, [ mediaUrl, temporaryURL ] );
+	if ( mediaUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
@@ -479,7 +476,7 @@ export default function PostFeaturedImageEdit( {
 						}
 						style={ imageStyles }
 					/>
-					{ temporaryURL && <Spinner /> }
+					{ temporaryURL && <WCSpinner /> }
 				</>
 			);
 	}

@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `isVerticalEdge` and `isHorizontalEdge`: No longer scroll the page to find the edge, and find the vertical edge when it is just outside the viewport ([#85408](https://github.com/WordPress/gutenberg/pull/85408)).
+-   Make the `inline` argument to `removeInvalidHTML` optional in its types, matching existing behavior ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
+
+### Internal
+
+-   Convert the remaining tests to TypeScript ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
+
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Refine the public types: `getScrollContainer` types `direction` as a union, `isEmpty` takes any `Node`, `isFormElement` accepts a missing element, `getPhrasingContentSchema` returns `ContentSchema`, `allowEmpty` is optional in a `Schema` item, and `Schema` and `SchemaItem` are exported ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
+
+### Bug Fixes
+
+-   `getOffsetParent`: Fix an infinite loop when the parent of the node is not an element ([#84374](https://github.com/WordPress/gutenberg/pull/84374)).
+
+### Internal
+
+-   Refactor to TypeScript ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
+
+## 4.57.0 (2026-10-07)
+
 ## 4.56.0 (2026-09-23)
 
 ### Bug Fixes

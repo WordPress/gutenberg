@@ -22,7 +22,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import SimpleGit from 'simple-git';
+import { simpleGit } from 'simple-git';
 
 const ROOT = path.resolve( import.meta.dirname, '../..' );
 const ROOT_PACKAGE_JSON = path.join( ROOT, 'package.json' );
@@ -42,7 +42,7 @@ try {
 	process.exit( 2 );
 }
 
-const git = SimpleGit( ROOT );
+const git = simpleGit( ROOT );
 
 async function tryGit( fn, errorContext ) {
 	try {

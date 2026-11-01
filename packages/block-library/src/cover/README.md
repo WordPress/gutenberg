@@ -149,10 +149,13 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`heading`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+  - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+  - [`button`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
   - [`enableContrastChecker`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-enablecontrastchecker): `false`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `aspectRatio`: `true`
+  - `minWidth`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`

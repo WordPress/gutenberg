@@ -1,13 +1,4 @@
-import {
-	afterAll,
-	afterEach,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	RichTextData,
 	create,
@@ -22,11 +13,14 @@ import {
 	findNoteInBlock,
 	applyNoteFormat,
 	removeNoteFormat,
+	wrapInlineNote,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	getNoteAtCaret,
+	pickNoteForCaret,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
@@ -38,6 +32,13 @@ vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 function makeRect( top ) {
 	return { top };
+}
+
+// Rich-text attributes parsed from post content keep their source HTML.
+function parseRichTextAttribute( html ) {
+	const element = document.createElement( 'p' );
+	element.innerHTML = html;
+	return RichTextData.fromHTMLElement( element );
 }
 
 describe( 'getNoteIdsFromMetadata', () => {
@@ -340,6 +341,120 @@ describe( 'pickPrimaryNote', () => {
 			{ id: 2, status: 'approved' },
 		];
 		expect( pickPrimaryNote( threads ) ).toBe( threads[ 0 ] );
+	} );
+} );
+
+describe( 'pickNoteForCaret', () => {
+	const FORMAT_NAME = 'core/note';
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	// "Alpha" is wrapped by note 7 (offsets 0-5), "charlie" by the draft
+	// marker (12-19); note 3 is block-level. Parsed once the format exists.
+	let attributes;
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, noteFormat );
+		}
+		attributes = {
+			content: RichTextData.fromHTMLString(
+				'<mark class="wp-note" data-id="7">Alpha</mark> bravo <mark class="wp-note" data-id="new">charlie</mark> delta.'
+			),
+			metadata: { noteId: [ 3, 7 ] },
+		};
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+	const notes = [
+		{ id: 3, status: 'hold', blockClientId: 'b' },
+		{ id: 7, status: 'hold', blockClientId: 'b' },
+	];
+	const caret = ( offset, end = offset ) => ( {
+		selectionStart: { attributeKey: 'content', offset },
+		selectionEnd: { attributeKey: 'content', offset: end },
+	} );
+	const noCaret = { selectionStart: {}, selectionEnd: {} };
+	const pick = (
+		{ selectionStart, selectionEnd },
+		{ attributes: blockAttributes = attributes, ...overrides } = {}
+	) =>
+		pickNoteForCaret( {
+			noteAtCaret: getNoteAtCaret(
+				blockAttributes,
+				selectionStart,
+				selectionEnd
+			),
+			attributes: blockAttributes,
+			blockThreads: notes,
+			hasDraft: false,
+			selectedNoteId: undefined,
+			isBlockChange: true,
+			...overrides,
+		} );
+
+	it( 'enters a marker: selects that note', () => {
+		expect( pick( caret( 2 ) ) ).toBe( 7 );
+		expect( pick( caret( 14 ) ) ).toBe( 'new' );
+		expect( pick( caret( 2 ), { hasDraft: true } ) ).toBe( 7 );
+	} );
+
+	it( "enters another block: selects the block's note", () => {
+		expect( pick( caret( 8 ) ) ).toBe( 3 );
+		expect( pick( noCaret ) ).toBe( 3 );
+		expect( pick( caret( 8 ), { hasDraft: true } ) ).toBe( 'new' );
+		expect(
+			pick( caret( 8 ), {
+				blockThreads: [ { id: 7, status: 'hold', blockClientId: 'b' } ],
+			} )
+		).toBeUndefined();
+	} );
+
+	it( 'enters another block: keeps the selected block-level note among several, else the primary', () => {
+		const several = [
+			{ id: 3, status: 'hold', blockClientId: 'b' },
+			{ id: 9, status: 'hold', blockClientId: 'b' },
+		];
+		expect(
+			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 9 } )
+		).toBe( 9 );
+		expect(
+			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 7 } )
+		).toBe( 3 );
+	} );
+
+	it( "leaves the selected note's marker: selects the block's note", () => {
+		const inBlock = { isBlockChange: false };
+		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 7 } ) ).toBe(
+			3
+		);
+		expect(
+			pick( caret( 8 ), { ...inBlock, selectedNoteId: 'new' } )
+		).toBe( 3 );
+	} );
+
+	it( 'anything else: keeps the selection', () => {
+		const inBlock = { isBlockChange: false };
+		expect( pick( caret( 8 ), inBlock ) ).toBeUndefined();
+		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 3 } ) ).toBe(
+			3
+		);
+		expect( pick( noCaret, { ...inBlock, selectedNoteId: 7 } ) ).toBe( 7 );
+	} );
+
+	it( 'reads markers from a string attribute', () => {
+		expect(
+			pick( caret( 2 ), {
+				attributes: {
+					content:
+						'<mark class="wp-note" data-id="7">Alpha</mark> bravo',
+				},
+			} )
+		).toBe( 7 );
 	} );
 } );
 
@@ -654,6 +769,13 @@ describe( 'findNoteRange', () => {
 		expect( findNoteRange( html, 7 ) ).toEqual( { start: 6, end: 12 } );
 	} );
 
+	it( 'returns the range in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute(
+			'one\n  two <span class="wp-note" data-id="7">three</span>'
+		);
+		expect( findNoteRange( value, 7 ) ).toEqual( { start: 8, end: 13 } );
+	} );
+
 	it( 'returns null when the marker id does not match', () => {
 		const value = RichTextData.fromHTMLString(
 			'<span class="wp-note" data-id="3">x</span>'
@@ -810,17 +932,20 @@ describe( 'applyNoteFormat', () => {
 		attributes: { 'data-id': String( id ) },
 	} );
 
-	// Apply a sequence of [ id, start, end ] notes, then round-trip through HTML
-	// to a normalised value (matching how wrapInlineNote stores the result).
 	const applyAll = ( html, ops ) => {
 		let record = create( { html } );
 		for ( const [ id, start, end ] of ops ) {
 			record = applyNoteFormat( record, note( id ), start, end );
 		}
-		return RichTextData.fromHTMLString(
-			new RichTextData( record ).toHTMLString()
-		);
+		return new RichTextData( record );
 	};
+
+	it( 'wraps the selected text in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute( 'one\n  two three' );
+		expect( wrapInlineNote( value, 7, 8, 13 ).toHTMLString() ).toBe(
+			'one two <mark data-id="7" class="wp-note">three</mark>'
+		);
+	} );
 
 	it( 'adds a single marker over plain text', () => {
 		const value = applyAll( 'the quick brown fox', [ [ 7, 4, 9 ] ] );
@@ -1029,6 +1154,24 @@ describe( 'removeNoteFormat', () => {
 		);
 	} );
 
+	it( 'leaves unformatted text without format entries', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
+		);
+		expect( Object.keys( removeNoteFormat( value, 7 ).formats ) ).toEqual(
+			[]
+		);
+	} );
+
+	it( 'leaves the text intact in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute(
+			'one\n  two <mark class="wp-note" data-id="7">three</mark>'
+		);
+		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
+			'one two three'
+		);
+	} );
+
 	it( 'removes only the targeted note, leaving a co-located note intact', () => {
 		// Note 2 wraps the whole string; note 1 nests inside it.
 		const value = RichTextData.fromHTMLString(
@@ -1121,110 +1264,6 @@ describe( 'getNoteAnchorRect', () => {
 		blockEl.checkVisibility = () => false;
 
 		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 40 );
-	} );
-
-	describe( 'pending new note', () => {
-		let blockEl;
-
-		beforeEach( () => {
-			blockEl = document.createElement( 'p' );
-			blockEl.textContent = 'Some longer paragraph text';
-			// Selections only work on nodes attached to the document.
-			document.body.appendChild( blockEl );
-			mockRect( blockEl, 100 );
-		} );
-
-		afterEach( () => {
-			window.getSelection().removeAllRanges();
-			document.body.removeChild( blockEl );
-			// jsdom's Range has neither getClientRects nor
-			// getBoundingClientRect; selectText defines both, so drop
-			// them to keep tests isolated.
-			delete window.Range.prototype.getClientRects;
-			delete window.Range.prototype.getBoundingClientRect;
-		} );
-
-		/**
-		 * Select a range and give it the client rects a browser would
-		 * report. One rect per line the selection covers; the bounding
-		 * rect is their union, as in a real engine.
-		 *
-		 * @param {Node}     node  Text node to select within.
-		 * @param {number}   start Start offset.
-		 * @param {number}   end   End offset.
-		 * @param {Object[]} rects Per-line rects the selection reports.
-		 */
-		function selectText(
-			node,
-			start,
-			end,
-			rects = [ { top: 160, width: 50, height: 20 } ]
-		) {
-			const range = document.createRange();
-			range.setStart( node, start );
-			range.setEnd( node, end );
-			window.Range.prototype.getClientRects = () => rects;
-			window.Range.prototype.getBoundingClientRect = () =>
-				rects.length
-					? {
-							top: Math.min( ...rects.map( ( r ) => r.top ) ),
-							width: Math.max( ...rects.map( ( r ) => r.width ) ),
-							height: rects.reduce(
-								( sum, r ) => sum + r.height,
-								0
-							),
-						}
-					: { top: 0, width: 0, height: 0 };
-			const selection = window.getSelection();
-			selection.removeAllRanges();
-			selection.addRange( range );
-		}
-
-		it( 'anchors to the text selection it will attach to', () => {
-			selectText( blockEl.firstChild, 5, 11 );
-
-			expect( getNoteAnchorRect( 'new', blockEl ).top ).toBe( 160 );
-		} );
-
-		it( 'falls back to the block rect for a collapsed selection', () => {
-			selectText( blockEl.firstChild, 5, 5 );
-
-			expect( getNoteAnchorRect( 'new', blockEl ).top ).toBe( 100 );
-		} );
-
-		it( 'falls back to the block rect when the selection is outside the block', () => {
-			const other = document.createElement( 'p' );
-			other.textContent = 'Elsewhere';
-			document.body.appendChild( other );
-			selectText( other.firstChild, 0, 4 );
-
-			expect( getNoteAnchorRect( 'new', blockEl ).top ).toBe( 100 );
-			document.body.removeChild( other );
-		} );
-
-		it( 'ignores the zero-width rect a selection picks up at a line edge', () => {
-			// A selection starting at the very end of one line reports a
-			// zero-width rect there plus the real rect on the next line.
-			// The union would align the form to the line above the text.
-			selectText( blockEl.firstChild, 5, 11, [
-				{ top: 100, width: 0, height: 20 },
-				{ top: 160, width: 50, height: 20 },
-			] );
-
-			expect( getNoteAnchorRect( 'new', blockEl ).top ).toBe( 160 );
-		} );
-
-		it( 'falls back to the block rect when the selection has no rendered rects', () => {
-			// An unrendered range still yields an all-zero rect rather
-			// than null, which would pin the form to the top of the canvas.
-			selectText( blockEl.firstChild, 5, 11, [] );
-
-			expect( getNoteAnchorRect( 'new', blockEl ).top ).toBe( 100 );
-		} );
-
-		it( 'falls back to the block rect when there is no selection', () => {
-			expect( getNoteAnchorRect( 'new', blockEl ).top ).toBe( 100 );
-		} );
 	} );
 
 	it( 'anchors a marker split into several runs to its first run', () => {

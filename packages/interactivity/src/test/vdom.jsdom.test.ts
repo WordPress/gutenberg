@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import type { ComponentChild } from 'preact';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseDirectiveValue, toVdom, hydratedIslands } from '../vdom';
+import { describe, expect, it, vi } from 'vitest';
+import { parseDirectiveValue, toVdom } from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
@@ -35,11 +35,6 @@ expect.extend( {
 } );
 
 describe( 'toVdom', () => {
-	beforeEach( () => {
-		// @ts-expect-error `_values` is an internal property, accessed here for testing.
-		hydratedIslands._values = new WeakMap();
-	} );
-
 	describe( 'parseDirectiveValue', () => {
 		it( 'should separate a namespace from a plain directive value', () => {
 			expect( parseDirectiveValue( 'myplugin::sidebar' ) ).toEqual( {
@@ -48,7 +43,7 @@ describe( 'toVdom', () => {
 			} );
 		} );
 
-		it( 'should keep plain objects and preserve JSON scalar values as strings', () => {
+		it( 'should keep plain objects and preserve other JSON values as strings', () => {
 			expect(
 				parseDirectiveValue( 'myplugin::{"id":"sidebar"}' )
 			).toEqual( {
@@ -58,6 +53,27 @@ describe( 'toVdom', () => {
 			expect( parseDirectiveValue( '123' ) ).toEqual( {
 				namespace: null,
 				value: '123',
+			} );
+			expect( parseDirectiveValue( '[1,2]' ) ).toEqual( {
+				namespace: null,
+				value: '[1,2]',
+			} );
+			expect( parseDirectiveValue( 'null' ) ).toEqual( {
+				namespace: null,
+				value: 'null',
+			} );
+		} );
+
+		it( 'should parse plain objects preceded by whitespace', () => {
+			expect( parseDirectiveValue( ' \n\t{"id":"sidebar"}' ) ).toEqual( {
+				namespace: null,
+				value: { id: 'sidebar' },
+			} );
+			expect(
+				parseDirectiveValue( 'myplugin:: {"id":"sidebar"}' )
+			).toEqual( {
+				namespace: 'myplugin',
+				value: { id: 'sidebar' },
 			} );
 		} );
 	} );
@@ -295,9 +311,75 @@ describe( 'toVdom', () => {
 				h( 'input', { type: 'text', value: 'hello' }, [] )
 			);
 		} );
+
+		it( 'should preserve the case of SVG attribute names', () => {
+			const element = createElementFromHTML(
+				'<svg viewBox="0 0 24 24"></svg>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'svg', { viewBox: '0 0 24 24' }, [] )
+			);
+		} );
 	} );
 
 	describe( 'Directive processing', () => {
+		it.each( [ 'data-wp--bind', 'data-wp---foo', 'data-wp----foo' ] )(
+			'should reject malformed directive name %s',
+			( attributeName ) => {
+				const element = createElementFromHTML(
+					`<div ${ attributeName }></div>`
+				);
+
+				expect( toVdom( element ) ).toMatchVNode(
+					h(
+						'div' as any,
+						{
+							[ attributeName ]: '',
+							__directives: {},
+						},
+						[]
+					)
+				);
+				expect( global.console.warn ).toHaveBeenCalledTimes( 1 );
+				expect( global.console ).toHaveWarnedWith(
+					`Found malformed directive name: ${ attributeName }.`
+				);
+			}
+		);
+
+		it.each( [
+			[ 'data-wp-bind', 'bind', null ],
+			[ 'data-wp-style--var', 'style', 'var' ],
+			[ 'data-wp-style----var', 'style', '--var' ],
+		] )(
+			'should parse valid directive name %s',
+			( attributeName, prefix, suffix ) => {
+				const element = createElementFromHTML(
+					`<div ${ attributeName }></div>`
+				);
+
+				expect( toVdom( element ) ).toMatchVNode(
+					h(
+						'div' as any,
+						{
+							[ attributeName ]: '',
+							__directives: {
+								[ prefix ]: [
+									{
+										namespace: null,
+										value: '',
+										suffix,
+										uniqueId: null,
+									},
+								],
+							},
+						},
+						[]
+					)
+				);
+			}
+		);
+
 		it( 'should process simple directives', () => {
 			const element = createElementFromHTML(
 				`<div data-wp-test-one data-wp-test-two="test value"></div>`
@@ -819,26 +901,6 @@ describe( 'toVdom', () => {
 					]
 				)
 			);
-		} );
-	} );
-
-	describe( 'Hydrated islands', () => {
-		it( 'should add a topmost island', () => {
-			const element = createElementFromHTML( `
-				<div data-wp-interactive="my-namespace"></div>
-			` );
-			toVdom( element );
-			expect( hydratedIslands.has( element ) ).toBe( true );
-		} );
-
-		it( 'should add nested islands', () => {
-			const outer = createElementFromHTML(
-				`<div data-wp-interactive="outer"><div data-wp-interactive="inner"></div></div>`
-			);
-			const inner = outer.querySelector( '[data-wp-interactive="inner"' );
-			toVdom( outer );
-			expect( hydratedIslands.has( outer ) ).toBe( true );
-			expect( hydratedIslands.has( inner! ) ).toBe( true );
 		} );
 	} );
 

@@ -4,10 +4,6 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 
-	&:not(.wp-element-button) {
-		font-size: 0.8em;
-	}
-
 	&.aligncenter {
 		text-align: center;
 	}
@@ -20,6 +16,12 @@
 	* + .wp-block-file__button {
 		margin-left: 0.75em;
 	}
+}
+
+// Matches Global Styles specificity so a font size set there can win, since
+// block library styles load first.
+:root :where(.wp-block-file:not(.wp-element-button)) {
+	font-size: 0.8em;
 }
 
 // Lowest specificity to avoid overriding layout styles.

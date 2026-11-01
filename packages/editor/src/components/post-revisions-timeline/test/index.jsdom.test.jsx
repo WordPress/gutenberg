@@ -12,9 +12,8 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	useDispatch: vi.fn(),
 } ) );
 
-vi.mock( import( '@wordpress/fields' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	authorField: {
+vi.mock( import( '../author-field' ), () => ( {
+	default: {
 		id: 'author',
 		label: 'Author',
 		getValue: ( { item } ) => item?._embedded?.author?.[ 0 ]?.name,

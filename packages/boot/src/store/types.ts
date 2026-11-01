@@ -4,7 +4,7 @@ import type { ReactNode, ComponentType } from 'react';
  * Icon type supporting multiple formats:
  * - Dashicon strings (e.g., "dashicons-admin-generic")
  * - JSX elements
- * - SVG icons from @wordpress/icons
+ * - SVG icons from `@wordpress/icons`
  * - Data URLs for images
  */
 export type IconType = string | React.JSX.Element | ReactNode;
