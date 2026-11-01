@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
+-   `Calendar` and `RangeCalendar`: Render as a block that fills its container. Days stay square and grow with the available width, from 32px up to 48px. When showing several months, they wrap onto new rows at equal widths. To keep the previous size, place the calendar in a container sized to its content, such as one with `width: fit-content`. The `--wp-ui-calendar-cell-size` custom property now sets the minimum day size rather than a fixed one ([#85933](https://github.com/WordPress/gutenberg/pull/85933)).
 
 ### New Features
 

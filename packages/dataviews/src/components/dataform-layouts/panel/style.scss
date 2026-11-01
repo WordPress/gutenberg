@@ -176,6 +176,11 @@
 	padding: var(--wpds-dimension-padding-lg);
 }
 
+// Let the calendar fill the popover, even when other content makes it wider.
+.dataforms-layouts-panel__field-dropdown .dataviews-controls__calendar {
+	max-width: none;
+}
+
 .dataforms-layouts-panel__dropdown-header {
 	margin-bottom: var(--wpds-dimension-gap-lg);
 }
