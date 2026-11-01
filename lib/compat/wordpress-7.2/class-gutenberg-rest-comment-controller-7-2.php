@@ -27,12 +27,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 *
 	 * @since 7.2.0
 	 *
-	 * @return string[] Hex keys for heart, celebration, smile, eyes and rocket.
+	 * @return string[] Hex keys for thumbs up, plus, heart, celebration, smile, eyes and rocket.
 	 *
 	 * @phpstan-return non-empty-list<lowercase-string&non-falsy-string>
 	 */
 	private static function get_note_reaction_keys(): array {
-		return array( '2764', '1f389', '1f604', '1f440', '1f680' );
+		return array( '1f44d', '2795', '2764', '1f389', '1f604', '1f440', '1f680' );
 	}
 	// END CHANGE.
 
@@ -352,6 +352,39 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		// END CHANGE.
 
 		return parent::update_item_permissions_check( $request );
+	}
+
+	/**
+	 * Checks if a comment can be edited or deleted.
+	 *
+	 * Copied from core, extended to the 'reaction' type. A reaction requires
+	 * the same edit access to the note's post as the note it belongs to.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $comment Comment object.
+	 * @return bool Whether the comment can be edited or deleted.
+	 */
+	protected function check_edit_permission( $comment ) {
+		if ( 0 === (int) get_current_user_id() ) {
+			return false;
+		}
+
+		// START CHANGE: Check notes and reactions against the note's post.
+		/*
+		 * Notes and their reactions are editorial content, so require edit access
+		 * to the note's post rather than the moderate_comments capability.
+		 */
+		if ( in_array( strtolower( $comment->comment_type ), array( 'note', 'reaction' ), true ) ) {
+			return current_user_can( 'edit_comment', $comment->comment_ID );
+		}
+		// END CHANGE.
+
+		if ( current_user_can( 'moderate_comments' ) ) {
+			return true;
+		}
+
+		return current_user_can( 'edit_comment', $comment->comment_ID );
 	}
 
 	/**
@@ -970,6 +1003,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		 */
 		$prefetch = null;
 		if (
+			// @phpstan-ignore function.alreadyNarrowedType (The stubs are generated from trunk, but the method does not exist before WordPress 7.2.)
 			! method_exists( 'WP_REST_Comments_Controller', 'prefetch_reaction_summaries' ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )

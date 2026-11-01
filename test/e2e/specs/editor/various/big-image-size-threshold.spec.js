@@ -1,7 +1,8 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
+const { readFileSync } = require( 'fs' );
 const os = require( 'os' );
-const { randomUUID } = require( 'crypto' );
+const { createHash, randomUUID } = require( 'crypto' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
@@ -218,7 +219,95 @@ test.describe( 'Big image size threshold', () => {
 		expect( media.media_details.width ).toBe( 1024 );
 		expect( media.media_details.height ).toBe( 768 );
 	} );
+
+	test( 'should finish uploading an image the browser cannot decode', async ( {
+		page,
+		editor,
+		imageBlockUtils,
+		requestUtils,
+	} ) => {
+		const isCrossOriginIsolated = await page.evaluate(
+			() => window.crossOriginIsolated
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isCrossOriginIsolated,
+			'Cross-origin isolation headers not configured on server'
+		);
+
+		/*
+		 * wasm-vips decodes this damaged JPEG tolerantly and generates its
+		 * sub-sizes, but `createImageBitmap()` rejects it. That rejection in
+		 * the threshold check must not leave the upload stuck in thumbnail
+		 * generation.
+		 * See https://github.com/WordPress/gutenberg/issues/83512.
+		 */
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.uploadBuffer(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			createDamagedJpeg(),
+			'.jpeg'
+		);
+
+		await page.waitForFunction(
+			() =>
+				window.wp.data.select( 'core/upload-media' ).getItems()
+					.length === 0,
+			undefined,
+			{ timeout: 60000 }
+		);
+
+		const imageId = await page.evaluate(
+			() =>
+				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
+					?.attributes?.id
+		);
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
+
+		// The sub-sizes are generated, but no scaled copy replaces the upload,
+		// even though it is larger than the threshold.
+		expect( media.media_details.width ).toBe( 4000 );
+		expect( media.media_details.sizes ).toHaveProperty( 'thumbnail' );
+		expect( media.media_details.original_image ).toBeUndefined();
+	} );
 } );
+
+/**
+ * Builds a JPEG with a valid header and a corrupt body: the start of a real
+ * photo followed by 20 KB of deterministic noise, with its frame size raised
+ * above the big image threshold.
+ *
+ * @return {Buffer} Damaged JPEG data.
+ */
+function createDamagedJpeg() {
+	const source = readFileSync(
+		path.join(
+			__dirname,
+			'../../../assets/1024x768_e2e_test_image_size.jpeg'
+		)
+	);
+	const noise = Buffer.concat(
+		Array.from( { length: 625 }, ( _, i ) =>
+			createHash( 'sha256' ).update( `83512-${ i }` ).digest()
+		)
+	);
+	const damaged = Buffer.concat( [ source.subarray( 0, 6000 ), noise ] );
+
+	// Declare a 4000x3000 frame, above the big image threshold.
+	const sof = damaged.indexOf( Buffer.from( [ 0xff, 0xc0 ] ) );
+	damaged.writeUInt16BE( 3000, sof + 5 );
+	damaged.writeUInt16BE( 4000, sof + 7 );
+	return damaged;
+}
 
 class ImageBlockUtils {
 	constructor( { page } ) {
@@ -240,6 +329,19 @@ class ImageBlockUtils {
 			? `${ this.basePath }/${ customFile }`
 			: this.TEST_IMAGE_FILE_PATH;
 		await fs.copyFile( filePath, tmpFileName );
+
+		await inputElement.setInputFiles( tmpFileName );
+
+		return fileName;
+	}
+
+	async uploadBuffer( inputElement, buffer, extension ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+		const fileName = randomUUID();
+		const tmpFileName = path.join( tmpDirectory, fileName + extension );
+		await fs.writeFile( tmpFileName, buffer );
 
 		await inputElement.setInputFiles( tmpFileName );
 
