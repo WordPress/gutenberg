@@ -203,6 +203,13 @@
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
+				&:focus-visible {
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+
+					outline: var(--_gcd-div-outline);
+					outline-offset: 0;
+				}
+
 				@media ( forced-colors: active ) {
 					color: GrayText;
 				}
