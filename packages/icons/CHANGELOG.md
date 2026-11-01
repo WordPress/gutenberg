@@ -14,7 +14,7 @@
 -   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
 -   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
 -   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
--   Add the `galleryGrid` icon.
+-   Add the `galleryGrid` icon ([#86134](https://github.com/WordPress/gutenberg/pull/86134)).
 
 ### Enhancements
 
