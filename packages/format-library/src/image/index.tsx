@@ -14,7 +14,6 @@ import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import type { FormatEditProps } from '../types';
 
@@ -103,6 +102,12 @@ function InlineUI( {
 			<form
 				className="block-editor-format-toolbar__image-container-content"
 				onSubmit={ ( event ) => {
+					event.preventDefault();
+
+					if ( value.start === undefined ) {
+						return;
+					}
+
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
@@ -120,8 +125,6 @@ function InlineUI( {
 						...value,
 						replacements: newReplacements,
 					} );
-
-					event.preventDefault();
 				} }
 			>
 				<Stack direction="column" gap="lg">
@@ -218,6 +221,7 @@ function Edit( {
 				} }
 				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
+						name="image"
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }

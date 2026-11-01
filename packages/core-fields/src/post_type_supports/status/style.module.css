@@ -1,0 +1,14 @@
+.icon {
+	display: flex;
+	align-items: center;
+	/* One line of text tall, so it sits on the first line of a label that wraps. */
+	block-size: 1lh;
+	inline-size: 24px;
+	/* Keep the icon full size when a long label wraps. */
+	flex-shrink: 0;
+}
+
+.icon svg {
+	fill: currentColor;
+	margin-inline-start: -4px;
+}

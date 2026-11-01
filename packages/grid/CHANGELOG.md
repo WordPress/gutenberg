@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+-   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#84869](https://github.com/WordPress/gutenberg/pull/84869)).
+
+### Internal
+
+-   Type check tests through the default dev project, replacing `tsconfig.test.json` ([#85516](https://github.com/WordPress/gutenberg/pull/85516)).
+
+## 0.10.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
+
+## 0.9.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).

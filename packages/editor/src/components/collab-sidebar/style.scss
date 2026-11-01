@@ -43,9 +43,7 @@
 		@include minimized-threads;
 	}
 
-	// The canvas draws the divider.
 	.editor-collab-sidebar-panel {
-		border-left: 0;
 		// A real scroller, mirrored with the canvas by `useFloatingBoard`.
 		// No anchoring, so a thread that grows doesn't move the panel.
 		overflow-y: auto;
@@ -79,7 +77,6 @@
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
-	border-left: $border-width solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
 .editor-collab-sidebar-panel__thread,
@@ -160,6 +157,9 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+	// Room for the floating add-reaction trigger, reserved on every note so
+	// text does not rewrap when one is selected.
+	padding-right: $button-size-small + $grid-unit-10;
 
 	p {
 		margin-top: 0;
@@ -179,6 +179,8 @@
 }
 
 .editor-collab-sidebar-panel__user-avatar {
+	aspect-ratio: 1;
+	overflow: hidden;
 	border-radius: $radius-round;
 	flex-shrink: 0;
 	border-width: var(--wp-admin-border-width-focus);
@@ -278,40 +280,6 @@
 	bottom: $grid-unit-10;
 }
 
-.editor-note-indicator__avatar {
-	width: $icon-size;
-	border-radius: $radius-round;
-	margin-left: -12px;
-	border-width: var(--wp-admin-border-width-focus);
-	border-style: solid;
-	padding: var(--wp-admin-border-width-focus);
-	background: $white;
-	box-sizing: border-box;
-
-	&:first-child {
-		margin-left: 0;
-	}
-}
-
-.editor-note-indicator__overflow {
-	font-weight: var(--wpds-typography-font-weight-emphasis);
-}
-
-.show-icon-labels {
-	.editor-note-indicator {
-		width: auto;
-		// Hide the user avatars container when labels are set to display...
-		div {
-			display: none;
-		}
-		// ... and display labels.
-		&::after {
-			content: attr(aria-label);
-			font-size: $helptext-font-size;
-		}
-	}
-}
-
 // Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
 // Each marker is tinted by `<NoteHighlightStyles>` using the note author's
 // color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
@@ -343,4 +311,33 @@ mark.wp-note {
 // leaves them square).
 .editor-collab-sidebar-panel__mention-suggestion .editor-autocompleters__user-avatar {
 	border-radius: $radius-round;
+}
+
+.editor-collab-sidebar-filters {
+	padding: $grid-unit-20 $grid-unit-20 0;
+}
+
+.editor-collab-sidebar-filters__search {
+	flex: 1;
+	min-width: 0;
+}
+
+.editor-collab-sidebar-filters__toggle.is-active {
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: $grid-unit-05;
+		right: $grid-unit-05;
+		width: $grid-unit-10;
+		height: $grid-unit-10;
+		border-radius: $radius-round;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.editor-collab-sidebar-panel__no-results {
+	margin: 0;
+	padding: $grid-unit-20 $grid-unit-20 0;
 }

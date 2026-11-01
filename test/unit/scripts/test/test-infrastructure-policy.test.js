@@ -318,7 +318,6 @@ describe( 'non-hoisted Vitest infrastructure', () => {
 		mkdirSync( path.join( configDir, 'matchers' ), { recursive: true } );
 		for ( const filename of [
 			'testing-library.vitest.js',
-			'matchers/to-match-diff-snapshot.vitest.js',
 			'matchers/to-be-positioned-popover.vitest.js',
 		] ) {
 			copyFileSync(
@@ -333,8 +332,7 @@ describe( 'non-hoisted Vitest infrastructure', () => {
 			{ name: 'vitest', exports: './index.js' },
 			{
 				'index.js': `
-export const expect = Object.assign( () => ( {} ), { extend() {}, addSnapshotSerializer() {} } );
-export const Snapshots = { toMatchSnapshot() {} };
+export const expect = Object.assign( () => ( {} ), { extend() {} } );
 export const vi = {};
 export const afterAll = () => {};
 export const afterEach = () => {};

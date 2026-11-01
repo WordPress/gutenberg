@@ -7,25 +7,21 @@ import {
 	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { external } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { applyPlainTextEdit, getPlainText } from '../../utils/plain-text-edit';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
-import { getSuggestionsQuery } from '../link-ui';
-import { useLinkPreview } from './use-link-preview';
+import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
 import { useIsInvalidLink } from './use-is-invalid-link';
+import ViewLinkButton from '../../utils/view-link-button';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker, isHashLink, isRelativePath } = unlock(
-	blockEditorPrivateApis
-);
+const { LinkPicker } = unlock( blockEditorPrivateApis );
 
 /**
  * Get a human-readable entity type name.
@@ -119,11 +115,6 @@ export function Controls( {
 		[]
 	);
 
-	const homeUrl = useSelect( ( select ) => {
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
-	}, [] );
-
 	const blockEditingMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockEditingMode( clientId ),
@@ -139,16 +130,6 @@ export function Controls( {
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
-
-	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
-	const isViewableUrl =
-		!! url &&
-		( ! isHashLink( url ) ||
-			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
-
-	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
-	const viewUrl =
-		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	return (
 		<ToolsPanel
@@ -172,9 +153,11 @@ export function Controls( {
 			>
 				<TextControl
 					label={ __( 'Text' ) }
-					value={ label ? stripHTML( label ) : '' }
+					value={ getPlainText( label ) }
 					onChange={ ( labelValue ) => {
-						setAttributes( { label: labelValue } );
+						setAttributes( {
+							label: applyPlainTextEdit( label, labelValue ),
+						} );
 					} }
 					autoComplete="off"
 				/>
@@ -243,19 +226,7 @@ export function Controls( {
 								{ __( 'Edit' ) }
 							</Button>
 						) }
-					{ isViewableUrl && (
-						<Button
-							variant="secondary"
-							href={ viewUrl }
-							target="_blank"
-							icon={ external }
-							iconPosition="right"
-							__next40pxDefaultSize
-							className="navigation-link-to__action-button"
-						>
-							{ __( 'View' ) }
-						</Button>
-					) }
+					<ViewLinkButton url={ url } />
 				</>
 			) }
 

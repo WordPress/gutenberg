@@ -1,8 +1,10 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Button } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
@@ -138,6 +140,8 @@ export default function BlockThemeControl() {
 							) }
 							<SwapTemplateButton
 								onClick={ () => setActiveModal( 'swap' ) }
+								// The menu has its own "Use default template" item.
+								includeDefaultTemplate={ false }
 							/>
 							<ResetDefaultTemplate />
 							{ canCreateTemplate && (
@@ -178,6 +182,7 @@ export default function BlockThemeControl() {
 			{ activeModal === 'swap' && (
 				<SwapTemplateModal
 					onRequestClose={ () => setActiveModal( null ) }
+					includeDefaultTemplate={ false }
 				/>
 			) }
 			{ activeModal === 'create' && (

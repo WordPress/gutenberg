@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Recommend `getWpCompatOverlaySlot` from `@wordpress/ui` ([#85835](https://github.com/WordPress/gutenberg/pull/85835)).
+-   `use-recommended-components`: Link directly to Storybook migration guides in lint messages ([#85752](https://github.com/WordPress/gutenberg/pull/85752)).
+-   `use-recommended-components`: Link to the `ProgressBar` migration guide in lint messages and rule documentation ([#85520](https://github.com/WordPress/gutenberg/pull/85520)).
+-   `use-recommended-components`: Update the deprecation message for `TabbableContainer` to mention the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
+
+## 28.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `use-recommended-components`: Recommend `useEnableWpCompatOverlaySlot` from `@wordpress/ui` ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
+-   `use-recommended-components`: Recommend `Notice` from `@wordpress/ui` instead of `Tip` from `@wordpress/components` ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   `use-recommended-components`: Recognize `Avatar` from `@wordpress/ui` as use-with-caution. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
+
+### Bug Fixes
+
+-   `use-recommended-components`: Require `allowUseWithCaution` for `ControlWithError`, `ValidatedInputControl`, and `ValidatedTextareaControl` from `@wordpress/ui`, matching their Storybook status ([#84319](https://github.com/WordPress/gutenberg/pull/84319)).
+
+### Internal
+
+-   Remove the unused `@eslint-community/eslint-plugin-eslint-comments` dependency ([#85102](https://github.com/WordPress/gutenberg/pull/85102)).
+
+## 27.1.0 (2026-10-07)
+
 ### New Features
 
 -   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).

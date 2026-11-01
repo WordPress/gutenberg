@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the remaining tests to TypeScript ([#85159](https://github.com/WordPress/gutenberg/pull/85159)).
+
+## 10.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 9.0.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).

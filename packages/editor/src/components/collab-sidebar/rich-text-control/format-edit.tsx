@@ -1,4 +1,4 @@
-import type { ComponentType, MutableRefObject } from 'react';
+import type { ComponentType, RefObject } from 'react';
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 
@@ -22,7 +22,7 @@ type EditProps = {
 	onChange: ( value: RichTextValue ) => void;
 	onFocus: () => void;
 	value: RichTextValue;
-	forwardedRef: MutableRefObject< HTMLElement | undefined >;
+	forwardedRef: RefObject< HTMLElement | undefined >;
 	isVisible: boolean;
 };
 
