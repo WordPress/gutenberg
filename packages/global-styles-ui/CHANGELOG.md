@@ -6,6 +6,7 @@
 
 -   Element screens: add an "Overridden by" list of the block types whose own styles override the element, linking to each block's screen ([#84671](https://github.com/WordPress/gutenberg/pull/84671)).
 -   Show icons for elements in the Blocks & Elements list, and rename Input, Select and Button (element) to Form input, Form select and Form button ([#85363](https://github.com/WordPress/gutenberg/pull/85363)).
+-   Font Library: Paginate installed fonts in the Library tab, like in the Install tab ([#86063](https://github.com/WordPress/gutenberg/pull/86063)).
 
 ## 2.0.0 (2026-10-20)
 
