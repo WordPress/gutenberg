@@ -286,11 +286,66 @@ export interface HeaderActionsProps {
 	showCloseButton?: boolean;
 }
 
-function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
-		useMediaEditorFrameContext();
+function PanelToggle() {
+	const { isWide, activePanel, onTogglePanel } = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
+	// The sidebar holds more than one panel, so this opens and closes the
+	// sidebar rather than naming a panel: reopening returns to whichever tab
+	// was last showing, and the tab strip inside switches between them.
+	return (
+		<Button
+			size="compact"
+			icon={ drawerRight }
+			label={ __( 'Media settings' ) }
+			isPressed={ isPanelOpen }
+			// Only a docked column really expands beside the canvas; below
+			// that the panel replaces the view, which the pressed state
+			// already describes.
+			aria-expanded={ isWide ? isPanelOpen : undefined }
+			onClick={ onTogglePanel }
+		/>
+	);
+}
+
+function MoreMenu() {
+	const { isImage } = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
+	if ( ! isImage ) {
+		return null;
+	}
+	return (
+		<>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More options' ) }
+				toggleProps={ { size: 'compact' } }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<MenuGroup>
+						<MenuItem
+							icon={ keyboard }
+							iconPosition="left"
+							onClick={ () => {
+								setIsShortcutsModalOpen( true );
+								closeMenu();
+							} }
+						>
+							{ __( 'Keyboard shortcuts' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
+		</>
+	);
+}
+
+function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
+	const { isSaving, onCancel } = useMediaEditorFrameContext();
 	return (
 		<Stack
 			className="media-editor__header-actions"
@@ -298,43 +353,8 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ /* The sidebar holds more than one panel, so this opens and
-			     closes the sidebar rather than naming a panel: reopening
-			     returns to whichever tab was last showing, and the tab strip
-			     inside switches between them. */ }
-			<Button
-				size="compact"
-				icon={ drawerRight }
-				label={ __( 'Media settings' ) }
-				isPressed={ isPanelOpen }
-				// Only a docked column really expands beside the canvas; below
-				// that the panel replaces the view, which the pressed state
-				// already describes.
-				aria-expanded={ isWide ? isPanelOpen : undefined }
-				onClick={ onTogglePanel }
-			/>
-			{ isImage && (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'More options' ) }
-					toggleProps={ { size: 'compact' } }
-				>
-					{ ( { onClose: closeMenu } ) => (
-						<MenuGroup>
-							<MenuItem
-								icon={ keyboard }
-								iconPosition="left"
-								onClick={ () => {
-									setIsShortcutsModalOpen( true );
-									closeMenu();
-								} }
-							>
-								{ __( 'Keyboard shortcuts' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
-			) }
+			<PanelToggle />
+			<MoreMenu />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -343,11 +363,6 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					onClick={ onCancel }
 					disabled={ isSaving }
 					accessibleWhenDisabled
-				/>
-			) }
-			{ isShortcutsModalOpen && (
-				<MediaEditorKeyboardShortcutsModal
-					onClose={ () => setIsShortcutsModalOpen( false ) }
 				/>
 			) }
 		</Stack>
@@ -1051,6 +1066,8 @@ export function MediaEditor( props: MediaEditorProps ) {
 // `DataViewsPicker` exposes its own sub-components. They read what they need
 // from context, so a frame only chooses where they go and how they look.
 MediaEditor.HeaderActions = HeaderActions;
+MediaEditor.PanelToggle = PanelToggle;
+MediaEditor.MoreMenu = MoreMenu;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
 
