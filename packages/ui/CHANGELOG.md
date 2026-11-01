@@ -23,7 +23,7 @@
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 -   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
 -   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
--   `Menu.SubmenuTrigger`: Vertically center the prefix icon on the label. The submenu chevron no longer makes the icon sit too high.
+-   `Menu.SubmenuTrigger`: Vertically center the prefix icon on the label. The submenu chevron no longer makes the icon sit too high ([#86135](https://github.com/WordPress/gutenberg/pull/86135)).
 
 ### Documentation
 
