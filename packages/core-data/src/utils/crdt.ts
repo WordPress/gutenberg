@@ -279,14 +279,12 @@ export function applyPostChangesToCRDTDoc(
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
 		const selection = changes.selection;
-		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the current selection before
-		// it is overwritten by the new selection from Gutenberg.
-		// Without this, selection history will already contain the latest
-		// selection (after this change) when the undo stack is saved.
-		setTimeout( () => {
+		// Persist selection changes once the current transaction ends, after
+		// the undo manager saves its undo meta with the selection from before
+		// this change. A timeout would miss changes applied in one batch.
+		ydoc.once( 'afterTransaction', () => {
 			updateSelectionHistory( ydoc, selection );
-		}, 0 );
+		} );
 	}
 }
 
