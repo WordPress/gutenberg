@@ -13,12 +13,6 @@ parameters:
 			path: ../../lib/block-supports/states.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../lib/block-supports/typography.php
-
-		-
 			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
@@ -241,12 +235,6 @@ parameters:
 			path: ../../packages/block-library/src/categories/index.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../packages/block-library/src/categories/index.php
-
-		-
 			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -263,12 +251,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/comment-date/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 2
-			path: ../../packages/block-library/src/comments-title/index.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IFRAME'' given\.$#'
@@ -399,12 +381,6 @@ parameters:
 		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
