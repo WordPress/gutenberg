@@ -25,9 +25,7 @@ function isViewportSettings(
 	);
 }
 
-function getViewportSettings(
-	configOrSettings?: unknown
-): ViewportSettings {
+function getViewportSettings( configOrSettings?: unknown ): ViewportSettings {
 	if ( ! configOrSettings || typeof configOrSettings !== 'object' ) {
 		return {};
 	}
