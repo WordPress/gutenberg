@@ -16,3 +16,10 @@ parameters:
 	# https://phpstan.org/user-guide/rule-levels
 	level: 5
 	reportUnmatchedIgnoredErrors: true
+
+	ignoreErrors:
+		# The block library also runs in WordPress Core, where WP_Theme_JSON_Gutenberg is not defined.
+		-
+			identifier: function.alreadyNarrowedType
+			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			path: packages/block-library/src/navigation/index.php

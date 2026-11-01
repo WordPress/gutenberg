@@ -429,7 +429,7 @@ function gutenberg_define_interactivity_modules_support() {
 
 	// Add client navigation support to block library modules.
 	foreach ( $modules as $module ) {
-		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
+		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) ) {
 			wp_interactivity()->add_client_navigation_support_to_script_module( $module['id'] );
 		}
 	}

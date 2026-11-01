@@ -45,7 +45,7 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  *
  * @since 7.1.0
  *
- * @param array $layout Layout configuration.
+ * @param mixed $layout Layout configuration. It comes from block attributes, so it is not guaranteed to be an array.
  * @return array Navigation layout custom property declarations.
  */
 function block_core_navigation_get_layout_custom_property_declarations( $layout ) {

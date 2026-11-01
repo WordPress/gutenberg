@@ -199,12 +199,6 @@ parameters:
 			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
 
 		-
-			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../lib/client-assets.php
-
-		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
@@ -461,18 +455,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/loginout/index.php
-
-		-
-			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
 
 		-
 			message: '#^Function block_core_navigation_get_classic_menu_fallback\(\) should return object but return statement is missing\.$#'
