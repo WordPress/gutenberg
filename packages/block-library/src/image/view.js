@@ -86,6 +86,33 @@ const COMMIT_DISTANCE_RATIO = 0.2;
 const FLICK_DISTANCE_PX = 50;
 const FLICK_MAX_DURATION_MS = 300;
 
+// Assumed line height when a wheel reports its delta in lines rather than
+// pixels. Only some mice and browsers do, and the exact value matters little:
+// it decides how far one notch of such a wheel moves the caption.
+const WHEEL_LINE_HEIGHT_PX = 16;
+
+/**
+ * The distance a wheel event asks to scroll, in pixels.
+ *
+ * `deltaY` is in pixels for trackpads and most mice, but some report lines or
+ * pages instead, while `scrollTop` is only ever pixels.
+ *
+ * @param {WheelEvent} event    The wheel event.
+ * @param {Element}    scroller The element being scrolled.
+ * @return {number} The distance in pixels.
+ */
+function getWheelDeltaPx( event, scroller ) {
+	// `WheelEvent.DOM_DELTA_LINE` and `WheelEvent.DOM_DELTA_PAGE`, spelled out
+	// because `WheelEvent` is not among this file's known globals.
+	if ( event.deltaMode === 1 ) {
+		return event.deltaY * WHEEL_LINE_HEIGHT_PX;
+	}
+	if ( event.deltaMode === 2 ) {
+		return event.deltaY * scroller.clientHeight;
+	}
+	return event.deltaY;
+}
+
 /**
  * How far a committed swipe travels before the image is swapped.
  *
@@ -443,6 +470,21 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				// A gesture that starts on the caption belongs to the caption,
+				// so it is left to scroll natively: the `preventDefault()`
+				// below would otherwise stop the caption from scrolling at all
+				// on touch devices, and the swipe tracking that follows would
+				// drag the image sideways while the finger is reading. Touch
+				// events keep the target they started on for the whole gesture,
+				// so one test here covers the whole scroll. The caption layer
+				// sets `overscroll-behavior: contain`, which keeps the page
+				// behind from scrolling once the caption reaches its end.
+				if (
+					event.target?.closest?.( '.wp-lightbox-caption-scroll' )
+				) {
+					return;
+				}
+
 				// Prevents triggering the scroll event because otherwise the page
 				// jumps around when it resets the scroll position. This also means
 				// that closing the lightbox requires a simple tap. May change in
@@ -503,6 +545,35 @@ const { state, actions, callbacks } = store(
 				stopDragAnimations();
 				resetTouchDrag();
 			},
+			handleCaptionWheel: withSyncEvent( ( event ) => {
+				if ( ! state.overlayEnabled || event.ctrlKey ) {
+					return;
+				}
+
+				const scroller = event.currentTarget.querySelector(
+					'.wp-lightbox-caption-scroll'
+				);
+				if ( ! scroller || scroller.hidden ) {
+					return;
+				}
+
+				// A wheel over the caption panel already scrolls the caption,
+				// so it is left to do that natively, smoothing and all. The
+				// panel only begins below the enlarged image, though, and the
+				// image fills most of the overlay, so the pointer is usually
+				// somewhere the caption layer takes no pointer events. There
+				// the wheel would scroll the page behind instead, which
+				// `handleScroll()` immediately yanks back, leaving the caption
+				// unreachable. Carry those deltas over to the caption by hand.
+				if ( event.target.closest( '.wp-lightbox-caption-scroll' ) ) {
+					return;
+				}
+
+				scroller.scrollTop += getWheelDeltaPx( event, scroller );
+				// Without this the page behind still scrolls underneath the
+				// overlay, even though the caption is what moved.
+				event.preventDefault();
+			} ),
 			handleTouchCancel() {
 				// The gesture was interrupted — the browser cancelled the drag, or
 				// a system gesture took over — so no `touchend` will arrive to
@@ -822,6 +893,15 @@ const { state, actions, callbacks } = store(
 					verticalPadding = 80;
 				}
 
+				// Adds extra breathing room on every side of the enlarged image
+				// so a caption has room to sit below it without covering it.
+				// Applied to every image (not only captioned ones) so navigating
+				// a gallery never resizes the image. `padding` here is the total
+				// removed from each axis, so the per-side inset is half of it.
+				const imageSafeArea = 24;
+				horizontalPadding += imageSafeArea * 2;
+				verticalPadding += imageSafeArea * 2;
+
 				const targetMaxWidth = Math.min(
 					window.innerWidth - horizontalPadding,
 					containerWidth
@@ -1029,6 +1109,25 @@ const { state, actions, callbacks } = store(
 				const imageMetadata = getImageMetadata( imageId );
 				if ( imageMetadata ) {
 					imageMetadata.buttonRef = ref;
+				}
+			},
+			setCaption() {
+				// The caption is injected imperatively rather than through a
+				// `data-wp-bind--innerHTML` binding: Preact reconciles the
+				// element's children and won't apply a plain `innerHTML` prop,
+				// so a binding leaves the node empty. This runs in a
+				// `data-wp-watch`, so it re-applies whenever the selected image
+				// (and therefore its caption) changes while navigating a
+				// gallery. The value was sanitized with `wp_kses_post()` on the
+				// server and is the same markup already shown as the on-page
+				// caption.
+				const { ref } = getElement();
+				if ( ! ref ) {
+					return;
+				}
+				const caption = state.selectedImage?.caption || '';
+				if ( ref.innerHTML !== caption ) {
+					ref.innerHTML = caption;
 				}
 			},
 		},
