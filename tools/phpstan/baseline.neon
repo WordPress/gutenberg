@@ -199,12 +199,6 @@ parameters:
 			path: ../../lib/client-assets.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../lib/client-assets.php
-
-		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
@@ -373,30 +367,6 @@ parameters:
 			path: ../../packages/block-library/src/comment-date/index.php
 
 		-
-			message: '#^Function render_block_core_comment_reply_link\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/comment-reply-link/index.php
-
-		-
-			message: '#^Function render_block_core_comment_template\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/comment-template/index.php
-
-		-
-			message: '#^Function render_block_core_comments_pagination\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/comments-pagination/index.php
-
-		-
-			message: '#^Function render_block_core_comments_title\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 2
-			path: ../../packages/block-library/src/comments-title/index.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IFRAME'' given\.$#'
 			identifier: argument.type
 			count: 1
@@ -437,12 +407,6 @@ parameters:
 			identifier: throws.notThrowable
 			count: 1
 			path: ../../packages/block-library/src/home-link/index.php
-
-		-
-			message: '#^Function render_block_core_icon\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 3
-			path: ../../packages/block-library/src/icon/index.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
@@ -493,21 +457,9 @@ parameters:
 			path: ../../packages/block-library/src/navigation-link/index.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 2
-			path: ../../packages/block-library/src/navigation-link/index.php
-
-		-
 			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
 			identifier: throws.notThrowable
 			count: 1
-			path: ../../packages/block-library/src/navigation-submenu/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 3
 			path: ../../packages/block-library/src/navigation-submenu/index.php
 
 		-
@@ -530,24 +482,6 @@ parameters:
 
 		-
 			message: '#^Function block_core_navigation_get_classic_menu_fallback_blocks\(\) should return array but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Function block_core_navigation_get_menu_items_at_location\(\) should return array but empty return statement found\.$#'
-			identifier: return.empty
-			count: 3
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Function block_core_navigation_maybe_use_classic_menu_fallback\(\) should return array but empty return statement found\.$#'
-			identifier: return.empty
-			count: 3
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Function block_core_navigation_maybe_use_classic_menu_fallback\(\) should return array but returns WP_Post\|null\.$#'
 			identifier: return.type
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
@@ -589,196 +523,10 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe access to private property WP_Navigation_Block_Renderer\:\:\$has_submenus through static\:\:\.$#'
-			identifier: staticClassAccess.privateProperty
-			count: 6
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe access to private property WP_Navigation_Block_Renderer\:\:\$needs_list_item_wrapper through static\:\:\.$#'
-			identifier: staticClassAccess.privateProperty
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe access to private property WP_Navigation_Block_Renderer\:\:\$seen_menu_names through static\:\:\.$#'
-			identifier: staticClassAccess.privateProperty
-			count: 6
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:disable_overlay_menu_for_nested_navigation_blocks\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 3
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:does_block_need_a_list_item_wrapper\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_classes\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_block_markup\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_fallback\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_navigation_post\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_inner_blocks_html\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_layout_class\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_markup_for_inner_block\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_nav_attributes\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_nav_element_directives\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_navigation_name\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_overlay_blocks_from_template_part\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_overlay_inline_styles\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_responsive_container_classes\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_responsive_container_markup\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_styles\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_template_part_blocks_html\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:get_unique_navigation_name\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:handle_view_script_module_loading\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:has_submenus\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:is_interactive\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 4
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe call to private method WP_Navigation_Block_Renderer\:\:is_responsive\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 4
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Variable \$responsive_container_content_directives might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Function block_core_page_list_nest_pages\(\) should return array but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/page-list/index.php
-
-		-
-			message: '#^Function block_core_page_list_render_nested_page_list\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/page-list/index.php
-
-		-
-			message: '#^Function render_block_core_page_list\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 2
-			path: ../../packages/block-library/src/page-list/index.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''p'' given\.$#'
@@ -797,12 +545,6 @@ parameters:
 			identifier: empty.property
 			count: 1
 			path: ../../packages/block-library/src/playlist/index.php
-
-		-
-			message: '#^Function render_block_core_post_comments_form\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/post-comments-form/index.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''img'' given\.$#'
@@ -865,12 +607,6 @@ parameters:
 			path: ../../packages/block-library/src/site-logo/index.php
 
 		-
-			message: '#^Function render_block_core_site_tagline\(\) should return string but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: ../../packages/block-library/src/site-tagline/index.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
 			identifier: argument.type
 			count: 1
@@ -905,12 +641,6 @@ parameters:
 			identifier: isset.property
 			count: 1
 			path: ../../packages/block-library/src/term-template/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../packages/core-actions/src/index.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
