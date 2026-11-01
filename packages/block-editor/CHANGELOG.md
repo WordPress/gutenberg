@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl` ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).
 -   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
