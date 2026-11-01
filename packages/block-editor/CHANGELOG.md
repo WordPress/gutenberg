@@ -31,6 +31,7 @@
 -   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 -   Typography panel: "Reset all" also clears the link color that follows the text color ([#85376](https://github.com/WordPress/gutenberg/pull/85376)).
+-   Fix a crash in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115), for example when opening the inserter ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
 
 ### Internal
 

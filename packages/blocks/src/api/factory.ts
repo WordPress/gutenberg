@@ -464,7 +464,7 @@ export function findTransform< T extends BlockTransform >(
 	const priority = ( t: T ) => t.priority ?? 10;
 	const candidates = transforms
 		.filter( ( t ) => predicate( t ) )
-		.toSorted( ( t1, t2 ) => priority( t1 ) - priority( t2 ) );
+		.sort( ( t1, t2 ) => priority( t1 ) - priority( t2 ) );
 	return candidates.length > 0 ? candidates[ 0 ] : null;
 }
 

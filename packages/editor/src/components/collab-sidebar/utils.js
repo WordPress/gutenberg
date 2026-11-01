@@ -736,7 +736,7 @@ export function calculateNotePositions( {
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
 	// below and never receive a position.
-	const orderedThreads = threads.toSorted(
+	const orderedThreads = [ ...threads ].sort(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
 			( blockRects[ b.id ]?.top ?? Number.MAX_VALUE )

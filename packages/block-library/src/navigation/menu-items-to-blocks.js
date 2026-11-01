@@ -34,7 +34,7 @@ function mapMenuItemsToBlocks( menuItems, level = 0 ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = menuItems.toSorted(
+	const sortedItems = [ ...menuItems ].sort(
 		( a, b ) => a.menu_order - b.menu_order
 	);
 

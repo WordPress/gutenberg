@@ -27,6 +27,7 @@
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
+-   Gallery, Navigation, Playlist: Fix sorting crashing in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115) ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
 
 ## 12.0.0 (2026-10-20)
 

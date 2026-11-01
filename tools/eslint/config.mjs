@@ -249,6 +249,14 @@ const noStringLiteralIds = {
 	message: 'Do not use string literals for IDs; use useId hook instead.',
 };
 
+// `Array.prototype.toSorted` crashes the editor in browsers that are still in
+// use but lack it (Chrome < 110, Safari < 16, Firefox < 115). See #86129.
+const noArrayToSorted = {
+	selector: 'CallExpression[callee.property.name="toSorted"]',
+	message:
+		'`Array.prototype.toSorted` is not available in all browsers that can run the editor (e.g. Chrome < 110, Safari < 16). Use `[ ...array ].sort()` instead.',
+};
+
 const restrictedSyntax = [
 	{
 		selector:
@@ -319,6 +327,7 @@ const restrictedSyntax = [
 		message:
 			"Avoid using the word 'sidebar' in translatable strings. Consider using 'panel' instead.",
 	},
+	noArrayToSorted,
 ];
 
 export default dedupePlugins( [
@@ -957,6 +966,24 @@ export default dedupePlugins( [
 				'error',
 				...restrictedSyntax.filter(
 					( rule ) => rule !== noStringLiteralIds
+				),
+			],
+		},
+	},
+
+	// Override: Node-only tooling — allow `Array.prototype.toSorted`, which is
+	// supported by every Node.js version these files run on.
+	{
+		files: [
+			`bin/**/*.${ SCRIPT_EXT }`,
+			`tools/**/*.${ SCRIPT_EXT }`,
+			`packages/babel-plugin-makepot/**/*.${ SCRIPT_EXT }`,
+		],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax.filter(
+					( rule ) => rule !== noArrayToSorted
 				),
 			],
 		},

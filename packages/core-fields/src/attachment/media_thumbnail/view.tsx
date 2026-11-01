@@ -62,7 +62,7 @@ export function getBestImageUrl(
 			( size ): size is typeof size & { width: number } =>
 				typeof size.width === 'number' && ! Number.isNaN( size.width )
 		)
-		.toSorted( ( a, b ) => a.width - b.width );
+		.sort( ( a, b ) => a.width - b.width );
 	if ( ! sorted.length ) {
 		return media.source_url;
 	}

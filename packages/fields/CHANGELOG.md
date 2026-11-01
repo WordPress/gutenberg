@@ -6,6 +6,10 @@
 
 - `MediaEdit`: Prevent animation on item removal for multiple select ([#85372](https://github.com/WordPress/gutenberg/pull/85372)).
 
+### Bug Fixes
+
+-   `MediaEdit`: Fix a crash in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115) ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
+
 ## 0.50.0 (2026-10-20)
 
 ### Breaking Changes
