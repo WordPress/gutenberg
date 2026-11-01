@@ -1911,7 +1911,7 @@ function block_core_navigation_get_classic_menu_fallback() {
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback_blocks() instead.
  *
  * @param object $classic_nav_menu WP_Term The classic navigation object to convert.
- * @return array the normalized parsed blocks.
+ * @return string The serialized blocks of the classic menu, or an empty string if it has no items.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
 
