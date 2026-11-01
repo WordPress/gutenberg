@@ -517,12 +517,6 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Function block_core_navigation_get_classic_menu_fallback_blocks\(\) should return array but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Function block_core_navigation_get_menu_items_at_location\(\) should return array but empty return statement found\.$#'
 			identifier: return.empty
 			count: 3
