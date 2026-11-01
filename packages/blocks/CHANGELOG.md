@@ -14,6 +14,7 @@
 -   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor, and pasting one keeps it again, as before WordPress 7.0 ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Raw HTML conversion no longer copies the classes a block adds itself into `className`. `<ul class="wp-block-list fancy">` now converts to a List block with `className: "fancy"`, where before it got `"wp-block-list fancy"` ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   `rawHandler`, `pasteHandler`: Keep shortcodes in text inline unless they're on their own line, or aligned at the start or end of a line ([#85795](https://github.com/WordPress/gutenberg/pull/85795)).
+-   Fix block transforms crashing in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115) ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
 
 ### Internal
 

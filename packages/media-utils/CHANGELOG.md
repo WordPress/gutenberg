@@ -6,6 +6,10 @@
 
 -   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
 
+### Bug Fixes
+
+-   `MediaEdit`: Fix a crash in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115) ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes

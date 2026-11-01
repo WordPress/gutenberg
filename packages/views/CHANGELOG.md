@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix `useViewConfig` crashing in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115) ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

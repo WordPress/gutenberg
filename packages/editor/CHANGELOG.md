@@ -19,6 +19,7 @@
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
 -   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
 -   Notes: List a note shared by duplicated or split blocks once, and resolve or delete it on every block ([#85906](https://github.com/WordPress/gutenberg/pull/85906)).
+-   Notes, collaborators presence, flat term selector: Fix crashes in browsers without `Array.prototype.toSorted` (Chrome < 110, Safari < 16, Firefox < 115) ([#86132](https://github.com/WordPress/gutenberg/pull/86132)).
 
 ## 16.0.0 (2026-10-20)
 
