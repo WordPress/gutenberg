@@ -2,6 +2,7 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import spawn from 'cross-spawn';
+import { hashSource, writeBuildStamp } from './build-stamp.mts';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
@@ -77,6 +78,7 @@ async function build() {
 	console.log( '🔨 Starting build process...\n' );
 
 	const startTime = Date.now();
+	const sourceHash = hashSource();
 
 	try {
 		/*
@@ -187,6 +189,8 @@ async function build() {
 			[ 'run', '--if-present', '--workspaces', '--silent', 'build:wp' ],
 			{ silent: true }
 		);
+
+		writeBuildStamp( sourceHash );
 
 		const totalTime = Date.now() - startTime;
 		console.log(
