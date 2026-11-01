@@ -13,12 +13,6 @@ parameters:
 			path: ../../lib/block-supports/states.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../lib/block-supports/typography.php
-
-		-
 			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
@@ -361,12 +355,6 @@ parameters:
 			path: ../../packages/block-library/src/categories/index.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../packages/block-library/src/categories/index.php
-
-		-
 			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -405,12 +393,6 @@ parameters:
 		-
 			message: '#^Function render_block_core_comments_title\(\) should return string but empty return statement found\.$#'
 			identifier: return.empty
-			count: 2
-			path: ../../packages/block-library/src/comments-title/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
 			count: 2
 			path: ../../packages/block-library/src/comments-title/index.php
 
@@ -609,7 +591,7 @@ parameters:
 		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
-			count: 3
+			count: 2
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
