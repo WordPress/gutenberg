@@ -263,7 +263,7 @@ function build_template_part_block_instance_variations() {
 			// block description. This is a bit hacky, but prevent the fallback
 			// by using a non-breaking space so that the value of description
 			// isn't falsey.
-			'description' => $template_part->description || '&nbsp;',
+			'description' => ! empty( $template_part->description ) ? $template_part->description : '&nbsp;',
 			'attributes'  => array(
 				'slug'  => $template_part->slug,
 				'theme' => $template_part->theme,
