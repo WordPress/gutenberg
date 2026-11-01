@@ -12,7 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	Navigator,
 	__experimentalHeading as Heading,
-	Notice,
+	Notice as WCNotice,
 	SelectControl as WCSelectControl,
 	Flex,
 	Button,
@@ -453,12 +453,12 @@ function FontCollection( { slug }: { slug: string } ) {
 							{ notice && (
 								<>
 									<Spacer margin={ 1 } />
-									<Notice
+									<WCNotice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
-									</Notice>
+									</WCNotice>
 									<Spacer margin={ 1 } />
 								</>
 							) }

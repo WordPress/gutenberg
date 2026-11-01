@@ -514,8 +514,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: '2' },
 		} );
-		// To hide the block tool bar.
-		await page.keyboard.press( 'ArrowDown' );
+		// Put the caret in the first paragraph, so moving the mouse shows the
+		// block toolbar above it, not over the paragraph the drag starts in.
+		await page.keyboard.press( 'ArrowUp' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -550,9 +551,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				},
 			],
 		} );
-		// To hide the block tool bar.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
+		// Put the caret in the first paragraph, so moving the mouse shows the
+		// block toolbar above it, not over the paragraph the drag starts in.
+		await page.keyboard.press( 'ArrowUp' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )

@@ -346,6 +346,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await editor.canvas.locator( ':root' ).evaluate( () => {
 			let called;
+			// Errors thrown here only reach the console, so collect them.
+			window.errors = [];
 			const { body } = document;
 			const config = {
 				attributes: true,
@@ -356,12 +358,12 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 			const mutationObserver = new MutationObserver( ( records ) => {
 				if ( called || records.length > 1 ) {
-					throw new Error( 'Typing should only mutate once.' );
+					window.errors.push( 'Typing should only mutate once.' );
 				}
 
 				records.forEach( ( record ) => {
 					if ( record.type !== 'characterData' ) {
-						throw new Error(
+						window.errors.push(
 							`Typing mutated more than character data: ${ record.type }`
 						);
 					}
@@ -378,7 +380,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				'selectionchange',
 				() => {
 					function throwMultipleSelectionChange() {
-						throw new Error(
+						window.errors.push(
 							'Typing should only emit one selection change event.'
 						);
 					}
@@ -404,18 +406,28 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( '4' );
 
-		await editor.canvas.locator( ':root' ).evaluate( () => {
-			// The selection change event should be called once. If there's only
-			// one item in `window.unsubscribes`, it means that only one
-			// function is present to disconnect the `mutationObserver`.
-			if ( window.unsubscribes.length === 1 ) {
-				throw new Error(
-					'The selection change event listener was never called.'
-				);
-			}
+		// The selection change event fires asynchronously, after the key
+		// press. Its listener adds a second item to `window.unsubscribes`,
+		// next to the one that disconnects the `mutationObserver`.
+		await expect
+			.poll(
+				() =>
+					editor.canvas
+						.locator( ':root' )
+						.evaluate( () => window.unsubscribes.length ),
+				{
+					message:
+						'The selection change event listener was never called.',
+				}
+			)
+			.toBe( 2 );
 
+		const errors = await editor.canvas.locator( ':root' ).evaluate( () => {
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+			return window.errors;
 		} );
+
+		expect( errors ).toEqual( [] );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -1031,7 +1043,10 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 	} ) => {
 		const button = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Replace non-breaking spaces' } );
+			.getByRole( 'button', {
+				name: 'Replace non-breaking space',
+				exact: true,
+			} );
 
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'one' );
@@ -1061,6 +1076,134 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'one\u00a0two!' },
 			},
+		] );
+	} );
+
+	test( 'should replace the non-breaking spaces on both sides of the caret', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one\u00a0\u00a0two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
+		// Between the two non-breaking spaces.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await editor.showBlockToolbar();
+		await toolbar
+			.getByRole( 'button', {
+				name: 'Replace non-breaking spaces',
+				exact: true,
+			} )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one  two' },
+			},
+		] );
+	} );
+
+	test( 'should delete all content of a block', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'Hello' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'x' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'x' } },
+			] );
+	} );
+
+	test( 'should delete all content of a block with siblings', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// A block with siblings is edited through the canvas wrapper as the
+		// editing host, where WebKit removes the whole element.
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+		] );
+	} );
+
+	test( 'should delete all content of a block with siblings from the Edit menu', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		// Runs the command of Edit > Delete, which has no Backspace or Delete
+		// key press, on every platform.
+		await editor.canvas
+			.locator( 'body' )
+			.evaluate( ( body ) => body.ownerDocument.execCommand( 'delete' ) );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
+
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
 		] );
 	} );
 } );

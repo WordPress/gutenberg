@@ -99,7 +99,7 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-padding-xs));
+			padding-inline-end: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-padding-sm));
 		}
 
 		&:hover:not(&.is-not-clickable),
@@ -124,10 +124,7 @@
 		}
 
 		&:focus-visible {
-			outline: none;
-			box-shadow:
-				0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus);
+			@include outset-ring__focus();
 		}
 
 		.dataviews-filters__summary-filter-text-name {
@@ -178,10 +175,7 @@
 		}
 
 		&:focus-visible {
-			outline: none;
-			box-shadow:
-				0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus);
+			@include outset-ring__focus();
 		}
 	}
 }

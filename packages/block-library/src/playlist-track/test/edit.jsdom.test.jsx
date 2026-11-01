@@ -284,15 +284,17 @@ describe( 'PlaylistTrackEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'preserves the current track source when a replacement upload fails', () => {
+	it( 'preserves the current track when a replacement upload fails', () => {
 		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect();
 
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
-		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
-			'src'
-		);
+		// Strict, so keys set to `undefined`, which would clear the track's
+		// details, also fail the assertion.
+		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).toStrictEqual( {
+			blob: undefined,
+		} );
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {

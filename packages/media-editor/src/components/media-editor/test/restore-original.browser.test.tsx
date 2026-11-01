@@ -45,6 +45,7 @@ function Frame( { children }: MediaEditorFrameProps ) {
 		>
 			<MediaEditor.HeaderActions />
 			{ children }
+			<MediaEditor.HistoryActions />
 			<MediaEditor.SaveActions />
 		</div>
 	);
@@ -120,11 +121,9 @@ async function setup() {
 }
 
 async function restoreOriginal() {
+	await userEvent.click( screen.getByRole( 'button', { name: 'History' } ) );
 	await userEvent.click(
-		screen.getByRole( 'button', { name: 'More options' } )
-	);
-	await userEvent.click(
-		screen.getByRole( 'menuitem', { name: /^Restore original image/ } )
+		screen.getByRole( 'menuitem', { name: /^Restore original/ } )
 	);
 }
 

@@ -149,6 +149,75 @@ test.describe( 'Image', () => {
 		] );
 	} );
 
+	test( 'should hide an empty caption when the image is deselected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+		} );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const caption = imageBlock.getByRole( 'textbox', {
+			name: 'Image caption text',
+		} );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await expect( caption ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( caption ).toBeHidden();
+
+		await editor.selectBlocks( imageBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add caption' } )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect( caption ).toBeHidden();
+	} );
+
+	test( 'should show the caption again when removing it is undone', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+				caption: 'Caption',
+			},
+		} );
+		const caption = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'textbox', { name: 'Image caption text' } );
+		await expect( caption ).toHaveText( 'Caption' );
+
+		await editor.clickBlockToolbarButton( 'Remove caption' );
+		await expect( caption ).toBeHidden();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: undefined } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( caption ).toHaveText( 'Caption' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: 'Caption' } },
+			] );
+	} );
+
 	test( 'should allow soft line breaks in caption', async ( {
 		editor,
 		page,
