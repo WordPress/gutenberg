@@ -368,6 +368,12 @@
 		}
 
 		.submenu-chevron {
+			/*
+			 * The chevron is taller than the label line. Trim its layout box to the
+			 * label line so it does not push the label away from the prefix icon,
+			 * which is centered on that line.
+			 */
+			margin-block: calc((var(--_wp-ui-menu-item-label-line-height) - var(--wpds-dimension-size-sm)) / 2);
 			margin-inline-end: calc(-1 * var(--wpds-dimension-gap-sm));
 		}
 

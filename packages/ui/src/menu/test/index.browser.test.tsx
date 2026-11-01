@@ -19,6 +19,8 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import { copySmall } from '@wordpress/icons';
+import '@wordpress/theme/design-tokens.css';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -157,6 +159,53 @@ describe( 'Menu', () => {
 			.element( within( item ).getByRole( 'img', { hidden: true } ) )
 			.toBeVisible();
 		expect( within( item ).queryByRole( 'img' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'centers the prefix icon of a submenu trigger on its label', async () => {
+		await render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger
+							prefix={
+								<Menu.PrefixIcon
+									icon={ copySmall }
+									role="img"
+									aria-label="Copy icon"
+								/>
+							}
+						>
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
+						</Menu.SubmenuTrigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Actions' } )
+		);
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Move to',
+		} );
+		const icon = within( item ).getByRole( 'img', { hidden: true } );
+		const label = within( item ).getByText( 'Move to' );
+
+		// The submenu chevron is taller than the label line. It must not
+		// move the label away from the icon.
+		const getCenter = ( element: Element ) => {
+			const { top, height } = element.getBoundingClientRect();
+			return top + height / 2;
+		};
+		expect(
+			Math.abs( getCenter( icon ) - getCenter( label ) )
+		).toBeLessThan( 0.5 );
 	} );
 
 	it( 'opens from the trigger and exposes menu semantics', async () => {
