@@ -31,6 +31,7 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 	 * Good candidate to be moved to a separate function in core.
 	*/
 	$spacing_attributes = $attributes['style']['spacing'] ?? null;
+	$spacing_string     = '';
 	if ( isset( $spacing_attributes ) && ! empty( $spacing_attributes ) ) {
 		$spacing_array = array();
 		foreach ( $spacing_attributes as $spacing_attribute_key => $spacing_attribute_value ) {
