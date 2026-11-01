@@ -689,15 +689,3 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/style-engine/src/class-wp-style-engine.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page-wp-admin.php.template
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page.php.template
