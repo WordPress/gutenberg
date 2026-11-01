@@ -46,6 +46,11 @@ const createNavigationOverlay = async ( {
 	await expect(
 		page.locator( 'h1' ).filter( { hasText: 'Navigation Overlay' } )
 	).toBeVisible( { timeout: 10000 } );
+	// The title changes before the canvas shows the overlay's blocks; wait
+	// for its close button so blocks aren't inserted into the header.
+	await expect(
+		editor.canvas.getByRole( 'document', { name: 'Close', exact: true } )
+	).toBeVisible();
 };
 
 test.describe( 'Navigation Overlay Template Part', () => {
