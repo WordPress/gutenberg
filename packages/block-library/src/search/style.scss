@@ -55,6 +55,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	.wp-block-search__inside-wrapper {
 		transition-property: width;
 		min-width: 0 !important;
+		gap: $button-spacing-x;
 	}
 
 	.wp-block-search__input {
