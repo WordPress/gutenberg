@@ -4,6 +4,7 @@ import glob from 'fast-glob';
 import { beforeAll, describe, expect, it } from 'vitest';
 import prettierConfig from '@wordpress/prettier-config';
 import {
+	cloneBlock,
 	getBlockTypes,
 	parse,
 	serialize,
@@ -184,9 +185,14 @@ describe( 'full post content fixture', () => {
 				);
 			}
 
+			// Copies count as edited, so this records what `save` writes, not
+			// the loaded markup an untouched block keeps.
+			const toSave = ( blocks ) =>
+				blocks.map( ( block ) => cloneBlock( block ) );
+
 			// `serialize` doesn't have a trailing newline, but the fixture
 			// files should.
-			const serializedActual = serialize( blocksActual ) + '\n';
+			const serializedActual = serialize( toSave( blocksActual ) ) + '\n';
 			const {
 				filename: serializedHTMLFileName,
 				file: serializedHTMLFixtureContent,
@@ -208,8 +214,8 @@ describe( 'full post content fixture', () => {
 				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
 				if (
-					serialize( blocksActual ) ===
-					serialize( parse( serializedExpected ) )
+					serialize( toSave( blocksActual ) ) ===
+					serialize( toSave( parse( serializedExpected ) ) )
 				) {
 					throw new Error(
 						format(
