@@ -487,7 +487,7 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: mixed, post_name\: mixed, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
+			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: string, post_name\: string, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
