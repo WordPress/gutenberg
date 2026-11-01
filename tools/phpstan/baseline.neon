@@ -247,12 +247,6 @@ parameters:
 			path: ../../packages/block-library/src/categories/index.php
 
 		-
-			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-author-avatar/index.php
-
-		-
 			message: '#^Variable \$spacing_string might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
