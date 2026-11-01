@@ -135,6 +135,10 @@ export interface LayoutType {
 	inspectorControls: ComponentType< LayoutInspectorControlsProps >;
 	toolBarControls: ComponentType< LayoutToolbarControlsProps >;
 	getLayoutStyle?: ( args: LayoutStyleArgs ) => string;
+	/**
+	 * Whether the toolbars of the blocks in the layout show over its block.
+	 */
+	capturesToolbars?: ( layout?: Layout ) => boolean;
 	getOrientation: ( layout: Layout ) => string;
 	getAlignments: (
 		layout: Layout,
