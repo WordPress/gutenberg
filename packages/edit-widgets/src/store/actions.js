@@ -155,9 +155,29 @@ export const saveWidgetArea =
 		const batchMeta = [];
 		const batchTasks = [];
 		const sidebarWidgetsIds = [];
+		const claimedWidgetIds = new Set();
 		for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 			const block = widgetsBlocks[ i ];
-			const widgetId = getWidgetIdFromBlock( block );
+			let widgetId = getWidgetIdFromBlock( block );
+
+			// Splitting a block, e.g. pressing Enter in the middle of a
+			// paragraph, copies all of its attributes to the new block,
+			// including the widget ID, and the new block can then be moved to
+			// another widget area. Only the first block with a given ID, in the
+			// first widget area that holds it, updates that widget. Any other
+			// block with the same ID is saved as a new widget.
+			if ( widgetId ) {
+				if (
+					claimedWidgetIds.has( widgetId ) ||
+					select.getWidgetAreaForWidgetId( widgetId )?.id !==
+						widgetAreaId
+				) {
+					widgetId = undefined;
+				} else {
+					claimedWidgetIds.add( widgetId );
+				}
+			}
+
 			const oldWidget = widgets[ widgetId ];
 			const widget = transformBlockToWidget( block, oldWidget );
 
