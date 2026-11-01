@@ -19,34 +19,10 @@ parameters:
 			path: ../../lib/block-supports/typography.php
 
 		-
-			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: ../../lib/class-wp-duotone-gutenberg.php
-
-		-
 			message: '#^Parameter \#1 \$id \(int\) of method WP_REST_Global_Styles_Controller_Gutenberg\:\:prepare_links\(\) should be compatible with parameter \$post \(WP_Post\) of method WP_REST_Posts_Controller\:\:prepare_links\(\)$#'
 			identifier: method.childParameterType
 			count: 1
 			path: ../../lib/class-wp-rest-global-styles-controller-gutenberg.php
-
-		-
-			message: '#^Method WP_Theme_JSON_Gutenberg\:\:get_block_name_from_metadata_path\(\) should return string\|null but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Method WP_Theme_JSON_Gutenberg\:\:get_block_selectors\(\) should return object but returns array\<string, array\<string, string\>\|string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Parameter \#1 \$css of method WP_Theme_JSON_Gutenberg\:\:process_blocks_custom_css\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
 
 		-
 			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:compute_spacing_sizes\(\) through static\:\:\.$#'

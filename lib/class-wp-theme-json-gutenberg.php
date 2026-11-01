@@ -2271,7 +2271,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the global styles custom CSS for a single block.
 	 * This function is deprecated; please do not sync to core.
 	 *
-	 * @param array  $css      The block css node.
+	 * @param string $css      The block CSS.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
@@ -5883,7 +5883,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param object $block_type    The block type.
 	 * @param string $root_selector The block's root selector.
 	 *
-	 * @return object The custom selectors set by the block.
+	 * @return array The custom selectors set by the block.
 	 */
 	protected static function get_block_selectors( $block_type, $root_selector ) {
 		if ( ! empty( $block_type->selectors ) ) {
@@ -6305,8 +6305,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string|null The block name or null if not found.
 	 */
 	private static function get_block_name_from_metadata_path( $block_metadata ) {
-		if ( isset( $block_metadata['path'] ) ) {
-			return $block_metadata['path'][2];
-		}
+		return $block_metadata['path'][2] ?? null;
 	}
 }
