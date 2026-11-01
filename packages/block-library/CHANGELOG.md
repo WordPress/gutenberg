@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
 -   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
 -   Navigation Link, Navigation Submenu: Keep the bold, italic, and other formatting of the text when editing it in the sidebar's Text field ([#85223](https://github.com/WordPress/gutenberg/pull/85223)).
