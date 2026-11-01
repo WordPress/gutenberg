@@ -14,7 +14,7 @@ import {
 	privateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import { store as mediaEditorStore } from '@wordpress/media-editor';
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -25,8 +25,6 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
-
-const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 

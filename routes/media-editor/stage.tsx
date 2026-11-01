@@ -6,7 +6,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import {
-	privateApis as mediaEditorPrivateApis,
+	MediaEditor,
 	type Media,
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
@@ -15,7 +15,6 @@ import { useViewConfig } from '@wordpress/views';
 import './style.scss';
 
 const { usePostFields } = unlock( editorPrivateApis );
-const { MediaEditor } = unlock( mediaEditorPrivateApis );
 
 /**
  * The stage only renders a form, so it requests the `form` of the entity view
