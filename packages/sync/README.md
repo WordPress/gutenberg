@@ -44,6 +44,10 @@ Creates the sync manager, which orchestrates the lifecycle of syncing entity rec
 
 Quill Delta implementation used to describe rich text changes.
 
+### DiffOptions
+
+Quill Delta implementation used to describe rich text changes.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.

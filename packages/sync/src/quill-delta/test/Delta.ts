@@ -268,6 +268,79 @@ describe( 'Delta.diffWithCursor', () => {
 		} );
 	} );
 
+	describe( 'tokenized diffing via DiffOptions', () => {
+		const htmlTokenizer = ( html: string ) =>
+			html.match(
+				/<!--[\s\S]*?-->|<\/?[a-zA-Z][a-zA-Z0-9:-]*(?:"[^"]*"|'[^']*'|[^'">])*>|&[a-zA-Z0-9#]+;|[\s\S]/g
+			) ?? [];
+
+		it( 'should keep HTML tags as indivisible units during diff', () => {
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const newDelta = new Delta().insert(
+				'the <strong data-attr="test">quick</strong> brown fox'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer: htmlTokenizer,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '<strong data-attr="test">' },
+				{ retain: 5 },
+				{ insert: '</strong>' },
+			] );
+		} );
+
+		it( 'should not interleave characters inside HTML tags when formatting overlapping text', () => {
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const linkDelta = new Delta().insert(
+				'the qu<a href="https://example.com">ick brown</a> fox'
+			);
+
+			const diff = oldDelta.diff( linkDelta, {
+				tokenizer: htmlTokenizer,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 6 },
+				{ insert: '<a href="https://example.com">' },
+				{ retain: 9 },
+				{ insert: '</a>' },
+			] );
+		} );
+
+		it( 'should not align characters inside custom tags like Suggestion mode marks with text', () => {
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const markDelta = new Delta().insert(
+				'the <mark data-suggestion="del-1">quick</mark> brown fox'
+			);
+
+			const diff = oldDelta.diff( markDelta, {
+				tokenizer: htmlTokenizer,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '<mark data-suggestion="del-1">' },
+				{ retain: 5 },
+				{ insert: '</mark>' },
+			] );
+		} );
+
+		it( 'should keep tags with attributes containing quotes and > whole', () => {
+			const oldDelta = new Delta().insert( 'the fox' );
+			const imgDelta = new Delta().insert(
+				'the <img src="test.jpg" alt="a > b" /> fox'
+			);
+
+			const diff = oldDelta.diff( imgDelta, {
+				tokenizer: htmlTokenizer,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '<img src="test.jpg" alt="a > b" /> ' },
+			] );
+		} );
+	} );
+
 	describe( 'end of document operations', () => {
 		it( 'should handle adding content at the very end', () => {
 			// 'hello|' -> 'hello world|'
