@@ -5,7 +5,10 @@ import {
 	useReducer,
 } from '@wordpress/element';
 import type { RefObject } from 'react';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { create, RichTextData } from '../create';
@@ -14,8 +17,9 @@ import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
 import { setDefaultStyle } from './default-style';
 import { useBoundaryStyle } from './use-boundary-style';
-import { addField, useEventListenerProps } from './event-listeners';
+import { listeners, useEventListenerProps } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
+import { unlock } from '../lock-unlock';
 import type {
 	ApplyRecordOptions,
 	RichTextBaseProps,
@@ -23,6 +27,8 @@ import type {
 	RichTextProps,
 	RichTextRecord,
 } from './types';
+
+const { addDelegatedListeners } = unlock( composePrivateApis );
 
 // A symbol, so the function stays private if the hook becomes public.
 export const getDomPositionKey = Symbol( 'getDomPosition' );
@@ -236,7 +242,11 @@ function useRichTextBase( {
 		( element: HTMLElement ) => {
 			ref.current = element;
 			setDefaultStyle( element );
-			const removeField = addField( element, eventListenerProps );
+			const removeField = addDelegatedListeners(
+				element,
+				listeners,
+				eventListenerProps
+			);
 			setRecordFromProps();
 			applyRecord( recordRef.current!, {
 				domOnly: ! hasFocus( element ),

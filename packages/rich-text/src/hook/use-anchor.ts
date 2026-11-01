@@ -1,8 +1,13 @@
-import { usePrevious } from '@wordpress/compose';
+import {
+	usePrevious,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import type { FormatType } from '../types';
-import { ownsSelection } from '../owns-selection';
+import { unlock } from '../lock-unlock';
+
+const { ownsSelection } = unlock( composePrivateApis );
 
 /**
  * Given a range and a format tag name and class name, returns the closest
