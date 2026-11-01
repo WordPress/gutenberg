@@ -205,12 +205,6 @@ parameters:
 			path: ../../lib/client-assets.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../lib/client-assets.php
-
-		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
@@ -511,21 +505,9 @@ parameters:
 			path: ../../packages/block-library/src/navigation-link/index.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 2
-			path: ../../packages/block-library/src/navigation-link/index.php
-
-		-
 			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
 			identifier: throws.notThrowable
 			count: 1
-			path: ../../packages/block-library/src/navigation-submenu/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 3
 			path: ../../packages/block-library/src/navigation-submenu/index.php
 
 		-
@@ -609,7 +591,7 @@ parameters:
 		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
-			count: 3
+			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
@@ -923,12 +905,6 @@ parameters:
 			identifier: isset.property
 			count: 1
 			path: ../../packages/block-library/src/term-template/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../packages/core-actions/src/index.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
