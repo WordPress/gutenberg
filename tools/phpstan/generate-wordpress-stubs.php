@@ -625,6 +625,8 @@ function main( array $args ): void {
 		} elseif ( read_stub_key( $stub_file ) !== $generation_key( $commit, $pr ) ) {
 			$reason = 'out of date';
 		} else {
+			$source_label = '' !== $pr ? "$develop_repo#$pr at " . short_commit( $commit ) : "$develop_repo@" . short_commit( $commit );
+			report( "The WordPress stubs are already generated from $source_label. Add --force to generate them again." );
 			return;
 		}
 	}
