@@ -125,9 +125,12 @@ function useHasFontSizeControl( settings: StyleSettings | undefined ) {
 }
 
 function useHasFontFamilyControl( settings: StyleSettings | undefined ) {
-	return [ 'default', 'theme', 'custom' ].some(
-		( key ) => settings?.typography?.fontFamilies?.[ key ]?.length
+	const fontFamilies = settings?.typography?.fontFamilies;
+	const total = [ 'default', 'theme', 'custom' ].reduce(
+		( count, key ) => count + ( fontFamilies?.[ key ]?.length ?? 0 ),
+		0
 	);
+	return total > 1 || !! fontFamilies?.custom?.length;
 }
 
 function useHasLineHeightControl( settings: StyleSettings | undefined ) {
