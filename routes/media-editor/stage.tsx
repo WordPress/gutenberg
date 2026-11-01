@@ -5,10 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import {
-	MediaEditor,
-	type Media,
-} from '@wordpress/media-editor';
+import { MediaEditor, type Media } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { useViewConfig } from '@wordpress/views';
