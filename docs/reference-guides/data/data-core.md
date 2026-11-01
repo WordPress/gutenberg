@@ -605,6 +605,23 @@ _Returns_
 
 - `ET.User< 'edit' >[]`: Users list.
 
+### getViewConfig
+
+Returns the view configuration for the given entity type.
+
+An optional fourth argument (e.g. `{ fields }`) may be passed when selecting; it is consumed by the `getViewConfig` resolver to request a subset of the config via the REST API `_fields` parameter and does not affect what is read here. Partial responses are merged in the reducer, so the returned object may accumulate properties across requests for the same entity.
+
+_Parameters_
+
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+- _options_ `Record< string, any >`: Optional options.
+
+_Returns_
+
+- `Record< string, any > | undefined`: The view configuration or undefined if not loaded.
+
 ### hasEditsForEntityRecord
 
 Returns true if the specified entity record has edits, and false otherwise.
