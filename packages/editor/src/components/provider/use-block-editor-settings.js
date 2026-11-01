@@ -6,8 +6,11 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
+import { layout } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
@@ -23,12 +26,15 @@ import { default as mediaSideloadFromUrl } from '../../utils/media-sideload-from
 import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
+
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 /**
  * The synced patterns the inserter offers: every pattern the user can read.
@@ -121,6 +127,7 @@ const {
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
+	outerWidthConstraintKey,
 	mediaEditKey,
 	getMediaSelectKey,
 	isIsolatedEditorKey,
@@ -169,6 +176,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isRevisionsMode,
 		viewablePostTypeLabel,
 		currentPostId,
+		templateId,
+		templateTitle,
+		canEditTemplate,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -177,16 +187,24 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getEntityRecord,
 				getBlockPatternCategories,
 				getPostType,
+				getCurrentTheme,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const { getCurrentPostId, getCurrentPostType } =
-				select( editorStore );
+			const {
+				getCurrentPostId,
+				getCurrentPostType,
+				getCurrentTemplateId,
+			} = select( editorStore );
 			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
 				select( editorStore )
 			);
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
+			const _templateId = getCurrentTemplateId();
+			const template = _templateId
+				? getEntityRecord( 'postType', TEMPLATE_POST_TYPE, _templateId )
+				: undefined;
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
 				name: 'site',
@@ -265,6 +283,25 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? postTypeObject?.labels?.singular_name
 					: undefined,
 				currentPostId: getCurrentPostId(),
+				templateId: _templateId,
+				/*
+				 * A template's own `title` is empty, or just its slug, until someone
+				 * renames it. `getTemplateInfo` falls back to the name the theme
+				 * gives it — "Pages", "Single Posts" — which is what the rest of the
+				 * editor shows. It destructures the template, so it is only called
+				 * once the record has actually loaded.
+				 */
+				templateTitle: template
+					? getTemplateInfo( {
+							templateTypes:
+								getCurrentTheme()?.default_template_types ?? [],
+							template,
+						} )?.title
+					: undefined,
+				canEditTemplate: !! canUser( 'create', {
+					kind: 'postType',
+					name: TEMPLATE_POST_TYPE,
+				} ),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -318,6 +355,98 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const { getEditorSettings } = useSelect( editorStore );
+
+	/*
+	 * Explains a width constraint that comes from the template rather than from
+	 * a block on the page, and offers to go and edit it. The block editor knows
+	 * a constraint exists but cannot know what a template is, so this is passed
+	 * down rather than derived there.
+	 */
+	const outerWidthConstraint = useMemo( () => {
+		const onNavigateToEntityRecord = settings.onNavigateToEntityRecord;
+
+		if ( ! templateId || ! canEditTemplate || ! onNavigateToEntityRecord ) {
+			return undefined;
+		}
+
+		const title = templateTitle
+			? decodeEntities( templateTitle )
+			: undefined;
+
+		return {
+			description: __( 'The template limits this block’s width.' ),
+			action: {
+				/*
+				 * Naming the template is better, but a template that cannot be
+				 * named is no reason to withhold the explanation entirely.
+				 */
+				label: title
+					? sprintf(
+							// translators: %s: name of the template, e.g. "Pages".
+							__( 'Edit %s template' ),
+							title
+						)
+					: __( 'Edit template' ),
+				icon: layout,
+				onClick: () => {
+					onNavigateToEntityRecord( {
+						postId: templateId,
+						postType: TEMPLATE_POST_TYPE,
+					} );
+					/*
+					 * Every other route into template editing warns that the
+					 * change is shared before it happens. The warning belongs to
+					 * the call site rather than to `onNavigateToEntityRecord`,
+					 * so leaving from here has to raise it too.
+					 */
+					if (
+						! getPreference(
+							'core/edit-site',
+							'welcomeGuideTemplate'
+						)
+					) {
+						/*
+						 * Read after navigating, so the way back belongs to the
+						 * template being edited rather than to the post left
+						 * behind.
+						 */
+						const goBack =
+							getEditorSettings()
+								.onNavigateToPreviousEntityRecord;
+
+						createSuccessNotice(
+							__(
+								'Editing template. Changes made here affect all posts and pages that use the template.'
+							),
+							{
+								type: 'snackbar',
+								actions: goBack
+									? [
+											{
+												label: __( 'Back' ),
+												onClick: goBack,
+											},
+										]
+									: undefined,
+							}
+						);
+					}
+				},
+			},
+		};
+	}, [
+		templateId,
+		templateTitle,
+		canEditTemplate,
+		settings.onNavigateToEntityRecord,
+		createSuccessNotice,
+		getPreference,
+		getEditorSettings,
+	] );
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
@@ -474,6 +603,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
+			/*
+			 * When a block's width is limited by the template rather than by a
+			 * block on the page, there is nothing for the block editor to name
+			 * or select. It detects the constraint; this says what it is.
+			 */
+			[ outerWidthConstraintKey ]: outerWidthConstraint,
 		};
 
 		if ( isRevisionsMode ) {
@@ -494,6 +629,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		blockPatterns,
 		blockPatternCategories,
 		inserterMediaCategories,
+		outerWidthConstraint,
 		canUseUnfilteredHTML,
 		undo,
 		createPageEntity,
