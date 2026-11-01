@@ -87,7 +87,6 @@ test.describe( 'Preload', () => {
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
 				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
-				'GET /wp/v2/users?context=view&include%5B0%5D=1&who=authors',
 				'POST /wp/v2/users/me',
 			].sort()
 		);

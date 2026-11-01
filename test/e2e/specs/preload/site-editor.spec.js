@@ -88,7 +88,6 @@ test.describe( 'Preload', () => {
 				'GET /wp/v2/templates?context=edit&per_page=100&post_type=page',
 				'GET /wp/v2/types/page?context=edit',
 				'GET /wp/v2/users/me',
-				'GET /wp/v2/users?context=view&include%5B0%5D=1&who=authors',
 				'GET /wp/v2/view-config?kind=postType&name=page',
 				'GET /wp/v2/view-config?kind=postType&name=page&_fields=form',
 				'OPTIONS /wp/v2/settings',
