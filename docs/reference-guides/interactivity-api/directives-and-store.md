@@ -723,7 +723,7 @@ For example, let's consider the following HTML.
 </ul>
 ```
 
-It would generate the following output:
+Once the Interactivity API has processed it in the browser, the `<template>` is replaced by one element for each item, so the page contains the following output:
 
 ```html
 <ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
@@ -732,6 +732,8 @@ It would generate the following output:
 	<li data-wp-text="context.item">olá</li>
 </ul>
 ```
+
+On a server-side rendered page, the HTML that the browser receives is different: it keeps the `<template>` and adds the rendered items after it, each marked with [`data-wp-each-child`](#wp-each-child).
 
 The prop that holds the item in the context can be changed by passing a suffix to the directive name. In the following example, the default prop changes from `item` to `greeting`.
 
@@ -768,18 +770,53 @@ For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-
 
 ### `wp-each-child`
 
-For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
+For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server, so you don't need to write it yourself. Its value is the namespace and the path of the list that rendered the element.
+
+For example, let's consider the following HTML.
 
 ```html
-<ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
+<ul
+	data-wp-interactive="myPlugin"
+	data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'
+>
 	<template data-wp-each--greeting="context.list">
 		<li data-wp-text="context.greeting"></li>
 	</template>
-	<li data-wp-each-child>hello</li>
-	<li data-wp-each-child>hola</li>
-	<li data-wp-each-child>olá</li>
 </ul>
 ```
+
+The server renders each item after the `<template>` and marks it with `data-wp-each-child`:
+
+```html
+<ul
+	data-wp-interactive="myPlugin"
+	data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'
+>
+	<template data-wp-each--greeting="context.list">
+		<li data-wp-text="context.greeting"></li>
+	</template>
+	<li
+		data-wp-each-child="myPlugin::context.list"
+		data-wp-text="context.greeting"
+	>
+		hello
+	</li>
+	<li
+		data-wp-each-child="myPlugin::context.list"
+		data-wp-text="context.greeting"
+	>
+		hola
+	</li>
+	<li
+		data-wp-each-child="myPlugin::context.list"
+		data-wp-text="context.greeting"
+	>
+		olá
+	</li>
+</ul>
+```
+
+This marker lets the client tell the items rendered on the server apart from the rest of the content. When the Interactivity API takes over, it replaces the marked elements with the items it renders from the `<template>`, which don't include `data-wp-each-child`.
 
 Inside an interactive region, interactive islands inside server-rendered `data-wp-each-child` items aren't hydrated on their own. They initialize as part of the items the list renders.
 
