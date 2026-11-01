@@ -307,24 +307,6 @@ parameters:
 			path: ../../lib/experimental/navigation-theme-opt-in.php
 
 		-
-			message: '#^Cannot assign offset ''_fields'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-		-
-			message: '#^Cannot assign offset ''context'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-		-
-			message: '#^WP_REST_Request\<array\<string, mixed\>\> does not accept string\.$#'
-			identifier: offsetAssign.valueType
-			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-		-
 			message: '#^Action callback returns bool but should not return anything\.$#'
 			identifier: return.void
 			count: 1
