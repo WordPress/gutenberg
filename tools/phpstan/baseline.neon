@@ -49,42 +49,6 @@ parameters:
 			path: ../../lib/class-wp-theme-json-gutenberg.php
 
 		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$blocks \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$core \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$i18n_schema \(array\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$theme \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user_custom_post_type_id \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
 			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
