@@ -25,11 +25,27 @@ function render_block_core_loginout( $attributes ) {
 
 	$user_logged_in = is_user_logged_in();
 
-	$classes  = $user_logged_in ? 'logged-in' : 'logged-out';
-	$contents = wp_loginout(
-		isset( $attributes['redirectToCurrent'] ) && $attributes['redirectToCurrent'] ? $current_url : '',
-		false
-	);
+	$classes = $user_logged_in ? 'logged-in' : 'logged-out';
+
+	$redirect = isset( $attributes['redirectToCurrent'] ) && $attributes['redirectToCurrent'] ? $current_url : '';
+
+	$login_text  = ! empty( $attributes['loginText'] ) ? esc_html( $attributes['loginText'] ) : __( 'Log in' );
+	$logout_text = ! empty( $attributes['logoutText'] ) ? esc_html( $attributes['logoutText'] ) : __( 'Log out' );
+
+	if ( ! $user_logged_in ) {
+		$link = '<a href="' . esc_url( wp_login_url( $redirect ) ) . '">' . $login_text . '</a>';
+	} else {
+		$link = '<a href="' . esc_url( wp_logout_url( $redirect ) ) . '">' . $logout_text . '</a>';
+	}
+
+	/**
+	 * Filters the HTML output of the Log In/Log Out link.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $link The HTML link content.
+	 */
+	$contents = apply_filters( 'loginout', $link );
 
 	// If logged-out and displayLoginAsForm is true, show the login form.
 	if ( ! $user_logged_in && ! empty( $attributes['displayLoginAsForm'] ) ) {
@@ -37,7 +53,12 @@ function render_block_core_loginout( $attributes ) {
 		$classes .= ' has-login-form';
 
 		// Get the form.
-		$contents = wp_login_form( array( 'echo' => false ) );
+		$contents = wp_login_form(
+			array(
+				'echo'         => false,
+				'label_log_in' => $login_text,
+			)
+		);
 
 		if ( wp_is_block_theme() ) {
 			$processor = new WP_HTML_Tag_Processor( $contents );

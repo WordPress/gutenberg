@@ -15,6 +15,12 @@
 		"redirectToCurrent": {
 			"type": "boolean",
 			"default": true
+		},
+		"loginText": {
+			"type": "string"
+		},
+		"logoutText": {
+			"type": "string"
 		}
 	},
 	"example": {
