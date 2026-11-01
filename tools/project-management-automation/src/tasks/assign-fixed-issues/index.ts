@@ -12,7 +12,7 @@ async function assignFixedIssues(
 	octokit: GitHub
 ): Promise< void > {
 	const regex =
-		/(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
+		/(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
 
 	let match;
 
