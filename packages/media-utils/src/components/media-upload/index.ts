@@ -2,26 +2,35 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
+import type {
+	MediaAttachment,
+	MediaCollection,
+	MediaFrame,
+	MediaFrameConstructor,
+	MediaFrameOptions,
+	MediaUploadProps,
+	MediaWindow,
+} from './types';
 
-const DEFAULT_EMPTY_GALLERY = [];
+const DEFAULT_EMPTY_GALLERY: number[] = [];
 
 /**
  * Prepares the Featured Image toolbars and frames.
  *
- * @return {window.wp.media.view.MediaFrame.Select} The default media workflow.
+ * Returns the default media workflow.
  */
 const getFeaturedImageMediaFrame = () => {
-	const { wp } = window;
+	const { wp } = window as unknown as MediaWindow;
 
 	return wp.media.view.MediaFrame.Select.extend( {
 		/**
 		 * Enables the Set Featured Image Button.
 		 *
-		 * @param {Object} toolbar toolbar for featured image state
-		 * @return {void}
+		 * @param toolbar - Toolbar for featured image state.
 		 */
-		featuredImageToolbar( toolbar ) {
+		featuredImageToolbar( toolbar: object ) {
 			this.createSelectToolbar( toolbar, {
 				text: wp.media.view.l10n.setFeaturedImage,
 				state: this.options.state,
@@ -30,8 +39,6 @@ const getFeaturedImageMediaFrame = () => {
 
 		/**
 		 * Handle the edit state requirements of selected media item.
-		 *
-		 * @return {void}
 		 */
 		editState() {
 			const selection = this.state( 'featured-image' ).get( 'selection' );
@@ -49,8 +56,6 @@ const getFeaturedImageMediaFrame = () => {
 
 		/**
 		 * Create the default states.
-		 *
-		 * @return {void}
 		 */
 		createStates: function createStates() {
 			this.on(
@@ -73,10 +78,10 @@ const getFeaturedImageMediaFrame = () => {
 /**
  * Prepares the default frame for selecting a single media item.
  *
- * @return {window.wp.media.view.MediaFrame.Select} The default media workflow.
+ * Returns the default media workflow.
  */
 const getSingleMediaFrame = () => {
-	const { wp } = window;
+	const { wp } = window as unknown as MediaWindow;
 
 	// Extend the default Select frame, and use the same `createStates` method as in core,
 	// but with the addition of `filterable: 'uploaded'` to the Library state, so that
@@ -113,22 +118,18 @@ const getSingleMediaFrame = () => {
 /**
  * Prepares the Gallery toolbars and frames.
  *
- * @return {window.wp.media.view.MediaFrame.Post} The default media workflow.
+ * Returns the default media workflow.
  */
 const getGalleryDetailsMediaFrame = () => {
-	const { wp } = window;
+	const { wp } = window as unknown as MediaWindow;
 	/**
 	 * Custom gallery details frame.
 	 *
-	 * @see https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
-	 * @class GalleryDetailsMediaFrame
-	 * @class
+	 * @see {@link https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js}
 	 */
 	return wp.media.view.MediaFrame.Post.extend( {
 		/**
 		 * Set up gallery toolbar.
-		 *
-		 * @return {void}
 		 */
 		galleryToolbar() {
 			const editing = this.state().get( 'editing' );
@@ -145,7 +146,7 @@ const getGalleryDetailsMediaFrame = () => {
 							requires: { library: true },
 
 							/**
-							 * @fires wp.media.controller.State#update
+							 * Fires the `wp.media.controller.State#update` event.
 							 */
 							click() {
 								const controller = this.controller,
@@ -169,8 +170,6 @@ const getGalleryDetailsMediaFrame = () => {
 
 		/**
 		 * Handle the edit state requirements of selected media item.
-		 *
-		 * @return {void}
 		 */
 		editState() {
 			const selection = this.state( 'gallery' ).get( 'selection' );
@@ -188,8 +187,6 @@ const getGalleryDetailsMediaFrame = () => {
 
 		/**
 		 * Create the default states.
-		 *
-		 * @return {void}
 		 */
 		createStates: function createStates() {
 			this.on( 'toolbar:create:main-gallery', this.galleryToolbar, this );
@@ -230,7 +227,7 @@ const getGalleryDetailsMediaFrame = () => {
 
 // The media library image object contains numerous attributes
 // we only need this set to display the image in the library.
-const slimImageObject = ( img ) => {
+const slimImageObject = ( img: MediaAttachment ) => {
 	const attrSet = [
 		'sizes',
 		'mime',
@@ -242,7 +239,7 @@ const slimImageObject = ( img ) => {
 		'link',
 		'caption',
 	];
-	return attrSet.reduce( ( result, key ) => {
+	return attrSet.reduce< MediaAttachment >( ( result, key ) => {
 		if ( img?.hasOwnProperty( key ) ) {
 			result[ key ] = img[ key ];
 		}
@@ -250,8 +247,8 @@ const slimImageObject = ( img ) => {
 	}, {} );
 };
 
-const getAttachmentsCollection = ( ids ) => {
-	const { wp } = window;
+const getAttachmentsCollection = ( ids?: number | number[] ) => {
+	const { wp } = window as unknown as MediaWindow;
 
 	return wp.media.query( {
 		order: 'ASC',
@@ -263,9 +260,12 @@ const getAttachmentsCollection = ( ids ) => {
 	} );
 };
 
-class MediaUpload extends Component {
-	constructor() {
-		super( ...arguments );
+class MediaUpload extends Component< MediaUploadProps > {
+	declare frame: MediaFrame;
+	declare lastGalleryValue: number[] | undefined;
+	declare GalleryDetailsMediaFrame: MediaFrameConstructor | undefined;
+	constructor( ...args: [ props: MediaUploadProps, context?: unknown ] ) {
+		super( ...args );
 		this.openModal = this.openModal.bind( this );
 		this.onOpen = this.onOpen.bind( this );
 		this.onSelect = this.onSelect.bind( this );
@@ -275,7 +275,7 @@ class MediaUpload extends Component {
 			this.stopUndoRedoPropagation.bind( this );
 	}
 
-	stopUndoRedoPropagation( event ) {
+	stopUndoRedoPropagation( event: KeyboardEvent ) {
 		if ( ! event.metaKey && ! event.ctrlKey ) {
 			return;
 		}
@@ -304,8 +304,6 @@ class MediaUpload extends Component {
 
 	/**
 	 * Sets the Gallery frame and initializes listeners.
-	 *
-	 * @return {void}
 	 */
 	buildAndSetGalleryFrame() {
 		const {
@@ -313,7 +311,7 @@ class MediaUpload extends Component {
 			allowedTypes,
 			multiple = false,
 			value = DEFAULT_EMPTY_GALLERY,
-		} = this.props;
+		} = this.props as MediaUploadProps & { value?: number[] };
 
 		const isFrameAttached = !! this.frame?.el?.isConnected;
 		// If the value did not change and the existing frame is still attached,
@@ -322,7 +320,7 @@ class MediaUpload extends Component {
 			return;
 		}
 
-		const { wp } = window;
+		const { wp } = window as unknown as MediaWindow;
 
 		this.lastGalleryValue = value;
 
@@ -358,11 +356,9 @@ class MediaUpload extends Component {
 
 	/**
 	 * Initializes the Media Library requirements for the featured image flow.
-	 *
-	 * @return {void}
 	 */
 	buildAndSetFeatureImageFrame() {
-		const { wp } = window;
+		const { wp } = window as unknown as MediaWindow;
 		const { value: featuredImageId, multiple, allowedTypes } = this.props;
 		const featuredImageFrame = getFeaturedImageMediaFrame();
 		const attachments = getAttachmentsCollection( featuredImageId );
@@ -389,11 +385,9 @@ class MediaUpload extends Component {
 
 	/**
 	 * Initializes the Media Library requirements for the single image flow.
-	 *
-	 * @return {void}
 	 */
 	buildAndSetSingleMediaFrame() {
-		const { wp } = window;
+		const { wp } = window as unknown as MediaWindow;
 		const {
 			allowedTypes,
 			multiple = false,
@@ -401,7 +395,7 @@ class MediaUpload extends Component {
 			value,
 		} = this.props;
 
-		const frameConfig = {
+		const frameConfig: MediaFrameOptions = {
 			title,
 			multiple,
 		};
@@ -445,7 +439,7 @@ class MediaUpload extends Component {
 		}
 	}
 
-	onUpdate( selections ) {
+	onUpdate( selections?: MediaCollection ) {
 		const { onSelect, multiple = false } = this.props;
 		const state = this.frame.state();
 		const selectedImages = selections || state.get( 'selection' );
@@ -473,7 +467,7 @@ class MediaUpload extends Component {
 	}
 
 	onOpen() {
-		const { wp } = window;
+		const { wp } = window as unknown as MediaWindow;
 		const { value } = this.props;
 		this.updateCollection();
 
@@ -500,7 +494,7 @@ class MediaUpload extends Component {
 
 		const isGallery = this.props.gallery;
 		const selection = this.frame.state().get( 'selection' );
-		const valueArray = Array.isArray( value ) ? value : [ value ];
+		const valueArray = Array.isArray( value ) ? value : [ value! ];
 
 		if ( ! isGallery ) {
 			valueArray.forEach( ( id ) => {
@@ -542,7 +536,10 @@ class MediaUpload extends Component {
 		// https://github.com/WordPress/gutenberg/pull/70648). The editor runs on
 		// the default registry in practice, so the only case this misses is a
 		// custom registry, where the invalidation is effectively a no-op.
-		invalidateAttachmentResolutions( { select, dispatch } );
+		invalidateAttachmentResolutions( { select, dispatch } as Pick<
+			DataRegistry,
+			'select' | 'dispatch'
+		> );
 
 		this.frame.detach();
 	}
