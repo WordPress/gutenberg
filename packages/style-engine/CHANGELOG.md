@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Convert dimension presets for `height`, as for `minHeight`, `minWidth` and `width` ([#86123](https://github.com/WordPress/gutenberg/pull/86123)).
+
 ## 3.1.0 (2026-11-04)
 
 ## 3.0.0 (2026-10-20)
