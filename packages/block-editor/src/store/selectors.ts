@@ -2944,22 +2944,23 @@ export const getAllowedBlocks = createRegistrySelector( ( select ) =>
 	)
 );
 
-export const __experimentalGetAllowedBlocks = createSelector(
-	( state: State, rootClientId: string | null = null ) => {
-		deprecated(
-			'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
-			{
-				alternative:
-					'wp.data.select( "core/block-editor" ).getAllowedBlocks',
-				since: '6.2',
-				version: '6.4',
-			}
-		);
-		return getAllowedBlocks( state, rootClientId );
-	},
-	( state: State, rootClientId?: string | null ) =>
-		// @ts-expect-error A registry selector has no `getDependants`, so this throws.
-		getAllowedBlocks.getDependants( state, rootClientId )
+export const __experimentalGetAllowedBlocks = createRegistrySelector(
+	( select ) =>
+		(
+			state: State,
+			rootClientId: string | null = null
+		): ReturnType< typeof getAllowedBlocks > => {
+			deprecated(
+				'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
+				{
+					alternative:
+						'wp.data.select( "core/block-editor" ).getAllowedBlocks',
+					since: '6.2',
+					version: '6.4',
+				}
+			);
+			return select( STORE_NAME ).getAllowedBlocks( rootClientId );
+		}
 );
 
 /**
