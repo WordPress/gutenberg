@@ -1,3 +1,5 @@
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { createElement } from '@wordpress/element';
 import { postCategories, postTerms } from '@wordpress/icons';
 
 const variationIconMap = {
@@ -22,3 +24,17 @@ export default function enhanceVariations( settings, name ) {
 		variations,
 	};
 }
+
+// The layout support adds its flow classes to every block that supports layout. Post Terms blocks without a saved layout must have the original markup if no layout is set for backwards compat.
+export const withoutUnusedLayoutClasses = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		if ( props.name !== 'core/post-terms' || props.attributes.layout ) {
+			return createElement( BlockListBlock, props );
+		}
+		return createElement( BlockListBlock, {
+			...props,
+			__unstableLayoutClassNames: undefined,
+		} );
+	},
+	'withoutUnusedLayoutClasses'
+);

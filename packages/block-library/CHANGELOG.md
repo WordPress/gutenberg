@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Terms: Add layout and Block spacing support. Blocks without a saved layout render as before ([#85587](https://github.com/WordPress/gutenberg/issues/85587)).
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
