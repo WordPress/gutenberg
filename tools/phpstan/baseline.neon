@@ -373,12 +373,6 @@ parameters:
 			path: ../../packages/block-library/src/comment-author-avatar/index.php
 
 		-
-			message: '#^Parameter \#1 \$from of function human_time_diff expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-date/index.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 2
@@ -403,19 +397,7 @@ parameters:
 			path: ../../packages/block-library/src/file/index.php
 
 		-
-			message: '#^Cannot access property \$context on array\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: ../../packages/block-library/src/gallery/index.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/gallery/index.php
-
-		-
-			message: '#^Parameter \#2 \$block of function block_core_gallery_resolve_dynamic_source expects WP_Block, array given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/gallery/index.php
@@ -445,18 +427,6 @@ parameters:
 			path: ../../packages/block-library/src/image/index.php
 
 		-
-			message: '#^Parameter \#1 \$author_id of function get_author_posts_url expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/latest-comments/index.php
-
-		-
-			message: '#^Parameter \#2 \$timestamp_with_offset of function date_i18n expects bool\|int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/latest-comments/index.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''input'' given\.$#'
 			identifier: argument.type
 			count: 1
@@ -481,20 +451,8 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Function block_core_navigation_get_classic_menu_fallback_blocks\(\) should return array but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_navigation_post\(\) should return WP_Block_List but return statement is missing\.$#'
 			identifier: return.missing
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: mixed, post_name\: mixed, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
@@ -553,18 +511,6 @@ parameters:
 			path: ../../packages/block-library/src/post-featured-image/index.php
 
 		-
-			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
-			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\<0, max\>\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
 			message: '#^Offset ''shortcodes_regexp'' does not exist on array\{html_regexp\: ''/\<\\\\/\?\[a\-z\]\[\^\>\]\*\?\>/i'', html_comment_regexp\: ''/\<\!\-\-\[\\\\s\\\\S\]\*\?\-\-\>/'', space_regexp\: ''/&nbsp;\|&\#160;/i'', html_entity_regexp\: ''/&\\\\S\+\?;/'', connector_regexp\: ''/\-\-\|\\\\x\{2014\}/u'', remove_regexp\: ''/\[\\\\x\{0021\}\-\\\\x\{0040\}…'', astral_regexp\: ''/\[\\\\x\{010000\}\-\\\\x…'', words_regexp\: ''/\\\\S\\\\s\+/u'', \.\.\.\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -575,24 +521,6 @@ parameters:
 			identifier: empty.offset
 			count: 1
 			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
-			message: '#^Parameter \#1 \$number of function number_format_i18n expects float, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
-			message: '#^Parameter \#3 \$number of function _n expects int, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
-			message: '#^Parameter \#3 \$side of function apply_block_core_search_border_style expects string, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/search/index.php
 
 		-
 			message: '#^Variable \$is_expandable_searchfield might not be defined\.$#'

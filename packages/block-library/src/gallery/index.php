@@ -463,9 +463,9 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  *
  * @since 6.0.0
  *
- * @param array  $attributes Attributes of the block being rendered.
- * @param string $content    Content of the block being rendered.
- * @param array  $block      The block instance being rendered.
+ * @param array    $attributes Attributes of the block being rendered.
+ * @param string   $content    Content of the block being rendered.
+ * @param WP_Block $block      The block instance being rendered.
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {

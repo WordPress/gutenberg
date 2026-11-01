@@ -23,7 +23,7 @@
  * @param string $text Text to count elements in.
  * @param string $type The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  *
- * @return string The rendered word count.
+ * @return int The number of words or characters in the text.
  */
 function block_core_post_time_to_read_word_count( $text, $type ) {
 	$settings = array(
