@@ -1,8 +1,5 @@
-import {
-	createBlockEditFilter,
-	createBlockListBlockFilter,
-	createBlockSaveFilter,
-} from './utils';
+import { createBlockEditFilter, createBlockSaveFilter } from './utils';
+import { setBlockListBlockFeatures } from '../components/block-list/block-supports';
 import './compat';
 import align from './align';
 import background from './background';
@@ -56,7 +53,7 @@ createBlockEditFilter(
 		AutoRegisterControls,
 	].filter( Boolean )
 );
-createBlockListBlockFilter( [
+setBlockListBlockFeatures( [
 	align,
 	textAlign,
 	background,

@@ -239,14 +239,14 @@ export function isExplicitAspectRatio( aspectRatio: unknown ) {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
 	attributeKeys: [ 'height', 'minHeight', 'width', 'style' ],
 	hasSupport( name: string | BlockType ) {
 		return hasDimensionsSupport( name );
 	},
 };
 
-function useBlockProps( {
+function getBlockProps( {
 	name,
 	height,
 	minHeight,

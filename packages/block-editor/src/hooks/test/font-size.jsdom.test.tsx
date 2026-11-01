@@ -1,6 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	getBlockTypes,
 	registerBlockType,
@@ -20,17 +18,17 @@ const fontSizes = [
 	},
 ];
 
-function addUseSettingFilter(
-	callback: ( result: unknown, path: string ) => unknown
-) {
-	addFilter(
-		'blockEditor.useSetting.before',
-		'test/useSetting.before',
-		callback
+// The settings font sizes read, as the callback resolves them.
+function getSettings( callback: ( result: unknown, path: string ) => unknown ) {
+	return Object.fromEntries(
+		_fontSize.settings.map( ( path ) => [
+			path,
+			callback( undefined, path ),
+		] )
 	);
 }
 
-describe( 'useBlockProps', () => {
+describe( 'getBlockProps', () => {
 	const blockSettings = {
 		apiVersion: 3,
 		save: () => noop,
@@ -48,10 +46,6 @@ describe( 'useBlockProps', () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
-		removeFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before'
-		);
 	} );
 
 	it( 'should return preset classname', () => {
@@ -60,7 +54,7 @@ describe( 'useBlockProps', () => {
 			blockSettings.name,
 			blockSettings as unknown as BlockConfiguration
 		);
-		addUseSettingFilter( ( result, path ) => {
+		const settings = getSettings( ( result, path ) => {
 			if ( 'typography.fontSizes' === path ) {
 				return fontSizes;
 			}
@@ -76,21 +70,17 @@ describe( 'useBlockProps', () => {
 			return result;
 		} );
 
-		const { result } = renderHook( () =>
-			_fontSize.useBlockProps( {
+		const props = _fontSize.getBlockProps(
+			{
 				name: blockSettings.name,
 				fontSize: 'larger',
-			} )
+			},
+			{ settings }
 		);
 		// The block has a font size, so it gets a style.
-		const { style, className } = result.current!;
+		const { style, className } = props!;
 		expect( className ).toBe( 'has-larger-font-size' );
 		expect( style!.fontSize ).toBe( '32px' );
-
-		removeFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before'
-		);
 	} );
 
 	it( 'should return custom font size', () => {
@@ -99,7 +89,7 @@ describe( 'useBlockProps', () => {
 			blockSettings.name,
 			blockSettings as unknown as BlockConfiguration
 		);
-		addUseSettingFilter( ( result, path ) => {
+		const settings = getSettings( ( result, path ) => {
 			if ( 'typography.fontSizes' === path ) {
 				return EMPTY_ARRAY;
 			}
@@ -115,24 +105,20 @@ describe( 'useBlockProps', () => {
 			return result;
 		} );
 
-		const { result } = renderHook( () =>
-			_fontSize.useBlockProps( {
+		const props = _fontSize.getBlockProps(
+			{
 				name: blockSettings.name,
 				style: {
 					typography: {
 						fontSize: '28px',
 					},
 				},
-			} )
+			},
+			{ settings }
 		);
 		// The block has a font size, so it gets a style.
-		const { style } = result.current!;
+		const { style } = props!;
 		expect( style!.fontSize ).toBe( '28px' );
-
-		removeFilter(
-			'blockEditor.useSetting.before',
-			'test/useSetting.before'
-		);
 	} );
 
 	it( 'should convert custom font sizes to fluid', () => {
@@ -141,7 +127,7 @@ describe( 'useBlockProps', () => {
 			blockSettings.name,
 			blockSettings as unknown as BlockConfiguration
 		);
-		addUseSettingFilter( ( result, path ) => {
+		const settings = getSettings( ( result, path ) => {
 			if ( 'typography.fontSizes' === path ) {
 				return EMPTY_ARRAY;
 			}
@@ -157,18 +143,19 @@ describe( 'useBlockProps', () => {
 			return result;
 		} );
 
-		const { result } = renderHook( () =>
-			_fontSize.useBlockProps( {
+		const props = _fontSize.getBlockProps(
+			{
 				name: blockSettings.name,
 				style: {
 					typography: {
 						fontSize: '28px',
 					},
 				},
-			} )
+			},
+			{ settings }
 		);
 		// The block has a font size, so it gets a style.
-		const { style } = result.current!;
+		const { style } = props!;
 		expect( style!.fontSize ).toBe(
 			'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)'
 		);

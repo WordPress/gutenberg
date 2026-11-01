@@ -15,7 +15,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { withDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 import type { ComponentType, ReactNode } from 'react';
@@ -23,6 +23,11 @@ import type { Block as BlockObject } from '@wordpress/blocks';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
+import {
+	getBlockSupportProps,
+	getBlockSupportSettings,
+	selectBlockSupportSettings,
+} from './block-supports';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
@@ -118,6 +123,7 @@ function BlockListBlock( {
 		mayDisplayParentControls,
 		isSelectionWithinCurrentSection,
 		themeSupportsLayout,
+		blockSupportProps,
 		...context
 	} = useContext( PrivateBlockContext );
 
@@ -154,6 +160,10 @@ function BlockListBlock( {
 	);
 
 	const blockType = getBlockType( name );
+
+	// The block supports' props apply after those of the filters, as when they
+	// were applied by the innermost filter.
+	wrapperProps = mergeWrapperProps( wrapperProps, blockSupportProps );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
@@ -719,6 +729,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				canMoveBlock,
 
 				getSettings,
+				getBlockSettings,
 				getEditedContentOnlySection,
 				getBlockEditingMode,
 				getBlockName,
@@ -800,6 +811,16 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
+				blockEditorSettings: settings,
+				// Settings resolve for the parent, as `useSettings` did in the
+				// block supports, above the block's own edit context.
+				...selectBlockSupportSettings(
+					blockName,
+					clientId,
+					attributes ?? {},
+					( ...paths ) =>
+						getBlockSettings( rootClientId || null, ...paths )
+				),
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -905,6 +926,9 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 
 	const currentViewport = useContext( CurrentViewport );
 
+	const registry = useRegistry();
+	const parentLayout = useLayout();
+
 	// Users of the editor.BlockListBlock filter used to be able to
 	// access the block prop.
 	// Ideally these blocks would rely on the clientId prop only.
@@ -973,7 +997,16 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		currentViewport
 	);
 
+	const { wrapperProps: blockSupportProps, effects: blockSupportEffects } =
+		getBlockSupportProps( name, clientId, attributes ?? {}, {
+			settings: getBlockSupportSettings( selectedProps ),
+			blockEditorSettings: selectedProps.blockEditorSettings,
+			parentLayout,
+			select: registry.select,
+		} );
+
 	const privateContext = {
+		blockSupportProps,
 		isPreviewMode,
 		ghostBlock,
 		rootClientId,
@@ -1034,6 +1067,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	// consumers might be memoized or "pure".
 	return (
 		<PrivateBlockContext.Provider value={ privateContext }>
+			{ blockSupportEffects }
 			<FilteredBlockListBlock
 				{ ...props }
 				// WARNING: all the following props are public API (through the

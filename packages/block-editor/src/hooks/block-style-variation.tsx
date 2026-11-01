@@ -12,6 +12,7 @@ import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockListBlockFeatureProps,
+	BlockSupportContext,
 	BlockStyleVariationOverridesWithConfigProps,
 	OverrideStylesProps,
 	StyleOverrideOptions,
@@ -229,7 +230,26 @@ function useBlockStyleVariation(
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
 // This is so that the variation style override's ID is predictable
 // when the order of applied style variations changes.
-function useBlockProps( {
+function getBlockProps(
+	{
+		name,
+		className,
+		clientId,
+	}: BlockListBlockFeatureProps & {
+		className?: string;
+	},
+	{ select }: Pick< BlockSupportContext, 'select' >
+) {
+	const variation = getVariationNameFromClass(
+		className,
+		select( blocksStore ).getBlockStyles( name )
+	);
+	return variation
+		? { className: `${ VARIATION_PREFIX }${ variation }-${ clientId }` }
+		: {};
+}
+
+function useStyles( {
 	name,
 	className,
 	clientId,
@@ -238,7 +258,6 @@ function useBlockProps( {
 
 	const registeredStyles = getBlockStyles( name );
 	const variation = getVariationNameFromClass( className, registeredStyles );
-	const variationClass = `${ VARIATION_PREFIX }${ variation }-${ clientId }`;
 
 	const { settings, styles } = useBlockStyleVariation(
 		name,
@@ -287,8 +306,6 @@ function useBlockProps( {
 		// correct CSS cascade is maintained.
 		clientId,
 	} );
-
-	return variation ? { className: variationClass } : {};
 }
 
 export default {
@@ -296,5 +313,6 @@ export default {
 	attributeKeys: [ 'className' ],
 	isMatch: ( { className }: { className?: string } ) =>
 		getVariationMatches( className ).length > 0,
-	useBlockProps,
+	getBlockProps,
+	useStyles,
 };
