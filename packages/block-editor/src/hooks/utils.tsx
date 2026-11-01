@@ -7,12 +7,6 @@ import { addFilter } from '@wordpress/hooks';
 import type { Block, BlockType } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
 import type { Dispatch, SetStateAction } from 'react';
-import {
-	useBlockEditContext,
-	mayDisplayControlsKey,
-	mayDisplayParentControlsKey,
-	mayDisplayPatternEditingControlsKey,
-} from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import {
@@ -25,8 +19,6 @@ import { unlock } from '../lock-unlock';
 import type { StyleOverride } from '../store/types';
 import type { StyleSettings } from '../components/global-styles/types';
 import type {
-	BlockEditFeature,
-	BlockEditHookProps,
 	BlockListBlockFeature,
 	BlockListBlockFeatureProps,
 	BlockListBlockHookProps,
@@ -580,93 +572,6 @@ export function useBlockSettings(
 
 	// Theme.json settings arrive untyped.
 	return useSettingsForBlockElement( rawSettings as StyleSettings, name );
-}
-
-export function createBlockEditFilter( features: BlockEditFeature[] ) {
-	// We don't want block controls to re-render when typing inside a block.
-	// `memo` will prevent re-renders unless props change, so only pass the
-	// needed props and not the whole attributes object.
-	features = features.map( ( settings ) => {
-		return { ...settings, Edit: memo( settings.edit ) };
-	} );
-	const withBlockEditHooks = createHigherOrderComponent(
-		( OriginalBlockEdit ) =>
-			function WithBlockEditHooks( props: BlockEditHookProps ) {
-				const context = useBlockEditContext();
-				// CAUTION: code added before this line will be executed for all
-				// blocks, not just those that support the feature! Code added
-				// above this line should be carefully evaluated for its impact on
-				// performance.
-				return [
-					...features.map( ( feature, i ) => {
-						// Every feature was mapped above to carry its memoized `Edit`.
-						const {
-							Edit,
-							hasSupport,
-							attributeKeys = [],
-							shareWithChildBlocks,
-							supportsPatternEditing,
-						} = feature as BlockEditFeature & {
-							Edit: BlockEditFeature[ 'edit' ];
-						};
-						// Explicit `false` hides the feature during pattern editing,
-						// even when the block is selected.
-						if (
-							context[ mayDisplayPatternEditingControlsKey ] &&
-							supportsPatternEditing === false
-						) {
-							return null;
-						}
-
-						const shouldDisplayControls =
-							// Explicit `true` also shows controls for unselected blocks
-							// in the section. `undefined` uses the selection/parent rules.
-							( supportsPatternEditing === true &&
-								context[
-									mayDisplayPatternEditingControlsKey
-								] ) ||
-							context[ mayDisplayControlsKey ] ||
-							( context[ mayDisplayParentControlsKey ] &&
-								shareWithChildBlocks );
-
-						if (
-							! shouldDisplayControls ||
-							! hasSupport( props.name )
-						) {
-							return null;
-						}
-
-						const neededProps: Record< string, unknown > = {};
-						for ( const key of attributeKeys ) {
-							if ( props.attributes[ key ] ) {
-								neededProps[ key ] = props.attributes[ key ];
-							}
-						}
-
-						return (
-							<Edit
-								// We can use the index because the array length
-								// is fixed per page load right now.
-								key={ i }
-								name={ props.name }
-								isSelected={ props.isSelected }
-								clientId={ props.clientId }
-								setAttributes={ props.setAttributes }
-								__unstableParentLayout={
-									props.__unstableParentLayout
-								}
-								// This component is pure, so only pass needed
-								// props!!!
-								{ ...neededProps }
-							/>
-						);
-					} ),
-					<OriginalBlockEdit key="edit" { ...props } />,
-				];
-			},
-		'withBlockEditHooks'
-	);
-	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
 }
 
 function BlockProps( {
