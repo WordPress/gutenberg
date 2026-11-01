@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { getLuminance, serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+import {
+	get,
+	getLuminance,
+	serialize,
+	to,
+	HSL,
+	OKLCH,
+	sRGB,
+} from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '..';
 import { buildRamp } from '../lib';
 import {
@@ -182,6 +190,48 @@ describe( 'buildRamps', () => {
 					} )
 				)
 			).toMatchSnapshot();
+		}
+	);
+
+	it.each( [
+		// The "Modern" and "Light" admin backgrounds.
+		'#222524',
+		'#eaeeed',
+		// Near-white seeds whose tint is barely perceptible.
+		'#fcfcfd',
+		'#f6f7f9',
+	] )(
+		'keeps the generated neutral steps of near-gray seed %s in its hue and near-gray',
+		( seed ) => {
+			const { ramp } = buildBgRamp( seed );
+			const seedChroma = get( seed, [ OKLCH, 'c' ] );
+			const seedHue = get( seed, [ OKLCH, 'h' ] );
+
+			for ( const step of [
+				'surface1',
+				'surface3',
+				'surface6',
+				'stroke1',
+				'stroke2',
+				'stroke3',
+				'stroke4',
+			] as const ) {
+				const chroma = get( ramp[ step ], [ OKLCH, 'c' ] );
+				const hueDistance = Math.abs(
+					get( ramp[ step ], [ OKLCH, 'h' ] ) - seedHue
+				);
+
+				// Pure white and black have no room for chroma.
+				const lightness = get( ramp[ step ], [ OKLCH, 'l' ] );
+				if ( lightness > 0.999 || lightness < 0.001 ) {
+					continue;
+				}
+				expect( chroma ).toBeGreaterThan( 0 );
+				expect( chroma ).toBeLessThan( seedChroma * 6 );
+				expect(
+					Math.min( hueDistance, 360 - hueDistance )
+				).toBeLessThan( 15 );
+			}
 		}
 	);
 
