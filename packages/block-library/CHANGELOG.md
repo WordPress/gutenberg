@@ -5,10 +5,13 @@
 ### Enhancements
 
 -   Post Terms: Add layout and Block spacing support. Blocks without a saved layout render as before ([#85587](https://github.com/WordPress/gutenberg/issues/85587)).
+-   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
 
+-   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
+-   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
 -   Navigation Link, Navigation Submenu: Keep the bold, italic, and other formatting of the text when editing it in the sidebar's Text field ([#85223](https://github.com/WordPress/gutenberg/pull/85223)).
 -   Playlist: Keep `&` intact in track audio and image URLs on the front end, so URLs with several query parameters, such as signed CDN or S3 links, load instead of being cut off at the first `&` ([#85931](https://github.com/WordPress/gutenberg/pull/85931)).
 -   Paragraph: Don't show an empty group in the block toolbar when the theme offers neither text alignment nor wide alignment ([#85796](https://github.com/WordPress/gutenberg/pull/85796)).
@@ -24,6 +27,7 @@
 -   Post Navigation Link, Comments Pagination: Escape the link labels before rendering. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
 
 ## 12.0.0 (2026-10-20)
 
