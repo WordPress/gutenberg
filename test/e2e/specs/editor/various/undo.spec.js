@@ -164,6 +164,158 @@ test.describe( 'undo', () => {
 		} );
 	} );
 
+	test( 'should undo formatting separately from typing', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'one two' );
+		await editor.page.waitForTimeout( 1000 );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( ' three' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one <strong>two</strong> three</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one <strong>two</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one two</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( '' );
+
+		// Undo inserting the paragraph.
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+	} );
+
+	test( 'should not end the undo level when leaving a format with the arrow key', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a<strong>b</strong>' },
+		} );
+		await page.keyboard.press( 'End' );
+		// At the end of a format, the arrow keys enter and leave it without
+		// moving the caret.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'y' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong>y</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
+	test( 'should undo each format change across blocks separately', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// The same text on both lines, so the caret lands between the same
+		// letters one line up.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toHaveLength( 2 );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await pageUtils.pressKeys( 'primary+i' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong><em>b</em></strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>a</em></strong>b</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>a</strong>b</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>ab</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ab</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
 	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )

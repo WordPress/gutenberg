@@ -5,24 +5,30 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import {
-	HorizontalRule,
-	SelectControl as WCSelectControl,
-} from '@wordpress/components';
+import { HorizontalRule } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import useDeprecatedOpacity from './use-deprecated-opacity';
 
-const HtmlElementControl = ( { tagName, setAttributes } ) => {
+const HTML_ELEMENT_ITEMS = [
+	{ label: __( 'Default (<hr>)' ), value: 'hr' },
+	{ label: '<div>', value: 'div' },
+];
+
+const HtmlElementControl = ( { tagName = 'hr', setAttributes } ) => {
+	const selectedItem =
+		HTML_ELEMENT_ITEMS.find( ( item ) => item.value === tagName ) ??
+		HTML_ELEMENT_ITEMS[ 0 ];
+
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'HTML element' ) }
-			value={ tagName }
-			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }
-			options={ [
-				{ label: __( 'Default (<hr>)' ), value: 'hr' },
-				{ label: '<div>', value: 'div' },
-			] }
-			help={
+			value={ selectedItem }
+			onValueChange={ ( item ) =>
+				setAttributes( { tagName: item?.value ?? 'hr' } )
+			}
+			items={ HTML_ELEMENT_ITEMS }
+			description={
 				tagName === 'hr'
 					? __(
 							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
