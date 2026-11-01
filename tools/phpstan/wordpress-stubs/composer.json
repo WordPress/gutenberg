@@ -1,12 +1,13 @@
 {
 	"name": "php-stubs/wordpress-stubs",
-	"version": "7.2.0-beta3.65047",
-	"description": "WordPress stubs generated from https://github.com/WordPress/wordpress-develop/commit/cb5eaeacdfec3c15eae12f52397520d06ae190de (r65047), in place of the released package.",
+	"version": "7.2.0-beta3.65159",
+	"description": "WordPress stubs generated from https://github.com/WordPress/wordpress-develop/pull/15305 at https://github.com/WordPress/wordpress-develop/commit/8c9fb0b67b8570e0a4ef6430e089bf8ba3a99370, based on r65159, in place of the released package.",
 	"license": "GPL-2.0-or-later",
 	"extra": {
 		"source": {
-			"commit": "cb5eaeacdfec3c15eae12f52397520d06ae190de",
-			"revision": 65047
+			"commit": "8c9fb0b67b8570e0a4ef6430e089bf8ba3a99370",
+			"pull-request": 15305,
+			"revision": 65159
 		}
 	}
 }
