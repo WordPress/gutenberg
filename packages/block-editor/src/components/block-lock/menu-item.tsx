@@ -3,13 +3,13 @@ import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { lock, unlock } from '@wordpress/icons';
 import useBlockLock from './use-block-lock';
-import type { BlockLockControlProps } from './types';
+import type { BlocksLockControlProps } from './types';
 import BlockLockModal from './modal';
 
 export default function BlockLockMenuItem( {
-	clientId,
-}: BlockLockControlProps ) {
-	const { canLock, isLocked } = useBlockLock( clientId );
+	clientIds,
+}: BlocksLockControlProps ) {
+	const { canLock, isLocked } = useBlockLock( clientIds );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive: boolean ) => ! isActive,
@@ -33,7 +33,10 @@ export default function BlockLockMenuItem( {
 				{ label }
 			</MenuItem>
 			{ isModalOpen && (
-				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
+				<BlockLockModal
+					clientIds={ clientIds }
+					onClose={ toggleModal }
+				/>
 			) }
 		</>
 	);
