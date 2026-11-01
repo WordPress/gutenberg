@@ -112,11 +112,13 @@ The available `source` values are:
 - `query` - data is stored as an array of objects.
 - `meta` - data is stored in post meta (deprecated).
 
-The `source` field is usually combined with a `selector` field. If no selector argument is specified, the source definition runs against the block's root node. If a selector argument is specified, it will run against the matching element(s) within the block.
+The `source` field is usually combined with a `selector` field. If no selector argument is specified, the source definition runs against the body element that wraps the block's markup, not the block's root element itself. To read a value from the block's root element, use a selector that matches it, such as its tag or a class. If a selector argument is specified, the source definition runs against the matching element(s) within the block.
 
 The `selector` can be an HTML tag, or anything queryable with [querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), such as a class or id attribute. Examples are given below.
 
 For example, a `selector` of `img` will match an `img` element, and `img.class` will match an `img` element that has a class of `class`.
+
+A selector can also match the block's root element itself. For example, if a block saves `<div class="wp-block-myplugin-section" data-section-name="…">`, an attribute sourced from `data-section-name` needs `"selector": "div.wp-block-myplugin-section"` (or simply `"div"`) — without a selector, the block's own attributes are not matched.
 
 Under the hood, attribute sources are a superset of the functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape.
 
