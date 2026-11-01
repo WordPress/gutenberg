@@ -229,6 +229,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'default' => 'height',
 					),
 					'path'          => array( 'dimensions', 'height' ),
+					'css_vars'      => array(
+						'dimension' => '--wp--preset--dimension--$slug',
+					),
 				),
 				'minHeight'   => array(
 					'property_keys' => array(
