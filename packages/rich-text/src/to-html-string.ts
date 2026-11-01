@@ -6,6 +6,28 @@ import {
 import { toTree } from './to-tree';
 import type { HTMLTreeNode, RichTextValue } from './types';
 
+const VOID_ELEMENTS = new Set( [
+	'area',
+	'base',
+	'br',
+	'col',
+	'embed',
+	'hr',
+	'img',
+	'input',
+	'link',
+	'meta',
+	'source',
+	'track',
+	'wbr',
+	// Browsers also keep these obsolete elements void when parsing HTML.
+	'basefont',
+	'bgsound',
+	'frame',
+	'keygen',
+	'param',
+] );
+
 /**
  * Create an HTML string from a Rich Text value.
  *
@@ -110,7 +132,7 @@ function createElementHTML( {
 		) }"`;
 	}
 
-	if ( object ) {
+	if ( object && type && VOID_ELEMENTS.has( type.toLowerCase() ) ) {
 		return `<${ type }${ attributeString }>`;
 	}
 
