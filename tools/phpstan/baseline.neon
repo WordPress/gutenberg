@@ -421,12 +421,6 @@ parameters:
 			path: ../../packages/block-library/src/gallery/index.php
 
 		-
-			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: ../../packages/block-library/src/home-link/index.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
 			identifier: argument.type
 			count: 1
@@ -469,18 +463,6 @@ parameters:
 			path: ../../packages/block-library/src/loginout/index.php
 
 		-
-			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: ../../packages/block-library/src/navigation-link/index.php
-
-		-
-			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: ../../packages/block-library/src/navigation-submenu/index.php
-
-		-
 			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -507,12 +489,6 @@ parameters:
 		-
 			message: '#^Method WP_Navigation_Block_Renderer\:\:get_inner_blocks_from_navigation_post\(\) should return WP_Block_List but return statement is missing\.$#'
 			identifier: return.missing
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^PHPDoc tag @throws with type WP_Error is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
@@ -671,18 +647,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: ../../packages/style-engine/src/class-wp-style-engine-css-rules-store.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(string\? \$style_value A single css preset value\.\)\: Unexpected token "\?", expected variable at offset 93 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../../packages/style-engine/src/class-wp-style-engine.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(void\.\)\: Unexpected token "\.", expected TOKEN_HORIZONTAL_WS at offset 929 on line 10$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: ../../packages/style-engine/src/class-wp-style-engine.php
 
 		-
 			message: '#^Parameter \#1 \$style_value of static method WP_Style_Engine\:\:get_slug_from_preset_value\(\) expects string, array given\.$#'
