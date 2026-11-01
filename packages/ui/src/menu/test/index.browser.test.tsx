@@ -20,6 +20,7 @@ import {
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { copySmall } from '@wordpress/icons';
+import '@wordpress/theme/design-tokens.css';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -193,10 +194,7 @@ describe( 'Menu', () => {
 		const item = await screen.findByRole( 'menuitem', {
 			name: 'Move to',
 		} );
-		const icon = within( item ).getByRole( 'img', {
-			hidden: true,
-			name: 'Copy icon',
-		} );
+		const icon = within( item ).getByRole( 'img', { hidden: true } );
 		const label = within( item ).getByText( 'Move to' );
 
 		// The submenu chevron is taller than the label line. It must not
