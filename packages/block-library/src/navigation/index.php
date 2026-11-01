@@ -1095,7 +1095,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 */
 	function block_core_navigation_get_menu_items_at_location( $location ) {
 		if ( empty( $location ) ) {
-			return;
+			return array();
 		}
 
 		// Build menu data. The following approximates the code in
@@ -1105,14 +1105,14 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		// location can't be found.
 		$locations = get_nav_menu_locations();
 		if ( ! isset( $locations[ $location ] ) ) {
-			return;
+			return array();
 		}
 
 		// Get the menu from the location, returning early if there is no
 		// menu or there was an error.
 		$menu = wp_get_nav_menu_object( $locations[ $location ] );
 		if ( ! $menu || is_wp_error( $menu ) ) {
-			return;
+			return array();
 		}
 
 		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
@@ -1952,7 +1952,7 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::create_classic_menu_fallback() instead.
  *
- * @return array the normalized parsed blocks.
+ * @return WP_Post|null The most recently published Navigation post, or null if no classic menu could be converted.
  */
 function block_core_navigation_maybe_use_classic_menu_fallback() {
 
@@ -1962,14 +1962,14 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
 
 	if ( ! $classic_nav_menu ) {
-		return;
+		return null;
 	}
 
 	// If we have a classic menu then convert it to blocks.
 	$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
 
 	if ( empty( $classic_nav_menu_blocks ) ) {
-		return;
+		return null;
 	}
 
 	// Create a new navigation menu from the classic menu.
@@ -1985,7 +1985,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	);
 
 	if ( is_wp_error( $wp_insert_post_result ) ) {
-		return;
+		return null;
 	}
 
 	// Fetch the most recently published navigation which will be the classic one created above.

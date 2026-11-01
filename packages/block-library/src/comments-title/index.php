@@ -17,7 +17,7 @@
 function render_block_core_comments_title( $attributes ) {
 
 	if ( post_password_required() ) {
-		return;
+		return '';
 	}
 
 	$align_class_name    = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
@@ -32,7 +32,7 @@ function render_block_core_comments_title( $attributes ) {
 	}
 
 	if ( '0' === $comments_count ) {
-		return;
+		return '';
 	}
 
 	if ( $show_comments_count ) {
