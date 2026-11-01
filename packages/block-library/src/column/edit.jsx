@@ -19,6 +19,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 
 function ColumnInspectorControls( { width, setAttributes } ) {
 	const [ availableUnits ] = useSettings( 'spacing.units' );
@@ -75,24 +76,44 @@ function ColumnEdit( {
 	setAttributes,
 	clientId,
 } ) {
+	const { columnsIds, hasChildBlocks, rootClientId, hasCollapsibleAppender } =
+		useSelect(
+			( select ) => {
+				const selectors = select( blockEditorStore );
+				const {
+					getBlockCount,
+					getBlockOrder,
+					getBlockRootClientId,
+					isBlockSelected,
+					isBlockMultiSelected,
+					hasSelectedInnerBlock,
+					isDraggingBlocks,
+				} = selectors;
+
+				const rootId = getBlockRootClientId( clientId );
+				const siblings = getBlockOrder( rootId );
+				const hasChildren = getBlockCount( clientId ) > 0;
+
+				return {
+					hasChildBlocks: hasChildren,
+					rootClientId: rootId,
+					columnsIds: siblings,
+					hasCollapsibleAppender:
+						! hasChildren &&
+						siblings.some( ( id ) => getBlockCount( id ) > 0 ) &&
+						! isBlockSelected( rootId ) &&
+						! isBlockMultiSelected( rootId ) &&
+						! hasSelectedInnerBlock( rootId, true ) &&
+						! isDraggingBlocks() &&
+						! unlock( selectors ).isDragging(),
+				};
+			},
+			[ clientId ]
+		);
 	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		'has-collapsible-appender': hasCollapsibleAppender,
 	} );
-	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
-		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } =
-				select( blockEditorStore );
-
-			const rootId = getBlockRootClientId( clientId );
-
-			return {
-				hasChildBlocks: getBlockOrder( clientId ).length > 0,
-				rootClientId: rootId,
-				columnsIds: getBlockOrder( rootId ),
-			};
-		},
-		[ clientId ]
-	);
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
