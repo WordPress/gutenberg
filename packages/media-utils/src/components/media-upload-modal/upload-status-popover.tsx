@@ -3,7 +3,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
 	Icon as WCIcon,
-	Notice,
+	Notice as WCNotice,
 	Popover,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
@@ -138,7 +138,7 @@ export function UploadStatusPopover( {
 									</span>
 								) }
 								{ file.status === 'error' && (
-									<Notice
+									<WCNotice
 										status="error"
 										isDismissible={ !! onDismissError }
 										onRemove={ () =>
@@ -146,7 +146,7 @@ export function UploadStatusPopover( {
 										}
 									>
 										{ file.name }: { file.error }
-									</Notice>
+									</WCNotice>
 								) }
 							</li>
 						) ) }
