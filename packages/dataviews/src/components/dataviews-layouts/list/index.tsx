@@ -33,6 +33,7 @@ import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
 import type { SelectionProps } from '../utils/use-selection-props';
 import getActionLabel from '../../../utils/get-action-label';
+import getActionPopup from '../../../utils/get-action-popup';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -91,6 +92,7 @@ function PrimaryActionGridCell< Item >( {
 						accessibleWhenDisabled
 						text={ label }
 						size="small"
+						aria-haspopup="dialog"
 						onClick={ () => setIsModalOpen( true ) }
 					/>
 				}
@@ -113,6 +115,7 @@ function PrimaryActionGridCell< Item >( {
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
 						size="small"
+						aria-haspopup={ getActionPopup( primaryAction ) }
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
@@ -283,6 +286,10 @@ function ListItem< Item >( {
 				/>
 			}
 			role={ infiniteScrollEnabled ? 'article' : 'row' }
+			// Otherwise the row is named after all of its content: the title,
+			// the actions and every field. The fields stay available as the
+			// description of the item.
+			aria-labelledby={ labelId }
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,

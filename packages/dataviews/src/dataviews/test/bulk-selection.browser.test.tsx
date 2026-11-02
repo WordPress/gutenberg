@@ -95,10 +95,12 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.toHaveFocus();
 	await user.keyboard( '{Tab}' );
 	await expect
-		.element( page.getByRole( 'button', { name: 'Cancel', exact: true } ) )
+		.element(
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
+		)
 		.toHaveFocus();
 	await user.click(
-		page.getByRole( 'button', { name: 'Cancel', exact: true } )
+		page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 	);
 
 	await expect
@@ -133,7 +135,7 @@ it( 'blocks focus on bulk actions and covers column headings while loading', asy
 		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
 	);
 	const cancel = page
-		.getByRole( 'button', { name: 'Cancel', exact: true } )
+		.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		.element();
 	const table = page.getByRole( 'table' ).element();
 	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
@@ -243,7 +245,10 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			).toBeLessThanOrEqual( 0.5 );
 			await expect
 				.element(
-					page.getByRole( 'button', { name: 'Cancel', exact: true } )
+					page.getByRole( 'button', {
+						name: 'Clear selection',
+						exact: true,
+					} )
 				)
 				.toBeInViewport();
 		}
@@ -254,7 +259,7 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			.poll( () => toolbar.getBoundingClientRect().height )
 			.toBe( 96 );
 		await user.click(
-			page.getByRole( 'button', { name: 'Cancel', exact: true } )
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		);
 		await expect
 			.element(
@@ -416,7 +421,7 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 	page.getByRole( 'gridcell' ).first().element().focus();
 	await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowUp}{Tab}{Tab}' );
 	const checkbox = page.getByRole( 'checkbox', {
-		name: 'Post 1',
+		name: 'Select Post 1',
 		exact: true,
 	} );
 	await expect.element( checkbox ).toHaveFocus();
@@ -431,4 +436,105 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 			);
 		} )
 		.toBe( true );
+} );
+
+function TrashableTable() {
+	const [ items, setItems ] = useState( posts );
+	const [ view, setView ] = useState< View >( {
+		type: 'table',
+		titleField: 'title',
+		fields: [ 'author' ],
+		page: 1,
+		perPage: 10,
+	} );
+	const { data, paginationInfo } = filterSortAndPaginate(
+		items,
+		view,
+		fields
+	);
+	const trashAction: Action< Post > = {
+		id: 'trash',
+		label: 'Trash',
+		isPrimary: true,
+		supportsBulk: true,
+		RenderModal: ( { items: itemsToTrash, closeModal } ) => (
+			<button
+				onClick={ () => {
+					const ids = itemsToTrash.map( ( { id } ) => id );
+					setItems( ( current ) =>
+						current.filter( ( { id } ) => ! ids.includes( id ) )
+					);
+					closeModal?.();
+				} }
+			>
+				Confirm
+			</button>
+		),
+	};
+	return (
+		<DataViews
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ setView }
+			actions={ [ trashAction ] }
+			paginationInfo={ paginationInfo }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'moves focus to the select all checkbox when an action removes the item that held it', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	await user.click(
+		page
+			.getByRole( 'row', { name: /First post/ } )
+			.getByRole( 'button', { name: 'Trash', exact: true } )
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'Confirm', exact: true } )
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+function TableOf( { items }: { items: Post[] } ) {
+	return (
+		<DataViews
+			data={ items }
+			fields={ fields }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [ 'author' ],
+				page: 1,
+				perPage: 10,
+			} }
+			onChangeView={ () => {} }
+			actions={ actions }
+			paginationInfo={ { totalItems: items.length, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'leaves focus alone when it was moved away before the item was removed', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	const checkbox = page
+		.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
+		.element() as HTMLElement;
+	checkbox.focus();
+	checkbox.blur();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	expect( checkbox.ownerDocument.body ).toHaveFocus();
 } );

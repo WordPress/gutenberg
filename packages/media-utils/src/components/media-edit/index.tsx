@@ -399,6 +399,19 @@ function ExpandedMediaEditAttachments( {
 						</MediaPickerButton>
 						{ ! isBlob && (
 							<div className="media-edit__expanded-overlay">
+								{ /*
+								 * The preview replaces the media when clicked,
+								 * but only the remove button shows on hover. Say
+								 * so on the preview too. The preview's own label
+								 * already names the action for assistive
+								 * technologies.
+								 */ }
+								<span
+									className="media-edit__expanded-replace"
+									aria-hidden="true"
+								>
+									{ __( 'Replace' ) }
+								</span>
 								<HStack
 									className="media-edit__expanded-actions"
 									spacing={ 0 }

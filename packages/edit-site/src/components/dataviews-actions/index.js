@@ -42,6 +42,7 @@ export const useQuickEditPostAction = () => {
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
+			opensDialog: true,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
 					return false;

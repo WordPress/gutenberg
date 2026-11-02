@@ -649,7 +649,9 @@ test.describe( 'Page List', () => {
 				toolbar.getByText( /items selected/ )
 			).toBeInViewport( { ratio: 1 } );
 			await page.keyboard.press( 'Escape' );
-			await toolbar.getByRole( 'button', { name: 'Cancel' } ).click();
+			await toolbar
+				.getByRole( 'button', { name: 'Clear selection' } )
+				.click();
 			await expect(
 				page.getByRole( 'checkbox', {
 					name: 'Select all',

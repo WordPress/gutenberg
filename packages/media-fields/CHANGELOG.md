@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Hide the decorative author avatar from assistive technologies, as the name of the author is next to it ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+
 ## 0.23.0 (2026-10-20)
 
 ### Breaking Changes

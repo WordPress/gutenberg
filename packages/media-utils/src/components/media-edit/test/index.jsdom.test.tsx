@@ -30,14 +30,17 @@ const field = {
 
 // The component reads the upload permission and the attachments from the
 // `core` store; a stand-in avoids the resolvers' requests.
-function createTestRegistry( { canUpload = true } = {} ) {
+function createTestRegistry( {
+	canUpload = true,
+	attachments = null as Record< string, unknown >[] | null,
+} = {} ) {
 	const registry = createRegistry();
 	registry.register(
 		createReduxStore( 'core', {
 			reducer: ( state = {} ) => state,
 			selectors: {
 				canUser: () => canUpload,
-				getEntityRecords: () => null,
+				getEntityRecords: () => attachments,
 			},
 			actions: {
 				receiveEntityRecords: () => ( {
@@ -116,6 +119,39 @@ describe( 'MediaEdit', () => {
 		removeFilter( 'editor.MediaUpload', 'test/media-upload-marker' );
 		await waitForElementToBeRemoved( () =>
 			screen.queryByText( 'Filter marker' )
+		);
+	} );
+
+	it( 'shows that clicking the preview replaces the media', () => {
+		render(
+			<RegistryProvider
+				value={ createTestRegistry( {
+					attachments: [
+						{
+							id: 5,
+							source_url: 'https://example.com/photo.jpg',
+							mime_type: 'image/jpeg',
+							title: { rendered: 'Photo' },
+							alt_text: '',
+						},
+					],
+				} ) }
+			>
+				<MediaEditControl
+					data={ { featured_media: 5 } }
+					field={ field }
+					onChange={ () => {} }
+					isExpanded
+				/>
+			</RegistryProvider>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Replace Photo' } )
+		).toBeInTheDocument();
+		// A visual hint only: the preview's label already names the action.
+		expect( screen.getByText( 'Replace' ) ).toHaveAttribute(
+			'aria-hidden',
+			'true'
 		);
 	} );
 

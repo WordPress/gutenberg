@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall, chevronDown } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Checkbox,
@@ -18,6 +18,7 @@ import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
 import getActionLabel from '../../utils/get-action-label';
+import getActionPopup from '../../utils/get-action-popup';
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -157,6 +158,7 @@ function ActionTrigger< Item >( {
 			icon={ isMobile ? action.icon : undefined }
 			size="compact"
 			onClick={ onClick }
+			aria-haspopup={ getActionPopup( action ) }
 			isBusy={ isBusy }
 		>
 			{ ! isMobile && label }
@@ -189,6 +191,7 @@ function ActionButton< Item >( {
 			<Menu.Item
 				onClick={ onClick }
 				disabled={ !! action.disabled || isBusy }
+				aria-haspopup={ getActionPopup( action ) }
 			>
 				<Menu.ItemLabel>
 					{ getActionLabel( action, selectedEligibleItems, 'menu' ) }
@@ -221,18 +224,20 @@ function renderBulkActionsContent< Item >(
 	isMobile: boolean,
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
 ) {
+	// A text button next to the actions, rather than a close icon at the far
+	// end, so it can't be read as closing the whole view and stays in sight
+	// for screen magnifier users.
 	const clearSelection = selectedItems.length > 0 && (
 		<Button
 			className="dataviews-bulk-actions__clear"
-			icon={ closeSmall }
-			showTooltip
-			tooltipPosition="top"
+			variant="tertiary"
 			size="compact"
-			label={ __( 'Cancel' ) }
 			disabled={ !! actionInProgress }
 			accessibleWhenDisabled={ false }
 			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
-		/>
+		>
+			{ __( 'Clear selection' ) }
+		</Button>
 	);
 	const renderActions = ( isMenuItem = false ) =>
 		actionsToShow.map( ( action ) => (

@@ -8,6 +8,10 @@ import {
 } from '@wordpress/element';
 import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
+import { hasAPossibleBulkAction } from '../components/dataviews-bulk-actions';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -139,9 +143,35 @@ function DataViews< Item >( {
 	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
+	function hasBulkActionsFor( ids: string[] ) {
+		// Only the table and grid show the bulk actions.
+		if ( view.type !== LAYOUT_TABLE && view.type !== LAYOUT_GRID ) {
+			return false;
+		}
+		return data.some(
+			( item ) =>
+				ids.includes( getItemId( item ) ) &&
+				hasAPossibleBulkAction( actions, item )
+		);
+	}
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
+		// The bulk actions only show once an item is selected, so screen
+		// reader users can't find them beforehand. Say when selecting makes
+		// them available and when clearing the selection removes them. Only
+		// changes made here, by the user, are announced: when the consumer
+		// clears the selection, e.g. after moving the items to the trash,
+		// announcing it would cut off the notice of that action.
+		const hadBulkActions = hasBulkActionsFor( selection );
+		const hasBulkActions = hasBulkActionsFor( newValue );
+		if ( hadBulkActions !== hasBulkActions ) {
+			speak(
+				hasBulkActions
+					? __( 'Bulk actions available.' )
+					: __( 'Bulk actions no longer available.' )
+			);
+		}
 		if ( isUncontrolled ) {
 			setSelectionState( newValue );
 		}

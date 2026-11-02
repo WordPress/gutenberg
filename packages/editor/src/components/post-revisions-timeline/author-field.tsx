@@ -57,7 +57,8 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
-						alt={ __( 'Author avatar' ) }
+						// Decorative: the name of the author is next to it.
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>

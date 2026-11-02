@@ -252,6 +252,7 @@ function PostListView( {
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
+			opensDialog: true,
 			isEligible( post: Post ) {
 				// PostStatus only includes assignable statuses. 'trash' is managed
 				// internally by WordPress, but the REST API can still return it.

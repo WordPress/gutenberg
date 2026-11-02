@@ -301,6 +301,13 @@
 		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
 		border-radius: var(--wpds-border-radius-md);
 	}
+
+	// An outline, so it shows in forced colors mode too, drawn inside the
+	// box as the grid cards do.
+	&:focus-visible {
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
 }
 
 // Only when the view configures `layout.aspectRatio` (the table then carries
