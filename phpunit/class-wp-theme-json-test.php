@@ -184,6 +184,25 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'blockVisibility', $actual['blocks']['core/group'] ?? array() );
 	}
 
+	public function test_remove_insecure_properties_keeps_text_wrap() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/list' => array(
+							'typography' => array(
+								'textWrap' => 'balance',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSame( 'balance', $actual['styles']['blocks']['core/list']['typography']['textWrap'] ?? null );
+	}
+
 	public function test_get_settings_presets_are_keyed_by_origin() {
 		$default_origin = new WP_Theme_JSON_Gutenberg(
 			array(

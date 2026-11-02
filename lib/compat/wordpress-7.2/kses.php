@@ -22,6 +22,22 @@ function gutenberg_add_text_shadow_to_safe_style_css( $attr ) {
 add_filter( 'safe_style_css', 'gutenberg_add_text_shadow_to_safe_style_css' );
 
 /**
+ * Adds 'text-wrap' to the list of safe CSS properties.
+ * This is needed for the typography text wrap style.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_text_wrap_to_safe_style_css( $attr ) {
+	if ( ! in_array( 'text-wrap', $attr, true ) ) {
+		$attr[] = 'text-wrap';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_text_wrap_to_safe_style_css' );
+
+/**
  * Adds background-clip and its vendor-prefixed companions to the list of safe
  * CSS properties.
  *
