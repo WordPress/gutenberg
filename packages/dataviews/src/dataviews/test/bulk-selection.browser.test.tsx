@@ -1,12 +1,15 @@
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
-import { afterEach, beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { speak } from '@wordpress/a11y';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
 import type { Action, Field, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import '../../style.scss';
+
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) as any );
 
 const initialViewport = {
 	width: window.innerWidth,
@@ -632,4 +635,29 @@ it( 'moves focus to the select all checkbox when a dialog closes after its actio
 			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
 		)
 		.toHaveFocus();
+} );
+
+it( 'does not announce bulk actions in layouts that do not show them', async () => {
+	vi.mocked( speak ).mockClear();
+	const user = userEvent.setup();
+	await render(
+		<DataViews
+			data={ posts }
+			fields={ fields }
+			view={ { type: 'list', titleField: 'title', fields: [ 'author' ] } }
+			onChangeView={ () => {} }
+			actions={ actions }
+			paginationInfo={ { totalItems: posts.length, totalPages: 1 } }
+			defaultLayouts={ { list: true } }
+		/>
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'First post', exact: true } )
+	);
+	await expect
+		.element(
+			page.getByRole( 'button', { name: 'First post', exact: true } )
+		)
+		.toHaveAttribute( 'aria-pressed', 'true' );
+	expect( speak ).not.toHaveBeenCalled();
 } );

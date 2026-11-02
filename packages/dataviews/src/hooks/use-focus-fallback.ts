@@ -21,7 +21,13 @@ function isVisible( element: Element ) {
 function getFallback( container: HTMLElement ) {
 	const controls = Array.from(
 		container.querySelectorAll< HTMLElement >( FOCUSABLE_SELECTOR )
-	).filter( ( element ) => element.tabIndex >= 0 && isVisible( element ) );
+	).filter(
+		( element ) =>
+			element.tabIndex >= 0 &&
+			isVisible( element ) &&
+			// The layout is inert while it loads, e.g. after an action.
+			! element.closest( '[inert]' )
+	);
 	return (
 		controls.find(
 			( element ) =>
@@ -69,8 +75,13 @@ export default function useFocusFallback() {
 				}
 			} );
 		};
-		const observer = new MutationObserver( () => {
-			if ( ! lastFocused ) {
+		const restoreFocus = () => {
+			// Behind an open modal, focus belongs to the modal. Check again
+			// once it closes.
+			if (
+				! lastFocused ||
+				container.closest( '[inert], [aria-hidden="true"]' )
+			) {
 				return;
 			}
 			const { activeElement } = ownerDocument;
@@ -90,9 +101,27 @@ export default function useFocusFallback() {
 			if ( ! fallback ) {
 				return;
 			}
-			lastFocused = null;
+			// Once it lands, `onFocusIn` tracks the fallback instead. Until
+			// then, the next change tries again.
 			fallback.focus();
-		} );
+		};
+		// Wait a frame, so that a closing popover or modal returns focus to its
+		// trigger first. Focus is only lost if it is still nowhere after that.
+		let frame: number | undefined;
+		const scheduleRestore = () => {
+			if ( ! lastFocused ) {
+				return;
+			}
+			const { defaultView } = ownerDocument;
+			if ( frame !== undefined ) {
+				defaultView?.cancelAnimationFrame( frame );
+			}
+			frame = defaultView?.requestAnimationFrame( () => {
+				frame = undefined;
+				restoreFocus();
+			} );
+		};
+		const observer = new MutationObserver( scheduleRestore );
 		container.addEventListener( 'focusin', onFocusIn );
 		container.addEventListener( 'focusout', onFocusOut );
 		observer.observe( container, {
@@ -101,14 +130,25 @@ export default function useFocusFallback() {
 			attributes: true,
 			attributeFilter: [ 'hidden', 'inert' ],
 		} );
-		// Modals render outside the layout. One can close after its action
-		// removed the control it returns focus to, without changing the layout
-		// any more, so check again when it goes away.
+		// Modals render outside the layout, and hide the rest of the page while
+		// open. One can close after its action removed the control it returns
+		// focus to, without changing the layout any more, so check again when
+		// it goes away and when the page is shown again.
 		observer.observe( ownerDocument.body, { childList: true } );
+		const pageObserver = new MutationObserver( scheduleRestore );
+		pageObserver.observe( ownerDocument.body, {
+			subtree: true,
+			attributes: true,
+			attributeFilter: [ 'aria-hidden', 'inert' ],
+		} );
 		return () => {
 			container.removeEventListener( 'focusin', onFocusIn );
 			container.removeEventListener( 'focusout', onFocusOut );
 			observer.disconnect();
+			pageObserver.disconnect();
+			if ( frame !== undefined ) {
+				ownerDocument.defaultView?.cancelAnimationFrame( frame );
+			}
 		};
 	}, [] );
 }
