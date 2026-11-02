@@ -77,3 +77,22 @@ function gutenberg_add_box_sizing_to_safe_style_css( array $attr ): array {
 	return $attr;
 }
 add_filter( 'safe_style_css', 'gutenberg_add_box_sizing_to_safe_style_css' );
+
+/**
+ * Adds 'rotate' to the list of safe CSS properties.
+ *
+ * The rotation block support uses the `rotate` property. The style engine filters
+ * every declaration through {@see safecss_filter_attr()}, so without this entry the
+ * rules the support adds to the block supports stylesheet are silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_rotate_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'rotate', $attr, true ) ) {
+		$attr[] = 'rotate';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_rotate_to_safe_style_css' );
