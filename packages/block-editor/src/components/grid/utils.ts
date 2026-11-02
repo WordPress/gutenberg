@@ -74,23 +74,62 @@ export function getComputedCSS( element: Element, property: string ) {
 }
 
 /**
- * Given a grid-template-columns or grid-template-rows CSS property value, gets the start and end
- * position in pixels of each grid track.
+ * Converts a computed `column-gap` or `row-gap` value to pixels. Lengths
+ * compute to pixels, but percentages are preserved and `normal` is 0 in grids.
+ *
+ * @param gap         The computed gap value.
+ * @param contentSize The size in pixels of the grid's content box along the
+ *                    gap's axis, which percentages resolve against.
+ *
+ * @return The gap in pixels.
+ */
+function getGapInPixels( gap: string, contentSize: number ): number {
+	const value = parseFloat( gap );
+	if ( ! Number.isFinite( value ) ) {
+		return 0;
+	}
+	return gap.trim().endsWith( '%' ) ? ( value * contentSize ) / 100 : value;
+}
+
+/**
+ * Gets the start and end position in pixels of each track of a grid element
+ * along one axis, from its computed grid-template-columns or
+ * grid-template-rows and column-gap or row-gap.
  *
  * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
  *
- * @param template The grid-template-columns or grid-template-rows CSS property value.
- *                 Only supports fixed sizes in pixels.
- * @param gap      The gap between grid tracks in pixels.
+ * @param gridElement The grid element.
+ * @param axis        Either 'column' or 'row'.
  *
  * @return An array of objects with the start and end
  *         position in pixels of each grid track.
  */
-export function getGridTracks( template: string, gap: number ): GridTrack[] {
+export function getGridTracks(
+	gridElement: HTMLElement,
+	axis: 'column' | 'row'
+): GridTrack[] {
+	const isColumn = axis === 'column';
+	const padding = ( isColumn ? [ 'left', 'right' ] : [ 'top', 'bottom' ] )
+		.map( ( side ) =>
+			parseFloat( getComputedCSS( gridElement, `padding-${ side }` ) )
+		)
+		.reduce( ( total, value ) => total + value, 0 );
+	const contentSize =
+		( isColumn ? gridElement.clientWidth : gridElement.clientHeight ) -
+		padding;
+	const gapInPixels = getGapInPixels(
+		getComputedCSS( gridElement, `${ axis }-gap` ),
+		contentSize
+	);
+	const template = getComputedCSS(
+		gridElement,
+		isColumn ? 'grid-template-columns' : 'grid-template-rows'
+	);
+
 	const tracks: GridTrack[] = [];
 	for ( const size of template.split( ' ' ) ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
-		const start = previousTrack ? previousTrack.end + gap : 0;
+		const start = previousTrack ? previousTrack.end + gapInPixels : 0;
 		const end = start + parseFloat( size );
 		tracks.push( { start, end } );
 	}
@@ -127,17 +166,85 @@ export function getClosestTrack(
 	);
 }
 
-export function getGridRect( gridElement: Element, rect: DOMRect ) {
-	const columnGap = parseFloat( getComputedCSS( gridElement, 'column-gap' ) );
-	const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
-	const gridColumnTracks = getGridTracks(
-		getComputedCSS( gridElement, 'grid-template-columns' ),
-		columnGap
-	);
-	const gridRowTracks = getGridTracks(
-		getComputedCSS( gridElement, 'grid-template-rows' ),
-		rowGap
-	);
+/**
+ * Gets the position in pixels of the track range covered by the given start
+ * and end positions, as 1-based inclusive track indexes. Unlike
+ * `getClosestTrack`, it includes every track the range overlaps.
+ *
+ * @param tracks An array of objects with the start and end
+ *               position in pixels of each grid track.
+ * @param start  The start position in pixels.
+ * @param end    The end position in pixels.
+ *
+ * @return The first and last overlapped tracks, or undefined if none.
+ */
+export function getTrackRange(
+	tracks: GridTrack[],
+	start: number,
+	end: number
+): [ number, number ] | undefined {
+	const first = tracks.findIndex( ( track ) => track.end > start + 0.1 );
+	let last = tracks.length - 1;
+	while ( last >= 0 && tracks[ last ].start >= end - 0.1 ) {
+		last--;
+	}
+	if ( first < 0 || last < first ) {
+		return undefined;
+	}
+	return [ first + 1, last + 1 ];
+}
+
+/**
+ * Gets the bounds of a grid item relative to the start of its grid's tracks,
+ * that is, inside the grid's border and padding. Accounts for CSS scaling and
+ * right-to-left direction, so `left` is the inline start edge.
+ *
+ * @param gridElement The grid element.
+ * @param element     The grid item element.
+ *
+ * @return The item's bounds, or undefined if the grid can't be measured.
+ */
+export function getRectInGrid(
+	gridElement: HTMLElement,
+	element: Element
+): { left: number; right: number; top: number; bottom: number } | undefined {
+	if ( ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
+		return undefined;
+	}
+	const gridBounds = gridElement.getBoundingClientRect();
+	const scaleX = gridBounds.width / gridElement.offsetWidth;
+	const scaleY = gridBounds.height / gridElement.offsetHeight;
+	if ( ! scaleX || ! scaleY ) {
+		return undefined;
+	}
+	const isRightToLeft = getComputedCSS( gridElement, 'direction' ) === 'rtl';
+	const inset = ( side: string ) =>
+		parseFloat( getComputedCSS( gridElement, `border-${ side }-width` ) ) +
+		parseFloat( getComputedCSS( gridElement, `padding-${ side }` ) );
+	const inlineOffset = inset( isRightToLeft ? 'right' : 'left' );
+	const topOffset = inset( 'top' );
+	const bounds = element.getBoundingClientRect();
+	return {
+		left:
+			( isRightToLeft
+				? gridBounds.right - bounds.right
+				: bounds.left - gridBounds.left ) /
+				scaleX -
+			inlineOffset,
+		right:
+			( isRightToLeft
+				? gridBounds.right - bounds.left
+				: bounds.right - gridBounds.left ) /
+				scaleX -
+			inlineOffset,
+		top: ( bounds.top - gridBounds.top ) / scaleY - topOffset,
+		bottom: ( bounds.bottom - gridBounds.top ) / scaleY - topOffset,
+	};
+}
+
+export function getGridRect( gridElement: HTMLElement, rect: DOMRect ) {
+	const gridColumnTracks = getGridTracks( gridElement, 'column' );
+	const gridRowTracks = getGridTracks( gridElement, 'row' );
 	const columnStart = getClosestTrack( gridColumnTracks, rect.left ) + 1;
 	const rowStart = getClosestTrack( gridRowTracks, rect.top ) + 1;
 	const columnEnd =

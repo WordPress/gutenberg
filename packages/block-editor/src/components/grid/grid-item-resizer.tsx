@@ -3,7 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import type { CSSProperties, PointerEvent } from 'react';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
+import { getGridTracks, getClosestTrack } from './utils';
 import type {
 	GridItemResizerInnerProps,
 	GridItemResizerProps,
@@ -155,25 +155,13 @@ function GridItemResizerInner( {
 					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const columnGap = parseFloat(
-						getComputedCSS( rootBlockElement, 'column-gap' )
-					);
-					const rowGap = parseFloat(
-						getComputedCSS( rootBlockElement, 'row-gap' )
-					);
 					const gridColumnTracks = getGridTracks(
-						getComputedCSS(
-							rootBlockElement,
-							'grid-template-columns'
-						),
-						columnGap
+						rootBlockElement,
+						'column'
 					);
 					const gridRowTracks = getGridTracks(
-						getComputedCSS(
-							rootBlockElement,
-							'grid-template-rows'
-						),
-						rowGap
+						rootBlockElement,
+						'row'
 					);
 					const rect = new window.DOMRect(
 						blockElement.offsetLeft + boxElement.offsetLeft,
@@ -194,8 +182,7 @@ function GridItemResizerInner( {
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
-						columnStart: isManualGrid ? columnStart : undefined,
-						rowStart: isManualGrid ? rowStart : undefined,
+						...( isManualGrid && { columnStart, rowStart } ),
 					} );
 				} }
 			/>

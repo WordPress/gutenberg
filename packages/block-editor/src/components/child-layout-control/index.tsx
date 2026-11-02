@@ -2,13 +2,11 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
-	__experimentalInputControl as WCInputControl,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
-	Flex,
-	FlexItem,
 } from '@wordpress/components';
+import { InputControl, Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -253,6 +251,26 @@ export function childLayoutOrientation(
 	return orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 }
 
+/**
+ * Parses the value of a column or row start input. Clearing the input resets
+ * the item to automatic placement, except in manual grids, where every item
+ * needs a position and the start falls back to 1.
+ *
+ * @param value             The input value.
+ * @param isManualPlacement Whether the parent grid uses manual placement.
+ *
+ * @return The start position, or undefined for automatic placement.
+ */
+function parseGridStartValue(
+	value: string,
+	isManualPlacement: boolean | undefined
+) {
+	if ( value === '' ) {
+		return isManualPlacement ? 1 : undefined;
+	}
+	return parseInt( value, 10 );
+}
+
 function GridControls( {
 	childLayout,
 	onChange,
@@ -263,6 +281,9 @@ function GridControls( {
 }: ChildLayoutControlsProps ) {
 	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
 	const { columnCount, rowCount } = parentLayout ?? {};
+	const isManualPlacement =
+		parentLayout?.isManualPlacement ??
+		parentLayout?.default?.isManualPlacement;
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
@@ -303,25 +324,28 @@ function GridControls( {
 
 	return (
 		<>
-			<Flex
-				as={ ToolsPanelItem }
-				hasValue={ hasSpanValue }
-				label={ __( 'Grid span' ) }
-				onDeselect={ resetGridSpans }
-				isShownByDefault={ isShownByDefault }
-				panelId={ panelId }
+			<Stack
+				render={
+					<ToolsPanelItem
+						hasValue={ hasSpanValue }
+						label={ __( 'Grid span' ) }
+						onDeselect={ resetGridSpans }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					/>
+				}
+				direction="row"
+				gap="sm"
+				align="center"
 			>
-				<FlexItem style={ { width: '50%' } }>
-					<WCInputControl
+				<div style={ { width: '50%', minWidth: 0 } }>
+					<InputControl
 						label={ __( 'Column span' ) }
 						type="number"
-						onChange={ ( value ) => {
+						onValueChange={ ( value ) => {
 							// Don't allow unsetting.
 							const newColumnSpan =
-								// The number input passes a string.
-								value === ''
-									? 1
-									: parseInt( value as string, 10 );
+								value === '' ? 1 : parseInt( value, 10 );
 							const constrainedValue = maxColumnSpan
 								? Math.min( newColumnSpan, maxColumnSpan )
 								: newColumnSpan;
@@ -333,22 +357,22 @@ function GridControls( {
 								columnSpan: constrainedValue,
 							} );
 						} }
-						// The input renders the number as is.
-						value={ columnSpanValue as unknown as string }
+						value={
+							columnSpanValue === undefined
+								? ''
+								: String( columnSpanValue )
+						}
 						min={ 1 }
 						max={ maxColumnSpan }
 					/>
-				</FlexItem>
-				<FlexItem style={ { width: '50%' } }>
-					<WCInputControl
+				</div>
+				<div style={ { width: '50%', minWidth: 0 } }>
+					<InputControl
 						label={ __( 'Row span' ) }
 						type="number"
-						onChange={ ( value ) => {
+						onValueChange={ ( value ) => {
 							const newRowSpan =
-								// The number input passes a string.
-								value === ''
-									? 1
-									: parseInt( value as string, 10 );
+								value === '' ? 1 : parseInt( value, 10 );
 							const constrainedValue = maxRowSpan
 								? Math.min( newRowSpan, maxRowSpan )
 								: newRowSpan;
@@ -360,43 +384,50 @@ function GridControls( {
 								rowSpan: constrainedValue,
 							} );
 						} }
-						// The input renders the number as is.
-						value={ rowSpanValue as unknown as string }
+						value={
+							rowSpanValue === undefined
+								? ''
+								: String( rowSpanValue )
+						}
 						min={ 1 }
 						max={ maxRowSpan }
 					/>
-				</FlexItem>
-			</Flex>
+				</div>
+			</Stack>
 
-			{ window.__experimentalEnableGridInteractivity && (
-				// Use Flex with an explicit width on the FlexItem instead of HStack to
-				// work around an issue in webkit where inputs with a max attribute are
-				// sized incorrectly.
-				<Flex
-					as={ ToolsPanelItem }
-					hasValue={ hasStartValue }
-					label={ __( 'Grid placement' ) }
-					onDeselect={ resetGridStarts }
-					isShownByDefault={ false }
-					panelId={ panelId }
-				>
-					<FlexItem style={ { width: '50%' } }>
-						<WCInputControl
-							label={ __( 'Column' ) }
-							type="number"
-							onChange={ ( value ) => {
-								// Don't allow unsetting.
-								const newColumnStart =
-									// The number input passes a string.
-									value === ''
-										? 1
-										: parseInt( value as string, 10 );
-								onChange( {
-									columnStart: newColumnStart,
-									rowStart,
-									columnSpan,
-									rowSpan,
-								} );
+			{ /* Use an explicit width on each input wrapper to
+			work around an issue in webkit where inputs with a max attribute are
+			sized incorrectly. */ }
+			<Stack
+				render={
+					<ToolsPanelItem
+						hasValue={ hasStartValue }
+						label={ __( 'Grid placement' ) }
+						onDeselect={ resetGridStarts }
+						isShownByDefault={ false }
+						panelId={ panelId }
+					/>
+				}
+				direction="row"
+				gap="sm"
+				align="center"
+			>
+				<div style={ { width: '50%', minWidth: 0 } }>
+					<InputControl
+						label={ __( 'Column start' ) }
+						type="number"
+						onValueChange={ ( value ) => {
+							const newColumnStart = parseGridStartValue(
+								value,
+								isManualPlacement
+							);
+							onChange( {
+								columnStart: newColumnStart,
+							} );
+							if (
+								isManualPlacement &&
+								newColumnStart !== undefined
+							) {
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
 									[ panelId ],
@@ -408,34 +439,37 @@ function GridControls( {
 										rowStart!
 									)
 								);
-							} }
-							// The input renders the number as is.
-							value={ ( columnStart ?? 1 ) as unknown as string }
-							min={ 1 }
-							max={
-								columnCount
-									? columnCount - ( columnSpan ?? 1 ) + 1
-									: undefined
 							}
-						/>
-					</FlexItem>
-					<FlexItem style={ { width: '50%' } }>
-						<WCInputControl
-							label={ __( 'Row' ) }
-							type="number"
-							onChange={ ( value ) => {
-								// Don't allow unsetting.
-								const newRowStart =
-									// The number input passes a string.
-									value === ''
-										? 1
-										: parseInt( value as string, 10 );
-								onChange( {
-									columnStart,
-									rowStart: newRowStart,
-									columnSpan,
-									rowSpan,
-								} );
+						} }
+						value={
+							columnStart === undefined
+								? ''
+								: String( columnStart )
+						}
+						min={ 1 }
+						max={
+							columnCount
+								? columnCount - ( columnSpan ?? 1 ) + 1
+								: undefined
+						}
+					/>
+				</div>
+				<div style={ { width: '50%', minWidth: 0 } }>
+					<InputControl
+						label={ __( 'Row start' ) }
+						type="number"
+						onValueChange={ ( value ) => {
+							const newRowStart = parseGridStartValue(
+								value,
+								isManualPlacement
+							);
+							onChange( {
+								rowStart: newRowStart,
+							} );
+							if (
+								isManualPlacement &&
+								newRowStart !== undefined
+							) {
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
 									[ panelId ],
@@ -447,19 +481,20 @@ function GridControls( {
 										newRowStart
 									)
 								);
-							} }
-							// The input renders the number as is.
-							value={ ( rowStart ?? 1 ) as unknown as string }
-							min={ 1 }
-							max={
-								rowCount
-									? rowCount - ( rowSpan ?? 1 ) + 1
-									: undefined
 							}
-						/>
-					</FlexItem>
-				</Flex>
-			) }
+						} }
+						value={
+							rowStart === undefined ? '' : String( rowStart )
+						}
+						min={ 1 }
+						max={
+							rowCount
+								? rowCount - ( rowSpan ?? 1 ) + 1
+								: undefined
+						}
+					/>
+				</div>
+			</Stack>
 		</>
 	);
 }
