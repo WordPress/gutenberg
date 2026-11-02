@@ -493,12 +493,6 @@ parameters:
 			path: ../../packages/block-library/src/tag-cloud/index.php
 
 		-
-			message: '#^Right side of \|\| is always true\.$#'
-			identifier: booleanOr.rightAlwaysTrue
-			count: 1
-			path: ../../packages/block-library/src/template-part/index.php
-
-		-
 			message: '#^Property WP_Block\:\:\$context \(array\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
