@@ -1,4 +1,3 @@
-import { memo, useMemo } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/ui';
 import {
@@ -6,7 +5,6 @@ import {
 	availableIcons,
 	nameToSlug,
 	type Collection,
-	type IconComponent,
 } from './manifest';
 import styles from './library.module.scss';
 
@@ -39,32 +37,6 @@ function filterIcons( filter: string, collection: Collection ) {
 	} );
 }
 
-// Memoized so selecting an icon only re-renders the tiles whose state changed.
-const IconTile = memo( function Tile( {
-	name,
-	icon,
-	isSelected,
-	onSelect,
-}: {
-	name: string;
-	icon: IconComponent;
-	isSelected: boolean;
-	onSelect: ( name: string ) => void;
-} ) {
-	return (
-		<Button
-			variant={ isSelected ? 'solid' : 'minimal' }
-			tone={ isSelected ? 'brand' : 'neutral' }
-			aria-pressed={ isSelected }
-			onClick={ () => onSelect( name ) }
-			className={ styles[ 'icon-button' ] }
-		>
-			<Icon icon={ icon } size={ 32 } />
-			<span className={ styles[ 'icon-name' ] }>{ name }</span>
-		</Button>
-	);
-} );
-
 export function IconGrid( {
 	filter,
 	collection,
@@ -76,10 +48,7 @@ export function IconGrid( {
 	selectedName: string | null;
 	onSelect: ( name: string ) => void;
 } ) {
-	const filteredIcons = useMemo(
-		() => filterIcons( filter, collection ),
-		[ filter, collection ]
-	);
+	const filteredIcons = filterIcons( filter, collection );
 
 	if ( ! filteredIcons.length ) {
 		return <p>No icons found.</p>;
@@ -94,14 +63,21 @@ export function IconGrid( {
 						`Icon "${ name }" (slug: ${ slug }) is not found in the manifest. Add it to packages/icons/src/manifest.json.`
 					);
 				}
+				const isSelected = name === selectedName;
 				return (
-					<IconTile
+					<Button
 						key={ name }
-						name={ name }
-						icon={ icon }
-						isSelected={ name === selectedName }
-						onSelect={ onSelect }
-					/>
+						variant={ isSelected ? 'solid' : 'minimal' }
+						tone={ isSelected ? 'brand' : 'neutral' }
+						aria-pressed={ isSelected }
+						onClick={ () => onSelect( name ) }
+						className={ styles[ 'icon-button' ] }
+					>
+						<Icon icon={ icon } size={ 32 } />
+						<span className={ styles[ 'icon-name' ] }>
+							{ name }
+						</span>
+					</Button>
 				);
 			} ) }
 		</div>

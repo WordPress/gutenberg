@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useArgs } from 'storybook/preview-api';
 import {
-	useArgs,
-	useCallback as useStoryCallback,
-} from 'storybook/preview-api';
-import {
-	useCallback,
 	useEffect,
 	useState,
 	type Element as ReactElement,
@@ -68,14 +64,6 @@ const LibraryExample = ( {
 	// args round trip through the Storybook manager.
 	const [ selectedSlug, setSelectedSlug ] = useState( icon );
 	useEffect( () => setSelectedSlug( icon ), [ icon ] );
-	const handleSelect = useCallback(
-		( name: string ) => {
-			const slug = nameToSlug( name );
-			setSelectedSlug( slug );
-			onSelectIcon( slug );
-		},
-		[ onSelectIcon ]
-	);
 	const selectedName =
 		ICON_NAMES.find( ( name ) => nameToSlug( name ) === selectedSlug ) ??
 		null;
@@ -118,7 +106,11 @@ const LibraryExample = ( {
 						filter={ filter }
 						collection={ collection }
 						selectedName={ selectedName }
-						onSelect={ handleSelect }
+						onSelect={ ( name ) => {
+							const slug = nameToSlug( name );
+							setSelectedSlug( slug );
+							onSelectIcon( slug );
+						} }
 					/>
 				</div>
 			</Stack>
@@ -133,10 +125,11 @@ export const Library: StoryObj< LibraryArgs > = {
 	},
 	render: function Render( args ) {
 		const [ , updateArgs ] = useArgs< LibraryArgs >();
-		const onSelectIcon = useStoryCallback(
-			( slug: string ) => updateArgs( { icon: slug } ),
-			[ updateArgs ]
+		return (
+			<LibraryExample
+				{ ...args }
+				onSelectIcon={ ( slug ) => updateArgs( { icon: slug } ) }
+			/>
 		);
-		return <LibraryExample { ...args } onSelectIcon={ onSelectIcon } />;
 	},
 };
