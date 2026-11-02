@@ -434,6 +434,7 @@ export default dedupePlugins( [
 						__experimentalInputControl: 'WCInputControl',
 						Menu: 'WCMenu',
 						Notice: 'WCNotice',
+						Popover: 'WCPopover',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
 						Tabs: 'WCTabs',
