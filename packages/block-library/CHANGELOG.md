@@ -11,7 +11,7 @@
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
 -   Playlist: Use the UI SelectControl for the Order and Shape settings ([#86161](https://github.com/WordPress/gutenberg/pull/86161)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
--   Social Icon: Add Link to and View controls beside Text in the inspector's Content tab, so the link can be edited from the inspector (including after selecting the icon from its parent's List View) and from the List View popover in a content-only section. An invalid link shows an error there and in the canvas popover, but is still kept ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
+-   Social Icon: Add Link to and View controls to inspector Content tab ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
