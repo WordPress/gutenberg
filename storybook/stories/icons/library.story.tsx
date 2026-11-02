@@ -11,8 +11,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { Icon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
-import { CollectionNotice } from './collection-notice';
+import { Link, Notice, Stack } from '@wordpress/ui';
 import { IconDetails } from './icon-details';
 import { IconGrid } from './icon-grid';
 import {
@@ -39,6 +38,46 @@ const meta: Meta = {
 	},
 };
 export default meta;
+
+const WP_GET_ICON_URL =
+	'https://developer.wordpress.org/reference/functions/wp_get_icon/';
+
+const COLLECTION_DESCRIPTIONS: Record< Collection, ReactElement > = {
+	all: (
+		<>
+			All icons are available. Import them from the npm package in
+			JavaScript.{ ' ' }
+			<Link
+				href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-icons/#usage"
+				openInNewTab
+			>
+				See the usage example
+			</Link>
+			.
+		</>
+	),
+	core: (
+		<>
+			These icons are registered in WordPress. Render them in PHP with{ ' ' }
+			<Link href={ WP_GET_ICON_URL } openInNewTab>
+				wp_get_icon()
+			</Link>
+			. They are also available through the Icons REST API and in the Icon
+			block.
+		</>
+	),
+	'core-admin': (
+		<>
+			These icons are registered in WordPress for the admin interface.
+			Render them in PHP with{ ' ' }
+			<Link href={ WP_GET_ICON_URL } openInNewTab>
+				wp_get_icon()
+			</Link>
+			. They are not available through the Icons REST API or in the Icon
+			block.
+		</>
+	),
+};
 
 type LibraryArgs = {
 	filter: string;
@@ -100,7 +139,11 @@ const LibraryExample = ( {
 						) ) }
 					</ToggleGroupControl>
 				</div>
-				<CollectionNotice collection={ collection } />
+				<Notice.Root intent="info">
+					<Notice.Description>
+						{ COLLECTION_DESCRIPTIONS[ collection ] }
+					</Notice.Description>
+				</Notice.Root>
 				<div className={ styles.grid }>
 					<IconGrid
 						filter={ filter }
