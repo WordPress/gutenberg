@@ -1,5 +1,4 @@
 import { store as coreStore } from '@wordpress/core-data';
-import type { WpTemplate } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -108,14 +107,10 @@ function BlockThemeTemplateEdit( {
 	const slug = data.slug;
 	const templates = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords< WpTemplate >(
-				'postType',
-				'wp_template',
-				{
-					per_page: -1,
-					post_type: postType,
-				}
-			) ?? EMPTY_ARRAY,
+			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: postType,
+			} ) ?? EMPTY_ARRAY,
 		[ postType ]
 	);
 	const canSwitchTemplate = useCanSwitchTemplate( postType, postId );
