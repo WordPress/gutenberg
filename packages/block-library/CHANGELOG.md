@@ -13,7 +13,7 @@
 
 ### Bug Fixes
 
--   Post Title: Render the title of the post supplied through block context when it differs from the global post ([#85495](https://github.com/WordPress/gutenberg/pull/85495)).
+-   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
 -   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
@@ -33,6 +33,7 @@
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
+-   Post Title: Render the title of the post supplied through block context when it differs from the global post ([#85495](https://github.com/WordPress/gutenberg/pull/85495)).
 
 ## 12.0.0 (2026-10-20)
 
