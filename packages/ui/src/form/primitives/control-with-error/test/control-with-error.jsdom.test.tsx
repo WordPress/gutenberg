@@ -184,3 +184,31 @@ describe( 'ControlWithError', () => {
 		} );
 	} );
 } );
+
+describe( 'custom validity ownership', () => {
+	it( 'clears its removed custom message', () => {
+		const view = render(
+			<ValidatedInputControl
+				label="Text"
+				customValidity={ { type: 'invalid', message: 'Server error' } }
+			/>
+		);
+		const input = screen.getByRole< HTMLInputElement >( 'textbox' );
+		expect( input.validationMessage ).toBe( 'Server error' );
+		view.rerender( <ValidatedInputControl label="Text" /> );
+		expect( input.validity.valid ).toBe( true );
+	} );
+	it( 'clears a removed wrapper error while the control is disabled', () => {
+		const view = render(
+			<ValidatedInputControl
+				label="Text"
+				disabled
+				customValidity={ { type: 'invalid', message: 'Server error' } }
+			/>
+		);
+		const input = screen.getByRole< HTMLInputElement >( 'textbox' );
+		view.rerender( <ValidatedInputControl label="Text" disabled /> );
+		view.rerender( <ValidatedInputControl label="Text" /> );
+		expect( input.validity.valid ).toBe( true );
+	} );
+} );
