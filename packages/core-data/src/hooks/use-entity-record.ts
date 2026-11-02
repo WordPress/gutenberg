@@ -64,7 +64,7 @@ const EMPTY_OBJECT = {};
  *
  * @param    kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
  * @param    name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param    recordId ID of the requested entity record.
+ * @param    recordId ID of the requested entity record. Omitted for entities without a key, such as `root`/`site`.
  * @param    options  Optional hook options.
  * @example
  * ```js
@@ -151,7 +151,7 @@ export default function useEntityRecord<
 >(
 	kind: Kind,
 	name: Name,
-	recordId: string | number,
+	recordId?: string | number,
 	options?: Options
 ): EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >;
 
@@ -162,13 +162,13 @@ export default function useEntityRecord<
 export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
-	recordId: string | number,
+	recordId?: string | number,
 	options?: Options
 ): EntityRecordResolution< RecordType >;
 export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
-	recordId: string | number,
+	recordId?: string | number,
 	options: Options = { enabled: true }
 ): EntityRecordResolution< RecordType > {
 	const { editEntityRecord, saveEditedEntityRecord } =

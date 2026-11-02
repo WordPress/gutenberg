@@ -30,8 +30,8 @@ function ExperimentsPage() {
 		editedRecord,
 		save: saveSettings,
 		edit,
-	} = useEntityRecord( 'root', 'site', undefined as unknown as string );
-	const siteSettings = editedRecord as Record< string, unknown > | undefined;
+	} = useEntityRecord( 'root', 'site' );
+	const siteSettings = editedRecord;
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );

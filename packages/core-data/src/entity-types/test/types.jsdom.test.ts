@@ -208,6 +208,19 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	it( 'site settings need no record ID', () => {
+		() => {
+			// The settings entity has no key, so the hook takes no ID.
+			const { record: site } = useEntityRecord( 'root', 'site' );
+			site?.title satisfies string | undefined;
+			site?.posts_per_page satisfies number | undefined;
+			// Settings registered by plugins are readable, but not typed.
+			site?.[ 'gutenberg-experiments' ] satisfies unknown;
+			// @ts-expect-error -- a core setting keeps its own type.
+			site?.title satisfies number | undefined;
+		};
+	} );
+
 	it( 'font families follow the REST schema', () => {
 		() => {
 			const { records: families } = useEntityRecords(
