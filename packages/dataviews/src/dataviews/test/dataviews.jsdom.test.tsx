@@ -1744,6 +1744,22 @@ describe( 'DataViews component', () => {
 			).toHaveAccessibleDescription( /Author\s*Jane/ );
 		} );
 
+		it( 'names an item by its content when the title is not shown', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'list',
+						titleField: 'title',
+						showTitle: false,
+						fields: [ 'author' ],
+					} }
+				/>
+			);
+			expect(
+				await screen.findByRole( 'row', { name: /Jane/ } )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should render actions dropdown if actions are supported and passed in for each list item', async () => {
 			render(
 				<DataViewWrapper

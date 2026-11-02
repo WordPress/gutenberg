@@ -288,8 +288,9 @@ function ListItem< Item >( {
 			role={ infiniteScrollEnabled ? 'article' : 'row' }
 			// Otherwise the row is named after all of its content: the title,
 			// the actions and every field. The fields stay available as the
-			// description of the item.
-			aria-labelledby={ labelId }
+			// description of the item. Without a title, the content is all
+			// there is to name it by.
+			aria-labelledby={ renderedTitleField ? labelId : undefined }
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
