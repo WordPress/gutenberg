@@ -16,7 +16,8 @@
 				"attributes": {
 					"tagName": "a",
 					"type": "button",
-					"text": "My button 1"
+					"text": "My button 1",
+					"download": false
 				},
 				"innerBlocks": []
 			},
@@ -26,7 +27,8 @@
 				"attributes": {
 					"tagName": "a",
 					"type": "button",
-					"text": "My button 2"
+					"text": "My button 2",
+					"download": false
 				},
 				"innerBlocks": []
 			},
@@ -36,7 +38,8 @@
 				"attributes": {
 					"tagName": "a",
 					"type": "button",
-					"text": "My button 3"
+					"text": "My button 3",
+					"download": false
 				},
 				"innerBlocks": []
 			},
@@ -46,7 +49,8 @@
 				"attributes": {
 					"tagName": "button",
 					"type": "button",
-					"text": "My button 4"
+					"text": "My button 4",
+					"download": false
 				},
 				"innerBlocks": []
 			}

@@ -6,6 +6,7 @@
 			"tagName": "a",
 			"type": "button",
 			"text": "Custom Width Button",
+			"download": false,
 			"style": {
 				"dimensions": {
 					"width": "150px"
