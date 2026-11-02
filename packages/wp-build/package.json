@@ -7,7 +7,7 @@
 	"keywords": [
 		"wordpress",
 		"build",
-		"esbuild",
+		"rolldown",
 		"bundler"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-build/README.md",
@@ -43,18 +43,18 @@
 	"dependencies": {
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
+		"@wordpress/theme-build-tools": "file:../theme-build-tools",
 		"autoprefixer": "^10.4.21",
 		"browserslist": "^4.28.7",
 		"browserslist-to-esbuild": "^2.1.1",
 		"change-case": "^4.1.2",
 		"chokidar": "^4.0.0",
 		"cssnano": "^6.0.1",
-		"esbuild": "^0.27.2",
-		"esbuild-sass-plugin": "^3.3.1",
 		"fast-glob": "^3.2.7",
 		"moment-timezone": "^0.5.40",
 		"postcss": "^8.4.38",
 		"postcss-modules": "^6.0.1",
+		"rolldown": "^1.2.15",
 		"rtlcss": "^4.3.0",
 		"sass-embedded": "^1.97.2"
 	},
@@ -64,7 +64,7 @@
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
-		"@wordpress/theme": ">=0.8.0 <3.0.0"
+		"@wordpress/theme": "^3.0.0 || ^4.0.0"
 	},
 	"peerDependenciesMeta": {
 		"@wordpress/theme": {

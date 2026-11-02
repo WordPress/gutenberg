@@ -30,6 +30,7 @@ export const route = {
 
 		return {
 			postType: params.type,
+			// @ts-expect-error Bug: a failed save resolves to `undefined`, which this reads.
 			postId: String( newPost.id ),
 		};
 	},

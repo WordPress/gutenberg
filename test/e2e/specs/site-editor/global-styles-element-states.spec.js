@@ -23,7 +23,7 @@ const ELEMENTS = [
 	},
 	{
 		name: 'Button',
-		listItem: 'Button (element)',
+		listItem: 'Form button',
 		property: 'background-color',
 		sample: '.wp-element-button',
 		// The preview shows a link, like a Button block, for the states only

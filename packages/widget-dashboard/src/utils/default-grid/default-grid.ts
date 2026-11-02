@@ -1,5 +1,5 @@
 import type { WidgetGridSettings } from '../../types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../types';
+import { WIDGET_DASHBOARD_COLUMN_STEPS } from '../../types';
 import { DEFAULT_ROW_HEIGHT } from '../row-height-presets';
 
 /**
@@ -9,6 +9,6 @@ import { DEFAULT_ROW_HEIGHT } from '../row-height-presets';
  */
 export const DEFAULT_GRID: WidgetGridSettings = {
 	model: 'grid',
-	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+	columns: WIDGET_DASHBOARD_COLUMN_STEPS,
 	rowHeight: DEFAULT_ROW_HEIGHT,
 };

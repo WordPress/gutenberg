@@ -175,6 +175,7 @@ export {
 // become a public support once the feature has settled.
 const editableRootKey = Symbol( 'editableRoot' );
 import { parseRawBlock as _parseRawBlock } from './parser';
+import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -182,4 +183,5 @@ lock( privateApis, {
 	isBlockAllowedInParent,
 	editableRootKey,
 	parseRawBlock: _parseRawBlock,
+	applyBuiltInValidationFixes,
 } );
