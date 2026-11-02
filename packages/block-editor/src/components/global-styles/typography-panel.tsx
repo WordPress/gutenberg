@@ -974,7 +974,9 @@ export default function TypographyPanel( {
 					resetValue={ resetTextColor }
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
-					contrastWarning={ contrastWarning }
+					contrastWarning={
+						isTextGradient ? undefined : contrastWarning
+					}
 					tabs={ [
 						{
 							key: 'text',
@@ -1009,6 +1011,9 @@ export default function TypographyPanel( {
 					resetValue={ resetTextGradient }
 					isShownByDefault={ defaultControls.textGradient }
 					indicators={ [ userTextGradient ?? inheritedTextGradient ] }
+					contrastWarning={
+						isTextGradient ? contrastWarning : undefined
+					}
 					tabs={ [
 						{
 							key: 'text-gradient',
