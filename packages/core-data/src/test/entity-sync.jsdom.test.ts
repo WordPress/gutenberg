@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import warning from '@wordpress/warning';
 import {
@@ -10,20 +11,51 @@ import {
 	getEntitySyncManager,
 	registerEntitySyncManager,
 } from '../entity-sync';
+import type { EntitySyncUndoHistory } from '../entity-sync';
 import { setCollaborationSupported } from '../private-actions';
 import { getUndoManager } from '../private-selectors';
 import { getEntityRecord, getEntityRecords } from '../resolvers';
 import { hasRedo, hasUndo } from '../selectors';
+import type { State } from '../selectors';
+import type { CoreDataThunkArgs } from '../private-types';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '@wordpress/warning' ) );
 
+// The tests stub REST responses and errors in place of typed requests.
+const apiFetchMock = apiFetch as unknown as Mock;
+
+// A mocked `dispatch`, with the action creators the tests check.
+type DispatchMock< Action extends string > = Mock & Record< Action, Mock >;
+
+// The fake records every interface call, so its members are mocks.
+type FakeManager = Record<
+	| 'shouldSync'
+	| 'load'
+	| 'loadCollection'
+	| 'update'
+	| 'beforeSave'
+	| 'afterSave'
+	| 'unload'
+	| 'unloadAll',
+	Mock
+> & { undoHistory: EntitySyncUndoHistory | undefined };
+
+/**
+ * Types the mocks a thunk runs with, which provide only what it uses.
+ *
+ * @param args The mocked thunk arguments.
+ */
+function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
+	return args as unknown as CoreDataThunkArgs;
+}
+
 /**
  * A fake manager that records every interface call.
  *
- * @return {Object} The manager.
+ * @return The manager.
  */
-function createFakeManager() {
+function createFakeManager(): FakeManager {
 	return {
 		shouldSync: vi.fn( () => true ),
 		load: vi.fn(),
@@ -46,12 +78,12 @@ const POST_ENTITY = {
 };
 
 describe( 'registerEntitySyncManager', () => {
-	let unregister;
+	let unregister: ( () => void ) | undefined;
 
 	afterEach( () => {
 		unregister?.();
 		unregister = undefined;
-		warning.mockReset();
+		vi.mocked( warning ).mockReset();
 	} );
 
 	it( 'registers a manager and unregisters it again', () => {
@@ -105,9 +137,17 @@ describe( 'registerEntitySyncManager', () => {
 } );
 
 describe( 'the entity sync interface', () => {
-	let manager;
-	let unregister;
-	let dispatch;
+	let manager: FakeManager;
+	let unregister: () => void;
+	let dispatch: DispatchMock<
+		| 'receiveEntityRecords'
+		| 'receiveAutosaves'
+		| 'receiveUserPermissions'
+		| 'finishResolutions'
+		| '__unstableAcquireStoreLock'
+		| '__unstableReleaseStoreLock'
+		| 'recordSyncUndoLevel'
+	>;
 
 	beforeEach( () => {
 		manager = createFakeManager();
@@ -121,7 +161,7 @@ describe( 'the entity sync interface', () => {
 			__unstableReleaseStoreLock: vi.fn(),
 			recordSyncUndoLevel: vi.fn(),
 		} );
-		apiFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	afterEach( () => {
@@ -129,7 +169,7 @@ describe( 'the entity sync interface', () => {
 	} );
 
 	describe( 'getEntityRecord', () => {
-		const registry = { batch: ( callback ) => callback() };
+		const registry = { batch: ( callback: () => void ) => callback() };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
@@ -139,7 +179,7 @@ describe( 'the entity sync interface', () => {
 		};
 
 		beforeEach( () => {
-			apiFetch.mockImplementation( () => ( {
+			apiFetchMock.mockImplementation( () => ( {
 				json: () => Promise.resolve( POST_RECORD ),
 			} ) );
 		} );
@@ -149,7 +189,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 			expect( manager.shouldSync ).toHaveBeenCalledWith(
 				'postType',
@@ -173,20 +213,20 @@ describe( 'the entity sync interface', () => {
 
 		it( 'does not load records with a query, a string id, or when shouldSync declines', async () => {
 			await getEntityRecord( 'postType', 'post', 1, { context: 'view' } )(
-				{ dispatch, registry, resolveSelect }
+				thunkArgs( { dispatch, registry, resolveSelect } )
 			);
 			await getEntityRecord(
 				'postType',
 				'post',
 				'hello-world'
-			)( { dispatch, registry, resolveSelect } );
+			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 			manager.shouldSync.mockReturnValue( false );
 			await getEntityRecord(
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 		} );
@@ -196,7 +236,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 
@@ -228,11 +268,11 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 			const REFETCHED = { id: 1, title: 'Refetched' };
-			apiFetch.mockImplementation( () => REFETCHED );
+			apiFetchMock.mockImplementation( () => REFETCHED );
 
 			await handlers.refetchRecord();
 
@@ -255,7 +295,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 			expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
@@ -268,19 +308,21 @@ describe( 'the entity sync interface', () => {
 	} );
 
 	describe( 'getEntityRecords', () => {
-		const registry = { batch: ( callback ) => callback() };
+		const registry = { batch: ( callback: () => void ) => callback() };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
 		};
 
 		it( 'loads the collection when the whole collection is requested', async () => {
-			apiFetch.mockImplementation( () => ( {} ) );
+			apiFetchMock.mockImplementation( () => ( {} ) );
 
-			await getEntityRecords( 'postType', 'post', { per_page: -1 } )( {
-				dispatch,
-				registry,
-				resolveSelect,
-			} );
+			await getEntityRecords( 'postType', 'post', { per_page: -1 } )(
+				thunkArgs( {
+					dispatch,
+					registry,
+					resolveSelect,
+				} )
+			);
 
 			expect( manager.loadCollection ).toHaveBeenCalledWith(
 				'postType',
@@ -290,13 +332,15 @@ describe( 'the entity sync interface', () => {
 		} );
 
 		it( 'does not load the collection for a page of records', async () => {
-			apiFetch.mockImplementation( () => ( {} ) );
+			apiFetchMock.mockImplementation( () => ( {} ) );
 
-			await getEntityRecords( 'postType', 'post', { per_page: 10 } )( {
-				dispatch,
-				registry,
-				resolveSelect,
-			} );
+			await getEntityRecords( 'postType', 'post', { per_page: 10 } )(
+				thunkArgs( {
+					dispatch,
+					registry,
+					resolveSelect,
+				} )
+			);
 
 			expect( manager.loadCollection ).not.toHaveBeenCalled();
 		} );
@@ -314,7 +358,7 @@ describe( 'the entity sync interface', () => {
 		};
 
 		it( 'forwards the edit and its intent before the store edit lands', () => {
-			const order = [];
+			const order: string[] = [];
 			manager.update.mockImplementation( () => order.push( 'update' ) );
 			dispatch.mockImplementation( () => order.push( 'dispatch' ) );
 
@@ -324,7 +368,7 @@ describe( 'the entity sync interface', () => {
 				1,
 				{ title: 'Updated' },
 				{ isCached: true }
-			)( { select, dispatch } );
+			)( thunkArgs( { select, dispatch } ) );
 
 			expect( manager.update ).toHaveBeenCalledWith(
 				'postType',
@@ -343,7 +387,7 @@ describe( 'the entity sync interface', () => {
 				1,
 				{ title: 'Updated' },
 				{ undoIgnore: true }
-			)( { select, dispatch } );
+			)( thunkArgs( { select, dispatch } ) );
 
 			expect( manager.update ).toHaveBeenCalledWith(
 				'postType',
@@ -365,12 +409,12 @@ describe( 'the entity sync interface', () => {
 		it( 'calls beforeSave and afterSave around a regular save', async () => {
 			const edits = { id: 10, title: 'Updated' };
 			const savedRecord = { ...persistedRecord, ...edits };
-			const order = [];
+			const order: string[] = [];
 			manager.beforeSave.mockImplementation( () => {
 				order.push( 'beforeSave' );
 				return { meta: { extra: 'value' } };
 			} );
-			apiFetch.mockImplementation( () => {
+			apiFetchMock.mockImplementation( () => {
 				order.push( 'fetch' );
 				return savedRecord;
 			} );
@@ -385,7 +429,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				edits
-			)( { select, dispatch, resolveSelect } );
+			)( thunkArgs( { select, dispatch, resolveSelect } ) );
 
 			expect( manager.beforeSave ).toHaveBeenCalledWith(
 				'postType',
@@ -425,14 +469,14 @@ describe( 'the entity sync interface', () => {
 
 		it( 'calls beforeSave for an autosave and never afterSave', async () => {
 			manager.beforeSave.mockReturnValue( { extra: 'value' } );
-			apiFetch.mockImplementation( () => ( { id: 20, parent: 10 } ) );
+			apiFetchMock.mockImplementation( () => ( { id: 20, parent: 10 } ) );
 
 			await saveEntityRecord(
 				'postType',
 				'post',
 				{ id: 10, content: 'Autosaved' },
 				{ isAutosave: true }
-			)( { select, dispatch, resolveSelect } );
+			)( thunkArgs( { select, dispatch, resolveSelect } ) );
 
 			expect( manager.beforeSave ).toHaveBeenCalledWith(
 				'postType',
@@ -455,13 +499,13 @@ describe( 'the entity sync interface', () => {
 		it( 'skips beforeSave for a new record and reports the save without an id', async () => {
 			const edits = { title: 'New' };
 			const savedRecord = { id: 11, title: 'New' };
-			apiFetch.mockImplementation( () => savedRecord );
+			apiFetchMock.mockImplementation( () => savedRecord );
 
 			await saveEntityRecord(
 				'postType',
 				'post',
 				edits
-			)( { select, dispatch, resolveSelect } );
+			)( thunkArgs( { select, dispatch, resolveSelect } ) );
 
 			expect( manager.beforeSave ).not.toHaveBeenCalled();
 			expect( manager.afterSave ).toHaveBeenCalledWith(
@@ -473,12 +517,12 @@ describe( 'the entity sync interface', () => {
 		} );
 
 		it( 'does not call afterSave when the request fails', async () => {
-			apiFetch.mockRejectedValue( new Error( 'API error' ) );
+			apiFetchMock.mockRejectedValue( new Error( 'API error' ) );
 
 			await saveEntityRecord( 'postType', 'post', {
 				id: 10,
 				title: 'Updated',
-			} )( { select, dispatch, resolveSelect } );
+			} )( thunkArgs( { select, dispatch, resolveSelect } ) );
 
 			expect( manager.beforeSave ).toHaveBeenCalledTimes( 1 );
 			expect( manager.afterSave ).not.toHaveBeenCalled();
@@ -487,7 +531,7 @@ describe( 'the entity sync interface', () => {
 		it( 'saves normally when no manager is registered', async () => {
 			unregister();
 			const edits = { id: 10, title: 'Updated' };
-			apiFetch.mockImplementation( () => ( {
+			apiFetchMock.mockImplementation( () => ( {
 				...persistedRecord,
 				...edits,
 			} ) );
@@ -496,7 +540,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				edits
-			)( { select, dispatch, resolveSelect } );
+			)( thunkArgs( { select, dispatch, resolveSelect } ) );
 
 			expect( apiFetch ).toHaveBeenCalledWith( {
 				path: '/wp/v2/posts/10',
@@ -513,13 +557,13 @@ describe( 'the entity sync interface', () => {
 			const resolveSelect = {
 				getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
 			};
-			apiFetch.mockImplementation( () => ( { deleted: true } ) );
+			apiFetchMock.mockImplementation( () => ( { deleted: true } ) );
 
 			await deleteEntityRecord(
 				'postType',
 				'post',
 				10
-			)( { dispatch, resolveSelect } );
+			)( thunkArgs( { dispatch, resolveSelect } ) );
 
 			expect( manager.unload ).toHaveBeenCalledWith(
 				'postType',
@@ -535,7 +579,8 @@ describe( 'the entity sync interface', () => {
 				hasUndo: vi.fn( () => true ),
 				hasRedo: vi.fn( () => false ),
 			};
-			const state = { undoManager };
+			// The selectors read only the undo manager.
+			const state = { undoManager } as unknown as State;
 
 			manager.undoHistory = {
 				undo: vi.fn(),
@@ -552,7 +597,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'setCollaborationSupported', () => {
 		it( 'unloads everything when support is withdrawn', () => {
-			setCollaborationSupported( false )( { dispatch } );
+			setCollaborationSupported( false )( thunkArgs( { dispatch } ) );
 
 			expect( manager.unloadAll ).toHaveBeenCalledTimes( 1 );
 		} );

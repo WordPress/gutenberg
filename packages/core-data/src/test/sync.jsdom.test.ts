@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import type { EntitySyncManager, EntitySyncRecord } from '../entity-sync';
 const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 	() => {
 		const manager = {
@@ -9,7 +11,12 @@ const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 			unloadAll: vi.fn(),
 			getEntitySnapshot: vi.fn(),
 			createPersistedCRDTDoc: vi.fn(),
-			undoManager: undefined,
+			undoManager: undefined as
+				| Record<
+						'undo' | 'redo' | 'stopCapturing' | 'clearRedo',
+						Mock
+				  >
+				| undefined,
 			isLoaded: vi.fn(),
 		};
 		return {
@@ -20,31 +27,36 @@ const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 	}
 );
 
-vi.mock( import( '@wordpress/sync' ), () => ( {
-	createSyncManager: mockCreateSyncManager,
-	ConnectionErrorCode: {},
-	Delta: class {},
-	CRDT_DOC_META_PERSISTENCE_KEY: 'crdt-doc-meta',
-	CRDT_RECORD_MAP_KEY: 'crdt-record',
-	LOCAL_EDITOR_ORIGIN: 'local-editor',
-	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
-	retrySyncConnection: vi.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/sync' ),
+	() =>
+		( {
+			createSyncManager: mockCreateSyncManager,
+			ConnectionErrorCode: {},
+			Delta: class {},
+			CRDT_DOC_META_PERSISTENCE_KEY: 'crdt-doc-meta',
+			CRDT_RECORD_MAP_KEY: 'crdt-record',
+			LOCAL_EDITOR_ORIGIN: 'local-editor',
+			LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
+			retrySyncConnection: vi.fn(),
+			// Stand-ins for the members the adapter uses.
+		} ) as unknown as typeof import( '@wordpress/sync' )
+);
 
 vi.mock( import( '../lock-unlock' ), () => ( {
-	unlock: ( privateApis ) => privateApis,
+	unlock: < T >( privateApis: unknown ) => privateApis as T,
 } ) );
 
 // Keep the adapter's module graph small: the entity configs and the CRDT
 // utilities pull in the block library, which does not survive module resets.
 vi.mock( import( '../entities' ), () => ( {
-	DEFAULT_ENTITY_KEY: 'id',
+	DEFAULT_ENTITY_KEY: 'id' as const,
 } ) );
 
 vi.mock( import( '../utils/crdt' ), () => ( {
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE: '_crdt_document',
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE: '_crdt_document' as const,
 	// Mirrors `getRawValue` in utils/crdt.ts.
-	getRawValue: ( value ) => {
+	getRawValue: ( value: unknown ) => {
 		if ( 'string' === typeof value ) {
 			return value;
 		}
@@ -77,7 +89,7 @@ async function loadSync() {
 // Fake store access for the adapter: one entity config, one dispatcher, one
 // edited record.
 const store = {
-	entityConfig: undefined,
+	entityConfig: undefined as EntitySyncRecord | undefined,
 	editedRecord: undefined,
 	dispatcher: { setSyncConnectionStatus: vi.fn() },
 	resolver: { getEditedEntityRecord: vi.fn() },
@@ -91,10 +103,10 @@ const dataAccess = {
 /**
  * Points the fake store at one entity config.
  *
- * @param {Object} entityConfig The entity config `getEntityConfig` returns.
- * @return {Object} The private dispatcher the adapter will use.
+ * @param entityConfig The entity config `getEntityConfig` returns.
+ * @return The private dispatcher the adapter will use.
  */
-function mockStore( entityConfig ) {
+function mockStore( entityConfig: EntitySyncRecord ) {
 	store.entityConfig = entityConfig;
 	return store.dispatcher;
 }
@@ -147,7 +159,8 @@ describe( 'the default entity sync manager', () => {
 		store.resolver.getEditedEntityRecord.mockReset();
 		mockSaveCRDTDoc.mockReset();
 		for ( const fn of Object.values( mockSyncManager ) ) {
-			fn?.mockReset?.();
+			// The undo manager stand-in is a plain object, which has no reset.
+			( fn as Partial< Mock > | undefined )?.mockReset?.();
 		}
 		mockSyncManager.undoManager = undefined;
 	} );
@@ -170,12 +183,17 @@ describe( 'the default entity sync manager', () => {
 	} );
 
 	describe( 'with the flag on', () => {
-		let manager;
+		// The default manager implements every optional member; only its undo
+		// history waits for a sync manager.
+		let manager: Required< Omit< EntitySyncManager, 'undoHistory' > > &
+			Pick< EntitySyncManager, 'undoHistory' >;
 
 		beforeEach( async () => {
 			window.__experimentalEnableRealTimeCollaboration = true;
 			const { createDefaultEntitySyncManager } = await loadSync();
-			manager = createDefaultEntitySyncManager( dataAccess );
+			manager = createDefaultEntitySyncManager(
+				dataAccess
+			) as typeof manager;
 		} );
 
 		it( 'syncs only entities with a sync config', () => {
@@ -263,7 +281,10 @@ describe( 'the default entity sync manager', () => {
 		} );
 
 		describe( 'persistCRDTDoc', () => {
-			async function loadAndPersist( syncConfig, editedRecord ) {
+			async function loadAndPersist(
+				syncConfig: EntitySyncRecord,
+				editedRecord: EntitySyncRecord
+			) {
 				mockStore( { syncConfig, key: 'id' } );
 				store.resolver.getEditedEntityRecord.mockImplementation( () =>
 					Promise.resolve( editedRecord )
@@ -371,7 +392,7 @@ describe( 'the default entity sync manager', () => {
 		describe( 'beforeSave', () => {
 			it( 'applies direct save changes to the CRDT before capturing the autosave snapshot', async () => {
 				mockStore( { syncConfig: {} } );
-				const callOrder = [];
+				const callOrder: string[] = [];
 				mockSyncManager.update.mockImplementation( () =>
 					callOrder.push( 'update' )
 				);
@@ -509,7 +530,11 @@ describe( 'the default entity sync manager', () => {
 				mockStore( { syncConfig: {} } );
 			} );
 
-			function afterSave( savedRecord, persistedRecord, edits ) {
+			function afterSave(
+				savedRecord: EntitySyncRecord,
+				persistedRecord: EntitySyncRecord | undefined,
+				edits: EntitySyncRecord
+			) {
 				manager.afterSave( 'postType', 'post', 10, {
 					savedRecord,
 					persistedRecord,
@@ -781,28 +806,28 @@ describe( 'the default entity sync manager', () => {
 			getSyncManager();
 
 			// Levels are moved for the record that opened them.
-			expect( manager.undoHistory.undo( 'postType', 'post', 1 ) ).toBe(
+			expect( manager.undoHistory!.undo( 'postType', 'post', 1 ) ).toBe(
 				true
 			);
-			expect( mockSyncManager.undoManager.undo ).toHaveBeenCalledWith(
+			expect( mockSyncManager.undoManager!.undo ).toHaveBeenCalledWith(
 				'postType/post',
 				1
 			);
-			expect( manager.undoHistory.redo( 'postType', 'post', 1 ) ).toBe(
+			expect( manager.undoHistory!.redo( 'postType', 'post', 1 ) ).toBe(
 				false
 			);
-			expect( mockSyncManager.undoManager.redo ).toHaveBeenCalledWith(
+			expect( mockSyncManager.undoManager!.redo ).toHaveBeenCalledWith(
 				'postType/post',
 				1
 			);
 
-			manager.undoHistory.stopCapturing();
-			manager.undoHistory.clearRedo();
+			manager.undoHistory!.stopCapturing();
+			manager.undoHistory!.clearRedo();
 			expect(
-				mockSyncManager.undoManager.stopCapturing
+				mockSyncManager.undoManager!.stopCapturing
 			).toHaveBeenCalledTimes( 1 );
 			expect(
-				mockSyncManager.undoManager.clearRedo
+				mockSyncManager.undoManager!.clearRedo
 			).toHaveBeenCalledTimes( 1 );
 		} );
 

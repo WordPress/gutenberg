@@ -1,49 +1,102 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { createUndoManager } from '@wordpress/undo-manager';
+import type { UndoManager } from '@wordpress/undo-manager';
+import type {
+	EntitySyncManager,
+	EntitySyncRecordId,
+	EntitySyncUndoHistory,
+} from '../../entity-sync';
 import {
 	applyUndoLevel,
 	createSyncUndoLevelRecord,
 	recordEntityEdit,
 } from '../sync-undo-levels';
 
+// The stand-in implements only what the undo helpers use, plus the controls
+// the tests drive it with.
+type FakeSyncManager = EntitySyncManager & {
+	synced: Set< string >;
+	undoHistory: Record< keyof EntitySyncUndoHistory, Mock >;
+	openLevel: (
+		undoManager: UndoManager,
+		kind?: string,
+		name?: string,
+		recordId?: EntitySyncRecordId
+	) => void;
+	deferLevel: (
+		undoManager: UndoManager,
+		kind?: string,
+		name?: string,
+		recordId?: EntitySyncRecordId
+	) => void;
+	unload: (
+		kind?: string,
+		name?: string,
+		recordId?: EntitySyncRecordId
+	) => void;
+};
+
 // A stand-in for the entity sync manager: it syncs the records in
 // `syncedIds` and keeps the levels of each record as plain counts.
-function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
+function createSyncManager(
+	syncedIds: string[] = [ 'postType/post/1' ]
+): FakeSyncManager {
 	const synced = new Set( syncedIds );
-	const levels = new Map();
+	const levels = new Map< string, { undo: number; redo: number } >();
 	// Levels of deferred local changes, opened when the manager flushes.
-	const deferredLevels = [];
-	const getLevels = ( kind, name, recordId ) => {
+	const deferredLevels: Array< () => void > = [];
+	const getLevels = (
+		kind: string,
+		name: string,
+		recordId: EntitySyncRecordId
+	) => {
 		const key = `${ kind }/${ name }/${ recordId }`;
 		if ( ! levels.has( key ) ) {
 			levels.set( key, { undo: 0, redo: 0 } );
 		}
-		return levels.get( key );
+		return levels.get( key )!;
 	};
 
+	// It lacks the members the undo helpers never call.
 	return {
 		synced,
-		isLoaded: ( kind, name, recordId ) =>
-			synced.has( `${ kind }/${ name }/${ recordId }` ),
+		isLoaded: (
+			kind: string,
+			name: string,
+			recordId: EntitySyncRecordId
+		) => synced.has( `${ kind }/${ name }/${ recordId }` ),
 		undoHistory: {
-			undo: vi.fn( ( kind, name, recordId ) => {
-				const record = getLevels( kind, name, recordId );
-				if ( ! record.undo ) {
-					return false;
+			undo: vi.fn(
+				(
+					kind: string,
+					name: string,
+					recordId: EntitySyncRecordId
+				) => {
+					const record = getLevels( kind, name, recordId );
+					if ( ! record.undo ) {
+						return false;
+					}
+					record.undo -= 1;
+					record.redo += 1;
+					return true;
 				}
-				record.undo -= 1;
-				record.redo += 1;
-				return true;
-			} ),
-			redo: vi.fn( ( kind, name, recordId ) => {
-				const record = getLevels( kind, name, recordId );
-				if ( ! record.redo ) {
-					return false;
+			),
+			redo: vi.fn(
+				(
+					kind: string,
+					name: string,
+					recordId: EntitySyncRecordId
+				) => {
+					const record = getLevels( kind, name, recordId );
+					if ( ! record.redo ) {
+						return false;
+					}
+					record.redo -= 1;
+					record.undo += 1;
+					return true;
 				}
-				record.redo -= 1;
-				record.undo += 1;
-				return true;
-			} ),
+			),
 			// Like the sync manager, closing the level applies deferred
 			// changes first, which opens their levels.
 			stopCapturing: vi.fn( () => {
@@ -58,10 +111,10 @@ function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 		// The manager opened a level for a synced record: it reports it, and
 		// core-data records the placeholder naming the record.
 		openLevel(
-			undoManager,
+			undoManager: UndoManager,
 			kind = 'postType',
 			name = 'post',
-			recordId = 1
+			recordId: EntitySyncRecordId = 1
 		) {
 			const record = getLevels( kind, name, recordId );
 			record.undo += 1;
@@ -73,10 +126,11 @@ function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 		// A local change to a synced record that the manager has not
 		// applied yet: its level opens on the next flush.
 		deferLevel(
-			undoManager,
+			this: FakeSyncManager,
+			undoManager: UndoManager,
 			kind = 'postType',
 			name = 'post',
-			recordId = 1
+			recordId: EntitySyncRecordId = 1
 		) {
 			deferredLevels.push( () =>
 				this.openLevel( undoManager, kind, name, recordId )
@@ -84,14 +138,23 @@ function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 		},
 		// The record was unloaded: it is no longer synced and its levels
 		// are gone.
-		unload( kind = 'postType', name = 'post', recordId = 1 ) {
+		unload(
+			kind = 'postType',
+			name = 'post',
+			recordId: EntitySyncRecordId = 1
+		) {
 			synced.delete( `${ kind }/${ name }/${ recordId }` );
 			levels.delete( `${ kind }/${ name }/${ recordId }` );
 		},
-	};
+	} as unknown as FakeSyncManager;
 }
 
-function createRecord( recordId, from, to, name = 'note' ) {
+function createRecord(
+	recordId: number,
+	from: string,
+	to: string,
+	name = 'note'
+) {
 	return [
 		{
 			id: { kind: 'root', name, recordId },

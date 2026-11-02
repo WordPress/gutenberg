@@ -2,10 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
 import { createSyncManager } from '../../../../sync/src/manager';
 import { getProviderCreators } from '../../../../sync/src/providers';
+import type { RecordHandlers, SyncConfig } from '../../../../sync/src/types';
 import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';
 import { applyPostChangesToCRDTDoc } from '../crdt';
+import type { YPostRecord } from '../crdt';
 import { mergeCrdtBlocks } from '../crdt-blocks';
+import type { Block, YBlock, YBlockAttributes, YBlocks } from '../crdt-blocks';
 import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
+import type { RichTextOffset } from '../crdt-utils';
 /**
  * Mock block schemas and sync providers.
  */
@@ -14,14 +18,14 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 
 	return {
 		...actual,
-		getBlockTypes: () => [
+		getBlockTypes: ( () => [
 			{
 				name: 'core/paragraph',
 				attributes: {
 					content: { type: 'rich-text' },
 				},
 			},
-		],
+		] ) as unknown as typeof actual.getBlockTypes,
 	};
 } );
 
@@ -43,14 +47,14 @@ const FUZZ_CASE_COUNT = 500;
 const PLACEMENT_FUZZ_CASE_COUNT = 500;
 const FUZZ_CHARS = [ 'a', 'a', 'a', 'b', 'b', 'c', 'x', 'y' ];
 const FUZZ_WRAPPERS = [
-	( text ) => text,
-	( text ) => `<em>${ text }</em>`,
-	( text ) => `<strong>${ text }</strong>`,
-	( text ) => `<strong><em>${ text }</em></strong>`,
-	( text ) => `<a href="https://example.com">${ text }</a>`,
+	( text: string ) => text,
+	( text: string ) => `<em>${ text }</em>`,
+	( text: string ) => `<strong>${ text }</strong>`,
+	( text: string ) => `<strong><em>${ text }</em></strong>`,
+	( text: string ) => `<a href="https://example.com">${ text }</a>`,
 ];
 
-function makeParagraphBlock( content ) {
+function makeParagraphBlock( content: string ): Block {
 	return {
 		clientId: 'block-1',
 		name: 'core/paragraph',
@@ -74,18 +78,18 @@ function getSelection() {
 	};
 }
 
-function getFirstBlockContentYText( yblocks ) {
-	const attrs = yblocks.get( 0 ).get( 'attributes' );
-	return attrs.get( 'content' );
+function getFirstBlockContentYText( yblocks: YBlocks ) {
+	const attrs = yblocks.get( 0 ).get( 'attributes' ) as YBlockAttributes;
+	return attrs.get( 'content' ) as Y.Text;
 }
 
-function readFirstBlockContentFromYBlocks( yblocks ) {
+function readFirstBlockContentFromYBlocks( yblocks: YBlocks ) {
 	return getFirstBlockContentYText( yblocks ).toString();
 }
 
-function readFirstBlockContentFromDoc( ydoc ) {
-	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
-	const yblocks = ymap.get( 'blocks' );
+function readFirstBlockContentFromDoc( ydoc: Y.Doc ) {
+	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+	const yblocks = ymap.get( 'blocks' )!;
 	return readFirstBlockContentFromYBlocks( yblocks );
 }
 
@@ -93,7 +97,7 @@ function waitForNextTick() {
 	return new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 }
 
-function createRandom( seed ) {
+function createRandom( seed: number ) {
 	const modulus = 2147483647;
 	const multiplier = 48271;
 	let state = seed % modulus;
@@ -108,15 +112,19 @@ function createRandom( seed ) {
 	};
 }
 
-function randomInt( random, min, max ) {
+function randomInt( random: () => number, min: number, max: number ) {
 	return min + Math.floor( random() * ( max - min + 1 ) );
 }
 
-function randomItem( random, items ) {
+function randomItem< T >( random: () => number, items: T[] ) {
 	return items[ randomInt( random, 0, items.length - 1 ) ];
 }
 
-function randomText( random, minLength, maxLength ) {
+function randomText(
+	random: () => number,
+	minLength: number,
+	maxLength: number
+) {
 	const length = randomInt( random, minLength, maxLength );
 	let text = '';
 
@@ -127,7 +135,7 @@ function randomText( random, minLength, maxLength ) {
 	return text;
 }
 
-function makeRandomRichTextHtml( random, text ) {
+function makeRandomRichTextHtml( random: () => number, text: string ) {
 	let html = '';
 	let offset = 0;
 
@@ -145,7 +153,7 @@ function makeRandomRichTextHtml( random, text ) {
 	return html;
 }
 
-function makeCursor( offset ) {
+function makeCursor( offset: number ) {
 	return {
 		attributeKey: 'content',
 		clientId: 'block-1',
@@ -153,25 +161,33 @@ function makeCursor( offset ) {
 	};
 }
 
-function deltaForUpdate( oldHtml, newHtml, cursorPosition ) {
+function deltaForUpdate(
+	oldHtml: string,
+	newHtml: string,
+	cursorPosition: number
+) {
 	return new Delta( [ { insert: oldHtml } ] ).diffWithCursor(
 		new Delta( [ { insert: newHtml } ] ),
 		cursorPosition
 	);
 }
 
-function applyDeltaToString( oldHtml, delta ) {
+function applyDeltaToString( oldHtml: string, delta: Delta ) {
 	return new Delta( [ { insert: oldHtml } ] )
 		.compose( delta )
 		.ops.map( ( op ) => ( typeof op.insert === 'string' ? op.insert : '' ) )
 		.join( '' );
 }
 
-function areEqual( actual, expected ) {
+function areEqual( actual: unknown, expected: unknown ) {
 	return JSON.stringify( actual ) === JSON.stringify( expected );
 }
 
-function assertEqualWithContext( actual, expected, context ) {
+function assertEqualWithContext(
+	actual: unknown,
+	expected: unknown,
+	context: Record< string, unknown >
+) {
 	if ( areEqual( actual, expected ) ) {
 		return;
 	}
@@ -199,7 +215,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 
 	it( 'preserves formatted paragraph content in mergeCrdtBlocks', () => {
 		const doc = new Y.Doc();
-		const yblocks = doc.getArray( 'blocks' );
+		const yblocks = doc.getArray< YBlock >( 'blocks' );
 
 		mergeCrdtBlocks( yblocks, [ makeParagraphBlock( OLD_HTML ) ], null );
 		mergeCrdtBlocks(
@@ -213,8 +229,8 @@ describe( 'RTC rich-text offset-space bug', () => {
 
 	it( 'uses the updated rich-text HTML to place cursor-guided inserts', () => {
 		const doc = new Y.Doc();
-		const yblocks = doc.getArray( 'blocks' );
-		const deltas = [];
+		const yblocks = doc.getArray< YBlock >( 'blocks' );
+		const deltas: Array< Y.YTextEvent[ 'delta' ] > = [];
 
 		mergeCrdtBlocks(
 			yblocks,
@@ -254,7 +270,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 			const newHtml = makeRandomRichTextHtml( random, newText );
 			const cursorOffset = randomInt( random, 0, newText.length );
 			const doc = new Y.Doc();
-			const yblocks = doc.getArray( 'blocks' );
+			const yblocks = doc.getArray< YBlock >( 'blocks' );
 
 			mergeCrdtBlocks( yblocks, [ makeParagraphBlock( oldHtml ) ], null );
 			mergeCrdtBlocks(
@@ -306,11 +322,11 @@ describe( 'RTC rich-text offset-space bug', () => {
 			const newHtml = makeRandomRichTextHtml( random, newText );
 			const expectedCursorPosition = richTextOffsetToHtmlIndex(
 				newHtml,
-				cursorOffset
+				cursorOffset as RichTextOffset
 			);
 			const oldHtmlCursorPosition = richTextOffsetToHtmlIndex(
 				oldHtml,
-				cursorOffset
+				cursorOffset as RichTextOffset
 			);
 			const expectedDelta = deltaForUpdate(
 				oldHtml,
@@ -336,12 +352,12 @@ describe( 'RTC rich-text offset-space bug', () => {
 			}
 
 			const doc = new Y.Doc();
-			const yblocks = doc.getArray( 'blocks' );
+			const yblocks = doc.getArray< YBlock >( 'blocks' );
 
 			mergeCrdtBlocks( yblocks, [ makeParagraphBlock( oldHtml ) ], null );
 
 			const content = getFirstBlockContentYText( yblocks );
-			const deltas = [];
+			const deltas: Array< Y.YTextEvent[ 'delta' ] > = [];
 			content.observe( ( event ) => {
 				deltas.push( event.delta );
 			} );
@@ -407,9 +423,9 @@ describe( 'RTC rich-text offset-space bug', () => {
 	} );
 
 	it( 'preserves formatted paragraph content in SyncManager.update', async () => {
-		let capturedDoc;
+		let capturedDoc: Y.Doc | undefined;
 		const manager = createSyncManager();
-		const handlers = {
+		const handlers: RecordHandlers = {
 			addUndoMeta: vi.fn(),
 			editRecord: vi.fn(),
 			getEditedRecord: vi.fn( async () => ( {
@@ -421,7 +437,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 			refetchRecord: vi.fn( async () => {} ),
 			restoreUndoMeta: vi.fn(),
 		};
-		const syncConfig = {
+		const syncConfig: SyncConfig = {
 			applyChangesToCRDTDoc: ( ydoc, changes ) => {
 				capturedDoc = ydoc;
 				applyPostChangesToCRDTDoc( ydoc, changes, SYNCED_PROPERTIES );
@@ -450,7 +466,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 		);
 		await waitForNextTick();
 
-		expect( readFirstBlockContentFromDoc( capturedDoc ) ).toBe( NEW_HTML );
+		expect( readFirstBlockContentFromDoc( capturedDoc! ) ).toBe( NEW_HTML );
 
 		manager.unload( 'postType/post', '1' );
 	} );
