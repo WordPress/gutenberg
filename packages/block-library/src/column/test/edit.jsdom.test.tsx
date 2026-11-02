@@ -161,12 +161,17 @@ describe( 'empty Column editor appender eligibility', () => {
 		async ( selected ) => {
 			const view = await renderColumns();
 			const { registry, emptyElement } = view;
+			await waitFor( () =>
+				expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+			);
 			await act( async () => {
 				await registry
 					.dispatch( blockEditorStore )
 					.selectBlock( view[ selected ].clientId );
 			} );
-			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE );
+			await waitFor( () =>
+				expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+			);
 			await act( async () => {
 				await registry
 					.dispatch( blockEditorStore )
@@ -181,6 +186,9 @@ describe( 'empty Column editor appender eligibility', () => {
 	it( 'preserves appenders when the Columns parent is multi-selected', async () => {
 		const { registry, columns, outside, emptyElement } =
 			await renderColumns();
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
@@ -191,7 +199,9 @@ describe( 'empty Column editor appender eligibility', () => {
 				.select( blockEditorStore )
 				.isBlockMultiSelected( columns.clientId )
 		).toBe( true );
-		expect( emptyElement ).not.toHaveClass( COLLAPSIBLE );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		} );
@@ -215,6 +225,9 @@ describe( 'empty Column editor appender eligibility', () => {
 	it( 'keeps appenders available when multiple sibling columns are selected', async () => {
 		const { registry, empty, populated, columns, emptyElement } =
 			await renderColumns();
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
@@ -230,7 +243,9 @@ describe( 'empty Column editor appender eligibility', () => {
 				.select( blockEditorStore )
 				.hasSelectedInnerBlock( columns.clientId, true )
 		).toBe( true );
-		expect( emptyElement ).not.toHaveClass( COLLAPSIBLE );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		} );
@@ -241,6 +256,9 @@ describe( 'empty Column editor appender eligibility', () => {
 
 	it( 'reveals an empty drop target as soon as an existing block starts dragging', async () => {
 		const { registry, outside, emptyElement } = await renderColumns();
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
@@ -249,7 +267,9 @@ describe( 'empty Column editor appender eligibility', () => {
 		expect( registry.select( blockEditorStore ).isDraggingBlocks() ).toBe(
 			true
 		);
-		expect( emptyElement ).not.toHaveClass( COLLAPSIBLE );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry.dispatch( blockEditorStore ).stopDraggingBlocks();
 		} );
@@ -260,6 +280,9 @@ describe( 'empty Column editor appender eligibility', () => {
 
 	it( 'reveals the drop target for a global inserter or external drag without dragged blocks', async () => {
 		const { registry, emptyElement } = await renderColumns();
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			unlock( registry.dispatch( blockEditorStore ) ).startDragging();
 		} );
@@ -269,7 +292,9 @@ describe( 'empty Column editor appender eligibility', () => {
 		expect(
 			unlock( registry.select( blockEditorStore ) ).isDragging()
 		).toBe( true );
-		expect( emptyElement ).not.toHaveClass( COLLAPSIBLE );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			unlock( registry.dispatch( blockEditorStore ) ).stopDragging();
 		} );
@@ -280,12 +305,17 @@ describe( 'empty Column editor appender eligibility', () => {
 
 	it( 'updates eligibility when the group becomes completely empty and is populated again', async () => {
 		const { registry, populated, emptyElement } = await renderColumns();
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
 				.replaceInnerBlocks( populated.clientId, [], false );
 		} );
-		expect( emptyElement ).not.toHaveClass( COLLAPSIBLE );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
@@ -310,22 +340,37 @@ describe( 'empty Column editor appender eligibility', () => {
 			emptyElement,
 			emptyAppender,
 		} = await renderColumns();
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
 				.selectBlock( columns.clientId );
 		} );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		} );
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry
 				.dispatch( blockEditorStore )
 				.startDraggingBlocks( [ outside.clientId ] );
 		} );
+		await waitFor( () =>
+			expect( emptyElement ).not.toHaveClass( COLLAPSIBLE )
+		);
 		await act( async () => {
 			await registry.dispatch( blockEditorStore ).stopDraggingBlocks();
 		} );
+		await waitFor( () =>
+			expect( emptyElement ).toHaveClass( COLLAPSIBLE )
+		);
 		expect(
 			screen.getByRole( 'document', { name: EMPTY_COLUMN_LABEL } )
 		).toBe( emptyElement );
