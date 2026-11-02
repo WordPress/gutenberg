@@ -432,3 +432,70 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 		} )
 		.toBe( true );
 } );
+
+function TrashableTable() {
+	const [ items, setItems ] = useState( posts );
+	const [ view, setView ] = useState< View >( {
+		type: 'table',
+		titleField: 'title',
+		fields: [ 'author' ],
+		page: 1,
+		perPage: 10,
+	} );
+	const { data, paginationInfo } = filterSortAndPaginate(
+		items,
+		view,
+		fields
+	);
+	const trashAction: Action< Post > = {
+		id: 'trash',
+		label: 'Trash',
+		isPrimary: true,
+		supportsBulk: true,
+		RenderModal: ( { items: itemsToTrash, closeModal } ) => (
+			<button
+				onClick={ () => {
+					const ids = itemsToTrash.map( ( { id } ) => id );
+					setItems( ( current ) =>
+						current.filter( ( { id } ) => ! ids.includes( id ) )
+					);
+					closeModal?.();
+				} }
+			>
+				Confirm
+			</button>
+		),
+	};
+	return (
+		<DataViews
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ setView }
+			actions={ [ trashAction ] }
+			paginationInfo={ paginationInfo }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'moves focus to the select all checkbox when an action removes the item that held it', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	await user.click(
+		page
+			.getByRole( 'row', { name: /First post/ } )
+			.getByRole( 'button', { name: 'Trash', exact: true } )
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'Confirm', exact: true } )
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
