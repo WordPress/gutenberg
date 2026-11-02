@@ -112,6 +112,7 @@ function getGridSnapshot(
 				rowStart: rowRange[ 0 ],
 				rowEnd: rowRange[ 1 ],
 			} ),
+			// An unset start can be undefined or null, and neither is explicit.
 			isExplicit:
 				( layout.columnStart ?? null ) !== null ||
 				( layout.rowStart ?? null ) !== null,
