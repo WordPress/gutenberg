@@ -46,6 +46,7 @@ import type { Post } from '../post';
 import type { Taxonomy } from '../taxonomy';
 import type { Term } from '../term';
 import type { User } from '../user';
+import type { WidgetType } from '../widget-type';
 import type { WpTemplate } from '../wp-template';
 import type { WpTemplatePart } from '../wp-template-part';
 
@@ -193,6 +194,16 @@ describe( 'Entity record types', () => {
 			);
 			// @ts-expect-error -- `visibility` is edit-only.
 			viewTaxonomy?.visibility;
+
+			const { record: widgetType } = useEntityRecord(
+				'root',
+				'widgetType',
+				'text'
+			);
+			true satisfies Expect<
+				typeof widgetType,
+				WidgetType< 'edit' > | null
+			>;
 		};
 	} );
 
