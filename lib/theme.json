@@ -403,6 +403,14 @@
 					}
 				}
 			},
+			"core/file": {
+				"spacing": {
+					"blockGap": {
+						"top": "1.3em",
+						"left": "0.75em"
+					}
+				}
+			},
 			"core/icon": {
 				"dimensions": {
 					"width": "24px"
