@@ -1,0 +1,11 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{h as t,u as n}from"./blocks-Bi8bw4xb.js";import{t as r}from"./jsx-runtime-BxZPLZy3.js";import{i,r as a}from"./react-sPqhvIIV.js";function _createMdxContent(e){let t={a:`a`,code:`code`,h1:`h1`,li:`li`,p:`p`,strong:`strong`,ul:`ul`,...i(),...e.components};return(0,o.jsxs)(o.Fragment,{children:[(0,o.jsx)(n,{id:`components-packages-introduction`,title:`Components/Introduction`}),`
+`,(0,o.jsx)(t.h1,{id:`components`,children:`Components`}),`
+`,(0,o.jsxs)(t.p,{children:[`WordPress components currently live in two npm packages while the component library moves incrementally toward a cohesive design system. Both packages remain in use because `,(0,o.jsx)(t.code,{children:`@wordpress/ui`}),` doesn't provide an equivalent for every component in `,(0,o.jsx)(t.code,{children:`@wordpress/components`}),`.`]}),`
+`,(0,o.jsxs)(t.p,{children:[`When choosing a component, start with `,(0,o.jsx)(t.a,{href:`?path=/docs/design-system-components-introduction--docs`,children:(0,o.jsx)(t.code,{children:`@wordpress/ui`})}),`. If it doesn't include a suitable recommended component, check `,(0,o.jsx)(t.a,{href:`?path=/docs/components-introduction--docs`,children:(0,o.jsx)(t.code,{children:`@wordpress/components`})}),`.`]}),`
+`,(0,o.jsx)(t.p,{children:`Recommendations are made component by component, not for an entire package. Each component page displays a status icon and, where needed, notes that explain the recommendation:`}),`
+`,(0,o.jsxs)(t.ul,{children:[`
+`,(0,o.jsxs)(t.li,{children:[`✅ `,(0,o.jsx)(t.strong,{children:`Recommended`}),`: Preferred for new work.`]}),`
+`,(0,o.jsxs)(t.li,{children:[`⚠️ `,(0,o.jsx)(t.strong,{children:`Use with caution`}),`: Review the notes before using it.`]}),`
+`,(0,o.jsxs)(t.li,{children:[`🚫 `,(0,o.jsx)(t.strong,{children:`Not recommended`}),`: Choose the recommended alternative.`]}),`
+`,(0,o.jsxs)(t.li,{children:[`❓ `,(0,o.jsx)(t.strong,{children:`Unaudited`}),`: The component hasn't been reviewed yet.`]}),`
+`]})]})}function MDXContent(e={}){let{wrapper:t}={...i(),...e.components};return t?(0,o.jsx)(t,{...e,children:(0,o.jsx)(_createMdxContent,{...e})}):_createMdxContent(e)}var o;function init_introduction(){return(init_introduction=e((()=>{o=r(),a(),t()})))()}init_introduction();export{MDXContent as default};

@@ -1,0 +1,49 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./react-Cd8OJmTE.js";import{n as i,t as a}from"./use-instance-id-DuzD68j8.js";import{a as o,i as s}from"./iframe-y9psNcyg.js";import{i as c,n as l,o as u,t as d}from"./use-context-system-CiYx-c7e.js";import{n as f,t as p}from"./component-Ct9KQYwf.js";import{a as m,i as h,n as g,o as _,r as v,t as y}from"./base-control-styles-CrkHVSbu.js";function useBaseControlProps(e){let{help:t,id:n,...r}=e,a=i(S,`wp-components-base-control`,n);return{baseControlProps:{id:a,help:t,...r},controlProps:{id:a,...t?{"aria-describedby":`${a}__help`}:{}}}}function init_hooks(){return(init_hooks=e((()=>{a(),init_base_control()})))()}var b,UnconnectedBaseControl,UnforwardedVisualLabel,x,S;function init_base_control(){return(init_base_control=e((()=>{o(),n(),f(),_(),u(),d(),b=t(),init_hooks(),UnconnectedBaseControl=e=>{let{id:t,label:n,hideLabelFromVision:r=!1,help:i,className:a,children:o}=l(e,`BaseControl`);return(0,b.jsxs)(m,{className:a,children:[(0,b.jsxs)(y,{className:`components-base-control__field`,children:[n&&t&&(r?(0,b.jsx)(p,{as:`label`,htmlFor:t,children:n}):(0,b.jsx)(v,{className:`components-base-control__label`,htmlFor:t,children:n})),n&&!t&&(r?(0,b.jsx)(p,{as:`label`,children:n}):(0,b.jsx)(x,{children:n})),o]}),!!i&&(0,b.jsx)(g,{id:t?t+`__help`:void 0,className:`components-base-control__help`,children:i})]})},UnforwardedVisualLabel=(e,t)=>{let{className:n,children:r,...i}=e;return(0,b.jsx)(h,{ref:t,...i,className:s(`components-base-control__label`,n),children:r})},x=(0,r.forwardRef)(UnforwardedVisualLabel),S=Object.assign(c(UnconnectedBaseControl,`BaseControl`),{VisualLabel:x});try{x.__docgenInfo={description:``,displayName:`VisualLabel`,filePath:`/home/runner/work/gutenberg/gutenberg/packages/components/src/base-control/index.tsx`,methods:[],props:{children:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:"The content to be displayed within the `BaseControl.VisualLabel`.",name:`children`,required:!0,tags:{},type:{name:`ReactNode`}},as:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/context/wordpress-component.ts`,name:`TypeLiteral`}],description:`The HTML element or React component to render the component as.`,name:`as`,required:!1,tags:{},type:{name:`JSXElementConstructor<any> | keyof IntrinsicElements`}}},tags:{}}}catch{}try{S.__docgenInfo={description:`\`BaseControl\` is a low-level component used to generate labels and help text for components handling user inputs.
+
+\`\`\`jsx
+import { BaseControl, useBaseControlProps } from '@wordpress/components';
+
+// Render a \`BaseControl\` for a textarea input
+const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+	// \`useBaseControlProps\` is a convenience hook to get the props for the \`BaseControl\`
+	// and the inner control itself. Namely, it takes care of generating a unique \`id\`,
+	// properly associating it with the \`label\` and \`help\` elements.
+	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+
+	return (
+		<BaseControl { ...baseControlProps }>
+			<textarea { ...controlProps }>
+			  { children }
+			</textarea>
+		</BaseControl>
+	);
+);
+\`\`\``,displayName:`BaseControl`,filePath:`/home/runner/work/gutenberg/gutenberg/packages/components/src/base-control/index.tsx`,methods:[],props:{__nextHasNoMarginBottom:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`Start opting into the new margin-free styles that will become the default in a future version.
+@deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+@ignore`,name:`__nextHasNoMarginBottom`,required:!1,tags:{},type:{name:`boolean`}},id:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:"The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.\nThis is necessary to accessibly associate the label with that element.\n\nThe recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you.\nOtherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.",name:`id`,required:!1,tags:{},type:{name:`string`}},help:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`Additional description for the control.
+
+Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an \`aria-describedby\` attribute.`,name:`help`,required:!1,tags:{},type:{name:`ReactNode`}},label:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`If this property is added, a label will be generated using label property as the content.`,name:`label`,required:!1,tags:{},type:{name:`ReactNode`}},hideLabelFromVision:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`If true, the label will only be visible to screen readers.`,name:`hideLabelFromVision`,required:!1,tags:{},type:{name:`boolean`}},className:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:``,name:`className`,required:!1,tags:{},type:{name:`string`}},children:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:"The content to be displayed within the `BaseControl`.",name:`children`,required:!0,tags:{},type:{name:`ReactNode`}}},tags:{}}}catch{}try{S.__docgenInfo={description:`\`BaseControl\` is a low-level component used to generate labels and help text for components handling user inputs.
+
+\`\`\`jsx
+import { BaseControl, useBaseControlProps } from '@wordpress/components';
+
+// Render a \`BaseControl\` for a textarea input
+const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+	// \`useBaseControlProps\` is a convenience hook to get the props for the \`BaseControl\`
+	// and the inner control itself. Namely, it takes care of generating a unique \`id\`,
+	// properly associating it with the \`label\` and \`help\` elements.
+	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+
+	return (
+		<BaseControl { ...baseControlProps }>
+			<textarea { ...controlProps }>
+			  { children }
+			</textarea>
+		</BaseControl>
+	);
+);
+\`\`\``,displayName:`basecontrol`,filePath:`/home/runner/work/gutenberg/gutenberg/packages/components/src/base-control/index.tsx`,methods:[],props:{__nextHasNoMarginBottom:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`Start opting into the new margin-free styles that will become the default in a future version.
+@deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+@ignore`,name:`__nextHasNoMarginBottom`,required:!1,tags:{},type:{name:`boolean`}},id:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:"The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.\nThis is necessary to accessibly associate the label with that element.\n\nThe recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you.\nOtherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.",name:`id`,required:!1,tags:{},type:{name:`string`}},help:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`Additional description for the control.
+
+Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an \`aria-describedby\` attribute.`,name:`help`,required:!1,tags:{},type:{name:`ReactNode`}},label:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`If this property is added, a label will be generated using label property as the content.`,name:`label`,required:!1,tags:{},type:{name:`ReactNode`}},hideLabelFromVision:{defaultValue:{value:`false`},declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:`If true, the label will only be visible to screen readers.`,name:`hideLabelFromVision`,required:!1,tags:{},type:{name:`boolean`}},className:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:``,name:`className`,required:!1,tags:{},type:{name:`string`}},children:{defaultValue:null,declarations:[{fileName:`gutenberg/packages/components/src/base-control/types.ts`,name:`TypeLiteral`}],description:"The content to be displayed within the `BaseControl`.",name:`children`,required:!0,tags:{},type:{name:`ReactNode`}}},tags:{}}}catch{}})))()}export{useBaseControlProps as i,init_base_control as n,init_hooks as r,S as t};

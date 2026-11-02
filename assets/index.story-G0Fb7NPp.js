@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{i as n,n as r}from"./build-module-CPA2Y5FH.js";import{n as i,t as a}from"./icon-CuFTK1Qw.js";var o,s,c;function init_index_story(){return(init_index_story=e((()=>{r(),i(),o=t(),s={title:`Components/@wordpress-ui/Icon`,id:`design-system-components-icon`,component:a,tags:[`manifest`],decorators:[e=>(0,o.jsx)(`div`,{style:{color:`var(--wpds-color-foreground-content-neutral, #1e1e1e)`},children:(0,o.jsx)(e,{})})],parameters:{componentStatus:{status:`recommended`,whereUsed:`global`,notes:"Prefer this component over the `Icon` component from `@wordpress/components` or `@wordpress/icons`."}}},c={args:{icon:n}},c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
+  args: {
+    icon: wordpress
+  }
+}`,...c.parameters?.docs?.source}}}})))()}init_index_story();export{c as Default,s as default};

@@ -1,0 +1,8 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./button-Ch2TgMo3.js";import{n as i,t as a}from"./link-C3WALUlf.js";var o,formDecorator,s,c,narrowContainerDecorator,l;function init_shared(){return(init_shared=e((()=>{i(),n(),o=t(),formDecorator=e=>(0,o.jsxs)(`form`,{style:{fontFamily:`sans-serif`,display:`flex`,flexDirection:`column`,alignItems:`flex-start`,gap:16},onSubmit:e=>{e.preventDefault(),alert(`Form submitted!`)},children:[(0,o.jsx)(`div`,{style:{display:`flex`,flexDirection:`column`,gap:16,alignItems:`stretch`,width:300},children:(0,o.jsx)(e,{})}),(0,o.jsx)(r,{type:`submit`,children:`Submit`})]}),s=`To add rich content (such as links) to the description, use the \`details\` prop.
+
+Although this content is not associated with the field using direct semantics,
+it is made discoverable to screen reader users via a visually hidden description,
+alerting them to the presence of additional information below.
+
+**Important:** If the content only includes plain text, use \`description\` instead,
+so the readout is not unnecessarily verbose for screen reader users.`,c=(0,o.jsxs)(o.Fragment,{children:[`Details can include`,` `,(0,o.jsx)(a,{href:`https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a`,children:`links to more information`}),` `,`and other semantic elements.`]}),narrowContainerDecorator=e=>(0,o.jsx)(`div`,{style:{width:248},children:(0,o.jsx)(e,{})}),l=[{value:`short`,label:`Short label`},{value:`long`,label:`Hippopotomonstrosesquipedaliophobia`}]})))()}export{l as a,init_shared as i,s as n,narrowContainerDecorator as o,formDecorator as r,c as t};

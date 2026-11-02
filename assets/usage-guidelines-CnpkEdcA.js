@@ -1,0 +1,25 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{h as t,r as n,u as r}from"./blocks-Bi8bw4xb.js";import{t as i}from"./jsx-runtime-BxZPLZy3.js";import{i as a,r as o}from"./react-sPqhvIIV.js";import{i as s,n as c,t as l}from"./index.story-DXWaf0TU.js";import{n as u,r as d,t as f}from"./usage-guidelines.story-CraGmmi6.js";function _createMdxContent(e){let t={a:`a`,code:`code`,h1:`h1`,h2:`h2`,p:`p`,pre:`pre`,...a(),...e.components};return(0,p.jsxs)(p.Fragment,{children:[(0,p.jsx)(r,{of:d}),`
+`,(0,p.jsx)(t.h1,{id:`breadcrumb-usage-guidelines`,children:`Breadcrumb usage guidelines`}),`
+`,(0,p.jsx)(t.p,{children:`Use Breadcrumb to show a hierarchical path to the current page or selected item. Every ancestor must belong to that hierarchy. Commands such as Delete and Duplicate belong in a separate menu.`}),`
+`,(0,p.jsx)(t.h2,{id:`page-navigation`,children:`Page navigation`}),`
+`,(0,p.jsxs)(t.p,{children:[`Use `,(0,p.jsx)(t.code,{children:`LinkItem`}),` ancestors with meaningful destinations followed by exactly one `,(0,p.jsx)(t.code,{children:`CurrentItem`}),`. Give `,(0,p.jsx)(t.code,{children:`Root`}),` an `,(0,p.jsx)(t.code,{children:`aria-label`}),` that describes the hierarchy, such as "Page hierarchy". This label names the navigation landmark. The current item is not a link and defaults to `,(0,p.jsx)(t.code,{children:`aria-current="page"`}),`. This follows the `,(0,p.jsx)(t.a,{href:`https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/`,rel:`nofollow`,children:`APG breadcrumb pattern`}),`.`]}),`
+`,(0,p.jsx)(n,{of:c}),`
+`,(0,p.jsx)(t.h2,{id:`hierarchy-selection`,children:`Hierarchy selection`}),`
+`,(0,p.jsxs)(t.p,{children:[`Use `,(0,p.jsx)(t.code,{children:`ButtonItem`}),` ancestors followed by exactly one `,(0,p.jsx)(t.code,{children:`CurrentItem`}),` when ancestors select or activate a position in the hierarchy. For example, a block editor can show Document, Group, and Paragraph. Group selects the ancestor block; Document clears selection. Give `,(0,p.jsx)(t.code,{children:`Root`}),` a descriptive `,(0,p.jsx)(t.code,{children:`aria-label`}),`, such as "Block hierarchy". This label names the ordered list; the outer `,(0,p.jsx)(t.code,{children:`div`}),` is a layout wrapper. For either variant, use `,(0,p.jsx)(t.code,{children:`aria-labelledby`}),` instead when a visible label is available.`]}),`
+`,(0,p.jsxs)(t.p,{children:[`Use `,(0,p.jsx)(t.code,{children:`onClick`}),` to update your selection state. If selection should move focus into the editor, do that in your handler. Breadcrumb preserves that focus move.`]}),`
+`,(0,p.jsxs)(t.p,{children:[`Set `,(0,p.jsx)(t.code,{children:`aria-current="true"`}),` on `,(0,p.jsx)(t.code,{children:`CurrentItem`}),` if selecting an ancestor can leave it as the only item. This keeps the selection list labelled after all button ancestors are removed.`]}),`
+`,(0,p.jsx)(n,{of:f}),`
+`,(0,p.jsxs)(t.p,{children:[`When using a ref or an event's `,(0,p.jsx)(t.code,{children:`currentTarget`}),`, handle both possible elements: `,(0,p.jsx)(t.code,{children:`HTMLButtonElement`}),` in the visible trail and `,(0,p.jsx)(t.code,{children:`HTMLDivElement`}),` in the overflow menu. A custom `,(0,p.jsx)(t.code,{children:`render`}),` must support both button and menu-item composition.`]}),`
+`,(0,p.jsx)(t.h2,{id:`current-only-trails`,children:`Current-only trails`}),`
+`,(0,p.jsxs)(t.p,{children:[`A single `,(0,p.jsx)(t.code,{children:`CurrentItem`}),` is supported. For page navigation, no `,(0,p.jsx)(t.code,{children:`aria-current`}),` prop is needed. For hierarchy selection, set `,(0,p.jsx)(t.code,{children:`aria-current="true"`}),` explicitly:`]}),`
+`,(0,p.jsx)(t.pre,{children:(0,p.jsx)(t.code,{className:`language-tsx`,children:`<Breadcrumb.Root aria-label="Block hierarchy">
+	<Breadcrumb.CurrentItem aria-current="true">
+		Document
+	</Breadcrumb.CurrentItem>
+</Breadcrumb.Root>
+`})}),`
+`,(0,p.jsx)(n,{of:l}),`
+`,(0,p.jsx)(t.h2,{id:`supported-collections`,children:`Supported collections`}),`
+`,(0,p.jsxs)(t.p,{children:[`Use only links or only buttons for ancestors within one trail. Keep exactly one final `,(0,p.jsx)(t.code,{children:`CurrentItem`}),`, use non-empty text labels, and give items generated from arrays stable React keys.`]}),`
+`,(0,p.jsx)(t.h2,{id:`truncated-labels`,children:`Truncated labels`}),`
+`,(0,p.jsx)(t.p,{children:`Keep labels concise and leave enough space to read them where possible. Truncated labels have a tooltip for mouse and keyboard users. Tooltips are unavailable on touch devices, so provide another way to read the full label when it is needed to understand the hierarchy.`})]})}function MDXContent(e={}){let{wrapper:t}={...a(),...e.components};return t?(0,p.jsx)(t,{...e,children:(0,p.jsx)(_createMdxContent,{...e})}):_createMdxContent(e)}var p;function init_usage_guidelines(){return(init_usage_guidelines=e((()=>{p=i(),o(),t(),s(),u()})))()}init_usage_guidelines();export{MDXContent as default};
