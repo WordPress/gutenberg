@@ -135,7 +135,7 @@ function setup( { content = 'Hello world' } = {} ) {
 	registry.register( editorStore );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
-	registry.dispatch( coreStore ).receiveCurrentUser( { id: AUTHOR_ID } );
+	registry.dispatch( coreStore ).receiveCurrentUser( { id: AUTHOR_ID } as any );
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
 
 	const block = createBlock( TEST_BLOCK_NAME, {} );
