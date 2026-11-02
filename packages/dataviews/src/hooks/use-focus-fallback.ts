@@ -41,8 +41,11 @@ function getFallback( container: HTMLElement ) {
 		( element ) =>
 			element.tabIndex >= 0 &&
 			isVisible( element ) &&
-			// The layout is inert while it loads, e.g. after an action.
-			! element.closest( '[inert]' )
+			// Usable, rather than disabled but still focusable.
+			! element.matches( ':disabled, [aria-disabled="true"]' ) &&
+			// Hidden on its own, like the table media, or inert while the
+			// layout loads, e.g. after an action.
+			! element.closest( '[aria-hidden="true"], [inert]' )
 	);
 	return (
 		controls.find(

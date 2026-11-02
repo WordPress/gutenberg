@@ -781,11 +781,13 @@ function FallbackList( {
 	items = LIST,
 	hidden = [],
 	ariaHidden = [],
+	disabled = [],
 	isInfiniteScroll = false,
 }: {
 	items?: string[];
 	hidden?: string[];
 	ariaHidden?: string[];
+	disabled?: string[];
 	isInfiniteScroll?: boolean;
 } ) {
 	const ref = useFocusFallback( { isEmpty: false, isInfiniteScroll } );
@@ -798,7 +800,12 @@ function FallbackList( {
 						style={ { height: 40 } }
 						aria-hidden={ ariaHidden.includes( item ) || undefined }
 					>
-						<button hidden={ hidden.includes( item ) }>
+						<button
+							hidden={ hidden.includes( item ) }
+							aria-disabled={
+								disabled.includes( item ) || undefined
+							}
+						>
 							{ item }
 						</button>
 					</div>
@@ -891,6 +898,21 @@ it( 'forgets a control hidden on its own once focus leaves it', async () => {
 	);
 	await nextFrames();
 	expect( item.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'skips disabled and hidden controls when moving focus on', async () => {
+	const { rerender } = await render( <FallbackList /> );
+	focusItem( 'Item 0' );
+	await rerender(
+		<FallbackList
+			items={ LIST.slice( 1 ) }
+			disabled={ [ 'Item 1' ] }
+			ariaHidden={ [ 'Item 2' ] }
+		/>
+	);
+	await expect
+		.element( page.getByRole( 'button', { name: 'Item 3', exact: true } ) )
+		.toHaveFocus();
 } );
 
 it( 'moves focus within a view inside a dialog', async () => {
