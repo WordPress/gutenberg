@@ -393,6 +393,10 @@ function ButtonEdit( props ) {
 	}
 
 	function unlink() {
+		// "Reset all" and the keyboard shortcut must not clear a locked URL.
+		if ( lockUrlControls ) {
+			return;
+		}
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
