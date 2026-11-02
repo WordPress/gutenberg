@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Button: Add a `download` attribute that adds the `download` HTML attribute to the button link ([#86162](https://github.com/WordPress/gutenberg/pull/86162)).
+-   File: Use an inner Button block for the download button, so that Button block styles from Global Styles apply to it. Themes that style `.wp-block-file__button` don't style File blocks that are created or saved again ([#86163](https://github.com/WordPress/gutenberg/pull/86163)).
 -   Archives: Use the UI SelectControl for the Group by setting ([#86137](https://github.com/WordPress/gutenberg/pull/86137)).
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
