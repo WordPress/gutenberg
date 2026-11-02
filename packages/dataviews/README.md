@@ -1086,6 +1086,10 @@ The unique identifier of the action.
 
 The user facing description of the action.
 
+Provide a translated label without an ellipsis. DataViews adds a translated ellipsis when an action with `RenderModal` is displayed in a menu. Buttons and default modal headings use the label without this added punctuation. Callback actions use the label unchanged in menus.
+
+For compatibility, DataViews recognizes common trailing ellipses in existing labels: `…`, `⋯`, and runs of three or more periods, ideographic full stops, or fullwidth full stops, including repeated ellipses and surrounding whitespace. It preserves these labels in menus without adding another ellipsis and removes the recognized suffix from buttons. This is a best-effort fallback, not a complete parser for every language. Migrate existing labels to text without an ellipsis rather than relying on this detection. Default modal headings still use the supplied label unchanged.
+
 -   Type: `string | function`
 -   Required
 -   Example:

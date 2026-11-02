@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import {
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,
 	ColorIndicator,
@@ -22,12 +23,6 @@ import {
 	getDuotoneSlugFromPreset,
 } from './utils';
 import { setImmutably } from '../../utils/object';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	InheritanceResetButton,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
 import type {
 	FiltersPanelProps,
 	PanelResetAllFilter,
@@ -141,7 +136,6 @@ const renderToggle = (
 	duotone: string[] | 'unset' | undefined,
 	resetConfig: {
 		hasLocalValue: boolean;
-		hasLocalOverride: boolean;
 		onReset: () => void;
 	}
 ) =>
@@ -151,7 +145,7 @@ const renderToggle = (
 	}: Parameters<
 		ComponentProps< typeof Dropdown >[ 'renderToggle' ]
 	>[ 0 ] ) {
-		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
+		const { hasLocalValue, onReset } = resetConfig;
 		const duotoneButtonRef = useRef< HTMLButtonElement >( undefined );
 
 		const toggleProps = {
@@ -181,21 +175,15 @@ const renderToggle = (
 						label={ __( 'Duotone' ) }
 					/>
 				</Button>
-				{ hasLocalValue &&
-					( hasLocalOverride ? (
-						<InheritanceResetButton
-							className="block-editor-panel-duotone-settings__reset"
-							onResetToInherited={ handleReset }
-						/>
-					) : (
-						<Button
-							size="small"
-							icon={ resetIcon }
-							label={ __( 'Reset' ) }
-							className="block-editor-panel-duotone-settings__reset"
-							onClick={ handleReset }
-						/>
-					) ) }
+				{ hasLocalValue && (
+					<Button
+						size="small"
+						icon={ resetIcon }
+						label={ __( 'Reset' ) }
+						className="block-editor-panel-duotone-settings__reset"
+						onClick={ handleReset }
+					/>
+				) }
 			</>
 		);
 	};
@@ -208,7 +196,6 @@ export default function FiltersPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 }: FiltersPanelProps ) {
 	const popoverProps = {
 		...useToolsPanelItemPopoverProps(),
@@ -218,18 +205,6 @@ export default function FiltersPanel( {
 	const decodeValue = ( rawValue: StyleValue | string[] ) =>
 		// A color array is returned as is.
 		getValueFromVariable( { settings }, '', rawValue as StyleValue );
-	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = (
-		isInherited: boolean,
-		hasLocalOverride: boolean,
-		className?: string
-	) =>
-		getInheritanceProps(
-			showInheritanceLabelIndicators && isInherited,
-			showInheritanceLabelIndicators && hasLocalOverride,
-			className
-		);
 
 	// Duotone
 	const hasDuotoneEnabled = useHasDuotoneControl( settings );
@@ -289,11 +264,6 @@ export default function FiltersPanel( {
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
-	// Only a local value shadowing an inherited one shows the blue-dot reset.
-	const hasDuotoneLocalOverride =
-		showInheritanceLabelIndicators &&
-		hasDuotone() &&
-		inheritedDuotone !== undefined;
 
 	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
@@ -317,19 +287,11 @@ export default function FiltersPanel( {
 			panelId={ panelId }
 		>
 			{ hasDuotoneEnabled && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isDuotonePlaceholder,
-						localDuotone !== undefined &&
-							inheritedDuotone !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Duotone' ) }
 					hasValue={ hasDuotone }
 					onDeselect={ resetDuotone }
 					isShownByDefault={ defaultControls.duotone }
-					// Toggle renders its own reset dot, so the item must not
-					// add a second.
-					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					<Dropdown
@@ -337,7 +299,6 @@ export default function FiltersPanel( {
 						className="block-editor-global-styles-filters-panel__dropdown"
 						renderToggle={ renderToggle( duotone, {
 							hasLocalValue: hasDuotone(),
-							hasLocalOverride: hasDuotoneLocalOverride,
 							onReset: resetDuotone,
 						} ) }
 						renderContent={ () => (
@@ -364,7 +325,7 @@ export default function FiltersPanel( {
 							</DropdownContentWrapper>
 						) }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 		</Wrapper>
 	);

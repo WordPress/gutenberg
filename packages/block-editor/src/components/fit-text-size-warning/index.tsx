@@ -1,6 +1,6 @@
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Notice } from '@wordpress/components';
+import { Notice as WCNotice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -23,13 +23,13 @@ export default function FitTextSizeWarning() {
 
 	return (
 		<div className="block-editor-fit-text-size-warning">
-			<Notice
+			<WCNotice
 				spokenMessage={ null }
 				status="warning"
 				isDismissible={ false }
 			>
 				{ message }
-			</Notice>
+			</WCNotice>
 		</div>
 	);
 }
