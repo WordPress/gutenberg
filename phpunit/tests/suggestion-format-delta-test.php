@@ -205,8 +205,8 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 							'removed' => array(
 								array( 'type' => 'core/bold' ),
 								array(
-									'type'                   => 'core/text-color',
-									'attributes'             => array(
+									'type'       => 'core/text-color',
+									'attributes' => array(
 										'style' => 'color:red;background-image:url(javascript:alert(1))',
 									),
 									'unregisteredAttributes' => array(
