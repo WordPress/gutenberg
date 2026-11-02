@@ -148,7 +148,9 @@ function DataViews< Item >( {
 		if ( view.type !== LAYOUT_TABLE && view.type !== LAYOUT_GRID ) {
 			return false;
 		}
-		return data.some(
+		// The items the toolbar works on, which with infinite scroll keep the
+		// selected items of the pages loaded before.
+		return displayData.some(
 			( item ) =>
 				ids.includes( getItemId( item ) ) &&
 				hasAPossibleBulkAction( actions, item )
