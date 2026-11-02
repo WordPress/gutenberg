@@ -145,12 +145,6 @@ parameters:
 			path: ../../lib/compat/wordpress-7.2/note-reactions.php
 
 		-
-			message: '#^Method WP_Sync_Save_Server\:\:handle_request\(\) should return WP_Error\|WP_REST_Response but returns array\.$#'
-			identifier: return.type
-			count: 1
-			path: ../../lib/experimental/collaboration/class-wp-sync-save-server.php
-
-		-
 			message: '#^Access to an undefined property WP_Post\:\:\$content\.$#'
 			identifier: property.notFound
 			count: 2
