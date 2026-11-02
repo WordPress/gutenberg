@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `start`: With `--experimental-modules`, build the `viewScriptModule` of a block added during the watch, and a module view file created after the watch started ([#86082](https://github.com/WordPress/gutenberg/pull/86082)).
+
 ## 37.0.0 (2026-10-20)
 
 ### Breaking Changes
