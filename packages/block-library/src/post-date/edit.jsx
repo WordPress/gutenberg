@@ -38,7 +38,7 @@ export default function PostDateEdit( props ) {
 		name,
 	} = props;
 	useDeprecatedTextAlign( props );
-	const { datetime, format, isLink } = attributes;
+	const { datetime, format, isLink, metadata } = attributes;
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -54,17 +54,25 @@ export default function PostDateEdit( props ) {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	// We need to set the datetime to a default value upon first loading
-	// to discern the block from its legacy version (which would default
-	// to the containing post's publish date).
-	useEffect( () => {
-		if ( datetime === undefined ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { datetime: new Date() } );
-		}
-	}, [ datetime ] );
-
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+
+	useEffect( () => {
+		const initialAttributes = getInitialAttributes(
+			{ datetime, metadata },
+			isDescendentOfQueryLoop
+		);
+		if ( initialAttributes ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( initialAttributes );
+		}
+	}, [
+		datetime,
+		metadata,
+		isDescendentOfQueryLoop,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
 	const dateSettings = getDateSettings();
 
 	const {
@@ -236,6 +244,48 @@ export default function PostDateEdit( props ) {
 			<div { ...blockProps }>{ postDate }</div>
 		</>
 	);
+}
+
+/**
+ * Returns the attributes to set on a Date block that has neither a `datetime`
+ * attribute nor a binding for it, which is the case right after insertion.
+ *
+ * Setting one of them discerns the block from its legacy version, which
+ * displayed the containing post's publish date. Outside a Query Loop, the
+ * block gets the current date. Inside a Query Loop, a fixed date would show
+ * the same date for every post, so the block is bound to each post's publish
+ * date instead, like the "Post Date" variation.
+ *
+ * @param {Object}  attributes              Block attributes.
+ * @param {string}  [attributes.datetime]   The block's date.
+ * @param {Object}  [attributes.metadata]   The block's metadata.
+ * @param {boolean} isDescendentOfQueryLoop Whether the block is inside a Query Loop.
+ * @return {Object|null} The attributes to set, or `null` if there is nothing to set.
+ */
+export function getInitialAttributes(
+	{ datetime, metadata },
+	isDescendentOfQueryLoop
+) {
+	if ( datetime !== undefined || metadata?.bindings?.datetime ) {
+		return null;
+	}
+
+	if ( isDescendentOfQueryLoop ) {
+		return {
+			metadata: {
+				...metadata,
+				bindings: {
+					...metadata?.bindings,
+					datetime: {
+						source: 'core/post-data',
+						args: { field: 'date' },
+					},
+				},
+			},
+		};
+	}
+
+	return { datetime: new Date() };
 }
 
 export function is12HourFormat( format ) {
