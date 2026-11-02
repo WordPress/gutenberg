@@ -14,6 +14,7 @@ export default function save( { attributes } ) {
 	const {
 		tagName,
 		type,
+		download,
 		fontSize,
 		linkTarget,
 		rel,
@@ -68,6 +69,7 @@ export default function save( { attributes } ) {
 				value={ text }
 				target={ isButtonTag ? null : linkTarget }
 				rel={ isButtonTag ? null : rel }
+				download={ ! isButtonTag && url && download ? true : null }
 			/>
 		</div>
 	);

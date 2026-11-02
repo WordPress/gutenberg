@@ -6,6 +6,7 @@
 			"tagName": "a",
 			"type": "button",
 			"text": "My button",
+			"download": false,
 			"style": {
 				"border": {
 					"radius": 0

@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"url": "http://localhost:8888/wp-content/uploads/2026/11/report.pdf",
+			"text": "Download",
+			"download": true
+		},
+		"innerBlocks": []
+	}
+]
