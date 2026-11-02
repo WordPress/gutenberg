@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `WpTemplate` and `WpTemplatePart` now match the REST schema: `has_theme_file` and `is_custom` are `boolean` instead of `Record< string, string >`, `modified` can be `null`, and `original_source` is added. `WpTemplatePart` also gains `author_text`, `plugin`, `is_custom` and `modified`.
+
+### Enhancements
+
+-   `useEntityRecord`, `useEntityRecords` and `useEntityRecordsWithPermissions` now infer the record type from their `kind` and `name` arguments, matching `getEntityRecord`. Pairs the map does not cover, and calls that name the record type explicitly, behave as before.
+-   The entity record map now covers templates and template parts, so `postType`/`wp_template` and `postType`/`wp_template_part` infer `WpTemplate` and `WpTemplatePart`.
+
 ### Bug Fixes
 
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).

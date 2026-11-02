@@ -17,7 +17,13 @@
 /* eslint-disable vitest/expect-expect -- these tests contain compile-time assertions only. */
 import { dispatch, select, resolveSelect } from '@wordpress/data';
 import { describe, it } from 'vitest';
-import { store as coreStore } from '../../index';
+import {
+	store as coreStore,
+	useEntityRecord,
+	useEntityRecords,
+} from '../../index';
+import { useEntityRecordsWithPermissions } from '../../hooks/use-entity-records';
+import type { WithPermissions } from '../../hooks/use-entity-records';
 import type {
 	Context,
 	ContextualField,
@@ -36,6 +42,8 @@ import type { Page } from '../page';
 import type { Post } from '../post';
 import type { Term } from '../term';
 import type { User } from '../user';
+import type { WpTemplate } from '../wp-template';
+import type { WpTemplatePart } from '../wp-template-part';
 
 /**
  * Resolves to `true` only when `A` and `B` are mutually assignable, so a
@@ -144,6 +152,40 @@ describe( 'Entity record types', () => {
 				EntityRecordOf< 'postType', 'wp_navigation' >,
 				Navigation< 'edit' >
 			>;
+			true satisfies Expect<
+				EntityRecordOf< 'postType', 'wp_template' >,
+				WpTemplate< 'edit' >
+			>;
+			true satisfies Expect<
+				EntityRecordOf< 'postType', 'wp_template_part' >,
+				WpTemplatePart< 'edit' >
+			>;
+		};
+	} );
+
+	it( 'the template fields follow the REST schema', () => {
+		() => {
+			const template = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template',
+				'theme//index'
+			);
+			template?.has_theme_file satisfies boolean | undefined;
+			template?.is_custom satisfies boolean | undefined;
+			template?.original_source satisfies
+				'theme' | 'plugin' | 'site' | 'user' | undefined;
+			// @ts-expect-error -- a template that was never saved has no date.
+			template?.modified satisfies string | undefined;
+
+			const part = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template_part',
+				'theme//header'
+			);
+			part?.area satisfies string | undefined;
+			part?.has_theme_file satisfies boolean | undefined;
+			part?.is_custom satisfies boolean | undefined;
+			part?.author_text satisfies string | undefined;
 		};
 	} );
 
@@ -550,6 +592,65 @@ describe( 'Entity record types', () => {
 				'post'
 			);
 			true satisfies Expect< typeof posts, Post< 'edit' >[] | null >;
+		};
+	} );
+
+	it( 'the entity record hooks infer the record', () => {
+		() => {
+			const { record, editedRecord } = useEntityRecord(
+				'postType',
+				'post',
+				1
+			);
+			true satisfies Expect< typeof record, Post< 'edit' > | null >;
+			editedRecord.title?.raw satisfies string | undefined;
+
+			const { records } = useEntityRecords( 'postType', 'post' );
+			true satisfies Expect< typeof records, Post< 'edit' >[] | null >;
+
+			const { records: viewRecords } = useEntityRecords(
+				'postType',
+				'post',
+				{ context: 'view' }
+			);
+			true satisfies Expect<
+				typeof viewRecords,
+				Post< 'view' >[] | null
+			>;
+
+			const { records: withPermissions } =
+				useEntityRecordsWithPermissions( 'postType', 'page' );
+			true satisfies Expect<
+				typeof withPermissions,
+				WithPermissions< Page< 'edit' > >[] | null
+			>;
+		};
+	} );
+
+	it( 'the entity record hooks fall back for an unknown pair', () => {
+		( kind: string, name: string ) => {
+			// Unknown or non-literal pairs keep the previous `unknown` record.
+			const { record } = useEntityRecord( 'myPlugin', 'order', 1 );
+			true satisfies Expect< typeof record, unknown >;
+
+			const { records } = useEntityRecords( kind, name );
+			true satisfies Expect< typeof records, unknown[] | null >;
+
+			// The explicit generic is still honoured, even for a mapped pair.
+			const { record: asserted } = useEntityRecord< Page< 'view' > >(
+				'postType',
+				'post',
+				1
+			);
+			true satisfies Expect< typeof asserted, Page< 'view' > | null >;
+
+			const { records: assertedRecords } = useEntityRecords<
+				Page< 'view' >
+			>( 'postType', 'post' );
+			true satisfies Expect<
+				typeof assertedRecords,
+				Page< 'view' >[] | null
+			>;
 		};
 	} );
 

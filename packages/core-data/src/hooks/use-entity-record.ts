@@ -2,6 +2,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '../';
+import type * as ET from '../entity-types';
 import type { Status } from './constants';
 import { getResolutionStatus } from './utils';
 
@@ -144,6 +145,26 @@ const EMPTY_OBJECT = {};
  * @return Entity record data.
  * @template RecordType
  */
+export default function useEntityRecord<
+	Kind extends ET.EntityKind,
+	Name extends ET.EntityNameOf< Kind >,
+>(
+	kind: Kind,
+	name: Name,
+	recordId: string | number,
+	options?: Options
+): EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >;
+
+/*
+ * Retained so call sites that name the record type explicitly, and pairs
+ * absent from the map, continue to compile.
+ */
+export default function useEntityRecord< RecordType >(
+	kind: string,
+	name: string,
+	recordId: string | number,
+	options?: Options
+): EntityRecordResolution< RecordType >;
 export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
