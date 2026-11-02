@@ -163,6 +163,52 @@ class BlockNoteUtils {
 		);
 	}
 
+	/**
+	 * Inserts a paragraph with a block-level note without going through the
+	 * notes UI. For tests that need notes but don't test adding them. Leaves
+	 * the note selected, as adding it through the UI does.
+	 *
+	 * @param {Object}   options
+	 * @param {string}   options.content   Paragraph content.
+	 * @param {string}   options.note      Text of the note.
+	 * @param {string[]} [options.replies] Texts of the note's replies.
+	 */
+	async insertBlockWithNote( { content, note, replies = [] } ) {
+		// Saves the way the notes UI does, so the notes list picks it up.
+		const noteId = await this.#page.evaluate(
+			async ( { noteContent, replyContents } ) => {
+				const { dispatch, select } = window.wp.data;
+				const save = ( text, parent = 0 ) =>
+					dispatch( 'core' ).saveEntityRecord(
+						'root',
+						'comment',
+						{
+							post: select( 'core/editor' ).getCurrentPostId(),
+							content: text,
+							status: 'hold',
+							type: 'note',
+							parent,
+						},
+						{ throwOnError: true }
+					);
+				const { id } = await save( noteContent );
+				for ( const reply of replyContents ) {
+					await save( reply, id );
+				}
+				return id;
+			},
+			{ noteContent: note, replyContents: replies }
+		);
+		await this.#editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content, metadata: { noteId: [ noteId ] } },
+		} );
+		// The caret entered the block before the notes list had the note.
+		const thread = this.getThread( note );
+		await thread.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+	}
+
 	async addNote( content ) {
 		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 		await this.#page

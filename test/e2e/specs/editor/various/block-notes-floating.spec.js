@@ -23,7 +23,10 @@ const LONG_NOTE =
 	'Comprehensive considerations regarding extraordinarily sophisticated implementation characteristics notwithstanding.';
 
 // Enough replies to make a thread taller than its height cap.
-const REPLY_COUNT = 6;
+const TALL_REPLIES = Array.from(
+	{ length: 6 },
+	( _, i ) => `Reply ${ i + 1 }`
+);
 
 test.describe( 'Block Notes: floating notes', () => {
 	// Tall enough that the selected thread in these tests fits within the
@@ -141,19 +144,17 @@ test.describe( 'Block Notes: floating notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'First noted' },
-			comment: 'First note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'First noted',
+			note: 'First note',
 		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: SPACER_TEXT },
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Second noted' },
-			comment: 'Second note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Second noted',
+			note: 'Second note',
 		} );
 
 		const firstThread = getThread( page, 'First note' );
@@ -182,15 +183,13 @@ test.describe( 'Block Notes: floating notes', () => {
 	} ) => {
 		// Adjacent one-line blocks: their threads are taller than the
 		// blocks, so they can't both sit next to their anchors.
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Alpha' },
-			comment: 'Alpha note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Alpha',
+			note: 'Alpha note',
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Bravo' },
-			comment: 'Bravo note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Bravo',
+			note: 'Bravo note',
 		} );
 
 		const alphaThread = getThread( page, 'Alpha note' );
@@ -226,10 +225,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Moving note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Noted',
+			note: 'Moving note',
 		} );
 		// Same height as the noted block, so swapping them resizes nothing.
 		await editor.insertBlock( {
@@ -260,15 +258,13 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Alpha' },
-				comment: 'Alpha note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Alpha',
+				note: 'Alpha note',
 			} );
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Bravo' },
-				comment: 'Bravo note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Bravo',
+				note: 'Bravo note',
 			} );
 
 			const alphaThread = getThread( page, 'Alpha note' );
@@ -306,10 +302,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Short' },
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Following note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Noted',
+			note: 'Following note',
 		} );
 		await addSpacerParagraphs( editor );
 
@@ -455,10 +450,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			name: 'core/paragraph',
 			attributes: { content: SPACER_TEXT.repeat( 2 ) },
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Low note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Noted',
+			note: 'Low note',
 		} );
 
 		const thread = getThread( page, 'Low note' );
@@ -471,10 +465,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Top note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Noted',
+			note: 'Top note',
 		} );
 		await addSpacerParagraphs( editor );
 		await editor.insertBlock( {
@@ -513,10 +506,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		// space above the selected one.
 		const labels = [ 'One', 'Two', 'Three', 'Four' ];
 		for ( const label of labels ) {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: label },
-				comment: `${ label }: ${ LONG_NOTE }`,
+			await blockNoteUtils.insertBlockWithNote( {
+				content: label,
+				note: `${ label }: ${ LONG_NOTE }`,
 			} );
 		}
 
@@ -539,23 +531,19 @@ test.describe( 'Block Notes: floating notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Alpha' },
-			comment: 'Alpha note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Alpha',
+			note: 'Alpha note',
 		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: SPACER_TEXT },
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: `Tall block. ${ SPACER_TEXT }` },
-			comment: 'Tall note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: `Tall block. ${ SPACER_TEXT }`,
+			note: 'Tall note',
+			replies: TALL_REPLIES,
 		} );
-		for ( let i = 1; i <= REPLY_COUNT; i++ ) {
-			await blockNoteUtils.addReply( `Reply ${ i }` );
-		}
 
 		// Deselect the note, collapsing the tall thread.
 		const tallThread = getThread( page, 'Tall note' );
@@ -574,10 +562,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Alpha' },
-			comment: 'Alpha note',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Alpha',
+			note: 'Alpha note',
 		} );
 		await addSpacerParagraphs( editor );
 
@@ -619,10 +606,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		// Adds the notes, then collapses the last one and scrolls back up.
 		test.beforeEach( async ( { editor, page, blockNoteUtils } ) => {
 			for ( const label of LABELS ) {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: label },
-					comment: `${ label } note`,
+				await blockNoteUtils.insertBlockWithNote( {
+					content: label,
+					note: `${ label } note`,
 				} );
 			}
 			await blockNoteUtils.deselect();
@@ -707,14 +693,11 @@ test.describe( 'Block Notes: floating notes', () => {
 		const FULLY_VISIBLE = 0.99;
 
 		async function addTallThread( { blockNoteUtils } ) {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Alpha' },
-				comment: 'Tall note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Alpha',
+				note: 'Tall note',
+				replies: TALL_REPLIES,
 			} );
-			for ( let i = 1; i <= REPLY_COUNT; i++ ) {
-				await blockNoteUtils.addReply( `Reply ${ i }` );
-			}
 		}
 
 		test( 'caps the thread height and keeps the reply form reachable', async ( {
@@ -722,8 +705,6 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			// Each reply goes through the reply form, so adding them all
-			// already requires reaching it once the thread overflows.
 			await addTallThread( { blockNoteUtils } );
 
 			const thread = getThread( page, 'Tall note' );
@@ -776,7 +757,6 @@ test.describe( 'Block Notes: floating notes', () => {
 			await addSpacerParagraphs( editor );
 			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
-			// Adding the replies scrolled the thread to its reply form.
 			const thread = getThread( page, 'Tall note' );
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await thread.evaluate( ( element ) => {
@@ -913,10 +893,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Noted' },
-				comment: 'Layout note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Noted',
+				note: 'Layout note',
 			} );
 
 			const canvasBox = await getCanvasFrame( page ).boundingBox();
@@ -970,10 +949,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Noted' },
-				comment: 'Narrow canvas note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Noted',
+				note: 'Narrow canvas note',
 			} );
 			await editor.openDocumentSettingsSidebar();
 			const thread = getThread( page, 'Narrow canvas note' );
@@ -1023,10 +1001,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Noted' },
-				comment: 'Device preview note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Noted',
+				note: 'Device preview note',
 			} );
 			await page.evaluate( () =>
 				window.wp.data
@@ -1062,10 +1039,9 @@ test.describe( 'Block Notes: floating notes', () => {
 				page,
 				blockNoteUtils,
 			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Noted' },
-					comment: 'Zoom out note',
+				await blockNoteUtils.insertBlockWithNote( {
+					content: 'Noted',
+					note: 'Zoom out note',
 				} );
 				// Zoom out needs the template shown.
 				await page.evaluate( () =>
@@ -1105,10 +1081,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		} ) => {
 			const tint = await getAuthorTint( requestUtils );
 
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Note the whole block.' },
-				comment: 'A floating note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Note the whole block.',
+				note: 'A floating note',
 			} );
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1167,10 +1142,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing block notes' },
-				comment: 'A minimized note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing block notes',
+				note: 'A minimized note',
 			} );
 			const thread = getThread( page, 'A minimized note' );
 			const content = thread.getByText( 'A minimized note' );
@@ -1202,10 +1176,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			blockNoteUtils,
 			pageUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing block notes' },
-				comment: 'A roomy note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing block notes',
+				note: 'A roomy note',
 			} );
 			await editor.openDocumentSettingsSidebar();
 			// Open by keyboard: resizing moves the menu, and a pointer left
