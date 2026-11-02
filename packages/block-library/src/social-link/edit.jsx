@@ -245,7 +245,7 @@ const SocialLinkEdit = ( {
 							}
 							label={ __( 'Link to' ) }
 							// A social profile is outside the site, so there are no pages to suggest.
-							showSuggestions={ false }
+							allowSearch={ false }
 						/>
 					</ToolsPanelItem>
 					<ViewLinkButton url={ url } />

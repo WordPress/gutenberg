@@ -445,10 +445,10 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
+					allowSearch={ false }
 					preview={ createMockPreview() }
 					onSelect={ onSelect }
 					label="Link"
-					showSuggestions={ false }
 				/>
 			);
 
@@ -518,10 +518,10 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
+					allowSearch={ false }
 					preview={ createMockPreview() }
 					onSelect={ vi.fn() }
 					label="Link"
-					showSuggestions={ false }
 				/>
 			);
 
@@ -539,10 +539,10 @@ describe( 'LinkPicker', () => {
 
 			render(
 				<LinkPicker
+					allowSearch={ false }
 					preview={ createMockPreview() }
 					onSelect={ vi.fn() }
 					label="Link"
-					showSuggestions={ false }
 				/>
 			);
 
