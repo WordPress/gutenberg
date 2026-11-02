@@ -6,11 +6,11 @@
 | --- | --- | --- |
 | Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
-| Presets | `src/state/` | The default aspect-ratio presets. |
+| Crop session | `src/state/` | `useCropSession`: undo and redo, gesture boundaries, crop options and the default aspect-ratio presets. |
 | Server instructions | `src/build-modifiers.ts` | Turns the crop into the rotate, flip and crop instructions the WordPress media REST endpoint expects. |
 | Deprecated cropper | `src/legacy/` | The older cropper built on `react-easy-crop`. Nothing outside this folder imports it. |
 
-The cropper does not own undo and redo. The media editor adds them in its own state code, because its sidebar controls and the cropper's gestures share one undo stack.
+`useCropperController` has no undo and redo. `useCropSession` adds them: cropper geometry and crop options go through one reducer and one history stack, so a control such as the aspect-ratio preset and a crop gesture share one undo stack. A wider state can join the same history by passing its own reducer, which handles its own actions and passes the rest to `cropSessionReducer`. The media editor does this for its named edits.
 
 ## Coordinate Spaces
 
@@ -37,7 +37,7 @@ The render path uses focused calculations for CSS transforms, stencil placement,
 
 ### State
 
-The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. Undo and redo, saving, and editor UI state belong to the code that uses the cropper.
+The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. `useCropSession` adds undo and redo on top. Saving and editor UI state belong to the code that uses the cropper.
 
 ### Viewport
 

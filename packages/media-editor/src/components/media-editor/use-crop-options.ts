@@ -1,10 +1,10 @@
 import { useMemo } from '@wordpress/element';
-import type { AspectRatioPreset } from '@wordpress/image-cropper';
 import {
 	DEFAULT_ASPECT_RATIOS,
-	useMediaEditor,
 	resolveAspectRatio,
-} from '../../state';
+	type AspectRatioPreset,
+} from '@wordpress/image-cropper';
+import { useMediaEditor } from '../../state';
 
 interface UseCropOptionsArgs {
 	aspectRatioPresets?: AspectRatioPreset[];

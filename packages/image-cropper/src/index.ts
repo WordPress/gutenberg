@@ -43,16 +43,21 @@ export { getMinZoom } from './core/containment';
 export { buildModifiers } from './build-modifiers';
 export type { Modifier } from './build-modifiers';
 
-// Used by the media editor's state code until it moves into this package.
+// A crop session: undo and redo, gestures, and aspect-ratio presets that
+// reshape the crop in one step. A wider state can share its history.
+export { useCropSession } from './state/use-crop-session';
+export type { CropSession, CropSessionOptions } from './state/use-crop-session';
 export {
-	DEFAULT_STATE,
-	cropperReducer,
-	enforceContainment,
-	areCropperStatesEqual,
-	computeInscribedRect,
-} from './core';
-export type { CropperAction } from './core';
-export { buildCropperSetters } from './react/hooks';
+	cropSessionReducer,
+	areCropSessionStatesEqual,
+	buildInitialCropSessionState,
+} from './state/reducer';
+export { resolveAspectRatio } from './state/resolve-aspect-ratio';
+export type {
+	CropOptions,
+	CropSessionAction,
+	CropSessionState,
+} from './state/types';
 
 // Deprecated: the `react-easy-crop` based cropper. Everything it needs lives
 // in `./legacy`, so removing that folder and these exports removes it.

@@ -44,7 +44,7 @@ function ImageCropper() {
 }
 ```
 
-`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It does not provide undo and redo.
+`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It does not provide undo and redo; use `useCropSession` for that.
 
 ## API
 
@@ -55,6 +55,14 @@ Fills its parent container. Required props are `src` and `controller`. Common op
 ### `useCropperController( initialState? )`
 
 React state hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`.
+
+### `useCropSession( options? )`
+
+A cropper controller with undo and redo, gesture boundaries, crop options and aspect-ratio presets that reshape the crop in one step. Pass its `cropper` to `<Cropper>` along with `onGestureStart={ session.beginGesture }` and `onGestureEnd={ session.endGesture }`. To keep more state in the same undo history, pass a `reducer` that handles your own actions and hands the rest to `cropSessionReducer`, plus `areStatesEqual` and `createInitialState`.
+
+### `resolveAspectRatio( presetKey, image )`
+
+Turns a preset value from `DEFAULT_ASPECT_RATIOS` into a width / height ratio, resolving "Original" from the loaded image.
 
 ### `CropperProvider` / `useCropper`
 

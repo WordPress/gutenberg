@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Cropper } from '@wordpress/image-cropper';
+import { Cropper, resolveAspectRatio } from '@wordpress/image-cropper';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { useMediaEditor, resolveAspectRatio } from '../../state';
+import { useMediaEditor } from '../../state';
 
 export interface MediaEditorCanvasProps {
 	/** Whether external placement activity should reveal the grid. */

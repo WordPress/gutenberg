@@ -76,6 +76,58 @@ function CropperPanel( { src }: { src: string } ) {
 }
 ```
 
+## Add Undo and Redo
+
+`useCropSession` records every change in one history, and groups a drag or pinch into one undo entry through the gesture callbacks.
+
+```tsx
+import {
+	Cropper,
+	DEFAULT_ASPECT_RATIOS,
+	resolveAspectRatio,
+	useCropSession,
+} from '@wordpress/image-cropper';
+
+function CropperWithHistory( { src }: { src: string } ) {
+	const session = useCropSession();
+	const aspectRatio = resolveAspectRatio(
+		session.cropOptions.aspectRatioValue,
+		session.cropper.state.image
+	);
+
+	return (
+		<>
+			<select
+				value={ session.cropOptions.aspectRatioValue }
+				onChange={ ( event ) =>
+					session.setAspectRatioValue( event.target.value )
+				}
+			>
+				{ DEFAULT_ASPECT_RATIOS.map( ( preset ) => (
+					<option key={ preset.value } value={ String( preset.value ) }>
+						{ preset.label }
+					</option>
+				) ) }
+			</select>
+			<button onClick={ session.undo } disabled={ ! session.hasUndo }>
+				Undo
+			</button>
+			<button onClick={ session.redo } disabled={ ! session.hasRedo }>
+				Redo
+			</button>
+			<Cropper
+				src={ src }
+				controller={ session.cropper }
+				aspectRatio={ aspectRatio }
+				freeformCrop
+				onGestureStart={ session.beginGesture }
+				onGestureEnd={ session.endGesture }
+			/>
+		</>
+	);
+}
+```
+
 ## Get Source Coordinates
 
 Use source-region helpers when saving crop data instead of rendering a `Blob`.
@@ -142,4 +194,5 @@ Useful test areas:
 -   `src/core/export/test/canvas-renderer.jsdom.test.ts` for canvas export.
 -   `src/react/components/test/cropper.browser.test.tsx` for React cropper behavior.
 -   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
+-   `src/state/test/use-crop-session.jsdom.test.ts` for undo, redo and gestures.
 -   `src/test/build-modifiers.test.ts` for the server instructions.
