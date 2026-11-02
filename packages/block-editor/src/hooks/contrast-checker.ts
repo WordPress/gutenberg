@@ -4,8 +4,13 @@ import { store as blocksStore } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
 import { speak } from '@wordpress/a11y';
+import { colord } from 'colord';
 import { getContrastWarning } from '../components/contrast-checker';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import {
+	getGradientStopColors,
+	getLowestContrastColor,
+} from './contrast-checker-utils';
 import type {
 	BlockElementColors,
 	UseBlockColorContrastWarningOptions,
@@ -16,6 +21,48 @@ function getComputedValue( node: Element, property: string ) {
 	return node.ownerDocument
 		.defaultView!.getComputedStyle( node )
 		.getPropertyValue( property );
+}
+
+/**
+ * Returns the color the reader sees for an element's text. A transparent fill
+ * shows the background of the nearest element clipping its background to the
+ * text, which for a gradient is its lowest contrast stop against the backdrop.
+ * Returns `undefined` when that can't be measured, such as for an image.
+ *
+ * @param element  Element holding the text.
+ * @param backdrop Color behind the text.
+ * @return The visible text color, if it can be measured.
+ */
+function getVisibleTextColor(
+	element: Element,
+	backdrop: string
+): string | undefined {
+	const fill = getComputedValue( element, '-webkit-text-fill-color' );
+	// Without the property, as in jsdom, the fill is the text color.
+	if ( ! colord( fill ).isValid() ) {
+		return getComputedValue( element, 'color' );
+	}
+	if ( colord( fill ).alpha() > 0 ) {
+		return fill;
+	}
+
+	let clipElement: Element | null = element;
+	while (
+		clipElement &&
+		'text' !== getComputedValue( clipElement, 'background-clip' )
+	) {
+		clipElement = clipElement.parentElement;
+	}
+	if ( ! clipElement ) {
+		return undefined;
+	}
+
+	const backgroundImage = getComputedValue( clipElement, 'background-image' );
+	if ( 'none' === backgroundImage ) {
+		return getComputedValue( clipElement, 'background-color' );
+	}
+	const stops = getGradientStopColors( backgroundImage );
+	return stops ? getLowestContrastColor( stops, backdrop ) : undefined;
 }
 
 function getBlockElementColors(
@@ -43,31 +90,33 @@ function getBlockElementColors(
 		blockEl.querySelector( backgroundSelector! ) || blockEl;
 	const linkElement = blockEl.querySelector( 'a' );
 
-	// Get computed colors from the appropriate elements
-	const textColor = getComputedValue( textElement, 'color' );
-	const linkColor =
-		linkElement && linkElement.textContent
-			? getComputedValue( linkElement, 'color' )
-			: undefined;
-
-	let backgroundColorNode = backgroundElement;
-	let backgroundColor = getComputedValue(
-		backgroundColorNode,
-		'background-color'
-	);
-	while (
-		backgroundColor === 'rgba(0, 0, 0, 0)' &&
-		backgroundColorNode.parentNode &&
-		backgroundColorNode.parentNode.nodeType ===
-			backgroundColorNode.parentNode.ELEMENT_NODE
-	) {
-		// The loop only climbs to element parents.
-		backgroundColorNode = backgroundColorNode.parentNode as Element;
+	// A background clipped to the text paints the box only through the
+	// glyphs, so the backdrop is the nearest background that isn't clipped.
+	let backgroundColorNode: Element | null = backgroundElement;
+	let backgroundColor = 'rgba(0, 0, 0, 0)';
+	while ( backgroundColorNode ) {
 		backgroundColor = getComputedValue(
 			backgroundColorNode,
 			'background-color'
 		);
+		if (
+			backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+			'text' !==
+				getComputedValue( backgroundColorNode, 'background-clip' )
+		) {
+			break;
+		}
+		backgroundColorNode = backgroundColorNode.parentElement;
 	}
+	if ( ! backgroundColorNode ) {
+		backgroundColor = 'rgba(0, 0, 0, 0)';
+	}
+
+	const textColor = getVisibleTextColor( textElement, backgroundColor );
+	const linkColor =
+		linkElement && linkElement.textContent
+			? getVisibleTextColor( linkElement, backgroundColor )
+			: undefined;
 
 	return {
 		textColor,

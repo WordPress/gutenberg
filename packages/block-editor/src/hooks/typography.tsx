@@ -332,12 +332,16 @@ export function TypographyPanel( {
 				setAttributes( newAttributes );
 			};
 
-	// Link color failures are reported by the Elements panel, which owns the
-	// link color selection.
+	// The Elements panel reports link color failures and the Background panel
+	// a solid color clipped to the text, since those panels own the colors.
+	const hasTextGradient =
+		'text' === value?.background?.backgroundClip &&
+		!! value?.background?.gradient;
 	const enableContrastChecking =
 		! value?.color?.gradient &&
-		'text' !== value?.background?.backgroundClip &&
-		!! value?.color?.text &&
+		( 'text' === value?.background?.backgroundClip
+			? hasTextGradient
+			: !! value?.color?.text ) &&
 		settings?.color?.text &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
 
@@ -346,9 +350,13 @@ export function TypographyPanel( {
 		name,
 		enabled: !! enableContrastChecking,
 		checkLinkColor: false,
-		messageOverride: __(
-			'This color has poor contrast against the background. Consider increasing contrast.'
-		),
+		messageOverride: hasTextGradient
+			? __(
+					'Part of this gradient has poor contrast against the background. Consider increasing contrast.'
+				)
+			: __(
+					'This color has poor contrast against the background. Consider increasing contrast.'
+				),
 	} );
 
 	if ( ! isEnabled ) {
