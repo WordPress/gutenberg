@@ -1,5 +1,6 @@
 import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import BackgroundClipIcon from './background-clip-icon';
 
 interface BackgroundClipItem {
 	value: string;
@@ -68,9 +69,8 @@ export default function BackgroundClipControl( {
 					label={ item.label }
 				>
 					<SelectControl.ItemLabel>
-						<span
-							className={ `block-editor-background-clip-control__option is-${ item.value }` }
-						>
+						<span className="block-editor-background-clip-control__option">
+							<BackgroundClipIcon value={ item.value } />
 							{ item.label }
 						</span>
 					</SelectControl.ItemLabel>
