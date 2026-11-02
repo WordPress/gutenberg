@@ -98,8 +98,8 @@ export default function DateEdit( {
 		},
 		[ data.type, data.id ]
 	);
-	// There is nothing to reset once the date is reset (`null`): whatever the
-	// status, the post takes its date when it is saved.
+	// Reset is available whenever there is a date, so there is nothing to
+	// reset only once the date is `null`: the post takes its date on save.
 	const isReset = ! value;
 	const isFloating = isDateFloating( {
 		...data,
@@ -108,8 +108,8 @@ export default function DateEdit( {
 
 	const disabled = field.isDisabled( { item: data, field } );
 
-	// Why Reset is disabled: the picker shows a date even when the post has
-	// none of its own (the save time of a floating draft, or now once reset).
+	// The picker shows a date even when the post has none of its own: the save
+	// time of a floating draft, or now once the date is reset.
 	let note;
 	if ( isFloating ) {
 		note = __( 'Publishes immediately.' );
@@ -154,7 +154,7 @@ export default function DateEdit( {
 				variant="secondary"
 				__next40pxDefaultSize
 				accessibleWhenDisabled
-				disabled={ disabled || isReset || isFloating }
+				disabled={ disabled || isReset }
 				onClick={ onReset }
 				aria-describedby={ note ? noteId : undefined }
 			>

@@ -54,7 +54,7 @@ describe( 'DateEdit', () => {
 		expect( onChange ).toHaveBeenCalledWith( { date: null } );
 	} );
 
-	it( 'disables the reset of a draft that publishes immediately', async () => {
+	it( 'lets a draft that publishes immediately reset its date', async () => {
 		render(
 			<DateEdit
 				data={ {
@@ -67,11 +67,11 @@ describe( 'DateEdit', () => {
 			/>
 		);
 		const reset = await screen.findByRole( 'button', { name: 'Reset' } );
-		expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( reset ).not.toHaveAttribute( 'aria-disabled', 'true' );
 		expect( reset ).toHaveAccessibleDescription( 'Publishes immediately.' );
 	} );
 
-	it( 'keeps the reset of a floating draft disabled when it is scheduled but not saved', async () => {
+	it( 'says a floating draft publishes immediately when it is scheduled but not saved', async () => {
 		render(
 			<RegistryProvider value={ createTestRegistry( 'draft' ) }>
 				<DateEdit
@@ -89,10 +89,10 @@ describe( 'DateEdit', () => {
 		);
 		expect(
 			await screen.findByRole( 'button', { name: 'Reset' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).toHaveAccessibleDescription( 'Publishes immediately.' );
 	} );
 
-	it( 'keeps the reset of a published post enabled when it is made a draft but not saved', async () => {
+	it( "doesn't say a published post publishes immediately when it is made a draft but not saved", async () => {
 		render(
 			<RegistryProvider value={ createTestRegistry( 'publish' ) }>
 				<DateEdit
@@ -108,9 +108,9 @@ describe( 'DateEdit', () => {
 				/>
 			</RegistryProvider>
 		);
-		const reset = await screen.findByRole( 'button', { name: 'Reset' } );
-		expect( reset ).not.toHaveAttribute( 'aria-disabled', 'true' );
-		expect( reset ).not.toHaveAccessibleDescription();
+		expect(
+			await screen.findByRole( 'button', { name: 'Reset' } )
+		).not.toHaveAccessibleDescription();
 	} );
 
 	it( 'disables the reset of a published post whose date was reset', async () => {
