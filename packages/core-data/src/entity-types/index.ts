@@ -332,11 +332,7 @@ export interface RootEntityContexts {
  * @see EntityContextDefaults
  */
 export interface PostTypeEntityContexts {
-	attachment: 'edit';
-	page: 'edit';
-	post: 'edit';
-	wp_block: 'edit';
-	wp_navigation: 'edit';
+	[ name: string ]: 'edit';
 }
 
 /**

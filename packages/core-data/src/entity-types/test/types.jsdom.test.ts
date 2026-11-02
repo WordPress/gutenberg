@@ -244,6 +244,20 @@ describe( 'Entity record types', () => {
 				'wp_template',
 				'theme//index'
 			);
+			// Every post type is fetched in the edit context.
+			true satisfies Expect<
+				typeof template,
+				WpTemplate< 'edit' > | undefined
+			>;
+			const { records: parts } = useEntityRecords(
+				'postType',
+				'wp_template_part',
+				{ per_page: -1 }
+			);
+			true satisfies Expect<
+				typeof parts,
+				WpTemplatePart< 'edit' >[] | null
+			>;
 			template?.has_theme_file satisfies boolean | undefined;
 			template?.is_custom satisfies boolean | undefined;
 			template?.original_source satisfies
