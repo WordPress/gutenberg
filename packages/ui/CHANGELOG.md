@@ -25,6 +25,10 @@
 -   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
 -   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
 
+### Internal
+
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+
 ### Documentation
 
 -   `Notice`: Add a Storybook example with native details and a text button to copy the error message and details ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).

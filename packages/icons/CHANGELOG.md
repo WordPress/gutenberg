@@ -25,6 +25,10 @@
 
 -   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
 
+### Internal
+
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes

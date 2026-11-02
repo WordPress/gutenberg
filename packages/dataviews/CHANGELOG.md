@@ -25,6 +25,7 @@
 
 ### Internal
 
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 -   Alias legacy `Popover` imports as `WCPopover` ([#85838](https://github.com/WordPress/gutenberg/pull/85838)).
 
 ## 21.0.0 (2026-10-20)
