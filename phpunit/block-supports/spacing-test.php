@@ -196,9 +196,9 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_get_spacing_classes_and_styles
-	 *
 	 * @covers ::gutenberg_get_spacing_classes_and_styles
+	 *
+	 * @dataProvider data_get_spacing_classes_and_styles
 	 *
 	 * @param mixed $block_attributes Block attributes.
 	 * @param array $expected         Expected classes and styles.
@@ -249,6 +249,10 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 						'spacing' => '10px',
 					),
 				),
+				'expected'         => array(),
+			),
+			'object attributes' => array(
+				'block_attributes' => (object) array( 'style' => array( 'spacing' => array( 'margin' => '3px' ) ) ),
 				'expected'         => array(),
 			),
 		);
