@@ -17,9 +17,13 @@ export const getStylelintResult = (
 ) =>
 	stylelint
 		.lint( {
-			files: path.resolve( __dirname, '../', filename ),
+			files: path.resolve( import.meta.dirname, '../', filename ),
 			config,
-			ignorePath: path.resolve( __dirname, '../', './.stylelintignore' ),
+			ignorePath: path.resolve(
+				import.meta.dirname,
+				'../',
+				'./.stylelintignore'
+			),
 			formatter: 'json',
 		} )
 		.then( ( { errored, report } ) => ( {
