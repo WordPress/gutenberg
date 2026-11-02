@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Audio: Use the UI SelectControl for the Preload setting ([#86194](https://github.com/WordPress/gutenberg/pull/86194)).
 -   List: Use the UI SelectControl for the List style setting ([#86141](https://github.com/WordPress/gutenberg/pull/86141)).
 -   Latest Comments: Use the UI SelectControl for the Display content setting ([#86138](https://github.com/WordPress/gutenberg/pull/86138)).
 -   Post Author: Use the UI SelectControl for the Avatar size setting ([#86160](https://github.com/WordPress/gutenberg/pull/86160)).
