@@ -8,8 +8,6 @@ import { getOptimalTextShade } from '../utils/colors';
 import styles from './style.module.scss';
 import { createHighlighterText } from './utils';
 import { getFontSize } from '../utils/font-size';
-import { CONFIG } from '../utils';
-import { getLineHeight } from './get-line-height';
 import type { Props } from './types';
 
 const CSS_WIDE_KEYWORDS = new Set( [
@@ -48,7 +46,7 @@ export default function useText(
 		truncate = false,
 		upperCase = false,
 		variant,
-		weight = CONFIG.fontWeight,
+		weight = 'var(--wpds-typography-font-weight-default)',
 		...otherProps
 	} = useContextSystem( props, 'Text' );
 
@@ -83,10 +81,7 @@ export default function useText(
 		display,
 		'font-size': getFontSize( size ),
 		'font-weight': weight,
-		'line-height': getLineHeight(
-			adjustLineHeightForInnerControls,
-			lineHeightProp
-		),
+		'line-height': lineHeightProp || undefined,
 		'letter-spacing':
 			typeof letterSpacing === 'number'
 				? `${ letterSpacing }px`
@@ -113,6 +108,13 @@ export default function useText(
 
 	const classes = clsx(
 		styles.text,
+		! lineHeightProp &&
+			adjustLineHeightForInnerControls && [
+				styles[ 'control-line-height' ],
+				styles[
+					`control-line-height-${ adjustLineHeightForInnerControls }`
+				],
+			],
 		{
 			[ styles[ 'has-display' ] ]: !! display,
 			[ styles[ 'has-letter-spacing' ] ]:

@@ -71,7 +71,7 @@ export function parseDropEvent(
  * @return The event handler for a block drop event.
  */
 export function onBlockDrop(
-	targetRootClientId: string | undefined,
+	targetRootClientId: string | null | undefined,
 	targetBlockIndex: number,
 	getBlockIndex: ( clientId: string ) => number,
 	getClientIdsOfDescendants: ( clientIds: string[] ) => string[],
@@ -104,10 +104,16 @@ export function onBlockDrop(
 			// A block drop carries the dragged client IDs.
 			const sourceBlockIndex = getBlockIndex( sourceClientIds![ 0 ] );
 
-			// If the user is dropping to the same position, return early.
+			// If the user is dropping to the same position, including between
+			// the dragged blocks, return early.
+			const lastSamePositionIndex =
+				operation === 'insert'
+					? sourceBlockIndex + sourceClientIds!.length
+					: sourceBlockIndex;
 			if (
 				sourceRootClientId === targetRootClientId &&
-				sourceBlockIndex === targetBlockIndex
+				targetBlockIndex >= sourceBlockIndex &&
+				targetBlockIndex <= lastSamePositionIndex
 			) {
 				return;
 			}
@@ -169,7 +175,7 @@ export function onBlockDrop(
  * @return The event handler for a block-related file drop event.
  */
 export function onFilesDrop(
-	targetRootClientId: string | undefined,
+	targetRootClientId: string | null | undefined,
 	getSettings: () => Settings,
 	updateBlockAttributes: (
 		clientId: string,
@@ -236,7 +242,7 @@ export function onHTMLDrop( insertOrReplaceBlocks: InsertOrReplaceBlocks ) {
  * @return A function to be passed to the onDrop handler.
  */
 export default function useOnBlockDrop(
-	targetRootClientId: string | undefined,
+	targetRootClientId: string | null | undefined,
 	targetBlockIndex: number,
 	options: UseOnBlockDropOptions = {}
 ) {

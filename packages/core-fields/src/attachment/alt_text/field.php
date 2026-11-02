@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Alt text', 'gutenberg' ),
+	'label'         => __( 'Alt text' ),
 	'Edit'          => array(
 		'control' => 'textarea',
 		'rows'    => 2,

@@ -8,6 +8,6 @@
  */
 
 return array(
-	'label'     => _x( 'View', 'verb', 'gutenberg' ),
+	'label'     => _x( 'View', 'verb' ),
 	'isPrimary' => true,
 );

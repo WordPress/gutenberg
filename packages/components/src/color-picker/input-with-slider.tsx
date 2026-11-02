@@ -3,7 +3,6 @@ import { Text } from '../text';
 import RangeControl from '../range-control';
 import NumberControl from '../number-control';
 import styles from './style.module.scss';
-import { COLORS } from '../utils/colors-values';
 import type { InputWithSliderProps } from './types';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
@@ -38,8 +37,8 @@ export const InputWithSlider = ( {
 				value={ value }
 				onChange={ onNumberControlChange }
 				prefix={
-					<InputControlPrefixWrapper>
-						<Text color={ COLORS.theme.accent } lineHeight={ 1 }>
+					<InputControlPrefixWrapper className={ styles.prefix }>
+						<Text color="inherit" lineHeight={ 1 }>
 							{ abbreviation }
 						</Text>
 					</InputControlPrefixWrapper>

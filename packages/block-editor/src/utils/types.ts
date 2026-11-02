@@ -1,3 +1,5 @@
+import type { FontFace } from '@wordpress/global-styles-engine';
+
 /**
  * Result of formatting a font style or weight.
  */
@@ -11,10 +13,7 @@ export interface FormattedFont {
 /**
  * A font family face from theme.json.
  */
-export interface FontFamilyFace {
-	fontStyle?: string;
-	fontWeight?: string | number;
-}
+export type FontFamilyFace = Partial< FontFace >;
 
 /**
  * Combined font style and weight option for a font picker.

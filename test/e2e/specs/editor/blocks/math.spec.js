@@ -100,18 +100,19 @@ test.describe( 'Math Block', () => {
 			},
 		] );
 
-		// The parsing error is surfaced once the field is blurred.
+		// The parsing error is surfaced once the field is blurred, and focus
+		// still leaves the field.
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page.getByRole( 'textbox', { name: 'LaTeX math syntax' } )
 		).toHaveAccessibleDescription(
 			`Expected 'EOF', got '&' at position 1: &̲x^2`
 		);
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Math' } )
+		).toBeFocused();
 
-		// Fix syntax error.
-		await page.keyboard.press( 'Backspace' );
 		// Can delete the math block.
-		await pageUtils.pressKeys( 'shift+Tab' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [

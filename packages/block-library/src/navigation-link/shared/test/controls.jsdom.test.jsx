@@ -1,5 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { dispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { Controls } from '../controls';
 import { useEntityBinding } from '../use-entity-binding';
 import { useIsInvalidLink } from '../use-is-invalid-link';
@@ -35,6 +37,10 @@ describe( 'Controls', () => {
 	// Initialize the mock function
 	beforeAll( () => {
 		mockUpdateAttributes = vi.fn();
+		// The View button resolves site-root paths against the home URL.
+		dispatch( coreStore ).receiveEntityRecords( 'root', '__unstableBase', {
+			home: 'https://example.com',
+		} );
 	} );
 
 	const defaultProps = {

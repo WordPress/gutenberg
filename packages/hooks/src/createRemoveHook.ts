@@ -3,7 +3,7 @@ import validateHookName from './validateHookName';
 import type { Hooks, StoreKey } from './types';
 
 /**
- * Removes the specified callback (or all callbacks) from the hook with a given hookName
+ * Removes the specified callback from the hook with a given hookName
  * and namespace.
  */
 export type RemoveHook = (
@@ -15,6 +15,12 @@ export type RemoveHook = (
 	 * The unique namespace identifying the callback in the form `vendor/plugin/function`.
 	 */
 	namespace: string
+) => number | undefined;
+
+/** Removes all callbacks from a hook, regardless of namespace. */
+export type RemoveAllHooks = (
+	hookName: string,
+	namespace?: string
 ) => number | undefined;
 
 /**
@@ -32,8 +38,18 @@ export type RemoveHook = (
 function createRemoveHook(
 	hooks: Hooks,
 	storeKey: StoreKey,
+	removeAll: true
+): RemoveAllHooks;
+function createRemoveHook(
+	hooks: Hooks,
+	storeKey: StoreKey,
+	removeAll?: false
+): RemoveHook;
+function createRemoveHook(
+	hooks: Hooks,
+	storeKey: StoreKey,
 	removeAll: boolean = false
-): RemoveHook {
+): RemoveAllHooks {
 	return function removeHook( hookName, namespace ) {
 		const hooksStore = hooks[ storeKey ];
 

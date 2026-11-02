@@ -3,8 +3,10 @@ import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { ToolbarItem } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { createElement } from '@wordpress/element';
 import NavigableToolbar from '..';
 

@@ -3,6 +3,7 @@ import type { ElementType, ReactElement, ReactNode } from 'react';
 import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
 import type { IconProps } from '../icon/types';
+import type { ItemPopupWidth } from '../utils/css/item-popup';
 
 export type PrefixIconProps = IconProps;
 
@@ -86,6 +87,20 @@ export type GroupLabelProps = ComponentProps< typeof _Menu.GroupLabel > & {
 export type SeparatorProps = ComponentProps< typeof _Menu.Separator >;
 
 export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
+	/**
+	 * Controls the popup width. All presets respect the menu's minimum width
+	 * (160px by default), maximum width override, and available viewport width.
+	 *
+	 * - `'anchor'`: Width matches the trigger, subject to the menu's bounds.
+	 * - `'content'`: Width grows with content up to the available viewport width.
+	 * - `'sm'`, `'md'`, `'lg'`: Width grows with content up to the corresponding
+	 *   surface width token (`--wpds-dimension-surface-width-*`).
+	 * - `'available'`: Width fills the available viewport width.
+	 *
+	 * @default 'sm'
+	 */
+	width?: ItemPopupWidth;
+
 	/**
 	 * The content to be rendered inside the menu popup.
 	 */
