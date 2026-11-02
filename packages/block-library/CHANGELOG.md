@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   List: Use the UI SelectControl for the List style setting ([#86141](https://github.com/WordPress/gutenberg/pull/86141)).
 -   Latest Comments: Use the UI SelectControl for the Display content setting ([#86138](https://github.com/WordPress/gutenberg/pull/86138)).
 -   Archives: Use the UI SelectControl for the Group by setting ([#86137](https://github.com/WordPress/gutenberg/pull/86137)).
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
