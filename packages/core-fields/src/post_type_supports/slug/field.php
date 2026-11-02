@@ -13,6 +13,6 @@
 
 return array(
 	'type'     => 'text',
-	'label'    => __( 'Slug', 'gutenberg' ),
+	'label'    => __( 'Slug' ),
 	'filterBy' => false,
 );

@@ -166,6 +166,39 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A numeric script module id is returned as a string, like any other.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_returns_a_numeric_module_id_as_a_string() {
+		$this->register_fields(
+			'customKind',
+			'customName',
+			array(
+				array(
+					'id'    => 'color',
+					'type'  => 'text',
+					'label' => 'Color',
+				),
+			),
+			'123'
+		);
+
+		wp_set_current_user( self::$editor_id );
+		$data = $this->dispatch_request( 'customKind', 'customName' )->get_data();
+
+		$this->assertSame(
+			array(
+				array(
+					'id'     => '123',
+					'fields' => array( 'color' ),
+				),
+			),
+			$data['script_modules']
+		);
+	}
+
+	/**
 	 * The route is registered once, and served by the 7.2 controller.
 	 *
 	 * @covers ::register_routes

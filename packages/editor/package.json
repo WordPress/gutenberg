@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "15.2.0",
+	"version": "16.0.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -57,6 +57,7 @@
 		"build-module/bindings/**"
 	],
 	"dependencies": {
+		"@base-ui/react": "^1.9.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
@@ -111,11 +112,11 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.6.1",
+		"@storybook/react-vite": "^10.6.3",
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
-		"@testing-library/user-event": "^14.6.1",
+		"@testing-library/user-event": "^14.6.8",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
 		"vitest": "^5.0.3",

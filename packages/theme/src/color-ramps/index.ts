@@ -1,4 +1,4 @@
-import { get, OKLCH } from 'colorjs.io/fn';
+import { ColorSpace, get, OKLCH, sRGB } from 'colorjs.io/fn';
 import { buildRamp } from './lib/index.ts';
 import { clampAccentScaleReferenceLightness } from './lib/utils.ts';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs.ts';
@@ -31,6 +31,10 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		value: number;
 	};
 } {
+	// The ramp holds colors as strings, and may be prebuilt rather than built
+	// from a seed, which registers the color space parsing them needs.
+	ColorSpace.register( sRGB );
+
 	return {
 		mainDirection: ramp.direction,
 		pinLightness: {

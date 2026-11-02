@@ -2263,6 +2263,59 @@
 				":visited"
 			]
 		},
+		"stylesSelectPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesSelectPseudoSelectorsPropertyNames": {
+			"enum": [ ":active", ":focus", ":focus-visible", ":hover" ]
+		},
+		"stylesTextInputPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":required": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":user-valid": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":user-invalid": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"::placeholder": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesTextInputPseudoSelectorsPropertyNames": {
+			"enum": [
+				":focus",
+				":focus-visible",
+				":required",
+				":user-valid",
+				":user-invalid",
+				"::placeholder"
+			]
+		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
@@ -2475,11 +2528,17 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesSelectPseudoSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesSelectPseudoSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2492,11 +2551,17 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesTextInputPseudoSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesTextInputPseudoSelectorsPropertyNames"
 									}
 								]
 							}

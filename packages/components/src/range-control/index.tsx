@@ -6,7 +6,6 @@ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { COLORS } from '../utils';
 import {
 	floatClamp,
 	useControlledRangeValue,
@@ -20,7 +19,8 @@ import NumberControl from '../number-control';
 import styles from './style.module.scss';
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import { space } from '../utils/space';
+
+const NUMBER_CONTROL_WIDTH = 80;
 
 const noop = () => {};
 
@@ -55,7 +55,7 @@ function UnforwardedRangeControl(
 		allowReset = false,
 		beforeIcon,
 		className,
-		color: colorProp = COLORS.theme.accent,
+		color: colorProp,
 		currentInput,
 		disabled = false,
 		help,
@@ -76,6 +76,7 @@ function UnforwardedRangeControl(
 		resetFallbackValue,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
+		size = 'default',
 		step = 1,
 		trackColor,
 		value: valueProp,
@@ -127,6 +128,7 @@ function UnforwardedRangeControl(
 	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
 		styles.wrapper,
+		colorProp === undefined && styles[ 'default-color' ],
 		colorKeyword && styles[ `color-${ colorKeyword }` ],
 		!! marks && 'is-marked'
 	);
@@ -230,7 +232,10 @@ function UnforwardedRangeControl(
 				className={ clsx(
 					'components-range-control__root',
 					styles.root,
-					{ [ styles[ 'is-rtl' ] ]: isRTL() }
+					{
+						[ styles[ 'is-rtl' ] ]: isRTL(),
+						[ styles[ 'is-compact' ] ]: size === 'compact',
+					}
 				) }
 			>
 				{ beforeIcon && (
@@ -343,7 +348,8 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						__unstableInputWidth={ space( 20 ) }
+						size={ size }
+						__unstableInputWidth={ `${ NUMBER_CONTROL_WIDTH }px` }
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
