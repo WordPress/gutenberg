@@ -10,6 +10,10 @@
 
 -   `ImageCropper`, `ImageCropperProvider`, `useImageCropper` and `normalizeRotation` are deprecated. Use `Cropper` instead.
 
+### Internal
+
+-   Stop publishing stories and tests, and move `@wordpress/components` to development dependencies, since only the stories use it.
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes

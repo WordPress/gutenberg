@@ -27,7 +27,9 @@
 		"build",
 		"build-module",
 		"build-style",
-		"build-types"
+		"build-types",
+		"!**/stories/**",
+		"!**/test/**"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -45,7 +47,6 @@
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"clsx": "^2.1.1",
@@ -58,6 +59,7 @@
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
+		"@wordpress/components": "file:../components",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
 		"vitest": "^5.0.3",
