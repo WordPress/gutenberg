@@ -93,6 +93,6 @@ body.js.site-editor-php {
 	}
 
 	.interface-interface-skeleton {
-		top: 0;
+		top: var(--wp-interface-skeleton--visual-viewport-top, 0);
 	}
 }

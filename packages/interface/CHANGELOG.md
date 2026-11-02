@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep the header and block toolbar visible above the on-screen keyboard on mobile Safari by following the visual viewport ([#82308](https://github.com/WordPress/gutenberg/issues/82308)).
+
 ## 11.0.0 (2026-10-20)
 
 ### Breaking Changes
