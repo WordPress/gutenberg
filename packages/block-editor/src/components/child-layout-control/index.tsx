@@ -251,6 +251,16 @@ export function childLayoutOrientation(
 	return orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 }
 
+/**
+ * Parses the value of a column or row start input. Clearing the input resets
+ * the item to automatic placement, except in manual grids, where every item
+ * needs a position and the start falls back to 1.
+ *
+ * @param value             The input value.
+ * @param isManualPlacement Whether the parent grid uses manual placement.
+ *
+ * @return The start position, or undefined for automatic placement.
+ */
 function parseGridStartValue(
 	value: string,
 	isManualPlacement: boolean | undefined

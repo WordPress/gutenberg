@@ -43,6 +43,19 @@ const DIRECTION_OFFSETS: Record< Direction, [ number, number ] > = {
 	down: [ 0, 1 ],
 };
 
+/**
+ * Reads where each child of an auto grid is rendered, as column and row
+ * ranges, and whether it has an explicit position.
+ *
+ * @param gridElement The grid element.
+ * @param blockOrder  The client IDs of the grid's children.
+ * @param blockStyles The style attributes of the children, by client ID.
+ * @param getElement  Gets the element of a block by client ID.
+ * @param styleState  The style state the explicit positions are read from.
+ *
+ * @return The grid's column count and items, or undefined if the grid can't
+ *         be measured.
+ */
 function getGridSnapshot(
 	gridElement: HTMLElement,
 	blockOrder: string[],
@@ -105,6 +118,15 @@ function getGridSnapshot(
 	return { columnCount: columns.length, items };
 }
 
+/**
+ * Directional movers for a child of an auto grid. Each move reorders the
+ * block when that moves it one cell, and otherwise pins it to the target cell
+ * with an explicit column and row start.
+ *
+ * @param props
+ * @param props.blockClientId The client ID of the child block.
+ * @param props.gridClientId  The client ID of the grid block.
+ */
 export default function AutoGridItemMovers( {
 	blockClientId,
 	gridClientId,
