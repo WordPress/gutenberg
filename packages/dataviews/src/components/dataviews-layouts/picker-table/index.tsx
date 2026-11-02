@@ -46,6 +46,8 @@ interface TableRowProps< Item > {
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
 	selectionProps: SelectionProps;
+	isItemSelectable: ( item: Item ) => boolean;
+	isMultiselect: boolean;
 	posinset?: number;
 }
 
@@ -85,6 +87,8 @@ function TableRow< Item >( {
 	getItemId,
 	onChangeSelection,
 	selectionProps,
+	isItemSelectable,
+	isMultiselect,
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
@@ -165,7 +169,8 @@ function TableRow< Item >( {
 						onChangeSelection={ onChangeSelection }
 						getItemId={ getItemId }
 						titleField={ titleField }
-						disabled={ false }
+						disabled={ ! isItemSelectable( item ) }
+						isMultiselect={ isMultiselect }
 						aria-hidden
 						tabIndex={ -1 }
 					/>
@@ -230,6 +235,7 @@ function ViewPickerTable< Item >( {
 	view,
 	className,
 	empty,
+	isItemSelectable,
 }: ViewPickerTableProps< Item > ) {
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
@@ -258,7 +264,7 @@ function ViewPickerTable< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
-		isItemSelectable: () => true,
+		isItemSelectable,
 		selection,
 		onChangeSelection,
 		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
@@ -343,6 +349,7 @@ function ViewPickerTable< Item >( {
 									data={ data }
 									actions={ actions }
 									getItemId={ getItemId }
+									isItemSelectable={ isItemSelectable }
 									disableSelectAll={ isInfiniteScroll }
 								/>
 							) }
@@ -461,6 +468,10 @@ function ViewPickerTable< Item >( {
 											selectionProps={ getSelectionProps(
 												id
 											) }
+											isItemSelectable={
+												isItemSelectable
+											}
+											isMultiselect={ isMultiselect }
 										/>
 									);
 								} ) }
@@ -496,6 +507,8 @@ function ViewPickerTable< Item >( {
 										selectionProps={ getSelectionProps(
 											id
 										) }
+										isItemSelectable={ isItemSelectable }
+										isMultiselect={ isMultiselect }
 										posinset={ posinset }
 									/>
 								);

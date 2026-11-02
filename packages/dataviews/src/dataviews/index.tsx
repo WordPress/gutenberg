@@ -234,6 +234,7 @@ function DataViews< Item >( {
 				getItemId,
 				getItemLevel,
 				isItemClickable,
+				isItemSelectable: () => true,
 				onClickItem,
 				renderItemLink,
 				containerWidth,

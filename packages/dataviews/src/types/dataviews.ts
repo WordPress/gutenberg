@@ -841,6 +841,13 @@ export interface ViewBaseProps< Item > {
 	isItemClickable: ( item: Item ) => boolean;
 
 	/**
+	 * Whether an item can be selected. Items that cannot be selected render
+	 * their selection indicator as disabled, ignore row-click selection, and
+	 * are left out of select-all.
+	 */
+	isItemSelectable: ( item: Item ) => boolean;
+
+	/**
 	 * The current view configuration.
 	 */
 	view: View;
