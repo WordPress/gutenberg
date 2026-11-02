@@ -2652,6 +2652,7 @@ test.describe( 'Navigation block', () => {
 
 			await expect( searchInput ).toBeHidden();
 			await expect( linkButton ).toContainText( 'example.com' );
+			await expect( linkButton ).toBeFocused();
 		} );
 
 		test( 'can add a page link to an empty link field', async ( {

@@ -402,7 +402,8 @@ describe( 'LinkPicker', () => {
 				/>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
 			const searchInput = await screen.findByRole( 'combobox', {
 				name: 'Search or type URL',
 			} );
@@ -418,6 +419,7 @@ describe( 'LinkPicker', () => {
 					name: 'Search or type URL',
 				} )
 			).not.toBeInTheDocument();
+			expect( button ).toHaveFocus();
 		} );
 	} );
 
