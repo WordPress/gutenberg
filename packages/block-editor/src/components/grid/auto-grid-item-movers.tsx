@@ -244,16 +244,25 @@ export default function AutoGridItemMovers( {
 		const neighbor = otherItems.find(
 			( candidate ) => candidate.clientId === blockOrder[ targetIndex ]
 		);
+		// Explicit blocks only affect the result of a swap when spans can
+		// make the auto-placed blocks flow around them differently.
+		const isSimpleSwap =
+			!! neighbor &&
+			item.rect.columnSpan === 1 &&
+			item.rect.rowSpan === 1 &&
+			neighbor.rect.columnSpan === 1 &&
+			neighbor.rect.rowSpan === 1;
 		const canReorder =
 			! item.isExplicit &&
 			!! neighbor &&
 			! neighbor.isExplicit &&
 			targets.includes( neighbor ) &&
-			! otherItems.some(
-				( candidate ) =>
-					candidate.isExplicit &&
-					candidate.rect.intersectsRect( nearby )
-			);
+			( isSimpleSwap ||
+				! otherItems.some(
+					( candidate ) =>
+						candidate.isExplicit &&
+						candidate.rect.intersectsRect( nearby )
+				) );
 
 		if ( canReorder ) {
 			moveBlocksToPosition(
