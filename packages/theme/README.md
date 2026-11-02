@@ -315,7 +315,7 @@ This step will:
 2. Generate primitive tokens.
 3. Build CSS and JavaScript token files.
 4. Update the design tokens documentation.
-5. Generate complete Figma border collection mode files in `prebuilt/figma`.
+5. Generate Figma-compatible token files in `prebuilt/figma`.
 6. Format all generated files.
 
 The files generated in this step will all be committed to the repo.
