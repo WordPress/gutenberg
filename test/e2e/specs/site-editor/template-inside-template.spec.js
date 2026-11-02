@@ -162,9 +162,15 @@ test.describe( 'Template rendered inside another template', () => {
 				name: isSiteEditorV2 ? 'Back' : 'Open Navigation',
 			} )
 			.click();
+		/*
+		 * The preview of a card and its title are both buttons that open the
+		 * template, and they carry the same name, so the title is named by its
+		 * own class rather than by role.
+		 */
 		await page
-			.locator( '.dataviews-view-grid__card' )
-			.getByRole( 'button', { name: 'Layout', exact: true } )
+			.locator( '.dataviews-view-grid__title-field', {
+				hasText: /^Layout$/,
+			} )
 			.click();
 
 		const paragraph = editor.canvas.getByText( 'Shared header' );
