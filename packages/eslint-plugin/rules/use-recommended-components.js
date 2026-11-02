@@ -130,6 +130,8 @@ const DENYLIST = {
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
 		CheckboxControl:
 			'Use `CheckboxControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide',
+		CustomGradientPicker:
+			'Use `GradientPicker` with `clearable={ false }` instead.',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
